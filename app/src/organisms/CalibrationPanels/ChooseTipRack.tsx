@@ -81,12 +81,12 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
   })?.data?.[mount].id
 
   const pipetteOffsetCal = useSelector((state: State) =>
-    robotName && pipSerial
+    robotName != null && pipSerial != null
       ? getCalibrationForPipette(state, robotName, pipSerial, mount)
       : null
   )
   const tipLengthCal = useSelector((state: State) =>
-    robotName && pipSerial && pipetteOffsetCal
+    robotName != null && pipSerial != null && pipetteOffsetCal != null
       ? getTipLengthForPipetteAndTiprack(
           state,
           robotName,
@@ -96,13 +96,14 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
       : null
   )
   const allTipLengthCal = useSelector((state: State) =>
-    robotName ? getTipLengthCalibrations(state, robotName) : []
+    robotName != null ? getTipLengthCalibrations(state, robotName) : []
   )
   const customTipRacks = useSelector(getCustomTipRackDefinitions)
 
-  const allTipRackDefs = defaultTipracks
-    ? defaultTipracks.concat(customTipRacks)
-    : customTipRacks
+  const allTipRackDefs =
+    defaultTipracks != null
+      ? defaultTipracks.concat(customTipRacks)
+      : customTipRacks
   const tipRackByUriMap = allTipRackDefs.reduce<TipRackMap>((obj, lw) => {
     if (lw) {
       obj[getLabwareDefURI(lw)] = {
@@ -117,8 +118,8 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
           // Old tip length data don't have tiprack uri info, so we are using the
           // tiprack hash in pipette offset to check against tip length cal for
           // backward compatability purposes
-          (pipetteOffsetCal &&
-          tipLengthCal &&
+          (pipetteOffsetCal != null &&
+          tipLengthCal != null &&
           pipetteOffsetCal.tiprackUri === getLabwareDefURI(lw)
             ? tipLengthCal
             : null),
@@ -127,9 +128,10 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     return obj
   }, {})
 
-  const opentronsTipRacksOptions: SelectOption[] = defaultTipracks
-    ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
-    : []
+  const opentronsTipRacksOptions: SelectOption[] =
+    defaultTipracks != null
+      ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
+      : []
   const customTipRacksOptions: SelectOption[] = customTipRacks.map(lw =>
     formatOptionsFromLabwareDef(lw)
   )
@@ -151,7 +153,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
   const [selectedValue, setSelectedValue] = React.useState<
     SingleValue<SelectOption> | MultiValue<SelectOption>
   >(
-    chosenTipRack
+    chosenTipRack != null
       ? formatOptionsFromLabwareDef(chosenTipRack)
       : formatOptionsFromLabwareDef(tipRack.definition)
   )
@@ -160,7 +162,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     selected: SingleValue<SelectOption> | MultiValue<SelectOption>,
     _: unknown
   ): void => {
-    selected && setSelectedValue(selected)
+    selected != null && setSelectedValue(selected)
   }
   const handleUseTipRack = (): void => {
     const value = (selectedValue as SelectOption).value

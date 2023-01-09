@@ -387,9 +387,7 @@ class LabwarePositionCheck:
 
     def get_labware_position_check_button(self) -> WebElement:
         """Button to locate LPC button."""
-        button = self.base.clickable_wrapper(
-            self.labware_setup_position_check_button, 2
-        )
+        button = self.base.clickable_wrapper(self.labware_setup_position_check_button, 2)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(button).perform()  # type: ignore
         return button
@@ -400,9 +398,7 @@ class LabwarePositionCheck:
 
     def get_close_and_apply_labware_offset_data_button(self) -> WebElement:
         """Button to close and apply labware oddset data on LPC flow."""
-        return self.base.clickable_wrapper(
-            self.close_and_apply_labware_offset_data_button, 2
-        )
+        return self.base.clickable_wrapper(self.close_and_apply_labware_offset_data_button, 2)
 
     def get_section_list_step2(self) -> WebElement:
         """Element to locate the section list step2."""
@@ -426,18 +422,14 @@ class LabwarePositionCheck:
 
     def click_labware_position_button(self) -> None:
         """Click labware position button."""
-        button = self.base.clickable_wrapper(
-            self.labware_setup_position_check_button, 2
-        )
+        button = self.base.clickable_wrapper(self.labware_setup_position_check_button, 2)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(button).perform()  # type: ignore
         self.base.click(self.labware_setup_position_check_button)
 
     def get_introScreen_labware_position_check_overview(self) -> WebElement:
         """Element to locate into screen of LPC overview."""
-        return self.base.clickable_wrapper(
-            self.introScreen_labware_position_check_overview, 2
-        )
+        return self.base.clickable_wrapper(self.introScreen_labware_position_check_overview, 2)
 
     def get_begin_labware_position_check_button(self) -> WebElement:
         """Element to locate begin LPC button."""
@@ -513,9 +505,7 @@ class LabwarePositionCheck:
 
     def get_confirm_position_button_pickup_tip(self) -> WebElement:
         """Locator for confirm position button pickup."""
-        toggle: WebElement = self.base.clickable_wrapper(
-            self.confirm_position_button_pickup_tip, 5
-        )
+        toggle: WebElement = self.base.clickable_wrapper(self.confirm_position_button_pickup_tip, 5)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
@@ -527,9 +517,7 @@ class LabwarePositionCheck:
 
     def get_confirm_position_moveto_slot_2(self) -> WebElement:
         """Locator for confirm position moveto slot."""
-        toggle: WebElement = self.base.clickable_wrapper(
-            self.confirm_position_moveto_slot_2, 5
-        )
+        toggle: WebElement = self.base.clickable_wrapper(self.confirm_position_moveto_slot_2, 5)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
@@ -541,9 +529,7 @@ class LabwarePositionCheck:
 
     def get_confirm_position_moveto_slot_5(self) -> WebElement:
         """Locator for confirm position move to slot."""
-        toggle: WebElement = self.base.clickable_wrapper(
-            self.confirm_position_moveto_slot_5, 5
-        )
+        toggle: WebElement = self.base.clickable_wrapper(self.confirm_position_moveto_slot_5, 5)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
@@ -555,9 +541,7 @@ class LabwarePositionCheck:
 
     def get_confirm_position_moveto_slot_6(self) -> WebElement:
         """Locator for confirm position moveto slot."""
-        toggle: WebElement = self.base.clickable_wrapper(
-            self.confirm_position_moveto_slot_6, 5
-        )
+        toggle: WebElement = self.base.clickable_wrapper(self.confirm_position_moveto_slot_6, 5)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(toggle).perform()  # type: ignore
         return toggle

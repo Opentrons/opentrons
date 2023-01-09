@@ -16,6 +16,7 @@ import {
   PipetteModelSpecs,
   PipetteName,
 } from '@opentrons/shared-data'
+import * as Config from '../../../redux/config'
 import type { Mount } from '../../../redux/pipettes/types'
 
 interface PipetteOverflowMenuProps {
@@ -42,6 +43,10 @@ export const PipetteOverflowMenu = (
     isPipetteCalibrated,
   } = props
 
+  const enableCalibrationWizards = Config.useFeatureFlag(
+    'enableCalibrationWizards'
+  )
+
   const pipetteName =
     pipetteSpecs?.name != null ? pipetteSpecs.name : t('empty')
   const pipetteDisplayName =
@@ -65,39 +70,56 @@ export const PipetteOverflowMenu = (
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
         top="2.6rem"
-        right={`calc(50% + ${SPACING.spacing2})`}
+        right={`calc(50% + ${String(SPACING.spacing2)})`}
         flexDirection={DIRECTION_COLUMN}
       >
         {pipetteDisplayName === 'Empty' ? (
           <MenuItem
-            key={`${pipetteDisplayName}_${mount}_attach_pipette`}
+            key={`${String(pipetteDisplayName)}_${mount}_attach_pipette`}
             onClick={() => handleChangePipette()}
-            data-testid={`pipetteOverflowMenu_attach_pipette_btn_${pipetteDisplayName}_${mount}`}
+            data-testid={`pipetteOverflowMenu_attach_pipette_btn_${String(
+              pipetteDisplayName
+            )}_${mount}`}
           >
             {t('attach_pipette')}
           </MenuItem>
         ) : (
           <>
+            {enableCalibrationWizards ? (
+              // Only show calibration option [RAUT-93]
+              isPipetteCalibrated ? null : (
+                <MenuItem
+                  key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
+                  onClick={() => handleCalibrate()}
+                  data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
+                >
+                  {t(calibratePipetteText)}
+                </MenuItem>
+              )
+            ) : (
+              <MenuItem
+                key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
+                onClick={() => handleCalibrate()}
+                data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
+              >
+                {t(
+                  isPipetteCalibrated
+                    ? recalibratePipetteText
+                    : calibratePipetteText
+                )}
+              </MenuItem>
+            )}
             <MenuItem
-              key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
-              onClick={() => handleCalibrate()}
-              data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
-            >
-              {t(
-                isPipetteCalibrated
-                  ? recalibratePipetteText
-                  : calibratePipetteText
-              )}
-            </MenuItem>
-            <MenuItem
-              key={`${pipetteDisplayName}_${mount}_detach`}
+              key={`${String(pipetteDisplayName)}_${mount}_detach`}
               onClick={() => handleChangePipette()}
-              data-testid={`pipetteOverflowMenu_detach_pipette_btn_${pipetteDisplayName}_${mount}`}
+              data-testid={`pipetteOverflowMenu_detach_pipette_btn_${String(
+                pipetteDisplayName
+              )}_${mount}`}
             >
               {t('detach_pipette')}
             </MenuItem>
             <MenuItem
-              key={`${pipetteDisplayName}_${mount}_about_pipette`}
+              key={`${String(pipetteDisplayName)}_${mount}_about_pipette`}
               onClick={() => handleAboutSlideout()}
               data-testid={`pipetteOverflowMenu_about_pipette_slideout_btn_${pipetteDisplayName}_${mount}`}
             >
@@ -106,9 +128,11 @@ export const PipetteOverflowMenu = (
             <Divider marginY="0" />
             {!isOT3PipetteAttached && (
               <MenuItem
-                key={`${pipetteDisplayName}_${mount}_view_settings`}
+                key={`${String(pipetteDisplayName)}_${mount}_view_settings`}
                 onClick={() => handleSettingsSlideout()}
-                data-testid={`pipetteOverflowMenu_view_settings_btn_${pipetteDisplayName}_${mount}`}
+                data-testid={`pipetteOverflowMenu_view_settings_btn_${String(
+                  pipetteDisplayName
+                )}_${mount}`}
               >
                 {t('view_pipette_setting')}
               </MenuItem>

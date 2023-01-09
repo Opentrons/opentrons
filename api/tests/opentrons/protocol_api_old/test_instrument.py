@@ -8,6 +8,8 @@ from opentrons.protocols.api_support.types import APIVersion
 
 import opentrons.protocol_api as papi
 
+pytestmark = pytest.mark.ot2_only
+
 
 @pytest.fixture
 def make_context_and_labware(hardware):

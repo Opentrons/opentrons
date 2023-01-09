@@ -8,7 +8,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     TemperatureStatus,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
 
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
@@ -28,7 +28,7 @@ def mock_geometry(decoy: Decoy) -> ModuleGeometry:
 @pytest.fixture
 def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[TempDeck]:
     """Get a mock synchronous temperature module hardware."""
-    return decoy.mock(name="SynchronousAdapater[TempDeck]")  # type: ignore[no-any-return]
+    return decoy.mock(name="SynchronousAdapter[TempDeck]")  # type: ignore[no-any-return]
 
 
 @pytest.fixture

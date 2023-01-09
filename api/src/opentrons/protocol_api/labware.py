@@ -14,11 +14,12 @@ import logging
 from itertools import dropwhile
 from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple
 
-from opentrons.types import Location, Point, LocationLabware
+from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
+
+from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version
+from opentrons.protocols.api_support.util import requires_version, APIVersionError
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -32,17 +33,16 @@ from opentrons.protocols.labware import (  # noqa: F401
 from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
-from .core.protocol_api.labware import LabwareImplementation
+from .core.module import AbstractModuleCore
+from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.core_map import LoadedCoreMap
+from .core.protocol_api.well import WellImplementation as LegacyWellCore
+from .core.protocol_api.well_geometry import WellGeometry
+
 
 if TYPE_CHECKING:
-    from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
-        ModuleGeometry,
-    )
-    from opentrons_shared_data.labware.dev_types import (
-        LabwareDefinition,
-        LabwareParameters,
-    )
-    from .core.common import LabwareCore, WellCore
+    from .core.common import LabwareCore, WellCore, ProtocolCore
+    from .protocol_context import ModuleTypes
 
 
 _log = logging.getLogger(__name__)
@@ -113,12 +113,14 @@ class Well:
 
     @property
     def geometry(self) -> WellGeometry:
-        return self._impl.geometry
+        if isinstance(self._impl, LegacyWellCore):
+            return self._impl.geometry
+        raise APIVersionError("Well.geometry has been deprecated.")
 
     @property  # type: ignore
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
-        return self.geometry.diameter
+        return self._impl.diameter
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -127,7 +129,7 @@ class Well:
         The length of a well, if the labware has
         square wells.
         """
-        return self.geometry._length
+        return self._impl.length
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -136,7 +138,7 @@ class Well:
         The width of a well, if the labware has
         square wells.
         """
-        return self.geometry._width
+        return self._impl.width
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -144,7 +146,7 @@ class Well:
         """
         The depth of a well in a labware.
         """
-        return self.geometry._depth
+        return self._impl.depth
 
     @property
     def display_name(self) -> str:
@@ -207,7 +209,7 @@ class Well:
         :return: a :py:class:`opentrons.types.Point` representing the specified
                  location in absolute deck coordinates
         """
-        return self.geometry.from_center_cartesian(x, y, z)
+        return self._impl.from_center_cartesian(x, y, z)
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
@@ -267,6 +269,8 @@ class Labware:
         self,
         implementation: AbstractLabware[Any],
         api_version: APIVersion,
+        protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
     ) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -282,6 +286,8 @@ class Labware:
 
         self._api_version = api_version
         self._implementation: LabwareCore = implementation
+        self._protocol_core = protocol_core
+        self._core_map = core_map
 
         well_columns = implementation.get_well_columns()
         self._well_grid = well_grid.create(columns=well_columns)
@@ -322,9 +328,22 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> LocationLabware:
+    def parent(self) -> Union[str, ModuleTypes, None]:
         """The parent of this labware. Usually a slot name."""
-        return self._implementation.get_geometry().parent.labware.object
+        if isinstance(self._implementation, LegacyLabwareCore):
+            # Type ignoring to preserve backwards compatibility
+            return self._implementation.get_geometry().parent.labware.object  # type: ignore
+
+        assert self._protocol_core and self._core_map, "Labware initialized incorrectly"
+
+        labware_location = self._protocol_core.get_labware_location(
+            self._implementation
+        )
+
+        if isinstance(labware_location, AbstractModuleCore):
+            return self._core_map.get(labware_location)
+
+        return labware_location
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -834,12 +853,14 @@ def load_from_definition(
                       defaults to ``MAX_SUPPORTED_VERSION``.
     """
     return Labware(
-        implementation=LabwareImplementation(
+        implementation=LegacyLabwareCore(
             definition=definition,
             parent=parent,
             label=label,
         ),
         api_version=api_level or MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
 

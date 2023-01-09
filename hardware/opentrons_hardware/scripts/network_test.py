@@ -352,7 +352,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "network_test.log",
+            "filename": "/var/log/network_test.log",
             "maxBytes": 5000000,
             "level": logging.INFO,
             "backupCount": 3,

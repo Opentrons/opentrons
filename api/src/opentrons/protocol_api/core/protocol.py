@@ -53,7 +53,7 @@ class AbstractProtocol(
         self,
         definition: LabwareDefinition,
     ) -> LabwareLoadParams:
-        """Add a labware defintion to the set of loadable definitions."""
+        """Add a labware definition to the set of loadable definitions."""
         ...
 
     @abstractmethod
@@ -155,6 +155,12 @@ class AbstractProtocol(
         """Get the contents of a given slot, if any."""
 
     @abstractmethod
+    def get_labware_on_module(
+        self, module_core: ModuleCoreType
+    ) -> Optional[LabwareCoreType]:
+        """Get the labware on a given module, if any."""
+
+    @abstractmethod
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
 
@@ -169,3 +175,9 @@ class AbstractProtocol(
     @abstractmethod
     def get_module_cores(self) -> List[ModuleCoreType]:
         """Get all loaded module cores."""
+
+    @abstractmethod
+    def get_labware_location(
+        self, labware_core: LabwareCoreType
+    ) -> Union[DeckSlotName, ModuleCoreType, None]:
+        """Get labware parent location."""

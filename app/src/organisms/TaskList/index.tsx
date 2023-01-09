@@ -19,6 +19,8 @@ import {
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
+import type { SubTaskProps, TaskListProps, TaskProps } from './types'
+
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null
   subTasks: SubTaskProps[]
@@ -56,7 +58,9 @@ function ProgressTrackerItem({
       marginTop="-0.75rem"
       // shorten connector length when subtasks are present
       marginBottom={
-        hasSubTasks ? `-${SPACING.spacing3}` : `-${SPACING.spacingM}`
+        hasSubTasks
+          ? `-${String(SPACING.spacing3)}`
+          : `-${String(SPACING.spacingM)}`
       }
       height="100%"
     />
@@ -152,23 +156,21 @@ function ProgressTrackerItem({
                 {/* subtask connector component */}
                 <Flex
                   flex="1"
-                  borderLeft={
+                  borderLeft={BORDERS.lineBorder}
+                  borderColor={
                     // do not show the subtask connector if it's the final subtask of the task list
                     isFinalSubTaskOfTaskList
-                      ? BORDERS.transparentLineBorder
-                      : BORDERS.lineBorder
-                  }
-                  borderColor={
-                    isTaskListComplete || isPastSubTask
+                      ? COLORS.transparent
+                      : isTaskListComplete || isPastSubTask
                       ? COLORS.blueEnabled
-                      : ''
+                      : COLORS.medGreyEnabled
                   }
-                  marginTop={`-${SPACING.spacing3}`}
+                  marginTop={`-${String(SPACING.spacing3)}`}
                   marginBottom={
                     // extend connector for last subtask
                     isLastSubTask
-                      ? `-${SPACING.spacingM}`
-                      : `-${SPACING.spacing3}`
+                      ? `-${String(SPACING.spacingM)}`
+                      : `-${String(SPACING.spacing3)}`
                   }
                   height="100%"
                 />
@@ -179,22 +181,6 @@ function ProgressTrackerItem({
       )}
     </Flex>
   )
-}
-
-interface SubTaskCTA {
-  label: string
-  onClick: () => void
-}
-
-interface SubTaskProps {
-  activeIndex: [number, number] | null
-  description: string
-  subTaskIndex: number
-  taskIndex: number
-  title: string
-  cta?: SubTaskCTA
-  footer?: string
-  isComplete?: boolean
 }
 
 function SubTask({
@@ -253,11 +239,6 @@ function SubTask({
       ) : null}
     </Flex>
   )
-}
-
-interface TaskProps extends Omit<SubTaskProps, 'subTaskIndex'> {
-  subTasks: SubTaskProps[]
-  taskListLength: number
 }
 
 function Task({
@@ -367,13 +348,6 @@ function Task({
       </Flex>
     </Flex>
   )
-}
-
-interface TaskListProps {
-  // activeIndex: a tuple [i, j] indicating activeTaskIndex i and activeSubtaskIndex j
-  // null activeIndex: all tasks complete
-  activeIndex: [number, number] | null
-  taskList: TaskProps[]
 }
 
 export function TaskList({

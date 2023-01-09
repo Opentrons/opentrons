@@ -305,7 +305,12 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
 
-        labware = Labware(implementation=labware_core, api_version=self._api_version)
+        labware = Labware(
+            implementation=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._implementation,
+            core_map=self._core_map,
+        )
         self._core_map.add(labware_core, labware)
 
         return labware
@@ -731,7 +736,10 @@ class ProtocolContext(CommandPublisher):
     def _load_fixed_trash(self) -> None:
         fixed_trash_core = self._implementation.fixed_trash
         fixed_trash = Labware(
-            implementation=fixed_trash_core, api_version=self._api_version
+            implementation=fixed_trash_core,
+            api_version=self._api_version,
+            protocol_core=self._implementation,
+            core_map=self._core_map,
         )
         self._core_map.add(fixed_trash_core, fixed_trash)
 

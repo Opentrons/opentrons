@@ -301,6 +301,7 @@ def test_loaded_labware(
 def test_move_labware_to_slot(
     decoy: Decoy,
     mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     subject: ProtocolContext,
 ) -> None:
     """It should move labware to new slot location."""
@@ -313,6 +314,8 @@ def test_move_labware_to_slot(
     movable_labware = Labware(
         implementation=mock_labware_core,
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
     )
     decoy.when(
         mock_validation.ensure_valid_labware_offset_vector(drop_offset)
@@ -353,13 +356,15 @@ def test_move_labware_to_module(
     movable_labware = Labware(
         implementation=mock_labware_core,
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
     )
     module_location = TemperatureModuleContext(
         core=mock_module_core,
-        protocol_core=mock_core,
-        core_map=mock_core_map,
         api_version=MAX_SUPPORTED_VERSION,
         broker=mock_broker,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
     )
 
     subject.move_labware(labware=movable_labware, new_location=module_location)
@@ -383,10 +388,8 @@ def test_load_module(
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
-    # TODO: replace with `decoy.mock(cls=TemperatureModuleCore)` with decoy >= 1.11.1
-    mock_module_core = cast(
-        TemperatureModuleCore, decoy.mock(cls=TemperatureModuleCore.__origin__)  # type: ignore[attr-defined]
-    )
+    mock_module_core = decoy.mock(cls=TemperatureModuleCore)
+
     decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
@@ -417,11 +420,8 @@ def test_load_module_default_location(
     mock_core: ProtocolCore,
     subject: ProtocolContext,
 ) -> None:
-    """It should load a module without specifying a location explicitely."""
-    # TODO: replace with `decoy.mock(cls=TemperatureModuleCore)` with decoy >= 1.11.1
-    mock_module_core = cast(
-        TemperatureModuleCore, decoy.mock(cls=TemperatureModuleCore.__origin__)  # type: ignore[attr-defined]
-    )
+    """It should load a module without specifying a location explicitly."""
+    mock_module_core = decoy.mock(cls=TemperatureModuleCore)
 
     decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
@@ -435,7 +435,7 @@ def test_load_module_default_location(
         )
     ).then_return(mock_module_core)
 
-    decoy.when(mock_module_core.get_type()).then_return(ModuleType.TEMPERATURE)
+    decoy.when(mock_module_core.MODULE_TYPE).then_return(ModuleType.TEMPERATURE)
     decoy.when(mock_module_core.get_model()).then_return(
         TemperatureModuleModel.TEMPERATURE_V2
     )

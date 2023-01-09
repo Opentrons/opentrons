@@ -12,6 +12,7 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import {
+  useIsOT3,
   usePipetteOffsetCalibrations,
   useRobot,
 } from '../../organisms/Devices/hooks'
@@ -42,6 +43,7 @@ export function RobotSettingsPipetteOffsetCalibration({
   ])
 
   const robot = useRobot(robotName)
+  const isOT3 = useIsOT3(robotName)
   const enableCalibrationWizards = Config.useFeatureFlag(
     'enableCalibrationWizards'
   )
@@ -64,11 +66,15 @@ export function RobotSettingsPipetteOffsetCalibration({
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('pipette_offset_calibrations_title')}
+              {isOT3
+                ? t('pipette_calibrations_title')
+                : t('pipette_offset_calibrations_title')}
             </Box>
             <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {/* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */}
-              {enableCalibrationWizards
+              {isOT3
+                ? t('pipette_calibrations_description')
+                : /* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */
+                enableCalibrationWizards
                 ? t('pipette_offset_calibrations_description')
                 : t('pipette_offset_calibrations_description_legacy')}
             </StyledText>

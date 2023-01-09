@@ -135,6 +135,8 @@ jobs:
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+      - name: setup-js
+        run: |
           make setup-js
       - name: 'test native(er) packages'
         run: |

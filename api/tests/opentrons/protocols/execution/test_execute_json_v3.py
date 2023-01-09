@@ -1,6 +1,6 @@
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.well import WellImplementation
+from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
 
 from unittest import mock
 from copy import deepcopy
@@ -56,6 +56,8 @@ def test_get_well(minimal_labware_def2):
     some_labware = labware.Labware(
         implementation=LabwareImplementation(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}
@@ -116,6 +118,8 @@ def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
     trash_labware = labware.Labware(
         implementation=LabwareImplementation(trash_labware_def, deck),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
     loaded_labware = {"someLabwareId": trash_labware}
@@ -206,6 +210,8 @@ def test_air_gap(minimal_labware_def2):
     some_labware = labware.Labware(
         implementation=LabwareImplementation(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}
@@ -459,6 +465,7 @@ def test_dispatch_json_invalid_command():
         )
 
 
+@pytest.mark.ot2_only
 def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture("3", "testAllAtomicSingleV3", False)
     protocol = parse(protocol_data, None)
