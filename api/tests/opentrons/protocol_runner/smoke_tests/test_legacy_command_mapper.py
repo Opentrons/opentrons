@@ -3,11 +3,13 @@
 Legacy ProtocolContext objects are prohibitively difficult to instansiate
 and mock in an isolated unit test environment.
 """
-import pytest
 import textwrap
 from datetime import datetime
-from decoy import matchers
 from pathlib import Path
+from typing import List
+
+import pytest
+from decoy import matchers
 
 from opentrons.protocol_engine import (
     commands,
@@ -21,113 +23,115 @@ from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
-    """
-    # my protocol
 
-    from opentrons.types import Location, Point
+async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Command]:
+    protocol_reader = ProtocolReader()
+    protocol_source = await protocol_reader.read_saved(
+        files=[protocol_file],
+        directory=None,
+    )
+    subject = await create_simulating_runner()
+    result = await subject.run(protocol_source)
+    assert result.state_summary.errors == []
+    return result.commands
 
-    metadata = {
-        "apiLevel": "2.1",
-    }
 
-    def run(ctx):
-        tip_rack_1 = ctx.load_labware(
-            load_name="opentrons_96_tiprack_300ul",
-            location="1",
-        )
-        tip_rack_2 = ctx.load_labware(
-            load_name="opentrons_96_tiprack_300ul",
-            location="2",
-        )
-        module_1 = ctx.load_module("tempdeck", "4")
-        well_plate_1 = ctx.load_labware(
-            load_name="opentrons_96_aluminumblock_nest_wellplate_100ul",
-            location="3",
-        )
-        module_plate_1 = module_1.load_labware(
-            "opentrons_96_aluminumblock_nest_wellplate_100ul"
-        )
-        pipette_left = ctx.load_instrument(
-            instrument_name="p300_single",
-            mount="left",
-            tip_racks=[tip_rack_1],
-        )
-        pipette_right = ctx.load_instrument(
-            instrument_name="p300_multi",
-            mount="right",
-        )
-        pipette_left.pick_up_tip(
-            location=tip_rack_1.wells_by_name()["A1"],
-        )
-        pipette_right.pick_up_tip(
-            location=tip_rack_2.wells_by_name()["A1"].top(),
-        )
-        pipette_left.drop_tip()
-        pipette_left.pick_up_tip()
-        pipette_left.aspirate(
-            volume=40,
-            rate=1.0,
-            location=module_plate_1["A1"],
-        )
-        pipette_left.dispense(
-            volume=35,
-            rate=1.2,
-            location=well_plate_1["B1"],
-        )
-        pipette_left.aspirate(
-            volume=40,
-            location=well_plate_1.wells_by_name()["A1"],
-        )
-        pipette_left.dispense(
-            volume=35,
-            location=module_plate_1.wells_by_name()["B1"],
-        )
-        pipette_left.blow_out(
-            location=well_plate_1.wells_by_name()["B1"].top(),
-        )
-        pipette_left.aspirate(50)
-        pipette_left.dispense(50)
-        pipette_left.blow_out(
-            location=module_plate_1["B1"].top(),
-        )
-        pipette_left.aspirate()
-        pipette_left.dispense()
-        pipette_left.blow_out()
-        pipette_left.move_to(Location(point=Point(100, 100, 10),labware=None))
-        pipette_left.aspirate()
-        pipette_left.dispense()
-        pipette_left.blow_out()
-        pipette_left.aspirate(50, well_plate_1["D1"].bottom().move(point=Point(100, 10, 0)))
-        pipette_left.dispense(50, well_plate_1["F1"].top().move(point=Point(10, 10, 0)))
-        pipette_left.aspirate(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
-        pipette_left.dispense(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
-        pipette_left.drop_tip(
-            location=tip_rack_1.wells_by_name()["A1"]
-        )
-    """
-)
+# TODO(mm, 2023-01-09): Split this up into smaller, more focused tests.
+BIG_PROTOCOL = """\
+from opentrons.types import Location, Point
+
+metadata = {
+    "apiLevel": "2.1",
+}
+
+def run(ctx):
+    tip_rack_1 = ctx.load_labware(
+        load_name="opentrons_96_tiprack_300ul",
+        location="1",
+    )
+    tip_rack_2 = ctx.load_labware(
+        load_name="opentrons_96_tiprack_300ul",
+        location="2",
+    )
+    module_1 = ctx.load_module("tempdeck", "4")
+    well_plate_1 = ctx.load_labware(
+        load_name="opentrons_96_aluminumblock_nest_wellplate_100ul",
+        location="3",
+    )
+    module_plate_1 = module_1.load_labware(
+        "opentrons_96_aluminumblock_nest_wellplate_100ul"
+    )
+    pipette_left = ctx.load_instrument(
+        instrument_name="p300_single",
+        mount="left",
+        tip_racks=[tip_rack_1],
+    )
+    pipette_right = ctx.load_instrument(
+        instrument_name="p300_multi",
+        mount="right",
+    )
+    pipette_left.pick_up_tip(
+        location=tip_rack_1.wells_by_name()["A1"],
+    )
+    pipette_right.pick_up_tip(
+        location=tip_rack_2.wells_by_name()["A1"].top(),
+    )
+    pipette_left.drop_tip()
+    pipette_left.pick_up_tip()
+    pipette_left.aspirate(
+        volume=40,
+        rate=1.0,
+        location=module_plate_1["A1"],
+    )
+    pipette_left.dispense(
+        volume=35,
+        rate=1.2,
+        location=well_plate_1["B1"],
+    )
+    pipette_left.aspirate(
+        volume=40,
+        location=well_plate_1.wells_by_name()["A1"],
+    )
+    pipette_left.dispense(
+        volume=35,
+        location=module_plate_1.wells_by_name()["B1"],
+    )
+    pipette_left.blow_out(
+        location=well_plate_1.wells_by_name()["B1"].top(),
+    )
+    pipette_left.aspirate(50)
+    pipette_left.dispense(50)
+    pipette_left.blow_out(
+        location=module_plate_1["B1"].top(),
+    )
+    pipette_left.aspirate()
+    pipette_left.dispense()
+    pipette_left.blow_out()
+    pipette_left.move_to(Location(point=Point(100, 100, 10),labware=None))
+    pipette_left.aspirate()
+    pipette_left.dispense()
+    pipette_left.blow_out()
+    pipette_left.aspirate(50, well_plate_1["D1"].bottom().move(point=Point(100, 10, 0)))
+    pipette_left.dispense(50, well_plate_1["F1"].top().move(point=Point(10, 10, 0)))
+    pipette_left.aspirate(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
+    pipette_left.dispense(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
+    pipette_left.drop_tip(
+        location=tip_rack_1.wells_by_name()["A1"]
+    )
+"""
 
 
 @pytest.fixture
-def legacy_commands_protocol_file(tmp_path: Path) -> Path:
+def big_protocol_file(tmp_path: Path) -> Path:
     """Put the pick up tip mapping test protocol on disk."""
     path = tmp_path / "protocol-name.py"
-    path.write_text(LEGACY_COMMANDS_PROTOCOL)
+    path.write_text(BIG_PROTOCOL)
     return path
 
 
-async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
+async def test_legacy_commands(big_protocol_file: Path) -> None:
     """It should map legacy pick up tip commands."""
-    protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read_saved(
-        files=[legacy_commands_protocol_file],
-        directory=None,
-    )
-
-    subject = await create_simulating_runner()
-    result = await subject.run(protocol_source)
-    commands_result = result.commands
+    commands_result = await simulate_and_get_commands(big_protocol_file)
 
     tiprack_1_result_captor = matchers.Captor()
     tiprack_2_result_captor = matchers.Captor()
@@ -615,3 +619,41 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DropTipResult(),
     )
+
+
+# A protocol with aspirates and dispenses with volume=0.
+ZERO_VOLUME_LIQUID_HANDLING_PROTOCOL = """\
+metadata = {"apiLevel": "2.0"}
+
+def run(ctx):
+    # Prep:
+    tip_rack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+    well_plate = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 2)
+    pipette = ctx.load_instrument("p300_single_gen2", mount="left", tip_racks=[tip_rack])
+    pipette.pick_up_tip()
+
+    # Test:
+    pipette.aspirate(0, well_plate["A1"])
+    pipette.dispense(0, well_plate["B2"])
+"""
+
+
+@pytest.fixture
+def zero_volume_liquid_handling_protocol_file(tmp_path: Path) -> Path:
+    path = tmp_path / "protocol-name.py"
+    path.write_text(ZERO_VOLUME_LIQUID_HANDLING_PROTOCOL)
+    return path
+
+
+async def test_zero_volume_liquid_handling_commands(zero_volume_liquid_handling_protocol_file: Path) -> None:
+    """It should map legacy pick up tip commands."""
+    commands_result = await simulate_and_get_commands(zero_volume_liquid_handling_protocol_file)
+    # TODO: Why are we getting this far? Shouldn't the above raise an error since I
+    # removed the .construct()s?
+    # Looks like this test doesn't work when aspirate() comes before dispense().
+    # If dispense() is alone, it does what I expect.
+    # Is there a way to trigger this bug on aspirate()?
+    assert commands_result == []
+
+
+# TODO: Test invalid rates and volumes raise an exception?
