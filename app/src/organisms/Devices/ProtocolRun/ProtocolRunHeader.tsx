@@ -1,4 +1,5 @@
 import * as React from 'react'
+import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
@@ -20,7 +21,7 @@ import {
   useModulesQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import { HEATERSHAKER_MODULE_TYPE, RunTimeCommand } from '@opentrons/shared-data'
 import {
   Box,
   Flex,
@@ -63,6 +64,7 @@ import {
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
 import {
@@ -81,6 +83,9 @@ import { EMPTY_TIMESTAMP } from '../constants'
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { head } from 'lodash'
+import { Portal } from '../../../App/portal'
+import { single } from 'rxjs/operators'
 
 const EQUIPMENT_POLL_MS = 5000
 
@@ -88,6 +93,7 @@ interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
+  makeHandleJumpToStep: (index: number) => () => void
 }
 
 function RunTimer({
@@ -115,10 +121,15 @@ function RunTimer({
   return <StyledText css={TYPOGRAPHY.pRegular}>{runTime}</StyledText>
 }
 
+const MIN_AGGREGATION_PERCENT = 8
+const X_MARGIN_PERCENT = 0.5
+const HEAD_SIZE_PERCENT = 1.5
+
 export function ProtocolRunHeader({
   protocolRunHeaderRef,
   robotName,
   runId,
+  makeHandleJumpToStep,
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const history = useHistory()
@@ -145,6 +156,34 @@ export function ProtocolRunHeader({
   // NOTE: we are polling pipettes, though not using their value directly here
   usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+
+  const [selectedCommandType, setSelectedCommandType] = React.useState('')
+  const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
+  const analysisCommands = robotSideAnalysis?.commands ?? []
+  const uniqCommandTypes = analysisCommands.reduce<Array<RunTimeCommand['commandType']>>(
+    (acc, c) => {
+      if (acc.includes(c.commandType)) {
+        return acc
+      } else {
+        return [...acc, c.commandType]
+      }
+    },
+    []
+  )
+  const commandBufferCount = analysisCommands.length * 0.01 * MIN_AGGREGATION_PERCENT
+  const ticks = analysisCommands.reduce<Array<{ index: number, count: number }>>((acc, c, index) => {
+    if (selectedCommandType === c.commandType) {
+      const mostRecentTick = last(acc)
+      if (mostRecentTick == null) {
+        return [...acc, { index, count: 1 }]
+      } else if ((index - mostRecentTick.index) > commandBufferCount) {
+        return [...acc, { index, count: 1 }]
+      } else {
+        return [...acc.slice(0, -1), { index: mostRecentTick.index, count: mostRecentTick.count + 1 }]
+      }
+    }
+    return acc
+  }, [])
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -304,7 +343,7 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
     isRobotOnWrongVersionOfSoftware
 
-  let handleButtonClick = (): void => {}
+  let handleButtonClick = (): void => { }
   let buttonIconName: IconName | null = null
   let buttonText: string = ''
 
@@ -546,7 +585,7 @@ export function ProtocolRunHeader({
         <Banner type="warning">{`${t('run_canceled')}.`}</Banner>
       ) : null}
       {isCurrentRun ? clearProtocolBanner : null}
-      <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
+      <Box display="grid" gridTemplateColumns="3fr 3fr 3fr 3fr 3fr">
         <Box>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -616,6 +655,9 @@ export function ProtocolRunHeader({
             completedAt={completedAt}
           />
         </Box>
+        <select onChange={(e) => setSelectedCommandType(e.target.value)}>
+          {uniqCommandTypes.map(cT => <option value={cT}>{cT}</option>)}
+        </select>
         {showIsShakingModal &&
           activeHeaterShaker != null &&
           isHeaterShakerInProtocol &&
@@ -646,7 +688,8 @@ export function ProtocolRunHeader({
           )}
         </Box>
       </Box>
-      {protocolRunningContent}
+      {/* {protocolRunningContent} */}
+      <ProgressMeter {...{ ticks, makeHandleJumpToStep, analysisCommands }} currentRunCommandIndex={1100} />
       {showConfirmCancelModal ? (
         <ConfirmCancelModal
           onClose={() => setShowConfirmCancelModal(false)}
@@ -654,5 +697,52 @@ export function ProtocolRunHeader({
         />
       ) : null}
     </Flex>
+  )
+}
+
+interface ProgressMeterProps {
+  analysisCommands: RunTimeCommand[]
+  ticks: Array<{ index: number, count: number }>
+  makeHandleJumpToStep: (i: number) => () => void
+  currentRunCommandIndex: number
+}
+function ProgressMeter(props: ProgressMeterProps) {
+  const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
+  const innerXMargin = analysisCommands.length * 0.01 * X_MARGIN_PERCENT
+  const headSize = analysisCommands.length * 0.01 * HEAD_SIZE_PERCENT
+  return (
+    <svg width="100%" height="40px" viewBox={`${-1 * innerXMargin} 0 ${analysisCommands.length + innerXMargin} ${headSize * 2}`}>
+      <rect stroke={COLORS.blueEnabled} fill="#fff" x="0" y={headSize * 3 / 4} height={headSize / 2} width={analysisCommands.length} />
+      <rect fill={COLORS.blueEnabled} x="0" y={headSize * 3 / 4} height={headSize / 2} width={currentRunCommandIndex} />
+      {ticks.map((tick) => (
+        <Tick {...{ ...tick, makeHandleJumpToStep, headSize }} />
+      ))}
+    </svg>
+  )
+}
+
+function Tick(props: { index: number, count: number, makeHandleJumpToStep: (i: number) => () => void, headSize: number }) {
+  const { index, count, makeHandleJumpToStep, headSize } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const isAggregatedTick = count > 1
+  const height = headSize * 2
+  const singleWidth = height/4
+  const aggregateWidth= height*3/4
+  const strokeWidth = height / 20
+  return (
+    <>
+      <g {...targetProps} onClick={makeHandleJumpToStep(index)}>
+        {isAggregatedTick
+          ? <>
+            <rect x={index + (headSize * 3 / 8)} y='0' height={height} width={aggregateWidth} fill="#fff" stroke={COLORS.blueEnabled} strokeWidth={strokeWidth} ry={height/4} rx={aggregateWidth/2} />
+            <text x={index + (aggregateWidth*(count >=10 ? 3/8 : 9/16))} y={height*5/8} color="black" fontSize={headSize}>{count}</text>
+          </>
+          : <rect x={index + (headSize * 3 / 8)} y='0' height={height} width={singleWidth} fill="#fff" stroke={COLORS.blueEnabled} strokeWidth={strokeWidth} ry={singleWidth/2} rx={singleWidth/2} />
+        }
+      </g>
+      {isAggregatedTick
+        ? <Portal level="top"><Tooltip {...tooltipProps}>{count}</Tooltip> </Portal>
+        : null}
+    </>
   )
 }
