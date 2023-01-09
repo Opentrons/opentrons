@@ -30,7 +30,7 @@ jobs:
           owner: opentrons
           repo: oe-core
           workflow-id: build-ot3-actions.yml
-          ref: RCORE-468_add_releases_json
+          ref: main
           inputs: |
             {
               "oe-core-ref": "-",
@@ -53,10 +53,10 @@ jobs:
           owner: opentrons
           repo: oe-core
           workflow-id: build-ot3-actions.yml
-          ref: RCORE-468_add_releases_json
+          ref: main
           inputs: |
             {
-              "oe-core-ref": "RCORE-468_add_releases_json",
+              "oe-core-ref": "-",
               "monorepo-ref": "refs/heads/${{ github.head_ref }}",
               "infra-stage": "stage-prod"
             }
