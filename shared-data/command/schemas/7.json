@@ -6,6 +6,9 @@
       "$ref": "#/definitions/AspirateCreate"
     },
     {
+      "$ref": "#/definitions/CommentCreate"
+    },
+    {
       "$ref": "#/definitions/CustomCreate"
     },
     {
@@ -248,6 +251,48 @@
         },
         "params": {
           "$ref": "#/definitions/AspirateParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "CommentParams": {
+      "title": "CommentParams",
+      "description": "Payload required to annotate execution with a comment.",
+      "type": "object",
+      "properties": {
+        "message": {
+          "title": "Message",
+          "description": "A user-facing message",
+          "type": "string"
+        }
+      }
+    },
+    "CommentCreate": {
+      "title": "CommentCreate",
+      "description": "Comment command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "comment",
+          "enum": ["comment"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/CommentParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
