@@ -7,16 +7,9 @@ import {
   JUSTIFY_CENTER,
   Box,
 } from '@opentrons/components'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
-import {
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../hooks'
-
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import { useModuleRenderInfoForProtocolById } from '../hooks'
 
 interface ProtocolRunModuleControlsProps {
   robotName: string
@@ -35,39 +28,6 @@ export const ProtocolRunModuleControls = ({
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
     module => module.attachedModuleMatch != null
   )
-  const { protocolData } = useProtocolDetailsForRun(runId)
-  const { createCommand } = useCreateCommandMutation()
-  const loadCommands: LoadModuleRunTimeCommand[] =
-    protocolData !== null
-      ? protocolData?.commands.filter(
-          (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
-            command.commandType === 'loadModule'
-        )
-      : []
-
-  React.useEffect(() => {
-    if (protocolData != null) {
-      const setupLoadCommands = loadCommands.map(command => {
-        const commandWithModuleId = {
-          ...command,
-          params: {
-            ...command.params,
-            moduleId: command.result?.moduleId,
-          },
-        }
-        return commandWithModuleId
-      })
-
-      setupLoadCommands.forEach(loadCommand => {
-        createCommand({
-          runId: runId,
-          command: loadCommand,
-        }).catch((e: Error) => {
-          console.error(`error issuing command to robot: ${e.message}`)
-        })
-      })
-    }
-  }, [])
 
   // split modules in half and map into each column separately to avoid
   // the need for hardcoded heights without limitation, array will be split equally
