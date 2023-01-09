@@ -13,11 +13,8 @@ import {
 
 import { StyledText } from '../../atoms/text'
 
-interface CheckUpdatesProps {
-  isDownloading: boolean
-}
 // This might be a molecules component since WiFi connection part has the same screen
-function CheckUpdates({ isDownloading }: CheckUpdatesProps): JSX.Element {
+export function CheckUpdates(): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (
     <Flex

@@ -6,6 +6,7 @@ import capitalize from 'lodash/capitalize'
 
 import {
   Flex,
+  Box,
   SPACING,
   COLORS,
   Icon,
@@ -16,17 +17,19 @@ import {
 } from '@opentrons/components'
 
 import { restartRobot } from '../../redux/robot-admin'
-import { getLocalRobot, UNREACHABLE } from '../../redux/discovery'
+import { getLocalRobot } from '../../redux/discovery'
 import {
-  getBuildrootUpdateAvailable,
+  // getBuildrootUpdateAvailable,
   getBuildrootDownloadProgress,
   getBuildrootDownloadError,
   getBuildrootSession,
   startBuildrootUpdate,
+  getBuildrootUpdateDisplayInfo,
 } from '../../redux/buildroot'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { ProgressBar } from '../../atoms/ProgressBar'
+import { CheckUpdates } from '../../organisms/UpdateRobotSoftware/CheckUpdates'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -38,31 +41,55 @@ export function UpdateRobot(): JSX.Element {
     isShowCheckingUpdates,
     setIsShowCheckingUpdates,
   ] = React.useState<boolean>(true)
-  const [isDownloading, setIsDownloading] = React.useState<boolean>(false)
+  const [isDownloading, setIsDownloading] = React.useState<boolean>(true)
   const [isInstalling, setIsInstalling] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const isViewableRobot =
-    localRobot != null && localRobot.status !== UNREACHABLE
-  // For the ODD app, it is only allowed to update the robot-server version
-  // if robotUpdatetype is downgrade or reinstall, the ODD app shows No update found screen
-  const robotUpdateType = useSelector((state: State) => {
-    return isViewableRobot
-      ? getBuildrootUpdateAvailable(state, localRobot)
-      : null
+  // const isViewableRobot =
+  //   localRobot != null && localRobot.status !== UNREACHABLE
+  // // For the ODD app, it is only allowed to update the robot-server version
+  // // if robotUpdatetype is downgrade or reinstall, the ODD app shows No update found screen
+  // const robotUpdateType = useSelector((state: State) => {
+  //   console.log(
+  //     'update available',
+  //     isViewableRobot && getBuildrootUpdateAvailable(state, localRobot)
+  //   )
+  //   return isViewableRobot
+  //     ? getBuildrootUpdateAvailable(state, localRobot)
+  //     : null
+  // })
+
+  const { autoUpdateAction } = useSelector((state: State) => {
+    return getBuildrootUpdateDisplayInfo(state, robotName)
   })
+
+  console.log('autoUpdateAction', autoUpdateAction)
+
   const downloadProgress = useSelector(getBuildrootDownloadProgress)
   const downloadError =
     useSelector(getBuildrootDownloadError) != null ? t('download_error') : null
   const session = useSelector(getBuildrootSession)
-  const { step, error: sessionError } = session || { step: null, error: null }
+  const { step, error: sessionError } = session ?? { step: null, error: null }
   const dispatch = useDispatch<Dispatch>()
 
-  React.useEffect(() => {
-    robotUpdateType != null && setIsShowCheckingUpdates(false)
-  }, [robotUpdateType])
+  console.log('step', step)
+  console.log('stage', session?.stage)
+  console.log('downloadProgress', downloadProgress)
+  console.log('downloadError', downloadError)
+  console.log('sessionError', sessionError)
 
-  console.log('robotUpdateType', robotUpdateType)
+  React.useEffect(() => {
+    // robotUpdateType != null && setIsShowCheckingUpdates(false)
+    autoUpdateAction !== 'upgrade' && setIsShowCheckingUpdates(false)
+    if (autoUpdateAction === 'upgrade') {
+      setIsShowCheckingUpdates(false)
+      setIsDownloading(true)
+    } else {
+      setIsShowCheckingUpdates(false)
+    }
+  }, [autoUpdateAction])
+
+  // console.log('robotUpdateType', robotUpdateType)
 
   React.useEffect(() => {
     if (isDownloading) {
@@ -70,104 +97,75 @@ export function UpdateRobot(): JSX.Element {
     }
   }, [isDownloading, dispatch, robotName])
 
+  React.useEffect(() => {
+    // check step & stage to handle validating software and installing software
+  })
+
   return (
     <Flex
       padding={`${String(SPACING.spacing5)} ${String(
         SPACING.spacingXXL
       )} ${String(SPACING.spacingXXL)}`}
     >
-      {isShowCheckingUpdates ? (
-        <CheckUpdates isDownloading={isDownloading} />
-      ) : (
-        <>
-          {robotUpdateType === 'reinstall' ||
-          robotUpdateType === 'downgrade' ? (
-            <NoUpdateFound />
-          ) : (
-            // Download software
-            <>
-              <UpdateSoftware
-                isDownloading={isDownloading}
-                processProgress={
-                  downloadProgress != null ? downloadProgress : 0
-                }
-              />
-              {downloadError != null ? (
-                <ErrorUpdateSoftware errorMessage={downloadError} />
-              ) : (
-                // Install software
-                <>
-                  <UpdateSoftware
-                    isDownloading={false}
-                    processProgress={session?.progress ? session.progress : 0}
-                  />
-                  {sessionError ? (
-                    <ErrorUpdateSoftware errorMessage={sessionError} />
-                  ) : (
-                    // Update complete
-                    <>
-                      {step === 'finished' ? (
-                        <CompleteUpdate
-                          robotName={robotName}
-                          dispatch={dispatch}
-                        />
-                      ) : null}
-                    </>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </>
-      )}
-
-      {/* {robotUpdateType === 'reinstall' || robotUpdateType === 'downgrade' ? (
-        <NoUpdateFound />
-      ) : (
-        <p>todo</p>
-      )} */}
-      {/* <CheckUpdates /> */}
-      {/* <UpdateSoftware /> */}
-      {/* <NoUpdateFound /> */}
-      {/* <CompleteUpdate robotName={robotName} /> */}
-      {/* <ErrorUpdateSoftware /> */}
+      {isShowCheckingUpdates ? <CheckUpdates /> : null}
+      {autoUpdateAction === 'upgrade' ? <NoUpdateFound /> : null}
+      {/* // Download software start */}
+      {isDownloading ? (
+        <UpdateSoftware
+          isDownloading={isDownloading}
+          processProgress={downloadProgress != null ? downloadProgress : 100}
+        />
+      ) : null}
+      {downloadError != null ? (
+        <ErrorUpdateSoftware errorMessage={downloadError} />
+      ) : null}
+      {isInstalling ? (
+        <UpdateSoftware
+          isDownloading={false}
+          processProgress={session?.progress ? session.progress : 0}
+        />
+      ) : null}
+      {/* {sessionError ? (
+        <ErrorUpdateSoftware errorMessage={sessionError} />
+      ) : null} */}
+      {/* // Installing software end */}
+      {step === 'finished' ? (
+        <CompleteUpdate robotName={robotName} dispatch={dispatch} />
+      ) : null}
     </Flex>
   )
 }
 
-interface CheckUpdatesProps {
-  isDownloading: boolean
-}
 // This might be a molecules component since WiFi connection part has the same screen
-const CheckUpdates = ({ isDownloading }: CheckUpdatesProps): JSX.Element => {
-  const { t } = useTranslation('device_settings')
-  return (
-    <Flex
-      backgroundColor={COLORS.darkGreyDisabled}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-      width="100%"
-      height="33rem"
-    >
-      <Icon
-        name="ot-spinner"
-        size="4.375rem"
-        spin
-        color={COLORS.darkGreyEnabled}
-      />
-      <StyledText
-        fontSize="2rem"
-        lineHeight="2.75rem"
-        fontWeight="700"
-        colors={COLORS.black}
-      >
-        {t('checking_for_updates')}
-      </StyledText>
-    </Flex>
-  )
-}
+// const CheckUpdates = (): JSX.Element => {
+//   const { t } = useTranslation('device_settings')
+//   return (
+//     <Flex
+//       backgroundColor={COLORS.darkGreyDisabled}
+//       flexDirection={DIRECTION_COLUMN}
+//       gridGap={SPACING.spacingXXL}
+//       alignItems={ALIGN_CENTER}
+//       justifyContent={JUSTIFY_CENTER}
+//       width="100%"
+//       height="33rem"
+//     >
+//       <Icon
+//         name="ot-spinner"
+//         size="4.375rem"
+//         spin
+//         color={COLORS.darkGreyEnabled}
+//       />
+//       <StyledText
+//         fontSize="2rem"
+//         lineHeight="2.75rem"
+//         fontWeight="700"
+//         colors={COLORS.black}
+//       >
+//         {t('checking_for_updates')}
+//       </StyledText>
+//     </Flex>
+//   )
+// }
 
 interface UpdateSoftwareProps {
   isDownloading: boolean
@@ -204,7 +202,9 @@ const UpdateSoftware = ({
       >
         {isDownloading ? t('downloading_software') : t('')}
       </StyledText>
-      <ProgressBar percentComplete={processProgress} />
+      <Box width="47.5rem">
+        <ProgressBar percentComplete={processProgress} />
+      </Box>
     </Flex>
   )
 }
