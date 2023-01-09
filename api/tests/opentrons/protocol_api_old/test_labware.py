@@ -13,12 +13,12 @@ from opentrons.hardware_control.modules.types import (
 )
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware, validation
 from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.core.protocol_api import module_geometry
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.well import WellImplementation
+from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
 
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
@@ -299,7 +299,7 @@ def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=parent.point,
-                parent_object=parent.labware.as_labware()._implementation,
+                parent_object=parent.labware.as_labware()._implementation,  # type: ignore[arg-type]
             ),
             display_name=well_name,
             has_tip=has_tip,
