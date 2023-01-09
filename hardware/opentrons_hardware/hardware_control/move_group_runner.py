@@ -358,7 +358,7 @@ class MoveScheduler:
         log.debug("recieved ack")
 
     def _handle_error(self, message: ErrorMessage) -> None:
-        raise RuntimeError("Firmware Error Revieved", message)
+        raise RuntimeError("Firmware Error Received", message)
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
