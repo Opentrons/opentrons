@@ -125,9 +125,7 @@ class SensorDriver(AbstractSensorDriver):
             SensorDataType.build(sensor.stop_threshold, sensor.sensor.sensor_type),
             SensorThresholdMode.absolute,
         )
-        threshold_data = await self._scheduler.send_threshold(
-            write, can_messenger, timeout
-        )
+        threshold_data = await self._scheduler.send_threshold(write, can_messenger)
         if not threshold_data:
             return threshold_data
         sensor.stop_threshold = threshold_data.to_float()

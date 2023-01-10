@@ -1666,7 +1666,7 @@ class OT3API(
         self,
         mount: OT3Mount,
         probe_settings: Optional[LiquidProbeSettings] = None,
-    ) -> None:
+    ) -> Any:
         """Find liquid."""
         pipette_axis = OT3Axis.of_main_tool_actuator(mount)
         if not probe_settings:
@@ -1678,7 +1678,7 @@ class OT3API(
         if new_position[pipette_axis] != 0:
             await self.home_plunger(mount)
 
-        await self._backend.liquid_probe(
+        return await self._backend.liquid_probe(
             mount,
             probe_settings.pipette_distance,
             probe_settings.pipette_speed,

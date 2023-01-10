@@ -887,6 +887,7 @@ class OT3Controller:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._present_nodes}
 
+    # make sure what's being returned is in deck coordinates and has a height
     async def liquid_probe(
         self,
         mount: OT3Mount,
@@ -898,7 +899,7 @@ class OT3Controller:
         starting_mount_height: float,
         prep_move_speed: float,
         sensor_id: SensorId = SensorId.S0,
-    ) -> None:
+    ) -> Dict[OT3Axis, Tuple[float, float, bool, bool]]:
         head_node = head_node_for_mount(OT3Mount(mount.value))
         tool = sensor_node_for_mount(OT3Mount(mount.value))
         positions = await liquid_probe(
@@ -914,9 +915,12 @@ class OT3Controller:
             sensor_id,
             threshold_pascals,
         )
-        for axis, point in positions.items():
-            self._position.update({axis: point[0]})
-            self._encoder_position.update({axis: point[1]})
+        pos_axes = dict()
+        for node, point in positions.items():
+            self._position.update({node: point[0]})
+            self._encoder_position.update({node: point[1]})
+            pos_axes[node_to_axis(node)] = point
+        return pos_axes
 
     async def capacitive_probe(
         self,
