@@ -31,8 +31,6 @@ from hardware_testing.opentrons_api.types import (
     OT3Mount,
     Point,
     OT3Axis,
-    GantryLoad,
-    OT3AxisKind,
 )
 
 TRASH_HEIGHT_MM: Final = 45
@@ -43,6 +41,16 @@ SAFE_HEIGHT_CALIBRATE = 10
 
 COLUMNS = "ABCDEFGH"
 PRESSURE_DATA_HEADER = ["PHASE", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8"]
+
+SPEED_REDUCTION_PERCENTAGE = 0.3
+
+# NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
+#       so here we cache these readings, and append them to the CSV in the end
+PRESSURE_DATA_CACHE = []
+# NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
+#       so here we cache these readings, and append them to the CSV in the end
+# save final test results, to be saved and displayed at the end
+FINAL_TEST_RESULTS = []
 
 
 @dataclass
@@ -96,10 +104,10 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     fixture=None,
 )
 
-TEMP_THRESH = [20, 35]
-HUMIDITY_THRESH = [20, 80]
-CAP_THRESH_OPEN_AIR = [0.0, 4.0]
-CAP_THRESH_PROBE = [3.0, 5.0]
+TEMP_THRESH = [20, 40]
+HUMIDITY_THRESH = [10, 90]
+CAP_THRESH_OPEN_AIR = [0.0, 10.0]
+CAP_THRESH_PROBE = [0.0, 20.0]
 CAP_PROBE_DISTANCE = 50.0
 CAP_PROBE_SECONDS = 5.0
 CAP_PROBE_SETTINGS = CapacitivePassSettings(
@@ -111,9 +119,9 @@ CAP_PROBE_SETTINGS = CapacitivePassSettings(
 
 PRESSURE_ASPIRATE_VOL = {50: 10.0, 1000: 100.0}
 PRESSURE_MAX_VALUE_ABS = 7500
-PRESSURE_THRESH_OPEN_AIR = [0, 150]
-PRESSURE_THRESH_SEALED = [0, 150]
-PRESSURE_THRESH_COMPRESS = [-PRESSURE_MAX_VALUE_ABS, -1000]
+PRESSURE_THRESH_OPEN_AIR = [-300, 300]
+PRESSURE_THRESH_SEALED = [-1000, 1000]
+PRESSURE_THRESH_COMPRESS = [-PRESSURE_MAX_VALUE_ABS, PRESSURE_MAX_VALUE_ABS]
 
 
 def _bool_to_pass_fail(result: bool) -> str:
@@ -590,7 +598,7 @@ async def _test_diagnostics_capacitive(
         print(f"FAIL: probe capacitance ({capacitance_with_probe}) is not correct")
     write_cb(
         [
-            "capacitive-open-air",
+            "capacitive-probe",
             capacitance_with_probe,
             _bool_to_pass_fail(capacitive_probe_attached_pass),
         ]
@@ -747,23 +755,79 @@ async def _test_plunger_positions(
     return blow_out_passed and drop_tip_passed
 
 
-async def _reduce_speeds_and_accelerations(api: OT3API, axes: List[OT3Axis], factor: float) -> None:
-    # SLOW DOWN THE XY AXES
-    cfg_x = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.X)
-    cfg_y = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.Y)
-    # both left/right Z's use same settings
-    cfg_z = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.Z_L)
-    slower_speed_cfg = {
-        OT3Axis.X: cfg_x,
-        OT3Axis.Y: cfg_y,
-        OT3Axis.Z_L: cfg_z,
-        OT3Axis.Z_R: cfg_z,
-    }
-    # slow down XY to avoid stall detection errors
-    for ax in slower_speed_cfg.keys():
-        slower_speed_cfg[ax].max_speed *= 0.5
-        slower_speed_cfg[ax].acceleration *= 0.5
-    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, slower_speed_cfg)
+async def _reduce_speeds_and_accelerations(
+    api: OT3API, axes: List[OT3Axis], factor: float
+) -> None:
+    new_robot_cfg = {}
+    for ax in axes:
+        cfg = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
+        cfg.max_speed *= factor
+        cfg.acceleration *= factor
+        new_robot_cfg[ax] = cfg
+    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, new_robot_cfg)
+
+
+@dataclass
+class CSVCallbacks:
+    write: Callable
+    pressure: Callable
+    results: Callable
+
+
+@dataclass
+class CSVProperties:
+    id: str
+    name: str
+    path: str
+
+
+def _create_csv_and_get_callbacks(
+    pipette_sn: str,
+) -> Tuple[CSVProperties, CSVCallbacks]:
+    run_id = data.create_run_id()
+    test_name = data.create_test_name_from_file(__file__)
+    folder_path = data.create_folder_for_test_data(test_name)
+    file_name = data.create_file_name(test_name, run_id, pipette_sn)
+    csv_display_name = os.path.join(folder_path, file_name)
+    print(f"CSV: {csv_display_name}")
+    start_time = time()
+
+    def _append_csv_data(
+        data_list: List[Any],
+        line_number: Optional[int] = None,
+        elapsed_seconds: Optional[float] = None,
+        timestamp_included: bool = False,
+    ) -> None:
+        # every line in the CSV file begins with the elapsed seconds
+        if not timestamp_included:
+            if elapsed_seconds is None:
+                elapsed_seconds = round(time() - start_time, 2)
+            data_list = [elapsed_seconds] + data_list
+        data_str = ",".join([str(d) for d in data_list])
+        if line_number is None:
+            data.append_data_to_file(test_name, file_name, data_str + "\n")
+        else:
+            data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
+
+    def _cache_pressure_data_callback(d: List[Any]) -> None:
+        elapsed_seconds = round(time() - start_time, 2)
+        data_list_with_time = [elapsed_seconds] + d
+        PRESSURE_DATA_CACHE.append(data_list_with_time)
+
+    def _handle_final_test_results(t: str, r: bool) -> None:
+        # save final test results to both the CSV and to display at end of script
+        _res = [t, _bool_to_pass_fail(r)]
+        _append_csv_data(_res)
+        FINAL_TEST_RESULTS.append(_res)
+
+    return (
+        CSVProperties(id=run_id, name=test_name, path=csv_display_name),
+        CSVCallbacks(
+            write=_append_csv_data,
+            pressure=_cache_pressure_data_callback,
+            results=_handle_final_test_results,
+        ),
+    )
 
 
 async def _main(test_config: TestConfig) -> None:
@@ -779,22 +843,10 @@ async def _main(test_config: TestConfig) -> None:
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",
     )
-    # SLOW DOWN THE XY AXES
-    cfg_x = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.X)
-    cfg_y = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.Y)
-    # both left/right Z's use same settings
-    cfg_z = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.Z_L)
-    slower_speed_cfg = {
-        OT3Axis.X: cfg_x,
-        OT3Axis.Y: cfg_y,
-        OT3Axis.Z_L: cfg_z,
-        OT3Axis.Z_R: cfg_z,
-    }
-    # slow down XY to avoid stall detection errors
-    for ax in slower_speed_cfg.keys():
-        slower_speed_cfg[ax].max_speed *= 0.5
-        slower_speed_cfg[ax].acceleration *= 0.5
-    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, slower_speed_cfg)
+    # FIXME: remove reducing speeds/accelerations once stall detection bug is fixed
+    await _reduce_speeds_and_accelerations(
+        api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L], SPEED_REDUCTION_PERCENTAGE
+    )
     pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
     assert pips, "no pipettes attached"
     for mount, pipette in pips.items():
@@ -818,83 +870,53 @@ async def _main(test_config: TestConfig) -> None:
             fixture=None,
         )
 
-        # create the CSV file, using the Pipette serial number as the tag
-        run_id = data.create_run_id()
-        test_name = data.create_test_name_from_file(__file__)
-        folder_path = data.create_folder_for_test_data(test_name)
-        file_name = data.create_file_name(test_name, run_id, pipette_sn)
-        csv_display_name = os.path.join(folder_path, file_name)
-        print(f"CSV: {csv_display_name}")
-        start_time = time()
-
         # callback function for writing new data to CSV file
-        def _append_csv_data(
-            data_list: List[Any],
-            line_number: Optional[int] = None,
-            elapsed_seconds: Optional[float] = None,
-            timestamp_included: bool = False,
-        ) -> None:
-            # every line in the CSV file begins with the elapsed seconds
-            if not timestamp_included:
-                if elapsed_seconds is None:
-                    elapsed_seconds = round(time() - start_time, 2)
-                data_list = [elapsed_seconds] + data_list
-            data_str = ",".join([str(d) for d in data_list])
-            if line_number is None:
-                data.append_data_to_file(test_name, file_name, data_str + "\n")
-            else:
-                data.insert_data_to_file(
-                    test_name, file_name, data_str + "\n", line_number
-                )
-
-        # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
-        #       so here we cache these readings, and append them to the CSV in the end
-        _cached_pressure_data = []
-        # save final test results, to be saved and displayed at the end
-        _final_test_results = []
-
-        def _cache_pressure_data_callback(d: List[Any]) -> None:
-            elapsed_seconds = round(time() - start_time, 2)
-            data_list_with_time = [elapsed_seconds] + d
-            _cached_pressure_data.append(data_list_with_time)
-
-        _cache_pressure_data_callback(PRESSURE_DATA_HEADER)
-
-        def _handle_final_test_results(t: str, r: bool) -> None:
-            # save final test results to both the CSV and to display at end of script
-            _res = [t, _bool_to_pass_fail(r)]
-            _append_csv_data(_res)
-            _final_test_results.append(_res)
+        csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
+        csv_cb.pressure(PRESSURE_DATA_HEADER)
 
         # add metadata to CSV
-        _append_csv_data(["--------"])
-        _append_csv_data(["METADATA"])
-        _append_csv_data(["test-name", test_name])
-        _append_csv_data(["operator-name", test_config.operator_name])
-        _append_csv_data(["date", run_id])  # run-id includes a date/time string
-        _append_csv_data(["pipette", pipette_sn])
+        csv_cb.write(["--------"])
+        csv_cb.write(["METADATA"])
+        csv_cb.write(["test-name", csv_props.name])
+        csv_cb.write(["operator-name", test_config.operator_name])
+        csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
+        csv_cb.write(["pipette", pipette_sn])
         if test_config.simulate:
-            _append_csv_data(["simulating"])
+            csv_cb.write(["simulating"])
         else:
-            _append_csv_data(["live"])
+            csv_cb.write(["live"])
         # add test configurations to CSV
-        _append_csv_data(["-------------------"])
-        _append_csv_data(["TEST-CONFIGURATIONS"])
+        csv_cb.write(["-------------------"])
+        csv_cb.write(["TEST-CONFIGURATIONS"])
         for f in fields(test_config):
-            _append_csv_data([f.name, getattr(test_config, f.name)])
+            csv_cb.write([f.name, getattr(test_config, f.name)])
+        csv_cb.write(["-------------------"])
+        csv_cb.write(["TEST-THRESHOLDS"])
+        csv_cb.write(["temperature"] + [str(t) for t in TEMP_THRESH])
+        csv_cb.write(["humidity"] + [str(t) for t in HUMIDITY_THRESH])
+        csv_cb.write(["capacitive-open-air"] + [str(t) for t in CAP_THRESH_OPEN_AIR])
+        csv_cb.write(["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE])
+        csv_cb.write(
+            ["pressure-microliters-aspirated", PRESSURE_ASPIRATE_VOL[pipette_volume]]
+        )
+        csv_cb.write(["pressure-open-air"] + [str(t) for t in PRESSURE_THRESH_OPEN_AIR])
+        csv_cb.write(["pressure-sealed"] + [str(t) for t in PRESSURE_THRESH_SEALED])
+        csv_cb.write(
+            ["pressure-compressed"] + [str(t) for t in PRESSURE_THRESH_COMPRESS]
+        )
         # add pressure thresholds to CSV
-        _append_csv_data(["-----------------------"])
-        _append_csv_data(["PRESSURE-CONFIGURATIONS"])
+        csv_cb.write(["-----------------------"])
+        csv_cb.write(["PRESSURE-CONFIGURATIONS"])
         for t, config in PRESSURE_CFG.items():
             for f in fields(config):
-                _append_csv_data([t.value, f.name, getattr(config, f.name)])
+                csv_cb.write([t.value, f.name, getattr(config, f.name)])
 
         tip_columns = COLUMNS[: test_config.num_trials]
         tips_used = [f"{c}1" for c in tip_columns]
 
         # run the test
-        _append_csv_data(["----"])
-        _append_csv_data(["TEST"])
+        csv_cb.write(["----"])
+        csv_cb.write(["TEST"])
         print("homing")
         await api.home()
         if not test_config.skip_plunger or not test_config.skip_diagnostics:
@@ -904,18 +926,18 @@ async def _main(test_config: TestConfig) -> None:
             hover_over_slot_2 = pos_slot_2._replace(z=current_pos.z)
             await api.move_to(mount, hover_over_slot_2)
         if not test_config.skip_diagnostics:
-            test_passed = await _test_diagnostics(api, mount, _append_csv_data)
-            _handle_final_test_results("diagnostics", test_passed)
+            test_passed = await _test_diagnostics(api, mount, csv_cb.write)
+            csv_cb.results("diagnostics", test_passed)
         if not test_config.skip_plunger:
-            test_passed = await _test_plunger_positions(api, mount, _append_csv_data)
-            _handle_final_test_results("plunger", test_passed)
+            test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
+            csv_cb.results("plunger", test_passed)
         if not test_config.skip_liquid:
             for i, tip in enumerate(tips_used):
                 droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
                 test_passed = await _test_for_leak_by_eye(
                     api, mount, test_config, tip, droplet_wait_seconds
                 )
-                _handle_final_test_results("droplets", test_passed)
+                csv_cb.results("droplets", test_passed)
         if not test_config.skip_fixture:
             test_passed = await _test_for_leak(
                 api,
@@ -923,16 +945,16 @@ async def _main(test_config: TestConfig) -> None:
                 test_config,
                 "A1",
                 fixture=fixture,
-                write_cb=_append_csv_data,
-                accumulate_raw_data_cb=_cache_pressure_data_callback,
+                write_cb=csv_cb.write,
+                accumulate_raw_data_cb=csv_cb.pressure,
             )
-            _handle_final_test_results("pressure", test_passed)
+            csv_cb.results("pressure", test_passed)
 
         print("test complete")
-        _append_csv_data(["-------------"])
-        _append_csv_data(["PRESSURE-DATA"])
-        for press_data in _cached_pressure_data:
-            _append_csv_data(press_data, timestamp_included=True)
+        csv_cb.write(["-------------"])
+        csv_cb.write(["PRESSURE-DATA"])
+        for press_data in PRESSURE_DATA_CACHE:
+            csv_cb.write(press_data, timestamp_included=True)
 
         # put the top-line results at the top of the CSV file
         # so here we cache each data line, then add them to the top
@@ -941,15 +963,15 @@ async def _main(test_config: TestConfig) -> None:
         _results_csv_lines.append(["-------"])
         _results_csv_lines.append(["RESULTS"])
         print("final test results:")
-        for result in _final_test_results:
+        for result in FINAL_TEST_RESULTS:
             _results_csv_lines.append(result)
             print(" - " + "\t".join(result))
         _results_csv_lines.reverse()
         for r in _results_csv_lines:
-            _append_csv_data(r, line_number=0, elapsed_seconds=0.0)
+            csv_cb.write(r, line_number=0, elapsed_seconds=0.0)
 
         # print the filepath again, to help debugging
-        print(f"CSV: {csv_display_name}")
+        print(f"CSV: {csv_props.name}")
         print("homing")
         await api.home()
     print("done")
