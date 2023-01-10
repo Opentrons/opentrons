@@ -1,8 +1,4 @@
-"""Test pause command."""
-from decoy import Decoy
-
-from opentrons.protocol_engine.execution import RunControlHandler
-
+"""Test comment command."""
 from opentrons.protocol_engine.commands.comment import (
     CommentParams,
     CommentResult,
@@ -11,6 +7,7 @@ from opentrons.protocol_engine.commands.comment import (
 
 
 async def test_comment_implementation() -> None:
+    """Confirm that commend command can be created and executed."""
     subject = CommentImplementation()
 
     data = CommentParams(message="hello world")

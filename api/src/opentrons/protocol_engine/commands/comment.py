@@ -12,7 +12,7 @@ CommentCommandType = Literal["comment"]
 class CommentParams(BaseModel):
     """Payload required to annotate execution with a comment."""
 
-    message: Optional[str] = Field(
+    message: str = Field(
         None,
         description="A user-facing message",
     )
@@ -29,6 +29,7 @@ class CommentImplementation(AbstractCommandImpl[CommentParams, CommentResult]):
         pass
 
     async def execute(self, params: CommentParams) -> CommentResult:
+        """No operation taken other than capturing message in command."""
         return CommentResult()
 
 
