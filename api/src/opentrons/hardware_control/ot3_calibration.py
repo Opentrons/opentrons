@@ -258,7 +258,7 @@ async def find_slot_center_binary(
 
     Returns the XY-center of the slot.
     """
-    real_pos = nominal_center._replace(y=nominal_center.y - 1, z=deck_height)
+    real_pos = nominal_center._replace(y=nominal_center.y - 3, z=deck_height)
     # Find X left/right edges
     plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, 1)
     LOG.info(f"Found +x edge at {plus_x_edge}mm")

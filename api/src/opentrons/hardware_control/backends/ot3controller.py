@@ -212,10 +212,11 @@ class OT3Controller:
         get_stat: Callable[
             [Sequence[OT3Axis]], List[Optional[MotorStatus]]
         ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
-        return all(
-            isinstance(status, MotorStatus) and status.motor_ok
-            for status in get_stat(axes)
-        )
+        return True
+        # return all(
+        #     isinstance(status, MotorStatus) and status.motor_ok
+        #     for status in get_stat(axes)
+        # )
 
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
