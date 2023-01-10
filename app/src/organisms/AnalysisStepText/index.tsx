@@ -191,7 +191,7 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
     case 'heaterShaker/closeLabwareLatch':
     case 'heaterShaker/deactivateShaker':
     case 'heaterShaker/waitForTemperature': {
-      SIMPLE_T_KEY_BY_COMMAND_TYPE[command.commandType]
+      messageNode = t(SIMPLE_T_KEY_BY_COMMAND_TYPE[command.commandType])
       break
     }
     case 'custom': {
@@ -213,6 +213,6 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
     }
   }
 
-  return <Flex alignItems={ALIGN_CENTER}>{messageNode}</Flex>
+  return <Flex alignItems={ALIGN_CENTER}><StyledText as="p">{messageNode}</StyledText></Flex>
 }
 

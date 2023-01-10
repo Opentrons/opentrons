@@ -51,7 +51,7 @@ export const LoadCommandText = ({
     case 'loadLabware': {
       if (command.params.location !== 'offDeck' && 'moduleId' in command.params.location) {
         const moduleModel = getModuleModel(robotSideAnalysis, command.params.location.moduleId)
-        moduleName = getModuleDisplayName(moduleModel)
+        moduleName = moduleModel != null ? getModuleDisplayName(moduleModel) : ''
 
         commandText = t("load_labware_info_protocol_setup", {
           count: getOccludedSlotCountForModule(getModuleType(moduleModel)),
