@@ -108,7 +108,7 @@ describe('CurrentOffsetsModal', () => {
     ])
   })
   it('renders the correct text and buttons CTA work', () => {
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     getByText('Applied Labware Offset data')
     getByText('location')
     getByText('labware')
