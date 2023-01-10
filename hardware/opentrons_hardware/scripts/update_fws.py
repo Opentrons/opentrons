@@ -48,19 +48,19 @@ TARGETS: Final = {
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    target1 = TARGETS[args.target1]
-    target2 = TARGETS[args.target2]
     retry_count = args.retry_count
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
 
+    update_details = {
+        TARGETS[args.target1]: args.file1,
+        TARGETS[args.target2]: args.file2,
+    }
+
     async with build.can_messenger(build_settings(args)) as messenger:
         await run_updates(
             messenger=messenger,
-            node_id1=target1,
-            node_id2=target2,
-            hex_file1=args.file1,
-            hex_file2=args.file2,
+            update_details=update_details,
             retry_count=retry_count,
             timeout_seconds=timeout_seconds,
             erase=erase,

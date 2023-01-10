@@ -1,7 +1,7 @@
 """Complete FW updater."""
 import logging
 import asyncio
-from typing import Optional, TextIO
+from typing import Optional, TextIO, Dict
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.firmware_bindings import NodeId
@@ -78,12 +78,12 @@ async def run_update(
     )
 
 
+UpdateDict = Dict[NodeId, TextIO]
+
+
 async def run_updates(
     messenger: CanMessenger,
-    node_id1: NodeId,
-    node_id2: NodeId,
-    hex_file1: TextIO,
-    hex_file2: TextIO,
+    update_details: UpdateDict,
     retry_count: int,
     timeout_seconds: float,
     erase: Optional[bool] = True,
@@ -103,21 +103,21 @@ async def run_updates(
     Returns:
         None
     """
-    await asyncio.gather(
+    # limit number of concurrent tasks? Test CAN bandwidth
+
+    # asyncio queue for update logging
+    # pass dict that reports progress back
+    tasks = [
         run_update(
             messenger=messenger,
-            node_id=node_id1,
-            hex_file=hex_file1,
+            node_id=node_id,
+            hex_file=hex_file,
             retry_count=retry_count,
             timeout_seconds=timeout_seconds,
             erase=erase,
-        ),
-        run_update(
-            messenger=messenger,
-            node_id=node_id2,
-            hex_file=hex_file2,
-            retry_count=retry_count,
-            timeout_seconds=timeout_seconds,
-            erase=erase,
-        ),
-    )
+        )
+        for node_id, hex_file in update_details.items()
+    ]
+
+    await asyncio.gather(*tasks)
+    # write tests
