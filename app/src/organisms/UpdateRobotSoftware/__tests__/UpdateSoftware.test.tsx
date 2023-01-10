@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UpdateSoftware } from '../UpdateSoftware'
 
@@ -21,19 +21,42 @@ describe('UpdateSoftware', () => {
       ...props,
       downloading: true,
     }
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByText, getByTestId }] = render(props)
     getByText('Downloading software...')
+    const bar = getByTestId('ProgressBar_Bar')
+    expect(bar).toHaveStyle(`background: ${String(COLORS.blueEnabled)}`)
+    expect(bar).toHaveStyle('width: 50%')
+  })
+  it('should render text and progressbar - sending software', () => {
+    props = {
+      ...props,
+      processProgress: 20,
+      sendingFile: true,
+    }
+    const [{ getByText, getByTestId }] = render(props)
+    getByText('Sending software...')
+    const bar = getByTestId('ProgressBar_Bar')
+    expect(bar).toHaveStyle('width: 20%')
   })
   it('should render text and progressbar - validating software', () => {
     props = {
       ...props,
+      processProgress: 80,
       validating: true,
     }
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByText, getByTestId }] = render(props)
     getByText('Validating software...')
+    const bar = getByTestId('ProgressBar_Bar')
+    expect(bar).toHaveStyle('width: 80%')
   })
   it('should render text and progressbar - installing software', () => {
-    const [{ getByText, getByRole }] = render(props)
+    props = {
+      ...props,
+      processProgress: 5,
+    }
+    const [{ getByText, getByTestId }] = render(props)
     getByText('Installing software...')
+    const bar = getByTestId('ProgressBar_Bar')
+    expect(bar).toHaveStyle('width: 5%')
   })
 })

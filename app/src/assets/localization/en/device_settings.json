@@ -191,6 +191,7 @@
   "update_found": "Update found!",
   "downloading_software": "Downloading software...",
   "download_error": "Download error",
+  "sending_software": "Sending software...",
   "validating_software": "Validating software...",
   "installing_software": "Installing software...",
   "software_is_up_to_date": "Your software is up to date!",

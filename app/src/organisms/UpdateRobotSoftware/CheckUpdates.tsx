@@ -13,7 +13,6 @@ import {
 
 import { StyledText } from '../../atoms/text'
 
-// This might be a molecules component since WiFi connection part has the same screen
 export function CheckUpdates(): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (

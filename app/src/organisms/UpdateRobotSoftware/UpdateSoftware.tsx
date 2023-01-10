@@ -17,11 +17,13 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 interface UpdateSoftwareProps {
   downloading?: boolean
   validating?: boolean
+  sendingFile?: boolean
   processProgress: number
 }
 export function UpdateSoftware({
   downloading = false,
   validating = false,
+  sendingFile = false,
   processProgress,
 }: UpdateSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -30,6 +32,8 @@ export function UpdateSoftware({
       ? t('downloading_software')
       : validating
       ? t('validating_software')
+      : sendingFile
+      ? t('sending_software')
       : t('installing_software')
   }
   return (

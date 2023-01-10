@@ -24,13 +24,18 @@ import {
   getBuildrootSession,
   startBuildrootUpdate,
   getBuildrootUpdateDisplayInfo,
+  getBuildrootUpdateAvailable,
 } from '../../redux/buildroot'
+import { UNREACHABLE } from '../../redux/discovery/constants'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { CheckUpdates } from '../../organisms/UpdateRobotSoftware/CheckUpdates'
+import { NoUpdateFound } from '../../organisms/UpdateRobotSoftware/NoUpdateFound'
 import { UpdateSoftware } from '../../organisms/UpdateRobotSoftware/UpdateSoftware'
 
 import type { Dispatch, State } from '../../redux/types'
+
+const CHECK_UPDATES_DURATION = 10000
 
 // Note typography isn't used in this component since properties will be changed in hi-fi design
 // currently most of them are hard-coded.
@@ -46,40 +51,69 @@ export function UpdateRobot(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 
-  const { autoUpdateAction } = useSelector((state: State) => {
-    return getBuildrootUpdateDisplayInfo(state, robotName)
+  const isViewableRobot =
+    localRobot != null && localRobot.status !== UNREACHABLE
+  // For the ODD app, it is only allowed to update the robot-server version
+  // if robotUpdatetype is downgrade or reinstall, the ODD app shows No update found screen
+  const robotUpdateType = useSelector((state: State) => {
+    // console.log(
+    //   'update available',
+    //   isViewableRobot && getBuildrootUpdateAvailable(state, localRobot)
+    // )
+    return isViewableRobot
+      ? getBuildrootUpdateAvailable(state, localRobot)
+      : null
   })
 
-  console.log('autoUpdateAction', autoUpdateAction)
+  // const { autoUpdateAction } = useSelector((state: State) => {
+  //   return getBuildrootUpdateDisplayInfo(state, robotName)
+  // })
 
-  const downloadProgress = useSelector(getBuildrootDownloadProgress)
-  const downloadError =
-    useSelector(getBuildrootDownloadError) != null ? t('download_error') : null
+  // console.log('autoUpdateAction', autoUpdateAction)
+
+  // const downloadProgress = useSelector(getBuildrootDownloadProgress)
+  // const downloadError =
+  //   useSelector(getBuildrootDownloadError) != null ? t('download_error') : null
   const session = useSelector(getBuildrootSession)
   const { step, error: sessionError } = session ?? { step: null, error: null }
   const dispatch = useDispatch<Dispatch>()
 
   console.log('step', step)
   console.log('stage', session?.stage)
-  console.log('downloadProgress', downloadProgress)
-  console.log('downloadError', downloadError)
   console.log('sessionError', sessionError)
 
-  React.useEffect(() => {
-    autoUpdateAction !== 'upgrade' && setIsShowCheckingUpdates(false)
-    if (autoUpdateAction === 'upgrade') {
-      setIsShowCheckingUpdates(false)
-      setIsDownloading(true)
-    } else {
-      setIsShowCheckingUpdates(false)
-    }
-  }, [autoUpdateAction])
+  // React.useEffect(() => {
+  //   autoUpdateAction !== 'upgrade' && setIsShowCheckingUpdates(false)
+  //   if (autoUpdateAction === 'upgrade') {
+  //     setIsShowCheckingUpdates(false)
+  //     setIsDownloading(true)
+  //   } else {
+  //     setIsShowCheckingUpdates(false)
+  //   }
+  // }, [autoUpdateAction])
 
   React.useEffect(() => {
-    if (isDownloading) {
+    const checkUpdateTimer = setTimeout(() => {
+      setIsShowCheckingUpdates(false)
+    }, CHECK_UPDATES_DURATION)
+    return () => {
+      clearTimeout(checkUpdateTimer)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    // check isDownloading to avoid dispatching again
+    if (robotUpdateType === 'upgrade' && !isDownloading) {
+      setIsDownloading(true)
       dispatch(startBuildrootUpdate(robotName))
     }
-  }, [isDownloading, dispatch, robotName])
+  }, [robotUpdateType, dispatch, robotName, isDownloading])
+
+  // React.useEffect(() => {
+  //   if (isDownloading) {
+  //     dispatch(startBuildrootUpdate(robotName))
+  //   }
+  // }, [isDownloading, dispatch, robotName])
 
   React.useEffect(() => {
     if (step === 'processFile' || step === 'commitUpdate') {
@@ -102,19 +136,29 @@ export function UpdateRobot(): JSX.Element {
     >
       {isShowCheckingUpdates ? <CheckUpdates /> : null}
       {/* No need to update software */}
-      {autoUpdateAction !== 'upgrade' ? <NoUpdateFound /> : null}
+      {robotUpdateType !== 'upgrade' ? <NoUpdateFound /> : null}
 
       {/* Download software start */}
-      {isDownloading ? (
+      {isDownloading &&
+      (step === 'premigration' ||
+        step === 'premigrationRestart' ||
+        step === 'restart' ||
+        step === 'restarting') ? (
         <UpdateSoftware
           downloading
-          processProgress={downloadProgress != null ? downloadProgress : 100}
+          processProgress={session?.progress ? session.progress : 0}
         />
       ) : null}
-      {downloadError != null ? (
-        <ErrorUpdateSoftware errorMessage={downloadError} />
-      ) : null}
       {/* Download software end */}
+      {/* Sending software start */}
+      {step === 'getToken' || step === 'uploadFile' ? (
+        <UpdateSoftware
+          sendingFile
+          processProgress={session?.progress ? session.progress : 0}
+        />
+      ) : null}
+
+      {/* Sending software end */}
 
       {/* Validating software start */}
       {isValidating ? (
@@ -140,46 +184,6 @@ export function UpdateRobot(): JSX.Element {
       {step === 'finished' ? (
         <CompleteUpdate robotName={robotName} dispatch={dispatch} />
       ) : null}
-    </Flex>
-  )
-}
-
-const NoUpdateFound = (): JSX.Element => {
-  const { t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.successBackgroundMed}
-        height="26.625rem"
-        gridGap={SPACING.spacingXXL}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
-      >
-        <Icon
-          name="check-circle"
-          size="4.375rem"
-          color={COLORS.successEnabled}
-        />
-        <StyledText
-          fontSize="2rem"
-          lineHeight="2.75rem"
-          fontWeight="700"
-          color={COLORS.black}
-        >
-          {t('software_is_up_to_date')}
-        </StyledText>
-      </Flex>
-      <PrimaryButton
-        marginTop={SPACING.spacing6}
-        height="4.4375rem"
-        onClick={() => history.push('/robot-settings/rename-robot')}
-      >
-        <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
-          {t('shared:next')}
-        </StyledText>
-      </PrimaryButton>
     </Flex>
   )
 }
