@@ -99,7 +99,7 @@ def run(ctx):
     Here is where you can change the locations of your labware and modules
     (note that this is the recommended configuration)
     """
-    magdeck = ctx.load_module("magdeck", "6")
+    magdeck = ctx.load_module("magnetic module gen2", "6")
     magdeck.disengage()
     magplate = magdeck.load_labware(deepwell_type, "deepwell plate")
     tempdeck = ctx.load_module("Temperature Module Gen2", "1")
