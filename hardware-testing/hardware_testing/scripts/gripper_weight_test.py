@@ -48,8 +48,9 @@ class Gripper_Weight_Test:
         self.simulate = simulate
         self.input = input
         self.cycles = cycles
-        self.time = time
+        self.stop_time = time
         self.height = height
+        self.interval = interval
         self.vref_default = 1.0 # Volts
         self.vref = 2.0 # Volts
         self.dc = 50 # %
@@ -86,6 +87,7 @@ class Gripper_Weight_Test:
         else:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Gripper"] = str(self.gripper_id)
+        self.test_data["Vref"] = str(self.vref)
         await self._update_vref(self.api, self.vref_default)
         gripper_config = await get_gripper_jaw_motor_param(self.api._backend._messenger)
         print(f"Initial Gripper Config: {gripper_config}")
@@ -121,12 +123,9 @@ class Gripper_Weight_Test:
             self.measurement_data[key] = str(self.oscilloscope.get_measurement(index+1))
         print(self.measurement_data)
 
-    async def _record_data(self, cycle: int, trial: int, vref: float, input_dc: int = 0, input_force: float = 0):
-        elapsed_time = (time.time() - self.start_time)/60
+    def _record_data(self, elapsed_time: float, cycle: int, input_dc: int = 0, input_force: float = 0):
         self.test_data["Time"] = str(round(elapsed_time, 3))
         self.test_data["Cycle"] = str(cycle)
-        self.test_data["Trial"] = str(trial)
-        self.test_data["Vref"] = str(vref)
         self.test_data["Input DC"] = str(input_dc)
         self.test_data["Input Force"] = str(input_force)
         test_data = self.test_data.copy()
@@ -153,14 +152,14 @@ class Gripper_Weight_Test:
         self, api: OT3API, mount: OT3Mount, input_dc: int = 0, input_force: float = 0
     ) -> None:
         await api.move_rel(mount, self.grip_position)
-        time.sleep(5)
+        time.sleep(3)
         if input_dc > 0:
             await api._grip(input_dc)
             api._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
         else:
             await api.grip(input_force)
-        time.sleep(5)
-        await api.move_rel(mount, self.hold_position)
+        time.sleep(3)
+        await api.home_z(mount)
 
     async def _drop_weight(
         self, api: OT3API, mount: OT3Mount
@@ -199,11 +198,18 @@ class Gripper_Weight_Test:
                     await self._update_vref(self.api, self.vref)
                     if self.input == 'dc':
                         await self._hold_weight(self.api, self.mount, input_dc=self.dc)
-                        # await self._record_data(cycle, input_dc=pwm)
                     else:
                         await self._hold_weight(self.api, self.mount, input_force=self.force)
-                        # await self._record_data(cycle, input_dc=pwm)
-                    time.sleep(10)
+                    start_time = time.time()
+                    elapsed_time = 0
+                    while elapsed_time < self.stop_time*60:
+                        elapsed_time = round(time.time() - start_time, 3)
+                        if elapsed_time % self.interval == 0:
+                            start_record = time.time()
+                            if self.input == 'dc':
+                                self._record_data(elapsed_time, cycle, input_dc=self.dc)
+                            else:
+                                self._record_data(elapsed_time, cycle, input_force=self.force)
                     await self._drop_weight(self.api, self.mount)
         except Exception as e:
             await self.exit()
