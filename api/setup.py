@@ -7,9 +7,7 @@ import os.path
 
 from setuptools import setup, find_packages
 
-
 HERE = os.path.abspath(os.path.dirname(__file__))
-log_file = open(HERE + '/log_version.txt', 'w')
 sys.path.append(os.path.join(HERE, "..", "scripts"))
 
 from python_build_utils import normalize_version  # noqa: E402
@@ -29,15 +27,10 @@ def get_version():
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-
-    log_file.write(project + '\n')
-    raise Exception("Thing is bad")
-    # return normalize_version("api", project, **normalize_opts)
+    return normalize_version("api", project, **normalize_opts)
 
 
 VERSION = get_version()
-log_file.write(VERSION)
-log_file.close()
 
 DISTNAME = "opentrons"
 LICENSE = "Apache 2.0"
