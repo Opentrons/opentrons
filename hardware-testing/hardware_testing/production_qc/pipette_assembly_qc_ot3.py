@@ -747,6 +747,25 @@ async def _test_plunger_positions(
     return blow_out_passed and drop_tip_passed
 
 
+async def _reduce_speeds_and_accelerations(api: OT3API, axes: List[OT3Axis], factor: float) -> None:
+    # SLOW DOWN THE XY AXES
+    cfg_x = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.X)
+    cfg_y = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.Y)
+    # both left/right Z's use same settings
+    cfg_z = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.Z_L)
+    slower_speed_cfg = {
+        OT3Axis.X: cfg_x,
+        OT3Axis.Y: cfg_y,
+        OT3Axis.Z_L: cfg_z,
+        OT3Axis.Z_R: cfg_z,
+    }
+    # slow down XY to avoid stall detection errors
+    for ax in slower_speed_cfg.keys():
+        slower_speed_cfg[ax].max_speed *= 0.5
+        slower_speed_cfg[ax].acceleration *= 0.5
+    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, slower_speed_cfg)
+
+
 async def _main(test_config: TestConfig) -> None:
     global IDEAL_LABWARE_LOCATIONS
     global CALIBRATED_LABWARE_LOCATIONS
