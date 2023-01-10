@@ -7,6 +7,8 @@ and expose it to a python commandline.
 import os
 from functools import wraps
 import asyncio
+import logging
+from logging.config import dictConfig
 
 has_robot_server = True
 if os.environ.get("OPENTRONS_SIMULATION"):
@@ -25,7 +27,6 @@ else:
 from code import interact  # noqa: E402
 from subprocess import run  # noqa: E402
 from typing import Union, Type, Any  # noqa: E402
-import logging  # noqa: E402
 
 from opentrons.types import Mount, Point  # noqa: E402
 from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
@@ -46,9 +47,6 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
 )
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
-
-import logging
-from logging.config import dictConfig
 
 
 log = logging.getLogger(__name__)
