@@ -111,3 +111,44 @@ def test_has_tip(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
 
     decoy.when(mock_well_core.has_tip()).then_return(False)
     assert subject.has_tip is False
+
+
+def test_diameter(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
+    """It should get the diameter from the core."""
+    decoy.when(mock_well_core.diameter).then_return(12.3)
+
+    assert subject.diameter == 12.3
+
+
+def test_length(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
+    """It should get the length from the core."""
+    decoy.when(mock_well_core.length).then_return(45.6)
+
+    assert subject.length == 45.6
+
+
+def test_width(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
+    """It should get the width from the core."""
+    decoy.when(mock_well_core.width).then_return(78.9)
+
+    assert subject.width == 78.9
+
+
+def test_depth(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
+    """It should get the depth from the core."""
+    decoy.when(mock_well_core.depth).then_return(42.0)
+
+    assert subject.depth == 42.0
+
+
+def test_from_center_cartesian(
+    decoy: Decoy, mock_well_core: WellCore, subject: Well
+) -> None:
+    """It should get the calculated center cartesian point from the core."""
+    decoy.when(mock_well_core.from_center_cartesian(1, 2, 3)).then_return(
+        Point(4, 5, 6)
+    )
+
+    result = subject.from_center_cartesian(1, 2, 3)
+
+    assert result == Point(4, 5, 6)

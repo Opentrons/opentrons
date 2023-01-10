@@ -257,6 +257,22 @@ class MotorPositionResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class UpdateMotorPositionEstimationRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.update_motor_position_estimation_request
+    ] = MessageId.update_motor_position_estimation_request
+
+
+@dataclass
+class UpdateMotorPositionEstimationResponse(BaseMessage):  # noqa: D101
+    payload: payloads.MotorPositionResponse
+    payload_type: Type[payloads.MotorPositionResponse] = payloads.MotorPositionResponse
+    message_id: Literal[
+        MessageId.update_motor_position_estimation_response
+    ] = MessageId.update_motor_position_estimation_response
+
+
+@dataclass
 class SetMotionConstraints(BaseMessage):  # noqa: D101
     payload: payloads.MotionConstraintsPayload
     payload_type: Type[

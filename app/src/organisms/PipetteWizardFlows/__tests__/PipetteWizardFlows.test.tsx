@@ -375,7 +375,7 @@ describe('PipetteWizardFlows', () => {
       left: {
         id: 'abc',
         name: 'p1000_96',
-        model: 'p1000_96_v1.0',
+        model: 'p1000_96_v1',
         tip_length: 42,
         mount_axis: 'c',
         plunger_axis: 'd',

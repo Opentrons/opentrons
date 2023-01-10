@@ -1,10 +1,14 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
-import { useAttachedPipettes } from '../../../../organisms/Devices/hooks'
+import {
+  useAttachedPipettes,
+  useIsOT3,
+} from '../../../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 
@@ -54,6 +58,7 @@ const mockUpdateRobotStatus = jest.fn()
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
   typeof OverflowMenu
 >
@@ -64,6 +69,7 @@ describe('PipetteOffsetCalibrationItems', () => {
   beforeEach(() => {
     mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
@@ -73,6 +79,7 @@ describe('PipetteOffsetCalibrationItems', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render table headers', () => {
@@ -80,6 +87,15 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Pipette Model and Serial')
     getByText('Mount')
     getByText('Tip Rack')
+    getByText('Last Calibrated')
+  })
+
+  it('should omit tip rack table header for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ getByText, queryByText }] = render(props)
+    getByText('Pipette Model and Serial')
+    getByText('Mount')
+    expect(queryByText('Tip Rack')).toBeNull()
     getByText('Last Calibrated')
   })
 

@@ -10,8 +10,30 @@ const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 
 const HOST_PYTHON = process.env.HOST_PYTHON ?? 'python3.10'
 
+const getPythonVersion = (platformName, arch) => {
+  const pythonForPlatform = PYTHON_BY_PLATFORM[platformName]
+  if (pythonForPlatform != null) {
+    if (pythonForPlatform[arch] != null) {
+      return pythonForPlatform[arch]
+    } else {
+      console.warn(
+        `could not find Python version for platform ${platformName} with arch ${arch}. Falling back to Python for ${platformName} with arch x64`
+      )
+      return pythonForPlatform.fallback
+    }
+  }
+  return null
+}
+
+// fallback options needed because electron builder does not provide a real arch as an argument in the beforePack script
 const PYTHON_BY_PLATFORM = {
   darwin: {
+    fallback: {
+      url:
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-apple-darwin-install_only.tar.gz',
+      sha256:
+        'ec2e90b6a589db7ef9f74358b1436558167629f9e4d725c8150496f9cb08a9d4',
+    },
     x64: {
       url:
         'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-apple-darwin-install_only.tar.gz',
@@ -20,6 +42,12 @@ const PYTHON_BY_PLATFORM = {
     },
   },
   linux: {
+    fallback: {
+      url:
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-unknown-linux-gnu-install_only.tar.gz',
+      sha256:
+        'b9989411bed71ba4867538c991f20b55f549dd9131905733f0df9f3fde81ad1d',
+    },
     x64: {
       url:
         'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-unknown-linux-gnu-install_only.tar.gz',
@@ -28,6 +56,12 @@ const PYTHON_BY_PLATFORM = {
     },
   },
   win32: {
+    fallback: {
+      url:
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-pc-windows-msvc-shared-install_only.tar.gz',
+      sha256:
+        'ba593370742ed8a7bc70ce563dd6a53e30ece1f6881e3888d334c1b485b0d9d0',
+    },
     x64: {
       url:
         'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-pc-windows-msvc-shared-install_only.tar.gz',
@@ -42,9 +76,9 @@ const PYTHON_SITE_PACKAGES_TARGET_POSIX = 'python/lib/python3.10/site-packages'
 const PYTHON_SITE_PACKAGES_TARGET_WINDOWS = 'python/Lib/site-packages'
 
 module.exports = function beforeBuild(context) {
-  const { platform, arch } = context
-  const platformName = platform.nodeName
-  const standalonePython = PYTHON_BY_PLATFORM?.[platformName]?.[arch]
+  const { platform, arch, electronPlatformName } = context
+  const platformName = electronPlatformName ?? platform.nodeName
+  const standalonePython = getPythonVersion(platformName, arch)
   if (!USE_PYTHON) {
     return Promise.resolve(true)
   }

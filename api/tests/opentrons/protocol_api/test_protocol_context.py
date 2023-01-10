@@ -430,7 +430,7 @@ def test_load_module_default_location(
         )
     ).then_return(mock_module_core)
 
-    decoy.when(mock_module_core.get_type()).then_return(ModuleType.TEMPERATURE)
+    decoy.when(mock_module_core.MODULE_TYPE).then_return(ModuleType.TEMPERATURE)
     decoy.when(mock_module_core.get_model()).then_return(
         TemperatureModuleModel.TEMPERATURE_V2
     )

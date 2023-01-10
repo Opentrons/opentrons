@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -10,6 +11,7 @@ import {
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
+  useIsOT3,
   usePipetteOffsetCalibrations,
   useRobot,
 } from '../../../organisms/Devices/hooks'
@@ -22,6 +24,7 @@ import type { FormattedPipetteOffsetCalibration } from '..'
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
 >
@@ -57,6 +60,7 @@ const render = (
 
 describe('RobotSettingsPipetteOffsetCalibration', () => {
   beforeEach(() => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,
@@ -70,6 +74,7 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders a title and description - Pipette Offset Calibrations', () => {
@@ -77,6 +82,16 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     getByText('Pipette Offset Calibrations')
     getByText(
       'Pipette offset calibration measures a pipette’s position relative to the pipette mount and the deck. You can recalibrate a pipette’s offset if its currently attached to this robot.'
+    )
+    getByText('PipetteOffsetCalibrationItems')
+  })
+
+  it('renders an OT-3 title and description - Pipette Calibrations', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Pipette Calibrations')
+    getByText(
+      `Pipette calibration uses a metal probe to determine the pipette's exact position relative to precision-cut divots on deck slots.`
     )
     getByText('PipetteOffsetCalibrationItems')
   })

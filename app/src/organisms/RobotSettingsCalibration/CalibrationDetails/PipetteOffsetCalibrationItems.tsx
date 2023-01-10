@@ -17,7 +17,7 @@ import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
-import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
+import { useAttachedPipettes, useIsOT3 } from '../../../organisms/Devices/hooks'
 
 import type { State } from '../../../redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
@@ -61,6 +61,7 @@ export function PipetteOffsetCalibrationItems({
     return getCustomLabwareDefinitions(state)
   })
   const attachedPipettes = useAttachedPipettes()
+  const isOT3 = useIsOT3(robotName)
 
   return (
     <StyledTable>
@@ -68,7 +69,8 @@ export function PipetteOffsetCalibrationItems({
         <tr>
           <StyledTableHeader>{t('model_and_serial')}</StyledTableHeader>
           <StyledTableHeader>{t('mount')}</StyledTableHeader>
-          <StyledTableHeader>{t('tiprack')}</StyledTableHeader>
+          {/* omit tip rack column for OT-3 */}
+          {isOT3 ? null : <StyledTableHeader>{t('tiprack')}</StyledTableHeader>}
           <StyledTableHeader>{t('last_calibrated_label')}</StyledTableHeader>
         </tr>
       </thead>
@@ -89,15 +91,17 @@ export function PipetteOffsetCalibrationItems({
                     {calibration.mount}
                   </StyledText>
                 </StyledTableCell>
-                <StyledTableCell>
-                  <StyledText as="p">
-                    {calibration.tiprack != null &&
-                      getDisplayNameForTipRack(
-                        calibration.tiprack,
-                        customLabwareDefs
-                      )}
-                  </StyledText>
-                </StyledTableCell>
+                {isOT3 ? null : (
+                  <StyledTableCell>
+                    <StyledText as="p">
+                      {calibration.tiprack != null &&
+                        getDisplayNameForTipRack(
+                          calibration.tiprack,
+                          customLabwareDefs
+                        )}
+                    </StyledText>
+                  </StyledTableCell>
+                )}
                 <StyledTableCell>
                   <Flex alignItems={ALIGN_CENTER}>
                     {calibration.lastCalibrated != null &&
