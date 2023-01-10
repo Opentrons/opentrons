@@ -1,4 +1,4 @@
-from typing import cast, Awaitable, Optional, Any, Dict
+from typing import cast, Awaitable, Optional, Any, Union
 from opentrons.types import Mount
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
@@ -48,7 +48,7 @@ class TipLengthCalibration(BaseSession):
 
     @staticmethod
     def _verify_tip_rack(
-        tip_rack_def: Dict[str, Any] | Any | None
+        tip_rack_def: Union[Any, None]
     ) -> Optional[LabwareDefinition]:
         if tip_rack_def:
             labware.verify_definition(tip_rack_def)
