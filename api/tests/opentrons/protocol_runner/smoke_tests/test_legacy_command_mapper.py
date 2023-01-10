@@ -3,7 +3,6 @@
 Legacy ProtocolContext objects are prohibitively difficult to instansiate
 and mock in an isolated unit test environment.
 """
-import textwrap
 from datetime import datetime
 from pathlib import Path
 from typing import List
@@ -12,6 +11,7 @@ import pytest
 from decoy import matchers
 
 from opentrons.protocol_engine import (
+    EngineStatus,
     commands,
     DeckSlotLocation,
     ModuleModel,
@@ -25,6 +25,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Command]:
+    """Simulate a protocol, make sure it succeeds, and return its commands."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[protocol_file],
@@ -33,6 +34,7 @@ async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Comman
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
     assert result.state_summary.errors == []
+    assert result.state_summary.status == EngineStatus.SUCCEEDED
     return result.commands
 
 
@@ -621,8 +623,7 @@ async def test_legacy_commands(big_protocol_file: Path) -> None:
     )
 
 
-# A protocol with aspirates and dispenses with volume=0.
-ZERO_VOLUME_LIQUID_HANDLING_PROTOCOL = """\
+ZERO_VOLUME_DISPENSE_PROTOCOL = """\
 metadata = {"apiLevel": "2.0"}
 
 def run(ctx):
@@ -633,37 +634,51 @@ def run(ctx):
     pipette.pick_up_tip()
 
     # Test:
+
+    # The falsey volume argument tells pipette.dispense() to use the pipette's current
+    # volume, which will be 0 because this is the first command.
     pipette.dispense(0, well_plate["D6"])
 """
 
 
 @pytest.fixture
-def zero_volume_liquid_handling_protocol_file(tmp_path: Path) -> Path:
+def zero_volume_dispense_protocol_file(tmp_path: Path) -> Path:
+    """Return a file containing the zero-volume dispense protocol."""
     path = tmp_path / "protocol-name.py"
-    path.write_text(ZERO_VOLUME_LIQUID_HANDLING_PROTOCOL)
+    path.write_text(ZERO_VOLUME_DISPENSE_PROTOCOL)
     return path
 
 
 # TODO BEFORE MERGE:
 # Is there a way to trigger this bug on aspirate()?
-async def test_zero_volume_liquid_handling_commands(zero_volume_liquid_handling_protocol_file: Path) -> None:
-    """It should map legacy pick up tip commands."""
-    commands_result = await simulate_and_get_commands(zero_volume_liquid_handling_protocol_file)
+async def test_zero_volume_dispense_commands(
+    zero_volume_dispense_protocol_file: Path,
+) -> None:
+    """It should map zero-volume dispenses to MoveToWell commands."""
+    result_commands = await simulate_and_get_commands(
+        zero_volume_dispense_protocol_file
+    )
 
-    [load_tip_rack, load_well_plate, load_pipette, pick_up_tip, move_to_well] = commands_result
+    [
+        load_tip_rack,
+        load_well_plate,
+        load_pipette,
+        pick_up_tip,
+        move_to_well,
+    ] = result_commands
     assert isinstance(load_tip_rack, commands.LoadLabware)
     assert isinstance(load_well_plate, commands.LoadLabware)
     assert isinstance(load_pipette, commands.LoadPipette)
     assert isinstance(pick_up_tip, commands.PickUpTip)
     assert isinstance(move_to_well, commands.MoveToWell)
 
-    assert move_to_well.params == MoveToWellParams(
+    assert load_well_plate.result is not None
+    assert load_pipette.result is not None
+    assert move_to_well.params == commands.MoveToWellParams(
         pipetteId=load_pipette.result.pipetteId,
         labwareId=load_well_plate.result.labwareId,
         wellName="D6",
     )
-
-    assert commands_result == []
 
 
 # TODO BEFORE MERGE: Test invalid rates and volumes raise an exception?

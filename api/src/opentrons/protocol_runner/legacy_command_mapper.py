@@ -383,23 +383,39 @@ class LegacyCommandMapper:
                     ),
                 )
             else:
-                flow_rate = command["payload"]["rate"] * pipette.flow_rate.dispense
-                return pe_commands.Dispense.construct(
-                    id=command_id,
-                    key=command_id,
-                    status=pe_commands.CommandStatus.RUNNING,
-                    createdAt=now,
-                    startedAt=now,
-                    # Don't .construct params, because we want to validate
-                    # volume and flowRate.
-                    params=pe_commands.DispenseParams(
-                        pipetteId=pipette_id,
-                        labwareId=labware_id,
-                        wellName=well_name,
-                        volume=volume,
-                        flowRate=flow_rate,
-                    ),
-                )
+                # In edge cases, it's possible for a Python protocol to do dispense()
+                # with a volume of 0, which behaves roughly like move_to().
+                if volume == 0:
+                    return pe_commands.MoveToWell.construct(
+                        id=command_id,
+                        key=command_id,
+                        status=pe_commands.CommandStatus.RUNNING,
+                        createdAt=now,
+                        startedAt=now,
+                        params=pe_commands.MoveToWellParams.construct(
+                            pipetteId=pipette_id,
+                            labwareId=labware_id,
+                            wellName=well_name,
+                        ),
+                    )
+                else:
+                    flow_rate = command["payload"]["rate"] * pipette.flow_rate.dispense
+                    return pe_commands.Dispense.construct(
+                        id=command_id,
+                        key=command_id,
+                        status=pe_commands.CommandStatus.RUNNING,
+                        createdAt=now,
+                        startedAt=now,
+                        # Don't .construct params, because we want to validate
+                        # volume and flowRate.
+                        params=pe_commands.DispenseParams(
+                            pipetteId=pipette_id,
+                            labwareId=labware_id,
+                            wellName=well_name,
+                            volume=volume,
+                            flowRate=flow_rate,
+                        ),
+                    )
         else:
             return pe_commands.Custom.construct(
                 id=command_id,
