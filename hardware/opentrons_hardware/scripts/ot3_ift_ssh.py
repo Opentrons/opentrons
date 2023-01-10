@@ -231,8 +231,8 @@ async def  run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver=driver)
     messenger.start()
     if args.home:
-        print('\n')
-        print('-------------------Test Homing--------------------------')
+        #print('\n')
+        #print('-------------------Test Homing--------------------------')
         await home(messenger, node)
         #print('Homed')
 
@@ -255,11 +255,11 @@ async def  run(args: argparse.Namespace) -> None:
         print(f'SN:{serial_number}')
     
     if args.downward:
-        res = await move_for_input(messenger, node,position,args.downward)
+        res = await move_for_input(messenger, node,position,"downward")
         #print("move=Pass")
         #return res
     if args.up:
-        res = await move_for_input(messenger, node,position,args.up)
+        res = await move_for_input(messenger, node,position,"up")
         #print("moveup=Pass")
         #return res
 

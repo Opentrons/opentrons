@@ -58,11 +58,11 @@ def getch():
     return _getch()
 
 async def _jog_axis(messenger: CanMessenger, node, position) -> None:
-    step_size = [0.1, 0.5, 1, 10, 20, 50]
+    step_size = [0.1, 0.5, 1, 15, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
-    speed = 10
+    speed = 15
     res = {node: (0,0,0)}
     information_str = """
         Click  >>   w  << to move up
@@ -73,7 +73,7 @@ async def _jog_axis(messenger: CanMessenger, node, position) -> None:
         Click  >> Enter << to save position
         Click  >> q << to quit the test script
                     """
-    print(information_str)
+    #print(information_str)
     while True:
         input = getch()
         if input == 'w':
