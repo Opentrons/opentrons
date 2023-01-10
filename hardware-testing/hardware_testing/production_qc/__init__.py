@@ -1,1 +1,1 @@
-"""OT3 Production QC."""
+"""Production QC."""

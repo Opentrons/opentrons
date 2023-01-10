@@ -27,7 +27,13 @@ from hardware_testing.measure.pressure.config import (
     PressureEventConfig,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Point, OT3Axis
+from hardware_testing.opentrons_api.types import (
+    OT3Mount,
+    Point,
+    OT3Axis,
+    GantryLoad,
+    OT3AxisKind,
+)
 
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
@@ -754,6 +760,22 @@ async def _main(test_config: TestConfig) -> None:
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",
     )
+    # SLOW DOWN THE XY AXES
+    cfg_x = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.X)
+    cfg_y = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.Y)
+    # both left/right Z's use same settings
+    cfg_z = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, OT3Axis.Z_L)
+    slower_speed_cfg = {
+        OT3Axis.X: cfg_x,
+        OT3Axis.Y: cfg_y,
+        OT3Axis.Z_L: cfg_z,
+        OT3Axis.Z_R: cfg_z,
+    }
+    # slow down XY to avoid stall detection errors
+    for ax in slower_speed_cfg.keys():
+        slower_speed_cfg[ax].max_speed *= 0.5
+        slower_speed_cfg[ax].acceleration *= 0.5
+    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, slower_speed_cfg)
     pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
     assert pips, "no pipettes attached"
     for mount, pipette in pips.items():

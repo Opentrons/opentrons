@@ -240,6 +240,40 @@ class GantryLoadSettings:
     run_current: float  # amps
 
 
+def get_gantry_load_per_axis_motion_settings_ot3(
+    api: OT3API,
+    axis: OT3Axis,
+    load: Optional[GantryLoad] = None,
+) -> GantryLoadSettings:
+    """Get the gantry-load settings, per OT3Axis."""
+    if load is None:
+        load = api.gantry_load
+    ax_kind = OT3Axis.to_kind(axis)
+    m_cfg = api.config.motion_settings
+    c_cfg = api.config.current_settings
+
+    def _default_motion(a: str) -> float:
+        try:
+            return getattr(m_cfg, a)[load][ax_kind]
+        except KeyError:
+            return getattr(m_cfg, a)[GantryLoad.NONE][ax_kind]
+
+    def _default_current(a: str) -> float:
+        try:
+            return getattr(c_cfg, a)[load][ax_kind]
+        except KeyError:
+            return getattr(c_cfg, a)[GantryLoad.NONE][ax_kind]
+
+    return GantryLoadSettings(
+        max_speed=_default_motion("default_max_speed"),
+        acceleration=_default_motion("acceleration"),
+        max_start_stop_speed=_default_motion("max_speed_discontinuity"),
+        max_change_dir_speed=_default_motion("direction_change_speed_discontinuity"),
+        hold_current=_default_current("hold_current"),
+        run_current=_default_current("run_current"),
+    )
+
+
 async def set_gantry_load_per_axis_settings_ot3(
     api: OT3API,
     settings: Dict[OT3Axis, GantryLoadSettings],
