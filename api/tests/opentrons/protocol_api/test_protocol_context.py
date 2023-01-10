@@ -301,7 +301,6 @@ def test_loaded_labware(
 def test_move_labware_to_slot(
     decoy: Decoy,
     mock_core: ProtocolCore,
-    mock_core_map: LoadedCoreMap,
     subject: ProtocolContext,
 ) -> None:
     """It should move labware to new slot location."""
@@ -314,8 +313,6 @@ def test_move_labware_to_slot(
     movable_labware = Labware(
         implementation=mock_labware_core,
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=mock_core,
-        core_map=mock_core_map,
     )
     decoy.when(
         mock_validation.ensure_valid_labware_offset_vector(drop_offset)
@@ -356,15 +353,13 @@ def test_move_labware_to_module(
     movable_labware = Labware(
         implementation=mock_labware_core,
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=mock_core,
-        core_map=mock_core_map,
     )
     module_location = TemperatureModuleContext(
         core=mock_module_core,
-        api_version=MAX_SUPPORTED_VERSION,
-        broker=mock_broker,
         protocol_core=mock_core,
         core_map=mock_core_map,
+        api_version=MAX_SUPPORTED_VERSION,
+        broker=mock_broker,
     )
 
     subject.move_labware(labware=movable_labware, new_location=module_location)

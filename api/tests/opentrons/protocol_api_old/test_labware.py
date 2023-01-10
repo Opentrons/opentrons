@@ -221,8 +221,6 @@ def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
             parent=Location(Point(0, 0, 0), "Test Slot"),
         ),
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
     )
 
 
@@ -240,8 +238,6 @@ def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
             parent=Location(Point(0, 0, 0), "Test Slot"),
         ),
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
     )
 
 
@@ -535,16 +531,12 @@ def test_tiprack_list():
             labware_def, Location(Point(0, 0, 0), "Test Slot")
         ),
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
     )
     tiprack_2 = labware.Labware(
         implementation=LabwareImplementation(
             labware_def, Location(Point(0, 0, 0), "Test Slot")
         ),
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
     )
 
     assert labware.select_tiprack_from_list([tiprack], 1) == (tiprack, tiprack["A1"])
@@ -583,8 +575,6 @@ def test_uris():
             defn, Location(Point(0, 0, 0), "Test Slot")
         ),
         api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
     )
     assert lw.uri == uri
 
@@ -596,12 +586,7 @@ def test_labware_hash_func_same_implementation(minimal_labware_def) -> None:
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
     )
     s = set(
-        labware.Labware(
-            implementation=impl,
-            api_version=APIVersion(2, 3),
-            protocol_core=None,  # type: ignore[arg-type]
-            core_map=None,  # type: ignore[arg-type]
-        )
+        labware.Labware(implementation=impl, api_version=APIVersion(2, 3))
         for i in range(10)
     )
     assert len(s) == 1
@@ -616,18 +601,8 @@ def test_labware_hash_func_same_implementation_different_version(
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
     )
 
-    l1 = labware.Labware(
-        implementation=impl,
-        api_version=APIVersion(2, 13),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
-    l2 = labware.Labware(
-        implementation=impl,
-        api_version=APIVersion(2, 14),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
+    l1 = labware.Labware(implementation=impl, api_version=APIVersion(2, 13))
+    l2 = labware.Labware(implementation=impl, api_version=APIVersion(2, 14))
 
     assert len({l1, l2}) == 2
 
@@ -644,18 +619,8 @@ def test_labware_hash_func_diff_implementation_same_version(
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot2")
     )
 
-    l1 = labware.Labware(
-        implementation=impl1,
-        api_version=APIVersion(2, 3),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
-    l2 = labware.Labware(
-        implementation=impl2,
-        api_version=APIVersion(2, 3),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
+    l1 = labware.Labware(implementation=impl1, api_version=APIVersion(2, 3))
+    l2 = labware.Labware(implementation=impl2, api_version=APIVersion(2, 3))
 
     assert len({l1, l2}) == 2
 
@@ -665,10 +630,7 @@ def test_set_offset(decoy: Decoy) -> None:
     labware_impl = decoy.mock(cls=AbstractLabware)
     decoy.when(labware_impl.get_well_columns()).then_return([])
     subject = labware.Labware(
-        implementation=labware_impl,
-        api_version=APIVersion(2, 12),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
+        implementation=labware_impl, api_version=APIVersion(2, 12)
     )
 
     subject.set_offset(x=1.1, y=2.2, z=3.3)
