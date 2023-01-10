@@ -13,7 +13,6 @@ from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
-from opentrons.hardware_control.types import OT3AxisKind
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -568,6 +567,8 @@ async def move_to_arched_ot3(
 
 
 class SensorResponseBad(Exception):
+    """Sensor Response is Bad."""
+
     pass
 
 

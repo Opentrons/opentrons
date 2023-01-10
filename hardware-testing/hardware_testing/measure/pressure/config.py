@@ -1,3 +1,4 @@
+"""Pressure Fixture Configs."""
 from dataclasses import dataclass
 import enum
 from typing import Dict
@@ -12,6 +13,8 @@ PRESSURE_FIXTURE_TIP_VOLUME = 50  # always 50ul
 
 
 class PressureEvent(enum.Enum):
+    """Pressure Event."""
+
     PRE = "pre"
     INSERT = "insert"
     ASPIRATE_P50 = "holding"
@@ -22,6 +25,8 @@ class PressureEvent(enum.Enum):
 
 @dataclass
 class PressureEventConfig:
+    """PressureEventConfig."""
+
     min: float
     max: float
     stability_delay: float
