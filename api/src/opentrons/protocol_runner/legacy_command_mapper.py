@@ -364,9 +364,11 @@ class LegacyCommandMapper:
             well_name = well.well_name
             pipette_id = self._pipette_id_by_mount[mount]
 
-            # In edge cases, it's possible for a Python protocol to do dispense()
-            # or aspirate() with a volume of 0, which behaves roughly like move_to().
             if volume == 0:
+                # In edge cases, it's possible for a Python protocol to do dispense()
+                # or aspirate() with a volume of 0, which behaves roughly like
+                # move_to(). Protocol Engine aspirate and dispense commands must have
+                # volume > 0, so we can't map into those.
                 return pe_commands.MoveToWell.construct(
                     id=command_id,
                     key=command_id,
