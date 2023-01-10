@@ -188,6 +188,26 @@ async def _find_square_center(
 
     probe_radius = helpers_ot3.CALIBRATION_PROBE_EVT.diameter / 2
 
+    # move to the FRONT until we hit the square edge
+    await _jog_axis(api, mount, OT3Axis.Y, -1)
+    current_position = await api.gantry_position(mount)
+    front_square = current_position.y - probe_radius
+    y_front = front_square + (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
+    print(f"Found Y-Front = {y_front}mm")
+
+    # move back to center of square
+    await api.move_to(mount, xy_start_pos)
+
+    # move to the FRONT until we hit the square edge
+    await _jog_axis(api, mount, OT3Axis.Y, 1)
+    current_position = await api.gantry_position(mount)
+    rear_square = current_position.y + probe_radius
+    y_rear = rear_square - (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
+    print(f"Found Y-Rear = {y_rear}mm")
+
+    # move back to center of square
+    await api.move_to(mount, xy_start_pos)
+
     # move to the RIGHT until we hit the square edge
     await _jog_axis(api, mount, OT3Axis.X, 1)
     current_position = await api.gantry_position(mount)
@@ -207,26 +227,6 @@ async def _find_square_center(
 
     x_center = (x_right + x_left) * 0.5
     print(f"Found X-Center = {x_center}mm")
-
-    # move back to center of square
-    await api.move_to(mount, xy_start_pos)
-
-    # move to the FRONT until we hit the square edge
-    await _jog_axis(api, mount, OT3Axis.Y, -1)
-    current_position = await api.gantry_position(mount)
-    front_square = current_position.y - probe_radius
-    y_front = front_square + (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
-    print(f"Found Y-Front = {y_front}mm")
-
-    # move back to center of square
-    await api.move_to(mount, xy_start_pos)
-
-    # move to the FRONT until we hit the square edge
-    await _jog_axis(api, mount, OT3Axis.Y, 1)
-    current_position = await api.gantry_position(mount)
-    rear_square = current_position.y + probe_radius
-    y_rear = rear_square - (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
-    print(f"Found Y-Rear = {y_rear}mm")
 
     y_center = (y_front + y_rear) * 0.5
     print(f"Fount Y-Center: {y_center}mm")
