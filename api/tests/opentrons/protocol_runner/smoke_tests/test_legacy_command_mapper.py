@@ -691,6 +691,3 @@ async def test_zero_volume_dispense_commands(
         labwareId=load_well_plate.result.labwareId,
         wellName="D7",
     )
-
-
-# TODO BEFORE MERGE: Test invalid rates and volumes raise an exception?
