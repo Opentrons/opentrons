@@ -34,6 +34,7 @@ from tests.conftest import CanLoopback
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
+    liquid_probe,
     ProbeTarget,
 )
 from opentrons_hardware.firmware_bindings.constants import (
@@ -55,7 +56,6 @@ def mock_sensor_threshold() -> Iterator[AsyncMock]:
         "opentrons_hardware.sensors.scheduler.SensorScheduler.send_threshold",
         AsyncMock(spec=SensorScheduler.send_threshold),
     ) as mock_threshold:
-
         async def echo_value(
             info: SensorThresholdInformation, messenger: CanMessenger
         ) -> SensorDataType:
@@ -82,6 +82,80 @@ def mock_bind_sync() -> Iterator[AsyncMock]:
         _fake_bind,
     ):
         yield mock_bind
+
+
+@pytest.mark.parametrize(
+    "target_node,motor_node, threshold_pascals",
+    [
+        (NodeId.pipette_left, NodeId.head_l, 14),
+        (NodeId.pipette_right, NodeId.head_r, 16),
+    ],
+)
+async def test_liquid_probe(
+    mock_messenger: AsyncMock,
+    message_send_loopback: CanLoopback,
+    mock_sensor_threshold: AsyncMock,
+    target_node: ProbeTarget,
+    motor_node: NodeId,
+    threshold_pascals: float,
+) -> None:
+    """Test that capacitive_probe targets the right nodes."""
+    sensor_info = SensorInformation(
+        sensor_type=SensorType.pressure, sensor_id=SensorId.S0, node_id=target_node
+    )
+
+    def move_responder(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        message.payload.serialize()
+        if isinstance(message, ExecuteMoveGroupRequest):
+            ack_payload = EmptyPayload()
+            ack_payload.message_index = message.payload.message_index
+            return [
+                (
+                    NodeId.host,
+                    Acknowledgement(payload=ack_payload),
+                    motor_node,
+                ),
+                (
+                    NodeId.host,
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            group_id=UInt8Field(0),
+                            seq_id=UInt8Field(0),
+                            current_position_um=UInt32Field(10000),
+                            encoder_position_um=Int32Field(10000),
+                            position_flags=MotorPositionFlagsField(0),
+                            ack_id=UInt8Field(2),
+                        )
+                    ),
+                    motor_node,
+                ),
+            ]
+        else:
+            return []
+
+    message_send_loopback.add_responder(move_responder)
+
+    position = await liquid_probe(
+        messenger=mock_messenger,
+        tool=target_node,
+        mount=motor_node,
+        pipette_distance=40,
+        pipette_speed=8,
+        mount_distance=30,
+        mount_speed=10,
+        starting_mount_height=120,
+        prep_move_speed=40,
+        sensor_id=SensorId.S0,
+        threshold_pascals=threshold_pascals,
+    )
+    assert position[motor_node][0] == 10
+    assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
+        sensor=sensor_info,
+        data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
+        mode=SensorThresholdMode.absolute,
+    )
 
 
 @pytest.mark.parametrize(
