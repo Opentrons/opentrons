@@ -182,6 +182,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     >
       {showAttachPipette ? (
         <ChoosePipette
+          robotName={robotName}
           proceed={handleAttachPipette}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
