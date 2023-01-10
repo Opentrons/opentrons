@@ -4,9 +4,10 @@ import logging
 from typing import List, Optional, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
 from opentrons.broker import Broker
-from opentrons.hardware_control.modules import ModuleModel, ThermocyclerStep
+from opentrons.hardware_control.modules import ThermocyclerStep
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -64,6 +65,33 @@ class ModuleContext(CommandPublisher):
     def api_version(self) -> APIVersion:
         return self._api_version
 
+    @property
+    def model(self) -> ModuleModel:
+        """Get the module's model identifier."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError("ModuleContext.model not supported for legacy core.")
+        return cast(ModuleModel, self._core.get_model().value)
+
+    @property
+    def type(self) -> ModuleType:
+        """Get the module's general type identifier."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError("ModuleContext.type not supported for legacy core.")
+        return cast(ModuleType, self._core.MODULE_TYPE.value)
+
+    @property
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError(
+                "ModuleContext.serial_number not supported for legacy core."
+            )
+        return self._core.get_serial_number()
+
+    # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """Specify the presence of a piece of labware on the module.
@@ -88,8 +116,9 @@ class ModuleContext(CommandPublisher):
 
         _log.warning(deprecation_message)
 
+        # Type ignoring to preserve backwards compatibility
         assert (
-            labware.parent == self._core.geometry
+            labware.parent == self._core.geometry  # type: ignore[comparison-overlap]
         ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)
@@ -139,6 +168,8 @@ class ModuleContext(CommandPublisher):
             labware = Labware(
                 implementation=labware_core,
                 api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
             )
 
         self._core_map.add(labware_core, labware)
@@ -191,6 +222,13 @@ class ModuleContext(CommandPublisher):
         labware_core = self._protocol_core.get_labware_on_module(self._core)
         return self._core_map.get(labware_core)
 
+    # TODO (tz, 1-7-23): change this to version 2.14
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
+    def parent(self) -> str:
+        """The name of the slot the module is on."""
+        return self._core.get_deck_slot().value
+
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def geometry(self) -> LegacyModuleGeometry:
@@ -207,19 +245,6 @@ class ModuleContext(CommandPublisher):
             "`ModuleContext.geometry` has been deprecated;"
             " use properties of the `ModuleContext` itself, instead."
         )
-
-    @property
-    def requested_as(self) -> ModuleModel:
-        """How the protocol requested this module.
-
-        For example, a physical ``temperatureModuleV2`` might have been requested
-        either as ``temperatureModuleV2`` or ``temperatureModuleV1``.
-
-        For Opentrons internal use only.
-
-        :meta private:
-        """
-        return self._core.get_requested_model()
 
     def __repr__(self) -> str:
         return "{} at {} lw {}".format(

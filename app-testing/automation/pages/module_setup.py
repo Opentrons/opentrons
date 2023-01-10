@@ -18,9 +18,7 @@ class ModuleSetup:
         self.base: Base = Base(driver, console, execution_id)
         self.console: Console = console
 
-    proceed_to_module_setup: Element = Element(
-        (By.ID, "RobotCalStep_proceedButton"), "proceed to module setup button"
-    )
+    proceed_to_module_setup: Element = Element((By.ID, "RobotCalStep_proceedButton"), "proceed to module setup button")
 
     module_setup_text_locator: Element = Element(
         (
@@ -38,9 +36,7 @@ class ModuleSetup:
         "",
     )
 
-    magnetic_module: Element = Element(
-        (By.XPATH, "//p[text()='Magnetic Module GEN2']"), ""
-    )
+    magnetic_module: Element = Element((By.XPATH, "//p[text()='Magnetic Module GEN2']"), "")
 
     temperature_module: Element = Element(
         (
@@ -72,9 +68,7 @@ class ModuleSetup:
 
     def get_module_setup_text_locator(self) -> WebElement:
         """Locator for module setup text."""
-        toggle: WebElement = self.base.clickable_wrapper(
-            ModuleSetup.module_setup_text_locator
-        )
+        toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.module_setup_text_locator)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
@@ -88,18 +82,14 @@ class ModuleSetup:
 
     def get_proceed_to_labware_setup(self) -> WebElement:
         """Locator for proceed to labware setup."""
-        toggle: WebElement = self.base.clickable_wrapper(
-            ModuleSetup.proceed_to_labware_setup
-        )
+        toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.proceed_to_labware_setup)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
 
     def click_proceed_to_labware_setup(self) -> None:
         """Proceed to labware setup."""
-        toggle: WebElement = self.base.clickable_wrapper(
-            ModuleSetup.proceed_to_labware_setup
-        )
+        toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.proceed_to_labware_setup)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(toggle).perform()  # type: ignore
         self.base.click(ModuleSetup.proceed_to_labware_setup)
@@ -110,9 +100,7 @@ class ModuleSetup:
 
     def click_module_setup_text(self) -> None:
         """Click module setup text."""
-        toggle: WebElement = self.base.clickable_wrapper(
-            ModuleSetup.module_setup_text_locator
-        )
+        toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.module_setup_text_locator)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(toggle).perform()  # type: ignore
         self.base.click(ModuleSetup.module_setup_text_locator)

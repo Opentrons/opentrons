@@ -156,16 +156,14 @@ function ProgressTrackerItem({
                 {/* subtask connector component */}
                 <Flex
                   flex="1"
-                  borderLeft={
+                  borderLeft={BORDERS.lineBorder}
+                  borderColor={
                     // do not show the subtask connector if it's the final subtask of the task list
                     isFinalSubTaskOfTaskList
-                      ? BORDERS.transparentLineBorder
-                      : BORDERS.lineBorder
-                  }
-                  borderColor={
-                    isTaskListComplete || isPastSubTask
+                      ? COLORS.transparent
+                      : isTaskListComplete || isPastSubTask
                       ? COLORS.blueEnabled
-                      : ''
+                      : COLORS.medGreyEnabled
                   }
                   marginTop={`-${String(SPACING.spacing3)}`}
                   marginBottom={

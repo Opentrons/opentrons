@@ -13,12 +13,12 @@ from opentrons.hardware_control.modules.types import (
 )
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware, validation
 from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.core.protocol_api import module_geometry
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.well import WellImplementation
+from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
 
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
@@ -221,6 +221,8 @@ def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
             parent=Location(Point(0, 0, 0), "Test Slot"),
         ),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
 
@@ -238,6 +240,8 @@ def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
             parent=Location(Point(0, 0, 0), "Test Slot"),
         ),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
 
@@ -299,7 +303,7 @@ def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=parent.point,
-                parent_object=parent.labware.as_labware()._implementation,
+                parent_object=parent.labware.as_labware()._implementation,  # type: ignore[arg-type]
             ),
             display_name=well_name,
             has_tip=has_tip,
@@ -531,12 +535,16 @@ def test_tiprack_list():
             labware_def, Location(Point(0, 0, 0), "Test Slot")
         ),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     tiprack_2 = labware.Labware(
         implementation=LabwareImplementation(
             labware_def, Location(Point(0, 0, 0), "Test Slot")
         ),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
     assert labware.select_tiprack_from_list([tiprack], 1) == (tiprack, tiprack["A1"])
@@ -575,6 +583,8 @@ def test_uris():
             defn, Location(Point(0, 0, 0), "Test Slot")
         ),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     assert lw.uri == uri
 
@@ -586,7 +596,12 @@ def test_labware_hash_func_same_implementation(minimal_labware_def) -> None:
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
     )
     s = set(
-        labware.Labware(implementation=impl, api_version=APIVersion(2, 3))
+        labware.Labware(
+            implementation=impl,
+            api_version=APIVersion(2, 3),
+            protocol_core=None,  # type: ignore[arg-type]
+            core_map=None,  # type: ignore[arg-type]
+        )
         for i in range(10)
     )
     assert len(s) == 1
@@ -601,8 +616,18 @@ def test_labware_hash_func_same_implementation_different_version(
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
     )
 
-    l1 = labware.Labware(implementation=impl, api_version=APIVersion(2, 13))
-    l2 = labware.Labware(implementation=impl, api_version=APIVersion(2, 14))
+    l1 = labware.Labware(
+        implementation=impl,
+        api_version=APIVersion(2, 13),
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
+    )
+    l2 = labware.Labware(
+        implementation=impl,
+        api_version=APIVersion(2, 14),
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
+    )
 
     assert len({l1, l2}) == 2
 
@@ -619,8 +644,18 @@ def test_labware_hash_func_diff_implementation_same_version(
         minimal_labware_def, Location(Point(0, 0, 0), "Test Slot2")
     )
 
-    l1 = labware.Labware(implementation=impl1, api_version=APIVersion(2, 3))
-    l2 = labware.Labware(implementation=impl2, api_version=APIVersion(2, 3))
+    l1 = labware.Labware(
+        implementation=impl1,
+        api_version=APIVersion(2, 3),
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
+    )
+    l2 = labware.Labware(
+        implementation=impl2,
+        api_version=APIVersion(2, 3),
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
+    )
 
     assert len({l1, l2}) == 2
 
@@ -630,7 +665,10 @@ def test_set_offset(decoy: Decoy) -> None:
     labware_impl = decoy.mock(cls=AbstractLabware)
     decoy.when(labware_impl.get_well_columns()).then_return([])
     subject = labware.Labware(
-        implementation=labware_impl, api_version=APIVersion(2, 12)
+        implementation=labware_impl,
+        api_version=APIVersion(2, 12),
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
     subject.set_offset(x=1.1, y=2.2, z=3.3)

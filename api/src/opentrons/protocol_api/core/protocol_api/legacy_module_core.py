@@ -12,7 +12,6 @@ from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
-    ModuleType,
     TemperatureStatus,
     MagneticStatus,
     SpeedStatus,
@@ -20,6 +19,7 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerStep,
 )
 from opentrons.types import DeckSlotName, Location
+
 
 from ..module import (
     AbstractModuleCore,
@@ -71,10 +71,6 @@ class LegacyModuleCore(AbstractModuleCore):
         """Get the module's model identifier."""
         return self._geometry.model
 
-    def get_type(self) -> ModuleType:
-        """Get the module's general type."""
-        return self._geometry.module_type
-
     def get_requested_model(self) -> ModuleModel:
         """Get the model identifier the module was requested as.
 
@@ -97,6 +93,8 @@ class LegacyModuleCore(AbstractModuleCore):
             Labware(
                 implementation=labware_core,
                 api_version=self._protocol_core.api_version,
+                protocol_core=None,  # type: ignore[arg-type]
+                core_map=None,  # type: ignore[arg-type]
             )
         )
         self._protocol_core.get_deck().recalculate_high_z()
