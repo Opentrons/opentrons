@@ -30,18 +30,14 @@ def test_LPC_flow(
     # this test is against only the dev robot
     robot = next(robot for robot in robots if robot.display_name == Dev.display_name)
     ot_robot = OtRobot(console, robot)
-    console.print(
-        f"Testing against robot {ot_robot.data.display_name}", style="white on blue"
-    )
+    console.print(f"Testing against robot {ot_robot.data.display_name}", style="white on blue")
     assert ot_robot.is_alive(), "is the robot available?"
 
     left_menu: LeftMenu = LeftMenu(driver, console, request.node.nodeid)
     left_menu.navigate("protocols")
 
     # Verifying elements on the protocol page
-    protocol_landing: ProtocolLanding = ProtocolLanding(
-        driver, console, request.node.nodeid
-    )
+    protocol_landing: ProtocolLanding = ProtocolLanding(driver, console, request.node.nodeid)
     console.print(
         f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}",
         style="white on blue",
@@ -59,21 +55,15 @@ def test_LPC_flow(
     labware_setup: LabwareSetup = LabwareSetup(driver, console, request.node.nodeid)
     labware_setup.click_labware_setup_text()
 
-    labware_position_check: LabwarePositionCheck = LabwarePositionCheck(
-        driver, console, request.node.nodeid
-    )
+    labware_position_check: LabwarePositionCheck = LabwarePositionCheck(driver, console, request.node.nodeid)
 
     if labware_position_check.get_ignored_stored_data():
         labware_position_check.click_ignored_stored_data()
 
     labware_position_check.click_labware_position_button()
-    assert (
-        labware_position_check.get_introScreen_labware_position_check_overview().is_displayed()
-    )
+    assert labware_position_check.get_introScreen_labware_position_check_overview().is_displayed()
     labware_position_check.click_begin_labware_position_check_button()
-    assert (
-        labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
-    )
+    assert labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
     labware_position_check.click_how_to_tell_pipette_is_centered_link()
     labware_setup.click_close_button()
     labware_position_check.click_reveal_all_jog_controls()
@@ -83,18 +73,14 @@ def test_LPC_flow(
     labware_position_check.click_forward_jog_button()
     labware_position_check.click_confirm_position_button_pickup_tip()
     labware_position_check.click_confirm_position_moveto_slot_5()
-    assert (
-        labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
-    )
+    assert labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
     labware_position_check.click_reveal_all_jog_controls()
     labware_position_check.click_back_jog_button()
     labware_position_check.click_down_jog_button()
     labware_position_check.click_right_jog_button()
     labware_position_check.click_forward_jog_button()
     labware_position_check.click_confirm_position_moveto_slot_6()
-    assert (
-        labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
-    )
+    assert labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
     labware_position_check.click_reveal_all_jog_controls()
     labware_position_check.click_back_jog_button()
     labware_position_check.click_down_jog_button()
@@ -106,15 +92,10 @@ def test_LPC_flow(
     assert labware_position_check.get_section_list_step0().is_displayed()
     assert labware_position_check.get_section_list_step1().is_displayed()
     assert labware_position_check.get_section_list_step2().is_displayed()
-    assert (
-        labware_position_check.get_close_and_apply_labware_offset_data_button().is_displayed()
-    )
+    assert labware_position_check.get_close_and_apply_labware_offset_data_button().is_displayed()
     labware_position_check.click_get_close_and_apply_labware_offset_data_button()
     # assert labware_position_check.get_labware_success_toast().is_displayed()
-    assert (
-        labware_position_check.get_labware_display_name_slot_4().text
-        == "Opentrons 96 Tip Rack 300 µL"
-    )
+    assert labware_position_check.get_labware_display_name_slot_4().text == "Opentrons 96 Tip Rack 300 µL"
     assert labware_position_check.get_labware_offsetbox_slot_4().is_displayed()
     assert labware_position_check.get_labware_slot_4_offset_x_text().is_displayed()
     assert labware_position_check.get_labware_slot_4_offset_x_value().text == "0.1"
@@ -129,10 +110,7 @@ def test_LPC_flow(
     assert labware_position_check.get_labware_slot_5_offset_y_value().text == "0.0"
     assert labware_position_check.get_labware_slot_5_offset_z_text().is_displayed()
     assert labware_position_check.get_labware_slot_5_offset_z_value().text == "-0.1"
-    assert (
-        labware_position_check.get_labware_display_name_slot_2().text
-        == "Opentrons 96 Tip Rack 10 µL"
-    )
+    assert labware_position_check.get_labware_display_name_slot_2().text == "Opentrons 96 Tip Rack 10 µL"
     assert labware_position_check.get_labware_slot_2_offset_x_text().is_displayed()
     assert labware_position_check.get_labware_slot_2_offset_x_value().text == "0.1"
     assert labware_position_check.get_labware_slot_2_offset_y_text().is_displayed()

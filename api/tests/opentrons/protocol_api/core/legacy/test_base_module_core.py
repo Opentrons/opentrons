@@ -4,8 +4,8 @@ from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
+from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
 
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
@@ -22,7 +22,7 @@ def mock_geometry(decoy: Decoy) -> ModuleGeometry:
 @pytest.fixture
 def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule]:
     """Get a mock synchronous module hardware."""
-    return decoy.mock(name="SynchronousAdapater[AbstractModule]")  # type: ignore[no-any-return]
+    return decoy.mock(name="SynchronousAdapter[AbstractModule]")  # type: ignore[no-any-return]
 
 
 @pytest.fixture
@@ -63,16 +63,7 @@ def test_get_model(
     """It should get the model from the geometry."""
     decoy.when(mock_geometry.model).then_return(TemperatureModuleModel.TEMPERATURE_V2)
     result = subject.get_model()
-    assert result == TemperatureModuleModel.TEMPERATURE_V2
-
-
-def test_get_type(
-    decoy: Decoy, mock_geometry: ModuleGeometry, subject: LegacyModuleCore
-) -> None:
-    """It should get the model from the geometry."""
-    decoy.when(mock_geometry.module_type).then_return(ModuleType.TEMPERATURE)
-    result = subject.get_type()
-    assert result == ModuleType.TEMPERATURE
+    assert result == "temperatureModuleV2"
 
 
 def test_get_serial_number(
