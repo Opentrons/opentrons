@@ -768,7 +768,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-        check_stalls: bool = False,
+        _check_stalls: bool = False,  # For testing only
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -799,7 +799,7 @@ class OT3API(
             target_position,
             speed=speed,
             max_speeds=checked_max,
-            check_stalls=check_stalls,
+            check_stalls=_check_stalls,
         )
 
     async def move_rel(
@@ -810,7 +810,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-        check_stalls: bool = False,
+        _check_stalls: bool = False,  # For testing only
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
@@ -850,7 +850,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
-            check_stalls=check_stalls,
+            check_stalls=_check_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:

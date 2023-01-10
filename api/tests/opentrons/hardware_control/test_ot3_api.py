@@ -689,12 +689,12 @@ async def test_move_stall_flag(
 
     expected = MoveStopCondition.stall if enable_stalls else MoveStopCondition.none
 
-    await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), check_stalls=enable_stalls)
+    await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), _check_stalls=enable_stalls)
     _, _, condition = mock_backend_move.call_args_list[0][0]
     assert condition == expected
 
     mock_backend_move.reset_mock()
-    await ot3_hardware.move_rel(Mount.LEFT, Point(0, 0, 0), check_stalls=enable_stalls)
+    await ot3_hardware.move_rel(Mount.LEFT, Point(0, 0, 0), _check_stalls=enable_stalls)
     _, _, condition = mock_backend_move.call_args_list[0][0]
     assert condition == expected
 
