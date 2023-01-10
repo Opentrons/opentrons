@@ -28,7 +28,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 
 CYCLES = 10
 
-mounts = {"left": "ZB", "right": "AC"}
+# mounts = {"left": "ZB", "right": "AC"}
 Current_list = [0.5, 0.4, 0.25, 0.2, 0.1]
 
 Current_dic = {
