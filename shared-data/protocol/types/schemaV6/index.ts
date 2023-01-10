@@ -6,7 +6,11 @@ import {
   PipetteName,
 } from '../../../js'
 import type { CreateCommand, RunTimeCommand } from './command'
-import type { LabwareDefinition2, ModuleModel } from '../../../js/types'
+import type {
+  LabwareDefinition2,
+  ModuleModel,
+  RobotType,
+} from '../../../js/types'
 
 export * from './command'
 
@@ -94,7 +98,7 @@ export interface ProtocolAnalysisOutput {
   modules: LoadedModule[]
   liquids: Liquid[]
   errors: AnalysisError[]
-  robotType?: 'OT-2 Standard' | 'OT-3 Standard'
+  robotType?: RobotType
 }
 
 interface AnalysisSourceFile {

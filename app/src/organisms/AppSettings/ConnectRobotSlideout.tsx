@@ -101,7 +101,7 @@ export function ConnectRobotSlideout({
           marginBottom={SPACING.spacing4}
           justifyContent={ALIGN_FLEX_END}
         >
-          {isScanning ? (
+          {Boolean(isScanning) ? (
             <Flex flexDirection={DIRECTION_ROW}>
               <StyledText
                 as="p"
@@ -119,11 +119,11 @@ export function ConnectRobotSlideout({
                   <StyledText
                     as="p"
                     color={COLORS.darkGreyEnabled}
-                    margin={`0 ${SPACING.spacing2}`}
+                    margin={`0 ${String(SPACING.spacing2)}`}
                   >
                     {t('discovery_timeout')}
                   </StyledText>
-                  {displayLinkButton(t('try_again'))}
+                  {displayLinkButton(t('shared:try_again'))}
                 </>
               ) : (
                 displayLinkButton(t('shared:refresh'))

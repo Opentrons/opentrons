@@ -23,19 +23,9 @@
     "units": "volts",
     "type": "float"
   },
-  "jawForcePerDutyCycle": [
-    [0.92, 4],
-    [1.48, 5],
-    [2.86, 7],
-    [3.72, 9],
-    [5.64, 12],
-    [7.66, 17],
-    [8.76, 20],
-    [10.06, 23],
-    [12.42, 34],
-    [16.2, 54],
-    [23, 80],
-    [25.7, 90]
+  "jawDutyCyclePolynomial": [
+    [0, -0.282],
+    [1, 2.09]
   ],
   "baseOffsetFromMount": {
     "x": 19.5,
@@ -45,7 +35,7 @@
   "jawCenterOffsetFromBase": {
     "x": 0,
     "y": 0,
-    "z": -78.475
+    "z": -88.475
   },
   "pinOneOffsetFromBase": {
     "x": 4,

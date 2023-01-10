@@ -304,6 +304,7 @@ def test_move_labware_to_slot(
     subject: ProtocolContext,
 ) -> None:
     """It should move labware to new slot location."""
+    drop_offset = {"x": 4, "y": 5, "z": 6}
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
     decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
@@ -313,10 +314,14 @@ def test_move_labware_to_slot(
         implementation=mock_labware_core,
         api_version=MAX_SUPPORTED_VERSION,
     )
-
+    decoy.when(
+        mock_validation.ensure_valid_labware_offset_vector(drop_offset)
+    ).then_return((1, 2, 3))
     subject.move_labware(
         labware=movable_labware,
         new_location=42,
+        use_pick_up_location_lpc_offset=True,
+        drop_offset=drop_offset,
     )
 
     decoy.verify(
@@ -324,6 +329,10 @@ def test_move_labware_to_slot(
             labware_core=mock_labware_core,
             new_location=DeckSlotName.SLOT_1,
             use_gripper=False,
+            use_pick_up_location_lpc_offset=True,
+            use_drop_location_lpc_offset=False,
+            pick_up_offset=None,
+            drop_offset=(1, 2, 3),
         )
     )
 
@@ -359,6 +368,10 @@ def test_move_labware_to_module(
             labware_core=mock_labware_core,
             new_location=mock_module_core,
             use_gripper=False,
+            use_pick_up_location_lpc_offset=False,
+            use_drop_location_lpc_offset=False,
+            pick_up_offset=None,
+            drop_offset=None,
         )
     )
 
@@ -370,10 +383,8 @@ def test_load_module(
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
-    # TODO: replace with `decoy.mock(cls=TemperatureModuleCore)` with decoy >= 1.11.1
-    mock_module_core = cast(
-        TemperatureModuleCore, decoy.mock(cls=TemperatureModuleCore.__origin__)  # type: ignore[attr-defined]
-    )
+    mock_module_core = decoy.mock(cls=TemperatureModuleCore)
+
     decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
@@ -404,11 +415,8 @@ def test_load_module_default_location(
     mock_core: ProtocolCore,
     subject: ProtocolContext,
 ) -> None:
-    """It should load a module without specifying a location explicitely."""
-    # TODO: replace with `decoy.mock(cls=TemperatureModuleCore)` with decoy >= 1.11.1
-    mock_module_core = cast(
-        TemperatureModuleCore, decoy.mock(cls=TemperatureModuleCore.__origin__)  # type: ignore[attr-defined]
-    )
+    """It should load a module without specifying a location explicitly."""
+    mock_module_core = decoy.mock(cls=TemperatureModuleCore)
 
     decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
@@ -422,7 +430,7 @@ def test_load_module_default_location(
         )
     ).then_return(mock_module_core)
 
-    decoy.when(mock_module_core.get_type()).then_return(ModuleType.TEMPERATURE)
+    decoy.when(mock_module_core.MODULE_TYPE).then_return(ModuleType.TEMPERATURE)
     decoy.when(mock_module_core.get_model()).then_return(
         TemperatureModuleModel.TEMPERATURE_V2
     )
@@ -465,3 +473,18 @@ def test_home(
     """It should home all axes."""
     subject.home()
     decoy.verify(mock_core.home(), times=1)
+
+
+def test_bundled_data(
+    decoy: Decoy, mock_core_map: LoadedCoreMap, mock_deck: Deck, mock_core: ProtocolCore
+) -> None:
+    """It should return bundled data."""
+    subject = ProtocolContext(
+        api_version=MAX_SUPPORTED_VERSION,
+        implementation=mock_core,
+        core_map=mock_core_map,
+        deck=mock_deck,
+        bundled_data={"foo": b"ar"},
+    )
+
+    assert subject.bundled_data == {"foo": b"ar"}

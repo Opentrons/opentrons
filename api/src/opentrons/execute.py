@@ -199,6 +199,10 @@ def execute(
     emit_runlog: Optional[Callable[[command_types.CommandMessage], None]] = None,
     custom_labware_paths: Optional[List[str]] = None,
     custom_data_paths: Optional[List[str]] = None,
+    # TODO(mm, 2022-12-14): The `machine` param should probably be removed.
+    #  * Protocols now declare their target robot types intrinsically.
+    #  * I don't think it would ever make sense to call this function with anything
+    #    other than the host robot's type, anyway?
     machine: Optional[MachineType] = None,
 ) -> None:
     """

@@ -10,7 +10,9 @@ from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.modules import ModuleType as ModuleType
+from opentrons.hardware_control.modules import (
+    ModuleType as ModuleType,
+)
 
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
@@ -60,6 +62,17 @@ class LabwareMovementStrategy(str, Enum):
     USING_GRIPPER = "usingGripper"
     MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
+
+
+# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
+@dataclass(frozen=True)
+class ExperimentalOffsetData(BaseModel):
+    """The result of a load module procedure."""
+
+    usePickUpLocationLpcOffset: bool
+    useDropLocationLpcOffset: bool
+    pickUpOffset: Optional[LabwareOffsetVector]
+    dropOffset: Optional[LabwareOffsetVector]
 
 
 class WellOrigin(str, Enum):

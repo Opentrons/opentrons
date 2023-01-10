@@ -1,6 +1,13 @@
 """Utilities for updating the gripper settings."""
 import logging
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+import asyncio
+from dataclasses import dataclass
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+    WaitableCallback,
+)
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetBrushedMotorVrefRequest,
@@ -8,6 +15,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     GripperGripRequest,
     GripperHomeRequest,
     AddBrushedLinearMoveRequest,
+    BrushedMotorConfRequest,
+    BrushedMotorConfResponse,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -18,6 +27,14 @@ from opentrons_hardware.firmware_bindings.constants import NodeId, ErrorCode
 from .constants import brushed_motor_interrupts_per_sec
 
 log = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class DriverConfig:
+    """Brushed motor driver config."""
+
+    reference_voltage: float
+    duty_cycle: int
 
 
 async def set_reference_voltage(
@@ -52,6 +69,36 @@ async def set_pwm_param(
     )
     if error != ErrorCode.ok:
         log.error(f"recieved error trying to set gripper pwm {str(error)}")
+
+
+async def get_gripper_jaw_motor_param(
+    can_messenger: CanMessenger,
+) -> DriverConfig:
+    """Get gripper brushed motor driver params: reference voltage and duty cycle."""
+
+    def _filter(arbitration_id: ArbitrationId) -> bool:
+        return NodeId(arbitration_id.parts.originating_node_id) == NodeId.gripper_g
+
+    async def _wait_for_response(reader: WaitableCallback) -> DriverConfig:
+        """Listener for receiving messages back."""
+        async for response, _ in reader:
+            if isinstance(response, BrushedMotorConfResponse):
+                return DriverConfig(
+                    reference_voltage=float(response.payload.v_ref.value / (2**16)),
+                    duty_cycle=int(response.payload.duty_cycle.value / (2**16)),
+                )
+        raise StopAsyncIteration
+
+    with WaitableCallback(can_messenger, _filter) as reader:
+        await can_messenger.send(
+            node_id=NodeId.gripper_g,
+            message=BrushedMotorConfRequest(),
+        )
+        try:
+            return await asyncio.wait_for(_wait_for_response(reader), 1.0)
+        except asyncio.TimeoutError:
+            log.warning("Read brushed motor driver config timed out")
+            raise StopAsyncIteration
 
 
 async def grip(

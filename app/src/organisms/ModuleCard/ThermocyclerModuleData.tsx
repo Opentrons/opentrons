@@ -69,7 +69,10 @@ export const ThermocyclerModuleData = (
   }
 
   return (
-    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing1} ${SPACING.spacing6}`}>
+    <Flex
+      flexWrap={WRAP}
+      gridGap={`${String(SPACING.spacing1)} ${String(SPACING.spacing6)}`}
+    >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid="thermocycler_module_data_lid"

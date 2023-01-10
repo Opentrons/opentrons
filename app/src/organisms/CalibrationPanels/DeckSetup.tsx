@@ -111,11 +111,14 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                   let labwareDef = null
                   if (String(tipRack?.slot) === slotId) {
                     labwareDef = tipRack?.definition
-                  } else if (calBlock && String(calBlock?.slot) === slotId) {
+                  } else if (
+                    calBlock != null &&
+                    String(calBlock?.slot) === slotId
+                  ) {
                     labwareDef = calBlock?.definition
                   }
 
-                  return labwareDef ? (
+                  return labwareDef != null ? (
                     <CalibrationLabwareRender
                       key={slotId}
                       slotDef={slot}

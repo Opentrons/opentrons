@@ -108,9 +108,7 @@ class LabwareSetup:
 
     def get_magnetic_module_link(self) -> WebElement:
         """Locator for securing labware to magentic module link."""
-        return self.base.clickable_wrapper(
-            LabwareSetup.securing_labware_to_magnetic_module_link
-        )
+        return self.base.clickable_wrapper(LabwareSetup.securing_labware_to_magnetic_module_link)
 
     def click_magnetic_module_link(self) -> None:
         """Click magnetic module link."""
@@ -118,9 +116,7 @@ class LabwareSetup:
 
     def get_thermocycler_link(self) -> WebElement:
         """Locator for securing labware to thermocycler module link."""
-        return self.base.clickable_wrapper(
-            LabwareSetup.securing_labware_to_thermocycler_link
-        )
+        return self.base.clickable_wrapper(LabwareSetup.securing_labware_to_thermocycler_link)
 
     def click_thermocycler_module_link(self) -> None:
         """Click thermocycler module link."""
@@ -150,18 +146,14 @@ class LabwareSetup:
 
     def get_proceed_to_run_button(self) -> WebElement:
         """Locator for proceed to run button."""
-        scroll: WebElement = self.base.clickable_wrapper(
-            LabwareSetup.proceed_to_run_button
-        )
+        scroll: WebElement = self.base.clickable_wrapper(LabwareSetup.proceed_to_run_button)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(scroll).perform()  # type: ignore
         return scroll
 
     def click_proceed_to_run_button(self) -> None:
         """Click proceed to run."""
-        scroll: WebElement = self.base.clickable_wrapper(
-            LabwareSetup.proceed_to_run_button
-        )
+        scroll: WebElement = self.base.clickable_wrapper(LabwareSetup.proceed_to_run_button)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(scroll).perform()  # type: ignore
         self.base.click(LabwareSetup.proceed_to_run_button)

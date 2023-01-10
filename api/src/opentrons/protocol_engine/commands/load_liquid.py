@@ -6,8 +6,6 @@ from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
-from opentrons.config import feature_flags
-
 if TYPE_CHECKING:
     from ..state import StateView
 
@@ -45,12 +43,11 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
 
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load data necessary for a liquid."""
-        if feature_flags.enable_load_liquid():
-            self._state_view.liquid.validate_liquid_id(params.liquidId)
+        self._state_view.liquid.validate_liquid_id(params.liquidId)
 
-            self._state_view.labware.validate_liquid_allowed_in_labware(
-                labware_id=params.labwareId, wells=params.volumeByWell
-            )
+        self._state_view.labware.validate_liquid_allowed_in_labware(
+            labware_id=params.labwareId, wells=params.volumeByWell
+        )
 
         return LoadLiquidResult()
 

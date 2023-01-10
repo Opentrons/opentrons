@@ -29,11 +29,9 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pipenv'
-          cache-dependency-path: |
-            app-testing/Pipfile.lock
+          cache-dependency-path: app-testing/Pipfile.lock
       - name: Install Pipenv
-        run: |
-          pip install -U pipenv
+        run: pip install -U pipenv
       - name: Pipenv Install
         id: install
         working-directory: ./app-testing
@@ -42,14 +40,10 @@ jobs:
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
         working-directory: ./app-testing
         run: make black-check
-      - name: isort-check
+      - name: ruff
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
         working-directory: ./app-testing
-        run: make isort-check
-      - name: flake8
-        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
-        working-directory: ./app-testing
-        run: make flake8
+        run: make ruff-check
       - name: mypy
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
         working-directory: ./app-testing
