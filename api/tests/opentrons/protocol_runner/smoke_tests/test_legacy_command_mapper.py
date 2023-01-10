@@ -47,6 +47,7 @@ metadata = {
 }
 
 def run(ctx):
+    # Labware and module loads:
     tip_rack_1 = ctx.load_labware(
         load_name="opentrons_96_tiprack_300ul",
         location="1",
@@ -63,6 +64,8 @@ def run(ctx):
     module_plate_1 = module_1.load_labware(
         "opentrons_96_aluminumblock_nest_wellplate_100ul"
     )
+
+    # Pipette loads:
     pipette_left = ctx.load_instrument(
         instrument_name="p300_single",
         mount="left",
@@ -72,6 +75,8 @@ def run(ctx):
         instrument_name="p300_multi",
         mount="right",
     )
+
+    # Tip pickups and drops with different kinds of locations:
     pipette_left.pick_up_tip(
         location=tip_rack_1.wells_by_name()["A1"],
     )
@@ -80,6 +85,8 @@ def run(ctx):
     )
     pipette_left.drop_tip()
     pipette_left.pick_up_tip()
+
+    # Liquid handling commands:
     pipette_left.aspirate(
         volume=40,
         rate=1.0,
@@ -117,6 +124,7 @@ def run(ctx):
     pipette_left.dispense(50, well_plate_1["F1"].top().move(point=Point(10, 10, 0)))
     pipette_left.aspirate(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
     pipette_left.dispense(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
+
     pipette_left.drop_tip(
         location=tip_rack_1.wells_by_name()["A1"]
     )
@@ -125,14 +133,14 @@ def run(ctx):
 
 @pytest.fixture
 def big_protocol_file(tmp_path: Path) -> Path:
-    """Put the pick up tip mapping test protocol on disk."""
+    """Put the big test protocol on disk."""
     path = tmp_path / "protocol-name.py"
     path.write_text(BIG_PROTOCOL)
     return path
 
 
-async def test_legacy_commands(big_protocol_file: Path) -> None:
-    """It should map legacy pick up tip commands."""
+async def test_big_protocol_commands(big_protocol_file: Path) -> None:
+    """It should map commands from the Python protocol."""
     commands_result = await simulate_and_get_commands(big_protocol_file)
 
     tiprack_1_result_captor = matchers.Captor()
