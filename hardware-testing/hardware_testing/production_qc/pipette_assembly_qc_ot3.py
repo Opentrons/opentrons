@@ -202,8 +202,10 @@ async def _pick_up_tip(
         api, mount, tip_pos, safe_height=tip_pos.z + SAFE_HEIGHT_TRAVEL
     )
     if not tip_volume:
-        tip_volume = api.hardware_pipettes[mount.to_mount()].working_volume
-    tip_length = helpers_ot3.get_default_tip_length(tip_volume)
+        pip = api.hardware_pipettes[mount.to_mount()]
+        assert pip
+        tip_volume = pip.working_volume
+    tip_length = helpers_ot3.get_default_tip_length(int(tip_volume))
     await api.pick_up_tip(mount, tip_length=tip_length)
     return actual
 
@@ -250,6 +252,7 @@ async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
 async def _drop_tip_in_trash(api: OT3API, mount: OT3Mount) -> None:
     # assume the ideal is accurate enough
     ideal = IDEAL_LABWARE_LOCATIONS.trash
+    assert ideal
     current_pos = await api.gantry_position(mount)
     safe_height = max(ideal.z, current_pos.z) + SAFE_HEIGHT_TRAVEL
     await helpers_ot3.move_to_arched_ot3(api, mount, ideal, safe_height=safe_height)
@@ -259,7 +262,9 @@ async def _drop_tip_in_trash(api: OT3API, mount: OT3Mount) -> None:
 async def _aspirate_and_look_for_droplets(
     api: OT3API, mount: OT3Mount, wait_time: int
 ) -> bool:
-    pipette_volume = api.hardware_pipettes[mount.to_mount()].working_volume
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pipette_volume = pip.working_volume
     print(f"aspirating {pipette_volume} microliters")
     await api.aspirate(mount, pipette_volume)
     await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
@@ -357,7 +362,9 @@ async def _fixture_check_pressure(
     )
     results.append(r)
     # aspirate 50uL
-    pip_vol = api.hardware_pipettes[mount.to_mount()].working_volume
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pip_vol = int(pip.working_volume)
     await api.aspirate(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
     if pip_vol == 50:
         asp_evt = PressureEvent.ASPIRATE_P50
@@ -513,7 +520,7 @@ async def _read_pipette_sensor_repeatedly_and_average(
 ) -> float:
     # FIXME: this while loop is required b/c the command does not always
     #        return a value, not sure if issue is in firmware or CAN
-    readings = []
+    readings: List[float] = []
     while len(readings) < num_readings:
         try:
             if sensor_type == SensorType.capacitive:
@@ -521,11 +528,11 @@ async def _read_pipette_sensor_repeatedly_and_average(
             elif sensor_type == SensorType.pressure:
                 r = await helpers_ot3.get_pressure_ot3(api, mount)
             elif sensor_type == SensorType.temperature:
-                r = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
-                r = r[0]
+                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                r = res[0]
             elif sensor_type == SensorType.humidity:
-                r = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
-                r = r[1]
+                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                r = res[1]
             else:
                 raise ValueError(f"unexpected sensor type: {sensor_type}")
         except helpers_ot3.SensorResponseBad:
@@ -594,7 +601,7 @@ async def _test_diagnostics_capacitive(
     )
     if trigger_pos <= probe_target + 1:
         capacitive_probing_pass = False
-        print(f"FAIL: probe was not triggered while moving downwards")
+        print("FAIL: probe was not triggered while moving downwards")
     write_cb(
         ["capacitive-probing", trigger_pos, _bool_to_pass_fail(capacitive_probing_pass)]
     )
@@ -656,8 +663,9 @@ async def _test_diagnostics_pressure(
     write_cb(
         ["pressure-sealed", pressure_sealed, _bool_to_pass_fail(pressure_sealed_pass)]
     )
-
-    pip_vol = api.hardware_pipettes[mount.to_mount()].working_volume
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pip_vol = int(pip.working_volume)
     plunger_aspirate_ul = PRESSURE_ASPIRATE_VOL[pip_vol]
     print(f"aspirate {plunger_aspirate_ul} ul")
     await api.aspirate(mount, plunger_aspirate_ul)
