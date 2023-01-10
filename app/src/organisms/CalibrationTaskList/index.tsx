@@ -8,22 +8,26 @@ import { TaskList } from '../TaskList'
 
 import { useCalibrationTaskList } from '../Devices/hooks'
 
-import type { DashboardCalInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 interface CalibrationTaskListProps {
   robotName: string
-  pipOffsetCalLauncher: DashboardCalInvoker
+  pipOffsetCalLauncher: DashboardCalOffsetInvoker
+  tipLengthCalLauncher: DashboardCalTipLengthInvoker
 }
 
 export function CalibrationTaskList({
   robotName,
   pipOffsetCalLauncher,
+  tipLengthCalLauncher,
 }: CalibrationTaskListProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const history = useHistory()
   const { activeIndex, taskList } = useCalibrationTaskList(
     robotName,
-    pipOffsetCalLauncher
+    pipOffsetCalLauncher,
+    tipLengthCalLauncher
   )
 
   return (

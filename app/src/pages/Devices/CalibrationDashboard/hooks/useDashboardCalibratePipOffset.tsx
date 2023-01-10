@@ -31,7 +31,7 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 const PIPETTE_OFFSET_TITLE = 'Pipette offset calibration'
 const EXIT = 'exit'
 
-export interface DashboardCalInvokerProps {
+export interface DashboardOffsetCalInvokerProps {
   params: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
     Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
   withIntent:
@@ -39,12 +39,14 @@ export interface DashboardCalInvokerProps {
     | typeof INTENT_RECALIBRATE_PIPETTE_OFFSET
 }
 
-export type DashboardCalInvoker = (props: DashboardCalInvokerProps) => void
+export type DashboardCalOffsetInvoker = (
+  props: DashboardOffsetCalInvokerProps
+) => void
 
 export function useDashboardCalibratePipOffset(
   robotName: string,
   onComplete: (() => unknown) | null = null
-): [DashboardCalInvoker, JSX.Element | null] {
+): [DashboardCalOffsetInvoker, JSX.Element | null] {
   const createRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
@@ -126,7 +128,7 @@ export function useDashboardCalibratePipOffset(
     }
   }, [shouldClose, onComplete])
 
-  const handleStartDashboardPipOffsetCalSession: DashboardCalInvoker = props => {
+  const handleStartDashboardPipOffsetCalSession: DashboardCalOffsetInvoker = props => {
     const { params, withIntent } = props
     const {
       mount,

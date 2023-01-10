@@ -14,15 +14,17 @@ import type {
   TaskProps,
 } from '../../TaskList/types'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { DashboardCalInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import {
   INTENT_CALIBRATE_PIPETTE_OFFSET,
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
 } from '../../DeprecatedCalibrationPanels'
+import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 export function useCalibrationTaskList(
   robotName: string,
-  pipOffsetCalLauncher: DashboardCalInvoker
+  pipOffsetCalLauncher: DashboardCalOffsetInvoker,
+  tipLengthCalLauncher: DashboardCalTipLengthInvoker
 ): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
   const TASK_LIST_LENGTH = 3
@@ -138,7 +140,11 @@ export function useCalibrationTaskList(
         })
         tipLengthSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () => {},
+          onClick: () =>
+            tipLengthCalLauncher({
+              params: { mount },
+              hasBlockModalResponse: null,
+            }),
         }
         tipLengthSubTask.isComplete = true
 
@@ -185,7 +191,11 @@ export function useCalibrationTaskList(
           )
           tipLengthSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () => {},
+            onClick: () =>
+              tipLengthCalLauncher({
+                params: { mount },
+                hasBlockModalResponse: null,
+              }),
           }
         } else {
           // the tip length calibration is present and valid
@@ -194,7 +204,11 @@ export function useCalibrationTaskList(
           })
           tipLengthSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () => {},
+            onClick: () =>
+              tipLengthCalLauncher({
+                params: { mount },
+                hasBlockModalResponse: null,
+              }),
           }
           tipLengthSubTask.isComplete = true
         }
