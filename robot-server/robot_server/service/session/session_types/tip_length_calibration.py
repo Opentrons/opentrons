@@ -1,4 +1,4 @@
-from typing import cast, Awaitable, Optional
+from typing import cast, Awaitable, Optional, Any, Dict
 from opentrons.types import Mount
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
@@ -46,6 +46,15 @@ class TipLengthCalibration(BaseSession):
         )
         self._shutdown_coroutine = shutdown_handler
 
+    @staticmethod
+    def _verify_tip_rack(
+        tip_rack_def: Dict[str, Any] | Any | None
+    ) -> Optional[LabwareDefinition]:
+        if tip_rack_def:
+            labware.verify_definition(tip_rack_def)
+            return (cast(LabwareDefinition, tip_rack_def),)
+        return tip_rack_def
+
     @classmethod
     async def create(
         cls, configuration: SessionConfiguration, instance_meta: SessionMetaData
@@ -53,9 +62,6 @@ class TipLengthCalibration(BaseSession):
         assert isinstance(instance_meta.create_params, SessionCreateParams)
         has_calibration_block = instance_meta.create_params.hasCalibrationBlock
         mount = instance_meta.create_params.mount
-        tip_rack_def = instance_meta.create_params.tipRackDefinition
-        if tip_rack_def:
-            labware.verify_definition(tip_rack_def)
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -67,7 +73,9 @@ class TipLengthCalibration(BaseSession):
                 hardware=configuration.hardware,
                 mount=Mount[mount.upper()],
                 has_calibration_block=has_calibration_block,
-                tip_rack=cast(LabwareDefinition, tip_rack_def),
+                tip_rack=TipLengthCalibration._verify_tip_rack(
+                    instance_meta.create_params.tipRackDefinition
+                ),
             )
         except AssertionError as e:
             raise SessionCreationException(str(e))
