@@ -67,9 +67,26 @@ const mockLoadLiquidRunTimeCommands = [
       liquidId: '1',
       labwareId: 'mockLabwareId2',
       volumeByWell: {
-        A1: 33,
-        B1: 33,
-        C1: 33,
+        D3: 40,
+      },
+    },
+    result: {},
+    startedAt: '2022-09-07T19:47:42.786212+00:00',
+    completedAt: '2022-09-07T19:47:42.786285+00:00',
+  },
+  {
+    id: '1e03ae10-7e9b-465c-bc72-21ab5706bfb0',
+    createdAt: '2022-09-07T19:47:42.781323+00:00',
+    commandType: 'loadLiquid',
+    key: '48df9766-04ff-4927-9f2d-4efdcf0b3df8',
+    status: 'succeeded',
+    params: {
+      liquidId: '1',
+      labwareId: 'mockLabwareId2',
+      volumeByWell: {
+        A3: 33,
+        B3: 33,
+        C3: 33,
       },
     },
     result: {},
@@ -317,9 +334,10 @@ describe('parseLabwareInfoByLiquidId', () => {
         {
           labwareId: 'mockLabwareId2',
           volumeByWell: {
-            A1: 33,
-            B1: 33,
-            C1: 33,
+            A3: 33,
+            B3: 33,
+            C3: 33,
+            D3: 40,
           },
         },
       ],
