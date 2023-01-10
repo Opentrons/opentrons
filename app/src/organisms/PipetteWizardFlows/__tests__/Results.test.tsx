@@ -139,16 +139,15 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
       attachedPipettes: { left: null, right: null },
       selectedPipette: NINETY_SIX_CHANNEL,
-      currentStepIndex: 6,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('96-Channel Pipette Successfully Detached')
+    getByText('All Pipettes Successfully Detached')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+    expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel', () => {
     props = {

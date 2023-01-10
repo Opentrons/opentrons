@@ -60,6 +60,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           if (currentStepIndex === totalStepCount) {
             header = t('ninety_six_detached_success')
           } else {
+            header = t('all_pipette_detached')
             subHeader = t('gantry_empty_for_96_channel_success')
             buttonText = t('attach_pip')
           }
