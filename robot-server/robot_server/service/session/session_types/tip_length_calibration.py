@@ -52,8 +52,8 @@ class TipLengthCalibration(BaseSession):
     ) -> Optional[LabwareDefinition]:
         if tip_rack_def:
             labware.verify_definition(tip_rack_def)
-            return (cast(LabwareDefinition, tip_rack_def),)
-        return tip_rack_def
+            return cast(LabwareDefinition, tip_rack_def)
+        return None
 
     @classmethod
     async def create(
