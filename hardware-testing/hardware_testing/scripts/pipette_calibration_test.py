@@ -64,9 +64,9 @@ class Pipette_Calibration_Test:
         }
         self.gauges = {}
         self.gauge_ports = {
-            "X":"/dev/ttyUSB0",
-            "Y":"/dev/ttyUSB1",
-            "Z":"/dev/ttyUSB2",
+            # "X":"/dev/ttyUSB0",
+            # "Y":"/dev/ttyUSB1",
+            # "Z":"/dev/ttyUSB2",
         }
         self.gauge_offsets = {
             "X":Point(x=0, y=5, z=5),
