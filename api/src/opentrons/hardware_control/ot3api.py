@@ -760,18 +760,6 @@ class OT3API(
             z=cur_pos[OT3Axis.by_mount(realmount)],
         )
 
-    async def home_and_recover_position(
-        self, mount: OT3Mount, axes_moving: List[OT3Axis]
-    ) -> None:
-        origin = await self.gantry_position(mount, refresh=True)
-        await self._cache_and_maybe_retract_mount(mount)
-        await self._move_gripper_to_idle_position(mount)
-        await self.home(axes_moving)
-        for ax in axes_moving:
-            # move back to the origin location one axis at a time after homing all axes
-            here = await self.gantry_position(mount, refresh=True)
-            await self.move_to(mount, ax.set_in_point(here, ax.of_point(origin)))
-
     async def move_to(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -784,19 +772,6 @@ class OT3API(
         relative to the deck, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
 
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if not self._backend.check_ready_for_movement(axes_moving):
-            self._log.info(f"Motor status not ok, homing all moving axes.")
-            await self.home_and_recover_position(realmount, axes_moving)
-
-        target_position = target_position_from_absolute(
-            realmount,
-            abs_position,
-            partial(self.critical_point_for, cp_override=critical_point),
-            top_types.Point(*self._config.left_mount_offset),
-            top_types.Point(*self._config.right_mount_offset),
-            top_types.Point(*self._config.gripper_mount_offset),
-        )
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
                 OT3Axis.from_axis(k): v for k, v in max_speeds.items()
@@ -806,7 +781,33 @@ class OT3API(
 
         await self._cache_and_maybe_retract_mount(realmount)
         await self._move_gripper_to_idle_position(realmount)
-        await self._move(target_position, speed=speed, max_speeds=checked_max)
+
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(realmount)]
+        if not self._backend.check_ready_for_movement(axes_moving):
+            self._log.info(f"Motor status not ok, homing all moving axes.")
+            self.home(axes_moving)
+            # move one axis at a time to the target position in XYZ order
+            for ax in ax:
+                here = await self.gantry_position(realmount)
+                target = target_position_from_absolute(
+                    realmount,
+                    ax.set_in_point(here, ax.of_point(abs_position)),
+                    partial(self.critical_point_for, cp_override=critical_point),
+                    top_types.Point(*self._config.left_mount_offset),
+                    top_types.Point(*self._config.right_mount_offset),
+                    top_types.Point(*self._config.gripper_mount_offset),
+                )
+                await self._move(target, speed=speed, max_speeds=checked_max)
+        else:
+            target_position = target_position_from_absolute(
+                realmount,
+                abs_position,
+                partial(self.critical_point_for, cp_override=critical_point),
+                top_types.Point(*self._config.left_mount_offset),
+                top_types.Point(*self._config.right_mount_offset),
+                top_types.Point(*self._config.gripper_mount_offset),
+            )
+            await self._move(target_position, speed=speed, max_speeds=checked_max)
 
     async def move_rel(
         self,
@@ -828,34 +829,47 @@ class OT3API(
         )
 
         realmount = OT3Mount.from_mount(mount)
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if not self._backend.check_ready_for_movement([axis for axis in axes_moving]):
-            if fail_on_not_homed:
-                raise mhe
-            else:
-                await self.home_and_recover_position(realmount, axes_moving)
 
-        target_position = target_position_from_relative(
-            realmount, delta, self._current_position
-        )
-        if fail_on_not_homed and not self._backend.check_ready_for_movement(
-            [axis for axis in axes_moving if axis is not None]
-        ):
+        origin = self._current_position.copy()
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        ready = self._backend.check_ready_for_movement([axis for axis in axes_moving])
+        if not ready and fail_on_not_homed:
             raise mhe
+
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
                 OT3Axis.from_axis(k): v for k, v in max_speeds.items()
             }
         else:
             checked_max = None
+
         await self._cache_and_maybe_retract_mount(realmount)
         await self._move_gripper_to_idle_position(realmount)
-        await self._move(
-            target_position,
-            speed=speed,
-            max_speeds=checked_max,
-            check_bounds=check_bounds,
-        )
+
+        if not ready:
+            self._log.info(f"Motor status not ok, homing all moving axes.")
+            self.home(axes_moving)
+            # move one axis at a time to the target position in XYZ order
+            for ax in ax:
+                target = target_position_from_relative(
+                    realmount,
+                    ax.set_in_point(top_types.Point(0, 0, 0), ax.of_point(delta)),
+                    origin,
+                )
+                await self._move(
+                    target,
+                    speed=speed,
+                    max_speeds=checked_max,
+                    check_bounds=check_bounds,
+                )
+        else:
+            target_position = target_position_from_relative(realmount, delta, origin)
+            await self._move(
+                target_position,
+                speed=speed,
+                max_speeds=checked_max,
+                check_bounds=check_bounds,
+            )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
         """Retract the 'other' mount if necessary
