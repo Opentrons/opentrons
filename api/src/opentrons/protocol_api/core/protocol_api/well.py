@@ -1,9 +1,11 @@
 """Legacy Well core implementation."""
+from typing import Optional
+
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
 
+from .well_geometry import WellGeometry
 from ..well import AbstractWellCore
 
 
@@ -38,8 +40,28 @@ class WellImplementation(AbstractWellCore):
 
     @geometry.setter
     def geometry(self, well_geometry: WellGeometry) -> None:
-        """Upate the well's geometry interface."""
+        """Update the well's geometry interface."""
         self._geometry = well_geometry
+
+    @property
+    def diameter(self) -> Optional[float]:
+        """Get the well's diameter, if circular."""
+        return self._geometry.diameter
+
+    @property
+    def length(self) -> Optional[float]:
+        """Get the well's length, if rectangular."""
+        return self._geometry.length
+
+    @property
+    def width(self) -> Optional[float]:
+        """Get the well's width, if rectangular."""
+        return self._geometry.width
+
+    @property
+    def depth(self) -> float:
+        """Get the well's depth."""
+        return self._geometry.depth
 
     def has_tip(self) -> bool:
         """Whether the well contains a tip."""
@@ -80,6 +102,10 @@ class WellImplementation(AbstractWellCore):
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
         return self._geometry.center()
+
+    def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
+        """Gets point in deck coordinates based on percentage of the radius of each axis."""
+        return self._geometry.from_center_cartesian(x, y, z)
 
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:

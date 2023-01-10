@@ -17,9 +17,7 @@ class Modal:
         self.base: Base = Base(driver, console, execution_id)
         self.console: Console = console
 
-    not_now: Element = Element(
-        (By.XPATH, '//button[text()="Not Now"]'), "Not Now to upgrade."
-    )
+    not_now: Element = Element((By.XPATH, '//button[text()="Not Now"]'), "Not Now to upgrade.")
 
     def get_not_now(self) -> Optional[WebElement]:
         """Safely get the not now button."""
