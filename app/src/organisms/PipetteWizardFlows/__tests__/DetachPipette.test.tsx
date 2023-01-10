@@ -34,7 +34,7 @@ const render = (props: React.ComponentProps<typeof DetachPipette>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
-  modelSpecs: { ...mockGen3P1000PipetteSpecs, maxVolume: 50 },
+  modelSpecs: mockGen3P1000PipetteSpecs,
 }
 describe('DetachPipette', () => {
   let props: React.ComponentProps<typeof DetachPipette>
@@ -60,7 +60,7 @@ describe('DetachPipette', () => {
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3, 50uL')
+    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3')
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
@@ -91,7 +91,7 @@ describe('DetachPipette', () => {
           tip_length: 42,
           mount_axis: 'c',
           plunger_axis: 'd',
-          modelSpecs: { ...mockGen3P1000PipetteSpecs, maxVolume: '1000' },
+          modelSpecs: mockGen3P1000PipetteSpecs,
         },
         right: null,
       },
@@ -99,7 +99,7 @@ describe('DetachPipette', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Loosen Screws and Detach 96-Channel Pipette')
     getByText(
-      'Hold the pipette so it does not fall. Then loosen the four captive screws on the front of the pipette. Once all the screws are loosened, slowly remove the pipette by sliding the unit towards by sliding it towards the front of the robot, off the supporting pins.'
+      'Hold the pipette so it does not fall. Then loosen the four captive screws on the front of the pipette. Once all the screws are loosened, slowly remove the pipette by sliding it towards the front of the robot, off the supporting pins.'
     )
     getByText(
       'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
@@ -128,7 +128,7 @@ describe('DetachPipette', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3, 50uL')
+    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3')
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )

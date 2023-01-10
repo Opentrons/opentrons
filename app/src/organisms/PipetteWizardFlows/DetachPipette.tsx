@@ -31,9 +31,6 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const is96ChannelPipette = attachedPipettes[mount]?.name === 'p1000_96'
-  const maxVolumeOfPipette = attachedPipettes[
-    mount
-  ]?.modelSpecs.maxVolume.toString()
 
   let bodyText: React.ReactNode = <div></div>
   if (isPending) {
@@ -79,7 +76,6 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         ) : !is96ChannelPipette ? (
           t('loose_detach', {
             pipetteName: attachedPipettes[mount]?.modelSpecs.displayName,
-            volume: maxVolumeOfPipette,
           })
         ) : (
           t('unscrew_remove_96_channel')
