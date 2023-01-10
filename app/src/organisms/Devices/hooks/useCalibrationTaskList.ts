@@ -14,8 +14,16 @@ import type {
   TaskProps,
 } from '../../TaskList/types'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type { DashboardCalInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import {
+  INTENT_CALIBRATE_PIPETTE_OFFSET,
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
+} from '../../DeprecatedCalibrationPanels'
 
-export function useCalibrationTaskList(robotName: string): TaskListProps {
+export function useCalibrationTaskList(
+  robotName: string,
+  pipOffsetCalLauncher: DashboardCalInvoker
+): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
@@ -139,7 +147,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
         })
         offsetSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () => {},
+          onClick: () =>
+            pipOffsetCalLauncher({
+              params: { mount },
+              withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+            }),
         }
         offsetSubTask.isComplete = true
 
@@ -203,7 +215,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           )
           offsetSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () => {},
+            onClick: () =>
+              pipOffsetCalLauncher({
+                params: { mount },
+                withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
+              }),
           }
         } else {
           // the offset calibration is present and valid
@@ -212,7 +228,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           })
           offsetSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () => {},
+            onClick: () =>
+              pipOffsetCalLauncher({
+                params: { mount },
+                withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+              }),
           }
           offsetSubTask.isComplete = true
         }

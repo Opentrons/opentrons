@@ -8,16 +8,23 @@ import { TaskList } from '../TaskList'
 
 import { useCalibrationTaskList } from '../Devices/hooks'
 
+import type { DashboardCalInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+
 interface CalibrationTaskListProps {
   robotName: string
+  pipOffsetCalLauncher: DashboardCalInvoker
 }
 
 export function CalibrationTaskList({
   robotName,
+  pipOffsetCalLauncher,
 }: CalibrationTaskListProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const history = useHistory()
-  const { activeIndex, taskList } = useCalibrationTaskList(robotName)
+  const { activeIndex, taskList } = useCalibrationTaskList(
+    robotName,
+    pipOffsetCalLauncher
+  )
 
   return (
     <Modal
