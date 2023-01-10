@@ -47,6 +47,36 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
+import logging
+from logging.config import dictConfig
+
+
+log = logging.getLogger(__name__)
+
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
+    },
+    "handlers": {
+        "file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "basic",
+            "filename": "/var/log/repl.log",
+            "maxBytes": 5000000,
+            "level": logging.DEBUG,
+            "backupCount": 3,
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["file_handler"],
+            "level": logging.DEBUG,
+        },
+    },
+}
+
 if ff.enable_ot3_hardware_controller():
     from opentrons.hardware_control.ot3api import OT3API
 
@@ -107,6 +137,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
 
 
 if __name__ == "__main__":
+    dictConfig(LOG_CONFIG)
     if has_robot_server:
         stop_server()
     api_tm = build_api()
