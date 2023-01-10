@@ -78,9 +78,7 @@ class LabwareLanding:
 
     def get_import_custom_labware_definition_header(self) -> WebElement:
         """Get the labware Slideout_title_Import a Custom Labware Definition."""
-        return self.base.present_wrapper(
-            self.import_custom_labware_definition_header, 2
-        )
+        return self.base.present_wrapper(self.import_custom_labware_definition_header, 2)
 
     choose_file_button: Element = Element(
         (By.ID, "UploadInput_protocolUploadButton"),

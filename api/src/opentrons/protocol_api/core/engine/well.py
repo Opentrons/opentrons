@@ -1,12 +1,14 @@
 """ProtocolEngine-based Well core implementations."""
+from typing import Optional
+
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
 
+from . import point_calculations
 from ..well import AbstractWellCore
 
 
@@ -37,9 +39,24 @@ class WellCore(AbstractWellCore):
         return self._labware_id
 
     @property
-    def geometry(self) -> WellGeometry:
-        """Get the well's geometry information interface."""
-        raise NotImplementedError("WellCore.geometry not implemented")
+    def diameter(self) -> Optional[float]:
+        """Get the well's diameter, if circular."""
+        return self._definition.diameter
+
+    @property
+    def length(self) -> Optional[float]:
+        """Get the well's length, if rectangular."""
+        return self._definition.xDimension
+
+    @property
+    def width(self) -> Optional[float]:
+        """Get the well's width, if rectangular."""
+        return self._definition.yDimension
+
+    @property
+    def depth(self) -> float:
+        """Get the well's depth."""
+        return self._definition.depth
 
     def has_tip(self) -> bool:
         """Whether the well contains a tip."""
@@ -75,7 +92,7 @@ class WellCore(AbstractWellCore):
         return self._definition.totalLiquidVolume
 
     def get_top(self, z_offset: float) -> Point:
-        """Get the coordinate of the well's top, with an z-offset."""
+        """Get the coordinate of the well's top, with a z-offset."""
         return self._engine_client.state.geometry.get_well_position(
             well_name=self._name,
             labware_id=self._labware_id,
@@ -85,7 +102,7 @@ class WellCore(AbstractWellCore):
         )
 
     def get_bottom(self, z_offset: float) -> Point:
-        """Get the coordinate of the well's bottom, with an z-offset."""
+        """Get the coordinate of the well's bottom, with a z-offset."""
         return self._engine_client.state.geometry.get_well_position(
             well_name=self._name,
             labware_id=self._labware_id,
@@ -98,8 +115,22 @@ class WellCore(AbstractWellCore):
     # Make this change carefully with respect to the robot-server because
     # `WellOrigin` is a public enum that may be persisted
     def get_center(self) -> Point:
-        """Get the coordinate of the well's center, with an z-offset."""
+        """Get the coordinate of the well's center."""
         well_height = self._engine_client.state.geometry.get_well_height(
             labware_id=self.labware_id, well_name=self._name
         )
         return self.get_bottom(z_offset=well_height / 2)
+
+    def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
+        """Gets point in deck coordinates based on percentage of the radius of each axis."""
+        well_size = self._engine_client.state.labware.get_well_size(
+            labware_id=self.labware_id, well_name=self._name
+        )
+
+        return point_calculations.get_relative_offset(
+            point=self.get_center(),
+            size=well_size,
+            x_ratio=x,
+            y_ratio=y,
+            z_ratio=z,
+        )
