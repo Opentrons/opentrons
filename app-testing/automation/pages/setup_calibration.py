@@ -100,21 +100,15 @@ class SetupCalibration:
 
     def get_robot_calibration(self) -> WebElement:
         """Search for the robot calibration text."""
-        return self.base.clickable_wrapper(
-            SetupCalibration.robot_calibration_text_locator
-        )
+        return self.base.clickable_wrapper(SetupCalibration.robot_calibration_text_locator)
 
     def get_deck_calibration(self) -> WebElement:
         """Search for the deck calibration text."""
-        return self.base.clickable_wrapper(
-            SetupCalibration.deck_calibration_text_locator
-        )
+        return self.base.clickable_wrapper(SetupCalibration.deck_calibration_text_locator)
 
     def get_required_pipettes(self) -> WebElement:
         """Search for the required pipette calibration."""
-        return self.base.clickable_wrapper(
-            SetupCalibration.required_pipettes_text_locator
-        )
+        return self.base.clickable_wrapper(SetupCalibration.required_pipettes_text_locator)
 
     def click_robot_calibration(self) -> None:
         """Click robot calibration."""
@@ -122,27 +116,19 @@ class SetupCalibration:
 
     def get_calibration_ready_locator(self) -> WebElement:
         """Calibration helper icon text."""
-        return self.base.clickable_wrapper(
-            SetupCalibration.calibration_helper_icon_text_locator
-        )
+        return self.base.clickable_wrapper(SetupCalibration.calibration_helper_icon_text_locator)
 
     def get_robot_calibration_help_locator(self) -> WebElement:
         """Robot calibration help link."""
-        return self.base.clickable_wrapper(
-            SetupCalibration.robot_calibration_help_link_locator
-        )
+        return self.base.clickable_wrapper(SetupCalibration.robot_calibration_help_link_locator)
 
     def get_robot_calibration_help_modal_text(self) -> WebElement:
         """Robot calibration help modal."""
-        return self.base.clickable_wrapper(
-            SetupCalibration.robot_calibration_help_model_text
-        )
+        return self.base.clickable_wrapper(SetupCalibration.robot_calibration_help_model_text)
 
     def get_robot_calibration_close_button(self) -> WebElement:
         """Robot claibration close button."""
-        close: WebElement = self.base.clickable_wrapper(
-            SetupCalibration.close_robot_calibration_button
-        )
+        close: WebElement = self.base.clickable_wrapper(SetupCalibration.close_robot_calibration_button)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(close).perform()  # type: ignore
         return close
@@ -153,15 +139,11 @@ class SetupCalibration:
 
     def click_robot_calibration_close_button(self) -> None:
         """Click robot calibration close."""
-        close: WebElement = self.base.clickable_wrapper(
-            SetupCalibration.close_robot_calibration_button
-        )
+        close: WebElement = self.base.clickable_wrapper(SetupCalibration.close_robot_calibration_button)
         actions = ActionChains(self.base.driver)  # type: ignore
         actions.move_to_element(close).perform()  # type: ignore
         self.base.click(SetupCalibration.close_robot_calibration_button)
 
     def get_required_tip_length_calibration(self) -> WebElement:
         """Tip length calibration."""
-        return self.base.clickable_wrapper(
-            SetupCalibration.required_tip_length_calibration_text_locator
-        )
+        return self.base.clickable_wrapper(SetupCalibration.required_tip_length_calibration_text_locator)

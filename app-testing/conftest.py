@@ -3,16 +3,15 @@ import os
 from typing import Generator, List, Optional
 
 import pytest
+from automation.menus.left_menu import LeftMenu
+from automation.pages.app_settings import AppSettings
+from automation.resources.robot_data import ROBOT_MAPPING, RobotDataType
 from dotenv import find_dotenv, load_dotenv
 from rich import pretty, traceback
 from rich.console import Console
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
-
-from automation.menus.left_menu import LeftMenu
-from automation.pages.app_settings import AppSettings
-from automation.resources.robot_data import ROBOT_MAPPING, RobotDataType
 
 collect_ignore_glob = ["files/**/*.py"]
 
@@ -45,9 +44,7 @@ def _chrome_options() -> Options:
     """Chrome options for setup."""
     options = Options()
     executable_path = os.getenv("EXECUTABLE_PATH")
-    assert (
-        executable_path is not None
-    ), "EXECUTABLE_PATH environment variable must be set"
+    assert executable_path is not None, "EXECUTABLE_PATH environment variable must be set"
     _console.print(f"EXECUTABLE_PATH is {executable_path}", style="white on blue")
     options.binary_location = executable_path
     options.add_argument("whitelisted-ips=''")  # type: ignore

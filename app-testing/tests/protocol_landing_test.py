@@ -4,9 +4,6 @@ from pathlib import Path
 from typing import Dict
 
 import pytest
-from rich.console import Console
-from selenium.webdriver.chrome.webdriver import WebDriver
-
 from automation.driver.drag_drop import drag_and_drop_file
 from automation.menus.left_menu import LeftMenu
 from automation.pages.device_landing import DeviceLanding
@@ -14,6 +11,8 @@ from automation.pages.labware_setup import LabwareSetup
 from automation.pages.module_setup import ModuleSetup
 from automation.pages.protocol_landing import ProtocolLanding
 from automation.pages.setup_calibration import SetupCalibration
+from rich.console import Console
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 @pytest.mark.skip("Need to fix.")
@@ -31,9 +30,7 @@ def test_protocol_landing(
     left_menu.navigate("protocols")
 
     # Verifying elements on the protocol page
-    protocol_landing: ProtocolLanding = ProtocolLanding(
-        driver, console, request.node.nodeid
-    )
+    protocol_landing: ProtocolLanding = ProtocolLanding(driver, console, request.node.nodeid)
     console.print(
         f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}",
         style="white on blue",
@@ -45,13 +42,9 @@ def test_protocol_landing(
 
     # Verifying elements on Protocol Landing Page
     assert protocol_landing.get_import_button_protocol_landing().is_displayed()
-    assert protocol_landing.get_deckMap_protocol_landing(
-        protocol_name="script_pur_sample_1"
-    ).is_displayed()
+    assert protocol_landing.get_deckMap_protocol_landing(protocol_name="script_pur_sample_1").is_displayed()
     assert (
-        protocol_landing.get_protocol_name_text_protocol_landing(
-            protocol_name="script_pur_sample_1"
-        )
+        protocol_landing.get_protocol_name_text_protocol_landing(protocol_name="script_pur_sample_1")
         == "script_pur_sample_1"
     )
     protocol_landing.click_overflow_menu()
@@ -73,10 +66,7 @@ def test_protocol_landing(
     assert robot_calibrate.get_deck_calibration().text == "Deck Calibration"
     assert robot_calibrate.get_required_pipettes().text == "Required Pipettes"
     assert robot_calibrate.get_calibration_ready_locator().text == "Calibration Ready"
-    assert (
-        robot_calibrate.get_required_tip_length_calibration().text
-        == "Required Tip Length Calibrations"
-    )
+    assert robot_calibrate.get_required_tip_length_calibration().text == "Required Tip Length Calibrations"
     module_setup = ModuleSetup(driver, console, request.node.nodeid)
     assert module_setup.get_proceed_to_module_setup().is_displayed()
     module_setup.click_proceed_to_module_setup()
