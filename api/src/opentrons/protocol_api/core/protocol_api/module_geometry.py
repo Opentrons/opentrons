@@ -277,8 +277,6 @@ class ThermocyclerGeometry(ModuleGeometry):
         return Labware(
             implementation=LabwareImplementation(definition, super().location),
             api_version=labware.api_version,
-            protocol_core=None,  # type: ignore[arg-type]
-            core_map=None,  # type: ignore[arg-type]
         )
 
     def add_labware(self, labware: Labware) -> Labware:
