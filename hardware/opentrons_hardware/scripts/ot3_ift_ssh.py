@@ -57,6 +57,29 @@ def getch():
         return ch
     return _getch()
 
+async def move_for_input(messenger: CanMessenger, node, position,xy) -> None:
+    step_size = [0.1, 0.5, 1, 10, 20, 50]
+    step_length_index = 3
+    step = step_size[step_length_index]
+    pos = 0
+    speed = 10
+    res = {node: (0,0,0)}
+    try:
+        if xy == "downward":
+            pos = pos + step
+            position['pipette'] = pos
+            res = await move_to(messenger, node, step, -speed)
+        elif xy == "up":
+            pos = pos - step
+            position['pipette'] = pos
+            res = await move_to(messenger, node, step, speed)
+        print("move=Pass")
+    except Exception as err:
+        print("move=Failed")
+
+
+
+
 async def _jog_axis(messenger: CanMessenger, node, position) -> None:
     step_size = [0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
@@ -141,7 +164,11 @@ async def home(messenger, node):
             ]
         ]
     )
-    await home_runner.run(can_messenger = messenger)
+    try:
+        await home_runner.run(can_messenger = messenger)
+        print("home=Pass")
+    except asyncio.TimeoutError:
+        print("home=Failed")
 
 async def move_to(messenger: CanMessenger, node, distance, velocity):
     move_runner = MoveGroupRunner(
@@ -192,7 +219,7 @@ async def read_epprom(messenger: CanMessenger, node):
     except asyncio.TimeoutError:
         return "None"
 
-async def run(args: argparse.Namespace) -> None:
+async def  run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     # build a GPIO handler, which will automatically release estop
     # gpio = OT3GPIO(__name__)
@@ -207,7 +234,7 @@ async def run(args: argparse.Namespace) -> None:
         print('\n')
         print('-------------------Test Homing--------------------------')
         await home(messenger, node)
-        print('Homed')
+        #print('Homed')
 
     if args.jog:
         print('\n')
@@ -226,6 +253,15 @@ async def run(args: argparse.Namespace) -> None:
     if args.read_epprom:
         serial_number = await read_epprom(messenger, node)
         print(f'SN:{serial_number}')
+    
+    if args.downward:
+        res = await move_for_input(messenger, node,position,args.downward)
+        #print("move=Pass")
+        #return res
+    if args.up:
+        res = await move_for_input(messenger, node,position,args.up)
+        #print("moveup=Pass")
+        #return res
 
 log = logging.getLogger(__name__)
 
@@ -290,6 +326,8 @@ def main() -> None:
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--read_epprom", action="store_true")
     parser.add_argument("--home", action="store_true")
+    parser.add_argument("--downward", action="store_true")
+    parser.add_argument("--up", action="store_true")
 
     args = parser.parse_args()
 
