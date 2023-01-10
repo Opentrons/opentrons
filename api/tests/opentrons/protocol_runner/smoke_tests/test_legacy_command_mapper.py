@@ -633,8 +633,7 @@ def run(ctx):
     pipette.pick_up_tip()
 
     # Test:
-    pipette.aspirate(0, well_plate["A1"])
-    pipette.dispense(0, well_plate["B2"])
+    pipette.dispense(0, well_plate["D6"])
 """
 
 
@@ -645,15 +644,26 @@ def zero_volume_liquid_handling_protocol_file(tmp_path: Path) -> Path:
     return path
 
 
+# TODO BEFORE MERGE:
+# Is there a way to trigger this bug on aspirate()?
 async def test_zero_volume_liquid_handling_commands(zero_volume_liquid_handling_protocol_file: Path) -> None:
     """It should map legacy pick up tip commands."""
     commands_result = await simulate_and_get_commands(zero_volume_liquid_handling_protocol_file)
-    # TODO: Why are we getting this far? Shouldn't the above raise an error since I
-    # removed the .construct()s?
-    # Looks like this test doesn't work when aspirate() comes before dispense().
-    # If dispense() is alone, it does what I expect.
-    # Is there a way to trigger this bug on aspirate()?
+
+    [load_tip_rack, load_well_plate, load_pipette, pick_up_tip, move_to_well] = commands_result
+    assert isinstance(load_tip_rack, commands.LoadLabware)
+    assert isinstance(load_well_plate, commands.LoadLabware)
+    assert isinstance(load_pipette, commands.LoadPipette)
+    assert isinstance(pick_up_tip, commands.PickUpTip)
+    assert isinstance(move_to_well, commands.MoveToWell)
+
+    assert move_to_well.params == MoveToWellParams(
+        pipetteId=load_pipette.result.pipetteId,
+        labwareId=load_well_plate.result.labwareId,
+        wellName="D6",
+    )
+
     assert commands_result == []
 
 
-# TODO: Test invalid rates and volumes raise an exception?
+# TODO BEFORE MERGE: Test invalid rates and volumes raise an exception?
