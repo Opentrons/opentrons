@@ -113,6 +113,7 @@ class AcknowledgeListener:
     def _remove_response_node(self, node: NodeId) -> None:
         # this is a bit of a hack, some nodes don't responde with the same originating nodes
         # and respond with their subnodes instead
+        log.info("removing node {node}")
         if node in self._expected_nodes:
             self._expected_nodes.remove(node)
         else:
@@ -144,7 +145,7 @@ class AcknowledgeListener:
             )
         except asyncio.TimeoutError:
             log.error(
-                f"Message did not receive ack for message index {self._message.payload.message_index}"
+                f"Message did not receive ack for message index {self._message.payload.message_index} remaining nodes {self._expected_nodes}"
             )
             return ErrorCode.timeout
         finally:

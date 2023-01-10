@@ -446,7 +446,11 @@ class OT3Controller:
     ) -> None:
         move_group = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
         runner = MoveGroupRunner(move_groups=[move_group])
-        positions = await runner.run(can_messenger=self._messenger)
+        try:
+            positions = await runner.run(can_messenger=self._messenger)
+        except RuntimeError as e:
+            print("made it to backend" + str(e))
+            raise
         self._handle_motor_status_response(positions)
 
     async def gripper_hold_jaw(

@@ -9,6 +9,7 @@ from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     ErrorCode,
+    ErrorSeverity,
     MotorPositionFlags,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -117,9 +118,9 @@ class MoveGroupRunner:
             raise RuntimeError("A group must be prepped before it can be executed.")
         try:
             move_completion_data = await self._move(can_messenger, self._start_at_index)
-        except RuntimeError:
+        except RuntimeError as e:
             log.error("raising error from Move group runner")
-            raise
+            raise e
         return self._accumulate_move_completions(move_completion_data)
 
     async def run(
@@ -296,6 +297,8 @@ class MoveGroupRunner:
         try:
             can_messenger.add_listener(scheduler)
             completions = await scheduler.run(can_messenger)
+        except RuntimeError as e:
+            raise e
         finally:
             can_messenger.remove_listener(scheduler)
         return completions
@@ -311,7 +314,7 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[MoveStopCondition] = []
         self._start_at_index = start_at_index
-
+        self._error = None
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
@@ -358,7 +361,9 @@ class MoveScheduler:
         log.debug("recieved ack")
 
     def _handle_error(self, message: ErrorMessage) -> None:
-        raise RuntimeError("Firmware Error Received", message)
+        self._error = RuntimeError("Firmware Error Revieved", message)
+        self._event.set()
+        #raise self._error
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
@@ -441,6 +446,7 @@ class MoveScheduler:
             )
             if error != ErrorCode.ok:
                 log.error(f"recieved error trying to execute move group {str(error)}")
+               
 
             try:
                 # TODO: The max here can be removed once can_driver.send() no longer
@@ -452,6 +458,11 @@ class MoveScheduler:
                     self._event.wait(),
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
+                if self._error is not None:
+                    log.warning("\n\nWe have an error\n\n")
+                    raise self._error
+                else:
+                    log.warning("\n\nWe dont have an error\n\n")
             except asyncio.TimeoutError:
                 log.warning(
                     f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
