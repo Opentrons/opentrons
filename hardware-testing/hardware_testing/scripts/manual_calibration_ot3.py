@@ -183,10 +183,13 @@ async def _find_square_center(
         expected_pos._replace(z=current_position.z),
     )
     input("\nPress ENTER to calibrate XY axes:")
-    xy_start_pos = expected_pos._replace(z=deck_height - 1)
+    xy_start_pos = expected_pos._replace(z=deck_height - 2)
     await api.move_to(mount, xy_start_pos)
 
     probe_radius = helpers_ot3.CALIBRATION_PROBE_EVT.diameter / 2
+    rel_dist_from_edge_to_center = (
+        helpers_ot3.CALIBRATION_SQUARE_EVT.width / 2
+    ) - probe_radius
 
     # move to the FRONT until we hit the square edge
     await _jog_axis(api, mount, OT3Axis.Y, -1)
@@ -194,9 +197,7 @@ async def _find_square_center(
     front_square = current_position.y - probe_radius
     y_front = front_square + (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
     print(f"Found Y-Front = {y_front}mm")
-
-    # move back to center of square
-    await api.move_to(mount, xy_start_pos)
+    await api.move_rel(mount, Point(y=rel_dist_from_edge_to_center))
 
     # move to the FRONT until we hit the square edge
     await _jog_axis(api, mount, OT3Axis.Y, 1)
@@ -204,9 +205,7 @@ async def _find_square_center(
     rear_square = current_position.y + probe_radius
     y_rear = rear_square - (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
     print(f"Found Y-Rear = {y_rear}mm")
-
-    # move back to center of square
-    await api.move_to(mount, xy_start_pos)
+    await api.move_rel(mount, Point(y=-rel_dist_from_edge_to_center))
 
     # move to the RIGHT until we hit the square edge
     await _jog_axis(api, mount, OT3Axis.X, 1)
@@ -214,9 +213,7 @@ async def _find_square_center(
     right_square = current_position.x + probe_radius
     x_right = right_square - (helpers_ot3.CALIBRATION_SQUARE_EVT.width / 2)
     print(f"Found X-Right = {x_right}mm")
-
-    # move back to center of square
-    await api.move_to(mount, xy_start_pos)
+    await api.move_rel(mount, Point(x=-rel_dist_from_edge_to_center))
 
     # move to the LEFT until we hit the square edge
     await _jog_axis(api, mount, OT3Axis.X, -1)
@@ -224,6 +221,7 @@ async def _find_square_center(
     left_square = current_position.x - probe_radius
     x_left = left_square + (helpers_ot3.CALIBRATION_SQUARE_EVT.width / 2)
     print(f"Found X-Left = {x_left}mm")
+    await api.move_rel(mount, Point(x=rel_dist_from_edge_to_center))
 
     x_center = (x_right + x_left) * 0.5
     print(f"Found X-Center = {x_center}mm")
@@ -387,9 +385,11 @@ async def _check_multi_channel_to_deck_alignment(
 async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) -> Point:
     if mount == OT3Mount.GRIPPER:
         helpers_ot3.set_gripper_offset_ot3(api, Point(x=0, y=0, z=0))
-        if 'y' in input('Use new centered probe? (y/n): '):
+        if "y" in input("Use new centered probe? (y/n): "):
             print("using new centered probe")
-            found_pos = await _find_square_center_of_gripper_jaw_with_new_probe(api, expected_pos)
+            found_pos = await _find_square_center_of_gripper_jaw_with_new_probe(
+                api, expected_pos
+            )
         else:
             print("using original rear/front probes")
             found_pos = await _find_square_center_of_gripper_jaw(api, expected_pos)
@@ -430,6 +430,17 @@ async def _init_deck_and_pipette_coordinates(
     return calibration_square_pos
 
 
+def _save_to_disk(mount: OT3Mount, instrument_id: str, new_offset: Point) -> None:
+    if "y" in input(f"New Offset: {new_offset}\n--> Save to Disk? (y/n): ").lower():
+        if mount == OT3Mount.GRIPPER:
+            save_gripper_calibration(new_offset, instrument_id)
+        else:
+            save_pipette_calibration(new_offset, instrument_id, mount.to_mount())
+        print("offset saved")
+    else:
+        print("offset NOT saved")
+
+
 async def _main(
     simulate: bool,
     slot: int,
@@ -466,6 +477,7 @@ async def _main(
         found_square_pos = await _find_the_square(api, mount, calibration_square_pos)
         found_offset = calibration_square_pos - found_square_pos
         instrument_offset = _apply_offset(api, mount, found_offset, relative_offset)
+        _save_to_disk(mount, instr_id, instrument_offset)
 
     # test
     if mount == OT3Mount.GRIPPER:
@@ -493,19 +505,7 @@ async def _main(
 
     # save
     if not test or relative_offset != Point():
-        if (
-            "y"
-            in input(
-                f"New Offset: {instrument_offset}\n--> Save to Disk? (y/n): "
-            ).lower()
-        ):
-            if mount == OT3Mount.GRIPPER:
-                save_gripper_calibration(instrument_offset, str(instr_id))
-            else:
-                save_pipette_calibration(instrument_offset, instr_id, mount.to_mount())
-            print("offset saved")
-        else:
-            print("offset NOT saved")
+        _save_to_disk(mount, instr_id, instrument_offset)
 
     # done
     await api.home()
