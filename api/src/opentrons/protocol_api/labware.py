@@ -330,11 +330,11 @@ class Labware:
     @requires_version(2, 0)
     def parent(self) -> Union[str, ModuleTypes, None]:
         """The parent of this labware.
-        
+
         If the labware is on the deck, a `str` deck slot name will be returned.
         If on a module, the parent :py:class:`ModuleContext` will be returned.
         If off deck, `None` will be returned.
-        
+
         .. versionchanged:: 2.14
             Return type for module parent changed to :py:class:`ModuleContext`.
             Prior to this version, an internal geometry interface is returned.
