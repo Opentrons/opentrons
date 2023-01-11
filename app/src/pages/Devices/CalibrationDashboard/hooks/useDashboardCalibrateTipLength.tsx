@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { SpinnerModalPage } from '@opentrons/components'
-import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { Portal } from '../../../../App/portal'
 import { CalibrateTipLength } from '../../../../organisms/CalibrateTipLength'
@@ -89,7 +88,7 @@ export function useDashboardCalibrateTipLength(
     }
   )
 
-  const configHasCalibrationBlock = null
+  const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
 
   const handleStartDashboardTipLengthCalSession: DashboardCalTipLengthInvoker = props => {
@@ -110,15 +109,14 @@ export function useDashboardCalibrateTipLength(
           hasCalibrationBlock,
         })
       )
-      // TODO: fix this so it can get uncommented
-      // dispatch(
-      //   tipLengthCalibrationStarted(
-      //     withIntent, // TODO: remove intent param entirely once calibration wizards ff is removed
-      //     mount,
-      //     hasCalibrationBlock,
-      //     getLabwareDefURI(tipRackDefinition)
-      //   )
-      // )
+      dispatch(
+        tipLengthCalibrationStarted(
+          withIntent, // TODO: remove intent param entirely once calibration wizards ff is removed
+          mount,
+          hasCalibrationBlock,
+          "default Opentrons tip rack for pipette on mount"
+        )
+      )
     }
   }
 

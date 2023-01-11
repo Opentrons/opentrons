@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import {
   useAttachedPipettes,
   useDeckCalibrationData,
@@ -21,6 +22,10 @@ import {
 import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
+import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
+import { fetchCalibrationStatus } from '../../../redux/calibration'
+import { useInterval } from '@opentrons/components'
 
 export function useCalibrationTaskList(
   robotName: string,
@@ -29,6 +34,7 @@ export function useCalibrationTaskList(
   deckCalLauncher: DashboardCalDeckInvoker
 ): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
+  const dispatch = useDispatch()
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
   let activeTaskIndices: [number, number] | null = null
@@ -44,6 +50,16 @@ export function useCalibrationTaskList(
   // get calibration data for mounted pipette subtasks
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
+
+  useInterval(
+    () => {
+      dispatch(fetchPipetteOffsetCalibrations(robotName))
+      dispatch(fetchTipLengthCalibrations(robotName))
+      dispatch(fetchCalibrationStatus(robotName))
+    },
+    5000,
+    true
+  )
 
   // first create the shape of the deck calibration task, then update values based on calibration status
   const deckTask: TaskProps = {
