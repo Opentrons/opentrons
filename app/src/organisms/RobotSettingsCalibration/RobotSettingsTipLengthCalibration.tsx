@@ -45,9 +45,6 @@ export function RobotSettingsTipLengthCalibration({
   ])
 
   const robot = useRobot(robotName)
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   // wait for robot request to resolve instead of using name directly from params
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
@@ -55,12 +52,12 @@ export function RobotSettingsTipLengthCalibration({
   const formattedTipLengthCalibrations: FormattedTipLengthCalibration[] =
     tipLengthCalibrations != null
       ? tipLengthCalibrations?.map(tipLength => ({
-          tiprack: tipLength.tiprack,
-          pipette: tipLength.pipette,
-          lastCalibrated: tipLength.lastModified,
-          markedBad: tipLength.status.markedBad,
-          uri: tipLength.uri,
-        }))
+        tiprack: tipLength.tiprack,
+        pipette: tipLength.pipette,
+        lastCalibrated: tipLength.lastModified,
+        markedBad: tipLength.status.markedBad,
+        uri: tipLength.uri,
+      }))
       : []
 
   return (
@@ -71,10 +68,7 @@ export function RobotSettingsTipLengthCalibration({
             {t('tip_length_calibrations_title')}
           </Box>
           <StyledText as="p" marginBottom={SPACING.spacing4}>
-            {/* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */}
-            {enableCalibrationWizards
-              ? t('tip_length_calibrations_description')
-              : t('tip_length_calibrations_description_legacy')}
+            {t('tip_length_calibrations_description')}
           </StyledText>
         </Box>
         {tipLengthCalibrations != null && tipLengthCalibrations.length !== 0 ? (

@@ -36,8 +36,6 @@ export function SetupTipLengthCalibration({
   const dispatch = useDispatch<Dispatch>()
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
 
-  const enableCalibrationWizards = useFeatureFlag('enableCalibrationWizards')
-
   useInterval(
     () =>
       robotName != null &&
@@ -77,27 +75,15 @@ export function SetupTipLengthCalibration({
                         : undefined
                     }
                     button={
-                      enableCalibrationWizards ? (
-                        <SetupTipLengthCalibrationButton
-                          mount={mount}
-                          disabled={pipetteNotAttached}
-                          robotName={robotName}
-                          runId={runId}
-                          hasCalibrated={tipRackInfo.lastModifiedDate !== null}
-                          tipRackDefinition={tipRackInfo.tipRackDef}
-                          isExtendedPipOffset={false}
-                        />
-                      ) : (
-                        <DeprecatedSetupTipLengthCalibrationButton
-                          mount={mount}
-                          disabled={pipetteNotAttached}
-                          robotName={robotName}
-                          runId={runId}
-                          hasCalibrated={tipRackInfo.lastModifiedDate !== null}
-                          tipRackDefinition={tipRackInfo.tipRackDef}
-                          isExtendedPipOffset={false}
-                        />
-                      )
+                      <SetupTipLengthCalibrationButton
+                        mount={mount}
+                        disabled={pipetteNotAttached}
+                        robotName={robotName}
+                        runId={runId}
+                        hasCalibrated={tipRackInfo.lastModifiedDate !== null}
+                        tipRackDefinition={tipRackInfo.tipRackDef}
+                        isExtendedPipOffset={false}
+                      />
                     }
                     runId={runId}
                   />

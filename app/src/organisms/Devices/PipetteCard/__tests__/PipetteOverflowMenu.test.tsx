@@ -46,9 +46,6 @@ describe('PipetteOverflowMenu', () => {
       handleSettingsSlideout: jest.fn(),
       isPipetteCalibrated: false,
     }
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()

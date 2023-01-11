@@ -96,9 +96,6 @@ export function RobotSettingsCalibration({
   const notConnectable = robot?.status !== CONNECTABLE
   const isOT3 = useIsOT3(robotName)
   const dispatch = useDispatch<Dispatch>()
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   React.useEffect(() => {
     dispatch(Sessions.fetchAllSessions(robotName))
@@ -114,7 +111,7 @@ export function RobotSettingsCalibration({
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-          Sessions.sharedCalCommands.JOG
+        Sessions.sharedCalCommands.JOG
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta
@@ -283,24 +280,13 @@ export function RobotSettingsCalibration({
   return (
     <>
       <Portal level="top">
-        {enableCalibrationWizards ? (
-          <CalibrateDeck
-            session={deckCalibrationSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-        ) : (
-          <DeprecatedCalibrateDeck
-            session={deckCalibrationSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-        )}
-
+        <CalibrateDeck
+          session={deckCalibrationSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={isPending}
+          isJogging={isJogging}
+        />
         {createStatus === RobotApi.PENDING ? (
           <SpinnerModalPage
             titleBar={{
@@ -313,23 +299,13 @@ export function RobotSettingsCalibration({
             }}
           />
         ) : null}
-        {enableCalibrationWizards ? (
-          <CheckCalibration
-            session={checkHealthSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-        ) : (
-          <DeprecatedCheckCalibration
-            session={checkHealthSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-        )}
+        <CheckCalibration
+          session={checkHealthSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={isPending}
+          isJogging={isJogging}
+        />
         {createStatus === RobotApi.FAILURE && (
           <AlertModal
             alertOverlay
@@ -360,21 +336,12 @@ export function RobotSettingsCalibration({
           onCloseClick={() => setShowHowCalibrationWorksModal(false)}
         />
       ) : null}
-      {enableCalibrationWizards && !isOT3 ? (
-        <CalibrationStatusCard
-          robotName={robotName}
-          setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
-        />
-      ) : (
-        <CalibrationDataDownload
-          robotName={robotName}
-          setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
-        />
-      )}
-
       {!isOT3 ? (
         <>
-          {!enableCalibrationWizards ? <Line /> : null}
+          <CalibrationStatusCard
+            robotName={robotName}
+            setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
+          />
           <RobotSettingsDeckCalibration
             buttonDisabledReason={buttonDisabledReason}
             dispatchRequests={dispatchRequests}
@@ -382,7 +349,12 @@ export function RobotSettingsCalibration({
             updateRobotStatus={updateRobotStatus}
           />
         </>
-      ) : null}
+      ) : (
+        <CalibrationDataDownload
+          robotName={robotName}
+          setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
+        />
+      )}
       <Line
         marginBottom={
           showPipetteOffsetCalibrationBanner ? SPACING.spacing4 : null
@@ -420,7 +392,7 @@ export function RobotSettingsCalibration({
           <RobotSettingsGripperCalibration />
         </>
       )}
-      {enableCalibrationWizards && !isOT3 ? (
+      {!isOT3 ? (
         <>
           <Line />
           <CalibrationDataDownload

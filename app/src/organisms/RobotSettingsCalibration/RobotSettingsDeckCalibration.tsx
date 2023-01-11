@@ -59,9 +59,6 @@ export function RobotSettingsDeckCalibration({
 
   const robot = useRobot(robotName)
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   // wait for robot request to resolve instead of using name directly from params
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
@@ -184,23 +181,12 @@ export function RobotSettingsDeckCalibration({
               {t('deck_calibration_title')}
             </Box>
             <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {/* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */}
-              {enableCalibrationWizards
-                ? t('deck_calibration_description')
-                : t('deck_calibration_description_legacy')}
+              {t('deck_calibration_description')}
             </StyledText>
             <StyledText as="label" color={COLORS.darkGreyEnabled}>
               {deckLastModified}
             </StyledText>
           </Box>
-          {enableCalibrationWizards ? null : (
-            <TertiaryButton
-              onClick={handleClickDeckCalibration}
-              disabled={disabledOrBusyReason != null}
-            >
-              {deckCalibrationButtonText}
-            </TertiaryButton>
-          )}
         </Flex>
       </Box>
     </>

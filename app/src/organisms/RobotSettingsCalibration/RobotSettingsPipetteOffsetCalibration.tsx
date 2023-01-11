@@ -44,9 +44,6 @@ export function RobotSettingsPipetteOffsetCalibration({
 
   const robot = useRobot(robotName)
   const isOT3 = useIsOT3(robotName)
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   // wait for robot request to resolve instead of using name directly from params
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
@@ -73,10 +70,8 @@ export function RobotSettingsPipetteOffsetCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {isOT3
                 ? t('pipette_calibrations_description')
-                : /* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */
-                enableCalibrationWizards
-                ? t('pipette_offset_calibrations_description')
-                : t('pipette_offset_calibrations_description_legacy')}
+                : t('pipette_offset_calibrations_description')
+              }
             </StyledText>
           </Box>
           {pipetteOffsetCalibrations != null ? (

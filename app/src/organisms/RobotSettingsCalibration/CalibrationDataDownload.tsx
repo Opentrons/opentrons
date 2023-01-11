@@ -44,10 +44,6 @@ export function CalibrationDataDownload({
   ])
   const doTrackEvent = useTrackEvent()
 
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
-
   const robot = useRobot(robotName)
   const isOT3 = useIsOT3(robotName)
   // wait for robot request to resolve instead of using name directly from params
@@ -91,7 +87,7 @@ export function CalibrationDataDownload({
 
   return (
     <>
-      {enableCalibrationWizards && !isOT3 ? (
+      {!isOT3 ? (
         <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
           <Flex
             alignItems={ALIGN_CENTER}

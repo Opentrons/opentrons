@@ -72,9 +72,6 @@ describe('SetupTipLengthCalibration', () => {
     when(mockDeprecatedSetupTipLengthCalibrationButton).mockReturnValue(
       <div>Mock DeprecatedSetupTipLengthCalibrationButton</div>
     )
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -116,10 +113,7 @@ describe('SetupTipLengthCalibration', () => {
     ).toHaveLength(2)
     expect(queryByText('Last calibrated:')).toBeFalsy()
   })
-  it('renders new tip length button when enableCalibrationWizards feature flag is set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(true)
+  it('renders tip length button', () => {
     const { getByText, queryByText } = render()
 
     expect(

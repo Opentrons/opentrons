@@ -51,8 +51,6 @@ export function useCalibratePipetteOffset(
   const spinnerRequestId = React.useRef<string | null>(null)
   const dispatch = useDispatch()
 
-  const enableCalibrationWizards = useFeatureFlag('enableCalibrationWizards')
-
   const pipOffsetCalSession: PipetteOffsetCalibrationSession | null = useSelector(
     (state: State) => {
       return getPipetteOffsetCalibrationSession(state, robotName)
@@ -64,7 +62,7 @@ export function useCalibratePipetteOffset(
       if (
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
         dispatchedAction.payload.sessionType ===
-          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
       ) {
         // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         createRequestId.current = dispatchedAction.meta.requestId
@@ -77,7 +75,7 @@ export function useCalibratePipetteOffset(
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-          Sessions.sharedCalCommands.JOG
+        Sessions.sharedCalCommands.JOG
       ) {
         // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         jogRequestId.current = dispatchedAction.meta.requestId
@@ -174,7 +172,7 @@ export function useCalibratePipetteOffset(
     mount === pipOffsetCalSession.createParams.mount &&
     tipRackDefinition === pipOffsetCalSession.createParams.tipRackDefinition
 
-  let Wizard: JSX.Element | null = enableCalibrationWizards ? (
+  let Wizard: JSX.Element | null =
     <Portal level="top">
       {startingSession ? (
         <SpinnerModalPage
@@ -197,34 +195,6 @@ export function useCalibratePipetteOffset(
         />
       )}
     </Portal>
-  ) : (
-    <Portal level="top">
-      {startingSession ? (
-        <SpinnerModalPage
-          titleBar={{
-            title:
-              intent === INTENT_CALIBRATE_PIPETTE_OFFSET
-                ? PIPETTE_OFFSET_TITLE
-                : TIP_LENGTH_TITLE,
-            back: {
-              disabled: true,
-              title: EXIT,
-              children: EXIT,
-            },
-          }}
-        />
-      ) : (
-        <DeprecatedCalibratePipetteOffset
-          session={pipOffsetCalSession}
-          robotName={robotName}
-          showSpinner={startingSession || showSpinner}
-          dispatchRequests={dispatchRequests}
-          isJogging={isJogging}
-          intent={intent}
-        />
-      )}
-    </Portal>
-  )
 
   if (!(startingSession || isCorrectSession)) Wizard = null
 

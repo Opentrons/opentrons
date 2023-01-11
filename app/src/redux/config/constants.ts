@@ -6,7 +6,6 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'allPipetteConfig',
   'enableBundleUpload',
   'enableManualDeckStateModification',
-  'enableCalibrationWizards',
   'enableExtendedHardware',
 ]
 

@@ -87,9 +87,6 @@ describe('OverflowMenu', () => {
       isDeckCalibrated: true,
       deckCalibrationData: mockDeckCalData,
     })
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(false)
   })
 
   afterEach(() => {

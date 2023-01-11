@@ -23,10 +23,8 @@ interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null
   mount: Mount
   handleChangePipette: () => void
-  handleCalibrate: () => void
   handleAboutSlideout: () => void
   handleSettingsSlideout: () => void
-  isPipetteCalibrated: boolean
 }
 
 export const PipetteOverflowMenu = (
@@ -37,28 +35,15 @@ export const PipetteOverflowMenu = (
     mount,
     pipetteSpecs,
     handleChangePipette,
-    handleCalibrate,
     handleAboutSlideout,
     handleSettingsSlideout,
-    isPipetteCalibrated,
   } = props
-
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   const pipetteName =
     pipetteSpecs?.name != null ? pipetteSpecs.name : t('empty')
   const pipetteDisplayName =
     pipetteSpecs?.displayName != null ? pipetteSpecs.displayName : t('empty')
   const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
-
-  const calibratePipetteText = isOT3PipetteAttached
-    ? 'calibrate_pipette'
-    : 'calibrate_pipette_offset'
-  const recalibratePipetteText = isOT3PipetteAttached
-    ? 'recalibrate_pipette'
-    : 'recalibrate_pipette_offset'
 
   return (
     <Flex position={POSITION_RELATIVE}>
@@ -85,30 +70,6 @@ export const PipetteOverflowMenu = (
           </MenuItem>
         ) : (
           <>
-            {enableCalibrationWizards ? (
-              // Only show calibration option [RAUT-93]
-              isPipetteCalibrated ? null : (
-                <MenuItem
-                  key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
-                  onClick={() => handleCalibrate()}
-                  data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
-                >
-                  {t(calibratePipetteText)}
-                </MenuItem>
-              )
-            ) : (
-              <MenuItem
-                key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
-                onClick={() => handleCalibrate()}
-                data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
-              >
-                {t(
-                  isPipetteCalibrated
-                    ? recalibratePipetteText
-                    : calibratePipetteText
-                )}
-              </MenuItem>
-            )}
             <MenuItem
               key={`${String(pipetteDisplayName)}_${mount}_detach`}
               onClick={() => handleChangePipette()}
