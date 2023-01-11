@@ -30,7 +30,7 @@ describe('NoUpdateFound', () => {
   })
 
   it('should call mock function when tapping next button', () => {
-    const [{ getByText, getByRole }] = render()
+    const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Next' })
     fireEvent.click(button)
     expect(mockPush).toBeCalledWith('/robot-settings/rename-robot')
