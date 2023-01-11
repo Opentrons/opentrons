@@ -28,11 +28,8 @@ export function UpdateRobot(): JSX.Element {
   const [isDownloading, setIsDownloading] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-
-  const isViewableRobot =
-    localRobot != null && localRobot.status !== UNREACHABLE
   const robotUpdateType = useSelector((state: State) => {
-    return isViewableRobot
+    return localRobot != null && localRobot.status !== UNREACHABLE
       ? getBuildrootUpdateAvailable(state, localRobot)
       : null
   })
