@@ -32,6 +32,8 @@ export function UpdateRobot(): JSX.Element {
   const isViewableRobot =
     localRobot != null && localRobot.status !== UNREACHABLE
   const robotUpdateType = useSelector((state: State) => {
+    console.log('available', getBuildrootUpdateAvailable(state, localRobot))
+    console.log(isViewableRobot)
     return isViewableRobot
       ? getBuildrootUpdateAvailable(state, localRobot)
       : null
@@ -40,6 +42,10 @@ export function UpdateRobot(): JSX.Element {
   const session = useSelector(getBuildrootSession)
   const { step, error: sessionError } = session ?? { step: null, error: null }
   const dispatch = useDispatch<Dispatch>()
+
+  console.log('robotUpdateType', robotUpdateType)
+  console.log('session', session)
+  console.log('step', step)
 
   const renderUpdateProcess = (): JSX.Element | undefined => {
     // Display Error screen
@@ -101,6 +107,7 @@ export function UpdateRobot(): JSX.Element {
 
   React.useEffect(() => {
     // check isDownloading to avoid dispatching again
+    console.log(isDownloading)
     if (robotUpdateType === 'upgrade' && !isDownloading) {
       setIsDownloading(true)
       dispatch(startBuildrootUpdate(robotName))
