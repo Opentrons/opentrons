@@ -236,50 +236,6 @@ async def _find_square_center(
     return found_square_pos
 
 
-async def _find_square_center_of_gripper_jaw_with_new_probe(
-    api: OT3API, expected_pos: Point
-) -> Point:
-    # first, we grip the jaw, so that the jaws are fully pressing inwards
-    # this removes wiggle/backlash from jaws during probing
-    await api.disengage_axes([OT3Axis.G])
-    input("ENTER to GRIP:")
-    await api.grip(GRIP_FORCE_CALIBRATION)
-    await asyncio.sleep(2)
-    # FIXME: (AS) run grip again, to make sure the correct encoder position is read.
-    #        This avoids a bug where jaw movements timeout too quickly, so the encoder
-    #        position is never read back. This is bad for calibration, b/c the encoder
-    #        is used to calculate the position of the calibration pins
-    await api.grip(GRIP_FORCE_CALIBRATION)
-    api.add_gripper_probe(GripperProbe.CENTER)
-    await api.home_z(OT3Mount.GRIPPER)  # home after attaching probe, if motor skips
-    found_square_center = await _find_square_center(
-        api,
-        OT3Mount.GRIPPER,
-        expected_pos,
-    )
-    input("Press ENTER to move to found center:")
-    await api.move_to(
-        OT3Mount.GRIPPER,
-        found_square_center,
-    )
-    input("Check by EYE, then press ENTER to continue:")
-    current_position = await api.gantry_position(
-        OT3Mount.GRIPPER,
-    )
-    await api.move_to(
-        OT3Mount.GRIPPER,
-        current_position + Point(z=PROBE_CHANGE_Z),
-    )
-    await api.disengage_axes([OT3Axis.G])
-    input("Remove probe from Gripper, then press ENTER: ")
-    api.remove_gripper_probe()
-    # ungrip the jaws
-    await api.home_gripper_jaw()
-    print(f"\nGripper Slot Center Position = {found_square_center}")
-    print(f"\tOffset from Expected = {expected_pos - found_square_center}")
-    return found_square_center
-
-
 async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -> Point:
     # first, we grip the jaw, so that the jaws are fully pressing inwards
     # this removes wiggle/backlash from jaws during probing
@@ -385,14 +341,7 @@ async def _check_multi_channel_to_deck_alignment(
 async def _find_the_square(api: OT3API, mount: OT3Mount, expected_pos: Point) -> Point:
     if mount == OT3Mount.GRIPPER:
         helpers_ot3.set_gripper_offset_ot3(api, Point(x=0, y=0, z=0))
-        if "y" in input("Use new centered probe? (y/n): "):
-            print("using new centered probe")
-            found_pos = await _find_square_center_of_gripper_jaw_with_new_probe(
-                api, expected_pos
-            )
-        else:
-            print("using original rear/front probes")
-            found_pos = await _find_square_center_of_gripper_jaw(api, expected_pos)
+        found_pos = await _find_square_center_of_gripper_jaw(api, expected_pos)
     else:
         helpers_ot3.set_pipette_offset_ot3(api, mount, Point(x=0, y=0, z=0))
         pip = api.hardware_pipettes[mount.to_mount()]
@@ -418,7 +367,7 @@ def _apply_offset(
 
 
 async def _init_deck_and_pipette_coordinates(
-    api: OT3API, mount: OT3Mount, slot: int, no_washers: bool
+    api: OT3API, mount: OT3Mount, slot: int, no_washers: bool, short_probe: bool
 ) -> Point:
     calibration_square_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
     if not no_washers:
@@ -426,7 +375,10 @@ async def _init_deck_and_pipette_coordinates(
         calibration_square_pos += Point(z=Z_OFFSET_FROM_WASHERS)
     if mount != OT3Mount.GRIPPER:
         # do this early on, so that all coordinates are using the probe's length
-        await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
+        if short_probe:
+            await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length - 10)
+        else:
+            await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
     return calibration_square_pos
 
 
@@ -448,6 +400,7 @@ async def _main(
     test: bool,
     relative_offset: Point,
     no_washers: bool = False,
+    short_probe: bool = False,
 ) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate, use_defaults=True
@@ -467,7 +420,7 @@ async def _main(
 
     # Initialize deck slot position
     calibration_square_pos = await _init_deck_and_pipette_coordinates(
-        api, mount, slot, no_washers
+        api, mount, slot, no_washers, short_probe
     )
 
     await api.home()
@@ -522,6 +475,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--rel-offset", nargs=3)
     arg_parser.add_argument("--no-washers", action="store_true")
+    arg_parser.add_argument("--short-probe", action="store_true")
     args = arg_parser.parse_args()
     ot3_mounts = {
         "left": OT3Mount.LEFT,
@@ -534,5 +488,13 @@ if __name__ == "__main__":
     else:
         rel_offset = Point()
     asyncio.run(
-        _main(args.simulate, args.slot, _mount, args.test, rel_offset, args.no_washers)
+        _main(
+            args.simulate,
+            args.slot,
+            _mount,
+            args.test,
+            rel_offset,
+            args.no_washers,
+            args.short_probe,
+        )
     )
