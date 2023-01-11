@@ -1322,7 +1322,10 @@ class OT3API(
                 target_down = target_position_from_relative(
                     mount, press.relative_down, self._current_position
                 )
-                await self._move(target_down, speed=press.speed)
+                try:
+                    await self._move(target_down, speed=press.speed, check_stalls=True)
+                except SomethingError:
+                    await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
