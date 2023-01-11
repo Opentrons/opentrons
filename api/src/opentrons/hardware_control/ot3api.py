@@ -789,7 +789,7 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
 
         # Refresh current position
-        await self.current_position_ot3(mount=mount, refresh=True)
+        await self.current_position_ot3(mount=realmount, refresh=True)
 
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_ready_for_movement(axes_moving):
@@ -847,7 +847,7 @@ class OT3API(
             else:
                 await self.home(axes_moving)
         # Refresh current position
-        await self.current_position_ot3(mount=mount, refresh=True)
+        await self.current_position_ot3(mount=realmount, refresh=True)
         target_position = target_position_from_relative(
             realmount, delta, self._current_position
         )
