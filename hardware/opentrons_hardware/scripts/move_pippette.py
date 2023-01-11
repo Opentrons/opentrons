@@ -9,6 +9,7 @@ import datetime
 from typing import Callable
 from logging.config import dictConfig
 import subprocess
+from typing import Dict, Tuple
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus import build, CanMessenger,  WaitableCallback
@@ -38,6 +39,8 @@ from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 from opentrons_hardware.drivers.gpio import OT3GPIO
 
+from opentrons_hardware.hardware_control.current_settings import set_currents
+
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
 
@@ -57,13 +60,28 @@ def getch():
         return ch
     return _getch()
 
-async def _jog_axis(messenger: CanMessenger, node, position) -> None:
+
+async def set_pipette_current(run_current,args) -> None:
+
+    currents: Dict[NodeId, Tuple[float, float]] = {}
+    currents[NodeId.pipette_left] = (float(0), float(run_current))
+
+    async with build.can_messenger(build_settings(args)) as messenger:
+        try:
+            await set_currents(messenger, currents)
+        except asyncio.CancelledError:
+            pass
+async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
     step_size = [0.1, 0.5, 1, 15, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
-    speed = 15
+    speed = 10
+    current = 0.4
+    print('Speed = {}, current = {}'.format(speed,current))
     res = {node: (0,0,0)}
+
+    await set_pipette_current(current, args)
     information_str = """
         Click  >>   w  << to move up
         Click  >>   s  << to move downward
@@ -73,7 +91,7 @@ async def _jog_axis(messenger: CanMessenger, node, position) -> None:
         Click  >> Enter << to save position
         Click  >> q << to quit the test script
                     """
-    #print(information_str)
+    print(information_str)
     while True:
         input = getch()
         if input == 'w':
@@ -212,7 +230,7 @@ async def run(args: argparse.Namespace) -> None:
     if args.jog:
         print('\n')
         print('----------Read Motor Position and Encoder--------------')
-        await _jog_axis(messenger, node, position)
+        await _jog_axis(messenger, node, position,args)
 
     if args.limit_switch:
         print('\n')
@@ -273,7 +291,7 @@ def main() -> None:
         "--plunger_run_current",
         type=float,
         help="Active current of the plunger",
-        default=1.0,
+        default=0.1,
     )
     parser.add_argument(
         "--plunger_hold_current",
