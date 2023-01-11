@@ -26,6 +26,7 @@ from opentrons.hardware_control.types import (
     InvalidPipetteName,
     InvalidPipetteModel,
     MotorStatus,
+    MustHomeError,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
@@ -617,6 +618,34 @@ async def test_update_motor_status(
         nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
         controller._present_nodes = nodes
         await controller.update_motor_status()
+        for node in nodes:
+            assert controller._position.get(node) == 0.223
+            assert controller._encoder_position.get(node) == 0.323
+            assert controller._motor_status.get(node) == MotorStatus(False, True)
+
+
+@pytest.mark.parametrize("axes", home_test_params)
+async def test_update_motor_estimation(
+    mock_messenger: CanMessenger, controller: OT3Controller, axes: Set[NodeId]
+) -> None:
+    async def fake_umpe(
+        can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
+    ):
+        return {node: (0.223, 0.323, False, True) for node in nodes}
+
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
+        fake_umpe,
+    ):
+        nodes = [axis_to_node(a) for a in axes]
+        if len(nodes) > 0:
+            with pytest.raises(MustHomeError):
+                await controller.update_motor_estimation(axes)
+        for node in nodes:
+            controller._motor_status.update(
+                {node: MotorStatus(motor_ok=False, encoder_ok=True)}
+            )
+        await controller.update_motor_estimation(axes)
         for node in nodes:
             assert controller._position.get(node) == 0.223
             assert controller._encoder_position.get(node) == 0.323
