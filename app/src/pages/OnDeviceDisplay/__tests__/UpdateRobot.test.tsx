@@ -124,6 +124,7 @@ describe('UpdateRobot', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render mock CheckUpdates', () => {

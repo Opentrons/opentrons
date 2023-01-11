@@ -47,7 +47,12 @@ export function UpdateRobot(): JSX.Element {
   const renderUpdateProcess = (): JSX.Element | undefined => {
     // Display Error screen
     if (sessionError != null) {
-      return <ErrorUpdateSoftware errorMessage={sessionError} />
+      return (
+        <ErrorUpdateSoftware
+          errorMessage={sessionError}
+          robotName={robotName}
+        />
+      )
     }
 
     if (

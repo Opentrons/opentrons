@@ -2,10 +2,11 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-
+import { startBuildrootUpdate } from '../../../redux/buildroot'
 import { ErrorUpdateSoftware } from '../ErrorUpdateSoftware'
 
 const mockPush = jest.fn()
+jest.mock('../../../redux/buildroot')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -26,6 +27,7 @@ describe('ErrorUpdateSoftware', () => {
   beforeEach(() => {
     props = {
       errorMessage: 'mock error message',
+      robotName: 'mockRobot',
     }
   })
 
@@ -45,9 +47,11 @@ describe('ErrorUpdateSoftware', () => {
   })
 
   it('call mock function when tapping Try again', () => {
-    const [{ getByRole }] = render(props)
+    const [{ getByRole }, store] = render(props)
     const button = getByRole('button', { name: 'Try again' })
     fireEvent.click(button)
-    // expect()
+    expect(store.dispatch).toHaveBeenCalledWith(
+      startBuildrootUpdate(props.robotName)
+    )
   })
 })

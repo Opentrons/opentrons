@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
+import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -16,15 +17,26 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { startBuildrootUpdate } from '../../redux/buildroot'
+
+import type { Dispatch } from '../../redux/types'
 
 interface ErrorUpdateSoftwareProps {
   errorMessage: string
+  robotName: string
 }
 export function ErrorUpdateSoftware({
   errorMessage,
+  robotName,
 }: ErrorUpdateSoftwareProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
+  const dispatch = useDispatch<Dispatch>()
+
+  const handleTryAgain = (): void => {
+    dispatch(startBuildrootUpdate(robotName))
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex
@@ -61,7 +73,7 @@ export function ErrorUpdateSoftware({
             {t('proceed_without_updating')}
           </StyledText>
         </SecondaryButton>
-        <PrimaryButton height="4.4375rem" width="100%">
+        <PrimaryButton height="4.4375rem" width="100%" onClick={handleTryAgain}>
           <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
             {capitalize(t('shared:try_again'))}
           </StyledText>
