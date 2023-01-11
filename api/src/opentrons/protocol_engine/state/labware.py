@@ -61,7 +61,7 @@ _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
 
 
 class LabwareLoadParams(NamedTuple):
-    """Parameters required to load a labware in Protocol Engine"""
+    """Parameters required to load a labware in Protocol Engine."""
 
     load_name: str
     namespace: str

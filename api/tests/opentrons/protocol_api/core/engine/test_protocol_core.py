@@ -36,7 +36,13 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnModuleError,
+    NonExistentLabwareError,
+)
+from opentrons.protocol_engine.state.labware import (
+    LabwareLoadParams as EngineLabwareLoadParams,
+)
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import (
@@ -53,6 +59,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     HeaterShakerModuleCore,
 )
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -182,6 +189,12 @@ def test_load_labware(
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
+        mock_engine_client.state.labware.find_labware_params("hello", "world", 456)
+    ).then_return(
+        EngineLabwareLoadParams("some_labware", "some_explicit_namespace", 9001)
+    )
+
+    decoy.when(
         mock_engine_client.load_labware(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             load_name="some_labware",
@@ -202,11 +215,11 @@ def test_load_labware(
     )
 
     result = subject.load_labware(
-        load_name="some_labware",
+        load_name="hello",
         location=DeckSlotName.SLOT_5,
         label="some_display_name",  # maps to optional display name
-        namespace="some_explicit_namespace",
-        version=9001,
+        namespace="world",
+        version=456,
     )
 
     assert isinstance(result, LabwareCore)
@@ -224,6 +237,48 @@ def test_load_labware(
     )
 
     assert subject.get_slot_item(DeckSlotName.SLOT_5) is result
+
+
+def test_load_labware_default_namespace_and_version(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a LoadLabware command."""
+    decoy.when(
+        mock_engine_client.state.labware.find_labware_params("hello", "world", 456)
+    ).then_raise(error=NonExistentLabwareError("uh oh"))
+
+    decoy.when(
+        mock_engine_client.load_labware(
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            load_name="hello",
+            display_name="some_display_name",
+            namespace=OPENTRONS_NAMESPACE,
+            version=1,
+        )
+    ).then_return(
+        commands.LoadLabwareResult(
+            labwareId="abc123",
+            definition=LabwareDefinition.construct(),  # type: ignore[call-arg]
+            offsetId=None,
+        )
+    )
+
+    decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+
+    result = subject.load_labware(
+        load_name="hello",
+        location=DeckSlotName.SLOT_5,
+        label="some_display_name",  # maps to optional display name
+        namespace="world",
+        version=456,
+    )
+
+    assert isinstance(result, LabwareCore)
+    assert result.labware_id == "abc123"
 
 
 @pytest.mark.parametrize(
@@ -299,6 +354,12 @@ def test_load_labware_on_module(
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
+        mock_engine_client.state.labware.find_labware_params("hello", "world", 456)
+    ).then_return(
+        EngineLabwareLoadParams("some_labware", "some_explicit_namespace", 9001)
+    )
+
+    decoy.when(
         mock_engine_client.load_labware(
             location=ModuleLocation(moduleId="module-id"),
             load_name="some_labware",
@@ -326,11 +387,11 @@ def test_load_labware_on_module(
     )
 
     result = subject.load_labware(
-        load_name="some_labware",
+        load_name="hello",
         location=module_core,
         label="some_display_name",  # maps to optional display name
-        namespace="some_explicit_namespace",
-        version=9001,
+        namespace="world",
+        version=456,
     )
 
     assert isinstance(result, LabwareCore)

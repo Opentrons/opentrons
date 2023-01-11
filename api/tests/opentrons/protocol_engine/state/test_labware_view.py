@@ -182,6 +182,7 @@ def test_find_labware_params_raises_no_labware_found() -> None:
 
 
 def find_labware_params_raises_multiple_labware_found() -> None:
+    """It should raise if multiple labware match given parameters."""
     labware_def_1 = LabwareDefinition.construct(  # type: ignore[call-arg]
         parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
     )
