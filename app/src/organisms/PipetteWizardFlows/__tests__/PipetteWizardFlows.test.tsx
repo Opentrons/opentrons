@@ -604,7 +604,7 @@ describe('PipetteWizardFlows', () => {
       )
     })
   })
-  it('renders the unskippable modal when you try to exit out of a 96 channel detach flow from an unskippable page', async () => {
+  it('renders the unskippable modal when you try to exit out of a 96 channel detach flow from a the detach pipette unskippable page', async () => {
     mockGetAttachedPipettes.mockReturnValue({
       left: {
         id: 'abc',
@@ -658,6 +658,52 @@ describe('PipetteWizardFlows', () => {
     })
     // page 2
     getByText('Unscrew and Remove 96 Channel Pipette')
+    getByLabelText('Exit').click()
+    getByText('mock unskippable modal')
+  })
+  it('renders the 96 channel attach flow carriage unskippable step page', async () => {
+    mockGetAttachedPipettes.mockReturnValue({ left: null, right: null })
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+    ])
+    const { getByText, getByRole, getByLabelText } = render(props)
+    // page 1
+    getByRole('button', { name: 'Move gantry to front' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalled()
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // page 2
+    getByText('Unscrew Z Axis Carriage')
     getByLabelText('Exit').click()
     getByText('mock unskippable modal')
   })
