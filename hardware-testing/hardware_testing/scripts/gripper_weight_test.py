@@ -100,7 +100,7 @@ class Gripper_Weight_Test:
         test_data = self.test_data.copy()
         test_data.update(self.measurement_data)
         if self.input == "dc":
-            input_value = srt(self.dc)
+            input_value = str(self.dc)
         else:
             input_value = str(self.force)
         self.test_name = class_name.lower()
