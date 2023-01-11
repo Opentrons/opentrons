@@ -21,6 +21,7 @@ import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
@@ -129,12 +130,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/robot-settings/update-robot',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>protocol dashboard</Box>
-      </>
-    ),
+    Component: ProtocolDashboard,
     exact: true,
     name: 'Protocol Dashboard',
     path: '/protocols',
