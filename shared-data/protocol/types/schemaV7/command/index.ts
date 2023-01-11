@@ -6,7 +6,10 @@ import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
 import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
 import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
 import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
-import type { AnnotationRunTimeCommand, AnnotationCreateCommand } from './annotation'
+import type {
+  AnnotationRunTimeCommand,
+  AnnotationCreateCommand,
+} from './annotation'
 import type {
   CalibrationRunTimeCommand,
   CalibrationCreateCommand,
