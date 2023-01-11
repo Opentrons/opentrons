@@ -32,20 +32,17 @@ export function UpdateRobot(): JSX.Element {
   const isViewableRobot =
     localRobot != null && localRobot.status !== UNREACHABLE
   const robotUpdateType = useSelector((state: State) => {
-    console.log('available', getBuildrootUpdateAvailable(state, localRobot))
-    console.log(isViewableRobot)
     return isViewableRobot
       ? getBuildrootUpdateAvailable(state, localRobot)
       : null
   })
 
   const session = useSelector(getBuildrootSession)
-  const { step, error: sessionError } = session ?? { step: null, error: null }
+  const { step, stage, progress, error: sessionError } = session ?? {
+    step: null,
+    error: null,
+  }
   const dispatch = useDispatch<Dispatch>()
-
-  console.log('robotUpdateType', robotUpdateType)
-  console.log('session', session)
-  console.log('step', step)
 
   const renderUpdateProcess = (): JSX.Element | undefined => {
     // Display Error screen
@@ -63,32 +60,27 @@ export function UpdateRobot(): JSX.Element {
       return (
         <UpdateSoftware
           downloading
-          processProgress={session?.progress ? session.progress : 0}
+          processProgress={progress != null ? progress : 0}
         />
       )
     } else if (step === 'getToken' || step === 'uploadFile') {
       return (
         <UpdateSoftware
           sendingFile
-          processProgress={session?.progress ? session.progress : 0}
+          processProgress={progress != null ? progress : 0}
         />
       )
     } else if (step === 'processFile' || step === 'commitUpdate') {
-      if (
-        session?.stage === 'awaiting-file' ||
-        session?.stage === 'validating'
-      ) {
+      if (stage === 'awaiting-file' || stage === 'validating') {
         return (
           <UpdateSoftware
             validating
-            processProgress={session?.progress ? session.progress : 0}
+            processProgress={progress != null ? progress : 0}
           />
         )
       } else {
         return (
-          <UpdateSoftware
-            processProgress={session?.progress ? session.progress : 0}
-          />
+          <UpdateSoftware processProgress={progress != null ? progress : 0} />
         )
       }
     } else if (step === 'finished') {
@@ -107,7 +99,6 @@ export function UpdateRobot(): JSX.Element {
 
   React.useEffect(() => {
     // check isDownloading to avoid dispatching again
-    console.log(isDownloading)
     if (robotUpdateType === 'upgrade' && !isDownloading) {
       setIsDownloading(true)
       dispatch(startBuildrootUpdate(robotName))

@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
 import * as Buildroot from '../../../redux/buildroot'
-import { mockConnectableRobot as mockRobot } from '../../../redux/discovery/__fixtures__'
+import { getLocalRobot } from '../../../redux/discovery'
 import { CheckUpdates } from '../../../organisms/UpdateRobotSoftware/CheckUpdates'
 import { CompleteUpdateSoftware } from '../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
 import { ErrorUpdateSoftware } from '../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware'
@@ -43,6 +44,44 @@ const mockGetBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as
 const mockGetBuildrootSession = Buildroot.getBuildrootSession as jest.MockedFunction<
   typeof Buildroot.getBuildrootSession
 >
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
+>
+
+const MOCK_STATE: State = {
+  discovery: {
+    robot: { connection: { connectedTo: null } },
+    robotsByName: {
+      oddtie: {
+        name: 'oddtie',
+        health: null,
+        serverHealth: null,
+        addresses: [
+          {
+            ip: '127.0.0.1',
+            port: 31950,
+            seen: true,
+            healthStatus: null,
+            serverHealthStatus: null,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: null,
+          },
+        ],
+      },
+    },
+  },
+} as any
+
+const mockRobot = {
+  name: 'oddtie',
+  status: null,
+  health: null,
+  ip: '127.0.0.1',
+  port: 31950,
+  healthStatus: null,
+  serverHealthStatus: null,
+} as any
 
 const mockSession = {
   robotName: mockRobot.name,
@@ -62,6 +101,7 @@ const render = () => {
     </MemoryRouter>,
     {
       i18nInstance: i18n,
+      initialState: MOCK_STATE,
     }
   )
 }
@@ -70,6 +110,7 @@ describe('UpdateRobot', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     mockGetBuildrootUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
+    when(mockGetLocalRobot).calledWith(MOCK_STATE).mockReturnValue(mockRobot)
     mockCheckUpdates.mockReturnValue(<div>mock CheckUpdates</div>)
     mockCompleteUpdateSoftware.mockReturnValue(
       <div>mock CompleteUpdateSoftware</div>
@@ -108,65 +149,73 @@ describe('UpdateRobot', () => {
     getByText('mock UpdateSoftware')
   })
 
-  // it('should render mock Update Software for sending file', () => {
-  //   const mockSendingFileSession = {
-  //     ...mockSession,
-  //   }
-  //   const [{ getByText }] = render()
-  //   jest.advanceTimersByTime(11000)
-  //   getByText('mock UpdateSoftware')
-  // })
+  it('should render mock Update Software for sending file', () => {
+    const mockSendingFileSession = {
+      ...mockSession,
+      step: Buildroot.GET_TOKEN,
+      stage: Buildroot.VALIDATING,
+    }
+    mockGetBuildrootSession.mockReturnValue(mockSendingFileSession)
+    const [{ getByText }] = render()
+    jest.advanceTimersByTime(11000)
+    getByText('mock UpdateSoftware')
+  })
 
-  // it('should render mock Update Software for validating', () => {
-  //   const mockValidatingSession = {
-  //     ...mockSession,
-  //   }
-  //   const [{ getByText }] = render()
-  //   jest.advanceTimersByTime(11000)
-  //   getByText('mock UpdateSoftware')
-  // })
+  it('should render mock Update Software for validating', () => {
+    const mockValidatingSession = {
+      ...mockSession,
+      step: Buildroot.PROCESS_FILE,
+    }
+    mockGetBuildrootSession.mockReturnValue(mockValidatingSession)
+    const [{ getByText }] = render()
+    jest.advanceTimersByTime(11000)
+    getByText('mock UpdateSoftware')
+  })
 
-  // it('should render mock Update Software for installing', () => {
-  //   const mockInstallingSession = {
-  //     ...mockSession,
-  //   }
-  //   const [{ getByText }] = render()
-  //   jest.advanceTimersByTime(11000)
-  //   getByText('mock UpdateSoftware')
-  // })
+  it('should render mock Update Software for installing', () => {
+    const mockInstallingSession = {
+      ...mockSession,
+      step: Buildroot.COMMIT_UPDATE,
+    }
+    mockGetBuildrootSession.mockReturnValue(mockInstallingSession)
+    const [{ getByText }] = render()
+    jest.advanceTimersByTime(11000)
+    getByText('mock UpdateSoftware')
+  })
 
-  // it('should render mock NoUpdate found when there is no upgrade - reinstall', () => {
-  //   mockGetBuildrootUpdateAvailable.mockReturnValue(Buildroot.REINSTALL)
-  //   const [{ getByText }] = render()
-  //   jest.advanceTimersByTime(11000)
-  //   getByText('mock NoUpdateFound')
-  // })
+  it('should render mock NoUpdate found when there is no upgrade - reinstall', () => {
+    mockGetBuildrootUpdateAvailable.mockReturnValue(Buildroot.REINSTALL)
+    const [{ getByText }] = render()
+    jest.advanceTimersByTime(11000)
+    getByText('mock NoUpdateFound')
+  })
 
-  // it('should render mock NoUpdate found when there is no upgrade - downgrade', () => {
-  //   mockGetBuildrootUpdateAvailable.mockReturnValue(Buildroot.DOWNGRADE)
-  //   const [{ getByText }] = render()
-  //   jest.advanceTimersByTime(11000)
-  //   getByText('mock NoUpdateFound')
-  // })
+  it('should render mock NoUpdate found when there is no upgrade - downgrade', () => {
+    mockGetBuildrootUpdateAvailable.mockReturnValue(Buildroot.DOWNGRADE)
+    const [{ getByText }] = render()
+    jest.advanceTimersByTime(11000)
+    getByText('mock NoUpdateFound')
+  })
 
-  // it('should render mock CompleteUpdateSoftware when the step is finished', () => {
-  //   const mockCompleteSession = {
-  //     ...mockSession,
-  //     step: Buildroot.FINISHED,
-  //   }
-  //   mockGetBuildrootSession.mockReturnValue(mockCompleteSession)
-  //   const [{ getByText }] = render()
-  //   jest.advanceTimersByTime(11000)
-  //   getByText('mock CompleteUpdateSoftware')
-  // })
+  it('should render mock CompleteUpdateSoftware when the step is finished', () => {
+    const mockCompleteSession = {
+      ...mockSession,
+      step: Buildroot.FINISHED,
+    }
+    mockGetBuildrootSession.mockReturnValue(mockCompleteSession)
+    const [{ getByText }] = render()
+    jest.advanceTimersByTime(11000)
+    getByText('mock CompleteUpdateSoftware')
+  })
 
-  // it('should render mock ErrorUpdateSoftware when an error occurs', () => {
-  //   const mockErrorSession = {
-  //     ...session,
-  //     error:
-  //   }
-  //   const [{ getByText }] = render()
-  //   jest.advanceTimersByTime(11000)
-  //   getByText('mock ErrorUpdateSoftware')
-  // })
+  it('should render mock ErrorUpdateSoftware when an error occurs', () => {
+    const mockErrorSession = {
+      ...mockSession,
+      error: 'mock error',
+    }
+    mockGetBuildrootSession.mockReturnValue(mockErrorSession)
+    const [{ getByText }] = render()
+    jest.advanceTimersByTime(11000)
+    getByText('mock ErrorUpdateSoftware')
+  })
 })
