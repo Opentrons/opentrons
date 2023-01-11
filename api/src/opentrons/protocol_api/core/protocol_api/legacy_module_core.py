@@ -87,6 +87,10 @@ class LegacyModuleCore(AbstractModuleCore):
         """Get the module's deck slot."""
         return DeckSlotName.from_primitive(self._geometry.parent)  # type: ignore[arg-type]
 
+    def get_display_name(self) -> str:
+        """Get the module's display name."""
+        return f"{self.get_model()} on {self.get_deck_slot()}"
+
     def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
         """Add a labware to the module."""
         labware = self.geometry.add_labware(

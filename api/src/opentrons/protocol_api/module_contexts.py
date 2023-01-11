@@ -248,7 +248,7 @@ class ModuleContext(CommandPublisher):
 
     def __repr__(self) -> str:
         return "{} at {} lw {}".format(
-            self.__class__.__name__, self.geometry, self.labware
+            self.__class__.__name__, self._core.get_display_name(), self.labware
         )
 
 
