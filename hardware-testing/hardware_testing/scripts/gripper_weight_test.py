@@ -34,29 +34,32 @@ def build_arg_parser():
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-t', '--time', type=float, required=False, help='Time to hold the weight in minutes', default=10)
     arg_parser.add_argument('-g', '--height', type=float, required=False, help='Height to hold the weight from deck in mm', default=20)
+    arg_parser.add_argument('-p', '--pwm', type=int, required=False, help='Grip PWM duty-cycle in percentage', default=50)
+    arg_parser.add_argument('-f', '--force', type=float, required=False, help='Grip force value in Newtons', default=26)
     arg_parser.add_argument('-i', '--interval', type=float, required=False, help='Interval for recording data in seconds', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Gripper_Weight_Test:
     def __init__(
-        self, simulate: bool, input: string, cycles: int, time: float, height: float, interval: float
+        self, simulate: bool, weight: string, input: string, cycles: int, time: float, height: float, pwm: int, force: float, interval: float
     ) -> None:
         self.api = None
         self.mount = None
         self.gripper_id = None
         self.simulate = simulate
+        self.weight = weight
         self.input = input
         self.cycles = cycles
-        self.stop_time = time
-        self.height = height
-        self.interval = interval
+        self.time = time # minutes
+        self.height = height # mm
+        self.interval = interval # seconds
+        self.dc = pwm # %
+        self.force = force # Newtons
         self.vref_default = 1.0 # Volts
         self.vref = 2.0 # Volts
-        self.dc = 50 # %
-        self.force = 26 # Newtons
-        self.grip_position = Point(0, 0, -78)
-        self.hold_position = Point(0, 0, -self.height)
+        self.grip_position = Point(0, 0, -135)
+        self.hold_position = Point(0, 0, self.height)
         self.measurement_data = {
             "RMS":"None",
             "Peak Plus":"None",
@@ -67,7 +70,6 @@ class Gripper_Weight_Test:
         self.test_data ={
             "Time":"None",
             "Cycle":"None",
-            "Trial":"None",
             "Gripper":"None",
             "Vref":"None",
             "Firmware Vref":"None",
@@ -87,7 +89,6 @@ class Gripper_Weight_Test:
         else:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Gripper"] = str(self.gripper_id)
-        self.test_data["Vref"] = str(self.vref)
         await self._update_vref(self.api, self.vref_default)
         gripper_config = await get_gripper_jaw_motor_param(self.api._backend._messenger)
         print(f"Initial Gripper Config: {gripper_config}")
@@ -98,8 +99,12 @@ class Gripper_Weight_Test:
         class_name = self.__class__.__name__
         test_data = self.test_data.copy()
         test_data.update(self.measurement_data)
+        if self.input == "dc":
+            input_value = srt(self.dc)
+        else:
+            input_value = str(self.force)
         self.test_name = class_name.lower()
-        self.test_tag = self.input
+        self.test_tag = self.input + input_value + "_" + self.weight + "g"
         self.test_header = self.dict_keys_to_line(test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -123,30 +128,17 @@ class Gripper_Weight_Test:
             self.measurement_data[key] = str(self.oscilloscope.get_measurement(index+1))
         print(self.measurement_data)
 
-    def _record_data(self, elapsed_time: float, cycle: int, input_dc: int = 0, input_force: float = 0):
+    def _record_data(self, elapsed_time: float, cycle: int, vref: float, input_dc: int = 0, input_force: float = 0):
+        self._read_oscilloscope()
         self.test_data["Time"] = str(round(elapsed_time, 3))
         self.test_data["Cycle"] = str(cycle)
+        self.test_data["Vref"] = str(vref)
         self.test_data["Input DC"] = str(input_dc)
         self.test_data["Input Force"] = str(input_force)
         test_data = self.test_data.copy()
         test_data.update(self.measurement_data)
         test_data = self.dict_values_to_line(test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
-
-    async def _move_gripper_jaw(
-        self, api: OT3API, mount: OT3Mount, input_dc: int = 0, input_force: float = 0
-    ) -> None:
-        if input_dc > 0:
-            await api._grip(input_dc)
-        else:
-            await api.grip(input_force)
-        api._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
-        time.sleep(self.interval)
-
-        self._read_oscilloscope()
-
-        await api.ungrip()
-        time.sleep(self.interval)
 
     async def _hold_weight(
         self, api: OT3API, mount: OT3Mount, input_dc: int = 0, input_force: float = 0
@@ -185,6 +177,7 @@ class Gripper_Weight_Test:
 
     async def exit(self):
         if self.api and self.mount:
+            await self._drop_weight(self.api, self.mount)
             await self._home_gripper(self.api, self.mount)
 
     async def run(self) -> None:
@@ -193,23 +186,31 @@ class Gripper_Weight_Test:
             if self.api and self.mount:
                 for i in range(self.cycles):
                     cycle = i + 1
+                    vref = round(self.vref, 1)
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     await self._home_gripper(self.api, self.mount)
                     await self._update_vref(self.api, self.vref)
                     if self.input == 'dc':
+                        print(f"\n-->> Applying Duty-Cycle {self.dc}%")
                         await self._hold_weight(self.api, self.mount, input_dc=self.dc)
                     else:
+                        print(f"\n-->> Applying Force {self.force}N")
                         await self._hold_weight(self.api, self.mount, input_force=self.force)
-                    start_time = time.time()
                     elapsed_time = 0
-                    while elapsed_time < self.stop_time*60:
-                        elapsed_time = round(time.time() - start_time, 3)
-                        if elapsed_time % self.interval == 0:
-                            start_record = time.time()
+                    record_time = 0
+                    stop_time = self.time*60
+                    start_time = time.time()
+                    while elapsed_time < stop_time:
+                        if record_time == self.interval:
+                            record_time = 0
                             if self.input == 'dc':
-                                self._record_data(elapsed_time, cycle, input_dc=self.dc)
+                                self._record_data(elapsed_time, cycle, vref, input_dc=self.dc)
                             else:
-                                self._record_data(elapsed_time, cycle, input_force=self.force)
+                                self._record_data(elapsed_time, cycle, vref, input_force=self.force)
+                        time.sleep(1)
+                        record_time += 1
+                        elapsed_time += 1
+                        print(f"Elapsed Time: {round(elapsed_time/60,2)}/{self.time} minutes")
                     await self._drop_weight(self.api, self.mount)
         except Exception as e:
             await self.exit()
@@ -225,5 +226,15 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper Weight Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Weight_Test(args.simulate, args.input, args.cycles, args.time, args.height, args.interval)
+    weight = str(input("Specify weight (grams): ") or 500)
+    test = Gripper_Weight_Test(
+        simulate=args.simulate,
+        weight=weight,
+        input=args.input,
+        cycles=args.cycles,
+        time=args.time,
+        height=args.height,
+        pwm=args.pwm,
+        force=args.force,
+        interval=args.interval)
     asyncio.run(test.run())
