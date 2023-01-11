@@ -10,6 +10,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     ErrorCode,
     MotorPositionFlags,
+    ErrorSeverity,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -357,8 +358,22 @@ class MoveScheduler:
     def _handle_acknowledge(self, message: Acknowledgement) -> None:
         log.debug("recieved ack")
 
-    def _handle_error(self, message: ErrorMessage) -> None:
-        raise RuntimeError("Firmware Error Received", message)
+    def _handle_error(
+        self, message: ErrorMessage, arbitration_id: ArbitrationId
+    ) -> None:
+        # Remove anything related to this node!
+        node = arbitration_id.parts.originating_node_id
+        """
+        for g in self._moves:
+            for m in self._moves[g]:
+                if m[0] == node:
+                    self._moves[g].remove(m)
+        """
+        for group in self._moves:
+            group.clear()
+        self._event.set()
+        if message.payload.severity == ErrorSeverity.unrecoverable:
+            raise RuntimeError("Firmware Error Received", message)
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
@@ -407,7 +422,7 @@ class MoveScheduler:
             self._remove_move_group(message, arbitration_id)
             self._handle_tip_action(message)
         elif isinstance(message, ErrorMessage):
-            self._handle_error(message)
+            self._handle_error(message, arbitration_id)
         elif isinstance(message, Acknowledgement):
             self._handle_acknowledge(message)
 
