@@ -51,6 +51,11 @@ export function SelectWifiNetwork(): JSX.Element {
     dispatch(Networking.fetchWifiList(robotName))
   }
 
+  // const handleShowSetWifiCred = (isShow: boolean): void => {
+  //   console.log('called: isShow', isShow)
+  //   setIsShowSetWifiCred(isShow)
+  // }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -59,8 +64,12 @@ export function SelectWifiNetwork(): JSX.Element {
       )} ${String(SPACING.spacingXXL)}`}
     >
       {isShowSetWifiCred ? (
-        <SetWifiCred ssid={selectedSsid} />
-      ) : list.length > 0 ? (
+        <SetWifiCred
+          ssid={selectedSsid}
+          setIsShowSetWifiCred={setIsShowSetWifiCred}
+        />
+      ) : null}
+      {list.length >= 1 ? (
         <>
           <HeaderWithIPs
             handleSearch={handleSearch}
