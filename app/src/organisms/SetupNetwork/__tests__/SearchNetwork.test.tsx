@@ -21,7 +21,7 @@ describe('SearchNetwork', () => {
   it('should render search screen with background', () => {
     const [{ getByText }] = render()
     getByText('Connect to a network')
-    const connectingScreen = getByText('Searching for network...')
+    const connectingScreen = getByText('Searching for networks...')
     expect(connectingScreen).toHaveStyle(`background-color: D6D6D6`)
   })
 

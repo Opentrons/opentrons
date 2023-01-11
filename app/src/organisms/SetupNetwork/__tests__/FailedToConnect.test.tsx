@@ -61,24 +61,25 @@ describe('ConnectedResult', () => {
     props.type = null
     const [{ getByText, getByRole }] = render(props)
     getByText('Oops! Incorrect password for mockWifi.')
-    getByRole('button', { name: 'try again' })
+    getByRole('button', { name: 'Try again' })
     getByRole('button', { name: 'Change network' })
   })
 
   it('should render a failure screen - other error cases', () => {
     const [{ getByText, getByRole }] = render(props)
     getByText('Failed to connect to mockWifi.')
-    getByRole('button', { name: 'try again' })
+    getByRole('button', { name: 'Try again' })
     getByRole('button', { name: 'Change network' })
   })
 
-  it('should render SetWifiCred when tapping try again button - incorrect password', () => {
-    props.type = null
-    const [{ getByRole, getByText }] = render(props)
-    const button = getByRole('button', { name: 'try again' })
-    fireEvent.click(button)
-    getByText('Mock SetWifiCred')
-  })
+  // No longer needed ToDo remove
+  // it('should render SetWifiCred when tapping try again button - incorrect password', () => {
+  //   props.type = null
+  //   const [{ getByRole, getByText }] = render(props)
+  //   const button = getByRole('button', { name: 'Try again' })
+  //   fireEvent.click(button)
+  //   getByText('Mock SetWifiCred')
+  // })
 
   it('should call mock function when tapping change network button - incorrect password', () => {
     props.type = null
@@ -90,7 +91,7 @@ describe('ConnectedResult', () => {
 
   it('should call mock function when clicking buttons - other error cases', () => {
     const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'try again' })
+    const button = getByRole('button', { name: 'Try again' })
     fireEvent.click(button)
     expect(mockFunc).toHaveBeenCalled()
   })

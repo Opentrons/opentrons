@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import capitalize from 'lodash/capitalize'
 
 import {
   Flex,
@@ -25,7 +26,7 @@ interface FailedToConnectProps {
   requestState?: RequestState
   type: NetworkChangeType | null
   onConnect: () => void
-  handleShowSetWifiCred: (isShow: boolean) => void
+  setIsShowSetWifiCred: (isShow: boolean) => void
 }
 
 export function FailedToConnect({
@@ -33,19 +34,27 @@ export function FailedToConnect({
   requestState,
   type,
   onConnect,
-  handleShowSetWifiCred,
+  setIsShowSetWifiCred,
 }: FailedToConnectProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  const isInvalidPassword = type === DISCONNECT
+  const isInvalidPassword = !(type === DISCONNECT)
+
+  const handleUpdate = (): void => {
+    console.log('called')
+    setIsShowSetWifiCred(true)
+  }
 
   const handleClick = (): void => {
-    if (!isInvalidPassword) {
-      // Try to reconnect
-      onConnect()
-    } else {
+    if (isInvalidPassword) {
       // Display SetWifiCred screen
-      handleShowSetWifiCred(true)
+      console.log('display SetWifiCred')
+      // handleShowSetWifiCred(true)
+      handleUpdate()
+    } else {
+      // Try to reconnect
+      console.log('try to connect again')
+      onConnect()
     }
   }
 
@@ -67,7 +76,7 @@ export function FailedToConnect({
             size="4.375rem"
             color={COLORS.errorEnabled}
             aria-label={
-              !isInvalidPassword
+              isInvalidPassword
                 ? 'failed_to_connect_invalidPassword'
                 : 'failed_to_connect'
             }
@@ -78,11 +87,11 @@ export function FailedToConnect({
             lineHeight="2.72375rem"
             marginTop={SPACING.spacingXXL}
           >
-            {!isInvalidPassword
+            {isInvalidPassword
               ? `Oops! Incorrect password for ${ssid}.`
               : t('failed_to_connect_to_ssid', { ssid: ssid })}
           </StyledText>
-          {isInvalidPassword &&
+          {!isInvalidPassword &&
             requestState != null &&
             'error' in requestState &&
             requestState.error != null &&
@@ -97,16 +106,24 @@ export function FailedToConnect({
       <Flex gridRow="0.75rem">
         <SecondaryButton
           flex="1"
-          onClick={handleClick}
+          onClick={() => history.push('/network-setup/wifi')}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
+          fontSize="1.5rem"
+          lineHeight="1.375rem"
+          fontWeight="600"
+          height="4.375rem"
         >
-          {t('shared:try_again')}
+          {t('change_network')}
         </SecondaryButton>
         <PrimaryButton
           flex="1"
-          onClick={() => history.push('/network-setup/wifi')}
+          onClick={handleClick}
+          fontSize="1.5rem"
+          lineHeight="1.375rem"
+          fontWeight="600"
+          height="4.375rem"
         >
-          {t('change_network')}
+          {capitalize(t('shared:try_again'))}
         </PrimaryButton>
       </Flex>
     </Flex>
