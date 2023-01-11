@@ -1324,8 +1324,12 @@ class OT3API(
                 )
                 try:
                     await self._move(target_down, speed=press.speed, check_stalls=True)
-                except SomethingError:
-                    await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
+                except RuntimeError as e:
+                    # TODO: (untested) check that this actually catches the correct error
+                    if "stall" in str(e):
+                        await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
+                    else:
+                        raise e
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
