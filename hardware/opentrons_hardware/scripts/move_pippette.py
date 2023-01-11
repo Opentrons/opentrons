@@ -91,7 +91,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
         Click  >> Enter << to save position
         Click  >> q << to quit the test script
                     """
-    print(information_str)
+    # print(information_str)
     while True:
         input = getch()
         if input == 'w':
