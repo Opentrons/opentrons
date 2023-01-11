@@ -47,9 +47,7 @@ class TipLengthCalibration(BaseSession):
         self._shutdown_coroutine = shutdown_handler
 
     @staticmethod
-    def _verify_tip_rack(
-        tip_rack_def: Union[Any, None]
-    ) -> Optional[LabwareDefinition]:
+    def _verify_tip_rack(tip_rack_def: Union[Any, None]) -> Optional[LabwareDefinition]:
         if tip_rack_def:
             labware.verify_definition(tip_rack_def)
             return cast(LabwareDefinition, tip_rack_def)
