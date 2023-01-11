@@ -6,7 +6,7 @@ from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import ModuleModel
+from opentrons.protocol_engine.types import ModuleModel, ModuleDefinition
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
@@ -85,3 +85,15 @@ def test_get_serial_number(
     )
 
     assert subject.get_serial_number() == "abc"
+
+
+def test_get_display_name(decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient) -> None:
+    """It should return the module display name."""
+    mock_definition = decoy.mock(cls=ModuleDefinition)
+    decoy.when(mock_engine_client.state.modules.get_definition("1234")).then_return(
+        mock_definition
+    )
+    decoy.when(mock_definition.displayName).then_return("abra kadabra")
+    decoy.when(mock_engine_client.state.modules.get_location("1234")).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_1))
+
+    assert subject.get_display_name() == "abra kadabra on 1"
