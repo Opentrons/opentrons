@@ -50,6 +50,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteTipActionTypeField,
+    MoveStopConditionField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
@@ -254,7 +255,7 @@ class MoveGroupRunner:
             return HomeRequest(payload=home_payload)
         else:
             linear_payload = AddLinearMoveRequestPayload(
-                request_stop_condition=UInt8Field(step.stop_condition),
+                request_stop_condition=MoveStopConditionField(step.stop_condition),
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
@@ -283,7 +284,7 @@ class MoveGroupRunner:
             duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
             velocity=self._convert_velocity(step.velocity_mm_sec, interrupts_per_sec),
             action=PipetteTipActionTypeField(step.action),
-            request_stop_condition=UInt8Field(step.stop_condition),
+            request_stop_condition=MoveStopConditionField(step.stop_condition),
         )
         return TipActionRequest(payload=tip_action_payload)
 
@@ -357,7 +358,7 @@ class MoveScheduler:
         log.debug("recieved ack")
 
     def _handle_error(self, message: ErrorMessage) -> None:
-        raise RuntimeError("Firmware Error Revieved", message)
+        raise RuntimeError("Firmware Error Received", message)
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
