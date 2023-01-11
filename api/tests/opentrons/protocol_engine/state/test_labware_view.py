@@ -255,6 +255,42 @@ def test_get_well_definition_get_first(well_plate_def: LabwareDefinition) -> Non
     assert result == expected_well_def
 
 
+def test_get_well_size_circular(well_plate_def: LabwareDefinition) -> None:
+    """It should return the well dimensions of a circular well."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
+    )
+    expected_well_def = well_plate_def.wells["A2"]
+    expected_size = (
+        expected_well_def.diameter,
+        expected_well_def.diameter,
+        expected_well_def.depth,
+    )
+
+    result = subject.get_well_size(labware_id="plate-id", well_name="A2")
+
+    assert result == expected_size
+
+
+def test_get_well_size_rectangular(reservoir_def: LabwareDefinition) -> None:
+    """It should return the well dimensions of a rectangular well."""
+    subject = get_labware_view(
+        labware_by_id={"reservoir-id": reservoir},
+        definitions_by_uri={"some-reservoir-uri": reservoir_def},
+    )
+    expected_well_def = reservoir_def.wells["A2"]
+    expected_size = (
+        expected_well_def.xDimension,
+        expected_well_def.yDimension,
+        expected_well_def.depth,
+    )
+
+    result = subject.get_well_size(labware_id="reservoir-id", well_name="A2")
+
+    assert result == expected_size
+
+
 def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
     """It should return a list of wells from definition."""
     subject = get_labware_view(
