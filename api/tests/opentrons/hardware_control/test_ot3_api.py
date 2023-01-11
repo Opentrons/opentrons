@@ -840,7 +840,7 @@ async def test_update_position_estimation(
         "update_motor_estimation",
         AsyncMock(spec=backend.update_motor_estimation),
     ) as mock_update:
-        await ot3_hardware.update_position_estimation(axes)
+        await ot3_hardware._update_position_estimation(axes)
         if axes is None:
             axes = [ax for ax in OT3Axis]
         mock_update.assert_called_once_with(axes)

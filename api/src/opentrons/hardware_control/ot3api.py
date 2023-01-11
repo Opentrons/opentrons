@@ -504,7 +504,7 @@ class OT3API(
         await self.set_gantry_load(self._gantry_load_from_instruments())
 
     @ExecutionManagerProvider.wait_for_running
-    async def update_position_estimation(
+    async def _update_position_estimation(
         self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
     ) -> None:
         """
