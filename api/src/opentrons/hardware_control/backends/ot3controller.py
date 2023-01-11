@@ -241,8 +241,16 @@ class OT3Controller:
         for axis, pos in response.items():
             self._position.update({axis: pos[0]})
             self._encoder_position.update({axis: pos[1]})
+            # if an axis has already been homed, we're not clearing the motor ok status flag
+            # TODO: (2023-01-10) This is just a temp fix so we're not blocking hardware testing,
+            # we should port the encoder position over to use as motor position if encoder status is ok
+            already_homed = (
+                self._motor_status[axis].motor_ok
+                if axis in self._motor_status.keys()
+                else False
+            )
             self._motor_status.update(
-                {axis: MotorStatus(motor_ok=pos[2], encoder_ok=pos[3])}
+                {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3])}
             )
 
     async def move(

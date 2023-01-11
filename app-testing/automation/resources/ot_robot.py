@@ -49,16 +49,12 @@ class OtRobot:
     def is_alive(self) -> bool:
         """Is a robot available by http - request the openapi.json."""
         try:
-            response: requests.Response = self.session.get(
-                f"{self.base_url}/openapi.json", timeout=5
-            )
+            response: requests.Response = self.session.get(f"{self.base_url}/openapi.json", timeout=5)
             if response.status_code == 200:
                 self.alive = True
                 return self.alive
         except requests.exceptions.ConnectionError:
-            self.console.print(
-                f"[bold cyan]{self.data.display_name } robot is not reachable."
-            )
+            self.console.print(f"[bold cyan]{self.data.display_name } robot is not reachable.")
         self.alive = False
         return self.alive
 
@@ -66,25 +62,19 @@ class OtRobot:
         """Retrieve the modules from /modules."""
         modules: List[Module] = []
         if self.is_alive():
-            response: requests.Response = self.session.get(
-                f"{self.base_url}/modules", timeout=5
-            )
+            response: requests.Response = self.session.get(f"{self.base_url}/modules", timeout=5)
             if response.status_code == 200:
                 self.console.print(
                     f"{self.data.display_name } retrieved modules successfully.",
                     style="white on blue",
                 )
             for module in response.json()["data"]:
-                modules.append(
-                    Module(module["moduleModel"], module["id"], module["serialNumber"])
-                )
+                modules.append(Module(module["moduleModel"], module["id"], module["serialNumber"]))
         self.modules: List[Module] = modules
 
     def deck_calibrated(self) -> bool:
         """Is the deck calibrated."""
-        response: requests.Response = self.session.get(
-            f"{self.base_url}/calibration/status", timeout=2
-        )
+        response: requests.Response = self.session.get(f"{self.base_url}/calibration/status", timeout=2)
         self.console.print(response.json())
         if response.status_code == 200:
             return bool(response.json()["deckCalibration"]["status"] == "OK")
@@ -95,25 +85,15 @@ class OtRobot:
 
         For now we will tightly couple this to our standard emulation pipette setup.
         """
-        response: requests.Response = self.session.get(
-            f"{self.base_url}/calibration/pipette_offset", timeout=2
-        )
+        response: requests.Response = self.session.get(f"{self.base_url}/calibration/pipette_offset", timeout=2)
         self.console.print(response.json())
         if response.status_code == 200:
             data = response.json()["data"]
             if data == []:
                 return False
             try:
-                left = [
-                    pipette
-                    for pipette in data
-                    if pipette["id"] == self.data.left_pipette
-                ][0]
-                right = [
-                    pipette
-                    for pipette in data
-                    if pipette["id"] == self.data.right_pipette
-                ][0]
+                left = [pipette for pipette in data if pipette["id"] == self.data.left_pipette][0]
+                right = [pipette for pipette in data if pipette["id"] == self.data.right_pipette][0]
                 left_offset: bool = len(left["offset"]) == 3
                 right_offset: bool = len(right["offset"]) == 3
                 return left_offset and right_offset
@@ -126,25 +106,15 @@ class OtRobot:
 
         For now we will tightly couple this to our standard emulation pipette setup.
         """
-        response: requests.Response = self.session.get(
-            f"{self.base_url}/calibration/tip_length", timeout=2
-        )
+        response: requests.Response = self.session.get(f"{self.base_url}/calibration/tip_length", timeout=2)
         self.console.print(response.json())
         if response.status_code == 200:
             data = response.json()["data"]
             if data == []:
                 return False
             try:
-                left = [
-                    pipette
-                    for pipette in data
-                    if pipette["pipette"] == self.data.left_pipette.split("&")[0]
-                ][0]
-                right = [
-                    pipette
-                    for pipette in data
-                    if pipette["pipette"] == self.data.right_pipette.split("&")[0]
-                ][0]
+                left = [pipette for pipette in data if pipette["pipette"] == self.data.left_pipette.split("&")[0]][0]
+                right = [pipette for pipette in data if pipette["pipette"] == self.data.right_pipette.split("&")[0]][0]
                 left_tip_length: bool = left["tipLength"] > 0
                 right_tip_length: bool = right["tipLength"] > 0
                 return left_tip_length and right_tip_length

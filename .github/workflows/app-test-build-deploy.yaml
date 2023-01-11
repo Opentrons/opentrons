@@ -8,6 +8,7 @@ on:
       - 'Makefile'
       - 'app/**/*'
       - 'app-shell/**/*'
+      - 'app-shell-odd/**/*'
       - 'components/**/*'
       - 'shared-data/**/*'
       - 'webpack-config/**/*'
@@ -28,6 +29,7 @@ on:
       - 'Makefile'
       - 'app/**/*'
       - 'app-shell/**/*'
+      - 'app-shell-odd/**/*'
       - 'components/**/*'
       - 'shared-data/**/*'
       - 'webpack-config/**/*'
@@ -49,11 +51,9 @@ env:
   _APP_DEPLOY_BUCKET_OT3: ot3-development.builds.opentrons.com
   _APP_DEPLOY_FOLDER_OT3: app
 
-
 jobs:
   js-unit-test:
-    # unit tests for js frontend projects (e.g. not app-shell or discovery-client) do not need
-    # to run cross-platform
+    # unit tests for the app's view layer (not the node layer)
     runs-on: 'ubuntu-22.04'
     name: 'opentrons app frontend unit tests'
     timeout-minutes: 60
@@ -124,19 +124,30 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: setup-js
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
       - name: setup-js
         run: |
           make setup-js
       - name: 'test native(er) packages'
         run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="(app-shell|discovery-client)/src/**/*.(js|ts|tsx)" app-shell/src discovery-client/src
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)" app-shell/src app-shell-odd/src discovery-client/src
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
           files: ./coverage/lcov.info
           flags: app
 
-      # build the app and deploy it
+      # build the desktop app and deploy it
       - if: github.event_name != 'pull_request'
         name: 'build app for ${{ matrix.os }}'
         timeout-minutes: 60
@@ -164,6 +175,13 @@ jobs:
         with:
           name: 'opentrons-${{ matrix.os }}'
           path: app-shell/dist/publish
+
+      # build the ODD app
+      - if: ${{ github.event_name != 'pull_request' && matrix.os == 'ubuntu-22.04' }}
+        name: 'build ODD app for linux'
+        timeout-minutes: 60
+        run: |
+          make -C app-shell-odd dist-ot3
 
   build-app-ot3:
     strategy:
@@ -195,6 +213,13 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
