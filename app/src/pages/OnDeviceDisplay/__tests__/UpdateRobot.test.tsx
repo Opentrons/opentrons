@@ -15,6 +15,8 @@ import { UpdateSoftware } from '../../../organisms/UpdateRobotSoftware/UpdateSof
 
 import { UpdateRobot } from '../UpdateRobot'
 
+import type { State } from '../../../redux/types'
+
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../organisms/UpdateRobotSoftware/CheckUpdates')
