@@ -515,7 +515,7 @@ async def _calibrate_mount(
 
         # update center with values obtained during calibration
         center = Point(x_center, y_center, z_pos)
-        offset = center - nominal_center
+        offset = nominal_center - center
         LOG.info(
             f"Found calibration value {center} for mount {mount.name} (offset={offset})"
         )
