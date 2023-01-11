@@ -2,7 +2,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Union, Tuple, cast
+from typing import (
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Union,
+    Tuple,
+    NamedTuple,
+    cast,
+)
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -46,6 +58,14 @@ _MAGDECK_HALF_MM_LABWARE = {
 }
 
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
+
+
+class LabwareLoadParams(NamedTuple):
+    """Parameters required to load a labware in Protocol Engine"""
+
+    load_name: str
+    namespace: str
+    version: int
 
 
 @dataclass
@@ -280,6 +300,61 @@ class LabwareView(HasState[LabwareState]):
             raise errors.LabwareDefinitionDoesNotExistError(
                 f"Labware definition for matching {uri} not found."
             ) from e
+
+    def find_labware_params(
+        self,
+        load_name: str,
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LabwareLoadParams:
+        """Resolve labware parameters based on load name and given parameters."""
+        if namespace is not None and version is not None:
+            return LabwareLoadParams(
+                load_name=load_name, namespace=namespace, version=version
+            )
+
+        # Find all labware definitions that match load name
+        matching_definitions = [
+            definition
+            for definition in self._state.definitions_by_uri.values()
+            if definition.parameters.loadName == load_name
+        ]
+
+        if not matching_definitions:
+            raise errors.NonExistentLabwareError(
+                f"Could not find labware with given load name {load_name}"
+            )
+
+        # If we have namespace and/or version, further match the definitions based on given parameter
+        if namespace is not None and version is None:
+            matching_definitions = [
+                definition
+                for definition in matching_definitions
+                if definition.namespace == namespace
+            ]
+        elif version is not None and namespace is None:
+            matching_definitions = [
+                definition
+                for definition in matching_definitions
+                if definition.version == version
+            ]
+
+        # If there's none matching at this point, we had a partial match
+        if not matching_definitions:
+            raise errors.AmbiguousLoadLabwareParamsError(
+                f"Found labware with load name {load_name} but could not match other given parameters."
+            )
+        elif len(matching_definitions) > 1:
+            raise errors.AmbiguousLoadLabwareParamsError(
+                f"Found multiple labware with load name {load_name} and given parameters."
+            )
+        found_definition = matching_definitions[0]
+
+        return LabwareLoadParams(
+            load_name=load_name,
+            namespace=found_definition.namespace,
+            version=found_definition.version,
+        )
 
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
