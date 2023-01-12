@@ -60,9 +60,9 @@ describe('DetachPipette', () => {
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Loosen Screws and Detach')
+    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3')
     getByText(
-      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette'
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
     getByAltText('Detach pipette')
     getByText('mock check pipette button')
@@ -97,12 +97,12 @@ describe('DetachPipette', () => {
       },
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Unscrew and Remove 96 Channel Pipette')
+    getByText('Loosen Screws and Detach 96-Channel Pipette')
     getByText(
-      'Place your hand onto the pipette so it does not fall. Begin by unscrewing the 4 captive screws found in the front of the 96 channel pipette. Once all the screws are lossened, proceed to slowly remove the pipette by sliding off the supporting pins.'
+      'Hold the pipette so it does not fall. Then loosen the four captive screws on the front of the pipette. Once all the screws are loosened, slowly remove the pipette by sliding it towards the front of the robot, off the supporting pins.'
     )
     getByText(
-      'The pipette is heavy so be cautious during uninstall. Having a helper near can be really helpful during this process.'
+      'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
     )
     getByAltText('Unscrew 96 channel pipette')
     getByText('mock check pipette button')
@@ -128,9 +128,9 @@ describe('DetachPipette', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Loosen Screws and Detach')
+    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3')
     getByText(
-      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette'
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
     getByAltText('Detach pipette')
     getByText('mock check pipette button')

@@ -270,7 +270,13 @@ export const PipetteWizardFlows = (
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         wizardTitle = t('attach_pipette')
       } else {
-        wizardTitle = t('attach_96_channel')
+        wizardTitle = isGantryEmpty
+          ? t('attach_96_channel')
+          : t('attach_96_channel_plus_detach', {
+              pipetteName:
+                attachedPipettes.left?.modelSpecs.displayName ??
+                attachedPipettes.right?.modelSpecs.displayName,
+            })
       }
       break
     }
