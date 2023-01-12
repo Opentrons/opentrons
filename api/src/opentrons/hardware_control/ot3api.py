@@ -1336,7 +1336,7 @@ class OT3API(
                     await self._move(target_down, speed=press.speed, check_stalls=True)
                 except RuntimeError as e:
                     # TODO: (untested) check that this actually catches the correct error
-                    if "stall" in str(e):
+                    if "collision_detected" in str(e):
                         await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
                     else:
                         raise e
