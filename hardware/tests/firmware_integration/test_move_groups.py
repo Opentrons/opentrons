@@ -20,6 +20,7 @@ from opentrons_hardware.firmware_bindings.utils import (
     Int32Field,
     UInt32Field,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import MoveStopConditionField
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -57,7 +58,7 @@ async def test_add_moves(
                 group_id=UInt8Field(group_id),
                 seq_id=UInt8Field(i),
                 duration=UInt32Field(duration),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 acceleration=Int32Field(0),
                 velocity=Int32Field(0),
             )

@@ -56,7 +56,10 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_enable_motor,
     set_disable_motor,
 )
-from opentrons_hardware.hardware_control.motor_position_status import get_motor_position
+from opentrons_hardware.hardware_control.motor_position_status import (
+    get_motor_position,
+    update_motor_position_estimation,
+)
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.network import probe
 from opentrons_hardware.hardware_control.current_settings import (
@@ -83,6 +86,7 @@ from opentrons.hardware_control.types import (
     InvalidPipetteModel,
     InstrumentProbeType,
     MotorStatus,
+    MustHomeError,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -170,6 +174,18 @@ class OT3Controller:
         response = await get_motor_position(self._messenger, self._present_nodes)
         self._handle_motor_status_response(response)
 
+    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
+        """Update motor position estimation for commanded nodes, and update cache of data."""
+        nodes = set([axis_to_node(a) for a in axes])
+        for node in nodes:
+            if not (
+                node in self._motor_status.keys()
+                and self._motor_status[node].encoder_ok
+            ):
+                raise MustHomeError(f"Axis {node} has invalid encoder position")
+        response = await update_motor_position_estimation(self._messenger, nodes)
+        self._handle_motor_status_response(response)
+
     @property
     def motor_run_currents(self) -> OT3AxisMap[float]:
         assert self._current_settings
@@ -232,8 +248,16 @@ class OT3Controller:
         for axis, pos in response.items():
             self._position.update({axis: pos[0]})
             self._encoder_position.update({axis: pos[1]})
+            # if an axis has already been homed, we're not clearing the motor ok status flag
+            # TODO: (2023-01-10) This is just a temp fix so we're not blocking hardware testing,
+            # we should port the encoder position over to use as motor position if encoder status is ok
+            already_homed = (
+                self._motor_status[axis].motor_ok
+                if axis in self._motor_status.keys()
+                else False
+            )
             self._motor_status.update(
-                {axis: MotorStatus(motor_ok=pos[2], encoder_ok=pos[3])}
+                {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3])}
             )
 
     async def move(

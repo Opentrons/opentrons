@@ -91,7 +91,6 @@ class ModuleContext(CommandPublisher):
             )
         return self._core.get_serial_number()
 
-    # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """Specify the presence of a piece of labware on the module.
@@ -116,9 +115,8 @@ class ModuleContext(CommandPublisher):
 
         _log.warning(deprecation_message)
 
-        # Type ignoring to preserve backwards compatibility
         assert (
-            labware.parent == self._core.geometry  # type: ignore[comparison-overlap]
+            labware.parent == self._core.geometry
         ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)
@@ -168,8 +166,6 @@ class ModuleContext(CommandPublisher):
             labware = Labware(
                 implementation=labware_core,
                 api_version=self._api_version,
-                protocol_core=self._protocol_core,
-                core_map=self._core_map,
             )
 
         self._core_map.add(labware_core, labware)
@@ -221,13 +217,6 @@ class ModuleContext(CommandPublisher):
         """The labware (if any) present on this module."""
         labware_core = self._protocol_core.get_labware_on_module(self._core)
         return self._core_map.get(labware_core)
-
-    # TODO (tz, 1-7-23): change this to version 2.14
-    @property  # type: ignore[misc]
-    @requires_version(2, 13)
-    def parent(self) -> str:
-        """The name of the slot the module is on."""
-        return self._core.get_deck_slot().value
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)

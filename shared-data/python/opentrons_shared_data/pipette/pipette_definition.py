@@ -9,14 +9,14 @@ PLUNGER_CURRENT_MAXIMUM = 1.5
 
 
 PipetteModelMajorVersion = [1, 2, 3]
-PipetteModelMinorVersion = [0, 1, 2, 3]
+PipetteModelMinorVersion = [0, 1, 2, 3, 4]
 
 # TODO Literals are only good for writing down
 # exact values. Is there a better typing mechanism
 # so we don't need to keep track of versions in two
 # different places?
 PipetteModelMajorVersionType = Literal[1, 2, 3]
-PipetteModelMinorVersionType = Literal[0, 1, 2, 3]
+PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4]
 
 
 class PipetteTipType(Enum):

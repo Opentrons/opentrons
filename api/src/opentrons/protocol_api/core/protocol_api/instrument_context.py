@@ -153,8 +153,6 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
                 parent=Labware(
                     implementation=location.geometry.parent,
                     api_version=self._api_version,
-                    protocol_core=None,  # type: ignore[arg-type]
-                    core_map=None,  # type: ignore[arg-type]
                 ),
                 well_implementation=location,
                 api_version=self._api_version,
@@ -215,10 +213,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             from opentrons.protocol_api.labware import Labware, Well
 
             labware = Labware(
-                implementation=labware_core,
-                api_version=self._api_version,
-                protocol_core=None,  # type: ignore[arg-type]
-                core_map=None,  # type: ignore[arg-type]
+                implementation=labware_core, api_version=self._api_version
             )
             well = Well(
                 parent=labware,

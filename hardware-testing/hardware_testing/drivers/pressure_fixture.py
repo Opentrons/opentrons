@@ -94,7 +94,7 @@ class PressureFixture(PressureFixtureBase):
         self._port.flushInput()
         # NOTE: device might take a few seconds to boot up
         sleep(FIXTURE_REBOOT_TIME)
-        assert self.firmware_version(), "No version read from device"
+        assert self.firmware_version(), "unable to communicate with pressure fixture"
 
     def disconnect(self) -> None:
         """Disconnect."""

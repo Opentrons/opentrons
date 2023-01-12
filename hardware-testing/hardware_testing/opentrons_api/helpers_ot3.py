@@ -142,6 +142,24 @@ def set_gantry_per_axis_setting_ot3(
         settings.gripper[axis_kind] = value
 
 
+def get_gantry_per_axis_setting_ot3(
+    settings: PerPipetteAxisSettings, axis: OT3Axis, load: GantryLoad
+) -> float:
+    """Set a value in an OT3 Gantry's per-axis-settings."""
+    axis_kind = OT3Axis.to_kind(axis)
+    if load == GantryLoad.HIGH_THROUGHPUT:
+        return settings.high_throughput[axis_kind]
+    elif load == GantryLoad.LOW_THROUGHPUT:
+        return settings.low_throughput[axis_kind]
+    elif load == GantryLoad.TWO_LOW_THROUGHPUT:
+        return settings.two_low_throughput[axis_kind]
+    elif load == GantryLoad.NONE:
+        return settings.none[axis_kind]
+    elif load == GantryLoad.GRIPPER:
+        return settings.gripper[axis_kind]
+    raise ValueError(f"unexpected gantry load: {load}")
+
+
 def set_gantry_load_per_axis_current_settings_ot3(
     api: OT3API,
     axis: OT3Axis,
@@ -220,6 +238,40 @@ class GantryLoadSettings:
     max_change_dir_speed: float  # mm/sec
     hold_current: float  # amps
     run_current: float  # amps
+
+
+def get_gantry_load_per_axis_motion_settings_ot3(
+    api: OT3API,
+    axis: OT3Axis,
+    load: Optional[GantryLoad] = None,
+) -> GantryLoadSettings:
+    """Get the gantry-load settings, per OT3Axis."""
+    if load is None:
+        load = api.gantry_load
+    ax_kind = OT3Axis.to_kind(axis)
+    m_cfg = api.config.motion_settings
+    c_cfg = api.config.current_settings
+
+    def _default_motion(a: str) -> float:
+        try:
+            return getattr(m_cfg, a)[load][ax_kind]
+        except KeyError:
+            return getattr(m_cfg, a)[GantryLoad.NONE][ax_kind]
+
+    def _default_current(a: str) -> float:
+        try:
+            return getattr(c_cfg, a)[load][ax_kind]
+        except KeyError:
+            return getattr(c_cfg, a)[GantryLoad.NONE][ax_kind]
+
+    return GantryLoadSettings(
+        max_speed=_default_motion("default_max_speed"),
+        acceleration=_default_motion("acceleration"),
+        max_start_stop_speed=_default_motion("max_speed_discontinuity"),
+        max_change_dir_speed=_default_motion("direction_change_speed_discontinuity"),
+        hold_current=_default_current("hold_current"),
+        run_current=_default_current("run_current"),
+    )
 
 
 async def set_gantry_load_per_axis_settings_ot3(
@@ -410,7 +462,7 @@ class OT3JogNoInput(Exception):
 
 
 def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bool]:
-    user_input = input(f'\tJog eg: x-10.5 ("{terminator}" to stop): ')
+    user_input = input(f'\tJog eg: x-10.5 (ENTER to repeat, "{terminator}" to stop): ')
     user_input = user_input.strip().replace(" ", "")
     if user_input == terminator:
         raise OT3JogTermination()
@@ -471,7 +523,7 @@ async def _jog_do_print_then_input_then_move(
     axis: str,
     distance: float,
     do_home: bool,
-    display: Optional[bool] = True
+    display: Optional[bool] = True,
 ) -> Tuple[str, float, bool]:
     try:
         if display:
@@ -480,7 +532,8 @@ async def _jog_do_print_then_input_then_move(
             terminator="stop", home_key="home"
         )
     except OT3JogNoInput:
-        print("\tno input, repeating previous jog")
+        # print("\tno input, repeating previous jog")
+        pass
     if do_home:
         str_to_axes = {
             "X": OT3Axis.X,
@@ -497,7 +550,10 @@ async def _jog_do_print_then_input_then_move(
 
 
 async def jog_mount_ot3(
-    api: OT3API, mount: OT3Mount, critical_point: Optional[CriticalPoint] = None, display: Optional[bool] = True
+    api: OT3API,
+    mount: OT3Mount,
+    critical_point: Optional[CriticalPoint] = None,
+    display: Optional[bool] = True,
 ) -> Dict[OT3Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
     if api.is_simulator:
@@ -544,18 +600,59 @@ async def move_to_arched_ot3(
         await api.move_to(mount=mount, abs_position=p, speed=speed)
 
 
+class SensorResponseBad(Exception):
+    """Sensor Response is Bad."""
+
+    pass
+
+
 async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
     """Get the capacitance reading from the pipette."""
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
+    # FIXME: allow SensorId to specify which sensor on the device to read from
     capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
         api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
     )
     if data is None:
-        raise ValueError("Unexpected None value from sensor")
+        raise SensorResponseBad("no response from sensor")
+    return data.to_float()  # type: ignore[union-attr]
+
+
+async def get_temperature_humidity_ot3(
+    api: OT3API, mount: OT3Mount
+) -> Tuple[float, float]:
+    """Get the temperature/humidity reading from the pipette."""
+    if api.is_simulator:
+        return 25.0, 50.0
+    node_id = sensor_node_for_mount(mount)
+    # FIXME: allow SensorId to specify which sensor on the device to read from
+    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        api._backend._messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise SensorResponseBad("no response from sensor")
+    return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
+
+
+async def get_pressure_ot3(api: OT3API, mount: OT3Mount) -> float:
+    """Get the pressure reading from the pipette."""
+    if api.is_simulator:
+        return 0.0
+    node_id = sensor_node_for_mount(mount)
+    # FIXME: allow SensorId to specify which sensor on the device to read from
+    pressure = sensor_types.PressureSensor.build(SensorId.S0, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        api._backend._messenger, pressure, offset=False, timeout=1  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise SensorResponseBad("no response from sensor")
     return data.to_float()  # type: ignore[union-attr]
 
 

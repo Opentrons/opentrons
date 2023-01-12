@@ -23,6 +23,7 @@ from .fields import (
     SensorThresholdModeField,
     PipetteTipActionTypeField,
     MotorPositionFlagsField,
+    MoveStopConditionField,
 )
 from .. import utils
 
@@ -145,7 +146,7 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 
     acceleration: utils.Int32Field
     velocity: utils.Int32Field
-    request_stop_condition: utils.UInt8Field
+    request_stop_condition: MoveStopConditionField
 
 
 @dataclass(eq=False)
@@ -482,7 +483,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
 
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
-    request_stop_condition: utils.UInt8Field
+    request_stop_condition: MoveStopConditionField
 
 
 @dataclass(eq=False)
