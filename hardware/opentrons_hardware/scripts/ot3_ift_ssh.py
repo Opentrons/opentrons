@@ -68,11 +68,11 @@ async def move_for_input(messenger: CanMessenger, node, position,xy) -> None:
         if xy == "downward":
             pos = pos + step
             position['pipette'] = pos
-            res = await move_to(messenger, node, step, -speed)
+            res = await move_to(messenger, node, step, speed)
         elif xy == "up":
             pos = pos - step
             position['pipette'] = pos
-            res = await move_to(messenger, node, step, speed)
+            res = await move_to(messenger, node, step, -speed)
         print("move=Pass")
     except Exception as err:
         print("move=Failed")
@@ -252,7 +252,7 @@ async def  run(args: argparse.Namespace) -> None:
 
     if args.read_epprom:
         serial_number = await read_epprom(messenger, node)
-        print(f'SN:{serial_number}')
+        print(f'SN={serial_number}')
     
     if args.downward:
         res = await move_for_input(messenger, node,position,"downward")

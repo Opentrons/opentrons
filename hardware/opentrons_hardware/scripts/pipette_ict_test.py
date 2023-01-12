@@ -129,7 +129,7 @@ async def home(messenger, node):
             [
                 create_home_step(
                     {node: float64(100.0)},
-                    {node: float64(-5)}
+                    {node: float64(5)}
                 )
             ]
         ]
@@ -220,7 +220,7 @@ async def run(args: argparse.Namespace) -> None:
         print('\n')
         print('-----------------Read EPPROM--------------')
         serial_number = await read_epprom(messenger, node)
-        print(f'SN: {serial_number}')
+        print(f'SN={serial_number}')
 
 log = logging.getLogger(__name__)
 
