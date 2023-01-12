@@ -241,7 +241,7 @@ async def test_method_enum(
         binary.assert_called_once()
         noncontact.assert_not_called()
         save_instrument_offset.assert_called_once()
-        assert binval == Point(1.0, 2.0, 10)
+        assert binval == Point(-1.0, -2.0, -10)
 
         reset_instrument_offset.reset_mock()
         find_deck.reset_mock()
@@ -257,7 +257,7 @@ async def test_method_enum(
         binary.assert_not_called()
         noncontact.assert_called_once()
         save_instrument_offset.assert_called_once()
-        assert ncval == Point(3.0, 4.0, 10)
+        assert ncval == Point(-3.0, -4.0, -10)
 
 
 async def test_calibrate_mount_errors(

@@ -1,6 +1,7 @@
 {
   "about_advanced": "About",
   "about_calibration_description": "For the robot to move accurately and precisely, you need to calibrate it. Positional calibration happens in three parts: deck calibration, pipette offset calibration and tip length calibration.",
+  "about_calibration_description_ot3": "For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin. \n\n After calibration is complete, you can save the calibration data to your computer as a JSON file.",
   "about_calibration_title": "About Calibration",
   "advanced": "Advanced",
   "app_change_in": "App Changes in {{version}}",
@@ -59,6 +60,8 @@
   "firmware_version": "Firmware Version",
   "fully_calibrate_before_checking_health": "Fully calibrate your robot before checking calibration health",
   "go_to_advanced_settings": "Go to Advanced App Settings",
+  "gripper_calibration_description": "Placeholder for gripper calibration section",
+  "gripper_calibration_title": "Gripper Calibration",
   "health_check": "Check health",
   "jupyter_notebook_description": "Open the Jupyter Notebook running on this robot in the web browser. This is an experimental feature.",
   "jupyter_notebook_link": "Learn more about using Jupyter notebook",
@@ -79,6 +82,8 @@
   "password": "Password",
   "pause_protocol_description": "When enabled, opening the robot door during a run will pause the robot after it has completed its current motion.",
   "pause_protocol": "Pause protocol when robot door opens",
+  "pipette_calibrations_description": "Pipette calibration uses a metal probe to determine the pipette's exact position relative to precision-cut divots on deck slots.",
+  "pipette_calibrations_title": "Pipette Calibrations",
   "pipette_offset_calibration_missing": "Pipette Offset calibration missing",
   "pipette_offset_calibration_recommended": "Pipette Offset calibration recommended",
   "pipette_offset_calibration": "pipette offset calibration",
@@ -184,5 +189,7 @@
   "next_step": "Next step",
   "name_love_it": "{{name}}, love it!",
   "your_robot_is_ready_to_go": "Your robot is ready to go!",
-  "finish_setup": "Finish setup"
+  "finish_setup": "Finish setup",
+  "welcome_title": "Welcome to your OT-3!",
+  "welcome_description": "Quickly run protocols and check on your robot's status right on your lab bench."
 }
