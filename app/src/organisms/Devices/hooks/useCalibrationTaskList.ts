@@ -91,6 +91,7 @@ export function useCalibrationTaskList(
     activeTaskIndices = [0, 0]
     deckTask.description = t('start_with_deck_calibration')
     deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
+    deckTask.markedBad = deckCalibrationData !== undefined
   }
 
   taskList.taskList.push(deckTask)
@@ -218,6 +219,7 @@ export function useCalibrationTaskList(
                 hasBlockModalResponse: null,
               }),
           }
+          tipLengthSubTask.markedBad = tipLengthCalForPipette !== undefined
         } else {
           // the tip length calibration is present and valid
           tipLengthSubTask.footer = t('robot_calibration:last_completed_on', {
@@ -256,6 +258,7 @@ export function useCalibrationTaskList(
                 withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
               }),
           }
+          offsetSubTask.markedBad = offsetCalForPipette !== undefined
         } else {
           // the offset calibration is present and valid
           offsetSubTask.footer = t('robot_calibration:last_completed_on', {

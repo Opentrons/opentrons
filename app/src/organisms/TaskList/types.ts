@@ -12,6 +12,7 @@ export interface SubTaskProps {
   cta?: SubTaskCTA
   footer?: string
   isComplete?: boolean
+  markedBad?: boolean
 }
 
 export interface TaskProps extends Omit<SubTaskProps, 'subTaskIndex'> {
