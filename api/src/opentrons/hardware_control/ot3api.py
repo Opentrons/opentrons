@@ -1402,7 +1402,7 @@ class OT3API(
             await self.move_rel(realmount, rel_point, speed=speed)
         # Here we add in the debounce distance for the switch as
         # a safety precaution
-        await self.retract(realmount, spec.retract_target)
+        # await self.retract(realmount, spec.retract_target)
 
         _add_tip_to_instrs()
 
