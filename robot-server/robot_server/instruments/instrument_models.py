@@ -1,9 +1,9 @@
 """Request and response models for /instruments endpoints."""
 from __future__ import annotations
 
+import enum
 from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic
-from enum import Enum
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
@@ -31,12 +31,12 @@ InstrumentType = Literal["pipette", "gripper"]
 
 
 # TODO (spp, 2023-01-03): use MountType from opentrons.types once it has extension type
-class MountType(str, Enum):
+class MountType(enum.Enum):
     """Available mount types."""
 
-    LEFT = "left"
-    RIGHT = "right"
-    EXTENSION = "extension"
+    LEFT = enum.auto()
+    RIGHT = enum.auto()
+    EXTENSION = enum.auto()
 
     @staticmethod
     def from_hw_mount(mount: Mount) -> MountType:
@@ -45,7 +45,7 @@ class MountType(str, Enum):
         return mount_map[mount]
 
 
-class GenericInstrument(
+class _GenericInstrument(
     GenericModel, Generic[InstrumentNameT, InstrumentModelT, InstrumentDataT]
 ):
     """Base instrument response."""
@@ -84,7 +84,7 @@ class PipetteData(BaseModel):
     #  add calibration data as decided by https://opentrons.atlassian.net/browse/RSS-167
 
 
-class Pipette(GenericInstrument[PipetteName, PipetteModel, PipetteData]):
+class Pipette(_GenericInstrument[PipetteName, PipetteModel, PipetteData]):
     """Attached pipette info & configuration."""
 
     instrumentType: Literal["pipette"] = "pipette"
@@ -93,7 +93,7 @@ class Pipette(GenericInstrument[PipetteName, PipetteModel, PipetteData]):
     data: PipetteData
 
 
-class Gripper(GenericInstrument[GripperName, GripperModel, GripperData]):
+class Gripper(_GenericInstrument[GripperName, GripperModel, GripperData]):
     """Attached gripper info & configuration."""
 
     instrumentType: Literal["gripper"] = "gripper"

@@ -29,8 +29,6 @@ from robot_server.instruments.router import get_attached_instruments
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
-_HTTP_API_VERSION: Final = 4
-
 
 @pytest.fixture()
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
