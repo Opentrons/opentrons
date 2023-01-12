@@ -58,11 +58,15 @@ const SSID_INPUT_FIELD_STYLE = css`
 interface SetWifiCredProps {
   ssid: string
   authType?: 'wpa' | 'none'
+  setIsShowSetWifiCred: (isShow: boolean) => void
+  setRequiredRerender: (requiredRerender: boolean) => void
 }
 
 export function SetWifiCred({
   ssid,
   authType = 'wpa',
+  setIsShowSetWifiCred,
+  setRequiredRerender,
 }: SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
@@ -86,7 +90,6 @@ export function SetWifiCred({
   const selectedNetwork = list.find(nw => nw.ssid === ssid)
 
   const formatNetworkSettings = (): WifiConfigureRequest => {
-    // ToDo kj 11/02/22 eapConfig for TLS
     const securityType = selectedNetwork?.securityType
     const hidden = false // ToDo update for manual connect when the design is ready for dev
     const psk = password
@@ -222,6 +225,8 @@ export function SetWifiCred({
               requestState={requestState}
               type={changeState.type}
               onConnect={handleConnect}
+              setIsShowSetWifiCred={setIsShowSetWifiCred}
+              setRequiredRerender={setRequiredRerender}
             />
           )}
         </>

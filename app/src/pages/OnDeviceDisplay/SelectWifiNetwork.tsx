@@ -29,6 +29,7 @@ export function SelectWifiNetwork(): JSX.Element {
     false
   )
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
+  const [requiredRerender, setRequiredRerender] = React.useState<boolean>(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
@@ -51,6 +52,12 @@ export function SelectWifiNetwork(): JSX.Element {
     dispatch(Networking.fetchWifiList(robotName))
   }
 
+  console.log('requiredRerender', requiredRerender)
+  // const handleShowSetWifiCred = (isShow: boolean): void => {
+  //   console.log('called: isShow', isShow)
+  //   setIsShowSetWifiCred(isShow)
+  // }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -59,8 +66,13 @@ export function SelectWifiNetwork(): JSX.Element {
       )} ${String(SPACING.spacingXXL)}`}
     >
       {isShowSetWifiCred ? (
-        <SetWifiCred ssid={selectedSsid} />
-      ) : list.length > 0 ? (
+        <SetWifiCred
+          ssid={selectedSsid}
+          setIsShowSetWifiCred={setIsShowSetWifiCred}
+          setRequiredRerender={setRequiredRerender}
+        />
+      ) : null}
+      {list.length >= 1 ? (
         <>
           <HeaderWithIPs
             handleSearch={handleSearch}
