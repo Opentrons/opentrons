@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.2.0...v6.2.1-alpha.0) (2023-01-12)
+
+
+### Bug Fixes
+
+* **api:** Safely map 0-volume aspirates and dispenses in Python protocols ([#11969](https://github.com/Opentrons/opentrons/issues/11969)) ([8a67aa0](https://github.com/Opentrons/opentrons/commit/8a67aa06b6d4f158ab44ea8748860e01c84b4986))
+
+
+### Performance Improvements
+
+* **robot-server:** Do only minimal parsing when rehydrating ProtocolStore ([#11891](https://github.com/Opentrons/opentrons/issues/11891)) ([c5338b8](https://github.com/Opentrons/opentrons/commit/c5338b84eee767fafe53c6634e5dd04254f5a6bc))
+
+
+
+
+
 # [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 

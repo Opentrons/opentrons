@@ -6,17 +6,29 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 6.2.0
+## OT-2 Software Changes in 6.2.1
+
+Welcome to the v6.2.1 release of the OT-2 software! This hotfix release addresses a few problems.
+
+### Bug Fixes
+
+- When you upload a protocol to an OT-2 that already has a lot of big protocols stored, the OT-2 will no longer show connection errors and become unresponsive for several minutes.
+- When a Thermocycler GEN2 is run for 50 days without a power cycle, it will no longer miscalculate hold times.
+- When you upload a Python protocol that contains an aspirate or dispense with an effective volume of 0 µL, it will no longer get stuck analyzing forever.
+
+---
+
+## OT-2 Software Changes in 6.2.0
 
 Welcome to the v6.2.0 release of the OT-2 software! This release focuses on adding support for the Thermocycler Module GEN2.
 
-## New Features
+### New Features
 
 - Thermocycler GEN2 support
     - Lid temperature is now available when querying module status
     - Pipettes properly move to avoid the GEN2 module
 
-## Bug Fixes
+### Bug Fixes
 
 - Fixed a bug that could cause hardware modules to become unresponsive
 
