@@ -278,7 +278,8 @@
           "description": "A user-facing message",
           "type": "string"
         }
-      }
+      },
+      "required": ["message"]
     },
     "CommentCreate": {
       "title": "CommentCreate",
