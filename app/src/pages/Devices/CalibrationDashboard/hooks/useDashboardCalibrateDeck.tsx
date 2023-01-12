@@ -20,12 +20,10 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 export type DashboardCalDeckInvoker = () => void
 
 export function useDashboardCalibrateDeck(
-  robotName: string,
-  onComplete: (() => unknown) | null = null
+  robotName: string
 ): [DashboardCalDeckInvoker, JSX.Element | null] {
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
-  const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
 
   const deckCalSession: DeckCalibrationSession | null = useSelector(
@@ -50,12 +48,6 @@ export function useDashboardCalibrateDeck(
           'requestId' in dispatchedAction.meta
             ? dispatchedAction.meta.requestId ?? null
             : null
-      } else if (
-        dispatchedAction.type === Sessions.DELETE_SESSION &&
-        deckCalSession?.id === dispatchedAction.payload.sessionId
-      ) {
-        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
-        deleteRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
@@ -83,13 +75,6 @@ export function useDashboardCalibrateDeck(
         ? RobotApi.getRequestById(state, trackedRequestId.current)
         : null
     )?.status === RobotApi.PENDING
-  
-    const shouldClose =
-    useSelector<State, RequestState | null>(state =>
-      deleteRequestId.current != null
-        ? RobotApi.getRequestById(state, deleteRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
 
   const isJogging =
     useSelector((state: State) =>
@@ -97,13 +82,6 @@ export function useDashboardCalibrateDeck(
         ? RobotApi.getRequestById(state, jogRequestId.current)
         : null
     )?.status === RobotApi.PENDING
-
-    React.useEffect(() => {
-      if (shouldClose) {
-        onComplete?.()
-        deleteRequestId.current = null
-      }
-    }, [shouldClose, onComplete])
 
   const handleStartDashboardDeckCalSession: DashboardCalDeckInvoker = () => {
     dispatchRequests(
