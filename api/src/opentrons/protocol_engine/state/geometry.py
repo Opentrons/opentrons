@@ -22,7 +22,6 @@ from ..types import (
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import CurrentWell
-from .config import Config
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
@@ -51,11 +50,8 @@ class TipGeometry:
 class GeometryView:
     """Geometry computed state getters."""
 
-    def __init__(
-        self, config: Config, labware_view: LabwareView, module_view: ModuleView
-    ) -> None:
+    def __init__(self, labware_view: LabwareView, module_view: ModuleView) -> None:
         """Initialize a GeometryView instance."""
-        self._config = config
         self._labware = labware_view
         self._modules = module_view
 

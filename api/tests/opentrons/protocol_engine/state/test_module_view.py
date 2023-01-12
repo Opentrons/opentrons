@@ -1,6 +1,4 @@
 """Tests for module state accessors in the protocol engine state store."""
-import math
-
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
@@ -347,33 +345,9 @@ def test_get_module_offset_for_ot3_standard(
             )
         },
     )
-    assert _labware_offsets_are_close(
-        subject.get_module_offset("module-id", DeckType.OT3_STANDARD), expected_offset
-    )
-
-
-def _labware_offsets_are_close(
-    offset1: LabwareOffsetVector, offset2: LabwareOffsetVector
-) -> bool:
-    """Return whether the two labware offset vectors are close."""
-    return all(
-        [
-            math.isclose(
-                offset1.x,
-                offset2.x,
-                abs_tol=0.001,
-            ),
-            math.isclose(
-                offset1.y,
-                offset2.y,
-                abs_tol=0.001,
-            ),
-            math.isclose(
-                offset1.z,
-                offset2.z,
-                abs_tol=0.001,
-            ),
-        ]
+    result_offset = subject.get_module_offset("module-id", DeckType.OT3_STANDARD)
+    assert (result_offset.x, result_offset.y, result_offset.z) == pytest.approx(
+        (expected_offset.x, expected_offset.y, expected_offset.z)
     )
 
 

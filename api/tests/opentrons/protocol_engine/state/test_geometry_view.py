@@ -27,7 +27,6 @@ from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.pipettes import CurrentWell
-from opentrons.protocol_engine.state.config import Config
 
 
 @pytest.fixture
@@ -43,19 +42,9 @@ def module_view(decoy: Decoy) -> ModuleView:
 
 
 @pytest.fixture
-def mock_config(decoy: Decoy) -> Config:
-    """Get a mocked out engine config class."""
-    return decoy.mock(cls=Config)
-
-
-@pytest.fixture
-def subject(
-    mock_config: Config, labware_view: LabwareView, module_view: ModuleView
-) -> GeometryView:
+def subject(labware_view: LabwareView, module_view: ModuleView) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
-    return GeometryView(
-        config=mock_config, labware_view=labware_view, module_view=module_view
-    )
+    return GeometryView(labware_view=labware_view, module_view=module_view)
 
 
 def test_get_labware_parent_position(

@@ -260,7 +260,6 @@ class StateStore(StateView, ActionHandler):
         self._geometry = GeometryView(
             labware_view=self._labware,
             module_view=self._modules,
-            config=self._config,
         )
         self._motion = MotionView(
             labware_view=self._labware,
