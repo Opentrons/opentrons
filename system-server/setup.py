@@ -45,9 +45,7 @@ KEYWORDS = ["robots", "automation", "lab"]
 DESCRIPTION = (
     "A server to provide an external interface to the robot.")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
-INSTALL_REQUIRES = [
-    "pyserial==3.5",
-]
+INSTALL_REQUIRES = []
 
 
 def read(*parts):

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "138259f5a14d418375c1966b7d4e2bf3e4753411a23c343509f0679a913f4932"
+            "sha256": "f3f5960140befbb22a8cd0b03590cf7f68c2ee8dcac1d0734f0383338fee981e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,22 +16,6 @@
         ]
     },
     "default": {
-        "pyserial": {
-            "hashes": [
-                "sha256:3c77e014170dfffbd816e6ffc205e9842efb10be9f58ec16d3e8675b4925cddb",
-                "sha256:c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0"
-            ],
-            "index": "pypi",
-            "version": "==3.5"
-        },
-        "pyudev": {
-            "hashes": [
-                "sha256:b2a3afe1c99ea751f8296652557eac559874da2a1b1ec0625178706ec5a345f3",
-                "sha256:d22451d9f10b4fef7737a0fa5c5664e7547cf9ae58a79084eb396e0ce9a0e406"
-            ],
-            "index": "pypi",
-            "version": "==0.24.0"
-        },
         "typing-extensions": {
             "hashes": [
                 "sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497",
@@ -617,14 +601,6 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.3.1"
-        },
-        "pyserial": {
-            "hashes": [
-                "sha256:3c77e014170dfffbd816e6ffc205e9842efb10be9f58ec16d3e8675b4925cddb",
-                "sha256:c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0"
-            ],
-            "index": "pypi",
-            "version": "==3.5"
         },
         "pytest": {
             "hashes": [
