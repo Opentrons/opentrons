@@ -75,7 +75,10 @@ const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedGen3Pipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
+  modelSpecs: {
+    ...mockGen3P1000PipetteSpecs,
+    maxVolume: 50,
+  },
 }
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
@@ -176,7 +179,7 @@ describe('PipetteWizardFlows', () => {
     getByText(
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
-    const initiate = getByRole('button', { name: 'Initiate calibration' })
+    const initiate = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(initiate)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -367,7 +370,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew Z Axis Carriage')
+    getByText('Unscrew Z-axis Carriage')
     // TODO wait until commands are wired up to write out more of this test!
   })
   it('renders the correct information, calling the correct commands for the detach flow 96 channel', async () => {
@@ -379,7 +382,11 @@ describe('PipetteWizardFlows', () => {
         tip_length: 42,
         mount_axis: 'c',
         plunger_axis: 'd',
-        modelSpecs: mockGen3P1000PipetteSpecs,
+        modelSpecs: {
+          ...mockGen3P1000PipetteSpecs,
+          maxVolume: 50,
+          displayName: 'mock display name',
+        },
       },
       right: null,
     })
@@ -442,7 +449,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew and Remove 96 Channel Pipette')
+    getByText('Loosen Screws and Detach 96-Channel Pipette')
     const continueBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(continueBtn)
     await waitFor(() => {
@@ -490,7 +497,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Attach 96-Channel Pipette')
+    getByText('Detach P1000 Single-Channel GEN3 and Attach 96-Channel Pipette')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
@@ -508,7 +515,9 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Loosen Screws and Detach')
+    getByText(
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
+    )
     getByText('Continue')
   })
   it('renders the correct information, calling the correct commands for the 96-channel calibration flow', async () => {
@@ -554,7 +563,7 @@ describe('PipetteWizardFlows', () => {
     getByText(
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
-    getByRole('button', { name: 'Initiate calibration' }).click()
+    getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [

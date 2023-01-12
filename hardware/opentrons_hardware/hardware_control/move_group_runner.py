@@ -2,7 +2,7 @@
 import asyncio
 from collections import defaultdict
 import logging
-from typing import List, Set, Tuple, Iterator, Union
+from typing import List, Set, Tuple, Iterator, Union, Optional
 import numpy as np
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
@@ -10,6 +10,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     ErrorCode,
     MotorPositionFlags,
+    ErrorSeverity,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -326,6 +327,7 @@ class MoveScheduler:
         log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
+        self._error: Optional[ErrorMessage] = None
 
     def _remove_move_group(
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
@@ -358,7 +360,11 @@ class MoveScheduler:
         log.debug("recieved ack")
 
     def _handle_error(self, message: ErrorMessage) -> None:
-        raise RuntimeError("Firmware Error Received", message)
+        self._error = message
+        self._event.set()
+        log.warning(f"Error during move group: {message}")
+        if message.payload.severity == ErrorSeverity.unrecoverable:
+            raise RuntimeError("Firmware Error Received", message)
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
@@ -452,6 +458,8 @@ class MoveScheduler:
                     self._event.wait(),
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
+                if self._error is not None:
+                    raise RuntimeError(f"Error during move group: {self._error}")
             except asyncio.TimeoutError:
                 log.warning(
                     f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
@@ -459,9 +467,9 @@ class MoveScheduler:
                 log.warning(
                     f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
                 )
-            except RuntimeError:
+            except RuntimeError as e:
                 log.error("canceling move group scheduler")
-                raise
+                raise e
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
