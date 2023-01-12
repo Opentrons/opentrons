@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.2.0...v6.2.1-alpha.0) (2023-01-12)
+
+
+### Bug Fixes
+
+* **app:** allow access to robot settings if robot server is down, but update server is up ([#11892](https://github.com/Opentrons/opentrons/issues/11892)) ([3b4d127](https://github.com/Opentrons/opentrons/commit/3b4d127851b240f94c24e0a1a997f658bd47f540))
+
+
+
+
+
 # [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 

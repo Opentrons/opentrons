@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.2.0...v6.2.1-alpha.0) (2023-01-12)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
+
 # [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 

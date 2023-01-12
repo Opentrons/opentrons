@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.2.0...v6.2.1-alpha.0) (2023-01-12)
+
+
+### Bug Fixes
+
+* **robot-server:** Fix async concurrency hazards in lazy-initialized dependencies ([#11927](https://github.com/Opentrons/opentrons/issues/11927)) ([c69fe00](https://github.com/Opentrons/opentrons/commit/c69fe006919d6706bd4a53887a2579df164fbe3f))
+
+
+### Performance Improvements
+
+* **robot-server:** Do only minimal parsing when rehydrating ProtocolStore ([#11891](https://github.com/Opentrons/opentrons/issues/11891)) ([c5338b8](https://github.com/Opentrons/opentrons/commit/c5338b84eee767fafe53c6634e5dd04254f5a6bc))
+* **robot-server:** Initialize database eagerly and in the background ([#11615](https://github.com/Opentrons/opentrons/issues/11615)) ([227e334](https://github.com/Opentrons/opentrons/commit/227e334c6312d661d1e5344e9203099eca09053d))
+
+
+
+
+
 # [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 
