@@ -386,6 +386,8 @@ async def _main(
 
     if len(slot_states.slots) == 1:
         slot_states.slots += [slot_states.slots[0]]
+    elif cycles > 1 and slot_states.slots[0] != slot_states.slots[-1]:
+        slot_states.slots.append(slot_states.slots[0])
 
     while True:
         if not api.is_simulator:
