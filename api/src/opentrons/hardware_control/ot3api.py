@@ -667,16 +667,22 @@ class OT3API(
 
         elif not self._current_position and not refresh:
             raise MustHomeError("Current position is unknown; please home motors.")
+
+        if refresh:
+            await self.refresh_current_position_ot3()
+        return self._effector_pos_from_carriage_pos(
+            OT3Mount.from_mount(mount), self._current_position, critical_point
+        )
+
+    async def refresh_current_position_ot3(self) -> Dict[OT3Axis, float]:
+        """Requests the current position and updates _current_position."""
         async with self._motion_lock:
-            if refresh:
-                self._current_position = deck_from_machine(
-                    await self._backend.update_position(),
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-            return self._effector_pos_from_carriage_pos(
-                OT3Mount.from_mount(mount), self._current_position, critical_point
+            self._current_position = deck_from_machine(
+                await self._backend.update_position(),
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
             )
+        return self._current_position
 
     async def encoder_current_position(
         self,
@@ -789,7 +795,7 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
 
         # Refresh current position
-        await self.current_position_ot3(mount=realmount, refresh=True)
+        await self.refresh_current_position_ot3()
 
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_ready_for_movement(axes_moving):
@@ -847,10 +853,8 @@ class OT3API(
             else:
                 await self.home(axes_moving)
         # Refresh current position
-        await self.current_position_ot3(mount=realmount, refresh=True)
-        target_position = target_position_from_relative(
-            realmount, delta, self._current_position
-        )
+        position = await self.refresh_current_position_ot3()
+        target_position = target_position_from_relative(realmount, delta, position)
         if fail_on_not_homed and not self._backend.check_ready_for_movement(
             [axis for axis in axes_moving if axis is not None]
         ):
