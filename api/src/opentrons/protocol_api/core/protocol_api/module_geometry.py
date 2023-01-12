@@ -169,7 +169,7 @@ class ModuleGeometry:
             return self._height
 
     def __repr__(self) -> str:
-        return self._display_name
+        return f"{self._display_name} on {str(self.parent)}"
 
 
 class ThermocyclerGeometry(ModuleGeometry):
