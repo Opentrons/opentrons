@@ -29,6 +29,8 @@ import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/Calibrati
 import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
 
+const CALIBRATION_DATA_POLL_MS = 5000
+
 export function useCalibrationTaskList(
   robotName: string,
   pipOffsetCalLauncher: DashboardCalOffsetInvoker,
@@ -59,7 +61,7 @@ export function useCalibrationTaskList(
       dispatch(fetchTipLengthCalibrations(robotName))
       dispatch(fetchCalibrationStatus(robotName))
     },
-    5000,
+    CALIBRATION_DATA_POLL_MS,
     true
   )
 
@@ -85,11 +87,11 @@ export function useCalibrationTaskList(
           })
         : ''
     // todo(jb, 2022-12-14): wire up ctas to actually launch wizards (RAUT-292)
-    deckTask.cta = { label: t('recalibrate'), onClick: () => deckCalLauncher() }
+    deckTask.cta = { label: t('recalibrate'), onClick: deckCalLauncher }
   } else {
     activeTaskIndices = [0, 0]
     deckTask.description = t('start_with_deck_calibration')
-    deckTask.cta = { label: t('calibrate'), onClick: () => deckCalLauncher() }
+    deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
   }
 
   taskList.taskList.push(deckTask)
