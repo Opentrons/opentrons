@@ -15,7 +15,12 @@ const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction
 const render = () => {
   return renderWithProviders(
     <StaticRouter>
-      <CalibrationTaskList robotName="otie" />
+      <CalibrationTaskList
+        robotName="otie"
+        pipOffsetCalLauncher={jest.fn()}
+        tipLengthCalLauncher={jest.fn()}
+        deckCalLauncher={jest.fn()}
+      />
     </StaticRouter>,
     {
       i18nInstance: i18n,
