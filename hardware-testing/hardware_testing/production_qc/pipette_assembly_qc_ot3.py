@@ -833,6 +833,8 @@ def _create_csv_and_get_callbacks(
 async def _main(test_config: TestConfig) -> None:
     global IDEAL_LABWARE_LOCATIONS
     global CALIBRATED_LABWARE_LOCATIONS
+    global FINAL_TEST_RESULTS
+    global PRESSURE_DATA_CACHE
 
     # connect to the pressure fixture (or simulate one)
     fixture = _connect_to_fixture(test_config)
@@ -871,6 +873,8 @@ async def _main(test_config: TestConfig) -> None:
         )
 
         # callback function for writing new data to CSV file
+        FINAL_TEST_RESULTS = []
+        PRESSURE_DATA_CACHE = []
         csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
         csv_cb.pressure(PRESSURE_DATA_HEADER)
 
