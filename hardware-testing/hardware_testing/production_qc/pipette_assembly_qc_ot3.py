@@ -893,10 +893,7 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["operator-name", test_config.operator_name])
         csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
         csv_cb.write(["pipette", pipette_sn])
-        if test_config.simulate:
-            csv_cb.write(["simulating"])
-        else:
-            csv_cb.write(["live"])
+        csv_cb.write(["simulating" if test_config.simulate else "live"])
         # add test configurations to CSV
         csv_cb.write(["-------------------"])
         csv_cb.write(["TEST-CONFIGURATIONS"])
