@@ -13,7 +13,7 @@ class CommentParams(BaseModel):
     """Payload required to annotate execution with a comment."""
 
     message: str = Field(
-        None,
+        ...,
         description="A user-facing message",
     )
 
