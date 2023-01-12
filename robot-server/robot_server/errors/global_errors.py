@@ -23,3 +23,10 @@ class InvalidRequest(ErrorDetails):
 
     id: Literal["InvalidRequest"] = "InvalidRequest"
     title: str = "Invalid Request"
+
+
+class FirmwareUpdateRequired(ErrorDetails):
+    """An error returned when a firmware update is required before a request can proceed."""
+
+    id: Literal["FirmwareUpdateRequired"] = "FirmwareUpdateRequired"
+    title: str = "Firmware Update Required"

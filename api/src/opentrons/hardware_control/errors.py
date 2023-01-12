@@ -79,3 +79,12 @@ class FirmwareUpdateRequiredError(Exception):
 
     def __init__(self, to_update: List[Union[OT2SubSystem, OT3SubSystem]]) -> None:
         self.required_for = to_update
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}: {self.formatted_details()}"
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: required_for={self.required_for}>"
+
+    def formatted_details(self) -> str:
+        return f'An update is required for the following subsystem(s): {", ".join(str(subsystem) for subsystem in self.required_for)}'

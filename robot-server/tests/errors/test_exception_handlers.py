@@ -4,10 +4,15 @@ from decoy import matchers
 from fastapi import FastAPI, Header, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
-from typing import List
+from typing import List, cast
 
 from robot_server.constants import V1_TAG
 from robot_server.errors import ApiError, exception_handlers
+
+from opentrons.hardware_control import (
+    errors as hardware_errors,
+    types as hardware_types,
+)
 
 
 class Item(BaseModel):
@@ -229,3 +234,53 @@ def test_handles_legacy_validation_error(app: FastAPI, client: TestClient) -> No
             "body.array_field.0: value could not be parsed to a boolean"
         )
     }
+
+
+def test_handles_update_required_error(app: FastAPI, client: TestClient) -> None:
+    """It should properly handle firmware update required exceptions in non-legacy routes."""
+
+    @app.post("/firmware-update")
+    def firmware_update() -> Item:
+        raise hardware_errors.FirmwareUpdateRequiredError(
+            to_update=[
+                cast(hardware_types.OT3SubSystem, "a"),
+                cast(hardware_types.OT3SubSystem, "b"),
+                cast(hardware_types.OT3SubSystem, "c"),
+            ]
+        )
+
+    response = client.post("/firmware-update")
+    assert response.status_code == 409
+    assert response.json() == {
+        "errors": [
+            {
+                "id": "FirmwareUpdateRequired",
+                "title": "Firmware Update Required",
+                "detail": matchers.StringMatching(r".*a,.*b,.*c.*"),
+                "meta": {"subsystems": ["a", "b", "c"]},
+            },
+        ]
+    }
+    jsonresp = response.json()
+    assert len(jsonresp["errors"]) == 1
+    err = jsonresp["errors"][0]
+    assert "FirmwareUpdateRequired" in err["id"]
+    assert "subsystems" in err["meta"]
+    assert err["meta"]["subsystems"] == ["a", "b", "c"]
+
+
+def test_handles_update_required_error_legacy(app: FastAPI, client: TestClient) -> None:
+    """It should properly handle firmware update required exceptions in legacy routes."""
+
+    @app.post("/firmware-update-legacy", tags=[V1_TAG])
+    def firmware_update_legacy() -> Item:
+        raise hardware_errors.FirmwareUpdateRequiredError(
+            to_update=[
+                cast(hardware_types.OT3SubSystem, "d"),
+                cast(hardware_types.OT3SubSystem, "e"),
+                cast(hardware_types.OT3SubSystem, "f"),
+            ]
+        )
+
+    response = client.post("/firmware-update-legacy")
+    assert response.status_code == status.HTTP_409_CONFLICT

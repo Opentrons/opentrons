@@ -15,7 +15,12 @@ from robot_server.versioning import (
     MIN_API_VERSION_HEADER,
 )
 from robot_server.constants import V1_TAG
-from .global_errors import UnexpectedError, BadRequest, InvalidRequest
+from .global_errors import (
+    UnexpectedError,
+    BadRequest,
+    InvalidRequest,
+    FirmwareUpdateRequired,
+)
 
 from .error_responses import (
     ApiError,
@@ -24,6 +29,8 @@ from .error_responses import (
     LegacyErrorResponse,
     MultiErrorResponse,
 )
+
+from opentrons.hardware_control import errors as hardware_errors
 
 
 log = getLogger(__name__)
@@ -141,6 +148,20 @@ async def handle_unexpected_error(request: Request, error: Exception) -> JSONRes
     )
 
 
+async def handle_update_required_error(
+    request: Request, error: hardware_errors.FirmwareUpdateRequiredError
+) -> JSONResponse:
+    """Map a FirmwareUpdateRequired error from hardware to an API response."""
+    details = error.formatted_details()
+    if _route_is_legacy(request):
+        response: BaseErrorBody = LegacyErrorResponse(message=details)
+    else:
+        response = FirmwareUpdateRequired(
+            detail=details, meta={"subsystems": error.required_for}
+        )
+    return await handle_api_error(request, response.as_error(status.HTTP_409_CONFLICT))
+
+
 exception_handlers: Dict[
     Union[int, Type[Exception]],
     Callable[[Request, Any], Coroutine[Any, Any, Response]],
@@ -148,5 +169,6 @@ exception_handlers: Dict[
     ApiError: handle_api_error,
     StarletteHTTPException: handle_framework_error,
     RequestValidationError: handle_validation_error,
+    hardware_errors.FirmwareUpdateRequiredError: handle_update_required_error,
     Exception: handle_unexpected_error,
 }
