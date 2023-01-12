@@ -725,6 +725,7 @@ class OT3API(
         elif not self._encoder_current_position and not refresh:
             raise MustHomeError("Encoder position is unknown; please home motors.")
         async with self._motion_lock:
+            await self._backend.update_motor_status()
             self._encoder_current_position = deck_from_machine(
                 await self._backend.update_encoder_position(),
                 self._transforms.deck_calibration.attitude,
