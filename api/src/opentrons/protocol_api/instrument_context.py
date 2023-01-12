@@ -538,35 +538,30 @@ class InstrumentContext(publisher.CommandPublisher):
             last_location = self._protocol_core.get_last_location()
             if not last_location:
                 raise RuntimeError("No valid current location cache present")
-            else:
-                well = last_location.labware
-                # type checked below
+            # type check below
+            well = last_location.labware
         else:
             well = LabwareLike(location)
 
-        if well.is_well:
-            if "touchTipDisabled" in well.quirks_from_any_parent():
-                _log.info(f"Ignoring touch tip on labware {well}")
-                return self
-            if well.parent.as_labware().is_tiprack:
-                _log.warning(
-                    "Touch_tip being performed on a tiprack. "
-                    "Please re-check your code"
-                )
+        if not well.is_well:
+            raise TypeError(f"location should be a Well, but it is {location}")
 
-            if self.api_version < APIVersion(2, 4):
-                to_loc = well.as_well().top()
-            else:
-                move_with_z_offset = well.as_well().top().point + types.Point(
-                    0, 0, v_offset
-                )
-                to_loc = types.Location(move_with_z_offset, well)
-            self.move_to(to_loc, publish=False)
+        if "touchTipDisabled" in well.quirks_from_any_parent():
+            _log.info(f"Ignoring touch tip on labware {well}")
+            return self
+        if well.parent.as_labware().is_tiprack:
+            _log.warning(
+                "Touch_tip being performed on a tiprack. " "Please re-check your code"
+            )
+
+        if self.api_version < APIVersion(2, 4):
+            move_to_location = well.as_well().top()
         else:
-            raise TypeError("location should be a Well, but it is {}".format(location))
+            move_to_location = well.as_well().top(z=v_offset)
 
         self._implementation.touch_tip(
-            location=well.as_well()._impl,
+            location=move_to_location,
+            well_core=well.as_well()._impl,
             radius=radius,
             v_offset=v_offset,
             speed=checked_speed,

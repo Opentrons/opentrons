@@ -512,3 +512,43 @@ def test_home_plunger(
         mock_engine_client.home(axes=[MotorAxis.LEFT_PLUNGER]),
         times=1,
     )
+
+
+def test_touch_tip(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should touch the tip to the edges of the well."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.touch_tip(
+        location=location,
+        well_core=well_core,
+        radius=1.23,
+        v_offset=4.56,
+        speed=7.89,
+    )
+
+    decoy.verify(
+        mock_engine_client.touch_tip(
+            pipette_id="abc123",
+            labware_id="123abc",
+            well_name="my cool well",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )

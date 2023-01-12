@@ -180,12 +180,29 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def touch_tip(
         self,
-        location: WellCore,
+        location: Location,
+        well_core: WellCore,
         radius: float,
         v_offset: float,
         speed: float,
     ) -> None:
-        raise NotImplementedError("InstrumentCore.touch_tip not implemented")
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        well_location = self._engine_client.state.geometry.get_relative_well_location(
+            labware_id=labware_id,
+            well_name=well_name,
+            absolute_point=location.point,
+        )
+
+        self._engine_client.touch_tip(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def pick_up_tip(
         self,

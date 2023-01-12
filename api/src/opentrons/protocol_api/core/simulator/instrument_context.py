@@ -131,7 +131,12 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         )
 
     def touch_tip(
-        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+        self,
+        location: types.Location,
+        well_core: WellImplementation,
+        radius: float,
+        v_offset: float,
+        speed: float,
     ) -> None:
         pass
 
