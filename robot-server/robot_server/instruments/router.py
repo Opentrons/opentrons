@@ -30,23 +30,24 @@ instruments_router = APIRouter()
 
 def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pipette:
     """Convert PipetteDict to Pipette response model."""
-    return Pipette.construct(
-        mount=MountType.from_hw_mount(mount),
-        instrumentName=pipette_dict["name"],
-        instrumentModel=pipette_dict["model"],
-        serialNumber=pipette_dict["pipette_id"],
-        data=PipetteData(
-            channels=pipette_dict["channels"],
-            min_volume=pipette_dict["min_volume"],
-            max_volume=pipette_dict["max_volume"],
-        ),
-    )
+    if pipette_dict:
+        return Pipette.construct(
+            mount=MountType.from_hw_mount(mount).as_string(),
+            instrumentName=pipette_dict["name"],
+            instrumentModel=pipette_dict["model"],
+            serialNumber=pipette_dict["pipette_id"],
+            data=PipetteData(
+                channels=pipette_dict["channels"],
+                min_volume=pipette_dict["min_volume"],
+                max_volume=pipette_dict["max_volume"],
+            ),
+        )
 
 
 def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     return Gripper.construct(
-        mount=MountType.EXTENSION,
+        mount=MountType.EXTENSION.as_string(),
         instrumentName=gripper_dict["name"],
         instrumentModel=gripper_dict["model"],
         serialNumber=gripper_dict["gripper_id"],
@@ -97,6 +98,7 @@ async def get_attached_instruments(
     response_data: List[AttachedInstrument] = [
         _pipette_dict_to_pipette_res(pipette_dict=pipette_dict, mount=mount)
         for mount, pipette_dict in pipettes.items()
+        if pipette_dict
     ]
 
     if gripper:

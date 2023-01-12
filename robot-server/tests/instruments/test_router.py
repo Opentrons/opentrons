@@ -2,8 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from typing import TYPE_CHECKING
-from typing_extensions import Final
+from typing import TYPE_CHECKING, cast
 from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
@@ -18,7 +17,6 @@ from opentrons_shared_data.gripper.dev_types import GripperModel
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
 from robot_server.instruments.instrument_models import (
-    MountType,
     Gripper,
     GripperData,
     Pipette,
@@ -117,7 +115,7 @@ async def test_get_all_attached_instruments(
     result = await get_attached_instruments(hardware=ot3_hardware_api)
     assert result.content.data == [
         Pipette.construct(
-            mount=MountType.LEFT,
+            mount="left",
             instrumentType="pipette",
             instrumentName="p10_multi",
             instrumentModel=PipetteModel("abc"),
@@ -129,7 +127,7 @@ async def test_get_all_attached_instruments(
             ),
         ),
         Pipette.construct(
-            mount=MountType.RIGHT,
+            mount="right",
             instrumentType="pipette",
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),
@@ -141,7 +139,7 @@ async def test_get_all_attached_instruments(
             ),
         ),
         Gripper.construct(
-            mount=MountType.EXTENSION,
+            mount="extension",
             instrumentType="gripper",
             instrumentName="gripper",
             instrumentModel=GripperModel.V1,
@@ -178,13 +176,14 @@ async def test_get_ot2_instruments(
                 model=PipetteModel("xyz"),
                 pipette_id="pipette-id",
             ),
+            Mount.LEFT: cast(PipetteDict, {}),
         }
     )
     result2 = await get_attached_instruments(hardware=hardware_api)
     assert result2.status_code == 200
     assert result2.content.data == [
         Pipette.construct(
-            mount=MountType.RIGHT,
+            mount="right",
             instrumentType="pipette",
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),

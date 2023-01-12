@@ -44,15 +44,17 @@ class MountType(enum.Enum):
         mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
         return mount_map[mount]
 
+    def as_string(self) -> str:
+        """Get stringified MountType."""
+        return self.name.lower()
+
 
 class _GenericInstrument(
     GenericModel, Generic[InstrumentNameT, InstrumentModelT, InstrumentDataT]
 ):
     """Base instrument response."""
 
-    mount: MountType = Field(
-        ..., description="The mount this instrument is attached to."
-    )
+    mount: str = Field(..., description="The mount this instrument is attached to.")
     instrumentType: InstrumentType = Field(
         ..., description="Type of instrument- either a pipette or a gripper."
     )
