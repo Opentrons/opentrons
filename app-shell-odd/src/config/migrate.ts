@@ -50,7 +50,7 @@ export const DEFAULTS_V12: ConfigV12 = {
   calibration: { useTrashSurfaceForTipCal: null },
   python: { pathToPythonOverride: null },
   modules: { heaterShaker: { isAttached: false } },
-  isOnDevice: false,
+  isOnDevice: true,
   protocols: { sendAllProtocolsToOT3: false, protocolsStoredSortKey: null },
   robotSystemUpdate: {
     manifestUrls: {
