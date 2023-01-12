@@ -809,10 +809,11 @@ def _create_csv_and_get_callbacks(
         else:
             data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
 
-    def _cache_pressure_data_callback(d: List[Any]) -> None:
-        elapsed_seconds = round(time() - start_time, 2)
-        data_list_with_time = [elapsed_seconds] + d
-        PRESSURE_DATA_CACHE.append(data_list_with_time)
+    def _cache_pressure_data_callback(d: List[Any], first_row_value: Optional[str] = None) -> None:
+        if first_row_value is None:
+            first_row_value = str(round(time() - start_time, 2))
+        data_list = [first_row_value] + d
+        PRESSURE_DATA_CACHE.append(data_list)
 
     def _handle_final_test_results(t: str, r: bool) -> None:
         # save final test results to both the CSV and to display at end of script
@@ -876,7 +877,7 @@ async def _main(test_config: TestConfig) -> None:
         FINAL_TEST_RESULTS = []
         PRESSURE_DATA_CACHE = []
         csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
-        csv_cb.pressure(PRESSURE_DATA_HEADER)
+        csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
 
         # add metadata to CSV
         csv_cb.write(["--------"])
