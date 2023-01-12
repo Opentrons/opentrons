@@ -63,5 +63,8 @@
   "gantry_empty_for_96_channel_success": "Now that both mounts are empty, you can begin the 96-Channel Pipette attachment process.",
   "attach_pip": "attach pipette",
   "attach_96_channel_plus_detach": "Detach {{pipetteName}} and Attach 96-Channel Pipette",
-  "all_pipette_detached": "All Pipettes Successfully Detached"
+  "all_pipette_detached": "All Pipettes Successfully Detached",
+  "z_axis_still_attached": "Z-axis Screw Still Attached",
+  "detach_z_axis_screw_again": "Please detach and Z-axis screw to proceed with attaching 96-channel pipette",
+  "cancel_attachment": "Cancel attachment"
 }
