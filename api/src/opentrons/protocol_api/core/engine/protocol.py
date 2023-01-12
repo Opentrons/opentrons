@@ -37,7 +37,8 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import Liquid, HexColor
 from opentrons.protocol_engine.resources import ModelUtils
 
-from ..protocol import AbstractProtocol, LoadedLiquid
+from ...liquid import LoadedLiquid
+from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
@@ -392,7 +393,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def add_liquid(
         self,
-        labware_core: LabwareCore,
         display_name: str,
         description: str,
         display_color: str,

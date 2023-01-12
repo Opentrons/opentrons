@@ -8,6 +8,7 @@ from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
 
 from ..well import AbstractWellCore
+from ...liquid import LoadedLiquid
 
 
 class WellCore(AbstractWellCore):
@@ -110,11 +111,9 @@ class WellCore(AbstractWellCore):
         volume: float,
     ) -> None:
         """Load liquid into a labware."""
-        labware_id = self._engine_client.state.labware.labware_id
-        liquid_id = liquid.id
 
         self._engine_client.load_liquid(
-            labware_id=labware_id,
-            liquid_id=liquid_id,
-            volume_by_well=volume_by_well,
+            labware_id=self._labware_id,
+            liquid_id=liquid.id,
+            volume_by_well={self._name: volume},
         )

@@ -6,8 +6,7 @@ from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.types import Point
 
 from ..well import AbstractWellCore
-from ..protocol import LoadedLiquid
-from .labware import LabwareImplementation
+from ...liquid import LoadedLiquid
 
 
 class WellImplementation(AbstractWellCore):
@@ -86,7 +85,6 @@ class WellImplementation(AbstractWellCore):
 
     def load_liquid(
         self,
-        labware_core: LabwareImplementation,
         liquid: LoadedLiquid,
         volume: float,
     ) -> None:

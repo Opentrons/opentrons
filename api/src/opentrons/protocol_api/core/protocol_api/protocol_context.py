@@ -16,7 +16,8 @@ from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
-from ..protocol import AbstractProtocol, LoadedLiquid
+from ...liquid import LoadedLiquid
+from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
 from . import legacy_module_core

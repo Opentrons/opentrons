@@ -12,6 +12,7 @@ from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
 from opentrons.protocol_api.core.engine import WellCore
+from opentrons.protocol_api.liquid import LoadedLiquid
 
 
 @pytest.fixture
@@ -150,3 +151,21 @@ def test_set_has_tip(subject: WellCore) -> None:
     """Trying to set the has tip state should raise an error."""
     with pytest.raises(APIVersionError):
         subject.set_has_tip(True)
+
+
+def test_load_liquid(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """It should load a liquid into a labware."""
+    mock_liquid = decoy.mock(cls=LoadedLiquid)
+
+    decoy.when(mock_liquid.id).then_return("liquid-id")
+
+    subject.load_liquid(liquid=mock_liquid, volume=20)
+
+    decoy.verify(
+        mock_engine_client.load_liquid(
+            labware_id="labware-id", liquid_id="liquid-id", volume_by_well={"well-name": 20}
+        ),
+        times=1,
+    )

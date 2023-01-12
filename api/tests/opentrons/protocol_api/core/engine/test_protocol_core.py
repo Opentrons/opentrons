@@ -46,7 +46,7 @@ from opentrons.protocol_api.core.engine import (
     LabwareCore,
     ModuleCore,
 )
-from opentrons.protocol_api.core.protocol import LoadedLiquid
+from opentrons.protocol_api.liquid import LoadedLiquid
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
@@ -682,29 +682,3 @@ def test_add_liquid(
     )
 
     assert result == expected_result
-
-
-def test_load_liquid(
-    decoy: Decoy,
-    mock_engine_client: EngineClient,
-    subject: ProtocolCore,
-    model_utils: ModelUtils,
-) -> None:
-    """It should load a liquid into a labware."""
-    mock_labware = decoy.mock(cls=LabwareCore)
-    mock_liquid = decoy.mock(cls=LoadedLiquid)
-
-    decoy.when(mock_labware.labware_id).then_return("labware-id")
-
-    decoy.when(mock_liquid.id).then_return("liquid-id")
-
-    subject.load_liquid(
-        labware_core=mock_labware, liquid=mock_liquid, volume_by_well={"A1": 20}
-    )
-
-    decoy.verify(
-        mock_engine_client.load_liquid(
-            labware_id="labware-id", liquid_id="liquid-id", volume_by_well={"A1": 20}
-        ),
-        times=1,
-    )

@@ -33,7 +33,7 @@ from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.protocol_api.labware import LabwareImplementation
-from .core.protocol import LoadedLiquid
+from .liquid import LoadedLiquid
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
@@ -220,8 +220,7 @@ class Well:
         :param volume: Volume of liquid to load into.
         """
 
-        self._implementation.load_liquid(
-            labware_id=self.parent._implementation,
+        self._impl.load_liquid(
             liquid=liquid,
             volume=volume,
         )

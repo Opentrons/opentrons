@@ -6,8 +6,7 @@ from typing import TypeVar
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Point
 
-from .protocol import LoadedLiquid
-from .labware import LabwareCoreType
+from ..liquid import LoadedLiquid
 
 
 class AbstractWellCore(ABC):
@@ -61,9 +60,8 @@ class AbstractWellCore(ABC):
     @abstractmethod
     def load_liquid(
         self,
-        labware_core: LabwareCoreType,
         liquid: LoadedLiquid,
-        volume_by_well: float,
+        volume: float,
     ) -> None:
         """Load liquid into a labware."""
 

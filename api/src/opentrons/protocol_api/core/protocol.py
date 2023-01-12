@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 from typing import Dict, Generic, List, Optional, Union, Tuple
-from dataclasses import dataclass
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -18,15 +17,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
-
-
-# TODO (tz, 12-19-22): move to a better location
-@dataclass(frozen=True)
-class LoadedLiquid:
-    id: str
-    display_name: str
-    description: str
-    display_color: Optional[str]
+from ..liquid import LoadedLiquid
 
 
 class AbstractProtocol(
