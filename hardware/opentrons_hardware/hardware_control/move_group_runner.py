@@ -362,6 +362,7 @@ class MoveScheduler:
     def _handle_error(self, message: ErrorMessage) -> None:
         self._error = message
         self._event.set()
+        log.warning(f"Error during move group: {message}")
         if message.payload.severity == ErrorSeverity.unrecoverable:
             raise RuntimeError("Firmware Error Received", message)
 
@@ -458,7 +459,6 @@ class MoveScheduler:
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
                 if self._error is not None:
-                    log.warning(f"Error during move group: {self._error}")
                     raise RuntimeError(f"Error during move group: {self._error}")
             except asyncio.TimeoutError:
                 log.warning(
