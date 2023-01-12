@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -17,6 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
+import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
@@ -144,7 +146,7 @@ function ProgressTrackerItem({
                     // is in the past or list is complete
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blueEnabled
-                      : subTask.isComplete
+                      : subTask.isComplete === true
                       ? COLORS.medGreyHover
                       : 'initial'
                   }
@@ -360,27 +362,67 @@ export function TaskList({
   activeIndex,
   taskList,
 }: TaskListProps): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
+
+  // start off assuming we are missing calibrations
+  let statusLabelBackgroundColor = COLORS.errorEnabled
+  let statusLabelIconColor = COLORS.errorEnabled
+  let statusLabelText = t('missing_calibration_data')
+
+  // if the tasklist is empty, though, all calibrations are good
+  if (activeIndex == null) {
+    statusLabelBackgroundColor = COLORS.successEnabled
+    statusLabelIconColor = COLORS.successEnabled
+    statusLabelText = t('calibration_complete')
+    // if we have tasks and they are all marked bad, then we should
+    // strongly suggest they re-do those calibrations
+  } else if (
+    taskList.filter(tp => tp.subTasks.every(st => st.markedBad)).length ===
+    taskList.length
+  ) {
+    statusLabelBackgroundColor = COLORS.warningEnabled
+    statusLabelIconColor = COLORS.warningEnabled
+    statusLabelText = t('calibration_recommended')
+  }
+
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-      {taskList.map(
-        (
-          { title, description, cta, footer, subTasks, isComplete },
-          taskIndex
-        ) => (
-          <Task
-            key={title}
-            title={title}
-            description={description}
-            cta={cta}
-            footer={footer}
-            subTasks={subTasks}
-            activeIndex={activeIndex}
-            taskIndex={taskIndex}
-            taskListLength={taskList.length}
-            isComplete={isComplete}
-          />
-        )
-      )}
-    </Flex>
+    <>
+      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <StyledText css={TYPOGRAPHY.h2SemiBold}>
+          {t('calibration_status')}
+        </StyledText>
+        <StatusLabel
+          status={statusLabelText}
+          backgroundColor={`${String(statusLabelBackgroundColor)}${String(
+            COLORS.opacity12HexCode
+          )}`}
+          iconColor={statusLabelIconColor}
+          textColor={COLORS.darkBlackEnabled}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          iconSize="0.313rem"
+        />
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        {taskList.map(
+          (
+            { title, description, cta, footer, subTasks, isComplete },
+            taskIndex
+          ) => (
+            <Task
+              key={title}
+              title={title}
+              description={description}
+              cta={cta}
+              footer={footer}
+              subTasks={subTasks}
+              activeIndex={activeIndex}
+              taskIndex={taskIndex}
+              taskListLength={taskList.length}
+              isComplete={isComplete}
+            />
+          )
+        )}
+      </Flex>
+    </>
   )
 }

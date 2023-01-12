@@ -20,6 +20,8 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
 
+import { useCalibrationTaskList } from '../Devices/hooks'
+
 export interface CalibrationStatusCardProps {
   robotName: string
   setShowHowCalibrationWorksModal: (
@@ -32,6 +34,28 @@ export function CalibrationStatusCard({
   setShowHowCalibrationWorksModal,
 }: CalibrationStatusCardProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
+  const { activeIndex, taskList } = useCalibrationTaskList(robotName)
+
+  // start off assuming we are missing calibrations
+  let statusLabelBackgroundColor = COLORS.errorEnabled
+  let statusLabelIconColor = COLORS.errorEnabled
+  let statusLabelText = t('missing_calibration_data')
+
+  // if the tasklist is empty, though, all calibrations are good
+  if (activeIndex == null) {
+    statusLabelBackgroundColor = COLORS.successEnabled
+    statusLabelIconColor = COLORS.successEnabled
+    statusLabelText = t('calibration_complete')
+    // if we have tasks and they are all marked bad, then we should
+    // strongly suggest they re-do those calibrations
+  } else if (
+    taskList.filter(tp => tp.subTasks.every(st => st.markedBad)).length ===
+    taskList.length
+  ) {
+    statusLabelBackgroundColor = COLORS.warningEnabled
+    statusLabelIconColor = COLORS.warningEnabled
+    statusLabelText = t('calibration_recommended')
+  }
 
   return (
     <Flex
@@ -53,11 +77,11 @@ export function CalibrationStatusCard({
             {t('calibration_status')}
           </StyledText>
           <StatusLabel
-            status={t('missing_calibration_data')}
-            backgroundColor={`${String(COLORS.errorEnabled)}${String(
+            status={statusLabelText}
+            backgroundColor={`${String(statusLabelBackgroundColor)}${String(
               COLORS.opacity12HexCode
             )}`}
-            iconColor={COLORS.errorEnabled}
+            iconColor={statusLabelIconColor}
             textColor={COLORS.darkBlackEnabled}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             iconSize="0.313rem"
