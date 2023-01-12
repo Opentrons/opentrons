@@ -20,6 +20,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -321,8 +322,10 @@ class LabwareView(HasState[LabwareState]):
         ]
 
         if not matching_definitions:
-            raise errors.LabwareDefinitionDoesNotExistError(
-                f"Could not find labware with given load name {load_name}"
+            return LabwareLoadParams(
+                load_name=load_name,
+                namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
+                version=version if version is not None else 1,
             )
 
         # If we have namespace and/or version, further match the definitions based on given parameter
@@ -342,11 +345,11 @@ class LabwareView(HasState[LabwareState]):
         # If there's none matching at this point, we had a partial match
         if not matching_definitions:
             raise errors.AmbiguousLoadLabwareParamsError(
-                f"Found labware with load name {load_name} but could not match other given parameters."
+                f"Found labware definition with load name {load_name} but could not match other given parameters."
             )
         elif len(matching_definitions) > 1:
             raise errors.AmbiguousLoadLabwareParamsError(
-                f"Found multiple labware with load name {load_name} and given parameters."
+                f"Found multiple labware definitions with load name {load_name} and given parameters."
             )
         found_definition = matching_definitions[0]
 

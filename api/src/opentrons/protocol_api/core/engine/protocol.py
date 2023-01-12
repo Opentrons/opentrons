@@ -14,7 +14,6 @@ from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
 )
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -28,13 +27,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors import (
-    LabwareNotLoadedOnModuleError,
-    LabwareDefinitionDoesNotExistError,
-)
-from opentrons.protocol_engine.state.labware import (
-    LabwareLoadParams as EngineLabwareLoadParams,
-)
+from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -146,14 +139,11 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         else:
             module_location = DeckSlotLocation(slotName=location)
 
-        try:
-            load_labware_params = self._engine_client.state.labware.find_labware_load_params(
+        load_labware_params = (
+            self._engine_client.state.labware.find_labware_load_params(
                 load_name, namespace, version
             )
-        except LabwareDefinitionDoesNotExistError:
-            load_labware_params = EngineLabwareLoadParams(
-                load_name=load_name, namespace=OPENTRONS_NAMESPACE, version=1
-            )
+        )
 
         load_result = self._engine_client.load_labware(
             load_name=load_labware_params.load_name,

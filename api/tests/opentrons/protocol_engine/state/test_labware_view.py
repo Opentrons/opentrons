@@ -7,6 +7,7 @@ from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import Parameters
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point
 
@@ -167,7 +168,20 @@ def test_find_labware_params(namespace: Optional[str], version: Optional[int]) -
     )
 
 
-def test_find_labware_params_raises_no_labware_found() -> None:
+@pytest.mark.parametrize(
+    argnames=["namespace", "expected_namespace", "version", "expected_version"],
+    argvalues=[
+        (None, OPENTRONS_NAMESPACE, 123, 123),
+        ("world", "world", None, 1),
+        (None, OPENTRONS_NAMESPACE, None, 1),
+    ],
+)
+def test_find_labware_params_no_labware_found_defaults(
+    namespace: Optional[str],
+    expected_namespace: str,
+    version: Optional[int],
+    expected_version: int,
+) -> None:
     """It should raise an error if there is no matching load name."""
     labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
         parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
@@ -177,8 +191,11 @@ def test_find_labware_params_raises_no_labware_found() -> None:
         definitions_by_uri={"some-labware-uri": labware_def},
     )
 
-    with pytest.raises(errors.LabwareDefinitionDoesNotExistError):
-        subject.find_labware_load_params("foo", None, None)
+    result = subject.find_labware_load_params("foo", namespace, version)
+
+    assert result == LabwareLoadParams(
+        load_name="foo", namespace=expected_namespace, version=expected_version
+    )
 
 
 def find_labware_params_raises_multiple_labware_found() -> None:
