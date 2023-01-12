@@ -40,6 +40,7 @@ export function UpdateRobot(): JSX.Element {
     error: null,
   }
   const dispatch = useDispatch<Dispatch>()
+  const currentProgress = progress != null ? progress : 0
 
   const renderUpdateProcess = (): JSX.Element | undefined => {
     // Display Error screen
@@ -59,31 +60,14 @@ export function UpdateRobot(): JSX.Element {
         step === 'restart' ||
         step === 'restarting')
     ) {
-      return (
-        <UpdateSoftware
-          downloading
-          processProgress={progress != null ? progress : 0}
-        />
-      )
+      return <UpdateSoftware downloading processProgress={currentProgress} />
     } else if (step === 'getToken' || step === 'uploadFile') {
-      return (
-        <UpdateSoftware
-          sendingFile
-          processProgress={progress != null ? progress : 0}
-        />
-      )
+      return <UpdateSoftware sendingFile processProgress={currentProgress} />
     } else if (step === 'processFile' || step === 'commitUpdate') {
       if (stage === 'awaiting-file' || stage === 'validating') {
-        return (
-          <UpdateSoftware
-            validating
-            processProgress={progress != null ? progress : 0}
-          />
-        )
+        return <UpdateSoftware validating processProgress={currentProgress} />
       } else {
-        return (
-          <UpdateSoftware processProgress={progress != null ? progress : 0} />
-        )
+        return <UpdateSoftware processProgress={currentProgress} />
       }
     } else if (step === 'finished') {
       return <CompleteUpdateSoftware robotName={robotName} />
