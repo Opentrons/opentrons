@@ -842,8 +842,8 @@ async def _main(test_config: TestConfig) -> None:
     # create API instance, and get Pipette serial number
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=test_config.simulate,
-        pipette_left="p1000_single_v3.3",
-        pipette_right="p1000_single_v3.3",
+        pipette_left="p1000_single_v3.4",
+        pipette_right="p1000_single_v3.4",
     )
     # FIXME: remove reducing speeds/accelerations once stall detection bug is fixed
     await _reduce_speeds_and_accelerations(
