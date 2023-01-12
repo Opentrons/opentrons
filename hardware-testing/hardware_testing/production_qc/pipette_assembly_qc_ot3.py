@@ -769,6 +769,8 @@ async def _reduce_speeds_and_accelerations(
 
 @dataclass
 class CSVCallbacks:
+    """CSV callback functions."""
+
     write: Callable
     pressure: Callable
     results: Callable
@@ -776,6 +778,8 @@ class CSVCallbacks:
 
 @dataclass
 class CSVProperties:
+    """CSV properties."""
+
     id: str
     name: str
     path: str
@@ -809,7 +813,9 @@ def _create_csv_and_get_callbacks(
         else:
             data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
 
-    def _cache_pressure_data_callback(d: List[Any], first_row_value: Optional[str] = None) -> None:
+    def _cache_pressure_data_callback(
+        d: List[Any], first_row_value: Optional[str] = None
+    ) -> None:
         if first_row_value is None:
             first_row_value = str(round(time() - start_time, 2))
         data_list = [first_row_value] + d
@@ -968,7 +974,9 @@ async def _main(test_config: TestConfig) -> None:
         _results_csv_lines = list()
         # add extra entries of black cells to the top of the CSV
         # to help operators when the copy/paste
-        _results_csv_lines.append(["-------"] + ["---" for _ in range(len(PRESSURE_DATA_HEADER) - 1)])
+        _results_csv_lines.append(
+            ["-------"] + ["---" for _ in range(len(PRESSURE_DATA_HEADER) - 1)]
+        )
         _results_csv_lines.append(["RESULTS"])
         print("final test results:")
         for result in FINAL_TEST_RESULTS:
