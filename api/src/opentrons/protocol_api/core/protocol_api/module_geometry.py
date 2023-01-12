@@ -108,8 +108,7 @@ class ModuleGeometry:
         self._parent = parent
         self._module_type = module_type
 
-        # Note (spp, 2022-05-23): I think this should say '{display_name} on {slot}'
-        self._display_name = "{} on {}".format(display_name, str(parent.labware))
+        self._display_name = display_name
         self._model = model
         self._offset = offset
         self._height = overall_height + self._parent.point.z

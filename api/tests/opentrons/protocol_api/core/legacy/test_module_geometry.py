@@ -121,7 +121,7 @@ def mock_location() -> mock.MagicMock:
                 module_type=ModuleType.HEATER_SHAKER,
                 display_name="Sample H/S Module",
             ),
-            "Sample H/S Module on ",
+            "Sample H/S Module",
         ),
     ],
 )

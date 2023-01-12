@@ -80,7 +80,9 @@ class ModuleCore(AbstractModuleCore):
 
     def get_display_name(self) -> str:
         """Get the module's display name."""
-        return self._engine_client.state.modules.get_definition(self.module_id).displayName
+        return self._engine_client.state.modules.get_definition(
+            self.module_id
+        ).displayName
 
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):

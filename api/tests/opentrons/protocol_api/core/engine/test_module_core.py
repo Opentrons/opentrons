@@ -96,8 +96,5 @@ def test_get_display_name(
         mock_definition
     )
     decoy.when(mock_definition.displayName).then_return("abra kadabra")
-    decoy.when(mock_engine_client.state.modules.get_location("1234")).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
 
-    assert subject.get_display_name() == "abra kadabra on 1"
+    assert subject.get_display_name() == "abra kadabra"
