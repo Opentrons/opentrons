@@ -233,6 +233,28 @@ describe('PipetteWizardFlows', () => {
     //   expect(props.closeFlow).toHaveBeenCalled()
     // })
   })
+  it('renders 3rd page and clicking back button redirects to the first page', async () => {
+    const { getByText, getByRole } = render(props)
+    //  first page
+    getByText('Before you begin')
+    getByRole('button', { name: 'Get started' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalled()
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // second page
+    getByText('Attach Calibration Probe')
+    getByRole('button', { name: 'Initiate calibration' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalled()
+    })
+    //  third page
+    getByText('Remove Calibration Probe')
+    getByRole('button', { name: 'back' }).click()
+    //   first page
+    getByText('Before you begin')
+  })
+
   it('renders the correct information, calling the correct commands for the detach flow', () => {
     props = {
       ...props,

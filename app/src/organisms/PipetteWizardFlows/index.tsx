@@ -71,9 +71,7 @@ export const PipetteWizardFlows = (
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== pipetteWizardSteps.length - 1
-        ? currentStepIndex - 1
-        : currentStepIndex
+      currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
     )
   }
   const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
