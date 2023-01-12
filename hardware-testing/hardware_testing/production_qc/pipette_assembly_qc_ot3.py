@@ -795,14 +795,14 @@ def _create_csv_and_get_callbacks(
     def _append_csv_data(
         data_list: List[Any],
         line_number: Optional[int] = None,
-        elapsed_seconds: Optional[float] = None,
-        timestamp_included: bool = False,
+        first_row_value: Optional[str] = None,
+        first_row_value_included: bool = False,
     ) -> None:
         # every line in the CSV file begins with the elapsed seconds
-        if not timestamp_included:
-            if elapsed_seconds is None:
-                elapsed_seconds = round(time() - start_time, 2)
-            data_list = [elapsed_seconds] + data_list
+        if not first_row_value_included:
+            if first_row_value is None:
+                first_row_value = str(round(time() - start_time, 2))
+            data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
             data.append_data_to_file(test_name, file_name, data_str + "\n")
@@ -877,6 +877,10 @@ async def _main(test_config: TestConfig) -> None:
         FINAL_TEST_RESULTS = []
         PRESSURE_DATA_CACHE = []
         csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
+        # add a label at the top of file, visually showing the length of the longest row
+        # this helps the operator now where to start/stop the manual copy/paste
+        csv_cb.write(["---" for _ in range(len(PRESSURE_DATA_HEADER))], first_row_value="---")
+        # cache the pressure-data header
         csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
 
         # add metadata to CSV
@@ -959,7 +963,7 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["-------------"])
         csv_cb.write(["PRESSURE-DATA"])
         for press_data in PRESSURE_DATA_CACHE:
-            csv_cb.write(press_data, timestamp_included=True)
+            csv_cb.write(press_data, first_row_value_included=True)
 
         # put the top-line results at the top of the CSV file
         # so here we cache each data line, then add them to the top
@@ -973,7 +977,7 @@ async def _main(test_config: TestConfig) -> None:
             print(" - " + "\t".join(result))
         _results_csv_lines.reverse()
         for r in _results_csv_lines:
-            csv_cb.write(r, line_number=0, elapsed_seconds=0.0)
+            csv_cb.write(r, line_number=1, first_row_value="0.0")
 
         # print the filepath again, to help debugging
         print(f"CSV: {csv_props.name}")
