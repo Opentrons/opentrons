@@ -7,11 +7,12 @@ import { SpinnerModalPage } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { CalibrateTipLength } from '../../../../organisms/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { tipLengthCalibrationStarted } from '../../../../redux/analytics'
-import { getHasCalibrationBlock } from '../../../../redux/config'
 import * as RobotApi from '../../../../redux/robot-api'
 import * as Sessions from '../../../../redux/sessions'
+import { tipLengthCalibrationStarted } from '../../../../redux/analytics'
+import { getHasCalibrationBlock } from '../../../../redux/config'
 import { getTipLengthCalibrationSession } from '../../../../redux/sessions/tip-length-calibration/selectors'
+import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../../organisms/DeprecatedCalibrationPanels/constants'
 
 import type { RequestState } from '../../../../redux/robot-api/types'
 import type {
@@ -20,7 +21,6 @@ import type {
   TipLengthCalibrationSessionParams,
 } from '../../../../redux/sessions/types'
 import type { State } from '../../../../redux/types'
-import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../../organisms/DeprecatedCalibrationPanels/constants'
 
 // tip length calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [
@@ -114,7 +114,7 @@ export function useDashboardCalibrateTipLength(
           withIntent, // TODO: remove intent param entirely once calibration wizards ff is removed
           mount,
           hasCalibrationBlock,
-          "default Opentrons tip rack for pipette on mount"
+          'default Opentrons tip rack for pipette on mount'
         )
       )
     }

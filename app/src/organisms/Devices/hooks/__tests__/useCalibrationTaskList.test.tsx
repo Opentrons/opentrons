@@ -38,6 +38,10 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
   typeof useDeckCalibrationData
 >
 
+const mockPipOffsetCalLauncher = jest.fn()
+const mockTipLengthCalLauncher = jest.fn()
+const mockDeckCalLauncher = jest.fn()
+
 describe('useCalibrationTaskList hook', () => {
   let wrapper: React.FunctionComponent<{}>
   beforeEach(() => {
@@ -65,9 +69,18 @@ describe('useCalibrationTaskList hook', () => {
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
 
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.taskList.length).toEqual(TASK_COUNT)
     result.current.taskList.forEach((task, i) => {
@@ -89,9 +102,18 @@ describe('useCalibrationTaskList hook', () => {
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
 
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual(null)
   })
@@ -109,9 +131,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.taskList[2].description).toEqual('Empty')
   })
@@ -129,9 +160,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual([0, 0])
   })
@@ -149,9 +189,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual([2, 1])
   })
@@ -169,9 +218,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual([1, 0])
   })
@@ -189,9 +247,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual([0, 0])
   })
@@ -209,9 +276,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.taskList[0].description).toEqual(
       'Start with Deck Calibration, which is the basis for the rest of calibration.'
@@ -237,9 +313,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.taskList[0].footer).toEqual(
       expectedTaskList.taskList[0].footer

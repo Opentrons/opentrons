@@ -1,5 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
+import { useInterval } from '@opentrons/components'
+
 import {
   useAttachedPipettes,
   useDeckCalibrationData,
@@ -8,6 +11,13 @@ import {
 } from '.'
 
 import { formatTimestamp } from '../utils'
+import {
+  INTENT_CALIBRATE_PIPETTE_OFFSET,
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
+} from '../../DeprecatedCalibrationPanels'
+import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
+import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
+import { fetchCalibrationStatus } from '../../../redux/calibration'
 
 import type {
   SubTaskProps,
@@ -15,17 +25,9 @@ import type {
   TaskProps,
 } from '../../TaskList/types'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
-import {
-  INTENT_CALIBRATE_PIPETTE_OFFSET,
-  INTENT_RECALIBRATE_PIPETTE_OFFSET,
-} from '../../DeprecatedCalibrationPanels'
 import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
-import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
-import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
-import { fetchCalibrationStatus } from '../../../redux/calibration'
-import { useInterval } from '@opentrons/components'
 
 export function useCalibrationTaskList(
   robotName: string,

@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
+import { Portal } from '../../../../App/portal'
+import { CalibrateDeck } from '../../../../organisms/CalibrateDeck'
 import * as RobotApi from '../../../../redux/robot-api'
 import * as Sessions from '../../../../redux/sessions'
 import { getDeckCalibrationSession } from '../../../../redux/sessions/deck-calibration/selectors'
@@ -9,8 +11,6 @@ import type { State } from '../../../../redux/types'
 import type { DeckCalibrationSession } from '../../../../redux/sessions'
 import type { SessionCommandString } from '../../../../redux/sessions/types'
 import type { RequestState } from '../../../../redux/robot-api/types'
-import { Portal } from '../../../../App/portal'
-import { CalibrateDeck } from '../../../../organisms/CalibrateDeck'
 
 // deck calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [
