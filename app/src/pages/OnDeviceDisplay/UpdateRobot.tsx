@@ -42,7 +42,7 @@ export function UpdateRobot(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const currentProgress = progress != null ? progress : 0
 
-  const renderUpdateProcess = (): JSX.Element | undefined => {
+  const renderUpdateProcess = (): JSX.Element | null => {
     // Display Error screen
     if (sessionError != null) {
       return (
@@ -53,13 +53,7 @@ export function UpdateRobot(): JSX.Element {
       )
     }
 
-    if (
-      isDownloading &&
-      (step === 'premigration' ||
-        step === 'premigrationRestart' ||
-        step === 'restart' ||
-        step === 'restarting')
-    ) {
+    if (isDownloading && (step === 'restart' || step === 'restarting')) {
       return <UpdateSoftware downloading processProgress={currentProgress} />
     } else if (step === 'getToken' || step === 'uploadFile') {
       return <UpdateSoftware sendingFile processProgress={currentProgress} />
@@ -72,6 +66,7 @@ export function UpdateRobot(): JSX.Element {
     } else if (step === 'finished') {
       return <CompleteUpdateSoftware robotName={robotName} />
     }
+    return null
   }
 
   React.useEffect(() => {

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -17,8 +16,6 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { restartRobot } from '../../redux/robot-admin'
 
-import type { Dispatch } from '../../redux/types'
-
 interface CompleteUpdateSoftwareProps {
   robotName: string
 }
@@ -26,20 +23,13 @@ export function CompleteUpdateSoftware({
   robotName,
 }: CompleteUpdateSoftwareProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'robot_controls'])
-  const dispatch = useDispatch<Dispatch>()
 
-  const handleRestartRobot: React.MouseEventHandler<HTMLButtonElement> = e => {
-    // ToDo kj 1/10/2023 Need to add a new config item to app-shell-odd to resume the process from nameRobot
-    // OnDeviceDisplayApp.tsx needs to get a config
-    e.preventDefault()
-    dispatch(restartRobot(robotName))
-  }
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.darkGreyDisabled}
-        height="26.625rem"
+        height="33rem"
         gridGap={SPACING.spacingXXL}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
@@ -52,19 +42,18 @@ export function CompleteUpdateSoftware({
         >
           {t('update_complete')}
         </StyledText>
+        <StyledText
+          marginTop={SPACING.spacing4}
+          fontSize="1.5rem"
+          lineHeight="2.0625rem"
+          fontWeight="400"
+        >
+          {t('restarting_robot')}
+        </StyledText>
         <Box width="47.5rem">
           <ProgressBar percentComplete={100} />
         </Box>
       </Flex>
-      <PrimaryButton
-        marginTop={SPACING.spacing6}
-        height="4.4375rem"
-        onClick={handleRestartRobot}
-      >
-        <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
-          {t('robot_controls:restart_label')}
-        </StyledText>
-      </PrimaryButton>
     </Flex>
   )
 }

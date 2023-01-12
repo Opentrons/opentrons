@@ -144,7 +144,7 @@ describe('UpdateRobot', () => {
   it('should render mock Update Software for downloading', () => {
     const mockDownloadSession = {
       ...mockSession,
-      step: Buildroot.PREMIGRATION,
+      step: Buildroot.RESTART,
     }
     mockGetBuildrootSession.mockReturnValue(mockDownloadSession)
     const [{ getByText }] = render()
