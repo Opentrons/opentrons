@@ -129,12 +129,7 @@ class GeometryView:
         if module_id is None:
             return slot_pos
         else:
-            # TODO (spp, 2022-12-13): wire up selection of short-trash deck type
-            deck_type = (
-                DeckType.OT3_STANDARD
-                if self._config.robot_type == "OT-3 Standard"
-                else DeckType.OT2_STANDARD
-            )
+            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
             module_offset = self._modules.get_module_offset(
                 module_id=module_id, deck_type=deck_type
             )
@@ -378,11 +373,7 @@ class GeometryView:
         module_offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName
         if isinstance(location, ModuleLocation):
-            deck_type = (
-                DeckType.OT3_STANDARD
-                if self._config.robot_type == "OT-3 Standard"
-                else DeckType.OT2_STANDARD
-            )
+            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
             module_offset = self._modules.get_module_offset(
                 module_id=location.moduleId, deck_type=deck_type
             )

@@ -3,6 +3,7 @@ import pytest
 from decoy import Decoy
 from typing import cast, List, Tuple, Union, Optional
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -102,7 +103,7 @@ def test_get_labware_parent_position_on_module(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
-    mock_config: Config,
+    standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should return a module position for labware on a module."""
@@ -121,7 +122,7 @@ def test_get_labware_parent_position_on_module(
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
         Point(1, 2, 3)
     )
-    decoy.when(mock_config.robot_type).then_return("OT-2 Standard")
+    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
     decoy.when(
         module_view.get_module_offset(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
@@ -203,7 +204,7 @@ def test_get_module_labware_highest_z(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
-    mock_config: Config,
+    standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should get the absolute location of a labware's highest Z point."""
@@ -228,7 +229,7 @@ def test_get_module_labware_highest_z(
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
-    decoy.when(mock_config.robot_type).then_return("OT-2 Standard")
+    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
     decoy.when(
         module_view.get_module_offset(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
@@ -543,7 +544,7 @@ def test_get_module_labware_well_position(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
-    mock_config: Config,
+    standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware on module."""
@@ -572,7 +573,7 @@ def test_get_module_labware_well_position(
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
     )
-    decoy.when(mock_config.robot_type).then_return("OT-2 Standard")
+    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
     decoy.when(
         module_view.get_module_offset(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
@@ -953,7 +954,7 @@ def test_get_labware_center(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
-    mock_config: Config,
+    standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
     location: Union[DeckSlotLocation, ModuleLocation],
     expected_center_point: Point,
@@ -964,7 +965,7 @@ def test_get_labware_center(
     )
 
     if isinstance(location, ModuleLocation):
-        decoy.when(mock_config.robot_type).then_return("OT-2 Standard")
+        decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
         decoy.when(
             module_view.get_module_offset(
                 module_id="module-id", deck_type=DeckType.OT2_STANDARD
