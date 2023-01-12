@@ -64,7 +64,7 @@
   "attach_pip": "attach pipette",
   "attach_96_channel_plus_detach": "Detach {{pipetteName}} and Attach 96-Channel Pipette",
   "all_pipette_detached": "All Pipettes Successfully Detached",
-  "z_axis_still_attached": "Z-axis Screw Still Attached",
-  "detach_z_axis_screw_again": "Please detach and Z-axis screw to proceed with attaching 96-channel pipette",
+  "z_axis_still_attached": "Z-axis Screw Still Secure",
+  "detach_z_axis_screw_again": "You need to loosen the screw before you can attach the 96-Channel Pipette",
   "cancel_attachment": "Cancel attachment"
 }

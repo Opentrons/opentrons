@@ -91,9 +91,9 @@ describe('Carriage', () => {
   it('renders the error z axis still attached modal when check z axis button still detects the attachment', async () => {
     const { getByText, getByRole } = render(props)
     getByRole('button', { name: 'Continue' }).click()
-    getByText('Z-axis Screw Still Attached')
+    getByText('Z-axis Screw Still Secure')
     getByText(
-      'Please detach and Z-axis screw to proceed with attaching 96-channel pipette'
+      'You need to loosen the screw before you can attach the 96-Channel Pipette'
     )
     getByRole('button', { name: 'try again' })
     getByRole('button', { name: 'Cancel attachment' })

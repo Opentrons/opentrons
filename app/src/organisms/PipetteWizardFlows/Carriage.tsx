@@ -25,14 +25,14 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
     setZAxisScrewStatus,
   ] = React.useState<ZAxisScrewStatus>('unknown')
 
-  //  this should never happen but to be safe
-  if (selectedPipette === SINGLE_MOUNT_PIPETTES || flowType === FLOWS.CALIBRATE)
-    return null
-
   React.useEffect(() => {
     if (zAxisScrewStatus === 'attached' || zAxisScrewStatus === 'detached')
       proceed()
   }, [proceed, zAxisScrewStatus])
+
+  //  this should never happen but to be safe
+  if (selectedPipette === SINGLE_MOUNT_PIPETTES || flowType === FLOWS.CALIBRATE)
+    return null
 
   return zAxisScrewStatus === 'stillAttached' ? (
     <SimpleWizardBody
