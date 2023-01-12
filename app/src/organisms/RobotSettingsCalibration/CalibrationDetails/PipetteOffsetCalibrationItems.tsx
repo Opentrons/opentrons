@@ -19,6 +19,7 @@ import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
 import { useAttachedPipettes, useIsOT3 } from '../../../organisms/Devices/hooks'
 
+import * as Config from '../../../redux/config'
 import type { State } from '../../../redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
@@ -62,6 +63,10 @@ export function PipetteOffsetCalibrationItems({
   })
   const attachedPipettes = useAttachedPipettes()
   const isOT3 = useIsOT3(robotName)
+
+  const enableCalibrationWizards = Config.useFeatureFlag(
+    'enableCalibrationWizards'
+  )
 
   return (
     <StyledTable>
@@ -113,39 +118,49 @@ export function PipetteOffsetCalibrationItems({
                       </>
                     ) : (
                       <>
-                        {calibration.markedBad ?? false ? (
-                          <>
-                            <Icon
-                              name="alert-circle"
-                              backgroundColor={COLORS.warningBackgroundLight}
-                              color={COLORS.warningEnabled}
-                              size={SPACING.spacing4}
-                            />
-                            <StyledText
-                              as="p"
-                              marginLeft={SPACING.spacing2}
-                              width="100%"
-                              color={COLORS.warningText}
-                            >
-                              {t('recalibration_recommended')}
-                            </StyledText>
-                          </>
+                        {enableCalibrationWizards ? (
+                          <StyledText as="p">
+                            {t('not_calibrated_short')}
+                          </StyledText>
                         ) : (
                           <>
-                            <Icon
-                              name="alert-circle"
-                              backgroundColor={COLORS.errorBackgroundLight}
-                              color={COLORS.errorEnabled}
-                              size={SPACING.spacing4}
-                            />
-                            <StyledText
-                              as="p"
-                              marginLeft={SPACING.spacing2}
-                              width="100%"
-                              color={COLORS.errorText}
-                            >
-                              {t('missing_calibration')}
-                            </StyledText>
+                            {calibration.markedBad ?? false ? (
+                              <>
+                                <Icon
+                                  name="alert-circle"
+                                  backgroundColor={
+                                    COLORS.warningBackgroundLight
+                                  }
+                                  color={COLORS.warningEnabled}
+                                  size={SPACING.spacing4}
+                                />
+                                <StyledText
+                                  as="p"
+                                  marginLeft={SPACING.spacing2}
+                                  width="100%"
+                                  color={COLORS.warningText}
+                                >
+                                  {t('recalibration_recommended')}
+                                </StyledText>
+                              </>
+                            ) : (
+                              <>
+                                <Icon
+                                  name="alert-circle"
+                                  backgroundColor={COLORS.errorBackgroundLight}
+                                  color={COLORS.errorEnabled}
+                                  size={SPACING.spacing4}
+                                />
+                                <StyledText
+                                  as="p"
+                                  marginLeft={SPACING.spacing2}
+                                  width="100%"
+                                  color={COLORS.errorText}
+                                >
+                                  {t('missing_calibration')}
+                                </StyledText>
+                              </>
+                            )}
                           </>
                         )}
                       </>

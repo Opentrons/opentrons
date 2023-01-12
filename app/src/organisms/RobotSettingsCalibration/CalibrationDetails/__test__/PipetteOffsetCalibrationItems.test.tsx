@@ -4,6 +4,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
+import { useFeatureFlag } from '../../../../redux/config'
 import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
 import {
   useAttachedPipettes,
@@ -58,6 +59,9 @@ const mockUpdateRobotStatus = jest.fn()
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
   typeof OverflowMenu
@@ -70,6 +74,9 @@ describe('PipetteOffsetCalibrationItems', () => {
     mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(false)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
@@ -133,7 +140,28 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Missing calibration')
   })
 
-  it('should render icon and test when calibration recommended', () => {
+  it('should only render text when calibration missing and when the calibration wizard feature flag is set', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(true)
+    props = {
+      ...props,
+      formattedPipetteOffsetCalibrations: [
+        {
+          modelName: 'mockPipetteModelLeft',
+          serialNumber: '1234567',
+          mount: 'left' as Mount,
+          tiprack: 'mockTiprackLeft',
+          markedBad: false,
+        },
+      ],
+    }
+    const [{ getByText, queryByText }] = render(props)
+    expect(queryByText('Missing calibration')).not.toBeInTheDocument()
+    getByText('Not calibrated')
+  })
+
+  it('should render icon and text when calibration recommended', () => {
     props = {
       ...props,
       formattedPipetteOffsetCalibrations: [
@@ -149,5 +177,26 @@ describe('PipetteOffsetCalibrationItems', () => {
     }
     const [{ getByText }] = render(props)
     getByText('Recalibration recommended')
+  })
+
+  it('should not render icon and text when calibration recommended and when the calibration wizard feature flag is set', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(true)
+    props = {
+      ...props,
+      formattedPipetteOffsetCalibrations: [
+        {
+          modelName: 'mockPipetteModelLeft',
+          serialNumber: '1234567',
+          mount: 'left' as Mount,
+          tiprack: 'mockTiprackLeft',
+          lastCalibrated: '2022-11-10T18:15:02',
+          markedBad: true,
+        },
+      ],
+    }
+    const [{ queryByText }] = render(props)
+    expect(queryByText('Recalibration recommended')).not.toBeInTheDocument()
   })
 })
