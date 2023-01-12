@@ -73,7 +73,7 @@ async def get_attached_instruments(
         description="If true, actively scan for attached pipettes. Note:"
         " this requires  disabling the pipette motors and"
         " should only be done when no  protocol is running "
-        "and you know  it won't cause a problem",
+        "and you know it won't cause a problem",
     ),
     hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> PydanticResponse[SimpleMultiBody[AttachedInstrument]]:
