@@ -30,7 +30,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
     LabwareNotLoadedOnModuleError,
-    NonExistentLabwareError,
+    LabwareDefinitionDoesNotExistError,
 )
 from opentrons.protocol_engine.state.labware import (
     LabwareLoadParams as EngineLabwareLoadParams,
@@ -147,10 +147,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             module_location = DeckSlotLocation(slotName=location)
 
         try:
-            load_labware_params = self._engine_client.state.labware.find_labware_params(
+            load_labware_params = self._engine_client.state.labware.find_labware_load_params(
                 load_name, namespace, version
             )
-        except NonExistentLabwareError:
+        except LabwareDefinitionDoesNotExistError:
             load_labware_params = EngineLabwareLoadParams(
                 load_name=load_name, namespace=OPENTRONS_NAMESPACE, version=1
             )

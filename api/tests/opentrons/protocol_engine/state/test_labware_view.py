@@ -160,7 +160,7 @@ def test_find_labware_params(namespace: Optional[str], version: Optional[int]) -
         definitions_by_uri={"some-labware-uri": labware_def},
     )
 
-    result = subject.find_labware_params("hello", namespace, version)
+    result = subject.find_labware_load_params("hello", namespace, version)
 
     assert result == LabwareLoadParams(
         load_name="hello", namespace="world", version=123
@@ -177,8 +177,8 @@ def test_find_labware_params_raises_no_labware_found() -> None:
         definitions_by_uri={"some-labware-uri": labware_def},
     )
 
-    with pytest.raises(errors.NonExistentLabwareError):
-        subject.find_labware_params("foo", None, None)
+    with pytest.raises(errors.LabwareDefinitionDoesNotExistError):
+        subject.find_labware_load_params("foo", None, None)
 
 
 def find_labware_params_raises_multiple_labware_found() -> None:
@@ -200,7 +200,7 @@ def find_labware_params_raises_multiple_labware_found() -> None:
     with pytest.raises(
         errors.AmbiguousLoadLabwareParamsError, match="multiple labware"
     ):
-        subject.find_labware_params("hello", None, None)
+        subject.find_labware_load_params("hello", None, None)
 
 
 @pytest.mark.parametrize(
@@ -222,7 +222,7 @@ def test_find_labware_params_raises_only_partial_found(
     )
 
     with pytest.raises(errors.AmbiguousLoadLabwareParamsError, match="could not match"):
-        subject.find_labware_params("hello", namespace, version)
+        subject.find_labware_load_params("hello", namespace, version)
 
 
 def test_get_all_labware(

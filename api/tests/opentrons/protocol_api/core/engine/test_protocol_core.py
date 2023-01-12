@@ -189,7 +189,7 @@ def test_load_labware(
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
-        mock_engine_client.state.labware.find_labware_params("hello", "world", 456)
+        mock_engine_client.state.labware.find_labware_load_params("hello", "world", 456)
     ).then_return(
         EngineLabwareLoadParams("some_labware", "some_explicit_namespace", 9001)
     )
@@ -246,7 +246,7 @@ def test_load_labware_default_namespace_and_version(
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
-        mock_engine_client.state.labware.find_labware_params("hello", "world", 456)
+        mock_engine_client.state.labware.find_labware_load_params("hello", "world", 456)
     ).then_raise(error=NonExistentLabwareError("uh oh"))
 
     decoy.when(
@@ -354,7 +354,7 @@ def test_load_labware_on_module(
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
-        mock_engine_client.state.labware.find_labware_params("hello", "world", 456)
+        mock_engine_client.state.labware.find_labware_load_params("hello", "world", 456)
     ).then_return(
         EngineLabwareLoadParams("some_labware", "some_explicit_namespace", 9001)
     )

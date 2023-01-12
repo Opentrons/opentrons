@@ -201,9 +201,5 @@ class LocationIsOccupiedError(ProtocolEngineError):
     """An error raised when attempting to place labware in a non-empty location."""
 
 
-class NonExistentLabwareError(ProtocolEngineError):
-    """An error raised when trying to find labware parameters with no matching load name."""
-
-
 class AmbiguousLoadLabwareParamsError(ProtocolEngineError):
     """An error raised when specific labware parameters cannot be found due to multiple/mismatching labware."""

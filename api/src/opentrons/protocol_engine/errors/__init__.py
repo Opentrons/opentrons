@@ -45,7 +45,6 @@ from .exceptions import (
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
     LocationIsOccupiedError,
-    NonExistentLabwareError,
     AmbiguousLoadLabwareParamsError,
 )
 
@@ -97,7 +96,6 @@ __all__ = [
     "HardwareNotSupportedError",
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
-    "NonExistentLabwareError",
     "AmbiguousLoadLabwareParamsError",
     # error occurrence models
     "ErrorOccurrence",

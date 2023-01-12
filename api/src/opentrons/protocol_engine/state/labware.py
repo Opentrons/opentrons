@@ -301,7 +301,7 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware definition for matching {uri} not found."
             ) from e
 
-    def find_labware_params(
+    def find_labware_load_params(
         self,
         load_name: str,
         namespace: Optional[str],
@@ -321,7 +321,7 @@ class LabwareView(HasState[LabwareState]):
         ]
 
         if not matching_definitions:
-            raise errors.NonExistentLabwareError(
+            raise errors.LabwareDefinitionDoesNotExistError(
                 f"Could not find labware with given load name {load_name}"
             )
 
