@@ -877,9 +877,6 @@ async def _main(test_config: TestConfig) -> None:
         FINAL_TEST_RESULTS = []
         PRESSURE_DATA_CACHE = []
         csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
-        # add a label at the top of file, visually showing the length of the longest row
-        # this helps the operator now where to start/stop the manual copy/paste
-        csv_cb.write(["---" for _ in range(len(PRESSURE_DATA_HEADER))], first_row_value="---")
         # cache the pressure-data header
         csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
 
@@ -969,7 +966,9 @@ async def _main(test_config: TestConfig) -> None:
         # so here we cache each data line, then add them to the top
         # of the file in reverse order
         _results_csv_lines = list()
-        _results_csv_lines.append(["-------"])
+        # add extra entries of black cells to the top of the CSV
+        # to help operators when the copy/paste
+        _results_csv_lines.append(["-------"] + ["---" for _ in range(len(PRESSURE_DATA_HEADER) - 1)])
         _results_csv_lines.append(["RESULTS"])
         print("final test results:")
         for result in FINAL_TEST_RESULTS:
@@ -977,7 +976,7 @@ async def _main(test_config: TestConfig) -> None:
             print(" - " + "\t".join(result))
         _results_csv_lines.reverse()
         for r in _results_csv_lines:
-            csv_cb.write(r, line_number=1, first_row_value="0.0")
+            csv_cb.write(r, line_number=0, first_row_value="0.0")
 
         # print the filepath again, to help debugging
         print(f"CSV: {csv_props.name}")
