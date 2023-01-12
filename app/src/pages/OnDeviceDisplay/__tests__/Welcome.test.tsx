@@ -43,5 +43,8 @@ describe('Welcome', () => {
 
   it('should call mockPush when tapping Get started', () => {
     const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Get started' })
+    fireEvent.click(button)
+    expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 })
