@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
 import { useCalibrationTaskList } from '../useCalibrationTaskList'
@@ -23,6 +25,9 @@ import {
 } from '../__fixtures__/taskListFixtures'
 import { i18n } from '../../../../i18n'
 
+import type { Store } from 'redux'
+import type { State } from '../../../../redux/types'
+
 jest.mock('../')
 
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
@@ -44,9 +49,14 @@ const mockDeckCalLauncher = jest.fn()
 
 describe('useCalibrationTaskList hook', () => {
   let wrapper: React.FunctionComponent<{}>
+  let store: Store<State>
   beforeEach(() => {
+    store = createStore(jest.fn(), {})
+    store.dispatch = jest.fn()
     wrapper = ({ children }) => (
-      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
     )
   })
   afterEach(() => {
