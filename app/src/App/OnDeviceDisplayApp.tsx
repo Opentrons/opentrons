@@ -12,13 +12,14 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { BackButton } from '../atoms/buttons'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
+import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
 import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
-import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
+// import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
@@ -49,7 +50,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup',
   },
   {
-    Component: SelectWifiNetwork,
+    Component: ConnectViaWifi,
     exact: true,
     name: 'Select Network',
     path: '/network-setup/wifi',

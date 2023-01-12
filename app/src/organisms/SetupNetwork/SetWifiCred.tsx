@@ -59,15 +59,15 @@ interface SetWifiCredProps {
   ssid: string
   authType?: 'wpa' | 'none'
   setIsShowSetWifiCred: (isShow: boolean) => void
-  setRequiredRerender: (requiredRerender: boolean) => void
+  // setRequiredRerender: (requiredRerender: boolean) => void
 }
 
 export function SetWifiCred({
   ssid,
   authType = 'wpa',
   setIsShowSetWifiCred,
-  setRequiredRerender,
-}: SetWifiCredProps): JSX.Element {
+}: // setRequiredRerender,
+SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -134,7 +134,7 @@ export function SetWifiCred({
             alignItems={ALIGN_CENTER}
             marginBottom="3.0625rem"
           >
-            <Btn onClick={() => history.push('/network-setup/wifi')}>
+            <Btn onClick={() => setIsShowSetWifiCred(false)}>
               <Flex flexDirection={DIRECTION_ROW}>
                 <Icon
                   name="arrow-back"
