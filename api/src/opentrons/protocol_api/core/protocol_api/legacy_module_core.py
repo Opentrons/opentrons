@@ -89,7 +89,7 @@ class LegacyModuleCore(AbstractModuleCore):
 
     def get_display_name(self) -> str:
         """Get the module's display name."""
-        return f"{self.get_model()} on {self.get_deck_slot()}"
+        return self._geometry.display_name
 
     def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
         """Add a labware to the module."""
