@@ -10,21 +10,16 @@ from opentrons.hardware_control.ot3api import OT3API  # noqa: E402
 from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: E402
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.types import Point  # noqa: E402
-from opentrons_shared_data.deck import load as load_deck_def  # noqa: E402
+from opentrons_shared_data.deck import (  # noqa: E402
+    DefinitionName as DeckDefinitionName,
+    load as load_deck_def,
+)
 
 
 class InvalidInput(Exception):
     """Invalid input exception."""
 
     pass
-
-
-VERSION = 2.0
-MOUNT = OT3Mount.GRIPPER
-deck_def = load_deck_def("ot3_standard", version=3)
-# Offset of the center of the gripper jaw to the desired location
-GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
-AVAILABLE_SLOTS = [1, 3, 4, 9, 10, 12]
 
 
 class GripperState(enum.Enum):
@@ -36,7 +31,7 @@ class GripperState(enum.Enum):
 
 VERSION = 2.0
 MOUNT = OT3Mount.GRIPPER
-deck_def = load_deck_def("ot3_standard", version=3)
+deck_def = load_deck_def(DeckDefinitionName.OT3_STANDARD, version=3)
 # Offset of the center of the gripper jaw to the desired location
 GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
 AVAILABLE_SLOTS = [1, 3, 4, 9, 10, 12]
