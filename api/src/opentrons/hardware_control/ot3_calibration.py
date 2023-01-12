@@ -434,7 +434,7 @@ async def _calibrate_mount(
         center = Point(x_center, y_center, z_pos)
         LOG.info(f"Found calibration value {center} for mount {mount.name}")
 
-        return center - Point(*hcapi.config.calibration.edge_sense.nominal_center)
+        return Point(*hcapi.config.calibration.edge_sense.nominal_center) - center
 
     except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
         LOG.info(

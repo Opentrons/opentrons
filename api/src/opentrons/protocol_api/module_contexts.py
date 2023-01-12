@@ -91,7 +91,6 @@ class ModuleContext(CommandPublisher):
             )
         return self._core.get_serial_number()
 
-    # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """Specify the presence of a piece of labware on the module.

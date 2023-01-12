@@ -42,7 +42,7 @@ class TipCalibrationUserFlow:
         hardware: HardwareControlAPI,
         mount: Mount,
         has_calibration_block: bool,
-        tip_rack: LabwareDefinition,
+        tip_rack: Optional[LabwareDefinition] = None,
     ):
         self._hardware = hardware
         self._mount = mount
@@ -235,11 +235,16 @@ class TipCalibrationUserFlow:
             await self.return_tip()
         await self._hardware.home()
 
-    def _get_tip_rack_lw(self, tip_rack_def: LabwareDefinition) -> labware.Labware:
+    def _get_tip_rack_lw(
+        self, tip_rack_def: Optional[LabwareDefinition]
+    ) -> labware.Labware:
+        position = self._deck.position_for(TIP_RACK_SLOT)
+        if tip_rack_def is None:
+            pip_vol = self._hw_pipette.config.max_volume
+            tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
+            return labware.load(tr_load_name, position)
         try:
-            return labware.load_from_definition(
-                tip_rack_def, self._deck.position_for(TIP_RACK_SLOT)
-            )
+            return labware.load_from_definition(tip_rack_def, position)
         except Exception:
             raise RobotServerError(definition=CalibrationError.BAD_LABWARE_DEF)
 

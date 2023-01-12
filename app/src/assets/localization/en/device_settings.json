@@ -201,5 +201,7 @@
   "name_love_it": "{{name}}, love it!",
   "your_robot_is_ready_to_go": "Your robot is ready to go!",
   "finish_setup": "Finish setup",
-  "restarting_robot": "Restarting robot..."
+  "restarting_robot": "Restarting robot...",
+  "welcome_title": "Welcome to your OT-3!",
+  "welcome_description": "Quickly run protocols and check on your robot's status right on your lab bench."
 }
