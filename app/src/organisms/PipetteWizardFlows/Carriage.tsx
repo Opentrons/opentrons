@@ -13,7 +13,7 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
 import { FLOWS } from './constants'
-import { CheckZAxisButton } from './CheckZAxisButton'
+import { CheckZAxisButton } from './CheckZaxisButton'
 
 import type { PipetteWizardStepProps, ZAxisScrewStatus } from './types'
 

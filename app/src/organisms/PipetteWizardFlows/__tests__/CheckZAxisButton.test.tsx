@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { CheckZAxisButton } from '../CheckZAxisButton'
+import { CheckZAxisButton } from '../CheckZaxisButton'
 
 const render = (props: React.ComponentProps<typeof CheckZAxisButton>) => {
   return renderWithProviders(<CheckZAxisButton {...props} />)[0]
