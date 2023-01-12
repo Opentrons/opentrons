@@ -15,27 +15,30 @@ import { StyledText } from '../../atoms/text'
 import { ProgressBar } from '../../atoms/ProgressBar'
 
 interface UpdateSoftwareProps {
-  downloading?: boolean
-  validating?: boolean
-  sendingFile?: boolean
+  updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' | null
   processProgress: number
 }
 export function UpdateSoftware({
-  downloading = false,
-  validating = false,
-  sendingFile = false,
+  updateType,
   processProgress,
 }: UpdateSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const renderText = (): string => {
-    return downloading
-      ? t('downloading_software')
-      : validating
-      ? t('validating_software')
-      : sendingFile
-      ? t('sending_software')
-      : t('installing_software')
+  const renderText = (): string | null => {
+    switch (updateType) {
+      case 'downloading':
+        return t('downloading_software')
+      case 'validating':
+        return t('validating_software')
+      case 'sendingFile':
+        return t('sending_software')
+      case 'installing':
+        return t('installing_software')
+      default:
+        console.warn('Update software has an issue')
+        return null
+    }
   }
+
   return (
     <Flex
       backgroundColor={COLORS.darkGreyDisabled}

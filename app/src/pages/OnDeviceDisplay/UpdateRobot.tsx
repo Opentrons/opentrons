@@ -40,9 +40,8 @@ export function UpdateRobot(): JSX.Element {
     error: null,
   }
   const dispatch = useDispatch<Dispatch>()
-  const currentProgress = progress != null ? progress : 0
 
-  const renderUpdateProcess = (): JSX.Element | null => {
+  const softwareUpdateProcess = (): JSX.Element => {
     // Display Error screen
     if (sessionError != null) {
       return (
@@ -52,21 +51,33 @@ export function UpdateRobot(): JSX.Element {
         />
       )
     }
-
-    if (isDownloading && (step === 'restart' || step === 'restarting')) {
-      return <UpdateSoftware downloading processProgress={currentProgress} />
-    } else if (step === 'getToken' || step === 'uploadFile') {
-      return <UpdateSoftware sendingFile processProgress={currentProgress} />
-    } else if (step === 'processFile' || step === 'commitUpdate') {
-      if (stage === 'awaiting-file' || stage === 'validating') {
-        return <UpdateSoftware validating processProgress={currentProgress} />
-      } else {
-        return <UpdateSoftware processProgress={currentProgress} />
-      }
-    } else if (step === 'finished') {
+    let updateType:
+      | 'downloading'
+      | 'validating'
+      | 'sendingFile'
+      | 'installing'
+      | null = null
+    if (step === 'finished') {
       return <CompleteUpdateSoftware robotName={robotName} />
+    } else {
+      if (isDownloading && (step === 'restart' || step === 'restarting')) {
+        updateType = 'downloading'
+      } else if (step === 'getToken' || step === 'uploadFile') {
+        updateType = 'sendingFile'
+      } else if (step === 'processFile' || step === 'commitUpdate') {
+        if (stage === 'awaiting-file' || stage === 'validating') {
+          updateType = 'validating'
+        } else {
+          updateType = 'installing'
+        }
+      }
+      return (
+        <UpdateSoftware
+          updateType={updateType}
+          processProgress={progress != null ? progress : 0}
+        />
+      )
     }
-    return null
   }
 
   React.useEffect(() => {
@@ -97,7 +108,7 @@ export function UpdateRobot(): JSX.Element {
       ) : robotUpdateType !== 'upgrade' ? (
         <NoUpdateFound />
       ) : (
-        renderUpdateProcess()
+        softwareUpdateProcess()
       )}
     </Flex>
   )

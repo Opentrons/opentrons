@@ -13,14 +13,11 @@ describe('UpdateSoftware', () => {
   let props: React.ComponentProps<typeof UpdateSoftware>
   beforeEach(() => {
     props = {
+      updateType: 'downloading',
       processProgress: 50,
     }
   })
   it('should render text and progressbar - downloading software', () => {
-    props = {
-      ...props,
-      downloading: true,
-    }
     const [{ getByText, getByTestId }] = render(props)
     getByText('Downloading software...')
     const bar = getByTestId('ProgressBar_Bar')
@@ -31,7 +28,7 @@ describe('UpdateSoftware', () => {
     props = {
       ...props,
       processProgress: 20,
-      sendingFile: true,
+      updateType: 'sendingFile',
     }
     const [{ getByText, getByTestId }] = render(props)
     getByText('Sending software...')
@@ -42,7 +39,7 @@ describe('UpdateSoftware', () => {
     props = {
       ...props,
       processProgress: 80,
-      validating: true,
+      updateType: 'validating',
     }
     const [{ getByText, getByTestId }] = render(props)
     getByText('Validating software...')
@@ -53,6 +50,7 @@ describe('UpdateSoftware', () => {
     props = {
       ...props,
       processProgress: 5,
+      updateType: 'installing',
     }
     const [{ getByText, getByTestId }] = render(props)
     getByText('Installing software...')

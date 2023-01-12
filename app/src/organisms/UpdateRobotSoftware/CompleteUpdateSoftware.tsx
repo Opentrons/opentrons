@@ -12,9 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 import { ProgressBar } from '../../atoms/ProgressBar'
-import { restartRobot } from '../../redux/robot-admin'
 
 interface CompleteUpdateSoftwareProps {
   robotName: string
