@@ -516,6 +516,7 @@ class OT3API(
         else:
             checked_axes = [ax for ax in OT3Axis]
         await self._backend.update_motor_estimation(checked_axes)
+        await self.refresh_current_position_ot3()
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
