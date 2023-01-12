@@ -244,7 +244,7 @@ describe('PipetteWizardFlows', () => {
     })
     // second page
     getByText('Attach Calibration Probe')
-    getByRole('button', { name: 'Initiate calibration' }).click()
+    getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
     })
@@ -679,7 +679,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew and Remove 96 Channel Pipette')
+    getByText('Loosen Screws and Detach 96-Channel Pipette')
     getByLabelText('Exit').click()
     getByText('mock unskippable modal')
   })
@@ -725,7 +725,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew Z Axis Carriage')
+    getByText('Unscrew Z-axis Carriage')
     getByLabelText('Exit').click()
     getByText('mock unskippable modal')
   })
