@@ -27,13 +27,12 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
-from .core.protocol import LoadedLiquid
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 
 from . import validation
 from .deck import Deck
 from .instrument_context import InstrumentContext
-from .labware import Labware, Well
+from .labware import Labware
 from .module_contexts import (
     MagneticModuleContext,
     TemperatureModuleContext,
@@ -739,7 +738,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.set_rail_lights(on=on)
 
-    # TODO (tz, 12-19-22): Should the api version be 2.14?
+    # TODO (tz, 12-19-22): Should the api version be 2.14
     @requires_version(2, 13)
     def add_liquid(
         self, display_name: str, description: str, display_color: str
@@ -755,28 +754,6 @@ class ProtocolContext(CommandPublisher):
             display_name=display_name,
             description=description,
             display_color=display_color,
-        )
-
-    # TODO (tz, 12-19-22): Should the api version be 2.14?
-    @requires_version(2, 13)
-    def load_liquid(
-        self, labware: Labware, liquid: LoadedLiquid, volume_by_well: Dict[Well, float]
-    ) -> None:
-        """
-        Load a liquid into a labware.
-
-        :param labware: The loaded labware to load liquid into.
-        :param liquid: The loaded liquid to load into a well.
-        :param volume_by_well: A key value per representing the well and the volume of liquid to load into.
-        """
-        volume_by_well_core = {}
-        for well, volume in volume_by_well.items():
-            volume_by_well_core[well._impl.get_name()] = volume
-
-        self._implementation.load_liquid(
-            labware_core=labware._implementation,
-            liquid=liquid,
-            volume_by_well=volume_by_well_core,
         )
 
     @property  # type: ignore

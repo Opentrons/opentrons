@@ -391,7 +391,11 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         return list(self._module_cores_by_id.values())
 
     def add_liquid(
-        self, display_name: str, description: str, display_color: str
+        self,
+        labware_core: LabwareCore,
+        display_name: str,
+        description: str,
+        display_color: str,
     ) -> LoadedLiquid:
         """create a liquid to load into a labware."""
         model_utils = ModelUtils()
@@ -411,20 +415,4 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             display_color=loaded_liquid.displayColor.__root__
             if loaded_liquid.displayColor
             else None,
-        )
-
-    def load_liquid(
-        self,
-        labware_core: LabwareCore,
-        liquid: LoadedLiquid,
-        volume_by_well: Dict[str, float],
-    ) -> None:
-        """Load liquid into a labware."""
-        labware_id = labware_core.labware_id
-        liquid_id = liquid.id
-
-        self._engine_client.load_liquid(
-            labware_id=labware_id,
-            liquid_id=liquid_id,
-            volume_by_well=volume_by_well,
         )

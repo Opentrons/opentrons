@@ -2,9 +2,12 @@
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.types import Point
 
 from ..well import AbstractWellCore
+from ..protocol import LoadedLiquid
+from .labware import LabwareImplementation
 
 
 class WellImplementation(AbstractWellCore):
@@ -80,6 +83,17 @@ class WellImplementation(AbstractWellCore):
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
         return self._geometry.center()
+
+    def load_liquid(
+        self,
+        labware_core: LabwareImplementation,
+        liquid: LoadedLiquid,
+        volume: float,
+    ) -> None:
+        """Load liquid into a labware."""
+        raise UnsupportedAPIError(
+            "Creating a liquid is not supported in this API version."
+        )
 
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:

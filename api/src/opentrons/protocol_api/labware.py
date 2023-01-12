@@ -33,6 +33,7 @@ from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.protocol_api.labware import LabwareImplementation
+from .core.protocol import LoadedLiquid
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
@@ -208,6 +209,22 @@ class Well:
                  location in absolute deck coordinates
         """
         return self.geometry.from_center_cartesian(x, y, z)
+
+    # TODO (tz, 12-19-22): Should the api version be 2.14
+    @requires_version(2, 13)
+    def load_liquid(self, liquid: LoadedLiquid, volume: float) -> None:
+        """
+        Load a liquid into a labware.
+
+        :param liquid: The loaded liquid to load into a well.
+        :param volume: Volume of liquid to load into.
+        """
+
+        self._implementation.load_liquid(
+            labware_id=self.parent._implementation,
+            liquid=liquid,
+            volume=volume,
+        )
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """

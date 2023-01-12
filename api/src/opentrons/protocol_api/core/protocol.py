@@ -190,12 +190,3 @@ class AbstractProtocol(
         self, display_name: str, description: str, display_color: str
     ) -> LoadedLiquid:
         """Add a liquid to load into a labware."""
-
-    @abstractmethod
-    def load_liquid(
-        self,
-        labware_core: LabwareCoreType,
-        liquid: LoadedLiquid,
-        volume_by_well: Dict[str, float],
-    ) -> None:
-        """Load liquid into a labware."""

@@ -426,14 +426,3 @@ class ProtocolContextImplementation(
         raise UnsupportedAPIError(
             "Creating a liquid is not supported in this API version."
         )
-
-    def load_liquid(
-        self,
-        labware_core: LabwareImplementation,
-        liquid: LoadedLiquid,
-        volume_by_well: Dict[str, float],
-    ) -> None:
-        """Load liquid into a labware."""
-        raise UnsupportedAPIError(
-            "Creating a liquid is not supported in this API version."
-        )

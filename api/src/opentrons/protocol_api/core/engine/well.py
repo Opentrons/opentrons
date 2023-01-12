@@ -103,3 +103,18 @@ class WellCore(AbstractWellCore):
             labware_id=self.labware_id, well_name=self._name
         )
         return self.get_bottom(z_offset=well_height / 2)
+
+    def load_liquid(
+        self,
+        liquid: LoadedLiquid,
+        volume: float,
+    ) -> None:
+        """Load liquid into a labware."""
+        labware_id = self._engine_client.state.labware.labware_id
+        liquid_id = liquid.id
+
+        self._engine_client.load_liquid(
+            labware_id=labware_id,
+            liquid_id=liquid_id,
+            volume_by_well=volume_by_well,
+        )
