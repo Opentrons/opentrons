@@ -677,6 +677,7 @@ class OT3API(
     async def refresh_current_position_ot3(self) -> Dict[OT3Axis, float]:
         """Requests the current position and updates _current_position."""
         async with self._motion_lock:
+            await self._backend.update_motor_status()
             self._current_position = deck_from_machine(
                 await self._backend.update_position(),
                 self._transforms.deck_calibration.attitude,
