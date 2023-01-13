@@ -116,10 +116,6 @@ class ModuleGeometry:
         self._labware: Optional[Labware] = None
         self._location = Location(point=self._offset + self._parent.point, labware=self)
 
-    @property
-    def display_name(self) -> str:
-        return self._display_name
-
     def add_labware(self, labware: Labware) -> Labware:
         assert not self._labware, "{} is already on this module".format(self._labware)
         self._labware = labware
@@ -127,6 +123,10 @@ class ModuleGeometry:
 
     def reset_labware(self) -> None:
         self._labware = None
+
+    @property
+    def display_name(self) -> str:
+        return self._display_name
 
     @property
     def model(self) -> ModuleModel:
