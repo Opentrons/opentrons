@@ -169,7 +169,7 @@ class ModuleGeometry:
             return self._height
 
     def __repr__(self) -> str:
-        return f"{self._display_name} on {str(self.parent)}"
+        return f"{self._display_name}{' on '+str(self.parent) if self.parent else ''}"
 
 
 class ThermocyclerGeometry(ModuleGeometry):
