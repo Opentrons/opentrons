@@ -5,7 +5,9 @@ import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../i18n'
+import { ConnectViaEthernet } from '../../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
+import { ConnectViaWifi } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
 import { ConfirmRobotName } from '../../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
@@ -15,7 +17,9 @@ import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
 jest.mock('../../pages/OnDeviceDisplay/InitialSplash')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
+jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
+jest.mock('../../pages/OnDeviceDisplay/ConnectViaWifi')
 jest.mock('../../pages/OnDeviceDisplay/ConfirmRobotName')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 
@@ -25,8 +29,14 @@ const mockInitialSplash = InitialSplash as jest.MockedFunction<
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
   typeof NetworkSetupMenu
 >
+const mockConnectViaEthernet = ConnectViaEthernet as jest.MockedFunction<
+  typeof ConnectViaWifi
+>
 const mockConnectViaUSB = ConnectViaUSB as jest.MockedFunction<
   typeof ConnectViaUSB
+>
+const mockConnectViaWifi = ConnectViaWifi as jest.MockedFunction<
+  typeof ConnectViaWifi
 >
 const mockConfirmRobotName = ConfirmRobotName as jest.MockedFunction<
   typeof ConfirmRobotName
@@ -48,9 +58,10 @@ describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
     mockInitialSplash.mockReturnValue(<div>Mock InitialSplash</div>)
     mockNetworkSetupMenu.mockReturnValue(<div>Mock NetworkSetupMenu</div>)
+    mockConnectViaEthernet.mockReturnValue(<div>Mock ConnectViaEthernet</div>)
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
+    mockConnectViaWifi.mockReturnValue(<div>Mock ConnectViaWifi</div>)
     mockConfirmRobotName.mockReturnValue(<div>Mock ConfirmRobotName</div>)
-    // mockSelectWifiNetwork.mockReturnValue(<div>Mock SelectWifiNetwork</div>)
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
   })
   afterEach(() => {
@@ -67,15 +78,20 @@ describe('OnDeviceDisplayApp', () => {
     getByText('Mock NetworkSetupMenu')
   })
 
-  it('renders a ConnectViaUSB component from /network-setup', () => {
+  it('renders a ConnectViaEthernet component from /network-setup/ethernet', () => {
+    const [{ getByText }] = render('/network-setup/ethernet')
+    getByText('Mock ConnectViaEthernet')
+  })
+
+  it('renders a ConnectViaUSB component from /network-setup/usb', () => {
     const [{ getByText }] = render('/network-setup/usb')
     getByText('Mock ConnectViaUSB')
   })
 
-  // it('renders a SelectWifiNetwork component from /connect-via-wifi', () => {
-  //   const [{ getByText }] = render('/network-setup/wifi')
-  //   getByText('Mock SelectWifiNetwork')
-  // })
+  it('renders a ConnectViaWifi component from /network-setup/wifi', () => {
+    const [{ getByText }] = render('/network-setup/wifi')
+    getByText('Mock ConnectViaWifi')
+  })
 
   it('renders a RobotDashboard component from /dashboard', () => {
     const [{ getByText }] = render('/dashboard')

@@ -53,8 +53,10 @@ export function SelectAuthenticationType({
   const handleClickBack = (): void => {
     if (fromWifiList != null) {
       // back to wifi list
+      setIsShowSelectAuthenticationType(false)
     } else {
       // back to set wifi ssid
+      // Note: This will be updated by #11917
       console.log('go back to SetWifiSsid screen')
     }
   }

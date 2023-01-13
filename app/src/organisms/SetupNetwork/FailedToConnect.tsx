@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
 import {
@@ -37,7 +36,6 @@ export function FailedToConnect({
   setIsShowSetWifiCred,
 }: FailedToConnectProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
   const isInvalidPassword = !(type === DISCONNECT)
 
   const handleUpdate = (): void => {
@@ -45,7 +43,7 @@ export function FailedToConnect({
     setIsShowSetWifiCred(true)
   }
 
-  const handleClick = (): void => {
+  const handleClickTryAgain = (): void => {
     if (isInvalidPassword) {
       // Display SetWifiCred screen
       console.log('display SetWifiCred')
@@ -103,10 +101,10 @@ export function FailedToConnect({
             )}
         </Flex>
       </Flex>
-      <Flex gridRow="0.75rem">
+      <Flex gridGap="0.75rem">
         <SecondaryButton
           flex="1"
-          onClick={() => history.push('/network-setup/wifi')}
+          onClick={() => console.log('need to update to display Wifi list')}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           fontSize="1.5rem"
           lineHeight="1.375rem"
@@ -117,7 +115,7 @@ export function FailedToConnect({
         </SecondaryButton>
         <PrimaryButton
           flex="1"
-          onClick={handleClick}
+          onClick={handleClickTryAgain}
           fontSize="1.5rem"
           lineHeight="1.375rem"
           fontWeight="600"
