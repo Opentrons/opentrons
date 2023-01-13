@@ -41,7 +41,12 @@ class RobotClient:
     ) -> AsyncGenerator[RobotClient, None]:
         with concurrent.futures.ThreadPoolExecutor() as worker_executor:
             async with httpx.AsyncClient(
-                headers={"opentrons-version": version}
+                headers={"opentrons-version": version},
+                # Set the default timeout high enough for our heaviest requests
+                # (like fetching a large protocol analysis) to fit comfortably.
+                # If an individual test wants to shorten this timeout, it should wrap
+                # its request in anyio.fail_after().
+                timeout=30,
             ) as httpx_client:
                 yield RobotClient(
                     httpx_client=httpx_client,
