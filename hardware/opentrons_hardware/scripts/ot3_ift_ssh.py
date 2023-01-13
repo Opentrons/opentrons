@@ -35,11 +35,12 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-
+from opentrons_hardware.hardware_control.current_settings import set_currents
 from opentrons_hardware.drivers.gpio import OT3GPIO
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
+from typing import Dict, Tuple
 
 def getch():
     """
@@ -57,13 +58,15 @@ def getch():
         return ch
     return _getch()
 
-async def move_for_input(messenger: CanMessenger, node, position,xy) -> None:
+async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> None:
     step_size = [0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
     speed = 10
     res = {node: (0,0,0)}
+    current = 0.4
+    await set_pipette_current(current, args)
     try:
         if xy == "downward":
             pos = pos + step
@@ -73,9 +76,32 @@ async def move_for_input(messenger: CanMessenger, node, position,xy) -> None:
             pos = pos - step
             position['pipette'] = pos
             res = await move_to(messenger, node, step, -speed)
-        print("move=Pass")
+        mores = res[node][0]
+        encoder =res[node][1]
+        diff = float(mores) - float(encoder)
+        print("diff",diff)
+        try:
+            if abs(diff) < 1:
+                if xy == "downward":
+                    print("MOVEDOWN=Pass")
+                elif xy == "up":
+                    print("MOVEUP=Pass")
+            else:
+                if xy == "downward":
+                    print("MOVEDOWN=Failed")
+                elif xy == "up":
+                    print("MOVEUP=Failed")
+                
+        except:
+            if xy == "downward":
+                print("MOVEDOWN=Failed")
+            elif xy == "up":
+                print("MOVEUP=Failed")
     except Exception as err:
-        print("move=Failed")
+        if xy == "downward":
+            print("MOVEDOWN=Failed")
+        elif xy == "up":
+            print("MOVEUP=Failed")
 
 
 
@@ -152,8 +178,17 @@ async def _jog_axis(messenger: CanMessenger, node, position) -> None:
 def calc_time(distance, speed):
     time = abs(distance/speed)
     return time
+async def set_pipette_current(run_current,args) -> None:
 
-async def home(messenger, node):
+    currents: Dict[NodeId, Tuple[float, float]] = {}
+    currents[NodeId.pipette_left] = (float(0), float(run_current))
+
+    async with build.can_messenger(build_settings(args)) as messenger:
+        try:
+            await set_currents(messenger, currents)
+        except asyncio.CancelledError:
+            pass
+async def home(messenger, node, args):
     home_runner = MoveGroupRunner(
         move_groups=[
             [
@@ -164,11 +199,13 @@ async def home(messenger, node):
             ]
         ]
     )
+    current = 0.4
     try:
+        await set_pipette_current(current, args)
         await home_runner.run(can_messenger = messenger)
-        print("home=Pass")
+        print("MOVEHOME=Pass")
     except asyncio.TimeoutError:
-        print("home=Failed")
+        print("MOVEHOME=Failed")
 
 async def move_to(messenger: CanMessenger, node, distance, velocity):
     move_runner = MoveGroupRunner(
@@ -233,7 +270,7 @@ async def  run(args: argparse.Namespace) -> None:
     if args.home:
         #print('\n')
         #print('-------------------Test Homing--------------------------')
-        await home(messenger, node)
+        await home(messenger, node,args)
         #print('Homed')
 
     if args.jog:
@@ -252,14 +289,14 @@ async def  run(args: argparse.Namespace) -> None:
 
     if args.read_epprom:
         serial_number = await read_epprom(messenger, node)
-        print(f'SN={serial_number}')
+        print(f'READEPPROM={serial_number}')
     
     if args.downward:
-        res = await move_for_input(messenger, node,position,"downward")
+        res = await move_for_input(messenger, node,position,"downward",args)
         #print("move=Pass")
         #return res
     if args.up:
-        res = await move_for_input(messenger, node,position,"up")
+        res = await move_for_input(messenger, node,position,"up",args)
         #print("moveup=Pass")
         #return res
 
