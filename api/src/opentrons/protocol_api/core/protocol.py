@@ -181,4 +181,4 @@ class AbstractProtocol(
     def add_liquid(
         self, display_name: str, description: str, display_color: Optional[str]
     ) -> LoadedLiquid:
-        """Add a liquid to load into a labware."""
+        """Add a liquid to load into a well."""
