@@ -177,7 +177,9 @@ def test_load_liquid(
 
     decoy.verify(
         mock_engine_client.load_liquid(
-            labware_id="labware-id", liquid_id="liquid-id", volume_by_well={"well-name": 20}
+            labware_id="labware-id",
+            liquid_id="liquid-id",
+            volume_by_well={"well-name": 20},
         ),
         times=1,
     )

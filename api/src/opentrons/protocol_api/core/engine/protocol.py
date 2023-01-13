@@ -399,7 +399,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         self,
         display_name: str,
         description: str,
-        display_color: str,
+        display_color: Optional[str],
     ) -> LoadedLiquid:
         """create a liquid to load into a labware."""
         model_utils = ModelUtils()
@@ -408,7 +408,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
                 id=model_utils.generate_id(),
                 displayName=display_name,
                 description=description,
-                displayColor=HexColor(__root__=display_color),
+                displayColor=HexColor(__root__=display_color)
+                if display_color
+                else None,
             )
         )
 

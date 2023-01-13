@@ -748,7 +748,7 @@ class ProtocolContext(CommandPublisher):
     # TODO (tz, 12-19-22): Should the api version be 2.14
     @requires_version(2, 13)
     def add_liquid(
-        self, display_name: str, description: str, display_color: str
+        self, display_name: str, description: str, display_color: Optional[str]
     ) -> LoadedLiquid:
         """
         Add a liquid to the protocol.
