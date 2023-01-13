@@ -94,6 +94,8 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
+      # If building on one platform fails, keep building on other platforms.
+      fail-fast: false  
     name: 'opentrons app backend unit tests and build'
     needs: ['js-unit-test']
     runs-on: ${{ matrix.os }}
