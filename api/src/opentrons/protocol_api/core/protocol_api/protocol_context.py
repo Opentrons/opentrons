@@ -425,7 +425,7 @@ class ProtocolContextImplementation(
     def add_liquid(
         self, display_name: str, description: str, display_color: Optional[str]
     ) -> LoadedLiquid:
-        """Add a liquid to load on a labware."""
+        """Add a liquid to load into a well."""
         raise UnsupportedAPIError(
             "Creating a liquid is not supported in this API version."
         )
