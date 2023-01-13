@@ -263,6 +263,17 @@ class LegacyCommandMapper:
                     message=command["payload"]["userMessage"],
                 ),
             )
+        elif command["name"] == legacy_command_types.COMMENT:
+            engine_command = pe_commands.Comment.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.CommentParams.construct(
+                    message=command["payload"]["text"]
+                ),
+            )
         else:
             engine_command = pe_commands.Custom.construct(
                 id=command_id,
