@@ -21,7 +21,7 @@ describe('ExitModal', () => {
       flowType: FLOWS.CALIBRATE,
     }
   })
-  it('returns the correct information for exit modal for calibration flow ', () => {
+  it('returns the correct information for exit modal for calibration flow', () => {
     const { getByText, getByRole } = render(props)
     getByText('Pipette Calibration progress will be lost')
     getByText(
@@ -35,7 +35,7 @@ describe('ExitModal', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('returns the correct information for exit modal for attach flow ', () => {
+  it('returns the correct information for exit modal for attach flow', () => {
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -53,7 +53,7 @@ describe('ExitModal', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('returns the correct information for exit modal for detach flow ', () => {
+  it('returns the correct information for exit modal for detach flow', () => {
     props = {
       ...props,
       flowType: FLOWS.DETACH,

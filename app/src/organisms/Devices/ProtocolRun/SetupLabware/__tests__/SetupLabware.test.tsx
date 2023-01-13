@@ -5,14 +5,15 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import { useLPCSuccessToast } from '../../../../ProtocolSetup/hooks'
+import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
-import { getModuleTypesThatRequireExtraAttention } from '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
+import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   useFeatureFlag,
 } from '../../../../../redux/config'
 import {
+  useLPCDisabledReason,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
@@ -24,14 +25,12 @@ import { SetupLabware } from '..'
 
 jest.mock('../SetupLabwareList')
 jest.mock('../SetupLabwareMap')
-jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../../../LabwarePositionCheck')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-)
+jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../../RunTimeControl/hooks')
 jest.mock('../../../../../redux/config')
 jest.mock('../../../hooks')
+jest.mock('../../../hooks/useLPCSuccessToast')
 
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
@@ -66,7 +65,10 @@ const mockSetupLabwareList = SetupLabwareList as jest.MockedFunction<
 const mockSetupLabwareMap = SetupLabwareMap as jest.MockedFunction<
   typeof SetupLabwareMap
 >
-
+const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
+  typeof useLPCDisabledReason
+>
+const DISABLED_REASON = 'MOCK_DISABLED_REASON'
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
@@ -109,7 +111,7 @@ const render = () => {
   )[0]
 }
 
-describe('SetupLabwareMap', () => {
+describe('SetupLabware', () => {
   beforeEach(() => {
     when(mockGetModuleTypesThatRequireExtraAttention)
       .calledWith(expect.anything())
@@ -171,6 +173,7 @@ describe('SetupLabwareMap', () => {
     when(mockSetupLabwareList).mockReturnValue(
       <div> mock setup labware list</div>
     )
+    when(mockUseLPCDisabledReason).mockReturnValue(null)
   })
 
   afterEach(() => {
@@ -191,14 +194,14 @@ describe('SetupLabwareMap', () => {
   )
   it('should render LPC button and clicking should launch modal', () => {
     const { getByRole, getByText } = render()
-    const button = getByRole('button', {
+    getByRole('button', {
       name: 'run labware position check',
-    })
-    fireEvent.click(button)
+    }).click()
     getByText('mock Labware Position Check')
   })
   it('should render a disabled LPC button when a run has started', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     const { getByRole, queryByText } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -226,6 +229,7 @@ describe('SetupLabwareMap', () => {
       .mockReturnValue({
         protocolData: null,
       } as any)
+    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     const { getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -238,6 +242,7 @@ describe('SetupLabwareMap', () => {
       .mockReturnValue({
         protocolData: { labware: {}, pipettes: {} },
       } as any)
+    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     const { getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -250,6 +255,7 @@ describe('SetupLabwareMap', () => {
       .mockReturnValue({
         complete: false,
       })
+    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     const { getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -263,6 +269,7 @@ describe('SetupLabwareMap', () => {
         missingModuleIds: ['temperatureModuleV1'],
         remainingAttachedModules: [],
       })
+    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     const { getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -281,6 +288,7 @@ describe('SetupLabwareMap', () => {
         missingModuleIds: ['temperatureModuleV1'],
         remainingAttachedModules: [],
       })
+    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     const { getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -310,6 +318,7 @@ describe('SetupLabwareMap', () => {
           },
         },
       } as any)
+    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     const { getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -340,6 +349,7 @@ describe('SetupLabwareMap', () => {
           commands: [],
         },
       } as any)
+    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     const { getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',

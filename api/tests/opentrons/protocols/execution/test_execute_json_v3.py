@@ -1,6 +1,6 @@
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.well import WellImplementation
+from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
 
 from unittest import mock
 from copy import deepcopy
@@ -459,6 +459,7 @@ def test_dispatch_json_invalid_command():
         )
 
 
+@pytest.mark.ot2_only
 def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture("3", "testAllAtomicSingleV3", False)
     protocol = parse(protocol_data, None)

@@ -47,24 +47,26 @@ describe('DetachPipette', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
+      isPending: false,
+      setPending: jest.fn(),
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Loosen Screws and Detach')
+    const { getByText, getByAltText, getByLabelText } = render(props)
+    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3')
     getByText(
-      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette'
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
     getByAltText('Detach pipette')
     getByText('mock check pipette button')
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -79,20 +81,60 @@ describe('DetachPipette', () => {
   it('returns the correct information, buttons work as expected for 96 channel pipettes', () => {
     props = {
       ...props,
+      flowType: FLOWS.ATTACH,
       selectedPipette: NINETY_SIX_CHANNEL,
+      attachedPipettes: {
+        left: {
+          id: 'abc',
+          name: 'p1000_96',
+          model: 'p1000_96_v1',
+          tip_length: 42,
+          mount_axis: 'c',
+          plunger_axis: 'd',
+          modelSpecs: mockGen3P1000PipetteSpecs,
+        },
+        right: null,
+      },
     }
-    const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Unscrew and Remove 96 Channel Pipette')
+    const { getByText, getByAltText, getByLabelText } = render(props)
+    getByText('Loosen Screws and Detach 96-Channel Pipette')
     getByText(
-      'Place your hand onto the pipette so it does not fall. Begin by unscrewing the 4 captive screws found in the front of the 96 channel pipette. Once all the screws are lossened, proceed to slowly remove the pipette by sliding off the supporting pins.'
+      'Hold the pipette so it does not fall. Then loosen the four captive screws on the front of the pipette. Once all the screws are loosened, slowly remove the pipette by sliding it towards the front of the robot, off the supporting pins.'
     )
     getByText(
-      'The pipette is heavy so be cautious during uninstall. Having a helper near can be really helpful during this process.'
+      'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
     )
     getByAltText('Unscrew 96 channel pipette')
     getByText('mock check pipette button')
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
+    expect(props.goBack).toHaveBeenCalled()
+  })
+  it('returns skeletons and disabled buttons when isPending is true', () => {
+    props = {
+      ...props,
+      selectedPipette: NINETY_SIX_CHANNEL,
+      isPending: true,
+    }
+    const { getAllByTestId, getByLabelText } = render(props)
+    getAllByTestId('Skeleton')
+    const backBtn = getByLabelText('back')
+    expect(backBtn).toBeDisabled()
+  })
+  it('returns the correct information, buttons work as expected for 96 channel pipette flow when single mount is attached', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    const { getByText, getByAltText, getByLabelText } = render(props)
+    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3')
+    getByText(
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
+    )
+    getByAltText('Detach pipette')
+    getByText('mock check pipette button')
+    getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
   })
 })

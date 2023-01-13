@@ -54,6 +54,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     TEST_VIAL_LIQUID = args.test_vial_liquid
-    _ctx = helpers.get_api_context(metadata["apiLevel"], is_simulating=args.simulate)
+    _ctx = helpers.get_api_context(
+        metadata["apiLevel"], is_simulating=args.simulate, machine="ot2"
+    )
     _ctx.home()
     _run(_ctx)

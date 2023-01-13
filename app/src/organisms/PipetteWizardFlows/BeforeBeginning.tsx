@@ -4,6 +4,7 @@ import { COLORS } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
+  WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
@@ -20,9 +21,10 @@ import {
   NINETY_SIX_CHANNEL_PIPETTE,
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
 } from './constants'
+import { getIsGantryEmpty } from './utils'
+import type { AxiosError } from 'axios'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
-import type { AxiosError } from 'axios'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
@@ -36,7 +38,7 @@ export const BeforeBeginning = (
     proceed,
     flowType,
     createRun,
-    attachedPipette,
+    attachedPipettes,
     chainRunCommands,
     isCreateLoading,
     mount,
@@ -49,8 +51,13 @@ export const BeforeBeginning = (
   React.useEffect(() => {
     createRun({})
   }, [])
+  const pipetteId = attachedPipettes[mount]?.id
 
-  const pipetteId = attachedPipette[mount]?.id
+  const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
+  const isGantryEmptyFor96ChannelAttachment =
+    isGantryEmpty &&
+    selectedPipette === NINETY_SIX_CHANNEL &&
+    flowType === FLOWS.ATTACH
 
   if (
     pipetteId == null &&
@@ -84,11 +91,7 @@ export const BeforeBeginning = (
     }
     case FLOWS.DETACH: {
       bodyText = t('get_started_detach')
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        equipmentList = [HEX_SCREWDRIVER]
-      } else {
-        equipmentList = [HEX_SCREWDRIVER, CALIBRATION_PROBE]
-      }
+      equipmentList = [HEX_SCREWDRIVER]
       break
     }
   }
@@ -103,7 +106,7 @@ export const BeforeBeginning = (
           commandType: 'loadPipette' as const,
           params: {
             // @ts-expect-error pipetteName is required but missing in schema v6 type
-            pipetteName: attachedPipette[mount]?.name,
+            pipetteName: attachedPipettes[mount]?.name,
             pipetteId: pipetteId,
             mount: mount,
           },
@@ -171,14 +174,17 @@ export const BeforeBeginning = (
           />
           {selectedPipette === NINETY_SIX_CHANNEL &&
           (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
-            <Banner type="warning">{t('pipette_heavy')}</Banner>
+            <Banner type="warning">
+              {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+            </Banner>
           ) : null}
         </>
       }
       proceedButtonText={proceedButtonText}
       proceedIsDisabled={isCreateLoading}
       proceed={
-        flowType === FLOWS.ATTACH
+        isGantryEmptyFor96ChannelAttachment ||
+        (flowType === FLOWS.ATTACH && selectedPipette === SINGLE_MOUNT_PIPETTES)
           ? handleOnClickAttach
           : handleOnClickCalibrateOrDetach
       }

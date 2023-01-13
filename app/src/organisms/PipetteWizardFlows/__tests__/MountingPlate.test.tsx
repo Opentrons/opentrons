@@ -36,7 +36,7 @@ describe('MountingPlate', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -45,19 +45,16 @@ describe('MountingPlate', () => {
     }
   })
   it('returns the correct information, buttons work as expected for attach flow', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Connect and Attach Mounting Plate')
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    getByText('Attach Mounting Plate')
     getByText(
-      'Hold onto the pipette so it does not fall. Attach the monting plate to the robot by alinging the pins on the mounting plate to the slots on the z axis carriage.'
-    )
-    getByText(
-      'You may need to adjust the z axis to align the left and right channels for propper fitment.'
+      'Attach the mounting plate by aligning the pins on the plate to the slots on the gantry carriage. You may need to adjust the position of the right pipette mount to achieve proper alignment.'
     )
     getByAltText('Attach mounting plate')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -67,16 +64,16 @@ describe('MountingPlate', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Unscrew and Dettach Mounting Plate')
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    getByText('Loosen Screws and Detach Mounting Plate')
     getByText(
-      'Hold onto the pipette so it does not fall. Dettach the monting plate to the robot by removing the pins on the plate from the slots on the gantry carriage'
+      'Hold onto the plate so it does not fall. Then remove the pins on the plate from the slots on the gantry carriage.'
     )
     getByAltText('Detach mounting plate')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })

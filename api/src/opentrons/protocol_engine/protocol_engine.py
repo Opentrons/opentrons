@@ -300,6 +300,7 @@ class ProtocolEngine:
     # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command
     # as a quick hack to support Python protocols. We should consider making this a
     # command, or adding speed parameters to existing commands.
+    # https://opentrons.atlassian.net/browse/RCORE-373
     def set_pipette_movement_speed(
         self, pipette_id: str, speed: Optional[float]
     ) -> None:

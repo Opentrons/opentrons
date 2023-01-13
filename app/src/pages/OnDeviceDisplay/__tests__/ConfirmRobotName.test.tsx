@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -61,10 +61,12 @@ const mockRobot = {
   serverHealthStatus: null,
 } as any
 
-const render = () => {
+const render = (path = '/') => {
   return renderWithProviders(
-    <MemoryRouter>
-      <ConfirmRobotName />
+    <MemoryRouter initialEntries={[path]} initialIndex={0}>
+      <Route path="/network-setup/confirm-name/:robotName">
+        <ConfirmRobotName />
+      </Route>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -83,14 +85,16 @@ describe('ConfirmRobotName', () => {
   })
 
   it('should render text, an image and a button', () => {
-    const [{ getByText, getByRole }] = render()
+    const [{ getByText, getByRole }] = render(
+      '/network-setup/confirm-name/oddtie'
+    )
     getByText('oddtie, love it!')
     getByText('Your robot is ready to go!')
     getByRole('button', { name: 'Finish setup' })
   })
 
   it('when tapping a button, call a mock function', () => {
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render('/network-setup/confirm-name/oddtie')
     const button = getByRole('button', { name: 'Finish setup' })
     fireEvent.click(button)
     expect(mockPush).toBeCalledWith('/dashboard')

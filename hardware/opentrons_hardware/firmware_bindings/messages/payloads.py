@@ -23,6 +23,7 @@ from .fields import (
     SensorThresholdModeField,
     PipetteTipActionTypeField,
     MotorPositionFlagsField,
+    MoveStopConditionField,
 )
 from .. import utils
 
@@ -145,7 +146,7 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 
     acceleration: utils.Int32Field
     velocity: utils.Int32Field
-    request_stop_condition: utils.UInt8Field
+    request_stop_condition: MoveStopConditionField
 
 
 @dataclass(eq=False)
@@ -453,6 +454,14 @@ class BrushedMotorPwmPayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class BrushedMotorConfPayload(EmptyPayload):
+    """A response carrying data about a brushed motor driver."""
+
+    v_ref: utils.UInt32Field
+    duty_cycle: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class GripperInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached gripper."""
 
@@ -474,7 +483,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
 
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
-    request_stop_condition: utils.UInt8Field
+    request_stop_condition: MoveStopConditionField
 
 
 @dataclass(eq=False)

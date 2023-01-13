@@ -12,7 +12,6 @@ from opentrons.hardware_control.modules import AbstractModule, ModuleModel, Modu
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
-from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
@@ -20,7 +19,7 @@ from ...liquid import LoadedLiquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
-from . import legacy_module_core
+from . import legacy_module_core, module_geometry
 from .deck import Deck
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider
@@ -45,7 +44,6 @@ class ProtocolContextImplementation(
         equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
         deck_layout: Optional[Deck] = None,
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
-        bundled_data: Optional[Dict[str, bytes]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContextImplementation`.
@@ -80,7 +78,6 @@ class ProtocolContextImplementation(
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
-        self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
@@ -104,12 +101,6 @@ class ProtocolContextImplementation(
         Calling code may only subscribe or unsubscribe.
         """
         return self._equipment_broker
-
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Extra bundled data."""
-        # TODO AL 20201110 - This should be removed along with the bundling
-        #  feature as we move to HTTP based protocol execution.
-        return self._bundled_data
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
         """Bundled labware definition."""
@@ -137,7 +128,7 @@ class ProtocolContextImplementation(
         self,
         definition: LabwareDefinition,
     ) -> LabwareLoadParams:
-        """Add a labware defintion to the set of loadable definitions."""
+        """Add a labware definition to the set of loadable definitions."""
         load_params = LabwareLoadParams(
             namespace=definition["namespace"],
             load_name=definition["parameters"]["loadName"],
@@ -399,6 +390,17 @@ class ProtocolContextImplementation(
     def get_labware_cores(self) -> List[LabwareImplementation]:
         """Get all loaded labware cores."""
         return self._labware_cores
+
+    def get_labware_on_module(
+        self, module_core: legacy_module_core.LegacyModuleCore
+    ) -> Optional[LabwareImplementation]:
+        """Get the item on top of a given module, if any."""
+        labware = module_core.geometry.labware
+        return (
+            cast(LabwareImplementation, labware._implementation)
+            if labware is not None
+            else None
+        )
 
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""

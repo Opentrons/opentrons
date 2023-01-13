@@ -10,7 +10,9 @@ from opentrons.hardware_control.modules import Thermocycler, TemperatureStatus
 from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
 )
-from opentrons.protocols.geometry.module_geometry import ThermocyclerGeometry
+from opentrons.protocol_api.core.protocol_api.module_geometry import (
+    ThermocyclerGeometry,
+)
 
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.protocol_api.protocol_context import (

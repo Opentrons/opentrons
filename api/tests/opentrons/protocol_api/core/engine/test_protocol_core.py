@@ -38,6 +38,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import Liquid, HexColor
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import (
@@ -259,7 +260,6 @@ def test_move_labware(
     decoy: Decoy,
     subject: ProtocolCore,
     mock_engine_client: EngineClient,
-    api_version: APIVersion,
     expected_strategy: LabwareMovementStrategy,
     use_gripper: bool,
     use_pick_up_location_lpc_offset: bool,
@@ -327,14 +327,16 @@ def test_load_labware_on_module(
         LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
     )
 
+    module_core = ModuleCore(
+        module_id="module-id",
+        engine_client=mock_engine_client,
+        api_version=api_version,
+        sync_module_hardware=mock_sync_module_hardware,
+    )
+
     result = subject.load_labware(
         load_name="some_labware",
-        location=ModuleCore(
-            module_id="module-id",
-            engine_client=mock_engine_client,
-            api_version=api_version,
-            sync_module_hardware=mock_sync_module_hardware,
-        ),
+        location=module_core,
         label="some_display_name",  # maps to optional display name
         namespace="some_explicit_namespace",
         version=9001,
@@ -343,6 +345,12 @@ def test_load_labware_on_module(
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
 
+    decoy.when(
+        mock_engine_client.state.labware.get_id_by_module("module-id")
+    ).then_return("abc123")
+
+    assert subject.get_labware_on_module(module_core) is result
+
 
 def test_add_labware_definition(
     decoy: Decoy,
@@ -350,7 +358,7 @@ def test_add_labware_definition(
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
 ) -> None:
-    """It should add a laware definition to the engine."""
+    """It should add a labware definition to the engine."""
     decoy.when(
         mock_engine_client.add_labware_definition(
             definition=LabwareDefinition.parse_obj(minimal_labware_def)
@@ -457,8 +465,12 @@ def test_load_module(
     ).then_return(
         LoadedModule.construct(id="abc123")  # type: ignore[call-arg]
     )
+    decoy.when(mock_engine_client.state.labware.get_id_by_module("abc123")).then_raise(
+        LabwareNotLoadedOnModuleError("oh no")
+    )
 
     assert subject.get_slot_item(DeckSlotName.SLOT_1) is result
+    assert subject.get_labware_on_module(result) is None
 
 
 @pytest.mark.parametrize(
@@ -524,10 +536,7 @@ def test_load_module_thermocycler_with_no_location(
     ],
 )
 def test_load_module_no_location(
-    decoy: Decoy,
-    mock_engine_client: EngineClient,
-    requested_model: ModuleModel,
-    subject: ProtocolCore,
+    requested_model: ModuleModel, subject: ProtocolCore
 ) -> None:
     """Should raise an InvalidModuleLocationError exception."""
     with pytest.raises(InvalidModuleLocationError):

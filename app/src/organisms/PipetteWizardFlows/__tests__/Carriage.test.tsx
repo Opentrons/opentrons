@@ -36,7 +36,7 @@ describe('Carriage', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -45,19 +45,16 @@ describe('Carriage', () => {
     }
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Unscrew Z Axis Carriage')
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    getByText('Unscrew Z-axis Carriage')
     getByText(
-      'Reach the top of of the gantry carriage and unscrew the captive screw connecting right pippete mount to the the z axis.'
-    )
-    getByText(
-      'The detached right mount should freely move up and down the z axis.'
+      'Loosen the captive screw on the top right of the gantry carriage. This will release the right pipette mount, which should then freely move up and down.'
     )
     getByAltText('Unscrew gantry')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -66,19 +63,19 @@ describe('Carriage', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Reattach Z Axis Carriage')
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    getByText('Reattach Z-axis Carriage')
     getByText(
-      'Take the right carriage and push it to the top of the z axis. Reach the top of of the gantry carriage and screw in the captive screw to connect right pippete mount to the the z axis.'
+      'Push the right pipette mount up to the top of the z-axis. Then tighten the captive screw at the top right of the gantry carriage.'
     )
     getByText(
-      'The detached right mount should freely move up and down the z axis.'
+      'When reattached, the right mount should no longer freely move up and down.'
     )
     getByAltText('Reattach carriage')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })

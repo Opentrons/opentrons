@@ -36,6 +36,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import Liquid, HexColor
 from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
 from ...liquid import LoadedLiquid
 from ..protocol import AbstractProtocol
@@ -96,13 +97,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_id=trash_id,
             engine_client=self._engine_client,
         )
-
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Get a map of file names to byte contents.
-
-        Deprecated method for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_data not implemented")
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
         """Get a map of labware names to definition dicts.
@@ -374,6 +368,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             return self._module_cores_by_id[loaded_item.id]
 
         return None
+
+    def get_labware_on_module(self, module_core: ModuleCore) -> Optional[LabwareCore]:
+        """Get the item on top of a given module, if any."""
+        try:
+            labware_id = self._engine_client.state.labware.get_id_by_module(
+                module_core.module_id
+            )
+            return self._labware_cores_by_id[labware_id]
+        except LabwareNotLoadedOnModuleError:
+            return None
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""

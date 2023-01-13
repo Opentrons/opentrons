@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Union, Tuple, cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -319,6 +319,30 @@ class LabwareView(HasState[LabwareState]):
             raise errors.WellDoesNotExistError(
                 f"{well_name} does not exist in {labware_id}."
             ) from e
+
+    def get_well_size(
+        self, labware_id: str, well_name: str
+    ) -> Tuple[float, float, float]:
+        """Get a well's size in x, y, z dimensions based on its shape.
+
+        Args:
+            labware_id: Labware identifier.
+            well_name: Name of well in labware.
+
+        Returns:
+            A tuple of dimensions in x, y, and z. If well is circular,
+            the x and y dimensions will both be set to the diameter.
+        """
+        well_definition = self.get_well_definition(labware_id, well_name)
+
+        if well_definition.diameter is not None:
+            x_size = y_size = well_definition.diameter
+        else:
+            # If diameter is None we know these values will be floats
+            x_size = cast(float, well_definition.xDimension)
+            y_size = cast(float, well_definition.yDimension)
+
+        return x_size, y_size, well_definition.depth
 
     def validate_liquid_allowed_in_labware(
         self, labware_id: str, wells: Mapping[str, Any]

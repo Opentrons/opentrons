@@ -1,197 +1,384 @@
 import pytest
+from mock import patch
+from typing import Union, Callable
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Point, Mount
-from opentrons.hardware_control.instruments.ot2 import pipette, instrument_calibration
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from opentrons.hardware_control.instruments.ot2 import (
+    pipette as ot2_pipette,
+    instrument_calibration,
+)
+from opentrons.hardware_control.instruments.ot3 import (
+    pipette as ot3_pipette,
+    instrument_calibration as ot3_calibration,
+)
 from opentrons.hardware_control import types
-from opentrons.config import pipette_config
+from opentrons.config import pipette_config, ot3_pipette_config
 
-PIP_CAL = instrument_calibration.PipetteOffsetByPipetteMount(
+OT2_PIP_CAL = instrument_calibration.PipetteOffsetByPipetteMount(
+    offset=Point(0, 0, 0),
+    source=cal_types.SourceType.user,
+    status=cal_types.CalibrationStatus(),
+)
+
+OT3_PIP_CAL = ot3_calibration.PipetteOffsetByPipetteMount(
     offset=Point(0, 0, 0),
     source=cal_types.SourceType.user,
     status=cal_types.CalibrationStatus(),
 )
 
 
-def test_tip_tracking():
-    pip = pipette.Pipette(pipette_config.load("p10_single_v1"), PIP_CAL, "testID")
+@pytest.fixture
+def hardware_pipette_ot2() -> Callable:
+    def _create_pipette(
+        model: str,
+        calibration: instrument_calibration.PipetteOffsetByPipetteMount = OT2_PIP_CAL,
+        id: str = "testID",
+    ):
+        return ot2_pipette.Pipette(pipette_config.load(model), calibration, id)
+
+    return _create_pipette
+
+
+@pytest.fixture
+def hardware_pipette_ot3() -> Callable:
+    def _create_pipette(
+        model: ot3_pipette_config.PipetteModelVersionType,
+        calibration: ot3_calibration.PipetteOffsetByPipetteMount = OT3_PIP_CAL,
+        id: str = "testID",
+    ):
+        return ot3_pipette.Pipette(
+            ot3_pipette_config.load_ot3_pipette(model), calibration, id
+        )
+
+    return _create_pipette
+
+
+@pytest.mark.parametrize(
+    argnames=["pipette_builder", "model"],
+    argvalues=[
+        [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1"],
+        [
+            lazy_fixture("hardware_pipette_ot3"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+        ],
+    ],
+)
+def test_tip_tracking(
+    pipette_builder: Callable,
+    model: Union[str, ot3_pipette_config.PipetteModelVersionType],
+) -> None:
+    hw_pipette = pipette_builder(model)
     with pytest.raises(AssertionError):
-        pip.remove_tip()
-    assert not pip.has_tip
+        hw_pipette.remove_tip()
+    assert not hw_pipette.has_tip
     tip_length = 25.0
-    pip.add_tip(tip_length)
-    assert pip.has_tip
+    hw_pipette.add_tip(tip_length)
+    assert hw_pipette.has_tip
     with pytest.raises(AssertionError):
-        pip.add_tip(tip_length)
-    pip.remove_tip()
-    assert not pip.has_tip
+        hw_pipette.add_tip(tip_length)
+    hw_pipette.remove_tip()
+    assert not hw_pipette.has_tip
     with pytest.raises(AssertionError):
-        pip.remove_tip()
+        hw_pipette.remove_tip()
 
 
-@pytest.mark.parametrize("model", pipette_config.config_models)
-def test_critical_points_nozzle_offset(model):
-    loaded = pipette_config.load(model)
-    pip = pipette.Pipette(loaded, PIP_CAL, "testID")
+@pytest.mark.parametrize(
+    argnames=["pipette_builder", "model", "nozzle_offset"],
+    argvalues=[
+        [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1", Point(0, 0, 12.0)],
+        [
+            lazy_fixture("hardware_pipette_ot3"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            Point(-8.0, -22.0, -259.15),
+        ],
+    ],
+)
+def test_tip_nozzle_position_tracking(
+    pipette_builder: Callable,
+    model: Union[str, ot3_pipette_config.PipetteModelVersionType],
+    nozzle_offset: Point,
+) -> None:
+    hw_pipette = pipette_builder(model)
     # default pipette offset is[0, 0, 0], only nozzle offset would be used
     # to determine critical point
-    nozzle_offset = Point(*loaded.nozzle_offset)
-    assert pip.critical_point() == nozzle_offset
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
-    assert pip.critical_point(types.CriticalPoint.TIP) == nozzle_offset
+    assert hw_pipette.critical_point() == nozzle_offset
+    assert hw_pipette.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert hw_pipette.critical_point(types.CriticalPoint.TIP) == nozzle_offset
     tip_length = 25.0
-    pip.add_tip(tip_length)
+    hw_pipette.add_tip(tip_length)
     new = nozzle_offset._replace(z=nozzle_offset.z - tip_length)
-    assert pip.critical_point() == new
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
-    assert pip.critical_point(types.CriticalPoint.TIP) == new
-    pip.remove_tip()
-    assert pip.critical_point() == nozzle_offset
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
-    assert pip.critical_point(types.CriticalPoint.TIP) == nozzle_offset
+    assert hw_pipette.critical_point() == new
+    assert hw_pipette.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert hw_pipette.critical_point(types.CriticalPoint.TIP) == new
+    hw_pipette.remove_tip()
+    assert hw_pipette.critical_point() == nozzle_offset
+    assert hw_pipette.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert hw_pipette.critical_point(types.CriticalPoint.TIP) == nozzle_offset
 
 
-@pytest.mark.parametrize("model", pipette_config.config_models)
-def test_critical_points_pipette_offset(model):
-    loaded = pipette_config.load(model)
-    # set pipette offset calibration
-    pip_cal = instrument_calibration.PipetteOffsetByPipetteMount(
-        offset=[10, 10, 10],
-        source=cal_types.SourceType.user,
-        status=cal_types.CalibrationStatus(),
-    )
-    pip = pipette.Pipette(loaded, pip_cal, "testID")
+@pytest.mark.parametrize(
+    argnames=["pipette_builder", "model", "calibration"],
+    argvalues=[
+        [
+            lazy_fixture("hardware_pipette_ot2"),
+            "p10_single_v1",
+            instrument_calibration.PipetteOffsetByPipetteMount(
+                offset=Point(10, 10, 10),
+                source=cal_types.SourceType.user,
+                status=cal_types.CalibrationStatus(),
+            ),
+        ],
+        [
+            lazy_fixture("hardware_pipette_ot3"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_calibration.PipetteOffsetByPipetteMount(
+                offset=Point(10, 10, 10),
+                source=cal_types.SourceType.user,
+                status=cal_types.CalibrationStatus(),
+            ),
+        ],
+    ],
+)
+def test_critical_points_pipette_offset(
+    pipette_builder: Callable,
+    model: Union[str, ot3_pipette_config.PipetteModelVersionType],
+    calibration: Union[
+        instrument_calibration.PipetteOffsetByPipetteMount,
+        ot3_calibration.PipetteOffsetByPipetteMount,
+    ],
+) -> None:
+
+    hw_pipette = pipette_builder(model, calibration)
     # pipette offset + nozzle offset to determine critical point
-    offsets = Point(*pip_cal.offset) + Point(*pip.nozzle_offset)
-    assert pip.critical_point() == offsets
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == offsets
-    assert pip.critical_point(types.CriticalPoint.TIP) == offsets
+    offsets = calibration.offset + Point(*hw_pipette.nozzle_offset)
+    assert hw_pipette.critical_point() == offsets
+    assert hw_pipette.critical_point(types.CriticalPoint.NOZZLE) == offsets
+    assert hw_pipette.critical_point(types.CriticalPoint.TIP) == offsets
     tip_length = 25.0
-    pip.add_tip(tip_length)
+    hw_pipette.add_tip(tip_length)
     new = offsets._replace(z=offsets.z - tip_length)
-    assert pip.critical_point() == new
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == offsets
-    assert pip.critical_point(types.CriticalPoint.TIP) == new
-    pip.remove_tip()
-    assert pip.critical_point() == offsets
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == offsets
-    assert pip.critical_point(types.CriticalPoint.TIP) == offsets
+    assert hw_pipette.critical_point() == new
+    assert hw_pipette.critical_point(types.CriticalPoint.NOZZLE) == offsets
+    assert hw_pipette.critical_point(types.CriticalPoint.TIP) == new
+    hw_pipette.remove_tip()
+    assert hw_pipette.critical_point() == offsets
+    assert hw_pipette.critical_point(types.CriticalPoint.NOZZLE) == offsets
+    assert hw_pipette.critical_point(types.CriticalPoint.TIP) == offsets
 
 
-@pytest.mark.parametrize("config_model", pipette_config.config_models)
-def test_volume_tracking(config_model):
-    loaded = pipette_config.load(config_model)
-    pip = pipette.Pipette(loaded, PIP_CAL, "testID")
-    assert pip.current_volume == 0.0
-    assert pip.available_volume == loaded.max_volume
-    assert pip.ok_to_add_volume(loaded.max_volume - 0.1)
-    pip.set_current_volume(0.1)
+@pytest.mark.parametrize(
+    argnames=["pipette_builder", "model", "max_volume"],
+    argvalues=[
+        [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1", 10.0],
+        [
+            lazy_fixture("hardware_pipette_ot3"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            1000.0,
+        ],
+    ],
+)
+def test_volume_tracking(
+    pipette_builder: Callable,
+    model: Union[str, ot3_pipette_config.PipetteModelVersionType],
+    max_volume: float,
+) -> None:
+    hw_pipette = pipette_builder(model)
+    assert hw_pipette.current_volume == 0.0
+    assert hw_pipette.available_volume == max_volume
+    assert hw_pipette.ok_to_add_volume(max_volume - 0.1)
+    hw_pipette.set_current_volume(0.1)
     with pytest.raises(AssertionError):
-        pip.set_current_volume(loaded.max_volume + 0.1)
+        hw_pipette.set_current_volume(max_volume + 0.1)
     with pytest.raises(AssertionError):
-        pip.set_current_volume(-1)
-    assert pip.current_volume == 0.1
-    pip.remove_current_volume(0.1)
+        hw_pipette.set_current_volume(-1)
+    assert hw_pipette.current_volume == 0.1
+    hw_pipette.remove_current_volume(0.1)
     with pytest.raises(AssertionError):
-        pip.remove_current_volume(0.1)
-    assert pip.current_volume == 0.0
-    pip.set_current_volume(loaded.max_volume)
-    assert not pip.ok_to_add_volume(0.1)
+        hw_pipette.remove_current_volume(0.1)
+    assert hw_pipette.current_volume == 0.0
+    hw_pipette.set_current_volume(max_volume)
+    assert not hw_pipette.ok_to_add_volume(0.1)
     with pytest.raises(AssertionError):
-        pip.add_current_volume(0.1)
-    assert pip.current_volume == loaded.max_volume
+        hw_pipette.add_current_volume(0.1)
+    assert hw_pipette.current_volume == max_volume
 
 
-@pytest.mark.parametrize("config_model", pipette_config.config_models)
-def test_config_update(config_model):
-    loaded = pipette_config.load(config_model)
-    pip = pipette.Pipette(loaded, PIP_CAL, "testID")
+@pytest.mark.ot2_only
+def test_config_update(hardware_pipette_ot2: Callable):
+    hw_pipette = hardware_pipette_ot2("p10_single_v1")
     sample_plunger_pos = {"top": 19.5}
-    pip.update_config_item("top", sample_plunger_pos.get("top"))
-    assert pip.config.top == sample_plunger_pos.get("top")
+    hw_pipette.update_config_item("top", sample_plunger_pos.get("top"))
+    assert hw_pipette.config.top == sample_plunger_pos.get("top")
 
 
-def test_smoothie_config_update(monkeypatch):
-    for config in pipette_config.config_models:
-        assert config == config
-
-
-@pytest.mark.parametrize("config_model", pipette_config.config_models)
-def test_tip_overlap(config_model):
-    # TODO (lc 10-31-2022) We really shouldn't need to paramaterize over all of the
-    # config models to check that the config is loaded in properly.
-    loaded = pipette_config.load(config_model)
-    pip = pipette.Pipette(loaded, PIP_CAL, "testId")
-    assert pip.config.tip_overlap == pipette_config.configs[config_model]["tipOverlap"]
-
-
-def test_flow_rate_setting():
-    pip = pipette.Pipette(pipette_config.load("p300_single_v2.0"), PIP_CAL, "testId")
+@pytest.mark.ot2_only
+def test_flow_rate_setting(
+    hardware_pipette_ot2: Callable,
+) -> None:
+    hw_pipette = hardware_pipette_ot2("p10_single_v1")
     # pipettes should load settings from config at init time
-    assert pip.aspirate_flow_rate == pip.config.default_aspirate_flow_rates["2.0"]
-    assert pip.dispense_flow_rate == pip.config.default_dispense_flow_rates["2.0"]
-    assert pip.blow_out_flow_rate == pip.config.default_blow_out_flow_rates["2.0"]
+    assert (
+        hw_pipette.aspirate_flow_rate
+        == hw_pipette.config.default_aspirate_flow_rates["2.0"]
+    )
+    assert (
+        hw_pipette.dispense_flow_rate
+        == hw_pipette.config.default_dispense_flow_rates["2.0"]
+    )
+    assert (
+        hw_pipette.blow_out_flow_rate
+        == hw_pipette.config.default_blow_out_flow_rates["2.0"]
+    )
     # changing flow rates with normal property access shouldn't touch
     # config or other flow rates
-    config = pip.config
-    pip.aspirate_flow_rate = 2
-    assert pip.aspirate_flow_rate == 2
-    assert pip.dispense_flow_rate == pip.config.default_dispense_flow_rates["2.0"]
-    assert pip.blow_out_flow_rate == pip.config.default_blow_out_flow_rates["2.0"]
-    assert pip.config is config
-    pip.dispense_flow_rate = 3
-    assert pip.aspirate_flow_rate == 2
-    assert pip.dispense_flow_rate == 3
-    assert pip.blow_out_flow_rate == pip.config.default_blow_out_flow_rates["2.0"]
-    assert pip.config is config
-    pip.blow_out_flow_rate = 4
-    assert pip.aspirate_flow_rate == 2
-    assert pip.dispense_flow_rate == 3
-    assert pip.blow_out_flow_rate == 4
-    assert pip.config is config
+    hw_pipette.aspirate_flow_rate = 2
+    assert hw_pipette.aspirate_flow_rate == 2
+    assert (
+        hw_pipette.dispense_flow_rate
+        == hw_pipette.config.default_dispense_flow_rates["2.0"]
+    )
+    assert (
+        hw_pipette.blow_out_flow_rate
+        == hw_pipette.config.default_blow_out_flow_rates["2.0"]
+    )
+    hw_pipette.dispense_flow_rate = 3
+    assert hw_pipette.aspirate_flow_rate == 2
+    assert hw_pipette.dispense_flow_rate == 3
+    assert (
+        hw_pipette.blow_out_flow_rate
+        == hw_pipette.config.default_blow_out_flow_rates["2.0"]
+    )
+    hw_pipette.blow_out_flow_rate = 4
+    assert hw_pipette.aspirate_flow_rate == 2
+    assert hw_pipette.dispense_flow_rate == 3
+    assert hw_pipette.blow_out_flow_rate == 4
 
 
-@pytest.mark.parametrize("config_model", pipette_config.config_models)
-def test_xy_center(config_model):
-    loaded = pipette_config.load(config_model)
-    pip = pipette.Pipette(loaded, PIP_CAL, "testId")
-    if loaded.channels == 8:
-        cp_y_offset = 9 * 3.5
-    else:
-        cp_y_offset = 0
-    assert pip.critical_point(types.CriticalPoint.XY_CENTER) == Point(
-        loaded.nozzle_offset[0],
-        loaded.nozzle_offset[1] - cp_y_offset,
-        loaded.nozzle_offset[2],
+@pytest.mark.parametrize(
+    argnames=[
+        "pipette_builder",
+        "model",
+        "expected_xy_critical_point",
+        "expected_front_critical_point",
+    ],
+    argvalues=[
+        [
+            lazy_fixture("hardware_pipette_ot2"),
+            "p10_single_v1",
+            Point(0, 0, 12.0),
+            Point(0, 0, 12.0),
+        ],
+        [
+            lazy_fixture("hardware_pipette_ot2"),
+            "p300_multi_v2.0",
+            Point(0.0, 0.0, 35.52),
+            Point(0.0, -31.5, 35.52),
+        ],
+        [
+            lazy_fixture("hardware_pipette_ot3"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            Point(-8.0, -22.0, -259.15),
+            Point(-8.0, -22.0, -259.15),
+        ],
+        [
+            lazy_fixture("hardware_pipette_ot3"),
+            ot3_pipette_config.convert_pipette_model("p1000_multi_v1.0"),
+            Point(-8.0, -47.5, -259.15),
+            Point(-8.0, -79.0, -259.15),
+        ],
+        [
+            lazy_fixture("hardware_pipette_ot3"),
+            ot3_pipette_config.convert_pipette_model("p1000_96", "1.0"),
+            Point(13.5, -46.5, -259.15),
+            Point(-36.0, -88.5, -259.15),
+        ],
+    ],
+)
+def test_alternative_critical_points(
+    pipette_builder: Callable,
+    model: Union[str, ot3_pipette_config.PipetteModelVersionType],
+    expected_xy_critical_point: Point,
+    expected_front_critical_point: Point,
+) -> None:
+    hw_pipette = pipette_builder(model)
+    assert (
+        hw_pipette.critical_point(types.CriticalPoint.XY_CENTER)
+        == expected_xy_critical_point
+    )
+    assert (
+        hw_pipette.critical_point(types.CriticalPoint.FRONT_NOZZLE)
+        == expected_front_critical_point
     )
 
 
-def test_reset_instrument_offset():
+@pytest.mark.parametrize(
+    argnames=["pipette_builder", "model", "calibration"],
+    argvalues=[
+        [
+            lazy_fixture("hardware_pipette_ot2"),
+            "p10_single_v1",
+            instrument_calibration.PipetteOffsetByPipetteMount(
+                offset=Point(1, 1, 1),
+                source=cal_types.SourceType.user,
+                status=cal_types.CalibrationStatus(),
+            ),
+        ],
+        [
+            lazy_fixture("hardware_pipette_ot3"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_calibration.PipetteOffsetByPipetteMount(
+                offset=Point(1, 1, 1),
+                source=cal_types.SourceType.user,
+                status=cal_types.CalibrationStatus(),
+            ),
+        ],
+    ],
+)
+def test_reset_instrument_offset(
+    pipette_builder: Callable,
+    model: Union[str, ot3_pipette_config.PipetteModelVersionType],
+    calibration: Union[
+        instrument_calibration.PipetteOffsetByPipetteMount,
+        ot3_calibration.PipetteOffsetByPipetteMount,
+    ],
+) -> None:
+
+    hw_pipette = pipette_builder(model, calibration)
+    assert hw_pipette.pipette_offset.offset == Point(1, 1, 1)
+    hw_pipette.reset_pipette_offset(Mount.LEFT, to_default=True)
+    assert hw_pipette.pipette_offset.offset == Point(0, 0, 0)
+
+
+def test_save_instrument_offset_ot3(hardware_pipette_ot2: Callable) -> None:
     # TODO (lc 10-31-2022) These tests would be much cleaner/easier to mock with
     # an InstrumentCalibrationProvider class (like robot calibration provider)
     # which should be done in a follow-up refactor.
-    temporary_calibration = instrument_calibration.PipetteOffsetByPipetteMount(
-        offset=Point(1, 1, 1),
-        source=cal_types.SourceType.user,
-        status=cal_types.CalibrationStatus(),
-    )
+    path_to_calibrations = "opentrons.hardware_control.instruments.ot2.pipette"
+    hw_pipette = hardware_pipette_ot2("p10_single_v1")
 
-    pip = pipette.Pipette(
-        pipette_config.load("p10_single_v1"), temporary_calibration, "testID"
-    )
-    assert pip.pipette_offset.offset == Point(1, 1, 1)
-    pip.reset_pipette_offset(Mount.LEFT, to_default=True)
-    assert pip.pipette_offset.offset == Point(0, 0, 0)
+    assert hw_pipette.pipette_offset.offset == Point(0, 0, 0)
+    with patch(f"{path_to_calibrations}.load_pipette_offset") as load_cal:
+        hw_pipette.save_pipette_offset(Mount.LEFT, Point(1.0, 2.0, 3.0))
+        load_cal.assert_called_once_with("testID", Mount.LEFT)
 
 
-@pytest.mark.xfail
-def test_save_instrument_offset():
+def test_save_instrument_offset_ot2(hardware_pipette_ot3: Callable) -> None:
     # TODO (lc 10-31-2022) These tests would be much cleaner/easier to mock with
     # an InstrumentCalibrationProvider class (like robot calibration provider)
     # which should be done in a follow-up refactor.
-    pip = pipette.Pipette(pipette_config.load("p10_single_v1"), PIP_CAL, "testID")
+    path_to_calibrations = "opentrons.hardware_control.instruments.ot3.pipette"
+    hw_pipette = hardware_pipette_ot3(
+        ot3_pipette_config.convert_pipette_model("p1000_single_v1.0")
+    )
 
-    assert pip.pipette_offset.offset == Point(0, 0, 0)
-    pip.save_pipette_offset(Mount.LEFT, Point(1.0, 2.0, 3.0))
-    # TODO (lc 10-31-2022) This assert should be easier to handle once we
-    # have the correct exports from calibration_storage
-    assert pip.pipette_offset.offset == Point(1.0, 2.0, 3.0)
+    assert hw_pipette.pipette_offset.offset == Point(0, 0, 0)
+    with patch(
+        f"{path_to_calibrations}.save_pipette_offset_calibration"
+    ) as save_cal, patch(f"{path_to_calibrations}.load_pipette_offset") as load_cal:
+        hw_pipette.save_pipette_offset(Mount.LEFT, Point(1.0, 2.0, 3.0))
+
+        save_cal.assert_called_once_with(
+            "testID", Mount.LEFT, Point(x=1.0, y=2.0, z=3.0)
+        )
+        load_cal.assert_called_once_with("testID", Mount.LEFT)

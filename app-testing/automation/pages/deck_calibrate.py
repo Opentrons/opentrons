@@ -61,9 +61,7 @@ class DeckCalibration:
         """Find the calibration Exit button or return None."""
         return self.base.clickable_wrapper_safe(self.exit_button)
 
-    exit_confirm_button: Element = Element(
-        (By.XPATH, "//button[text()='yes, exit now']"), "exit confirm button"
-    )
+    exit_confirm_button: Element = Element((By.XPATH, "//button[text()='yes, exit now']"), "exit confirm button")
 
     def get_exit_confirm_button(self) -> Optional[WebElement]:
         """Find the calibration Exit button or return None."""
