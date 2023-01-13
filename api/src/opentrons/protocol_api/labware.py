@@ -219,7 +219,6 @@ class Well:
         :param liquid: The loaded liquid to load into a well.
         :param volume: Volume in uL of liquid to load into.
         """
-
         self._impl.load_liquid(
             liquid=liquid,
             volume=volume,
