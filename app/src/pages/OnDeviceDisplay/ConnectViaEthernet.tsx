@@ -39,6 +39,7 @@ export function ConnectViaEthernet(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
+  const history = useHistory()
 
   const { ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
@@ -78,7 +79,7 @@ export function ConnectViaEthernet(): JSX.Element {
             <PrimaryButton
               width="11.875rem"
               height="4.4375rem"
-              onClick={() => console.log('move to name screen')}
+              onClick={() => history.push('/robot-settings/update-robot')}
               fontSize="1.5rem"
               lineHeight="1.375rem"
               fontWeight="500"
