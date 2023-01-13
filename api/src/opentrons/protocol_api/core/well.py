@@ -77,7 +77,7 @@ class AbstractWellCore(ABC):
         liquid: LoadedLiquid,
         volume: float,
     ) -> None:
-        """Load liquid into a labware."""
+        """Load liquid into a well."""
 
     @abstractmethod
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
