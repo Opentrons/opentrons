@@ -16,7 +16,7 @@ from opentrons.protocol_api.core.common import (
     ModuleCore,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.module_contexts import TemperatureModuleContext
+from opentrons.protocol_api import TemperatureModuleContext
 
 from opentrons.types import DeckSlotName
 
