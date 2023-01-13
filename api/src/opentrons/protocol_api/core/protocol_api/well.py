@@ -112,7 +112,7 @@ class WellImplementation(AbstractWellCore):
         liquid: LoadedLiquid,
         volume: float,
     ) -> None:
-        """Load liquid into a labware."""
+        """Load liquid into a well."""
         raise UnsupportedAPIError(
             "Creating a liquid is not supported in this API version."
         )
