@@ -13,7 +13,6 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
-from opentrons.protocol_api.core.engine import WellCore
 from opentrons.protocol_api.liquid import LoadedLiquid
 from opentrons.protocol_api.core.engine import WellCore, point_calculations
 

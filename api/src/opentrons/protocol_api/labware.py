@@ -33,7 +33,6 @@ from opentrons.protocols.labware import (  # noqa: F401
 from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
-from .core.protocol_api.labware import LabwareImplementation
 from .liquid import LoadedLiquid
 
 from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
