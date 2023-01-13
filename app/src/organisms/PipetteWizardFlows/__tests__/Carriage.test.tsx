@@ -98,4 +98,8 @@ describe('Carriage', () => {
     getByRole('button', { name: 'try again' })
     getByRole('button', { name: 'Cancel attachment' })
   })
+  //  TODO(jr 1/13/23): when z axis screw status is fully wired up, extend test cases for:
+  // 2nd case try again button where button disappears
+  // try again button click being a success
+  // cancel attachment click
 })

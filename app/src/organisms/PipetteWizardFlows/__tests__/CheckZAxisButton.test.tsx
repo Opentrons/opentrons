@@ -12,11 +12,14 @@ describe('CheckZAxisButton', () => {
     props = {
       proceedButtonText: 'continue',
       setZAxisScrewStatus: jest.fn(),
+      numberOfTryAgains: 0,
+      setNumberOfTryAgains: jest.fn(),
     }
   })
-  it('clicking on the button calls setZAxisScrewStatus prop', () => {
+  it('clicking on the button calls setZAxisScrewStatus and setNumberOfTryAgains prop', () => {
     const { getByRole } = render(props)
     getByRole('button', { name: 'continue' }).click()
     expect(props.setZAxisScrewStatus).toHaveBeenCalled()
+    expect(props.setNumberOfTryAgains).toHaveBeenCalled()
   })
 })
