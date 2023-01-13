@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -18,11 +19,18 @@ import {
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   Link,
+  useHoverTooltip,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
+
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { PrimaryButton } from '../../../../atoms/buttons'
+import { Tooltip } from '../../../../atoms/Tooltip'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
+import { useLPCDisabledReason } from '../../hooks'
+import { getLatestCurrentOffsets } from './utils'
+
 import type { LabwareOffset } from '@opentrons/api-client'
 
 const OffsetTable = styled('table')`
@@ -51,19 +59,33 @@ const OffsetTableDatum = styled('td')`
 interface CurrentOffsetsModalProps {
   currentOffsets: LabwareOffset[]
   commands: RunTimeCommand[]
+  runId: string
+  robotName: string
   onCloseClick: () => void
+  handleRelaunchLPC: () => void
 }
 export function CurrentOffsetsModal(
   props: CurrentOffsetsModalProps
 ): JSX.Element {
-  const { currentOffsets, commands, onCloseClick } = props
+  const {
+    currentOffsets,
+    commands,
+    runId,
+    robotName,
+    onCloseClick,
+    handleRelaunchLPC,
+  } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const [showCodeSnippet, setShowCodeSnippet] = React.useState<boolean>(false)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
-
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+  const lpcDisabledReason = useLPCDisabledReason(robotName, runId)
+  const latestCurrentOffsets = getLatestCurrentOffsets(currentOffsets)
   return (
     <ModalShell
       maxWidth="40rem"
@@ -91,7 +113,6 @@ export function CurrentOffsetsModal(
             TODO ADD JUPYTER/CLI SNIPPET SUPPORT
           </PrimaryButton>
         ) : null}
-
         <OffsetTable>
           <thead>
             <tr>
@@ -101,7 +122,7 @@ export function CurrentOffsetsModal(
             </tr>
           </thead>
           <tbody>
-            {currentOffsets.map(offset => {
+            {latestCurrentOffsets.map(offset => {
               const labwareDisplayName =
                 offset.definitionUri in defsByURI
                   ? getLabwareDisplayName(defsByURI[offset.definitionUri])
@@ -111,8 +132,8 @@ export function CurrentOffsetsModal(
                   <OffsetTableDatum>
                     {t('slot', { slotName: offset.location.slotName })}
                     {offset.location.moduleModel != null
-                      ? ` - ${String(
-                          getModuleDisplayName(offset.location.moduleModel)
+                      ? ` - ${getModuleDisplayName(
+                          offset.location.moduleModel
                         )}`
                       : null}
                   </OffsetTableDatum>
@@ -142,12 +163,15 @@ export function CurrentOffsetsModal(
           </Link>
           <PrimaryButton
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={() => {
-              console.log('TODO, run LPC')
-            }}
+            onClick={handleRelaunchLPC}
+            disabled={lpcDisabledReason !== null}
+            {...targetProps}
           >
             {t('run_labware_position_check')}
           </PrimaryButton>
+          {lpcDisabledReason !== null ? (
+            <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
+          ) : null}
         </Flex>
       </Flex>
     </ModalShell>

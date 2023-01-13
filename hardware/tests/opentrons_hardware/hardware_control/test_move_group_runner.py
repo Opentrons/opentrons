@@ -6,7 +6,11 @@ from mock import AsyncMock, call, MagicMock
 import asyncio
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, ErrorCode
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    ErrorCode,
+    ErrorSeverity,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
 )
@@ -21,8 +25,14 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     MoveCompletedPayload,
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
+    ErrorMessagePayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFlagsField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    MotorPositionFlagsField,
+    MoveStopConditionField,
+    ErrorSeverityField,
+    ErrorCodeField,
+)
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
 )
@@ -274,7 +284,7 @@ async def test_single_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -299,7 +309,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -316,7 +326,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -332,7 +342,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -349,7 +359,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -365,7 +375,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(1),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -950,3 +960,75 @@ async def test_groups_from_nonzero_index(
             )
         ]
     )
+
+
+class MockSendMoveErrorCompleter:
+    """Side effect mock of CanMessenger.send that immediately sends an error."""
+
+    def __init__(
+        self,
+        move_groups: MoveGroups,
+        listener: MessageListenerCallback,
+        start_at_index: int = 0,
+    ) -> None:
+        """Constructor."""
+        self._move_groups = move_groups
+        self._listener = listener
+        self._start_at_index = start_at_index
+
+    @property
+    def groups(self) -> MoveGroups:
+        """Retrieve the groups, for instance from a child class."""
+        return self._move_groups
+
+    async def mock_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+    ) -> None:
+        """Mock send function."""
+        if isinstance(message, md.ExecuteMoveGroupRequest):
+            # Iterate through each move in each sequence and send a move
+            # completed for it.
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
+            for seq_id, moves in enumerate(
+                self._move_groups[message.payload.group_id.value - self._start_at_index]
+            ):
+                for node, move in moves.items():
+                    assert isinstance(move, MoveGroupSingleAxisStep)
+                    payload = ErrorMessagePayload(
+                        severity=ErrorSeverityField(ErrorSeverity.recoverable),
+                        error_code=ErrorCodeField(ErrorCode.collision_detected),
+                    )
+                    arbitration_id = ArbitrationId(
+                        parts=ArbitrationIdParts(originating_node_id=node)
+                    )
+                    self._listener(md.ErrorMessage(payload=payload), arbitration_id)
+
+    async def mock_ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> ErrorCode:
+        """Mock ensure_send function."""
+        await self.mock_send(node_id, message)
+        return ErrorCode.ok
+
+
+async def test_single_move_error(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """It should send a start group command."""
+    subject = MoveScheduler(move_groups=move_group_single)
+    mock_sender = MockSendMoveErrorCompleter(move_group_single, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    with pytest.raises(RuntimeError):
+        await subject.run(can_messenger=mock_can_messenger)

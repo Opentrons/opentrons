@@ -32,6 +32,7 @@ from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
 from opentrons.types import Point, Mount
 
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 from opentrons.config import gripper_config as gc, ot3_pipette_config
 from opentrons_shared_data.gripper.dev_types import GripperModel
@@ -659,7 +660,7 @@ async def test_gripper_move_to(
     await ot3_hardware.cache_gripper(instr_data)
 
     await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
-    origin, moves = mock_backend_move.call_args_list[0][0]
+    origin, moves, _ = mock_backend_move.call_args_list[0][0]
     # The moves that it emits should move only x, y, and the gripper z
     assert origin == {
         OT3Axis.X: 0,
@@ -677,6 +678,29 @@ async def test_gripper_move_to(
             OT3Axis.Y,
             OT3Axis.Z_G,
         ]
+
+
+@pytest.mark.parametrize("enable_stalls", [True, False])
+async def test_move_stall_flag(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_backend_move: AsyncMock,
+    enable_stalls: bool,
+) -> None:
+
+    expected = MoveStopCondition.stall if enable_stalls else MoveStopCondition.none
+
+    await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), _check_stalls=enable_stalls)
+    mock_backend_move.assert_called_once()
+    _, _, condition = mock_backend_move.call_args_list[0][0]
+    assert condition == expected
+
+    mock_backend_move.reset_mock()
+    await ot3_hardware.move_rel(
+        Mount.LEFT, Point(10, 0, 0), _check_stalls=enable_stalls
+    )
+    mock_backend_move.assert_called_once()
+    _, _, condition = mock_backend_move.call_args_list[0][0]
+    assert condition == expected
 
 
 @pytest.mark.parametrize(
@@ -804,3 +828,42 @@ async def test_drop_tip_full_tiprack(
         await ot3_hardware.drop_tip(Mount.LEFT)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_called_once_with([OT3Axis.P_L], 1, 1, "drop")
+
+
+@pytest.mark.parametrize(
+    "axes",
+    [[OT3Axis.X], [OT3Axis.X, OT3Axis.Y], [OT3Axis.X, OT3Axis.Y, OT3Axis.P_L], None],
+)
+async def test_update_position_estimation(
+    ot3_hardware: ThreadManager[OT3API], axes: List[OT3Axis]
+) -> None:
+
+    backend = ot3_hardware.managed_obj._backend
+    with patch.object(
+        backend,
+        "update_motor_estimation",
+        AsyncMock(spec=backend.update_motor_estimation),
+    ) as mock_update:
+        await ot3_hardware._update_position_estimation(axes)
+        if axes is None:
+            axes = [ax for ax in OT3Axis]
+        mock_update.assert_called_once_with(axes)
+
+
+async def test_refresh_current_position(ot3_hardware: ThreadManager[OT3API]) -> None:
+
+    backend = ot3_hardware.managed_obj._backend
+
+    mock_update = AsyncMock(spec=backend.update_position)
+    mock_update.return_value = {ax: 100 for ax in OT3Axis}
+    ot3_hardware._current_position.clear()
+    with patch.object(
+        backend,
+        "update_position",
+        mock_update,
+    ) as mock:
+        await ot3_hardware.refresh_current_position_ot3()
+        mock.assert_called_once()
+
+        for ax in OT3Axis:
+            assert ax in ot3_hardware._current_position.keys()

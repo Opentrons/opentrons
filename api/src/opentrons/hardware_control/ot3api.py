@@ -37,6 +37,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     ZeroLengthMoveError,
 )
 
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
@@ -502,6 +503,20 @@ class OT3API(
         await self._backend.update_motor_status()
         await self.set_gantry_load(self._gantry_load_from_instruments())
 
+    @ExecutionManagerProvider.wait_for_running
+    async def _update_position_estimation(
+        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
+    ) -> None:
+        """
+        Function to update motor estimation for a set of axes
+        """
+
+        if axes:
+            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
+        else:
+            checked_axes = [ax for ax in OT3Axis]
+        await self._backend.update_motor_estimation(checked_axes)
+
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
         """
@@ -652,16 +667,23 @@ class OT3API(
 
         elif not self._current_position and not refresh:
             raise MustHomeError("Current position is unknown; please home motors.")
+
+        if refresh:
+            await self.refresh_current_position_ot3()
+        return self._effector_pos_from_carriage_pos(
+            OT3Mount.from_mount(mount), self._current_position, critical_point
+        )
+
+    async def refresh_current_position_ot3(self) -> Dict[OT3Axis, float]:
+        """Requests the current position and updates _current_position."""
         async with self._motion_lock:
-            if refresh:
-                self._current_position = deck_from_machine(
-                    await self._backend.update_position(),
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-            return self._effector_pos_from_carriage_pos(
-                OT3Mount.from_mount(mount), self._current_position, critical_point
+            await self._backend.update_motor_status()
+            self._current_position = deck_from_machine(
+                await self._backend.update_position(),
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
             )
+        return self._current_position
 
     async def encoder_current_position(
         self,
@@ -767,10 +789,14 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
+        _check_stalls: bool = False,  # For testing only
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
+
+        # Refresh current position
+        await self.refresh_current_position_ot3()
 
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_ready_for_movement(axes_moving):
@@ -793,7 +819,12 @@ class OT3API(
 
         await self._cache_and_maybe_retract_mount(realmount)
         await self._move_gripper_to_idle_position(realmount)
-        await self._move(target_position, speed=speed, max_speeds=checked_max)
+        await self._move(
+            target_position,
+            speed=speed,
+            max_speeds=checked_max,
+            check_stalls=_check_stalls,
+        )
 
     async def move_rel(
         self,
@@ -803,6 +834,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
+        _check_stalls: bool = False,  # For testing only
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
@@ -821,10 +853,9 @@ class OT3API(
                 raise mhe
             else:
                 await self.home(axes_moving)
-
-        target_position = target_position_from_relative(
-            realmount, delta, self._current_position
-        )
+        # Refresh current position
+        position = await self.refresh_current_position_ot3()
+        target_position = target_position_from_relative(realmount, delta, position)
         if fail_on_not_homed and not self._backend.check_ready_for_movement(
             [axis for axis in axes_moving if axis is not None]
         ):
@@ -842,6 +873,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
+            check_stalls=_check_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
@@ -886,6 +918,7 @@ class OT3API(
         max_speeds: Optional[OT3AxisMap[float]] = None,
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
+        check_stalls: bool = False,
     ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
@@ -923,7 +956,11 @@ class OT3API(
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
             try:
-                await self._backend.move(origin, moves[0])
+                await self._backend.move(
+                    origin,
+                    moves[0],
+                    MoveStopCondition.stall if check_stalls else MoveStopCondition.none,
+                )
                 encoder_machine_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")

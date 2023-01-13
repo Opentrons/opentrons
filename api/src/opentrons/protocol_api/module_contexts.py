@@ -91,7 +91,6 @@ class ModuleContext(CommandPublisher):
             )
         return self._core.get_serial_number()
 
-    # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """Specify the presence of a piece of labware on the module.
@@ -247,9 +246,12 @@ class ModuleContext(CommandPublisher):
         )
 
     def __repr__(self) -> str:
-        return "{} at {} lw {}".format(
-            self.__class__.__name__, self.geometry, self.labware
-        )
+
+        class_name = self.__class__.__name__
+        display_name = self._core.get_display_name()
+        location = self._core.get_deck_slot().value
+
+        return f"{class_name} at {display_name} on {location} lw {self.labware}"
 
 
 class TemperatureModuleContext(ModuleContext):

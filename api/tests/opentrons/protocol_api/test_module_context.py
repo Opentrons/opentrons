@@ -168,7 +168,8 @@ def test_parent(decoy: Decoy, mock_core: ModuleCore, subject: ModuleContext) -> 
     """Should get the parent slot name."""
     decoy.when(mock_core.get_deck_slot()).then_return(DeckSlotName.SLOT_1)
 
-    assert subject.parent == DeckSlotName.SLOT_1
+    assert subject.parent == "1"
+    assert not isinstance(subject.parent, DeckSlotName)
 
 
 def test_module_model(

@@ -195,6 +195,11 @@ class OT3Simulator:
             (node, MotorStatus(False, False)) for node in self._present_nodes
         )
 
+    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
+        """Update motor position estimation for commanded nodes, and update cache of data."""
+        # Simulate conditions as if there are no stalls, aka do nothing
+        return None
+
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
         get_stat: Callable[
             [Sequence[OT3Axis]], List[Optional[MotorStatus]]
