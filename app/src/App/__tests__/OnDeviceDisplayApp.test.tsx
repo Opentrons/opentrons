@@ -18,7 +18,6 @@ jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
 jest.mock('../../pages/OnDeviceDisplay/ConfirmRobotName')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
-// jest.mock('../../pages/OnDeviceDisplay/SelectWifiNetwork')
 
 const mockInitialSplash = InitialSplash as jest.MockedFunction<
   typeof InitialSplash
@@ -32,9 +31,6 @@ const mockConnectViaUSB = ConnectViaUSB as jest.MockedFunction<
 const mockConfirmRobotName = ConfirmRobotName as jest.MockedFunction<
   typeof ConfirmRobotName
 >
-// const mockSelectWifiNetwork = SelectWifiNetwork as jest.MockedFunction<
-//   typeof SelectWifiNetwork
-// >
 const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
   typeof RobotDashboard
 >
