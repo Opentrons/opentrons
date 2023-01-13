@@ -699,3 +699,31 @@ async def test_zero_volume_dispense_commands(
         labwareId=load_well_plate.result.labwareId,
         wellName="D7",
     )
+
+
+COMMENT_PROTOCOL_FILE = """\
+metadata = {"apiLevel": "2.0"}
+def run(ctx):
+    ctx.comment("")
+    ctx.comment("Hello, world!")
+    ctx.comment("😎")
+"""
+
+
+@pytest.fixture
+def comment_protocol_file(tmp_path: Path) -> Path:
+    """Return a file containing the comment protocol."""
+    path = tmp_path / "protocol-name.py"
+    path.write_text(COMMENT_PROTOCOL_FILE)
+    return path
+
+
+async def test_comment_commands(comment_protocol_file: Path) -> None:
+    """It should map comment() calls to Protocol Engine comment commands."""
+    result_commands = await simulate_and_get_commands(comment_protocol_file)
+    expected_messages = ["", "Hello, world!", "😎"]
+
+    assert len(result_commands) == len(expected_messages)
+    for result_command, expected_message in zip(result_commands, expected_messages):
+        assert isinstance(result_command, commands.Comment)
+        assert result_command.params == commands.CommentParams(message=expected_message)
