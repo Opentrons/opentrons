@@ -127,7 +127,7 @@ class WellCore(AbstractWellCore):
         liquid: LoadedLiquid,
         volume: float,
     ) -> None:
-        """Load liquid into a labware."""
+        """Load liquid into a well."""
         self._engine_client.load_liquid(
             labware_id=self._labware_id,
             liquid_id=liquid.id,
