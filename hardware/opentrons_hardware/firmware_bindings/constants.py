@@ -133,6 +133,11 @@ class MessageId(int, Enum):
 
     do_self_contained_tip_action_request = 0x501
     do_self_contained_tip_action_response = 0x502
+    gear_enable_motor_request = 0x503
+    gear_disable_motor_request = 0x504
+    gear_set_current_request = 0x505
+    gear_write_motor_driver_request = 0x506
+    gear_read_motor_driver_request = 0x507
 
     read_sensor_request = 0x82
     write_sensor_request = 0x83
