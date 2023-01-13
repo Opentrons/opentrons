@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
 
-from opentrons.types import Location, Point, LocationLabware
+from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -33,12 +33,16 @@ from opentrons.protocols.labware import (  # noqa: F401
 from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
+from .core.module import AbstractModuleCore
 from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.core_map import LoadedCoreMap
 from .core.protocol_api.well import WellImplementation as LegacyWellCore
 from .core.protocol_api.well_geometry import WellGeometry
 
+
 if TYPE_CHECKING:
-    from .core.common import LabwareCore, WellCore
+    from .core.common import LabwareCore, WellCore, ProtocolCore
+    from .protocol_context import ModuleTypes
 
 
 _log = logging.getLogger(__name__)
@@ -265,6 +269,8 @@ class Labware:
         self,
         implementation: AbstractLabware[Any],
         api_version: APIVersion,
+        protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
     ) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -280,6 +286,8 @@ class Labware:
 
         self._api_version = api_version
         self._implementation: LabwareCore = implementation
+        self._protocol_core = protocol_core
+        self._core_map = core_map
 
         well_columns = implementation.get_well_columns()
         self._well_grid = well_grid.create(columns=well_columns)
@@ -320,9 +328,31 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> LocationLabware:
-        """The parent of this labware. Usually a slot name."""
-        return self._implementation.get_geometry().parent.labware.object
+    def parent(self) -> Union[str, ModuleTypes, None]:
+        """The parent of this labware.
+
+        If the labware is on the deck, a `str` deck slot name will be returned.
+        If on a module, the parent :py:class:`ModuleContext` will be returned.
+        If off deck, `None` will be returned.
+
+        .. versionchanged:: 2.14
+            Return type for module parent changed to :py:class:`ModuleContext`.
+            Prior to this version, an internal geometry interface is returned.
+        """
+        if isinstance(self._implementation, LegacyLabwareCore):
+            # Type ignoring to preserve backwards compatibility
+            return self._implementation.get_geometry().parent.labware.object  # type: ignore
+
+        assert self._protocol_core and self._core_map, "Labware initialized incorrectly"
+
+        labware_location = self._protocol_core.get_labware_location(
+            self._implementation
+        )
+
+        if isinstance(labware_location, AbstractModuleCore):
+            return self._core_map.get(labware_location)
+
+        return labware_location
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -838,6 +868,8 @@ def load_from_definition(
             label=label,
         ),
         api_version=api_level or MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
 
 

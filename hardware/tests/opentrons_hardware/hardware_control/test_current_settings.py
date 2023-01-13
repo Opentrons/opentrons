@@ -128,3 +128,38 @@ async def test_send_run_current_only(
             ),
             expected_nodes=[node_id],
         )
+
+
+async def test_send_current_for_tip_motors(
+    mock_can_messenger: AsyncMock,
+    current_settings: CompleteCurrentSettings,
+    current_settings_in_uint32: Dict[NodeId, Tuple[UInt32Field, UInt32Field]],
+) -> None:
+    """Test setting currents when specifying that you want to modify the tip motors."""
+    await set_currents(
+        mock_can_messenger,
+        current_settings,
+        use_tip_motor_message_for=[NodeId.pipette_left],
+    )
+    for node_id, currents in current_settings_in_uint32.items():
+        if node_id == NodeId.pipette_left:
+            mock_can_messenger.ensure_send.assert_any_call(
+                node_id=node_id,
+                message=md.GearWriteMotorCurrentRequest(
+                    payload=MotorCurrentPayload(
+                        hold_current=currents[0], run_current=currents[1]
+                    )
+                ),
+                expected_nodes=[node_id],
+            )
+        else:
+            mock_can_messenger.ensure_send.assert_any_call(
+                node_id=node_id,
+                message=md.WriteMotorCurrentRequest(
+                    payload=MotorCurrentPayload(
+                        hold_current=currents[0],
+                        run_current=currents[1],
+                    )
+                ),
+                expected_nodes=[node_id],
+            )

@@ -21,6 +21,7 @@ import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
@@ -125,12 +126,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/robot-settings/rename-robot',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>update robot</Box>
-      </>
-    ),
+    Component: UpdateRobot,
     exact: true,
     name: 'Update Robot',
     path: '/robot-settings/update-robot',

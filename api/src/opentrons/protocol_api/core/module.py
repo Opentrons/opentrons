@@ -36,6 +36,9 @@ class AbstractModuleCore(ABC):
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
 
+    def get_display_name(self) -> str:
+        """Get the module's display name."""
+
 
 ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore)
 
