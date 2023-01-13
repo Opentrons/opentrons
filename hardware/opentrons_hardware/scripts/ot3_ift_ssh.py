@@ -65,7 +65,7 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
     pos = 0
     speed = 10
     res = {node: (0,0,0)}
-    current = 0.4
+    current = 0.6
     await set_pipette_current(current, args)
     try:
         if xy == "downward":
@@ -199,7 +199,7 @@ async def home(messenger, node, args):
             ]
         ]
     )
-    current = 0.4
+    current = 0.6
     try:
         await set_pipette_current(current, args)
         await home_runner.run(can_messenger = messenger)
