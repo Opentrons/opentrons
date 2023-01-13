@@ -429,3 +429,11 @@ class ProtocolContextImplementation(
         raise UnsupportedAPIError(
             "Creating a liquid is not supported in this API version."
         )
+
+    def get_labware_location(
+        self, labware_core: LabwareImplementation
+    ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
+        """Get labware parent location."""
+        raise NotImplementedError(
+            "LegacyProtocolCore.get_labware_location not implemented"
+        )

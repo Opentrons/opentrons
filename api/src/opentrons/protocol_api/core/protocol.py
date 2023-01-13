@@ -182,3 +182,9 @@ class AbstractProtocol(
         self, display_name: str, description: str, display_color: Optional[str]
     ) -> LoadedLiquid:
         """Add a liquid to load into a well."""
+
+    @abstractmethod
+    def get_labware_location(
+        self, labware_core: LabwareCoreType
+    ) -> Union[DeckSlotName, ModuleCoreType, None]:
+        """Get labware parent location."""

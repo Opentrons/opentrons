@@ -422,3 +422,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             if loaded_liquid.displayColor
             else None,
         )
+
+    def get_labware_location(
+        self, labware_core: LabwareCore
+    ) -> Union[DeckSlotName, ModuleCore, None]:
+        """Get labware parent location."""
+        labware_location = self._engine_client.state.labware.get_location(
+            labware_core.labware_id
+        )
+        if isinstance(labware_location, DeckSlotLocation):
+            return labware_location.slotName
+        elif isinstance(labware_location, ModuleLocation):
+            return self._module_cores_by_id.get(labware_location.moduleId)
+        return None
