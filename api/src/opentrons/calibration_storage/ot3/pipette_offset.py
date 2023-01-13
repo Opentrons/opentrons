@@ -7,7 +7,7 @@ from opentrons import config, types
 
 
 from .. import file_operators as io, types as local_types
-from opentrons.util.helpers import utc_now
+from opentrons.util import helpers
 
 from .models import v1
 
@@ -38,6 +38,7 @@ def clear_pipette_offset_calibrations() -> None:
 
 # Save Pipette Offset Calibrations
 
+
 def save_pipette_calibration(
     offset: types.Point,
     pip_id: str,
@@ -47,7 +48,7 @@ def save_pipette_calibration(
 
     pipette_calibration = v1.InstrumentOffsetModel(
         offset=offset,
-        lastModified=utc_now(),
+        lastModified=helpers.utc_now(),
         source=local_types.SourceType.user,
         status=v1.CalibrationStatus(),
     )
@@ -55,6 +56,7 @@ def save_pipette_calibration(
 
 
 # Get Pipette Offset Calibrations
+
 
 def get_pipette_offset(
     pipette_id: str, mount: types.Mount

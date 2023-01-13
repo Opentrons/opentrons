@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from opentrons import config, types
 from dataclasses import asdict
-from opentrons.util.helpers import utc_now
+from opentrons.util import helpers
 
 
 from .. import file_operators as io, types as local_types
@@ -58,7 +58,7 @@ def save_gripper_calibration(
 
     gripper_calibration = v1.InstrumentOffsetModel(
         offset=offset,
-        lastModified=utc_now(),
+        lastModified=helpers.utc_now(),
         source=local_types.SourceType.user,
         status=cal_status_model,
     )

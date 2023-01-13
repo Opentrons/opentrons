@@ -1020,7 +1020,7 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
 
     decoy.when(
-        mock_load_tip_length(None, tip_rack._implementation.get_definition())
+        mock_load_tip_length("pip", tip_rack._implementation.get_definition())
     ).then_return(
         instr_cal.TipLengthCalibration(
             tip_length=2,
@@ -1029,7 +1029,7 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
             status=CSTypes.CalibrationStatus(markedBad=False),
             uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
             tiprack="somehash",
-            pipette=None,
+            pipette="pip",
         )
     )
 

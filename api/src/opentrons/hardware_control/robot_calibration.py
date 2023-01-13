@@ -17,12 +17,15 @@ from opentrons.calibration_storage import (
     save_robot_deck_attitude,
     get_robot_deck_attitude,
 )
+from opentrons.calibration_storage.ot2 import models as ot2_models
 from opentrons.types import Point
 from opentrons.util import linal
 
 from .util import DeckTransformState
 
 log = logging.getLogger(__name__)
+
+# Loading deck calibrations for the OT-2 only
 
 
 @dataclass
@@ -167,7 +170,7 @@ def save_attitude_matrix(
 
 
 def load_attitude_matrix() -> DeckCalibration:
-    calibration_data = get_robot_deck_attitude()
+    calibration_data = cast(Optional[ot2_models.v1.DeckCalibrationModel], get_robot_deck_attitude())
     gantry_cal = get_legacy_gantry_calibration()
     if not calibration_data and gantry_cal:
         if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:

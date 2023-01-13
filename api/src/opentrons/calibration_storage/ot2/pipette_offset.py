@@ -2,7 +2,6 @@ import json
 import typing
 import logging
 from pydantic import ValidationError
-from dataclasses import asdict
 
 from opentrons import config, types
 
@@ -11,7 +10,7 @@ from .. import file_operators as io, types as local_types
 from .models import v1
 
 from opentrons.types import Mount, Point
-from opentrons.util.helpers import utc_now
+from opentrons.util import helpers
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +54,7 @@ def save_pipette_calibration(
         offset=offset,
         tiprack=tiprack_hash,
         uri=tiprack_uri,
-        last_modified=utc_now(),
+        last_modified=helpers.utc_now(),
         source=local_types.SourceType.user,
         status=v1.CalibrationStatus(),
     )

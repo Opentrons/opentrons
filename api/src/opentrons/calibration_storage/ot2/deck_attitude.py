@@ -1,11 +1,10 @@
 import json
 import logging
 from pydantic import ValidationError
-from typing import Optional, Union
-from dataclasses import asdict
+from typing import Optional
 
 from opentrons import config
-from opentrons.util.helpers import utc_now
+from opentrons.util import helpers
 
 
 from .. import file_operators as io, types as local_types
@@ -46,7 +45,7 @@ def save_robot_deck_attitude(
     gantry_calibration = v1.DeckCalibrationModel(
         attitude=transform,
         pipette_calibrated_with=pip_id,
-        last_modified=utc_now(),
+        last_modified=helpers.utc_now(),
         tiprack=lw_hash,
         source=source or local_types.SourceType.user,
         status=v1.CalibrationStatus(),

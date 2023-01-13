@@ -2,13 +2,12 @@ import json
 import typing
 import logging
 from pydantic import ValidationError
-from dataclasses import asdict
 
 from opentrons import config
 
 from .. import file_operators as io, helpers, types as local_types
 
-from opentrons.util.helpers import utc_now
+from opentrons.util import helpers as util_helpers
 
 
 from .models import v1
@@ -62,6 +61,7 @@ def load_tip_length_calibration(
             "be loaded"
         )
 
+
 def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
@@ -77,7 +77,7 @@ def create_tip_length_data(
 
     tip_length_data = v1.TipLengthModel(
         tipLength=length,
-        lastModified=utc_now(),
+        lastModified=util_helpers.utc_now(),
         source=local_types.SourceType.user,
         status=v1.CalibrationStatus(),
         uri=labware_uri,
@@ -88,6 +88,7 @@ def create_tip_length_data(
 
 
 # Delete Tip Length Calibration
+
 
 def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
     """
@@ -113,6 +114,7 @@ def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
             "be loaded"
         )
 
+
 def clear_tip_length_calibration() -> None:
     """
     Delete all tip length calibration files.
@@ -125,6 +127,7 @@ def clear_tip_length_calibration() -> None:
 
 
 # Save Tip Length Calibration
+
 
 def save_tip_length_calibration(
     pip_id: str,

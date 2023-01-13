@@ -4,7 +4,7 @@ from pydantic import ValidationError
 from typing import Optional
 
 from opentrons import config
-from opentrons.util.helpers import utc_now
+from opentrons.util import helpers
 
 
 from .. import file_operators as io, types as local_types
@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 # Delete Deck Calibration
 
+
 def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
@@ -23,11 +24,11 @@ def delete_robot_deck_attitude() -> None:
     gantry_path = (
         config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
     )
-
     io.delete_file(gantry_path)
 
 
 # Save Deck Calibration
+
 
 def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
@@ -39,7 +40,7 @@ def save_robot_deck_attitude(
     gantry_calibration = v1.DeckCalibrationModel(
         attitude=transform,
         pipetteCalibratedWith=pip_id,
-        lastModified=utc_now(),
+        lastModified=helpers.utc_now(),
         source=source or local_types.SourceType.user,
         status=v1.CalibrationStatus(),
     )
@@ -48,6 +49,7 @@ def save_robot_deck_attitude(
 
 
 # Get Deck Calibration
+
 
 def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationModel]:
     deck_calibration_path = (

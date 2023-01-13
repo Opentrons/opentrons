@@ -2,14 +2,13 @@ import json
 import typing
 import logging
 from pydantic import ValidationError
-from dataclasses import asdict
 
 from opentrons import config
 
 from .. import file_operators as io, helpers, types as local_types
 
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
-from opentrons.util.helpers import utc_now
+from opentrons.util import helpers as util_helpers
 
 
 from .models import v1
@@ -172,7 +171,7 @@ def create_tip_length_data(
 
     tip_length_data = v1.TipLengthModel(
         tipLength=length,
-        lastModified=utc_now(),
+        lastModified=util_helpers.utc_now(),
         source=local_types.SourceType.user,
         status=v1.CalibrationStatus(),
         uri=labware_uri,
@@ -218,4 +217,5 @@ def save_tip_length_calibration(
     dict_of_tip_lengths = {}
     for key, item in all_tip_lengths.items():
         dict_of_tip_lengths[key] = json.loads(item.json())
+    print("save being called!")
     io.save_to_file(tip_length_dir_path, pip_id, dict_of_tip_lengths)

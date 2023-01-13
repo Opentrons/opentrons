@@ -1,69 +1,93 @@
 import pytest
-import typing
-
+import mock
+from datetime import datetime
+from typing import Any, cast
+from pathlib import Path
+from decoy import Decoy
 from opentrons.types import Point
 from opentrons.calibration_storage import (
     types as cs_types,
     ot3_gripper_offset as gripper,
 )
+from opentrons.calibration_storage.ot3 import models
+from . import READ_FUNC_TYPE, SAVE_FUNC_TYPE, DELETE_FUNC_TYPE, MOCK_UTC
 
 
 @pytest.fixture
-def starting_calibration_data(
-    ot_config_tempdir: typing.Any, enable_ot3_hardware_controller: typing.Any
+def gripper_path(ot_config_tempdir: Any) -> Path:
+    return Path(f"{ot_config_tempdir}/robot/gripper")
+
+
+def test_delete_all_gripper_calibration(
+    gripper_path: Path, decoy: Decoy, mock_file_operator_remove_files: DELETE_FUNC_TYPE
 ) -> None:
-    """
-    Starting calibration data fixture.
-
-    Adds dummy data to a temporary directory to test delete commands against.
-    """
-    gripper.save_gripper_calibration(Point(1, 1, 1), "gripper1")
-    gripper.save_gripper_calibration(Point(1, 2, 1), "gripper2")
-
-
-def test_delete_all_gripper_calibration(starting_calibration_data: typing.Any) -> None:
     """
     Test delete all gripper calibrations.
     """
-    assert gripper.get_gripper_calibration_offset("gripper1") is not None
-    assert gripper.get_gripper_calibration_offset("gripper2") is not None
     gripper.clear_gripper_calibration_offsets()
-    assert gripper.get_gripper_calibration_offset("gripper1") is None
-    assert gripper.get_gripper_calibration_offset("gripper2") is None
+    decoy.verify(
+        mock_file_operator_remove_files(gripper_path),
+        times=1,
+    )
 
 
-def test_delete_gripper_calibration(starting_calibration_data: typing.Any) -> None:
+def test_delete_gripper_calibration(
+    gripper_path: Path, decoy: Decoy, mock_file_operator_delete: DELETE_FUNC_TYPE
+) -> None:
     """
     Test delete a single gripper calibration.
     """
-    assert gripper.get_gripper_calibration_offset("gripper1") is not None
     gripper.delete_gripper_calibration_file("gripper1")
-    assert gripper.get_gripper_calibration_offset("gripper1") is None
+    decoy.verify(
+        mock_file_operator_delete(gripper_path / "gripper1.json"),
+        times=1,
+    )
 
 
 def test_save_gripper_calibration(
-    ot_config_tempdir: typing.Any, enable_ot3_hardware_controller: typing.Any
+    gripper_path: Path,
+    decoy: Decoy,
+    mock_file_operator_save: SAVE_FUNC_TYPE,
+    mock_timestamp: datetime,
+    mock_utc_now: MOCK_UTC,
+    enable_ot3_hardware_controller: Any,
 ) -> None:
     """
     Test saving gripper calibrations.
     """
-    assert gripper.get_gripper_calibration_offset("gripper1") is None
+    return_data = models.v1.InstrumentOffsetModel(
+        offset=Point(1, 1, 1),
+        lastModified=mock_timestamp,
+        source=cs_types.SourceType.user,
+    )
+
     gripper.save_gripper_calibration(Point(1, 1, 1), "gripper1")
-    gripper_offset = gripper.get_gripper_calibration_offset("gripper1")
-    assert gripper_offset is not None
-    assert gripper_offset.offset == Point(1, 1, 1)
+
+    decoy.verify(
+        mock_file_operator_save(gripper_path, "gripper1", return_data), times=1
+    )
 
 
 def test_get_gripper_calibration(
-    starting_calibration_data: typing.Any, enable_ot3_hardware_controller: typing.Any
+    gripper_path: Path,
+    decoy: Decoy,
+    mock_file_operator_read: READ_FUNC_TYPE,
+    mock_timestamp: datetime,
+    mock_utc_now: MOCK_UTC,
+    enable_ot3_hardware_controller: Any,
 ) -> None:
     """
     Test ability to get a gripper calibration schema.
     """
-    from opentrons.calibration_storage.ot3 import models
-
-    gripper_data = gripper.get_gripper_calibration_offset("gripper1")
-    assert gripper_data is not None
+    return_data = {
+        "offset": [1, 1, 1],
+        "lastModified": mock_timestamp,
+        "source": "user",
+    }
+    decoy.when(mock_file_operator_read(gripper_path / "gripper1.json")).then_return(
+        return_data
+    )
+    gripper_data = cast(models.v1.InstrumentOffsetModel, gripper.get_gripper_calibration_offset("gripper1"))
     assert gripper_data == models.v1.InstrumentOffsetModel(
         offset=Point(1, 1, 1),
         lastModified=gripper_data.lastModified,
