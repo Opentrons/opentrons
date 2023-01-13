@@ -3,7 +3,6 @@ from typing import Optional
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.api_support.util import UnsupportedAPIError
 
 from opentrons.types import Point
