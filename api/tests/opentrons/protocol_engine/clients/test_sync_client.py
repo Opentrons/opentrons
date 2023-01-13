@@ -465,19 +465,12 @@ def test_comment(
     decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
 ) -> None:
     """It should execute a comment command."""
-    # TODO(mm, 2022-11-09): Use a proper Protocol Engine Comment command instead of
-    # a Custom command, once one exists.
-    class LegacyCommentCustomParams(commands.CustomParams):
-        legacyCommandType: str
-        legacyCommandText: str
-
-    request = commands.CustomCreate(
-        params=LegacyCommentCustomParams(
-            legacyCommandType="command.COMMENT",
-            legacyCommandText="Hello, world!",
+    request = commands.CommentCreate(
+        params=commands.CommentParams(
+            message="Hello, world!",
         )
     )
-    response = commands.CustomResult()
+    response = commands.CommentResult()
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
