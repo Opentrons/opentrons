@@ -10,7 +10,6 @@ import { ConfirmRobotName } from '../../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
-import { SelectWifiNetwork } from '../../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
 jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
@@ -19,7 +18,7 @@ jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
 jest.mock('../../pages/OnDeviceDisplay/ConfirmRobotName')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
-jest.mock('../../pages/OnDeviceDisplay/SelectWifiNetwork')
+// jest.mock('../../pages/OnDeviceDisplay/SelectWifiNetwork')
 
 const mockInitialSplash = InitialSplash as jest.MockedFunction<
   typeof InitialSplash
@@ -33,9 +32,9 @@ const mockConnectViaUSB = ConnectViaUSB as jest.MockedFunction<
 const mockConfirmRobotName = ConfirmRobotName as jest.MockedFunction<
   typeof ConfirmRobotName
 >
-const mockSelectWifiNetwork = SelectWifiNetwork as jest.MockedFunction<
-  typeof SelectWifiNetwork
->
+// const mockSelectWifiNetwork = SelectWifiNetwork as jest.MockedFunction<
+//   typeof SelectWifiNetwork
+// >
 const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
   typeof RobotDashboard
 >
@@ -55,7 +54,7 @@ describe('OnDeviceDisplayApp', () => {
     mockNetworkSetupMenu.mockReturnValue(<div>Mock NetworkSetupMenu</div>)
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
     mockConfirmRobotName.mockReturnValue(<div>Mock ConfirmRobotName</div>)
-    mockSelectWifiNetwork.mockReturnValue(<div>Mock SelectWifiNetwork</div>)
+    // mockSelectWifiNetwork.mockReturnValue(<div>Mock SelectWifiNetwork</div>)
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
   })
   afterEach(() => {
@@ -77,10 +76,10 @@ describe('OnDeviceDisplayApp', () => {
     getByText('Mock ConnectViaUSB')
   })
 
-  it('renders a SelectWifiNetwork component from /connect-via-wifi', () => {
-    const [{ getByText }] = render('/network-setup/wifi')
-    getByText('Mock SelectWifiNetwork')
-  })
+  // it('renders a SelectWifiNetwork component from /connect-via-wifi', () => {
+  //   const [{ getByText }] = render('/network-setup/wifi')
+  //   getByText('Mock SelectWifiNetwork')
+  // })
 
   it('renders a RobotDashboard component from /dashboard', () => {
     const [{ getByText }] = render('/dashboard')

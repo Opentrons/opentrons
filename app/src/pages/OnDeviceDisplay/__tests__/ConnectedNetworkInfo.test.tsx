@@ -78,7 +78,6 @@ describe('ConnectedNetworkInfo', () => {
     getByText('Subnet Mask: 255.255.255.230')
     getByText('MAC Address: WI:FI:00:00:00:00')
     getByRole('button', { name: 'Check for updates' })
-    getByRole('button', { name: 'Change network' })
   })
 
   it('when clicking Check for updates button, should call mock function', () => {
@@ -86,12 +85,5 @@ describe('ConnectedNetworkInfo', () => {
     const button = getByRole('button', { name: 'Check for updates' })
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
-  })
-
-  it('when clicking Change network button, should call mock function', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Change network' })
-    fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
   })
 })

@@ -12,6 +12,7 @@ import { StepMeter } from '../../atoms/StepMeter'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import { DisplayWifiList } from '../../organisms/SetupNetwork/DisplayWifiList'
+import { SelectAuthenticationType } from '../../organisms/SetupNetwork/SelectAuthenticationType'
 import { SetWifiCred } from '../../organisms/SetupNetwork/SetWifiCred'
 
 import type { State, Dispatch } from '../../redux/types'
@@ -20,6 +21,10 @@ const LIST_REFRESH_MS = 10000
 
 export function ConnectViaWifi(): JSX.Element {
   const [isSearching, setIsSearching] = React.useState<boolean>(true)
+  const [
+    isShowSelectAuthenticationType,
+    setIsShowSelectAuthenticationType,
+  ] = React.useState<boolean>(false)
   const [isShowSetWifiCred, setIsShowSetWifiCred] = React.useState<boolean>(
     false
   )
@@ -56,18 +61,30 @@ export function ConnectViaWifi(): JSX.Element {
           SPACING.spacingXXL
         )} ${String(SPACING.spacingXXL)}`}
       >
-        {isShowSetWifiCred ? (
+        {isShowSelectAuthenticationType ? (
+          <SelectAuthenticationType
+            ssid={selectedSsid}
+            fromWifiList={true}
+            setIsShowSelectAuthenticationType={
+              setIsShowSelectAuthenticationType
+            }
+            setIsShowSetWifiCred={setIsShowSetWifiCred}
+          />
+        ) : isShowSetWifiCred ? (
           <SetWifiCred
             ssid={selectedSsid}
             setIsShowSetWifiCred={setIsShowSetWifiCred}
           />
-        ) : null}
-        <DisplayWifiList
-          list={list}
-          isSearching={isSearching}
-          setSelectedSsid={setSelectedSsid}
-          setIsShowSetWifiCred={setIsShowSetWifiCred}
-        />
+        ) : (
+          <DisplayWifiList
+            list={list}
+            isSearching={isSearching}
+            setSelectedSsid={setSelectedSsid}
+            setIsShowSelectAuthenticationType={
+              setIsShowSelectAuthenticationType
+            }
+          />
+        )}
       </Flex>
     </>
   )

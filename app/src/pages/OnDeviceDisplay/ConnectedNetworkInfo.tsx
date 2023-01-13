@@ -210,19 +210,6 @@ const DisplayButtons = (): JSX.Element => {
       height="4.375rem"
       marginTop="1.4375rem"
     >
-      <SecondaryButton
-        onClick={() => history.push('/network-setup/wifi')}
-        width="100%"
-      >
-        <StyledText
-          fontSize="1.5rem"
-          lineHeight="1.375rem"
-          fontWeight="500"
-          color={COLORS.blueEnabled}
-        >
-          {t('change_network')}
-        </StyledText>
-      </SecondaryButton>
       <PrimaryButton
         onClick={() => history.push('/robot-settings/update-robot')}
         width="100%"

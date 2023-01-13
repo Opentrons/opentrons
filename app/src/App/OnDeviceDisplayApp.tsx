@@ -19,7 +19,6 @@ import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
-// import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
