@@ -108,12 +108,17 @@ def mock_location() -> mock.MagicMock:
 
 
 @pytest.mark.parametrize(
-    argnames=["module_definition", "expected_geometry", "expected_parent_location", "expected_repr"],
+    argnames=[
+        "module_definition",
+        "expected_geometry",
+        "expected_parent_location",
+        "expected_repr",
+    ],
     argvalues=[
         (
             lazy_fixture("minimal_heater_shaker_definition"),
             HeaterShakerGeometry(
-                parent=Location(Point(0, 0, 0), labware=5),
+                parent=Location(Point(0, 0, 0), labware="5"),
                 offset=Point(11, 22, 33),
                 overall_height=123,
                 height_over_labware=234,
@@ -121,22 +126,22 @@ def mock_location() -> mock.MagicMock:
                 module_type=ModuleType.HEATER_SHAKER,
                 display_name="Sample H/S Module",
             ),
-            5,
+            "5",
             "Sample H/S Module on 5",
         ),
         (
-                lazy_fixture("minimal_heater_shaker_definition"),
-                HeaterShakerGeometry(
-                    parent=Location(Point(0, 0, 0), labware=None),
-                    offset=Point(11, 22, 33),
-                    overall_height=123,
-                    height_over_labware=234,
-                    model=HeaterShakerModuleModel.HEATER_SHAKER_V1,
-                    module_type=ModuleType.HEATER_SHAKER,
-                    display_name="Sample H/S Module",
-                ),
-                None,
-                "Sample H/S Module",
+            lazy_fixture("minimal_heater_shaker_definition"),
+            HeaterShakerGeometry(
+                parent=Location(Point(0, 0, 0), labware=None),
+                offset=Point(11, 22, 33),
+                overall_height=123,
+                height_over_labware=234,
+                model=HeaterShakerModuleModel.HEATER_SHAKER_V1,
+                module_type=ModuleType.HEATER_SHAKER,
+                display_name="Sample H/S Module",
+            ),
+            None,
+            "Sample H/S Module",
         ),
     ],
 )
