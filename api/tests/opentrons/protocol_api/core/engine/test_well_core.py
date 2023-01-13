@@ -168,7 +168,7 @@ def test_set_has_tip(subject: WellCore) -> None:
 def test_load_liquid(
     decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
 ) -> None:
-    """It should load a liquid into a labware."""
+    """It should load a liquid into a well."""
     mock_liquid = decoy.mock(cls=LoadedLiquid)
 
     decoy.when(mock_liquid.id).then_return("liquid-id")
