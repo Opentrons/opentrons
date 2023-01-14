@@ -30,8 +30,6 @@ PIPETTE_NAMES = {
 
 DEFAULT_CURRENT_SEQUENCE = [0.6, 0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05]
 CUSTOM_CURRENT_SEQUENCE = {
-    "p1000_single_v43": None,
-    "p50_single_v43": None,
     "p1000_single_v33": None,
     "p50_single_v33": None,
     "p1000_single_v34": None,
@@ -40,8 +38,6 @@ CUSTOM_CURRENT_SEQUENCE = {
     "p50_multi_v33": None,
 }
 PIPETTE_TOLERANCES_MM = {
-    "p1000_single_v43": 0.4,
-    "p50_single_v43": 0.4,
     "p1000_single_v33": 0.4,
     "p50_single_v33": 0.4,
     "p1000_single_v34": 0.4,
