@@ -133,8 +133,8 @@ async def _jog_axis(
             else:
                 try:
                     tmp_step = float(inp.strip())
-                    if tmp_step < 0.0 or tmp_step > 1.0:
-                        print("Cannot jog greater than 1.0 mm")
+                    if abs(tmp_step) > 1.0:
+                        print("Cannot jog greater than +/- 1.0 mm")
                         continue
                     else:
                         step = tmp_step
