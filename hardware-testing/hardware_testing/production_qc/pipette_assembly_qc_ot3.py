@@ -47,8 +47,6 @@ SPEED_REDUCTION_PERCENTAGE = 0.3
 # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
 #       so here we cache these readings, and append them to the CSV in the end
 PRESSURE_DATA_CACHE = []
-# NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
-#       so here we cache these readings, and append them to the CSV in the end
 # save final test results, to be saved and displayed at the end
 FINAL_TEST_RESULTS = []
 
@@ -104,8 +102,11 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     fixture=None,
 )
 
+# THRESHOLDS: environment sensor
 TEMP_THRESH = [20, 40]
 HUMIDITY_THRESH = [10, 90]
+
+# THRESHOLDS: capacitive sensor
 CAP_THRESH_OPEN_AIR = [0.0, 10.0]
 CAP_THRESH_PROBE = [0.0, 20.0]
 CAP_PROBE_DISTANCE = 50.0
@@ -117,6 +118,7 @@ CAP_PROBE_SETTINGS = CapacitivePassSettings(
     sensor_threshold_pf=1.0,
 )
 
+# THRESHOLDS: air-pressure sensor
 PRESSURE_ASPIRATE_VOL = {50: 10.0, 1000: 100.0}
 PRESSURE_MAX_VALUE_ABS = 7500
 PRESSURE_THRESH_OPEN_AIR = [-300, 300]
@@ -297,6 +299,19 @@ async def _aspirate_and_look_for_droplets(
     return leak_test_passed
 
 
+def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
+    if not test_config.simulate and not test_config.skip_fixture:
+        if not test_config.fixture_port:
+            _port = list_ports_and_select("pressure-fixture")
+        else:
+            _port = ""
+        fixture = PressureFixture.create(port=_port, slot_side=test_config.fixture_side)
+    else:
+        fixture = SimPressureFixture()  # type: ignore[assignment]
+    fixture.connect()
+    return fixture
+
+
 async def _read_pressure_and_check_results(
     api: OT3API,
     fixture: PressureFixture,
@@ -448,17 +463,32 @@ async def _test_for_leak_by_eye(
     )
 
 
-def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
-    if not test_config.simulate and not test_config.skip_fixture:
-        if not test_config.fixture_port:
-            _port = list_ports_and_select("pressure-fixture")
-        else:
-            _port = ""
-        fixture = PressureFixture.create(port=_port, slot_side=test_config.fixture_side)
-    else:
-        fixture = SimPressureFixture()  # type: ignore[assignment]
-    fixture.connect()
-    return fixture
+async def _read_pipette_sensor_repeatedly_and_average(
+    api: OT3API, mount: OT3Mount, sensor_type: SensorType, num_readings: int
+) -> float:
+    # FIXME: this while loop is required b/c the command does not always
+    #        return a value, not sure what's the source of this issue
+    readings: List[float] = []
+    while len(readings) < num_readings:
+        try:
+            if sensor_type == SensorType.capacitive:
+                r = await helpers_ot3.get_capacitance_ot3(api, mount)
+            elif sensor_type == SensorType.pressure:
+                r = await helpers_ot3.get_pressure_ot3(api, mount)
+            elif sensor_type == SensorType.temperature:
+                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                r = res[0]
+            elif sensor_type == SensorType.humidity:
+                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                r = res[1]
+            else:
+                raise ValueError(f"unexpected sensor type: {sensor_type}")
+        except helpers_ot3.SensorResponseBad:
+            continue
+        readings.append(r)
+    readings.sort()
+    readings = readings[1:-1]
+    return sum(readings) / len(readings)
 
 
 async def _test_diagnostics_environment(
@@ -527,34 +557,6 @@ async def _test_diagnostics_encoder(
     print("homing plunger")
     await api.home([pip_axis])
     return encoder_home_pass and encoder_move_pass and encoder_stall_pass
-
-
-async def _read_pipette_sensor_repeatedly_and_average(
-    api: OT3API, mount: OT3Mount, sensor_type: SensorType, num_readings: int
-) -> float:
-    # FIXME: this while loop is required b/c the command does not always
-    #        return a value, not sure if issue is in firmware or CAN
-    readings: List[float] = []
-    while len(readings) < num_readings:
-        try:
-            if sensor_type == SensorType.capacitive:
-                r = await helpers_ot3.get_capacitance_ot3(api, mount)
-            elif sensor_type == SensorType.pressure:
-                r = await helpers_ot3.get_pressure_ot3(api, mount)
-            elif sensor_type == SensorType.temperature:
-                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
-                r = res[0]
-            elif sensor_type == SensorType.humidity:
-                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
-                r = res[1]
-            else:
-                raise ValueError(f"unexpected sensor type: {sensor_type}")
-        except helpers_ot3.SensorResponseBad:
-            continue
-        readings.append(r)
-    readings.sort()
-    readings = readings[1:-1]
-    return sum(readings) / len(readings)
 
 
 async def _test_diagnostics_capacitive(
@@ -887,6 +889,10 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
 
         # add metadata to CSV
+        # FIXME: create a set of CSV helpers, such that you can define a test-report
+        #        schema/format/line-length/etc., before having to fill its contents.
+        #        This would be very helpful, because changes to CVS length/contents
+        #        will break the analysis done in our Sheets
         csv_cb.write(["--------"])
         csv_cb.write(["METADATA"])
         csv_cb.write(["test-name", csv_props.name])
@@ -928,18 +934,20 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["TEST"])
         print("homing")
         await api.home()
+
         if not test_config.skip_plunger or not test_config.skip_diagnostics:
             print("moving over slot 3")
             pos_slot_2 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
             current_pos = await api.gantry_position(mount)
             hover_over_slot_2 = pos_slot_2._replace(z=current_pos.z)
             await api.move_to(mount, hover_over_slot_2)
-        if not test_config.skip_diagnostics:
-            test_passed = await _test_diagnostics(api, mount, csv_cb.write)
-            csv_cb.results("diagnostics", test_passed)
-        if not test_config.skip_plunger:
-            test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
-            csv_cb.results("plunger", test_passed)
+            if not test_config.skip_diagnostics:
+                test_passed = await _test_diagnostics(api, mount, csv_cb.write)
+                csv_cb.results("diagnostics", test_passed)
+            if not test_config.skip_plunger:
+                test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
+                csv_cb.results("plunger", test_passed)
+
         if not test_config.skip_liquid:
             for i, tip in enumerate(tips_used):
                 droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
@@ -947,6 +955,7 @@ async def _main(test_config: TestConfig) -> None:
                     api, mount, test_config, tip, droplet_wait_seconds
                 )
                 csv_cb.results("droplets", test_passed)
+
         if not test_config.skip_fixture:
             test_passed = await _test_for_leak(
                 api,
