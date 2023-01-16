@@ -103,8 +103,9 @@ const HeaderWithIPs = ({ isSearching }: HeadWithIPsProps): JSX.Element => {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       marginBottom="3.0625rem"
+      flex="1"
     >
-      <Flex justifyContent={JUSTIFY_START}>
+      <Flex justifyContent={JUSTIFY_START} flex="1">
         <Btn onClick={() => history.push('/network-setup')}>
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
@@ -122,12 +123,12 @@ const HeaderWithIPs = ({ isSearching }: HeadWithIPsProps): JSX.Element => {
           </Flex>
         </Btn>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER}>
+      <Flex justifyContent={JUSTIFY_CENTER} flex="1">
         <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
           {t('connect_via', { type: t('wifi') })}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_END}>
+      <Flex justifyContent={JUSTIFY_END} flex="1">
         {isSearching ? <Icon name="ot-spinner" spin size="3.3125rem" /> : null}
       </Flex>
     </Flex>
