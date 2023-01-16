@@ -21,6 +21,8 @@ import { StyledText } from '../../atoms/text'
 import { SearchNetwork } from './SearchNetwork'
 
 import type { WifiNetwork } from '../../redux/networking/types'
+import { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
+import { CONNECT } from '../Devices/RobotSettings/ConnectNetwork/constants'
 
 const NETWORK_ROW_STYLE = css`
   &:active {
@@ -40,6 +42,7 @@ interface DisplayWifiListProps {
   setIsShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
+  setChangeState: (changeState: NetworkChangeState) => void
 }
 
 export function DisplayWifiList({
@@ -47,6 +50,7 @@ export function DisplayWifiList({
   isSearching,
   setSelectedSsid,
   setIsShowSelectAuthenticationType,
+  setChangeState,
 }: DisplayWifiListProps): JSX.Element {
   return (
     <>
@@ -64,6 +68,7 @@ export function DisplayWifiList({
             onClick={() => {
               setSelectedSsid(nw.ssid)
               setIsShowSelectAuthenticationType(true)
+              setChangeState({ type: CONNECT, ssid: nw.ssid, network: nw })
             }}
           >
             <Flex

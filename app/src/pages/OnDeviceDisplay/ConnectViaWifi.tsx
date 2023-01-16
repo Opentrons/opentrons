@@ -16,6 +16,7 @@ import { SelectAuthenticationType } from '../../organisms/SetupNetwork/SelectAut
 import { SetWifiCred } from '../../organisms/SetupNetwork/SetWifiCred'
 
 import type { State, Dispatch } from '../../redux/types'
+import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 
 const LIST_REFRESH_MS = 10000
 
@@ -32,6 +33,9 @@ export function ConnectViaWifi(): JSX.Element {
   const [selectedAuthType, setSelectedAuthType] = React.useState<
     'wpa' | 'none'
   >('wpa')
+  const [changeState, setChangeState] = React.useState<NetworkChangeState>({
+    type: null,
+  })
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
@@ -64,7 +68,36 @@ export function ConnectViaWifi(): JSX.Element {
           SPACING.spacingXXL
         )} ${String(SPACING.spacingXXL)}`}
       >
-        {isShowSelectAuthenticationType ? (
+        {changeState.type == null ? (
+          <DisplayWifiList
+            list={list}
+            isSearching={isSearching}
+            setSelectedSsid={setSelectedSsid}
+            setIsShowSelectAuthenticationType={
+              setIsShowSelectAuthenticationType
+            }
+            setChangeState={setChangeState}
+          />
+        ) : isShowSelectAuthenticationType ? (
+          <SelectAuthenticationType
+            ssid={selectedSsid}
+            fromWifiList={true}
+            setIsShowSelectAuthenticationType={
+              setIsShowSelectAuthenticationType
+            }
+            setIsShowSetWifiCred={setIsShowSetWifiCred}
+            setSelectedAuthType={setSelectedAuthType}
+          />
+        ) : (
+          <SetWifiCred
+            ssid={selectedSsid}
+            setIsShowSetWifiCred={setIsShowSetWifiCred}
+            authType={selectedAuthType}
+            changeState={changeState}
+            setChangeState={setChangeState}
+          />
+        )}
+        {/* {isShowSelectAuthenticationType ? (
           <SelectAuthenticationType
             ssid={selectedSsid}
             fromWifiList={true}
@@ -89,7 +122,7 @@ export function ConnectViaWifi(): JSX.Element {
               setIsShowSelectAuthenticationType
             }
           />
-        )}
+        )} */}
       </Flex>
     </>
   )

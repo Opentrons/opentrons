@@ -18,7 +18,10 @@ import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { DISCONNECT } from '../Devices/RobotSettings/ConnectNetwork/constants'
 
 import type { RequestState } from '../../redux/robot-api/types'
-import type { NetworkChangeType } from '../Devices/RobotSettings/ConnectNetwork/types'
+import type {
+  NetworkChangeType,
+  NetworkChangeState,
+} from '../Devices/RobotSettings/ConnectNetwork/types'
 
 interface FailedToConnectProps {
   ssid: string
@@ -26,6 +29,7 @@ interface FailedToConnectProps {
   type: NetworkChangeType | null
   onConnect: () => void
   setIsShowSetWifiCred: (isShow: boolean) => void
+  setChangeState: (changeState: NetworkChangeState) => void
 }
 
 export function FailedToConnect({
@@ -34,11 +38,8 @@ export function FailedToConnect({
   type,
   onConnect,
   setIsShowSetWifiCred,
+  setChangeState,
 }: FailedToConnectProps): JSX.Element {
-  console.log('requestState', requestState)
-
-  console.log('type', type)
-
   const { t } = useTranslation(['device_settings', 'shared'])
   const isInvalidPassword = !(type === DISCONNECT)
 
@@ -108,7 +109,7 @@ export function FailedToConnect({
       <Flex gridGap="0.75rem">
         <SecondaryButton
           flex="1"
-          onClick={() => console.log('need to update to display Wifi list')}
+          onClick={() => setChangeState({ type: null })}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           fontSize="1.5rem"
           lineHeight="1.375rem"

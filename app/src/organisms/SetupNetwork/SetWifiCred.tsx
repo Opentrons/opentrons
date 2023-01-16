@@ -28,14 +28,7 @@ import { getLocalRobot } from '../../redux/discovery'
 import { ConnectingNetwork } from './ConnectingNetwork'
 import { FailedToConnect } from './FailedToConnect'
 import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
-import {
-  /* 
-  Note: kj 12/27/2022 These will be used in RobotSettings networking function
-  CONNECT,
-  DISCONNECT,
-  */
-  JOIN_OTHER,
-} from '../Devices/RobotSettings/ConnectNetwork/constants'
+import { JOIN_OTHER } from '../Devices/RobotSettings/ConnectNetwork/constants'
 
 import type { State, Dispatch } from '../../redux/types'
 import type {
@@ -58,12 +51,16 @@ interface SetWifiCredProps {
   ssid: string
   authType: 'wpa' | 'none'
   setIsShowSetWifiCred: (isShow: boolean) => void
+  changeState: NetworkChangeState
+  setChangeState: (changeState: NetworkChangeState) => void
 }
 
 export function SetWifiCred({
   ssid,
   authType,
   setIsShowSetWifiCred,
+  changeState,
+  setChangeState,
 }: SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
@@ -71,9 +68,6 @@ export function SetWifiCred({
   const keyboardRef = React.useRef(null)
   const [password, setPassword] = React.useState<string>('')
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
-  const [changeState, setChangeState] = React.useState<NetworkChangeState>({
-    type: null,
-  })
   const dispatch = useDispatch<Dispatch>()
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
@@ -229,6 +223,7 @@ export function SetWifiCred({
               type={changeState.type}
               onConnect={handleConnect}
               setIsShowSetWifiCred={setIsShowSetWifiCred}
+              setChangeState={setChangeState}
             />
           )}
         </>
