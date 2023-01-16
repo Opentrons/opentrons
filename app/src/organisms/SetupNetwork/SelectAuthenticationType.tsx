@@ -30,6 +30,7 @@ interface SelectAuthenticationTypeProps {
     isShowSelectAuthenticationType: boolean
   ) => void
   setIsShowSetWifiCred: (isShowSetWifiCred: boolean) => void
+  setSelectedAuthType: (authType: 'wpa' | 'none') => void
 }
 
 export function SelectAuthenticationType({
@@ -37,13 +38,12 @@ export function SelectAuthenticationType({
   fromWifiList,
   setIsShowSelectAuthenticationType,
   setIsShowSetWifiCred,
+  setSelectedAuthType,
 }: SelectAuthenticationTypeProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
+  const [isWpaTapped, setIsWpaTapped] = React.useState<boolean>(true)
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
-  const [selectedAuthType, setSelectedAuthType] = React.useState<
-    'wpa' | 'none'
-  >('wpa')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const { wifi } = useSelector((state: State) =>
@@ -125,10 +125,13 @@ export function SelectAuthenticationType({
           gridGap="1.375rem"
         >
           <Btn
-            backgroundColor={selectedAuthType === 'wpa' ? COLORS.medBlue : ''}
+            backgroundColor={isWpaTapped ? COLORS.medBlue : ''}
             padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
             borderRadius="3.5625rem"
-            onClick={() => setSelectedAuthType('wpa')}
+            onClick={() => {
+              setSelectedAuthType('wpa')
+              setIsWpaTapped(true)
+            }}
           >
             <StyledText
               fontSize="2rem"
@@ -140,10 +143,13 @@ export function SelectAuthenticationType({
             </StyledText>
           </Btn>
           <Btn
-            backgroundColor={selectedAuthType === 'none' ? COLORS.medBlue : ''}
+            backgroundColor={!isWpaTapped ? COLORS.medBlue : ''}
             borderRadius="3.5625rem"
             padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
-            onClick={() => setSelectedAuthType('none')}
+            onClick={() => {
+              setSelectedAuthType('none')
+              setIsWpaTapped(false)
+            }}
           >
             <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="600">
               {t('shared:none')}

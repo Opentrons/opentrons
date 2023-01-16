@@ -35,6 +35,10 @@ export function FailedToConnect({
   onConnect,
   setIsShowSetWifiCred,
 }: FailedToConnectProps): JSX.Element {
+  console.log('requestState', requestState)
+
+  console.log('type', type)
+
   const { t } = useTranslation(['device_settings', 'shared'])
   const isInvalidPassword = !(type === DISCONNECT)
 

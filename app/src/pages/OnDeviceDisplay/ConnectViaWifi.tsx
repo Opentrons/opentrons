@@ -29,6 +29,9 @@ export function ConnectViaWifi(): JSX.Element {
     false
   )
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
+  const [selectedAuthType, setSelectedAuthType] = React.useState<
+    'wpa' | 'none'
+  >('wpa')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
@@ -69,11 +72,13 @@ export function ConnectViaWifi(): JSX.Element {
               setIsShowSelectAuthenticationType
             }
             setIsShowSetWifiCred={setIsShowSetWifiCred}
+            setSelectedAuthType={setSelectedAuthType}
           />
         ) : isShowSetWifiCred ? (
           <SetWifiCred
             ssid={selectedSsid}
             setIsShowSetWifiCred={setIsShowSetWifiCred}
+            authType={selectedAuthType}
           />
         ) : (
           <DisplayWifiList

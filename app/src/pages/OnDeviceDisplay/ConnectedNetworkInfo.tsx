@@ -19,11 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import {
-  PrimaryButton,
-  SecondaryButton,
-  TertiaryButton,
-} from '../../atoms/buttons'
+import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import {
   getNetworkInterfaces,
@@ -39,12 +35,12 @@ const LIST_REFRESH_MS = 10000
 
 interface ConnectedNetworkInfoProps {
   ssid: string
-  authType?: 'wpa' | 'none'
+  authType: 'wpa' | 'none'
 }
 
 export function ConnectedNetworkInfo({
   ssid,
-  authType = 'wpa', // ToDo kj 12/27/2022 this default will be removed by the PR for manual connection
+  authType,
 }: ConnectedNetworkInfoProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
@@ -62,34 +58,31 @@ export function ConnectedNetworkInfo({
   }, [robotName, dispatch])
 
   return (
-    <>
-      <StepMeter totalSteps={5} currentStep={2} OnDevice />
+    <Flex
+      margin={`${String(SPACING.spacing6)} ${String(
+        SPACING.spacingXXL
+      )} ${String(SPACING.spacingXXL)}`}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing5}
+    >
+      <TitleHeader />
+      <DisplayConnectionStatus />
+      <DisplayConnectedNetworkInfo
+        wifi={wifi}
+        ssid={ssid}
+        authType={authType}
+      />
+      <DisplayButtons />
       <Flex
-        margin={`${String(SPACING.spacing6)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
       >
-        <TitleHeader />
-        <DisplayConnectionStatus />
-        <DisplayConnectedNetworkInfo
-          wifi={wifi}
-          ssid={ssid}
-          authType={authType}
-        />
-        <DisplayButtons />
-        <Flex
-          alignSelf={ALIGN_FLEX_END}
-          marginTop={SPACING.spacing5}
-          width="fit-content"
-        >
-          <Link to="menu">
-            <TertiaryButton>To ODD Menu</TertiaryButton>
-          </Link>
-        </Flex>
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
       </Flex>
-    </>
+    </Flex>
   )
 }
 
@@ -201,7 +194,7 @@ const DisplayConnectedNetworkInfo = ({
 }
 
 const DisplayButtons = (): JSX.Element => {
-  const { t } = useTranslation(['device_settings'])
+  const { t } = useTranslation('device_settings')
   const history = useHistory()
   return (
     <Flex

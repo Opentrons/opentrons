@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
@@ -57,13 +56,13 @@ const SSID_INPUT_FIELD_STYLE = css`
 
 interface SetWifiCredProps {
   ssid: string
-  authType?: 'wpa' | 'none'
+  authType: 'wpa' | 'none'
   setIsShowSetWifiCred: (isShow: boolean) => void
 }
 
 export function SetWifiCred({
   ssid,
-  authType = 'wpa',
+  authType,
   setIsShowSetWifiCred,
 }: SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
@@ -87,9 +86,15 @@ export function SetWifiCred({
   )
   const selectedNetwork = list.find(nw => nw.ssid === ssid)
 
+  React.useEffect(() => {
+    // if securityType is none directly connect to a network without showing password form
+    authType === 'none' && handleConnect()
+    dispatch(Networking.fetchStatus(robotName))
+  }, [])
+
   const formatNetworkSettings = (): WifiConfigureRequest => {
     const securityType = selectedNetwork?.securityType
-    const hidden = false // ToDo update for manual connect when the design is ready for dev
+    const hidden = false
     const psk = password
 
     return {
@@ -97,12 +102,12 @@ export function SetWifiCred({
       securityType,
       hidden,
       psk,
-      // eapConfig,
     }
   }
 
   const handleConnect = (): void => {
     const options = formatNetworkSettings()
+    console.log(options)
     dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
     // ToDo There will be needed codes for manual connect for wpa-2
     if (changeState.type === JOIN_OTHER) {
