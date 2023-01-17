@@ -28,8 +28,8 @@ interface FailedToConnectProps {
   requestState?: RequestState
   type: NetworkChangeType | null
   onConnect: () => void
-  setIsShowSetWifiCred: (isShow: boolean) => void
   setChangeState: (changeState: NetworkChangeState) => void
+  setCurrentRequestState: (currentState: RequestState | null) => void
 }
 
 export function FailedToConnect({
@@ -37,26 +37,18 @@ export function FailedToConnect({
   requestState,
   type,
   onConnect,
-  setIsShowSetWifiCred,
   setChangeState,
+  setCurrentRequestState,
 }: FailedToConnectProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const isInvalidPassword = !(type === DISCONNECT)
 
-  const handleUpdate = (): void => {
-    console.log('called')
-    setIsShowSetWifiCred(true)
-  }
-
   const handleClickTryAgain = (): void => {
     if (isInvalidPassword) {
       // Display SetWifiCred screen
-      console.log('display SetWifiCred')
-      // handleShowSetWifiCred(true)
-      handleUpdate()
+      setCurrentRequestState(null)
     } else {
       // Try to reconnect
-      console.log('try to connect again')
       onConnect()
     }
   }

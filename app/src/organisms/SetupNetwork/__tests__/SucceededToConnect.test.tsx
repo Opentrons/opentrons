@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import * as Networking from '../../../redux/networking'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
-import { ConnectedNetworkInfo } from '../ConnectedNetworkInfo'
+import { SucceededToConnect } from '../SucceededToConnect'
 
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
@@ -28,10 +28,10 @@ jest.mock('react-router-dom', () => {
   }
 })
 
-const render = (props: React.ComponentProps<typeof ConnectedNetworkInfo>) => {
+const render = (props: React.ComponentProps<typeof SucceededToConnect>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <ConnectedNetworkInfo {...props} />
+      <SucceededToConnect {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -51,8 +51,8 @@ const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'bar', active: false },
 ]
 
-describe('ConnectedNetworkInfo', () => {
-  let props: React.ComponentProps<typeof ConnectedNetworkInfo>
+describe('SucceededToConnect', () => {
+  let props: React.ComponentProps<typeof SucceededToConnect>
   beforeEach(() => {
     props = {
       ssid: 'mockWifi',

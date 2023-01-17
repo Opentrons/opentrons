@@ -14,7 +14,6 @@ import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
-jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
 jest.mock('../../pages/OnDeviceDisplay/InitialSplash')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')

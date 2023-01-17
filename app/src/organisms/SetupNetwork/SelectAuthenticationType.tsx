@@ -22,6 +22,7 @@ import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 
 import type { Dispatch, State } from '../../redux/types'
+import { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
 
 interface SelectAuthenticationTypeProps {
   ssid: string
@@ -29,16 +30,16 @@ interface SelectAuthenticationTypeProps {
   setIsShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
-  setIsShowSetWifiCred: (isShowSetWifiCred: boolean) => void
-  setSelectedAuthType: (authType: 'wpa' | 'none') => void
+  setSelectedAuthType: (authType: 'wpa-psk' | 'none') => void
+  setChangeState: (changeState: NetworkChangeState) => void
 }
 
 export function SelectAuthenticationType({
   ssid,
   fromWifiList,
   setIsShowSelectAuthenticationType,
-  setIsShowSetWifiCred,
   setSelectedAuthType,
+  setChangeState,
 }: SelectAuthenticationTypeProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const [isWpaTapped, setIsWpaTapped] = React.useState<boolean>(true)
@@ -53,7 +54,7 @@ export function SelectAuthenticationType({
   const handleClickBack = (): void => {
     if (fromWifiList != null) {
       // back to wifi list
-      setIsShowSelectAuthenticationType(false)
+      setChangeState({ type: null })
     } else {
       // back to set wifi ssid
       // Note: This will be updated by #11917
@@ -107,7 +108,6 @@ export function SelectAuthenticationType({
           borderRadius="42px"
           onClick={() => {
             setIsShowSelectAuthenticationType(false)
-            setIsShowSetWifiCred(true)
           }}
         >
           {t('shared:next')}
@@ -129,7 +129,7 @@ export function SelectAuthenticationType({
             padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
             borderRadius="3.5625rem"
             onClick={() => {
-              setSelectedAuthType('wpa')
+              setSelectedAuthType('wpa-psk')
               setIsWpaTapped(true)
             }}
           >

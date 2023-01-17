@@ -20,7 +20,6 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
-import { StepMeter } from '../../atoms/StepMeter'
 import {
   getNetworkInterfaces,
   fetchStatus,
@@ -33,15 +32,15 @@ import type { State, Dispatch } from '../../redux/types'
 const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
 
-interface ConnectedNetworkInfoProps {
+interface SucceededToConnectProps {
   ssid: string
-  authType: 'wpa' | 'none'
+  authType: 'wpa-psk' | 'none'
 }
 
-export function ConnectedNetworkInfo({
+export function SucceededToConnect({
   ssid,
   authType,
-}: ConnectedNetworkInfoProps): JSX.Element {
+}: SucceededToConnectProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -140,8 +139,8 @@ const DisplayConnectionStatus = (): JSX.Element => {
 
 interface DisplayConnectedNetworkInfoProps {
   ssid: string
-  wifi: any
-  authType: 'wpa' | 'none'
+  wifi: any // ToDo specify the type
+  authType: 'wpa-psk' | 'none'
 }
 
 const DisplayConnectedNetworkInfo = ({
@@ -180,7 +179,9 @@ const DisplayConnectedNetworkInfo = ({
           {`${t('ip_address')}:  ${String(wifi?.ipAddress)}`}
         </StyledText>
         <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
-          {`Authentication: ${String(authType === 'wpa' ? 'WPA2' : 'None')}`}
+          {`Authentication: ${String(
+            authType === 'wpa-psk' ? 'WPA2' : 'None'
+          )}`}
         </StyledText>
         <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
           {`${t('subnet_mask')}: ${String(wifi?.subnetMask)}`}

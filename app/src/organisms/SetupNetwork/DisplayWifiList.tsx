@@ -38,7 +38,6 @@ const NETWORK_ROW_STYLE = css`
 interface DisplayWifiListProps {
   list: WifiNetwork[]
   isSearching: boolean
-  setSelectedSsid: (nwSsid: string) => void
   setIsShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
@@ -48,7 +47,6 @@ interface DisplayWifiListProps {
 export function DisplayWifiList({
   list,
   isSearching,
-  setSelectedSsid,
   setIsShowSelectAuthenticationType,
   setChangeState,
 }: DisplayWifiListProps): JSX.Element {
@@ -66,7 +64,6 @@ export function DisplayWifiList({
             borderRadius="12px"
             css={NETWORK_ROW_STYLE}
             onClick={() => {
-              setSelectedSsid(nw.ssid)
               setIsShowSelectAuthenticationType(true)
               setChangeState({ type: CONNECT, ssid: nw.ssid, network: nw })
             }}
