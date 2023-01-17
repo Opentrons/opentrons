@@ -54,7 +54,7 @@ async def test_calibrate_gripper(
 
     params = CalibrateGripperParams(probe=params_probe)
     decoy.when(
-        await ot3_calibration.calibrate_gripper(
+        await ot3_calibration.calibrate_gripper_jaw(
             ot3_hardware_api,
             probe=expected_hc_probe,
         )
