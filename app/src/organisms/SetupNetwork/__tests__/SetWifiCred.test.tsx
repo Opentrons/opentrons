@@ -5,42 +5,13 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import * as Networking from '../../../redux/networking'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
-import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { SetWifiCred } from '../SetWifiCred'
-
-import type { DispatchApiRequestType } from '../../../redux/robot-api'
-
-const mockWifiList = [
-  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
-  {
-    ...Fixtures.mockWifiNetwork,
-    ssid: 'baz',
-  },
-]
-const mockRobotName = 'otie'
-const mockOptions = {
-  ssid: 'mockWiFi',
-  securityType: Networking.SECURITY_NONE,
-  hidden: false,
-  psk: 'mockPsk',
-}
 
 const mockSetIsShowSelectAuthenticationType = jest.fn()
 const mockSetPassword = jest.fn()
 const mockHandleConnect = jest.fn()
-jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/robot-api')
-
-const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
-  typeof useDispatchApiRequest
->
-const mockPostWifiConfigure = Networking.postWifiConfigure as jest.MockedFunction<
-  typeof Networking.postWifiConfigure
->
 
 const render = (props: React.ComponentProps<typeof SetWifiCred>) => {
   return renderWithProviders(
@@ -53,15 +24,8 @@ const render = (props: React.ComponentProps<typeof SetWifiCred>) => {
   )
 }
 
-const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
-  typeof Networking.getWifiList
->
-
-// ToDo: kj 12/27/2022 authType test cases will be added in another PR
-// props authType none case
 describe('SetWifiCred', () => {
   let props: React.ComponentProps<typeof SetWifiCred>
-  let dispatchApiRequest: DispatchApiRequestType
   beforeEach(() => {
     props = {
       ssid: 'mockWifi',
@@ -71,9 +35,6 @@ describe('SetWifiCred', () => {
       setPassword: mockSetPassword,
       handleConnect: mockHandleConnect,
     }
-    mockGetWifiList.mockReturnValue(mockWifiList)
-    dispatchApiRequest = jest.fn()
-    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
   })
 
   afterEach(() => {
