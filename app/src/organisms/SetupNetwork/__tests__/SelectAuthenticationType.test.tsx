@@ -67,6 +67,10 @@ describe('SelectAuthenticationType', () => {
     mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   it('should render text and buttons', () => {
     const [{ getByText, getByRole }] = render(props)
     getByText('Connect to mockWifi')

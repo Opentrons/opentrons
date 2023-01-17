@@ -19,10 +19,10 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { SearchNetwork } from './SearchNetwork'
+import { CONNECT } from '../Devices/RobotSettings/ConnectNetwork/constants'
 
 import type { WifiNetwork } from '../../redux/networking/types'
-import { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
-import { CONNECT } from '../Devices/RobotSettings/ConnectNetwork/constants'
+import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
 
 const NETWORK_ROW_STYLE = css`
   &:active {
@@ -131,7 +131,14 @@ const HeaderWithIPs = ({ isSearching }: HeadWithIPsProps): JSX.Element => {
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_END} flex="1">
-        {isSearching ? <Icon name="ot-spinner" spin size="3.3125rem" /> : null}
+        {isSearching ? (
+          <Icon
+            name="ot-spinner"
+            spin
+            size="3.3125rem"
+            data-testid="wifi_list_search_spinner"
+          />
+        ) : null}
       </Flex>
     </Flex>
   )
