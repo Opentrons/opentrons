@@ -136,7 +136,7 @@ async def _main(directory: Path, is_simulating: bool, skip: SkipUpdateTarget) ->
     # flash 96-channel pipette
     if has_96 and FW_PIP_96.path and not skip.left:
         _run_update_fw_command(
-            path=FW_PIP_MULTI.path,
+            path=FW_PIP_96.path,
             target=FW_PIP_96.target.format(mount="left"),
             is_simulating=is_simulating,
         )
