@@ -1,4 +1,4 @@
-"""Wait for resume command request, result, and implementation models."""
+"""Comment command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Optional, Type
