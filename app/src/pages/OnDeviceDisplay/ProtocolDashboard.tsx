@@ -78,9 +78,11 @@ export function ProtocolDashboard(): JSX.Element {
               >
                 <TableDatum> {protocol.metadata.protocolName}</TableDatum>
                 <TableDatum>
-                  {lastRun != null ? formatDistance(new Date(lastRun), new Date(), {
-                    addSuffix: true,
-                  }): t('no_history')}
+                  {lastRun != null
+                    ? formatDistance(new Date(lastRun), new Date(), {
+                        addSuffix: true,
+                      })
+                    : t('no_history')}
                 </TableDatum>
                 <TableDatum>
                   {format(new Date(protocol.createdAt), 'Pp')}
