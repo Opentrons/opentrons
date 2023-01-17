@@ -5,7 +5,7 @@
 max-line-length = 100
 
 # max cyclomatic complexity
-max-complexity = 9
+max-complexity = 15
 
 extend-ignore =
     # ignore E203 because black might reformat it

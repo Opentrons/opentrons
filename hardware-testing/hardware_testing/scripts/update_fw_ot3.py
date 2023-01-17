@@ -111,28 +111,19 @@ async def _main(directory: Path, is_simulating: bool, skip: SkipUpdateTarget) ->
                 _run_update_fw_command(
                     path=fw.path, target=fw.target, is_simulating=is_simulating
                 )
-    # flash single-channel pipettes
-    if FW_PIP_SINGLE.path:
-        for mount in singles:
-            if (mount == "left" and not skip.left) or (
-                mount == "right" and not skip.right
-            ):
-                _run_update_fw_command(
-                    path=FW_PIP_SINGLE.path,
-                    target=FW_PIP_SINGLE.target.format(mount=mount),
-                    is_simulating=is_simulating,
-                )
-    # flash multi-channel pipettes
-    if FW_PIP_MULTI.path:
-        for mount in multis:
-            if (mount == "left" and not skip.left) or (
-                mount == "right" and not skip.right
-            ):
-                _run_update_fw_command(
-                    path=FW_PIP_MULTI.path,
-                    target=FW_PIP_MULTI.target.format(mount=mount),
-                    is_simulating=is_simulating,
-                )
+    # flash single/multi channel pipettes
+    _pip_fw_and_target = {FW_PIP_SINGLE: singles, FW_PIP_MULTI: multis}
+    for fw, mnt_list in _pip_fw_and_target.items():
+        if not fw.path:
+            continue
+        for mount in mnt_list:
+            if (mount == "left" and skip.left) or (mount == "right" and skip.right):
+                continue
+            _run_update_fw_command(
+                path=fw.path,
+                target=fw.target.format(mount=mount),
+                is_simulating=is_simulating,
+            )
     # flash 96-channel pipette
     if has_96 and FW_PIP_96.path and not skip.left:
         _run_update_fw_command(
