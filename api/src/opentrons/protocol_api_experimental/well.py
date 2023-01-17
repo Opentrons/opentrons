@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Optional
 
-from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from .types import Location, Point

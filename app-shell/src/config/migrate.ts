@@ -1,7 +1,11 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
+import {
+  CONFIG_VERSION_LATEST,
+  OT2_MANIFEST_URL,
+  OT3_MANIFEST_URL,
+} from '@opentrons/app/src/redux/config'
 
 import type {
   Config,
@@ -17,11 +21,13 @@ import type {
   ConfigV9,
   ConfigV10,
   ConfigV11,
+  ConfigV12,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
 // any default values for later config versions are specified in the migration
 // functions for those version below
+
 export const DEFAULTS_V0: ConfigV0 = {
   version: 0,
   devtools: false,
@@ -241,6 +247,24 @@ const toVersion11 = (prevConfig: ConfigV10): ConfigV11 => {
   return nextConfig
 }
 
+// config version 11 migration and defaults
+const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
+  // @ts-expect-error deleting a key from the config removes a required param from the prev config
+  delete prevConfig.buildroot
+  const nextConfig = {
+    ...prevConfig,
+    version: 12 as const,
+    robotSystemUpdate: {
+      manifestUrls: {
+        OT2: OT2_MANIFEST_URL,
+        OT3: OT3_MANIFEST_URL,
+      },
+    },
+  }
+
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -252,7 +276,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV7) => ConfigV8,
   (prevConfig: ConfigV8) => ConfigV9,
   (prevConfig: ConfigV9) => ConfigV10,
-  (prevConfig: ConfigV10) => ConfigV11
+  (prevConfig: ConfigV10) => ConfigV11,
+  (prevConfig: ConfigV11) => ConfigV12
 ] = [
   toVersion1,
   toVersion2,
@@ -265,6 +290,7 @@ const MIGRATIONS: [
   toVersion9,
   toVersion10,
   toVersion11,
+  toVersion12,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -283,6 +309,7 @@ export function migrate(
     | ConfigV9
     | ConfigV10
     | ConfigV11
+    | ConfigV12
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

@@ -87,6 +87,8 @@ class MessageId(int, Enum):
 
     motor_position_request = 0x12
     motor_position_response = 0x14
+    update_motor_position_estimation_request = 0x21
+    update_motor_position_estimation_response = 0x22
 
     set_motion_constraints = 0x101
     get_motion_constraints_request = 0x102
@@ -131,6 +133,11 @@ class MessageId(int, Enum):
 
     do_self_contained_tip_action_request = 0x501
     do_self_contained_tip_action_response = 0x502
+    gear_enable_motor_request = 0x503
+    gear_disable_motor_request = 0x504
+    gear_set_current_request = 0x505
+    gear_write_motor_driver_request = 0x506
+    gear_read_motor_driver_request = 0x507
 
     read_sensor_request = 0x82
     write_sensor_request = 0x83
@@ -169,6 +176,8 @@ class ErrorCode(int, Enum):
     estop_detected = 0x07
     collision_detected = 0x08
     labware_dropped = 0x09
+    estop_released = 0x0A
+    motor_busy = 0x0B
 
 
 @unique
@@ -254,3 +263,15 @@ class MotorPositionFlags(Enum):
     # Referring to the closed-loop encoder on the relevant axis.
     # Generally only unset if the motor board has not homed since power-on.
     encoder_position_ok = 0x2
+
+
+@unique
+class MoveStopCondition(int, Enum):
+    """Move Stop Condition."""
+
+    none = 0x0
+    limit_switch = 0x1
+    cap_sensor = 0x2
+    encoder_position = 0x4
+    gripper_force = 0x8
+    stall = 0x10

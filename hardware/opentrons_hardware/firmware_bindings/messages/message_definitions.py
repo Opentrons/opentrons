@@ -257,6 +257,22 @@ class MotorPositionResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class UpdateMotorPositionEstimationRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.update_motor_position_estimation_request
+    ] = MessageId.update_motor_position_estimation_request
+
+
+@dataclass
+class UpdateMotorPositionEstimationResponse(BaseMessage):  # noqa: D101
+    payload: payloads.MotorPositionResponse
+    payload_type: Type[payloads.MotorPositionResponse] = payloads.MotorPositionResponse
+    message_id: Literal[
+        MessageId.update_motor_position_estimation_response
+    ] = MessageId.update_motor_position_estimation_response
+
+
+@dataclass
 class SetMotionConstraints(BaseMessage):  # noqa: D101
     payload: payloads.MotionConstraintsPayload
     payload_type: Type[
@@ -658,6 +674,20 @@ class GripperInfoResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class GearEnableMotorRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gear_enable_motor_request
+    ] = MessageId.gear_enable_motor_request
+
+
+@dataclass
+class GearDisableMotorRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gear_disable_motor_request
+    ] = MessageId.gear_disable_motor_request
+
+
+@dataclass
 class TipActionRequest(BaseMessage):  # noqa: D101
     payload: payloads.TipActionRequestPayload
     payload_type: Type[
@@ -677,6 +707,37 @@ class TipActionResponse(BaseMessage):  # noqa: D101
     message_id: Literal[
         MessageId.do_self_contained_tip_action_response
     ] = MessageId.do_self_contained_tip_action_response
+
+
+@dataclass
+class GearWriteMotorDriverRegisterRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorDriverRegisterDataPayload
+    payload_type: Type[
+        payloads.MotorDriverRegisterPayload
+    ] = payloads.MotorDriverRegisterDataPayload
+    message_id: Literal[
+        MessageId.gear_write_motor_driver_request
+    ] = MessageId.gear_write_motor_driver_request
+
+
+@dataclass
+class GearReadMotorDriverRegisterRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorDriverRegisterPayload
+    payload_type: Type[
+        payloads.MotorDriverRegisterPayload
+    ] = payloads.MotorDriverRegisterPayload
+    message_id: Literal[
+        MessageId.gear_read_motor_driver_request
+    ] = MessageId.gear_read_motor_driver_request
+
+
+@dataclass
+class GearWriteMotorCurrentRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorCurrentPayload
+    payload_type: Type[payloads.MotorCurrentPayload] = payloads.MotorCurrentPayload
+    message_id: Literal[
+        MessageId.gear_set_current_request
+    ] = MessageId.gear_set_current_request
 
 
 @dataclass

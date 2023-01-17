@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-
   "definitions": {
     "idleZCurrentRange": {
       "type": "number",
@@ -27,9 +26,15 @@
       "additionalProperties": false,
       "required": ["x", "y", "z"],
       "properties": {
-        "x": { "type": "number" },
-        "y": { "type": "number" },
-        "z": { "type": "number" }
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
       }
     },
     "positiveNumber": {
@@ -40,12 +45,15 @@
       "type": "object",
       "required": ["min", "max"],
       "properties": {
-        "min": { "$ref": "#/definitions/positiveNumber" },
-        "max": { "$ref": "#/definitions/positiveNumber" }
+        "min": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "max": {
+          "$ref": "#/definitions/positiveNumber"
+        }
       }
     }
   },
-
   "description": "Gripper specification",
   "type": "object",
   "required": [
@@ -55,13 +63,13 @@
     "idleZCurrent",
     "activeZCurrent",
     "jawReferenceVoltage",
-    "jawForcePerDutyCycle",
+    "jawDutyCyclePolynomial",
     "baseOffsetFromMount",
     "jawCenterOffsetFromBase",
     "pinOneOffsetFromBase",
     "pinTwoOffsetFromBase",
     "quirks",
-    "jawSizes_um"
+    "jawSizes_mm"
   ],
   "additionalProperties": false,
   "properties": {
@@ -69,43 +77,69 @@
       "type": "string",
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/gripper/schemas/1 is a reference to this schema."
     },
-    "displayName": { "type": "string" },
+    "displayName": {
+      "type": "string"
+    },
     "model": {
       "type": "string",
       "pattern": "^gripperV[0-9]$"
     },
     "idleZCurrent": {
       "type": "object",
-      "value": { "$ref": "#/definitions/idleZCurrentRange" }
+      "value": {
+        "$ref": "#/definitions/idleZCurrentRange"
+      }
     },
     "activeZCurrent": {
       "type": "object",
-      "value": { "$ref": "#/definitions/activeZCurrentRange" }
+      "value": {
+        "$ref": "#/definitions/activeZCurrentRange"
+      }
     },
     "jawReferenceVoltage": {
       "type": "object",
-      "value": { "$ref": "#/definitions/jawReferenceVoltageRange" }
+      "value": {
+        "$ref": "#/definitions/jawReferenceVoltageRange"
+      }
     },
-    "jawForcePerDutyCycle": {
+    "jawDutyCyclePolynomial": {
       "type": "array",
       "items": {
         "type": "array",
-        "items": [{ "type": "number" }, { "$ref": "#/definitions/percentage" }],
+        "items": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          }
+        ],
         "minItems": 2,
         "maxItems": 2
-      }
+      },
+      "minItems": 1
     },
-    "baseOffsetFromMount": { "$ref": "#/definitions/coordinates" },
-    "jawCenterOffsetFromBase": { "$ref": "#/definitions/coordinates" },
-    "pinOneOffsetFromBase": { "$ref": "#/definitions/coordinates" },
-    "pinTwoOffsetFromBase": { "$ref": "#/definitions/coordinates" },
+    "baseOffsetFromMount": {
+      "$ref": "#/definitions/coordinates"
+    },
+    "jawCenterOffsetFromBase": {
+      "$ref": "#/definitions/coordinates"
+    },
+    "pinOneOffsetFromBase": {
+      "$ref": "#/definitions/coordinates"
+    },
+    "pinTwoOffsetFromBase": {
+      "$ref": "#/definitions/coordinates"
+    },
     "quirks": {
       "type": "array",
       "description": "Array of valid quirks for a given gripper",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "jawSizes_mm": {
-      "$ref": "#/definitions/configValue"
+      "$ref": "#/definitions/jawWidthValue"
     }
   }
 }

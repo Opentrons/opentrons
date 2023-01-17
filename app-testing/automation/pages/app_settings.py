@@ -136,9 +136,7 @@ class AppSettings:
 
     def get_learn_more_about_uninstalling_opentrons_app(self) -> WebElement:
         """Get the link to uninstalling the opentrons app."""
-        return self.base.present_wrapper(
-            self.learn_more_about_uninstalling_opentrons_app, 2
-        )
+        return self.base.present_wrapper(self.learn_more_about_uninstalling_opentrons_app, 2)
 
     link_to_previous_releases: Element = Element(
         (By.ID, "PreviousVersionModal_previousReleases"),
@@ -176,9 +174,7 @@ class AppSettings:
         self,
     ) -> WebElement:
         """Get the connect to robot via IP address slideout header."""
-        return self.base.present_wrapper(
-            self.connect_to_robot_via_IP_address_slideout_header, 2
-        )
+        return self.base.present_wrapper(self.connect_to_robot_via_IP_address_slideout_header, 2)
 
     link_learn_more_about_connecting_a_robot_manually: Element = Element(
         (By.ID, "ConnectIPAddressSupportPage"),
@@ -189,9 +185,7 @@ class AppSettings:
         self,
     ) -> WebElement:
         """Get the link to connect to robot manually."""
-        return self.base.present_wrapper(
-            self.link_learn_more_about_connecting_a_robot_manually, 2
-        )
+        return self.base.present_wrapper(self.link_learn_more_about_connecting_a_robot_manually, 2)
 
     textbox_to_enter_the_ip: Element = Element(
         (By.ID, "ip"),
@@ -337,9 +331,7 @@ class AppSettings:
 
     def get_additional_custom_labware_source_folder(self) -> WebElement:
         """Get the additional custom labware source folder on advanced tab."""
-        return self.base.present_wrapper(
-            self.additional_custom_labware_source_folder, 2
-        )
+        return self.base.present_wrapper(self.additional_custom_labware_source_folder, 2)
 
     change_labware_source_folder_button: Element = Element(
         (By.ID, "AdvancedSettings_changeLabwareSource"),

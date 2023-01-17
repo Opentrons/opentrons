@@ -1,23 +1,17 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic, List, Optional, TypeVar, cast
+from typing import List, Optional, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
 from opentrons.broker import Broker
-from opentrons.hardware_control import SynchronousAdapter, modules
-from opentrons.hardware_control.modules import ModuleModel
+from opentrons.hardware_control.modules import ThermocyclerStep
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version
-
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-    HeaterShakerGeometry,
-)
+from opentrons.protocols.api_support.util import APIVersionError, requires_version
 
 from .core.common import (
     ProtocolCore,
@@ -28,6 +22,9 @@ from .core.common import (
     HeaterShakerCore,
 )
 from .core.core_map import LoadedCoreMap
+from .core.protocol_api.legacy_module_core import LegacyModuleCore
+from .core.protocol_api.module_geometry import ModuleGeometry as LegacyModuleGeometry
+from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -42,10 +39,8 @@ ENGAGE_HEIGHT_UNIT_CNV = 2
 
 _log = logging.getLogger(__name__)
 
-GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
 
-
-class ModuleContext(CommandPublisher, Generic[GeometryType]):
+class ModuleContext(CommandPublisher):
     """A connected module in the protocol.
 
     .. versionadded:: 2.0
@@ -64,14 +59,38 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         self._protocol_core = protocol_core
         self._core_map = core_map
         self._api_version = api_version
-        self._labware: Optional[Labware] = None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    # TODO(mc, 2022-09-08): Remove this method
+    @property
+    def model(self) -> ModuleModel:
+        """Get the module's model identifier."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError("ModuleContext.model not supported for legacy core.")
+        return cast(ModuleModel, self._core.get_model().value)
+
+    @property
+    def type(self) -> ModuleType:
+        """Get the module's general type identifier."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError("ModuleContext.type not supported for legacy core.")
+        return cast(ModuleType, self._core.MODULE_TYPE.value)
+
+    @property
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
+        if isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError(
+                "ModuleContext.serial_number not supported for legacy core."
+            )
+        return self._core.get_serial_number()
+
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """Specify the presence of a piece of labware on the module.
@@ -86,12 +105,19 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         .. deprecated:: 2.14
             Use :py:meth:`load_labware` or :py:meth:`load_labware_by_definition`.
         """
-        _log.warning(
-            "`module.load_labware_object` is an internal, deprecated method."
-            " Use `module.load_labware` or `load_labware_by_definition` instead."
+        deprecation_message = (
+            "`ModuleContext.load_labware_object` is an internal, deprecated method."
+            " Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
         )
+
+        if not isinstance(self._core, LegacyModuleCore):
+            raise APIVersionError(deprecation_message)
+
+        _log.warning(deprecation_message)
+
+        # Type ignoring to preserve backwards compatibility
         assert (
-            labware.parent == self.geometry
+            labware.parent == self._core.geometry  # type: ignore[comparison-overlap]
         ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)
@@ -135,7 +161,16 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             location=self._core,
         )
 
-        labware = self._core.add_labware_core(labware_core)
+        if isinstance(self._core, LegacyModuleCore):
+            labware = self._core.add_labware_core(cast(LegacyLabwareCore, labware_core))
+        else:
+            labware = Labware(
+                implementation=labware_core,
+                api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
+            )
+
         self._core_map.add(labware_core, labware)
 
         return labware
@@ -183,42 +218,43 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
     @requires_version(2, 0)
     def labware(self) -> Optional[Labware]:
         """The labware (if any) present on this module."""
-        return self._core.geometry.labware
+        labware_core = self._protocol_core.get_labware_on_module(self._core)
+        return self._core_map.get(labware_core)
+
+    # TODO (tz, 1-7-23): change this to version 2.14
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
+    def parent(self) -> str:
+        """The name of the slot the module is on."""
+        return self._core.get_deck_slot().value
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def geometry(self) -> GeometryType:
+    def geometry(self) -> LegacyModuleGeometry:
         """The object representing the module as an item on the deck.
 
-        :returns: ModuleGeometry
+        .. deprecated:: 2.14
+            Use properties of the :py:class:`ModuleContext` instead,
+            like :py:meth:`model` and :py:meth:`type`
         """
-        return cast(GeometryType, self._core.geometry)
+        if isinstance(self._core, LegacyModuleCore):
+            return self._core.geometry
 
-    @property
-    def requested_as(self) -> ModuleModel:
-        """How the protocol requested this module.
-
-        For example, a physical ``temperatureModuleV2`` might have been requested
-        either as ``temperatureModuleV2`` or ``temperatureModuleV1``.
-
-        For Opentrons internal use only.
-
-        :meta private:
-        """
-        return self._core.get_requested_model()
-
-    # TODO(mc, 2022-09-08): remove this property
-    @property
-    def _module(self) -> SynchronousAdapter[modules.AbstractModule]:
-        return self._core._sync_module_hardware  # type: ignore[attr-defined, no-any-return]
-
-    def __repr__(self) -> str:
-        return "{} at {} lw {}".format(
-            self.__class__.__name__, self.geometry, self.labware
+        raise APIVersionError(
+            "`ModuleContext.geometry` has been deprecated;"
+            " use properties of the `ModuleContext` itself, instead."
         )
 
+    def __repr__(self) -> str:
 
-class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
+        class_name = self.__class__.__name__
+        display_name = self._core.get_display_name()
+        location = self._core.get_deck_slot().value
+
+        return f"{class_name} at {display_name} on {location} lw {self.labware}"
+
+
+class TemperatureModuleContext(ModuleContext):
     """An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
@@ -298,7 +334,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         return self._core.get_status().value
 
 
-class MagneticModuleContext(ModuleContext[ModuleGeometry]):
+class MagneticModuleContext(ModuleContext):
     """An object representing a connected Magnetic Module.
 
     It should not be instantiated directly; instead, it should be
@@ -315,7 +351,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         """Calibrate the Magnetic Module.
 
         .. deprecated:: 2.14
-            This method is unncessary; remove any usage.
+            This method is unnecessary; remove any usage.
         """
         _log.warning(
             "`MagneticModuleContext.calibrate` doesn't do anything useful"
@@ -391,7 +427,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         return self._core.get_status().value
 
 
-class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
+class ThermocyclerContext(ModuleContext):
     """An object representing a connected Thermocycler Module.
 
     It should not be instantiated directly; instead, it should be
@@ -477,7 +513,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def execute_profile(
         self,
-        steps: List[modules.ThermocyclerStep],
+        steps: List[ThermocyclerStep],
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> None:
@@ -631,7 +667,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         return self._core.get_current_step_index()
 
 
-class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
+class HeaterShakerContext(ModuleContext):
     """An object representing a connected Heater-Shaker Module.
 
     It should not be instantiated directly; instead, it should be
