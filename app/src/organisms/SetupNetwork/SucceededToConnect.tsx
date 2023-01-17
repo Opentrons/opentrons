@@ -57,13 +57,7 @@ export function SucceededToConnect({
   }, [robotName, dispatch])
 
   return (
-    <Flex
-      margin={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing5}
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing5}>
       <TitleHeader />
       <DisplayConnectionStatus />
       <DisplayConnectedNetworkInfo
