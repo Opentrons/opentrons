@@ -12,7 +12,7 @@ Welcome to the v6.2.1 release of the OT-2 software! This hotfix release addresse
 
 ### Bug Fixes
 
-- When you upload a protocol file larger than 2 MiB, you will no longer get an error saying "Protocol run could not be created on the robot."
+- When you upload a protocol file larger than 2 megabytes, you will no longer get an error saying "Protocol run could not be created on the robot."
 - When you upload a protocol to an OT-2 that already has a lot of big protocols stored, the OT-2 will no longer show connection errors and become unresponsive for several minutes.
 - When a Thermocycler GEN2 is run for 50 days without a power cycle, it will no longer miscalculate hold times.
 - When you upload a Python protocol that contains an aspirate or dispense with an effective volume of 0 µL, it will no longer get stuck analyzing forever.
