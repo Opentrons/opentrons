@@ -38,7 +38,7 @@ export type DashboardCalTipLengthInvoker = (
 ) => void
 
 export function useDashboardCalibrateTipLength(
-  robotName: string,
+  robotName: string
 ): [DashboardCalTipLengthInvoker, JSX.Element | null] {
   const createRequestId = React.useRef<string | null>(null)
   const trackedRequestId = React.useRef<string | null>(null)
@@ -94,7 +94,9 @@ export function useDashboardCalibrateTipLength(
   )
 
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
-  const [showCalBlockModal, setShowCalBlockModal] = React.useState<boolean | null>(null)
+  const [showCalBlockModal, setShowCalBlockModal] = React.useState<
+    boolean | null
+  >(null)
 
   const handleStartDashboardTipLengthCalSession: DashboardCalTipLengthInvoker = props => {
     const { params, hasBlockModalResponse } = props

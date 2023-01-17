@@ -30,10 +30,9 @@ describe('useDashboardCalibrateDeck hook', () => {
   const robotName = 'robotName'
 
   const TestUseDashboardCalibrateDeck = (): JSX.Element => {
-    const [
-      _startCalibration,
-      _CalWizardComponent,
-    ] = useDashboardCalibrateDeck(robotName)
+    const [_startCalibration, _CalWizardComponent] = useDashboardCalibrateDeck(
+      robotName
+    )
     React.useEffect(() => {
       startCalibration = _startCalibration
       CalWizardComponent = _CalWizardComponent
@@ -51,21 +50,19 @@ describe('useDashboardCalibrateDeck hook', () => {
   })
 
   it('returns start callback, and no wizard if session not present', () => {
-    const [, store ] = renderWithProviders(<TestUseDashboardCalibrateDeck />, {
+    const [, store] = renderWithProviders(<TestUseDashboardCalibrateDeck />, {
       initialState: { robotApi: {}, sessions: {} },
-      i18nInstance: i18n
+      i18nInstance: i18n,
     })
     expect(typeof startCalibration).toBe('function')
     expect(CalWizardComponent).toBe(null)
 
-    act(() =>
-      startCalibration()
-    )
+    act(() => startCalibration())
 
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.ensureSession(
         robotName,
-        Sessions.SESSION_TYPE_DECK_CALIBRATION,
+        Sessions.SESSION_TYPE_DECK_CALIBRATION
       ),
       meta: { requestId: expect.any(String) },
     })
@@ -97,9 +94,7 @@ describe('useDashboardCalibrateDeck hook', () => {
         status: 200,
       },
     })
-    act(() =>
-      startCalibration()
-    )
+    act(() => startCalibration())
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
 

@@ -55,10 +55,13 @@ describe('useDashboardCalibratePipOffset hook', () => {
   })
 
   it('returns start callback, and no wizard if session not present', () => {
-    const [, store ] = renderWithProviders(<TestUseDashboardCalibratePipOffset />, {
-      initialState: { robotApi: {}, sessions: {} },
-      i18nInstance: i18n
-    })
+    const [, store] = renderWithProviders(
+      <TestUseDashboardCalibratePipOffset />,
+      {
+        initialState: { robotApi: {}, sessions: {} },
+        i18nInstance: i18n,
+      }
+    )
     expect(typeof startCalibration).toBe('function')
     expect(CalWizardComponent).toBe(null)
 

@@ -57,7 +57,7 @@ describe('useDashboardCalibrateTipLength hook', () => {
       <TestUseDashboardCalibrateTipLength />,
       {
         initialState: { robotApi: {}, sessions: {} },
-        i18nInstance: i18n
+        i18nInstance: i18n,
       }
     )
     expect(typeof startCalibration).toBe('function')
