@@ -3,7 +3,7 @@ import pytest
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.legacy.labware import LabwareCore
+from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.protocol_context import (
     ProtocolContextImplementation,
 )
@@ -95,16 +95,16 @@ def second_simulating_instrument_context(
 
 
 @pytest.fixture
-def labware(minimal_labware_def: LabwareDefinition) -> LabwareCore:
+def labware(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
     """Labware fixture."""
-    return LabwareCore(
+    return LegacyLabwareCore(
         definition=minimal_labware_def,
         parent=types.Location(types.Point(0, 0, 0), "1"),
     )
 
 
 @pytest.fixture
-def tip_rack(minimal_labware_def: LabwareDefinition) -> LabwareCore:
+def tip_rack(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
     tip_rack_definition = minimal_labware_def.copy()
     tip_rack_parameters = minimal_labware_def["parameters"].copy()
 
@@ -113,16 +113,16 @@ def tip_rack(minimal_labware_def: LabwareDefinition) -> LabwareCore:
     tip_rack_definition["parameters"] = tip_rack_parameters
 
     """Labware fixture."""
-    return LabwareCore(
+    return LegacyLabwareCore(
         definition=tip_rack_definition,
         parent=types.Location(types.Point(0, 0, 0), "1"),
     )
 
 
 @pytest.fixture
-def second_labware(minimal_labware_def: LabwareDefinition) -> LabwareCore:
+def second_labware(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
     """Labware fixture."""
-    return LabwareCore(
+    return LegacyLabwareCore(
         definition=minimal_labware_def,
         parent=types.Location(types.Point(0, 0, 0), "5"),
     )

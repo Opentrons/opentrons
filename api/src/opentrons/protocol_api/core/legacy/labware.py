@@ -21,7 +21,7 @@ _MAGDECK_HALF_MM_LABWARE = {
 }
 
 
-class LabwareCore(AbstractLabware[LegacyWellCore]):
+class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
     """Labware implementation core based on legacy PAPIv2 behavior.
 
     Args:

@@ -1,6 +1,6 @@
 import pytest
 
-from opentrons.protocol_api.core.legacy.labware import LabwareCore
+from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
 from opentrons.types import Point, Location, Mount
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition
@@ -58,7 +58,7 @@ def test_max_speeds_userdict():
 def test_build_edges():
     lw_def = get_labware_definition("corning_96_wellplate_360ul_flat")
     test_lw = Labware(
-        implementation=LabwareCore(lw_def, Location(Point(0, 0, 0), None)),
+        implementation=LegacyLabwareCore(lw_def, Location(Point(0, 0, 0), None)),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]

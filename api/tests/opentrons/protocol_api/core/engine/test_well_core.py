@@ -47,7 +47,7 @@ def well_definition() -> WellDefinition:
 def subject(
     decoy: Decoy, mock_engine_client: EngineClient, well_definition: WellDefinition
 ) -> WellCore:
-    """Get a WellCore test subject with mocked dependencies."""
+    """Get a LegacyWellCore test subject with mocked dependencies."""
     decoy.when(
         mock_engine_client.state.labware.get_well_definition(
             labware_id="labware-id", well_name="well-name"

@@ -1,4 +1,4 @@
-from opentrons.protocol_api.core.legacy.labware import LabwareCore
+from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.well import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
@@ -54,7 +54,7 @@ def test_get_well(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareCore(minimal_labware_def2, deck),
+        implementation=LegacyLabwareCore(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -116,7 +116,7 @@ def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
     trash_labware_def = deepcopy(minimal_labware_def2)
     trash_labware_def["parameters"]["quirks"] = ["fixedTrash"]
     trash_labware = labware.Labware(
-        implementation=LabwareCore(trash_labware_def, deck),
+        implementation=LegacyLabwareCore(trash_labware_def, deck),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -208,7 +208,7 @@ def test_air_gap(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareCore(minimal_labware_def2, deck),
+        implementation=LegacyLabwareCore(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]

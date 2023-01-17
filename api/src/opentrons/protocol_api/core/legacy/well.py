@@ -115,7 +115,4 @@ class LegacyWellCore(AbstractWellCore):
     # TODO(mc, 2022-08-24): comparing only names seems insufficient
     def __eq__(self, other: object) -> bool:
         """Assume that if name is the same then it's the same well."""
-        return (
-            isinstance(other, LegacyWellCore)
-            and self.get_name() == other.get_name()
-        )
+        return isinstance(other, LegacyWellCore) and self.get_name() == other.get_name()
