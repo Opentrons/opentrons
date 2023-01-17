@@ -34,6 +34,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     HomeRequestPayload,
     GripperMoveRequestPayload,
     TipActionRequestPayload,
+    EmptyPayload,
 )
 from .constants import interrupts_per_sec, brushed_motor_interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import (
@@ -191,7 +192,9 @@ class MoveGroupRunner:
         """
         await can_messenger.send(
             node_id=NodeId.broadcast,
-            message=ClearAllMoveGroupsRequest(),
+            message=ClearAllMoveGroupsRequest(
+                payload=EmptyPayload()
+            ),
         )
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
