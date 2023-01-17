@@ -26,7 +26,7 @@ from .core.legacy.labware_offset_provider import (
     LabwareOffsetProvider,
     NullLabwareOffsetProvider,
 )
-from .core.legacy_simulator.protocol_context import LegacyProtocolCoreSimulation
+from .core.legacy_simulator.protocol_context import ProtocolContextSimulation
 from .core.engine import ProtocolCore
 
 
@@ -70,7 +70,7 @@ def create_protocol_context(
     """
     sync_hardware: SynchronousAdapter[HardwareControlAPI]
     labware_offset_provider: AbstractLabwareOffsetProvider
-    core: Union[ProtocolCore, LegacyProtocolCoreSimulation, LegacyProtocolCore]
+    core: Union[ProtocolCore, ProtocolContextSimulation, LegacyProtocolCore]
 
     if isinstance(hardware_api, ThreadManager):
         sync_hardware = hardware_api.sync
@@ -101,7 +101,7 @@ def create_protocol_context(
 
     # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
-        core = LegacyProtocolCoreSimulation(
+        core = ProtocolContextSimulation(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
             equipment_broker=equipment_broker,

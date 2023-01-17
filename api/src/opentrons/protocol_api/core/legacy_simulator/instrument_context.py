@@ -19,7 +19,7 @@ from ..legacy.legacy_well_core import LegacyWellCore
 
 
 if TYPE_CHECKING:
-    from .protocol_context import LegacyProtocolCoreSimulation
+    from .protocol_context import ProtocolContextSimulation
 
 
 _log = logging.getLogger()
@@ -28,12 +28,12 @@ _PRE_2_2_TIP_DROP_HEIGHT_MM = 10
 """In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
-class LegacyInstrumentCoreSimulation(AbstractInstrument[LegacyWellCore]):
+class InstrumentContextSimulation(AbstractInstrument[LegacyWellCore]):
     """A simulation of an instrument context."""
 
     def __init__(
         self,
-        protocol_interface: LegacyProtocolCoreSimulation,
+        protocol_interface: ProtocolContextSimulation,
         pipette_dict: PipetteDict,
         mount: types.Mount,
         instrument_name: str,

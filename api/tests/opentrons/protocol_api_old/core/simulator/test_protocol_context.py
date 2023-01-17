@@ -27,8 +27,8 @@ def test_replacing_instrument_tip_state(
     # is fixed. The user who found this calls load_instrument repeatedly with same name,
     # mount, and replace=True. The resulting InstrumentContext references are used
     # interchangeably causing fast simulation to fail due to the pipette state being
-    # attached to the LegacyInstrumentCoreSimulation object.
-    # The solution is to reuse LegacyInstrumentCoreSimulation instances when the user is
+    # attached to the InstrumentContextSimulation object.
+    # The solution is to reuse InstrumentContextSimulation instances when the user is
     # replacing the same pipette at the same mount.
     subject.home()
     pip1 = subject.load_instrument(PipetteNameType.P300_SINGLE_GEN2, Mount.RIGHT)

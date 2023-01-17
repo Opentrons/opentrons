@@ -14,10 +14,10 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
 from opentrons.protocol_api.core.legacy_simulator.instrument_context import (
-    LegacyInstrumentCoreSimulation,
+    InstrumentContextSimulation,
 )
 from opentrons.protocol_api.core.legacy_simulator.protocol_context import (
-    LegacyProtocolCoreSimulation,
+    ProtocolContextSimulation,
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -37,9 +37,9 @@ def protocol_context(hardware: ThreadManagedHardware) -> LegacyProtocolCore:
 @pytest.fixture
 def simulating_protocol_context(
     hardware: ThreadManagedHardware,
-) -> LegacyProtocolCoreSimulation:
+) -> ProtocolContextSimulation:
     """Protocol context simulation fixture."""
-    return LegacyProtocolCoreSimulation(
+    return ProtocolContextSimulation(
         sync_hardware=hardware.sync,
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
@@ -68,11 +68,11 @@ def second_instrument_context(
 
 @pytest.fixture
 def simulating_instrument_context(
-    simulating_protocol_context: LegacyProtocolCoreSimulation,
+    simulating_protocol_context: ProtocolContextSimulation,
     instrument_context: LegacyInstrumentCore,
-) -> LegacyInstrumentCoreSimulation:
+) -> InstrumentContextSimulation:
     """A simulating instrument context."""
-    return LegacyInstrumentCoreSimulation(
+    return InstrumentContextSimulation(
         protocol_interface=simulating_protocol_context,
         pipette_dict=instrument_context.get_hardware_state(),
         mount=types.Mount.RIGHT,
@@ -82,11 +82,11 @@ def simulating_instrument_context(
 
 @pytest.fixture
 def second_simulating_instrument_context(
-    simulating_protocol_context: LegacyProtocolCoreSimulation,
+    simulating_protocol_context: ProtocolContextSimulation,
     second_instrument_context: LegacyInstrumentCore,
-) -> LegacyInstrumentCoreSimulation:
+) -> InstrumentContextSimulation:
     """A simulating instrument context."""
-    return LegacyInstrumentCoreSimulation(
+    return InstrumentContextSimulation(
         protocol_interface=simulating_protocol_context,
         pipette_dict=second_instrument_context.get_hardware_state(),
         mount=types.Mount.LEFT,
