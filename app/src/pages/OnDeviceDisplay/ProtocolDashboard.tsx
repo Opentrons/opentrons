@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { format, formatDistance } from 'date-fns'
 import {
@@ -47,6 +48,7 @@ export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useAllRunsQuery()
   const history = useHistory()
+  const { t } = useTranslation('protocol_info')
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -58,9 +60,9 @@ export function ProtocolDashboard(): JSX.Element {
       <Table>
         <thead>
           <tr>
-            <TableHeader>Protocol Name</TableHeader>
-            <TableHeader>Last Run</TableHeader>
-            <TableHeader>Date Added</TableHeader>
+            <TableHeader>{t('protocol_name_title')}</TableHeader>
+            <TableHeader>{t('last_run')}</TableHeader>
+            <TableHeader>{t('date_added')}</TableHeader>
           </tr>
         </thead>
 
@@ -76,9 +78,9 @@ export function ProtocolDashboard(): JSX.Element {
               >
                 <TableDatum> {protocol.metadata.protocolName}</TableDatum>
                 <TableDatum>
-                  {formatDistance(new Date(lastRun), new Date(), {
+                  {lastRun != null ? formatDistance(new Date(lastRun), new Date(), {
                     addSuffix: true,
-                  }) ?? 'No History'}
+                  }): t('no_history')}
                 </TableDatum>
                 <TableDatum>
                   {format(new Date(protocol.createdAt), 'Pp')}
