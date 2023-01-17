@@ -145,7 +145,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             )
 
     def save_offset(self, delta: Point) -> None:
-        """Tempoarily reset the gripper offsets to default values."""
+        """Save a new gripper offset."""
         save_gripper_calibration_offset(self._gripper_id, delta)
         self._calibration_offset = load_gripper_calibration_offset(self._gripper_id)
 
@@ -218,6 +218,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
             "state": self._state,
+            "calibration_offset": self._calibration_offset,
         }
         return d
 
