@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import { format, formatDistance } from 'date-fns'
 import {
   COLORS,
   SPACING,
-  SIZING,
   TYPOGRAPHY,
   Flex,
   DIRECTION_COLUMN,
@@ -14,6 +14,7 @@ import {
   useAllProtocolsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
+import { BackButton } from '../../atoms/buttons'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -45,6 +46,7 @@ const TableDatum = styled('td')`
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useAllRunsQuery()
+  const history = useHistory()
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -52,6 +54,7 @@ export function ProtocolDashboard(): JSX.Element {
       padding={SPACING.spacing6}
       minHeight="25rem"
     >
+      <BackButton />
       <Table>
         <thead>
           <tr>
@@ -67,7 +70,10 @@ export function ProtocolDashboard(): JSX.Element {
               run => run.protocolId === protocol.id
             )?.createdAt
             return (
-              <TableRow key={index}>
+              <TableRow
+                key={index}
+                onClick={() => history.push(`/protocols/${protocol.id}`)}
+              >
                 <TableDatum> {protocol.metadata.protocolName}</TableDatum>
                 <TableDatum>
                   {formatDistance(new Date(lastRun), new Date(), {
