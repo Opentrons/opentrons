@@ -45,7 +45,7 @@ class MountType(enum.Enum):
         return mount_map[mount]
 
     def as_string(self) -> str:
-        """Get stringified MountType."""
+        """Get MountType as a string."""
         return self.name.lower()
 
 
