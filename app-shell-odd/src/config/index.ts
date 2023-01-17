@@ -8,11 +8,11 @@ import yargsParser from 'yargs-parser'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
 import { createLogger } from '../log'
-import { DEFAULTS_V0, migrate } from './migrate'
+import { DEFAULTS_V12, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
 
 import type {
-  ConfigV0,
+  ConfigV12,
   ConfigValueChangeAction,
 } from '@opentrons/app/src/redux/config/types'
 
@@ -41,8 +41,8 @@ let _log: Logger | undefined
 const store = (): Store => {
   if (_store == null) {
     // perform store migration if loading for the first time
-    _store = (new Store({ defaults: DEFAULTS_V0 }) as unknown) as Store<Config>
-    _store.store = migrate((_store.store as unknown) as ConfigV0)
+    _store = (new Store({ defaults: DEFAULTS_V12 }) as unknown) as Store<Config>
+    _store.store = migrate((_store.store as unknown) as ConfigV12)
   }
   return _store
 }
