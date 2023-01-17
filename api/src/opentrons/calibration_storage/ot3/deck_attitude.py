@@ -33,6 +33,7 @@ def delete_robot_deck_attitude() -> None:
 def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
     pip_id: Optional[str],
+    calibration_status: Optional[v1.CalibrationStatus],
     source: Optional[local_types.SourceType] = None,
 ) -> None:
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
@@ -42,7 +43,7 @@ def save_robot_deck_attitude(
         pipetteCalibratedWith=pip_id,
         lastModified=helpers.utc_now(),
         source=source or local_types.SourceType.user,
-        status=v1.CalibrationStatus(),
+        status=calibration_status or v1.CalibrationStatus(),
     )
     # convert to schema + validate json conversion
     io.save_to_file(robot_dir, "deck_calibration", gantry_calibration)

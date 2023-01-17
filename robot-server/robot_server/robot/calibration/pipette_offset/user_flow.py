@@ -8,6 +8,7 @@ from typing import (
     Optional,
     Union,
     Tuple,
+    cast,
 )
 from opentrons.calibration_storage import (
     helpers,
@@ -312,7 +313,10 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_stored_pipette_offset_cal(
         self,
     ) -> Optional[models.v1.InstrumentOffsetModel]:
-        return get_pipette_offset(self._hw_pipette.pipette_id, self._mount)
+        return cast(
+            models.v1.InstrumentOffsetModel,
+            get_pipette_offset(self._hw_pipette.pipette_id, self._mount),
+        )
 
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
@@ -444,7 +448,7 @@ class PipetteOffsetCalibrationUserFlow:
             save_pipette_calibration(
                 offset=offset,
                 mount=self._mount,
-                pip_id=self._hw_pipette.pipette_id,
+                pipette_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri,
             )

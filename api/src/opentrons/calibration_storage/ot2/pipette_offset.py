@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 # Delete Pipette Offset Calibrations
 
 
-def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
+def delete_pipette_offset_file(pipette: typing.Optional[str], mount: Mount) -> None:
     """
     Delete pipette offset file based on mount and pipette serial number
 
@@ -43,10 +43,11 @@ def clear_pipette_offset_calibrations() -> None:
 
 def save_pipette_calibration(
     offset: Point,
-    pip_id: str,
+    pip_id: typing.Optional[str],
     mount: Mount,
     tiprack_hash: str,
     tiprack_uri: str,
+    calibration_status: typing.Optional[v1.CalibrationStatus]
 ) -> None:
     pip_dir = config.get_opentrons_path("pipette_calibration_dir") / mount.name.lower()
 
@@ -56,7 +57,7 @@ def save_pipette_calibration(
         uri=tiprack_uri,
         last_modified=helpers.utc_now(),
         source=local_types.SourceType.user,
-        status=v1.CalibrationStatus(),
+        status=calibration_status or v1.CalibrationStatus(),
     )
     io.save_to_file(pip_dir, pip_id, pipette_calibration)
 
@@ -65,7 +66,7 @@ def save_pipette_calibration(
 
 
 def get_pipette_offset(
-    pipette_id: str, mount: Mount
+    pipette_id: typing.Optional[str], mount: Mount
 ) -> typing.Optional[v1.InstrumentOffsetModel]:
     try:
         pipette_calibration_filepath = (

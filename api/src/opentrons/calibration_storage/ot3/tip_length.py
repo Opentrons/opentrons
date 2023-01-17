@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 
 
 def tip_lengths_for_pipette(
-    pipette_id: str,
+    pipette_id: typing.Optional[str],
 ) -> typing.Dict[str, v1.TipLengthModel]:
     tip_lengths = {}
     try:
@@ -41,7 +41,7 @@ def tip_lengths_for_pipette(
 
 
 def load_tip_length_calibration(
-    pip_id: str, definition: "LabwareDefinition"
+    pip_id: typing.Optional[str], definition: "LabwareDefinition"
 ) -> v1.TipLengthModel:
     """
     Function used to grab the current tip length associated

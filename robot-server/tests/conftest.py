@@ -210,7 +210,7 @@ def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
     for pip, mount in zip(attached_pip_list, mount_list):
         save_pipette_calibration(
             offset=Point(0, 0, 0),
-            pip_id=pip,
+            pipette_id=pip,
             mount=mount,
             tiprack_hash=def_hash,
             tiprack_uri="opentrons/opentrons_96_filtertiprack_200ul/1",
@@ -232,8 +232,8 @@ def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
     attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
     save_robot_deck_attitude(
         attitude,
-        "pip_1",
-        "fakehash",
+        pipette_id="pip_1",
+        lw_hash="fakehash",
     )
 
 

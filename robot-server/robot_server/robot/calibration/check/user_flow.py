@@ -10,7 +10,6 @@ from opentrons.calibration_storage import (
     get_custom_tiprack_definition_for_tlc,
     load_tip_length_calibration,
     save_tip_length_calibration,
-    create_tip_length_data,
     get_pipette_offset,
     save_pipette_calibration,
     mark_bad_calibration,
@@ -345,7 +344,9 @@ class CheckCalibrationUserFlow:
     ) -> Optional[models.v1.TipLengthModel]:
         if not pipette.pipette_id:
             return None
-        pip_offset = get_pipette_offset(pipette.pipette_id, mount)
+        pip_offset = cast(
+            models.v1.TipLengthModel, get_pipette_offset(pipette.pipette_id, mount)
+        )
         if not pip_offset or not pip_offset.uri:
             return None
         details = helpers.details_from_uri(pip_offset.uri)
@@ -360,7 +361,10 @@ class CheckCalibrationUserFlow:
             tiprack_def = tiprack._implementation.get_definition()
         else:
             tiprack_def = get_custom_tiprack_definition_for_tlc(pip_offset.uri)
-        return load_tip_length_calibration(pipette.pipette_id, tiprack_def)
+        tip_length_calibration = load_tip_length_calibration(
+            pipette.pipette_id, tiprack_def
+        )
+        return cast(models.v1.TipLengthModel, tip_length_calibration)
 
     def _check_valid_calibrations(self):
         deck = self._deck_calibration
@@ -414,7 +418,7 @@ class CheckCalibrationUserFlow:
         else:
             pip_offset = get_pipette_offset(pipette.pipette_id, mount)
         assert pip_offset, "No Pipette Offset Found"
-        return pip_offset
+        return cast(models.v1.InstrumentOffsetModel, pip_offset)
 
     @staticmethod
     def _get_tr_lw(
@@ -670,12 +674,10 @@ class CheckCalibrationUserFlow:
             calibration = mark_bad_calibration.mark_bad(
                 self._tip_lengths[active_mount], cal_types.SourceType.calibration_check
             )
-            tip_definition = self.active_tiprack._implementation.get_definition()
-            tip_length_dict = create_tip_length_data(
-                definition=tip_definition,
-                length=calibration.tip_length,
-                cal_status=calibration.status,
+            tip_hash = helpers.hash_labware_def(
+                self.active_tiprack._implementation.get_definition()
             )
+            tip_length_dict = {tip_hash: calibration}
             save_tip_length_calibration(calibration.pipette, tip_length_dict)
         elif self.current_state == State.comparingPointOne and pipette_state:
             # Here if we're on the second pipette, but the first slot we
@@ -691,18 +693,18 @@ class CheckCalibrationUserFlow:
             assert pipette_id, "Cannot update pipette offset calibraion"
             save_pipette_calibration(
                 offset=Point(*pip_calibration.offset),
-                pip_id=pipette_id,
+                pipette_id=pipette_id,
                 mount=active_mount,
                 tiprack_hash=pip_calibration.tiprack,
                 tiprack_uri=pip_calibration.uri,
-                cal_status=pip_calibration.status,
+                calibration_status=pip_calibration.status,
             )
             save_robot_deck_attitude(
                 transform=deck_calibration.attitude,
-                pip_id=deck_calibration.pipette_calibrated_with,
+                pipette_id=deck_calibration.pipette_calibrated_with,
                 lw_hash=deck_calibration.tiprack,
                 source=deck_calibration.source,
-                cal_status=deck_calibration.status,
+                calibration_status=deck_calibration.status,
             )
         elif self.current_state in pipette_offset_states:
             calibration = mark_bad_calibration.mark_bad(
@@ -713,11 +715,11 @@ class CheckCalibrationUserFlow:
             assert pipette_id, "Cannot update pipette offset calibraion"
             save_pipette_calibration(
                 offset=Point(*calibration.offset),
-                pip_id=pipette_id,
+                pipette_id=pipette_id,
                 mount=active_mount,
                 tiprack_hash=calibration.tiprack,
                 tiprack_uri=calibration.uri,
-                cal_status=calibration.status,
+                calibration_status=calibration.status,
             )
         elif self.current_state in deck_calibration_states and pipette_state:
             calibration = mark_bad_calibration.mark_bad(
@@ -725,10 +727,10 @@ class CheckCalibrationUserFlow:
             )
             save_robot_deck_attitude(
                 transform=calibration.attitude,
-                pip_id=calibration.pipette_calibrated_with,
+                pipette_id=calibration.pipette_calibrated_with,
                 lw_hash=calibration.tiprack,
                 source=calibration.source,
-                cal_status=calibration.status,
+                calibration_status=calibration.status,
             )
 
     async def update_comparison_map(self):

@@ -4,7 +4,7 @@ import pytest
 from mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
 from opentrons import config
-from opentrons.calibration_storage import helpers, types as CSTypes, models
+from opentrons.calibration_storage import helpers, types as CSTypes, ot2
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config.pipette_config import load
@@ -25,7 +25,7 @@ from robot_server.robot.calibration.pipette_offset.constants import (
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 
-PIP_CAL = models.v1.InstrumentOffsetModel(
+PIP_CAL = ot2.models.v1.InstrumentOffsetModel(
     offset=[0, 0, 0],
     tiprack="some_tiprack",
     uri="custom/some_tiprack/1",
@@ -52,7 +52,7 @@ pipette_map = {
 def build_mock_stored_pipette_offset(kind="normal"):
     if kind == "normal":
         return MagicMock(
-            return_value=models.v1.InstrumentOffsetModel(
+            return_value=ot2.models.v1.InstrumentOffsetModel(
                 offset=[0, 1, 2],
                 tiprack="tiprack-id",
                 uri="opentrons/opentrons_96_filtertiprack_200ul/1",
@@ -611,7 +611,7 @@ async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
     mock_save_pipette.assert_called_with(
         offset=offset,
         mount=uf._mount,
-        pip_id=uf._hw_pipette.pipette_id,
+        pipette_id=uf._hw_pipette.pipette_id,
         tiprack_hash=tiprack_hash,
         tiprack_uri=uf._tip_rack.uri,
     )

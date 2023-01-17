@@ -38,22 +38,28 @@ TipLengthCalibrationType = typing.Union[
     ot3_models.v1.TipLengthModel,
 ]
 
+CalibrationStatusType = typing.Union[
+    ot2_models.v1.CalibrationStatus,
+    ot3_models.v1.CalibrationStatus,
+]
+
 
 def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
     pipette_id: typing.Optional[str],
     source: local_types.SourceType = local_types.SourceType.user,
     lw_hash: typing.Optional[str] = None,
+    calibration_status: typing.Optional[CalibrationStatusType] = None,
 ) -> None:
     # add can't save file error for pipette id
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_save_robot_deck_attitude
 
-        ot3_save_robot_deck_attitude(transform, pipette_id, source)
+        ot3_save_robot_deck_attitude(transform, pipette_id, calibration_status, source)
     else:
         from .ot2 import ot2_save_robot_deck_attitude
 
-        ot2_save_robot_deck_attitude(transform, pipette_id, lw_hash, source)
+        ot2_save_robot_deck_attitude(transform, pipette_id, lw_hash, source, calibration_status)
 
 
 def get_robot_deck_attitude() -> typing.Optional[DeckCalibrationType]:
@@ -80,26 +86,27 @@ def delete_robot_deck_attitude() -> None:
 
 def save_pipette_calibration(
     offset: Point,
-    pipette_id: str,
+    pipette_id: typing.Optional[str],
     mount: Mount,
     tiprack_hash: str = "",
     tiprack_uri: str = "",
+    calibration_status: typing.Optional[CalibrationStatusType] = None
 ) -> None:
     # check pip id and tiprack info here
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_save_pipette_calibration
 
-        ot3_save_pipette_calibration(offset, pipette_id, mount)
+        ot3_save_pipette_calibration(offset, pipette_id, mount, calibration_status)
     else:
         from .ot2 import ot2_save_pipette_calibration
 
         ot2_save_pipette_calibration(
-            offset, pipette_id, mount, tiprack_hash, tiprack_uri
+            offset, pipette_id, mount, tiprack_hash, tiprack_uri, calibration_status
         )
 
 
 def get_pipette_offset(
-    pipette_id: str, mount: Mount
+    pipette_id: typing.Optional[str], mount: Mount
 ) -> typing.Optional[PipetteCalibrationType]:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_get_pipette_offset
@@ -122,7 +129,7 @@ def clear_pipette_offset_calibrations() -> None:
         ot2_clear_pipette_offset_calibrations()
 
 
-def delete_pipette_offset_file(pipette_id: str, mount: Mount) -> None:
+def delete_pipette_offset_file(pipette_id: typing.Optional[str], mount: Mount) -> None:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_delete_pipette_offset_file
 
@@ -183,7 +190,7 @@ def clear_tip_length_calibration() -> None:
 
 
 def tip_lengths_for_pipette(
-    pipette_id: str,
+    pipette_id: typing.Optional[str],
 ) -> typing.Mapping[str, TipLengthCalibrationType]:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_tip_lengths_for_pipette
@@ -196,7 +203,7 @@ def tip_lengths_for_pipette(
 
 
 def load_tip_length_calibration(
-    pip_id: str, definition: "LabwareDefinition"
+    pip_id: typing.Optional[str], definition: "LabwareDefinition"
 ) -> TipLengthCalibrationType:
     if config.feature_flags.enable_ot3_hardware_controller():
         from .ot3 import ot3_load_tip_length_calibration
