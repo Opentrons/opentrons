@@ -23,9 +23,9 @@ Once again, if you did not perform testing against hardware, justify why.
 
 Note: It can be helpful to write a test plan before doing development
 
-Example Test Plan (HTTP API Change) 
+Example Test Plan (HTTP API Change)
 
-- Verified that new optional argument `dance-party` causes the robot to flash it's lights, move the pipettes, 
+- Verified that new optional argument `dance-party` causes the robot to flash its lights, move the pipettes,
 then home.
 - Verified that when you omit the `dance-party` option the robot homes normally
 - Added protocol that uses `dance-party` argument to G-Code Testing Suite
