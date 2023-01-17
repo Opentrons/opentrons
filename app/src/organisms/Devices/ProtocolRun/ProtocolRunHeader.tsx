@@ -474,19 +474,16 @@ export function ProtocolRunHeader({
         <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
         <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
         <Box marginLeft={SPACING_AUTO}>
-          {showCancelButton && (
-            <SecondaryButton
-              color={COLORS.errorText}
-              backgroundColor='none'
-              borderColor={COLORS.errorEnabled}
-              padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
-              onClick={handleCancelClick}
-              id="ProtocolRunHeader_cancelRunButton"
-              disabled={isClosingCurrentRun}
-            >
-              {t('cancel_run')}
-            </SecondaryButton>
-          )}
+          {/* {showCancelButton && ( */}
+          <SecondaryButton
+            isDangerous
+            onClick={handleCancelClick}
+            id="ProtocolRunHeader_cancelRunButton"
+            disabled={isClosingCurrentRun}
+          >
+            {t('cancel_run')}
+          </SecondaryButton>
+          {/* )} */}
         </Box>
       </Box>
     ) : null
