@@ -8,7 +8,7 @@ import {
   styleProps,
 } from '@opentrons/components'
 
-export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
+export const QuaternaryButton = styled(NewSecondaryBtn)`
   background-color: ${COLORS.white};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;

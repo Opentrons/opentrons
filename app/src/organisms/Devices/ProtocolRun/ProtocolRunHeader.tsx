@@ -15,6 +15,7 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RunStatus,
 } from '@opentrons/api-client'
 import {
   useRunQuery,
@@ -470,49 +471,15 @@ export function ProtocolRunHeader({
         gridTemplateColumns="4fr 6fr 4fr"
         padding={SPACING.spacing3}
       >
-        <Box>
-          <StyledText
-            textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
-            css={TYPOGRAPHY.h6Default}
-            paddingBottom={SPACING.spacing2}
-          >
-            {t('protocol_start')}
-          </StyledText>
-          <StyledText
-            css={TYPOGRAPHY.pRegular}
-            id="ProtocolRunHeader_protocolStart"
-          >
-            {startedAtTimestamp}
-          </StyledText>
-        </Box>
-        <Box>
-          <StyledText
-            textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
-            css={TYPOGRAPHY.h6Default}
-            paddingBottom={SPACING.spacing2}
-          >
-            {t('protocol_end')}
-          </StyledText>
-          <StyledText
-            css={TYPOGRAPHY.pRegular}
-            id="ProtocolRunHeader_protocolEnd"
-          >
-            {completedAtTimestamp}
-          </StyledText>
-        </Box>
+        <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
+        <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
         <Box marginLeft={SPACING_AUTO}>
           {showCancelButton && (
             <SecondaryButton
-              style={{
-                color: `${String(COLORS.errorText)}`,
-                backgroundColor: 'none',
-                borderColor: `${String(COLORS.errorEnabled)}`,
-              }}
-              padding={`${String(SPACING.spacingSM)} ${String(
-                SPACING.spacing4
-              )}`}
+              color={COLORS.errorText}
+              backgroundColor='none'
+              borderColor={COLORS.errorEnabled}
+              padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
               onClick={handleCancelClick}
               id="ProtocolRunHeader_cancelRunButton"
               disabled={isClosingCurrentRun}
@@ -581,83 +548,18 @@ export function ProtocolRunHeader({
         <Banner type="warning">{t('close_door_to_resume')}</Banner>
       ) : null}
       {runStatus === RUN_STATUS_STOPPED ? (
-        <Banner type="warning">{`${t('run_canceled')}.`}</Banner>
+        <Banner type="warning">{t('run_canceled')}</Banner>
       ) : null}
       {isCurrentRun ? clearProtocolBanner : null}
       <Box display="grid" gridTemplateColumns="3fr 3fr 3fr 3fr 3fr">
-        <Box>
-          <StyledText
-            textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
-            css={TYPOGRAPHY.h6Default}
-            paddingBottom={SPACING.spacing2}
-          >
-            {t('run')}
-          </StyledText>
-          {/* this is the createdAt timestamp, not the run id */}
-          <StyledText
-            css={TYPOGRAPHY.pRegular}
-            id="ProtocolRunHeader_runRecordId"
-          >
-            {createdAtTimestamp}
-          </StyledText>
-        </Box>
-        <Box>
-          <StyledText
-            textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
-            css={TYPOGRAPHY.h6Default}
-            paddingBottom={SPACING.spacing2}
-          >
-            {t('status')}
-          </StyledText>
-          <Flex alignItems={ALIGN_CENTER}>
-            {runStatus === RUN_STATUS_RUNNING ? (
-              <Icon
-                name="circle"
-                color={COLORS.blueEnabled}
-                size={SPACING.spacing2}
-                marginRight={SPACING.spacing2}
-                data-testid="running_circle"
-              >
-                <animate
-                  attributeName="fill"
-                  values={`${String(COLORS.blueEnabled)}; transparent`}
-                  dur="1s"
-                  calcMode="discrete"
-                  repeatCount="indefinite"
-                  data-testid="pulsing_status_circle"
-                />
-              </Icon>
-            ) : null}
-            <StyledText
-              css={TYPOGRAPHY.pRegular}
-              id="ProtocolRunHeader_runStatus"
-            >
-              {runStatus != null ? t(`status_${String(runStatus)}`) : ''}
-            </StyledText>
-          </Flex>
-        </Box>
-        <Box>
-          <StyledText
-            textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
-            css={TYPOGRAPHY.h6Default}
-            paddingBottom={SPACING.spacing2}
-          >
-            {t('run_time')}
-          </StyledText>
-          <RunTimer
-            runStatus={runStatus}
-            startedAt={startedAt}
-            stoppedAt={stoppedAt}
-            completedAt={completedAt}
-          />
-        </Box>
+        <LabeledValue label={t('run')} value={createdAtTimestamp} />
+        <LabeledValue label={t('status')} value={<DisplayRunStatus runStatus={runStatus} />} />
+        <LabeledValue label={t('run_time')} value={<RunTimer {...{ runStatus, startedAt, stoppedAt, completedAt }} />} />
         <select onChange={(e) => setSelectedCommandType(e.target.value)}>
           {uniqCommandTypes.map(cT => <option value={cT}>{cT}</option>)}
         </select>
-        {showIsShakingModal &&
+        {
+          showIsShakingModal &&
           activeHeaterShaker != null &&
           isHeaterShakerInProtocol &&
           runId != null && (
@@ -666,14 +568,15 @@ export function ProtocolRunHeader({
               module={activeHeaterShaker}
               startRun={play}
             />
-          )}
+          )
+        }
         <Box marginLeft={SPACING_AUTO}>
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
             boxShadow="none"
             display={DISPLAY_FLEX}
-            padding={`${String(SPACING.spacingSM)} ${String(SPACING.spacing4)}`}
+            padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
             disabled={isRunControlButtonDisabled}
             onClick={handleButtonClick}
             id="ProtocolRunHeader_runControlButton"
@@ -686,15 +589,64 @@ export function ProtocolRunHeader({
             <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
           )}
         </Box>
-      </Box>
+      </Box >
       {protocolRunningContent}
       <RunProgressMeter {...{ ticks, makeHandleJumpToStep, analysisCommands }} currentRunCommandIndex={1100} />
-      {showConfirmCancelModal ? (
-        <ConfirmCancelModal
-          onClose={() => setShowConfirmCancelModal(false)}
-          runId={runId}
-        />
+      {
+        showConfirmCancelModal ? (
+          <ConfirmCancelModal
+            onClose={() => setShowConfirmCancelModal(false)
+            }
+            runId={runId}
+          />
+        ) : null
+      }
+    </Flex >
+  )
+}
+
+interface LabeledValueProps {
+  label: string
+  value: React.ReactNode
+}
+
+function LabeledValue(props: LabeledValueProps): JSX.Element {
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+      <StyledText as="h6">{props.label}</StyledText>
+      {typeof props.value === 'string' ? <StyledText as="p">{props.value}</StyledText> : props.value}
+    </Flex>
+  )
+}
+
+interface DisplayRunStatusProps {
+  runStatus: RunStatus | null
+}
+
+function DisplayRunStatus(props: DisplayRunStatusProps) {
+  const { t } = useTranslation('run_details')
+  return (
+    <Flex alignItems={ALIGN_CENTER}>
+      {props.runStatus === RUN_STATUS_RUNNING ? (
+        <Icon
+          name="circle"
+          color={COLORS.blueEnabled}
+          size={SPACING.spacing2}
+          marginRight={SPACING.spacing2}
+          data-testid="running_circle"
+        >
+          <animate
+            attributeName="fill"
+            values={`${String(COLORS.blueEnabled)}; transparent`}
+            dur="1s"
+            calcMode="discrete"
+            repeatCount="indefinite"
+          />
+        </Icon>
       ) : null}
+      <StyledText as="p">
+        {props.runStatus != null ? t(`status_${String(props.runStatus)}`) : ''}
+      </StyledText>
     </Flex>
   )
 }

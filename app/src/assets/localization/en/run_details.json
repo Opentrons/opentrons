@@ -60,7 +60,7 @@
   "protocol_run_canceled": "Protocol run canceled",
   "protocol_run_complete": "Protocol run complete",
   "run_failed": "Run failed",
-  "run_canceled": "Run canceled",
+  "run_canceled": "Run canceled.",
   "run_completed": "Run completed",
   "run_cta_disabled": "Complete required steps on Protocol tab before starting the run",
   "total_step_count": "{{count}} step total",

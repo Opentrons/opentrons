@@ -7,16 +7,16 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { SecondaryTertiaryButton } from '..'
+import { QuaternaryButton } from '..'
 
 const render = (
-  props: React.ComponentProps<typeof SecondaryTertiaryButton>
+  props: React.ComponentProps<typeof QuaternaryButton>
 ) => {
-  return renderWithProviders(<SecondaryTertiaryButton {...props} />)[0]
+  return renderWithProviders(<QuaternaryButton {...props} />)[0]
 }
 
-describe('SecondaryTertiaryButton', () => {
-  let props: React.ComponentProps<typeof SecondaryTertiaryButton>
+describe('QuaternaryButton', () => {
+  let props: React.ComponentProps<typeof QuaternaryButton>
 
   beforeEach(() => {
     props = {
