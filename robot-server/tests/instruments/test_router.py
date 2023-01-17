@@ -64,6 +64,9 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
         return None  # type: ignore[return-value]
 
 
+# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
+#  OT2 vs OT3 tests correclty
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_instruments_empty(
     decoy: Decoy,
@@ -77,6 +80,9 @@ async def test_get_instruments_empty(
     assert result.status_code == 200
 
 
+# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
+#  OT2 vs OT3 tests correclty
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
     decoy: Decoy,
