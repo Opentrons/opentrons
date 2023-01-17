@@ -38,6 +38,7 @@ else:
 class GripperBaseModel(BaseModel):
     class Config:
         alias_generator = _snake_to_camel_case
+        allow_population_by_field_name = True
 
 
 class Offset(GripperBaseModel):
@@ -89,7 +90,7 @@ class JawMotorConfigurations(GripperBaseModel):
 PolynomialTerm = Tuple[_StrictNonNegativeInt, float]
 
 
-class JawForceProfile(GripperBaseModel):
+class GripForceProfile(GripperBaseModel):
     """Gripper force profile."""
 
     polynomial: List[PolynomialTerm] = Field(
@@ -109,43 +110,6 @@ class GripperDefinitionV1(GripperBaseModel):
     display_name: str = Field(..., description="Gripper display name.")
     model: GripperModel
     geometry: Geometry
-    z_motor_config: ZMotorConfigurations
+    z_motor_configurations: ZMotorConfigurations
     jaw_motor_configurations: JawMotorConfigurations
-    jaw_force_configurations: JawForceProfile
-
-    # class Config:
-    #     alias_generator = to_camel
-
-    # @classmethod
-    # def from_dict(cls, data: Dict[str, Any]) -> "GripperDefinitionV1":
-    #     """Create GripperDefinitionV1 from object loaded from json file."""
-    #     try:
-    #         return cls(
-    #             display_name=data["displayName"],
-    #             model=GripperModel(data["model"]),
-    #             geometry=GripperGeometryDefinition(
-    #                  base_offset_from_mount=GripperOffset(**data[]["baseOffsetFromMount"]),
-    #                 jaw_center_offset_from_base=GripperOffset(
-    #                     **data["jawCenterOffsetFromBase"]
-    #                 ),
-    #                 pin_one_offset_from_base=GripperOffset(**data["pinOneOffsetFromBase"]),
-    #                 pin_two_offset_from_base=GripperOffset(**data["pinTwoOffsetFromBase"]),
-    #                 jaw_width=data["jaw_width"],
-    #             ),
-    #             z_motor=GripperZMotorConfigurations(
-    #                 idle_current=GripperCustomizableFloat.build(**data["idleZCurrent"]),
-    #             )
-    #             z_idle_current=
-    #             z_active_current=GripperCustomizableFloat.build(
-    #                 **data["activeZCurrent"]
-    #             ),
-    #             jaw_reference_voltage=GripperCustomizableFloat.build(
-    #                 **data["jawReferenceVoltage"]
-    #             ),
-    #             jaw_duty_cycle_polynomial=[
-    #                 (d[0], d[1]) for d in data["jawDutyCyclePolynomial"]
-    #             ],
-
-    #         )
-    #     except (KeyError) as e:
-    #         raise InvalidGripperDefinition(e)
+    grip_force_configurations: GripForceProfile

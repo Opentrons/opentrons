@@ -18,7 +18,6 @@ class InvalidGripperDefinition(Exception):
     pass
 
 
-
 def load_schema(version: GripperSchemaVersion) -> GripperSchema:
     """Load gripper schema."""
     path = Path("gripper") / "schemas" / f"{version}.json"
@@ -37,5 +36,5 @@ def load_definition(
     if version == GripperSchemaVersion.V1:
         path = Path("gripper") / "definitions" / f"{version}" / f"{model}.json"
         data = _load_definition_data(path)
-        return GripperDefinitionV1.from_dict(data)
+        return GripperDefinitionV1.parse_obj(data)
     raise InvalidGripperDefinition(f"Gripper definition for {version} does not exist.")

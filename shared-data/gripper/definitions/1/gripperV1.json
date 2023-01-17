@@ -9,15 +9,15 @@
   "jawMotorConfigurations": {
     "vref": 2.0
   },
-  "gripForceProfile": {
+  "gripForceConfigurations": {
     "polynomial": [
       [0, -0.282],
       [1, 2.09]
     ],
-    "defaultGripForce": 20,
-    "defaultHomeForce": 12,
-    "minForce": 5,
-    "maxForce": 30
+    "defaultGripForce": 20.0,
+    "defaultHomeForce": 12.0,
+    "min": 5.0,
+    "max": 30.0
   },
   "geometry": {
     "baseOffsetFromMount": {
@@ -26,18 +26,18 @@
       "z": -94.825
     },
     "jawCenterOffsetFromBase": {
-      "x": 0,
-      "y": 0,
+      "x": 0.0,
+      "y": 0.0,
       "z": -88.475
     },
     "pinOneOffsetFromBase": {
-      "x": 4,
-      "y": -57,
+      "x": 4.0,
+      "y": -57.0,
       "z": -100.475
     },
     "pinTwoOffsetFromBase": {
-      "x": 4,
-      "y": 57,
+      "x": 4.0,
+      "y": 57.0,
       "z": -100.475
     },
     "jawWidth": {
