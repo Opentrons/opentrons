@@ -4,7 +4,7 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 class ThermocyclerModuleContext:  # noqa: D101
     # TODO(mc, 2022-02-09): copy or rewrite docstring from
-    # src/opentrons/protocol_api/module_contexts.py
+    # src/opentrons/legacy/module_contexts.py
 
     def __init__(self, engine_client: ProtocolEngineClient, module_id: str) -> None:
         self._engine_client = engine_client

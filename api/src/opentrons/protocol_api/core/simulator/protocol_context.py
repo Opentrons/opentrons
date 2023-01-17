@@ -5,10 +5,10 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount
 
 from ..protocol import AbstractProtocol
-from ..protocol_api.protocol_context import ProtocolContextImplementation
-from ..protocol_api.labware import LabwareCore
-from ..protocol_api.legacy_module_core import LegacyModuleCore
-from ..protocol_api.load_info import InstrumentLoadInfo
+from ..legacy.protocol_context import ProtocolContextImplementation
+from ..legacy.labware import LabwareCore
+from ..legacy.legacy_module_core import LegacyModuleCore
+from ..legacy.load_info import InstrumentLoadInfo
 
 from .instrument_context import InstrumentContextSimulation
 
@@ -17,9 +17,7 @@ logger = logging.getLogger(__name__)
 
 class ProtocolContextSimulation(
     ProtocolContextImplementation,
-    AbstractProtocol[
-        InstrumentContextSimulation, LabwareCore, LegacyModuleCore
-    ],
+    AbstractProtocol[InstrumentContextSimulation, LabwareCore, LegacyModuleCore],
 ):
     _instruments: Dict[Mount, Optional[InstrumentContextSimulation]]  # type: ignore[assignment]
 

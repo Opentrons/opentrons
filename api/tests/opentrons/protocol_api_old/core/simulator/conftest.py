@@ -3,14 +3,14 @@ import pytest
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.protocol_api.labware import LabwareCore
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.legacy.labware import LabwareCore
+from opentrons.protocol_api.core.legacy.protocol_context import (
     ProtocolContextImplementation,
 )
-from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
+from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     NullLabwareOffsetProvider,
 )
-from opentrons.protocol_api.core.protocol_api.instrument_context import (
+from opentrons.protocol_api.core.legacy.instrument_context import (
     InstrumentContextImplementation,
 )
 from opentrons.protocol_api.core.simulator.instrument_context import (

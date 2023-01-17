@@ -396,9 +396,7 @@ class ProtocolContextImplementation(
         """Get the item on top of a given module, if any."""
         labware = module_core.geometry.labware
         return (
-            cast(LabwareCore, labware._implementation)
-            if labware is not None
-            else None
+            cast(LabwareCore, labware._implementation) if labware is not None else None
         )
 
     def get_deck_definition(self) -> DeckDefinitionV3:

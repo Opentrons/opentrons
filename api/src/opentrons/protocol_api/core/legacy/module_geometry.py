@@ -271,7 +271,7 @@ class ThermocyclerGeometry(ModuleGeometry):
     # https://opentrons.atlassian.net/browse/RSS-106
     def labware_accessor(self, labware: Labware) -> Labware:
         from opentrons.protocol_api.labware import Labware
-        from opentrons.protocol_api.core.protocol_api.labware import (
+        from opentrons.protocol_api.core.legacy.labware import (
             LabwareCore,
         )
 

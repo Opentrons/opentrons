@@ -15,10 +15,10 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware, validation
 from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocol_api.core.protocol_api import module_geometry
-from opentrons.protocol_api.core.protocol_api.labware import LabwareCore
-from opentrons.protocol_api.core.protocol_api.well import WellImplementation
-from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
+from opentrons.protocol_api.core.legacy import module_geometry
+from opentrons.protocol_api.core.legacy.labware import LabwareCore
+from opentrons.protocol_api.core.legacy.well import WellImplementation
+from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
@@ -531,17 +531,13 @@ def test_tiprack_list():
     labware_name = "opentrons_96_tiprack_300ul"
     labware_def = labware.get_labware_definition(labware_name)
     tiprack = labware.Labware(
-        implementation=LabwareCore(
-            labware_def, Location(Point(0, 0, 0), "Test Slot")
-        ),
+        implementation=LabwareCore(labware_def, Location(Point(0, 0, 0), "Test Slot")),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )
     tiprack_2 = labware.Labware(
-        implementation=LabwareCore(
-            labware_def, Location(Point(0, 0, 0), "Test Slot")
-        ),
+        implementation=LabwareCore(labware_def, Location(Point(0, 0, 0), "Test Slot")),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -579,9 +575,7 @@ def test_uris():
     )
     assert helpers.uri_from_definition(defn) == uri
     lw = labware.Labware(
-        implementation=LabwareCore(
-            defn, Location(Point(0, 0, 0), "Test Slot")
-        ),
+        implementation=LabwareCore(defn, Location(Point(0, 0, 0), "Test Slot")),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -592,9 +586,7 @@ def test_uris():
 def test_labware_hash_func_same_implementation(minimal_labware_def) -> None:
     """Test that multiple Labware objects with same implementation and version
     have the same __hash__"""
-    impl = LabwareCore(
-        minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
-    )
+    impl = LabwareCore(minimal_labware_def, Location(Point(0, 0, 0), "Test Slot"))
     s = set(
         labware.Labware(
             implementation=impl,
@@ -612,9 +604,7 @@ def test_labware_hash_func_same_implementation_different_version(
 ) -> None:
     """Test that multiple Labware objects with same implementation yet
     different version have different __hash__"""
-    impl = LabwareCore(
-        minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
-    )
+    impl = LabwareCore(minimal_labware_def, Location(Point(0, 0, 0), "Test Slot"))
 
     l1 = labware.Labware(
         implementation=impl,
@@ -637,12 +627,8 @@ def test_labware_hash_func_diff_implementation_same_version(
 ) -> None:
     """Test that multiple Labware objects with different implementation yet
     sane version have different __hash__"""
-    impl1 = LabwareCore(
-        minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
-    )
-    impl2 = LabwareCore(
-        minimal_labware_def, Location(Point(0, 0, 0), "Test Slot2")
-    )
+    impl1 = LabwareCore(minimal_labware_def, Location(Point(0, 0, 0), "Test Slot"))
+    impl2 = LabwareCore(minimal_labware_def, Location(Point(0, 0, 0), "Test Slot2"))
 
     l1 = labware.Labware(
         implementation=impl1,

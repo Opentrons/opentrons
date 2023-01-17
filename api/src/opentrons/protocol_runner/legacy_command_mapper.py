@@ -15,7 +15,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.protocol_api.core.protocol_api.deck import FIXED_TRASH_ID
+from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
 
 from .legacy_wrappers import (
     LegacyLoadInfo,

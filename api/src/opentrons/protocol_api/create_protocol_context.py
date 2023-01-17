@@ -20,8 +20,8 @@ from .protocol_context import ProtocolContext
 from .deck import Deck
 
 from .core.common import ProtocolCore as AbstractProtocolCore
-from .core.protocol_api.protocol_context import ProtocolContextImplementation
-from .core.protocol_api.labware_offset_provider import (
+from .core.legacy.protocol_context import ProtocolContextImplementation
+from .core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     LabwareOffsetProvider,
     NullLabwareOffsetProvider,

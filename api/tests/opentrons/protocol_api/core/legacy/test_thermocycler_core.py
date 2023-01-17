@@ -10,22 +10,22 @@ from opentrons.hardware_control.modules import Thermocycler, TemperatureStatus
 from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
 )
-from opentrons.protocol_api.core.protocol_api.module_geometry import (
+from opentrons.protocol_api.core.legacy.module_geometry import (
     ThermocyclerGeometry,
 )
 
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.legacy.protocol_context import (
     ProtocolContextImplementation,
 )
-from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
+from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyThermocyclerCore,
     create_module_core,
 )
-from opentrons.protocol_api.core.protocol_api.instrument_context import (
+from opentrons.protocol_api.core.legacy.instrument_context import (
     InstrumentContextImplementation,
 )
-from opentrons.protocol_api.core.protocol_api.well import WellImplementation
+from opentrons.protocol_api.core.legacy.well import WellImplementation
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 

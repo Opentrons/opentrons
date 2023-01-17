@@ -15,7 +15,7 @@ from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from ..protocol_api.well import WellImplementation
+from ..legacy.well import WellImplementation
 
 
 if TYPE_CHECKING:

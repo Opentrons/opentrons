@@ -1,13 +1,13 @@
-from opentrons.protocol_api.core.protocol_api.labware import LabwareCore
-from opentrons.protocol_api.core.protocol_api.well import WellImplementation
-from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
+from opentrons.protocol_api.core.legacy.labware import LabwareCore
+from opentrons.protocol_api.core.legacy.well import WellImplementation
+from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from unittest import mock
 from copy import deepcopy
 import pytest
 from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api import (
     ProtocolContext,
     InstrumentContext,

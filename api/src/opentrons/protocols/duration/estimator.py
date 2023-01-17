@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from opentrons.commands import types
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
 
 
@@ -513,7 +513,7 @@ class DurationEstimator:
         z_default_module_height = 95.25
         # 177.8 - 82.55 Where did we get 177.8 from?
         # Would it be better to just use
-        # protocol_api.labware.Well.top
+        # legacy.labware.Well.top
         # labware.top() ?
 
         if is_module:

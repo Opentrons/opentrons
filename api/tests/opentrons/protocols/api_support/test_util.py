@@ -1,10 +1,10 @@
 import pytest
 
-from opentrons.protocol_api.core.protocol_api.labware import LabwareCore
+from opentrons.protocol_api.core.legacy.labware import LabwareCore
 from opentrons.types import Point, Location, Mount
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,

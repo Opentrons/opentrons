@@ -17,31 +17,31 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols import labware as mock_labware
-from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 
-from opentrons.protocol_api.core.protocol_api.deck import Deck
-from opentrons.protocol_api.core.protocol_api.load_info import (
+from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocol_api.core.legacy.load_info import (
     LoadInfo,
     LabwareLoadInfo,
     InstrumentLoadInfo,
     ModuleLoadInfo,
 )
-from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
+from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     ProvidedLabwareOffset,
 )
-from opentrons.protocol_api.core.protocol_api.instrument_context import (
+from opentrons.protocol_api.core.legacy.instrument_context import (
     InstrumentContextImplementation,
 )
-from opentrons.protocol_api.core.protocol_api.labware import LabwareCore
-from opentrons.protocol_api.core.protocol_api.legacy_module_core import LegacyModuleCore
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.legacy.labware import LabwareCore
+from opentrons.protocol_api.core.legacy.legacy_module_core import LegacyModuleCore
+from opentrons.protocol_api.core.legacy.protocol_context import (
     ProtocolContextImplementation,
 )
 
-from opentrons.protocol_api.core.protocol_api import (
+from opentrons.protocol_api.core.legacy import (
     legacy_module_core as mock_legacy_module_core,
     module_geometry as mock_module_geometry,
 )
@@ -65,7 +65,7 @@ def _mock_module_geometry_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) 
 def _mock_legacy_module_core_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Mock out opentrons.protocol_api.core.protocol_api.legacy_module_core functions."""
+    """Mock out opentrons.protocol_api.core.legacy.legacy_module_core functions."""
     for name, func in inspect.getmembers(mock_legacy_module_core, inspect.isfunction):
         monkeypatch.setattr(mock_legacy_module_core, name, decoy.mock(func=func))
 

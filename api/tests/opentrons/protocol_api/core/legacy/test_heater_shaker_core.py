@@ -12,13 +12,13 @@ from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
     SpeedStatus,
 )
-from opentrons.protocol_api.core.protocol_api.module_geometry import (
+from opentrons.protocol_api.core.legacy.module_geometry import (
     HeaterShakerGeometry,
 )
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.legacy.protocol_context import (
     ProtocolContextImplementation,
 )
-from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
+from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyHeaterShakerCore,
     create_module_core,
     CannotPerformModuleAction,

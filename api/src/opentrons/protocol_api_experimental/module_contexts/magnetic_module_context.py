@@ -28,7 +28,7 @@ class MagneticModuleStatus(str, Enum):
 
 class MagneticModuleContext:  # noqa: D101
     # TODO(mc, 2022-02-09): copy or rewrite docstrings from
-    # src/opentrons/protocol_api/module_contexts.py
+    # src/opentrons/legacy/module_contexts.py
 
     def __init__(self, engine_client: ProtocolEngineClient, module_id: str) -> None:
         self._engine_client = engine_client
