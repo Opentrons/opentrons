@@ -280,7 +280,17 @@ export function parseLabwareInfoByLiquidId(
       }
       const labwareId = command.params.labwareId
       const volumeByWell = command.params.volumeByWell
-      acc[command.params.liquidId].push({ labwareId, volumeByWell })
+      const labwareIndex = acc[command.params.liquidId].findIndex(
+        i => i.labwareId === labwareId
+      )
+      if (labwareIndex >= 0) {
+        acc[command.params.liquidId][labwareIndex].volumeByWell = {
+          ...acc[command.params.liquidId][labwareIndex].volumeByWell,
+          ...volumeByWell,
+        }
+      } else {
+        acc[command.params.liquidId].push({ labwareId, volumeByWell })
+      }
       return acc
     },
     {}

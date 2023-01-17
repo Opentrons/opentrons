@@ -25,6 +25,14 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .comment import (
+    Comment,
+    CommentParams,
+    CommentCreate,
+    CommentResult,
+    CommentCommandType,
+)
+
 from .custom import (
     Custom,
     CustomParams,
@@ -179,6 +187,7 @@ from .blow_out import (
 
 Command = Union[
     Aspirate,
+    Comment,
     Custom,
     Dispense,
     DispenseInPlace,
@@ -227,6 +236,7 @@ Command = Union[
 
 CommandParams = Union[
     AspirateParams,
+    CommentParams,
     CustomParams,
     DispenseParams,
     DispenseInPlaceParams,
@@ -276,6 +286,7 @@ CommandParams = Union[
 
 CommandType = Union[
     AspirateCommandType,
+    CommentCommandType,
     CustomCommandType,
     DispenseCommandType,
     DispenseInPlaceCommandType,
@@ -324,6 +335,7 @@ CommandType = Union[
 
 CommandCreate = Union[
     AspirateCreate,
+    CommentCreate,
     CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
@@ -372,6 +384,7 @@ CommandCreate = Union[
 
 CommandResult = Union[
     AspirateResult,
+    CommentResult,
     CustomResult,
     DispenseResult,
     DispenseInPlaceResult,

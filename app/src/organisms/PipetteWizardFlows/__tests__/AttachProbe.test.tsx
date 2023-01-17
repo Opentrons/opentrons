@@ -49,7 +49,7 @@ describe('AttachProbe', () => {
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
     getByAltText('Attach probe')
-    const proceedBtn = getByRole('button', { name: 'Initiate calibration' })
+    const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [

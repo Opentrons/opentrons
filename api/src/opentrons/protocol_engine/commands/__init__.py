@@ -46,6 +46,14 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .comment import (
+    Comment,
+    CommentParams,
+    CommentCreate,
+    CommentResult,
+    CommentCommandType,
+)
+
 from .custom import (
     Custom,
     CustomParams,
@@ -230,6 +238,12 @@ __all__ = [
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # comment command models
+    "Comment",
+    "CommentParams",
+    "CommentCreate",
+    "CommentResult",
+    "CommentCommandType",
     # custom command models
     "Custom",
     "CustomCreate",

@@ -108,8 +108,7 @@ class ModuleGeometry:
         self._parent = parent
         self._module_type = module_type
 
-        # Note (spp, 2022-05-23): I think this should say '{display_name} on {slot}'
-        self._display_name = "{} on {}".format(display_name, str(parent.labware))
+        self._display_name = display_name
         self._model = model
         self._offset = offset
         self._height = overall_height + self._parent.point.z
@@ -124,6 +123,10 @@ class ModuleGeometry:
 
     def reset_labware(self) -> None:
         self._labware = None
+
+    @property
+    def display_name(self) -> str:
+        return self._display_name
 
     @property
     def model(self) -> ModuleModel:
@@ -170,7 +173,8 @@ class ModuleGeometry:
             return self._height
 
     def __repr__(self) -> str:
-        return self._display_name
+        location = f" on {self.parent}" if isinstance(self.parent, str) else ""
+        return f"{self._display_name}{location}"
 
 
 class ThermocyclerGeometry(ModuleGeometry):
@@ -277,6 +281,8 @@ class ThermocyclerGeometry(ModuleGeometry):
         return Labware(
             implementation=LabwareImplementation(definition, super().location),
             api_version=labware.api_version,
+            protocol_core=None,  # type: ignore[arg-type]
+            core_map=None,  # type: ignore[arg-type]
         )
 
     def add_labware(self, labware: Labware) -> Labware:
