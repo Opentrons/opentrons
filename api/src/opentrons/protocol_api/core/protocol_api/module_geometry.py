@@ -272,14 +272,14 @@ class ThermocyclerGeometry(ModuleGeometry):
     def labware_accessor(self, labware: Labware) -> Labware:
         from opentrons.protocol_api.labware import Labware
         from opentrons.protocol_api.core.protocol_api.labware import (
-            LabwareImplementation,
+            LabwareCore,
         )
 
         # Block first three columns from being accessed
         definition = labware._implementation.get_definition()
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
-            implementation=LabwareImplementation(definition, super().location),
+            implementation=LabwareCore(definition, super().location),
             api_version=labware.api_version,
             protocol_core=None,  # type: ignore[arg-type]
             core_map=None,  # type: ignore[arg-type]

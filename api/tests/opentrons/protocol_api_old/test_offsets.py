@@ -1,6 +1,6 @@
 import typing
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.protocol_api.labware import LabwareCore
 from opentrons.types import Point, Location
 
 if typing.TYPE_CHECKING:
@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
 def test_wells_rebuilt_with_offset(minimal_labware_def: "LabwareDefinition") -> None:
     test_labware = labware.Labware(
         api_version=MAX_SUPPORTED_VERSION,
-        implementation=LabwareImplementation(
+        implementation=LabwareCore(
             minimal_labware_def, Location(Point(0, 0, 0), "deck")
         ),
         protocol_core=None,  # type: ignore[arg-type]

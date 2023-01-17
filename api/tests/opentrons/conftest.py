@@ -53,7 +53,7 @@ from opentrons.protocol_api import (
     Labware,
     create_protocol_context,
 )
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.protocol_api.labware import LabwareCore
 
 from opentrons.types import Location, Point
 
@@ -617,21 +617,21 @@ def minimal_labware_def2() -> LabwareDefinition:
 
 
 @pytest.fixture()
-def min_lw_impl(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
-    return LabwareImplementation(
+def min_lw_impl(minimal_labware_def: LabwareDefinition) -> LabwareCore:
+    return LabwareCore(
         definition=minimal_labware_def, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
 @pytest.fixture()
-def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LabwareImplementation:
-    return LabwareImplementation(
+def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LabwareCore:
+    return LabwareCore(
         definition=minimal_labware_def2, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
 @pytest.fixture()
-def min_lw(min_lw_impl: LabwareImplementation) -> Labware:
+def min_lw(min_lw_impl: LabwareCore) -> Labware:
     return Labware(
         implementation=min_lw_impl,
         api_version=MAX_SUPPORTED_VERSION,
@@ -641,7 +641,7 @@ def min_lw(min_lw_impl: LabwareImplementation) -> Labware:
 
 
 @pytest.fixture()
-def min_lw2(min_lw2_impl: LabwareImplementation) -> Labware:
+def min_lw2(min_lw2_impl: LabwareCore) -> Labware:
     return Labware(
         implementation=min_lw2_impl,
         api_version=MAX_SUPPORTED_VERSION,

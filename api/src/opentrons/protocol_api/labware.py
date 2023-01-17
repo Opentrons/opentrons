@@ -34,7 +34,7 @@ from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
-from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.protocol_api.labware import LabwareCore as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
 from .core.protocol_api.well import WellImplementation as LegacyWellCore
 from .core.protocol_api.well_geometry import WellGeometry

@@ -35,7 +35,7 @@ from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
 from opentrons.protocol_api.core.protocol_api.instrument_context import (
     InstrumentContextImplementation,
 )
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.protocol_api.labware import LabwareCore
 from opentrons.protocol_api.core.protocol_api.legacy_module_core import LegacyModuleCore
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
@@ -88,7 +88,7 @@ def mock_deck(decoy: Decoy) -> Deck:
     setattr(
         deck, "resolve_module_location", decoy.mock(name="Deck.resolve_module_location")
     )
-    deck["12"] = decoy.mock(cls=LabwareImplementation)
+    deck["12"] = decoy.mock(cls=LabwareCore)
 
     return cast(Deck, deck)
 
@@ -212,7 +212,7 @@ def test_load_labware(
         version=1337,
     )
 
-    assert isinstance(result, LabwareImplementation)
+    assert isinstance(result, LabwareCore)
     assert mock_deck["5"] is result
     assert result.get_definition() == labware_definition_dict
     assert result.get_user_display_name() == "cool label"
@@ -300,7 +300,7 @@ def test_load_labware_on_module(
         version=1337,
     )
 
-    assert isinstance(result, LabwareImplementation)
+    assert isinstance(result, LabwareCore)
     assert result.get_calibrated_offset() == Point(
         x=(1 + 4 + 7),
         y=(2 + 5 + 8),

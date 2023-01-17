@@ -29,7 +29,7 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 
-from .labware import LabwareImplementation
+from .labware import LabwareCore
 from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
 from ...labware import Labware
 
@@ -91,7 +91,7 @@ class LegacyModuleCore(AbstractModuleCore):
         """Get the module's display name."""
         return self._geometry.display_name
 
-    def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
+    def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
         labware = self.geometry.add_labware(
             Labware(
@@ -220,7 +220,7 @@ class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
         """Get the module's current magnet status."""
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
-    def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
+    def add_labware_core(self, labware_core: LabwareCore) -> Labware:
         """Add a labware to the module."""
         labware = super().add_labware_core(labware_core)
         if labware_core.get_default_magnet_engage_height() is None:

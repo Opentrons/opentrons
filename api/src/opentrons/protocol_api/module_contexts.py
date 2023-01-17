@@ -24,7 +24,7 @@ from .core.common import (
 from .core.core_map import LoadedCoreMap
 from .core.protocol_api.legacy_module_core import LegacyModuleCore
 from .core.protocol_api.module_geometry import ModuleGeometry as LegacyModuleGeometry
-from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.protocol_api.labware import LabwareCore as LegacyLabwareCore
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,

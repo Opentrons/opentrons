@@ -6,7 +6,7 @@ from opentrons.types import Mount
 
 from ..protocol import AbstractProtocol
 from ..protocol_api.protocol_context import ProtocolContextImplementation
-from ..protocol_api.labware import LabwareImplementation
+from ..protocol_api.labware import LabwareCore
 from ..protocol_api.legacy_module_core import LegacyModuleCore
 from ..protocol_api.load_info import InstrumentLoadInfo
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class ProtocolContextSimulation(
     ProtocolContextImplementation,
     AbstractProtocol[
-        InstrumentContextSimulation, LabwareImplementation, LegacyModuleCore
+        InstrumentContextSimulation, LabwareCore, LegacyModuleCore
     ],
 ):
     _instruments: Dict[Mount, Optional[InstrumentContextSimulation]]  # type: ignore[assignment]
