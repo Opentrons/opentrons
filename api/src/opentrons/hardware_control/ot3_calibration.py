@@ -435,7 +435,7 @@ async def find_slot_center_noncontact(
 async def _calibrate_mount(
     hcapi: OT3API,
     mount: OT3Mount,
-    slot: int,
+    slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
@@ -488,7 +488,7 @@ async def _calibrate_mount(
         center = Point(x_center, y_center, z_pos)
         LOG.info(f"Found calibration value {center} for mount {mount.name}")
 
-        return Point(*hcapi.config.calibration.edge_sense.nominal_center) - center
+        return nominal_center - center
 
     except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
         LOG.info(
@@ -520,7 +520,7 @@ def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
 async def calibrate_gripper_jaw(
     hcapi: OT3API,
     probe: GripperProbe,
-    slot: int,
+    slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
@@ -559,7 +559,7 @@ async def calibrate_gripper(
 async def calibrate_pipette(
     hcapi: OT3API,
     mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
-    slot: int,
+    slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
