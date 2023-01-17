@@ -1,5 +1,5 @@
 from opentrons.protocol_api.core.legacy.labware import LabwareCore
-from opentrons.protocol_api.core.legacy.well import WellImplementation
+from opentrons.protocol_api.core.legacy.well import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from unittest import mock
@@ -315,7 +315,7 @@ def test_touch_tip():
     location = Location(Point(1, 2, 3), "deck")
     well = labware.Well(
         parent=None,  # type: ignore[arg-type]
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",

@@ -17,7 +17,7 @@ from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware, validation
 from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.core.legacy import module_geometry
 from opentrons.protocol_api.core.legacy.labware import LabwareCore
-from opentrons.protocol_api.core.legacy.well import WellImplementation
+from opentrons.protocol_api.core.legacy.well import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from opentrons.calibration_storage import helpers
@@ -53,7 +53,7 @@ def test_well_init() -> None:
     well1 = labware.Well(
         parent=None,  # type: ignore[arg-type]
         api_version=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=slot.point,
@@ -72,7 +72,7 @@ def test_well_init() -> None:
     well2 = labware.Well(
         parent=None,  # type: ignore[arg-type]
         api_version=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 well_props=test_data[well2_name],
                 parent_point=slot.point,
@@ -95,7 +95,7 @@ def test_top() -> None:
     well = labware.Well(
         parent=None,  # type: ignore[arg-type]
         api_version=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=slot.point,
@@ -120,7 +120,7 @@ def test_bottom() -> None:
     well = labware.Well(
         parent=None,  # type: ignore[arg-type]
         api_version=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=slot.point,
@@ -145,7 +145,7 @@ def test_from_center_cartesian():
     well1 = labware.Well(
         parent=None,  # type: ignore[arg-type]
         api_version=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=slot1.point,
@@ -179,7 +179,7 @@ def test_from_center_cartesian():
     well2 = labware.Well(
         parent=None,  # type: ignore[arg-type]
         api_version=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 well_props=test_data[well2_name],
                 parent_point=slot2.point,
@@ -299,7 +299,7 @@ def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
     well = labware.Well(
         parent=lw,
         api_version=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=parent.point,

@@ -25,7 +25,7 @@ from opentrons.protocol_api.core.legacy.legacy_module_core import (
 from opentrons.protocol_api.core.legacy.instrument_context import (
     InstrumentContextImplementation,
 )
-from opentrons.protocol_api.core.legacy.well import WellImplementation
+from opentrons.protocol_api.core.legacy.well import LegacyWellCore
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 
@@ -71,9 +71,9 @@ def mock_labware(decoy: Decoy) -> Labware:
 
 
 @pytest.fixture
-def mock_trash_well_core(decoy: Decoy) -> WellImplementation:
+def mock_trash_well_core(decoy: Decoy) -> LegacyWellCore:
     """Get a mock well implementation for the trash."""
-    return decoy.mock(cls=WellImplementation)
+    return decoy.mock(cls=LegacyWellCore)
 
 
 @pytest.fixture
@@ -262,7 +262,7 @@ def test_open_lid(
     mock_protocol_core: ProtocolContextImplementation,
     mock_instrument_core: InstrumentContextImplementation,
     mock_geometry: ThermocyclerGeometry,
-    mock_trash_well_core: WellImplementation,
+    mock_trash_well_core: LegacyWellCore,
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should open the lid with the hardware."""
@@ -305,7 +305,7 @@ def test_close_lid(
     mock_protocol_core: ProtocolContextImplementation,
     mock_instrument_core: InstrumentContextImplementation,
     mock_geometry: ThermocyclerGeometry,
-    mock_trash_well_core: WellImplementation,
+    mock_trash_well_core: LegacyWellCore,
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should close the lid with the hardware."""
