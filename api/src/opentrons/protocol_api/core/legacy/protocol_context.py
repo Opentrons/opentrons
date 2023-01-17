@@ -20,7 +20,7 @@ from ..labware import LabwareLoadParams
 
 from . import legacy_module_core, module_geometry
 from .deck import Deck
-from .instrument_context import InstrumentContextImplementation
+from .instrument_context import LegacyInstrumentCore
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .labware import LegacyLabwareCore
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 class ProtocolContextImplementation(
     AbstractProtocol[
-        InstrumentContextImplementation,
+        LegacyInstrumentCore,
         LegacyLabwareCore,
         legacy_module_core.LegacyModuleCore,
     ]
@@ -72,7 +72,7 @@ class ProtocolContextImplementation(
         self._equipment_broker = equipment_broker or EquipmentBroker()
         self._deck_layout = Deck() if deck_layout is None else deck_layout
 
-        self._instruments: Dict[Mount, Optional[InstrumentContextImplementation]] = {
+        self._instruments: Dict[Mount, Optional[LegacyInstrumentCore]] = {
             mount: None for mount in Mount
         }
         self._bundled_labware = bundled_labware
@@ -279,7 +279,7 @@ class ProtocolContextImplementation(
 
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount
-    ) -> InstrumentContextImplementation:
+    ) -> LegacyInstrumentCore:
         """Load an instrument."""
         attached = {
             att_mount: instr.get("name", None)
@@ -289,7 +289,7 @@ class ProtocolContextImplementation(
         attached[mount] = instrument_name.value
         self._sync_hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
-        new_instr = InstrumentContextImplementation(
+        new_instr = LegacyInstrumentCore(
             api_version=self._api_version,
             protocol_interface=self,
             mount=mount,
@@ -310,7 +310,7 @@ class ProtocolContextImplementation(
 
     def get_loaded_instruments(
         self,
-    ) -> Dict[Mount, Optional[InstrumentContextImplementation]]:
+    ) -> Dict[Mount, Optional[LegacyInstrumentCore]]:
         """Get a mapping of mount to instrument."""
         return self._instruments
 

@@ -13,7 +13,7 @@ from opentrons.protocol_api.core.legacy.protocol_context import (
 )
 
 from opentrons.protocol_api.core.legacy.instrument_context import (
-    InstrumentContextImplementation,
+    LegacyInstrumentCore,
 )
 
 
@@ -59,8 +59,8 @@ def subject(
     mock_protocol_impl: ProtocolContextImplementation,
     mount: Mount,
     api_version: APIVersion,
-) -> InstrumentContextImplementation:
-    return InstrumentContextImplementation(
+) -> LegacyInstrumentCore:
+    return LegacyInstrumentCore(
         protocol_interface=mock_protocol_impl,
         mount=mount,
         instrument_name="cool pipette",
@@ -73,7 +73,7 @@ def test_home(
     mount: Mount,
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
-    subject: InstrumentContextImplementation,
+    subject: LegacyInstrumentCore,
 ) -> None:
     """It should home the pipette's Z-axis and plunger."""
     subject.home()
@@ -89,7 +89,7 @@ def test_home_legacy_behavior(
     mount: Mount,
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
-    subject: InstrumentContextImplementation,
+    subject: LegacyInstrumentCore,
 ) -> None:
     """It should avoid homing other instrument in API version <= 2.12."""
     subject.home()

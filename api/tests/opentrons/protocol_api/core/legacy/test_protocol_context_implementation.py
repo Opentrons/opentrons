@@ -33,7 +33,7 @@ from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     ProvidedLabwareOffset,
 )
 from opentrons.protocol_api.core.legacy.instrument_context import (
-    InstrumentContextImplementation,
+    LegacyInstrumentCore,
 )
 from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.legacy_module_core import LegacyModuleCore
@@ -147,7 +147,7 @@ def test_load_instrument(
         instrument_name=PipetteNameType.P300_SINGLE, mount=Mount.RIGHT
     )
 
-    assert isinstance(result, InstrumentContextImplementation)
+    assert isinstance(result, LegacyInstrumentCore)
 
     decoy.verify(
         mock_sync_hardware_api.cache_instruments({Mount.RIGHT: "p300_single"}),

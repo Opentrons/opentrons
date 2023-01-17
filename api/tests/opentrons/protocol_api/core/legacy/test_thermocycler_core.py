@@ -23,7 +23,7 @@ from opentrons.protocol_api.core.legacy.legacy_module_core import (
     create_module_core,
 )
 from opentrons.protocol_api.core.legacy.instrument_context import (
-    InstrumentContextImplementation,
+    LegacyInstrumentCore,
 )
 from opentrons.protocol_api.core.legacy.well import LegacyWellCore
 
@@ -59,9 +59,9 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncThermocyclerHardware:
 
 
 @pytest.fixture
-def mock_instrument_core(decoy: Decoy) -> InstrumentContextImplementation:
+def mock_instrument_core(decoy: Decoy) -> LegacyInstrumentCore:
     """Get a mock instrument core."""
-    return decoy.mock(cls=InstrumentContextImplementation)
+    return decoy.mock(cls=LegacyInstrumentCore)
 
 
 @pytest.fixture
@@ -260,7 +260,7 @@ def test_open_lid(
     mock_sync_module_hardware: SyncThermocyclerHardware,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_protocol_core: ProtocolContextImplementation,
-    mock_instrument_core: InstrumentContextImplementation,
+    mock_instrument_core: LegacyInstrumentCore,
     mock_geometry: ThermocyclerGeometry,
     mock_trash_well_core: LegacyWellCore,
     subject: LegacyThermocyclerCore,
@@ -303,7 +303,7 @@ def test_close_lid(
     mock_sync_module_hardware: SyncThermocyclerHardware,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_protocol_core: ProtocolContextImplementation,
-    mock_instrument_core: InstrumentContextImplementation,
+    mock_instrument_core: LegacyInstrumentCore,
     mock_geometry: ThermocyclerGeometry,
     mock_trash_well_core: LegacyWellCore,
     subject: LegacyThermocyclerCore,

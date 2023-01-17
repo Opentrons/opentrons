@@ -11,7 +11,7 @@ from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     NullLabwareOffsetProvider,
 )
 from opentrons.protocol_api.core.legacy.instrument_context import (
-    InstrumentContextImplementation,
+    LegacyInstrumentCore,
 )
 from opentrons.protocol_api.core.legacy_simulator.instrument_context import (
     InstrumentContextSimulation,
@@ -49,7 +49,7 @@ def simulating_protocol_context(
 @pytest.fixture
 def instrument_context(
     protocol_context: ProtocolContextImplementation,
-) -> InstrumentContextImplementation:
+) -> LegacyInstrumentCore:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
         PipetteNameType.P300_SINGLE_GEN2, types.Mount.RIGHT
@@ -59,7 +59,7 @@ def instrument_context(
 @pytest.fixture
 def second_instrument_context(
     protocol_context: ProtocolContextImplementation,
-) -> InstrumentContextImplementation:
+) -> LegacyInstrumentCore:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
         PipetteNameType.P300_SINGLE_GEN2, types.Mount.LEFT
@@ -69,7 +69,7 @@ def second_instrument_context(
 @pytest.fixture
 def simulating_instrument_context(
     simulating_protocol_context: ProtocolContextSimulation,
-    instrument_context: InstrumentContextImplementation,
+    instrument_context: LegacyInstrumentCore,
 ) -> InstrumentContextSimulation:
     """A simulating instrument context."""
     return InstrumentContextSimulation(
@@ -83,7 +83,7 @@ def simulating_instrument_context(
 @pytest.fixture
 def second_simulating_instrument_context(
     simulating_protocol_context: ProtocolContextSimulation,
-    second_instrument_context: InstrumentContextImplementation,
+    second_instrument_context: LegacyInstrumentCore,
 ) -> InstrumentContextSimulation:
     """A simulating instrument context."""
     return InstrumentContextSimulation(
