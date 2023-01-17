@@ -182,6 +182,14 @@ class LegacyCommandMapper:
                             "completedAt": now,
                         }
                     )
+                elif isinstance(running_command, pe_commands.Comment):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.CommentResult.construct(),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
                 elif isinstance(running_command, pe_commands.Custom):
                     completed_command = running_command.copy(
                         update={
