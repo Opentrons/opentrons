@@ -83,9 +83,8 @@ import { EMPTY_TIMESTAMP } from '../constants'
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { head } from 'lodash'
 import { Portal } from '../../../App/portal'
-import { single } from 'rxjs/operators'
+import { RunProgressMeter } from '../RunProgressMeter'
 
 const EQUIPMENT_POLL_MS = 5000
 
@@ -688,9 +687,8 @@ export function ProtocolRunHeader({
           )}
         </Box>
       </Box>
-      {/* {protocolRunningContent} */}
-      {/* <ProgressMeter {...{ ticks, makeHandleJumpToStep, analysisCommands }} currentRunCommandIndex={1100} /> */}
-      <ProgressMeterDiv {...{ ticks, makeHandleJumpToStep, analysisCommands }} currentRunCommandIndex={1100} />
+      {protocolRunningContent}
+      <RunProgressMeter {...{ ticks, makeHandleJumpToStep, analysisCommands }} currentRunCommandIndex={1100} />
       {showConfirmCancelModal ? (
         <ConfirmCancelModal
           onClose={() => setShowConfirmCancelModal(false)}
@@ -698,94 +696,5 @@ export function ProtocolRunHeader({
         />
       ) : null}
     </Flex>
-  )
-}
-
-interface ProgressMeterProps {
-  analysisCommands: RunTimeCommand[]
-  ticks: Array<{ index: number, count: number }>
-  makeHandleJumpToStep: (i: number) => () => void
-  currentRunCommandIndex: number
-}
-function ProgressMeter(props: ProgressMeterProps) {
-  const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
-  const innerXMargin = analysisCommands.length * 0.01 * X_MARGIN_PERCENT
-  const headSize = analysisCommands.length * 0.01 * HEAD_SIZE_PERCENT
-  return (
-    <svg width="100%" height="40px" viewBox={`${-1 * innerXMargin} 0 ${analysisCommands.length + innerXMargin} ${headSize * 2}`}>
-      <rect stroke={COLORS.blueEnabled} fill="#fff" x="0" y={headSize * 3 / 4} height={headSize / 2} width={analysisCommands.length} />
-      <rect fill={COLORS.blueEnabled} x="0" y={headSize * 3 / 4} height={headSize / 2} width={currentRunCommandIndex} />
-      {ticks.map((tick) => (
-        <Tick {...{ ...tick, makeHandleJumpToStep, headSize }} />
-      ))}
-    </svg>
-  )
-}
-
-function ProgressMeterDiv(props: ProgressMeterProps) {
-  const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      <Flex width="100%" height="6px" borderRadius="3px" backgroundColor={COLORS.medGreyEnabled} />
-      <Flex marginTop="-6px" width={`${((currentRunCommandIndex + 1) / analysisCommands.length) * 100}%`} height="6px" borderRadius="3px" backgroundColor={COLORS.darkBlackEnabled} />
-      <Flex marginTop="-10px" width="100%">
-        {ticks.map((tick) => (
-          <TickDiv {...{ ...tick, makeHandleJumpToStep }} total={analysisCommands.length} />
-        ))}
-      </Flex>
-    </Flex>
-  )
-}
-
-function TickDiv(props: { index: number, count: number, makeHandleJumpToStep: (i: number) => () => void, total: number }) {
-  const { index, count, makeHandleJumpToStep, total } = props
-  const [targetProps, tooltipProps] = useHoverTooltip()
-  const isAggregatedTick = count > 1
-  const width = isAggregatedTick ? 11.156 : 4
-  return (
-    <Flex
-      {...targetProps}
-      cursor="pointer"
-      onClick={makeHandleJumpToStep(index)}
-      backgroundColor={COLORS.white}
-      fontSize="9px"
-      borderRadius="4px"
-      border={`${COLORS.blueEnabled} 1px solid`}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-      height="13px"
-      padding="2px"
-      position="absolute"
-      left={`calc(${((index + 1) / total) * 100}% - 2rem + 1px - ${(isAggregatedTick ? 13.156 : 6)}px)`}
-    >
-      {isAggregatedTick ? count : null}
-      <Portal><Tooltip tooltipProps={tooltipProps}>{count}</Tooltip></Portal>
-    </Flex>
-  )
-}
-
-function Tick(props: { index: number, count: number, makeHandleJumpToStep: (i: number) => () => void, headSize: number }) {
-  const { index, count, makeHandleJumpToStep, headSize } = props
-  const [targetProps, tooltipProps] = useHoverTooltip()
-  const isAggregatedTick = count > 1
-  const height = headSize * 2
-  const singleWidth = height / 4
-  const aggregateWidth = height * 3 / 4
-  const strokeWidth = height / 20
-  return (
-    <>
-      <g {...targetProps} onClick={makeHandleJumpToStep(index)}>
-        {isAggregatedTick
-          ? <>
-            <rect x={index + (headSize * 3 / 8)} y='0' height={height} width={aggregateWidth} fill="#fff" stroke={COLORS.blueEnabled} strokeWidth={strokeWidth} ry={height / 4} rx={aggregateWidth / 2} />
-            <text x={index + (aggregateWidth * (count >= 10 ? 3 / 8 : 9 / 16))} y={height * 5 / 8} color="black" fontSize={headSize}>{count}</text>
-          </>
-          : <rect x={index + (headSize * 3 / 8)} y='0' height={height} width={singleWidth} fill="#fff" stroke={COLORS.blueEnabled} strokeWidth={strokeWidth} ry={singleWidth / 2} rx={singleWidth / 2} />
-        }
-      </g>
-      {isAggregatedTick
-        ? <Portal level="top"><Tooltip {...tooltipProps}>{count}</Tooltip> </Portal>
-        : null}
-    </>
   )
 }
