@@ -1119,7 +1119,9 @@ class OT3API(
                 self._encoder_current_position[OT3Axis.G]
             )
         except Exception:
-            self._log.exception("Gripper grip failed")
+            self._log.exception(
+                f"Gripper grip failed, encoder pos: {self._encoder_current_position[OT3Axis.G]}"
+            )
             raise
 
     @ExecutionManagerProvider.wait_for_running
