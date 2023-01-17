@@ -1,6 +1,6 @@
 import pytest
 
-from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.types import Point, Location, Mount
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition

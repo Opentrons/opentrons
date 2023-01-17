@@ -1,6 +1,6 @@
 from unittest import mock
 
-from opentrons.protocol_api.core.legacy.well import LegacyWellCore
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 from opentrons.types import Point
 from opentrons.protocol_api import InstrumentContext, labware, MAX_SUPPORTED_VERSION

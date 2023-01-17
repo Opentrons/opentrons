@@ -20,15 +20,15 @@ from ..labware import LabwareLoadParams
 
 from . import legacy_module_core, module_geometry
 from .deck import Deck
-from .instrument_context import LegacyInstrumentCore
+from .legacy_instrument_core import LegacyInstrumentCore
 from .labware_offset_provider import AbstractLabwareOffsetProvider
-from .labware import LegacyLabwareCore
+from .legacy_labware_core import LegacyLabwareCore
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
 
 
-class ProtocolContextImplementation(
+class LegacyProtocolCore(
     AbstractProtocol[
         LegacyInstrumentCore,
         LegacyLabwareCore,
@@ -45,7 +45,7 @@ class ProtocolContextImplementation(
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
-        """Build a :py:class:`.ProtocolContextImplementation`.
+        """Build a :py:class:`.LegacyProtocolCore`.
 
         :param api_version: The API version to use. If this is ``None``, uses
                             the max supported version.

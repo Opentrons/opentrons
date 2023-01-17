@@ -8,11 +8,11 @@ from opentrons.types import Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.legacy.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
 
-from opentrons.protocol_api.core.legacy.instrument_context import (
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
 
@@ -48,15 +48,15 @@ def mock_sync_hardware_api(
 @pytest.fixture
 def mock_protocol_impl(
     decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI
-) -> ProtocolContextImplementation:
-    protocol_impl = decoy.mock(cls=ProtocolContextImplementation)
+) -> LegacyProtocolCore:
+    protocol_impl = decoy.mock(cls=LegacyProtocolCore)
     decoy.when(protocol_impl.get_hardware()).then_return(mock_sync_hardware_api)
     return protocol_impl
 
 
 @pytest.fixture
 def subject(
-    mock_protocol_impl: ProtocolContextImplementation,
+    mock_protocol_impl: LegacyProtocolCore,
     mount: Mount,
     api_version: APIVersion,
 ) -> LegacyInstrumentCore:

@@ -15,11 +15,11 @@ from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from ..legacy.well import LegacyWellCore
+from ..legacy.legacy_well_core import LegacyWellCore
 
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContextSimulation
+    from .protocol_context import LegacyProtocolCoreSimulation
 
 
 _log = logging.getLogger()
@@ -28,12 +28,12 @@ _PRE_2_2_TIP_DROP_HEIGHT_MM = 10
 """In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
-class InstrumentContextSimulation(AbstractInstrument[LegacyWellCore]):
+class LegacyInstrumentCoreSimulation(AbstractInstrument[LegacyWellCore]):
     """A simulation of an instrument context."""
 
     def __init__(
         self,
-        protocol_interface: ProtocolContextSimulation,
+        protocol_interface: LegacyProtocolCoreSimulation,
         pipette_dict: PipetteDict,
         mount: types.Mount,
         instrument_name: str,

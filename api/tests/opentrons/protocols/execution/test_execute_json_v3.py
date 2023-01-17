@@ -1,5 +1,5 @@
-from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
-from opentrons.protocol_api.core.legacy.well import LegacyWellCore
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from unittest import mock

@@ -19,7 +19,7 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 
 from ...deck import CalibrationPosition
 from ...labware import load as load_lw, Labware
-from .labware import LegacyLabwareCore
+from .legacy_labware_core import LegacyLabwareCore
 from .module_geometry import ModuleGeometry, ThermocyclerGeometry
 from . import deck_conflict
 

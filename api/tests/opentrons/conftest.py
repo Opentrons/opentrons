@@ -53,7 +53,7 @@ from opentrons.protocol_api import (
     Labware,
     create_protocol_context,
 )
-from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 
 from opentrons.types import Location, Point
 

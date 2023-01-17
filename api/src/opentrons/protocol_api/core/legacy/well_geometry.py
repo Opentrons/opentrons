@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 
 if TYPE_CHECKING:
-    from .labware import LegacyLabwareCore
+    from .legacy_labware_core import LegacyLabwareCore
 
 
 class WellGeometry:

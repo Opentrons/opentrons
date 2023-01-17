@@ -34,9 +34,9 @@ from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
-from .core.legacy.labware import LegacyLabwareCore as LegacyLabwareCore
+from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
-from .core.legacy.well import LegacyWellCore as LegacyWellCore
+from .core.legacy.legacy_well_core import LegacyWellCore as LegacyWellCore
 from .core.legacy.well_geometry import WellGeometry
 
 

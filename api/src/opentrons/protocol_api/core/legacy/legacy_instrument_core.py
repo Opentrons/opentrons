@@ -18,11 +18,11 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from .well import LegacyWellCore
+from .legacy_well_core import LegacyWellCore
 from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContextImplementation
+    from .legacy_protocol_core import LegacyProtocolCore
 
 
 _log = logging.getLogger()
@@ -36,7 +36,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def __init__(
         self,
-        protocol_interface: ProtocolContextImplementation,
+        protocol_interface: LegacyProtocolCore,
         mount: types.Mount,
         instrument_name: str,
         default_speed: float,

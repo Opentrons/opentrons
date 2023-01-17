@@ -15,17 +15,17 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
 )
 
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.legacy.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
 from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyThermocyclerCore,
     create_module_core,
 )
-from opentrons.protocol_api.core.legacy.instrument_context import (
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
-from opentrons.protocol_api.core.legacy.well import LegacyWellCore
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 
@@ -39,9 +39,9 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 @pytest.fixture
 def mock_protocol_core(
     decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI
-) -> ProtocolContextImplementation:
+) -> LegacyProtocolCore:
     """Get a mock protocol core."""
-    mock_protocol_core = decoy.mock(cls=ProtocolContextImplementation)
+    mock_protocol_core = decoy.mock(cls=LegacyProtocolCore)
     decoy.when(mock_protocol_core.get_hardware()).then_return(mock_sync_hardware_api)
     return mock_protocol_core
 
@@ -79,7 +79,7 @@ def mock_trash_well_core(decoy: Decoy) -> LegacyWellCore:
 @pytest.fixture
 def subject(
     mock_geometry: ThermocyclerGeometry,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
     mock_sync_module_hardware: SyncThermocyclerHardware,
 ) -> LegacyThermocyclerCore:
     """Get a legacy module implementation core with mocked out dependencies."""
@@ -94,7 +94,7 @@ def subject(
 def test_create(
     decoy: Decoy,
     mock_geometry: ThermocyclerGeometry,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> None:
     """It should be able to create a thermocycler module core."""
     mock_module_hardware_api = decoy.mock(cls=Thermocycler)
@@ -259,7 +259,7 @@ def test_open_lid(
     decoy: Decoy,
     mock_sync_module_hardware: SyncThermocyclerHardware,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
     mock_instrument_core: LegacyInstrumentCore,
     mock_geometry: ThermocyclerGeometry,
     mock_trash_well_core: LegacyWellCore,
@@ -302,7 +302,7 @@ def test_close_lid(
     decoy: Decoy,
     mock_sync_module_hardware: SyncThermocyclerHardware,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
     mock_instrument_core: LegacyInstrumentCore,
     mock_geometry: ThermocyclerGeometry,
     mock_trash_well_core: LegacyWellCore,

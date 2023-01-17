@@ -32,13 +32,13 @@ from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     ProvidedLabwareOffset,
 )
-from opentrons.protocol_api.core.legacy.instrument_context import (
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
-from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.legacy_module_core import LegacyModuleCore
-from opentrons.protocol_api.core.legacy.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
 
 from opentrons.protocol_api.core.legacy import (
@@ -111,9 +111,9 @@ def subject(
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
     mock_deck: Deck,
-) -> ProtocolContextImplementation:
+) -> LegacyProtocolCore:
     """Get a legacy protocol implementation core with mocked out dependencies."""
-    return ProtocolContextImplementation(
+    return LegacyProtocolCore(
         api_version=MAX_SUPPORTED_VERSION,
         sync_hardware=mock_sync_hardware_api,
         labware_offset_provider=mock_labware_offset_provider,
@@ -126,7 +126,7 @@ def test_load_instrument(
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
-    subject: ProtocolContextImplementation,
+    subject: LegacyProtocolCore,
 ) -> None:
     """It should load an instrument core."""
     pipette_dict = cast(
@@ -162,7 +162,7 @@ def test_load_labware(
     mock_deck: Deck,
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
-    subject: ProtocolContextImplementation,
+    subject: LegacyProtocolCore,
 ) -> None:
     """It should load a labware core."""
     labware_definition_dict = cast(
@@ -244,7 +244,7 @@ def test_load_labware_on_module(
     decoy: Decoy,
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
-    subject: ProtocolContextImplementation,
+    subject: LegacyProtocolCore,
 ) -> None:
     """It should load a labware core."""
     mock_module_core = decoy.mock(cls=LegacyModuleCore)
@@ -329,7 +329,7 @@ def test_load_module(
     mock_deck: Deck,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
-    subject: ProtocolContextImplementation,
+    subject: LegacyProtocolCore,
 ) -> None:
     """It should load a module core.
 

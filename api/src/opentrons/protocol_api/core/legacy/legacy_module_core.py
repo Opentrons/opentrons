@@ -29,12 +29,12 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 
-from .labware import LegacyLabwareCore
+from .legacy_labware_core import LegacyLabwareCore
 from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
 from ...labware import Labware
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContextImplementation
+    from .legacy_protocol_core import LegacyProtocolCore
 
 
 _log = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ class LegacyModuleCore(AbstractModuleCore):
         sync_module_hardware: SynchronousAdapter[hw_modules.AbstractModule],
         requested_model: ModuleModel,
         geometry: ModuleGeometry,
-        protocol_core: ProtocolContextImplementation,
+        protocol_core: LegacyProtocolCore,
     ) -> None:
         self._sync_module_hardware = sync_module_hardware
         self._requested_model = requested_model
@@ -560,7 +560,7 @@ def create_module_core(
     module_hardware_api: hw_modules.AbstractModule,
     requested_model: ModuleModel,
     geometry: ModuleGeometry,
-    protocol_core: ProtocolContextImplementation,
+    protocol_core: LegacyProtocolCore,
 ) -> LegacyModuleCore:
     core_cls = LegacyModuleCore
 

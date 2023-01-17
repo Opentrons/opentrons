@@ -7,8 +7,8 @@ from opentrons.hardware_control.modules import MagDeck, MagneticStatus
 from opentrons.hardware_control.modules.types import MagneticModuleModel
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 
-from opentrons.protocol_api.core.legacy.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
 from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyMagneticModuleCore,
@@ -29,16 +29,16 @@ def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[MagDeck]:
 
 
 @pytest.fixture
-def mock_protocol_core(decoy: Decoy) -> ProtocolContextImplementation:
+def mock_protocol_core(decoy: Decoy) -> LegacyProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolContextImplementation)
+    return decoy.mock(cls=LegacyProtocolCore)
 
 
 @pytest.fixture
 def subject(
     mock_geometry: ModuleGeometry,
     mock_sync_module_hardware: SynchronousAdapter[MagDeck],
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> LegacyMagneticModuleCore:
     """Get a legacy module implementation core with mocked out dependencies."""
     return LegacyMagneticModuleCore(
@@ -52,7 +52,7 @@ def subject(
 def test_create(
     decoy: Decoy,
     mock_geometry: ModuleGeometry,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> None:
     """It should be able to create a magnetic module core."""
     mock_module_hardware_api = decoy.mock(cls=MagDeck)

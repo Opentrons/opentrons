@@ -1,6 +1,6 @@
 import typing
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware
-from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.types import Point, Location
 
 if typing.TYPE_CHECKING:

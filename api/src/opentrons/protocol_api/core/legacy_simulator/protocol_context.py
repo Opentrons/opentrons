@@ -5,25 +5,25 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount
 
 from ..protocol import AbstractProtocol
-from ..legacy.protocol_context import ProtocolContextImplementation
-from ..legacy.labware import LegacyLabwareCore
+from ..legacy.legacy_protocol_core import LegacyProtocolCore
+from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ..legacy.legacy_module_core import LegacyModuleCore
 from ..legacy.load_info import InstrumentLoadInfo
 
-from .instrument_context import InstrumentContextSimulation
+from .instrument_context import LegacyInstrumentCoreSimulation
 
 logger = logging.getLogger(__name__)
 
 
-class ProtocolContextSimulation(
-    ProtocolContextImplementation,
-    AbstractProtocol[InstrumentContextSimulation, LegacyLabwareCore, LegacyModuleCore],
+class LegacyProtocolCoreSimulation(
+    LegacyProtocolCore,
+    AbstractProtocol[LegacyInstrumentCoreSimulation, LegacyLabwareCore, LegacyModuleCore],
 ):
-    _instruments: Dict[Mount, Optional[InstrumentContextSimulation]]  # type: ignore[assignment]
+    _instruments: Dict[Mount, Optional[LegacyInstrumentCoreSimulation]]  # type: ignore[assignment]
 
     def load_instrument(  # type: ignore[override]
         self, instrument_name: PipetteNameType, mount: Mount
-    ) -> InstrumentContextSimulation:
+    ) -> LegacyInstrumentCoreSimulation:
         """Create a simulating instrument context."""
         existing_instrument = self._instruments[mount]
 
@@ -43,7 +43,7 @@ class ProtocolContextSimulation(
         attached[mount] = instrument_name.value
         self._sync_hardware.cache_instruments(attached)
 
-        new_instr = InstrumentContextSimulation(
+        new_instr = LegacyInstrumentCoreSimulation(
             protocol_interface=self,
             pipette_dict=self._sync_hardware.get_attached_instruments()[mount],
             mount=mount,

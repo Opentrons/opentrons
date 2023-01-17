@@ -8,7 +8,7 @@ from opentrons.types import DeckSlotName, Location, Point
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 from ..labware import AbstractLabware, LabwareLoadParams
-from .well import LegacyWellCore
+from .legacy_well_core import LegacyWellCore
 from .well_geometry import WellGeometry
 
 

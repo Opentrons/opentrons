@@ -7,8 +7,8 @@ from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 
-from opentrons.protocol_api.core.legacy.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
 from opentrons.protocol_api.core.legacy.legacy_module_core import LegacyModuleCore
 
@@ -26,16 +26,16 @@ def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule
 
 
 @pytest.fixture
-def mock_protocol_core(decoy: Decoy) -> ProtocolContextImplementation:
+def mock_protocol_core(decoy: Decoy) -> LegacyProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolContextImplementation)
+    return decoy.mock(cls=LegacyProtocolCore)
 
 
 @pytest.fixture
 def subject(
     mock_geometry: ModuleGeometry,
     mock_sync_module_hardware: SynchronousAdapter[AbstractModule],
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> LegacyModuleCore:
     """Get a legacy module implementation core with mocked out dependencies."""
     return LegacyModuleCore(

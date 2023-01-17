@@ -3,21 +3,21 @@ import pytest
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.legacy.labware import LegacyLabwareCore
-from opentrons.protocol_api.core.legacy.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
 from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     NullLabwareOffsetProvider,
 )
-from opentrons.protocol_api.core.legacy.instrument_context import (
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
 from opentrons.protocol_api.core.legacy_simulator.instrument_context import (
-    InstrumentContextSimulation,
+    LegacyInstrumentCoreSimulation,
 )
 from opentrons.protocol_api.core.legacy_simulator.protocol_context import (
-    ProtocolContextSimulation,
+    LegacyProtocolCoreSimulation,
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -25,9 +25,9 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 @pytest.fixture
-def protocol_context(hardware: ThreadManagedHardware) -> ProtocolContextImplementation:
+def protocol_context(hardware: ThreadManagedHardware) -> LegacyProtocolCore:
     """Protocol context implementation fixture."""
-    return ProtocolContextImplementation(
+    return LegacyProtocolCore(
         sync_hardware=hardware.sync,
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
@@ -37,9 +37,9 @@ def protocol_context(hardware: ThreadManagedHardware) -> ProtocolContextImplemen
 @pytest.fixture
 def simulating_protocol_context(
     hardware: ThreadManagedHardware,
-) -> ProtocolContextSimulation:
+) -> LegacyProtocolCoreSimulation:
     """Protocol context simulation fixture."""
-    return ProtocolContextSimulation(
+    return LegacyProtocolCoreSimulation(
         sync_hardware=hardware.sync,
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
@@ -48,7 +48,7 @@ def simulating_protocol_context(
 
 @pytest.fixture
 def instrument_context(
-    protocol_context: ProtocolContextImplementation,
+    protocol_context: LegacyProtocolCore,
 ) -> LegacyInstrumentCore:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
@@ -58,7 +58,7 @@ def instrument_context(
 
 @pytest.fixture
 def second_instrument_context(
-    protocol_context: ProtocolContextImplementation,
+    protocol_context: LegacyProtocolCore,
 ) -> LegacyInstrumentCore:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
@@ -68,11 +68,11 @@ def second_instrument_context(
 
 @pytest.fixture
 def simulating_instrument_context(
-    simulating_protocol_context: ProtocolContextSimulation,
+    simulating_protocol_context: LegacyProtocolCoreSimulation,
     instrument_context: LegacyInstrumentCore,
-) -> InstrumentContextSimulation:
+) -> LegacyInstrumentCoreSimulation:
     """A simulating instrument context."""
-    return InstrumentContextSimulation(
+    return LegacyInstrumentCoreSimulation(
         protocol_interface=simulating_protocol_context,
         pipette_dict=instrument_context.get_hardware_state(),
         mount=types.Mount.RIGHT,
@@ -82,11 +82,11 @@ def simulating_instrument_context(
 
 @pytest.fixture
 def second_simulating_instrument_context(
-    simulating_protocol_context: ProtocolContextSimulation,
+    simulating_protocol_context: LegacyProtocolCoreSimulation,
     second_instrument_context: LegacyInstrumentCore,
-) -> InstrumentContextSimulation:
+) -> LegacyInstrumentCoreSimulation:
     """A simulating instrument context."""
-    return InstrumentContextSimulation(
+    return LegacyInstrumentCoreSimulation(
         protocol_interface=simulating_protocol_context,
         pipette_dict=second_instrument_context.get_hardware_state(),
         mount=types.Mount.LEFT,

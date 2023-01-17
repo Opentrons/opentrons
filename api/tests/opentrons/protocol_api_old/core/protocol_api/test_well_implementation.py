@@ -1,6 +1,6 @@
 import pytest
 
-from opentrons.protocol_api.core.legacy.well import LegacyWellCore
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 
 
 @pytest.mark.parametrize(
