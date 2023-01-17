@@ -125,6 +125,38 @@ describe('useDashboardCalibrateTipLength hook', () => {
     ).toBeFalsy()
   })
 
+  it('closes AskForCalibrationBlockModal when exit is clicked', () => {
+    const { wrapper } = mountWithStore(<TestUseDashboardCalibrateTipLength />, {
+      initialState: { robotApi: {} },
+    })
+    act(() =>
+      startCalibration({
+        params: { mount: mountString },
+        hasBlockModalResponse: null,
+      })
+    )
+
+    wrapper.setProps({})
+    expect(CalWizardComponent).not.toBe(null)
+    expect(
+      wrapper.containsMatchingElement(<button>Use trash bin</button>)
+    ).toBeTruthy()
+    expect(
+      wrapper.containsMatchingElement(<button>Use Calibration Block</button>)
+    ).toBeTruthy()
+
+    wrapper.find('button[aria-label="Exit"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
+    wrapper.setProps({})
+    expect(
+      wrapper.containsMatchingElement(<button>Use trash bin</button>)
+    ).toBeFalsy()
+    expect(
+      wrapper.containsMatchingElement(<button>Use Calibration Block</button>)
+    ).toBeFalsy()
+  })
+
   it('wizard should appear after create request succeeds with session and close on closeWizard', () => {
     const seshId = 'fake-session-id'
     const mockTipLengthCalSession = {
