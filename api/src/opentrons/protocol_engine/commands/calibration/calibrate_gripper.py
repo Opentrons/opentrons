@@ -74,7 +74,7 @@ class CalibrateGripperImplementation(
         """
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
 
-        result = await ot3_calibration.calibrate_gripper(
+        result = await ot3_calibration.calibrate_gripper_jaw(
             ot3_hardware_api, self._convert_to_hw_api_probe(params.probe)
         )
 
