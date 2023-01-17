@@ -10,7 +10,7 @@ If this change is accidental, undo the changes to our Python models.
 
 Or, if this change is intentional, update the shared JSON schema by running:
 
-    make -C shared-data/python command-schema COMMAND_SCHEMA_VERSION=<version number>
+    make -C api command-schema COMMAND_SCHEMA_VERSION=<version number>
 
 ...and include the updated JSON schema file in your pull request.
 """
