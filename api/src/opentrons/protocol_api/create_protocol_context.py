@@ -26,7 +26,7 @@ from .core.legacy.labware_offset_provider import (
     LabwareOffsetProvider,
     NullLabwareOffsetProvider,
 )
-from .core.simulator.protocol_context import ProtocolContextSimulation
+from .core.legacy_simulator.protocol_context import ProtocolContextSimulation
 from .core.engine import ProtocolCore
 
 
