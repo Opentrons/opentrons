@@ -4,17 +4,13 @@ import { renderHook } from '@testing-library/react-hooks'
 import { createStore, Store } from 'redux'
 
 import * as RobotApi from '../../../redux/robot-api'
-// import { fetchPipettes } from '../../../redux/pipettes'
+import { FETCH_PIPETTES } from '../../../redux/pipettes'
 import { useCheckPipettes } from '../hooks'
 
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
 jest.mock('../../../redux/robot-api')
-jest.mock('../../../redux/pipettes')
 
-// const mockFetchPipettes = fetchPipettes as jest.MockedFunction<
-//   typeof fetchPipettes
-// >
 const mockUseDispatchApiRequests = RobotApi.useDispatchApiRequests as jest.MockedFunction<
   typeof RobotApi.useDispatchApiRequests
 >
@@ -41,25 +37,18 @@ describe('useCheckPipettes', () => {
     expect(result.current.requestStatus).toEqual(undefined)
     expect(dispatchApiRequest).not.toBeCalled()
   })
-  it('returns request pending', () => {
+  it('calls dispatch api request with a type FETCH_PIPETTES', () => {
     mockGetRequestById.mockReturnValue({
       status: RobotApi.PENDING,
     })
-    // const { result } = renderHook(() => useCheckPipettes('otie'), {
-    //   wrapper,
-    // })
-    // expect(result.current.isPending).toEqual(true)
-    // expect(result.current.requestStatus).toEqual(RobotApi.PENDING)
-    // expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+    const { result } = renderHook(() => useCheckPipettes('otie'), {
+      wrapper,
+    })
+    result.current.handleCheckPipette()
+    expect(dispatchApiRequest).toBeCalledWith({
+      type: FETCH_PIPETTES,
+      payload: expect.anything(),
+      meta: expect.anything(),
+    })
   })
-  it.todo('returns request success')
-  // mockGetRequestById.mockReturnValue({
-  //   status: RobotApi.SUCCESS,
-  //   response: {
-  //     method: 'POST',
-  //     ok: true,
-  //     path: '/',
-  //     status: 200,
-  //   },
-  // })
 })

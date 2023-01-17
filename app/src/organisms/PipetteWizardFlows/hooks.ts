@@ -33,10 +33,7 @@ export function useCheckPipettes(robotName: string): CheckPipettes {
       ? getRequestById(state, fetchPipettesRequestId.current)
       : null
   )?.status
-
   const isPending = requestStatus === PENDING
-
-  console.log(requestStatus)
 
   return {
     handleCheckPipette,
