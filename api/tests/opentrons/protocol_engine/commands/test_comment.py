@@ -7,7 +7,7 @@ from opentrons.protocol_engine.commands.comment import (
 
 
 async def test_comment_implementation() -> None:
-    """Confirm that commend command can be created and executed."""
+    """Confirm that comment command can be created and executed."""
     subject = CommentImplementation()
 
     data = CommentParams(message="hello world")
