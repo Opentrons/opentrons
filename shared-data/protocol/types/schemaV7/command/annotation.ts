@@ -18,7 +18,7 @@ export interface CommentRunTimeCommand
 }
 
 interface CommentParams {
-  message?: string
+  message: string
 }
 
 export interface CustomCreateCommand extends CommonCommandCreateInfo {
