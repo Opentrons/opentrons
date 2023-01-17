@@ -459,10 +459,9 @@ class MoveScheduler:
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
                 if self._error is not None:
-                    log.warning("\n\nWe have an error\n\n")
-                    raise self._error
-                else:
-                    log.warning("\n\nWe dont have an error\n\n")
+                    string, fw_error = self._error.args
+                    if fw_error.payload.severity != ErrorSeverity.warning:
+                        raise self._error
             except asyncio.TimeoutError:
                 log.warning(
                     f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
