@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-// import last from 'lodash/last'
 import { css } from 'styled-components'
 
 import {
@@ -15,26 +14,16 @@ import {
   Btn,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
-  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { TertiaryButton } from '../../atoms/buttons'
-// import * as RobotApi from '../../redux/robot-api'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 
-import type { /* State, */ Dispatch } from '../../redux/types'
-// import type { RequestState } from '../../redux/robot-api/types'
-// import type {
-//   // WifiConfigureRequest,
-//   NetworkChangeState,
-// } from '../Devices/RobotSettings/ConnectNetwork/types'
-
-const STATUS_REFRESH_MS = 5000
-const LIST_REFRESH_MS = 10000
+import type { Dispatch } from '../../redux/types'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: ${SPACING.spacing5};
@@ -73,18 +62,6 @@ export function SetWifiCred({
     authType === 'none' && handleConnect()
     dispatch(Networking.fetchStatus(robotName))
   }, [])
-
-  useInterval(
-    () => dispatch(Networking.fetchWifiList(robotName)),
-    LIST_REFRESH_MS,
-    true
-  )
-
-  useInterval(
-    () => dispatch(Networking.fetchStatus(robotName)),
-    STATUS_REFRESH_MS,
-    true
-  )
 
   return (
     <>

@@ -11,7 +11,9 @@ import { SelectAuthenticationType } from '../SelectAuthenticationType'
 
 const mockPush = jest.fn()
 const mockSetIsShowSelectAuthenticationType = jest.fn()
-const mockSetIsShowSetWifiCred = jest.fn()
+const mockSetSelectedAuthType = jest.fn()
+const mockSetChangeState = jest.fn()
+
 jest.mock('../../../organisms/SetupNetwork/SetWifiCred')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery/selectors')
@@ -55,7 +57,8 @@ describe('SelectAuthenticationType', () => {
       ssid: 'mockWifi',
       fromWifiList: undefined,
       setIsShowSelectAuthenticationType: mockSetIsShowSelectAuthenticationType,
-      setIsShowSetWifiCred: mockSetIsShowSetWifiCred,
+      setSelectedAuthType: mockSetSelectedAuthType,
+      setChangeState: mockSetChangeState,
     }
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
@@ -81,7 +84,7 @@ describe('SelectAuthenticationType', () => {
   })
 
   it('when tapping back button, call a mock function', () => {
-    // ToDo need to update this later
+    // ToDo need to update this later PR-#11917
     // const [{ getByRole }] = render(props)
     // const button = getByRole('button', { name: 'Back' })
     // fireEvent.click(button)
@@ -89,10 +92,11 @@ describe('SelectAuthenticationType', () => {
 
   it('when tapping back button, call a mock function - fromWifiList', () => {
     // ToDo need to update this later
-    // props.fromWifiList = true
-    // const [{ getByRole }] = render(props)
-    // const button = getByRole('button', { name: 'Back' })
-    // fireEvent.click(button)
+    props.fromWifiList = true
+    const [{ getByRole }] = render(props)
+    const button = getByRole('button', { name: 'Back' })
+    fireEvent.click(button)
+    expect(props.setChangeState).toHaveBeenCalled()
   })
 
   it('when tapping next button, call a mock function - wpa', () => {
@@ -100,7 +104,6 @@ describe('SelectAuthenticationType', () => {
     const button = getByRole('button', { name: 'Next' })
     fireEvent.click(button)
     expect(mockSetIsShowSelectAuthenticationType).toHaveBeenCalled()
-    expect(mockSetIsShowSetWifiCred).toHaveBeenCalled()
   })
 
   it('when tapping connect via usb button, call a mock function', () => {

@@ -28,6 +28,7 @@ import {
 import { getLocalRobot } from '../../redux/discovery'
 
 import type { State, Dispatch } from '../../redux/types'
+import { SimpleInterfaceStatus } from '../../redux/networking/types'
 
 const STATUS_REFRESH_MS = 5000
 const LIST_REFRESH_MS = 10000
@@ -133,7 +134,7 @@ const DisplayConnectionStatus = (): JSX.Element => {
 
 interface DisplayConnectedNetworkInfoProps {
   ssid: string
-  wifi: any // ToDo specify the type
+  wifi: SimpleInterfaceStatus | null
   authType: 'wpa-psk' | 'none'
 }
 

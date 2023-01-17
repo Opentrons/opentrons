@@ -57,7 +57,7 @@ export function SelectAuthenticationType({
       setChangeState({ type: null })
     } else {
       // back to set wifi ssid
-      // Note: This will be updated by #11917
+      // Note: This will be updated by PR-#11917
       console.log('go back to SetWifiSsid screen')
     }
   }

@@ -12,7 +12,6 @@ import { SetWifiCred } from '../SetWifiCred'
 
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
-const mockPush = jest.fn()
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
   { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
@@ -29,16 +28,12 @@ const mockOptions = {
   psk: 'mockPsk',
 }
 
+const mockSetIsShowSelectAuthenticationType = jest.fn()
+const mockSetPassword = jest.fn()
+const mockHandleConnect = jest.fn()
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/robot-api')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
-  return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
-  }
-})
 
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
@@ -70,6 +65,11 @@ describe('SetWifiCred', () => {
   beforeEach(() => {
     props = {
       ssid: 'mockWifi',
+      authType: 'wpa-psk',
+      setIsShowSelectAuthenticationType: mockSetIsShowSelectAuthenticationType,
+      password: 'mock-password',
+      setPassword: mockSetPassword,
+      handleConnect: mockHandleConnect,
     }
     mockGetWifiList.mockReturnValue(mockWifiList)
     dispatchApiRequest = jest.fn()
@@ -97,16 +97,10 @@ describe('SetWifiCred', () => {
     expect(shiftButtons.length).toBe(2)
   })
 
-  it('should display a dot when typing a char', () => {
-    const [{ getByRole, getByLabelText }] = render(props)
+  it('should display password', () => {
+    const [{ getByLabelText }] = render(props)
     const inputBox = getByLabelText('wifi_password')
-    const aKey = getByRole('button', { name: 'a' })
-    const bKey = getByRole('button', { name: 'b' })
-    const cKey = getByRole('button', { name: 'c' })
-    fireEvent.click(aKey)
-    fireEvent.click(bKey)
-    fireEvent.click(cKey)
-    expect(inputBox).toHaveValue('abc')
+    expect(inputBox).toHaveValue('mock-password')
   })
 
   it('should switch the input type and button text when tapping the icon next to the input', () => {
@@ -121,19 +115,16 @@ describe('SetWifiCred', () => {
   })
 
   it('should call mock function when tapping back', () => {
-    // ToDo update test
-    // const [{ getByText }] = render(props)
-    // const button = getByText('Back')
-    // fireEvent.click(button)
-    // expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
+    const [{ getByText }] = render(props)
+    const button = getByText('Back')
+    fireEvent.click(button)
+    expect(props.setIsShowSelectAuthenticationType).toHaveBeenCalled()
   })
 
   it('should call mock function when tapping connect', () => {
     const [{ getByRole }] = render(props)
     const button = getByRole('button', { name: 'Connect' })
     fireEvent.click(button)
-    expect(dispatchApiRequest).toBeCalledWith(
-      mockPostWifiConfigure(mockRobotName, mockOptions)
-    )
+    expect(props.handleConnect).toHaveBeenCalled()
   })
 })

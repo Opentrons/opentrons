@@ -6,9 +6,10 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { mockFetchModulesSuccessMeta } from '../../../redux/modules/__fixtures__'
-import { FailedToConnect } from '../FailedToConnect'
 import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
-import { SetWifiCred } from '../SetWifiCred'
+// import { DisplayWifiList } from '../DisplayWifiList'
+// import { SetWifiCred } from '../SetWifiCred'
+import { FailedToConnect } from '../FailedToConnect'
 
 import type { RequestState } from '../../../redux/robot-api/types'
 
@@ -24,17 +25,13 @@ const render = (props: React.ComponentProps<typeof FailedToConnect>) => {
 }
 
 const mockFunc = jest.fn()
-const mockPush = jest.fn()
-jest.mock('../SetWifiCred')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
-  return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
-  }
-})
+const mockSetChangeState = jest.fn()
+const mockSetCurrentRequestState = jest.fn()
 
-const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
+// const mockDisplayWifiList = DisplayWifiList as jest.MockedFunction<
+//   typeof DisplayWifiList
+// >
+// const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
 
 const failureState = {
   status: 'failure',
@@ -53,8 +50,11 @@ describe('ConnectedResult', () => {
       requestState: failureState,
       type: DISCONNECT,
       onConnect: mockFunc,
+      setChangeState: mockSetChangeState,
+      setCurrentRequestState: mockSetCurrentRequestState,
     }
-    mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
+    // mockDisplayWifiList.mockReturnValue(<div>Mock DisplayList</div>)
+    // mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
   })
 
   it('should render a failure screen - incorrect password', () => {
@@ -72,34 +72,33 @@ describe('ConnectedResult', () => {
     getByRole('button', { name: 'Change network' })
   })
 
-  // No longer needed ToDo remove
-  // it('should render SetWifiCred when tapping try again button - incorrect password', () => {
-  //   props.type = null
-  //   const [{ getByRole, getByText }] = render(props)
-  //   const button = getByRole('button', { name: 'Try again' })
-  //   fireEvent.click(button)
-  //   getByText('Mock SetWifiCred')
-  // })
-
-  it('should call mock function when tapping change network button - incorrect password', () => {
+  it('should call mock function when tapping change network - incorrect password', () => {
     props.type = null
     const [{ getByRole }] = render(props)
     const button = getByRole('button', { name: 'Change network' })
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
+    expect(props.setChangeState).toHaveBeenCalled()
   })
 
-  it('should call mock function when clicking buttons - other error cases', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Try again' })
-    fireEvent.click(button)
-    expect(mockFunc).toHaveBeenCalled()
-  })
-
-  it('should call mock function when tapping change network button - other error cases', () => {
+  it('should call mock function when tapping change network - other error cases', () => {
     const [{ getByRole }] = render(props)
     const button = getByRole('button', { name: 'Change network' })
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/wifi')
+    expect(props.setChangeState).toHaveBeenCalled()
+  })
+
+  it('should call mock function when tapping try again - incorrect password', () => {
+    props.type = null
+    const [{ getByRole }] = render(props)
+    const button = getByRole('button', { name: 'Try again' })
+    fireEvent.click(button)
+    expect(props.setCurrentRequestState).toHaveBeenCalled()
+  })
+
+  it('should call mock function when tapping try again - other error cases', () => {
+    const [{ getByRole }] = render(props)
+    const button = getByRole('button', { name: 'Try again' })
+    fireEvent.click(button)
+    expect(props.onConnect).toHaveBeenCalled()
   })
 })
