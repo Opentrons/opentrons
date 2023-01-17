@@ -61,7 +61,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.Y: 500,
         OT3AxisKind.Z: 65,
         OT3AxisKind.P: 45,
-        OT3AxisKind.Z_G: 100,
+        OT3AxisKind.Z_G: 65,
     },
     high_throughput={
         OT3AxisKind.X: 500,
@@ -89,7 +89,7 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.Y: 1000,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 50,
-        OT3AxisKind.Z_G: 20,
+        OT3AxisKind.Z_G: 100,
     },
     high_throughput={
         OT3AxisKind.X: 1000,
@@ -120,7 +120,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 10,
-        OT3AxisKind.Z_G: 15,
+        OT3AxisKind.Z_G: 10,
         OT3AxisKind.P: 5,
     },
     high_throughput={
