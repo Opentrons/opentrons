@@ -33,9 +33,9 @@ const CALIBRATION_DATA_POLL_MS = 5000
 
 export function useCalibrationTaskList(
   robotName: string,
-  pipOffsetCalLauncher: DashboardCalOffsetInvoker,
-  tipLengthCalLauncher: DashboardCalTipLengthInvoker,
-  deckCalLauncher: DashboardCalDeckInvoker
+  pipOffsetCalLauncher: DashboardCalOffsetInvoker = () => {},
+  tipLengthCalLauncher: DashboardCalTipLengthInvoker = () => {},
+  deckCalLauncher: DashboardCalDeckInvoker = () => {}
 ): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
   const dispatch = useDispatch()
