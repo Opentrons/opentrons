@@ -28,7 +28,7 @@ export const AnalyzedSteps = React.forwardRef(({ runId }: RunLogProps, ref: Reac
     <Flex
       ref={viewPortRef}
       flexDirection={DIRECTION_COLUMN}
-      height="30rem"
+      height="25rem"
       width="100%"
       overflowY="scroll"
       gridGap={SPACING.spacing3}

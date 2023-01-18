@@ -11,6 +11,7 @@ import {
 
 import { Tooltip } from '../../../atoms/Tooltip'
 import { Portal } from '../../../App/portal'
+import { ProgressBar } from '../../../atoms/ProgressBar'
 
 interface RunProgressMeterProps {
   analysisCommands: RunTimeCommand[]
@@ -23,9 +24,9 @@ export function RunProgressMeter(props: RunProgressMeterProps) {
   const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      <Flex width="100%" height="6px" borderRadius="3px" backgroundColor={COLORS.medGreyEnabled} />
-      <Flex marginTop="-6px" width={`${((currentRunCommandIndex + 1) / analysisCommands.length) * 100}%`} height="6px" borderRadius="3px" backgroundColor={COLORS.darkBlackEnabled} />
-      <Flex marginTop="-10px" width="100%">
+      {/* <Flex width="100%" height="6px" borderRadius="3px" backgroundColor={COLORS.medGreyEnabled} />
+      <Flex marginTop="-6px" width={`${((currentRunCommandIndex + 1) / analysisCommands.length) * 100}%`} height="6px" borderRadius="3px" backgroundColor={COLORS.darkBlackEnabled} /> */}
+      <ProgressBar percentComplete={((currentRunCommandIndex + 1) / analysisCommands.length) * 100} />
         {ticks.map((tick) => (
           <Tick {...{ ...tick, makeHandleJumpToStep }} total={analysisCommands.length} />
         ))}
