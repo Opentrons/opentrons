@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import { SpinnerModalPage } from '@opentrons/components'
 
@@ -27,9 +28,6 @@ const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-const PIPETTE_OFFSET_TITLE = 'Pipette offset calibration'
-const EXIT = 'exit'
-
 export interface DashboardOffsetCalInvokerProps {
   params: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
     Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
@@ -51,6 +49,7 @@ export function useDashboardCalibratePipOffset(
   const jogRequestId = React.useRef<string | null>(null)
   const spinnerRequestId = React.useRef<string | null>(null)
   const dispatch = useDispatch()
+  const { t } = useTranslation(['device_settings', 'shared'])
 
   const pipOffsetCalSession: PipetteOffsetCalibrationSession | null = useSelector(
     (state: State) => {
@@ -173,11 +172,11 @@ export function useDashboardCalibratePipOffset(
       {startingSession ? (
         <SpinnerModalPage
           titleBar={{
-            title: PIPETTE_OFFSET_TITLE,
+            title: t('pipette_offset_calibration'),
             back: {
               disabled: true,
-              title: EXIT,
-              children: EXIT,
+              title: t('shared:exit'),
+              children: t('shared:exit'),
             },
           }}
         />

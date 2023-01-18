@@ -86,7 +86,6 @@ export function useCalibrationTaskList(
             timestamp: formatTimestamp(deckCalibrationData.lastModified),
           })
         : ''
-    // todo(jb, 2022-12-14): wire up ctas to actually launch wizards (RAUT-292)
     deckTask.cta = { label: t('recalibrate'), onClick: deckCalLauncher }
   } else {
     activeTaskIndices = [0, 0]
