@@ -14,7 +14,7 @@ This code is totally unsupported. To do science on a robot, use the stable
 
 # todo(mm, 2021-04-09): The APIv2 analogue to this file exposes some, but not
 # all, package members at the top level. For example, you can access
-# legacy.InstrumentContext, but not legacy.Point. We should take
+# protocol_api.InstrumentContext, but not protocol_api.Point. We should take
 # advantage of the APIv3 break to consolidate the API namespaces.
 
 from .protocol_context import ProtocolContext
