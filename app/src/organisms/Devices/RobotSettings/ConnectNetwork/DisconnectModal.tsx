@@ -115,8 +115,10 @@ export const DisconnectModal = ({
       <Flex flexDirection={DIRECTION_COLUMN}>
         {isError ? (
           <StyledText as="p" marginBottom={SPACING.spacing5}>
-            {'message' in requestState.error
-              ? requestState.error.message
+            {requestState != null &&
+            'error' in requestState &&
+            'message' in requestState?.error
+              ? requestState?.error?.message
               : t('shared:unknown_error')}
           </StyledText>
         ) : null}
