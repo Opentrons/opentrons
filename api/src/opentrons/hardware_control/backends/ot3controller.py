@@ -516,7 +516,7 @@ class OT3Controller:
         model = gripper_config.info_num_to_model(attached.model)
         serial = attached.serial
         return {
-            "config": gripper_config.load(model, serial),
+            "config": gripper_config.load(model),
             "id": f"GRPV{attached.model}{serial}",
         }
 

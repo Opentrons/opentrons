@@ -22,7 +22,10 @@ from .instrument_calibration import (
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 
-from opentrons_shared_data.gripper.dev_types import GripperName, GripperModel
+from opentrons_shared_data.gripper.gripper_definition import (
+    GripperDefinition,
+    GripperModel,
+)
 
 RECONFIG_KEYS = {"quirks"}
 
@@ -30,7 +33,7 @@ RECONFIG_KEYS = {"quirks"}
 mod_log = logging.getLogger(__name__)
 
 
-class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
+class Gripper(AbstractInstrument[GripperDefinition]):
     """A class to gather and track gripper state and configs.
 
     This class should not touch hardware or call back out to the hardware
@@ -39,25 +42,27 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
 
     def __init__(
         self,
-        config: gripper_config.GripperConfig,
+        config: GripperDefinition,
         gripper_cal_offset: GripperCalibrationOffset,
         gripper_id: str,
     ) -> None:
         self._config = config
-        self._name = self._config.name
-        self._model = self._config.model
-        base_offset = Point(*self._config.base_offset_from_mount)
+        self._name = "gripper"  # TODO: evaluate if this is necessary
+        self._model = config.model
+
+        geometry = self._config.geometry
+        base_offset = Point(*geometry.base_offset_from_mount)
         self._jaw_center_offset = (
-            Point(*self._config.jaw_center_offset_from_base) + base_offset
+            Point(*geometry.jaw_center_offset_from_base) + base_offset
         )
         #: the distance between the gripper mount and the jaw center at home
         self._front_calibration_pin_offset = (
-            Point(*self._config.pin_one_offset_from_base) + base_offset
+            Point(*geometry.pin_one_offset_from_base) + base_offset
         )
         #: the distance between the gripper mount and the front calibration pin
         #: at home
         self._rear_calibration_pin_offset = (
-            Point(*self._config.pin_two_offset_from_base) + base_offset
+            Point(*geometry.pin_two_offset_from_base) + base_offset
         )
         #: the distance between the gripper mount and the rear calibration pin
         #: at home
@@ -101,8 +106,17 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         )
         self._current_jaw_displacement = mm
 
+    @property
+    def default_grip_force(self) -> float:
+        return self._config.grip_force_profile.default_grip_force
+
+    @property
+    def default_home_force(self) -> float:
+        return self._config.grip_force_profile.default_home_force
+
     def _max_jaw_displacement(self) -> float:
-        return (self._config.jaw_sizes_mm["max"] - self._config.jaw_sizes_mm["min"]) / 2
+        geometry = self._config.geometry
+        return (geometry.jaw_width["max"] - geometry.jaw_width["min"]) / 2
 
     @property
     def state(self) -> GripperJawState:
@@ -113,15 +127,14 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._state = s
 
     @property
-    def config(self) -> gripper_config.GripperConfig:
+    def config(self) -> GripperDefinition:
         return self._config
 
     def update_config_item(self, elem_name: str, elem_val: Any) -> None:
-        self._log.info(f"updated config: {elem_name}={elem_val}")
-        self._config = replace(self._config, **{elem_name: elem_val})
+        raise NotImplementedError("Update config is not supported at this time.")
 
     @property
-    def name(self) -> GripperName:
+    def name(self) -> str:
         return self._name
 
     @property
@@ -198,7 +211,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
 
     def duty_cycle_by_force(self, newton: float) -> float:
         return gripper_config.duty_cycle_by_force(
-            newton, self._config.jaw_duty_cycle_polynomial
+            newton, self._config.grip_force_profile
         )
 
     def __str__(self) -> str:
@@ -209,7 +222,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
 
     def as_dict(self) -> GripperDict:
         d: GripperDict = {
-            "name": self._config.name,
+            "name": self._name,
             "model": self._config.model,
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
@@ -220,7 +233,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
 
 
 def _reload_gripper(
-    new_config: gripper_config.GripperConfig,
+    new_config: GripperDefinition,
     attached_instr: Gripper,
     cal_offset: GripperCalibrationOffset,
 ) -> Gripper:

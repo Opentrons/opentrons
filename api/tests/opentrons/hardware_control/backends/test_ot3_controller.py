@@ -370,7 +370,7 @@ async def test_probing(
             ),
             "P1KSV33hello",
             "GRPV0fake_serial",
-            "gripper",
+            "Gripper V1",
         ),
     ],
 )
@@ -395,7 +395,7 @@ async def test_get_attached_instruments(
     assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == pipette_id
     assert detected[OT3Mount.GRIPPER]["id"] == gripper_id
-    assert detected[OT3Mount.GRIPPER]["config"].name == gripper_name
+    assert detected[OT3Mount.GRIPPER]["config"].display_name == gripper_name
 
 
 async def test_get_attached_instruments_handles_unknown_name(
