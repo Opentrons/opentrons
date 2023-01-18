@@ -13,7 +13,7 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
 )
 from opentrons.hardware_control.types import GripperJawState
 from opentrons.types import Point, Mount
-from opentrons_shared_data.gripper.dev_types import GripperModel
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
 from robot_server.instruments.instrument_models import (
