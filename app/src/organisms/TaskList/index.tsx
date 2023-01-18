@@ -384,7 +384,12 @@ export function TaskList({
 
   return (
     <>
-      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        gridGap={SPACING.spacing3}
+        paddingTop={SPACING.spacing4}
+        paddingBottom={SPACING.spacing6}
+      >
         <StyledText css={TYPOGRAPHY.h2SemiBold}>
           {t('calibration_status')}
         </StyledText>
