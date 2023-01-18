@@ -127,6 +127,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     button = (
       <PrimaryButton
         onClick={handleCleanUpAndClose}
+        textTransform={TEXT_TRANSFORM_CAPITALIZE}
         disabled={isPending}
         aria-label="Results_errorExit"
       >
