@@ -62,7 +62,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
         for f in self._definition["locations"]["fixtures"]:
             slot_name = self._check_name(f["slot"])  # type: ignore
             # TODO(mc, 2022-06-15): this loads the fixed trash as an instance of
-            # `opentrons.legacy.labware.Labware`
+            # `opentrons.protocol_api.labware.Labware`
             # However, all other labware will be added to the `Deck` as instances of
             # `opentrons.protocol_api.core.labware.AbstractLabware`
             # And modules will be added as instances of
