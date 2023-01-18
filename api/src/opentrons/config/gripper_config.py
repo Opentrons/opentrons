@@ -1,7 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
 import logging
-from typing import List, Tuple, Optional, Dict
 
 from opentrons_shared_data.gripper import load_definition
 from opentrons_shared_data.gripper.gripper_definition import (
@@ -9,7 +7,6 @@ from opentrons_shared_data.gripper.gripper_definition import (
     GripperDefinition,
     GripForceProfile,
 )
-from .types import Offset
 
 log = logging.getLogger(__name__)
 

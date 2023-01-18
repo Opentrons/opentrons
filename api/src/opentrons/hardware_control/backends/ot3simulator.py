@@ -280,9 +280,9 @@ class OT3Simulator:
         """Move gripper inward."""
         _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
 
-    async def gripper_home_jaw(self) -> None:
+    async def gripper_home_jaw(self, duty_cycle: float) -> None:
         """Move gripper outward."""
-        _ = create_gripper_jaw_home_group()
+        _ = create_gripper_jaw_home_group(duty_cycle)
         self._motor_status[NodeId.gripper_g] = MotorStatus(True, True)
 
     async def gripper_hold_jaw(
