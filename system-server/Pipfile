@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 typing-extensions = "==3.10.0.0"
+pyjwt = "==2.6.0"
 
 [dev-packages]
 system_server = {path = ".", editable = true}

@@ -124,8 +124,3 @@ deploy: wheel
 .PHONY: test
 test:
 	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
-
-.PHONY: command-schema
-command-schema: 
-	$(python) ../../api/src/opentrons/protocol_engine/commands/generate_command_schema.py $(COMMAND_SCHEMA_VERSION) > ../command/schemas/$(COMMAND_SCHEMA_VERSION).json
-

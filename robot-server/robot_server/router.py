@@ -8,6 +8,7 @@ from .protocols import protocols_router
 from .runs import runs_router
 from .commands import commands_router
 from .modules import modules_router
+from .instruments import instruments_router
 from .system import system_router
 from .versioning import check_version_header
 from .service.legacy.routers import legacy_routes
@@ -62,6 +63,12 @@ router.include_router(
 router.include_router(
     router=modules_router,
     tags=["Attached Modules"],
+    dependencies=[Depends(check_version_header)],
+)
+
+router.include_router(
+    router=instruments_router,
+    tags=["Attached instruments"],
     dependencies=[Depends(check_version_header)],
 )
 
