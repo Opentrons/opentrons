@@ -20,26 +20,10 @@
     "max": 30.0
   },
   "geometry": {
-    "baseOffsetFromMount": {
-      "x": 19.5,
-      "y": -74.325,
-      "z": -94.825
-    },
-    "jawCenterOffsetFromBase": {
-      "x": 0.0,
-      "y": 0.0,
-      "z": -88.475
-    },
-    "pinOneOffsetFromBase": {
-      "x": 4.0,
-      "y": -57.0,
-      "z": -100.475
-    },
-    "pinTwoOffsetFromBase": {
-      "x": 4.0,
-      "y": 57.0,
-      "z": -100.475
-    },
+    "baseOffsetFromMount": [19.5, -74.325, -94.825],
+    "jawCenterOffsetFromBase": [0.0, 0.0, -88.475],
+    "pinOneOffsetFromBase": [4.0, -57.0, -100.475],
+    "pinTwoOffsetFromBase": [4.0, 57.0, -100.475],
     "jawWidth": {
       "min": 58.0,
       "max": 90.0

@@ -42,12 +42,7 @@ class GripperBaseModel(BaseModel):
         allow_population_by_field_name = True
 
 
-class Offset(BaseModel):
-    """Offset values for gripper."""
-
-    x: float
-    y: float
-    z: float
+Offset = Tuple[float, float, float]
 
 
 class Geometry(GripperBaseModel):

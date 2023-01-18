@@ -1,8 +1,14 @@
 {
-  "title": "GripperDefinitionV1",
-  "description": "Gripper v1 definition.",
+  "title": "GripperDefinition",
+  "description": "Gripper definition.",
   "type": "object",
   "properties": {
+    "schemaVersion": {
+      "title": "Schemaversion",
+      "description": "Which schema version a gripper is using",
+      "enum": [1],
+      "type": "integer"
+    },
     "displayName": {
       "title": "Displayname",
       "description": "Gripper display name.",
@@ -17,6 +23,7 @@
     "gripForceConfigurations": { "$ref": "#/definitions/GripForceProfile" }
   },
   "required": [
+    "schemaVersion",
     "displayName",
     "model",
     "geometry",
@@ -28,29 +35,50 @@
     "GripperModel": {
       "title": "GripperModel",
       "description": "Gripper models.",
-      "enum": ["gripperV1"],
+      "enum": ["v1"],
       "type": "string"
-    },
-    "Offset": {
-      "title": "Offset",
-      "description": "Offset values for gripper.",
-      "type": "object",
-      "properties": {
-        "x": { "title": "X", "type": "number" },
-        "y": { "title": "Y", "type": "number" },
-        "z": { "title": "Z", "type": "number" }
-      },
-      "required": ["x", "y", "z"]
     },
     "Geometry": {
       "title": "Geometry",
       "description": "Gripper geometry definition.",
       "type": "object",
       "properties": {
-        "baseOffsetFromMount": { "$ref": "#/definitions/Offset" },
-        "jawCenterOffsetFromBase": { "$ref": "#/definitions/Offset" },
-        "pinOneOffsetFromBase": { "$ref": "#/definitions/Offset" },
-        "pinTwoOffsetFromBase": { "$ref": "#/definitions/Offset" },
+        "baseOffsetFromMount": {
+          "title": "Baseoffsetfrommount",
+          "type": "array",
+          "items": [
+            { "type": "number" },
+            { "type": "number" },
+            { "type": "number" }
+          ]
+        },
+        "jawCenterOffsetFromBase": {
+          "title": "Jawcenteroffsetfrombase",
+          "type": "array",
+          "items": [
+            { "type": "number" },
+            { "type": "number" },
+            { "type": "number" }
+          ]
+        },
+        "pinOneOffsetFromBase": {
+          "title": "Pinoneoffsetfrombase",
+          "type": "array",
+          "items": [
+            { "type": "number" },
+            { "type": "number" },
+            { "type": "number" }
+          ]
+        },
+        "pinTwoOffsetFromBase": {
+          "title": "Pintwooffsetfrombase",
+          "type": "array",
+          "items": [
+            { "type": "number" },
+            { "type": "number" },
+            { "type": "number" }
+          ]
+        },
         "jawWidth": {
           "title": "Jawwidth",
           "type": "object",
