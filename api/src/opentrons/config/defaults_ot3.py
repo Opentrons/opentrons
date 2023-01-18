@@ -58,9 +58,9 @@ DEFAULT_GRIPPER_JAW_HOME_DUTY_CYCLE: Final = 25
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 65,
+        OT3AxisKind.X: 500 / 2,
+        OT3AxisKind.Y: 500 / 2,
+        OT3AxisKind.Z: 65 / 2,
         OT3AxisKind.P: 45,
         OT3AxisKind.Z_G: 65,
     },
@@ -72,23 +72,23 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.Q: 40,
     },
     low_throughput={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 65,
+        OT3AxisKind.X: 500 / 2,
+        OT3AxisKind.Y: 500 / 2,
+        OT3AxisKind.Z: 65 / 2,
         OT3AxisKind.P: 45,
     },
     two_low_throughput={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
+        OT3AxisKind.X: 500 / 2,
+        OT3AxisKind.Y: 500 / 2,
     },
     gripper={OT3AxisKind.Z: 65},
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 100,
+        OT3AxisKind.X: 1000 / 2,
+        OT3AxisKind.Y: 1000 / 2,
+        OT3AxisKind.Z: 100 / 2,
         OT3AxisKind.P: 50,
         OT3AxisKind.Z_G: 100,
     },
@@ -100,9 +100,9 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.Q: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 100,
+        OT3AxisKind.X: 1000 / 2,
+        OT3AxisKind.Y: 1000 / 2,
+        OT3AxisKind.Z: 100 / 2,
         OT3AxisKind.P: 50,
     },
     two_low_throughput={
