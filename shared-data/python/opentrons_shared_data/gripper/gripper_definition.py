@@ -111,4 +111,4 @@ class GripperDefinition(GripperBaseModel):
     geometry: Geometry
     z_motor_configurations: ZMotorConfigurations
     jaw_motor_configurations: JawMotorConfigurations
-    grip_force_configurations: GripForceProfile
+    grip_force_profile: GripForceProfile

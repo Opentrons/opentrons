@@ -20,7 +20,7 @@
     "jawMotorConfigurations": {
       "$ref": "#/definitions/JawMotorConfigurations"
     },
-    "gripForceConfigurations": { "$ref": "#/definitions/GripForceProfile" }
+    "gripForceProfile": { "$ref": "#/definitions/GripForceProfile" }
   },
   "required": [
     "schemaVersion",
@@ -29,7 +29,7 @@
     "geometry",
     "zMotorConfigurations",
     "jawMotorConfigurations",
-    "gripForceConfigurations"
+    "gripForceProfile"
   ],
   "definitions": {
     "GripperModel": {
