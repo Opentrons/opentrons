@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional, Dict
 
 from opentrons.drivers.types import Temperature
@@ -9,6 +10,10 @@ TEMP_DECK_MODELS = {
 }
 
 
+async def _yield() -> None:
+    await asyncio.sleep(0)
+
+
 class SimulatingDriver(AbstractTempDeckDriver):
     def __init__(self, sim_model: Optional[str] = None):
         self._temp = Temperature(target=None, current=0)
@@ -18,12 +23,15 @@ class SimulatingDriver(AbstractTempDeckDriver):
     async def set_temperature(self, celsius: float) -> None:
         self._temp.target = celsius
         self._temp.current = self._temp.target
+        await _yield()
 
     async def get_temperature(self) -> Temperature:
+        await _yield()
         return self._temp
 
     async def deactivate(self) -> None:
         self._temp = Temperature(target=None, current=23)
+        await _yield()
 
     async def connect(self) -> None:
         pass
@@ -35,9 +43,10 @@ class SimulatingDriver(AbstractTempDeckDriver):
         pass
 
     async def enter_programming_mode(self) -> None:
-        pass
+        await _yield()
 
     async def get_device_info(self) -> Dict[str, str]:
+        await _yield()
         return {
             "serial": "dummySerialTD",
             "model": self._model,
