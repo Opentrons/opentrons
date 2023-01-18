@@ -21,8 +21,6 @@ interface RunProgressMeterProps {
 
 export function RunProgressMeter(props: RunProgressMeterProps) {
   const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
-  console.log('AL', analysisCommands.length)
-  console.log('CRCI',currentRunCommandIndex)
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex width="100%" height="6px" borderRadius="3px" backgroundColor={COLORS.medGreyEnabled} />
@@ -40,7 +38,6 @@ function Tick(props: { index: number, count: number, makeHandleJumpToStep: (i: n
   const { index, count, makeHandleJumpToStep, total } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isAggregatedTick = count > 1
-  const width = isAggregatedTick ? 11.156 : 4
   return (
     <Flex
       {...targetProps}

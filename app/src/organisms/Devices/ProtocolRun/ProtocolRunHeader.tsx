@@ -41,7 +41,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   useConditionalConfirm,
-  SPACING_AUTO,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
@@ -84,10 +84,10 @@ import { EMPTY_TIMESTAMP } from '../constants'
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { Portal } from '../../../App/portal'
 import { RunProgressMeter } from '../RunProgressMeter'
 
 const EQUIPMENT_POLL_MS = 5000
+const CANCELLABLE_STATUSES = [RUN_STATUS_RUNNING, RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_BLOCKED_BY_OPEN_DOOR, RUN_STATUS_IDLE]
 
 interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -122,8 +122,6 @@ function RunTimer({
 }
 
 const MIN_AGGREGATION_PERCENT = 8
-const X_MARGIN_PERCENT = 0.5
-const HEAD_SIZE_PERCENT = 1.5
 
 export function ProtocolRunHeader({
   protocolRunHeaderRef,
@@ -133,10 +131,6 @@ export function ProtocolRunHeader({
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const history = useHistory()
-  const [targetProps, tooltipProps] = useHoverTooltip()
-  const trackEvent = useTrackEvent()
-  const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
-  const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const {
     protocolData,
@@ -151,8 +145,6 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  const attachedModules =
-    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // NOTE: we are polling pipettes, though not using their value directly here
   usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
@@ -192,17 +184,14 @@ export function ProtocolRunHeader({
   }, [protocolData, isRobotViewable, history])
 
   React.useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
-      if (runId != null) {
-        trackProtocolRunEvent({
-          name: 'runFinish',
-          properties: {
-            ...robotAnalyticsData,
-          },
-        })
-
-        closeCurrentRun()
-      }
+    if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
+      trackProtocolRunEvent({
+        name: 'runFinish',
+        properties: {
+          ...robotAnalyticsData,
+        },
+      })
+      closeCurrentRun()
     }
   }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
@@ -218,62 +207,9 @@ export function ProtocolRunHeader({
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
     )
 
-  const {
-    play,
-    pause,
-    reset,
-    isPlayRunActionLoading,
-    isPauseRunActionLoading,
-    isResetRunLoading,
-  } = useRunControls(runId, onResetSuccess)
+  const { pause } = useRunControls(runId, onResetSuccess)
 
-  const isMutationLoading =
-    isPlayRunActionLoading || isPauseRunActionLoading || isResetRunLoading
-
-  const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
-  const { complete: isCalibrationComplete } = useRunCalibrationStatus(
-    robotName,
-    runId
-  )
-  const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
-
-  const currentRunId = useCurrentRunId()
-  const isRobotBusy = currentRunId != null && currentRunId !== runId
-  const isCurrentRun = currentRunId === runId
-
-  const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
-    false
-  )
-  const activeHeaterShaker = attachedModules.find(
-    (module): module is HeaterShakerModule =>
-      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      module?.data != null &&
-      module.data.speedStatus !== 'idle'
-  )
-  const isShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
-    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
-
-  const handleProceedToRunClick = (): void => {
-    trackEvent({ name: 'proceedToRun', properties: {} })
-    play()
-  }
-
-  const {
-    confirm: confirmAttachment,
-    showConfirmation: showConfirmationModal,
-    cancel: cancelExit,
-  } = useConditionalConfirm(
-    handleProceedToRunClick,
-    !configHasHeaterShakerAttached
-  )
-
-  const [showAnalysisErrorModal, setShowAnalysisErrorModal] = React.useState(
-    false
-  )
+  const [showAnalysisErrorModal, setShowAnalysisErrorModal] = React.useState(false)
   const handleErrorModalCloseClick: React.MouseEventHandler = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -285,122 +221,6 @@ export function ProtocolRunHeader({
     }
   }, [analysisErrors])
 
-  const isIdle = runStatus === RUN_STATUS_IDLE
-
-  const handlePlayButtonClick = (): void => {
-    if (isShaking && isHeaterShakerInProtocol) {
-      setShowIsShakingModal(true)
-    } else if (
-      isHeaterShakerInProtocol &&
-      !isShaking &&
-      (isIdle || runStatus === RUN_STATUS_STOPPED)
-    ) {
-      confirmAttachment()
-    } else {
-      play()
-
-      const eventProperties =
-        isIdle && robotAnalyticsData != null ? robotAnalyticsData : {}
-      const eventName = isIdle ? 'runStart' : 'runResume'
-
-      trackProtocolRunEvent({
-        name: eventName,
-        properties: eventProperties,
-      })
-    }
-  }
-
-  const handlePauseButtonClick = (): void => {
-    pause()
-
-    trackProtocolRunEvent({ name: 'runPause' })
-  }
-
-  const handleResetButtonClick = (): void => {
-    reset()
-
-    trackEvent({
-      name: 'proceedToRun',
-      properties: { sourceLocation: 'RunRecordDetail' },
-    })
-    trackProtocolRunEvent({ name: 'runAgain' })
-  }
-
-  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
-    useSelector((state: State) => {
-      return getBuildrootUpdateDisplayInfo(state, robotName)
-    })?.autoUpdateAction
-  )
-  const isRunControlButtonDisabled =
-    (isCurrentRun && !isSetupComplete) ||
-    isMutationLoading ||
-    isRobotBusy ||
-    isProtocolAnalyzing ||
-    protocolData == null ||
-    runStatus === RUN_STATUS_FINISHING ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    runStatus === RUN_STATUS_STOP_REQUESTED ||
-    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
-    isRobotOnWrongVersionOfSoftware
-
-  let handleButtonClick = (): void => { }
-  let buttonIconName: IconName | null = null
-  let buttonText: string = ''
-
-  switch (runStatus) {
-    case RUN_STATUS_IDLE:
-    case RUN_STATUS_PAUSED:
-    case RUN_STATUS_PAUSE_REQUESTED:
-    case RUN_STATUS_BLOCKED_BY_OPEN_DOOR:
-      buttonIconName = 'play'
-      buttonText =
-        runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
-      handleButtonClick = handlePlayButtonClick
-      break
-    case RUN_STATUS_RUNNING:
-      buttonIconName = 'pause'
-      buttonText = t('pause_run')
-      handleButtonClick = handlePauseButtonClick
-      break
-    case RUN_STATUS_STOP_REQUESTED:
-      buttonIconName = null
-      buttonText = t('canceling_run')
-      handleButtonClick = handleResetButtonClick
-      break
-    case RUN_STATUS_STOPPED:
-    case RUN_STATUS_FINISHING:
-    case RUN_STATUS_FAILED:
-    case RUN_STATUS_SUCCEEDED:
-      buttonIconName = 'play'
-      buttonText = t('run_again')
-      handleButtonClick = handleResetButtonClick
-      break
-  }
-
-  if (isProtocolAnalyzing) {
-    buttonIconName = 'ot-spinner'
-    buttonText = t('analyzing_on_robot')
-  }
-
-  let disableReason = null
-  if (isCurrentRun && !isSetupComplete) {
-    disableReason = t('setup_incomplete')
-  } else if (isRobotBusy) {
-    disableReason = t('robot_is_busy')
-  } else if (isRobotOnWrongVersionOfSoftware) {
-    disableReason = t('shared:a_software_update_is_available')
-  }
-
-  const buttonIcon =
-    buttonIconName != null ? (
-      <Icon
-        name={buttonIconName}
-        size={SIZE_1}
-        marginRight={SPACING.spacing3}
-        spin={isProtocolAnalyzing}
-      />
-    ) : null
-
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,
@@ -411,82 +231,10 @@ export function ProtocolRunHeader({
     setShowConfirmCancelModal(true)
   }
 
-  const showCancelButton =
-    runStatus === RUN_STATUS_RUNNING ||
-    runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
-    runStatus === RUN_STATUS_IDLE
-
   const handleClearClick = (): void => {
-    trackProtocolRunEvent({
-      name: 'runFinish',
-      properties: {
-        ...robotAnalyticsData,
-      },
-    })
-
+    trackProtocolRunEvent({ name: 'runFinish', properties: robotAnalyticsData })
     closeCurrentRun()
   }
-
-  let clearProtocolBanner: JSX.Element | null
-  switch (runStatus) {
-    case RUN_STATUS_FAILED: {
-      clearProtocolBanner = (
-        <Banner
-          type="error"
-          onCloseClick={handleClearClick}
-          isCloseActionLoading={isClosingCurrentRun}
-        >
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            {`${t('run_failed')}.`}
-          </Flex>
-        </Banner>
-      )
-      break
-    }
-    case RUN_STATUS_SUCCEEDED: {
-      clearProtocolBanner = (
-        <Banner
-          type="success"
-          onCloseClick={handleClearClick}
-          isCloseActionLoading={isClosingCurrentRun}
-        >
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            {`${t('run_completed')}.`}
-          </Flex>
-        </Banner>
-      )
-      break
-    }
-    default:
-      clearProtocolBanner = null
-  }
-
-  const protocolRunningContent: JSX.Element | null =
-    runStatus != null ? (
-      <Box
-        backgroundColor={COLORS.fundamentalsBackground}
-        display="grid"
-        gridTemplateColumns="4fr 6fr 4fr"
-        padding={SPACING.spacing3}
-      >
-        <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
-        <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
-        <Box marginLeft={SPACING_AUTO}>
-          {/* {showCancelButton && ( */}
-          <SecondaryButton
-            isDangerous
-            onClick={handleCancelClick}
-            id="ProtocolRunHeader_cancelRunButton"
-            disabled={isClosingCurrentRun}
-          >
-            {t('cancel_run')}
-          </SecondaryButton>
-          {/* )} */}
-        </Box>
-      </Box>
-    ) : null
 
   return (
     <Flex
@@ -500,15 +248,8 @@ export function ProtocolRunHeader({
       marginBottom={SPACING.spacing4}
       padding={SPACING.spacing4}
     >
-      {showConfirmationModal && (
-        <ConfirmAttachmentModal
-          onCloseClick={cancelExit}
-          isProceedToRunModal={true}
-          onConfirmClick={handleProceedToRunClick}
-        />
-      )}
       {showAnalysisErrorModal &&
-        analysisErrors &&
+        analysisErrors != null &&
         analysisErrors?.length > 0 && (
           <ProtocolAnalysisErrorModal
             displayName={displayName}
@@ -521,19 +262,12 @@ export function ProtocolRunHeader({
       <Flex>
         {protocolKey != null ? (
           <Link to={`/protocols/${protocolKey}`}>
-            <StyledText
-              color={COLORS.blueEnabled}
-              css={TYPOGRAPHY.h2SemiBold}
-              id="ProtocolRunHeader_protocolName"
-            >
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold} color={COLORS.blueEnabled}>
               {displayName}
             </StyledText>
           </Link>
         ) : (
-          <StyledText
-            css={TYPOGRAPHY.h2SemiBold}
-            id="ProtocolRunHeader_protocolName"
-          >
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {displayName}
           </StyledText>
         )}
@@ -547,7 +281,7 @@ export function ProtocolRunHeader({
       {runStatus === RUN_STATUS_STOPPED ? (
         <Banner type="warning">{t('run_canceled')}</Banner>
       ) : null}
-      {isCurrentRun ? clearProtocolBanner : null}
+      <TerminalRunBanner {...{ runStatus, handleClearClick, isClosingCurrentRun }} />
       <Box display="grid" gridTemplateColumns="3fr 3fr 3fr 3fr 3fr">
         <LabeledValue label={t('run')} value={createdAtTimestamp} />
         <LabeledValue label={t('status')} value={<DisplayRunStatus runStatus={runStatus} />} />
@@ -555,39 +289,30 @@ export function ProtocolRunHeader({
         <select onChange={(e) => setSelectedCommandType(e.target.value)}>
           {uniqCommandTypes.map(cT => <option value={cT}>{cT}</option>)}
         </select>
-        {
-          showIsShakingModal &&
-          activeHeaterShaker != null &&
-          isHeaterShakerInProtocol &&
-          runId != null && (
-            <HeaterShakerIsRunningModal
-              closeModal={() => setShowIsShakingModal(false)}
-              module={activeHeaterShaker}
-              startRun={play}
-            />
-          )
-        }
-        <Box marginLeft={SPACING_AUTO}>
-          <PrimaryButton
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
-            boxShadow="none"
-            display={DISPLAY_FLEX}
-            padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
-            disabled={isRunControlButtonDisabled}
-            onClick={handleButtonClick}
-            id="ProtocolRunHeader_runControlButton"
-            {...targetProps}
-          >
-            {buttonIcon}
-            <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
-          </PrimaryButton>
-          {disableReason != null && (
-            <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
-          )}
-        </Box>
+
+        <Flex justifyContent={JUSTIFY_FLEX_END}>
+          <ActionButton runId={runId} robotName={robotName} runStatus={runStatus} isProtocolAnalyzing={protocolData == null || !!isProtocolAnalyzing} />
+        </Flex>
       </Box >
-      {protocolRunningContent}
+      {
+        runStatus != null ? (
+          <Box
+            backgroundColor={COLORS.fundamentalsBackground}
+            display="grid"
+            gridTemplateColumns="4fr 6fr 4fr"
+            padding={SPACING.spacing3}
+          >
+            <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
+            <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
+            <Flex justifyContent={JUSTIFY_FLEX_END}>
+              {CANCELLABLE_STATUSES.includes(runStatus) && (
+                <SecondaryButton isDangerous onClick={handleCancelClick} disabled={isClosingCurrentRun}>
+                    {t('cancel_run')}
+                  </SecondaryButton>
+                )}
+            </Flex>
+          </Box>
+        ) : null}
       <RunProgressMeter {...{ ticks, makeHandleJumpToStep, analysisCommands }} currentRunCommandIndex={1100} />
       {
         showConfirmCancelModal ? (
@@ -646,4 +371,203 @@ function DisplayRunStatus(props: DisplayRunStatusProps) {
       </StyledText>
     </Flex>
   )
+}
+
+const START_RUN_STATUSES: RunStatus[] = [RUN_STATUS_IDLE, RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_BLOCKED_BY_OPEN_DOOR]
+const RUN_AGAIN_STATUSES: RunStatus[] = [RUN_STATUS_STOPPED, RUN_STATUS_FINISHING, RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED]
+const DISABLED_STATUSES: RunStatus[] = [RUN_STATUS_FINISHING, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_STOP_REQUESTED, RUN_STATUS_BLOCKED_BY_OPEN_DOOR]
+interface ActionButtonProps {
+  runId: string
+  robotName: string
+  runStatus: RunStatus | null
+  isProtocolAnalyzing: boolean
+}
+function ActionButton(props: ActionButtonProps) {
+  const { runId, robotName, runStatus, isProtocolAnalyzing } = props
+  const history = useHistory()
+  const { t } = useTranslation('run_details')
+  const attachedModules = useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+  const trackEvent = useTrackEvent()
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const { play, pause, reset, isPlayRunActionLoading, isPauseRunActionLoading, isResetRunLoading } = useRunControls(runId,
+    (createRunResponse: Run): void =>
+      // redirect to new run after successful reset
+      history.push(
+        `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
+      )
+  )
+  const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
+  const { complete: isCalibrationComplete } = useRunCalibrationStatus(robotName, runId)
+  const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
+    false
+  )
+  const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
+  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
+    useSelector((state: State) => {
+      return getBuildrootUpdateDisplayInfo(state, robotName)
+    })?.autoUpdateAction
+  )
+  const currentRunId = useCurrentRunId()
+  const isCurrentRun = currentRunId === runId
+  const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
+  const isRunControlButtonDisabled =
+    (isCurrentRun && !isSetupComplete) ||
+    isPlayRunActionLoading ||
+    isPauseRunActionLoading ||
+    isResetRunLoading ||
+    isOtherRunCurrent ||
+    isProtocolAnalyzing ||
+    (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
+    isRobotOnWrongVersionOfSoftware
+  const handleProceedToRunClick = (): void => {
+    trackEvent({ name: 'proceedToRun', properties: {} })
+    play()
+  }
+  const configBypassHeaterShakerAttachmentConfirmation = useSelector(getIsHeaterShakerAttached)
+  const {
+    confirm: confirmAttachment,
+    showConfirmation: showConfirmationModal,
+    cancel: cancelExit,
+  } = useConditionalConfirm(
+    handleProceedToRunClick,
+    !configBypassHeaterShakerAttachmentConfirmation
+  )
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
+
+  const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
+  const activeHeaterShaker = attachedModules.find(
+    (module): module is HeaterShakerModule =>
+      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module?.data != null &&
+      module.data.speedStatus !== 'idle'
+  )
+  const isHeaterShakerShaking = attachedModules
+    .filter(
+      (module): module is HeaterShakerModule =>
+        module.moduleType === HEATERSHAKER_MODULE_TYPE
+    )
+    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
+
+  let buttonText: string = ''
+  let handleButtonClick = (): void => { }
+  let buttonIconName: IconName | null = null
+  let disableReason = null
+
+  if (currentRunId === runId && !isSetupComplete) {
+    disableReason = t('setup_incomplete')
+  } else if (isOtherRunCurrent) {
+    disableReason = t('robot_is_busy')
+  } else if (isRobotOnWrongVersionOfSoftware) {
+    disableReason = t('shared:a_software_update_is_available')
+  }
+
+  if (isProtocolAnalyzing) {
+    buttonIconName = 'ot-spinner'
+    buttonText = t('analyzing_on_robot')
+  } else if (runStatus === RUN_STATUS_RUNNING) {
+    buttonIconName = 'pause'
+    buttonText = t('pause_run')
+    handleButtonClick = (): void => {
+      pause()
+      trackProtocolRunEvent({ name: 'runPause' })
+    }
+  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
+    buttonIconName = null
+    buttonText = t('canceling_run')
+  } else if (runStatus != null && START_RUN_STATUSES.includes(runStatus)) {
+    buttonIconName = 'play'
+    buttonText = runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
+    handleButtonClick = () => {
+      if (isHeaterShakerShaking && isHeaterShakerInProtocol) {
+        setShowIsShakingModal(true)
+      } else if (
+        isHeaterShakerInProtocol &&
+        !isHeaterShakerShaking &&
+        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+      ) {
+        confirmAttachment()
+      } else {
+        play()
+        trackProtocolRunEvent({
+          name: runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume',
+          properties: runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null ? robotAnalyticsData : {}
+        })
+      }
+    }
+  } else if (runStatus != null && RUN_AGAIN_STATUSES.includes(runStatus)) {
+    buttonIconName = 'play'
+    buttonText = t('run_again')
+    handleButtonClick = () => {
+      reset()
+      trackEvent({ name: 'proceedToRun', properties: { sourceLocation: 'RunRecordDetail' } })
+      trackProtocolRunEvent({ name: 'runAgain' })
+    }
+  }
+
+  return (
+    <>
+      <PrimaryButton
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+        boxShadow="none"
+        display={DISPLAY_FLEX}
+        padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
+        disabled={isRunControlButtonDisabled}
+        onClick={handleButtonClick}
+        id="ProtocolRunHeader_runControlButton"
+        {...targetProps}
+      >
+        {buttonIconName != null ? (
+          <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING.spacing3} spin={isProtocolAnalyzing} />
+        ) : null}
+        <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
+      </PrimaryButton>
+      {disableReason != null && (
+        <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
+      )}
+      {
+        showIsShakingModal &&
+        activeHeaterShaker != null &&
+        isHeaterShakerInProtocol &&
+        runId != null && (
+          <HeaterShakerIsRunningModal
+            closeModal={() => setShowIsShakingModal(false)}
+            module={activeHeaterShaker}
+            startRun={play}
+          />
+        )
+      }
+      {showConfirmationModal && (
+        <ConfirmAttachmentModal
+          onCloseClick={cancelExit}
+          isProceedToRunModal={true}
+          onConfirmClick={handleProceedToRunClick}
+        />
+      )}
+    </>)
+}
+
+interface TerminalRunProps {
+  runStatus: RunStatus | null
+  handleClearClick: () => void
+  isClosingCurrentRun: boolean
+}
+function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
+  const { runStatus, handleClearClick, isClosingCurrentRun } = props
+  const { t } = useTranslation('run_details')
+  if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
+    return (<Banner
+      type="error"
+      onCloseClick={handleClearClick}
+      isCloseActionLoading={isClosingCurrentRun}
+    >
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+        {runStatus === RUN_STATUS_FAILED ? t('run_failed') : t('run_completed')}
+      </Flex>
+    </Banner>
+    )
+
+  }
+  return null
 }
