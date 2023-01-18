@@ -2,7 +2,6 @@ config BR2_PACKAGE_PYTHON_OPENTRONS_SYSTEM_SERVER
   bool "python-opentrons-robot-server"
   depends on BR2_PACKAGE_PYTHON3
   select BR2_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
-  select BR2_PACKAGE_PYTHON_UVICORN # runtime
   select BR2_PACKAGE_PYTHON_PYJWT # runtime
 
   help
