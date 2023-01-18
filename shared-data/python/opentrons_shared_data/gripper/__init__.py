@@ -1,14 +1,15 @@
 """opentrons_shared_data.gripper: functions and types for gripper config."""
 from typing import cast, Any
+from typing_extensions import Literal
 import json
 from pathlib import Path
 
 from .. import load_shared_data
 from .gripper_definition import (
-    GripperDefinitionV1,
+    GripperDefinition,
     GripperSchema,
-    GripperModel,
     GripperSchemaVersion,
+    GripperModel,
 )
 
 
@@ -18,7 +19,7 @@ class InvalidGripperDefinition(Exception):
     pass
 
 
-def load_schema(version: GripperSchemaVersion) -> GripperSchema:
+def load_schema(version: Literal[1]) -> GripperSchema:
     """Load gripper schema."""
     path = Path("gripper") / "schemas" / f"{version}.json"
     return cast(GripperSchema, json.loads(load_shared_data(path)))
@@ -29,12 +30,15 @@ def _load_definition_data(path: Path) -> Any:
 
 
 def load_definition(
-    version: GripperSchemaVersion,
     model: GripperModel,
-) -> GripperDefinitionV1:
+    version: GripperSchemaVersion = 1,
+) -> GripperDefinition:
     """Load gripper definition based on schema version and gripper model."""
-    if version == GripperSchemaVersion.V1:
+    try:
         path = Path("gripper") / "definitions" / f"{version}" / f"{model}.json"
         data = _load_definition_data(path)
-        return GripperDefinitionV1.parse_obj(data)
-    raise InvalidGripperDefinition(f"Gripper definition for {version} does not exist.")
+        return GripperDefinition(**data, schema_version=version)
+    except FileNotFoundError:
+        raise InvalidGripperDefinition(
+            f"Gripper model {model} definition in schema version {version} does not exist."
+        )

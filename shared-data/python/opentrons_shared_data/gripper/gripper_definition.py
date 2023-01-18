@@ -1,12 +1,13 @@
+"""Gripper configurations."""
+
 from typing_extensions import Literal
-from typing import TYPE_CHECKING, List, Dict, Tuple, cast, Any
-from pydantic import BaseModel, Field, validator, conint, conlist, confloat
+from typing import TYPE_CHECKING, List, Dict, Tuple, Any
+from pydantic import BaseModel, Field, conint, confloat
 from enum import Enum
-from re import sub
 
 
 def _snake_to_camel_case(snake: str) -> str:
-    """Turns snake_case to camelCase"""
+    """Turns snake_case to camelCase."""
     return "".join(
         [s.capitalize() if i > 0 else s.lower() for i, s in enumerate(snake.split("_"))]
     )
@@ -15,14 +16,10 @@ def _snake_to_camel_case(snake: str) -> str:
 class GripperModel(str, Enum):
     """Gripper models."""
 
-    V1 = "gripperV1"
+    v1 = "v1"
 
 
-class GripperSchemaVersion(str, Enum):
-    """Gripper schema versions."""
-
-    V1 = "1"
-
+GripperSchemaVersion = Literal[1]
 
 GripperSchema = Dict[str, Any]
 
@@ -36,12 +33,16 @@ else:
 
 
 class GripperBaseModel(BaseModel):
+    """Gripper base model."""
+
     class Config:
+        """Config."""
+
         alias_generator = _snake_to_camel_case
         allow_population_by_field_name = True
 
 
-class Offset(GripperBaseModel):
+class Offset(BaseModel):
     """Offset values for gripper."""
 
     x: float
@@ -104,9 +105,12 @@ class GripForceProfile(GripperBaseModel):
     max: _StrictNonNegativeFloat
 
 
-class GripperDefinitionV1(GripperBaseModel):
-    """Gripper v1 definition."""
+class GripperDefinition(GripperBaseModel):
+    """Gripper definition."""
 
+    schema_version: GripperSchemaVersion = Field(
+        ..., description="Which schema version a gripper is using"
+    )
     display_name: str = Field(..., description="Gripper display name.")
     model: GripperModel
     geometry: Geometry
