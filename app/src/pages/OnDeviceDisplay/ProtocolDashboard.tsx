@@ -71,12 +71,16 @@ export function ProtocolDashboard(): JSX.Element {
             const lastRun = runs.data?.data.find(
               run => run.protocolId === protocol.id
             )?.createdAt
+
+            const protocolName =
+              protocol.metadata.protocolName ?? protocol.files[0].name
+
             return (
               <TableRow
                 key={index}
                 onClick={() => history.push(`/protocols/${protocol.id}`)}
               >
-                <TableDatum> {protocol.metadata.protocolName}</TableDatum>
+                <TableDatum> {protocolName}</TableDatum>
                 <TableDatum>
                   {lastRun != null
                     ? formatDistance(new Date(lastRun), new Date(), {
