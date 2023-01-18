@@ -3,7 +3,7 @@
 
 class TemperatureModuleContext:  # noqa: D101
     # TODO(mc, 2022-02-09): copy or rewrite docstring from
-    # src/opentrons/legacy/module_contexts.py
+    # src/opentrons/protocol_api/module_contexts.py
 
     def __init__(self, module_id: str) -> None:
         self._module_id = module_id
