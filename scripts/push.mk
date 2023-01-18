@@ -18,6 +18,12 @@ is-in-version=$(findstring $(firstword $(checked-ssh-version)),$(allowed-ssh-ver
 # when using an OpenSSH version larger than 8.9,
 # we need to add a flag to use legacy scp with SFTP protocol
 scp-legacy-option-flag = $(if $(is-in-version),,-O)
+# when using windows, make is running against a different openSSH than the OS. 
+# adding the -O flag to scp will fail if the openSSH on OS is less than 9.
+# if openSSH on OS is 9 or more please add the -O flag to scp.
+PLATFORM := $(shell uname -s)
+is-windows=$(findstring $(PLATFORM), Windows)
+$(if $(is-windows), echo "when using windows with an openSSH version larger then 9 add -O flag to scp command. see comments for more details")
 
 # push-python-package: execute a push to the robot of a particular python
 # package.
