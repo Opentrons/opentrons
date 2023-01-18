@@ -687,7 +687,7 @@ def test_add_liquid(
     decoy.when(mock_engine_client.add_liquid(liquid)).then_return(liquid)
 
     result = subject.add_liquid(
-        display_name="water", description="water desc", display_color="#fff"
+        name="water", description="water desc", display_color="#fff"
     )
 
     assert result == expected_result

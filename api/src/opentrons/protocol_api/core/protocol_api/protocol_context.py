@@ -423,7 +423,7 @@ class ProtocolContextImplementation(
         raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
 
     def add_liquid(
-        self, display_name: str, description: str, display_color: Optional[str]
+        self, name: str, description: str, display_color: Optional[str]
     ) -> LoadedLiquid:
         """Add a liquid to load into a well."""
         raise UnsupportedAPIError(

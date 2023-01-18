@@ -397,7 +397,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def add_liquid(
         self,
-        display_name: str,
+        name: str,
         description: str,
         display_color: Optional[str],
     ) -> LoadedLiquid:
@@ -406,7 +406,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         loaded_liquid = self._engine_client.add_liquid(
             Liquid(
                 id=model_utils.generate_id(),
-                displayName=display_name,
+                displayName=name,
                 description=description,
                 displayColor=HexColor(__root__=display_color)
                 if display_color
