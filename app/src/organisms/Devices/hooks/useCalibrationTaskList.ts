@@ -190,6 +190,8 @@ export function useCalibrationTaskList(
         pipetteTask.subTasks.push(tipLengthSubTask)
         pipetteTask.subTasks.push(offsetSubTask)
 
+        pipetteTask.markedBad = pipetteTask.subTasks.every(st => st.markedBad)
+
         taskList.taskList.push(pipetteTask)
 
         if (taskIndex < TASK_LIST_LENGTH - 1) {
@@ -278,6 +280,9 @@ export function useCalibrationTaskList(
         // We've got the appropriately constructed subtasks, push them to the pipette task, then the task list
         pipetteTask.subTasks.push(tipLengthSubTask)
         pipetteTask.subTasks.push(offsetSubTask)
+
+        pipetteTask.markedBad = pipetteTask.subTasks.every(st => st.markedBad)
+
         taskList.taskList.push(pipetteTask)
 
         if (taskIndex < TASK_LIST_LENGTH - 1) {

@@ -48,10 +48,7 @@ export function CalibrationStatusCard({
     statusLabelText = t('calibration_complete')
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
-  } else if (
-    taskList.filter(tp => tp.subTasks.every(st => st.markedBad)).length ===
-    taskList.length
-  ) {
+  } else if (taskList.every(tp => tp.isComplete === true || tp.markedBad)) {
     statusLabelBackgroundColor = COLORS.warningEnabled
     statusLabelIconColor = COLORS.warningEnabled
     statusLabelText = t('calibration_recommended')
