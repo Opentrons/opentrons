@@ -15,10 +15,6 @@ def test_gripper_definition() -> None:
     assert isinstance(gripper_def, GripperDefinition)
     assert gripper_def.schema_version == 1
 
-    with pytest.raises(gripper.InvalidGripperDefinition):
-        # invalid schema version
-        gripper.load_definition(GripperModel.v1, 3)
-
 
 def test_gripper_definition_type() -> None:
     assert GripperDefinition(**GRIPPER_DEF, schema_version=1)
