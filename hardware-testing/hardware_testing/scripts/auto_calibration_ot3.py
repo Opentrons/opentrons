@@ -11,7 +11,7 @@ from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper,
 )
 
-from hardware_testing.opentrons_api.types import OT3Mount, GripperProbe
+from hardware_testing.opentrons_api.types import OT3Mount, GripperProbe, Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 LOG_CONFIG = {
@@ -40,8 +40,11 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, cycle: int) -> None:
         gripper="GRPV102",
         use_defaults=True,
     )
+    await api.home()
+    homed_pos = await api.gantry_position(mount)
+    fast_home_pos = homed_pos + Point(-5, -5, -5)
+
     for i in range(cycle):
-        await api.home()
         if mount == OT3Mount.GRIPPER:
             input("Add probe to gripper FRONT, then press ENTER: ")
             front_offset = await calibrate_gripper_jaw(api, GripperProbe.FRONT, slot)
@@ -50,13 +53,15 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, cycle: int) -> None:
             rear_offset = await calibrate_gripper_jaw(api, GripperProbe.REAR, slot)
             offset = await calibrate_gripper(api, front_offset, rear_offset)
         else:
-            input("Attach calibration probe to the pipette and press Enter\n")
+            # input("Attach calibration probe to the pipette and press Enter\n")
             offset = await calibrate_pipette(api, mount, slot)
 
         with open("/var/auto_calibration.csv", "a") as cv:
             writer = csv.writer(cv)
             writer.writerow(offset)
-        await api.home_z()
+
+        await api.move_to(mount, fast_home_pos)
+        await api.home()
 
         print(f"Offset: {offset}")
 
