@@ -114,13 +114,19 @@ function ProgressTrackerItem({
           {taskConnector}
           {subTasks.map((subTask, subTaskIndex) => {
             const isPastSubTask =
-              activeTaskIndex != null &&
-              activeSubTaskIndex != null &&
-              subTaskIndex < activeSubTaskIndex &&
-              taskIndex <= activeTaskIndex
+              (activeTaskIndex != null &&
+                activeSubTaskIndex != null &&
+                subTaskIndex <= activeSubTaskIndex &&
+                taskIndex < activeTaskIndex) ||
+              (activeTaskIndex != null &&
+                subTask.isComplete &&
+                taskIndex <= activeTaskIndex)
             const isFutureSubTask =
-              activeSubTaskIndex != null &&
-              (subTaskIndex > activeSubTaskIndex || isFutureTask)
+              (activeSubTaskIndex != null &&
+                activeTaskIndex != null &&
+                subTaskIndex > activeSubTaskIndex &&
+                taskIndex >= activeTaskIndex) ||
+              isFutureTask
             // last subtask of the parent task
             const isLastSubTask = subTaskIndex === subTasks.length - 1
             // last subtask of the last task of the entire list

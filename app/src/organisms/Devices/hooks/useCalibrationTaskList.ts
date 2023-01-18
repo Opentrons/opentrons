@@ -1,4 +1,8 @@
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+
+import { useInterval } from '@opentrons/components'
+
 import {
   useAttachedPipettes,
   useDeckCalibrationData,
@@ -7,6 +11,13 @@ import {
 } from '.'
 
 import { formatTimestamp } from '../utils'
+import {
+  INTENT_CALIBRATE_PIPETTE_OFFSET,
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
+} from '../../DeprecatedCalibrationPanels'
+import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
+import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
+import { fetchCalibrationStatus } from '../../../redux/calibration'
 
 import type {
   SubTaskProps,
@@ -14,9 +25,20 @@ import type {
   TaskProps,
 } from '../../TaskList/types'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
 
-export function useCalibrationTaskList(robotName: string): TaskListProps {
+const CALIBRATION_DATA_POLL_MS = 5000
+
+export function useCalibrationTaskList(
+  robotName: string,
+  pipOffsetCalLauncher: DashboardCalOffsetInvoker,
+  tipLengthCalLauncher: DashboardCalTipLengthInvoker,
+  deckCalLauncher: DashboardCalDeckInvoker
+): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
+  const dispatch = useDispatch()
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
   let activeTaskIndices: [number, number] | null = null
@@ -32,6 +54,16 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
   // get calibration data for mounted pipette subtasks
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
+
+  useInterval(
+    () => {
+      dispatch(fetchPipetteOffsetCalibrations(robotName))
+      dispatch(fetchTipLengthCalibrations(robotName))
+      dispatch(fetchCalibrationStatus(robotName))
+    },
+    CALIBRATION_DATA_POLL_MS,
+    true
+  )
 
   // first create the shape of the deck calibration task, then update values based on calibration status
   const deckTask: TaskProps = {
@@ -54,12 +86,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
             timestamp: formatTimestamp(deckCalibrationData.lastModified),
           })
         : ''
-    // todo(jb, 2022-12-14): wire up ctas to actually launch wizards (RAUT-292)
-    deckTask.cta = { label: t('recalibrate'), onClick: () => {} }
+    deckTask.cta = { label: t('recalibrate'), onClick: deckCalLauncher }
   } else {
     activeTaskIndices = [0, 0]
     deckTask.description = t('start_with_deck_calibration')
-    deckTask.cta = { label: t('calibrate'), onClick: () => {} }
+    deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
   }
 
   taskList.taskList.push(deckTask)
@@ -130,7 +161,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
         })
         tipLengthSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () => {},
+          onClick: () =>
+            tipLengthCalLauncher({
+              params: { mount },
+              hasBlockModalResponse: null,
+            }),
         }
         tipLengthSubTask.isComplete = true
 
@@ -139,7 +174,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
         })
         offsetSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () => {},
+          onClick: () =>
+            pipOffsetCalLauncher({
+              params: { mount },
+              withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+            }),
         }
         offsetSubTask.isComplete = true
 
@@ -173,7 +212,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           )
           tipLengthSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () => {},
+            onClick: () =>
+              tipLengthCalLauncher({
+                params: { mount },
+                hasBlockModalResponse: null,
+              }),
           }
         } else {
           // the tip length calibration is present and valid
@@ -182,7 +225,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           })
           tipLengthSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () => {},
+            onClick: () =>
+              tipLengthCalLauncher({
+                params: { mount },
+                hasBlockModalResponse: null,
+              }),
           }
           tipLengthSubTask.isComplete = true
         }
@@ -203,7 +250,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           )
           offsetSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () => {},
+            onClick: () =>
+              pipOffsetCalLauncher({
+                params: { mount },
+                withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
+              }),
           }
         } else {
           // the offset calibration is present and valid
@@ -212,7 +263,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           })
           offsetSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () => {},
+            onClick: () =>
+              pipOffsetCalLauncher({
+                params: { mount },
+                withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+              }),
           }
           offsetSubTask.isComplete = true
         }
