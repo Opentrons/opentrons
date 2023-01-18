@@ -1,4 +1,5 @@
 """Test for the ProtocolEngine-based protocol API core."""
+import inspect
 from typing import Optional, Type, cast, Tuple
 
 import pytest
@@ -47,6 +48,7 @@ from opentrons.protocol_api.core.engine import (
     InstrumentCore,
     LabwareCore,
     ModuleCore,
+    engine_param_validation,
 )
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
@@ -57,6 +59,15 @@ from opentrons.protocol_api.core.engine.module_core import (
 )
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_engine_param_validation(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out point_calculations.py functions."""
+    for name, func in inspect.getmembers(engine_param_validation, inspect.isfunction):
+        monkeypatch.setattr(engine_param_validation, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -185,17 +196,23 @@ def test_load_labware(
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
-        mock_engine_client.state.labware.find_labware_load_params("hello", "world", 456)
-    ).then_return(
-        EngineLabwareLoadParams("some_labware", "some_explicit_namespace", 9001)
-    )
+        mock_engine_client.state.labware.find_custom_labware_load_params(
+            "some_labware", "a_namespace", 456
+        )
+    ).then_return([EngineLabwareLoadParams("hello", "world", 654)])
+
+    decoy.when(
+        engine_param_validation.resolve_load_labware_params(
+            [EngineLabwareLoadParams("hello", "world", 654)], "a_namespace", 456
+        )
+    ).then_return(("some_namespace", 9001))
 
     decoy.when(
         mock_engine_client.load_labware(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             load_name="some_labware",
             display_name="some_display_name",
-            namespace="some_explicit_namespace",
+            namespace="some_namespace",
             version=9001,
         )
     ).then_return(
@@ -211,10 +228,10 @@ def test_load_labware(
     )
 
     result = subject.load_labware(
-        load_name="hello",
+        load_name="some_labware",
         location=DeckSlotName.SLOT_5,
         label="some_display_name",  # maps to optional display name
-        namespace="world",
+        namespace="a_namespace",
         version=456,
     )
 
@@ -308,17 +325,23 @@ def test_load_labware_on_module(
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
-        mock_engine_client.state.labware.find_labware_load_params("hello", "world", 456)
-    ).then_return(
-        EngineLabwareLoadParams("some_labware", "some_explicit_namespace", 9001)
-    )
+        mock_engine_client.state.labware.find_custom_labware_load_params(
+            "some_labware", "a_namespace", 456
+        )
+    ).then_return([EngineLabwareLoadParams("hello", "world", 654)])
+
+    decoy.when(
+        engine_param_validation.resolve_load_labware_params(
+            [EngineLabwareLoadParams("hello", "world", 654)], "a_namespace", 456
+        )
+    ).then_return(("some_namespace", 9001))
 
     decoy.when(
         mock_engine_client.load_labware(
             location=ModuleLocation(moduleId="module-id"),
             load_name="some_labware",
             display_name="some_display_name",
-            namespace="some_explicit_namespace",
+            namespace="some_namespace",
             version=9001,
         )
     ).then_return(
@@ -341,10 +364,10 @@ def test_load_labware_on_module(
     )
 
     result = subject.load_labware(
-        load_name="hello",
+        load_name="some_labware",
         location=module_core,
         label="some_display_name",  # maps to optional display name
-        namespace="world",
+        namespace="a_namespace",
         version=456,
     )
 

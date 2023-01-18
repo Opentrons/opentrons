@@ -302,62 +302,31 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware definition for matching {uri} not found."
             ) from e
 
-    def find_labware_load_params(
+    def find_custom_labware_load_params(
         self,
         load_name: str,
         namespace: Optional[str],
         version: Optional[int],
-    ) -> LabwareLoadParams:
+    ) -> List[LabwareLoadParams]:
         """Resolve labware parameters based on load name and given parameters."""
-        if namespace is not None and version is not None:
-            return LabwareLoadParams(
-                load_name=load_name, namespace=namespace, version=version
-            )
 
-        # Find all labware definitions that match load name
-        matching_definitions = [
-            definition
-            for definition in self._state.definitions_by_uri.values()
-            if definition.parameters.loadName == load_name
-        ]
+        def matches_params(definition: LabwareDefinition) -> bool:
+            matches_load_name = definition.parameters.loadName == load_name
+            matches_namespace = namespace is None or definition.namespace == namespace
+            matches_version = version is None or definition.version == version
 
-        if not matching_definitions:
-            return LabwareLoadParams(
+            return matches_load_name and matches_namespace and matches_version
+
+        return [
+            LabwareLoadParams(
                 load_name=load_name,
-                namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
-                version=version if version is not None else 1,
+                namespace=definition.namespace,
+                version=definition.version,
             )
-
-        # If we have namespace and/or version, further match the definitions based on given parameter
-        if namespace is not None and version is None:
-            matching_definitions = [
-                definition
-                for definition in matching_definitions
-                if definition.namespace == namespace
-            ]
-        elif version is not None and namespace is None:
-            matching_definitions = [
-                definition
-                for definition in matching_definitions
-                if definition.version == version
-            ]
-
-        # If there's none matching at this point, we had a partial match
-        if not matching_definitions:
-            raise errors.AmbiguousLoadLabwareParamsError(
-                f"Found labware definition with load name {load_name} but could not match other given parameters."
-            )
-        elif len(matching_definitions) > 1:
-            raise errors.AmbiguousLoadLabwareParamsError(
-                f"Found multiple labware definitions with load name {load_name} and given parameters."
-            )
-        found_definition = matching_definitions[0]
-
-        return LabwareLoadParams(
-            load_name=load_name,
-            namespace=found_definition.namespace,
-            version=found_definition.version,
-        )
+            for definition in self._state.definitions_by_uri.values()
+            if definition.namespace != OPENTRONS_NAMESPACE
+            and matches_params(definition)
+        ]
 
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""

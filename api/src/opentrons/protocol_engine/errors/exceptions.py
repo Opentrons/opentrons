@@ -199,7 +199,3 @@ class LabwareMovementNotAllowedError(ProtocolEngineError):
 
 class LocationIsOccupiedError(ProtocolEngineError):
     """An error raised when attempting to place labware in a non-empty location."""
-
-
-class AmbiguousLoadLabwareParamsError(ProtocolEngineError):
-    """An error raised when specific labware parameters cannot be found due to multiple/mismatching labware."""

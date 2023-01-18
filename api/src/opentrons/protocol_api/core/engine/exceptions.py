@@ -17,3 +17,7 @@ class InvalidModuleLocationError(ValueError):
 
 class InvalidMagnetEngageHeightError(ValueError):
     """Error raised if a Magnetic Module engage height is invalid."""
+
+
+class AmbiguousLoadLabwareParamsError(RuntimeError):
+    """Error raised when specific labware parameters cannot be found due to multiple matching labware definitions."""

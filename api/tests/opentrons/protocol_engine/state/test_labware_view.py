@@ -7,7 +7,6 @@ from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import Parameters
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point
 
@@ -149,97 +148,33 @@ def test_get_labware_definition_bad_id() -> None:
     argnames=["namespace", "version"],
     argvalues=[("world", 123), (None, 123), ("world", None), (None, None)],
 )
-def test_find_labware_params(namespace: Optional[str], version: Optional[int]) -> None:
+def test_find_custom_labware_params(
+    namespace: Optional[str], version: Optional[int]
+) -> None:
     """It should find the missing (if any) load labware parameters."""
     labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
         parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
         namespace="world",
         version=123,
     )
-
-    subject = get_labware_view(
-        definitions_by_uri={"some-labware-uri": labware_def},
-    )
-
-    result = subject.find_labware_load_params("hello", namespace, version)
-
-    assert result == LabwareLoadParams(
-        load_name="hello", namespace="world", version=123
-    )
-
-
-@pytest.mark.parametrize(
-    argnames=["namespace", "expected_namespace", "version", "expected_version"],
-    argvalues=[
-        (None, OPENTRONS_NAMESPACE, 123, 123),
-        ("world", "world", None, 1),
-        (None, OPENTRONS_NAMESPACE, None, 1),
-    ],
-)
-def test_find_labware_params_no_labware_found_defaults(
-    namespace: Optional[str],
-    expected_namespace: str,
-    version: Optional[int],
-    expected_version: int,
-) -> None:
-    """It should raise an error if there is no matching load name."""
-    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+    standard_def = LabwareDefinition.construct(  # type: ignore[call-arg]
         parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
-    )
-
-    subject = get_labware_view(
-        definitions_by_uri={"some-labware-uri": labware_def},
-    )
-
-    result = subject.find_labware_load_params("foo", namespace, version)
-
-    assert result == LabwareLoadParams(
-        load_name="foo", namespace=expected_namespace, version=expected_version
-    )
-
-
-def find_labware_params_raises_multiple_labware_found() -> None:
-    """It should raise if multiple labware match given parameters."""
-    labware_def_1 = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
-    )
-    labware_def_2 = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
-    )
-
-    subject = get_labware_view(
-        definitions_by_uri={
-            "some-labware-uri-1": labware_def_1,
-            "some-labware-uri-2": labware_def_2,
-        },
-    )
-
-    with pytest.raises(
-        errors.AmbiguousLoadLabwareParamsError, match="multiple labware"
-    ):
-        subject.find_labware_load_params("hello", None, None)
-
-
-@pytest.mark.parametrize(
-    argnames=["namespace", "version"],
-    argvalues=[(None, 456), ("foo", None)],
-)
-def test_find_labware_params_raises_only_partial_found(
-    namespace: Optional[str], version: Optional[int]
-) -> None:
-    """It should raise an error if there is no matching load name."""
-    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
-        namespace="world",
+        namespace="opentrons",
         version=123,
     )
 
     subject = get_labware_view(
-        definitions_by_uri={"some-labware-uri": labware_def},
+        definitions_by_uri={
+            "some-labware-uri": labware_def,
+            "some-standard-uri": standard_def,
+        },
     )
 
-    with pytest.raises(errors.AmbiguousLoadLabwareParamsError, match="could not match"):
-        subject.find_labware_load_params("hello", namespace, version)
+    result = subject.find_custom_labware_load_params("hello", namespace, version)
+
+    assert result == [
+        LabwareLoadParams(load_name="hello", namespace="world", version=123)
+    ]
 
 
 def test_get_all_labware(
