@@ -1,16 +1,22 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import * as Networking from '../../../../redux/networking'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
+import { useIsOT3, useIsRobotBusy } from '../../hooks'
+import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
+
+import type { State } from '../../../../redux/types'
 
 jest.mock('../../../../redux/networking/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../hooks')
+jest.mock('../ConnectNetwork/DisconnectModal')
 
 const mockUpdateRobotStatus = jest.fn()
 
@@ -22,11 +28,25 @@ const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
   typeof Networking.getWifiList
 >
 
+const mockGetCanDisconnect = Networking.getCanDisconnect as jest.MockedFunction<
+  typeof Networking.getCanDisconnect
+>
+
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
+const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
+  typeof DisconnectModal
+>
+
+const ROBOT_NAME = 'otie'
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
       <RobotSettingsNetworking
-        robotName="otie"
+        robotName={ROBOT_NAME}
         updateRobotStatus={mockUpdateRobotStatus}
       />
     </MemoryRouter>,
@@ -57,12 +77,23 @@ const mockWifiList = [
 
 describe('RobotSettingsNetworking', () => {
   beforeEach(() => {
-    mockGetNetworkInterfaces.mockReturnValue({
-      wifi: initialMockWifi,
-      ethernet: initialMockEthernet,
-    })
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue({
+        wifi: initialMockWifi,
+        ethernet: initialMockEthernet,
+      })
 
-    mockGetWifiList.mockReturnValue(mockWifiList)
+    when(mockGetWifiList)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue(mockWifiList)
+
+    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(false)
+    when(mockGetCanDisconnect)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue(false)
+    mockDisconnectModal.mockReturnValue(<div>mock disconnect modal</div>)
   })
 
   afterEach(() => {
@@ -70,7 +101,7 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render title and description', () => {
-    const [{ getByText, getByTestId, queryByText }] = render()
+    const [{ getByText, getByTestId, queryByRole, queryByText }] = render()
     getByText('Wi-Fi - foo')
     getByText('Wired USB')
     getByText('Learn about connecting to a robot via USB')
@@ -81,6 +112,18 @@ describe('RobotSettingsNetworking', () => {
     ).toBeInTheDocument()
     expect(getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
     expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
+    expect(queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
+  })
+
+  it('should render title and description for OT-3', () => {
+    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    const [{ getByText, queryByText }] = render()
+    getByText('Wi-Fi - foo')
+    getByText('Ethernet')
+    getByText('USB')
+    expect(queryByText('Learn about connecting to a robot via USB')).toBeNull()
+    expect(queryByText('Looking for USB-to-Ethernet Adapter info?')).toBeNull()
+    expect(queryByText('Go to Advanced App Settings')).toBeNull()
   })
 
   it('should render Wi-Fi mock data and ethernet mock data', () => {
@@ -116,7 +159,9 @@ describe('RobotSettingsNetworking', () => {
       macAddress: '00:00:00:00:00:00',
       type: Networking.INTERFACE_WIFI,
     }
-    mockGetNetworkInterfaces.mockReturnValue({ wifi: mockWiFi, ethernet: null })
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue({ wifi: mockWiFi, ethernet: null })
 
     const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
     getByText('Wi-Fi - foo')
@@ -145,11 +190,15 @@ describe('RobotSettingsNetworking', () => {
       macAddress: '00:00:00:00:00:00',
       type: Networking.INTERFACE_ETHERNET,
     }
-    mockGetNetworkInterfaces.mockReturnValue({
-      wifi: null,
-      ethernet: mockWiredUSB,
-    })
-    mockGetWifiList.mockReturnValue([])
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue({
+        wifi: null,
+        ethernet: mockWiredUSB,
+      })
+    when(mockGetWifiList)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue([])
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
 
     getByText('Wired USB')
@@ -170,11 +219,15 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi and Wired USB are not connected', () => {
-    mockGetNetworkInterfaces.mockReturnValue({
-      wifi: null,
-      ethernet: null,
-    })
-    mockGetWifiList.mockReturnValue([])
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue({
+        wifi: null,
+        ethernet: null,
+      })
+    when(mockGetWifiList)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue([])
     const [{ getByText, queryByText, queryAllByTestId }] = render()
 
     expect(queryByText('Wireless IP')).not.toBeInTheDocument()
@@ -200,5 +253,26 @@ describe('RobotSettingsNetworking', () => {
     const internalLink = getByText('Go to Advanced App Settings')
     expect(externalLink.closest('a')).toHaveAttribute('href', usbExternalLink)
     expect(internalLink.closest('a')).toHaveAttribute('href', usbInternalLink)
+  })
+
+  it('should render Disconnect from Wi-Fi button when robot can disconnect and is not busy', () => {
+    when(mockGetCanDisconnect)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue(true)
+    const [{ getByRole, getByText, queryByText }] = render()
+
+    expect(queryByText('mock disconnect modal')).toBeNull()
+    getByRole('button', { name: 'Disconnect from Wi-Fi' }).click()
+    getByText('mock disconnect modal')
+  })
+
+  it('should not render Disconnect from Wi-Fi button when robot is busy', () => {
+    when(mockGetCanDisconnect)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue(true)
+    when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(true)
+    const [{ queryByRole }] = render()
+
+    expect(queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
   })
 })

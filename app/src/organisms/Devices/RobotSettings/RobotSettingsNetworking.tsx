@@ -62,7 +62,7 @@ export function RobotSettingsNetworking({
     getCanDisconnect(state, robotName)
   )
 
-  // TODO: get the real OT-3 USB connection info
+  // TODO(bh, 2023-1-18): get the real OT-3 USB connection info
   const isOT3ConnectedViaUSB = false
 
   const { wifi, ethernet } = useSelector((state: State) =>
