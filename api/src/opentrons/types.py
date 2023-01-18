@@ -8,6 +8,7 @@ from .protocols.api_support.labware_like import LabwareLike
 if TYPE_CHECKING:
     from .protocol_api.labware import Labware, Well
     from .protocol_api.core.protocol_api.module_geometry import ModuleGeometry
+    from .protocol_api.module_contexts import ModuleContext
 
 
 class PipetteNotAttachedError(KeyError):
@@ -62,7 +63,9 @@ class Point(NamedTuple):
         return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
 
-LocationLabware = Union["Labware", "Well", str, "ModuleGeometry", LabwareLike, None]
+LocationLabware = Union[
+    "Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"
+]
 
 
 class Location:

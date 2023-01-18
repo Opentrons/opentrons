@@ -52,7 +52,7 @@ CALIBRATION_SQUARE_OFFSET_EVT = Point(x=64, y=-43, z=-0.25)
 CALIBRATION_SQUARE_EVT = CalibrationSquare(
     top_left_offset=CALIBRATION_SQUARE_OFFSET_EVT, width=20, height=20, depth=3
 )
-CALIBRATION_PROBE_EVT = CalibrationProbe(length=34.5, diameter=4.0)
+CALIBRATION_PROBE_EVT = CalibrationProbe(length=44.5, diameter=4.0)
 
 
 def stop_server_ot3() -> None:

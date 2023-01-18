@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
+import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
@@ -21,12 +22,14 @@ export const Results = (props: ResultsProps): JSX.Element => {
     handleCleanUpAndClose,
     currentStepIndex,
     totalStepCount,
+    selectedPipette,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
   let buttonText: string = t('shared:exit')
+  let subHeader
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       header = t('pip_cal_success')
@@ -53,6 +56,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
         isSuccess = false
       } else {
         header = t('pipette_detached')
+        if (selectedPipette === NINETY_SIX_CHANNEL) {
+          if (currentStepIndex === totalStepCount) {
+            header = t('ninety_six_detached_success')
+          } else {
+            header = t('all_pipette_detached')
+            subHeader = t('gantry_empty_for_96_channel_success')
+            buttonText = t('attach_pip')
+          }
+        }
       }
       break
     }
@@ -71,6 +83,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       iconColor={iconColor}
       header={header}
       isSuccess={isSuccess}
+      subHeader={subHeader}
     >
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}

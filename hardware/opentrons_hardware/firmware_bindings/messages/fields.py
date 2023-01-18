@@ -17,6 +17,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteTipActionType,
     MotorPositionFlags,
     ErrorSeverity,
+    MoveStopCondition,
 )
 
 
@@ -246,3 +247,15 @@ class MotorPositionFlagsField(utils.UInt8Field):
             flag.name for flag in MotorPositionFlags if bool(self.value & flag.value)
         ]
         return f"{self.__class__.__name__}(value={','.join(flags_list)})"
+
+
+class MoveStopConditionField(utils.UInt8Field):
+    """Move stop condition."""
+
+    def __repr__(self) -> str:
+        """Print move stop condition."""
+        try:
+            condition = MoveStopCondition(self.value).name
+        except ValueError:
+            condition = str(self.value)
+        return f"{self.__class__.__name__}(value={condition})"

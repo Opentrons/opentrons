@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   ALIGN_FLEX_END,
   BORDERS,
@@ -22,13 +23,17 @@ import { Portal } from '../../App/portal'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { getAttachedPipettes } from '../../redux/pipettes'
 import singleChannelAndEightChannel from '../../assets/images/change-pip/single-channel-and-eight-channel.png'
 import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
+import { getIsGantryEmpty } from './utils'
 
+import type { State } from '../../redux/types'
 import type { SelectablePipettes } from './types'
 
 interface ChoosePipetteProps {
+  robotName: string
   proceed: () => void
   selectedPipette: SelectablePipettes
   setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
@@ -59,10 +64,21 @@ const selectedOptionStyles = css`
 `
 
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
-  const { selectedPipette, setSelectedPipette, proceed, exit } = props
+  const {
+    robotName,
+    selectedPipette,
+    setSelectedPipette,
+    proceed,
+    exit,
+  } = props
   const { t } = useTranslation('pipette_wizard_flows')
+  const attachedPipettesByMount = useSelector((state: State) =>
+    getAttachedPipettes(state, robotName)
+  )
+
+  const isGantryEmpty = getIsGantryEmpty(attachedPipettesByMount)
   const [setShowExit, showExit] = React.useState<boolean>(false)
-  const proceedButtonText: string = t('attach_this_pipette')
+  const proceedButtonText: string = t('next')
   const nintySixChannelWrapper =
     selectedPipette === NINETY_SIX_CHANNEL
       ? selectedOptionStyles
@@ -72,7 +88,16 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
       ? selectedOptionStyles
       : unselectedOptionStyles
 
-  const ninetySix = t('ninety_six_channel', { ninetySix: NINETY_SIX_CHANNEL })
+  let ninetySix: string = t('ninety_six_channel', {
+    ninetySix: NINETY_SIX_CHANNEL,
+  })
+  if (!isGantryEmpty) {
+    ninetySix = t('detach_pipette_to_attach_96', {
+      pipetteName:
+        attachedPipettesByMount.right?.modelSpecs.displayName ??
+        attachedPipettesByMount.left?.modelSpecs.displayName,
+    })
+  }
   const singleMount = t('single_or_8_channel', {
     single: 'Single',
     eight: EIGHT_CHANNEL,

@@ -4,6 +4,7 @@ import { COLORS } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
+  WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
@@ -90,11 +91,7 @@ export const BeforeBeginning = (
     }
     case FLOWS.DETACH: {
       bodyText = t('get_started_detach')
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        equipmentList = [HEX_SCREWDRIVER]
-      } else {
-        equipmentList = [HEX_SCREWDRIVER, CALIBRATION_PROBE]
-      }
+      equipmentList = [HEX_SCREWDRIVER]
       break
     }
   }
@@ -177,7 +174,9 @@ export const BeforeBeginning = (
           />
           {selectedPipette === NINETY_SIX_CHANNEL &&
           (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
-            <Banner type="warning">{t('pipette_heavy')}</Banner>
+            <Banner type="warning">
+              {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+            </Banner>
           ) : null}
         </>
       }
