@@ -513,7 +513,7 @@ class DurationEstimator:
         z_default_module_height = 95.25
         # 177.8 - 82.55 Where did we get 177.8 from?
         # Would it be better to just use
-        # legacy.labware.Well.top
+        # protocol_api.labware.Well.top
         # labware.top() ?
 
         if is_module:
