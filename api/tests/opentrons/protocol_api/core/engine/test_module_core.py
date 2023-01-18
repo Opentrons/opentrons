@@ -1,4 +1,4 @@
-"""Tests for opentrons.legacy.core.engine.ModuleCore."""
+"""Tests for opentrons.protocol_api.core.engine.ModuleCore."""
 import pytest
 from decoy import Decoy
 
