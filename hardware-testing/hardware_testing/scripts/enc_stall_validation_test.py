@@ -26,8 +26,8 @@ CYCLES = 25
 SPEED_XY = 400
 SPEED_Z = 65
 
-MOVE_POS = Point(235.414, 385.308, 509.15)
-FIXTURE_POS = Point(235.414, 385.308, 303.965)
+MOVE_POS = Point(227.826, 362.808, 250.0) #Point(235.414, 385.308, 509.15)
+FIXTURE_POS = Point(227.826, 362.808, 44.61) #Point(235.414, 385.308, 303.965)
 
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
@@ -80,60 +80,86 @@ async def _main(is_simulating: bool) -> None:
 
     for cycle in range(CYCLES):
         print(f"Cycle: {cycle+1} out of {CYCLES}")
-        time.sleep(1)
+        ### time.sleep(1)
         await home_ot3(api)
-        await api.move_to(MOUNT, MOVE_POS, speed = 50)
-        time.sleep(1)
-        await api.move_to(MOUNT, FIXTURE_POS, speed = 50)
-        time.sleep(1)
+        # MOVE_POS = Point(227.826, 362.808, 250.0) #Point(235.414, 385.308, 509.15)
+        # FIXTURE_POS = Point(227.826, 362.808, 44.61) #Point(235.414, 385.308, 303.965)
+        await api.move_to(MOUNT, Point(227.826, 362.808, 250.0)) #, speed = 50)
+        ### time.sleep(1)
+        await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50)
+        ### time.sleep(1)
+        await api.move_to(MOUNT, Point(227.826, 362.808, 42.61)) #, speed = 50)
+        ### time.sleep(1)
         init_reading = gauge.read()
         init_robot_pos = await api.current_position_ot3(MOUNT)
         init_encoder_pos = await api.encoder_current_position_ot3(MOUNT)
-        time.sleep(1)
         print(f"Initial Dial Reading (mm) = {init_reading}\n")
-        print(f"Initial robot position: {init_robot_pos}\n")
-        print(f"Initial encoder position: {init_encoder_pos}\n")
+        print(f"Initial robot position: {init_robot_pos[OT3Axis.Z_R]}\n")
+        print(f"Initial encoder position: {init_encoder_pos[OT3Axis.Z_R]}\n")
+        await asyncio.sleep(1)
 
-        input("Press enter to continue test...\n")
+        # input("Press enter to continue test...\n")
         print("\n--STALLING--\n")
-        await api.move_rel(MOUNT, delta=Point(z=10))
-        time.sleep(1)
-        await api.move_rel(MOUNT, delta=Point(x=30))
-        time.sleep(1)
+        # await api.move_rel(MOUNT, delta=Point(z=10))
+        await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50)
+        ### time.sleep(1)
+        # await api.move_rel(MOUNT, delta=Point(x=30))
+        await api.move_to(MOUNT, Point(257.826, 362.808, 52.61)) #, speed = 50)
+        ### time.sleep(1)
         try:
-            await api.move_rel(MOUNT, delta=Point(z=20), _check_stalls=True)
-        except:
+            await api.move_rel(MOUNT, delta=Point(z=-20), _check_stalls=True)
+        except RuntimeError as e:
+            if "collision_detected" in str(e):
+                print("--COLLISION DETECTED--\n")
+                collision_detected = True
+                # print("--UPDATE POSITION--\n")
+                # await api._update_position_estimation([OT3Axis.Z_R])
 
-        time.sleep(1)
-        await api._update_position_estimation([OT3Axis.Z_R])
+        await asyncio.sleep(1)
+        if collision_detected:
+            print("--UPDATE POSITION--\n")
+            await api._update_position_estimation([OT3Axis.Z_R])
+        await asyncio.sleep(1)
         stall_robot_pos = await api.current_position_ot3(MOUNT)
         stall_encoder_pos = await api.encoder_current_position_ot3(MOUNT)
-        time.sleep(1)
-        print(f"Stalled robot position: {stall_robot_pos}\n")
-        print(f"Stalled encoder position: {stall_encoder_pos}\n")
+        print(f"Stalled robot position: {stall_robot_pos[OT3Axis.Z_R]}\n")
+        print(f"Stalled encoder position: {stall_encoder_pos[OT3Axis.Z_R]}\n")
+        await asyncio.sleep(1)
 
-        await api.move_to(MOUNT, Point(235.414, 385.308, 313.965))
-        time.sleep(1)
-        await api.move_rel(MOUNT, delta=Point(x=-30))
-        time.sleep(1)
-        await api.move_to(MOUNT, MOVE_POS, speed = 50)
-        time.sleep(1)
+        # MOVE_POS = Point(227.826, 362.808, 250.0) #Point(235.414, 385.308, 509.15)
+        # FIXTURE_POS = Point(227.826, 362.808, 44.61) #Point(235.414, 385.308, 303.965)
+
+        await api.move_to(MOUNT, Point(257.826, 362.808, 52.61)) #, speed = 50)
+        ### time.sleep(1)
+        await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50)
+        ### time.sleep(1)
+        # pos = await api.current_position_ot3(MOUNT)
+        # input(f"Current pos: {pos[OT3Axis.Z_R]}")
+        await api.move_to(MOUNT, Point(227.826, 362.808, 42.61)) #, speed = 50)
+        ### time.sleep(1)
+        # pos = await api.current_position_ot3(MOUNT)
+        # input(f"Current pos: {pos[OT3Axis.Z_R]}")
 
         stall_reading = gauge.read()
         updated_robot_pos = await api.current_position_ot3(MOUNT)
         updated_encoder_pos = await api.encoder_current_position_ot3(MOUNT)
-        time.sleep(1)
         print(f"Stall Dial Reading (mm) = {stall_reading}\n")
-        print(f"Initial robot position: {updated_robot_pos}\n")
-        print(f"Initial encoder position: {updated_encoder_pos}\n")
+        print(f"Updated robot position: {updated_robot_pos[OT3Axis.Z_R]}\n")
+        print(f"Updated encoder position: {updated_encoder_pos[OT3Axis.Z_R]}\n")
+        await aysncio.sleep(1)
 
         reading_diff = init_reading - stall_reading
         print(f"Dial reading difference after stall: {reading_diff} mm\n")
+
+        if cycle > 0:
+            test_robot = ""
+            test_tag = ""
 
         cycle_data = [cycle+1, test_robot, test_tag, init_reading, stall_reading, reading_diff, init_encoder_pos[OT3Axis.Z_R], updated_encoder_pos[OT3Axis.Z_R]]
         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
         data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
 
+    await home_ot3(api)
     await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
 
 if __name__ == "__main__":
