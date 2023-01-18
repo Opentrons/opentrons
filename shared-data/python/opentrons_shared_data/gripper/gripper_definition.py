@@ -13,6 +13,10 @@ def _snake_to_camel_case(snake: str) -> str:
     )
 
 
+# TODO: get rid of this at some point
+GripperName = Literal["gripper"]
+
+
 class GripperModel(str, Enum):
     """Gripper models."""
 

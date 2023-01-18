@@ -18,10 +18,8 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
     ChannelCount,
 )
-from opentrons_shared_data.gripper.dev_types import (
-    GripperName,
-    GripperModel,
-)
+from opentrons_shared_data.gripper.gripper_definition import GripperName, GripperModel
+
 
 InstrumentNameT = TypeVar("InstrumentNameT", bound=Union[GripperName, PipetteName])
 InstrumentModelT = TypeVar("InstrumentModelT", bound=Union[GripperModel, PipetteModel])
