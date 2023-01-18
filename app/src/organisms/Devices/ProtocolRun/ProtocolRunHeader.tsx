@@ -122,6 +122,7 @@ function RunTimer({
 }
 
 const MIN_AGGREGATION_PERCENT = 8
+const TICKED_COMMAND_TYPES = ['waitForResume', 'moveLabware']
 
 export function ProtocolRunHeader({
   protocolRunHeaderRef,
@@ -149,22 +150,11 @@ export function ProtocolRunHeader({
   usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
-  const [selectedCommandType, setSelectedCommandType] = React.useState('')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = robotSideAnalysis?.commands ?? []
-  const uniqCommandTypes = analysisCommands.reduce<Array<RunTimeCommand['commandType']>>(
-    (acc, c) => {
-      if (acc.includes(c.commandType)) {
-        return acc
-      } else {
-        return [...acc, c.commandType]
-      }
-    },
-    []
-  )
   const commandBufferCount = analysisCommands.length * 0.01 * MIN_AGGREGATION_PERCENT
   const ticks = analysisCommands.reduce<Array<{ index: number, count: number }>>((acc, c, index) => {
-    if (selectedCommandType === c.commandType) {
+    if (TICKED_COMMAND_TYPES.includes(c.commandType)) {
       const mostRecentTick = last(acc)
       if (mostRecentTick == null) {
         return [...acc, { index, count: 1 }]
@@ -286,10 +276,6 @@ export function ProtocolRunHeader({
         <LabeledValue label={t('run')} value={createdAtTimestamp} />
         <LabeledValue label={t('status')} value={<DisplayRunStatus runStatus={runStatus} />} />
         <LabeledValue label={t('run_time')} value={<RunTimer {...{ runStatus, startedAt, stoppedAt, completedAt }} />} />
-        <select onChange={(e) => setSelectedCommandType(e.target.value)}>
-          {uniqCommandTypes.map(cT => <option value={cT}>{cT}</option>)}
-        </select>
-
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <ActionButton runId={runId} robotName={robotName} runStatus={runStatus} isProtocolAnalyzing={protocolData == null || !!isProtocolAnalyzing} />
         </Flex>
