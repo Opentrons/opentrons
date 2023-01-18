@@ -85,6 +85,7 @@ import type { Run } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { RunProgressMeter } from '../RunProgressMeter'
+import { ProtocolRunProgressMeter } from './ProtocolRunProgressMeter'
 
 const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [RUN_STATUS_RUNNING, RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_BLOCKED_BY_OPEN_DOOR, RUN_STATUS_IDLE]
@@ -121,9 +122,6 @@ function RunTimer({
   return <StyledText css={TYPOGRAPHY.pRegular}>{runTime}</StyledText>
 }
 
-const MIN_AGGREGATION_PERCENT = 8
-const TICKED_COMMAND_TYPES = ['waitForResume', 'moveLabware']
-
 export function ProtocolRunHeader({
   protocolRunHeaderRef,
   robotName,
@@ -149,23 +147,6 @@ export function ProtocolRunHeader({
   // NOTE: we are polling pipettes, though not using their value directly here
   usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-
-  const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  const analysisCommands = robotSideAnalysis?.commands ?? []
-  const commandBufferCount = analysisCommands.length * 0.01 * MIN_AGGREGATION_PERCENT
-  const ticks = analysisCommands.reduce<Array<{ index: number, count: number }>>((acc, c, index) => {
-    if (TICKED_COMMAND_TYPES.includes(c.commandType)) {
-      const mostRecentTick = last(acc)
-      if (mostRecentTick == null) {
-        return [...acc, { index, count: 1 }]
-      } else if ((index - mostRecentTick.index) > commandBufferCount) {
-        return [...acc, { index, count: 1 }]
-      } else {
-        return [...acc.slice(0, -1), { index: mostRecentTick.index, count: mostRecentTick.count + 1 }]
-      }
-    }
-    return acc
-  }, [])
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -232,7 +213,6 @@ export function ProtocolRunHeader({
       backgroundColor={COLORS.white}
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
-      color={COLORS.black}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
       marginBottom={SPACING.spacing4}
@@ -272,7 +252,7 @@ export function ProtocolRunHeader({
         <Banner type="warning">{t('run_canceled')}</Banner>
       ) : null}
       <TerminalRunBanner {...{ runStatus, handleClearClick, isClosingCurrentRun }} />
-      <Box display="grid" gridTemplateColumns="3fr 3fr 3fr 3fr 3fr">
+      <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
         <LabeledValue label={t('run')} value={createdAtTimestamp} />
         <LabeledValue label={t('status')} value={<DisplayRunStatus runStatus={runStatus} />} />
         <LabeledValue label={t('run_time')} value={<RunTimer {...{ runStatus, startedAt, stoppedAt, completedAt }} />} />
@@ -299,12 +279,11 @@ export function ProtocolRunHeader({
             </Flex>
           </Box>
         ) : null}
-      <RunProgressMeter {...{ ticks, makeHandleJumpToStep, analysisCommands }} currentRunCommandIndex={1100} />
+      <ProtocolRunProgressMeter {...{makeHandleJumpToStep, runId}} />
       {
         showConfirmCancelModal ? (
           <ConfirmCancelModal
-            onClose={() => setShowConfirmCancelModal(false)
-            }
+            onClose={() => setShowConfirmCancelModal(false)}
             runId={runId}
           />
         ) : null
