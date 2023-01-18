@@ -2,6 +2,8 @@
 import asyncio
 import argparse
 import csv
+import logging
+from logging.config import dictConfig
 
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
@@ -11,6 +13,23 @@ from opentrons.hardware_control.ot3_calibration import (
 
 from hardware_testing.opentrons_api.types import OT3Mount, GripperProbe
 from hardware_testing.opentrons_api import helpers_ot3
+
+LOG_CONFIG = {
+    "version": 1,
+    "formatters": {
+        "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
+    },
+    "handlers": {
+        "file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "basic",
+            "filename": "/var/log/auto_calibration.log",
+            "maxBytes": 5000000,
+            "level": logging.INFO,
+            "backupCount": 3,
+        },
+    },
+}
 
 
 async def _main(simulate: bool, slot: int, mount: OT3Mount, cycle: int) -> None:
@@ -33,12 +52,17 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, cycle: int) -> None:
         else:
             input("Attach calibration probe to the pipette and press Enter\n")
             offset = await calibrate_pipette(api, mount, slot)
+
+        with open("/var/auto_calibration.csv", "a") as cv:
+            writer = csv.writer(cv)
+            writer.writerow(offset)
         await api.home_z()
 
         print(f"Offset: {offset}")
 
 
 if __name__ == "__main__":
+    dictConfig(LOG_CONFIG)
     print("\nOT-3 Auto-Calibration\n")
     arg_parser = argparse.ArgumentParser(description="OT-3 Auto-Calibration")
     arg_parser.add_argument(
