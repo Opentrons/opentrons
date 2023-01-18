@@ -108,8 +108,27 @@ def mock_location() -> mock.MagicMock:
 
 
 @pytest.mark.parametrize(
-    argnames=["module_definition", "expected_geometry", "expected_repr"],
+    argnames=[
+        "module_definition",
+        "expected_geometry",
+        "expected_parent_location",
+        "expected_repr",
+    ],
     argvalues=[
+        (
+            lazy_fixture("minimal_heater_shaker_definition"),
+            HeaterShakerGeometry(
+                parent=Location(Point(0, 0, 0), labware="5"),
+                offset=Point(11, 22, 33),
+                overall_height=123,
+                height_over_labware=234,
+                model=HeaterShakerModuleModel.HEATER_SHAKER_V1,
+                module_type=ModuleType.HEATER_SHAKER,
+                display_name="Sample H/S Module",
+            ),
+            "5",
+            "Sample H/S Module on 5",
+        ),
         (
             lazy_fixture("minimal_heater_shaker_definition"),
             HeaterShakerGeometry(
@@ -121,19 +140,21 @@ def mock_location() -> mock.MagicMock:
                 module_type=ModuleType.HEATER_SHAKER,
                 display_name="Sample H/S Module",
             ),
-            "Sample H/S Module on ",
+            None,
+            "Sample H/S Module",
         ),
     ],
 )
 def test_create_geometry(
     module_definition: ModuleDefinitionV3,
     expected_geometry: ModuleGeometry,
+    expected_parent_location: Optional[str],
     expected_repr: str,
 ) -> None:
     """It should load an API-version-specific module from its definition."""
     load_result = create_geometry(
         definition=module_definition,
-        parent=Location(point=Point(0, 0, 0), labware=None),
+        parent=Location(point=Point(0, 0, 0), labware=expected_parent_location),
         configuration=None,
     )
     assert isinstance(load_result, expected_geometry.__class__)

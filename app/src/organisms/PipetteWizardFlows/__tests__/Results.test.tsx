@@ -49,7 +49,7 @@ describe('Results', () => {
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Calibrated')
+    getByText('Pipette Successfully Attached and Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -110,7 +110,7 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette failed to detach')
+    getByText('Pipette Still Attached')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
@@ -125,7 +125,7 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette failed to detach')
+    getByText('Pipette Still Attached')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
@@ -141,7 +141,7 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Detached')
+    getByText('All Pipettes Successfully Detached')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -155,7 +155,7 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Calibrated')
+    getByText('Pipette Successfully Attached and Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -170,7 +170,7 @@ describe('Results', () => {
       totalStepCount: 9,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Calibrated')
+    getByText('Pipette Successfully Attached and Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -185,7 +185,7 @@ describe('Results', () => {
       totalStepCount: 5,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Calibrated')
+    getByText('Pipette Successfully Attached and Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )

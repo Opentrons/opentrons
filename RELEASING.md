@@ -48,7 +48,7 @@ git merge --ff-only release_${version}
 git push origin release
 ```
 
-10. Run [`make bump](#make-bump-usage) to tag the release and start release builds:
+10. Run [`make bump`](#make-bump-usage) to tag the release and start release builds:
 
 ```shell
 git tag -a v${version} -m 'chore(release): ${version}'

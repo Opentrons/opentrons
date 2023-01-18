@@ -99,11 +99,10 @@ describe('ConnectViaEthernet', () => {
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 
-  // ToDo kj: 12/01/2022 activate this case when merge name screen
-  // it('when clicking next step button, call a mock function', () => {
-  //   const [{ getByRole }] = render()
-  //   const button = getByRole('button', { name: 'Next step' })
-  //   fireEvent.click(button)
-  //   // expect(mockPush).toHaveBeenCalledWith('/name-robot')
-  // })
+  it('when clicking next step button, call a mock function', () => {
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Next step' })
+    fireEvent.click(button)
+    expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
+  })
 })
