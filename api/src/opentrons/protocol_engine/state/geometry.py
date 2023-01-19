@@ -170,6 +170,8 @@ class GeometryView:
 
             if well_location.origin == WellOrigin.TOP:
                 offset = offset.copy(update={"z": offset.z + well_depth})
+            elif well_location.origin == WellOrigin.CENTER:
+                offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
 
         else:
             offset = WellOffset(x=0, y=0, z=well_depth)

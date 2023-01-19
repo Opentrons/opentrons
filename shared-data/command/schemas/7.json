@@ -142,7 +142,7 @@
     "WellOrigin": {
       "title": "WellOrigin",
       "description": "Origin of WellLocation offset.",
-      "enum": ["top", "bottom"],
+      "enum": ["top", "bottom", "center"],
       "type": "string"
     },
     "WellOffset": {

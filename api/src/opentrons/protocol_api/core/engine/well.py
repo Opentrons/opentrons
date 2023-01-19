@@ -116,10 +116,11 @@ class WellCore(AbstractWellCore):
     # `WellOrigin` is a public enum that may be persisted
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
-        well_height = self._engine_client.state.geometry.get_well_height(
-            labware_id=self.labware_id, well_name=self._name
+        return self._engine_client.state.geometry.get_well_position(
+            well_name=self._name,
+            labware_id=self._labware_id,
+            well_location=WellLocation(origin=WellOrigin.CENTER),
         )
-        return self.get_bottom(z_offset=well_height / 2)
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """Gets point in deck coordinates based on percentage of the radius of each axis."""
