@@ -5,7 +5,7 @@ from subprocess import run
 from time import time
 from typing import List, Optional, Dict, Tuple
 
-from opentrons_hardware.firmware_bindings.constants import SensorId
+from opentrons_hardware.firmware_bindings.constants import SensorId, ErrorCode
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
 from opentrons_shared_data.deck import load as load_deck
