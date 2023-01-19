@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -20,10 +19,6 @@ import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { TertiaryButton } from '../../atoms/buttons'
-import * as Networking from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
-
-import type { Dispatch } from '../../redux/types'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: ${SPACING.spacing5};
@@ -36,7 +31,7 @@ const SSID_INPUT_FIELD_STYLE = css`
 interface SetWifiCredProps {
   ssid: string
   authType: 'wpa-psk' | 'none'
-  setIsShowSelectAuthenticationType: (isShow: boolean) => void
+  setShowSelectAuthenticationType: (isShow: boolean) => void
   password: string
   setPassword: (password: string) => void
   handleConnect: () => void
@@ -45,23 +40,14 @@ interface SetWifiCredProps {
 export function SetWifiCred({
   ssid,
   authType,
-  setIsShowSelectAuthenticationType,
+  setShowSelectAuthenticationType,
   password,
   setPassword,
   handleConnect,
 }: SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const keyboardRef = React.useRef(null)
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
-  const dispatch = useDispatch<Dispatch>()
-
-  React.useEffect(() => {
-    // if securityType is none directly connect to a network without showing password form
-    authType === 'none' && handleConnect()
-    dispatch(Networking.fetchStatus(robotName))
-  }, [])
 
   return (
     <>
@@ -71,7 +57,7 @@ export function SetWifiCred({
         alignItems={ALIGN_CENTER}
         marginBottom="3.0625rem"
       >
-        <Btn onClick={() => setIsShowSelectAuthenticationType(true)}>
+        <Btn onClick={() => setShowSelectAuthenticationType(true)}>
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
               name="arrow-back"

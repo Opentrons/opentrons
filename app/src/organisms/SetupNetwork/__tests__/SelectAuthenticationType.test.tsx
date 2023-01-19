@@ -10,7 +10,7 @@ import { SetWifiCred } from '../SetWifiCred'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 
 const mockPush = jest.fn()
-const mockSetIsShowSelectAuthenticationType = jest.fn()
+const mockSetShowSelectAuthenticationType = jest.fn()
 const mockSetSelectedAuthType = jest.fn()
 const mockSetChangeState = jest.fn()
 
@@ -56,7 +56,7 @@ describe('SelectAuthenticationType', () => {
     props = {
       ssid: 'mockWifi',
       fromWifiList: undefined,
-      setIsShowSelectAuthenticationType: mockSetIsShowSelectAuthenticationType,
+      setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
       setSelectedAuthType: mockSetSelectedAuthType,
       setChangeState: mockSetChangeState,
     }
@@ -107,7 +107,7 @@ describe('SelectAuthenticationType', () => {
     const [{ getByRole }] = render(props)
     const button = getByRole('button', { name: 'Next' })
     fireEvent.click(button)
-    expect(mockSetIsShowSelectAuthenticationType).toHaveBeenCalled()
+    expect(mockSetShowSelectAuthenticationType).toHaveBeenCalled()
   })
 
   it('when tapping connect via usb button, call a mock function', () => {

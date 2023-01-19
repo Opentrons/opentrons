@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { SetWifiCred } from '../SetWifiCred'
 
-const mockSetIsShowSelectAuthenticationType = jest.fn()
+const mockSetShowSelectAuthenticationType = jest.fn()
 const mockSetPassword = jest.fn()
 const mockHandleConnect = jest.fn()
 jest.mock('../../../redux/discovery')
@@ -30,7 +30,7 @@ describe('SetWifiCred', () => {
     props = {
       ssid: 'mockWifi',
       authType: 'wpa-psk',
-      setIsShowSelectAuthenticationType: mockSetIsShowSelectAuthenticationType,
+      setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
       password: 'mock-password',
       setPassword: mockSetPassword,
       handleConnect: mockHandleConnect,
@@ -79,7 +79,7 @@ describe('SetWifiCred', () => {
     const [{ getByText }] = render(props)
     const button = getByText('Back')
     fireEvent.click(button)
-    expect(props.setIsShowSelectAuthenticationType).toHaveBeenCalled()
+    expect(props.setShowSelectAuthenticationType).toHaveBeenCalled()
   })
 
   it('should call mock function when tapping connect', () => {

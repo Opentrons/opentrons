@@ -8,8 +8,9 @@ import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { DisplayWifiList } from '../DisplayWifiList'
 
 const mockPush = jest.fn()
-const mockSetIsShowSelectAuthenticationType = jest.fn()
+const mockSetShowSelectAuthenticationType = jest.fn()
 const mockSetChangeState = jest.fn()
+const mockSetSelectedSsid = jest.fn()
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
   { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
@@ -41,8 +42,9 @@ describe('DisplayWifiList', () => {
     props = {
       list: mockWifiList,
       isSearching: true,
-      setIsShowSelectAuthenticationType: mockSetIsShowSelectAuthenticationType,
+      setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
       setChangeState: mockSetChangeState,
+      setSelectedSsid: mockSetSelectedSsid,
     }
   })
 
@@ -77,7 +79,8 @@ describe('DisplayWifiList', () => {
     const [{ getByText }] = render(props)
     const button = getByText('foo')
     fireEvent.click(button)
-    expect(props.setIsShowSelectAuthenticationType).toHaveBeenCalled()
+    expect(props.setShowSelectAuthenticationType).toHaveBeenCalled()
     expect(props.setChangeState).toHaveBeenCalled()
+    expect(props.setSelectedSsid).toHaveBeenCalled()
   })
 })

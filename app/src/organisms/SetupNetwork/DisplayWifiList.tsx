@@ -38,22 +38,30 @@ const NETWORK_ROW_STYLE = css`
 interface DisplayWifiListProps {
   list: WifiNetwork[]
   isSearching: boolean
-  setIsShowSelectAuthenticationType: (
+  setShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
   setChangeState: (changeState: NetworkChangeState) => void
+  setSelectedSsid: (selectedSsid: string) => void
 }
 
 export function DisplayWifiList({
   list,
   isSearching,
-  setIsShowSelectAuthenticationType,
+  setShowSelectAuthenticationType,
   setChangeState,
+  setSelectedSsid,
 }: DisplayWifiListProps): JSX.Element {
+  const handleClick = (nw: WifiNetwork): void => {
+    setShowSelectAuthenticationType(true)
+    setSelectedSsid(nw.ssid)
+    setChangeState({ type: CONNECT, ssid: nw.ssid, network: nw })
+  }
+
   return (
     <>
       <HeaderWithIPs isSearching={isSearching} />
-      {list.length >= 1 ? (
+      {list != null && list.length > 0 ? (
         list.map(nw => (
           <Btn
             width="59rem"
@@ -63,10 +71,7 @@ export function DisplayWifiList({
             marginBottom={SPACING.spacing3}
             borderRadius="12px"
             css={NETWORK_ROW_STYLE}
-            onClick={() => {
-              setIsShowSelectAuthenticationType(true)
-              setChangeState({ type: CONNECT, ssid: nw.ssid, network: nw })
-            }}
+            onClick={() => handleClick(nw)}
           >
             <Flex
               flexDirection={DIRECTION_ROW}

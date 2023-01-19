@@ -27,7 +27,7 @@ import { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/type
 interface SelectAuthenticationTypeProps {
   ssid: string
   fromWifiList?: boolean
-  setIsShowSelectAuthenticationType: (
+  setShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
   setSelectedAuthType: (authType: 'wpa-psk' | 'none') => void
@@ -37,7 +37,7 @@ interface SelectAuthenticationTypeProps {
 export function SelectAuthenticationType({
   ssid,
   fromWifiList,
-  setIsShowSelectAuthenticationType,
+  setShowSelectAuthenticationType,
   setSelectedAuthType,
   setChangeState,
 }: SelectAuthenticationTypeProps): JSX.Element {
@@ -107,7 +107,7 @@ export function SelectAuthenticationType({
           lineHeight="2.0425rem"
           borderRadius="42px"
           onClick={() => {
-            setIsShowSelectAuthenticationType(false)
+            setShowSelectAuthenticationType(false)
           }}
         >
           {t('shared:next')}

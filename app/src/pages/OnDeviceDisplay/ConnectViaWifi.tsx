@@ -15,7 +15,7 @@ import { getLocalRobot } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
 import {
   CONNECT,
-  JOIN_OTHER,
+  /* JOIN_OTHER, this will need for a following PR */
 } from '../../organisms/Devices/RobotSettings/ConnectNetwork/constants'
 import { DisplayWifiList } from '../../organisms/SetupNetwork/DisplayWifiList'
 import { SelectAuthenticationType } from '../../organisms/SetupNetwork/SelectAuthenticationType'
@@ -26,18 +26,17 @@ import { FailedToConnect } from '../../organisms/SetupNetwork/FailedToConnect'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import type {
-  WifiConfigureRequest,
-  NetworkChangeState,
-} from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
+import type { WifiNetwork } from '../../redux/networking/types'
+import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 
 const LIST_REFRESH_MS = 10000
 
 export function ConnectViaWifi(): JSX.Element {
   const [isSearching, setIsSearching] = React.useState<boolean>(true)
+  const [selectedSsid, setSelectedSsid] = React.useState<string>('')
   const [
-    isShowSelectAuthenticationType,
-    setIsShowSelectAuthenticationType,
+    showSelectAuthenticationType,
+    setShowSelectAuthenticationType,
   ] = React.useState<boolean>(false)
   const [selectedAuthType, setSelectedAuthType] = React.useState<
     'wpa-psk' | 'none'
@@ -45,7 +44,6 @@ export function ConnectViaWifi(): JSX.Element {
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
-
   const [password, setPassword] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -53,7 +51,6 @@ export function ConnectViaWifi(): JSX.Element {
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
   )
-
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)
@@ -64,47 +61,18 @@ export function ConnectViaWifi(): JSX.Element {
     setCurrentRequestState,
   ] = React.useState<RequestState | null>(requestState)
 
-  React.useEffect(() => {
-    dispatch(Networking.fetchWifiList(robotName))
-  }, [dispatch, robotName])
-
-  useInterval(
-    () => dispatch(Networking.fetchWifiList(robotName)),
-    LIST_REFRESH_MS,
-    true
-  )
-
-  React.useEffect(() => {
-    if (list.length >= 1) {
-      setIsSearching(false)
-    }
-  }, [list])
-
-  React.useEffect(() => {
-    setCurrentRequestState(requestState)
-  }, [requestState])
-
-  const formatNetworkOptions = (): WifiConfigureRequest => {
-    // const securityType = selectedNetwork?.securityType
-    const ssid = changeState.ssid
-    const securityType = selectedAuthType
-    const hidden = false
-    const psk = password
-
-    return {
-      ssid,
-      securityType,
-      hidden,
-      psk,
-    }
-  }
-
   const handleConnect = (): void => {
-    const options = formatNetworkOptions()
-    dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
-    if (changeState.type === JOIN_OTHER) {
-      setChangeState({ ...changeState, ssid: options.ssid })
+    const options = {
+      ssid: selectedSsid,
+      securityType: selectedAuthType,
+      hidden: selectedAuthType === 'none' && false,
+      psk: password,
     }
+    dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
+    // Note: kj 1/18/2023 for join_other network , this will be required by a following PR
+    // if (changeState.type === JOIN_OTHER) {
+    //   setChangeState({ type: changeState.type, ssid: options.ssid })
+    // }
     setPassword('')
   }
 
@@ -114,16 +82,17 @@ export function ConnectViaWifi(): JSX.Element {
         <DisplayWifiList
           list={list}
           isSearching={isSearching}
-          setIsShowSelectAuthenticationType={setIsShowSelectAuthenticationType}
+          setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setChangeState={setChangeState}
+          setSelectedSsid={setSelectedSsid}
         />
       )
-    } else if (changeState.type === CONNECT && isShowSelectAuthenticationType) {
+    } else if (showSelectAuthenticationType) {
       return (
         <SelectAuthenticationType
-          ssid={changeState.ssid}
+          ssid={selectedSsid}
           fromWifiList={true}
-          setIsShowSelectAuthenticationType={setIsShowSelectAuthenticationType}
+          setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setSelectedAuthType={setSelectedAuthType}
           setChangeState={setChangeState}
         />
@@ -134,9 +103,7 @@ export function ConnectViaWifi(): JSX.Element {
         return (
           <SetWifiCred
             ssid={changeState.ssid}
-            setIsShowSelectAuthenticationType={
-              setIsShowSelectAuthenticationType
-            }
+            setShowSelectAuthenticationType={setShowSelectAuthenticationType}
             authType={selectedAuthType}
             password={password}
             setPassword={setPassword}
@@ -168,6 +135,37 @@ export function ConnectViaWifi(): JSX.Element {
       return null
     }
   }
+
+  React.useEffect(() => {
+    dispatch(Networking.fetchWifiList(robotName))
+  }, [dispatch, robotName])
+
+  useInterval(
+    () => dispatch(Networking.fetchWifiList(robotName)),
+    LIST_REFRESH_MS,
+    true
+  )
+
+  React.useEffect(() => {
+    if (list != null && list.length > 0) {
+      setIsSearching(false)
+    }
+  }, [list])
+
+  React.useEffect(() => {
+    setCurrentRequestState(requestState)
+  }, [requestState])
+
+  React.useEffect(() => {
+    // a user selects none as authType
+    if (selectedSsid !== '' && selectedAuthType === 'none') {
+      const network = list.find((nw: WifiNetwork) => nw.ssid === selectedSsid)
+      if (network != null) {
+        handleConnect()
+        setChangeState({ type: CONNECT, ssid: selectedSsid, network })
+      }
+    }
+  }, [selectedSsid, selectedAuthType])
 
   return (
     <>
