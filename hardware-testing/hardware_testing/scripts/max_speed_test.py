@@ -1,4 +1,4 @@
-"""OT3 Single Axis Movement Test."""
+"""OT3 Speed and Acceleration Profile Test."""
 import argparse
 import asyncio
 import csv
@@ -18,7 +18,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 MOUNT = OT3Mount.LEFT
-LOAD = GantryLoad.NONE
+# LOAD = GantryLoad.NONE
+# LOAD = GantryLoad.LOW_THROUGHPUT
+LOAD = GantryLoad.TWO_LOW_THROUGHPUT
 CYCLES = 1
 SPEED_X = 500
 SPEED_Z = 200
@@ -26,8 +28,23 @@ SPEED_Z = 200
 SPEED_Y = 500
 ACCEL_Y = 500
 
+#X SETTINGS
 MAX_ACCEL = 3000
+ACCEL_INC = 200
 MAX_SPEED = 1000
+SPEED_INC = 50
+
+#Y Settings
+# MAX_ACCEL = 2500
+# ACCEL_INC = 100
+# MAX_SPEED = 800
+# SPEED_INC = 25
+
+#Z Settings
+# MAX_ACCEL = 800
+# ACCEL_INC = 200
+# MAX_SPEED = 140
+# SPEED_INC = 10
 
 
 SETTINGS = {
@@ -118,6 +135,10 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
+        print('Executing Move:')
+        print('Speed: ' + str(cur_speed))
+        print('Acceleration: ' + str(SETTINGS[AXIS_MAP[axis]].acceleration))
+
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[axis], speed=cur_speed)
 
         move_pos = await api.encoder_current_position_ot3(mount=MOUNT)
@@ -162,16 +183,17 @@ async def _main(is_simulating: bool) -> None:
             initial_accel = SETTINGS[AXIS_MAP[a]].acceleration
             valid_speed = True
             valid_accel = True
-            while(SETTINGS[AXIS_MAP[a]].max_speed < MAX_SPEED):
-                while(SETTINGS[AXIS_MAP[a]].acceleration < MAX_ACCEL):
+            while(SETTINGS[AXIS_MAP[a]].max_speed <= MAX_SPEED):
+                while(SETTINGS[AXIS_MAP[a]].acceleration <= MAX_ACCEL):
                     #update the robot settings to use test speed/accel
                     await match_z_settings(a,
                                      SETTINGS[AXIS_MAP[a]].max_speed,
                                      SETTINGS[AXIS_MAP[a]].acceleration)
+
                     await set_gantry_load_per_axis_settings_ot3(api,
                                                     SETTINGS,
-                                                    load=None)
-
+                                                    load=LOAD)
+                    # print(api.config.motion_settings.default_max_speed)
                     #attempt to cycle with the test settings
                     await api.home([AXIS_MAP[a]])
                     move_output_tuple = await _single_axis_move(a,
@@ -205,13 +227,13 @@ async def _main(is_simulating: bool) -> None:
                                          'cycles': cycles_completed})
 
                     #increment to the next acceleration
-                    SETTINGS[AXIS_MAP[a]].acceleration = cur_accel + 250
+                    SETTINGS[AXIS_MAP[a]].acceleration = cur_accel + ACCEL_INC
 
                 #increment to the next speed
                 SETTINGS[AXIS_MAP[a]].acceleration = initial_accel
                 valid_accel = True
                 cur_speed = SETTINGS[AXIS_MAP[a]].max_speed
-                SETTINGS[AXIS_MAP[a]].max_speed = cur_speed + 25
+                SETTINGS[AXIS_MAP[a]].max_speed = cur_speed + SPEED_INC
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     finally:
