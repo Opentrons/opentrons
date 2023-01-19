@@ -217,7 +217,7 @@ class Well:
     @requires_version(2, 13)
     def load_liquid(self, liquid: LoadedLiquid, volume: float) -> None:
         """
-        Load a liquid into a labware.
+        Load a liquid into a well.
 
         :param liquid: The type of liquid to load into the well.
         :param volume: The volume of liquid to load, in µL.
