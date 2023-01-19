@@ -47,7 +47,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         gripper_id: str,
     ) -> None:
         self._config = config
-        self._name = "gripper"  # TODO: evaluate if this is necessary
         self._model = config.model
 
         geometry = self._config.geometry
@@ -222,7 +221,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     def as_dict(self) -> GripperDict:
         d: GripperDict = {
-            "name": self._name,
             "model": self._config.model,
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
