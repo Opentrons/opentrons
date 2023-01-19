@@ -133,10 +133,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         raise NotImplementedError("Update config is not supported at this time.")
 
     @property
-    def name(self) -> str:
-        return self._name
-
-    @property
     def model(self) -> GripperModel:
         return self._model
 
