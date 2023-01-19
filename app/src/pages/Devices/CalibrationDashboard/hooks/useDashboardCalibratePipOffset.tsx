@@ -2,10 +2,11 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { SpinnerModalPage } from '@opentrons/components'
-
 import { Portal } from '../../../../App/portal'
+import { ModalShell } from '../../../../molecules/Modal'
+import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibratePipetteOffset } from '../../../../organisms/CalibratePipetteOffset'
+import { LoadingState } from '../../../../organisms/CalibrationPanels'
 import * as RobotApi from '../../../../redux/robot-api'
 import * as Sessions from '../../../../redux/sessions'
 import { getPipetteOffsetCalibrationSession } from '../../../../redux/sessions/pipette-offset-calibration/selectors'
@@ -49,7 +50,7 @@ export function useDashboardCalibratePipOffset(
   const jogRequestId = React.useRef<string | null>(null)
   const spinnerRequestId = React.useRef<string | null>(null)
   const dispatch = useDispatch()
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation('robot_calibration')
 
   const pipOffsetCalSession: PipetteOffsetCalibrationSession | null = useSelector(
     (state: State) => {
@@ -170,16 +171,17 @@ export function useDashboardCalibratePipOffset(
   let Wizard: JSX.Element | null = (
     <Portal level="top">
       {startingSession ? (
-        <SpinnerModalPage
-          titleBar={{
-            title: t('pipette_offset_calibration'),
-            back: {
-              disabled: true,
-              title: t('shared:exit'),
-              children: t('shared:exit'),
-            },
-          }}
-        />
+        <ModalShell
+          width="47rem"
+          header={
+            <WizardHeader
+              title={t('pipette_offset_calibration')}
+              onExit={() => {}}
+            />
+          }
+        >
+          <LoadingState />
+        </ModalShell>
       ) : (
         <CalibratePipetteOffset
           session={pipOffsetCalSession}

@@ -3,6 +3,7 @@ import uniqueId from 'lodash/uniqueId'
 import { mountWithStore, renderWithProviders } from '@opentrons/components'
 import { act } from 'react-dom/test-utils'
 
+import { LoadingState } from '../../../../../organisms/CalibrationPanels'
 import * as RobotApi from '../../../../../redux/robot-api'
 import * as Sessions from '../../../../../redux/sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../../../redux/sessions/__fixtures__'
@@ -146,5 +147,33 @@ describe('useDashboardCalibratePipOffset hook', () => {
     wrapper.setProps({})
     expect(CalWizardComponent).toBe(null)
     expect(onComplete).toHaveBeenCalled()
+  })
+
+  it('loading state modal should appear while session is being created', () => {
+    const seshId = 'fake-session-id'
+    const mockDeckCalSession = {
+      id: seshId,
+      ...mockPipetteOffsetCalibrationSessionAttributes,
+      details: {
+        ...mockPipetteOffsetCalibrationSessionAttributes.details,
+        currentStep: Sessions.PIP_OFFSET_STEP_SESSION_STARTED,
+      },
+    }
+    const { wrapper } = mountWithStore(<TestUseDashboardCalibratePipOffset />, {
+      initialState: { robotApi: {} },
+    })
+    mockGetRobotSessionOfType.mockReturnValue(mockDeckCalSession)
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.PENDING,
+    })
+    act(() =>
+      startCalibration({
+        params: { mount: mountString },
+        withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
+      })
+    )
+    wrapper.setProps({})
+    expect(CalWizardComponent).not.toBe(null)
+    expect(LoadingState).not.toBe(null)
   })
 })

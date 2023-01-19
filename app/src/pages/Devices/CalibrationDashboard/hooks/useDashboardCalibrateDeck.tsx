@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import { Portal } from '../../../../App/portal'
+import { ModalShell } from '../../../../molecules/Modal'
+import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibrateDeck } from '../../../../organisms/CalibrateDeck'
+import { LoadingState } from '../../../../organisms/CalibrationPanels'
 import * as RobotApi from '../../../../redux/robot-api'
 import * as Sessions from '../../../../redux/sessions'
 import { getDeckCalibrationSession } from '../../../../redux/sessions/deck-calibration/selectors'
@@ -25,6 +29,7 @@ export function useDashboardCalibrateDeck(
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
+  const { t } = useTranslation('robot_calibration')
 
   const deckCalSession: DeckCalibrationSession | null = useSelector(
     (state: State) => {
@@ -91,13 +96,24 @@ export function useDashboardCalibrateDeck(
 
   let Wizard: JSX.Element | null = (
     <Portal level="top">
-      <CalibrateDeck
-        session={deckCalSession}
-        robotName={robotName}
-        showSpinner={showSpinner}
-        dispatchRequests={dispatchRequests}
-        isJogging={isJogging}
-      />
+      {startingSession ? (
+        <ModalShell
+          width="47rem"
+          header={
+            <WizardHeader title={t('deck_calibration')} onExit={() => {}} />
+          }
+        >
+          <LoadingState />
+        </ModalShell>
+      ) : (
+        <CalibrateDeck
+          session={deckCalSession}
+          robotName={robotName}
+          showSpinner={showSpinner}
+          dispatchRequests={dispatchRequests}
+          isJogging={isJogging}
+        />
+      )}
     </Portal>
   )
 
