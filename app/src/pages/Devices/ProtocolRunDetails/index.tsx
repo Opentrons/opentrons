@@ -197,8 +197,8 @@ function PageContents(props: PageContentsProps) {
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
-    'run-log': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} />,
-    'analyzed-steps': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} />,
+    'run-preview': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} />,
+    'run-preview': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} />,
   }
 
   const protocolRunDetailsContent = protocolRunDetailsContentByTab[
@@ -271,7 +271,7 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
       />
       {currentRunId !== runId ? (
         // redirect to run log if not current run
-        <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-log`} />
+        <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`} />
       ) : null}
     </>
   )
@@ -312,7 +312,7 @@ const ModuleControlsTab = (
       />
       {disabled ? (
         // redirect to run log if not current run
-        <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-log`} />
+        <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`} />
       ) : null}
     </>
   )
@@ -328,7 +328,7 @@ const AnalyzedStepsTab = (props: SetupTabProps): JSX.Element | null => {
     <RoundTab
       id="ProtocolRunDetails_analyzedStepsTab"
       disabled={robotSideAnalysis == null}
-      to={`/devices/${robotName}/protocol-runs/${runId}/analyzed-steps`}
+      to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
       tabName={t('analyzed_steps')}
     />
   )

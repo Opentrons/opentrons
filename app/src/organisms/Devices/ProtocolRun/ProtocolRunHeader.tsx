@@ -175,7 +175,7 @@ export function ProtocolRunHeader({
   // redirect to new run after successful reset
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
-      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
+      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
 
   const { pause } = useRunControls(runId, onResetSuccess)
@@ -359,7 +359,7 @@ function ActionButton(props: ActionButtonProps) {
     (createRunResponse: Run): void =>
       // redirect to new run after successful reset
       history.push(
-        `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
+        `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
       )
   )
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)

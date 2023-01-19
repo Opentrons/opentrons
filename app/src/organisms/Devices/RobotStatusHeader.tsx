@@ -66,7 +66,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
-            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-log'
+            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
           }`}
           id={`RobotStatusHeader_${String(name)}_goToRun`}
         >
