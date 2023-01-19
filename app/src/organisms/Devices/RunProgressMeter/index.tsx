@@ -1,21 +1,28 @@
 import * as React from 'react'
 import { RunTimeCommand } from '@opentrons/shared-data'
+import { css } from 'styled-components'
 import {
   Flex,
+  Icon,
   useHoverTooltip,
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   COLORS,
+  BORDERS,
+  SPACING,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { Tooltip } from '../../../atoms/Tooltip'
 import { Portal } from '../../../App/portal'
 import { ProgressBar } from '../../../atoms/ProgressBar'
+import { StyledText } from '../../../atoms/text'
+import { useTranslation } from 'react-i18next'
+import type { IconName } from '@opentrons/components'
 
 interface RunProgressMeterProps {
   analysisCommands: RunTimeCommand[]
-  ticks: Array<{ index: number, count: number }>
+  ticks: Array<{ index: number, count: number, range: number }>
   makeHandleJumpToStep: (i: number) => () => void
   currentRunCommandIndex: number
 }
@@ -23,22 +30,56 @@ interface RunProgressMeterProps {
 export function RunProgressMeter(props: RunProgressMeterProps) {
   const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      {/* <Flex width="100%" height="6px" borderRadius="3px" backgroundColor={COLORS.medGreyEnabled} />
-      <Flex marginTop="-6px" width={`${((currentRunCommandIndex + 1) / analysisCommands.length) * 100}%`} height="6px" borderRadius="3px" backgroundColor={COLORS.darkBlackEnabled} /> */}
-      <ProgressBar percentComplete={((currentRunCommandIndex + 1) / analysisCommands.length) * 100} />
-        {ticks.map((tick) => (
-          <Tick {...{ ...tick, makeHandleJumpToStep }} total={analysisCommands.length} />
-        ))}
-      </Flex>
-    </Flex>
+    <ProgressBar
+      percentComplete={currentRunCommandIndex > 0 ? ((currentRunCommandIndex + 1) / analysisCommands.length) * 100 : 0}
+      outerStyles={css`
+        height: 0.375rem;
+        background-color: ${COLORS.medGreyEnabled};
+        border-radius: ${BORDERS.radiusSoftCorners};
+        position: relative;
+        overflow: initial;
+      `}
+      innerStyles={css`
+        height: 0.375rem;
+        background-color: ${COLORS.darkBlackEnabled};
+        border-radius: ${BORDERS.radiusSoftCorners};
+      `}
+    >
+      {ticks.map((tick) => (
+        <Tick {...{ ...tick, makeHandleJumpToStep, firstCommandType: analysisCommands[tick.index]?.commandType }} total={analysisCommands.length} />
+      ))}
+    </ProgressBar>
   )
 }
 
-function Tick(props: { index: number, count: number, makeHandleJumpToStep: (i: number) => () => void, total: number }) {
-  const { index, count, makeHandleJumpToStep, total } = props
+interface TickProps {
+  index: number,
+  count: number,
+  range: number,
+  firstCommandType: RunTimeCommand['commandType'],
+  makeHandleJumpToStep: (i: number) => () => void,
+  total: number
+}
+
+function Tick(props: TickProps) {
+  const { index, count, range, firstCommandType, makeHandleJumpToStep, total } = props
+  const { t } = useTranslation('run_details')
+
+  const tKeyByCommandType: { [commandType in RunTimeCommand['commandType']]?: string } = {
+    waitForResume: 'pause',
+    moveLabware: 'move_labware',
+  }
+  const iconByCommandType: { [commandType in RunTimeCommand['commandType']]?: IconName } = {
+    waitForResume: 'pause-slim',
+    moveLabware:  'move-xy',
+  }
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isAggregatedTick = count > 1
+  const percent = (index / (total - 1)) * 100
+  const stepNumber = index + 1
+
+  const commandTKey = (firstCommandType in tKeyByCommandType && tKeyByCommandType[firstCommandType] != null) ? tKeyByCommandType[firstCommandType] ?? null : null
+  const iconName = (firstCommandType in iconByCommandType && iconByCommandType[firstCommandType] != null) ? iconByCommandType[firstCommandType] ?? null : null
   return (
     <Flex
       {...targetProps}
@@ -50,13 +91,30 @@ function Tick(props: { index: number, count: number, makeHandleJumpToStep: (i: n
       border={`${COLORS.blueEnabled} 1px solid`}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      height="13px"
-      padding="2px"
+      height="0.75rem"
+      width={isAggregatedTick ? "0.75rem" : "0.25rem"}
       position="absolute"
-      left={`calc(${((index + 1) / total) * 100}% - 2rem + 1px - ${(isAggregatedTick ? 13.156 : 6)}px)`}
+      top="-50%"
+      left={`${percent}%`}
+      transform={`translateX(-${percent}%)`}
     >
-      {isAggregatedTick ? count : null}
-      <Portal><Tooltip tooltipProps={tooltipProps}>{count}</Tooltip></Portal>
+      <StyledText as="h6">{isAggregatedTick ? count : null}</StyledText>
+      <Portal>
+        <Tooltip tooltipProps={tooltipProps}>
+          <Flex padding={SPACING.spacing2} gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+            {!isAggregatedTick && iconName != null ? <Icon name={iconName} size={SPACING.spacingM} /> : null}
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="label">
+                {t('step_number', { step_number: isAggregatedTick ? `${stepNumber} - ${stepNumber + range}` : stepNumber })}
+              </StyledText>
+              <StyledText as="label">
+                {commandTKey != null ? t(commandTKey) : null}
+              </StyledText>
+              {isAggregatedTick ? <StyledText>{t('plus_more', { count })}</StyledText> : null}
+            </Flex>
+          </Flex>
+        </Tooltip>
+      </Portal>
     </Flex>
   )
 }

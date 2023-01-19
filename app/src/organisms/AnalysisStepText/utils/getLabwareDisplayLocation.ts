@@ -1,5 +1,5 @@
 import { getLoadedLabware } from "./accessors"
-import { CompletedProtocolAnalysis, getModuleDisplayName, getModuleType, getOccludedSlotCountForModule, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis, FIXED_TRASH_ID, getModuleDisplayName, getModuleType, getOccludedSlotCountForModule, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 import { TFunction } from "react-i18next"
 import { getModuleDisplayLocation } from "./getModuleDisplayLocation"
 import { getModuleModel } from "./getModuleModel"

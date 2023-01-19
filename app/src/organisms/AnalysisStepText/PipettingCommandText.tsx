@@ -69,6 +69,13 @@ export const PipettingCommandText = ({
     }
     case 'dropTip': {
       const { wellName, labwareId } = command.params
+
+      console.log('drop_tip', {
+        command: command,
+        well_name: wellName,
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
+      })
       commandText = t('drop_tip', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),

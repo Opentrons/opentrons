@@ -107,5 +107,7 @@
   "view_analysis_error_details": "View <errorLink>error details</errorLink>",
   "off_deck": "Off deck",
   "left": "Left",
-  "right": "Right"
+  "right": "Right",
+  "step_number": "Step {{step_number}}:",
+  "plus_more": "+{{count}} more"
 }

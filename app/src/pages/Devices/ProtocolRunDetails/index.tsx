@@ -44,7 +44,6 @@ import type {
 import type { Dispatch } from '../../../redux/types'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ViewportListRef } from 'react-viewport-list'
-import { assertCatchClause } from '@babel/types'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}

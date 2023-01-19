@@ -9,10 +9,12 @@ import {
   styleProps,
 } from '@opentrons/components'
 
-interface SecondaryButtonProps extends React.ComponentProps<typeof Btn>{
+interface SecondaryButtonProps extends React.ComponentProps<typeof Btn> {
   isDangerous?: boolean
 }
-export const SecondaryButton = styled(Btn)<SecondaryButtonProps>`
+export const SecondaryButton = styled(Btn).withConfig({
+  shouldForwardProp: p => p !== 'isDangerous'
+}) <SecondaryButtonProps>`
   color: ${props => props.isDangerous ? COLORS.errorText : COLORS.blueEnabled};
   border: ${BORDERS.lineBorder};
   border-color: ${props => props.isDangerous ? COLORS.errorEnabled : 'initial'};

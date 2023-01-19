@@ -1,20 +1,22 @@
 import * as React from 'react'
-import { css, FlattenInterpolation } from 'styled-components'
-
+import { css } from 'styled-components'
 import { COLORS, Box } from '@opentrons/components'
-import type { StyleProps } from '@opentrons/components'
+
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 interface ProgressBarProps {
   /** the completed progress the range 0-100  */
   percentComplete: number
-  outerStyleProps: FlattenSimpleInterpolation
-  innerStyleProps: StyleProps
+  outerStyles?: FlattenSimpleInterpolation
+  innerStyles?: FlattenSimpleInterpolation
+  children?: React.ReactNode
 }
 
 export function ProgressBar({
   percentComplete,
-  outerStyleProps,
-  innerStyleProps,
+  outerStyles,
+  innerStyles,
+  children
 }: ProgressBarProps): JSX.Element {
   const ratio = percentComplete / 100
   const progress = ratio > 1 ? '100%' : `${String(ratio * 100)}%`
@@ -27,19 +29,22 @@ export function ProgressBar({
     margin: 0;
     overflow: hidden;
     border-radius: 0;
-    ${outerStyleProps}
+    ${outerStyles}
   `
 
   const LINER_PROGRESS_FILLER_STYLE = css`
     height: 0.5rem;
     width: ${progress};
     background: ${COLORS.blueEnabled};
-    transition: ${progress} 1s ease-in-out;
+    transition: width 0.5s ease-in-out;
+    webkit-transition: width 0.5s ease-in-out;
+    moz-transition: width 0.5s ease-in-out;
+    o-transition: width 0.5s ease-in-out;
     display: flex;
     align-items: center;
     justify-content: right;
     border-radius: inherit;
-    ${innerStyleProps}
+    ${innerStyles}
   `
 
   return (
@@ -51,7 +56,8 @@ export function ProgressBar({
       <Box
         css={LINER_PROGRESS_FILLER_STYLE}
         data-testid="ProgressBar_Bar"
-      ></Box>
+      />
+      {children}
     </Box>
   )
 }
