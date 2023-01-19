@@ -47,7 +47,7 @@ export function SetWifiSsid({
   setChangeState,
 }: SetWifiSsidProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const [inputSsid, setInputSsid] = React.useState<string>('') // Need to remove since need to pass typed ssid
+  const [inputSsid, setInputSsid] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
 
   const handleNext = (): void => {
