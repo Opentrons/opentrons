@@ -15,7 +15,7 @@ from .instrument_context import InstrumentContextSimulation
 logger = logging.getLogger(__name__)
 
 
-class ProtocolContextSimulation(
+class LegacyProtocolCoreSimulator(
     LegacyProtocolCore,
     AbstractProtocol[InstrumentContextSimulation, LegacyLabwareCore, LegacyModuleCore],
 ):
