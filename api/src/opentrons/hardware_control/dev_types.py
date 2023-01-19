@@ -97,7 +97,6 @@ class PipetteDict(InstrumentDict):
 
 
 class GripperDict(InstrumentDict):
-    name: str
     model: GripperModel
     gripper_id: str
     state: GripperJawState  # Can we call this jaw_state?

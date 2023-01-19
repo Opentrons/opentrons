@@ -91,7 +91,6 @@ async def test_get_all_attached_instruments(
     """It should get data of all attached instruments."""
     decoy.when(ot3_hardware_api.attached_gripper).then_return(
         {
-            "name": "gripper",
             "model": GripperModel.v1,
             "gripper_id": "GripperID321",
             "display_name": "my-special-gripper",
@@ -147,7 +146,6 @@ async def test_get_all_attached_instruments(
         Gripper.construct(
             mount="extension",
             instrumentType="gripper",
-            instrumentName="gripper",
             instrumentModel=GripperModel.v1,
             serialNumber="GripperID321",
             data=GripperData(
