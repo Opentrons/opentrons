@@ -64,14 +64,18 @@ export function ProtocolRunProgressMeter(props: ProtocolRunProgressMeterProps) {
   }, [])
   const countOfTotalText = currentRunCommandIndex < 0 || currentRunCommandIndex === analysisCommands.length - 1 ? '' : ` ${currentRunCommandIndex + 1}/${analysisCommands.length}`
 
+  const hasCurrentCommand = analysis != null && analysisCommands[currentRunCommandIndex] != null
+  const statusPlaceholder = runStatus === RUN_STATUS_IDLE && !hasCurrentCommand ? t('not_started_yet') : t('protocol_completed')
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex gridGap={SPACING.spacing3}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t('current_step')}${countOfTotalText}: `}</StyledText>
           <StyledText as="h2">
-            {analysis != null && analysisCommands[currentRunCommandIndex] != null? <AnalysisStepText robotSideAnalysis={analysis} command={analysisCommands[currentRunCommandIndex]} /> : null}
+            {hasCurrentCommand
+              ? <AnalysisStepText robotSideAnalysis={analysis} command={analysisCommands[currentRunCommandIndex]} />
+              : statusPlaceholder}
           </StyledText>
         </Flex>
       </Flex>

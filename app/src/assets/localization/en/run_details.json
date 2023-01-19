@@ -74,7 +74,7 @@
   "protocol_start": "Protocol start",
   "protocol_end": "Protocol end",
   "total_elapsed_time": "Total elapsed time",
-  "analyzed_steps": "Analyzed Steps",
+  "run_preview": "Run Preview",
   "run": "Run",
   "setup": "Setup",
   "status": "Status",
@@ -111,5 +111,6 @@
   "step_number": "Step {{step_number}}:",
   "plus_more": "+{{count}} more",
   "pause": "Pause",
-  "move_labware": "Move Labware"
+  "move_labware": "Move Labware",
+  "not_started_yet": "Not started yet"
 }

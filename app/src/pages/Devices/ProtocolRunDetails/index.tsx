@@ -329,7 +329,7 @@ const AnalyzedStepsTab = (props: SetupTabProps): JSX.Element | null => {
       id="ProtocolRunDetails_analyzedStepsTab"
       disabled={robotSideAnalysis == null}
       to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
-      tabName={t('analyzed_steps')}
+      tabName={t('run_preview')}
     />
   )
 }
