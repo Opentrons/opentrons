@@ -53,18 +53,7 @@ export function HistoricalProtocolRunOverflowMenu(
     onClickOutside: () => setShowOverflowMenu(false),
   })
 
-  const commands = useAllCommandsQuery(
-    runId,
-    { cursor: 0, pageLength: RUN_LOG_WINDOW_SIZE },
-    { staleTime: Infinity }
-  )
-  const runTotalCommandCount = commands?.data?.meta?.totalLength ?? 0
-
-  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
-    robotName,
-    runId,
-    runTotalCommandCount
-  )
+  
 
   return (
     <Flex
@@ -82,8 +71,7 @@ export function HistoricalProtocolRunOverflowMenu(
             <MenuDropdown
               {...props}
               closeOverflowMenu={handleOverflowClick}
-              downloadRunLog={downloadRunLog}
-              isRunLogLoading={isRunLogLoading}
+              runId={runId}
             />
           </Box>
           {menuOverlay}
@@ -95,20 +83,16 @@ export function HistoricalProtocolRunOverflowMenu(
 
 interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   closeOverflowMenu: React.MouseEventHandler<HTMLButtonElement>
-  downloadRunLog: () => void
-  isRunLogLoading: boolean
+  runId: string
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const history = useHistory()
-
   const {
     runId,
     robotName,
     robotIsBusy,
     closeOverflowMenu,
-    downloadRunLog,
-    isRunLogLoading,
   } = props
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
@@ -130,6 +114,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
+
+  const commands = useAllCommandsQuery( runId, { cursor: 0, pageLength: 0}, { staleTime: Infinity })
+  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog( robotName, runId, commands?.data?.meta?.totalLength ?? 0)
 
   const handleResetClick: React.MouseEventHandler<HTMLButtonElement> = (
     e
