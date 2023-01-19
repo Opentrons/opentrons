@@ -100,10 +100,11 @@ async def build_async_ot3_hardware_api(
     use_defaults: Optional[bool] = True,
     pipette_left: Optional[str] = None,
     pipette_right: Optional[str] = None,
+    ignored_errors: Optional[List[ErrorCode]] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
-    kwargs = {"config": config}
+    kwargs = {"config": config, "ignored_errors": ignored_errors}
     if is_simulating:
         builder = OT3API.build_hardware_simulator
         # TODO (andy s): add ability to simulate:

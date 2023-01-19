@@ -33,7 +33,7 @@ from .ot3utils import (
     PipetteAction,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, ErrorCode
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -550,3 +550,7 @@ class OT3Simulator:
     ) -> List[float]:
         self._position[axis_to_node(moving)] += distance_mm
         return []
+
+    def messenger_ignore_errors(self, errors: List[ErrorCode]) -> None:
+        # simulator doesn't use messenger for now so just stash these
+        self._ignored_errors = errors

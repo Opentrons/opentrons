@@ -38,7 +38,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
-
+from opentrons_hardware.firmware_bindings.constants import ErrorCode
 from .util import use_or_initialize_loop, check_motion_bounds
 
 from .instruments.ot3.pipette import (
@@ -244,6 +244,7 @@ class OT3API(
         config: Union[OT3Config, RobotConfig, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        ignored_errors: Optional[List[ErrorCode]] = None,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -252,6 +253,10 @@ class OT3API(
         else:
             checked_config = config
         backend = await OT3Controller.build(checked_config)
+
+        if ignored_errors is not None:
+            backend.messenger_ignore_errors(ignored_errors)
+
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
@@ -271,6 +276,7 @@ class OT3API(
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        ignored_errors: Optional[List[ErrorCode]] = None,
     ) -> "OT3API":
         """Build a simulating hardware controller.
 
@@ -293,6 +299,10 @@ class OT3API(
             checked_loop,
             strict_attached_instruments,
         )
+
+        if ignored_errors is not None:
+            backend.messenger_ignore_errors(ignored_errors)
+
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(

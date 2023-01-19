@@ -71,6 +71,7 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
+    ErrorCode,
 )
 from opentrons_hardware import firmware_update
 
@@ -915,3 +916,6 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
+
+    def messenger_ignore_errors(self, errors: List[ErrorCode]) -> None:
+        self._messenger.set_ignore_errors(errors)

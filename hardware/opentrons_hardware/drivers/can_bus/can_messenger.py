@@ -178,6 +178,7 @@ class CanMessenger:
             Tuple[MessageListenerCallback, Optional[MessageListenerCallbackFilter]],
         ] = {}
         self._task: Optional[asyncio.Task[None]] = None
+        self._ignored: List[ErrorCode] = []
 
     async def send(self, node_id: NodeId, message: MessageDefinition) -> None:
         """Send a message."""
@@ -311,6 +312,9 @@ class CanMessenger:
         err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
         error_payload: ErrorMessagePayload = err_msg.payload
         err_msg.log_error(log)
+        if ErrorCode(error_payload.error_code.value) in self._ignored:
+            # Short circuit ignored errors
+            return
         if error_payload.severity.value == ErrorSeverity.unrecoverable:
             await self.send(NodeId.broadcast, StopRequest())
 
@@ -323,6 +327,10 @@ class CanMessenger:
                 ErrorCode(error_payload.error_code.value),
                 ErrorSeverity(error_payload.severity.value),
             )
+
+    def set_ignore_errors(self, errors: List[ErrorCode]) -> None:
+        """Set certain errors to be ignored."""
+        self._ignored = errors
 
 
 class WaitableCallback:
