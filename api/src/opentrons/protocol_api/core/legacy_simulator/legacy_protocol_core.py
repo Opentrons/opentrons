@@ -10,7 +10,7 @@ from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ..legacy.legacy_module_core import LegacyModuleCore
 from ..legacy.load_info import InstrumentLoadInfo
 
-from .instrument_context import LegacyInstrumentCoreSimulator
+from .legacy_instrument_core import LegacyInstrumentCoreSimulator
 
 logger = logging.getLogger(__name__)
 

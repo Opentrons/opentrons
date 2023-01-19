@@ -19,7 +19,7 @@ from ..legacy.legacy_well_core import LegacyWellCore
 
 
 if TYPE_CHECKING:
-    from .protocol_context import LegacyProtocolCoreSimulator
+    from .legacy_protocol_core import LegacyProtocolCoreSimulator
 
 
 _log = logging.getLogger()

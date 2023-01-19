@@ -13,10 +13,10 @@ from opentrons.protocol_api.core.legacy.labware_offset_provider import (
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
-from opentrons.protocol_api.core.legacy_simulator.instrument_context import (
+from opentrons.protocol_api.core.legacy_simulator.legacy_instrument_core import (
     LegacyInstrumentCoreSimulator,
 )
-from opentrons.protocol_api.core.legacy_simulator.protocol_context import (
+from opentrons.protocol_api.core.legacy_simulator.legacy_protocol_core import (
     LegacyProtocolCoreSimulator,
 )
 
