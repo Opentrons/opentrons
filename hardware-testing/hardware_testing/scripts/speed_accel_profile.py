@@ -232,7 +232,7 @@ GANTRY_LOAD_MAP = {'NONE': GantryLoad.NONE,
 
 step_x = 530
 step_y = 400
-step_z = 180
+step_z = 200
 POINT_MAP = {'Y': Point(y=step_y),
              'X': Point(x=step_x),
              'L': Point(z=step_z),
@@ -269,7 +269,7 @@ def check_move_error(delta_move, point_delta, axis):
 async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
     avg_error = []
     for c in range(cycles):
-        if(AXIS == 'L'):
+        if(axis == 'L'):
             MOUNT = OT3Mount.LEFT
         else:
             MOUNT = OT3Mount.RIGHT
@@ -277,12 +277,14 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
         print('Executing Move:')
-        print('Speed: ' + str(cur_speed))
-        print('Acceleration: ' + str(SETTINGS[AXIS_MAP[axis]].acceleration))
+        print(' Speed - ' + str(cur_speed))
+        print(' Acceleration - ' + str(SETTINGS[AXIS_MAP[axis]].acceleration))
 
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[axis], speed=cur_speed)
 
         move_pos = await api.encoder_current_position_ot3(mount=MOUNT)
+        print("inital_pos: " + str(inital_pos))
+        print("mov_pos: " + str(move_pos))
         delta_move_pos = get_pos_delta(move_pos, inital_pos)
         delta_move_axis = delta_move_pos[AXIS_MAP[axis]]
         move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[axis], axis)
