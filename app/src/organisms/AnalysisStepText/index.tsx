@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
+  Icon,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
@@ -53,7 +54,6 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
           <Flex
             textTransform={TYPOGRAPHY.textTransformUppercase}
             padding={SPACING.spacing2}
-            id="RunDetails_CommandList"
           >
             {t('comment')}
           </Flex>
@@ -65,7 +65,12 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
 
     case 'pause':
     case 'waitForResume': {
-      messageNode = command.params?.message ?? t('wait_for_resume')
+      messageNode = (
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+          <Icon name="pause-circle" size={SPACING.spacingM} />
+          {command.params?.message && command.params.message !== '' ? command.params.message : t('wait_for_resume')}
+        </Flex>
+      )
       break
     }
 
@@ -134,7 +139,7 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
       messageNode = t('setting_hs_temp', { temp: celsius })
       break
     }
-    
+
     case 'heaterShaker/setAndWaitForShakeSpeed': {
       const { rpm } = command.params
       messageNode = t('set_and_await_hs_shake', { rpm: rpm })
@@ -172,7 +177,7 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
       })
       break
     }
-    
+
     case 'touchTip':
     case 'home':
     case 'savePosition':

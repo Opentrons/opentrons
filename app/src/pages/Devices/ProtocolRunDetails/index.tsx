@@ -80,9 +80,9 @@ const RoundNavLink = styled(NavLink)`
       display: ${DISPLAY_BLOCK};
       content: '';
       background-color: ${COLORS.white};
-      top: 100;
+      bottom: -1px;
       left: 0;
-      height: ${SIZE_1};
+      height: 1px;
       width: 100%;
     }
   }
@@ -167,10 +167,22 @@ export function ProtocolRunDetails(): JSX.Element | null {
   ) : null
 }
 
-function PageContents(props) {
+const JUMPED_STEP_HIGHLIGHT_DELAY_MS = 500
+interface PageContentsProps {
+  runId: string
+  robotName: string,
+  protocolRunDetailsTab: ProtocolRunDetailsTab
+}
+function PageContents(props: PageContentsProps) {
   const { runId, robotName, protocolRunDetailsTab } = props
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
   const listRef = React.useRef<ViewportListRef | null>(null)
+  const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
+  React.useEffect(() => {
+    if (jumpedIndex != null) {
+      setTimeout(() => setJumpedIndex(null), JUMPED_STEP_HIGHLIGHT_DELAY_MS)
+    }
+  }, [jumpedIndex])
 
   const protocolRunDetailsContentByTab: {
     [K in ProtocolRunDetailsTab]: JSX.Element | null
@@ -185,8 +197,8 @@ function PageContents(props) {
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
-    'run-log': <AnalyzedSteps runId={runId} ref={listRef} />,
-    'analyzed-steps': <AnalyzedSteps runId={runId} ref={listRef} />,
+    'run-log': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} />,
+    'analyzed-steps': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} />,
   }
 
   const protocolRunDetailsContent = protocolRunDetailsContentByTab[
@@ -196,7 +208,11 @@ function PageContents(props) {
       <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
     )
 
-  const makeHandleJumpToStep = (i: number) => () => listRef.current?.scrollToIndex(i)
+  const makeHandleJumpToStep = (i: number) => () => {
+    listRef.current?.scrollToIndex(i)
+    setJumpedIndex(i)
+  }
+
   return (
     <>
       <ProtocolRunHeader

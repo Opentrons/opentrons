@@ -29,6 +29,7 @@ interface RunProgressMeterProps {
 
 export function RunProgressMeter(props: RunProgressMeterProps) {
   const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
+  console.log('commands', analysisCommands)
   return (
     <ProgressBar
       percentComplete={currentRunCommandIndex > 0 ? ((currentRunCommandIndex + 1) / analysisCommands.length) * 100 : 0}
@@ -101,7 +102,7 @@ function Tick(props: TickProps) {
       <StyledText as="h6">{isAggregatedTick ? count : null}</StyledText>
       <Portal>
         <Tooltip tooltipProps={tooltipProps}>
-          <Flex padding={SPACING.spacing2} gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+          <Flex padding={SPACING.spacing1} gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
             {!isAggregatedTick && iconName != null ? <Icon name={iconName} size={SPACING.spacingM} /> : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="label">

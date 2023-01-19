@@ -109,5 +109,7 @@
   "left": "Left",
   "right": "Right",
   "step_number": "Step {{step_number}}:",
-  "plus_more": "+{{count}} more"
+  "plus_more": "+{{count}} more",
+  "pause": "Pause",
+  "move_labware": "Move Labware"
 }

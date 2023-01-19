@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { css } from 'styled-components'
 import {
   Flex,
   ALIGN_CENTER,
@@ -15,10 +15,12 @@ import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMo
 
 import { AnalysisStepText } from '../../AnalysisStepText'
 
-interface RunLogProps {
+const COLOR_FADE_MS = 500
+interface AnalyzedStepsProps {
   runId: string,
+  jumpedIndex: number | null,
 }
-export const AnalyzedSteps = React.forwardRef(({ runId }: RunLogProps, ref: React.ForwardedRef<ViewportListRef>): JSX.Element | null =>  {
+export const AnalyzedSteps = React.forwardRef(({ runId, jumpedIndex }: AnalyzedStepsProps, ref: React.ForwardedRef<ViewportListRef>): JSX.Element | null => {
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
 
@@ -42,7 +44,9 @@ export const AnalyzedSteps = React.forwardRef(({ runId }: RunLogProps, ref: Reac
         {(command, index) => (
           <Flex
             key={command.id}
-            alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+            alignItems={ALIGN_CENTER}
+            gridGap={SPACING.spacing3}
+          >
             <StyledText fontSize={TYPOGRAPHY.fontSizeCaption}>
               {index + 1}
             </StyledText>
@@ -50,11 +54,14 @@ export const AnalyzedSteps = React.forwardRef(({ runId }: RunLogProps, ref: Reac
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing2}
               width="100%"
-              border='none'
-              backgroundColor={COLORS.fundamentalsBackground}
+              border={`solid 1px ${index === jumpedIndex ? COLORS.blueEnabled : COLORS.transparent}`}
+              backgroundColor={index === jumpedIndex ? COLORS.lightBlue : COLORS.fundamentalsBackground}
               color={COLORS.darkBlackEnabled}
               borderRadius={BORDERS.radiusSoftCorners}
               padding={SPACING.spacing3}
+              css={css`
+                transition: background-color ${COLOR_FADE_MS}ms ease-out, border-color ${COLOR_FADE_MS}ms ease-out;
+              `}
             >
               <AnalysisStepText command={command} robotSideAnalysis={robotSideAnalysis} />
             </Flex>
