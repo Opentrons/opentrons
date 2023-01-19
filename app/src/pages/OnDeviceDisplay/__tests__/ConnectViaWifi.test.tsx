@@ -32,13 +32,15 @@ const initialMockWifi = {
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
 >
-
 const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
   typeof Networking.getWifiList
 >
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
+
+// Note: kj 1/19/2023 most cases just check one part from each screen since for this test,
+// what we need to check is to render each component with a specific condition.
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
