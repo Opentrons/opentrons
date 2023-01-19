@@ -293,6 +293,16 @@ class CanMessenger:
                         f"Received <--\n\tarbitration_id: {message.arbitration_id},\n\t"
                         f"payload: {build}"
                     )
+                    if (
+                        message.arbitration_id.parts.message_id
+                        == MessageId.error_message
+                    ):
+                        err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
+                        error_payload: ErrorMessagePayload = err_msg.payload
+                        if ErrorCode(error_payload.error_code.value) in self._ignored:
+                            # Short circuit ignored errors
+                            log.debug("message ignored by driver settings")
+                            continue
                     for listener, filter in self._listeners.values():
                         if filter and not filter(message.arbitration_id):
                             log.debug("message ignored by filter")
@@ -312,9 +322,6 @@ class CanMessenger:
         err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
         error_payload: ErrorMessagePayload = err_msg.payload
         err_msg.log_error(log)
-        if ErrorCode(error_payload.error_code.value) in self._ignored:
-            # Short circuit ignored errors
-            return
         if error_payload.severity.value == ErrorSeverity.unrecoverable:
             await self.send(NodeId.broadcast, StopRequest())
 
