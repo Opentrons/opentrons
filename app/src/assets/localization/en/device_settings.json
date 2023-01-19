@@ -207,5 +207,7 @@
   "switch_to_usb_description": "If your network uses a different authentication method, connect to the Opentrons App and finish Wi-Fi setup there.",
   "restarting_robot": "Restarting robot...",
   "welcome_title": "Welcome to your OT-3!",
-  "welcome_description": "Quickly run protocols and check on your robot's status right on your lab bench."
+  "welcome_description": "Quickly run protocols and check on your robot's status right on your lab bench.",
+  "join_other_network": "Join other network",
+  "enter_ssid": "Enter SSID"
 }
