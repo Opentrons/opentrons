@@ -302,30 +302,16 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware definition for matching {uri} not found."
             ) from e
 
-    def find_custom_labware_load_params(
-        self,
-        load_name: str,
-        namespace: Optional[str],
-        version: Optional[int],
-    ) -> List[LabwareLoadParams]:
-        """Resolve labware parameters based on load name and given parameters."""
-
-        def matches_params(definition: LabwareDefinition) -> bool:
-            matches_load_name = definition.parameters.loadName == load_name
-            matches_namespace = namespace is None or definition.namespace == namespace
-            matches_version = version is None or definition.version == version
-
-            return matches_load_name and matches_namespace and matches_version
-
+    def find_custom_labware_load_params(self) -> List[LabwareLoadParams]:
+        """Find all load labware parameters for custom labware definitions in state."""
         return [
             LabwareLoadParams(
-                load_name=load_name,
+                load_name=definition.parameters.loadName,
                 namespace=definition.namespace,
                 version=definition.version,
             )
             for definition in self._state.definitions_by_uri.values()
             if definition.namespace != OPENTRONS_NAMESPACE
-            and matches_params(definition)
         ]
 
     def get_location(self, labware_id: str) -> LabwareLocation:

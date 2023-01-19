@@ -158,9 +158,9 @@ def test_find_custom_labware_params(
         version=123,
     )
     standard_def = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
+        parameters=Parameters.construct(loadName="goodbye"),  # type: ignore[call-arg]
         namespace="opentrons",
-        version=123,
+        version=456,
     )
 
     subject = get_labware_view(
@@ -170,7 +170,7 @@ def test_find_custom_labware_params(
         },
     )
 
-    result = subject.find_custom_labware_load_params("hello", namespace, version)
+    result = subject.find_custom_labware_load_params()
 
     assert result == [
         LabwareLoadParams(load_name="hello", namespace="world", version=123)

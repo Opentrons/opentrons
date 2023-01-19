@@ -41,7 +41,7 @@ from .module_core import (
     HeaterShakerModuleCore,
 )
 from .exceptions import InvalidModuleLocationError
-from . import engine_param_validation
+from . import load_labware_params
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
@@ -141,12 +141,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             module_location = DeckSlotLocation(slotName=location)
 
         custom_labware_params = (
-            self._engine_client.state.labware.find_custom_labware_load_params(
-                load_name, namespace, version
-            )
+            self._engine_client.state.labware.find_custom_labware_load_params()
         )
-        namespace, version = engine_param_validation.resolve_load_labware_params(
-            custom_labware_params, namespace, version
+        namespace, version = load_labware_params.resolve(
+            load_name, namespace, version, custom_labware_params
         )
 
         load_result = self._engine_client.load_labware(
