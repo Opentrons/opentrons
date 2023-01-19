@@ -150,7 +150,6 @@ push-ot3:
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
-	$(MAKE) -C $(APP_SHELL_ODD_DIR) push-ot3
 	$(MAKE) -C $(USB_BRIDGE_DIR) push-ot3
 
 
