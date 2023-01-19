@@ -2,11 +2,12 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { SpinnerModalPage } from '@opentrons/components'
-
 import { Portal } from '../../../../App/portal'
+import { WizardHeader } from '../../../../molecules/WizardHeader'
+import { ModalShell } from '../../../../molecules/Modal'
 import { CalibrateTipLength } from '../../../../organisms/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import { LoadingState } from '../../../../organisms/CalibrationPanels'
 import * as RobotApi from '../../../../redux/robot-api'
 import * as Sessions from '../../../../redux/sessions'
 import { tipLengthCalibrationStarted } from '../../../../redux/analytics'
@@ -49,7 +50,7 @@ export function useDashboardCalibrateTipLength(
     | null
   >(null)
   const dispatch = useDispatch()
-  const { t } = useTranslation(['protocol_setup', 'shared'])
+  const { t } = useTranslation('robot_calibration')
 
   const sessionType = Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
   const withIntent = INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
@@ -165,16 +166,12 @@ export function useDashboardCalibrateTipLength(
         />
       ) : null}
       {startingSession ? (
-        <SpinnerModalPage
-          titleBar={{
-            title: t('tip_length_calibration'),
-            back: {
-              disabled: true,
-              title: t('shared:exit'),
-              children: t('shared:exit'),
-            },
-          }}
-        />
+        <ModalShell
+          width="47rem"
+          header={<WizardHeader title={t('tip_length_calibration')} />}
+        >
+          <LoadingState />
+        </ModalShell>
       ) : null}
       <CalibrateTipLength
         session={tipLengthCalibrationSession}
