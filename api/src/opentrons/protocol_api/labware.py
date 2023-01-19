@@ -212,7 +212,7 @@ class Well:
         """
         return self._impl.from_center_cartesian(x, y, z)
 
-    # TODO (tz, 12-19-22): Should the api version be 2.14
+    # TODO (tz, 12-19-22): Limit to API version 2.14
     # https://opentrons.atlassian.net/browse/RCORE-537
     @requires_version(2, 13)
     def load_liquid(self, liquid: LoadedLiquid, volume: float) -> None:
