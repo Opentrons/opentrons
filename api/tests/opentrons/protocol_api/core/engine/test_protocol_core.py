@@ -47,7 +47,7 @@ from opentrons.protocol_api.core.engine import (
     LabwareCore,
     ModuleCore,
 )
-from opentrons.protocol_api.liquid import LoadedLiquid
+from opentrons.protocol_api._liquid import Liquid
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
@@ -675,7 +675,7 @@ def test_add_liquid(
         displayColor=HexColor(__root__="#fff"),
     )
 
-    expected_result = LoadedLiquid(
+    expected_result = Liquid(
         id="water-id",
         display_name="water",
         description="water desc",

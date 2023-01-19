@@ -15,7 +15,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIEr
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
-from ...liquid import LoadedLiquid
+from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -424,7 +424,7 @@ class ProtocolContextImplementation(
 
     def add_liquid(
         self, name: str, description: str, display_color: Optional[str]
-    ) -> LoadedLiquid:
+    ) -> Liquid:
         """Add a liquid to load into a well."""
         raise UnsupportedAPIError(
             "Creating a liquid is not supported in this API version."

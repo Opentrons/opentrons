@@ -5,7 +5,7 @@ from decoy import Decoy
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
 from opentrons.protocol_api.core.common import WellCore
-from opentrons.protocol_api.liquid import LoadedLiquid
+from opentrons.protocol_api._liquid import Liquid
 from opentrons.types import Point, Location
 
 
@@ -116,7 +116,7 @@ def test_has_tip(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
 
 def test_load_liquid(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
     """It should load a liquid to a location."""
-    mocked_liquid = decoy.mock(cls=LoadedLiquid)
+    mocked_liquid = decoy.mock(cls=Liquid)
     mocked_well = decoy.mock(cls=Well)
 
     decoy.when(mocked_well._impl.get_name()).then_return("A1")

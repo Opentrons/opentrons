@@ -20,7 +20,7 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.common import ModuleCore, ProtocolCore
-from .liquid import LoadedLiquid
+from ._liquid import Liquid
 from .core.core_map import LoadedCoreMap
 from .core.module import (
     AbstractTemperatureModuleCore,
@@ -758,7 +758,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 13)
     def add_liquid(
         self, name: str, description: str, display_color: Optional[str]
-    ) -> LoadedLiquid:
+    ) -> Liquid:
         """
         Add a liquid to the protocol.
 

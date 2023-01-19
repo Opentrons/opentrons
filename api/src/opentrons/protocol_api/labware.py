@@ -33,7 +33,7 @@ from opentrons.protocols.labware import (  # noqa: F401
 from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
-from .liquid import LoadedLiquid
+from ._liquid import Liquid
 from .core.module import AbstractModuleCore
 from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
@@ -215,7 +215,7 @@ class Well:
     # TODO (tz, 12-19-22): Limit to API version 2.14
     # https://opentrons.atlassian.net/browse/RCORE-537
     @requires_version(2, 13)
-    def load_liquid(self, liquid: LoadedLiquid, volume: float) -> None:
+    def load_liquid(self, liquid: Liquid, volume: float) -> None:
         """
         Load a liquid into a well.
 

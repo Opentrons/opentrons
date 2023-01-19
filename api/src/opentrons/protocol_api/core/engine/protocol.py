@@ -38,7 +38,7 @@ from opentrons.protocol_engine.types import Liquid, HexColor
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
-from ...liquid import LoadedLiquid
+from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
@@ -400,7 +400,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         name: str,
         description: str,
         display_color: Optional[str],
-    ) -> LoadedLiquid:
+    ) -> Liquid:
         """create a liquid to load into a labware."""
         model_utils = ModelUtils()
         loaded_liquid = self._engine_client.add_liquid(
@@ -414,8 +414,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             )
         )
 
-        return LoadedLiquid(
-            id=loaded_liquid.id,
+        return Liquid(
+            _id=loaded_liquid.id,
             display_name=loaded_liquid.displayName,
             description=loaded_liquid.description,
             display_color=loaded_liquid.displayColor.__root__

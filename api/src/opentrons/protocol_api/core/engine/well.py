@@ -10,7 +10,7 @@ from opentrons.types import Point
 
 from . import point_calculations
 from ..well import AbstractWellCore
-from ...liquid import LoadedLiquid
+from ..._liquid import Liquid
 
 
 class WellCore(AbstractWellCore):
@@ -124,7 +124,7 @@ class WellCore(AbstractWellCore):
 
     def load_liquid(
         self,
-        liquid: LoadedLiquid,
+        liquid: Liquid,
         volume: float,
     ) -> None:
         """Load liquid into a well."""
