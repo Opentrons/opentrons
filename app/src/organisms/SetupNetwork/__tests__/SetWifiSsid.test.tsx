@@ -11,7 +11,6 @@ import { SetWifiSsid } from '../SetWifiSsid'
 const mockSetSelectedSsid = jest.fn()
 const mockSetShowSelectAuthenticationType = jest.fn()
 const mockSetChangeState = jest.fn()
-
 const render = (props: React.ComponentProps<typeof SetWifiSsid>) => {
   return renderWithProviders(
     <MemoryRouter>
@@ -58,7 +57,7 @@ describe('SetWifiSsid', () => {
   })
 
   it('when tapping next button, call a mock function', () => {
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByRole }] = render(props)
     const button = getByRole('button', { name: 'Next' })
     const aKey = getByRole('button', { name: 'a' })
     const bKey = getByRole('button', { name: 'b' })
