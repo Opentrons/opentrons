@@ -77,7 +77,7 @@ export function ProtocolDashboard(): JSX.Element {
 
             return (
               <TableRow
-                key={index}
+                key={protocol.key ?? index}
                 onClick={() => history.push(`/protocols/${protocol.id}`)}
               >
                 <TableDatum> {protocolName}</TableDatum>
