@@ -3,7 +3,7 @@ from typing import Optional
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-from opentrons.protocols.api_support.util import UnsupportedAPIError
+from opentrons.protocols.api_support.util import APIVersionError
 
 from opentrons.types import Point
 
