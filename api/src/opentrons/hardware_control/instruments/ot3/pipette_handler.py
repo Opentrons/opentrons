@@ -767,6 +767,10 @@ class PipetteHandlerProvider:
             instrument.current_tiprack_diameter = 0.0
             instrument.remove_tip()
 
+        is_96_chan = instrument.channels.value == 96
+        drop_tip_current_axis = (
+            OT3Axis.Q if is_96_chan else OT3Axis.of_main_tool_actuator(mount)
+        )
         seq_builder_ot3 = self._droptip_sequence_builder(
             bottom,
             droptip,
@@ -775,15 +779,11 @@ class PipetteHandlerProvider:
                     mount
                 ): instrument.plunger_motor_current.run
             },
-            {
-                OT3Axis.of_main_tool_actuator(
-                    mount
-                ): instrument.drop_configurations.current
-            },
+            {drop_tip_current_axis: instrument.drop_configurations.current},
             speed,
             home_after,
             (OT3Axis.of_main_tool_actuator(mount),),
-            instrument.channels.value == 96,
+            is_96_chan,
         )
 
         seq_ot3 = seq_builder_ot3()
