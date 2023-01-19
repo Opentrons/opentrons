@@ -28,7 +28,7 @@ _PRE_2_2_TIP_DROP_HEIGHT_MM = 10
 """In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
-class InstrumentContextSimulation(AbstractInstrument[LegacyWellCore]):
+class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     """A simulation of an instrument context."""
 
     def __init__(
