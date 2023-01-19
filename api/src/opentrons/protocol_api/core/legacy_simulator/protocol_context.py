@@ -10,20 +10,22 @@ from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ..legacy.legacy_module_core import LegacyModuleCore
 from ..legacy.load_info import InstrumentLoadInfo
 
-from .instrument_context import InstrumentContextSimulation
+from .instrument_context import LegacyInstrumentCoreSimulator
 
 logger = logging.getLogger(__name__)
 
 
 class LegacyProtocolCoreSimulator(
     LegacyProtocolCore,
-    AbstractProtocol[InstrumentContextSimulation, LegacyLabwareCore, LegacyModuleCore],
+    AbstractProtocol[
+        LegacyInstrumentCoreSimulator, LegacyLabwareCore, LegacyModuleCore
+    ],
 ):
-    _instruments: Dict[Mount, Optional[InstrumentContextSimulation]]  # type: ignore[assignment]
+    _instruments: Dict[Mount, Optional[LegacyInstrumentCoreSimulator]]  # type: ignore[assignment]
 
     def load_instrument(  # type: ignore[override]
         self, instrument_name: PipetteNameType, mount: Mount
-    ) -> InstrumentContextSimulation:
+    ) -> LegacyInstrumentCoreSimulator:
         """Create a simulating instrument context."""
         existing_instrument = self._instruments[mount]
 
@@ -43,7 +45,7 @@ class LegacyProtocolCoreSimulator(
         attached[mount] = instrument_name.value
         self._sync_hardware.cache_instruments(attached)
 
-        new_instr = InstrumentContextSimulation(
+        new_instr = LegacyInstrumentCoreSimulator(
             protocol_interface=self,
             pipette_dict=self._sync_hardware.get_attached_instruments()[mount],
             mount=mount,

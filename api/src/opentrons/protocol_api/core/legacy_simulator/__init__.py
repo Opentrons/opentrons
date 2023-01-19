@@ -7,10 +7,10 @@ To speed things up, these classes can additionally take the place of a
 Protocol API v2 context's implementation, to simulate certain things at the level of
 the Protocol API, avoiding certain calls to the underlying hardware API.
 """
-from .protocol_context import ProtocolContextSimulation
-from .instrument_context import InstrumentContextSimulation
+from .protocol_context import LegacyProtocolCoreSimulator
+from .instrument_context import LegacyInstrumentCoreSimulator
 
 __all__ = [
-    "ProtocolContextSimulation",
-    "InstrumentContextSimulation",
+    "LegacyProtocolCoreSimulator",
+    "LegacyInstrumentCoreSimulator",
 ]

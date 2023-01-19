@@ -19,7 +19,7 @@ from ..legacy.legacy_well_core import LegacyWellCore
 
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContextSimulation
+    from .protocol_context import LegacyProtocolCoreSimulator
 
 
 _log = logging.getLogger()
@@ -33,7 +33,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def __init__(
         self,
-        protocol_interface: ProtocolContextSimulation,
+        protocol_interface: LegacyProtocolCoreSimulator,
         pipette_dict: PipetteDict,
         mount: types.Mount,
         instrument_name: str,
