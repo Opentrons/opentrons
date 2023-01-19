@@ -99,9 +99,7 @@ export function useDashboardCalibrateDeck(
       {startingSession ? (
         <ModalShell
           width="47rem"
-          header={
-            <WizardHeader title={t('deck_calibration')} onExit={() => {}} />
-          }
+          header={<WizardHeader title={t('deck_calibration')} />}
         >
           <LoadingState />
         </ModalShell>

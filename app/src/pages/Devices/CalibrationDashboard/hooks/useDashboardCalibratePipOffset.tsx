@@ -173,12 +173,7 @@ export function useDashboardCalibratePipOffset(
       {startingSession ? (
         <ModalShell
           width="47rem"
-          header={
-            <WizardHeader
-              title={t('pipette_offset_calibration')}
-              onExit={() => {}}
-            />
-          }
+          header={<WizardHeader title={t('pipette_offset_calibration')} />}
         >
           <LoadingState />
         </ModalShell>
