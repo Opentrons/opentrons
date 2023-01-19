@@ -3,6 +3,7 @@ import uniqueId from 'lodash/uniqueId'
 import { mountWithStore, renderWithProviders } from '@opentrons/components'
 import { act } from 'react-dom/test-utils'
 
+import { LoadingState } from '../../../../../organisms/CalibrationPanels'
 import * as RobotApi from '../../../../../redux/robot-api'
 import * as Sessions from '../../../../../redux/sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../../../redux/sessions/__fixtures__'
@@ -203,5 +204,33 @@ describe('useDashboardCalibrateTipLength hook', () => {
       ...Sessions.deleteSession(robotName, seshId),
       meta: { requestId: expect.any(String) },
     })
+  })
+
+  it('loading state modal should appear while session is being created', () => {
+    const seshId = 'fake-session-id'
+    const mockDeckCalSession = {
+      id: seshId,
+      ...mockTipLengthCalibrationSessionAttributes,
+      details: {
+        ...mockTipLengthCalibrationSessionAttributes.details,
+        currentStep: Sessions.TIP_LENGTH_STEP_SESSION_STARTED,
+      },
+    }
+    const { wrapper } = mountWithStore(<TestUseDashboardCalibrateTipLength />, {
+      initialState: { robotApi: {} },
+    })
+    mockGetRobotSessionOfType.mockReturnValue(mockDeckCalSession)
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.PENDING,
+    })
+    act(() =>
+      startCalibration({
+        params: { mount: mountString },
+        hasBlockModalResponse: null,
+      })
+    )
+    wrapper.setProps({})
+    expect(CalWizardComponent).not.toBe(null)
+    expect(LoadingState).not.toBe(null)
   })
 })
