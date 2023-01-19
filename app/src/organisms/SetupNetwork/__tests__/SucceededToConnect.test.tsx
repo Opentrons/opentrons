@@ -56,6 +56,7 @@ describe('SucceededToConnect', () => {
   beforeEach(() => {
     props = {
       ssid: 'mockWifi',
+      authType: 'wpa-psk',
     }
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
