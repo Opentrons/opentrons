@@ -4,9 +4,12 @@ from typing import NoReturn
 import logging
 from . import systemd
 
+LOG = logging.getLogger(__name__)
+
 
 async def main() -> NoReturn:
     """Entrypoint for system server."""
+    LOG.info("Starting system server")
     systemd.notify_up()
     while True:
         await asyncio.sleep(1)
