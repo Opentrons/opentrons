@@ -133,6 +133,9 @@ async def update_motor_position_estimation(
                 data[node] = await asyncio.wait_for(
                     _parser_update_motor_position_response(reader, node), timeout
                 )
+                if data[node][2] == False:
+                    # If the stepper_ok flag isn't set, that means the node didn't update position.
+                    raise RuntimeError(f'Failed to update motor position for node: {node}')
             except asyncio.TimeoutError:
                 log.warning("Update motor position estimation timed out")
                 raise StopAsyncIteration
