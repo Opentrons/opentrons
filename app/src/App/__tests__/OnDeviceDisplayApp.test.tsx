@@ -8,7 +8,6 @@ import { i18n } from '../../i18n'
 import { ConnectViaEthernet } from '../../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
-import { ConfirmRobotName } from '../../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
@@ -19,7 +18,6 @@ jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaWifi')
-jest.mock('../../pages/OnDeviceDisplay/ConfirmRobotName')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 
 const mockInitialSplash = InitialSplash as jest.MockedFunction<
@@ -36,9 +34,6 @@ const mockConnectViaUSB = ConnectViaUSB as jest.MockedFunction<
 >
 const mockConnectViaWifi = ConnectViaWifi as jest.MockedFunction<
   typeof ConnectViaWifi
->
-const mockConfirmRobotName = ConfirmRobotName as jest.MockedFunction<
-  typeof ConfirmRobotName
 >
 const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
   typeof RobotDashboard
@@ -60,7 +55,6 @@ describe('OnDeviceDisplayApp', () => {
     mockConnectViaEthernet.mockReturnValue(<div>Mock ConnectViaEthernet</div>)
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
     mockConnectViaWifi.mockReturnValue(<div>Mock ConnectViaWifi</div>)
-    mockConfirmRobotName.mockReturnValue(<div>Mock ConfirmRobotName</div>)
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
   })
   afterEach(() => {

@@ -12,6 +12,28 @@ To ensure your code is reviewed quickly and thoroughly, please fill out the sect
 Use this section to describe your pull-request at a high level. If the PR addresses any open issues, please tag the issues here.
 -->
 
+# Test Plan
+
+<!--
+Use this section to describe the steps that you took to test your Pull Request.
+If you did not perform any testing provide justification why.
+
+OT-3 Developers: You should default to testing on actual physical hardware.
+Once again, if you did not perform testing against hardware, justify why.
+
+Note: It can be helpful to write a test plan before doing development
+
+Example Test Plan (HTTP API Change)
+
+- Verified that new optional argument `dance-party` causes the robot to flash its lights, move the pipettes,
+then home.
+- Verified that when you omit the `dance-party` option the robot homes normally
+- Added protocol that uses `dance-party` argument to G-Code Testing Suite
+- Ran protocol that did not use `dance-party` argument and everything was successful
+- Added unit tests to validate that changes to pydantic model are correct
+
+-->
+
 # Changelog
 
 <!--

@@ -52,5 +52,4 @@ export interface DesktopRouteParams {
 export interface OnDeviceRouteParams {
   protocolId: string
   runId: string
-  robotName: string
 }

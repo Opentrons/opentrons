@@ -7,6 +7,9 @@ from typing import Optional, Dict, List, Union
 
 from typing_extensions import TypedDict, Literal
 
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+)
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
     PipetteName,
@@ -98,7 +101,8 @@ class GripperDict(InstrumentDict):
     name: GripperName
     model: GripperModel
     gripper_id: str
-    state: GripperJawState
+    state: GripperJawState  # Can we call this jaw_state?
+    calibration_offset: GripperCalibrationOffset
 
 
 class InstrumentHardwareConfigs(TypedDict):

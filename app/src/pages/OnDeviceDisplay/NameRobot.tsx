@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 import { useFormik } from 'formik'
 import { css } from 'styled-components'
 
@@ -34,6 +33,7 @@ import { InputField } from '../../atoms/InputField'
 import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
+import { ConfirmRobotName } from '../../organisms/NameRobot/ConfirmRobotName'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
@@ -59,8 +59,12 @@ export function NameRobot(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const previousName = localRobot?.name != null ? localRobot.name : null
   const [name, setName] = React.useState<string>('')
+  const [newName, setNewName] = React.useState<string>('')
+  const [
+    isShowConfirmRobotName,
+    setIsShowConfirmRobotName,
+  ] = React.useState<boolean>(false)
   const keyboardRef = React.useRef(null)
-  const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 
   // check for robot name
@@ -110,11 +114,13 @@ export function NameRobot(): JSX.Element {
 
   const { updateRobotName, isLoading: isNaming } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
-      data.name != null &&
-        previousName != null &&
-        dispatch(removeRobot(previousName))
-      !Boolean(isNaming) &&
-        history.push(`/network-setup/confirm-name/${String(data.name)}`)
+      if (data.name != null) {
+        setNewName(data.name)
+        setIsShowConfirmRobotName(true)
+        if (previousName != null) {
+          dispatch(removeRobot(previousName))
+        }
+      }
     },
     onError: (error: Error) => {
       console.error('error', error.message)
@@ -136,107 +142,113 @@ export function NameRobot(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={4} OnDevice />
-      <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacingXXL}>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_CENTER}
-          position={POSITION_RELATIVE}
-          marginBottom="3.041875rem"
-        >
-          <Flex>
-            <StyledText
-              fontSize="2rem"
-              fontWeight="700"
-              lineHeight="2.72375rem"
+      {isShowConfirmRobotName ? (
+        <ConfirmRobotName robotName={newName} />
+      ) : (
+        <>
+          <StepMeter totalSteps={5} currentStep={4} OnDevice />
+          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacingXXL}>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_CENTER}
+              position={POSITION_RELATIVE}
+              marginBottom="3.041875rem"
             >
-              {t('name_your_robot')}
-            </StyledText>
-          </Flex>
+              <Flex>
+                <StyledText
+                  fontSize="2rem"
+                  fontWeight="700"
+                  lineHeight="2.72375rem"
+                >
+                  {t('name_your_robot')}
+                </StyledText>
+              </Flex>
 
-          <Flex position={POSITION_ABSOLUTE} right="0">
-            <TertiaryButton
-              width="11.8125rem"
-              height="3.75rem"
-              fontSize="1.5rem"
-              fontWeight="500"
-              lineHeight="2.0425rem"
-              onClick={handleConfirm}
+              <Flex position={POSITION_ABSOLUTE} right="0">
+                <TertiaryButton
+                  width="11.8125rem"
+                  height="3.75rem"
+                  fontSize="1.5rem"
+                  fontWeight="500"
+                  lineHeight="2.0425rem"
+                  onClick={handleConfirm}
+                >
+                  {Boolean(isNaming) ? (
+                    <Icon
+                      name="ot-spinner"
+                      size="1.25rem"
+                      spin
+                      marginRight={SPACING.spacing3}
+                    />
+                  ) : null}
+                  {t('shared:confirm')}
+                </TertiaryButton>
+              </Flex>
+            </Flex>
+
+            <Flex
+              width="100%"
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_CENTER}
             >
-              {Boolean(isNaming) ? (
-                <Icon
-                  name="ot-spinner"
-                  size="1.25rem"
-                  spin
-                  marginRight={SPACING.spacing3}
+              <StyledText
+                color={COLORS.black}
+                fontSize="1.375rem"
+                lineHeight="1.875rem"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                marginBottom="0.75rem"
+              >
+                {t('name_your_robot_description')}
+              </StyledText>
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                alignItems={ALIGN_CENTER}
+                marginBottom="0.625rem"
+                justifyContent={JUSTIFY_CENTER}
+                width="100%"
+              >
+                <InputField
+                  data-testid="name-robot_input"
+                  id="newRobotName"
+                  name="newRobotName"
+                  type="text"
+                  onChange={formik.handleChange}
+                  value={name}
+                  error={formik.errors.newRobotName && ''}
+                  css={INPUT_FIELD_ODD_STYLE}
                 />
-              ) : null}
-              {t('shared:confirm')}
-            </TertiaryButton>
-          </Flex>
-        </Flex>
+              </Flex>
+              <StyledText
+                color={COLORS.darkGreyEnabled}
+                fontSize="1.5rem"
+                lineHeight="2.0625rem"
+                fontWeight="500"
+                marginBottom="0.75rem"
+              >
+                {t('name_rule_description')}
+              </StyledText>
+              {formik.errors.newRobotName && (
+                <StyledText
+                  fontSize="1.375rem"
+                  lineHeight="1.875rem"
+                  fontWeight="500"
+                  color={COLORS.errorText}
+                >
+                  {formik.errors.newRobotName}
+                </StyledText>
+              )}
+            </Flex>
 
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-        >
-          <StyledText
-            color={COLORS.black}
-            fontSize="1.375rem"
-            lineHeight="1.875rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            marginBottom="0.75rem"
-          >
-            {t('name_your_robot_description')}
-          </StyledText>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_CENTER}
-            marginBottom="0.625rem"
-            justifyContent={JUSTIFY_CENTER}
-            width="100%"
-          >
-            <InputField
-              data-testid="name-robot_input"
-              id="newRobotName"
-              name="newRobotName"
-              type="text"
-              onChange={formik.handleChange}
-              value={name}
-              error={formik.errors.newRobotName && ''}
-              css={INPUT_FIELD_ODD_STYLE}
-            />
+            <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
+              <CustomKeyboard
+                onChange={e => e != null && setName(e)}
+                keyboardRef={keyboardRef}
+              />
+            </Flex>
           </Flex>
-          <StyledText
-            color={COLORS.darkGreyEnabled}
-            fontSize="1.5rem"
-            lineHeight="2.0625rem"
-            fontWeight="500"
-            marginBottom="0.75rem"
-          >
-            {t('name_rule_description')}
-          </StyledText>
-          {formik.errors.newRobotName && (
-            <StyledText
-              fontSize="1.375rem"
-              lineHeight="1.875rem"
-              fontWeight="500"
-              color={COLORS.errorText}
-            >
-              {formik.errors.newRobotName}
-            </StyledText>
-          )}
-        </Flex>
-
-        <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-          <CustomKeyboard
-            onChange={e => e != null && setName(e)}
-            keyboardRef={keyboardRef}
-          />
-        </Flex>
-      </Flex>
+        </>
+      )}
     </>
   )
 }
