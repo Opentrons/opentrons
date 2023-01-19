@@ -132,6 +132,7 @@ export function ConnectViaWifi(): JSX.Element {
         )
       }
     } else {
+      console.log('here')
       return null
     }
   }
