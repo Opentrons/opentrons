@@ -9,7 +9,7 @@ After=opentrons-status-leds.service
 
 
 [Service]
-Type=simple
+Type=notify
 ExecStart=python -m system_server
 Restart=on-failure
 TimeoutStartSec=3min
