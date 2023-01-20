@@ -8,7 +8,14 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from . import commands
 from .resources import ModelUtils, ModuleDataProvider
-from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel, Liquid
+from .types import (
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareUri,
+    ModuleModel,
+    Liquid,
+    HexColor,
+)
 from .execution import (
     QueueWorker,
     create_queue_worker,
@@ -288,12 +295,25 @@ class ProtocolEngine:
         )
         return self._state_store.labware.get_uri_from_definition(definition)
 
-    def add_liquid(self, liquid: Liquid) -> Liquid:
+    def add_liquid(
+        self,
+        id: Optional[str],
+        name: str,
+        color: Optional[str] = None,
+        description: str = "",
+    ) -> Liquid:
         """Add a liquid to the state for subsequent liquid loads."""
-        if liquid.id is None:
-            liquid.id = self._model_utils.generate_id()
-        self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
-        return liquid
+        if id is None:
+            id = self._model_utils.generate_id()
+        self._action_dispatcher.dispatch(
+            AddLiquidAction(id=id, name=name, color=color, description=description)
+        )
+        return Liquid(
+            id=id,
+            displayName=name,
+            description=description,
+            displayColor=HexColor(__root__=color) if color else None,
+        )
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""

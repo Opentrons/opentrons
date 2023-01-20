@@ -16,7 +16,9 @@ def test_handles_add_liquid(subject: LiquidStore) -> None:
     expected_liquid = Liquid(
         id="water-id", displayName="water", description="water-desc"
     )
-    subject.handle_action(AddLiquidAction(liquid=expected_liquid))
+    subject.handle_action(AddLiquidAction(
+        id="water-id", name="water", description="water-desc"
+    ))
 
     assert len(subject.state.liquids_by_id) == 1
 

@@ -14,7 +14,7 @@ from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
+from ..types import LabwareOffsetCreate, ModuleDefinition
 
 
 @dataclass(frozen=True)
@@ -139,7 +139,10 @@ class AddLabwareDefinitionAction:
 class AddLiquidAction:
     """Add a liquid, to apply to subsequent `LoadLiquid`s."""
 
-    liquid: Liquid
+    id: str
+    name: str
+    description: str
+    color: Optional[str] = None
 
 
 @dataclass(frozen=True)

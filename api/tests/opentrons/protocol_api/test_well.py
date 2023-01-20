@@ -117,10 +117,7 @@ def test_has_tip(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
 def test_load_liquid(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
     """It should load a liquid to a location."""
     mocked_liquid = Liquid(
-        _id="liquid-id",
-        name="water",
-        description=None,
-        display_color=None
+        _id="liquid-id", name="water", description=None, display_color=None
     )
 
     subject.load_liquid(

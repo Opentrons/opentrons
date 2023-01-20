@@ -402,18 +402,12 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     ) -> Liquid:
         """create a liquid to load into a labware."""
         loaded_liquid = self._engine_client.add_liquid(
-            PE_Liquid(
-                displayName=name,
-                description=description,
-                displayColor=HexColor(__root__=display_color)
-                if display_color
-                else None,
-            )
+            name=name, description=description, color=display_color
         )
 
         return Liquid(
             _id=loaded_liquid.id,
-            display_name=loaded_liquid.displayName,
+            name=loaded_liquid.displayName,
             description=loaded_liquid.description,
             display_color=loaded_liquid.displayColor.__root__
             if loaded_liquid.displayColor

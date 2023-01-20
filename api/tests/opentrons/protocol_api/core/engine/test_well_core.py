@@ -169,10 +169,7 @@ def test_load_liquid(
 ) -> None:
     """It should load a liquid into a well."""
     mock_liquid = Liquid(
-        _id="liquid-id",
-        display_name="water",
-        description=None,
-        display_color=None
+        _id="liquid-id", display_name="water", description=None, display_color=None
     )
 
     subject.load_liquid(liquid=mock_liquid, volume=20)

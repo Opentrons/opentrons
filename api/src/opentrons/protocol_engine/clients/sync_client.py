@@ -45,9 +45,11 @@ class SyncClient:
             definition=definition,
         )
 
-    def add_liquid(self, liquid: Liquid) -> Liquid:
+    def add_liquid(
+        self, name: str, color: Optional[str], description: Optional[str]
+    ) -> Liquid:
         """Add a liquid to the engine."""
-        return self._transport.call_method("add_liquid", liquid=liquid)  # type: ignore[no-any-return]
+        return self._transport.call_method("add_liquid", name=name, color=color, description=description)  # type: ignore[no-any-return]
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset a labware's tip tracking state.."""
