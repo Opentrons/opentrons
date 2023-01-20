@@ -13,7 +13,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
-from opentrons.protocol_api._liquid import LoadedLiquid
+from opentrons.protocol_api._liquid import Liquid
 from opentrons.protocol_api.core.engine import WellCore, point_calculations
 
 
@@ -168,9 +168,9 @@ def test_load_liquid(
     decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
 ) -> None:
     """It should load a liquid into a well."""
-    mock_liquid = decoy.mock(cls=LoadedLiquid)
+    mock_liquid = decoy.mock(cls=Liquid)
 
-    decoy.when(mock_liquid.id).then_return("liquid-id")
+    decoy.when(mock_liquid._id).then_return("liquid-id")
 
     subject.load_liquid(liquid=mock_liquid, volume=20)
 

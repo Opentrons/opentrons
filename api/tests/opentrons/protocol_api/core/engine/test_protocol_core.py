@@ -36,7 +36,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import Liquid, HexColor
+from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
@@ -668,7 +668,7 @@ def test_add_liquid(
     model_utils: ModelUtils,
 ) -> None:
     """It should return the created liquid."""
-    liquid = Liquid.construct(
+    liquid = PE_Liquid.construct(
         id=matchers.IsA(str),
         displayName="water",
         description="water desc",
@@ -676,7 +676,7 @@ def test_add_liquid(
     )
 
     expected_result = Liquid(
-        id="water-id",
+        _id="water-id",
         display_name="water",
         description="water desc",
         display_color="#fff",

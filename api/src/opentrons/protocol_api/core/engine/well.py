@@ -130,7 +130,7 @@ class WellCore(AbstractWellCore):
         """Load liquid into a well."""
         self._engine_client.load_liquid(
             labware_id=self._labware_id,
-            liquid_id=liquid.id,
+            liquid_id=liquid._id,
             volume_by_well={self._name: volume},
         )
 
