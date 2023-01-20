@@ -117,6 +117,14 @@ class DeckPoint(BaseModel):
     z: float
 
 
+class DeckType(str, Enum):
+    """Types of deck available."""
+
+    OT2_STANDARD = "ot2_standard"
+    OT2_SHORT_TRASH = "ot2_short_trash"
+    OT3_STANDARD = "ot3_standard"
+
+
 class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 

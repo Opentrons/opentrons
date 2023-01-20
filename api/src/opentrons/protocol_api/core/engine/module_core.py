@@ -78,6 +78,12 @@ class ModuleCore(AbstractModuleCore):
         """Get the module's deck slot."""
         return self._engine_client.state.modules.get_location(self.module_id).slotName
 
+    def get_display_name(self) -> str:
+        """Get the module's display name."""
+        return self._engine_client.state.modules.get_definition(
+            self.module_id
+        ).displayName
+
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
     """Temperature Module core logic implementation for Python protocols."""

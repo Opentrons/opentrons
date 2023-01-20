@@ -175,3 +175,9 @@ class AbstractProtocol(
     @abstractmethod
     def get_module_cores(self) -> List[ModuleCoreType]:
         """Get all loaded module cores."""
+
+    @abstractmethod
+    def get_labware_location(
+        self, labware_core: LabwareCoreType
+    ) -> Union[DeckSlotName, ModuleCoreType, None]:
+        """Get labware parent location."""

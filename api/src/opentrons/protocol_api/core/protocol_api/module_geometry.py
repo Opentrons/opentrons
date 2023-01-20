@@ -108,8 +108,7 @@ class ModuleGeometry:
         self._parent = parent
         self._module_type = module_type
 
-        # Note (spp, 2022-05-23): I think this should say '{display_name} on {slot}'
-        self._display_name = "{} on {}".format(display_name, str(parent.labware))
+        self._display_name = display_name
         self._model = model
         self._offset = offset
         self._height = overall_height + self._parent.point.z
@@ -124,6 +123,10 @@ class ModuleGeometry:
 
     def reset_labware(self) -> None:
         self._labware = None
+
+    @property
+    def display_name(self) -> str:
+        return self._display_name
 
     @property
     def model(self) -> ModuleModel:
@@ -170,7 +173,8 @@ class ModuleGeometry:
             return self._height
 
     def __repr__(self) -> str:
-        return self._display_name
+        location = f" on {self.parent}" if isinstance(self.parent, str) else ""
+        return f"{self._display_name}{location}"
 
 
 class ThermocyclerGeometry(ModuleGeometry):
@@ -277,6 +281,8 @@ class ThermocyclerGeometry(ModuleGeometry):
         return Labware(
             implementation=LabwareImplementation(definition, super().location),
             api_version=labware.api_version,
+            protocol_core=None,  # type: ignore[arg-type]
+            core_map=None,  # type: ignore[arg-type]
         )
 
     def add_labware(self, labware: Labware) -> Labware:
@@ -454,7 +460,12 @@ def create_geometry(
     function; all definitions passed here are assumed to be valid.
     """
     pre_transform = np.array(
-        (definition["labwareOffset"]["x"], definition["labwareOffset"]["y"], 1)
+        (
+            definition["labwareOffset"]["x"],
+            definition["labwareOffset"]["y"],
+            definition["labwareOffset"]["z"],
+            1,
+        )
     )
     if not parent.labware.is_slot:
         par = ""
@@ -470,7 +481,10 @@ def create_geometry(
     xforms_ser = (
         definition["slotTransforms"]
         .get("ot2_standard", {})
-        .get(par, {"labwareOffset": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]})
+        .get(
+            par,
+            {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]},
+        )
     )
     xform_ser = xforms_ser["labwareOffset"]
 
@@ -482,7 +496,7 @@ def create_geometry(
     if module_type == ModuleType.MAGNETIC or module_type == ModuleType.TEMPERATURE:
         return ModuleGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
+            offset=Point(xformed[0], xformed[1], xformed[2]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
             model=module_model_from_string(definition["model"]),
@@ -492,7 +506,7 @@ def create_geometry(
     elif module_type == ModuleType.THERMOCYCLER:
         return ThermocyclerGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
+            offset=Point(xformed[0], xformed[1], xformed[2]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
             model=module_model_from_string(definition["model"]),
@@ -508,7 +522,7 @@ def create_geometry(
     elif module_type == ModuleType.HEATER_SHAKER:
         return HeaterShakerGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
+            offset=Point(xformed[0], xformed[1], xformed[2]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
             model=module_model_from_string(definition["model"]),

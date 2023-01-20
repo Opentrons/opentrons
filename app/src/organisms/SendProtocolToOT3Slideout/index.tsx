@@ -89,26 +89,33 @@ export function SendProtocolToOT3Slideout(
         })
         onCloseClick()
       })
-      .catch((error: AxiosError) => {
-        eatToast(toastId)
-        const { id, detail, title } = error?.response?.data.errors[0]
-        if (id === 'ProtocolFilesInvalid') {
-          makeToast(detail, ERROR_TOAST, {
-            closeButton: true,
-            disableTimeout: true,
-            heading: `${protocolDisplayName} ${title} on ${
-              selectedRobot?.name ?? ''
-            }`,
-          })
-        } else {
-          makeToast(selectedRobot?.name ?? '', ERROR_TOAST, {
-            closeButton: true,
-            disableTimeout: true,
-            heading: `${t('unsuccessfully_sent')} ${protocolDisplayName}`,
-          })
+      .catch(
+        (
+          error: AxiosError<{
+            errors: Array<{ id: string; detail: string; title: string }>
+          }>
+        ) => {
+          eatToast(toastId)
+          const [errorDetail] = error?.response?.data?.errors ?? []
+          const { id, detail, title } = errorDetail ?? {}
+          if (id != null && detail != null && title != null) {
+            makeToast(detail, ERROR_TOAST, {
+              closeButton: true,
+              disableTimeout: true,
+              heading: `${protocolDisplayName} ${title} - ${
+                selectedRobot?.name ?? ''
+              }`,
+            })
+          } else {
+            makeToast(selectedRobot?.name ?? '', ERROR_TOAST, {
+              closeButton: true,
+              disableTimeout: true,
+              heading: `${t('unsuccessfully_sent')} ${protocolDisplayName}`,
+            })
+          }
+          onCloseClick()
         }
-        onCloseClick()
-      })
+      )
   }
 
   return (

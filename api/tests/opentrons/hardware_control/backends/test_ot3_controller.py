@@ -1,5 +1,5 @@
 import pytest
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Set, Tuple, Any
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
@@ -12,7 +12,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallbackFilter,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons.config.types import OT3Config
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -23,6 +23,7 @@ from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons.hardware_control.types import (
     OT3Axis,
     OT3Mount,
+    OT3AxisMap,
     InvalidPipetteName,
     InvalidPipetteModel,
     MotorStatus,
@@ -34,6 +35,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
 )
+from opentrons_hardware.hardware_control import current_settings
 from opentrons_hardware.hardware_control.tools.detector import OneshotToolDetector
 from opentrons_hardware.hardware_control.tools.types import (
     ToolSummary,
@@ -107,7 +109,7 @@ def mock_move_group_run():
 
 
 @pytest.fixture
-def mock_present_nodes(controller: OT3Controller):
+def mock_present_nodes(controller: OT3Controller) -> OT3Controller:
     old_pn = controller._present_nodes
     controller._present_nodes = set(
         (
@@ -650,3 +652,100 @@ async def test_update_motor_estimation(
             assert controller._position.get(node) == 0.223
             assert controller._encoder_position.get(node) == 0.323
             assert controller._motor_status.get(node) == MotorStatus(False, True)
+
+
+@pytest.mark.parametrize(
+    argnames=["gantry_load", "expected_call"],
+    argvalues=[
+        [GantryLoad.NONE, []],
+        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],
+        [GantryLoad.LOW_THROUGHPUT, []],
+    ],
+)
+async def test_set_default_currents(
+    mock_present_nodes: OT3Controller, gantry_load: GantryLoad, expected_call: bool
+):
+    mock_present_nodes._present_nodes.add(NodeId.gripper_g)
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.set_currents",
+        spec=current_settings.set_currents,
+    ) as mocked_currents:
+        await mock_present_nodes.update_to_default_current_settings(gantry_load)
+        mocked_currents.assert_called_once_with(
+            mocked_currents.call_args_list[0][0][0],
+            mocked_currents.call_args_list[0][0][1],
+            use_tip_motor_message_for=expected_call,
+        )
+
+        for k, v in mock_present_nodes._current_settings.items():
+            assert (
+                mocked_currents.call_args_list[0][0][1][axis_to_node(k)] == v.as_tuple()
+            )
+
+
+@pytest.mark.parametrize(
+    argnames=["active_current", "gantry_load", "expected_call"],
+    argvalues=[
+        [
+            {OT3Axis.X: 1.0, OT3Axis.Y: 2.0},
+            GantryLoad.NONE,
+            [{NodeId.gantry_x: 1.0, NodeId.gantry_y: 2.0}, []],
+        ],
+        [
+            {OT3Axis.Q: 1.5},
+            GantryLoad.HIGH_THROUGHPUT,
+            [{NodeId.pipette_left: 1.5}, [NodeId.pipette_left]],
+        ],
+    ],
+)
+async def test_set_run_current(
+    mock_present_nodes: OT3Controller,
+    active_current: OT3AxisMap[float],
+    gantry_load: GantryLoad,
+    expected_call: List[Any],
+):
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.set_run_current",
+        spec=current_settings.set_run_current,
+    ) as mocked_currents:
+        await mock_present_nodes.update_to_default_current_settings(gantry_load)
+        await mock_present_nodes.set_active_current(active_current)
+        mocked_currents.assert_called_once_with(
+            mocked_currents.call_args_list[0][0][0],
+            expected_call[0],
+            use_tip_motor_message_for=expected_call[1],
+        )
+
+
+@pytest.mark.parametrize(
+    argnames=["hold_current", "gantry_load", "expected_call"],
+    argvalues=[
+        [
+            {OT3Axis.P_L: 0.5, OT3Axis.Y: 0.8},
+            GantryLoad.NONE,
+            [{NodeId.pipette_left: 0.5, NodeId.gantry_y: 0.8}, []],
+        ],
+        [
+            {OT3Axis.Q: 0.8},
+            GantryLoad.HIGH_THROUGHPUT,
+            [{NodeId.pipette_left: 0.8}, [NodeId.pipette_left]],
+        ],
+    ],
+)
+async def test_set_hold_current(
+    mock_present_nodes: OT3Controller,
+    hold_current: OT3AxisMap[float],
+    gantry_load: GantryLoad,
+    expected_call: List[Any],
+):
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.set_hold_current",
+        spec=current_settings.set_hold_current,
+    ) as mocked_currents:
+        await mock_present_nodes.update_to_default_current_settings(gantry_load)
+        await mock_present_nodes.set_hold_current(hold_current)
+        mocked_currents.assert_called_once_with(
+            mocked_currents.call_args_list[0][0][0],
+            expected_call[0],
+            use_tip_motor_message_for=expected_call[1],
+        )

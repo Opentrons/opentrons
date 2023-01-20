@@ -145,7 +145,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             )
 
     def save_offset(self, delta: Point) -> None:
-        """Tempoarily reset the gripper offsets to default values."""
+        """Save a new gripper offset."""
         save_gripper_calibration_offset(self._gripper_id, delta)
         self._calibration_offset = load_gripper_calibration_offset(self._gripper_id)
 
@@ -157,10 +157,6 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         if self.current_jaw_displacement == 0.0:
             raise RuntimeError(
                 f"must grip the jaws before starting calibration (jaw displacement is {self.current_jaw_displacement})"
-            )
-        if self.current_jaw_displacement > self._max_jaw_displacement() - 1:
-            raise RuntimeError(
-                f"must hold something between gripper jaws during calibration (jaw displacement is {self.current_jaw_displacement})"
             )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
@@ -218,6 +214,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
             "state": self._state,
+            "calibration_offset": self._calibration_offset,
         }
         return d
 

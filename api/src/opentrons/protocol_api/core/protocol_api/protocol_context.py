@@ -420,3 +420,11 @@ class ProtocolContextImplementation(
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
         raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
+
+    def get_labware_location(
+        self, labware_core: LabwareImplementation
+    ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
+        """Get labware parent location."""
+        raise NotImplementedError(
+            "LegacyProtocolCore.get_labware_location not implemented"
+        )

@@ -60,6 +60,8 @@ def test_build_edges():
     test_lw = Labware(
         implementation=LabwareImplementation(lw_def, Location(Point(0, 0, 0), None)),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     off = Point(0, 0, 1.0)
     deck = Deck()

@@ -18,6 +18,7 @@ from typing import (
     Set,
     TypeVar,
     Iterator,
+    KeysView,
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
@@ -569,6 +570,10 @@ class OT3Controller:
         res = await get_limit_switches(self._messenger, self._present_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
+    @staticmethod
+    def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
+        return [axis_to_node(OT3Axis.Q)] if OT3Axis.Q in axis_current_keys else []
+
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
@@ -576,6 +581,9 @@ class OT3Controller:
             self._messenger,
             self._axis_map_to_present_nodes(
                 {k: v.as_tuple() for k, v in self._current_settings.items()}
+            ),
+            use_tip_motor_message_for=self._tip_motor_nodes(
+                self._current_settings.keys()
             ),
         )
 
@@ -590,7 +598,9 @@ class OT3Controller:
         """
         assert self._current_settings, "Invalid current settings"
         await set_run_current(
-            self._messenger, self._axis_map_to_present_nodes(axis_currents)
+            self._messenger,
+            self._axis_map_to_present_nodes(axis_currents),
+            use_tip_motor_message_for=self._tip_motor_nodes(axis_currents.keys()),
         )
         for axis, current in axis_currents.items():
             self._current_settings[axis].run_current = current
@@ -606,7 +616,9 @@ class OT3Controller:
         """
         assert self._current_settings, "Invalid current settings"
         await set_hold_current(
-            self._messenger, self._axis_map_to_present_nodes(axis_currents)
+            self._messenger,
+            self._axis_map_to_present_nodes(axis_currents),
+            use_tip_motor_message_for=self._tip_motor_nodes(axis_currents.keys()),
         )
         for axis, current in axis_currents.items():
             self._current_settings[axis].hold_current = current

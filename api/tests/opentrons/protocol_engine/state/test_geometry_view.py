@@ -3,6 +3,7 @@ import pytest
 from decoy import Decoy
 from typing import cast, List, Tuple, Union, Optional
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -20,6 +21,7 @@ from opentrons.protocol_engine.types import (
     WellOffset,
     OFF_DECK_LOCATION,
     Dimensions,
+    DeckType,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -90,6 +92,7 @@ def test_get_labware_parent_position_on_module(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should return a module position for labware on a module."""
@@ -108,9 +111,12 @@ def test_get_labware_parent_position_on_module(
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
         Point(1, 2, 3)
     )
-    decoy.when(module_view.get_module_offset("module-id")).then_return(
-        LabwareOffsetVector(x=4, y=5, z=6)
-    )
+    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
+    decoy.when(
+        module_view.get_module_offset(
+            module_id="module-id", deck_type=DeckType.OT2_STANDARD
+        )
+    ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
 
     result = subject.get_labware_parent_position("labware-id")
 
@@ -187,6 +193,7 @@ def test_get_module_labware_highest_z(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
+    standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should get the absolute location of a labware's highest Z point."""
@@ -211,9 +218,12 @@ def test_get_module_labware_highest_z(
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
-    decoy.when(module_view.get_module_offset("module-id")).then_return(
-        LabwareOffsetVector(x=4, y=5, z=6)
-    )
+    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
+    decoy.when(
+        module_view.get_module_offset(
+            module_id="module-id", deck_type=DeckType.OT2_STANDARD
+        )
+    ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
 
     highest_z = subject.get_labware_highest_z("labware-id")
@@ -523,6 +533,7 @@ def test_get_module_labware_well_position(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
+    standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware on module."""
@@ -551,9 +562,12 @@ def test_get_module_labware_well_position(
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
     )
-    decoy.when(module_view.get_module_offset("module-id")).then_return(
-        LabwareOffsetVector(x=4, y=5, z=6)
-    )
+    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
+    decoy.when(
+        module_view.get_module_offset(
+            module_id="module-id", deck_type=DeckType.OT2_STANDARD
+        )
+    ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
 
     result = subject.get_well_position("labware-id", "B2")
 
@@ -975,6 +989,7 @@ def test_get_labware_center(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
     location: Union[DeckSlotLocation, ModuleLocation],
     expected_center_point: Point,
@@ -985,9 +1000,12 @@ def test_get_labware_center(
     )
 
     if isinstance(location, ModuleLocation):
-        decoy.when(module_view.get_module_offset("module-id")).then_return(
-            LabwareOffsetVector(x=10, y=20, z=30)
-        )
+        decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
+        decoy.when(
+            module_view.get_module_offset(
+                module_id="module-id", deck_type=DeckType.OT2_STANDARD
+            )
+        ).then_return(LabwareOffsetVector(x=10, y=20, z=30))
 
         decoy.when(module_view.get_location("module-id")).then_return(
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
