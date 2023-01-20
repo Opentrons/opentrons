@@ -1670,7 +1670,7 @@ class OT3API(
     ) -> float:
         """Search for and return liquid level height.
 
-        This function checks makes sure the plunger motor is homed before starting.
+        This function makes sure the plunger motor is homed before starting.
         After moving the mount the distance specified by starting_mount_height in the
         LiquidProbeSettings, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
