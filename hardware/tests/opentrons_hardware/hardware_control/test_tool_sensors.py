@@ -56,6 +56,7 @@ def mock_sensor_threshold() -> Iterator[AsyncMock]:
         "opentrons_hardware.sensors.scheduler.SensorScheduler.send_threshold",
         AsyncMock(spec=SensorScheduler.send_threshold),
     ) as mock_threshold:
+
         async def echo_value(
             info: SensorThresholdInformation, messenger: CanMessenger
         ) -> SensorDataType:
@@ -141,10 +142,9 @@ async def test_liquid_probe(
         messenger=mock_messenger,
         tool=target_node,
         mount=motor_node,
-        pipette_distance=40,
-        pipette_speed=8,
-        mount_distance=30,
+        max_z_distance=40,
         mount_speed=10,
+        plunger_speed=8,
         starting_mount_height=120,
         prep_move_speed=40,
         sensor_id=SensorId.S0,

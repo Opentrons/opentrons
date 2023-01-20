@@ -40,8 +40,10 @@ def _build_pass_step(
     #   mover and determine the step duration
     if NodeId.pipette_left in movers or NodeId.pipette_right in movers:
         primary_mover = [ax for ax in movers if ax in [NodeId.head_l, NodeId.head_r]][0]
+        stop_condition = MoveStopCondition.pressure_sensor
     else:
         primary_mover = movers[0]
+        stop_condition = MoveStopCondition.cap_sensor
     return create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
@@ -58,9 +60,8 @@ async def liquid_probe(
     messenger: CanMessenger,
     tool: ProbeTarget,
     mount: NodeId,
-    pipette_distance: float,
-    pipette_speed: float,
-    mount_distance: float,
+    max_z_distance: float,
+    plunger_speed: float,
     mount_speed: float,
     starting_mount_height: float,
     prep_move_speed: float,
@@ -76,10 +77,10 @@ async def liquid_probe(
         stop_threshold=threshold_fixed_point,
     )
 
-    pass_group = _build_pass_step(
+    sensor_group = _build_pass_step(
         movers=[mount, tool],
-        distance={mount: mount_distance, tool: pipette_distance},
-        speed={mount: mount_speed, tool: pipette_speed},
+        distance={mount: max_z_distance, tool: max_z_distance},
+        speed={mount: mount_speed, tool: plunger_speed},
     )
 
     prep_move = create_step(
@@ -91,12 +92,9 @@ async def liquid_probe(
         stop_condition=MoveStopCondition.none,
     )
 
-    print(f"pass group = {pass_group}")
-    print(f"prep move = {prep_move}")
-
     await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
     prep_runner = MoveGroupRunner(move_groups=[[prep_move]])
-    sensor_runner = MoveGroupRunner(move_groups=[[pass_group]])
+    sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
     await prep_runner.run(can_messenger=messenger)
     async with sensor_driver.bind_output(
         messenger,

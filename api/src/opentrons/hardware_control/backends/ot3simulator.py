@@ -227,10 +227,9 @@ class OT3Simulator:
     async def liquid_probe(
         self,
         mount: OT3Mount,
-        pipette_distance: float,
-        pipette_speed: float,
-        mount_distance: float,
+        max_z_distance: float,
         mount_speed: float,
+        plunger_speed: float,
         threshold_pascals: float,
         starting_mount_height: float,
         prep_move_speed: float,

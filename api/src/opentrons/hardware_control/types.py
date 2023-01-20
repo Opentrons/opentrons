@@ -440,6 +440,7 @@ class HardwareAction(enum.Enum):
     DISPENSE = enum.auto()
     BLOWOUT = enum.auto()
     PREPARE_ASPIRATE = enum.auto()
+    LIQUID_PROBE = enum.auto()
 
     def __str__(self) -> str:
         return self.name

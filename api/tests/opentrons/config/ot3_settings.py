@@ -183,11 +183,12 @@ ot3_dummy_settings = {
     "liquid_sense": {
         "starting_mount_height": 80,
         "prep_move_speed": 40,
-        "pipette_distance": 100,
-        "mount_distance": 50,
+        "max_z_distance": 20,
+        "min_z_distance": 3,
         "mount_speed": 10,
-        "pipette_speed": 10,
+        "plunger_speed": 10,
         "sensor_threshold_pascals": 17,
+        "expected_liquid_height": 90,
     },
     "calibration": {
         "z_offset": {
