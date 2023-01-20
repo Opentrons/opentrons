@@ -91,8 +91,8 @@ async def _main(is_simulating: bool) -> None:
         await api.move_to(MOUNT, Point(227.826, 362.808, 42.61)) #, speed = 50)
         ### time.sleep(1)
         init_reading = gauge.read()
-        init_robot_pos = await api.current_position_ot3(MOUNT)
-        init_encoder_pos = await api.encoder_current_position_ot3(MOUNT)
+        init_robot_pos = await api.current_position_ot3(MOUNT, refresh=True)
+        init_encoder_pos = await api.encoder_current_position_ot3(MOUNT, refresh=True)
         print(f"Initial Dial Reading (mm) = {init_reading}\n")
         print(f"Initial robot position: {init_robot_pos[OT3Axis.Z_R]}\n")
         print(f"Initial encoder position: {init_encoder_pos[OT3Axis.Z_R]}\n")
@@ -115,16 +115,20 @@ async def _main(is_simulating: bool) -> None:
                 # print("--UPDATE POSITION--\n")
                 # await api._update_position_estimation([OT3Axis.Z_R])
 
-        await asyncio.sleep(1)
+        ### all 3 --> weird behavior, the probe moves diagonally when trying to hit the gauge after the stall
+        ### first and third commented out --> able to reach gauge, but is off by like 2mm
+        ### first and second commented out --> similar to first and third behavior, also off by like 2mm
+        ### second and third commented out --> all good
+        # 1 await asyncio.sleep(1) ### --> if this is the only one commented out,  ~2.4mm diff present
         if collision_detected:
             print("--UPDATE POSITION--\n")
             await api._update_position_estimation([OT3Axis.Z_R])
-        await asyncio.sleep(1)
-        stall_robot_pos = await api.current_position_ot3(MOUNT)
-        stall_encoder_pos = await api.encoder_current_position_ot3(MOUNT)
+        # 2 await asyncio.sleep(1) ### --> if this is the only one commented out, everything is good
+        stall_robot_pos = await api.current_position_ot3(MOUNT, refresh=True)
+        stall_encoder_pos = await api.encoder_current_position_ot3(MOUNT, refresh=True)
         print(f"Stalled robot position: {stall_robot_pos[OT3Axis.Z_R]}\n")
         print(f"Stalled encoder position: {stall_encoder_pos[OT3Axis.Z_R]}\n")
-        await asyncio.sleep(1)
+        # 3 await asyncio.sleep(1) ### --> if this is the only one commented out, everything is good
 
         # MOVE_POS = Point(227.826, 362.808, 250.0) #Point(235.414, 385.308, 509.15)
         # FIXTURE_POS = Point(227.826, 362.808, 44.61) #Point(235.414, 385.308, 303.965)
@@ -141,12 +145,12 @@ async def _main(is_simulating: bool) -> None:
         # input(f"Current pos: {pos[OT3Axis.Z_R]}")
 
         stall_reading = gauge.read()
-        updated_robot_pos = await api.current_position_ot3(MOUNT)
-        updated_encoder_pos = await api.encoder_current_position_ot3(MOUNT)
+        updated_robot_pos = await api.current_position_ot3(MOUNT, refresh=True)
+        updated_encoder_pos = await api.encoder_current_position_ot3(MOUNT, refresh=True)
         print(f"Stall Dial Reading (mm) = {stall_reading}\n")
         print(f"Updated robot position: {updated_robot_pos[OT3Axis.Z_R]}\n")
         print(f"Updated encoder position: {updated_encoder_pos[OT3Axis.Z_R]}\n")
-        await aysncio.sleep(1)
+        await asyncio.sleep(1)
 
         reading_diff = init_reading - stall_reading
         print(f"Dial reading difference after stall: {reading_diff} mm\n")
