@@ -17,7 +17,7 @@ def resolve(
     """Resolve the load labware parameters that best matches any custom labware, or default to opentrons standards
 
     Args:
-        load_name:
+        load_name: Load name of the labware.
         namespace: Optionally provided labware definition namespace
         version: Optionally provided labware definition version
         custom_load_labware_params: List of load labware parameters associated with custom labware that
