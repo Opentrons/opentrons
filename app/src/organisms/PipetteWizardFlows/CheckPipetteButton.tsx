@@ -25,7 +25,9 @@ export const CheckPipetteButton = (
   )
   React.useEffect(() => {
     if (isPending) {
-      setPending(isPending)
+      setPending(true)
+    } else {
+      setPending(false)
     }
   }, [isPending, setPending])
 
