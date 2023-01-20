@@ -109,6 +109,30 @@ def mock_home(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 
 @pytest.fixture
+def mock_home_z(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "home_z",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.home_z,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_home_plunger(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "home_plunger",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.home_plunger,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
 def mock_gantry_position(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
         ot3_hardware.managed_obj,
@@ -396,6 +420,8 @@ async def test_liquid_probe(
     fake_liquid_settings: LiquidProbeSettings,
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
+    mock_home_z: AsyncMock,
+    mock_home_plunger: AsyncMock,
 ) -> None:
     backend = ot3_hardware.managed_obj._backend
 
