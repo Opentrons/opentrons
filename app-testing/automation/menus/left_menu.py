@@ -17,15 +17,9 @@ class LeftMenu:
         """Initialize with driver, console, and unique id for the test."""
         self.base: Base = Base(driver, console, execution_id)
 
-    protocols: Element = Element(
-        (By.XPATH, '//a[contains(@href,"#/protocols")]'), "Left menu Protocols"
-    )
-    labware: Element = Element(
-        (By.XPATH, '//a[contains(@href,"#/labware")]'), "Left menu Labware"
-    )
-    devices: Element = Element(
-        (By.XPATH, '//a[contains(@href,"#/devices")]'), "Left menu Devices"
-    )
+    protocols: Element = Element((By.XPATH, '//a[contains(@href,"#/protocols")]'), "Left menu Protocols")
+    labware: Element = Element((By.XPATH, '//a[contains(@href,"#/labware")]'), "Left menu Labware")
+    devices: Element = Element((By.XPATH, '//a[contains(@href,"#/devices")]'), "Left menu Devices")
     gear: Element = Element(
         (By.XPATH, '//a[contains(@href,"#/app-settings")]'),
         "Left menu bottom gear to go to App Settings",
@@ -44,7 +38,5 @@ class LeftMenu:
         )
         button = self.base.clickable_wrapper_safe(not_now, 3)
         if button is not None:
-            self.base.console.print(
-                "Version available layover present.", style="white on blue"
-            )
+            self.base.console.print("Version available layover present.", style="white on blue")
             self.base.click_webelement(button)

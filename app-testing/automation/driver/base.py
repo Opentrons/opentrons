@@ -109,9 +109,7 @@ class Base:
 
     def take_screenshot(self, message: str = "") -> None:
         """Take a screenshot and place in the results directory."""
-        directory_for_results: Path = Path(
-            Path(__file__).resolve().parents[2], "results"
-        )
+        directory_for_results: Path = Path(Path(__file__).resolve().parents[2], "results")
         workspace = os.getenv("GITHUB_WORKSPACE", None)
         if workspace is not None:
             # We are in a GitHub action.
@@ -120,9 +118,7 @@ class Base:
             os.makedirs(directory_for_results)
         note = "" if (message == "") else f"_{message}".replace(" ", "_")
         file_name = (
-            f"{str(time.time_ns())[:-3]}_{self.execution_id}".replace("/", "_")
-            .replace("::", "__")
-            .replace(".py", "")
+            f"{str(time.time_ns())[:-3]}_{self.execution_id}".replace("/", "_").replace("::", "__").replace(".py", "")
             + note
             + ".png"
         )
@@ -174,9 +170,7 @@ class Base:
         element: Element,
     ) -> None:
         """Handle exceptions for locators."""
-        self.console.print(
-            f"Issue finding {element.description}", style="white on blue"
-        )
+        self.console.print(f"Issue finding {element.description}", style="white on blue")
         self.console.print(f"Locator {element.locator}", style="white on blue")
         self.take_screenshot(message="on exception")
         self.console.print_exception()
@@ -194,9 +188,9 @@ class Base:
         )
 
         def finder() -> Any:
-            return WebDriverWait(
-                self.driver, timeout_sec, ignored_exceptions=ignored_exceptions
-            ).until(expected_condition(element.locator))
+            return WebDriverWait(self.driver, timeout_sec, ignored_exceptions=ignored_exceptions).until(
+                expected_condition(element.locator)
+            )
 
         return finder
 
@@ -207,9 +201,7 @@ class Base:
     ) -> WebElement:
         """Use the expected condition element_to_be_clickable. Raise on issue."""
         try:
-            finder = self.create_finder(
-                element, EC.element_to_be_clickable, timeout_sec
-            )
+            finder = self.create_finder(element, EC.element_to_be_clickable, timeout_sec)
             finder()
             self.highlight_element(finder)
             return finder()
@@ -261,9 +253,7 @@ class Base:
     ) -> Optional[WebElement]:
         """Gracefully use the expected condition element_to_be_clickable."""
         try:
-            finder = self.create_finder(
-                element, EC.element_to_be_clickable, timeout_sec
-            )
+            finder = self.create_finder(element, EC.element_to_be_clickable, timeout_sec)
             finder()
             self.highlight_element(finder)
             return finder()
@@ -278,9 +268,7 @@ class Base:
     ) -> Optional[WebElement]:
         """Gracefully use the expected condition element_to_be_clickable."""
         try:
-            finder = self.create_finder(
-                element, EC.invisibility_of_element_located, timeout_sec
-            )
+            finder = self.create_finder(element, EC.invisibility_of_element_located, timeout_sec)
             finder()
             self.highlight_element(finder)
             return finder()

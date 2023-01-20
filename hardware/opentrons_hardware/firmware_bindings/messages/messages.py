@@ -33,6 +33,8 @@ MessageDefinition = Union[
     defs.MoveCompleted,
     defs.MotorPositionRequest,
     defs.MotorPositionResponse,
+    defs.UpdateMotorPositionEstimationRequest,
+    defs.UpdateMotorPositionEstimationResponse,
     defs.SetMotionConstraints,
     defs.GetMotionConstraintsRequest,
     defs.GetMotionConstraintsResponse,
@@ -75,10 +77,17 @@ MessageDefinition = Union[
     defs.BindSensorOutputRequest,
     defs.TipActionRequest,
     defs.TipActionResponse,
+    defs.GearDisableMotorRequest,
+    defs.GearEnableMotorRequest,
+    defs.GearReadMotorDriverRegisterRequest,
+    defs.GearWriteMotorDriverRegisterRequest,
+    defs.GearWriteMotorCurrentRequest,
     defs.PeripheralStatusRequest,
     defs.PeripheralStatusResponse,
     defs.SetSerialNumber,
     defs.InstrumentInfoRequest,
+    defs.BrushedMotorConfRequest,
+    defs.BrushedMotorConfResponse,
 ]
 
 

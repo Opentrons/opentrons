@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
   Flex,
   SPACING,
@@ -18,6 +19,7 @@ import {
   WELL_LABEL_OPTIONS,
   SIZE_AUTO,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
@@ -31,16 +33,17 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import { ToggleButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
-import { SecureLabwareModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
+import { SecureLabwareModal } from './SecureLabwareModal'
+
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import type { LabwareSetupItem } from './types'
 
 const LabwareRow = styled.div`
@@ -263,7 +266,9 @@ function StandaloneLabware(props: {
   const { definition } = props
   return (
     <LabwareThumbnail
-      viewBox={` 0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+      viewBox={` 0 0 ${String(definition.dimensions.xDimension)} ${String(
+        definition.dimensions.yDimension
+      )}`}
     >
       <LabwareRender
         definition={definition}

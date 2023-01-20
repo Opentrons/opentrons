@@ -139,6 +139,8 @@ def get_protocol_api(
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     hardware_simulator: Optional[ThreadManagedHardware] = None,
+    # TODO(mm, 2022-12-14): The name and type of this parameter should be unified with
+    # robotType in a standalone Python protocol's `requirements` dict. Jira RCORE-318.
     machine: Optional[MachineType] = None,
 ) -> protocol_api.ProtocolContext:
     """
@@ -211,6 +213,9 @@ def get_protocol_api(
 def _check_hardware_simulator(
     hardware_simulator: Optional[ThreadManagedHardware], machine: Optional[MachineType]
 ) -> ThreadManagedHardware:
+    # TODO(mm, 2022-12-14): This should fail with a more descriptive error if someone
+    # runs this on a robot, and that robot doesn't have a matching robot type.
+    # Jira RCORE-318.
     if hardware_simulator:
         return hardware_simulator
     elif machine == "ot3" or should_use_ot3():
@@ -276,6 +281,9 @@ def simulate(
     hardware_simulator_file_path: Optional[str] = None,
     duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
+    # TODO(mm, 2022-12-14): Now that protocols declare their target robot types
+    # intrinsically, the `machine` param should be removed in favor of determining
+    # it automatically.
     machine: Optional[MachineType] = None,
 ) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
     """

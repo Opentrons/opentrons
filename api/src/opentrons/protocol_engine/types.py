@@ -10,7 +10,9 @@ from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.modules import ModuleType as ModuleType
+from opentrons.hardware_control.modules import (
+    ModuleType as ModuleType,
+)
 
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
@@ -112,6 +114,14 @@ class DeckPoint(BaseModel):
     x: float
     y: float
     z: float
+
+
+class DeckType(str, Enum):
+    """Types of deck available."""
+
+    OT2_STANDARD = "ot2_standard"
+    OT2_SHORT_TRASH = "ot2_short_trash"
+    OT3_STANDARD = "ot3_standard"
 
 
 class LoadedPipette(BaseModel):

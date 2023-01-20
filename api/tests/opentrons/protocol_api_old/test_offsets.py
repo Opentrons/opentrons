@@ -13,6 +13,8 @@ def test_wells_rebuilt_with_offset(minimal_labware_def: "LabwareDefinition") -> 
         implementation=LabwareImplementation(
             minimal_labware_def, Location(Point(0, 0, 0), "deck")
         ),
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     old_well_top = test_labware.wells()[0].top().point
     assert test_labware._implementation.get_geometry().offset == Point(10, 10, 5)

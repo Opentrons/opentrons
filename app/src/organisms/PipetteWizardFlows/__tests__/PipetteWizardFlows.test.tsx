@@ -75,7 +75,10 @@ const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedGen3Pipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
+  modelSpecs: {
+    ...mockGen3P1000PipetteSpecs,
+    maxVolume: 50,
+  },
 }
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
@@ -176,7 +179,7 @@ describe('PipetteWizardFlows', () => {
     getByText(
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
-    const initiate = getByRole('button', { name: 'Initiate calibration' })
+    const initiate = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(initiate)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -315,6 +318,7 @@ describe('PipetteWizardFlows', () => {
     })
   })
   it('renders the correct information, calling the correct commands for the attach flow 96 channel', async () => {
+    mockGetAttachedPipettes.mockReturnValue({ left: null, right: null })
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -366,10 +370,26 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew Z Axis Carriage')
+    getByText('Unscrew Z-axis Carriage')
     // TODO wait until commands are wired up to write out more of this test!
   })
   it('renders the correct information, calling the correct commands for the detach flow 96 channel', async () => {
+    mockGetAttachedPipettes.mockReturnValue({
+      left: {
+        id: 'abc',
+        name: 'p1000_96',
+        model: 'p1000_96_v1',
+        tip_length: 42,
+        mount_axis: 'c',
+        plunger_axis: 'd',
+        modelSpecs: {
+          ...mockGen3P1000PipetteSpecs,
+          maxVolume: 50,
+          displayName: 'mock display name',
+        },
+      },
+      right: null,
+    })
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -429,11 +449,153 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew and Remove 96 Channel Pipette')
+    getByText('Loosen Screws and Detach 96-Channel Pipette')
     const continueBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(continueBtn)
     await waitFor(() => {
       expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+    })
+  })
+  it('renders the correct information, calling the correct commands for the attach flow 96 channel with gantry not empty', async () => {
+    mockGetAttachedPipettes.mockReturnValue({ left: null, right: mockPipette })
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+    ])
+    const { getByText, getByRole } = render(props)
+    getByText('Detach P1000 Single-Channel GEN3 and Attach 96-Channel Pipette')
+    getByText('Before you begin')
+    // page 1
+    const getStarted = getByRole('button', { name: 'Move gantry to front' })
+    fireEvent.click(getStarted)
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // page 2
+    getByText(
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
+    )
+    getByText('Continue')
+  })
+  it('renders the correct information, calling the correct commands for the 96-channel calibration flow', async () => {
+    props = {
+      ...props,
+      flowType: FLOWS.CALIBRATE,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    const { getByText, getByRole } = render(props)
+    //  first page
+    getByText('Calibrate 96-Channel pipette')
+    getByText('Before you begin')
+    getByText(
+      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+    )
+    getByText(
+      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+    )
+    getByRole('button', { name: 'Get started' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_gen3',
+            },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // second page
+    getByText('Step 1 / 3')
+    getByText('Attach Calibration Probe')
+    getByText(
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+    )
+    getByRole('button', { name: 'Begin calibration' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: LEFT },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+    })
+    //  third page
+    getByText('Step 2 / 3')
+    getByText('Remove Calibration Probe')
+    getByText(
+      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
+    )
+    getByRole('button', { name: 'Complete calibration' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: {},
+          },
+        ],
+        false
+      )
     })
   })
 })

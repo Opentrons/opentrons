@@ -3,15 +3,14 @@ import time
 from typing import List
 
 import pytest
-from pytest import FixtureRequest
-from rich.console import Console
-from selenium.webdriver.chrome.webdriver import WebDriver
-
 from automation.menus.left_menu import LeftMenu
 from automation.pages.deck_calibrate import DeckCalibration
 from automation.pages.device_landing import DeviceLanding
 from automation.resources.ot_robot import OtRobot
 from automation.resources.robot_data import EmulatedAlpha, RobotDataType
+from pytest import FixtureRequest
+from rich.console import Console
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 @pytest.mark.skip("Need to fix.")
@@ -28,16 +27,12 @@ def test_deck_calibrate(
     # this test is against only the EmulatedAlpha robot
     robot = next(robot for robot in robots if robot.name == EmulatedAlpha.name)
     ot_robot = OtRobot(console, robot)
-    console.print(
-        f"Testing against robot {ot_robot.data.display_name}", style="white on blue"
-    )
+    console.print(f"Testing against robot {ot_robot.data.display_name}", style="white on blue")
     assert ot_robot.is_alive(), "is the robot available?"
 
     # calibrate
 
-    device_landing.click_overflow_menu_button_on_device_landing(
-        ot_robot.data.display_name
-    )
+    device_landing.click_overflow_menu_button_on_device_landing(ot_robot.data.display_name)
     device_landing.click_overflow_robot_settings(ot_robot.data.display_name)
 
     # Now we are on Robot Settings > calibration tab
@@ -97,14 +92,10 @@ def test_calibrate_pipettes(
     # this test is against only the EmulatedAlpha robot
     robot = next(robot for robot in robots if robot.name == EmulatedAlpha.name)
     ot_robot: OtRobot = OtRobot(console, robot)
-    console.print(
-        f"Testing against robot {ot_robot.data.display_name}", style="white on blue"
-    )
+    console.print(f"Testing against robot {ot_robot.data.display_name}", style="white on blue")
     assert ot_robot.is_alive(), "is the robot available?"
 
-    assert (
-        ot_robot.deck_calibrated() is True
-    ), "Stopping test, deck must be calibrated to calibrate pipettes."
+    assert ot_robot.deck_calibrated() is True, "Stopping test, deck must be calibrated to calibrate pipettes."
 
     # calibrate the left pipette
     # devices > robot detail
@@ -126,9 +117,7 @@ def test_calibrate_pipettes(
 
     time.sleep(6)  # when spinner up, click will error # todo wait for spinner gone
     left_menu.navigate("devices")
-    device_landing.click_overflow_menu_button_on_device_landing(
-        ot_robot.data.display_name
-    )
+    device_landing.click_overflow_menu_button_on_device_landing(ot_robot.data.display_name)
     device_landing.click_overflow_robot_settings(ot_robot.data.display_name)
     # Now we are on Robot Settings > calibration tab
     banner = device_landing.invisible_pipette_offset_missing_banner_safely()
@@ -149,8 +138,6 @@ def test_all_calibrated_api(
     ot_robot: OtRobot = OtRobot(console, robot)
     console.print(f"Testing against robot {ot_robot.data.name}", style="white on blue")
     assert ot_robot.is_alive(), "is the robot available?"
-    assert (
-        ot_robot.deck_calibrated() is True
-    ), "Stopping test, deck must be calibrated to calibrate pipettes."
+    assert ot_robot.deck_calibrated() is True, "Stopping test, deck must be calibrated to calibrate pipettes."
     assert ot_robot.pipettes_calibrated()
     assert ot_robot.tip_length_calibrated()

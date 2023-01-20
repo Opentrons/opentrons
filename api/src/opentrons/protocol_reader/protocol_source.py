@@ -8,6 +8,8 @@ from typing_extensions import Literal
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 
 class ProtocolType(str, Enum):
     """Type of protocol, JSON or Python."""
@@ -16,7 +18,7 @@ class ProtocolType(str, Enum):
     PYTHON = "python"
 
 
-# TODO(mc, 2021-12-07): add data and python support roles
+# TODO(mc, 2021-12-07): add python support roles
 class ProtocolFileRole(str, Enum):
     """The purpose of a given file in a protocol.
 
@@ -26,10 +28,13 @@ class ProtocolFileRole(str, Enum):
             that exports the main `run` method.
         LABWARE: A labware definition file, loadable by a
             Python file in the same protocol.
+        DATA: An arbitrary text or csv file for usage in `bundled_data`
+            for a Python protool
     """
 
     MAIN = "main"
     LABWARE = "labware"
+    DATA = "data"
 
 
 @dataclass(frozen=True)
@@ -113,7 +118,6 @@ class ProtocolSource:
     main_file: Path
     files: List[ProtocolSourceFile]
     metadata: Metadata
-    # TODO(mm, 2022-10-21): Make this an enum once we figure out where to put it.
-    robot_type: Literal["OT-2 Standard", "OT-3 Standard"]
+    robot_type: RobotType
     config: ProtocolConfig
     labware_definitions: List[LabwareDefinition]

@@ -26,6 +26,7 @@ import {
 } from '../../../redux/discovery/constants'
 import { useAttachedModules, useAttachedPipettes } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
+import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotCard } from '../RobotCard'
 
@@ -36,6 +37,7 @@ jest.mock('../../../redux/discovery/selectors')
 jest.mock('../hooks')
 jest.mock('../../UpdateRobotBanner')
 jest.mock('../../../redux/config')
+jest.mock('../RobotOverflowMenu')
 jest.mock('../RobotStatusHeader')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
@@ -91,6 +93,9 @@ const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
 >
+const mockRobotOverflowMenu = RobotOverflowMenu as jest.MockedFunction<
+  typeof RobotOverflowMenu
+>
 const mockRobotStatusHeader = RobotStatusHeader as jest.MockedFunction<
   typeof RobotStatusHeader
 >
@@ -126,6 +131,7 @@ describe('RobotCard', () => {
       right: mockRightProtoPipette,
     })
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
+    mockRobotOverflowMenu.mockReturnValue(<div>Mock RobotOverflowMenu</div>)
     mockRobotStatusHeader.mockReturnValue(<div>Mock RobotStatusHeader</div>)
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
@@ -162,6 +168,11 @@ describe('RobotCard', () => {
   it('renders a UpdateRobotBanner component', () => {
     const [{ getByText }] = render(props)
     getByText('Mock UpdateRobotBanner')
+  })
+
+  it('renders a RobotOverflowMenu component', () => {
+    const [{ getByText }] = render(props)
+    getByText('Mock RobotOverflowMenu')
   })
 
   it('renders a RobotStatusHeader component', () => {

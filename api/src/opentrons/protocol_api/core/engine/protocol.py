@@ -28,6 +28,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -87,13 +88,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_id=trash_id,
             engine_client=self._engine_client,
         )
-
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Get a map of file names to byte contents.
-
-        Deprecated method for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_data not implemented")
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
         """Get a map of labware names to definition dicts.
@@ -366,6 +360,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
         return None
 
+    def get_labware_on_module(self, module_core: ModuleCore) -> Optional[LabwareCore]:
+        """Get the item on top of a given module, if any."""
+        try:
+            labware_id = self._engine_client.state.labware.get_id_by_module(
+                module_core.module_id
+            )
+            return self._labware_cores_by_id[labware_id]
+        except LabwareNotLoadedOnModuleError:
+            return None
+
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
         return self._engine_client.state.labware.get_slot_center_position(slot_name)
@@ -381,3 +385,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def get_module_cores(self) -> List[ModuleCore]:
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
+
+    def get_labware_location(
+        self, labware_core: LabwareCore
+    ) -> Union[DeckSlotName, ModuleCore, None]:
+        """Get labware parent location."""
+        labware_location = self._engine_client.state.labware.get_location(
+            labware_core.labware_id
+        )
+        if isinstance(labware_location, DeckSlotLocation):
+            return labware_location.slotName
+        elif isinstance(labware_location, ModuleLocation):
+            return self._module_cores_by_id.get(labware_location.moduleId)
+        return None

@@ -113,11 +113,11 @@ export function RobotSettings(): JSX.Element | null {
         marginBottom={SPACING.spacing4}
         width="100%"
       >
-        <Box padding={`0 ${SPACING.spacing4}`}>
+        <Box padding={`0 ${String(SPACING.spacing4)}`}>
           <Box
             color={COLORS.black}
             css={TYPOGRAPHY.h1Default}
-            padding={`${SPACING.spacing5} 0`}
+            padding={`${String(SPACING.spacing5)} 0`}
           >
             {t('robot_settings')}
           </Box>
@@ -162,7 +162,9 @@ export function RobotSettings(): JSX.Element | null {
           </Flex>
         </Box>
         <Line />
-        <Box padding={`${SPACING.spacing5} ${SPACING.spacing4}`}>
+        <Box
+          padding={`${String(SPACING.spacing5)} ${String(SPACING.spacing4)}`}
+        >
           <ApiHostProvider
             hostname={robot?.ip ?? null}
             port={robot?.port ?? null}

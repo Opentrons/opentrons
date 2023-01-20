@@ -129,8 +129,8 @@ export function useModuleOverflowMenu(
   const labwareLatchBtn = (
     <>
       <MenuItem
-        key={`hs_labware_latch_${module.moduleModel}`}
-        data-testid={`hs_labware_latch_${module.moduleModel}`}
+        key={`hs_labware_latch_${String(module.moduleModel)}`}
+        data-testid={`hs_labware_latch_${String(module.moduleModel)}`}
         onClick={toggleLatch}
         disabled={isLatchDisabled || isDisabled}
         {...targetProps}
@@ -152,9 +152,9 @@ export function useModuleOverflowMenu(
 
   const aboutModuleBtn = (
     <MenuItem
-      key={`about_module_${module.moduleModel}`}
-      id={`about_module_${module.moduleModel}`}
-      data-testid={`about_module_${module.moduleModel}`}
+      key={`about_module_${String(module.moduleModel)}`}
+      id={`about_module_${String(module.moduleModel)}`}
+      data-testid={`about_module_${String(module.moduleModel)}`}
       disabled={isIncompatibleWithOT3}
       onClick={() => handleAboutClick()}
     >
@@ -164,8 +164,8 @@ export function useModuleOverflowMenu(
 
   const attachToDeckBtn = (
     <MenuItem
-      key={`hs_attach_to_deck_${module.moduleModel}`}
-      data-testid={`hs_attach_to_deck_${module.moduleModel}`}
+      key={`hs_attach_to_deck_${String(module.moduleModel)}`}
+      data-testid={`hs_attach_to_deck_${String(module.moduleModel)}`}
       onClick={() => handleWizardClick()}
       whiteSpace="nowrap"
     >
@@ -176,9 +176,9 @@ export function useModuleOverflowMenu(
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle' ? (
       <MenuItem
-        key={`test_shake_${module.moduleModel}`}
-        id={`test_shake_${module.moduleModel}`}
-        data-testid={`test_shake_${module.moduleModel}`}
+        key={`test_shake_${String(module.moduleModel)}`}
+        id={`test_shake_${String(module.moduleModel)}`}
+        data-testid={`test_shake_${String(module.moduleModel)}`}
         disabled={isDisabled}
         onClick={() =>
           handleDeactivationCommand('heaterShaker/deactivateShaker')
@@ -189,7 +189,7 @@ export function useModuleOverflowMenu(
     ) : (
       <MenuItem
         onClick={() => handleTestShakeClick()}
-        key={`hs_test_shake_btn_${module.moduleModel}`}
+        key={`hs_test_shake_btn_${String(module.moduleModel)}`}
         disabled={isDisabled}
       >
         {t('heater_shaker:test_shake')}
@@ -260,7 +260,7 @@ export function useModuleOverflowMenu(
 
   const thermoSetBlockTempBtn = (
     <MenuItem
-      key={`thermocycler_block_temp_command_btn_${module.moduleModel}`}
+      key={`thermocycler_block_temp_command_btn_${String(module.moduleModel)}`}
       onClick={sendBlockTempCommand}
       disabled={isDisabled}
       whiteSpace="nowrap"

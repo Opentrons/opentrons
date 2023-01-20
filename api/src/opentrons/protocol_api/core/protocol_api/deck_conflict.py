@@ -15,11 +15,8 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 )
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-    HeaterShakerGeometry,
-)
+
+from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
 
 if TYPE_CHECKING:
     from .deck import DeckItem

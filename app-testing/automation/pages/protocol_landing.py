@@ -33,7 +33,7 @@ class ProtocolLanding:
             (By.XPATH, '//label[@data-testid="file_drop_zone"]'),
             "the drag and drop file button on Protocol Page",
         )
-        return self.base.present_wrapper(header, 2)
+        return self.base.present_wrapper(header, 4)
 
     def get_protocol_library_link(self) -> WebElement:
         """Get the Protocol Library Link on Protocol Page."""
@@ -211,10 +211,30 @@ class ProtocolLanding:
         )
         self.base.click(card)
 
+    def protocol_list_parents(self) -> Element:
+        """The parent row div on the protocol landing page."""
+        return Element(
+            (By.XPATH, '//div[contains(@class, "ProtocolCard___StyledBox")]'),
+            "protocol parent rows",
+        )
+
+    def get_protocol_list_parents(self) -> list[WebElement]:
+        return self.base.finds_wrapper(self.protocol_list_parents())
+
+    def delete_all_protocols(self) -> None:
+        """Delete every protocol."""
+        for _protocol in self.get_protocol_list_parents():
+            self.click_overflow_menu()
+            self.base.click_webelement(self.get_delete_protocol())
+            self.base.click_webelement(self.get_delete_protocol_confirm())
+
     def click_overflow_menu(self) -> None:
         """Get the overflow menu on protocol landing page."""
         card: Element = Element(
-            (By.XPATH, '//button[@data-testid="ProtocolOverflowMenu_overflowBtn"]'),
+            (
+                By.XPATH,
+                '//button[@data-testid="ProtocolOverflowMenu_overflowBtn"]',
+            ),
             "protocol card",
         )
         self.base.click(card)
@@ -495,18 +515,16 @@ class ProtocolLanding:
 
     def get_loading_data_safe(self) -> Optional[WebElement]:
         """Get loading data."""
-        ptext: Optional[WebElement] = self.base.present_wrapper_safe(
-            self.loading_data(), 1
-        )
+        ptext: Optional[WebElement] = self.base.present_wrapper_safe(self.loading_data(), 1)
         if ptext is None:
             self.console.print("Loading data... NOT found!", style="white on blue")
         else:
             self.console.print("Loading data... found!", style="white on blue")
         return ptext
 
-    def wait_until_loading_data_gone(self) -> bool:
+    def wait_until_loading_data_gone(self, timeout_sec: int = 61) -> bool:
         """Wait for loading data to go away."""
-        return wait_until_none(self.get_loading_data_safe, 61)
+        return wait_until_none(self.get_loading_data_safe, timeout_sec=timeout_sec)
 
     def error_details(self) -> Element:
         """Element locator for the link to the protocol analysis error details."""
@@ -520,17 +538,11 @@ class ProtocolLanding:
 
     def get_error_details_safe(self) -> Optional[WebElement]:
         """Get error details link."""
-        error_details: Optional[WebElement] = self.base.present_wrapper_safe(
-            self.error_details(), 2
-        )
+        error_details: Optional[WebElement] = self.base.present_wrapper_safe(self.error_details(), 2)
         if error_details is None:
-            self.console.print(
-                "No errors in the protocol analysis.", style="bright_yellow on blue"
-            )
+            self.console.print("No errors in the protocol analysis.", style="bright_yellow on blue")
         else:
-            self.console.print(
-                "Errors in protocol analysis.", style="bright_yellow on blue"
-            )
+            self.console.print("Errors in protocol analysis.", style="bright_yellow on blue")
         return error_details
 
     def reanalyze_link(self) -> Element:

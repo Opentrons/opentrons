@@ -34,6 +34,7 @@ import * as Sessions from '../../redux/sessions'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
 import { CalibrationHealthCheck } from './CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
+import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
 
@@ -359,36 +360,34 @@ export function RobotSettingsCalibration({
           onCloseClick={() => setShowHowCalibrationWorksModal(false)}
         />
       ) : null}
-      {enableCalibrationWizards ? (
+      {enableCalibrationWizards && !isOT3 ? (
         <CalibrationStatusCard
           robotName={robotName}
           setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
         />
       ) : (
-        <>
-          <CalibrationDataDownload
-            robotName={robotName}
-            setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
-          />
-          {!isOT3 ? <Line /> : null}
-        </>
+        <CalibrationDataDownload
+          robotName={robotName}
+          setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
+        />
       )}
 
       {!isOT3 ? (
-        <RobotSettingsDeckCalibration
-          buttonDisabledReason={buttonDisabledReason}
-          dispatchRequests={dispatchRequests}
-          robotName={robotName}
-          updateRobotStatus={updateRobotStatus}
-        />
+        <>
+          {!enableCalibrationWizards ? <Line /> : null}
+          <RobotSettingsDeckCalibration
+            buttonDisabledReason={buttonDisabledReason}
+            dispatchRequests={dispatchRequests}
+            robotName={robotName}
+            updateRobotStatus={updateRobotStatus}
+          />
+        </>
       ) : null}
-      {!isOT3 || !enableCalibrationWizards ? (
-        <Line
-          marginBottom={
-            showPipetteOffsetCalibrationBanner ? SPACING.spacing4 : null
-          }
-        />
-      ) : null}
+      <Line
+        marginBottom={
+          showPipetteOffsetCalibrationBanner ? SPACING.spacing4 : null
+        }
+      />
       <RobotSettingsPipetteOffsetCalibration
         formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
         pipetteOffsetCalBannerType={pipetteOffsetCalBannerType}
@@ -406,16 +405,30 @@ export function RobotSettingsCalibration({
             robotName={robotName}
             updateRobotStatus={updateRobotStatus}
           />
+          <Line />
+          <CalibrationHealthCheck
+            buttonDisabledReason={buttonDisabledReason}
+            dispatchRequests={dispatchRequests}
+            isPending={isPending}
+            robotName={robotName}
+            updateRobotStatus={updateRobotStatus}
+          />
+        </>
+      ) : (
+        <>
+          <Line />
+          <RobotSettingsGripperCalibration />
+        </>
+      )}
+      {enableCalibrationWizards && !isOT3 ? (
+        <>
+          <Line />
+          <CalibrationDataDownload
+            robotName={robotName}
+            setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
+          />
         </>
       ) : null}
-      <Line />
-      <CalibrationHealthCheck
-        buttonDisabledReason={buttonDisabledReason}
-        dispatchRequests={dispatchRequests}
-        isPending={isPending}
-        robotName={robotName}
-        updateRobotStatus={updateRobotStatus}
-      />
     </>
   )
 }

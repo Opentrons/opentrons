@@ -19,6 +19,7 @@ interface WizardHeaderProps {
   onExit?: (() => void) | null
   totalSteps?: number
   currentStep?: number | null
+  exitDisabled?: boolean
 }
 
 const EXIT_BUTTON_STYLE = css`
@@ -31,13 +32,13 @@ const EXIT_BUTTON_STYLE = css`
   }
 `
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const { totalSteps, currentStep, title, onExit } = props
+  const { totalSteps, currentStep, title, onExit, exitDisabled } = props
   const { t } = useTranslation('shared')
 
   return (
     <Box backgroundColor={COLORS.white}>
       <Flex
-        padding={`${SPACING.spacing4} ${SPACING.spacing6}`}
+        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
@@ -55,7 +56,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           ) : null}
         </Flex>
         {onExit != null ? (
-          <Btn onClick={onExit} aria-label="Exit">
+          <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
             <StyledText css={EXIT_BUTTON_STYLE}>{t('exit')}</StyledText>
           </Btn>
         ) : null}

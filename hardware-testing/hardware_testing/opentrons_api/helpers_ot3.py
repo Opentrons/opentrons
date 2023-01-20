@@ -1,5 +1,5 @@
 """Opentrons helper methods."""
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime
 from subprocess import run
 from time import time
@@ -15,7 +15,7 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
-from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -52,7 +52,7 @@ CALIBRATION_SQUARE_OFFSET_EVT = Point(x=64, y=-43, z=-0.25)
 CALIBRATION_SQUARE_EVT = CalibrationSquare(
     top_left_offset=CALIBRATION_SQUARE_OFFSET_EVT, width=20, height=20, depth=3
 )
-CALIBRATION_PROBE_EVT = CalibrationProbe(length=34.5, diameter=4.0)
+CALIBRATION_PROBE_EVT = CalibrationProbe(length=44.5, diameter=4.0)
 
 
 def stop_server_ot3() -> None:
@@ -289,24 +289,32 @@ def get_plunger_positions_ot3(
 ) -> Tuple[float, float, float, float]:
     """Update plunger current."""
     pipette = _get_pipette_from_mount(api, mount)
-    cfg = pipette.config
-    return cfg.top, cfg.bottom, cfg.blow_out, cfg.drop_tip
+    return (
+        pipette.plunger_positions.top,
+        pipette.plunger_positions.bottom,
+        pipette.plunger_positions.blow_out,
+        pipette.plunger_positions.drop_tip,
+    )
 
 
 async def update_pick_up_current(
-    api: OT3API, mount: OT3Mount, current: Optional[float] = 0.125
+    api: OT3API, mount: OT3Mount, current: float = 0.125
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    pipette._config = replace(pipette.config, pick_up_current=current)
+    config_model = pipette.pick_up_configurations
+    config_model.current = current
+    pipette.pick_up_configurations = config_model
 
 
 async def update_pick_up_distance(
-    api: OT3API, mount: OT3Mount, distance: Optional[float] = 17.0
+    api: OT3API, mount: OT3Mount, distance: float = 17.0
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    pipette._config = replace(pipette.config, pick_up_distance=distance)
+    config_model = pipette.pick_up_configurations
+    config_model.distance = distance
+    pipette.pick_up_configurations = config_model
 
 
 async def move_plunger_absolute_ot3(

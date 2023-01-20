@@ -117,7 +117,9 @@ export const TestShakeSlideout = (
           command,
         }).catch((e: Error) => {
           console.error(
-            `error setting module status with command type ${command.commandType}: ${e.message}`
+            `error setting module status with command type ${String(
+              command.commandType
+            )}: ${e.message}`
           )
         })
       } else if (isRunTerminal || currentRunId == null) {
@@ -125,7 +127,9 @@ export const TestShakeSlideout = (
           command,
         }).catch((e: Error) => {
           console.error(
-            `error setting module status with command type ${command.commandType}: ${e.message}`
+            `error setting module status with command type ${String(
+              command.commandType
+            )}: ${e.message}`
           )
         })
       }
@@ -171,7 +175,7 @@ export const TestShakeSlideout = (
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           width="100%"
           onClick={onCloseClick}
-          data-testid={`Temp_Slideout_set_temp_btn_${name}`}
+          data-testid={`Temp_Slideout_set_temp_btn_${String(name)}`}
         >
           {t('shared:close')}
         </PrimaryButton>
@@ -213,7 +217,9 @@ export const TestShakeSlideout = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${SPACING.spacing4} ${SPACING.spacingM} ${SPACING.spacingM} ${SPACING.spacing4}`}
+        padding={`${String(SPACING.spacing4)} ${String(
+          SPACING.spacingM
+        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing4)}`}
         width="100%"
       >
         <Flex

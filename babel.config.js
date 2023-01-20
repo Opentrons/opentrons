@@ -53,6 +53,11 @@ module.exports = {
       presets: [['@babel/preset-env', { targets: { electron: '6' } }]],
     },
     {
+      test: 'app-shell-odd/**/*',
+      plugins: [['react-hot-loader/babel', false]],
+      presets: [['@babel/preset-env', { targets: { electron: '6' } }]],
+    },
+    {
       test: ['discovery-client/**/*'],
       plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { node: '8' } }]],

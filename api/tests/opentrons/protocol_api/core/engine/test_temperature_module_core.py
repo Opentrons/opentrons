@@ -4,7 +4,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import TempDeck
-from opentrons.hardware_control.modules.types import TemperatureStatus
+from opentrons.hardware_control.modules.types import TemperatureStatus, ModuleType
 
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
@@ -39,6 +39,23 @@ def subject(
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
     )
+
+
+def test_create(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: TempDeckHardware,
+) -> None:
+    """It should be able to create a temperature module core."""
+    result = TemperatureModuleCore(
+        module_id="1234",
+        engine_client=mock_engine_client,
+        api_version=MAX_SUPPORTED_VERSION,
+        sync_module_hardware=mock_sync_module_hardware,
+    )
+
+    assert result.module_id == "1234"
+    assert result.MODULE_TYPE == ModuleType.TEMPERATURE
 
 
 def test_set_target_temperature(

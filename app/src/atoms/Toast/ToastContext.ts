@@ -1,18 +1,11 @@
 import * as React from 'react'
 
-import type { IconProps } from '@opentrons/components'
-import type { ToastType } from './Toast'
+import type { ToastProps, ToastType } from './Toast'
 
-export interface MakeToastOptions {
-  closeButton?: boolean
-  disableTimeout?: boolean
-  duration?: number
-  icon?: IconProps
-  onClose?: () => void
-}
+export type MakeToastOptions = Omit<ToastProps, 'id' | 'message' | 'type'>
 
 type MakeToast = (
-  message: string | JSX.Element,
+  message: string,
   type: ToastType,
   options?: MakeToastOptions
 ) => string

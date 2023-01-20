@@ -20,6 +20,7 @@ from . import thermocycler
 from . import calibration
 
 from .hash_command_params import hash_command_params
+from .generate_command_schema import generate_command_schema
 
 from .command import (
     AbstractCommandImpl,
@@ -43,6 +44,14 @@ from .aspirate import (
     AspirateCreate,
     AspirateResult,
     AspirateCommandType,
+)
+
+from .comment import (
+    Comment,
+    CommentParams,
+    CommentCreate,
+    CommentResult,
+    CommentCommandType,
 )
 
 from .custom import (
@@ -221,12 +230,20 @@ __all__ = [
     "CommandIntent",
     # command parameter hashing
     "hash_command_params",
+    # command schema generation
+    "generate_command_schema",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # comment command models
+    "Comment",
+    "CommentParams",
+    "CommentCreate",
+    "CommentResult",
+    "CommentCommandType",
     # custom command models
     "Custom",
     "CustomCreate",

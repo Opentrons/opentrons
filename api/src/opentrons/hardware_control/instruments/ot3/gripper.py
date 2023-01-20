@@ -132,6 +132,9 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
     def gripper_id(self) -> str:
         return self._gripper_id
 
+    def reload_configurations(self) -> None:
+        return None
+
     def reset_offset(self, to_default: bool) -> None:
         """Tempoarily reset the gripper offsets to default values."""
         if to_default:
@@ -142,7 +145,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             )
 
     def save_offset(self, delta: Point) -> None:
-        """Tempoarily reset the gripper offsets to default values."""
+        """Save a new gripper offset."""
         save_gripper_calibration_offset(self._gripper_id, delta)
         self._calibration_offset = load_gripper_calibration_offset(self._gripper_id)
 
@@ -154,10 +157,6 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         if self.current_jaw_displacement == 0.0:
             raise RuntimeError(
                 f"must grip the jaws before starting calibration (jaw displacement is {self.current_jaw_displacement})"
-            )
-        if self.current_jaw_displacement > self._max_jaw_displacement() - 1:
-            raise RuntimeError(
-                f"must hold something between gripper jaws during calibration (jaw displacement is {self.current_jaw_displacement})"
             )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
@@ -198,8 +197,8 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             raise InvalidMoveError(f"Critical point {cp_override} is not valid")
 
     def duty_cycle_by_force(self, newton: float) -> float:
-        return gripper_config.piecewise_force_conversion(
-            newton, self.config.jaw_force_per_duty_cycle
+        return gripper_config.duty_cycle_by_force(
+            newton, self._config.jaw_duty_cycle_polynomial
         )
 
     def __str__(self) -> str:
@@ -215,6 +214,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
             "state": self._state,
+            "calibration_offset": self._calibration_offset,
         }
         return d
 

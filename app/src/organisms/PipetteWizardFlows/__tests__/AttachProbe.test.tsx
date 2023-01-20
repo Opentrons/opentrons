@@ -33,7 +33,7 @@ describe('AttachProbe', () => {
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
-      attachedPipette: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -43,13 +43,13 @@ describe('AttachProbe', () => {
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Attach Calibration Probe')
     getByText(
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
     getByAltText('Attach probe')
-    const proceedBtn = getByRole('button', { name: 'Initiate calibration' })
+    const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
@@ -68,7 +68,7 @@ describe('AttachProbe', () => {
       expect(props.proceed).toHaveBeenCalled()
     })
 
-    const backBtn = getByRole('button', { name: 'Go back' })
+    const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })

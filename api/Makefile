@@ -178,9 +178,10 @@ push: push-no-restart
 push-no-restart-ot3: sdist
 	echo $(sdist_file)
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src)
-	ssh $(ssh_opts) root@$(host) "mkdir -p /usr/local/bin"
+	ssh $(ssh_opts) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
 	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/ot3repl
 	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/ot3gripper
+	ssh $(ssh_opts) root@$(host) "mount -o remount,ro /"
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
@@ -207,3 +208,7 @@ term:
 .PHONY: plot-session
 plot-session:
 	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf
+
+PHONY: command-schema
+command-schema: 
+	$(python) src/opentrons/protocol_engine/commands/generate_command_schema.py $(COMMAND_SCHEMA_VERSION) > ../shared-data/command/schemas/$(COMMAND_SCHEMA_VERSION).json
