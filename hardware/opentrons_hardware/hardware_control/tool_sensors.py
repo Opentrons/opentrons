@@ -154,6 +154,7 @@ async def liquid_probe(
         movers=[mount, tool],
         distance={mount: max_z_distance, tool: max_z_distance},
         speed={mount: mount_speed, tool: plunger_speed},
+        sensor_stop_condition=MoveStopCondition.pressure_sensor,
     )
 
     prep_move = create_step(
