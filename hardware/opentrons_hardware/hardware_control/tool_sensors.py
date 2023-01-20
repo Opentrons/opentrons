@@ -61,8 +61,11 @@ async def liquid_probe(
     sensor_id: SensorId = SensorId.S0,
     threshold_pascals: float = 1.0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
-    """Move the mount down to the starting height, then move the
-    mount and pipette while reading from the pressure sensor."""
+    """Create and run liquid probing moves.
+
+    Move the mount down to the starting height, then move the
+    mount and pipette while reading from the pressure sensor.
+    """
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     pressure_sensor = PressureSensor.build(
