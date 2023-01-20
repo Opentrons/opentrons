@@ -12,7 +12,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallbackFilter,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons.config.types import OT3Config
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
