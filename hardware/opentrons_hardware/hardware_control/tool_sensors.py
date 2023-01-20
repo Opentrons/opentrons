@@ -37,15 +37,15 @@ def _build_pass_step(
     speed: Dict[NodeId, float],
     sensor_stop_condition: MoveStopCondition = MoveStopCondition.cap_sensor,
 ) -> MoveGroupStep:
-    # use the head node to determine the duration of the move
-    head_node = [ax for ax in movers if ax in [NodeId.head_l, NodeId.head_r]][0]
+    # use any node present to calculate duration of the move, assuming the durations
+    #   will be the same
     return create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
             ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
         },
         acceleration={},
-        duration=float64(abs(distance[head_node] / speed[head_node])),
+        duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
         stop_condition=sensor_stop_condition,
     )
