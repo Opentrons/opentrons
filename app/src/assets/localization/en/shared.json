@@ -59,5 +59,6 @@
   "alphabetical": "Alphabetical",
   "reverse": "Reverse alphabetical",
   "next": "Next",
-  "something_went_wrong": "something went wrong"
+  "something_went_wrong": "something went wrong",
+  "return": "return"
 }

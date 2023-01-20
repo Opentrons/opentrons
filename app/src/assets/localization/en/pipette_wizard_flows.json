@@ -68,5 +68,7 @@
   "detach_z_axis_screw_again": "You need to loosen the screw before you can attach the 96-Channel Pipette",
   "cancel_attachment": "Cancel attachment",
   "detach_and_retry": "Detach and retry",
-  "attach_and_retry": "Attach and retry"
+  "attach_and_retry": "Attach and retry",
+  "critical_unskippable_step": "This is a critical step that cannot be skipped",
+  "must_detach_mounting_plate": "You must detach the mounting plate before using other pipettes."
 }
