@@ -1,7 +1,7 @@
 from unittest import mock
 
-from opentrons.protocol_api.core.protocol_api.well import WellImplementation
-from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
+from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 from opentrons.types import Point
 from opentrons.protocol_api import InstrumentContext, labware, MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.execute_json_v5 import _move_to_well
@@ -13,7 +13,7 @@ def test_move_to_well_with_optional_params():
 
     well = labware.Well(
         parent=None,  # type: ignore[arg-type]
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",
@@ -67,7 +67,7 @@ def test_move_to_well_without_optional_params():
 
     well = labware.Well(
         parent=None,  # type: ignore[arg-type]
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",

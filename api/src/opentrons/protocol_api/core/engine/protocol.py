@@ -14,7 +14,6 @@ from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
 )
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -42,6 +41,7 @@ from .module_core import (
     HeaterShakerModuleCore,
 )
 from .exceptions import InvalidModuleLocationError
+from . import load_labware_params
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
@@ -140,11 +140,18 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         else:
             module_location = DeckSlotLocation(slotName=location)
 
+        custom_labware_params = (
+            self._engine_client.state.labware.find_custom_labware_load_params()
+        )
+        namespace, version = load_labware_params.resolve(
+            load_name, namespace, version, custom_labware_params
+        )
+
         load_result = self._engine_client.load_labware(
             load_name=load_name,
             location=module_location,
-            namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
-            version=version or 1,
+            namespace=namespace,
+            version=version,
             display_name=label,
         )
         labware_core = LabwareCore(
