@@ -44,21 +44,21 @@ TEST_PARAMETERS = {
                 'INC': 200}},
         'L': {
             'SPEED': {
-                'MIN': 80,
+                'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
                 'MIN': 800,
-                'MAX': 3000,
+                'MAX': 2000,
                 'INC': 200}},
         'R': {
             'SPEED': {
-                'MIN': 80,
+                'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
+                'MIN': 600,
+                'MAX': 2000,
                 'INC': 200}}
     },
     GantryLoad.LOW_THROUGHPUT: {
@@ -82,21 +82,21 @@ TEST_PARAMETERS = {
                 'INC': 200}},
         'L': {
             'SPEED': {
-                'MIN': 80,
+                'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
                 'MIN': 800,
-                'MAX': 3000,
+                'MAX': 2000,
                 'INC': 200}},
         'R': {
             'SPEED': {
-                'MIN': 80,
+                'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
+                'MIN': 600,
+                'MAX': 2000,
                 'INC': 200}}
     },
     GantryLoad.TWO_LOW_THROUGHPUT: {
@@ -120,21 +120,21 @@ TEST_PARAMETERS = {
                 'INC': 200}},
         'L': {
             'SPEED': {
-                'MIN': 80,
+                'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
                 'MIN': 800,
-                'MAX': 3000,
+                'MAX': 2000,
                 'INC': 200}},
         'R': {
             'SPEED': {
-                'MIN': 80,
+                'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
+                'MIN': 600,
+                'MAX': 2000,
                 'INC': 200}}
     },
     GantryLoad.HIGH_THROUGHPUT: {
@@ -158,21 +158,21 @@ TEST_PARAMETERS = {
                 'INC': 200}},
         'L': {
             'SPEED': {
-                'MIN': 80,
+                'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
                 'MIN': 800,
-                'MAX': 3000,
+                'MAX': 2000,
                 'INC': 200}},
         'R': {
             'SPEED': {
-                'MIN': 80,
+                'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
+                'MIN': 600,
+                'MAX': 2000,
                 'INC': 200}}
     }
 }
@@ -219,8 +219,8 @@ AXIS_MAP = {'Y': OT3Axis.Y,
                 'X': OT3Axis.X,
                 'L': OT3Axis.Z_L,
                 'R': OT3Axis.Z_R,
-                'PL': OT3Axis.P_L,
-                'PR': OT3Axis.P_R}
+                'P': OT3Axis.P_L,
+                'O': OT3Axis.P_R}
 
 LOAD = GantryLoad.NONE
 GANTRY_LOAD_MAP = {'NONE': GantryLoad.NONE,
@@ -325,6 +325,8 @@ async def _main(is_simulating: bool) -> None:
 
             test_axis_list = list(AXIS)
             for test_axis in test_axis_list:
+                table_results[test_axis] = {}
+
                 axis_parameters = TEST_LIST[test_axis]
                 print('Testing Axis: ' + test_axis)
                 for p in axis_parameters:
@@ -350,7 +352,14 @@ async def _main(is_simulating: bool) -> None:
                     run_avg_error = move_output_tuple[0]
                     cycles_completed = move_output_tuple[1]
 
-                    #record results of cycles
+                    #record results to dictionary for neat formatting later
+                    if p['SPEED'] in table_results[test_axis].keys():
+                        table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+                    else:
+                        table_results[test_axis][p['SPEED']] = {}
+                        table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+
+                    #record results of cycles to raw csv
                     print("Cycles complete")
                     print("Speed: " + str(p['SPEED']))
                     print("Acceleration: " + str(p['ACCEL']))
@@ -362,7 +371,25 @@ async def _main(is_simulating: bool) -> None:
                                      'cycles': cycles_completed})
 
         #create tableized output csv for neat presentation
-        # with open('speed_test_' + AXIS + '_table.csv', mode='w') as csv_file:
+        # print(table_results)
+        test_axis_list = list(AXIS)
+        for test_axis in test_axis_list:
+            with open('speed_test_output_' + test_axis + '_table.csv', mode='w') as csv_file:
+                fieldnames = ['Speed'] + [*parameter_range(LOAD, test_axis, 'ACCEL')]
+                # print(fieldnames)
+                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+                td = {'Speed': LOAD}
+                writer.writerow(td)
+                td = {'Speed': test_axis}
+                writer.writerow(td)
+                td = {'Speed': 'Acceleration'}
+                writer.writerow(td)
+                writer.writeheader()
+                for i in parameter_range(LOAD, test_axis, 'SPEED'):
+                    td = {'Speed': i}
+                    td.update(table_results[test_axis][i])
+                    writer.writerow(td)
+                # print(table_results[test_axis])
 
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
