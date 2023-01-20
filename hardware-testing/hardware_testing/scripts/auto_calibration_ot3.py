@@ -16,6 +16,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 
 LOG_CONFIG = {
     "version": 1,
+    "disable_existing_loggers": False,
     "formatters": {
         "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
     },
@@ -31,8 +32,19 @@ LOG_CONFIG = {
     },
 }
 
+logging.basicConfig(level=logging.INFO)
 
-async def _main(simulate: bool, slot: int, mount: OT3Mount, cycle: int) -> None:
+
+async def fast_home_seq(api, mount, fast_home_pos):
+    # home z first
+    cur_pos = await api.gantry_position(mount, refresh=True)
+    await api.move_to(mount, cur_pos._replace(z=fast_home_pos.z))
+    await api.move_to(mount, fast_home_pos)
+
+
+async def _main(
+    simulate: bool, slot: int, mount: OT3Mount, cycle: int, id: str
+) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulate,
         pipette_left="p1000_single_v3.3",
@@ -43,27 +55,43 @@ async def _main(simulate: bool, slot: int, mount: OT3Mount, cycle: int) -> None:
     await api.home()
     homed_pos = await api.gantry_position(mount)
     fast_home_pos = homed_pos + Point(-5, -5, -5)
+    try:
 
-    for i in range(cycle):
-        if mount == OT3Mount.GRIPPER:
-            input("Add probe to gripper FRONT, then press ENTER: ")
-            front_offset = await calibrate_gripper_jaw(api, GripperProbe.FRONT, slot)
-            await api.home_z()
-            input("Add probe to gripper REAR, then press ENTER: ")
-            rear_offset = await calibrate_gripper_jaw(api, GripperProbe.REAR, slot)
-            offset = await calibrate_gripper(api, front_offset, rear_offset)
-        else:
-            # input("Attach calibration probe to the pipette and press Enter\n")
-            offset = await calibrate_pipette(api, mount, slot)
+        # if mount == OT3Mount.GRIPPER:
+        #     if id == "S1":
+        #         input("Add probe to gripper REAR, then press ENTER: ")
+        #     else:
+        #         input("Add probe to gripper FRONT, then press ENTER: ")
+        # else:
+        #     input("Attach calibration probe to the pipette and press Enter\n")
 
-        with open("/var/auto_calibration.csv", "a") as cv:
-            writer = csv.writer(cv)
-            writer.writerow(offset)
+        for i in range(cycle):
+            if mount == OT3Mount.GRIPPER:
+                if id != "S1":
+                    offset = await calibrate_gripper_jaw(api, GripperProbe.FRONT, slot)
+                    if id == "all":
+                        front_offset = offset
+                        await api.home_z()
 
-        await api.move_to(mount, fast_home_pos)
+                if id != "S0":
+                    offset = await calibrate_gripper_jaw(api, GripperProbe.REAR, slot)
+                    if id == "all":
+                        rear_offset = offset
+                        offset = await calibrate_gripper(api, front_offset, rear_offset)
+            else:
+                offset = await calibrate_pipette(api, mount, slot)
+
+            print(f"Offset: {offset}")
+
+            with open(f"/var/{mount}_{id}_auto_cal.csv", "a") as cv:
+                writer = csv.writer(cv)
+                writer.writerow(offset)
+
+            await fast_home_seq(api, mount, fast_home_pos)
+            await api.home()
+    finally:
+        await fast_home_seq(api, mount, fast_home_pos)
         await api.home()
-
-        print(f"Offset: {offset}")
 
 
 if __name__ == "__main__":
@@ -75,7 +103,8 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--slot", type=int, default=5)
-    arg_parser.add_argument("--cycle", type=int, default=20)
+    arg_parser.add_argument("--cycle", type=int, default=50)
+    arg_parser.add_argument("--id", "-i", choices=["S0", "S1", "all"], default="all")
     args = arg_parser.parse_args()
     ot3_mounts = {
         "left": OT3Mount.LEFT,
@@ -83,4 +112,4 @@ if __name__ == "__main__":
         "gripper": OT3Mount.GRIPPER,
     }
     _mount = ot3_mounts[args.mount]
-    asyncio.run(_main(args.simulate, args.slot, _mount, args.cycle))
+    asyncio.run(_main(args.simulate, args.slot, _mount, args.cycle, args.id))
