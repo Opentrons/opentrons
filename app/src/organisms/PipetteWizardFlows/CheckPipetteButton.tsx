@@ -24,11 +24,7 @@ export const CheckPipetteButton = (
     robotName
   )
   React.useEffect(() => {
-    if (isPending) {
-      setPending(true)
-    } else {
-      setPending(false)
-    }
+    setPending(isPending)
   }, [isPending, setPending])
 
   React.useEffect(() => {
