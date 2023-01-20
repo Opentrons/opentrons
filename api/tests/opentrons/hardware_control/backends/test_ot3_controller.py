@@ -97,6 +97,7 @@ def mock_driver(mock_messenger) -> AbstractCanDriver:
 def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Controller:
     return OT3Controller(mock_config, mock_driver)
 
+
 @pytest.fixture
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
@@ -110,11 +111,12 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         expected_liquid_height=109,
     )
 
+
 @pytest.fixture
 def mock_send_stop_threshold() -> None:
     with patch(
-            "opentrons_hardware.sensors.sensor_driver.SensorDriver.send_stop_threshold",
-            autospec=True,
+        "opentrons_hardware.sensors.sensor_driver.send_stop_threshold",
+        autospec=True,
     ) as mock_stop_threshold:
         yield mock_stop_threshold
 
@@ -127,7 +129,6 @@ def mock_move_group_run():
     ) as mock_mgr_run:
         mock_mgr_run.return_value = {}
         yield mock_mgr_run
-
 
 
 @pytest.fixture
@@ -600,46 +601,6 @@ async def test_ready_for_movement(
 
     axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
     assert controller.check_ready_for_movement(axes) == ready
-
-
-# for mocking sensor_driver.send_stop_threshold, can either
-#   move this test into test_ot3_calibration or some other file, and make
-#       a new mock move group function in there
-#   or see if there's a way to do it in this file with decoy or smthz
-@pytest.mark.parametrize(
-    "mount",
-    [OT3Mount.LEFT, OT3Mount.RIGHT]
-)
-async def test_liquid_probe(
-    mount: OT3Mount,
-    controller: OT3Controller,
-    fake_liquid_settings: LiquidProbeSettings,
-    mock_move_group_run,
-) -> None:
-    # mock tool_sensors liquid_probe
-    positions = await controller.liquid_probe(
-        mount=mount,
-        max_z_distance=fake_liquid_settings.max_z_distance,
-        mount_speed=fake_liquid_settings.mount_speed,
-        plunger_speed=fake_liquid_settings.plunger_speed,
-        threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
-        starting_mount_height=fake_liquid_settings.starting_mount_height,
-        prep_move_speed=fake_liquid_settings.prep_move_speed,
-    )
-    breakpoint()
-    for call in mock_move_group_run.call_args_list:
-        move_group_runner = call[0][0]
-        for move_group in move_group_runner._move_groups:
-            assert move_group  # don't pass in empty groups
-            assert len(move_group) == 2
-        # we should be sending this command to the pipette axes to process.
-        # assert list(move_group[0].keys()) == [NodeId.pipette_left]
-        breakpoint()
-        step = move_group[0][NodeId.pipette_left]
-        assert step.stop_condition == MoveStopCondition.none
-
-
-
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
