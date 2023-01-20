@@ -35,24 +35,19 @@ def _build_pass_step(
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
+    sensor_stop_condition: MoveStopCondition = MoveStopCondition.cap_sensor,
 ) -> MoveGroupStep:
-    # if a pipette is present, choose the mount axis present to be the primary
-    #   mover and determine the step duration
-    if NodeId.pipette_left in movers or NodeId.pipette_right in movers:
-        primary_mover = [ax for ax in movers if ax in [NodeId.head_l, NodeId.head_r]][0]
-        stop_condition = MoveStopCondition.pressure_sensor
-    else:
-        primary_mover = movers[0]
-        stop_condition = MoveStopCondition.cap_sensor
+    # use the head node to determine the duration of the move
+    head_node = [ax for ax in movers if ax in [NodeId.head_l, NodeId.head_r]][0]
     return create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
             ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
         },
         acceleration={},
-        duration=float64(abs(distance[primary_mover] / speed[primary_mover])),
+        duration=float64(abs(distance[head_node] / speed[head_node])),
         present_nodes=movers,
-        stop_condition=stop_condition,
+        stop_condition=sensor_stop_condition,
     )
 
 
@@ -68,7 +63,8 @@ async def liquid_probe(
     sensor_id: SensorId = SensorId.S0,
     threshold_pascals: float = 1.0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
-    """Just send mount down, then move mount and pipette."""
+    """Move the mount down to the starting height, then move the
+    mount and pipette while reading from the pressure sensor."""
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     pressure_sensor = PressureSensor.build(
@@ -81,6 +77,7 @@ async def liquid_probe(
         movers=[mount, tool],
         distance={mount: max_z_distance, tool: max_z_distance},
         speed={mount: mount_speed, tool: plunger_speed},
+        sensor_stop_condition=MoveStopCondition.pressure_sensor,
     )
 
     prep_move = create_step(
