@@ -246,6 +246,14 @@ class SensorThresholdMode(int, Enum):
 
 
 @unique
+class GearMotorId(int, Enum):
+    """Tip action types."""
+
+    left = 0x0
+    right = 0x01
+
+
+@unique
 class PipetteTipActionType(int, Enum):
     """Tip action types."""
 
