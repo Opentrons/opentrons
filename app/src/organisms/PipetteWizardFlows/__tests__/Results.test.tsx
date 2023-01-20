@@ -106,6 +106,25 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
     }
     const { getByText, getByRole } = render(props)
+    getByText('Detach and retry')
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    //  critical error modal after tryAgain failing 2 times
+    getByText('Something Went Wrong')
+    getByRole('button', { name: 'Results_errorExit' }).click()
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+  })
+  it('renders the try again button when fail to detach and clicking on buton several times renders exit button', () => {
+    props = {
+      ...props,
+      attachedPipettes: { left: mockPipette, right: null },
+      flowType: FLOWS.DETACH,
+    }
+    const { getByText, getByRole } = render(props)
+    getByText('Attach and retry')
     getByRole('button', { name: 'Results_tryAgain' }).click()
     expect(mockCheckPipette).toHaveBeenCalled()
     getByRole('button', { name: 'Results_tryAgain' }).click()
@@ -142,9 +161,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    const exit = getByRole('button', { name: 'Results_exit' })
-    fireEvent.click(exit)
-    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' })
   })
   it('renders the correct information when pipette wizard is a fail for 96 channel attach flow and gantry not empty', () => {
     props = {
@@ -157,9 +174,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    const exit = getByRole('button', { name: 'Results_exit' })
-    fireEvent.click(exit)
-    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' }).click()
   })
   it('renders the correct information when pipette wizard is a success for 96 channel attach flow and gantry not empty', () => {
     props = {

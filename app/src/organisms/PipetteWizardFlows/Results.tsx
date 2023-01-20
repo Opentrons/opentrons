@@ -108,19 +108,23 @@ export const Results = (props: ResultsProps): JSX.Element => {
     </PrimaryButton>
   )
 
-  if (!isSuccess && flowType === FLOWS.ATTACH && numberOfTryAgains < 3) {
+  if (
+    !isSuccess &&
+    (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) &&
+    numberOfTryAgains < 3
+  ) {
     button = (
       <PrimaryButton
         onClick={handleTryAgain}
         disabled={isPending}
         aria-label="Results_tryAgain"
       >
-        {t('detach_and_retry')}
+        {t(flowType === FLOWS.ATTACH ? 'detach_and_retry' : 'attach_and_retry')}
       </PrimaryButton>
     )
   } else if (
     !isSuccess &&
-    flowType === FLOWS.ATTACH &&
+    (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) &&
     numberOfTryAgains <= 3
   ) {
     header = startCase(t('shared:something_went_wrong'))
