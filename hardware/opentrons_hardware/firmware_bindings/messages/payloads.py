@@ -24,6 +24,7 @@ from .fields import (
     PipetteTipActionTypeField,
     MotorPositionFlagsField,
     MoveStopConditionField,
+    GearMotorIdField,
 )
 from .. import utils
 
@@ -492,6 +493,7 @@ class TipActionResponsePayload(MoveCompletedPayload):
 
     action: PipetteTipActionTypeField
     success: utils.UInt8Field
+    gear_motor_id: GearMotorIdField
 
 
 @dataclass(eq=False)

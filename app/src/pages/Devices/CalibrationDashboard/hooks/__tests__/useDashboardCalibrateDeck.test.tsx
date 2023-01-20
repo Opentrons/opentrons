@@ -3,6 +3,7 @@ import uniqueId from 'lodash/uniqueId'
 import { mountWithStore, renderWithProviders } from '@opentrons/components'
 import { act } from 'react-dom/test-utils'
 
+import { LoadingState } from '../../../../../organisms/CalibrationPanels'
 import * as RobotApi from '../../../../../redux/robot-api'
 import * as Sessions from '../../../../../redux/sessions'
 import { i18n } from '../../../../../i18n'
@@ -112,5 +113,28 @@ describe('useDashboardCalibrateDeck hook', () => {
     mockGetRobotSessionOfType.mockReturnValue(null)
     wrapper.setProps({})
     expect(CalWizardComponent).toBe(null)
+  })
+
+  it('loading state modal should appear while session is being created', () => {
+    const seshId = 'fake-session-id'
+    const mockDeckCalSession = {
+      id: seshId,
+      ...mockDeckCalibrationSessionAttributes,
+      details: {
+        ...mockDeckCalibrationSessionAttributes.details,
+        currentStep: Sessions.DECK_STEP_SESSION_STARTED,
+      },
+    }
+    const { wrapper } = mountWithStore(<TestUseDashboardCalibrateDeck />, {
+      initialState: { robotApi: {} },
+    })
+    mockGetRobotSessionOfType.mockReturnValue(mockDeckCalSession)
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.PENDING,
+    })
+    act(() => startCalibration())
+    wrapper.setProps({})
+    expect(CalWizardComponent).not.toBe(null)
+    expect(LoadingState).not.toBe(null)
   })
 })

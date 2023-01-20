@@ -18,6 +18,7 @@ import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
+import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
@@ -109,12 +110,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/robot-settings/update-robot',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>protocol dashboard</Box>
-      </>
-    ),
+    Component: ProtocolDashboard,
     exact: true,
     name: 'Protocol Dashboard',
     path: '/protocols',

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
@@ -51,11 +50,8 @@ describe('Carriage', () => {
       'Loosen the captive screw on the top right of the gantry carriage. This will release the right pipette mount, which should then freely move up and down.'
     )
     getByAltText('Unscrew gantry')
-    const proceedBtn = getByRole('button', { name: 'Continue' })
-    fireEvent.click(proceedBtn)
-    expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByLabelText('back')
-    fireEvent.click(backBtn)
+    getByRole('button', { name: 'Continue' })
+    getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
   })
   it('returns the correct information, buttons work as expected when flow is detach', () => {
@@ -72,11 +68,8 @@ describe('Carriage', () => {
       'When reattached, the right mount should no longer freely move up and down.'
     )
     getByAltText('Reattach carriage')
-    const proceedBtn = getByRole('button', { name: 'Continue' })
-    fireEvent.click(proceedBtn)
-    expect(props.proceed).toHaveBeenCalled()
-    const backBtn = getByLabelText('back')
-    fireEvent.click(backBtn)
+    getByRole('button', { name: 'Continue' })
+    getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
   })
   it('renders null if a single mount pipette is attached', () => {
@@ -87,7 +80,6 @@ describe('Carriage', () => {
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
   })
-
   it('renders null if flow is calibrate is attached', () => {
     props = {
       ...props,
@@ -96,4 +88,18 @@ describe('Carriage', () => {
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
   })
+  it('renders the error z axis still attached modal when check z axis button still detects the attachment', async () => {
+    const { getByText, getByRole } = render(props)
+    getByRole('button', { name: 'Continue' }).click()
+    getByText('Z-axis Screw Still Secure')
+    getByText(
+      'You need to loosen the screw before you can attach the 96-Channel Pipette'
+    )
+    getByRole('button', { name: 'try again' })
+    getByRole('button', { name: 'Cancel attachment' })
+  })
+  //  TODO(jr 1/13/23): when z axis screw status is fully wired up, extend test cases for:
+  // 2nd case try again button where button disappears
+  // try again button click being a success
+  // cancel attachment click
 })
