@@ -396,9 +396,9 @@ class HexColor(BaseModel):
 class Liquid(BaseModel):
     """Payload required to create a liquid."""
 
-    id: str
+    id: Optional[str]
     displayName: str
-    description: Optional[str]
+    description: str = Field(default_factory="")
     displayColor: Optional[HexColor]
 
 

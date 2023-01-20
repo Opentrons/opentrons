@@ -290,6 +290,8 @@ class ProtocolEngine:
 
     def add_liquid(self, liquid: Liquid) -> Liquid:
         """Add a liquid to the state for subsequent liquid loads."""
+        if liquid.id is None:
+            liquid.id = self._model_utils.generate_id()
         self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
         return liquid
 

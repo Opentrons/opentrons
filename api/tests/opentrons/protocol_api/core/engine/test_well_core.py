@@ -168,9 +168,12 @@ def test_load_liquid(
     decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
 ) -> None:
     """It should load a liquid into a well."""
-    mock_liquid = decoy.mock(cls=Liquid)
-
-    decoy.when(mock_liquid._id).then_return("liquid-id")
+    mock_liquid = Liquid(
+        _id="liquid-id",
+        display_name="water",
+        description=None,
+        display_color=None
+    )
 
     subject.load_liquid(liquid=mock_liquid, volume=20)
 

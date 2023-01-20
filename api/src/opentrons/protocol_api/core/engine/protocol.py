@@ -35,7 +35,6 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor
-from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
 from ..._liquid import Liquid
@@ -402,10 +401,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         display_color: Optional[str],
     ) -> Liquid:
         """create a liquid to load into a labware."""
-        model_utils = ModelUtils()
         loaded_liquid = self._engine_client.add_liquid(
             PE_Liquid(
-                id=model_utils.generate_id(),
                 displayName=name,
                 description=description,
                 displayColor=HexColor(__root__=display_color)
