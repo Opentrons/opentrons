@@ -100,7 +100,7 @@ async def test_liquid_probe(
     motor_node: NodeId,
     threshold_pascals: float,
 ) -> None:
-    """Test that capacitive_probe targets the right nodes."""
+    """Test that liquid_probe targets the right nodes."""
     sensor_info = SensorInformation(
         sensor_type=SensorType.pressure, sensor_id=SensorId.S0, node_id=target_node
     )
@@ -124,8 +124,8 @@ async def test_liquid_probe(
                         payload=MoveCompletedPayload(
                             group_id=UInt8Field(0),
                             seq_id=UInt8Field(0),
-                            current_position_um=UInt32Field(10000),
-                            encoder_position_um=Int32Field(10000),
+                            current_position_um=UInt32Field(14000),
+                            encoder_position_um=Int32Field(14000),
                             position_flags=MotorPositionFlagsField(0),
                             ack_id=UInt8Field(2),
                         )
@@ -150,7 +150,7 @@ async def test_liquid_probe(
         sensor_id=SensorId.S0,
         threshold_pascals=threshold_pascals,
     )
-    assert position[motor_node][0] == 10
+    assert position[motor_node][0] == 14
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
         sensor=sensor_info,
         data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
