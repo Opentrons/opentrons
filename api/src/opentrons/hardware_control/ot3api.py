@@ -1054,6 +1054,58 @@ class OT3API(
                     except GripperNotAttachedError:
                         pass
 
+    async def park(
+        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
+    ) -> None:
+        """Move multiple axes to the homed position with acceleration."""
+
+        self._reset_last_mount()
+        if axes:
+            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
+        else:
+            checked_axes = [ax for ax in OT3Axis if ax != OT3Axis.Q]
+        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            checked_axes.append(OT3Axis.Q)
+
+        if (
+            not self._backend.check_ready_for_park(checked_axes)
+            or not self._current_position
+            or not self._encoder_current_position
+        ):
+            raise MustHomeError(f"Cannot park because the current position is unknown.")
+
+        park_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
+        self._log.info(f"Parking {axes}")
+
+        async with self._motion_lock:
+            for axis in park_seq:
+                origin = await self._backend.update_position()
+                if self._backend.is_parkable(axis):
+                    target_pos = {ax: pos for ax, pos in origin.items()}
+                    target_pos[axis] = 0
+                    target = deck_from_machine(
+                        target_pos,
+                        self._transforms.deck_calibration.attitude,
+                        self._transforms.carriage_offset,
+                    )
+                    await self._move(target)
+                else:
+                    await self._backend.home(axis)
+                    machine_pos = await self._backend.update_position()
+                    encoder_machine_pos = await self._backend.update_encoder_position()
+                    position = deck_from_machine(
+                        machine_pos,
+                        self._transforms.deck_calibration.attitude,
+                        self._transforms.carriage_offset,
+                    )
+                    self._current_position.update(position)
+                    encoder_position = deck_from_machine(
+                        encoder_machine_pos,
+                        self._transforms.deck_calibration.attitude,
+                        self._transforms.carriage_offset,
+                    )
+                    self._encoder_current_position.update(encoder_position)
+
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
         return self._axis_map_from_ot3axis_map(self._backend.engaged_axes())
