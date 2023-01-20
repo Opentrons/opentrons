@@ -1668,7 +1668,22 @@ class OT3API(
         mount: OT3Mount,
         probe_settings: Optional[LiquidProbeSettings] = None,
     ) -> float:
-        """Find liquid."""
+        """Search for and return liquid level height.
+
+        This function checks makes sure the plunger motor is homed before starting.
+        After moving the mount the distance specified by starting_mount_height in the
+        LiquidProbeSettings, the mount and plunger motors will move simultaneously while
+        reading from the pressure sensor.
+
+        If the move is completed without the specified threshold being triggered, a
+        MoveConditionNotMet error will be thrown.
+        If the threshold is triggered before the minimum z distance has been traveled,
+        a ThresholdReachedTooEarly error will be thrown.
+
+        Otherwise, the function will stop moving once the threshold is triggered,
+        home the mount and plunger to avoid collision, and return the height at
+        which the liquid was found.
+        """
 
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
@@ -1727,6 +1742,9 @@ class OT3API(
                 self._transforms.carriage_offset,
             )
             self._encoder_current_position.update(encoder_position)
+
+            await self.home_plunger(mount)
+            await self.home_z(mount)
 
             return final_mount_pos_um
 

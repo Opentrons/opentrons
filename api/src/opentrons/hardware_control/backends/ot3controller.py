@@ -887,7 +887,6 @@ class OT3Controller:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._present_nodes}
 
-    # make sure what's being returned is in deck coordinates and has a height
     async def liquid_probe(
         self,
         mount: OT3Mount,
