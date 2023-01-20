@@ -1338,6 +1338,7 @@ class OT3API(
                 except RuntimeError as e:
                     # TODO: (untested) check that this actually catches the correct error
                     if "collision_detected" in str(e):
+                        print("Collision detected\n")
                         await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
                     else:
                         raise e
