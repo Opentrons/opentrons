@@ -398,7 +398,7 @@ class Liquid(BaseModel):
 
     id: str
     displayName: str
-    description: str
+    description: Optional[str]
     displayColor: Optional[HexColor]
 
 

@@ -398,7 +398,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def add_liquid(
         self,
         name: str,
-        description: str,
+        description: Optional[str],
         display_color: Optional[str],
     ) -> Liquid:
         """create a liquid to load into a labware."""

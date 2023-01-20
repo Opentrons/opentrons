@@ -179,7 +179,7 @@ class AbstractProtocol(
 
     @abstractmethod
     def add_liquid(
-        self, name: str, description: str, display_color: Optional[str]
+        self, name: str, description: Optional[str], display_color: Optional[str]
     ) -> Liquid:
         """Add a liquid to load into a well."""
 

@@ -6,5 +6,5 @@ from typing import Optional
 class Liquid:
     _id: str
     display_name: str
-    description: str
+    description: Optional[str]
     display_color: Optional[str]
