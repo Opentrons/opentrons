@@ -37,6 +37,8 @@ def _build_pass_step(
     speed: Dict[NodeId, float],
     sensor_stop_condition: MoveStopCondition = MoveStopCondition.cap_sensor,
 ) -> MoveGroupStep:
+    # use any node present to calculate duration of the move, assuming the durations
+    #   will be the same
     return create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
