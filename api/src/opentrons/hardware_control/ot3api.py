@@ -49,7 +49,7 @@ from .instruments.ot3.pipette import (
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import get_system_constraints, head_node_for_mount
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -1740,7 +1740,6 @@ class OT3API(
                     "Liquid Sensing failed- threshold reached too early."
                 )
                 raise ThresholdReachedTooEarly
-
             await self.home_plunger(mount)
 
             return position[mount_axis], encoder_position[mount_axis]
