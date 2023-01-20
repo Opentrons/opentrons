@@ -484,9 +484,9 @@ def test_add_liquid(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
     """It should add a liquid to the state."""
-    subject.add_liquid(name="water", description="water desc", display_color="#1234")
+    subject.define_liquid(name="water", description="water desc", display_color="#1234")
     decoy.verify(
-        mock_core.add_liquid(
+        mock_core.define_liquid(
             name="water", description="water desc", display_color="#1234"
         ),
         times=1,

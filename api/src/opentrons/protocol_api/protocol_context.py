@@ -756,7 +756,7 @@ class ProtocolContext(CommandPublisher):
     # TODO (tz, 12-19-22): Should the api version be 2.14
     # https://opentrons.atlassian.net/browse/RCORE-537
     @requires_version(2, 13)
-    def add_liquid(
+    def define_liquid(
         self, name: str, description: Optional[str], display_color: Optional[str]
     ) -> Liquid:
         """
@@ -766,7 +766,7 @@ class ProtocolContext(CommandPublisher):
         :param str description: A optional description of this liquid.
         :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
         """
-        return self._implementation.add_liquid(
+        return self._implementation.define_liquid(
             name=name,
             description=description,
             display_color=display_color,

@@ -395,7 +395,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
 
-    def add_liquid(
+    def define_liquid(
         self,
         name: str,
         description: Optional[str],
