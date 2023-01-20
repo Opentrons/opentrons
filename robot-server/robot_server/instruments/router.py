@@ -1,20 +1,30 @@
 """Instruments routes."""
 from typing import Optional, List, Dict
 
+from pydantic import BaseModel, Field
+from typing_extensions import Literal
 from fastapi import APIRouter, status, Depends, Query
-from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
+from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from robot_server.hardware import get_hardware
 from robot_server.service.json_api import (
     SimpleMultiBody,
+    SimpleBody,
     PydanticResponse,
-    MultiBodyMeta,
+    MultiBodyMeta, SimpleEmptyBody, RequestModel,
 )
+from robot_server.errors import ErrorBody, ErrorDetails
 
 from opentrons.types import Mount
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
+from opentrons.protocol_engine.types import Vec3f
+
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset
+)
+from opentrons.hardware_control.dev_types import PipetteDict, GripperDict, O
+from opentrons.hardware_control.types import OT3Mount
 
 from .instrument_models import (
     MountType,
@@ -26,6 +36,23 @@ from .instrument_models import (
 )
 
 instruments_router = APIRouter()
+
+
+class InstrumentNotFound(ErrorDetails):
+    """An error if a given instrument is not found."""
+
+    id: Literal["RunNotFound"] = "InstrumentNotFound"
+    title: str = "Instrument Not Found"
+
+
+class InstrumentTypeMismatch(ErrorDetails):
+    """An error returned when sending a request to the wrong type of instrument.
+
+    For example, if a request is meant for a gripper but is issued for a pipette.
+    """
+
+    id: Literal["InstrumentTypeMismatch"] = "InstrumentTypeMismatch"
+    title: str = "Request for different instrument type."
 
 
 def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pipette:
@@ -109,5 +136,44 @@ async def get_attached_instruments(
             data=response_data,
             meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
         ),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+class JawOffsets(BaseModel):
+    """Create request data for a new run."""
+
+    frontProbeOffset: Optional[Vec3f] = Field(
+        None,
+        description="Front probe offset",
+    )
+    rearProbeOffset: Optional[Vec3f] = Field(
+        None,
+        description="Rear probe offset",
+    )
+
+@instruments_router.patch(
+    path="/instruments/{gripperSerial}/gripper_offset",
+    summary="Save/update gripper calibration offset.",
+    description="Provided the offsets found for front and rear gripper jaws using"
+                " calibration probes, compute the total offset and save to disk.",
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[GripperCalibrationOffset]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[InstrumentNotFound]},
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[InstrumentTypeMismatch]},
+    },
+)
+async def save_gripper_offset(
+    gripperSerial: str,
+    request_body: RequestModel[JawOffsets],
+    hardware: HardwareControlAPI = Depends(get_hardware)
+) -> PydanticResponse[SimpleEmptyBody]:
+    """Save the given gripper's calibration offset to disk and load it into hardware controller."""
+    ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
+    # Do gripper serial validation?
+    total_offset = 0.5 * (request_body.data.frontProbeOffset + request_body.data.rearProbeOffset)
+    await ot3_hardware.save_instrument_offset(mount=OT3Mount.GRIPPER, delta=total_offset)
+    return await PydanticResponse.create(
+        content=SimpleEmptyBody.construct(),
         status_code=status.HTTP_200_OK,
     )
