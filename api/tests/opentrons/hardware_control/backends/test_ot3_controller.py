@@ -99,29 +99,6 @@ def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Con
 
 
 @pytest.fixture
-def fake_liquid_settings() -> LiquidProbeSettings:
-    return LiquidProbeSettings(
-        starting_mount_height=100,
-        prep_move_speed=6,
-        max_z_distance=15,
-        min_z_distance=5,
-        mount_speed=40,
-        plunger_speed=10,
-        sensor_threshold_pascals=15,
-        expected_liquid_height=109,
-    )
-
-
-@pytest.fixture
-def mock_send_stop_threshold() -> None:
-    with patch(
-        "opentrons_hardware.sensors.sensor_driver.send_stop_threshold",
-        autospec=True,
-    ) as mock_stop_threshold:
-        yield mock_stop_threshold
-
-
-@pytest.fixture
 def mock_move_group_run():
     with patch(
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner.run",
