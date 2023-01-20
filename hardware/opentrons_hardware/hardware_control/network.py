@@ -1,13 +1,15 @@
 """Utilities for managing the CANbus network on the OT3."""
 import asyncio
 import logging
-from typing import Set, Optional
+from typing import Dict, Set, Optional
+from opentrons.hardware_control.types import DeviceInfoCache
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest,
+    DeviceInfoResponse,
 )
 
 mod_log = logging.getLogger(__name__)
@@ -17,7 +19,7 @@ async def probe(
     can_messenger: CanMessenger,
     expected: Optional[Set[NodeId]],
     timeout: Optional[float],
-) -> Set[NodeId]:
+) -> Dict[NodeId, DeviceInfoCache]:
     """Probe the bus and discover connected devices.
 
     Sends a status request to the broadcast address and waits for responses. Ends either
@@ -30,7 +32,7 @@ async def probe(
     are attached) and use this method to verify the assumption.
     """
     event = asyncio.Event()
-    nodes: Set[NodeId] = set()
+    nodes: Dict[NodeId, DeviceInfoCache] = dict()
 
     def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
         try:
@@ -46,10 +48,16 @@ async def probe(
             mod_log.error(
                 f"Recieved an error message {str(message)} from {str(arbitration_id.parts)}"
             )
-        else:
-            nodes.add(originator)
-            if expected and expected.issubset(nodes):
-                event.set()
+        elif isinstance(message, DeviceInfoResponse):
+            nodes[originator] = DeviceInfoCache(
+                node_id=arbitration_id.parts.originating_node_id,
+                version=message.payload.version.value,
+                flags=message.payload.flags.value,
+                shortsha=message.payload.shortsha.value.decode()
+                )
+
+        if expected and expected.issubset(nodes):
+            event.set()
 
     can_messenger.add_listener(listener)
     await can_messenger.send(

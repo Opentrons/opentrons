@@ -73,6 +73,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware import firmware_update
+from opentrons_hardware.firmware_update.device_info import get_device_info
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
@@ -88,6 +89,7 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     MotorStatus,
     MustHomeError,
+    DeviceInfoCache,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -153,6 +155,7 @@ class OT3Controller:
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._subsystem_info_cache: dict[NodeId, DeviceInfoCache] = {}
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -827,7 +830,9 @@ class OT3Controller:
         a working machine, and no more.
         """
         core_nodes = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        core_present = await probe(self._messenger, core_nodes, timeout)
+        core_present_info = await probe(self._messenger, core_nodes, timeout)
+        self._handle_device_info_response(core_present_info)
+        core_present = set(core_present_info.keys())
         self._present_nodes = self._filter_probed_core_nodes(
             self._present_nodes, core_present
         )
@@ -856,9 +861,11 @@ class OT3Controller:
             "config", None
         ):
             expected.add(NodeId.gripper)
-        present = await probe(self._messenger, expected, timeout)
+        core_present_info = await probe(self._messenger, expected, timeout)
+        self._handle_device_info_response(core_present_info)
+        core_present = set(core_present_info.keys())
         self._present_nodes = self._replace_gripper_node(
-            self._replace_head_node(present)
+            self._replace_head_node(core_present)
         )
         log.info(f"The present nodes are now {self._present_nodes}")
 
@@ -915,3 +922,23 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
+
+    async def update_motor_status(self) -> None:
+        """Retreieve motor and encoder status and position from all present nodes"""
+        assert len(self._present_nodes)
+        response = await get_motor_position(self._messenger, self._present_nodes)
+        self._handle_motor_status_response(response)
+
+    async def update_device_info(self) -> None:
+        """Update the device info cache for all attached instruments"""
+        response = await get_device_info(self._messenger, self._present_nodes)
+        self._handle_device_info_response(response)
+
+    def _handle_device_info_response(self, network_info: Dict[NodeId, DeviceInfoCache]) -> None:
+        subsystem_info_cache = {}
+        for node, device_info in network_info.items():
+            old_device_info = self._subsystem_info_cache.get(node)
+            if old_device_info is None or device_info != old_device_info:
+                log.debug(f"Updated node version cache {device_info}")
+                subsystem_info_cache[node] = device_info
+        self._subsystem_info_cache = subsystem_info_cache

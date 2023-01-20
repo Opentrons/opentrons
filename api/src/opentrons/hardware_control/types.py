@@ -551,3 +551,14 @@ class InvalidPipetteModel(KeyError):
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"
+
+
+@dataclass
+class DeviceInfoCache:
+    node_id: int
+    version: int
+    shortsha: str
+    flags: any
+
+    def __repr__(self) -> str:
+        return f"<node: {self.node_id} version: {self.version} shortsha: {self.shortsha}>"
