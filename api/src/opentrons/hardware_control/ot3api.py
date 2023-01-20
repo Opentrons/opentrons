@@ -48,7 +48,7 @@ from .instruments.ot3.pipette import (
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import get_system_constraints, head_node_for_mount
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -115,6 +115,7 @@ from .dev_types import (
 )
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
+    ThresholdReachedTooEarly,
 )
 
 mod_log = logging.getLogger(__name__)
@@ -1666,28 +1667,68 @@ class OT3API(
         self,
         mount: OT3Mount,
         probe_settings: Optional[LiquidProbeSettings] = None,
-    ) -> Any:
+    ) -> float:
         """Find liquid."""
-        pipette_axis = OT3Axis.of_main_tool_actuator(mount)
+
+        checked_mount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(checked_mount)
+        self._pipette_handler.ready_for_tip_action(
+            instrument, HardwareAction.LIQUID_PROBE
+        )
+
         if not probe_settings:
             probe_settings = self.config.liquid_sense
+        pipette_axis = OT3Axis.of_main_tool_actuator(mount)
 
         if not self._current_position:
             await self.home()
-        new_position = await self.current_position_ot3(mount)
-        if new_position[pipette_axis] != 0:
+        checked_position = await self.current_position_ot3(mount)
+        if checked_position[pipette_axis] != 0:
             await self.home_plunger(mount)
+        try:
+            positions = await self._backend.liquid_probe(
+                mount,
+                probe_settings.max_z_distance,
+                probe_settings.mount_speed,
+                probe_settings.plunger_speed,
+                probe_settings.sensor_threshold_pascals,
+                probe_settings.starting_mount_height,
+                probe_settings.prep_move_speed,
+            )
+        except MoveConditionNotMet:
+            self._log.exception("Liquid Sensing failed- threshold never reached.")
+            self._current_position.clear()
+            raise
+        else:
+            final_mount_pos_um: float = positions[head_node_for_mount(mount)][0]
+            pipette_distance_traveled = (
+                final_mount_pos_um - probe_settings.starting_mount_height
+            )
 
-        return await self._backend.liquid_probe(
-            mount,
-            probe_settings.pipette_distance,
-            probe_settings.pipette_speed,
-            probe_settings.mount_distance,
-            probe_settings.mount_speed,
-            probe_settings.sensor_threshold_pascals,
-            probe_settings.starting_mount_height,
-            probe_settings.prep_move_speed,
-        )
+            if pipette_distance_traveled < probe_settings.min_z_distance:
+                self._log.exception(
+                    "Liquid Sensing failed- threshold reached too early."
+                )
+                self._current_position.clear()
+                raise ThresholdReachedTooEarly
+
+            machine_pos = await self._backend.update_position()
+            position = deck_from_machine(
+                machine_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
+            self._current_position.update(position)
+
+            encoder_machine_pos = await self._backend.update_encoder_position()
+            encoder_position = deck_from_machine(
+                encoder_machine_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
+            self._encoder_current_position.update(encoder_position)
+
+            return final_mount_pos_um
 
     async def capacitive_probe(
         self,

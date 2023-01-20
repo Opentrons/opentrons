@@ -1,11 +1,16 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
 from typing import Iterator, Union, Dict, Tuple, List
+
 from typing_extensions import Literal
 from math import copysign
 import pytest
 from mock import AsyncMock, patch, Mock
-from opentrons.config.types import GantryLoad, CapacitivePassSettings
+from opentrons.config.types import (
+    GantryLoad,
+    CapacitivePassSettings,
+    LiquidProbeSettings,
+)
 from opentrons.hardware_control.dev_types import AttachedGripper, OT3AttachedPipette
 from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
@@ -27,9 +32,15 @@ from opentrons.hardware_control.types import (
     GripperProbe,
     InstrumentProbeType,
 )
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+    ThresholdReachedTooEarly,
+)
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
-from opentrons.hardware_control.backends.ot3utils import axis_to_node
+from opentrons.hardware_control.backends.ot3utils import (
+    axis_to_node,
+)
 from opentrons.types import Point, Mount
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
@@ -42,6 +53,10 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteVersionType,
 )
 
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+)
+
 
 @pytest.fixture
 def fake_settings() -> CapacitivePassSettings:
@@ -50,6 +65,20 @@ def fake_settings() -> CapacitivePassSettings:
         max_overrun_distance_mm=2,
         speed_mm_per_s=4,
         sensor_threshold_pf=1.0,
+    )
+
+
+@pytest.fixture
+def fake_liquid_settings() -> LiquidProbeSettings:
+    return LiquidProbeSettings(
+        starting_mount_height=100,
+        prep_move_speed=6,
+        max_z_distance=15,
+        min_z_distance=5,
+        mount_speed=40,
+        plunger_speed=10,
+        sensor_threshold_pascals=15,
+        expected_liquid_height=109,
     )
 
 
@@ -254,6 +283,50 @@ def mock_backend_capacitive_probe(
 
 
 @pytest.fixture
+def mock_current_position_ot3(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "current_position_ot3",
+        AsyncMock(spec=ot3_hardware.managed_obj.current_position_ot3),
+    ) as mock_position:
+        mock_position.return_value = {
+            OT3Axis.X: 477.2,
+            OT3Axis.Y: 493.8,
+            OT3Axis.Z_L: 253.475,
+            OT3Axis.Z_R: 253.475,
+            OT3Axis.Z_G: 253.475,
+            OT3Axis.P_L: 0,
+            OT3Axis.P_R: 0,
+            OT3Axis.G: 0,
+        }
+        yield mock_position
+
+
+@pytest.fixture
+def mock_backend_liquid_probe(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[AsyncMock]:
+    backend = ot3_hardware.managed_obj._backend
+    with patch.object(
+        backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
+    ) as mock_probe:
+        mock_probe.side_effect = [
+            {
+                NodeId.head_l: (2, 2, True, True),
+                NodeId.pipette_left: (1, 2, True, True),
+            },
+            {
+                NodeId.head_r: (12, 12, True, True),
+                NodeId.pipette_right: (11, 11, True, True),
+            },
+            MoveConditionNotMet,
+        ]
+        yield mock_probe
+
+
+@pytest.fixture
 def mock_backend_capacitive_pass(
     ot3_hardware: ThreadManager[OT3API],
 ) -> Iterator[AsyncMock]:
@@ -306,6 +379,45 @@ async def test_move_to_without_homing_first(
     )
     mock_home.assert_called_once_with(homed_axis)
     assert ot3_hardware._backend.check_ready_for_movement(homed_axis)
+
+
+@pytest.mark.parametrize(
+    "mount, head_node, pipette_node",
+    [
+        (OT3Mount.LEFT, NodeId.head_l, NodeId.pipette_left),
+        (OT3Mount.RIGHT, NodeId.head_r, NodeId.pipette_right),
+    ],
+)
+async def test_liquid_probe(
+    ot3_hardware: ThreadManager[OT3API],
+    head_node: NodeId,
+    pipette_node: NodeId,
+    mount: OT3Mount,
+    fake_liquid_settings: LiquidProbeSettings,
+    mock_instrument_handlers: Tuple[Mock],
+    mock_current_position_ot3: AsyncMock,
+) -> None:
+    backend = ot3_hardware.managed_obj._backend
+
+    await ot3_hardware.home()
+
+    with patch.object(
+        backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
+    ) as mock_probe:
+        mock_probe.side_effect = [
+            {head_node: (102, 102, True, True), pipette_node: (102, 102, True, True)},
+            {head_node: (112, 112, True, True), pipette_node: (111, 111, True, True)},
+            MoveConditionNotMet,
+        ]
+
+        with pytest.raises(ThresholdReachedTooEarly):
+            await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
+
+        final_pos = await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
+        assert final_pos == 112
+
+        with pytest.raises(MoveConditionNotMet):
+            await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
 
 
 @pytest.mark.parametrize(

@@ -139,11 +139,12 @@ class ZSenseSettings:
 class LiquidProbeSettings:
     starting_mount_height: float
     prep_move_speed: float
-    pipette_distance: float
-    mount_distance: float
+    max_z_distance: float
+    min_z_distance: float
     mount_speed: float
-    pipette_speed: float
+    plunger_speed: float
     sensor_threshold_pascals: float
+    expected_liquid_height: float
 
 
 @dataclass(frozen=True)

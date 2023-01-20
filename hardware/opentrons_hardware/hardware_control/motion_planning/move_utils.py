@@ -29,6 +29,10 @@ class MoveConditionNotMet(ValueError):
     """Error raised if a move does not meet its stop condition before finishing."""
 
 
+class ThresholdReachedTooEarly(ValueError):
+    """Error raised if sensor threshold reached before minimum probing distance."""
+
+
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     """Keep the sign of the input but cap the numeric value at the constraint value."""
     return cast(np.float64, np.copysign(np.minimum(abs(constraint), abs(input)), input))
