@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -17,14 +17,17 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import screenImage from '../../assets/images/odd/odd_abstract@x2.png'
 
-import type { OnDeviceRouteParams } from '../../App/types'
-
 const IMAGE_ALT = 'finish setting up a robot'
 
-export function ConfirmRobotName(): JSX.Element {
+interface ConfirmRobotNameProps {
+  robotName: string
+}
+
+export function ConfirmRobotName({
+  robotName,
+}: ConfirmRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const history = useHistory()
-  const { robotName } = useParams<OnDeviceRouteParams>()
   return (
     <>
       <StepMeter totalSteps={5} currentStep={5} OnDevice />
