@@ -55,7 +55,7 @@
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
     "merge-options": "1.0.1",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.8",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
     "semver": "5.5.0",
