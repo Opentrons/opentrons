@@ -7,13 +7,8 @@ from pydantic import BaseModel, Field
 
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.ot3_calibration import (
-    calibrate_gripper,
-)
-from opentrons.hardware_control.types import (
-    OT3Mount,
-    GripperProbe as HWAPIGripperProbe
-)
+from opentrons.hardware_control import ot3_calibration
+from opentrons.hardware_control.types import OT3Mount, GripperProbe as HWAPIGripperProbe
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -50,7 +45,7 @@ class CalibrateGripperParams(BaseModel):
             " process by calculating the total offset and saving it to disk."
             " If this param is not specified then the command will only find and return"
             " the offset for the specified probe."
-        )
+        ),
     )
 
 
@@ -68,7 +63,7 @@ class CalibrateGripperResult(BaseModel):
         None,
         description=(
             "The total gripper offset calculated when `otherProbeOffset` is provided"
-        )
+        ),
     )
 
 
@@ -94,22 +89,33 @@ class CalibrateGripperImplementation(
         """
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
 
-        probe_offset = await calibrate_gripper(
+        probe_offset = await ot3_calibration.calibrate_gripper(
             ot3_hardware_api, self._convert_to_hw_api_probe(params.probe)
         )
         other_probe_offset = params.otherProbeOffset
         total_offset: Optional[Point] = None
         if other_probe_offset is not None:
-            total_offset = 0.5 * (probe_offset + Point(x=other_probe_offset.x,
-                                                      y=other_probe_offset.y,
-                                                      z=other_probe_offset.z))
-            await ot3_hardware_api.save_instrument_offset(mount=OT3Mount.GRIPPER,
-                                                    delta=total_offset)
+            total_offset = 0.5 * (
+                probe_offset
+                + Point(
+                    x=other_probe_offset.x,
+                    y=other_probe_offset.y,
+                    z=other_probe_offset.z,
+                )
+            )
+            await ot3_hardware_api.save_instrument_offset(
+                mount=OT3Mount.GRIPPER, delta=total_offset
+            )
 
         return CalibrateGripperResult.construct(
-            probeOffset=Vec3f.construct(x=probe_offset.x, y=probe_offset.y, z=probe_offset.z),
-            gripperOffset=Vec3f.construct(x=total_offset.x, y=total_offset.y, z=total_offset.z)
-            if total_offset is not None else None
+            probeOffset=Vec3f.construct(
+                x=probe_offset.x, y=probe_offset.y, z=probe_offset.z
+            ),
+            gripperOffset=Vec3f.construct(
+                x=total_offset.x, y=total_offset.y, z=total_offset.z
+            )
+            if total_offset
+            else None,
         )
 
     @staticmethod

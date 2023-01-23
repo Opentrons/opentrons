@@ -64,6 +64,33 @@ async def test_calibrate_gripper(
     assert result == CalibrateGripperResult(probeOffset=Vec3f(x=1.1, y=2.2, z=3.3))
 
 
+async def test_calibrate_gripper_saves_calibration(
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+    use_mock_hc_calibrate_gripper: None,
+) -> None:
+    """It should delegate to hardware API to calibrate the gripper & save calibration."""
+    subject = CalibrateGripperImplementation(hardware_api=ot3_hardware_api)
+    params = CalibrateGripperParams(
+        probe=CalibrateGripperParamsProbe.REAR,
+        otherProbeOffset=Vec3f(x=4.4, y=5.5, z=6.6),
+    )
+    decoy.when(
+        await ot3_calibration.calibrate_gripper(
+            ot3_hardware_api, probe=GripperProbe.REAR
+        )
+    ).then_return(Point(1.1, 2.2, 3.3))
+
+    result = await subject.execute(params)
+    assert result.probeOffset == Vec3f(x=1.1, y=2.2, z=3.3)
+    assert result.gripperOffset is not None
+    assert (
+        result.gripperOffset.x,
+        result.gripperOffset.y,
+        result.gripperOffset.z,
+    ) == pytest.approx((2.75, 3.85, 4.95))
+
+
 async def test_calibrate_gripper_raises_on_ot2(
     decoy: Decoy,
     ot2_hardware_api: OT2API,
