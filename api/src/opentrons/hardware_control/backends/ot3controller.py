@@ -3,8 +3,10 @@
 from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
+import json
 import logging
 from copy import deepcopy
+import os
 from typing import (
     Callable,
     Dict,
@@ -22,7 +24,7 @@ from typing import (
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
-from opentrons_hardware.firmware_update.errors import MustUpdateFirmware
+from opentrons_hardware.firmware_update.errors import FirmwareManifestMissing, MustUpdateFirmware
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -176,6 +178,27 @@ class OT3Controller:
     @property
     def update_required(self):
         return self._update_required
+
+    async def load_firmware_manifest(self, filepath: str) -> Dict[NodeId, Dict]:
+        # TODO: make sure we have this path in a config somewhere
+        opentrons_firmware = os.path("/usr/lib/firmware/opentrons-firmware.json")
+        if not os.path.exists(opentrons_firmware):
+            log.error(f"Firmware manifest file not found {opentrons_firmware}")
+            raise FirmwareManifestMissing
+ 
+        opentrons_manifest = {}
+        with open(opentrons_firmware, "r") as fh:
+            manifest = await json.loads(fh)
+            for subsystem_name, version_info in manifest:
+                node = _subsystem_name_to_node(subsystem_name)
+                if not node:
+                    log.error(f"Found invalid subsystem name {subsystem_name}")
+                    continue
+                    opentrons_manifest[node] = version_info
+        return opentrons_manifest
+
+    def check_firmware_updates(self) -> None:
+        pass
 
     def requires_update(function: callable):
         """Decorator that raises MustUpdateFirmware if the update_required flag is set."""

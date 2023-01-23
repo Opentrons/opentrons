@@ -36,6 +36,16 @@ class BootloaderNotReady(FirmwareUpdateException):
 
     pass
 
+class FirmwareManifestMissing(FirmwareUpdateException):
+    """Firmware manifest file not found."""
+
+    message: MessageDefinition
+
+    def __init__(self, message: MessageDefinition) -> None:
+        self.message = message
+        super().__init__(f"Firmware manifest file not found {message}.")
+
+
 class MustUpdateFirmware(FirmwareUpdateException):
     """At least one subsystem requires an update."""
 
