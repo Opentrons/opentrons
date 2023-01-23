@@ -45,7 +45,9 @@ KEYWORDS = ["robots", "automation", "lab"]
 DESCRIPTION = (
     "A server to provide an external interface to the robot.")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = [
+    "pyjwt==2.6.0"
+]
 
 
 def read(*parts):

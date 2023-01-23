@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional, Union, cast, Tuple, List, Set
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware, Well
-    from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
+    from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
     from opentrons.protocol_api.module_contexts import ModuleContext
 
 
@@ -29,7 +29,7 @@ class LabwareLike:
         """
         # Import locally to avoid circular dependency
         from opentrons.protocol_api.labware import Labware, Well
-        from opentrons.protocol_api.core.protocol_api.module_geometry import (
+        from opentrons.protocol_api.core.legacy.module_geometry import (
             ModuleGeometry,
         )
         from opentrons.protocol_api.module_contexts import ModuleContext
@@ -116,7 +116,7 @@ class LabwareLike:
         return cast(Labware, self.object)
 
     def as_module(self) -> Union["ModuleContext", "ModuleGeometry"]:
-        from opentrons.protocol_api.core.protocol_api.module_geometry import (
+        from opentrons.protocol_api.core.legacy.module_geometry import (
             ModuleGeometry,
         )
         from opentrons.protocol_api.module_contexts import ModuleContext

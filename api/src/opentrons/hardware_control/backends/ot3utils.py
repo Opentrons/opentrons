@@ -40,8 +40,8 @@ from opentrons_hardware.hardware_control.motion import (
     create_tip_action_step,
 )
 
-GRIPPER_JAW_HOME_TIME: float = 120
-GRIPPER_JAW_GRIP_TIME: float = 1
+GRIPPER_JAW_HOME_TIME: float = 10
+GRIPPER_JAW_GRIP_TIME: float = 10
 GRIPPER_JAW_HOME_DC: float = 100
 
 PipetteAction = Literal["pick_up", "drop"]

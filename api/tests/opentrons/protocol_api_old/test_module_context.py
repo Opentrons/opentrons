@@ -17,7 +17,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     ThermocyclerModuleModel,
 )
-from opentrons.protocol_api.core.protocol_api.module_geometry import (
+from opentrons.protocol_api.core.legacy.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
     models_compatible,
 )
