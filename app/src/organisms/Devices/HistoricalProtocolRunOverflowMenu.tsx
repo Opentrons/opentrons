@@ -56,7 +56,7 @@ export function HistoricalProtocolRunOverflowMenu(
 
   const commands = useAllCommandsQuery(
     runId,
-    { cursor: 0, pageLength: 0},
+    { cursor: 0, pageLength: 0 },
     { staleTime: Infinity }
   )
   const runTotalCommandCount = commands?.data?.meta?.totalLength
