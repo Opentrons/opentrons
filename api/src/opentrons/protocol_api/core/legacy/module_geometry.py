@@ -276,7 +276,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         )
 
         # Block first three columns from being accessed
-        definition = labware._implementation.get_definition()
+        definition = labware._core.get_definition()
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
             implementation=LegacyLabwareCore(definition, super().location),

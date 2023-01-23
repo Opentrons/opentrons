@@ -216,7 +216,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             self._implementation.aspirate(
                 location=move_to_location,
-                well_core=well._impl if well is not None else None,
+                well_core=well._core if well is not None else None,
                 volume=c_vol,
                 rate=rate,
                 flow_rate=flow_rate,
@@ -281,7 +281,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if isinstance(location, labware.Well):
             well = location
-            if well.parent._implementation.is_fixed_trash():
+            if well.parent._core.is_fixed_trash():
                 move_to_location = location.top()
             else:
                 move_to_location = location.bottom(
@@ -328,7 +328,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume=c_vol,
                 rate=rate,
                 location=move_to_location,
-                well_core=well._impl if well is not None else None,
+                well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
             )
 
@@ -473,7 +473,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             self._implementation.blow_out(
                 location=checked_loc,
-                well_core=well._impl if well is not None else None,
+                well_core=well._core if well is not None else None,
                 move_to_well=move_to_well,
             )
 
@@ -566,7 +566,7 @@ class InstrumentContext(publisher.CommandPublisher):
             raise TypeError("location should be a Well, but it is {}".format(location))
 
         self._implementation.touch_tip(
-            location=well.as_well()._impl,
+            location=well.as_well()._core,
             radius=radius,
             v_offset=v_offset,
             speed=checked_speed,
@@ -800,7 +800,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             self._implementation.pick_up_tip(
                 location=move_to_location,
-                well_core=well._impl,
+                well_core=well._core,
                 presses=presses,
                 increment=increment,
                 prep_after=prep_after,
@@ -918,7 +918,7 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.drop_tip(instrument=self, location=well),
         ):
             self._implementation.drop_tip(
-                location=location, well_core=well._impl, home_after=home_after
+                location=location, well_core=well._core, home_after=home_after
             )
 
         self._last_tip_picked_up_from = None
@@ -1279,7 +1279,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
             self._implementation.move_to(
                 location=location,
-                well_core=well._impl if well is not None else None,
+                well_core=well._core if well is not None else None,
                 force_direct=force_direct,
                 minimum_z_height=minimum_z_height,
                 speed=speed,

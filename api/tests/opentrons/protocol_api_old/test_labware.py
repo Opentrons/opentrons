@@ -303,7 +303,7 @@ def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=parent.point,
-                parent_object=parent.labware.as_labware()._implementation,  # type: ignore[arg-type]
+                parent_object=parent.labware.as_labware()._core,  # type: ignore[arg-type]
             ),
             display_name=well_name,
             has_tip=has_tip,

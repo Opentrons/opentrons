@@ -189,9 +189,7 @@ class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
                 " using `height_from_base` or `height`"
             )
 
-        engage_height = labware._implementation.get_default_magnet_engage_height(
-            preserve_half_mm
-        )
+        engage_height = labware._core.get_default_magnet_engage_height(preserve_half_mm)
 
         if engage_height is None:
             raise ValueError(
