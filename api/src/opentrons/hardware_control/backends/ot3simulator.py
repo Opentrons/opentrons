@@ -518,7 +518,6 @@ class OT3Simulator:
     async def clean_up(self) -> None:
         """Clean up."""
         await _yield()
-        pass
 
     async def configure_mount(
         self, mount: OT3Mount, config: InstrumentHardwareConfigs
