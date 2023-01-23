@@ -91,7 +91,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   {
     Component: ProtocolDashboard,
     exact: true,
-    // name: 'Protocol Dashboard',
+    // 'Protocol Dashboard',
     name: 'All Protocols',
     navLinkTo: '/protocols',
     path: '/protocols',
@@ -140,7 +140,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
       </>
     ),
     exact: true,
-    // name: 'Attach Instruments Dashboard',
+    // 'Attach Instruments Dashboard',
     name: 'Instruments',
     navLinkTo: '/attach-instruments',
     path: '/attach-instruments',
@@ -154,7 +154,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
       </>
     ),
     exact: true,
-    // name: 'Robot Settings Dashboard',
+    // 'Robot Settings Dashboard',
     name: 'Settings',
     navLinkTo: '/robot-settings',
     path: '/robot-settings',
