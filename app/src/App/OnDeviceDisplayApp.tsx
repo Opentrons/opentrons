@@ -89,43 +89,6 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup/usb',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>robot settings dashboard</Box>
-      </>
-    ),
-    exact: true,
-    // name: 'Robot Settings Dashboard',
-    name: 'Settings',
-    navLinkTo: '/robot-settings',
-    path: '/robot-settings',
-  },
-  // insert robot settings subroutes
-  {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>factory reset</Box>
-      </>
-    ),
-    exact: true,
-    name: 'Factory Reset',
-    path: '/robot-settings/factory-reset',
-  },
-  {
-    Component: NameRobot,
-    exact: true,
-    name: 'Rename Robot',
-    path: '/robot-settings/rename-robot',
-  },
-  {
-    Component: UpdateRobot,
-    exact: true,
-    name: 'Update Robot',
-    path: '/robot-settings/update-robot',
-  },
-  {
     Component: ProtocolDashboard,
     exact: true,
     // name: 'Protocol Dashboard',
@@ -183,6 +146,43 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/attach-instruments',
   },
   // insert attach instruments subroutes
+  {
+    Component: () => (
+      <>
+        <BackButton />
+        <Box>robot settings dashboard</Box>
+      </>
+    ),
+    exact: true,
+    // name: 'Robot Settings Dashboard',
+    name: 'Settings',
+    navLinkTo: '/robot-settings',
+    path: '/robot-settings',
+  },
+  // insert robot settings subroutes
+  {
+    Component: () => (
+      <>
+        <BackButton />
+        <Box>factory reset</Box>
+      </>
+    ),
+    exact: true,
+    name: 'Factory Reset',
+    path: '/robot-settings/factory-reset',
+  },
+  {
+    Component: NameRobot,
+    exact: true,
+    name: 'Rename Robot',
+    path: '/robot-settings/rename-robot',
+  },
+  {
+    Component: UpdateRobot,
+    exact: true,
+    name: 'Update Robot',
+    path: '/robot-settings/update-robot',
+  },
   {
     Component: () => (
       <>

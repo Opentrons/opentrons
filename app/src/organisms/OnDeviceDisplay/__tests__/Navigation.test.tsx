@@ -24,13 +24,6 @@ const mockRoutes = [
   {
     Component: mockComponent,
     exact: true,
-    name: 'Settings',
-    navLinkTo: '/robot-settings',
-    path: '/robot-settings',
-  },
-  {
-    Component: mockComponent,
-    exact: true,
     name: 'All Protocols',
     navLinkTo: '/protocols',
     path: '/protocols',
@@ -41,6 +34,13 @@ const mockRoutes = [
     name: 'Instruments',
     navLinkTo: '/attach-instruments',
     path: '/attach-instruments',
+  },
+  {
+    Component: mockComponent,
+    exact: true,
+    name: 'Settings',
+    navLinkTo: '/robot-settings',
+    path: '/robot-settings',
   },
 ]
 

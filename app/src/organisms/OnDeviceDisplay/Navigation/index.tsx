@@ -38,13 +38,6 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
 
-  const sortNavRoutesByName = navRoutes.slice(0)
-  sortNavRoutesByName.sort(function (a, b) {
-    const x = a.name.toLowerCase()
-    const y = b.name.toLowerCase()
-    return x < y ? -1 : x > y ? 1 : 0
-  })
-
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
@@ -57,7 +50,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_CENTER}
-        gridGap="0.625rem"
+        gridGap="0.5rem"
       >
         <NavLink to="/dashboard">
           <StyledText
@@ -72,7 +65,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         <Icon name="wifi" size="2rem" />
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
-        {sortNavRoutesByName.map(({ name, navLinkTo }: RouteProps) => (
+        {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavigationLink key={name} to={navLinkTo as string}>
             <StyledText
               color={COLORS.black}
