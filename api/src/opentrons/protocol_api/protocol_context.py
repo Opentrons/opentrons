@@ -753,7 +753,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.set_rail_lights(on=on)
 
-    # TODO (tz, 12-19-22): Should the api version be 2.14
+    # TODO (tz, 12-19-22): Limit to api version 2.14.
     # https://opentrons.atlassian.net/browse/RCORE-537
     @requires_version(2, 13)
     def define_liquid(
