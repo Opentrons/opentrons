@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -11,6 +11,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_ROW,
   ALIGN_FLEX_END,
+  useSwipe,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
@@ -49,6 +50,16 @@ const NetworkSetupOptions = [
 
 export function NetworkSetupMenu(): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const swipe = useSwipe()
+  const history = useHistory()
+
+  React.useEffect(() => {
+    console.log('swipe')
+    console.log(swipe.swipeType)
+    if (swipe.swipeType === 'swipe-left') {
+      history.push('/get-started')
+    }
+  }, [history, swipe.swipeType])
 
   return (
     <>
@@ -58,6 +69,7 @@ export function NetworkSetupMenu(): JSX.Element {
           SPACING.spacingXXL
         )} ${String(SPACING.spacingXXL)}`}
         flexDirection={DIRECTION_COLUMN}
+        ref={swipe.ref}
       >
         <Flex
           justifyContent={JUSTIFY_CENTER}
