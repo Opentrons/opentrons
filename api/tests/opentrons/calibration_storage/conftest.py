@@ -3,7 +3,7 @@ import time
 import mock
 from decoy import Decoy
 
-from typing import Callable, Generator
+from typing import Generator
 from datetime import datetime
 
 from opentrons.util import helpers

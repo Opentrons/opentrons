@@ -494,9 +494,8 @@ async def test_mark_bad_calibration(mock_user_flow_bad_vectors):
     user_flow_path = "robot_server.robot.calibration.check.user_flow"
 
     with patch(f"{cal_store}.mark_bad_calibration.mark_bad") as m, patch(
-        f"{user_flow_path}.save_tip_length_calibration"), patch(
-        f"{user_flow_path}.save_pipette_calibration"
-    ), patch(
+        f"{user_flow_path}.save_tip_length_calibration"
+    ), patch(f"{user_flow_path}.save_pipette_calibration"), patch(
         f"{user_flow_path}.save_robot_deck_attitude"
     ):
         uf._current_state = CalibrationCheckState.comparingTip

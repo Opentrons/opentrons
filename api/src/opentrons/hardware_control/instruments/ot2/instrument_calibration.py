@@ -12,6 +12,7 @@ from opentrons.calibration_storage import (
     get_pipette_offset,
     save_pipette_calibration,
 )
+from opentrons.calibration_storage.ot2 import models as ot2_models
 from opentrons.hardware_control.types import OT3Mount
 
 
@@ -81,7 +82,10 @@ def load_pipette_offset(
     else:
         checked_mount = mount
     if pip_id:
-        pip_offset_data = get_pipette_offset(pip_id, checked_mount)
+        pip_offset_data = typing.cast(
+            ot2_models.v1.InstrumentOffsetModel,
+            get_pipette_offset(pip_id, checked_mount),
+        )
         if pip_offset_data:
             return PipetteOffsetByPipetteMount(
                 offset=pip_offset_data.offset,

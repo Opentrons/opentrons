@@ -58,7 +58,9 @@ def save_robot_deck_attitude(
         ot3_save_robot_deck_attitude(
             transform,
             pipette_id,
-            typing.cast(ot3_models.v1.CalibrationStatus, calibration_status),
+            typing.cast(
+                typing.Optional[ot3_models.v1.CalibrationStatus], calibration_status
+            ),
             source,
         )
     else:
@@ -69,7 +71,9 @@ def save_robot_deck_attitude(
             pipette_id,
             lw_hash,
             source,
-            typing.cast(ot2_models.v1.CalibrationStatus, calibration_status),
+            typing.cast(
+                typing.Optional[ot2_models.v1.CalibrationStatus], calibration_status
+            ),
         )
 
 
@@ -111,7 +115,9 @@ def save_pipette_calibration(
             offset,
             pipette_id,
             mount,
-            typing.cast(ot3_models.v1.CalibrationStatus, calibration_status),
+            typing.cast(
+                typing.Optional[ot3_models.v1.CalibrationStatus], calibration_status
+            ),
         )
     else:
         from .ot2 import ot2_save_pipette_calibration
@@ -122,7 +128,9 @@ def save_pipette_calibration(
             mount,
             tiprack_hash,
             tiprack_uri,
-            typing.cast(ot2_models.v1.CalibrationStatus, calibration_status),
+            typing.cast(
+                typing.Optional[ot2_models.v1.CalibrationStatus], calibration_status
+            ),
         )
 
 

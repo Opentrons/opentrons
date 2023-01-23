@@ -1,5 +1,4 @@
 import pytest
-import mock
 from datetime import datetime
 from typing import Any, cast
 from pathlib import Path

@@ -10,7 +10,8 @@ from typing import Optional
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.labware import get_labware_definition
 
-from opentrons.hardware_control.instruments import (
+# TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
+from opentrons.hardware_control.instruments.ot2 import (
     instrument_calibration as instr_cal,
 )
 from opentrons.calibration_storage.types import TipLengthCalNotFound

@@ -10,7 +10,8 @@ from opentrons.calibration_storage.helpers import uri_from_definition
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.hardware_control.dev_types import PipetteDict
 
-from opentrons.hardware_control.instruments import (
+# TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
+from opentrons.hardware_control.instruments.ot2 import (
     instrument_calibration as instr_cal,
 )
 from opentrons.protocol_api.labware import Labware

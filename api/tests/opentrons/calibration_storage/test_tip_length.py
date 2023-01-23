@@ -1,5 +1,4 @@
 import pytest
-import mock
 from decoy import Decoy
 from datetime import datetime
 from pathlib import Path
