@@ -91,7 +91,6 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   {
     Component: ProtocolDashboard,
     exact: true,
-    // 'Protocol Dashboard',
     name: 'All Protocols',
     navLinkTo: '/protocols',
     path: '/protocols',
