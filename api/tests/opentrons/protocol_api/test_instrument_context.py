@@ -79,7 +79,7 @@ def subject(
 ) -> InstrumentContext:
     """Get a ProtocolCore test subject with its dependencies mocked out."""
     return InstrumentContext(
-        implementation=mock_instrument_core,
+        core=mock_instrument_core,
         protocol_core=mock_protocol_core,
         broker=mock_broker,
         api_version=api_version,

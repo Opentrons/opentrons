@@ -95,7 +95,7 @@ class LegacyModuleCore(AbstractModuleCore):
         """Add a labware to the module."""
         labware = self.geometry.add_labware(
             Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._protocol_core.api_version,
                 protocol_core=None,  # type: ignore[arg-type]
                 core_map=None,  # type: ignore[arg-type]

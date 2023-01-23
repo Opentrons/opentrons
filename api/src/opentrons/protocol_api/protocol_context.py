@@ -82,7 +82,7 @@ class ProtocolContext(CommandPublisher):
     def __init__(
         self,
         api_version: APIVersion,
-        implementation: ProtocolCore,
+        core: ProtocolCore,
         broker: Optional[Broker] = None,
         core_map: Optional[LoadedCoreMap] = None,
         deck: Optional[Deck] = None,
@@ -91,7 +91,7 @@ class ProtocolContext(CommandPublisher):
         """Build a :py:class:`.ProtocolContext`.
 
         :param api_version: The API version to use.
-        :param implementation: The protocol implementation core.
+        :param core: The protocol implementation core.
         :param labware_offset_provider: Where this protocol context and its child
                                         module contexts will get labware offsets from.
         :param broker: An optional command broker to link to. If not
@@ -110,9 +110,9 @@ class ProtocolContext(CommandPublisher):
 
         super().__init__(broker)
         self._api_version = api_version
-        self._core = implementation
+        self._core = core
         self._core_map = core_map or LoadedCoreMap()
-        self._deck = deck or Deck(protocol_core=implementation, core_map=self._core_map)
+        self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
@@ -306,7 +306,7 @@ class ProtocolContext(CommandPublisher):
         )
 
         labware = Labware(
-            implementation=labware_core,
+            core=labware_core,
             api_version=self._api_version,
             protocol_core=self._core,
             core_map=self._core_map,
@@ -591,9 +591,9 @@ class ProtocolContext(CommandPublisher):
             )
 
         instrument = InstrumentContext(
-            broker=self._broker,
-            implementation=instrument_core,
+            core=instrument_core,
             protocol_core=self._core,
+            broker=self._broker,
             api_version=self._api_version,
             tip_racks=tip_racks,
             trash=self.fixed_trash,
@@ -735,7 +735,7 @@ class ProtocolContext(CommandPublisher):
     def _load_fixed_trash(self) -> None:
         fixed_trash_core = self._core.fixed_trash
         fixed_trash = Labware(
-            implementation=fixed_trash_core,
+            core=fixed_trash_core,
             api_version=self._api_version,
             protocol_core=self._core,
             core_map=self._core_map,

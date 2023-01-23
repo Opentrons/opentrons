@@ -64,7 +64,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __init__(
         self,
-        implementation: InstrumentCore,
+        core: InstrumentCore,
         protocol_core: ProtocolCore,
         broker: Broker,
         api_version: APIVersion,
@@ -75,7 +75,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         super().__init__(broker)
         self._api_version = api_version
-        self._core = implementation
+        self._core = core
         self._protocol_core = protocol_core
         self._tip_racks = tip_racks
         self._last_tip_picked_up_from: Union[labware.Well, None] = None

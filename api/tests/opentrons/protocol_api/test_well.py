@@ -33,11 +33,7 @@ def subject(
     mock_parent: Labware, mock_well_core: WellCore, api_version: APIVersion
 ) -> Well:
     """Get a Well test subject with its dependencies mocked out."""
-    return Well(
-        parent=mock_parent,
-        well_implementation=mock_well_core,
-        api_version=api_version,
-    )
+    return Well(parent=mock_parent, core=mock_well_core, api_version=api_version)
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])

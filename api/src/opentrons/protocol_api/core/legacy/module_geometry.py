@@ -279,7 +279,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         definition = labware._core.get_definition()
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
-            implementation=LegacyLabwareCore(definition, super().location),
+            core=LegacyLabwareCore(definition, super().location),
             api_version=labware.api_version,
             protocol_core=None,  # type: ignore[arg-type]
             core_map=None,  # type: ignore[arg-type]

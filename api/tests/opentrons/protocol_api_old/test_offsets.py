@@ -9,10 +9,8 @@ if typing.TYPE_CHECKING:
 
 def test_wells_rebuilt_with_offset(minimal_labware_def: "LabwareDefinition") -> None:
     test_labware = labware.Labware(
+        core=LegacyLabwareCore(minimal_labware_def, Location(Point(0, 0, 0), "deck")),
         api_version=MAX_SUPPORTED_VERSION,
-        implementation=LegacyLabwareCore(
-            minimal_labware_def, Location(Point(0, 0, 0), "deck")
-        ),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )

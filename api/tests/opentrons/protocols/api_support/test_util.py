@@ -58,7 +58,7 @@ def test_max_speeds_userdict():
 def test_build_edges():
     lw_def = get_labware_definition("corning_96_wellplate_360ul_flat")
     test_lw = Labware(
-        implementation=LegacyLabwareCore(lw_def, Location(Point(0, 0, 0), None)),
+        core=LegacyLabwareCore(lw_def, Location(Point(0, 0, 0), None)),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]

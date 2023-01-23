@@ -72,14 +72,12 @@ class Well:
     such as :py:meth:`top`, :py:meth:`bottom`
     """
 
-    def __init__(
-        self, parent: Labware, well_implementation: WellCore, api_version: APIVersion
-    ):
+    def __init__(self, parent: Labware, core: WellCore, api_version: APIVersion):
         if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
             api_version = _IGNORE_API_VERSION_BREAKPOINT
 
         self._parent = parent
-        self._core = well_implementation
+        self._core = core
         self._api_version = api_version
 
     @property  # type: ignore
@@ -267,13 +265,13 @@ class Labware:
 
     def __init__(
         self,
-        implementation: AbstractLabware[Any],
+        core: AbstractLabware[Any],
         api_version: APIVersion,
         protocol_core: ProtocolCore,
         core_map: LoadedCoreMap,
     ) -> None:
         """
-        :param implementation: The class that implements the public interface
+        :param core: The class that implements the public interface
                                of the class.
         :param APIVersion api_level: the API version to set for the instance.
                                      The :py:class:`.Labware` will
@@ -285,17 +283,15 @@ class Labware:
             api_version = _IGNORE_API_VERSION_BREAKPOINT
 
         self._api_version = api_version
-        self._core: LabwareCore = implementation
+        self._core: LabwareCore = core
         self._protocol_core = protocol_core
         self._core_map = core_map
 
-        well_columns = implementation.get_well_columns()
+        well_columns = core.get_well_columns()
         self._well_grid = well_grid.create(columns=well_columns)
         self._wells_by_name = {
             well_name: Well(
-                parent=self,
-                well_implementation=implementation.get_well_core(well_name),
-                api_version=api_version,
+                parent=self, core=core.get_well_core(well_name), api_version=api_version
             )
             for column in well_columns
             for well_name in column
@@ -858,7 +854,7 @@ def load_from_definition(
                       defaults to ``MAX_SUPPORTED_VERSION``.
     """
     return Labware(
-        implementation=LegacyLabwareCore(
+        core=LegacyLabwareCore(
             definition=definition,
             parent=parent,
             label=label,
