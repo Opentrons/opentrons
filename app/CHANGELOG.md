@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.2...v6.2.1-alpha.3) (2023-01-23)
+
+
+### Bug Fixes
+
+* **app:** minimize command page length when only retrieving run total length ([#12036](https://github.com/Opentrons/opentrons/issues/12036)) ([d05440c](https://github.com/Opentrons/opentrons/commit/d05440cf72ab950d0d20a572aba7f6963b8f7013))
+
+
+
+
+
 ## [6.2.1-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.0...v6.2.1-alpha.2) (2023-01-13)
 
 **Note:** Version bump only for package @opentrons/app

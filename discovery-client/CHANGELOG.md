@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.2...v6.2.1-alpha.3) (2023-01-23)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
 ## [6.2.1-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.0...v6.2.1-alpha.2) (2023-01-13)
 
 **Note:** Version bump only for package @opentrons/discovery-client
