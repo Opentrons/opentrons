@@ -112,5 +112,7 @@
   "plus_more": "+{{count}} more",
   "pause": "Pause",
   "move_labware": "Move Labware",
-  "not_started_yet": "Not started yet"
+  "not_started_yet": "Not started yet",
+  "preview_of_protocol_steps": "This is a preview of your protocol's steps",
+  "steps_total": "{{count}} steps total"
 }

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  Icon,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
@@ -62,18 +61,11 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
       )
       break
     }
-
     case 'pause':
     case 'waitForResume': {
-      messageNode = (
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-          <Icon name="pause-circle" size={SPACING.spacingM} />
-          {command.params?.message && command.params.message !== '' ? command.params.message : t('wait_for_resume')}
-        </Flex>
-      )
+      messageNode = command.params?.message && command.params.message !== '' ? command.params.message : t('wait_for_resume')
       break
     }
-
     case 'aspirate':
     case 'dispense':
     case 'blowout':
