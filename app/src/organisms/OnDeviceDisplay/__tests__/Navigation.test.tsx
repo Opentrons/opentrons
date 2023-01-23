@@ -7,10 +7,7 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../Navigation'
 
-const mockPush = jest.fn()
-
 jest.mock('../../../redux/discovery')
-
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
@@ -78,7 +75,7 @@ describe('Navigation', () => {
     expect(queryByText('Get started')).not.toBeInTheDocument()
   })
 
-  it.skip('should call a mock function when tapping icon', () => {
+  it.todo('should call a mock function when tapping icon', () => {
     // this part will be implemented in a follow pr (overflow menu for the ODD app)
   })
 })
