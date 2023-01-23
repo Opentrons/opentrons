@@ -13,7 +13,10 @@ Welcome to the v6.2.1 release of the Opentrons App!
 ## Bug Fixes
 
 - Fixed a problem where certain kinds of robot errors would block you from accessing the robot's settings.
-- Improved the time it takes to load a device's details page.
+
+## Improved Features
+
+- The device details page now loads faster.
 
 ---
 
