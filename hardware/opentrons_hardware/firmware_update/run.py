@@ -103,10 +103,6 @@ async def run_updates(
     Returns:
         None
     """
-    # limit number of concurrent tasks? Test CAN bandwidth
-
-    # asyncio queue for update logging
-    # pass dict that reports progress back
     tasks = [
         run_update(
             messenger=messenger,
@@ -120,4 +116,3 @@ async def run_updates(
     ]
 
     await asyncio.gather(*tasks)
-    # write tests
