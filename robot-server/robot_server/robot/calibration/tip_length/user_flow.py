@@ -4,7 +4,7 @@ from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
