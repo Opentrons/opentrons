@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.2...v6.2.1-alpha.3) (2023-01-23)
+
+
+### Bug Fixes
+
+* **app:** minimize command page length when only retrieving run total length ([#12036](https://github.com/Opentrons/opentrons/issues/12036)) ([d05440c](https://github.com/Opentrons/opentrons/commit/d05440cf72ab950d0d20a572aba7f6963b8f7013))
+
+
+### Performance Improvements
+
+* **api:** Do not block the event loop when loading JSONv6 protocols ([#12039](https://github.com/Opentrons/opentrons/issues/12039)) ([f885f44](https://github.com/Opentrons/opentrons/commit/f885f44e87e3f54cec646031610944924a7f0d40))
+* **api:** Regularly yield to the event loop when executing Protocol Engine commands ([#12038](https://github.com/Opentrons/opentrons/issues/12038)) ([fab3ef2](https://github.com/Opentrons/opentrons/commit/fab3ef20f550f20aa2be49f4f543cbd0d16cb3e9))
+
+
+
+
+
 ## [6.2.1-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.0...v6.2.1-alpha.2) (2023-01-13)
 
 **Note:** Version bump only for package opentrons
