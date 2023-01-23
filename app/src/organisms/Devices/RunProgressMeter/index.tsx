@@ -29,7 +29,6 @@ interface RunProgressMeterProps {
 
 export function RunProgressMeter(props: RunProgressMeterProps) {
   const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
-  console.log('commands', analysisCommands)
   return (
     <ProgressBar
       percentComplete={currentRunCommandIndex > 0 ? ((currentRunCommandIndex + 1) / analysisCommands.length) * 100 : 0}

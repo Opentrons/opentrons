@@ -3,23 +3,15 @@ import { Flex, DIRECTION_COLUMN, JUSTIFY_SPACE_BETWEEN, TYPOGRAPHY, SPACING } fr
 import last from 'lodash/last'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { RunProgressMeter } from '../RunProgressMeter'
-import { useAllCommandsQuery, useRunQuery } from '@opentrons/react-api-client'
 import { useRunStatus } from '../../RunTimeControl/hooks'
-import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR, RUN_STATUS_FINISHING, RUN_STATUS_IDLE, RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_RUNNING, RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { StyledText } from '../../../atoms/text'
 import { useTranslation } from 'react-i18next'
 import { AnalysisStepText } from '../../AnalysisStepText'
+import { useCurrentRunCommandKey } from '../hooks/useCurrentRunCommandKey'
 
 const MIN_AGGREGATION_PERCENT = 0.6
-const LIVE_RUN_STATUSES = [RUN_STATUS_IDLE, RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_STOP_REQUESTED, RUN_STATUS_RUNNING, RUN_STATUS_FINISHING, RUN_STATUS_BLOCKED_BY_OPEN_DOOR]
-const TICKED_COMMAND_TYPES = [
-  'waitForResume',
-  'moveLabware',
-  // 'loadLabware',
-  // 'loadPipette',
-  // 'aspirate',
-]
-const LIVE_RUN_COMMANDS_POLL_MS = 3000
+const TICKED_COMMAND_TYPES = ['waitForResume', 'moveLabware']
 interface ProtocolRunProgressMeterProps {
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
@@ -28,16 +20,7 @@ export function ProtocolRunProgressMeter(props: ProtocolRunProgressMeterProps) {
   const { runId, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
-  const { data: commandsData } = useAllCommandsQuery(
-    runId,
-    { cursor: 0, pageLength: 0 },
-    {
-      refetchInterval: runStatus != null && LIVE_RUN_STATUSES.includes(runStatus) ? LIVE_RUN_COMMANDS_POLL_MS : Infinity,
-      keepPreviousData: true,
-    }
-  )
-  const currentCommandKey = commandsData?.links?.current?.meta?.key ?? null
-
+  const currentCommandKey = useCurrentRunCommandKey(runId) 
   const analysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = analysis?.commands ?? []
   const currentRunCommandIndex = analysisCommands.findIndex(c => c.key === currentCommandKey) ?? 0

@@ -184,6 +184,11 @@ function PageContents(props: PageContentsProps) {
     }
   }, [jumpedIndex])
 
+  const makeHandleJumpToStep = (i: number) => () => {
+    listRef.current?.scrollToIndex(i)
+    setJumpedIndex(i)
+  }
+
   const protocolRunDetailsContentByTab: {
     [K in ProtocolRunDetailsTab]: JSX.Element | null
   } = {
@@ -197,8 +202,7 @@ function PageContents(props: PageContentsProps) {
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
-    'run-preview': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} />,
-    'run-preview': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} />,
+    'run-preview': <AnalyzedSteps runId={runId} ref={listRef} jumpedIndex={jumpedIndex} makeHandleJumpToStep={makeHandleJumpToStep} />,
   }
 
   const protocolRunDetailsContent = protocolRunDetailsContentByTab[
@@ -207,11 +211,6 @@ function PageContents(props: PageContentsProps) {
       // default to the setup tab if no tab or nonexistent tab is passed as a param
       <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
     )
-
-  const makeHandleJumpToStep = (i: number) => () => {
-    listRef.current?.scrollToIndex(i)
-    setJumpedIndex(i)
-  }
 
   return (
     <>

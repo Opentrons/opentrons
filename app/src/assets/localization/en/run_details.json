@@ -114,5 +114,6 @@
   "move_labware": "Move Labware",
   "not_started_yet": "Not started yet",
   "preview_of_protocol_steps": "This is a preview of your protocol's steps",
-  "steps_total": "{{count}} steps total"
+  "steps_total": "{{count}} steps total",
+  "protocol_completed": "Protocol completed"
 }
