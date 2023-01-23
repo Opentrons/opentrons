@@ -14,6 +14,7 @@ from opentrons.config.types import RobotConfig
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+from opentrons.util.async_helpers import ensure_yield
 
 from .. import modules
 from ..types import BoardRevision, Axis
@@ -32,12 +33,6 @@ if TYPE_CHECKING:
 
 
 MODULE_LOG = logging.getLogger(__name__)
-
-
-async def _yield() -> None:
-    # if an await chain doesn't eventually reach a call that returns to the loop, the task
-    # won't yield. The 0-time sleep will yield for a spin without sleeping.
-    await asyncio.sleep(0)
 
 
 class Simulator:
@@ -178,8 +173,8 @@ class Simulator:
     def module_controls(self, module_controls: AttachedModulesControl) -> None:
         self._module_controls = module_controls
 
+    @ensure_yield
     async def update_position(self) -> Dict[str, float]:
-        await _yield()
         return self._position
 
     def is_homed(self, axes: Sequence[str]) -> bool:
@@ -188,6 +183,7 @@ class Simulator:
                 return False
         return True
 
+    @ensure_yield
     async def move(
         self,
         target_position: Dict[str, float],
@@ -197,8 +193,8 @@ class Simulator:
     ) -> None:
         self._position.update(target_position)
         self._engaged_axes.update({ax: True for ax in target_position})
-        await _yield()
 
+    @ensure_yield
     async def home(self, axes: Optional[List[str]] = None) -> Dict[str, float]:
         # driver_3_0-> HOMED_POSITION
         checked_axes = "".join(axes) if axes else "XYZABC"
@@ -207,14 +203,13 @@ class Simulator:
         )
         self._engaged_axes.update({ax: True for ax in checked_axes})
         await self._smoothie_driver.home(axis=checked_axes)
-        await _yield()
         return self._position
 
+    @ensure_yield
     async def fast_home(self, axis: Sequence[str], margin: float) -> Dict[str, float]:
         for ax in axis:
             self._position[ax] = self._smoothie_driver.homed_position[ax]
             self._engaged_axes[ax] = True
-        await _yield()
         return self._position
 
     def _attached_to_mount(
@@ -265,6 +260,7 @@ class Simulator:
             # No instrument detected or expected
             return {"config": None, "id": None}
 
+    @ensure_yield
     async def get_attached_instruments(
         self, expected: Dict[types.Mount, PipetteName]
     ) -> AttachedInstruments:
@@ -286,7 +282,6 @@ class Simulator:
         :raises RuntimeError: If an instrument is expected but not found.
         :returns: A dict of mount to either instrument model names or `None`.
         """
-        await _yield()
         return {
             mount: self._attached_to_mount(mount, expected.get(mount))
             for mount in types.Mount
@@ -295,6 +290,7 @@ class Simulator:
     def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:
         pass
 
+    @ensure_yield
     async def watch(self) -> None:
         new_mods_at_ports = [
             modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
@@ -319,25 +315,26 @@ class Simulator:
     def fw_version(self) -> Optional[str]:
         return "Virtual Smoothie"
 
+    @ensure_yield
     async def update_fw_version(self) -> None:
-        await _yield()
+        pass
 
     @property
     def board_revision(self) -> BoardRevision:
         return self._board_revision
 
+    @ensure_yield
     async def update_firmware(
         self, filename: str, loop: asyncio.AbstractEventLoop, modeset: bool
     ) -> str:
-        await _yield()
         return "Did nothing (simulating)"
 
     def engaged_axes(self) -> Dict[str, bool]:
         return self._engaged_axes
 
+    @ensure_yield
     async def disengage_axes(self, axes: List[str]) -> None:
         self._engaged_axes.update({ax: False for ax in axes})
-        await _yield()
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         if button is not None:
@@ -354,22 +351,24 @@ class Simulator:
     def resume(self) -> None:
         self._run_flag.set()
 
+    @ensure_yield
     async def halt(self) -> None:
         self._run_flag.set()
-        await _yield()
 
+    @ensure_yield
     async def hard_halt(self) -> None:
         self._run_flag.set()
-        await _yield()
 
+    @ensure_yield
     async def probe(self, axis: str, distance: float) -> Dict[str, float]:
         self._position[axis.upper()] = self._position[axis.upper()] + distance
-        await _yield()
         return self._position
 
+    @ensure_yield
     async def clean_up(self) -> None:
-        await _yield()
+        pass
 
+    @ensure_yield
     async def configure_mount(
         self, mount: types.Mount, config: InstrumentHardwareConfigs
     ) -> None:
@@ -391,4 +390,3 @@ class Simulator:
         ms = config["splits"]
         if ms:
             self._smoothie_driver.configure_splits_for({plunger_axis.name: ms})
-        await _yield()
