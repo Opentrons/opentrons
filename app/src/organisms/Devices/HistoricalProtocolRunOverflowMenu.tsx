@@ -23,7 +23,6 @@ import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
-import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { DownloadRunLogToast } from './DownloadRunLogToast'
 import { useTrackProtocolRunEvent } from './hooks'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
@@ -57,7 +56,7 @@ export function HistoricalProtocolRunOverflowMenu(
 
   const commands = useAllCommandsQuery(
     runId,
-    { cursor: 0, pageLength: RUN_LOG_WINDOW_SIZE },
+    { cursor: 0, pageLength: 0},
     { staleTime: Infinity }
   )
   const runTotalCommandCount = commands?.data?.meta?.totalLength
