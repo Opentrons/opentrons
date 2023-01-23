@@ -968,9 +968,6 @@ class OT3API(
 
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 400
-        self._move_manager.update_constraints(
-            get_system_constraints(self._config.motion_settings, self._gantry_load)
-        )
         move_target = MoveTarget.build(position=machine_pos, max_speed=checked_speed)
         origin = await self._backend.update_position()
         try:
@@ -1057,7 +1054,7 @@ class OT3API(
     async def park(
         self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
     ) -> None:
-        """Move multiple axes to the homed position with acceleration."""
+        """Move axes to home position with acceleration."""
 
         self._reset_last_mount()
         if axes:
@@ -1067,16 +1064,14 @@ class OT3API(
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(OT3Axis.Q)
 
-        if (
-            not self._backend.check_ready_for_park(checked_axes)
-            or not self._current_position
-            or not self._encoder_current_position
+        if not (
+            self._backend.check_ready_for_park(checked_axes)
+            and self._current_position
+            and self._encoder_current_position
         ):
             raise MustHomeError(f"Cannot park because the current position is unknown.")
-
         park_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
-        self._log.info(f"Parking {axes}")
-
+        self._log.info(f"Parking {park_seq}")
         async with self._motion_lock:
             for axis in park_seq:
                 origin = await self._backend.update_position()
