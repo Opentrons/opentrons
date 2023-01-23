@@ -13,7 +13,6 @@ import { BackButton } from '../atoms/buttons'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
-import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
@@ -28,12 +27,6 @@ import { PortalRoot as ModalPortalRoot } from './portal'
 import type { RouteProps } from './types'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
-  {
-    Component: InitialSplash,
-    exact: true,
-    name: 'Initial Splash',
-    path: '/',
-  },
   {
     Component: Welcome,
     exact: true,
