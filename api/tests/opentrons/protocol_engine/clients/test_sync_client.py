@@ -79,7 +79,7 @@ def test_add_liquid(
         )
     ).then_return(liquid)
 
-    result = subject.add_liquid(liquid)
+    result = subject.add_liquid(name="water")  # type: ignore[call-arg]
 
     assert result == liquid
 

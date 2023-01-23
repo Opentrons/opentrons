@@ -159,7 +159,12 @@ class ProtocolRunner:
 
         liquids = self._json_translator.translate_liquids(protocol)
         for liquid in liquids:
-            self._protocol_engine.add_liquid(liquid=liquid)
+            self._protocol_engine.add_liquid(
+                id=liquid.id,
+                name=liquid.displayName,
+                description=liquid.description,
+                color=liquid.displayColor.__root__ if liquid.displayColor else None,
+            )
 
         for command in commands:
             self._protocol_engine.add_command(request=command)

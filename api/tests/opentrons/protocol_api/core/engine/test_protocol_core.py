@@ -677,14 +677,18 @@ def test_add_liquid(
 
     expected_result = Liquid(
         _id="water-id",
-        display_name="water",
+        name="water",
         description="water desc",
         display_color="#fff",
     )
 
     decoy.when(model_utils.generate_id()).then_return("water-id")
 
-    decoy.when(mock_engine_client.add_liquid(liquid)).then_return(liquid)
+    decoy.when(
+        mock_engine_client.add_liquid(
+            name="water", color="#fff", description="water desc"
+        )
+    ).then_return(liquid)
 
     result = subject.define_liquid(
         name="water", description="water desc", display_color="#fff"

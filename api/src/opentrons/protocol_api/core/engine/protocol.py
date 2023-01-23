@@ -34,7 +34,6 @@ from opentrons.protocol_engine import (
     LoadedModule,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
 from ..._liquid import Liquid

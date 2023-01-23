@@ -20,7 +20,6 @@ from opentrons.protocol_engine.types import (
     LabwareUri,
     ModuleDefinition,
     ModuleModel,
-    Liquid,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
