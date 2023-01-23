@@ -77,16 +77,16 @@ def get_labware_def(monkeypatch):
 async def test_motion(ctx, hardware):
     ctx.home()
     instr = ctx.load_instrument("p10_single", Mount.RIGHT)
-    old_pos = await hardware.current_position(instr._implementation.get_mount())
+    old_pos = await hardware.current_position(instr._core.get_mount())
     instr.home()
     assert instr.move_to(Location(Point(0, 0, 0), None)) is instr
     old_pos[Axis.X] = 0.0
     old_pos[Axis.Y] = 0.0
     old_pos[Axis.A] = 0.0
     old_pos[Axis.C] = 2.0
-    assert await hardware.current_position(
-        instr._implementation.get_mount()
-    ) == pytest.approx(old_pos)
+    assert await hardware.current_position(instr._core.get_mount()) == pytest.approx(
+        old_pos
+    )
 
 
 def test_max_speeds(ctx, monkeypatch, hardware):
@@ -182,8 +182,8 @@ def test_location_cache_two_pipettes_fails_pre_2_10(ctx, get_labware_def, hardwa
     ctx.home()
     left = ctx.load_instrument("p10_single", Mount.LEFT)
     right = ctx.load_instrument("p10_single", Mount.RIGHT)
-    left._implementation._api_version = APIVersion(2, 9)
-    right._implementation._api_version = APIVersion(2, 9)
+    left._core._api_version = APIVersion(2, 9)
+    right._core._api_version = APIVersion(2, 9)
 
     left_loc = Location(point=Point(1, 2, 3), labware="1")
     right_loc = Location(point=Point(3, 4, 5), labware="2")
@@ -764,7 +764,7 @@ def test_blow_out(ctx, monkeypatch):
         nonlocal move_location
         move_location = location
 
-    monkeypatch.setattr(instr._implementation, "move_to", fake_move)
+    monkeypatch.setattr(instr._core, "move_to", fake_move)
 
     instr.blow_out()
     # pipette should not move, if no location is passed
