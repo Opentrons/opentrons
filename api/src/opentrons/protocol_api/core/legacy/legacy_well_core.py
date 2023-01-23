@@ -9,7 +9,7 @@ from .well_geometry import WellGeometry
 from ..well import AbstractWellCore
 
 
-class WellImplementation(AbstractWellCore):
+class LegacyWellCore(AbstractWellCore):
     """Well implementation core based on legacy PAPIv2 behavior.
 
     Args:
@@ -115,7 +115,4 @@ class WellImplementation(AbstractWellCore):
     # TODO(mc, 2022-08-24): comparing only names seems insufficient
     def __eq__(self, other: object) -> bool:
         """Assume that if name is the same then it's the same well."""
-        return (
-            isinstance(other, WellImplementation)
-            and self.get_name() == other.get_name()
-        )
+        return isinstance(other, LegacyWellCore) and self.get_name() == other.get_name()

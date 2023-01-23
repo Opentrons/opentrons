@@ -271,15 +271,15 @@ class ThermocyclerGeometry(ModuleGeometry):
     # https://opentrons.atlassian.net/browse/RSS-106
     def labware_accessor(self, labware: Labware) -> Labware:
         from opentrons.protocol_api.labware import Labware
-        from opentrons.protocol_api.core.protocol_api.labware import (
-            LabwareImplementation,
+        from opentrons.protocol_api.core.legacy.legacy_labware_core import (
+            LegacyLabwareCore,
         )
 
         # Block first three columns from being accessed
         definition = labware._implementation.get_definition()
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
-            implementation=LabwareImplementation(definition, super().location),
+            implementation=LegacyLabwareCore(definition, super().location),
             api_version=labware.api_version,
             protocol_core=None,  # type: ignore[arg-type]
             core_map=None,  # type: ignore[arg-type]
@@ -460,7 +460,12 @@ def create_geometry(
     function; all definitions passed here are assumed to be valid.
     """
     pre_transform = np.array(
-        (definition["labwareOffset"]["x"], definition["labwareOffset"]["y"], 1)
+        (
+            definition["labwareOffset"]["x"],
+            definition["labwareOffset"]["y"],
+            definition["labwareOffset"]["z"],
+            1,
+        )
     )
     if not parent.labware.is_slot:
         par = ""
@@ -476,7 +481,10 @@ def create_geometry(
     xforms_ser = (
         definition["slotTransforms"]
         .get("ot2_standard", {})
-        .get(par, {"labwareOffset": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]})
+        .get(
+            par,
+            {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]},
+        )
     )
     xform_ser = xforms_ser["labwareOffset"]
 
@@ -488,7 +496,7 @@ def create_geometry(
     if module_type == ModuleType.MAGNETIC or module_type == ModuleType.TEMPERATURE:
         return ModuleGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
+            offset=Point(xformed[0], xformed[1], xformed[2]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
             model=module_model_from_string(definition["model"]),
@@ -498,7 +506,7 @@ def create_geometry(
     elif module_type == ModuleType.THERMOCYCLER:
         return ThermocyclerGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
+            offset=Point(xformed[0], xformed[1], xformed[2]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
             model=module_model_from_string(definition["model"]),
@@ -514,7 +522,7 @@ def create_geometry(
     elif module_type == ModuleType.HEATER_SHAKER:
         return HeaterShakerGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
+            offset=Point(xformed[0], xformed[1], xformed[2]),
             overall_height=definition["dimensions"]["bareOverallHeight"],
             height_over_labware=definition["dimensions"]["overLabwareHeight"],
             model=module_model_from_string(definition["model"]),

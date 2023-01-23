@@ -1,13 +1,13 @@
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
-from opentrons.protocol_api.core.protocol_api.well import WellImplementation
-from opentrons.protocol_api.core.protocol_api.well_geometry import WellGeometry
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
+from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from unittest import mock
 from copy import deepcopy
 import pytest
 from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api import (
     ProtocolContext,
     InstrumentContext,
@@ -54,7 +54,7 @@ def test_get_well(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck),
+        implementation=LegacyLabwareCore(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -116,7 +116,7 @@ def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
     trash_labware_def = deepcopy(minimal_labware_def2)
     trash_labware_def["parameters"]["quirks"] = ["fixedTrash"]
     trash_labware = labware.Labware(
-        implementation=LabwareImplementation(trash_labware_def, deck),
+        implementation=LegacyLabwareCore(trash_labware_def, deck),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -208,7 +208,7 @@ def test_air_gap(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck),
+        implementation=LegacyLabwareCore(minimal_labware_def2, deck),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -315,7 +315,7 @@ def test_touch_tip():
     location = Location(Point(1, 2, 3), "deck")
     well = labware.Well(
         parent=None,  # type: ignore[arg-type]
-        well_implementation=WellImplementation(
+        well_implementation=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",

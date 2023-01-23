@@ -1,17 +1,7 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
-import {
-  getRequestById,
-  useDispatchApiRequests,
-  PENDING,
-  SUCCESS,
-  FAILURE,
-} from '../../redux/robot-api'
+import { SUCCESS, FAILURE } from '../../redux/robot-api'
 import { PrimaryButton } from '../../atoms/buttons'
-
-import type { RequestState } from '../../redux/robot-api/types'
-import type { State } from '../../redux/types'
+import { useCheckPipettes } from './hooks'
 
 interface CheckPipetteButtonProps {
   robotName: string
@@ -30,30 +20,11 @@ export const CheckPipetteButton = (
     proceed,
     isDisabled,
   } = props
-  const fetchPipettesRequestId = React.useRef<string | null>(null)
-  const [dispatch] = useDispatchApiRequests(dispatchedAction => {
-    if (
-      dispatchedAction.type === FETCH_PIPETTES &&
-      'requestId' in dispatchedAction.meta &&
-      dispatchedAction.meta.requestId
-    ) {
-      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
-    }
-  })
-  const handleCheckPipette = (): void =>
-    dispatch(fetchPipettes(robotName, true))
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    fetchPipettesRequestId.current
-      ? getRequestById(state, fetchPipettesRequestId.current)
-      : null
-  )?.status
-
-  const isPending = requestStatus === PENDING
-
+  const { handleCheckPipette, isPending, requestStatus } = useCheckPipettes(
+    robotName
+  )
   React.useEffect(() => {
-    if (isPending) {
-      setPending(isPending)
-    }
+    setPending(isPending)
   }, [isPending, setPending])
 
   React.useEffect(() => {
