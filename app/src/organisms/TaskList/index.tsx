@@ -387,7 +387,7 @@ export function TaskList({
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing3}
-        paddingTop={SPACING.spacing4}
+        padding={SPACING.spacing4}
         paddingBottom={SPACING.spacing6}
       >
         <StyledText css={TYPOGRAPHY.h2SemiBold}>
