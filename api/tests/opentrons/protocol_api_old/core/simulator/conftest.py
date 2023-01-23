@@ -3,21 +3,21 @@ import pytest
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
-from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
+from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     NullLabwareOffsetProvider,
 )
-from opentrons.protocol_api.core.protocol_api.instrument_context import (
-    InstrumentContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
 )
-from opentrons.protocol_api.core.simulator.instrument_context import (
-    InstrumentContextSimulation,
+from opentrons.protocol_api.core.legacy_simulator.legacy_instrument_core import (
+    LegacyInstrumentCoreSimulator,
 )
-from opentrons.protocol_api.core.simulator.protocol_context import (
-    ProtocolContextSimulation,
+from opentrons.protocol_api.core.legacy_simulator.legacy_protocol_core import (
+    LegacyProtocolCoreSimulator,
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -25,9 +25,9 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 @pytest.fixture
-def protocol_context(hardware: ThreadManagedHardware) -> ProtocolContextImplementation:
+def protocol_context(hardware: ThreadManagedHardware) -> LegacyProtocolCore:
     """Protocol context implementation fixture."""
-    return ProtocolContextImplementation(
+    return LegacyProtocolCore(
         sync_hardware=hardware.sync,
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
@@ -37,9 +37,9 @@ def protocol_context(hardware: ThreadManagedHardware) -> ProtocolContextImplemen
 @pytest.fixture
 def simulating_protocol_context(
     hardware: ThreadManagedHardware,
-) -> ProtocolContextSimulation:
+) -> LegacyProtocolCoreSimulator:
     """Protocol context simulation fixture."""
-    return ProtocolContextSimulation(
+    return LegacyProtocolCoreSimulator(
         sync_hardware=hardware.sync,
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
@@ -48,8 +48,8 @@ def simulating_protocol_context(
 
 @pytest.fixture
 def instrument_context(
-    protocol_context: ProtocolContextImplementation,
-) -> InstrumentContextImplementation:
+    protocol_context: LegacyProtocolCore,
+) -> LegacyInstrumentCore:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
         PipetteNameType.P300_SINGLE_GEN2, types.Mount.RIGHT
@@ -58,8 +58,8 @@ def instrument_context(
 
 @pytest.fixture
 def second_instrument_context(
-    protocol_context: ProtocolContextImplementation,
-) -> InstrumentContextImplementation:
+    protocol_context: LegacyProtocolCore,
+) -> LegacyInstrumentCore:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
         PipetteNameType.P300_SINGLE_GEN2, types.Mount.LEFT
@@ -68,11 +68,11 @@ def second_instrument_context(
 
 @pytest.fixture
 def simulating_instrument_context(
-    simulating_protocol_context: ProtocolContextSimulation,
-    instrument_context: InstrumentContextImplementation,
-) -> InstrumentContextSimulation:
+    simulating_protocol_context: LegacyProtocolCoreSimulator,
+    instrument_context: LegacyInstrumentCore,
+) -> LegacyInstrumentCoreSimulator:
     """A simulating instrument context."""
-    return InstrumentContextSimulation(
+    return LegacyInstrumentCoreSimulator(
         protocol_interface=simulating_protocol_context,
         pipette_dict=instrument_context.get_hardware_state(),
         mount=types.Mount.RIGHT,
@@ -82,11 +82,11 @@ def simulating_instrument_context(
 
 @pytest.fixture
 def second_simulating_instrument_context(
-    simulating_protocol_context: ProtocolContextSimulation,
-    second_instrument_context: InstrumentContextImplementation,
-) -> InstrumentContextSimulation:
+    simulating_protocol_context: LegacyProtocolCoreSimulator,
+    second_instrument_context: LegacyInstrumentCore,
+) -> LegacyInstrumentCoreSimulator:
     """A simulating instrument context."""
-    return InstrumentContextSimulation(
+    return LegacyInstrumentCoreSimulator(
         protocol_interface=simulating_protocol_context,
         pipette_dict=second_instrument_context.get_hardware_state(),
         mount=types.Mount.LEFT,
@@ -95,16 +95,16 @@ def second_simulating_instrument_context(
 
 
 @pytest.fixture
-def labware(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
+def labware(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
     """Labware fixture."""
-    return LabwareImplementation(
+    return LegacyLabwareCore(
         definition=minimal_labware_def,
         parent=types.Location(types.Point(0, 0, 0), "1"),
     )
 
 
 @pytest.fixture
-def tip_rack(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
+def tip_rack(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
     tip_rack_definition = minimal_labware_def.copy()
     tip_rack_parameters = minimal_labware_def["parameters"].copy()
 
@@ -113,16 +113,16 @@ def tip_rack(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
     tip_rack_definition["parameters"] = tip_rack_parameters
 
     """Labware fixture."""
-    return LabwareImplementation(
+    return LegacyLabwareCore(
         definition=tip_rack_definition,
         parent=types.Location(types.Point(0, 0, 0), "1"),
     )
 
 
 @pytest.fixture
-def second_labware(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
+def second_labware(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
     """Labware fixture."""
-    return LabwareImplementation(
+    return LegacyLabwareCore(
         definition=minimal_labware_def,
         parent=types.Location(types.Point(0, 0, 0), "5"),
     )

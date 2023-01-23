@@ -58,5 +58,7 @@
   "sort_by": "Sort by",
   "alphabetical": "Alphabetical",
   "reverse": "Reverse alphabetical",
-  "next": "Next"
+  "next": "Next",
+  "something_went_wrong": "something went wrong",
+  "return": "return"
 }

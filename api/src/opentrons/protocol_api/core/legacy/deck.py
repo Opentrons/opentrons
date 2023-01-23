@@ -19,7 +19,7 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 
 from ...deck import CalibrationPosition
 from ...labware import load as load_lw, Labware
-from .labware import LabwareImplementation
+from .legacy_labware_core import LegacyLabwareCore
 from .module_geometry import ModuleGeometry, ThermocyclerGeometry
 from . import deck_conflict
 
@@ -278,13 +278,13 @@ class Deck(UserDict):  # type: ignore[type-arg]
             )
         return calibration_position
 
-    def get_fixed_trash(self) -> Optional[Union[Labware, LabwareImplementation]]:
+    def get_fixed_trash(self) -> Optional[Union[Labware, LegacyLabwareCore]]:
         fixtures = self._definition["locations"]["fixtures"]
         ft = next((f for f in fixtures if f["id"] == FIXED_TRASH_ID), None)
 
         # NOTE(mc, 2022-12-06): type ignore below because this `Deck` is typed
         # as contiaining `DeckItem` values, but the contents of slot 12
-        # will always be limited to either a `Labware` or `LabwareImplementation` object
+        # will always be limited to either a `Labware` or `LegacyLabwareCore` object
         return self.data[self._check_name(ft.get("slot"))] if ft else None  # type: ignore[return-value]
 
     def get_non_fixture_slots(self) -> List[int]:

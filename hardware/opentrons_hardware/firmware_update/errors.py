@@ -1,5 +1,4 @@
 """Firmware update exceptions."""
-from api.src.opentrons.hardware_control.types import OT3SubSystem
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 
 
@@ -36,21 +35,11 @@ class BootloaderNotReady(FirmwareUpdateException):
 
     pass
 
-class FirmwareManifestMissing(FirmwareUpdateException):
-    """Firmware manifest file not found."""
+class FirmwareUpdateRequired(FirmwareUpdateException):
+    """At least one subsystem requires an update."""
 
     message: MessageDefinition
 
-    def __init__(self, message: MessageDefinition) -> None:
+    def __init__(self, message: MessageDefinition = "") -> None:
         self.message = message
-        super().__init__(f"Firmware manifest file not found {message}.")
-
-
-class MustUpdateFirmware(FirmwareUpdateException):
-    """At least one subsystem requires an update."""
-
-    subsystem: OT3SubSystem
-
-    def __init__(self, subsystem: OT3SubSystem) -> None:
-        self.subsystem = subsystem
-        super().__init__(f"Operation not permited because subsystem {subsystem} requires an update.")
+        super().__init__(f"Operation not permited because a firmware update is required {message}.")

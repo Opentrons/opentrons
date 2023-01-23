@@ -24,7 +24,6 @@ from typing import (
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
-from opentrons_hardware.firmware_update.errors import FirmwareManifestMissing, MustUpdateFirmware
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -77,6 +76,7 @@ from opentrons_hardware.firmware_bindings.constants import (
 )
 from opentrons_hardware import firmware_update
 from opentrons_hardware.firmware_update.device_info import get_device_info
+from opentrons_hardware.firmware_update.errors import FirmwareUpdateRequired
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
@@ -201,10 +201,11 @@ class OT3Controller:
         pass
 
     def requires_update(function: callable):
-        """Decorator that raises MustUpdateFirmware if the update_required flag is set."""
+        """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
+
         async def wrapper(self, *args, **kwargs):
             if self.update_required:
-                raise MustUpdateFirmware
+                raise FirmwareUpdateRequired()
             return await function(self, *args, **kwargs)
         return wrapper
 
