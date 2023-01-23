@@ -171,7 +171,6 @@ def test_get_ot2_tip_length_calibration(
         load_tip_length_calibration("nopipette", minimal_labware_def)
 
 
-
 def test_get_ot3_tip_length_calibration(
     decoy: Decoy,
     tip_length_path: Path,

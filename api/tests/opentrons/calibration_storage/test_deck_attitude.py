@@ -7,7 +7,7 @@ from opentrons.calibration_storage import (
     save_robot_deck_attitude,
     get_robot_deck_attitude,
     delete_robot_deck_attitude,
-    types as cs_types
+    types as cs_types,
 )
 
 from . import READ_FUNC_TYPE, SAVE_FUNC_TYPE, DELETE_FUNC_TYPE, MOCK_UTC
@@ -29,7 +29,9 @@ def test_no_file_found_deck_calibration(
 ) -> None:
     decoy.when(
         mock_file_operator_read(robot_path / "deck_calibration.json")
-    ).then_raise(FileNotFoundError)   # type: ignore[arg-type]
+    ).then_raise(
+        FileNotFoundError  # type: ignore[arg-type]
+    )
     # Check nothing is stored when a FileNotFoundError called
     assert get_robot_deck_attitude() is None
 

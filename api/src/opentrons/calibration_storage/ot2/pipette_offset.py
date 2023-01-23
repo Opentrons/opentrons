@@ -47,7 +47,7 @@ def save_pipette_calibration(
     mount: Mount,
     tiprack_hash: str,
     tiprack_uri: str,
-    calibration_status: typing.Optional[v1.CalibrationStatus]
+    calibration_status: typing.Optional[v1.CalibrationStatus],
 ) -> None:
     pip_dir = config.get_opentrons_path("pipette_calibration_dir") / mount.name.lower()
 
@@ -59,7 +59,7 @@ def save_pipette_calibration(
         source=local_types.SourceType.user,
         status=calibration_status or v1.CalibrationStatus(),
     )
-    io.save_to_file(pip_dir, pip_id, pipette_calibration)
+    io.save_to_file(pip_dir, pip_id or "unknown", pipette_calibration)
 
 
 # Get Pipette Offset Calibrations

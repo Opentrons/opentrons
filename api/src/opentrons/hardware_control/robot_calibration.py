@@ -170,7 +170,9 @@ def save_attitude_matrix(
 
 
 def load_attitude_matrix() -> DeckCalibration:
-    calibration_data = cast(Optional[ot2_models.v1.DeckCalibrationModel], get_robot_deck_attitude())
+    calibration_data = cast(
+        Optional[ot2_models.v1.DeckCalibrationModel], get_robot_deck_attitude()
+    )
     gantry_cal = get_legacy_gantry_calibration()
     if not calibration_data and gantry_cal:
         if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:
@@ -187,7 +189,9 @@ def load_attitude_matrix() -> DeckCalibration:
                 lw_hash=None,
                 source=types.SourceType.legacy,
             )
-            calibration_data = get_robot_deck_attitude()
+            calibration_data = cast(
+                ot2_models.v1.DeckCalibrationModel, get_robot_deck_attitude()
+            )
 
     if calibration_data:
         return DeckCalibration(

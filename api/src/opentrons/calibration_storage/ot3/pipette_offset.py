@@ -53,7 +53,7 @@ def save_pipette_calibration(
         source=local_types.SourceType.user,
         status=calibration_status or v1.CalibrationStatus(),
     )
-    io.save_to_file(pip_dir, pip_id, pipette_calibration)
+    io.save_to_file(pip_dir, pip_id or "unknown", pipette_calibration)
 
 
 # Get Pipette Offset Calibrations

@@ -38,7 +38,9 @@ def mock_file_operator_delete(decoy: Decoy) -> Generator[DELETE_FUNC_TYPE, None,
 
 
 @pytest.fixture
-def mock_file_operator_remove_files(decoy: Decoy) -> Generator[DELETE_FUNC_TYPE, None, None]:
+def mock_file_operator_remove_files(
+    decoy: Decoy,
+) -> Generator[DELETE_FUNC_TYPE, None, None]:
     delete_mock = decoy.mock(func=file_operators._remove_json_files_in_directories)
     with mock.patch.object(
         file_operators, "_remove_json_files_in_directories", delete_mock
@@ -47,7 +49,9 @@ def mock_file_operator_remove_files(decoy: Decoy) -> Generator[DELETE_FUNC_TYPE,
 
 
 @pytest.fixture
-def mock_utc_now(decoy: Decoy, mock_timestamp: datetime) -> Generator[MOCK_UTC, None, None]:
+def mock_utc_now(
+    decoy: Decoy, mock_timestamp: datetime
+) -> Generator[MOCK_UTC, None, None]:
     utc_mock = decoy.mock()
     decoy.when(utc_mock()).then_return(mock_timestamp)
     with mock.patch.object(helpers, "utc_now", utc_mock) as m:

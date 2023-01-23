@@ -87,7 +87,10 @@ def test_get_gripper_calibration(
     decoy.when(mock_file_operator_read(gripper_path / "gripper1.json")).then_return(
         return_data
     )
-    gripper_data = cast(models.v1.InstrumentOffsetModel, gripper.get_gripper_calibration_offset("gripper1"))
+    gripper_data = cast(
+        models.v1.InstrumentOffsetModel,
+        gripper.get_gripper_calibration_offset("gripper1"),
+    )
     assert gripper_data == models.v1.InstrumentOffsetModel(
         offset=Point(1, 1, 1),
         lastModified=gripper_data.lastModified,
