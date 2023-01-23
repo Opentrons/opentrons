@@ -37,7 +37,6 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
@@ -81,12 +80,6 @@ def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule
 def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
     """Get a mock hardware API."""
     return decoy.mock(cls=SyncHardwareAPI)
-
-
-@pytest.fixture
-def model_utils(decoy: Decoy) -> ModelUtils:
-    """Get a mocked out ModelUtils."""
-    return decoy.mock(cls=ModelUtils)
 
 
 @pytest.fixture
@@ -665,7 +658,6 @@ def test_add_liquid(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
-    model_utils: ModelUtils,
 ) -> None:
     """It should return the created liquid."""
     liquid = PE_Liquid.construct(
@@ -681,8 +673,6 @@ def test_add_liquid(
         description="water desc",
         display_color="#fff",
     )
-
-    decoy.when(model_utils.generate_id()).then_return("water-id")
 
     decoy.when(
         mock_engine_client.add_liquid(
