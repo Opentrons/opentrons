@@ -96,3 +96,7 @@ push: wheel
 push-ot3: sdist
 	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-system-server,system_server)
 	$(call restart-service,$(host),,$(br_ssh_opts),opentrons-system-server)
+
+.PHONY: dev 
+dev: 
+	$(pipenv) run python -m system_server
