@@ -25,3 +25,11 @@ export const wellNameSplit = (wellName: string): [string, string] => {
 
   return [letters, numbers]
 }
+
+export const truncateString = (text: string, maxLength: number): string => {
+  if (text.length > maxLength) {
+    return `${text.substring(0, maxLength - 3)}...`
+  } else {
+    return text
+  }
+}

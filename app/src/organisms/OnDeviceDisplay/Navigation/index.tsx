@@ -14,6 +14,7 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   ALIGN_END,
+  truncateString,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -28,6 +29,7 @@ const NavigationLink = styled(NavLink)`
     color: ${COLORS.blueEnabled};
   }
 `
+const MAX_LETTERS = 20
 
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
@@ -42,13 +44,6 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
     const y = b.name.toLowerCase()
     return x < y ? -1 : x > y ? 1 : 0
   })
-
-  const truncateString = (text: string, maxLength = 10): string => {
-    const dots = '...'
-    if (text.length > maxLength)
-      return `${text.substring(0, maxLength - dots.length)}${dots}`
-    else return text
-  }
 
   return (
     <Flex
@@ -71,7 +66,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
             fontWeight="700"
             lineHeight="1.9375rem"
           >
-            {truncateString(robotName)}
+            {truncateString(robotName, MAX_LETTERS)}
           </StyledText>
         </NavLink>
         <Icon name="wifi" size="2rem" />
