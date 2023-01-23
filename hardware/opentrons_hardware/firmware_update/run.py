@@ -92,10 +92,7 @@ async def run_updates(
 
     Args:
         messenger: The can messenger to use.
-        node_id1: The first node being updated.
-        node_id2: The second node being updated.
-        hex_file1: File containing first node's firmware.
-        hex_file2: File containing second node's firmware.
+        update_details: Dict of nodes to be updated and their firmware files.
         retry_count: Number of times to retry.
         timeout_seconds: How much to wait for responses.
         erase: Whether to erase flash before updating.
