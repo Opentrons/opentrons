@@ -104,7 +104,7 @@ export NVS_HOME="$HOME/.nvs"
 On macOS, we recommend [pyenv][] to install different versions of Python.
 
 1. Go to [pyenv suggested build environment](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
-2. Follow instructions for Mac OS X
+2. Follow instructions for your operating system
 3. Go to [pyenv](https://github.com/pyenv/pyenv)
 4. Follow the instructions for [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout)
    - **Do not install `pyenv` with `brew`**
