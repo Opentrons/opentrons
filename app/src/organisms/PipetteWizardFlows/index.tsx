@@ -30,6 +30,7 @@ import { MountPipette } from './MountPipette'
 import { DetachPipette } from './DetachPipette'
 import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
+import { UnskippableModal } from './UnskippableModal'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
@@ -70,9 +71,7 @@ export const PipetteWizardFlows = (
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== pipetteWizardSteps.length - 1
-        ? currentStepIndex - 1
-        : currentStepIndex
+      currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
     )
   }
   const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
@@ -157,6 +156,13 @@ export const PipetteWizardFlows = (
   const exitModal = (
     <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
   )
+  const [
+    showUnskippableStepModal,
+    setIsUnskippableStep,
+  ] = React.useState<boolean>(false)
+  const unskippableModal = (
+    <UnskippableModal goBack={() => setIsUnskippableStep(false)} />
+  )
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -231,9 +237,7 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
-    ) : (
+    modalContent = (
       <DetachPipette
         {...currentStep}
         {...calibrateBaseProps}
@@ -241,17 +245,22 @@ export const PipetteWizardFlows = (
         setPending={setIsFetchingPipettes}
       />
     )
+    if (showConfirmExit) {
+      modalContent = exitModal
+    } else if (showUnskippableStepModal) {
+      modalContent = unskippableModal
+    }
   } else if (currentStep.section === SECTIONS.CARRIAGE) {
     onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
+    modalContent = showUnskippableStepModal ? (
+      unskippableModal
     ) : (
       <Carriage {...currentStep} {...calibrateBaseProps} />
     )
   } else if (currentStep.section === SECTIONS.MOUNTING_PLATE) {
     onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
+    modalContent = showUnskippableStepModal ? (
+      unskippableModal
     ) : (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
@@ -290,11 +299,20 @@ export const PipetteWizardFlows = (
     }
   }
 
+  const is96ChannelUnskippableStep =
+    currentStep.section === SECTIONS.CARRIAGE ||
+    currentStep.section === SECTIONS.MOUNTING_PLATE ||
+    (selectedPipette === NINETY_SIX_CHANNEL &&
+      currentStep.section === SECTIONS.DETACH_PIPETTE)
+
   let exitWizardButton = onExit
-  if (isRobotMoving) {
+  if (isRobotMoving || showUnskippableStepModal) {
     exitWizardButton = undefined
-  } else if (showConfirmExit || errorMessage != null)
+  } else if (is96ChannelUnskippableStep) {
+    exitWizardButton = () => setIsUnskippableStep(true)
+  } else if (showConfirmExit || errorMessage != null) {
     exitWizardButton = handleCleanUpAndClose
+  }
 
   return (
     <Portal level="top">

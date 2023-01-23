@@ -1,6 +1,6 @@
 import pytest
 
-from opentrons.protocol_api.core.protocol_api.well import WellImplementation
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 
 
 @pytest.mark.parametrize(
@@ -14,7 +14,7 @@ from opentrons.protocol_api.core.protocol_api.well import WellImplementation
     ],
 )
 def test_row_column(name, row, col):
-    w = WellImplementation(
+    w = LegacyWellCore(
         well_geometry=None,  # type: ignore[arg-type]
         display_name=None,  # type: ignore[arg-type]
         has_tip=None,  # type: ignore[arg-type]
@@ -35,7 +35,7 @@ def test_row_column(name, row, col):
 )
 def test_row_column_fail(name):
     with pytest.raises(AssertionError, match=f"could not match '{name}'"):
-        WellImplementation(
+        LegacyWellCore(
             well_geometry=None,  # type: ignore[arg-type]
             display_name=None,  # type: ignore[arg-type]
             has_tip=None,  # type: ignore[arg-type]

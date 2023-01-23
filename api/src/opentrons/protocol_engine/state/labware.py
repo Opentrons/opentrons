@@ -2,12 +2,25 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Union, Tuple, cast
+from typing import (
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Union,
+    Tuple,
+    NamedTuple,
+    cast,
+)
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -46,6 +59,14 @@ _MAGDECK_HALF_MM_LABWARE = {
 }
 
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
+
+
+class LabwareLoadParams(NamedTuple):
+    """Parameters required to load a labware in Protocol Engine."""
+
+    load_name: str
+    namespace: str
+    version: int
 
 
 @dataclass
@@ -280,6 +301,18 @@ class LabwareView(HasState[LabwareState]):
             raise errors.LabwareDefinitionDoesNotExistError(
                 f"Labware definition for matching {uri} not found."
             ) from e
+
+    def find_custom_labware_load_params(self) -> List[LabwareLoadParams]:
+        """Find all load labware parameters for custom labware definitions in state."""
+        return [
+            LabwareLoadParams(
+                load_name=definition.parameters.loadName,
+                namespace=definition.namespace,
+                version=definition.version,
+            )
+            for definition in self._state.definitions_by_uri.values()
+            if definition.namespace != OPENTRONS_NAMESPACE
+        ]
 
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""

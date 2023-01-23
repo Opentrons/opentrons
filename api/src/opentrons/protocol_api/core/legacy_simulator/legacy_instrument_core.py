@@ -15,14 +15,12 @@ from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from ..protocol_api.well import WellImplementation
-from ..protocol_api.legacy_module_core import (
-    LegacyThermocyclerCore,
-    LegacyHeaterShakerCore,
-)
+
+from ..legacy.legacy_well_core import LegacyWellCore
+from ..legacy.legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContextSimulation
+    from .legacy_protocol_core import LegacyProtocolCoreSimulator
 
 
 _log = logging.getLogger()
@@ -31,12 +29,12 @@ _PRE_2_2_TIP_DROP_HEIGHT_MM = 10
 """In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
-class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
+class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     """A simulation of an instrument context."""
 
     def __init__(
         self,
-        protocol_interface: ProtocolContextSimulation,
+        protocol_interface: LegacyProtocolCoreSimulator,
         pipette_dict: PipetteDict,
         mount: types.Mount,
         instrument_name: str,
@@ -67,7 +65,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def aspirate(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
@@ -106,7 +104,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def dispense(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
@@ -118,7 +116,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def blow_out(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         move_to_well: bool,
     ) -> None:
         if move_to_well:
@@ -134,14 +132,14 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         )
 
     def touch_tip(
-        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+        self, location: LegacyWellCore, radius: float, v_offset: float, speed: float
     ) -> None:
         pass
 
     def pick_up_tip(
         self,
         location: types.Location,
-        well_core: WellImplementation,
+        well_core: LegacyWellCore,
         presses: Optional[int],
         increment: Optional[float],
         prep_after: bool = True,
@@ -174,7 +172,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def drop_tip(
         self,
         location: Optional[types.Location],
-        well_core: WellImplementation,
+        well_core: LegacyWellCore,
         home_after: bool,
     ) -> None:
         labware_core = well_core.geometry.parent
@@ -236,7 +234,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation] = None,
+        well_core: Optional[LegacyWellCore] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,

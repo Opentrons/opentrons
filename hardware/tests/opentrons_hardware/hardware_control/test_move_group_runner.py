@@ -975,6 +975,7 @@ class MockSendMoveErrorCompleter:
         self._move_groups = move_groups
         self._listener = listener
         self._start_at_index = start_at_index
+        self.call_count = 0
 
     @property
     def groups(self) -> MoveGroups:
@@ -1005,9 +1006,11 @@ class MockSendMoveErrorCompleter:
                         severity=ErrorSeverityField(ErrorSeverity.recoverable),
                         error_code=ErrorCodeField(ErrorCode.collision_detected),
                     )
+                    payload.message_index = message.payload.message_index
                     arbitration_id = ArbitrationId(
                         parts=ArbitrationIdParts(originating_node_id=node)
                     )
+                    self.call_count += 1
                     self._listener(md.ErrorMessage(payload=payload), arbitration_id)
 
     async def mock_ensure_send(
@@ -1032,3 +1035,44 @@ async def test_single_move_error(
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     with pytest.raises(RuntimeError):
         await subject.run(can_messenger=mock_can_messenger)
+    assert mock_sender.call_count == 1
+
+
+@pytest.fixture
+def move_group_multiple_axes() -> MoveGroups:
+    """Move group with two moves."""
+    return [
+        # Group 0
+        [
+            {
+                NodeId.gantry_y: MoveGroupSingleAxisStep(
+                    distance_mm=float64(25),
+                    velocity_mm_sec=float64(23),
+                    duration_sec=float64(1),
+                    acceleration_mm_sec_sq=float64(1000),
+                ),
+            },
+            {
+                NodeId.gantry_x: MoveGroupSingleAxisStep(
+                    distance_mm=float64(25),
+                    velocity_mm_sec=float64(23),
+                    duration_sec=float64(1),
+                    acceleration_mm_sec_sq=float64(1000),
+                ),
+            },
+        ]
+    ]
+
+
+async def test_multiple_move_error(
+    mock_can_messenger: AsyncMock, move_group_multiple_axes: MoveGroups
+) -> None:
+    """It should receive all of the errors."""
+    subject = MoveScheduler(move_groups=move_group_multiple_axes)
+    mock_sender = MockSendMoveErrorCompleter(move_group_multiple_axes, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    print(subject._moves)
+    with pytest.raises(RuntimeError):
+        await subject.run(can_messenger=mock_can_messenger)
+    assert mock_sender.call_count == 2
