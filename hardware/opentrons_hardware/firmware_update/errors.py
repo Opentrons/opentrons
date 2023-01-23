@@ -1,4 +1,5 @@
 """Firmware update exceptions."""
+from api.src.opentrons.hardware_control.types import OT3SubSystem
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 
 
@@ -34,3 +35,12 @@ class BootloaderNotReady(FirmwareUpdateException):
     """Bootloader is not ready."""
 
     pass
+
+class MustUpdateFirmware(FirmwareUpdateException):
+    """At least one subsystem requires an update."""
+
+    subsystem: OT3SubSystem
+
+    def __init__(self, subsystem: OT3SubSystem) -> None:
+        self.subsystem = subsystem
+        super().__init__(f"Operation not permited because subsystem {subsystem} requires an update.")
