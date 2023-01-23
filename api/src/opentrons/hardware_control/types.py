@@ -561,4 +561,4 @@ class DeviceInfoCache:
     flags: any
 
     def __repr__(self) -> str:
-        return f"<node: {self.node_id} version: {self.version} shortsha: {self.shortsha}>"
+        return f"<{self.__class__.__name__}: node={self.node_id}, version={self.version}, sha={self.shortsha}>"

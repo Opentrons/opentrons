@@ -43,3 +43,12 @@ class FirmwareUpdateRequired(FirmwareUpdateException):
     def __init__(self, message: MessageDefinition = "") -> None:
         self.message = message
         super().__init__(f"Operation not permited because a firmware update is required {message}.")
+
+class FirmwareManifestMissing(FirmwareUpdateException):
+    """The firmware manifest file was not found."""
+
+    message: MessageDefinition
+
+    def __init__(self, message: MessageDefinition) -> None:
+        self.message = message
+        super().__init__(f"Firmware update manifest file not found {message}.")
