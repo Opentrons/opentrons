@@ -75,7 +75,5 @@ describe('Navigation', () => {
     expect(queryByText('Get started')).not.toBeInTheDocument()
   })
 
-  it.todo('should call a mock function when tapping icon', () => {
-    // this part will be implemented in a follow pr (overflow menu for the ODD app)
-  })
+  // Note: kj 2023/01/23 overflow menu test case will be added in a following PR.
 })
