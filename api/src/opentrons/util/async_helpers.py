@@ -2,10 +2,15 @@
 util.async_helpers - various utilities for asyncio functions and tasks.
 """
 
-from functools import wrap
-from typing import TypeVar, Callable, Awaitable, cast
+from functools import wraps
+from typing import TypeVar, Callable, Awaitable, cast, Any, TYPE_CHECKING
 
 import asyncio
+
+if TYPE_CHECKING:
+    from typing_extensions import ParamSpec
+    P = ParamSpec("P")
+    T = TypeVar("T")
 
 async def asyncio_yield() -> None:
     """
@@ -34,11 +39,7 @@ async def asyncio_yield() -> None:
     """
     await asyncio.sleep(0)
 
-
-WrappedReturn = TypeVar("WrappedReturn", contravariant=True)
-WrappedCoro = TypeVar("WrappedCoro", bound=Callable[..., Awaitable[WrappedReturn]])
-
-def ensure_yield(async_def_func: WrappedCoro) -> WrappedCoro:
+def ensure_yield(async_def_func: "Callable[P, Awaitable[T]]") -> "T":
     """
     A decorator that makes sure that asyncio_yield() is called after the decorated async
     function finishes executing.
@@ -48,10 +49,11 @@ def ensure_yield(async_def_func: WrappedCoro) -> WrappedCoro:
     # when we either go to python 3.10 or bump typing_extensions to 4.2.0
     # https://github.com/python/typing_extensions/blob/main/CHANGELOG.md#release-420-april-17-2022
     # Until then, we need the cast on line 57
-    @wrap(async_def_func)
-    async def _wrapper(*args, **kwargs):
+
+    @wraps(async_def_func)
+    async def _wrapper(*args: "P.args", **kwargs: "P.kwargs") -> "T":
         ret = await async_def_func(*args, **kwargs)
         await asyncio_yield()
         return ret
 
-    return cast(WrappedCoro, _wrapper)
+    return _wrapper
