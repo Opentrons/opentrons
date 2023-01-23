@@ -4,7 +4,6 @@ import { useHistory, useParams } from 'react-router-dom'
 import { last } from 'lodash'
 import { format } from 'date-fns'
 import {
-  Box,
   COLORS,
   Flex,
   Icon,
