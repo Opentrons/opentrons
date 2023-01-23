@@ -223,7 +223,7 @@ class OT3Simulator:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
 
-    @nsure_yield
+    @ensure_yield
     async def move(
         self,
         origin: Coordinates[OT3Axis, float],

@@ -3,9 +3,10 @@ util.async_helpers - various utilities for asyncio functions and tasks.
 """
 
 from functools import wraps
-from typing import TypeVar, Callable, Awaitable, cast
+from typing import TypeVar, Callable, Awaitable, cast, Any
 
 import asyncio
+
 
 async def asyncio_yield() -> None:
     """
@@ -35,23 +36,25 @@ async def asyncio_yield() -> None:
     await asyncio.sleep(0)
 
 
-WrappedReturn = TypeVar("WrappedReturn", contravariant=True)
-WrappedCoro = TypeVar("WrappedCoro", bound=Callable[..., Awaitable[WrappedReturn]])
+Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
 
-def ensure_yield(async_def_func: WrappedCoro) -> WrappedCoro:
+
+def ensure_yield(async_def_func: Wrapped) -> Wrapped:
     """
     A decorator that makes sure that asyncio_yield() is called after the decorated async
     function finishes executing.
     """
 
     # _wrapper can be typed using ParamSpec https://docs.python.org/3/library/typing.html#typing.ParamSpec
-    # when we either go to python 3.10 or bump typing_extensions to 4.2.0
-    # https://github.com/python/typing_extensions/blob/main/CHANGELOG.md#release-420-april-17-2022
-    # Until then, we need the cast on line 57
+    # when we
+    # - bump to a mypy version that supports it (>0.930)
+    # - either go to python 3.10 or bump typing_extensions to 4.2.0
+    # Until then, this is a mess of opaque type vars and disabling internal checking because of their
+    # opacity. The cast on line 58 should keep the external interface of the annotated function correct.
     @wraps(async_def_func)
-    async def _wrapper(*args, **kwargs):
+    async def _wrapper(*args: Any, **kwargs: Any) -> Any:
         ret = await async_def_func(*args, **kwargs)
         await asyncio_yield()
         return ret
 
-    return cast(WrappedCoro, _wrapper)
+    return cast(Wrapped, _wrapper)

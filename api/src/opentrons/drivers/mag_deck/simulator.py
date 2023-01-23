@@ -1,5 +1,3 @@
-import asyncio
-
 from typing import Dict, Optional
 
 from .abstract import AbstractMagDeckDriver

@@ -1,4 +1,3 @@
-import asyncio
 from typing import Dict
 from opentrons.util.async_helpers import ensure_yield
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
