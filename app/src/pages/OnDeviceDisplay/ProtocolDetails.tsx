@@ -85,10 +85,14 @@ const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
           props.setCurrentOption(option)
 
         if (option === props.currentOption) {
-          return <TertiaryButton onClick={onClick}>{option}</TertiaryButton>
+          return (
+            <TertiaryButton key={option} onClick={onClick}>
+              {option}
+            </TertiaryButton>
+          )
         } else {
           return (
-            <SecondaryTertiaryButton onClick={onClick}>
+            <SecondaryTertiaryButton key={option} onClick={onClick}>
               {option}
             </SecondaryTertiaryButton>
           )
