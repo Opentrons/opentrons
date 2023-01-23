@@ -22,7 +22,7 @@ from opentrons.protocol_api import (
     Labware,
     Deck,
     validation as mock_validation,
-    Liquid
+    Liquid,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.labware import LabwareLoadParams
@@ -487,12 +487,20 @@ def test_add_liquid(
     """It should add a liquid to the state."""
     expected_result = Liquid(
         _id=matchers.IsA(str),
-        name="water", description="water desc", display_color="#1234"
+        name="water",
+        description="water desc",
+        display_color="#1234",
     )
 
-    decoy.when(mock_core.define_liquid(name="water", description="water desc", display_color="#1234")).then_return(expected_result)
+    decoy.when(
+        mock_core.define_liquid(
+            name="water", description="water desc", display_color="#1234"
+        )
+    ).then_return(expected_result)
 
-    result = subject.define_liquid(name="water", description="water desc", display_color="#1234")
+    result = subject.define_liquid(
+        name="water", description="water desc", display_color="#1234"
+    )
 
     assert result == expected_result
 
