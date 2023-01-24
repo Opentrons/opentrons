@@ -8,12 +8,12 @@ from opentrons.types import Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
 
-from opentrons.protocol_api.core.protocol_api.instrument_context import (
-    InstrumentContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
 )
 
 
@@ -48,19 +48,19 @@ def mock_sync_hardware_api(
 @pytest.fixture
 def mock_protocol_impl(
     decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI
-) -> ProtocolContextImplementation:
-    protocol_impl = decoy.mock(cls=ProtocolContextImplementation)
+) -> LegacyProtocolCore:
+    protocol_impl = decoy.mock(cls=LegacyProtocolCore)
     decoy.when(protocol_impl.get_hardware()).then_return(mock_sync_hardware_api)
     return protocol_impl
 
 
 @pytest.fixture
 def subject(
-    mock_protocol_impl: ProtocolContextImplementation,
+    mock_protocol_impl: LegacyProtocolCore,
     mount: Mount,
     api_version: APIVersion,
-) -> InstrumentContextImplementation:
-    return InstrumentContextImplementation(
+) -> LegacyInstrumentCore:
+    return LegacyInstrumentCore(
         protocol_interface=mock_protocol_impl,
         mount=mount,
         instrument_name="cool pipette",
@@ -73,7 +73,7 @@ def test_home(
     mount: Mount,
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
-    subject: InstrumentContextImplementation,
+    subject: LegacyInstrumentCore,
 ) -> None:
     """It should home the pipette's Z-axis and plunger."""
     subject.home()
@@ -89,7 +89,7 @@ def test_home_legacy_behavior(
     mount: Mount,
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
-    subject: InstrumentContextImplementation,
+    subject: LegacyInstrumentCore,
 ) -> None:
     """It should avoid homing other instrument in API version <= 2.12."""
     subject.home()
