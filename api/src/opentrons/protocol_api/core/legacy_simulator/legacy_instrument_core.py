@@ -15,8 +15,9 @@ from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from ..legacy.legacy_well_core import LegacyWellCore
 
+from ..legacy.legacy_well_core import LegacyWellCore
+from ..legacy.legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
     from .legacy_protocol_core import LegacyProtocolCoreSimulator
@@ -239,6 +240,8 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         speed: Optional[float] = None,
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
+        self.flag_unsafe_move(location)
+
         last_location = self._protocol_interface.get_last_location()
         if last_location:
             from_loc = last_location
@@ -341,6 +344,29 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
             blow_out=blow_out,
         )
         self._update_flow_rate()
+
+    def flag_unsafe_move(self, location: types.Location) -> None:
+        """Check if a movement to a destination is potentially unsafe.
+
+        Args:
+            location: The movement destination.
+
+        Raises:
+            RuntimeError: The movement is unsafe.
+        """
+        from_loc = self._protocol_interface.get_last_location()
+
+        if not from_loc:
+            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
+
+        for mod in self._protocol_interface.get_module_cores():
+            if isinstance(mod, LegacyThermocyclerCore):
+                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+            elif isinstance(mod, LegacyHeaterShakerCore):
+                mod.flag_unsafe_move(
+                    to_loc=location,
+                    is_multichannel=self.get_channels() > 1,
+                )
 
     def _update_flow_rate(self) -> None:
         """Update cached speed and flow rates from hardware controller pipette."""
