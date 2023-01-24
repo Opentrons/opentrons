@@ -17,16 +17,15 @@ import last from 'lodash/last'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { RunProgressMeter } from '../RunProgressMeter'
 import { useRunStatus } from '../../RunTimeControl/hooks'
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { StyledText } from '../../../atoms/text'
 import { useTranslation } from 'react-i18next'
 import { AnalysisStepText } from '../../AnalysisStepText'
-import { useCurrentRunCommandKey } from '../hooks/useCurrentRunCommandKey'
+import { useLastRunCommandKey } from '../hooks/useLastRunCommandKey'
 
 import type { RunStatus } from '@opentrons/api-client'
 
 
-const TERMINAL_RUN_STATUSES: RunStatus[] = [RUN_STATUS_STOPPED, RUN_STATUS_FINISHING, RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED]
+const TERMINAL_RUN_STATUSES: RunStatus[] = [RUN_STATUS_STOPPED, RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED]
 const MIN_AGGREGATION_PERCENT = 0.6
 const TICKED_COMMAND_TYPES = ['waitForResume', 'moveLabware']
 interface ProtocolRunProgressMeterProps {
@@ -39,12 +38,12 @@ export function ProtocolRunProgressMeter(
   const { runId, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
-  const currentCommandKey = useCurrentRunCommandKey(runId)
+  const lastRunCommandKey = useLastRunCommandKey(runId)
   const analysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = analysis?.commands ?? []
-  const currentRunCommandIndex = runStatus === RUN_STATUS_SUCCEEDED
+  const lastRunCommandIndex = runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus) 
     ? analysisCommands.length
-    : analysisCommands.findIndex(c => c.key === currentCommandKey) ?? 0
+    : analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
   const commandAggregationCount =
     analysisCommands.length > 100
       ? analysisCommands.length * 0.01 * MIN_AGGREGATION_PERCENT
@@ -72,21 +71,21 @@ export function ProtocolRunProgressMeter(
     return acc
   }, [])
   let countOfTotalText = ''
-  if (currentRunCommandIndex >= 0 && currentRunCommandIndex <= analysisCommands.length - 1) {
-    countOfTotalText = ` ${currentRunCommandIndex + 1}/${analysisCommands.length}`
+  if (lastRunCommandIndex >= 0 && lastRunCommandIndex <= analysisCommands.length - 1) {
+    countOfTotalText = ` ${lastRunCommandIndex + 1}/${analysisCommands.length}`
   } else if (analysis == null) {
     countOfTotalText = '?/?'
   }
 
   let currentStepContents: React.ReactNode = null
-  if (analysis != null && analysisCommands[currentRunCommandIndex] != null) {
+  if (analysis != null && analysisCommands[lastRunCommandIndex] != null) {
     currentStepContents = (
       <AnalysisStepText
         robotSideAnalysis={analysis}
-        command={analysisCommands[currentRunCommandIndex]}
+        command={analysisCommands[lastRunCommandIndex]}
       />
     )
-  } else if (runStatus === RUN_STATUS_IDLE && analysisCommands[currentRunCommandIndex] == null) {
+  } else if (runStatus === RUN_STATUS_IDLE && analysisCommands[lastRunCommandIndex] == null) {
     currentStepContents = <StyledText as="h2">{t('not_started_yet')}</StyledText>
   } else if (runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)) {
     currentStepContents = <StyledText as="h2">{t('protocol_completed')}</StyledText>
@@ -98,7 +97,7 @@ export function ProtocolRunProgressMeter(
         <Flex gridGap={SPACING.spacing3}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
-          )}${countOfTotalText}: `}</StyledText>
+          )} ${countOfTotalText}: `}</StyledText>
           {currentStepContents}
         </Flex>
       </Flex>
@@ -108,7 +107,7 @@ export function ProtocolRunProgressMeter(
             ticks,
             makeHandleJumpToStep,
             analysisCommands,
-            currentRunCommandIndex,
+            lastRunCommandIndex,
           }}
         />
         : null

@@ -24,7 +24,7 @@ import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMo
 import { AnalysisStepText } from '../../AnalysisStepText'
 import { Divider } from '../../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../../App/constants'
-import { useCurrentRunCommandKey } from '../hooks/useCurrentRunCommandKey'
+import { useLastRunCommandKey } from '../hooks/useLastRunCommandKey'
 
 const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
   pause: 'pause-circle',
@@ -44,7 +44,7 @@ export const AnalyzedSteps = React.forwardRef(
     const { t } = useTranslation('run_details')
     const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
     const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-    const currentRunCommandKey = useCurrentRunCommandKey(runId)
+    const currentRunCommandKey = useLastRunCommandKey(runId)
     // -1 -> current earlier than visible commands
     //  0 -> current within visible commands
     //  1 -> current later than visible commands
@@ -52,7 +52,6 @@ export const AnalyzedSteps = React.forwardRef(
       currentCommandDirection,
       setCurrentCommandDirection,
     ] = React.useState<-1 | 0 | 1>(0)
-    console.log(currentCommandDirection)
     if (robotSideAnalysis == null) return null
     const currentRunCommandIndex =
       robotSideAnalysis.commands.findIndex(

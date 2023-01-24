@@ -521,7 +521,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
     return (
       <Banner
-        type="error"
+        type={runStatus === RUN_STATUS_FAILED ? "error" : "success"}
         onCloseClick={handleClearClick}
         isCloseActionLoading={isClosingCurrentRun}
       >

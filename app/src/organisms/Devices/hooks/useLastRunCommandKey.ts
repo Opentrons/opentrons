@@ -21,11 +21,11 @@ const LIVE_RUN_STATUSES = [
 ]
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 
-export function useCurrentRunCommandKey(runId: string): string | null {
+export function useLastRunCommandKey(runId: string): string | null {
   const runStatus = useRunStatus(runId)
   const { data: commandsData } = useAllCommandsQuery(
     runId,
-    { cursor: 0, pageLength: 0 },
+    { cursor: null, pageLength: 1 },
     {
       refetchInterval:
         runStatus != null && LIVE_RUN_STATUSES.includes(runStatus)
@@ -34,5 +34,8 @@ export function useCurrentRunCommandKey(runId: string): string | null {
       keepPreviousData: true,
     }
   )
-  return commandsData?.links?.current?.meta?.key ?? null
+
+  console.log('1', commandsData?.links?.current?.meta?.key)
+  console.log('2', commandsData?.data?.[0]?.key)
+  return commandsData?.links?.current?.meta?.key ?? commandsData?.data?.[0]?.key ?? null
 }

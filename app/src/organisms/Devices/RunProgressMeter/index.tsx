@@ -24,7 +24,7 @@ interface RunProgressMeterProps {
   analysisCommands: RunTimeCommand[]
   ticks: Array<{ index: number; count: number; range: number }>
   makeHandleJumpToStep: (i: number) => () => void
-  currentRunCommandIndex: number
+  lastRunCommandIndex: number
 }
 
 export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
@@ -32,13 +32,13 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     ticks,
     analysisCommands,
     makeHandleJumpToStep,
-    currentRunCommandIndex,
+    lastRunCommandIndex,
   } = props
   return (
     <ProgressBar
       percentComplete={
-        currentRunCommandIndex > 0
-          ? ((currentRunCommandIndex + 1) / analysisCommands.length) * 100
+        lastRunCommandIndex > 0
+          ? ((lastRunCommandIndex + 1) / analysisCommands.length) * 100
           : 0
       }
       outerStyles={css`
