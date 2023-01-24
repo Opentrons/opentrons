@@ -587,6 +587,11 @@ def test_get_well_edges(
         well_def
     )
 
+    assert well_def.diameter is not None
+    decoy.when(labware_view.get_well_size("labware-id", "B2")).then_return(
+        (well_def.diameter, well_def.diameter, well_def.depth)
+    )
+
     result = subject.get_well_edges("labware-id", "B2", radius=0.5, offset=1.0)
 
     expected_center = Point(
@@ -594,7 +599,7 @@ def test_get_well_edges(
         y=slot_pos[1] - 2 + well_def.y,
         z=slot_pos[2] + 3 + well_def.z + well_def.depth / 2.0,
     )
-    assert well_def.diameter is not None
+
     expected_xy_offset = well_def.diameter / 4.0
     expected_z_offset = well_def.depth / 2.0 + 1
 

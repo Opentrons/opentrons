@@ -263,28 +263,16 @@ class GeometryView:
         offset: float = -1.0,
     ) -> EdgeList:
         """Get list of absolute positions of four cardinal edges and center of well."""
-        well_def = self._labware.get_well_definition(labware_id, well_name)
-        if well_def.shape == "rectangular":
-            x_size = well_def.xDimension
-            y_size = well_def.yDimension
-            if x_size is None or y_size is None:
-                raise ValueError(
-                    f"Rectangular well {well_name} does not have x and y dimensions"
-                )
-        elif well_def.shape == "circular":
-            x_size = y_size = well_def.diameter
-            if x_size is None or y_size is None:
-                raise ValueError(f"Circular well {well_name} does not have diameter")
-        else:
-            raise ValueError(f'Shape "{well_def.shape}" is not a supported well shape')
+        x_size, y_size, z_size = self._labware.get_well_size(labware_id, well_name)
 
         x_offset = x_size / 2.0 * radius
         y_offset = y_size / 2.0 * radius
-        z_offset = well_def.depth / 2.0 + offset
+        z_offset = z_size / 2.0 + offset
 
         center = self.get_well_position(
             labware_id, well_name, well_location=WellLocation(origin=WellOrigin.CENTER)
         )
+
         return EdgeList(
             right=center + Point(x=x_offset, y=0, z=z_offset),
             left=center + Point(x=-x_offset, y=0, z=z_offset),
