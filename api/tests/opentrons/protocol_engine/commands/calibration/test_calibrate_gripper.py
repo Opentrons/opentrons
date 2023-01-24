@@ -64,6 +64,7 @@ async def test_calibrate_gripper(
     assert result == CalibrateGripperResult(probeOffset=Vec3f(x=1.1, y=2.2, z=3.3))
 
 
+@pytest.mark.ot3_only
 async def test_calibrate_gripper_saves_calibration(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
