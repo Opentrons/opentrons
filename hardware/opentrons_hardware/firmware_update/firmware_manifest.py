@@ -8,13 +8,13 @@ import logging
 import os
 from typing import Dict
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_update.errors import FirmwareManifestMissing
 
 
 _FIRMWARE_MANIFEST_PATH = os.path.abspath("/usr/lib/firmware/opentrons-firmware.json")
 
 log = logging.getLogger(__name__)
+
 
 class FirmwareUpdateType(Enum):
     head = 0
@@ -32,13 +32,19 @@ class FirmwareUpdateType(Enum):
     @classmethod
     def from_string(cls, name: str) -> "FirmwareUpdateType":
         # convert '-' to '_'so we can match enum name
-        sanitized_name = name.replace('-', '_')
+        sanitized_name = name.replace("-", "_")
         return cls.__members__.get(sanitized_name)
 
 
 @dataclass
 class UpdateInfo:
-    def __init__(self, update_type: FirmwareUpdateType, version: int, shortsha: str, filepath: str) -> None:
+    def __init__(
+        self,
+        update_type: FirmwareUpdateType,
+        version: int,
+        shortsha: str,
+        filepath: str,
+    ) -> None:
         self.update_type = update_type
         self.version = version
         self.shortsha = shortsha
@@ -48,11 +54,15 @@ class UpdateInfo:
         return f"<{self.__class__.__name__}: type={self.update_type}, version={self.version}, sha={self.shortsha}>"
 
 
-def load_firmware_manifest(firmware_manifest: str = None) -> Dict[FirmwareUpdateType, Dict]:
-    """Loads the opentrons firmware of the """
+def load_firmware_manifest(
+    firmware_manifest: str = None,
+) -> Dict[FirmwareUpdateType, Dict]:
+    """Loads the opentrons firmware of the"""
     opentrons_firmware = firmware_manifest or _FIRMWARE_MANIFEST_PATH
     if not os.path.exists(opentrons_firmware):
-        raise FirmwareManifestMissing(f"Firmware manifest file not found {opentrons_firmware}")
+        raise FirmwareManifestMissing(
+            f"Firmware manifest file not found {opentrons_firmware}"
+        )
 
     opentrons_manifest = {}
     try:
@@ -61,8 +71,8 @@ def load_firmware_manifest(firmware_manifest: str = None) -> Dict[FirmwareUpdate
     except json.JSONDecodeError as e:
         log.error(f"Could not load manifest file {opentrons_firmware} {e}")
         return opentrons_manifest
-    
-    subsystems = manifest.get('subsystems')
+
+    subsystems = manifest.get("subsystems")
     for subsystem_name, version_info in subsystems.items():
         update_type = FirmwareUpdateType.from_string(subsystem_name)
         if not update_type:
@@ -76,12 +86,14 @@ def load_firmware_manifest(firmware_manifest: str = None) -> Dict[FirmwareUpdate
     return opentrons_manifest
 
 
-def _generate_firmware_info(update_type: FirmwareUpdateType, version_info: dict) -> UpdateInfo:
+def _generate_firmware_info(
+    update_type: FirmwareUpdateType, version_info: dict
+) -> UpdateInfo:
     """Validate the version info and return an UpdateInfo object if valid."""
     try:
-        version = int(version_info.get('version'))
-        shortsha = str(version_info.get('shortsha'))
-        filepath = os.path.abspath(version_info.get('filepath'))
+        version = int(version_info.get("version"))
+        shortsha = str(version_info.get("shortsha"))
+        filepath = os.path.abspath(version_info.get("filepath"))
         if os.path.exists(filepath):
             raise FileNotFoundError
         return UpdateInfo(update_type, version, shortsha, filepath)

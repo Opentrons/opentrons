@@ -19,5 +19,5 @@ __all__ = [
     "HexRecordProcessor",
     "run_update",
     "get_device_info",
-    "load_firmware_manifest"
+    "load_firmware_manifest",
 ]

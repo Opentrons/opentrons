@@ -35,6 +35,7 @@ class BootloaderNotReady(FirmwareUpdateException):
 
     pass
 
+
 class FirmwareUpdateRequired(FirmwareUpdateException):
     """At least one subsystem requires an update."""
 
@@ -42,7 +43,10 @@ class FirmwareUpdateRequired(FirmwareUpdateException):
 
     def __init__(self, message: MessageDefinition = "") -> None:
         self.message = message
-        super().__init__(f"Operation not permited because a firmware update is required {message}.")
+        super().__init__(
+            f"Operation not permited because a firmware update is required {message}."
+        )
+
 
 class FirmwareManifestMissing(FirmwareUpdateException):
     """The firmware manifest file was not found."""

@@ -3,10 +3,8 @@
 from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
-import json
 import logging
 from copy import deepcopy
-import os
 from typing import (
     Callable,
     Dict,
@@ -194,6 +192,7 @@ class OT3Controller:
             if self.update_required:
                 raise FirmwareUpdateRequired()
             return await function(self, *args, **kwargs)
+
         return wrapper
 
     @requires_update
@@ -961,19 +960,14 @@ class OT3Controller:
         self._position[axis_to_node(moving)] += distance_mm
         return data
 
-    @requires_update
-    async def update_motor_status(self) -> None:
-        """Retreieve motor and encoder status and position from all present nodes"""
-        assert len(self._present_nodes)
-        response = await get_motor_position(self._messenger, self._present_nodes)
-        self._handle_motor_status_response(response)
-
     async def update_device_info(self) -> None:
         """Update the device info cache for all attached instruments"""
         response = await get_device_info(self._messenger, self._present_nodes)
         self._handle_device_info_response(response)
 
-    def _handle_device_info_response(self, network_info: Dict[NodeId, DeviceInfoCache]) -> None:
+    def _handle_device_info_response(
+        self, network_info: Dict[NodeId, DeviceInfoCache]
+    ) -> None:
         subsystem_info_cache = {}
         for node, device_info in network_info.items():
             old_device_info = self._subsystem_info_cache.get(node)

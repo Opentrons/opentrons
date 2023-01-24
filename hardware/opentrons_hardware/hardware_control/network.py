@@ -53,8 +53,8 @@ async def probe(
                 node_id=arbitration_id.parts.originating_node_id,
                 version=message.payload.version.value,
                 flags=message.payload.flags.value,
-                shortsha=message.payload.shortsha.value.decode()
-                )
+                shortsha=message.payload.shortsha.value.decode(),
+            )
 
         if expected and expected.issubset(nodes):
             event.set()

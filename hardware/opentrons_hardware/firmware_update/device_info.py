@@ -6,10 +6,17 @@ import logging
 from typing import Set
 from opentrons.hardware_control.types import DeviceInfoCache
 
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger, MultipleMessagesWaitableCallback, WaitableCallback
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+    MultipleMessagesWaitableCallback,
+    WaitableCallback,
+)
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
-from opentrons_hardware.firmware_bindings.messages.message_definitions import DeviceInfoRequest, DeviceInfoResponse
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    DeviceInfoRequest,
+    DeviceInfoResponse,
+)
 from opentrons_hardware.hardware_control.types import NodeMap
 
 
@@ -27,8 +34,7 @@ async def get_device_info(
 
     def _listener_filter(arbitration_id: ArbitrationId) -> bool:
         return (NodeId(arbitration_id.parts.originating_node_id) in nodes) and (
-            MessageId(arbitration_id.parts.message_id)
-            == DeviceInfoResponse.message_id
+            MessageId(arbitration_id.parts.message_id) == DeviceInfoResponse.message_id
         )
 
     expected_nodes = len(nodes) if nodes else None
@@ -38,9 +44,7 @@ async def get_device_info(
         listener_filter,
         expected_nodes,
     ) as reader:
-        await can_messenger.send(
-            node_id=NodeId.broadcast, message=DeviceInfoRequest()
-        )
+        await can_messenger.send(node_id=NodeId.broadcast, message=DeviceInfoRequest())
         try:
             data = await asyncio.wait_for(
                 _parse_device_info_response(reader),
@@ -58,11 +62,10 @@ async def _parse_device_info_response(
         assert isinstance(response, DeviceInfoResponse)
         node = NodeId(arb_id.parts.originating_node_id)
         if node == expected:
-            return (
-                DeviceInfoCache(
-                    node_id=node,
-                    version=response.payload.version.value,
-                    flags=response.payload.flags.value,
-                    shortsha=response.payload.shortsha.value.decode())
+            return DeviceInfoCache(
+                node_id=node,
+                version=response.payload.version.value,
+                flags=response.payload.flags.value,
+                shortsha=response.payload.shortsha.value.decode(),
             )
     raise StopAsyncIteration
