@@ -765,7 +765,7 @@ class ProtocolContext(CommandPublisher):
         :param str description: An optional description of this liquid.
         :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
         """
-        return self._implementation.define_liquid(
+        return self._core.define_liquid(
             name=name,
             description=description,
             display_color=display_color,

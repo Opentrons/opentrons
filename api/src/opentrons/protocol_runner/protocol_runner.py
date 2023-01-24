@@ -163,7 +163,7 @@ class ProtocolRunner:
                 id=liquid.id,
                 name=liquid.displayName,
                 description=liquid.description,
-                color=liquid.displayColor.__root__ if liquid.displayColor else None,
+                color=liquid.displayColor,
             )
 
         for command in commands:

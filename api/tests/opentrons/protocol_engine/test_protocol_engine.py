@@ -628,7 +628,9 @@ def test_add_liquid(
     subject: ProtocolEngine,
 ) -> None:
     """It should dispatch an AddLiquidAction action."""
-    subject.add_liquid(id="water-id", name="water", description="water desc")
+    subject.add_liquid(
+        id="water-id", name="water", description="water desc", color=None
+    )
 
     decoy.verify(
         action_dispatcher.dispatch(
