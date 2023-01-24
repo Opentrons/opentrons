@@ -401,18 +401,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         display_color: Optional[str],
     ) -> Liquid:
         """create a liquid to load into a well."""
-        loaded_liquid = self._engine_client.add_liquid(
+        liquid = self._engine_client.add_liquid(
             name=name, description=description, color=display_color
         )
 
         return Liquid(
-            _id=loaded_liquid.id,
-            name=loaded_liquid.displayName,
-            description=loaded_liquid.description,
+            _id=liquid.id,
+            name=liquid.displayName,
+            description=liquid.description,
             display_color=(
-                loaded_liquid.displayColor.__root__
-                if loaded_liquid.displayColor
-                else None
+                liquid.displayColor.__root__ if liquid.displayColor else None
             ),
         )
 
