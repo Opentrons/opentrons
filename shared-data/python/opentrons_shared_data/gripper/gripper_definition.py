@@ -3,7 +3,7 @@
 from typing_extensions import Literal
 from typing import TYPE_CHECKING, List, Dict, Tuple, Any
 from pydantic import BaseModel, Field, conint, confloat
-from enum import Enum
+from enum import Enum, auto
 
 
 def _snake_to_camel_case(snake: str) -> str:
@@ -16,7 +16,7 @@ def _snake_to_camel_case(snake: str) -> str:
 class GripperModel(Enum):
     """Gripper models."""
 
-    v1 = "v1"
+    v1 = 1
 
 
 GripperSchemaVersion = Literal[1]

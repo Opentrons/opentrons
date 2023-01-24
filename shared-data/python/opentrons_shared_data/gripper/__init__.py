@@ -36,7 +36,7 @@ def load_schema(version: Literal[1]) -> GripperSchema:
 
 
 def _load_definition_data(path: Path) -> Any:
-    return json.loads(load_shared_data(path))
+    return
 
 
 def load_definition(
@@ -45,9 +45,8 @@ def load_definition(
 ) -> GripperDefinition:
     """Load gripper definition based on schema version and gripper model."""
     try:
-        path = Path("gripper") / "definitions" / f"{version}" / f"{model}.json"
-        data = _load_definition_data(path)
-        return GripperDefinition(**data, schema_version=version)
+        path = Path("gripper") / "definitions" / f"{version}" / f"v{model}.json"
+        return GripperDefinition.parse_obj(json.loads(load_shared_data(path)))
     except FileNotFoundError:
         raise InvalidGripperDefinition(
             f"Gripper model {model} definition in schema version {version} does not exist."
