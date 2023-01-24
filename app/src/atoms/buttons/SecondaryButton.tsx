@@ -7,17 +7,23 @@ import {
   BORDERS,
   TYPOGRAPHY,
   styleProps,
+  isntStyleProp,
 } from '@opentrons/components'
 
-interface SecondaryButtonProps extends React.ComponentProps<typeof Btn> {
+import type { StyleProps } from '@opentrons/components'
+
+interface SecondaryButtonProps extends StyleProps {
+  /** button action is dangerous and may have non-reversible side-effects for user */
   isDangerous?: boolean
 }
-export const SecondaryButton = styled(Btn).withConfig({
-  shouldForwardProp: p => p !== 'isDangerous'
-}) <SecondaryButtonProps>`
-  color: ${props => props.isDangerous ? COLORS.errorText : COLORS.blueEnabled};
+export const SecondaryButton = styled(Btn).withConfig<SecondaryButtonProps>({
+  shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
+})<SecondaryButtonProps>`
+  color: ${props =>
+    props.isDangerous ? COLORS.errorText : COLORS.blueEnabled};
   border: ${BORDERS.lineBorder};
-  border-color: ${props => props.isDangerous ? COLORS.errorEnabled : 'initial'};
+  border-color: ${props =>
+    props.isDangerous ? COLORS.errorEnabled : 'initial'};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};

@@ -1,8 +1,14 @@
-import { getLoadedModule } from "./accessors"
+import { getLoadedModule } from './accessors'
 
-import type { ModuleModel, CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  ModuleModel,
+  CompletedProtocolAnalysis,
+} from '@opentrons/shared-data'
 
-export function getModuleModel(analysis: CompletedProtocolAnalysis, moduleId: string): ModuleModel | null {
+export function getModuleModel(
+  analysis: CompletedProtocolAnalysis,
+  moduleId: string
+): ModuleModel | null {
   const loadedModule = getLoadedModule(analysis, moduleId)
   return loadedModule != null ? loadedModule.model : null
 }

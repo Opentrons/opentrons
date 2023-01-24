@@ -16,7 +16,7 @@ export function ProgressBar({
   percentComplete,
   outerStyles,
   innerStyles,
-  children
+  children,
 }: ProgressBarProps): JSX.Element {
   const ratio = percentComplete / 100
   const progress = ratio > 1 ? '100%' : `${String(ratio * 100)}%`
@@ -53,10 +53,7 @@ export function ProgressBar({
       css={LINER_PROGRESS_CONTAINER_STYLE}
       data-testid="ProgressBar_Container"
     >
-      <Box
-        css={LINER_PROGRESS_FILLER_STYLE}
-        data-testid="ProgressBar_Bar"
-      />
+      <Box css={LINER_PROGRESS_FILLER_STYLE} data-testid="ProgressBar_Bar" />
       {children}
     </Box>
   )

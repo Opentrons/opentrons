@@ -37,7 +37,9 @@ const mockUseSyncRobotClock = useSyncRobotClock as jest.MockedFunction<
 const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
   typeof ProtocolRunHeader
 >
-const mockAnalyzedSteps = AnalyzedSteps as jest.MockedFunction<typeof AnalyzedSteps>
+const mockAnalyzedSteps = AnalyzedSteps as jest.MockedFunction<
+  typeof AnalyzedSteps
+>
 const mockProtocolRunSetup = ProtocolRunSetup as jest.MockedFunction<
   typeof ProtocolRunSetup
 >

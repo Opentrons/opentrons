@@ -22,16 +22,25 @@ import type { IconName } from '@opentrons/components'
 
 interface RunProgressMeterProps {
   analysisCommands: RunTimeCommand[]
-  ticks: Array<{ index: number, count: number, range: number }>
+  ticks: Array<{ index: number; count: number; range: number }>
   makeHandleJumpToStep: (i: number) => () => void
   currentRunCommandIndex: number
 }
 
-export function RunProgressMeter(props: RunProgressMeterProps) {
-  const { ticks, analysisCommands, makeHandleJumpToStep, currentRunCommandIndex } = props
+export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
+  const {
+    ticks,
+    analysisCommands,
+    makeHandleJumpToStep,
+    currentRunCommandIndex,
+  } = props
   return (
     <ProgressBar
-      percentComplete={currentRunCommandIndex > 0 ? ((currentRunCommandIndex + 1) / analysisCommands.length) * 100 : 0}
+      percentComplete={
+        currentRunCommandIndex > 0
+          ? ((currentRunCommandIndex + 1) / analysisCommands.length) * 100
+          : 0
+      }
       outerStyles={css`
         height: 0.375rem;
         background-color: ${COLORS.medGreyEnabled};
@@ -45,41 +54,68 @@ export function RunProgressMeter(props: RunProgressMeterProps) {
         border-radius: ${BORDERS.radiusSoftCorners};
       `}
     >
-      {ticks.map((tick) => (
-        <Tick {...{ ...tick, makeHandleJumpToStep, firstCommandType: analysisCommands[tick.index]?.commandType }} total={analysisCommands.length} />
+      {ticks.map(tick => (
+        <Tick
+          key={tick.index}
+          {...{
+            ...tick,
+            makeHandleJumpToStep,
+            firstCommandType: analysisCommands[tick.index]?.commandType,
+          }}
+          total={analysisCommands.length}
+        />
       ))}
     </ProgressBar>
   )
 }
 
 interface TickProps {
-  index: number,
-  count: number,
-  range: number,
-  firstCommandType: RunTimeCommand['commandType'],
-  makeHandleJumpToStep: (i: number) => () => void,
+  index: number
+  count: number
+  range: number
+  firstCommandType: RunTimeCommand['commandType']
+  makeHandleJumpToStep: (i: number) => () => void
   total: number
 }
 
-function Tick(props: TickProps) {
-  const { index, count, range, firstCommandType, makeHandleJumpToStep, total } = props
+function Tick(props: TickProps): JSX.Element {
+  const {
+    index,
+    count,
+    range,
+    firstCommandType,
+    makeHandleJumpToStep,
+    total,
+  } = props
   const { t } = useTranslation('run_details')
 
-  const tKeyByCommandType: { [commandType in RunTimeCommand['commandType']]?: string } = {
+  const tKeyByCommandType: {
+    [commandType in RunTimeCommand['commandType']]?: string
+  } = {
     waitForResume: 'pause',
     moveLabware: 'move_labware',
   }
-  const iconByCommandType: { [commandType in RunTimeCommand['commandType']]?: IconName } = {
+  const iconByCommandType: {
+    [commandType in RunTimeCommand['commandType']]?: IconName
+  } = {
     waitForResume: 'pause-circle',
-    moveLabware:  'move-xy',
+    moveLabware: 'move-xy',
   }
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isAggregatedTick = count > 1
   const percent = (index / (total - 1)) * 100
   const stepNumber = index + 1
 
-  const commandTKey = (firstCommandType in tKeyByCommandType && tKeyByCommandType[firstCommandType] != null) ? tKeyByCommandType[firstCommandType] ?? null : null
-  const iconName = (firstCommandType in iconByCommandType && iconByCommandType[firstCommandType] != null) ? iconByCommandType[firstCommandType] ?? null : null
+  const commandTKey =
+    firstCommandType in tKeyByCommandType &&
+    tKeyByCommandType[firstCommandType] != null
+      ? tKeyByCommandType[firstCommandType] ?? null
+      : null
+  const iconName =
+    firstCommandType in iconByCommandType &&
+    iconByCommandType[firstCommandType] != null
+      ? iconByCommandType[firstCommandType] ?? null
+      : null
   return (
     <Flex
       {...targetProps}
@@ -92,7 +128,7 @@ function Tick(props: TickProps) {
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       height="0.75rem"
-      width={isAggregatedTick ? "0.75rem" : "0.25rem"}
+      width={isAggregatedTick ? '0.75rem' : '0.25rem'}
       position="absolute"
       top="-50%"
       left={`${percent}%`}
@@ -101,16 +137,28 @@ function Tick(props: TickProps) {
       <StyledText as="h6">{isAggregatedTick ? count : null}</StyledText>
       <Portal>
         <Tooltip tooltipProps={tooltipProps}>
-          <Flex padding={SPACING.spacing1} gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
-            {!isAggregatedTick && iconName != null ? <Icon name={iconName} size={SPACING.spacingM} /> : null}
+          <Flex
+            padding={SPACING.spacing1}
+            gridGap={SPACING.spacing2}
+            alignItems={ALIGN_CENTER}
+          >
+            {!isAggregatedTick && iconName != null ? (
+              <Icon name={iconName} size={SPACING.spacingM} />
+            ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="label">
-                {t('step_number', { step_number: isAggregatedTick ? `${stepNumber} - ${stepNumber + range}` : stepNumber })}
+                {t('step_number', {
+                  step_number: isAggregatedTick
+                    ? `${stepNumber} - ${stepNumber + range}`
+                    : stepNumber,
+                })}
               </StyledText>
               <StyledText as="label">
                 {commandTKey != null ? t(commandTKey) : null}
               </StyledText>
-              {isAggregatedTick ? <StyledText>{t('plus_more', { count })}</StyledText> : null}
+              {isAggregatedTick ? (
+                <StyledText>{t('plus_more', { count })}</StyledText>
+              ) : null}
             </Flex>
           </Flex>
         </Tooltip>

@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../atoms/text'
 
-import type { RunTimeCommand, CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  RunTimeCommand,
+  CompletedProtocolAnalysis,
+} from '@opentrons/shared-data'
 import { getLabwareDisplayLocation, getLabwareName } from './utils'
 
 interface PipettingCommandTextProps {
@@ -26,7 +29,11 @@ export const PipettingCommandText = ({
       commandText = t('aspirate', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
+        labware_location: getLabwareDisplayLocation(
+          robotSideAnalysis,
+          labwareId,
+          t
+        ),
         volume: volume,
         flow_rate: flowRate,
       })
@@ -37,7 +44,11 @@ export const PipettingCommandText = ({
       commandText = t('dispense', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
+        labware_location: getLabwareDisplayLocation(
+          robotSideAnalysis,
+          labwareId,
+          t
+        ),
         volume: volume,
         flow_rate: flowRate,
       })
@@ -49,7 +60,11 @@ export const PipettingCommandText = ({
       commandText = t('blowout', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
+        labware_location: getLabwareDisplayLocation(
+          robotSideAnalysis,
+          labwareId,
+          t
+        ),
         flow_rate: flowRate,
       })
       break
@@ -73,7 +88,11 @@ export const PipettingCommandText = ({
       commandText = t('drop_tip', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
+        labware_location: getLabwareDisplayLocation(
+          robotSideAnalysis,
+          labwareId,
+          t
+        ),
       })
       break
     }
@@ -82,13 +101,15 @@ export const PipettingCommandText = ({
       commandText = t('pickup_tip', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: getLabwareDisplayLocation(robotSideAnalysis, labwareId, t),
+        labware_location: getLabwareDisplayLocation(
+          robotSideAnalysis,
+          labwareId,
+          t
+        ),
       })
       break
     }
   }
 
-  return (
-    <StyledText as="p">{commandText}</StyledText>
-  )
+  return <StyledText as="p">{commandText}</StyledText>
 }

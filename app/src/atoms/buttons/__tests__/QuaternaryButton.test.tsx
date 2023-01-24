@@ -9,9 +9,7 @@ import {
 
 import { QuaternaryButton } from '..'
 
-const render = (
-  props: React.ComponentProps<typeof QuaternaryButton>
-) => {
+const render = (props: React.ComponentProps<typeof QuaternaryButton>) => {
   return renderWithProviders(<QuaternaryButton {...props} />)[0]
 }
 

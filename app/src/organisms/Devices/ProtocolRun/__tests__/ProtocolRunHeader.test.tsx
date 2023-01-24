@@ -210,6 +210,7 @@ const render = () => {
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
+        makeHandleJumpToStep={jest.fn(() => jest.fn())}
       />
     </BrowserRouter>,
     { i18nInstance: i18n }

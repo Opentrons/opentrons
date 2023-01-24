@@ -15,7 +15,9 @@ import { PipettingCommandText } from './PipettingCommandText'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
 
-const SIMPLE_T_KEY_BY_COMMAND_TYPE: { [commandType in RunTimeCommand['commandType']]?: string } = {
+const SIMPLE_T_KEY_BY_COMMAND_TYPE: {
+  [commandType in RunTimeCommand['commandType']]?: string
+} = {
   home: 'home_gantry',
   savePosition: 'save_position',
   touchTip: 'touch_tip',
@@ -63,7 +65,10 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
     }
     case 'pause':
     case 'waitForResume': {
-      messageNode = command.params?.message && command.params.message !== '' ? command.params.message : t('wait_for_resume')
+      messageNode =
+        command.params?.message && command.params.message !== ''
+          ? command.params.message
+          : t('wait_for_resume')
       break
     }
     case 'aspirate':
@@ -72,14 +77,24 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
     case 'moveToWell':
     case 'dropTip':
     case 'pickUpTip': {
-      messageNode = <PipettingCommandText command={command} robotSideAnalysis={robotSideAnalysis} />
+      messageNode = (
+        <PipettingCommandText
+          command={command}
+          robotSideAnalysis={robotSideAnalysis}
+        />
+      )
       break
     }
     case 'loadLabware':
     case 'loadPipette':
     case 'loadModule':
     case 'loadLiquid': {
-      messageNode = <LoadCommandText command={command} robotSideAnalysis={robotSideAnalysis} />
+      messageNode = (
+        <LoadCommandText
+          command={command}
+          robotSideAnalysis={robotSideAnalysis}
+        />
+      )
       break
     }
     case 'temperatureModule/setTargetTemperature': {
@@ -198,18 +213,22 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
           ? JSON.stringify(legacyCommandText)
           : String(legacyCommandText)
       messageNode =
-        legacyCommandText != null
-          ? sanitizedCommandText
-          : command.commandType
+        legacyCommandText != null ? sanitizedCommandText : command.commandType
       break
     }
     default: {
-      console.warn('Step Text encountered a command with an unrecognized commandType: ', command)
+      console.warn(
+        'Step Text encountered a command with an unrecognized commandType: ',
+        command
+      )
       messageNode = JSON.stringify(command)
       break
     }
   }
 
-  return <Flex alignItems={ALIGN_CENTER}><StyledText as="p">{messageNode}</StyledText></Flex>
+  return (
+    <Flex alignItems={ALIGN_CENTER}>
+      <StyledText as="p">{messageNode}</StyledText>
+    </Flex>
+  )
 }
-
