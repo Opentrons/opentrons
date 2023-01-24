@@ -297,10 +297,10 @@ class ProtocolEngine:
 
     def add_liquid(
         self,
-        id: Optional[str],
         name: str,
         color: Optional[str] = None,
         description: str = "",
+        id: Optional[str] = None,
     ) -> Liquid:
         """Add a liquid to the state for subsequent liquid loads."""
         if id is None:
