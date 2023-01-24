@@ -409,9 +409,11 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             _id=loaded_liquid.id,
             name=loaded_liquid.displayName,
             description=loaded_liquid.description,
-            display_color=loaded_liquid.displayColor.__root__
-            if loaded_liquid.displayColor
-            else None,
+            display_color=(
+                loaded_liquid.displayColor.__root__
+                if loaded_liquid.displayColor
+                else None
+            ),
         )
 
     def get_labware_location(
