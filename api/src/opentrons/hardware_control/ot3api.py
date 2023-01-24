@@ -1326,6 +1326,7 @@ class OT3API(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
     ) -> None:
         for press in pipette_spec.presses:
+            start_pos = await self.gantry_position(mount)
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
                     {axis: current for axis, current in press.current.items()}
@@ -1342,10 +1343,7 @@ class OT3API(
                         await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
                     else:
                         raise e
-            target_up = target_position_from_relative(
-                mount, press.relative_up, self._current_position
-            )
-            await self._move(target_up)
+            await self.move_to(mount, start_pos)
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec

@@ -85,77 +85,69 @@ async def _main(is_simulating: bool) -> None:
         # MOVE_POS = Point(227.826, 362.808, 250.0) #Point(235.414, 385.308, 509.15)
         # FIXTURE_POS = Point(227.826, 362.808, 44.61) #Point(235.414, 385.308, 303.965)
         # await api.move_to(MOUNT, Point(227.826, 362.808, 250.0)) #, speed = 50)
-        # await api.move_to(MOUNT, Point(226.526, 362.208, 250.0)) #, speed = 50) ### Z-Axis
-        await api.move_to(MOUNT, Point(236.218, 61.227, 250.0)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(226.526, 362.208, 250.0)) #, speed = 50)
         ### time.sleep(1)
         # await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50)
-        # await api.move_to(MOUNT, Point(226.526, 362.208, 151.0)) #, speed = 50) ### Z-Axis
-        await api.move_to(MOUNT, Point(236.218, 61.227, 371.859)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(226.526, 362.208, 151.0)) #, speed = 50)
         ### time.sleep(1)
         # await api.move_to(MOUNT, Point(227.826, 362.808, 42.61)) #, speed = 50)
-        # await api.move_to(MOUNT, Point(226.526, 362.208, 141.0)) #, speed = 50) ### Point(226.526, 362.608, 146.0)) makes contact with gauge ### Z-Axis
-        await api.move_to(MOUNT, Point(236.218, 71.227, 371.859)) ### Y-Axis ### Point(x=236.21799999999996, y=66.227, z=371.85900000000004)
+        await api.move_to(MOUNT, Point(226.526, 362.208, 141.0)) #, speed = 50) ### Point(226.526, 362.608, 146.0)) makes contact with gauge
         ### time.sleep(1)
         init_reading = gauge.read()
         init_robot_pos = await api.current_position_ot3(MOUNT, refresh=True)
         init_encoder_pos = await api.encoder_current_position_ot3(MOUNT, refresh=True)
         print(f"Initial Dial Reading (mm) = {init_reading}\n")
-        # print(f"Initial robot position: {init_robot_pos[OT3Axis.Z_R]}\n")
-        print(f"Initial robot position: {init_robot_pos[OT3Axis.Y]}\n")
-        # print(f"Initial encoder position: {init_encoder_pos[OT3Axis.Z_R]}\n")
-        print(f"Initial encoder position: {init_encoder_pos[OT3Axis.Y]}\n")
+        print(f"Initial robot position: {init_robot_pos[OT3Axis.Z_R]}\n")
+        print(f"Initial encoder position: {init_encoder_pos[OT3Axis.Z_R]}\n")
         await asyncio.sleep(1)
 
         # input("Press enter to continue test...\n")
-        print("\n--STALLING--\n")
-        # await api.move_rel(MOUNT, delta=Point(z=10))
-        # await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50) ### Z-Axis
-        await api.move_to(MOUNT, Point(236.218, 61.227, 371.859)) #, speed = 50)
-        ### time.sleep(1)
-        # await api.move_rel(MOUNT, delta=Point(x=30))
-        # await api.move_to(MOUNT, Point(257.826, 362.808, 52.61)) #, speed = 50) ### Z-Axis
-        await api.move_to(MOUNT, Point(236.218, 31.231, 371.859)) #, speed = 50)
-        ### time.sleep(1)
-        try:
-            await api.move_rel(MOUNT, delta=Point(y=-20), _check_stalls=True)
-        except RuntimeError as e:
-            if "collision_detected" in str(e):
-                print("--COLLISION DETECTED--\n")
-                # collision_detected = True
-                print("--UPDATE POSITION--\n")
-                await api._update_position_estimation([OT3Axis.Y])
-        ### -->
-        # print("\n--PICK UP TIP--\n")
+        # print("\n--STALLING--\n")
         # # await api.move_rel(MOUNT, delta=Point(z=10))
-        # # await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50)
-        # await api.move_to(MOUNT, Point(226.526, 362.208, 151.0)) #, speed = 50)
+        # await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50)
         # ### time.sleep(1)
         # # await api.move_rel(MOUNT, delta=Point(x=30))
-        # # await api.move_to(MOUNT, Point(257.826, 362.808, 52.61)) #, speed = 50)
-        # await api.move_to(MOUNT, Point(177.926, 362.208, 151.0)) #, speed = 50)
-        # await api.move_to(MOUNT, Point(177.926, 287.408, 151.0)) #, speed = 50)
+        # await api.move_to(MOUNT, Point(257.826, 362.808, 52.61)) #, speed = 50)
         # ### time.sleep(1)
-        # await api.move_to(MOUNT, Point(177.926, 287.408, 104.5))
-        # ### multi: (177.926, 287.408, 99.2)
-        # ### single: (177.726, 287.708, 99.5)
-        # await api.move_to(MOUNT, Point(177.926, 287.408, 99.2), speed = 50)
-        # # try:
-        # #     # await api.move_rel(MOUNT, delta=Point(z=-20), _check_stalls=True)
-        # #     await api.pick_up_tip(MOUNT, tip_length=57)
-        # # except RuntimeError as e:
-        # #     if "collision_detected" in str(e):
-        # #         print("--COLLISION DETECTED--\n")
-        # #         # collision_detected = True
-        # #         print("--UPDATE POSITION--\n")
-        # #         await api._update_position_estimation([OT3Axis.Z_R])
-        # print("Picking up tip\n")
-        # await api.pick_up_tip(MOUNT, tip_length=57)
-        # # print("--UPDATE POSITION--\n")
-        # # await api._update_position_estimation([OT3Axis.Z_R])
-        # # await asyncio.sleep(1)
-        # print("Dropping tip\n")
-        # await api.drop_tip(MOUNT, home_after=False)
-        ### <--
+        # try:
+        #     await api.move_rel(MOUNT, delta=Point(z=-20), _check_stalls=True)
+        # except RuntimeError as e:
+        #     if "collision_detected" in str(e):
+        #         print("--COLLISION DETECTED--\n")
+        #         collision_detected = True
+        #         print("--UPDATE POSITION--\n")
+        #         await api._update_position_estimation([OT3Axis.Z_R])
+
+        print("\n--PICK UP TIP--\n")
+        # await api.move_rel(MOUNT, delta=Point(z=10))
+        # await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50)
+        await api.move_to(MOUNT, Point(226.526, 362.208, 151.0)) #, speed = 50)
+        ### time.sleep(1)
+        # await api.move_rel(MOUNT, delta=Point(x=30))
+        # await api.move_to(MOUNT, Point(257.826, 362.808, 52.61)) #, speed = 50)
+        await api.move_to(MOUNT, Point(177.926, 362.208, 151.0)) #, speed = 50)
+        await api.move_to(MOUNT, Point(177.926, 287.408, 151.0)) #, speed = 50)
+        ### time.sleep(1)
+        await api.move_to(MOUNT, Point(177.926, 287.408, 104.5))
+        ### multi: (177.926, 287.408, 99.2)
+        ### single: (177.726, 287.708, 99.5)
+        await api.move_to(MOUNT, Point(177.926, 287.408, 99.2), speed = 50)
+        # try:
+        #     # await api.move_rel(MOUNT, delta=Point(z=-20), _check_stalls=True)
+        #     await api.pick_up_tip(MOUNT, tip_length=57)
+        # except RuntimeError as e:
+        #     if "collision_detected" in str(e):
+        #         print("--COLLISION DETECTED--\n")
+        #         # collision_detected = True
+        #         print("--UPDATE POSITION--\n")
+        #         await api._update_position_estimation([OT3Axis.Z_R])
+        print("Picking up tip\n")
+        await api.pick_up_tip(MOUNT, tip_length=57)
+        # print("--UPDATE POSITION--\n")
+        # await api._update_position_estimation([OT3Axis.Z_R])
+        # await asyncio.sleep(1)
+        print("Dropping tip\n")
+        await api.drop_tip(MOUNT, home_after=False)
 
         ### all 3 --> weird behavior, the probe moves diagonally when trying to hit the gauge after the stall
         ### first and third commented out --> able to reach gauge, but is off by like 2mm
@@ -168,27 +160,24 @@ async def _main(is_simulating: bool) -> None:
         # 2 await asyncio.sleep(1) ### --> if this is the only one commented out, everything is good
         stall_robot_pos = await api.current_position_ot3(MOUNT, refresh=True)
         stall_encoder_pos = await api.encoder_current_position_ot3(MOUNT, refresh=True)
-        print(f"Stalled robot position: {stall_robot_pos[OT3Axis.Y]}\n")
-        print(f"Stalled encoder position: {stall_encoder_pos[OT3Axis.Y]}\n")
+        print(f"Stalled robot position: {stall_robot_pos[OT3Axis.Z_R]}\n")
+        print(f"Stalled encoder position: {stall_encoder_pos[OT3Axis.Z_R]}\n")
         # 3 await asyncio.sleep(1) ### --> if this is the only one commented out, everything is good
 
         # MOVE_POS = Point(227.826, 362.808, 250.0) #Point(235.414, 385.308, 509.15)
         # FIXTURE_POS = Point(227.826, 362.808, 44.61) #Point(235.414, 385.308, 303.965)
 
         # await api.move_to(MOUNT, Point(257.826, 362.808, 52.61)) #, speed = 50)
-        # await api.move_to(MOUNT, Point(177.926, 287.408, 151.0)) #, speed = 50) ### Z-Axis
-        # await api.move_to(MOUNT, Point(177.926, 362.208, 151.0)) #, speed = 50) ### Z-Axis
-        # await api.move_to(MOUNT, Point(226.526, 362.208, 151.0)) #, speed = 50) ### Z-Axis
-        await api.move_to(MOUNT, Point(236.218, 31.231, 371.859)) #, speed = 50) ### Y-Axis
-        await api.move_to(MOUNT, Point(236.218, 61.227, 371.859)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(177.926, 287.408, 151.0)) #, speed = 50)
+        await api.move_to(MOUNT, Point(177.926, 362.208, 151.0)) #, speed = 50)
+        await api.move_to(MOUNT, Point(226.526, 362.208, 151.0)) #, speed = 50)
         ### time.sleep(1)
         # await api.move_to(MOUNT, Point(227.826, 362.808, 52.61)) #, speed = 50)
         ### time.sleep(1)
         # pos = await api.current_position_ot3(MOUNT)
         # input(f"Current pos: {pos[OT3Axis.Z_R]}")
         # await api.move_to(MOUNT, Point(227.826, 362.808, 42.61)) #, speed = 50)
-        # await api.move_to(MOUNT, Point(226.526, 362.208, 141.0)) #, speed = 50) ### Z-Axis
-        await api.move_to(MOUNT, Point(236.218, 71.227, 371.859)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(226.526, 362.208, 141.0)) #, speed = 50)
         ### time.sleep(1)
         # pos = await api.current_position_ot3(MOUNT)
         # input(f"Current pos: {pos[OT3Axis.Z_R]}")
@@ -197,8 +186,8 @@ async def _main(is_simulating: bool) -> None:
         updated_robot_pos = await api.current_position_ot3(MOUNT, refresh=True)
         updated_encoder_pos = await api.encoder_current_position_ot3(MOUNT, refresh=True)
         print(f"Stall Dial Reading (mm) = {stall_reading}\n")
-        print(f"Updated robot position: {updated_robot_pos[OT3Axis.Y]}\n")
-        print(f"Updated encoder position: {updated_encoder_pos[OT3Axis.Y]}\n")
+        print(f"Updated robot position: {updated_robot_pos[OT3Axis.Z_R]}\n")
+        print(f"Updated encoder position: {updated_encoder_pos[OT3Axis.Z_R]}\n")
         await asyncio.sleep(1)
 
         reading_diff = init_reading - stall_reading
@@ -208,12 +197,11 @@ async def _main(is_simulating: bool) -> None:
             test_robot = ""
             test_tag = ""
 
-        cycle_data = [cycle+1, test_robot, test_tag, init_reading, stall_reading, reading_diff, init_encoder_pos[OT3Axis.Y], updated_encoder_pos[OT3Axis.Y]]
+        cycle_data = [cycle+1, test_robot, test_tag, init_reading, stall_reading, reading_diff, init_encoder_pos[OT3Axis.Z_R], updated_encoder_pos[OT3Axis.Z_R]]
         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
         data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
 
-        # await api.move_to(MOUNT, Point(226.526, 362.208, 151.0)) ### Z-Axis
-        await api.move_to(MOUNT, Point(236.218, 61.227, 371.859)) ### Y-Axis
+        await api.move_to(MOUNT, Point(226.526, 362.208, 151.0))
         await api.move_to(MOUNT, Point(485.0, 386.0, 151.0))
         # await api.move_to(MOUNT, Point(485.0, 386.0, 225.0))
 
