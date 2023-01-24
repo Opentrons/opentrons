@@ -17,14 +17,14 @@ def test_gripper_definition() -> None:
 
 
 def test_gripper_definition_type() -> None:
-    assert GripperDefinition(**GRIPPER_DEF, schema_version=1)
+    assert GripperDefinition.parse_obj(GRIPPER_DEF)
 
     # missing key
     del GRIPPER_DEF["geometry"]
     with pytest.raises(ValidationError):
-        assert GripperDefinition(**GRIPPER_DEF, schema_version=1)
+        assert GripperDefinition.parse_obj(GRIPPER_DEF)
 
     # no missing key but with incorrect value
     GRIPPER_DEF["ZMotorConfigurations"] = {"idle": 2.0, "run": "1.0"}
     with pytest.raises(ValidationError):
-        assert GripperDefinition(**GRIPPER_DEF, schema_version=1)
+        assert GripperDefinition.parse_obj(GRIPPER_DEF)
