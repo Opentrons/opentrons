@@ -19,6 +19,7 @@ class GripperModel(Enum):
     v1 = 1
 
     def __repr__(self) -> str:
+        """Model name."""
         return self.name
 
 

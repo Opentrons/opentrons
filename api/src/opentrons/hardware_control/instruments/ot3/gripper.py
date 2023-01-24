@@ -26,7 +26,6 @@ from opentrons_shared_data.gripper import (
     GripperDefinition,
     GripForceProfile,
     Geometry,
-    GripperModel,
 )
 
 RECONFIG_KEYS = {"quirks"}
