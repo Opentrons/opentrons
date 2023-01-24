@@ -7,13 +7,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import (
-    DeckSlotName,
-    Location,
-    Mount,
-    MountType,
-    Point,
-)
+from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
