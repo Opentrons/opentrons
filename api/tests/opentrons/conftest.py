@@ -633,7 +633,7 @@ def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LegacyLabwareCore:
 @pytest.fixture()
 def min_lw(min_lw_impl: LegacyLabwareCore) -> Labware:
     return Labware(
-        implementation=min_lw_impl,
+        core=min_lw_impl,
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -643,7 +643,7 @@ def min_lw(min_lw_impl: LegacyLabwareCore) -> Labware:
 @pytest.fixture()
 def min_lw2(min_lw2_impl: LegacyLabwareCore) -> Labware:
     return Labware(
-        implementation=min_lw2_impl,
+        core=min_lw2_impl,
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
