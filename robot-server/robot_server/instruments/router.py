@@ -48,7 +48,6 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     return Gripper.construct(
         mount=MountType.EXTENSION.as_string(),
-        instrumentName=gripper_dict["name"],
         instrumentModel=gripper_dict["model"],
         serialNumber=gripper_dict["gripper_id"],
         data=GripperData(
