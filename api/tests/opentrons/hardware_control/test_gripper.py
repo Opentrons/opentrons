@@ -5,7 +5,7 @@ from opentrons.types import Point
 from opentrons.hardware_control.instruments.ot3 import gripper
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import gripper_config
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
+from opentrons_shared_data.gripper import GripperModel
 
 fake_gripper_conf = gripper_config.load(GripperModel.v1)
 

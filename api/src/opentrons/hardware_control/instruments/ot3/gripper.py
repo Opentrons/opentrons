@@ -26,6 +26,7 @@ from opentrons_shared_data.gripper import (
     GripperDefinition,
     GripForceProfile,
     Geometry,
+    GripperModel,
 )
 
 RECONFIG_KEYS = {"quirks"}
@@ -143,7 +144,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     @property
     def model(self) -> str:
-        return self._model.value
+        return repr(self._model)
 
     @property
     def gripper_id(self) -> str:
