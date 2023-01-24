@@ -262,7 +262,7 @@ def bundle_from_sim(
             isinstance(lw, opentrons.protocol_api.labware.Labware)
             and lw.uri not in bundled_labware
         ):
-            bundled_labware[lw.uri] = lw._implementation.get_definition()
+            bundled_labware[lw.uri] = lw._core.get_definition()
 
     return BundleContents(
         protocol.text,

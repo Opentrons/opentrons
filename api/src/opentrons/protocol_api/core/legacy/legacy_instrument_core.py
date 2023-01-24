@@ -18,11 +18,11 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from .well import WellImplementation
+from .legacy_well_core import LegacyWellCore
 from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContextImplementation
+    from .legacy_protocol_core import LegacyProtocolCore
 
 
 _log = logging.getLogger()
@@ -31,12 +31,12 @@ _PRE_2_2_TIP_DROP_HEIGHT_MM = 10
 """In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
-class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
+class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     """Implementation of the InstrumentContext interface."""
 
     def __init__(
         self,
-        protocol_interface: ProtocolContextImplementation,
+        protocol_interface: LegacyProtocolCore,
         mount: types.Mount,
         instrument_name: str,
         default_speed: float,
@@ -62,7 +62,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def aspirate(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
@@ -101,7 +101,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def dispense(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
@@ -121,7 +121,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def blow_out(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         move_to_well: bool,
     ) -> None:
         """Blow liquid out of the tip.
@@ -138,7 +138,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def touch_tip(
         self,
         location: types.Location,
-        well_core: WellImplementation,
+        well_core: LegacyWellCore,
         radius: float,
         v_offset: float,
         speed: float,
@@ -149,7 +149,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         """
         # TODO al 20201110 - build_edges relies on where being a Well. This is
         #  an unpleasant compromise until refactoring build_edges to support
-        #  WellImplementation.
+        #  LegacyWellCore.
         #  Also, build_edges should not require api_version.
         from opentrons.protocol_api.labware import Labware, Well
 
@@ -158,12 +158,12 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         edges = build_edges(
             where=Well(
                 parent=Labware(
-                    implementation=well_core.geometry.parent,
+                    core=well_core.geometry.parent,
                     api_version=self._api_version,
                     protocol_core=None,  # type: ignore[arg-type]
                     core_map=None,  # type: ignore[arg-type]
                 ),
-                well_implementation=well_core,
+                core=well_core,
                 api_version=self._api_version,
             ),
             offset=v_offset,
@@ -178,7 +178,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def pick_up_tip(
         self,
         location: types.Location,
-        well_core: WellImplementation,
+        well_core: LegacyWellCore,
         presses: Optional[int],
         increment: Optional[float],
         prep_after: bool = True,
@@ -205,7 +205,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def drop_tip(
         self,
         location: Optional[types.Location],
-        well_core: WellImplementation,
+        well_core: LegacyWellCore,
         home_after: bool,
     ) -> None:
         """Move to and drop a tip into a given well.
@@ -222,16 +222,12 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
             from opentrons.protocol_api.labware import Labware, Well
 
             labware = Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._api_version,
                 protocol_core=None,  # type: ignore[arg-type]
                 core_map=None,  # type: ignore[arg-type]
             )
-            well = Well(
-                parent=labware,
-                well_implementation=well_core,
-                api_version=self._api_version,
-            )
+            well = Well(parent=labware, core=well_core, api_version=self._api_version)
 
             if LabwareLike(labware).is_fixed_trash():
                 location = well.top()
@@ -281,7 +277,7 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation] = None,
+        well_core: Optional[LegacyWellCore] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,

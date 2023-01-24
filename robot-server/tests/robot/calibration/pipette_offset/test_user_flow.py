@@ -604,9 +604,7 @@ async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
     )
 
     await uf.save_offset()
-    tiprack_hash = helpers.hash_labware_def(
-        uf._tip_rack._implementation.get_definition()
-    )
+    tiprack_hash = helpers.hash_labware_def(uf._tip_rack._core.get_definition())
     offset = uf._cal_ref_point - Point(x=10, y=10, z=40)
     mock_save_pipette.assert_called_with(
         offset=offset,

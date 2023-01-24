@@ -5,9 +5,9 @@ from opentrons.types import Point
 from opentrons.hardware_control.instruments.ot3 import gripper
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import gripper_config
-from opentrons_shared_data.gripper.dev_types import GripperModel
+from opentrons_shared_data.gripper import GripperModel
 
-fake_gripper_conf = gripper_config.load(GripperModel.V1)
+fake_gripper_conf = gripper_config.load(GripperModel.v1)
 
 
 @pytest.mark.ot3_only
@@ -18,18 +18,6 @@ def fake_offset():
     )
 
     return load_gripper_calibration_offset("fakeid123")
-
-
-@pytest.mark.ot3_only
-def test_config_update(fake_offset):
-    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
-    config_to_update = {"z_idle_current": 1.0, "jaw_reference_voltage": 0.5}
-    for k, v in config_to_update.items():
-        gripr.update_config_item(k, v)
-    assert gripr.config.z_idle_current == config_to_update["z_idle_current"]
-    assert (
-        gripr.config.jaw_reference_voltage == config_to_update["jaw_reference_voltage"]
-    )
 
 
 @pytest.mark.ot3_only

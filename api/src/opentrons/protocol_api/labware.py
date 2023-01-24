@@ -34,10 +34,10 @@ from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
-from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
-from .core.protocol_api.well import WellImplementation as LegacyWellCore
-from .core.protocol_api.well_geometry import WellGeometry
+from .core.legacy.legacy_well_core import LegacyWellCore as LegacyWellCore
+from .core.legacy.well_geometry import WellGeometry
 
 
 if TYPE_CHECKING:
@@ -72,14 +72,12 @@ class Well:
     such as :py:meth:`top`, :py:meth:`bottom`
     """
 
-    def __init__(
-        self, parent: Labware, well_implementation: WellCore, api_version: APIVersion
-    ):
+    def __init__(self, parent: Labware, core: WellCore, api_version: APIVersion):
         if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
             api_version = _IGNORE_API_VERSION_BREAKPOINT
 
         self._parent = parent
-        self._impl = well_implementation
+        self._core = core
         self._api_version = api_version
 
     @property  # type: ignore
@@ -96,7 +94,7 @@ class Well:
     @requires_version(2, 0)
     def has_tip(self) -> bool:
         """If parent labware is a tip rack, whether this well contains a tip."""
-        return self._impl.has_tip()
+        return self._core.has_tip()
 
     @has_tip.setter
     def has_tip(self, value: bool) -> None:
@@ -105,22 +103,22 @@ class Well:
             " and will raise an error in a future version of the Python Protocol API."
         )
 
-        self._impl.set_has_tip(value)
+        self._core.set_has_tip(value)
 
     @property
     def max_volume(self) -> float:
-        return self._impl.get_max_volume()
+        return self._core.get_max_volume()
 
     @property
     def geometry(self) -> WellGeometry:
-        if isinstance(self._impl, LegacyWellCore):
-            return self._impl.geometry
+        if isinstance(self._core, LegacyWellCore):
+            return self._core.geometry
         raise APIVersionError("Well.geometry has been deprecated.")
 
     @property  # type: ignore
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
-        return self._impl.diameter
+        return self._core.diameter
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -129,7 +127,7 @@ class Well:
         The length of a well, if the labware has
         square wells.
         """
-        return self._impl.length
+        return self._core.length
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -138,7 +136,7 @@ class Well:
         The width of a well, if the labware has
         square wells.
         """
-        return self._impl.width
+        return self._core.width
 
     @property  # type: ignore
     @requires_version(2, 9)
@@ -146,16 +144,16 @@ class Well:
         """
         The depth of a well in a labware.
         """
-        return self._impl.depth
+        return self._core.depth
 
     @property
     def display_name(self) -> str:
-        return self._impl.get_display_name()
+        return self._core.get_display_name()
 
     @property  # type: ignore
     @requires_version(2, 7)
     def well_name(self) -> str:
-        return self._impl.get_name()
+        return self._core.get_name()
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
@@ -166,7 +164,7 @@ class Well:
                  front-left corner of slot 1 as (0,0,0)). If z is specified,
                  returns a point offset by z mm from top-center
         """
-        return Location(self._impl.get_top(z_offset=z), self)
+        return Location(self._core.get_top(z_offset=z), self)
 
     @requires_version(2, 0)
     def bottom(self, z: float = 0.0) -> Location:
@@ -177,7 +175,7 @@ class Well:
                  slot 1 as (0,0,0)). If z is specified, returns a point
                  offset by z mm from bottom-center
         """
-        return Location(self._impl.get_bottom(z_offset=z), self)
+        return Location(self._core.get_bottom(z_offset=z), self)
 
     @requires_version(2, 0)
     def center(self) -> Location:
@@ -186,7 +184,7 @@ class Well:
                  of the well relative to the deck (with the front-left corner
                  of slot 1 as (0,0,0))
         """
-        return Location(self._impl.get_center(), self)
+        return Location(self._core.get_center(), self)
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
@@ -209,7 +207,7 @@ class Well:
         :return: a :py:class:`opentrons.types.Point` representing the specified
                  location in absolute deck coordinates
         """
-        return self._impl.from_center_cartesian(x, y, z)
+        return self._core.from_center_cartesian(x, y, z)
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
@@ -222,7 +220,7 @@ class Well:
         return self.from_center_cartesian(x, y, z)
 
     def __repr__(self) -> str:
-        return self._impl.get_display_name()
+        return self._core.get_display_name()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -267,13 +265,13 @@ class Labware:
 
     def __init__(
         self,
-        implementation: AbstractLabware[Any],
+        core: AbstractLabware[Any],
         api_version: APIVersion,
         protocol_core: ProtocolCore,
         core_map: LoadedCoreMap,
     ) -> None:
         """
-        :param implementation: The class that implements the public interface
+        :param core: The class that implements the public interface
                                of the class.
         :param APIVersion api_level: the API version to set for the instance.
                                      The :py:class:`.Labware` will
@@ -285,17 +283,15 @@ class Labware:
             api_version = _IGNORE_API_VERSION_BREAKPOINT
 
         self._api_version = api_version
-        self._implementation: LabwareCore = implementation
+        self._core: LabwareCore = core
         self._protocol_core = protocol_core
         self._core_map = core_map
 
-        well_columns = implementation.get_well_columns()
+        well_columns = core.get_well_columns()
         self._well_grid = well_grid.create(columns=well_columns)
         self._wells_by_name = {
             well_name: Well(
-                parent=self,
-                well_implementation=implementation.get_well_core(well_name),
-                api_version=api_version,
+                parent=self, core=core.get_well_core(well_name), api_version=api_version
             )
             for column in well_columns
             for well_name in column
@@ -324,7 +320,7 @@ class Labware:
 
         :returns: The uri, ``"namespace/loadname/version"``
         """
-        return self._implementation.get_uri()
+        return self._core.get_uri()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -339,15 +335,13 @@ class Labware:
             Return type for module parent changed to :py:class:`ModuleContext`.
             Prior to this version, an internal geometry interface is returned.
         """
-        if isinstance(self._implementation, LegacyLabwareCore):
+        if isinstance(self._core, LegacyLabwareCore):
             # Type ignoring to preserve backwards compatibility
-            return self._implementation.get_geometry().parent.labware.object  # type: ignore
+            return self._core.get_geometry().parent.labware.object  # type: ignore
 
         assert self._protocol_core and self._core_map, "Labware initialized incorrectly"
 
-        labware_location = self._protocol_core.get_labware_location(
-            self._implementation
-        )
+        labware_location = self._protocol_core.get_labware_location(self._core)
 
         if isinstance(labware_location, AbstractModuleCore):
             return self._core_map.get(labware_location)
@@ -359,37 +353,37 @@ class Labware:
     def name(self) -> str:
         """Can either be the canonical name of the labware, which is used to
         load it, or the label of the labware specified by a user."""
-        return self._implementation.get_name()
+        return self._core.get_name()
 
     # TODO(jbl, 2022-12-06): deprecate officially when there is a PAPI version for the engine core
     @name.setter
     def name(self, new_name: str) -> None:
         """Set the labware name"""
-        self._implementation.set_name(new_name)
+        self._core.set_name(new_name)
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def load_name(self) -> str:
         """The API load name of the labware definition"""
-        return self._implementation.load_name
+        return self._core.load_name
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def parameters(self) -> "LabwareParameters":
         """Internal properties of a labware including type and quirks"""
-        return self._implementation.get_parameters()
+        return self._core.get_parameters()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def quirks(self) -> List[str]:
         """Quirks specific to this labware."""
-        return self._implementation.get_quirks()
+        return self._core.get_quirks()
 
-    # TODO(mc, 2022-09-23): use `self._implementation.get_default_magnet_engage_height`
+    # TODO(mc, 2022-09-23): use `self._core.get_default_magnet_engage_height`
     @property  # type: ignore
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
-        p = self._implementation.get_parameters()
+        p = self._core.get_parameters()
         if not p["isMagneticModuleCompatible"]:
             return None
         else:
@@ -399,7 +393,7 @@ class Labware:
         """
         Called by save calibration in order to update the offset on the object.
         """
-        self._implementation.set_calibration(delta)
+        self._core.set_calibration(delta)
 
     @requires_version(2, 12)
     def set_offset(self, x: float, y: float, z: float) -> None:
@@ -421,12 +415,12 @@ class Labware:
             at the same time will produce undefined behavior. We may choose
             to define this behavior in a future release.
         """
-        self._implementation.set_calibration(Point(x=x, y=y, z=z))
+        self._core.set_calibration(Point(x=x, y=y, z=z))
 
     @property  # type: ignore
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
-        return self._implementation.get_calibrated_offset()
+        return self._core.get_calibrated_offset()
 
     @requires_version(2, 0)
     def well(self, idx: Union[int, str]) -> Well:
@@ -634,12 +628,12 @@ class Labware:
         This is drawn from the 'dimensions'/'zDimension' elements of the
         labware definition and takes into account the calibration offset.
         """
-        return self._implementation.highest_z
+        return self._core.highest_z
 
     @property
     def _is_tiprack(self) -> bool:
         """as is_tiprack but not subject to version checking for speed"""
-        return self._implementation.is_tip_rack()
+        return self._core.is_tip_rack()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -649,12 +643,12 @@ class Labware:
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def tip_length(self) -> float:
-        return self._implementation.get_tip_length()
+        return self._core.get_tip_length()
 
     # TODO(jbl, 2022-12-06): deprecate officially when there is a PAPI version for the engine core
     @tip_length.setter
     def tip_length(self, length: float) -> None:
-        self._implementation.set_tip_length(length)
+        self._core.set_tip_length(length)
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
@@ -676,9 +670,9 @@ class Labware:
         """
         assert num_tips > 0, f"num_tips must be positive integer, but got {num_tips}"
 
-        well_name = self._implementation.get_next_tip(
+        well_name = self._core.get_next_tip(
             num_tips=num_tips,
-            starting_tip=starting_tip._impl if starting_tip else None,
+            starting_tip=starting_tip._core if starting_tip else None,
         )
 
         return self._wells_by_name[well_name] if well_name is not None else None
@@ -708,22 +702,22 @@ class Labware:
 
         fail_if_full = self._api_version < APIVersion(2, 2)
 
-        self._implementation.get_tip_tracker().use_tips(
-            start_well=start_well._impl,
+        self._core.get_tip_tracker().use_tips(
+            start_well=start_well._core,
             num_channels=num_channels,
             fail_if_full=fail_if_full,
         )
 
     def __repr__(self) -> str:
-        return self._implementation.get_display_name()
+        return self._core.get_display_name()
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Labware):
             return NotImplemented
-        return self._implementation == other._implementation
+        return self._core == other._core
 
     def __hash__(self) -> int:
-        return hash((self._implementation, self._api_version))
+        return hash((self._core, self._api_version))
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
@@ -740,9 +734,7 @@ class Labware:
         """
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-        well_core = self._implementation.get_tip_tracker().previous_tip(
-            num_tips=num_tips
-        )
+        well_core = self._core.get_tip_tracker().previous_tip(num_tips=num_tips)
         return self._wells_by_name[well_core.get_name()] if well_core else None
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
@@ -769,14 +761,14 @@ class Labware:
         """
         # This logic is the inverse of :py:meth:`use_tips`
         assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
-        self._implementation.get_tip_tracker().return_tips(
-            start_well=start_well._impl, num_channels=num_channels
+        self._core.get_tip_tracker().return_tips(
+            start_well=start_well._core, num_channels=num_channels
         )
 
     @requires_version(2, 0)
     def reset(self) -> None:
         """Reset all tips in a tiprack."""
-        self._implementation.reset_tips()
+        self._core.reset_tips()
 
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
@@ -862,7 +854,7 @@ def load_from_definition(
                       defaults to ``MAX_SUPPORTED_VERSION``.
     """
     return Labware(
-        implementation=LegacyLabwareCore(
+        core=LegacyLabwareCore(
             definition=definition,
             parent=parent,
             label=label,
