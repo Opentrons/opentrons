@@ -495,7 +495,6 @@ def test_get_well_edges(
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
-    well_location = WellLocation(offset=WellOffset(x=7, y=8, z=-9))
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
@@ -509,22 +508,23 @@ def test_get_well_edges(
         well_def
     )
 
-    result = subject.get_well_edges("labware-id", "B2", well_location)
+    result = subject.get_well_edges("labware-id", "B2", radius=0.5, offset=1.0)
 
     expected_center = Point(
-        x=slot_pos[0] + 1 + well_def.x + 7,
-        y=slot_pos[1] - 2 + well_def.y + 8,
-        z=slot_pos[2] + 3 + well_def.z - 9 + well_def.depth,
+        x=slot_pos[0] + 1 + well_def.x,
+        y=slot_pos[1] - 2 + well_def.y,
+        z=slot_pos[2] + 3 + well_def.z + well_def.depth / 2.0,
     )
     assert well_def.diameter is not None
-    offset = well_def.diameter / 2.0
+    expected_xy_offset = well_def.diameter / 4.0
+    expected_z_offset = well_def.depth / 2.0 + 1
 
     assert result == [
-        expected_center + Point(x=offset, y=0, z=0),
-        expected_center + Point(x=-offset, y=0, z=0),
-        expected_center,
-        expected_center + Point(x=0, y=offset, z=0),
-        expected_center + Point(x=0, y=-offset, z=0),
+        expected_center + Point(x=expected_xy_offset, y=0, z=expected_z_offset),
+        expected_center + Point(x=-expected_xy_offset, y=0, z=expected_z_offset),
+        expected_center + Point(x=0, y=0, z=expected_z_offset),
+        expected_center + Point(x=0, y=expected_xy_offset, z=expected_z_offset),
+        expected_center + Point(x=0, y=-expected_xy_offset, z=expected_z_offset),
     ]
 
 

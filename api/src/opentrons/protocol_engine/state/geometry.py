@@ -210,7 +210,8 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
-        well_location: WellLocation,
+        radius: float = 1.0,
+        offset: float = -1.0,
     ) -> List[Point]:
         """Get list of absolute positions of four cardinal edges and center of well."""
         well_def = self._labware.get_well_definition(labware_id, well_name)
@@ -224,19 +225,24 @@ class GeometryView:
         elif well_def.shape == "circular":
             x_size = y_size = well_def.diameter
             if x_size is None or y_size is None:
-                raise ValueError(f"Circular well {well_name} does not have diamater")
+                raise ValueError(f"Circular well {well_name} does not have diameter")
         else:
             raise ValueError(f'Shape "{well_def.shape}" is not a supported well shape')
 
-        x_offset = x_size / 2.0
-        y_offset = y_size / 2.0
-        center = self.get_well_position(labware_id, well_name, well_location)
+        x_offset = x_size / 2.0 * radius
+        y_offset = y_size / 2.0 * radius
+        z_offset = well_def.depth / 2.0 + offset
+
+        center = self.get_well_position(
+            labware_id, well_name, well_location=WellLocation(origin=WellOrigin.CENTER)
+        )
+
         return [
-            center + Point(x=x_offset, y=0, z=0),  # right
-            center + Point(x=-x_offset, y=0, z=0),  # left
-            center,  # center
-            center + Point(x=0, y=y_offset, z=0),  # up
-            center + Point(x=0, y=-y_offset, z=0),  # down
+            center + Point(x=x_offset, y=0, z=z_offset),  # right
+            center + Point(x=-x_offset, y=0, z=z_offset),  # left
+            center + Point(x=0, y=0, z=z_offset),  # center
+            center + Point(x=0, y=y_offset, z=z_offset),  # up
+            center + Point(x=0, y=-y_offset, z=z_offset),  # down
         ]
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
