@@ -6,9 +6,7 @@
     "schemaVersion": {
       "title": "Schemaversion",
       "description": "Which schema version a gripper is using",
-      "enum": [
-        1
-      ],
+      "enum": [1],
       "type": "integer"
     },
     "displayName": {
@@ -45,9 +43,7 @@
     "GripperModel": {
       "title": "GripperModel",
       "description": "Gripper models.",
-      "enum": [
-        "v1"
-      ]
+      "enum": ["v1"]
     },
     "Geometry": {
       "title": "Geometry",
@@ -150,10 +146,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "idle",
-        "run"
-      ]
+      "required": ["idle", "run"]
     },
     "JawMotorConfigurations": {
       "title": "JawMotorConfigurations",
@@ -168,9 +161,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "vref"
-      ]
+      "required": ["vref"]
     },
     "GripForceProfile": {
       "title": "GripForceProfile",
