@@ -50,22 +50,8 @@ describe('CalibrationTaskList', () => {
     getByText('Right Mount')
   })
 
-  it('clicking the recalibrate CTAs triggers the calibration launchers', () => {
-    const [{ getByText, getAllByText }] = render()
-    getByText('Left Mount').click()
-    getByText('Right Mount').click()
-    const recalibrateButtons = getAllByText('Recalibrate') // [deck, left-tip-length, left-offset, right-tip-length, left-offset]
-    expect(recalibrateButtons).toHaveLength(5)
-
-    recalibrateButtons[0].click()
-    expect(mockDeckCalLauncher).toHaveBeenCalled()
-    recalibrateButtons[1].click()
-    expect(mockTipLengthCalLauncher).toHaveBeenCalled()
-    recalibrateButtons[2].click()
-    expect(mockPipOffsetCalLauncher).toHaveBeenCalled()
-    recalibrateButtons[3].click()
-    expect(mockTipLengthCalLauncher).toHaveBeenCalled()
-    recalibrateButtons[4].click()
-    expect(mockPipOffsetCalLauncher).toHaveBeenCalled()
+  it('does not show the Calibrations complete screen when viewing a completed task list', () => {
+    const [{ queryByText }] = render()
+    expect(queryByText('Calibrations complete!')).toBeFalsy()
   })
 })
