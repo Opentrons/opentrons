@@ -934,7 +934,9 @@ class OT3Controller:
         response = await get_device_info(self._messenger, self._present_nodes)
         self._handle_device_info_response(response)
 
-    def _handle_device_info_response(self, network_info: Dict[NodeId, DeviceInfoCache]) -> None:
+    def _handle_device_info_response(
+        self, network_info: Dict[NodeId, DeviceInfoCache]
+    ) -> None:
         subsystem_info_cache = {}
         for node, device_info in network_info.items():
             old_device_info = self._subsystem_info_cache.get(node)
