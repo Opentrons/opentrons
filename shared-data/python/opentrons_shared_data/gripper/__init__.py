@@ -9,7 +9,11 @@ from .gripper_definition import (
     GripperDefinition,
     GripperSchema,
     GripperSchemaVersion,
+    GripForceProfile,
+    JawMotorConfigurations,
+    ZMotorConfigurations,
     GripperModel,
+    Geometry,
 )
 
 
@@ -17,6 +21,12 @@ class InvalidGripperDefinition(Exception):
     """Incorrect gripper definition."""
 
     pass
+
+
+def generate_schema() -> str:
+    raw_json_schema = GripperDefinition.schema_json()
+    schema_as_dict = json.loads(raw_json_schema)
+    return json.dumps(schema_as_dict, indent=2)
 
 
 def load_schema(version: Literal[1]) -> GripperSchema:
@@ -42,3 +52,16 @@ def load_definition(
         raise InvalidGripperDefinition(
             f"Gripper model {model} definition in schema version {version} does not exist."
         )
+
+
+__all__ = [
+    "GripperDefinition",
+    "GripperSchema",
+    "GripperSchemaVersion",
+    "GripForceProfile",
+    "JawMotorConfigurations",
+    "ZMotorConfigurations",
+    "GripperModel",
+    "Geometry",
+    "generate_schema",
+]

@@ -13,7 +13,7 @@ def _snake_to_camel_case(snake: str) -> str:
     )
 
 
-class GripperModel(str, Enum):
+class GripperModel(Enum):
     """Gripper models."""
 
     v1 = "v1"
