@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 opentrons = { editable = true, path = "../api" }
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+robot-server = {path = "../robot-server", editable = true}
+notify-server = { editable = true, path = "../notify-server" }
 fastapi = "==0.68.1"
 uvicorn = "==0.14.0"
 typing-extensions = ">=4.0.0,<5"
