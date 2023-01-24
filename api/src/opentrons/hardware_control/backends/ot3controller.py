@@ -28,6 +28,7 @@ from .ot3utils import (
     axis_to_node,
     get_current_settings,
     create_home_group,
+    node_id_to_subsystem,
     node_to_axis,
     sub_system_to_node_id,
     sensor_node_for_mount,
@@ -74,7 +75,11 @@ from opentrons_hardware.firmware_bindings.constants import (
 )
 from opentrons_hardware import firmware_update
 from opentrons_hardware.firmware_update.device_info import get_device_info
-from opentrons_hardware.firmware_update.firmware_manifest import load_firmware_manifest
+from opentrons_hardware.firmware_update.firmware_manifest import (
+    FirmwareUpdateType,
+    UpdateInfo,
+    load_firmware_manifest,
+)
 from opentrons_hardware.firmware_update.errors import FirmwareUpdateRequired
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -157,8 +162,6 @@ class OT3Controller:
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
-        self._subsystem_info_cache: dict[NodeId, DeviceInfoCache] = {}
-        self._update_required = False
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -169,21 +172,20 @@ class OT3Controller:
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
-        # load the firmware info from the manifest
+        # firmware update variables
+        self._update_required = False
+        self._subsystem_info_cache: dict[NodeId, DeviceInfoCache] = {}
+        self._firmware_update_list: Dict[DeviceInfoCache, UpdateInfo] = {}
         self._known_firmware = load_firmware_manifest()
-        log.info(self._known_firmware)
 
     @property
     def fw_version(self) -> Optional[str]:
         """Get the firmware version."""
-        return None
+        return self._subsystem_info_cache
 
     @property
     def update_required(self):
         return self._update_required
-
-    def check_firmware_updates(self) -> None:
-        pass
 
     def requires_update(function: callable):
         """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
@@ -195,9 +197,47 @@ class OT3Controller:
 
         return wrapper
 
+    def get_update_type(self, node_id: NodeId) -> FirmwareUpdateType:
+        if "pipette" in node_id.name:
+            # TODO check model number here
+            pass
+        return FirmwareUpdateType.from_string(node_id.name)
+
+    def check_firmware_updates(
+        self, update: bool = False
+    ) -> Dict[DeviceInfoCache, UpdateInfo]:
+        """Returns a dict of NodeIds that require a firmware update."""
+        firmware_update_list = dict()
+        for node, version_cache in self._subsystem_info_cache.items():
+            update_type = self.get_update_type(node)
+            update_info = self._known_firmware.get(update_type)
+            if not update_info:
+                log.warning(f"No firmware update found for {node}")
+                continue
+            # TODO: BEWARE! the shortsha we get from devices is short one character.
+            if version_cache.shortsha != update_info.shortsha:
+                log.debug(
+                    f"Subsystem {node} requires an update '{version_cache.shortsha} != {update_info.shortsha}'"
+                )
+                self._update_required = (
+                    True  # TODO need to unset this after updates are done.
+                )
+                firmware_update_list[version_cache] = update_info
+        return firmware_update_list
+
+    async def do_firmware_updates(self) -> None:
+        """Update all the firmware."""
+        firmware_update_list = self.check_firmware_updates()
+        async for device_info, update_info in firmware_update_list.items():
+            subsystem = node_id_to_subsystem(device_info.node_id)
+            log.info(
+                f"starting firmware update for {subsystem} {device_info.version} -> {update_info.version}"
+            )
+            await self.update_firmware(update_info.filepath, subsystem)
+
     @requires_update
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
-        """Update the firmware."""
+        """Update the firmware for a single subsystem."""
         with open(filename, "r") as f:
             await firmware_update.run_update(
                 messenger=self._messenger,

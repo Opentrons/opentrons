@@ -54,6 +54,15 @@ PipetteAction = Literal["pick_up", "drop"]
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
 
+SubsystemToNodeId = {
+    OT3SubSystem.gantry_x: NodeId.gantry_x,
+    OT3SubSystem.gantry_y: NodeId.gantry_y,
+    OT3SubSystem.head: NodeId.head,
+    OT3SubSystem.pipette_left: NodeId.pipette_left,
+    OT3SubSystem.pipette_right: NodeId.pipette_right,
+    OT3SubSystem.gripper: NodeId.gripper,
+}
+
 
 def axis_nodes() -> List["NodeId"]:
     return [
@@ -141,15 +150,15 @@ def axis_is_node(axis: OT3Axis) -> bool:
 
 def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
     """Convert a sub system to a NodeId."""
-    nam = {
-        OT3SubSystem.gantry_x: NodeId.gantry_x,
-        OT3SubSystem.gantry_y: NodeId.gantry_y,
-        OT3SubSystem.head: NodeId.head,
-        OT3SubSystem.pipette_left: NodeId.pipette_left,
-        OT3SubSystem.pipette_right: NodeId.pipette_right,
-        OT3SubSystem.gripper: NodeId.gripper,
+    return SubsystemToNodeId[sub_sys]
+
+
+def node_id_to_subsystem(node_id: NodeId) -> "OT3Subsystem":
+    """Convert a NodeId to a Subsystem"""
+    node_to_subsystem = {
+        node_id: subsystem for node_id, subsystem in SubsystemToNodeId.items()
     }
-    return nam[sub_sys]
+    return node_to_subsystem[node_id]
 
 
 def get_current_settings(

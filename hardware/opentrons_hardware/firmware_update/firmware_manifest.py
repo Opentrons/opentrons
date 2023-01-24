@@ -35,6 +35,8 @@ class FirmwareUpdateType(Enum):
         sanitized_name = name.replace("-", "_")
         return cls.__members__.get(sanitized_name)
 
+    def from_model(cls, model: str) -> "FirmwareUpdateType":
+        return cls.__members__.get('head')  # TODO: static for now
 
 @dataclass
 class UpdateInfo:
@@ -56,7 +58,7 @@ class UpdateInfo:
 
 def load_firmware_manifest(
     firmware_manifest: str = None,
-) -> Dict[FirmwareUpdateType, Dict]:
+) -> Dict[FirmwareUpdateType, UpdateInfo]:
     """Loads the opentrons firmware of the"""
     opentrons_firmware = firmware_manifest or _FIRMWARE_MANIFEST_PATH
     if not os.path.exists(opentrons_firmware):
