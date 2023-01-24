@@ -346,7 +346,7 @@ class LegacyProtocolCore(
         if isinstance(trash, LegacyLabwareCore):
             return trash
         if isinstance(trash, Labware):
-            return cast(LegacyLabwareCore, trash._implementation)
+            return cast(LegacyLabwareCore, trash._core)
 
         raise RuntimeError("Robot must have a trash container in 12")
 
@@ -394,11 +394,7 @@ class LegacyProtocolCore(
     ) -> Optional[LegacyLabwareCore]:
         """Get the item on top of a given module, if any."""
         labware = module_core.geometry.labware
-        return (
-            cast(LegacyLabwareCore, labware._implementation)
-            if labware is not None
-            else None
-        )
+        return cast(LegacyLabwareCore, labware._core) if labware is not None else None
 
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""

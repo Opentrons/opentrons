@@ -370,7 +370,7 @@ async def test_probing(
             ),
             "P1KSV33hello",
             "GRPV0fake_serial",
-            "gripper",
+            "Gripper V1",
         ),
     ],
 )
@@ -395,7 +395,7 @@ async def test_get_attached_instruments(
     assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == pipette_id
     assert detected[OT3Mount.GRIPPER]["id"] == gripper_id
-    assert detected[OT3Mount.GRIPPER]["config"].name == gripper_name
+    assert detected[OT3Mount.GRIPPER]["config"].display_name == gripper_name
 
 
 async def test_get_attached_instruments_handles_unknown_name(
@@ -476,7 +476,7 @@ def test_nodeid_filter_probed_core():
 
 
 async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
-    await controller.gripper_home_jaw()
+    await controller.gripper_home_jaw(25)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:

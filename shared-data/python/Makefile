@@ -124,3 +124,11 @@ deploy: wheel
 .PHONY: test
 test:
 	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+
+
+.PHONY: generate-schema
+generate-schema:
+	$(python) -c "from opentrons_shared_data.$(target) import generate_schema; print(generate_schema())" > ../${target}/schemas/${version}.json
+
+%-schema:
+	$(MAKE) generate-schema target=$*
