@@ -16,7 +16,7 @@ from opentrons_shared_data.pipette.dev_types import (
     ChannelCount,
 )
 from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
-from opentrons_shared_data.gripper.gripper_definition import (
+from opentrons_shared_data.gripper import (
     GripperModel,
     GripperDefinition,
 )

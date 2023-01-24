@@ -1,8 +1,8 @@
 from __future__ import annotations
 import logging
 
-from opentrons_shared_data.gripper import load_definition
-from opentrons_shared_data.gripper.gripper_definition import (
+from opentrons_shared_data.gripper import (
+    load_definition,
     GripperModel,
     GripperDefinition,
     GripForceProfile,

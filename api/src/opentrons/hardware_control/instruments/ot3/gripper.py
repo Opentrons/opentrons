@@ -22,9 +22,10 @@ from .instrument_calibration import (
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 
-from opentrons_shared_data.gripper.gripper_definition import (
+from opentrons_shared_data.gripper import (
     GripperDefinition,
-    GripperModel,
+    GripForceProfile,
+    Geometry,
 )
 
 RECONFIG_KEYS = {"quirks"}
@@ -49,19 +50,19 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._config = config
         self._model = config.model
 
-        geometry = self._config.geometry
-        base_offset = Point(*geometry.base_offset_from_mount)
+        self._geometry = self._config.geometry
+        base_offset = Point(*self._geometry.base_offset_from_mount)
         self._jaw_center_offset = (
-            Point(*geometry.jaw_center_offset_from_base) + base_offset
+            Point(*self._geometry.jaw_center_offset_from_base) + base_offset
         )
         #: the distance between the gripper mount and the jaw center at home
         self._front_calibration_pin_offset = (
-            Point(*geometry.pin_one_offset_from_base) + base_offset
+            Point(*self._geometry.pin_one_offset_from_base) + base_offset
         )
         #: the distance between the gripper mount and the front calibration pin
         #: at home
         self._rear_calibration_pin_offset = (
-            Point(*geometry.pin_two_offset_from_base) + base_offset
+            Point(*self._geometry.pin_two_offset_from_base) + base_offset
         )
         #: the distance between the gripper mount and the rear calibration pin
         #: at home
@@ -76,6 +77,14 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
+
+    @property
+    def grip_force_profile(self) -> GripForceProfile:
+        return self._config.grip_force_profile
+
+    @property
+    def geometry(self) -> Geometry:
+        return self._geometry
 
     @property
     def attached_probe(self) -> Optional[GripperProbe]:
@@ -107,11 +116,11 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     @property
     def default_grip_force(self) -> float:
-        return self._config.grip_force_profile.default_grip_force
+        return self.grip_force_profile.default_grip_force
 
     @property
     def default_home_force(self) -> float:
-        return self._config.grip_force_profile.default_home_force
+        return self.grip_force_profile.default_home_force
 
     def _max_jaw_displacement(self) -> float:
         geometry = self._config.geometry
@@ -133,8 +142,8 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         raise NotImplementedError("Update config is not supported at this time.")
 
     @property
-    def model(self) -> GripperModel:
-        return self._model
+    def model(self) -> str:
+        return self._model.value
 
     @property
     def gripper_id(self) -> str:
@@ -205,9 +214,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
             raise InvalidMoveError(f"Critical point {cp_override} is not valid")
 
     def duty_cycle_by_force(self, newton: float) -> float:
-        return gripper_config.duty_cycle_by_force(
-            newton, self._config.grip_force_profile
-        )
+        return gripper_config.duty_cycle_by_force(newton, self.grip_force_profile)
 
     def __str__(self) -> str:
         return f"{self._config.display_name}"
