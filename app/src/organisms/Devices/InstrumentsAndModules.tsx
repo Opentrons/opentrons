@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
-import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
+import { useModulesQuery, usePipettesQuery, useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import {
   Flex,
@@ -58,6 +58,10 @@ export function InstrumentsAndModules({
   const isOT3 = useIsOT3(robotName)
   const dispatch = useDispatch<Dispatch>()
 
+  const attachedInstruments = useInstrumentsQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })
+  console.log(attachedInstruments)
   // TODO(BC, 2022-12-05): replace with attachedGripper after RLAB-88 is done
   const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
     model: string
@@ -190,7 +194,7 @@ export function InstrumentsAndModules({
                   pipetteInfo={
                     attachedPipettes.right?.model != null
                       ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                        null
+                      null
                       : null
                   }
                   pipetteOffsetCalibration={rightMountOffsetCalibration}
