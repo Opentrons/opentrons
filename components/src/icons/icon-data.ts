@@ -203,10 +203,6 @@ export const ICON_DATA_BY_NAME = {
     path:
       'M15 16h-2V8h2m-4 8H9V8h2m1-6A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z',
   },
-  'pause-slim': {
-    viewBox: '0 0 32 32',
-    path: 'M11,10H14V22H11V10zM17,10H20V22H17V10z'
-  },
   pen: {
     viewBox: '0 0 24 24',
     path:

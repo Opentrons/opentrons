@@ -89,7 +89,6 @@ const RoundNavLink = styled(NavLink)`
 `
 
 interface RoundTabProps {
-  id: string
   disabled: boolean
   tabDisabledReason?: string
   to: string
@@ -262,14 +261,13 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
   return (
     <>
       <RoundTab
-        id="ProtocolRunDetails_setupTab"
         disabled={disabled}
         tabDisabledReason={tabDisabledReason}
         to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
         tabName={t('setup')}
       />
       {currentRunId !== runId ? (
-        // redirect to run log if not current run
+        // redirect to run preview if not current run
         <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`} />
       ) : null}
     </>
@@ -303,14 +301,13 @@ const ModuleControlsTab = (
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (
     <>
       <RoundTab
-        id="ProtocolRunDetails_moduleControlsTab"
         disabled={disabled}
         tabDisabledReason={tabDisabledReason}
         to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
         tabName={t('module_controls')}
       />
       {disabled ? (
-        // redirect to run log if not current run
+        // redirect to run preview if not current run
         <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`} />
       ) : null}
     </>
@@ -325,7 +322,6 @@ const AnalyzedStepsTab = (props: SetupTabProps): JSX.Element | null => {
 
   return (
     <RoundTab
-      id="ProtocolRunDetails_analyzedStepsTab"
       disabled={robotSideAnalysis == null}
       to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
       tabName={t('run_preview')}

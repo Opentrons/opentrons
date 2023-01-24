@@ -200,7 +200,7 @@ export function ProtocolRunHeader({
   }
 
   const handleClearClick = (): void => {
-    trackProtocolRunEvent({ name: 'runFinish', properties: robotAnalyticsData })
+    trackProtocolRunEvent({ name: 'runFinish', properties: robotAnalyticsData ?? undefined})
     closeCurrentRun()
   }
 
@@ -307,7 +307,7 @@ interface DisplayRunStatusProps {
   runStatus: RunStatus | null
 }
 
-function DisplayRunStatus(props: DisplayRunStatusProps) {
+function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
   const { t } = useTranslation('run_details')
   return (
     <Flex alignItems={ALIGN_CENTER}>
@@ -344,7 +344,7 @@ interface ActionButtonProps {
   runStatus: RunStatus | null
   isProtocolAnalyzing: boolean
 }
-function ActionButton(props: ActionButtonProps) {
+function ActionButton(props: ActionButtonProps): JSX.Element {
   const { runId, robotName, runStatus, isProtocolAnalyzing } = props
   const history = useHistory()
   const { t } = useTranslation('run_details')

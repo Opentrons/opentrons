@@ -70,7 +70,7 @@ function Tick(props: TickProps) {
     moveLabware: 'move_labware',
   }
   const iconByCommandType: { [commandType in RunTimeCommand['commandType']]?: IconName } = {
-    waitForResume: 'pause-slim',
+    waitForResume: 'pause-circle',
     moveLabware:  'move-xy',
   }
   const [targetProps, tooltipProps] = useHoverTooltip()
