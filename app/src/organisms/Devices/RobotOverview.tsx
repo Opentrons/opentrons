@@ -24,6 +24,7 @@ import OT3_PNG from '../../assets/images/OT3.png'
 import { Banner, BannerType } from '../../atoms/Banner'
 import { ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import * as Config from '../../redux/config'
 import { useDispatchApiRequest } from '../../redux/robot-api'
 import { fetchLights } from '../../redux/robot-controls'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
@@ -63,6 +64,10 @@ export function RobotOverview({
     calibrationStatusBannerText = t('robot_calibration:recalibration_recommended')
   }
   const [dispatchRequest] = useDispatchApiRequest()
+
+  const enableCalibrationWizards = Config.useFeatureFlag(
+    'enableCalibrationWizards'
+  )
 
   const robot = useRobot(robotName)
   const robotModel = useSelector((state: State) =>
@@ -151,7 +156,7 @@ export function RobotOverview({
           <RobotOverviewOverflowMenu robot={robot} />
         </Box>
       </Flex>
-      {showCalibrationStatusBanner && (
+      {enableCalibrationWizards && showCalibrationStatusBanner && (
           <Flex
             paddingBottom={SPACING.spacing4}
             flexDirection={DIRECTION_COLUMN}
