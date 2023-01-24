@@ -82,7 +82,7 @@ class ProtocolContext(CommandPublisher):
     def __init__(
         self,
         api_version: APIVersion,
-        implementation: ProtocolCore,
+        core: ProtocolCore,
         broker: Optional[Broker] = None,
         core_map: Optional[LoadedCoreMap] = None,
         deck: Optional[Deck] = None,
@@ -91,7 +91,7 @@ class ProtocolContext(CommandPublisher):
         """Build a :py:class:`.ProtocolContext`.
 
         :param api_version: The API version to use.
-        :param implementation: The protocol implementation core.
+        :param core: The protocol implementation core.
         :param labware_offset_provider: Where this protocol context and its child
                                         module contexts will get labware offsets from.
         :param broker: An optional command broker to link to. If not
@@ -110,9 +110,9 @@ class ProtocolContext(CommandPublisher):
 
         super().__init__(broker)
         self._api_version = api_version
-        self._implementation = implementation
+        self._core = core
         self._core_map = core_map or LoadedCoreMap()
-        self._deck = deck or Deck(protocol_core=implementation, core_map=self._core_map)
+        self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
@@ -143,7 +143,7 @@ class ProtocolContext(CommandPublisher):
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
-        return HardwareManager(hardware=self._implementation.get_hardware())
+        return HardwareManager(hardware=self._core.get_hardware())
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -198,7 +198,7 @@ class ProtocolContext(CommandPublisher):
                 protocol.max_speeds['X'] = None  # reset to default
 
         """
-        return self._implementation.get_max_speeds()
+        return self._core.get_max_speeds()
 
     @requires_version(2, 0)
     def commands(self) -> List[str]:
@@ -230,7 +230,7 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
-        return self._implementation.is_simulating()
+        return self._core.is_simulating()
 
     @requires_version(2, 0)
     def load_labware_from_definition(
@@ -253,7 +253,7 @@ class ProtocolContext(CommandPublisher):
                           as in the run log and the calibration view in the
                           Opentrons app.
         """
-        load_params = self._implementation.add_labware_definition(labware_def)
+        load_params = self._core.add_labware_definition(labware_def)
 
         return self.load_labware(
             load_name=load_params.load_name,
@@ -297,7 +297,7 @@ class ProtocolContext(CommandPublisher):
         load_name = validation.ensure_lowercase_name(load_name)
         deck_slot = validation.ensure_deck_slot(location)
 
-        labware_core = self._implementation.load_labware(
+        labware_core = self._core.load_labware(
             load_name=load_name,
             location=deck_slot,
             label=label,
@@ -306,9 +306,9 @@ class ProtocolContext(CommandPublisher):
         )
 
         labware = Labware(
-            implementation=labware_core,
+            core=labware_core,
             api_version=self._api_version,
-            protocol_core=self._implementation,
+            protocol_core=self._core,
             core_map=self._core_map,
         )
         self._core_map.add(labware_core, labware)
@@ -352,8 +352,7 @@ class ProtocolContext(CommandPublisher):
                   the locations.
         """
         labware_cores = (
-            (core.get_deck_slot(), core)
-            for core in self._implementation.get_labware_cores()
+            (core.get_deck_slot(), core) for core in self._core.get_labware_cores()
         )
 
         return {
@@ -425,8 +424,8 @@ class ProtocolContext(CommandPublisher):
             if drop_offset
             else None
         )
-        self._implementation.move_labware(
-            labware_core=labware._implementation,
+        self._core.move_labware(
+            labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
             use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
@@ -484,7 +483,7 @@ class ProtocolContext(CommandPublisher):
         requested_model = validation.ensure_module_model(module_name)
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
 
-        module_core = self._implementation.load_module(
+        module_core = self._core.load_module(
             model=requested_model,
             deck_slot=deck_slot,
             configuration=configuration,
@@ -492,7 +491,7 @@ class ProtocolContext(CommandPublisher):
 
         module_context = _create_module_context(
             module_core=module_core,
-            protocol_core=self._implementation,
+            protocol_core=self._core,
             core_map=self._core_map,
             broker=self._broker,
             api_version=self._api_version,
@@ -520,7 +519,7 @@ class ProtocolContext(CommandPublisher):
         """
         return {
             core.get_deck_slot().as_int(): self._core_map.get(core)
-            for core in self._implementation.get_module_cores()
+            for core in self._core.get_module_cores()
         }
 
     @requires_version(2, 0)
@@ -556,7 +555,7 @@ class ProtocolContext(CommandPublisher):
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         is_96_channel = instrument_name == "p1000_96"
-        if is_96_channel and isinstance(self._implementation, ProtocolEngineCore):
+        if is_96_channel and isinstance(self._core, ProtocolEngineCore):
             checked_instrument_name = instrument_name
             checked_mount = Mount.LEFT
         else:
@@ -579,7 +578,7 @@ class ProtocolContext(CommandPublisher):
 
         # TODO (tz, 11-22-22): was added to support 96 channel pipette.
         #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
-        instrument_core = self._implementation.load_instrument(
+        instrument_core = self._core.load_instrument(
             instrument_name=checked_instrument_name,  # type: ignore[arg-type]
             mount=checked_mount,
         )
@@ -592,9 +591,9 @@ class ProtocolContext(CommandPublisher):
             )
 
         instrument = InstrumentContext(
+            core=instrument_core,
+            protocol_core=self._core,
             broker=self._broker,
-            implementation=instrument_core,
-            protocol_core=self._implementation,
             api_version=self._api_version,
             tip_racks=tip_racks,
             trash=self.fixed_trash,
@@ -643,7 +642,7 @@ class ProtocolContext(CommandPublisher):
         :param str msg: An optional message to show to connected clients. The
             Opentrons App will show this in the run log.
         """
-        self._implementation.pause(msg=msg)
+        self._core.pause(msg=msg)
 
     @publish(command=cmds.resume)
     @requires_version(2, 0)
@@ -656,7 +655,7 @@ class ProtocolContext(CommandPublisher):
            If you're looking for a way for your protocol to resume automatically
            after a period of time, use :py:meth:`delay`.
         """
-        self._implementation.resume()
+        self._core.resume()
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)
@@ -669,7 +668,7 @@ class ProtocolContext(CommandPublisher):
         so cannot be used to communicate real-time information from the robot's
         actual run.
         """
-        self._implementation.comment(msg=msg)
+        self._core.comment(msg=msg)
 
     @publish(command=cmds.delay)
     @requires_version(2, 0)
@@ -687,21 +686,21 @@ class ProtocolContext(CommandPublisher):
         If both `seconds` and `minutes` are specified, they will be added.
         """
         delay_time = seconds + minutes * 60
-        self._implementation.delay(seconds=delay_time, msg=msg)
+        self._core.delay(seconds=delay_time, msg=msg)
 
     @requires_version(2, 0)
     def home(self) -> None:
         """Homes the robot."""
-        self._implementation.home()
+        self._core.home()
 
     @property
     def location_cache(self) -> Optional[Location]:
         """The cache used by the robot to determine where it last was."""
-        return self._implementation.get_last_location()
+        return self._core.get_last_location()
 
     @location_cache.setter
     def location_cache(self, loc: Optional[Location]) -> None:
-        self._implementation.set_last_location(loc)
+        self._core.set_last_location(loc)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -731,14 +730,14 @@ class ProtocolContext(CommandPublisher):
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
         """
-        return self._core_map.get(self._implementation.fixed_trash)
+        return self._core_map.get(self._core.fixed_trash)
 
     def _load_fixed_trash(self) -> None:
-        fixed_trash_core = self._implementation.fixed_trash
+        fixed_trash_core = self._core.fixed_trash
         fixed_trash = Labware(
-            implementation=fixed_trash_core,
+            core=fixed_trash_core,
             api_version=self._api_version,
-            protocol_core=self._implementation,
+            protocol_core=self._core,
             core_map=self._core_map,
         )
         self._core_map.add(fixed_trash_core, fixed_trash)
@@ -750,19 +749,19 @@ class ProtocolContext(CommandPublisher):
 
         :param bool on: If true, turn on rail lights; otherwise, turn off.
         """
-        self._implementation.set_rail_lights(on=on)
+        self._core.set_rail_lights(on=on)
 
     @property  # type: ignore
     @requires_version(2, 5)
     def rail_lights_on(self) -> bool:
         """Returns True if the rail lights are on"""
-        return self._implementation.get_rail_lights_on()
+        return self._core.get_rail_lights_on()
 
     @property  # type: ignore
     @requires_version(2, 5)
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""
-        return self._implementation.door_closed()
+        return self._core.door_closed()
 
 
 def _create_module_context(

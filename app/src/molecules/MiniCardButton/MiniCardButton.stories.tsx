@@ -7,7 +7,7 @@ import { MiniCardButton } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Molecules/MiniCardButton',
+  title: 'Odd/Molecules/MiniCardButton',
   component: MiniCardButton,
   decorators: [
     Story => (

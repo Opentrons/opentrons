@@ -1,5 +1,6 @@
 from typing import Optional, Dict
 
+from opentrons.util.async_helpers import ensure_yield
 from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
 
@@ -19,27 +20,35 @@ class SimulatingDriver(AbstractThermocyclerDriver):
     def model(self) -> str:
         return self._model
 
+    @ensure_yield
     async def connect(self) -> None:
         pass
 
+    @ensure_yield
     async def disconnect(self) -> None:
         pass
 
+    @ensure_yield
     async def is_connected(self) -> bool:
         return True
 
+    @ensure_yield
     async def open_lid(self) -> None:
         self._lid_status = ThermocyclerLidStatus.OPEN
 
+    @ensure_yield
     async def close_lid(self) -> None:
         self._lid_status = ThermocyclerLidStatus.CLOSED
 
+    @ensure_yield
     async def get_lid_status(self) -> ThermocyclerLidStatus:
         return self._lid_status
 
+    @ensure_yield
     async def get_lid_temperature(self) -> Temperature:
         return self._lid_temperature
 
+    @ensure_yield
     async def set_plate_temperature(
         self,
         temp: float,
@@ -50,31 +59,38 @@ class SimulatingDriver(AbstractThermocyclerDriver):
         self._plate_temperature.current = temp
         self._plate_temperature.hold = 0
 
+    @ensure_yield
     async def get_plate_temperature(self) -> PlateTemperature:
         return self._plate_temperature
 
+    @ensure_yield
     async def set_ramp_rate(self, ramp_rate: float) -> None:
         self._ramp_rate = ramp_rate
 
+    @ensure_yield
     async def set_lid_temperature(self, temp: float) -> None:
         """Set the lid temperature in deg Celsius"""
         self._lid_temperature.target = temp
         self._lid_temperature.current = temp
 
+    @ensure_yield
     async def deactivate_lid(self) -> None:
         self._lid_temperature.target = None
         self._lid_temperature.current = self.DEFAULT_TEMP
 
+    @ensure_yield
     async def deactivate_block(self) -> None:
         self._plate_temperature.target = None
         self._plate_temperature.current = self.DEFAULT_TEMP
         self._plate_temperature.hold = None
         self._ramp_rate = None
 
+    @ensure_yield
     async def deactivate_all(self) -> None:
         await self.deactivate_lid()
         await self.deactivate_block()
 
+    @ensure_yield
     async def get_device_info(self) -> Dict[str, str]:
         return {
             "serial": "dummySerialTC",
@@ -82,5 +98,6 @@ class SimulatingDriver(AbstractThermocyclerDriver):
             "version": "dummyVersionTC",
         }
 
+    @ensure_yield
     async def enter_programming_mode(self) -> None:
         pass

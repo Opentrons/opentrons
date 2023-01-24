@@ -11,7 +11,7 @@ import { Numpad } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/SoftwareKeyboard/Numpad',
+  title: 'Odd/Atoms/SoftwareKeyboard/Numpad',
   component: Numpad,
 } as Meta
 
