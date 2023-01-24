@@ -77,11 +77,7 @@ export function CalibrationTaskList({
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
-            <Icon
-              name="ot-check"
-              size="3rem"
-              color={COLORS.successEnabled}
-            />
+            <Icon name="ot-check" size="3rem" color={COLORS.successEnabled} />
             <StyledText as="h1" marginTop={SPACING.spacing5}>
               {t('calibrations_complete')}
             </StyledText>

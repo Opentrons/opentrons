@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { StaticRouter } from 'react-router-dom'
 import { i18n } from '../../../i18n'
 import { CalibrationTaskList } from '..'
 import {
@@ -11,7 +12,6 @@ import {
   mockCompleteTipLengthCalibrations,
   mockCompletePipetteOffsetCalibrations,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
-import { StaticRouter } from 'react-router-dom'
 
 jest.mock('../../Devices/hooks', () => {
   const actualHooks = jest.requireActual('../../Devices/hooks')
