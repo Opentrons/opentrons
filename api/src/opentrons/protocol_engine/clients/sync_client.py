@@ -302,6 +302,9 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        radius: float,
+        v_offset: float,
+        speed: float,
     ) -> commands.TouchTipResult:
         """Execute a ``Touch Tip`` command and return the result."""
         request = commands.TouchTipCreate(
@@ -310,6 +313,9 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                radius=radius,
+                vOffset=v_offset,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)

@@ -200,6 +200,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            radius=radius,
+            v_offset=v_offset,
+            speed=speed,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())

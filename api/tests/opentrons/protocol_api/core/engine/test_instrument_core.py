@@ -549,6 +549,9 @@ def test_touch_tip(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            radius=1.23,
+            v_offset=4.56,
+            speed=7.89,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )

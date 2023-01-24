@@ -19,14 +19,14 @@ TouchTipCommandType = Literal["touchTip"]
 class TouchTipParams(PipetteIdMixin, WellLocationMixin):
     """Payload needed to touch a pipette tip the sides of a specific well."""
 
-    radius: Optional[float] = Field(
+    radius: float = Field(
         1.0,
         description=(
             "The proportion of the target well's radius the pipette tip will move towards."
         ),
     )
 
-    vOffset: Optional[float] = Field(
+    vOffset: float = Field(
         -1.0,
         description=(
             "Offset in mm from the top of the well to touch tip. A positive offset moves the tip higher above the well"

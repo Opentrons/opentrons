@@ -586,7 +586,9 @@ async def test_touch_tip(
     ).then_return([Point(x=0, y=1, z=2), Point(x=3, y=4, z=5)])
 
     decoy.when(
-        state_store.pipettes.get_movement_speed(pipette_id="pipette-id", requested_speed=987)
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=987
+        )
     ).then_return(9001)
 
     await subject.touch_tip(
