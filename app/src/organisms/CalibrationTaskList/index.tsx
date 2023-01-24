@@ -9,7 +9,6 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  JUSTIFY_FLEX_END,
   SPACING,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
@@ -51,10 +50,6 @@ export function CalibrationTaskList({
   )
 
   React.useEffect(() => {
-    console.log({ prevActiveIndex: prevActiveIndex.current })
-    if (prevActiveIndex.current == null && activeIndex == null) {
-      return
-    }
     if (prevActiveIndex.current !== null && activeIndex === null) {
       setShowCompletionScreen(true)
     }
@@ -69,14 +64,13 @@ export function CalibrationTaskList({
       }
       fullPage
       backgroundColor={COLORS.fundamentalsBackground}
-      childrenPadding={`${String(SPACING.spacing4)} ${String(
-        SPACING.spacing5
-      )} ${String(SPACING.spacing5)} ${
-        showCompletionScreen ? '' : String(SPACING.spacing2)
-      }`}
+      childrenPadding={`${SPACING.spacing4} ${SPACING.spacing5} ${SPACING.spacing5} ${SPACING.spacing2}`}
     >
       {showCompletionScreen ? (
-        <Flex flexDirection={DIRECTION_COLUMN} padding="4.375rem">
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          padding="4.25rem 4.25rem 4.25rem 5.5rem"
+        >
           <Flex
             flex="1"
             flexDirection={DIRECTION_COLUMN}
@@ -85,28 +79,20 @@ export function CalibrationTaskList({
           >
             <Icon
               name="ot-check"
-              size="2.775rem"
+              size="3rem"
               color={COLORS.successEnabled}
             />
             <StyledText as="h1" marginTop={SPACING.spacing5}>
               {t('calibrations_complete')}
             </StyledText>
-            <Flex
-              flex="0"
-              alignSelf={ALIGN_CENTER}
+            <PrimaryButton
               marginTop={SPACING.spacing5}
-              justifyContent={JUSTIFY_FLEX_END}
+              onClick={() =>
+                history.push(`/devices/${robotName}/robot-settings/calibration`)
+              }
             >
-              <PrimaryButton
-                onClick={() =>
-                  history.push(
-                    `/devices/${robotName}/robot-settings/calibration`
-                  )
-                }
-              >
-                {t('device_settings:done')}
-              </PrimaryButton>
-            </Flex>
+              {t('device_settings:done')}
+            </PrimaryButton>
           </Flex>
         </Flex>
       ) : (
