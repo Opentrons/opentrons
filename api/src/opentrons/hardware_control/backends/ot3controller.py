@@ -924,7 +924,7 @@ class OT3Controller:
         return data
 
     async def update_motor_status(self) -> None:
-        """Retreieve motor and encoder status and position from all present nodes"""
+        """Retreive motor and encoder status and position from all present nodes"""
         assert len(self._present_nodes)
         response = await get_motor_position(self._messenger, self._present_nodes)
         self._handle_motor_status_response(response)
