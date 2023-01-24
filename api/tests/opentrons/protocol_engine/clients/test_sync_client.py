@@ -75,11 +75,13 @@ def test_add_liquid(
     decoy.when(
         transport.call_method(
             "add_liquid",
-            liquid=liquid,
+            name="water",
+            description="water desc",
+            color="#fff",
         )
     ).then_return(liquid)
 
-    result = subject.add_liquid(name="water")  # type: ignore[call-arg]
+    result = subject.add_liquid(name="water", description="water desc", color="#fff")
 
     assert result == liquid
 
