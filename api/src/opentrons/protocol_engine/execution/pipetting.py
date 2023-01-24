@@ -266,11 +266,18 @@ class PipettingHandler:
             current_well=target_well,
         )
 
-        touch_points = self._state_store.geometry.get_well_edges(
+        edge_list = self._state_store.geometry.get_well_edges(
             labware_id=labware_id,
             well_name=well_name,
             radius=radius,
             offset=v_offset,
+        )
+
+        touch_points = self._state_store.geometry.determine_edge_path(
+            labware_id=labware_id,
+            well_name=well_name,
+            mount=pipette_location.mount.to_hw_mount(),
+            edges=edge_list,
         )
 
         speed = self._state_store.pipettes.get_movement_speed(

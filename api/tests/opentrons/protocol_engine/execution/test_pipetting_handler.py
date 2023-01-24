@@ -17,6 +17,7 @@ from opentrons.protocol_engine.state import (
     CurrentWell,
     PipetteLocationData,
 )
+from opentrons.protocol_engine.state.geometry import EdgeList
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 from opentrons.protocol_engine.resources import LabwareDataProvider
@@ -576,6 +577,14 @@ async def test_touch_tip(
         )
     )
 
+    edge_list = EdgeList(
+        right=Point(0, 1, 2),
+        left=Point(3, 4, 5),
+        center=Point(6, 7, 8),
+        up=Point(9, 8, 7),
+        down=Point(6, 5, 4),
+    )
+
     decoy.when(
         state_store.geometry.get_well_edges(
             labware_id="labware-id",
@@ -583,7 +592,16 @@ async def test_touch_tip(
             radius=1.23,
             offset=-4.56,
         )
-    ).then_return([Point(x=0, y=1, z=2), Point(x=3, y=4, z=5)])
+    ).then_return(edge_list)
+
+    decoy.when(
+        state_store.geometry.determine_edge_path(
+            labware_id="labware-id",
+            well_name="A3",
+            mount=Mount.LEFT,
+            edges=edge_list,
+        )
+    ).then_return([Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)])
 
     decoy.when(
         state_store.pipettes.get_movement_speed(
@@ -611,13 +629,13 @@ async def test_touch_tip(
         await hardware_api.move_to(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=0, y=1, z=2),
+            abs_position=Point(x=11, y=22, z=33),
             speed=9001,
         ),
         await hardware_api.move_to(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=3, y=4, z=5),
+            abs_position=Point(x=44, y=55, z=66),
             speed=9001,
         ),
     )

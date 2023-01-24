@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Set, Tuple, Union
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, Mount
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
@@ -24,6 +24,17 @@ from .modules import ModuleView
 from .pipettes import CurrentWell
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
+
+
+@dataclass
+class EdgeList:
+    """Potential points for a touch tip operation."""
+
+    right: Point
+    left: Point
+    center: Point
+    up: Point
+    down: Point
 
 
 @dataclass(frozen=True)
@@ -206,13 +217,51 @@ class GeometryView:
         well_def = self._labware.get_well_definition(labware_id, well_name)
         return well_def.depth
 
+    def determine_edge_path(
+        self,
+        labware_id: str,
+        well_name: str,
+        mount: Mount,
+        edges: EdgeList,
+    ) -> List[Point]:
+        """Determine the safe list of points to touch the pipette tip to."""
+        left_path = [edges.left, edges.center, edges.up, edges.down]
+        right_path = [edges.right, edges.center, edges.up, edges.down]
+
+        labware_def = self._labware.get_definition(labware_id)
+        labware_slot = self.get_ancestor_slot_name(labware_id)
+        left_column = labware_def.ordering[0]
+        right_column = labware_def.ordering[-1]
+
+        left_path_criteria = mount is Mount.RIGHT and well_name in left_column
+        right_path_criteria = mount is Mount.LEFT and well_name in right_column
+        next_to_mod = self._modules.is_edge_move_unsafe(mount, labware_slot)
+
+        if (
+            labware_slot
+            in [
+                DeckSlotName.SLOT_3,
+                DeckSlotName.SLOT_6,
+                DeckSlotName.SLOT_9,
+                DeckSlotName.FIXED_TRASH,
+            ]
+            and left_path_criteria
+        ):
+            return left_path
+        elif left_path_criteria and next_to_mod:
+            return left_path
+        elif right_path_criteria and next_to_mod:
+            return right_path
+
+        return [edges.right, edges.left, edges.center, edges.up, edges.down]
+
     def get_well_edges(
         self,
         labware_id: str,
         well_name: str,
         radius: float = 1.0,
         offset: float = -1.0,
-    ) -> List[Point]:
+    ) -> EdgeList:
         """Get list of absolute positions of four cardinal edges and center of well."""
         well_def = self._labware.get_well_definition(labware_id, well_name)
         if well_def.shape == "rectangular":
@@ -236,14 +285,13 @@ class GeometryView:
         center = self.get_well_position(
             labware_id, well_name, well_location=WellLocation(origin=WellOrigin.CENTER)
         )
-
-        return [
-            center + Point(x=x_offset, y=0, z=z_offset),  # right
-            center + Point(x=-x_offset, y=0, z=z_offset),  # left
-            center + Point(x=0, y=0, z=z_offset),  # center
-            center + Point(x=0, y=y_offset, z=z_offset),  # up
-            center + Point(x=0, y=-y_offset, z=z_offset),  # down
-        ]
+        return EdgeList(
+            right=center + Point(x=x_offset, y=0, z=z_offset),
+            left=center + Point(x=-x_offset, y=0, z=z_offset),
+            center=center + Point(x=0, y=0, z=z_offset),
+            up=center + Point(x=0, y=y_offset, z=z_offset),
+            down=center + Point(x=0, y=-y_offset, z=z_offset),
+        )
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         labware_pos = self.get_labware_position(lw_data.id)

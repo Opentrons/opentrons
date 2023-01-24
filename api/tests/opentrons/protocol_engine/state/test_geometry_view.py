@@ -7,7 +7,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, Mount
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -25,7 +25,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.geometry import GeometryView
+from opentrons.protocol_engine.state.geometry import GeometryView, EdgeList
 from opentrons.protocol_engine.state.pipettes import CurrentWell
 
 
@@ -478,6 +478,85 @@ def test_get_well_height(
     assert subject.get_well_height("labware-id", "B2") == 10.67
 
 
+@pytest.mark.parametrize(
+    ["well_name", "mount", "labware_slot", "expected_result"],
+    [
+        (
+            "abc",
+            Mount.RIGHT,
+            DeckSlotName.SLOT_3,
+            [Point(1, 1, 1), Point(2, 2, 2), Point(3, 3, 3), Point(4, 4, 4)],
+        ),
+        (
+            "abc",
+            Mount.RIGHT,
+            DeckSlotName.SLOT_5,
+            [Point(1, 1, 1), Point(2, 2, 2), Point(3, 3, 3), Point(4, 4, 4)],
+        ),
+        (
+            "pqr",
+            Mount.LEFT,
+            DeckSlotName.SLOT_3,
+            [Point(0, 0, 0), Point(2, 2, 2), Point(3, 3, 3), Point(4, 4, 4)],
+        ),
+        (
+            "jkl",
+            Mount.RIGHT,
+            DeckSlotName.SLOT_3,
+            [
+                Point(0, 0, 0),
+                Point(1, 1, 1),
+                Point(2, 2, 2),
+                Point(3, 3, 3),
+                Point(4, 4, 4),
+            ],
+        ),
+    ],
+)
+def test_determine_edge_path(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    well_name: str,
+    mount: Mount,
+    labware_slot: DeckSlotName,
+    expected_result: List[Point],
+    subject: GeometryView,
+) -> None:
+    """It should determine the correct list of touch points."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=labware_slot),
+        offsetId="offset-id",
+    )
+
+    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+        ordering=[["abc", "def"], ["ghi", "jkl"], ["mno", "pqr"]]
+    )
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(labware_def)
+
+    decoy.when(module_view.is_edge_move_unsafe(mount, labware_slot)).then_return(True)
+
+    result = subject.determine_edge_path(
+        labware_id="labware-id",
+        well_name=well_name,
+        mount=mount,
+        edges=EdgeList(
+            right=Point(0, 0, 0),
+            left=Point(1, 1, 1),
+            center=Point(2, 2, 2),
+            up=Point(3, 3, 3),
+            down=Point(4, 4, 4),
+        ),
+    )
+
+    assert result == expected_result
+
+
 def test_get_well_edges(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
@@ -519,13 +598,13 @@ def test_get_well_edges(
     expected_xy_offset = well_def.diameter / 4.0
     expected_z_offset = well_def.depth / 2.0 + 1
 
-    assert result == [
-        expected_center + Point(x=expected_xy_offset, y=0, z=expected_z_offset),
-        expected_center + Point(x=-expected_xy_offset, y=0, z=expected_z_offset),
-        expected_center + Point(x=0, y=0, z=expected_z_offset),
-        expected_center + Point(x=0, y=expected_xy_offset, z=expected_z_offset),
-        expected_center + Point(x=0, y=-expected_xy_offset, z=expected_z_offset),
-    ]
+    assert result == EdgeList(
+        right=expected_center + Point(x=expected_xy_offset, y=0, z=expected_z_offset),
+        left=expected_center + Point(x=-expected_xy_offset, y=0, z=expected_z_offset),
+        center=expected_center + Point(x=0, y=0, z=expected_z_offset),
+        up=expected_center + Point(x=0, y=expected_xy_offset, z=expected_z_offset),
+        down=expected_center + Point(x=0, y=-expected_xy_offset, z=expected_z_offset),
+    )
 
 
 def test_get_module_labware_well_position(
