@@ -34,8 +34,9 @@ export function useLastRunCommandKey(runId: string): string | null {
       keepPreviousData: true,
     }
   )
-
-  console.log('1', commandsData?.links?.current?.meta?.key)
-  console.log('2', commandsData?.data?.[0]?.key)
-  return commandsData?.links?.current?.meta?.key ?? commandsData?.data?.[0]?.key ?? null
+  return (
+    commandsData?.links?.current?.meta?.key ??
+    commandsData?.data?.[0]?.key ??
+    null
+  )
 }

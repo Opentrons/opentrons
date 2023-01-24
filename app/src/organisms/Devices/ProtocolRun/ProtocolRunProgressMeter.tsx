@@ -24,8 +24,12 @@ import { useLastRunCommandKey } from '../hooks/useLastRunCommandKey'
 
 import type { RunStatus } from '@opentrons/api-client'
 
-
-const TERMINAL_RUN_STATUSES: RunStatus[] = [RUN_STATUS_STOPPED, RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED]
+const TERMINAL_RUN_STATUSES: RunStatus[] = [
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_SUCCEEDED,
+]
 const MIN_AGGREGATION_PERCENT = 0.6
 const TICKED_COMMAND_TYPES = ['waitForResume', 'moveLabware']
 interface ProtocolRunProgressMeterProps {
@@ -41,9 +45,7 @@ export function ProtocolRunProgressMeter(
   const lastRunCommandKey = useLastRunCommandKey(runId)
   const analysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = analysis?.commands ?? []
-  const lastRunCommandIndex = runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus) 
-    ? analysisCommands.length
-    : analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
+  const lastRunCommandIndex = analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
   const commandAggregationCount =
     analysisCommands.length > 100
       ? analysisCommands.length * 0.01 * MIN_AGGREGATION_PERCENT
@@ -71,7 +73,10 @@ export function ProtocolRunProgressMeter(
     return acc
   }, [])
   let countOfTotalText = ''
-  if (lastRunCommandIndex >= 0 && lastRunCommandIndex <= analysisCommands.length - 1) {
+  if (
+    lastRunCommandIndex >= 0 &&
+    lastRunCommandIndex <= analysisCommands.length - 1
+  ) {
     countOfTotalText = ` ${lastRunCommandIndex + 1}/${analysisCommands.length}`
   } else if (analysis == null) {
     countOfTotalText = '?/?'
@@ -85,10 +90,17 @@ export function ProtocolRunProgressMeter(
         command={analysisCommands[lastRunCommandIndex]}
       />
     )
-  } else if (runStatus === RUN_STATUS_IDLE && analysisCommands[lastRunCommandIndex] == null) {
-    currentStepContents = <StyledText as="h2">{t('not_started_yet')}</StyledText>
+  } else if (
+    runStatus === RUN_STATUS_IDLE &&
+    analysisCommands[lastRunCommandIndex] == null
+  ) {
+    currentStepContents = (
+      <StyledText as="h2">{t('not_started_yet')}</StyledText>
+    )
   } else if (runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)) {
-    currentStepContents = <StyledText as="h2">{t('protocol_completed')}</StyledText>
+    currentStepContents = (
+      <StyledText as="h2">{t('protocol_completed')}</StyledText>
+    )
   }
 
   return (
@@ -97,11 +109,13 @@ export function ProtocolRunProgressMeter(
         <Flex gridGap={SPACING.spacing3}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
-          )} ${countOfTotalText}: `}</StyledText>
+          )} ${countOfTotalText}${
+            currentStepContents != null ? ': ' : ''
+          }`}</StyledText>
           {currentStepContents}
         </Flex>
       </Flex>
-      {analysis != null ?
+      {analysis != null ? (
         <RunProgressMeter
           {...{
             ticks,
@@ -110,8 +124,7 @@ export function ProtocolRunProgressMeter(
             lastRunCommandIndex,
           }}
         />
-        : null
-      }
+      ) : null}
     </Flex>
   )
 }
