@@ -79,7 +79,7 @@ def subject(
 ) -> InstrumentContext:
     """Get a ProtocolCore test subject with its dependencies mocked out."""
     return InstrumentContext(
-        implementation=mock_instrument_core,
+        core=mock_instrument_core,
         protocol_core=mock_protocol_core,
         broker=mock_broker,
         api_version=api_version,
@@ -160,7 +160,7 @@ def test_move_to_well(
     decoy.verify(
         mock_instrument_core.move_to(
             location=location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
@@ -183,7 +183,7 @@ def test_pick_up_from_well(
     decoy.verify(
         mock_instrument_core.pick_up_tip(
             location=top_location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             presses=1,
             increment=2.0,
             prep_after=False,
@@ -209,7 +209,7 @@ def test_aspirate(
     decoy.verify(
         mock_instrument_core.aspirate(
             location=bottom_location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
@@ -232,7 +232,7 @@ def test_blow_out_to_well(
     decoy.verify(
         mock_instrument_core.blow_out(
             location=top_location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             move_to_well=True,
         ),
         times=1,
@@ -255,7 +255,7 @@ def test_blow_out_to_location(
     decoy.verify(
         mock_instrument_core.blow_out(
             location=mock_location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             move_to_well=True,
         ),
         times=1,
@@ -279,7 +279,7 @@ def test_blow_out_in_place(
     decoy.verify(
         mock_instrument_core.blow_out(
             location=location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             move_to_well=False,
         ),
         times=1,
@@ -321,7 +321,7 @@ def test_pick_up_tip_from_labware(
     decoy.verify(
         mock_instrument_core.pick_up_tip(
             location=top_location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             presses=None,
             increment=None,
             prep_after=True,
@@ -342,7 +342,7 @@ def test_pick_up_tip_from_well_location(
     decoy.verify(
         mock_instrument_core.pick_up_tip(
             location=location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             presses=None,
             increment=None,
             prep_after=True,
@@ -375,7 +375,7 @@ def test_pick_up_tip_from_labware_location(
     decoy.verify(
         mock_instrument_core.pick_up_tip(
             location=top_location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             presses=None,
             increment=None,
             prep_after=True,
@@ -411,7 +411,7 @@ def test_pick_up_from_associated_tip_racks(
     decoy.verify(
         mock_instrument_core.pick_up_tip(
             location=top_location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             presses=None,
             increment=None,
             prep_after=True,
@@ -430,7 +430,7 @@ def test_drop_tip_to_well(
 
     decoy.verify(
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._impl, home_after=False
+            location=None, well_core=mock_well._core, home_after=False
         ),
         times=1,
     )
@@ -451,7 +451,7 @@ def test_drop_tip_to_trash(
 
     decoy.verify(
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._impl, home_after=True
+            location=None, well_core=mock_well._core, home_after=True
         ),
         times=1,
     )
@@ -471,13 +471,13 @@ def test_return_tip(
     decoy.verify(
         mock_instrument_core.pick_up_tip(
             location=top_location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             presses=None,
             increment=None,
             prep_after=True,
         ),
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._impl, home_after=True
+            location=None, well_core=mock_well._core, home_after=True
         ),
     )
 
@@ -501,7 +501,7 @@ def test_dispense_with_location(
     decoy.verify(
         mock_instrument_core.dispense(
             location=location,
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             volume=42.0,
             rate=1.0,
             flow_rate=3.0,
@@ -529,7 +529,7 @@ def test_dispense_with_well_location(
     decoy.verify(
         mock_instrument_core.dispense(
             location=Location(point=Point(1, 2, 3), labware=mock_well),
-            well_core=mock_well._impl,
+            well_core=mock_well._core,
             volume=42.0,
             rate=1.0,
             flow_rate=3.0,
