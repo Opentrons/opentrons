@@ -28,31 +28,13 @@ class Plot:
             "legend":None,
             "annotation":None
         }
-        self.titles = {
-            "Input DC":"Input Duty Cycle (%)",
-            "Input Force":"Input Force (N)",
-        }
-        self.ranges = {
-            "Input DC":[10,60],
-            "Input Force":[5,30],
-            "Current":[100,450],
-            "Force":[5,30],
-        }
-        self.dticks = {
-            "Input DC":10,
-            "Input Force":5,
-        }
+        self.weights = ["0","500","1000","1500","2000"]
         self.create_folder()
         self.df_data = self.import_file(self.data)
-        self.input = self.get_input(self.df_data)
-        self.df_avg = self.avg_df(self.df_data)
+        self.dc = self.get_dc(self.df_data)
 
     def import_file(self, file):
         df = pd.read_csv(file)
-        df["Current"] = df["RMS"]*1000
-        df["Peak+"] = df["Peak Plus"]*1000
-        df["Peak-"] = df["Peak Minus"]*1000
-        df["Frequency"] = df["PWM Frequency"]/1000
         df.name = file
         return df
 
@@ -63,14 +45,12 @@ class Plot:
 
     def create_plot(self):
         print("Plotting Current vs. Time...")
-        self.current_plot()
+        self.current_weight_plot()
         print("Plots Saved!")
 
-    def get_input(self, df):
-        if df["Input DC"].iloc[0] > 0:
-            return "Input DC"
-        else:
-            return "Input Force"
+    def get_dc(self, df):
+        dc = df["Input DC"].iloc[0]
+        return dc
 
     def set_legend(self, figure, legend):
         for idx, name in enumerate(legend):
@@ -126,25 +106,20 @@ class Plot:
         for key, value in self.plot_param.items():
             self.plot_param[key] = None
 
-    def current_plot(self):
-        df = self.df_avg
-        df = df[df[self.input]<=60]
-        x_axis = self.input
-        y_axis = "Current"
-        fig = px.line(df, x=x_axis, y=[y_axis], color="Vref", markers=True)
-        fig.update_layout(
-            xaxis_tickmode = 'linear',
-            xaxis_tick0 = 0,
-            xaxis_dtick = self.dticks[self.input],
-        )
+    def current_weight_plot(self):
+        df = self.df_data
+        x_axis = "Time"
+        y_axis = self.weights
+        fig = px.line(df, x=x_axis, y=y_axis, markers=True)
+        self.set_legend(fig, [float(weight)/1000 for weight in self.weights])
         self.plot_param["figure"] = fig
-        self.plot_param["filename"] = "plot_current_pwm"
-        self.plot_param["title"] = f"Current vs. {self.input}"
-        self.plot_param["x_title"] = self.titles[self.input]
-        self.plot_param["y_title"] = "Average Current [RMS] (mA)"
-        self.plot_param["x_range"] = self.ranges[self.input]
-        self.plot_param["y_range"] = self.ranges["Current"]
-        self.plot_param["legend"] = "Vref (V)"
+        self.plot_param["filename"] = "plot_current_weight"
+        self.plot_param["title"] = f"Current vs. Time (DC = {self.dc}%)"
+        self.plot_param["x_title"] = "Time (min)"
+        self.plot_param["y_title"] = "Current [RMS] (mA)"
+        self.plot_param["x_range"] = [0, 60]
+        self.plot_param["y_range"] = [200, 250]
+        self.plot_param["legend"] = "Weight (kg)"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
 
