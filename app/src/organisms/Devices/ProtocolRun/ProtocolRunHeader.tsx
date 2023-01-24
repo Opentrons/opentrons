@@ -85,13 +85,7 @@ import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { ProtocolRunProgressMeter } from './ProtocolRunProgressMeter'
 
 const EQUIPMENT_POLL_MS = 5000
-const CANCELLABLE_STATUSES = [
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_PAUSED,
-  RUN_STATUS_PAUSE_REQUESTED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_IDLE,
-]
+const CANCELLABLE_STATUSES = [RUN_STATUS_RUNNING, RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_BLOCKED_BY_OPEN_DOOR, RUN_STATUS_IDLE]
 
 interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -183,9 +177,7 @@ export function ProtocolRunHeader({
 
   const { pause } = useRunControls(runId, onResetSuccess)
 
-  const [showAnalysisErrorModal, setShowAnalysisErrorModal] = React.useState(
-    false
-  )
+  const [showAnalysisErrorModal, setShowAnalysisErrorModal] = React.useState(false)
   const handleErrorModalCloseClick: React.MouseEventHandler = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -208,10 +200,7 @@ export function ProtocolRunHeader({
   }
 
   const handleClearClick = (): void => {
-    trackProtocolRunEvent({
-      name: 'runFinish',
-      properties: robotAnalyticsData ?? undefined,
-    })
+    trackProtocolRunEvent({ name: 'runFinish', properties: robotAnalyticsData ?? undefined })
     closeCurrentRun()
   }
 
@@ -240,11 +229,7 @@ export function ProtocolRunHeader({
       <Flex>
         {protocolKey != null ? (
           <Link to={`/protocols/${protocolKey}`}>
-            <StyledText
-              as="h2"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.blueEnabled}
-            >
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold} color={COLORS.blueEnabled}>
               {displayName}
             </StyledText>
           </Link>
@@ -263,66 +248,44 @@ export function ProtocolRunHeader({
       {runStatus === RUN_STATUS_STOPPED ? (
         <Banner type="warning">{t('run_canceled')}</Banner>
       ) : null}
-      <TerminalRunBanner
-        {...{ runStatus, handleClearClick, isClosingCurrentRun }}
-      />
+      <TerminalRunBanner {...{ runStatus, handleClearClick, isClosingCurrentRun }} />
       <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
         <LabeledValue label={t('run')} value={createdAtTimestamp} />
-        <LabeledValue
-          label={t('status')}
-          value={<DisplayRunStatus runStatus={runStatus} />}
-        />
-        <LabeledValue
-          label={t('run_time')}
-          value={
-            <RunTimer {...{ runStatus, startedAt, stoppedAt, completedAt }} />
-          }
-        />
+        <LabeledValue label={t('status')} value={<DisplayRunStatus runStatus={runStatus} />} />
+        <LabeledValue label={t('run_time')} value={<RunTimer {...{ runStatus, startedAt, stoppedAt, completedAt }} />} />
         <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <ActionButton
-            runId={runId}
-            robotName={robotName}
-            runStatus={runStatus}
-            isProtocolAnalyzing={protocolData == null || !!isProtocolAnalyzing}
-          />
+          <ActionButton runId={runId} robotName={robotName} runStatus={runStatus} isProtocolAnalyzing={protocolData == null || !!isProtocolAnalyzing} />
         </Flex>
-      </Box>
-      {runStatus != null ? (
-        <Box
-          backgroundColor={COLORS.fundamentalsBackground}
-          display="grid"
-          gridTemplateColumns="4fr 6fr 4fr"
-          padding={SPACING.spacing3}
-        >
-          <LabeledValue
-            label={t('protocol_start')}
-            value={startedAtTimestamp}
-          />
-          <LabeledValue
-            label={t('protocol_end')}
-            value={completedAtTimestamp}
-          />
-          <Flex justifyContent={JUSTIFY_FLEX_END}>
-            {CANCELLABLE_STATUSES.includes(runStatus) && (
-              <SecondaryButton
-                isDangerous
-                onClick={handleCancelClick}
-                disabled={isClosingCurrentRun}
-              >
-                {t('cancel_run')}
-              </SecondaryButton>
-            )}
-          </Flex>
-        </Box>
-      ) : null}
+      </Box >
+      {
+        runStatus != null ? (
+          <Box
+            backgroundColor={COLORS.fundamentalsBackground}
+            display="grid"
+            gridTemplateColumns="4fr 6fr 4fr"
+            padding={SPACING.spacing3}
+          >
+            <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
+            <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
+            <Flex justifyContent={JUSTIFY_FLEX_END}>
+              {CANCELLABLE_STATUSES.includes(runStatus) && (
+                <SecondaryButton isDangerous onClick={handleCancelClick} disabled={isClosingCurrentRun}>
+                  {t('cancel_run')}
+                </SecondaryButton>
+              )}
+            </Flex>
+          </Box>
+        ) : null}
       <ProtocolRunProgressMeter {...{ makeHandleJumpToStep, runId }} />
-      {showConfirmCancelModal ? (
-        <ConfirmCancelModal
-          onClose={() => setShowConfirmCancelModal(false)}
-          runId={runId}
-        />
-      ) : null}
-    </Flex>
+      {
+        showConfirmCancelModal ? (
+          <ConfirmCancelModal
+            onClose={() => setShowConfirmCancelModal(false)}
+            runId={runId}
+          />
+        ) : null
+      }
+    </Flex >
   )
 }
 
@@ -335,11 +298,7 @@ function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
       <StyledText as="h6">{props.label}</StyledText>
-      {typeof props.value === 'string' ? (
-        <StyledText as="p">{props.value}</StyledText>
-      ) : (
-        props.value
-      )}
+      {typeof props.value === 'string' ? <StyledText as="p">{props.value}</StyledText> : props.value}
     </Flex>
   )
 }
@@ -376,24 +335,9 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
   )
 }
 
-const START_RUN_STATUSES: RunStatus[] = [
-  RUN_STATUS_IDLE,
-  RUN_STATUS_PAUSED,
-  RUN_STATUS_PAUSE_REQUESTED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-]
-const RUN_AGAIN_STATUSES: RunStatus[] = [
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_SUCCEEDED,
-]
-const DISABLED_STATUSES: RunStatus[] = [
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_PAUSE_REQUESTED,
-  RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-]
+const START_RUN_STATUSES: RunStatus[] = [RUN_STATUS_IDLE, RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_BLOCKED_BY_OPEN_DOOR]
+const RUN_AGAIN_STATUSES: RunStatus[] = [RUN_STATUS_STOPPED, RUN_STATUS_FINISHING, RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED]
+const DISABLED_STATUSES: RunStatus[] = [RUN_STATUS_FINISHING, RUN_STATUS_PAUSE_REQUESTED, RUN_STATUS_STOP_REQUESTED, RUN_STATUS_BLOCKED_BY_OPEN_DOOR]
 interface ActionButtonProps {
   runId: string
   robotName: string
@@ -404,29 +348,19 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const { runId, robotName, runStatus, isProtocolAnalyzing } = props
   const history = useHistory()
   const { t } = useTranslation('run_details')
-  const attachedModules =
-    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+  const attachedModules = useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const {
-    play,
-    pause,
-    reset,
-    isPlayRunActionLoading,
-    isPauseRunActionLoading,
-    isResetRunLoading,
-  } = useRunControls(runId, (createRunResponse: Run): void =>
-    // redirect to new run after successful reset
-    history.push(
-      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
-    )
+  const { play, pause, reset, isPlayRunActionLoading, isPauseRunActionLoading, isResetRunLoading } = useRunControls(runId,
+    (createRunResponse: Run): void =>
+      // redirect to new run after successful reset
+      history.push(
+        `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
+      )
   )
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
-  const { complete: isCalibrationComplete } = useRunCalibrationStatus(
-    robotName,
-    runId
-  )
+  const { complete: isCalibrationComplete } = useRunCalibrationStatus(robotName, runId)
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
@@ -452,9 +386,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     trackEvent({ name: 'proceedToRun', properties: {} })
     play()
   }
-  const configBypassHeaterShakerAttachmentConfirmation = useSelector(
-    getIsHeaterShakerAttached
-  )
+  const configBypassHeaterShakerAttachmentConfirmation = useSelector(getIsHeaterShakerAttached)
   const {
     confirm: confirmAttachment,
     showConfirmation: showConfirmationModal,
@@ -480,7 +412,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   let buttonText: string = ''
-  let handleButtonClick = (): void => {}
+  let handleButtonClick = (): void => { }
   let buttonIconName: IconName | null = null
   let disableReason = null
 
@@ -507,8 +439,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     buttonText = t('canceling_run')
   } else if (runStatus != null && START_RUN_STATUSES.includes(runStatus)) {
     buttonIconName = 'play'
-    buttonText =
-      runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
+    buttonText = runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
     handleButtonClick = () => {
       if (isHeaterShakerShaking && isHeaterShakerInProtocol) {
         setShowIsShakingModal(true)
@@ -522,10 +453,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         play()
         trackProtocolRunEvent({
           name: runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume',
-          properties:
-            runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
-              ? robotAnalyticsData
-              : {},
+          properties: runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null ? robotAnalyticsData : {}
         })
       }
     }
@@ -534,10 +462,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     buttonText = t('run_again')
     handleButtonClick = () => {
       reset()
-      trackEvent({
-        name: 'proceedToRun',
-        properties: { sourceLocation: 'RunRecordDetail' },
-      })
+      trackEvent({ name: 'proceedToRun', properties: { sourceLocation: 'RunRecordDetail' } })
       trackProtocolRunEvent({ name: 'runAgain' })
     }
   }
@@ -556,19 +481,15 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         {...targetProps}
       >
         {buttonIconName != null ? (
-          <Icon
-            name={buttonIconName}
-            size={SIZE_1}
-            marginRight={SPACING.spacing3}
-            spin={isProtocolAnalyzing}
-          />
+          <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING.spacing3} spin={isProtocolAnalyzing} />
         ) : null}
         <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
       </PrimaryButton>
       {disableReason != null && (
         <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
       )}
-      {showIsShakingModal &&
+      {
+        showIsShakingModal &&
         activeHeaterShaker != null &&
         isHeaterShakerInProtocol &&
         runId != null && (
@@ -577,7 +498,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             module={activeHeaterShaker}
             startRun={play}
           />
-        )}
+        )
+      }
       {showConfirmationModal && (
         <ConfirmAttachmentModal
           onCloseClick={cancelExit}
@@ -585,8 +507,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
           onConfirmClick={handleProceedToRunClick}
         />
       )}
-    </>
-  )
+    </>)
 }
 
 interface TerminalRunProps {
@@ -605,12 +526,11 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
         isCloseActionLoading={isClosingCurrentRun}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-          {runStatus === RUN_STATUS_FAILED
-            ? t('run_failed')
-            : t('run_completed')}
+          {runStatus === RUN_STATUS_FAILED ? t('run_failed') : t('run_completed')}
         </Flex>
       </Banner>
     )
+
   }
   return null
 }

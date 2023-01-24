@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {
-  Btn,
   SPACING,
   COLORS,
   BORDERS,
@@ -16,7 +15,7 @@ interface SecondaryButtonProps extends StyleProps {
   /** button action is dangerous and may have non-reversible side-effects for user */
   isDangerous?: boolean
 }
-export const SecondaryButton = styled(Btn).withConfig<SecondaryButtonProps>({
+export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
 })<SecondaryButtonProps>`
   color: ${props =>

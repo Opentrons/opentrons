@@ -52,7 +52,7 @@ export const AnalyzedSteps = React.forwardRef(
       currentCommandDirection,
       setCurrentCommandDirection,
     ] = React.useState<-1 | 0 | 1>(0)
-
+    console.log(currentCommandDirection)
     if (robotSideAnalysis == null) return null
     const currentRunCommandIndex =
       robotSideAnalysis.commands.findIndex(
