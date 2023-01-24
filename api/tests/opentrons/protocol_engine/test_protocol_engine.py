@@ -20,6 +20,7 @@ from opentrons.protocol_engine.types import (
     LabwareUri,
     ModuleDefinition,
     ModuleModel,
+    Liquid,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -631,7 +632,11 @@ def test_add_liquid(
 
     decoy.verify(
         action_dispatcher.dispatch(
-            AddLiquidAction(id="water-id", name="water", description="water desc")
+            AddLiquidAction(
+                liquid=Liquid(
+                    id="water-id", displayName="water", description="water desc"
+                )
+            )
         )
     )
 

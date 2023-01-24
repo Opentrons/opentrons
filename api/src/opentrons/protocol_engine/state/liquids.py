@@ -1,7 +1,7 @@
 """Basic liquid data state and store."""
 from dataclasses import dataclass
 from typing import Dict, List
-from opentrons.protocol_engine.types import Liquid, HexColor
+from opentrons.protocol_engine.types import Liquid
 
 from .abstract_store import HasState, HandlesActions
 from ..actions import Action, AddLiquidAction
@@ -31,13 +31,7 @@ class LiquidStore(HasState[LiquidState], HandlesActions):
 
     def _add_liquid(self, action: AddLiquidAction) -> None:
         """Add liquid to protocol liquids."""
-        liquid = Liquid(
-            id=action.id,
-            displayName=action.name,
-            description=action.description,
-            displayColor=HexColor(__root__=action.color) if action.color else None,
-        )
-        self._state.liquids_by_id[action.id] = liquid
+        self._state.liquids_by_id[action.liquid.id] = action.liquid
 
 
 class LiquidView(HasState[LiquidState]):

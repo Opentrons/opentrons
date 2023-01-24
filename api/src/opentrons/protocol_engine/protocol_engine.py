@@ -305,15 +305,16 @@ class ProtocolEngine:
         """Add a liquid to the state for subsequent liquid loads."""
         if id is None:
             id = self._model_utils.generate_id()
-        self._action_dispatcher.dispatch(
-            AddLiquidAction(id=id, name=name, color=color, description=description)
-        )
-        return Liquid(
+
+        liquid = Liquid(
             id=id,
             displayName=name,
             description=description,
             displayColor=HexColor(__root__=color) if color else None,
         )
+
+        self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
+        return liquid
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""
