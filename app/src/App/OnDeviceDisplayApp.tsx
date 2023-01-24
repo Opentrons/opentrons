@@ -13,7 +13,6 @@ import { BackButton } from '../atoms/buttons'
 import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
-import { ConfirmRobotName } from '../pages/OnDeviceDisplay/ConfirmRobotName'
 import { InitialSplash } from '../pages/OnDeviceDisplay/InitialSplash'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
@@ -21,6 +20,9 @@ import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
+import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
+import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
@@ -31,6 +33,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Initial Splash',
     path: '/',
+  },
+  {
+    Component: Welcome,
+    exact: true,
+    name: 'Get started',
+    path: '/get-started',
   },
   {
     Component: TempODDMenu,
@@ -81,14 +89,6 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup/usb',
   },
   {
-    Component: ConfirmRobotName,
-    exact: true,
-    name: 'Name confirmation',
-    // Note: kj 12/19/2022 this path might be changed since the ODD app will have rename screen
-    // and it will use the same components for doing that.
-    path: '/network-setup/confirm-name/:robotName',
-  },
-  {
     Component: () => (
       <>
         <BackButton />
@@ -118,23 +118,13 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/robot-settings/rename-robot',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>update robot</Box>
-      </>
-    ),
+    Component: UpdateRobot,
     exact: true,
     name: 'Update Robot',
     path: '/robot-settings/update-robot',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>protocol dashboard</Box>
-      </>
-    ),
+    Component: ProtocolDashboard,
     exact: true,
     name: 'Protocol Dashboard',
     path: '/protocols',

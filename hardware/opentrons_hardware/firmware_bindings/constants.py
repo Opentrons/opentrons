@@ -133,6 +133,11 @@ class MessageId(int, Enum):
 
     do_self_contained_tip_action_request = 0x501
     do_self_contained_tip_action_response = 0x502
+    gear_enable_motor_request = 0x503
+    gear_disable_motor_request = 0x504
+    gear_set_current_request = 0x505
+    gear_write_motor_driver_request = 0x506
+    gear_read_motor_driver_request = 0x507
 
     read_sensor_request = 0x82
     write_sensor_request = 0x83
@@ -241,6 +246,14 @@ class SensorThresholdMode(int, Enum):
 
 
 @unique
+class GearMotorId(int, Enum):
+    """Tip action types."""
+
+    left = 0x0
+    right = 0x01
+
+
+@unique
 class PipetteTipActionType(int, Enum):
     """Tip action types."""
 
@@ -258,3 +271,15 @@ class MotorPositionFlags(Enum):
     # Referring to the closed-loop encoder on the relevant axis.
     # Generally only unset if the motor board has not homed since power-on.
     encoder_position_ok = 0x2
+
+
+@unique
+class MoveStopCondition(int, Enum):
+    """Move Stop Condition."""
+
+    none = 0x0
+    limit_switch = 0x1
+    cap_sensor = 0x2
+    encoder_position = 0x4
+    gripper_force = 0x8
+    stall = 0x10
