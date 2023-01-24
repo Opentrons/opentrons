@@ -1,5 +1,4 @@
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { LoadedLabware, LoadedModule, LoadedPipette } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis, LoadedLabware, LoadedModule, LoadedPipette } from '@opentrons/shared-data'
 
 export function getLoadedLabware(analysis: CompletedProtocolAnalysis, labwareId: string): LoadedLabware | undefined {
   // NOTE: old analysis contains a object dictionary of labware entities by id, this case is supported for backwards compatibility purposes

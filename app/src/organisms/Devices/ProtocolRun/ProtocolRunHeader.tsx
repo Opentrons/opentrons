@@ -1,5 +1,4 @@
 import * as React from 'react'
-import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
@@ -22,7 +21,7 @@ import {
   useModulesQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
-import { HEATERSHAKER_MODULE_TYPE, RunTimeCommand } from '@opentrons/shared-data'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
   Flex,
@@ -65,7 +64,6 @@ import {
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
 import {
@@ -84,7 +82,6 @@ import { EMPTY_TIMESTAMP } from '../constants'
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { RunProgressMeter } from '../RunProgressMeter'
 import { ProtocolRunProgressMeter } from './ProtocolRunProgressMeter'
 
 const EQUIPMENT_POLL_MS = 5000

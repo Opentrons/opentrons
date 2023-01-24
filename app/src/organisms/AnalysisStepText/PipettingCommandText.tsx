@@ -7,7 +7,7 @@ import { StyledText } from '../../atoms/text'
 import type { RunTimeCommand, CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { getLabwareDisplayLocation, getLabwareName } from './utils'
 
-interface PipettingCommandText {
+interface PipettingCommandTextProps {
   command: RunTimeCommand
   robotSideAnalysis: CompletedProtocolAnalysis
 }
@@ -15,7 +15,7 @@ interface PipettingCommandText {
 export const PipettingCommandText = ({
   command,
   robotSideAnalysis,
-}: PipettingCommandText): JSX.Element | null => {
+}: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
   let commandText

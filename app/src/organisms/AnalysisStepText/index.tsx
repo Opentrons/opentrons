@@ -131,7 +131,6 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
       messageNode = t('setting_hs_temp', { temp: celsius })
       break
     }
-
     case 'heaterShaker/setAndWaitForShakeSpeed': {
       const { rpm } = command.params
       messageNode = t('set_and_await_hs_shake', { rpm: rpm })
@@ -188,7 +187,8 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
     case 'heaterShaker/closeLabwareLatch':
     case 'heaterShaker/deactivateShaker':
     case 'heaterShaker/waitForTemperature': {
-      messageNode = t(SIMPLE_T_KEY_BY_COMMAND_TYPE[command.commandType])
+      const simpleTKey = SIMPLE_T_KEY_BY_COMMAND_TYPE[command.commandType]
+      messageNode = simpleTKey != null ? t(simpleTKey) : null
       break
     }
     case 'custom': {
