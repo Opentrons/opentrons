@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 
 import {
   Box,
@@ -206,6 +206,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
               )
             }
           )}
+          <Redirect exact from="/" to="/dashboard" />
         </Switch>
       </Box>
     </ApiHostProvider>
