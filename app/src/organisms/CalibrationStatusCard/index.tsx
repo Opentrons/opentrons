@@ -34,7 +34,7 @@ export function CalibrationStatusCard({
   setShowHowCalibrationWorksModal,
 }: CalibrationStatusCardProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
-  const { activeIndex, taskList } = useCalibrationTaskList(robotName)
+  const { taskListStatus } = useCalibrationTaskList(robotName)
 
   // start off assuming we are missing calibrations
   let statusLabelBackgroundColor = COLORS.errorEnabled
@@ -42,13 +42,13 @@ export function CalibrationStatusCard({
   let statusLabelText = t('missing_calibration_data')
 
   // if the tasklist is empty, though, all calibrations are good
-  if (activeIndex == null) {
+  if (taskListStatus === 'complete') {
     statusLabelBackgroundColor = COLORS.successEnabled
     statusLabelIconColor = COLORS.successEnabled
     statusLabelText = t('calibration_complete')
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
-  } else if (taskList.every(tp => tp.isComplete === true || tp.markedBad)) {
+  } else if (taskListStatus === 'bad') {
     statusLabelBackgroundColor = COLORS.warningEnabled
     statusLabelIconColor = COLORS.warningEnabled
     statusLabelText = t('calibration_recommended')

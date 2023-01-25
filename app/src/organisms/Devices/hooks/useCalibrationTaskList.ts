@@ -44,6 +44,7 @@ export function useCalibrationTaskList(
   let activeTaskIndices: [number, number] | null = null
   const taskList: TaskListProps = {
     activeIndex: null,
+    taskListStatus: 'incomplete',
     taskList: [],
   }
   // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
@@ -294,5 +295,22 @@ export function useCalibrationTaskList(
   }
 
   taskList.activeIndex = activeTaskIndices
+
+  // Set top-level state of calibration status
+  // if the tasklist is empty, though, all calibrations are good
+
+  let calibrationStatus = 'incomplete'
+
+  if (activeTaskIndices == null) {
+    calibrationStatus = 'complete'
+    // if we have tasks and they are all marked bad, then we should
+    // strongly suggest they re-do those calibrations
+  } else if (
+    taskList.taskList.every(tp => tp.isComplete === true || tp.markedBad)
+  ) {
+    calibrationStatus = 'bad'
+  }
+  taskList.taskListStatus = calibrationStatus
+
   return taskList
 }
