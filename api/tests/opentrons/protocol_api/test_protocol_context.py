@@ -486,7 +486,7 @@ def test_add_liquid(
 ) -> None:
     """It should add a liquid to the state."""
     expected_result = Liquid(
-        _id=matchers.IsA(str),
+        _id="water-id",
         name="water",
         description="water desc",
         display_color="#1234",

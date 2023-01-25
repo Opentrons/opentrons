@@ -69,7 +69,7 @@ def test_add_liquid(
     transport: AbstractSyncTransport,
     subject: SyncClient,
 ) -> None:
-    """It should add a labware definition."""
+    """It should add a liquid to engine state."""
     liquid = Liquid.construct(displayName="water")  # type: ignore[call-arg]
 
     decoy.when(
