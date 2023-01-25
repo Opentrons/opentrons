@@ -29,10 +29,6 @@ class CalibrationError(Exception):
     pass
 
 
-# TODO: verify value with HW and put this value in gripper config
-DEFAULT_GRIP_FORCE_IN_NEWTON = 3.0
-
-
 class GripperHandler:
     GH_LOG = MOD_LOG.getChild("GripperHandler")
 
@@ -137,12 +133,14 @@ class GripperHandler:
     def set_jaw_state(self, state: GripperJawState) -> None:
         self.get_gripper().state = state
 
-    def get_duty_cycle_by_grip_force(self, newton: Optional[float] = None) -> float:
+    def get_duty_cycle_by_grip_force(self, newton: float) -> float:
         gripper = self.get_gripper()
-        if not newton:
-            newton = DEFAULT_GRIP_FORCE_IN_NEWTON
         return gripper.duty_cycle_by_force(newton)
 
     def set_jaw_displacement(self, mm: float) -> None:
         gripper = self.get_gripper()
         gripper.current_jaw_displacement = mm
+
+    def is_valid_jaw_width(self, mm: float) -> bool:
+        conf = self.get_gripper().geometry
+        return conf.jaw_width["min"] <= mm <= conf.jaw_width["max"]
