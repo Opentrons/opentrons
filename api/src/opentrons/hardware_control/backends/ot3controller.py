@@ -185,7 +185,6 @@ class OT3Controller:
             return await function(self, *args, **kwargs)
         return wrapper
 
-    @requires_update
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""
         with open(filename, "r") as f:
