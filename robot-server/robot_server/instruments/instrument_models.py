@@ -68,7 +68,7 @@ class _GenericInstrument(
 class GripperData(BaseModel):
     """Data from attached gripper."""
 
-    jawState: GripperJawState = Field(..., description="Gripper Jaw state.")
+    jawState: str = Field(..., description="Gripper Jaw state.")
     # TODO (spp, 2023-01-03): update calibration field as decided after
     #  spike https://opentrons.atlassian.net/browse/RSS-167
     calibratedOffset: Optional[GripperCalibrationOffset] = Field(

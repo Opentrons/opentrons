@@ -49,10 +49,10 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     return Gripper.construct(
         mount=MountType.EXTENSION.as_string(),
         instrumentName=gripper_dict["name"],
-        instrumentModel=gripper_dict["model"],
+        instrumentModel=gripper_dict["model"].value,
         serialNumber=gripper_dict["gripper_id"],
         data=GripperData(
-            jawState=gripper_dict["state"],
+            jawState=gripper_dict["state"].name.lower(),
             calibratedOffset=gripper_dict["calibration_offset"],
         ),
     )
