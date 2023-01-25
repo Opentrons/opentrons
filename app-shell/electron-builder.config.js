@@ -76,6 +76,7 @@ module.exports = async () => ({
     target: ['nsis'],
     publisherName: 'Opentrons Labworks Inc.',
     icon: project === 'robot-stack' ? 'build/icon.ico' : 'build/three.ico',
+    sign: path.join(__dirname, './scripts/sign-windows.js')
   },
   nsis: {
     oneClick: false,
