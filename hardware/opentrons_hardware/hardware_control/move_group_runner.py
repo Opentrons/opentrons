@@ -403,7 +403,7 @@ class MoveScheduler:
                     raise MoveConditionNotMet()
             if self._stop_condition[
                 group_id
-            ] == MoveStopCondition.sync_line and ack_id != UInt8Field(2):
+            ] == MoveStopCondition.cap_sensor and ack_id != UInt8Field(2):
                 if ack_id == 1:
                     condition = "Sensing timed out."
                     log.warning(f"Sensing timed out. Condition: {condition}")
