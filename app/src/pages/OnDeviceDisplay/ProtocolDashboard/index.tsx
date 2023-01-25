@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { format, formatDistance, previousDay } from 'date-fns'
+import { format, formatDistance } from 'date-fns'
 import {
   COLORS,
   SPACING,
@@ -48,7 +48,7 @@ const TableHeader = styled('th')`
 `
 const TableRow = styled('tr')`
   border: 1px ${COLORS.medGreyHover} solid;
-  /* height: 4rem; */
+  height: 4rem;
   padding: ${SPACING.spacing5};
 `
 
@@ -76,30 +76,24 @@ export function ProtocolDashboard(): JSX.Element {
   const handleSortByName = (): void => {
     if (sortBy === 'alphabetical') {
       handleProtocolsBySortKey('reverse')
-      console.log('reverse')
     } else {
       handleProtocolsBySortKey('alphabetical')
-      console.log('alphabetical')
     }
   }
 
   const handleSortByLastRun = (): void => {
     if (sortBy === 'recentRun') {
       handleProtocolsBySortKey('oldRun')
-      console.log('oldRun')
     } else {
       handleProtocolsBySortKey('recentRun')
-      console.log('recentRun')
     }
   }
 
   const handleSortByDate = (): void => {
     if (sortBy === 'recentCreated') {
       handleProtocolsBySortKey('oldCreated')
-      console.log('oldCreated')
     } else {
       handleProtocolsBySortKey('recentCreated')
-      console.log('recentCreated')
     }
   }
 
@@ -116,7 +110,15 @@ export function ProtocolDashboard(): JSX.Element {
           <tr>
             <TableHeader>
               <Flex flexDirection="row" alignItems="center">
-                <Btn onClick={handleSortByName}>{t('protocol_name_title')}</Btn>
+                <Btn onClick={handleSortByName}>
+                  <StyledText
+                    fontSize="1.25rem"
+                    lineHeight="1.6875rem"
+                    fontWeight="600"
+                  >
+                    {t('protocol_name_title')}
+                  </StyledText>
+                </Btn>
                 {sortBy === 'alphabetical' || sortBy === 'reverse' ? (
                   <Icon
                     name={
@@ -129,7 +131,15 @@ export function ProtocolDashboard(): JSX.Element {
             </TableHeader>
             <TableHeader>
               <Flex flexDirection="row" alignItems="center">
-                <Btn onClick={handleSortByLastRun}>{t('last_run')}</Btn>
+                <Btn onClick={handleSortByLastRun}>
+                  <StyledText
+                    fontSize="1.25rem"
+                    lineHeight="1.6875rem"
+                    fontWeight="600"
+                  >
+                    {t('last_run')}
+                  </StyledText>
+                </Btn>
                 {sortBy === 'recentRun' || sortBy === 'oldRun' ? (
                   <Icon
                     name={
@@ -142,7 +152,15 @@ export function ProtocolDashboard(): JSX.Element {
             </TableHeader>
             <TableHeader>
               <Flex flexDirection="row" alignItems="center">
-                <Btn onClick={handleSortByDate}>{t('date_added')}</Btn>
+                <Btn onClick={handleSortByDate}>
+                  <StyledText
+                    fontSize="1.25rem"
+                    lineHeight="1.6875rem"
+                    fontWeight="600"
+                  >
+                    {t('date_added')}
+                  </StyledText>
+                </Btn>
                 {sortBy === 'recentCreated' || sortBy === 'oldCreated' ? (
                   <Icon
                     name={

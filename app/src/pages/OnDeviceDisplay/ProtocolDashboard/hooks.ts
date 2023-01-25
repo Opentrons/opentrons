@@ -18,7 +18,7 @@ export function useSortProtocols(
 ): ProtocolResource[] {
   protocols.sort((a, b) => {
     const aName = a.metadata.protocolName ?? a.files[0].name
-    const bName = a.metadata.protocolName ?? b.files[0].name
+    const bName = b.metadata.protocolName ?? b.files[0].name
     const aLastRun = new Date(
       runs.find(run => run.protocolId === a.id)?.completedAt ?? 0
     )
