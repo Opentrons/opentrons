@@ -103,12 +103,11 @@ class Capturer:
             self.csv_writer.writerow([data, (time.time() - self.start_time)])
 
 
-
 def _build_pass_step(
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
-    sensor_stop_condition: MoveStopCondition = MoveStopCondition.cap_sensor,
+    sensor_stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
     # use any node present to calculate duration of the move, assuming the durations
     #   will be the same
@@ -141,6 +140,10 @@ async def liquid_probe(
     """Move the mount down to the starting height, then move the
     mount and pipette while reading from the pressure sensor.
     """
+    sensor_capturer = Capturer()
+    sensor_capturer.set_mount(mount)
+    sensor_capturer.create_csv_header(mount_speed, plunger_speed, threshold_pascals)
+    messenger.add_listener(sensor_capturer, None)
 
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
@@ -154,7 +157,7 @@ async def liquid_probe(
         movers=[mount, tool],
         distance={mount: max_z_distance, tool: max_z_distance},
         speed={mount: mount_speed, tool: plunger_speed},
-        sensor_stop_condition=MoveStopCondition.pressure_sensor,
+        sensor_stop_condition=MoveStopCondition.sync_line,
     )
 
     prep_move = create_step(
