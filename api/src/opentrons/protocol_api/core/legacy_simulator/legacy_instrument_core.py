@@ -181,16 +181,12 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
             from opentrons.protocol_api.labware import Labware, Well
 
             labware = Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._api_version,
                 protocol_core=None,  # type: ignore[arg-type]
                 core_map=None,  # type: ignore[arg-type]
             )
-            well = Well(
-                parent=labware,
-                well_implementation=well_core,
-                api_version=self._api_version,
-            )
+            well = Well(parent=labware, core=well_core, api_version=self._api_version)
 
             if LabwareLike(labware).is_fixed_trash():
                 location = well.top()

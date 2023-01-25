@@ -165,7 +165,7 @@ class ModuleContext(CommandPublisher):
             labware = self._core.add_labware_core(cast(LegacyLabwareCore, labware_core))
         else:
             labware = Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._api_version,
                 protocol_core=self._protocol_core,
                 core_map=self._core_map,
