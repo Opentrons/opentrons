@@ -36,7 +36,11 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     TipActionRequestPayload,
     EmptyPayload,
 )
-from .constants import interrupts_per_sec, brushed_motor_interrupts_per_sec
+from .constants import (
+    interrupts_per_sec,
+    tip_interrupts_per_sec,
+    brushed_motor_interrupts_per_sec,
+)
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -283,8 +287,10 @@ class MoveGroupRunner:
         tip_action_payload = TipActionRequestPayload(
             group_id=UInt8Field(group),
             seq_id=UInt8Field(seq),
-            duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-            velocity=self._convert_velocity(step.velocity_mm_sec, interrupts_per_sec),
+            duration=UInt32Field(int(step.duration_sec * tip_interrupts_per_sec)),
+            velocity=self._convert_velocity(
+                step.velocity_mm_sec, tip_interrupts_per_sec
+            ),
             action=PipetteTipActionTypeField(step.action),
             request_stop_condition=MoveStopConditionField(step.stop_condition),
         )
