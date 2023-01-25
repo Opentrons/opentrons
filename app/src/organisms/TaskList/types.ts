@@ -25,4 +25,5 @@ export interface TaskListProps {
   // null activeIndex: all tasks complete
   activeIndex: [number, number] | null
   taskList: TaskProps[]
+  taskListStatus: string | null
 }

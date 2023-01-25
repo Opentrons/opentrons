@@ -243,6 +243,7 @@ export const expectedTaskList: TaskListProps = {
       taskIndex: 2,
     },
   ],
+  taskListStatus: 'complete',
 }
 
 export const expectedFailedTaskList: TaskListProps = {
@@ -339,6 +340,7 @@ export const expectedFailedTaskList: TaskListProps = {
       taskIndex: 2,
     },
   ],
+  taskListStatus: 'bad',
 }
 
 export const expectedIncompleteDeckCalTaskList: TaskListProps = {
@@ -430,6 +432,7 @@ export const expectedIncompleteDeckCalTaskList: TaskListProps = {
       taskIndex: 2,
     },
   ],
+  taskListStatus: 'incomplete',
 }
 
 export const expectedIncompleteLeftMountTaskList: TaskListProps = {
@@ -517,6 +520,7 @@ export const expectedIncompleteLeftMountTaskList: TaskListProps = {
       taskIndex: 2,
     },
   ],
+  taskListStatus: 'incomplete',
 }
 
 export const expectedIncompleteRightMountTaskList: TaskListProps = {
@@ -604,4 +608,5 @@ export const expectedIncompleteRightMountTaskList: TaskListProps = {
       taskIndex: 2,
     },
   ],
+  taskListStatus: 'incomplete',
 }
