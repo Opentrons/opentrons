@@ -3,9 +3,12 @@
 from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
+from functools import wraps
 import logging
 from copy import deepcopy
 from typing import (
+    Any,
+    Awaitable,
     Callable,
     Dict,
     List,
@@ -121,7 +124,7 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 MapPayload = TypeVar("MapPayload")
-
+Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
 
 class OT3Controller:
     """OT3 Hardware Controller Backend."""
@@ -174,28 +177,26 @@ class OT3Controller:
 
         # firmware update variables
         self._update_required = False
-        self._subsystem_info_cache: dict[NodeId, DeviceInfoCache] = {}
         self._firmware_update_list: Dict[DeviceInfoCache, UpdateInfo] = {}
         self._known_firmware = load_firmware_manifest()
 
     @property
     def fw_version(self) -> Optional[str]:
         """Get the firmware version."""
-        return self._subsystem_info_cache
+        return None
 
     @property
-    def update_required(self):
+    def update_required(self) -> bool:
         return self._update_required
 
-    def requires_update(function: callable):
+    def requires_update(self, func: Wrapped) -> Wrapped:
         """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
-
-        async def wrapper(self, *args, **kwargs):
+        @wraps(func)
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
             if self.update_required:
                 raise FirmwareUpdateRequired()
-            return await function(self, *args, **kwargs)
-
-        return wrapper
+            return await func(*args, **kwargs)
+        return cast(Wrapped, wrapper)
 
     def get_update_type(self, node_id: NodeId) -> FirmwareUpdateType:
         if "pipette" in node_id.name:
@@ -208,7 +209,7 @@ class OT3Controller:
     ) -> Dict[DeviceInfoCache, UpdateInfo]:
         """Returns a dict of NodeIds that require a firmware update."""
         firmware_update_list = dict()
-        for node, version_cache in self._subsystem_info_cache.items():
+        for node, version_cache in self._network_info.device_info.items():
             update_type = self.get_update_type(node)
             update_info = self._known_firmware.get(update_type)
             if not update_info:

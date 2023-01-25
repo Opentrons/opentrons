@@ -53,7 +53,7 @@ PipetteAction = Literal["pick_up", "drop"]
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
 
-SubsystemToNodeId = {
+SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
     OT3SubSystem.gantry_x: NodeId.gantry_x,
     OT3SubSystem.gantry_y: NodeId.gantry_y,
     OT3SubSystem.head: NodeId.head,
@@ -149,13 +149,13 @@ def axis_is_node(axis: OT3Axis) -> bool:
 
 def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
     """Convert a sub system to a NodeId."""
-    return SubsystemToNodeId[sub_sys]
+    return SUBSYSTEM_NODEID[sub_sys]
 
 
-def node_id_to_subsystem(node_id: NodeId) -> "OT3Subsystem":
+def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
     """Convert a NodeId to a Subsystem"""
     node_to_subsystem = {
-        node_id: subsystem for node_id, subsystem in SubsystemToNodeId.items()
+        node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
     }
     return node_to_subsystem[node_id]
 
