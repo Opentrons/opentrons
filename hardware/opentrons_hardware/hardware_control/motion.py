@@ -36,7 +36,6 @@ class MoveType(int, Enum):
             MoveStopCondition.encoder_position: cls.linear,
             MoveStopCondition.gripper_force: cls.grip,
             MoveStopCondition.stall: cls.linear,
-            MoveStopCondition.pressure_sensor: cls.liquid_sense,
         }
         return mapping[condition]
 

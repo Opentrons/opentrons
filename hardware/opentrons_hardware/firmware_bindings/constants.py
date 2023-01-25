@@ -283,4 +283,3 @@ class MoveStopCondition(int, Enum):
     encoder_position = 0x4
     gripper_force = 0x8
     stall = 0x10
-    pressure_sensor = 0x20
