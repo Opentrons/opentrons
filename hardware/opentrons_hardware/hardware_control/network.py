@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import logging
 from typing import Any, Dict, Set, Optional, Union
 from opentrons_hardware.firmware_bindings import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class DeviceInfoCache:
-    node_id: int
+    node_id: NodeId
     version: int
     shortsha: str
     flags: Any
@@ -70,18 +70,10 @@ class NetworkInfo:
         nodes: Dict[NodeId, DeviceInfoCache] = dict()
 
         def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
-            try:
-                node = NodeId(arbitration_id.parts.originating_node_id)
-            except ValueError:
-                log.error(
-                    "unknown node id on network: "
-                    f"0x{arbitration_id.parts.originating_node_id:x}"
-                )
-                return
             if isinstance(message, DeviceInfoResponse):
                 device_info_cache = _parse_device_info_response(message, arbitration_id)
                 if device_info_cache:
-                    nodes[node] = device_info_cache
+                    nodes[device_info_cache.node_id] = device_info_cache
             if expected and expected.issubset(nodes):
                 event.set()
 
@@ -110,14 +102,18 @@ def _parse_device_info_response(
     message: MessageDefinition, arbitration_id: ArbitrationId
 ) -> Union[DeviceInfoCache, None]:
     """Parses the DeviceInfoRequest message and returns DeviceInfoCache."""
-    if arbitration_id.parts.message_id == MessageId.error_message:
-        log.error(
-            f"Recieved an error message {str(message)} from {str(arbitration_id.parts)}"
-        )
-    elif isinstance(message, DeviceInfoResponse):
+    if isinstance(message, DeviceInfoResponse):
+        try:
+            node = NodeId(arbitration_id.parts.originating_node_id)
+        except ValueError:
+            log.error(
+                "unknown node id on network: "
+                f"0x{arbitration_id.parts.originating_node_id:x}"
+            )
+            return None
         try:
             return DeviceInfoCache(
-                node_id=int(arbitration_id.parts.originating_node_id),
+                node_id=node,
                 version=int(message.payload.version.value),
                 shortsha=message.payload.shortsha.value.decode(),
                 flags=message.payload.flags.value,
