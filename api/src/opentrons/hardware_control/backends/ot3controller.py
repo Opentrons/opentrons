@@ -896,6 +896,7 @@ class OT3Controller:
         threshold_pascals: float,
         starting_mount_height: float,
         prep_move_speed: float,
+        log_pressure: bool = True,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
         head_node = head_node_for_mount(OT3Mount(mount.value))
@@ -909,8 +910,9 @@ class OT3Controller:
             mount_speed,
             starting_mount_height,
             prep_move_speed,
-            sensor_id,
             threshold_pascals,
+            log_pressure,
+            sensor_id,
         )
         pos_axes = dict()
         for node, point in positions.items():

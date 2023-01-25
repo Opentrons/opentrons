@@ -147,8 +147,9 @@ async def test_liquid_probe(
         plunger_speed=8,
         starting_mount_height=120,
         prep_move_speed=40,
-        sensor_id=SensorId.S0,
         threshold_pascals=threshold_pascals,
+        log_pressure=False,
+        sensor_id=SensorId.S0,
     )
     assert position[motor_node][0] == 14
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
