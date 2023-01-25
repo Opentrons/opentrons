@@ -1682,8 +1682,9 @@ class OT3API(
         a ThresholdReachedTooEarly error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
-        home the mount and plunger to avoid collision, and return the height at
-        which the liquid was found.
+        home the plunger to prepare to aspirate, and return the position of the
+        z axis in deck coordinates, as well as the encoder position, where
+        the liquid was found.
         """
 
         checked_mount = OT3Mount.from_mount(mount)
@@ -1712,7 +1713,6 @@ class OT3API(
             )
         except MoveConditionNotMet:
             self._log.exception("Liquid Sensing failed- threshold never reached.")
-            self._current_position.clear()
             raise
         else:
             machine_pos = await self._backend.update_position()
@@ -1739,11 +1739,9 @@ class OT3API(
                 self._log.exception(
                     "Liquid Sensing failed- threshold reached too early."
                 )
-                self._current_position.clear()
                 raise ThresholdReachedTooEarly
 
             await self.home_plunger(mount)
-            await self.home_z(mount)
 
             return position[mount_axis], encoder_position[mount_axis]
 
