@@ -14,6 +14,7 @@ from typing import (
     Sequence,
     Set,
     Any,
+    Tuple,
     TypeVar,
 )
 
@@ -48,7 +49,7 @@ from .instruments.ot3.pipette import (
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints, head_node_for_mount
+from .backends.ot3utils import get_system_constraints
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -1667,7 +1668,7 @@ class OT3API(
         self,
         mount: OT3Mount,
         probe_settings: Optional[LiquidProbeSettings] = None,
-    ) -> float:
+    ) -> Tuple[float, float]:
         """Search for and return liquid level height.
 
         This function makes sure the plunger motor is homed before starting.
@@ -1693,15 +1694,14 @@ class OT3API(
 
         if not probe_settings:
             probe_settings = self.config.liquid_sense
-        pipette_axis = OT3Axis.of_main_tool_actuator(mount)
+        mount_axis = OT3Axis.by_mount(mount)
 
         if not self._current_position:
             await self.home()
-        checked_position = await self.current_position_ot3(mount)
-        if checked_position[pipette_axis] != 0:
+        if probe_settings.home_plunger_at_start:
             await self.home_plunger(mount)
         try:
-            positions = await self._backend.liquid_probe(
+            await self._backend.liquid_probe(
                 mount,
                 probe_settings.max_z_distance,
                 probe_settings.mount_speed,
@@ -1715,18 +1715,6 @@ class OT3API(
             self._current_position.clear()
             raise
         else:
-            final_mount_pos_um: float = positions[head_node_for_mount(mount)][0]
-            pipette_distance_traveled = (
-                final_mount_pos_um - probe_settings.starting_mount_height
-            )
-
-            if pipette_distance_traveled < probe_settings.min_z_distance:
-                self._log.exception(
-                    "Liquid Sensing failed- threshold reached too early."
-                )
-                self._current_position.clear()
-                raise ThresholdReachedTooEarly
-
             machine_pos = await self._backend.update_position()
             position = deck_from_machine(
                 machine_pos,
@@ -1743,10 +1731,21 @@ class OT3API(
             )
             self._encoder_current_position.update(encoder_position)
 
+            z_distance_traveled = (
+                position[mount_axis] - probe_settings.starting_mount_height
+            )
+
+            if z_distance_traveled < probe_settings.min_z_distance:
+                self._log.exception(
+                    "Liquid Sensing failed- threshold reached too early."
+                )
+                self._current_position.clear()
+                raise ThresholdReachedTooEarly
+
             await self.home_plunger(mount)
             await self.home_z(mount)
 
-            return final_mount_pos_um
+            return position[mount_axis], encoder_position[mount_axis]
 
     async def capacitive_probe(
         self,

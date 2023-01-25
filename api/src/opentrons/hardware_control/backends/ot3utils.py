@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence
+from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence, Union
 from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     InstrumentProbeType,
 )
+from opentrons.types import Mount
 import numpy as np
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -317,7 +318,9 @@ _head_node_lookup: Dict[OT3Mount, NodeId] = {
 }
 
 
-def head_node_for_mount(mount: OT3Mount) -> NodeId:
+def head_node_for_mount(mount: Union[OT3Mount, Mount]) -> NodeId:
+    if isinstance(mount, Mount):
+        mount = OT3Mount.from_mount(mount)
     return _head_node_lookup[mount]
 
 

@@ -145,6 +145,8 @@ class LiquidProbeSettings:
     plunger_speed: float
     sensor_threshold_pascals: float
     expected_liquid_height: float
+    log_pressure: bool
+    home_plunger_at_start: bool
 
 
 @dataclass(frozen=True)

@@ -22,12 +22,14 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     starting_mount_height=100,
     prep_move_speed=10,
-    max_z_distance=60,
+    max_z_distance=40,
     min_z_distance=5,
     mount_speed=10,
     plunger_speed=5,
-    sensor_threshold_pascals=17,
+    sensor_threshold_pascals=100,
     expected_liquid_height=110,
+    log_pressure=True,
+    home_plunger_at_start=False,
 )
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
@@ -361,6 +363,10 @@ def _build_default_liquid_probe(
         ),
         expected_liquid_height=from_conf.get(
             "expected_liquid_height", default.expected_liquid_height
+        ),
+        log_pressure=from_conf.get("log_pressure", default.log_pressure),
+        home_plunger_at_start=from_conf.get(
+            "home_plunger_at_start", default.home_plunger_at_start
         ),
     )
 
