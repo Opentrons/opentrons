@@ -11,14 +11,14 @@ comma=,
 # string manipulations to extract the int version number
 ssh-version-output = $(shell ssh -V 2>&1)
 ssh-version-words=$(subst _, ,$(filter OpenSSH_%, $(ssh-version-output)))
-ssh-version-label=$(filter %p1$(comma),$(ssh-version-words))
+ssh-version-label=$(or $(filter %p1$(comma),$(ssh-version-words)), $(filter %p1,$(ssh-version-words)))
 ssh-version-number=$(subst ., ,$(firstword $(subst p, ,$(ssh-version-label))))
 checked-ssh-version=$(if $(ssh-version-number),$(ssh-version-number),"$(warning Could not find ssh version for version $(ssh-version-output), scp flags may be wrong")))
 is-in-version=$(findstring $(firstword $(checked-ssh-version)),$(allowed-ssh-versions))
 # when using an OpenSSH version larger than 8.9,
 # we need to add a flag to use legacy scp with SFTP protocol
 scp-legacy-option-flag = $(if $(is-in-version),,-O)
-# when using windows, make is running against a different openSSH than the OS. 
+# when using windows, make is running against a different openSSH than the OS.
 # adding the -O flag to scp will fail if the openSSH on OS is less than 9.
 # if openSSH on OS is 9 or more please add the -O flag to scp.
 PLATFORM := $(shell uname -s)
@@ -80,7 +80,7 @@ ssh -i "$(2)" $(3)  root@$(1) \
 endef
 
 # push-systemd-unit: move a systemd unit file to the robot
-# 
+#
 # argument 1 is the host to push to
 # argument 2 is the identity key to use
 # argument 3 is any further ssh options, quoted
