@@ -50,7 +50,7 @@ const ProtocolHeader = (props: {
         <StyledText as="h2">{`${t('protocol_info:date_added')}: ${
           date != null
             ? format(new Date(date), 'MM/dd/yyyy')
-            : t('shared: no_data')
+            : t('shared:no_data')
         }`}</StyledText>
         <StyledText as="h2">{`${t(
           'protocol_details:creation_method'
