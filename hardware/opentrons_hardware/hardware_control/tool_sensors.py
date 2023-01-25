@@ -131,18 +131,15 @@ async def liquid_probe(
     mount_speed: float,
     starting_mount_height: float,
     prep_move_speed: float,
-    sensor_id: SensorId = SensorId.S0,
     threshold_pascals: float = 1.0,
+    log_pressure: bool = True,
+    sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
     """Create and run liquid probing moves.
 
     Move the mount down to the starting height, then move the
     mount and pipette while reading from the pressure sensor.
     """
-    sensor_capturer = Capturer()
-    sensor_capturer.set_mount(mount)
-    sensor_capturer.create_csv_header(mount_speed, plunger_speed, threshold_pascals)
-    messenger.add_listener(sensor_capturer, None)
 
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
@@ -172,15 +169,26 @@ async def liquid_probe(
     prep_runner = MoveGroupRunner(move_groups=[[prep_move]])
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
     await prep_runner.run(can_messenger=messenger)
+
+    if log_pressure:
+        sensor_capturer = Capturer()
+        sensor_capturer.set_mount(mount)
+        sensor_capturer.create_csv_header(mount_speed, plunger_speed, threshold_pascals)
+        messenger.add_listener(sensor_capturer, None)
+        binding = SensorOutputBinding.report | SensorOutputBinding.sync
+    else:
+        binding = SensorOutputBinding.sync
+
     async with sensor_driver.bind_output(
         messenger,
         pressure_sensor,
-        SensorOutputBinding.report | SensorOutputBinding.sync,
+        binding,
     ):
-        sensor_capturer.start_time = time.time()
         positions = await sensor_runner.run(can_messenger=messenger)
-        sensor_capturer.get_all()
-        sensor_capturer.data_file.close()
+        if log_pressure:
+            sensor_capturer.start_time = time.time()
+            sensor_capturer.get_all()
+            sensor_capturer.data_file.close()
         return positions
 
 
