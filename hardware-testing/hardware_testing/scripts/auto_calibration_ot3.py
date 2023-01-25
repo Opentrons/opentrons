@@ -56,15 +56,6 @@ async def _main(
     homed_pos = await api.gantry_position(mount)
     fast_home_pos = homed_pos + Point(-5, -5, -5)
     try:
-
-        # if mount == OT3Mount.GRIPPER:
-        #     if id == "S1":
-        #         input("Add probe to gripper REAR, then press ENTER: ")
-        #     else:
-        #         input("Add probe to gripper FRONT, then press ENTER: ")
-        # else:
-        #     input("Attach calibration probe to the pipette and press Enter\n")
-
         for i in range(cycle):
             if mount == OT3Mount.GRIPPER:
                 if id != "S1":
@@ -72,12 +63,15 @@ async def _main(
                     if id == "all":
                         front_offset = offset
                         await api.home_z()
+                        input("Add probe to gripper REAR, then press ENTER: ")
 
                 if id != "S0":
                     offset = await calibrate_gripper_jaw(api, GripperProbe.REAR, slot)
                     if id == "all":
                         rear_offset = offset
                         offset = await calibrate_gripper(api, front_offset, rear_offset)
+                        await api.home_z()
+                        input("Add probe to gripper FRONT, then press ENTER: ")
             else:
                 offset = await calibrate_pipette(api, mount, slot)
 
