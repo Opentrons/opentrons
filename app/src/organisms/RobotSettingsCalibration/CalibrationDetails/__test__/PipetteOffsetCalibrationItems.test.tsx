@@ -12,6 +12,7 @@ import {
 } from '../../../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
+import { formatLastCalibrated } from '../utils'
 
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
@@ -179,7 +180,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Recalibration recommended')
   })
 
-  it('should not render icon and text when calibration recommended and when the calibration wizard feature flag is set', () => {
+  it('should only render last calibrated date text when calibration recommended and when the calibration wizard feature flag is set', () => {
     when(mockUseFeatureFlag)
       .calledWith('enableCalibrationWizards')
       .mockReturnValue(true)
@@ -196,7 +197,9 @@ describe('PipetteOffsetCalibrationItems', () => {
         },
       ],
     }
-    const [{ queryByText }] = render(props)
+    const [{ getByText, queryByText }] = render(props)
+    expect(queryByText('Not calibrated')).not.toBeInTheDocument()
     expect(queryByText('Recalibration recommended')).not.toBeInTheDocument()
+    getByText(formatLastCalibrated('2022-11-10T18:15:02'))
   })
 })

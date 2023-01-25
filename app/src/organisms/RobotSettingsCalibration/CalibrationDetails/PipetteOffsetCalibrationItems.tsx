@@ -120,7 +120,16 @@ export function PipetteOffsetCalibrationItems({
                       <>
                         {enableCalibrationWizards ? (
                           <StyledText as="p">
-                            {t('not_calibrated_short')}
+                            {calibration.lastCalibrated != null &&
+                            calibration.markedBad === true ? (
+                              <>
+                                {formatLastCalibrated(
+                                  calibration.lastCalibrated
+                                )}
+                              </>
+                            ) : (
+                              <>{t('not_calibrated_short')}</>
+                            )}
                           </StyledText>
                         ) : (
                           <>
