@@ -15,7 +15,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorThresholdMode,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.hardware_control.network import probe
+from opentrons_hardware.hardware_control.network import NetworkInfo
 import opentrons_hardware.sensors.types as sensor_types
 
 from opentrons_hardware.firmware_bindings.messages import (
@@ -97,7 +97,8 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     """Run the test."""
     target_z = NodeId["head_" + args.mount[0]]
     target_pipette = NodeId["pipette_" + args.mount]
-    found = await probe(messenger, {NodeId.head, target_pipette}, 10)
+    network_info = NetworkInfo(messenger)
+    found = set(await network_info.probe({NodeId.head, target_pipette}, 10))
     if NodeId.head not in found or target_pipette not in found:
         raise RuntimeError(f"could not find targets for {args.mount} in {found}")
 

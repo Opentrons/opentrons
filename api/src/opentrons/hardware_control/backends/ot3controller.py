@@ -828,7 +828,7 @@ class OT3Controller:
         a working machine, and no more.
         """
         core_nodes = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        core_present = await set(self._network_info.probe(core_nodes, timeout))
+        core_present = set(await self._network_info.probe(core_nodes, timeout))
         self._present_nodes = self._filter_probed_core_nodes(
             self._present_nodes, core_present
         )
@@ -857,7 +857,7 @@ class OT3Controller:
             "config", None
         ):
             expected.add(NodeId.gripper)
-        core_present = await set(self._network_info.probe(expected, timeout))
+        core_present = set(await self._network_info.probe(expected, timeout))
         self._present_nodes = self._replace_gripper_node(
             self._replace_head_node(core_present)
         )
@@ -916,9 +916,3 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
-
-    async def update_motor_status(self) -> None:
-        """Retreive motor and encoder status and position from all present nodes"""
-        assert len(self._present_nodes)
-        response = await get_motor_position(self._messenger, self._present_nodes)
-        self._handle_motor_status_response(response)
