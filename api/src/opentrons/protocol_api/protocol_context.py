@@ -761,7 +761,7 @@ class ProtocolContext(CommandPublisher):
         """
         Add a liquid to the protocol.
 
-        :param str name: An human-readable name for this liquid.
+        :param str name: A human-readable name for this liquid.
         :param str description: An optional description of this liquid.
         :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
         """
