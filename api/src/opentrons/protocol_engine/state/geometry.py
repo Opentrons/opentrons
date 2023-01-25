@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Set, Tuple, Union
 
-from opentrons.types import Point, DeckSlotName, Mount
+from opentrons.types import Point, DeckSlotName, MountType
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
@@ -19,7 +19,7 @@ from ..types import (
     LabwareOffsetVector,
     DeckType,
 )
-from .labware import LabwareView
+from .labware import LabwareView, EdgePathType
 from .modules import ModuleView
 from .pipettes import CurrentWell
 
@@ -221,39 +221,22 @@ class GeometryView:
         self,
         labware_id: str,
         well_name: str,
-        mount: Mount,
+        mount: MountType,
         edges: EdgeList,
     ) -> List[Point]:
         """Determine the safe list of points to touch the pipette tip to."""
-        left_path = [edges.left, edges.center, edges.up, edges.down]
-        right_path = [edges.right, edges.center, edges.up, edges.down]
-
-        labware_def = self._labware.get_definition(labware_id)
         labware_slot = self.get_ancestor_slot_name(labware_id)
-        left_column = labware_def.ordering[0]
-        right_column = labware_def.ordering[-1]
+        next_to_module = self._modules.is_edge_move_unsafe(mount, labware_slot)
+        edge_path_type = self._labware.get_edge_path_type(
+            labware_id, well_name, mount, labware_slot, next_to_module
+        )
 
-        left_path_criteria = mount is Mount.RIGHT and well_name in left_column
-        right_path_criteria = mount is Mount.LEFT and well_name in right_column
-        next_to_mod = self._modules.is_edge_move_unsafe(mount, labware_slot)
-
-        if (
-            labware_slot
-            in [
-                DeckSlotName.SLOT_3,
-                DeckSlotName.SLOT_6,
-                DeckSlotName.SLOT_9,
-                DeckSlotName.FIXED_TRASH,
-            ]
-            and left_path_criteria
-        ):
-            return left_path
-        elif left_path_criteria and next_to_mod:
-            return left_path
-        elif right_path_criteria and next_to_mod:
-            return right_path
-
-        return [edges.right, edges.left, edges.center, edges.up, edges.down]
+        if edge_path_type == EdgePathType.LEFT:
+            return [edges.left, edges.center, edges.up, edges.down]
+        elif edge_path_type == EdgePathType.RIGHT:
+            return [edges.right, edges.center, edges.up, edges.down]
+        else:
+            return [edges.right, edges.left, edges.center, edges.up, edges.down]
 
     def get_well_edges(
         self,

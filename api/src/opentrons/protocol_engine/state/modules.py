@@ -25,7 +25,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_slot,
     get_west_slot,
 )
-from opentrons.types import DeckSlotName, Mount
+from opentrons.types import DeckSlotName, MountType
 
 from ..types import (
     LoadedModule,
@@ -716,24 +716,24 @@ class ModuleView(HasState[ModuleState]):
                 return True
         return False
 
-    def is_edge_move_unsafe(self, mount: Mount, target_slot: DeckSlotName) -> bool:
+    def is_edge_move_unsafe(self, mount: MountType, target_slot: DeckSlotName) -> bool:
         """Check if the slot next to target contains a module to be avoided, depending on mount."""
         slot_int = target_slot.as_int()
 
-        if mount is Mount.RIGHT:
+        if mount is MountType.RIGHT:
             # Check left of the target
             neighbor_int = get_west_slot(slot_int)
             if neighbor_int is None:
                 return False
             else:
-                neighbor_slot = DeckSlotName(str(neighbor_int))
+                neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
         else:
             # Check right of the target
             neighbor_int = get_east_slot(slot_int)
             if neighbor_int is None:
                 return False
             else:
-                neighbor_slot = DeckSlotName(str(neighbor_int))
+                neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
 
         return neighbor_slot in self._state.slot_by_module_id.values()
 

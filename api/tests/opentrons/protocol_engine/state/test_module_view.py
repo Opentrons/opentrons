@@ -6,7 +6,7 @@ from contextlib import nullcontext as does_not_raise
 from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any
 
 from opentrons_shared_data import load_shared_data
-from opentrons.types import DeckSlotName, Mount
+from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedModule,
@@ -1626,16 +1626,16 @@ def test_get_by_slot_filter_ids() -> None:
 @pytest.mark.parametrize(
     argnames=["mount", "target_slot", "expected_result"],
     argvalues=[
-        (Mount.RIGHT, DeckSlotName.SLOT_1, False),
-        (Mount.RIGHT, DeckSlotName.SLOT_2, True),
-        (Mount.RIGHT, DeckSlotName.SLOT_5, False),
-        (Mount.LEFT, DeckSlotName.SLOT_3, False),
-        (Mount.RIGHT, DeckSlotName.SLOT_5, False),
-        (Mount.LEFT, DeckSlotName.SLOT_8, True),
+        (MountType.RIGHT, DeckSlotName.SLOT_1, False),
+        (MountType.RIGHT, DeckSlotName.SLOT_2, True),
+        (MountType.RIGHT, DeckSlotName.SLOT_5, False),
+        (MountType.LEFT, DeckSlotName.SLOT_3, False),
+        (MountType.RIGHT, DeckSlotName.SLOT_5, False),
+        (MountType.LEFT, DeckSlotName.SLOT_8, True),
     ],
 )
 def test_is_edge_move_unsafe(
-    mount: Mount, target_slot: DeckSlotName, expected_result: bool
+    mount: MountType, target_slot: DeckSlotName, expected_result: bool
 ) -> None:
     """It should determine if an edge move would be unsafe."""
     subject = make_module_view(

@@ -8,7 +8,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import Parameters
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, Point, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -26,6 +26,7 @@ from opentrons.protocol_engine.state.labware import (
     LabwareState,
     LabwareView,
     LabwareLoadParams,
+    EdgePathType,
 )
 
 
@@ -864,3 +865,48 @@ def test_get_by_slot_filter_ids() -> None:
     )
 
     assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == labware_1
+
+
+@pytest.mark.parametrize(
+    ["well_name", "mount", "labware_slot", "next_to_module", "expected_result"],
+    [
+        ("abc", MountType.RIGHT, DeckSlotName.SLOT_3, False, EdgePathType.LEFT),
+        ("abc", MountType.RIGHT, DeckSlotName.SLOT_1, True, EdgePathType.LEFT),
+        ("pqr", MountType.LEFT, DeckSlotName.SLOT_3, True, EdgePathType.RIGHT),
+        ("pqr", MountType.LEFT, DeckSlotName.SLOT_3, False, EdgePathType.DEFAULT),
+        ("pqr", MountType.RIGHT, DeckSlotName.SLOT_3, True, EdgePathType.DEFAULT),
+        ("def", MountType.LEFT, DeckSlotName.SLOT_3, True, EdgePathType.DEFAULT),
+    ],
+)
+def test_get_edge_path_type(
+    well_name: str,
+    mount: MountType,
+    labware_slot: DeckSlotName,
+    next_to_module: bool,
+    expected_result: EdgePathType,
+) -> None:
+    """It should get the proper edge path type based on well name, mount, and labware position."""
+    labware = LoadedLabware(
+        id="tip-rack-id",
+        loadName="load-name",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        definitionUri="some-labware-uri",
+        offsetId=None,
+    )
+
+    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+        ordering=[["abc", "def"], ["ghi", "jkl"], ["mno", "pqr"]]
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"labware-id": labware},
+        definitions_by_uri={
+            "some-labware-uri": labware_def,
+        },
+    )
+
+    result = subject.get_edge_path_type(
+        "labware-id", well_name, mount, labware_slot, next_to_module
+    )
+
+    assert result == expected_result

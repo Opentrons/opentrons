@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import (
     Any,
     Dict,
@@ -19,7 +20,7 @@ from typing import (
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, Point, MountType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -67,6 +68,14 @@ class LabwareLoadParams(NamedTuple):
     load_name: str
     namespace: str
     version: int
+
+
+class EdgePathType(str, Enum):
+    """Types of well edge point paths for touch tip."""
+
+    LEFT = "left"
+    RIGHT = "right"
+    DEFAULT = "default"
 
 
 @dataclass
@@ -393,6 +402,35 @@ class LabwareView(HasState[LabwareState]):
                 f"Some of the supplied wells do not match the labwareId: {labware_id}."
             )
         return list(wells)
+
+    def get_edge_path_type(
+        self,
+        labware_id: str,
+        well_name: str,
+        mount: MountType,
+        labware_slot: DeckSlotName,
+        next_to_module: bool,
+    ) -> EdgePathType:
+        """Get the recommended edge path type based on well column, labware position and any neighboring modules."""
+        labware_definition = self.get_definition(labware_id)
+        left_column = labware_definition.ordering[0]
+        right_column = labware_definition.ordering[-1]
+
+        left_path_criteria = mount is MountType.RIGHT and well_name in left_column
+        right_path_criteria = mount is MountType.LEFT and well_name in right_column
+        labware_right_side = labware_slot in [
+            DeckSlotName.SLOT_3,
+            DeckSlotName.SLOT_6,
+            DeckSlotName.SLOT_9,
+            DeckSlotName.FIXED_TRASH,
+        ]
+
+        if left_path_criteria and (next_to_module or labware_right_side):
+            return EdgePathType.LEFT
+        elif right_path_criteria and next_to_module:
+            return EdgePathType.RIGHT
+        else:
+            return EdgePathType.DEFAULT
 
     def get_tip_length(self, labware_id: str) -> float:
         """Get the tip length of a tip rack."""

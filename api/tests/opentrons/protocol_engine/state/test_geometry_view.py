@@ -7,7 +7,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.types import Point, DeckSlotName, Mount
+from opentrons.types import Point, DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -23,7 +23,7 @@ from opentrons.protocol_engine.types import (
     Dimensions,
     DeckType,
 )
-from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.labware import LabwareView, EdgePathType
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.geometry import GeometryView, EdgeList
 from opentrons.protocol_engine.state.pipettes import CurrentWell
@@ -479,30 +479,18 @@ def test_get_well_height(
 
 
 @pytest.mark.parametrize(
-    ["well_name", "mount", "labware_slot", "expected_result"],
+    ["edge_path_type", "expected_result"],
     [
         (
-            "abc",
-            Mount.RIGHT,
-            DeckSlotName.SLOT_3,
+            EdgePathType.LEFT,
             [Point(1, 1, 1), Point(2, 2, 2), Point(3, 3, 3), Point(4, 4, 4)],
         ),
         (
-            "abc",
-            Mount.RIGHT,
-            DeckSlotName.SLOT_5,
-            [Point(1, 1, 1), Point(2, 2, 2), Point(3, 3, 3), Point(4, 4, 4)],
-        ),
-        (
-            "pqr",
-            Mount.LEFT,
-            DeckSlotName.SLOT_3,
+            EdgePathType.RIGHT,
             [Point(0, 0, 0), Point(2, 2, 2), Point(3, 3, 3), Point(4, 4, 4)],
         ),
         (
-            "jkl",
-            Mount.RIGHT,
-            DeckSlotName.SLOT_3,
+            EdgePathType.DEFAULT,
             [
                 Point(0, 0, 0),
                 Point(1, 1, 1),
@@ -517,9 +505,7 @@ def test_determine_edge_path(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
-    well_name: str,
-    mount: Mount,
-    labware_slot: DeckSlotName,
+    edge_path_type: EdgePathType,
     expected_result: List[Point],
     subject: GeometryView,
 ) -> None:
@@ -528,23 +514,25 @@ def test_determine_edge_path(
         id="labware-id",
         loadName="load-name",
         definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=labware_slot),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         offsetId="offset-id",
     )
-
-    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
-        ordering=[["abc", "def"], ["ghi", "jkl"], ["mno", "pqr"]]
-    )
-
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(labware_def)
 
-    decoy.when(module_view.is_edge_move_unsafe(mount, labware_slot)).then_return(True)
+    decoy.when(
+        module_view.is_edge_move_unsafe(MountType.LEFT, DeckSlotName.SLOT_4)
+    ).then_return(True)
+
+    decoy.when(
+        labware_view.get_edge_path_type(
+            "labware-id", "well-name", MountType.LEFT, DeckSlotName.SLOT_4, True
+        )
+    ).then_return(edge_path_type)
 
     result = subject.determine_edge_path(
         labware_id="labware-id",
-        well_name=well_name,
-        mount=mount,
+        well_name="well-name",
+        mount=MountType.LEFT,
         edges=EdgeList(
             right=Point(0, 0, 0),
             left=Point(1, 1, 1),

@@ -598,7 +598,7 @@ async def test_touch_tip(
         state_store.geometry.determine_edge_path(
             labware_id="labware-id",
             well_name="A3",
-            mount=Mount.LEFT,
+            mount=MountType.LEFT,
             edges=edge_list,
         )
     ).then_return([Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)])
