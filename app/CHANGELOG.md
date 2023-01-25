@@ -5,28 +5,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [6.2.1](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.3...v6.2.1) (2023-01-25)
 
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-## [6.2.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.2...v6.2.1-alpha.3) (2023-01-23)
-
 
 ### Bug Fixes
 
 * **app:** minimize command page length when only retrieving run total length ([#12036](https://github.com/Opentrons/opentrons/issues/12036)) ([d05440c](https://github.com/Opentrons/opentrons/commit/d05440cf72ab950d0d20a572aba7f6963b8f7013))
-
-
-
-
-
-## [6.2.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.2.0...v6.2.1-alpha.0) (2023-01-12)
-
-
-### Bug Fixes
-
 * **app:** allow access to robot settings if robot server is down, but update server is up ([#11892](https://github.com/Opentrons/opentrons/issues/11892)) ([3b4d127](https://github.com/Opentrons/opentrons/commit/3b4d127851b240f94c24e0a1a997f658bd47f540))
 
 

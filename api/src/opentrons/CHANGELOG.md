@@ -8,24 +8,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 **Note:** Version bump only for package @opentrons/api-server
 
 
-
-
-
-## [6.2.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.2...v6.2.1-alpha.3) (2023-01-23)
-
-
-### Performance Improvements
-
-* **api:** Do not block the event loop when loading JSONv6 protocols ([#12039](https://github.com/Opentrons/opentrons/issues/12039)) ([f885f44](https://github.com/Opentrons/opentrons/commit/f885f44e87e3f54cec646031610944924a7f0d40))
-* **api:** Regularly yield to the event loop when executing Protocol Engine commands ([#12038](https://github.com/Opentrons/opentrons/issues/12038)) ([fab3ef2](https://github.com/Opentrons/opentrons/commit/fab3ef20f550f20aa2be49f4f543cbd0d16cb3e9))
-
-
-
-
-
-## [6.2.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.2.0...v6.2.1-alpha.0) (2023-01-12)
-
-
 ### Bug Fixes
 
 * **api:** Safely map 0-volume aspirates and dispenses in Python protocols ([#11969](https://github.com/Opentrons/opentrons/issues/11969)) ([8a67aa0](https://github.com/Opentrons/opentrons/commit/8a67aa06b6d4f158ab44ea8748860e01c84b4986))
@@ -33,6 +15,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Performance Improvements
 
+* **api:** Do not block the event loop when loading JSONv6 protocols ([#12039](https://github.com/Opentrons/opentrons/issues/12039)) ([f885f44](https://github.com/Opentrons/opentrons/commit/f885f44e87e3f54cec646031610944924a7f0d40))
+* **api:** Regularly yield to the event loop when executing Protocol Engine commands ([#12038](https://github.com/Opentrons/opentrons/issues/12038)) ([fab3ef2](https://github.com/Opentrons/opentrons/commit/fab3ef20f550f20aa2be49f4f543cbd0d16cb3e9))
 * **robot-server:** Do only minimal parsing when rehydrating ProtocolStore ([#11891](https://github.com/Opentrons/opentrons/issues/11891)) ([c5338b8](https://github.com/Opentrons/opentrons/commit/c5338b84eee767fafe53c6634e5dd04254f5a6bc))
 
 
