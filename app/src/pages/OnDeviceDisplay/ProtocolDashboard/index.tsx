@@ -65,11 +65,9 @@ export function ProtocolDashboard(): JSX.Element {
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const sortBy = useSelector(getProtocolsStoredSortKey) ?? 'alphabetical'
-  const sortedProtocols = useSortProtocols(
-    sortBy,
-    protocols.data?.data,
-    runs.data?.data
-  )
+  const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
+  const runData = runs.data?.data != null ? runs.data?.data : []
+  const sortedProtocols = useSortProtocols(sortBy, protocolsData, runData)
 
   const handleProtocolsBySortKey = (sortKey: ProtocolSortKeyType): void => {
     dispatch(updateConfigValue('protocols.protocolsStoredSortKey', sortKey))

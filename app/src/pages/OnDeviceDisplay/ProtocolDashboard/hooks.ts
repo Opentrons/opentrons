@@ -43,7 +43,6 @@ export function useSortProtocols(
         return bDate.valueOf() - aDate.valueOf()
       case 'oldCreated':
         return aDate.valueOf() - bDate.valueOf()
-
       default:
         return 0
     }
