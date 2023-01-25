@@ -897,7 +897,7 @@ class OT3Controller:
         starting_mount_height: float,
         prep_move_speed: float,
         sensor_id: SensorId = SensorId.S0,
-    ) -> Dict[OT3Axis, Tuple[float, float, bool, bool]]:
+    ) -> None:
         head_node = head_node_for_mount(OT3Mount(mount.value))
         tool = sensor_node_for_mount(OT3Mount(mount.value))
         positions = await liquid_probe(
@@ -917,7 +917,6 @@ class OT3Controller:
             self._position.update({node: point[0]})
             self._encoder_position.update({node: point[1]})
             pos_axes[node_to_axis(node)] = point
-        return pos_axes
 
     async def capacitive_probe(
         self,
