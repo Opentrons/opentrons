@@ -11,38 +11,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-## [6.2.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.2...v6.2.1-alpha.3) (2023-01-23)
-
-**Note:** Version bump only for package @opentrons/webpack-config
-
-
-
-
-
-## [6.2.1-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.0...v6.2.1-alpha.2) (2023-01-13)
-
-**Note:** Version bump only for package @opentrons/webpack-config
-
-
-
-
-
-## [6.2.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.2.1-alpha.0...v6.2.1-alpha.1) (2023-01-13)
-
-**Note:** Version bump only for package @opentrons/webpack-config
-
-
-
-
-
-## [6.2.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.2.0...v6.2.1-alpha.0) (2023-01-12)
-
-**Note:** Version bump only for package @opentrons/webpack-config
-
-
-
-
-
 # [6.2.0](https://github.com/Opentrons/opentrons/compare/v6.1.0...v6.2.0) (2022-12-06)
 
 **Note:** Version bump only for package @opentrons/webpack-config
