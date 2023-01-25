@@ -233,6 +233,7 @@ class OT3Simulator:
         threshold_pascals: float,
         starting_mount_height: float,
         prep_move_speed: float,
+        log_pressure: bool = True,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
         return
