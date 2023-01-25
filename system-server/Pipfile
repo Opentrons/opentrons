@@ -3,16 +3,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[packages]
-opentrons = { editable = true, path = "../api" }
-opentrons-shared-data = { editable = true, path = "../shared-data/python" }
-robot-server = {path = "../robot-server", editable = true}
-notify-server = { editable = true, path = "../notify-server" }
-fastapi = "==0.68.1"
-uvicorn = "==0.14.0"
-typing-extensions = ">=4.0.0,<5"
-pyjwt = "==2.6.0"
-systemd-python = { version = "==234", sys_platform = "== 'linux'" }
+[requires]
+python_version = "3.7"
 
 [dev-packages]
 system_server = {path = ".", editable = true}
@@ -21,10 +13,11 @@ flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.2.1"
 pytest = "~=6.1"
-pytest-asyncio = "~=0.18"
+pytest-asyncio = "==0.18"
 pytest-cov = "==2.10.1"
 pytest-lazy-fixture = "==0.6.3"
 pytest-xdist = "~=2.2.1 "
+coverage = "==5.1"
 # atomicwrites and colorama are pytest dependencies on windows,
 # spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
@@ -35,6 +28,20 @@ black = "==22.3.0"
 decoy = "~=1.10"
 mock = "~=4.0.2"
 types-mock = "==4.0.1"
+types-requests = "==2.25.6"
+requests = "==2.26.0"
 
-[requires]
-python_version = "3.7"
+[packages]
+opentrons = { editable = true, path = "../api" }
+opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+robot-server = {path = "../robot-server", editable = true}
+notify-server = { editable = true, path = "../notify-server" }
+fastapi = "==0.68.1"
+uvicorn = "==0.14.0"
+typing-extensions = ">=4.0.0,<5"
+pyjwt = "==2.6.0"
+python-dotenv = "==0.19.0"
+python-multipart = "==0.0.5"
+pydantic = "==1.8.2"
+systemd-python = { version = "==234", sys_platform = "== 'linux'" }
+importlib-metadata = "~=4.13.0"

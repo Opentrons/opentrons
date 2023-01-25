@@ -77,7 +77,6 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
-        tests_require=['pytest'],
         include_package_data=True,
         project_urls={
             "opentrons.com": "https://www.opentrons.com",

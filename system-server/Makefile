@@ -99,4 +99,5 @@ push-ot3: sdist
 
 .PHONY: dev 
 dev: 
-	$(pipenv) run python -m system_server
+# Run with reload enabled for development purposes.
+	$(pipenv) run python -m system_server --reload
