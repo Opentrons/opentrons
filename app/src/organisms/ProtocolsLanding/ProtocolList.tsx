@@ -64,7 +64,10 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(null)
 
-  const sortedStoredProtocols = useSortedProtocols(sortBy, storedProtocols)
+  const sortedStoredProtocols = useSortedProtocols(
+    sortBy as ProtocolSort,
+    storedProtocols
+  )
 
   const dispatch = useDispatch<Dispatch>()
 
