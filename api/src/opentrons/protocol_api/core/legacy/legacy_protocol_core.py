@@ -420,7 +420,7 @@ class LegacyProtocolCore(
         self, name: str, description: Optional[str], display_color: Optional[str]
     ) -> Liquid:
         """Define a liquid to load into a well."""
-        raise APIVersionError("Adding a liquid is not supported in this API version.")
+        raise APIVersionError("Defining a liquid is not supported in this API version.")
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore

@@ -112,7 +112,7 @@ class LegacyWellCore(AbstractWellCore):
         volume: float,
     ) -> None:
         """Load liquid into a well."""
-        raise APIVersionError("Creating a liquid is not supported in this API version.")
+        raise APIVersionError("Loading a liquid is not supported in this API version.")
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """Gets point in deck coordinates based on percentage of the radius of each axis."""

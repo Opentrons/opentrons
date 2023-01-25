@@ -24,7 +24,6 @@ from ._liquid import Liquid
 
 from .create_protocol_context import create_protocol_context
 
-
 __all__ = [
     "MAX_SUPPORTED_VERSION",
     "MIN_SUPPORTED_VERSION",

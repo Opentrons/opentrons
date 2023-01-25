@@ -8,8 +8,8 @@ class Liquid:
 
     Attributes:
         name: A human-readable name for this liquid.
-        description: An optional description.
-        display_color: An optional display color of the liquid.
+        description: A optional description.
+        display_color: A optional display color of the liquid.
     """
 
     _id: str

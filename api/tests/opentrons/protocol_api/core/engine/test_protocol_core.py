@@ -3,7 +3,7 @@ import inspect
 from typing import Optional, Type, cast, Tuple
 
 import pytest
-from decoy import Decoy, matchers
+from decoy import Decoy
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -701,7 +701,7 @@ def test_add_liquid(
 ) -> None:
     """It should return the created liquid."""
     liquid = PE_Liquid.construct(
-        id=matchers.IsA(str),
+        id="water-id",
         displayName="water",
         description="water desc",
         displayColor=HexColor(__root__="#fff"),
