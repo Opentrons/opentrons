@@ -7,7 +7,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine
 
 from robot_server.errors import ErrorDetails
-from robot_server.hardware import get_hardware
+from robot_server.hardware import get_ready_hardware
 from robot_server.runs import EngineStore, EngineConflictError, get_engine_store
 from robot_server.modules import ModuleIdentifier
 
@@ -28,7 +28,7 @@ class RunActive(ErrorDetails):
 
 async def get_default_engine(
     engine_store: EngineStore = Depends(get_engine_store),
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
+    hardware_api: HardwareControlAPI = Depends(get_ready_hardware),
     module_identifier: ModuleIdentifier = Depends(ModuleIdentifier),
 ) -> ProtocolEngine:
     """Get the default engine with attached modules loaded."""

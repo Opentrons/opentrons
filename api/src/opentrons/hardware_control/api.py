@@ -1099,3 +1099,7 @@ class API(
         input_map: Dict[Axis, "API.MapPayload"]
     ) -> Dict[str, "API.MapPayload"]:
         return {k.name: v for k, v in input_map.items()}
+
+    async def firmware_updated_ok(self) -> bool:
+        # TODO: Implement based on motor controller board version
+        return True

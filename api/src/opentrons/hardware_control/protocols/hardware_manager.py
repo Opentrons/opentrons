@@ -26,3 +26,12 @@ class HardwareManager(Protocol):
         Return the revision of the central hardware.
         """
         ...
+
+    async def firmware_updated_ok(self) -> bool:
+        """
+        Return whether all required firmware updates are currently complete.
+
+        If a mandatory firmware update is not yet completed, this method will raise the
+        same kind of exception that calling a method that requires updated firmware would.
+        """
+        ...

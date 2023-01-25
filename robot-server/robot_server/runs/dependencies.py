@@ -7,7 +7,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.hardware_control import HardwareControlAPI
 
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
-from robot_server.hardware import get_hardware, get_robot_type
+from robot_server.hardware import get_ready_hardware, get_robot_type
 from robot_server.persistence import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner
 from robot_server.deletion_planner import RunDeletionPlanner
@@ -37,7 +37,7 @@ async def get_run_store(
 
 async def get_engine_store(
     app_state: AppState = Depends(get_app_state),
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
+    hardware_api: HardwareControlAPI = Depends(get_ready_hardware),
     robot_type: RobotType = Depends(get_robot_type),
 ) -> EngineStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""

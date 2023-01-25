@@ -14,7 +14,7 @@ from opentrons.types import Mount, Point
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.service.dependencies import get_motion_lock
-from robot_server.hardware import get_hardware
+from robot_server.hardware import get_hardware, get_ready_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import control
 
@@ -70,7 +70,7 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
 )
 async def post_move_robot(
     robot_move_target: control.RobotMoveTarget,
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_ready_hardware),
     motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
 ) -> V1BasicResponse:
     """Move the robot"""
@@ -93,7 +93,7 @@ async def post_move_robot(
 )
 async def post_home_robot(
     robot_home_target: control.RobotHomeTarget,
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_ready_hardware),
     motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
 ) -> V1BasicResponse:
     """Home the robot or one of the pipettes"""

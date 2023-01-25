@@ -22,6 +22,7 @@ from notify_server.models.hardware_event import DoorStatePayload
 
 from .app_state import AppState, AppStateAccessor, get_app_state
 from .errors import ErrorDetails
+from .errors.global_errors import UnexpectedError
 from .settings import get_settings
 
 
@@ -77,6 +78,15 @@ async def cleanup_hardware(app_state: AppState) -> None:
 
     if thread_manager is not None:
         thread_manager.clean_up()
+
+
+async def get_ready_hardware(hardware: HardwareControlAPI = Depends(get_hardware)) -> HardwareControlAPI:
+    """
+    Returns a hardware controller that is ready to run, with its firmware updated. """
+    ready = await hardware.firmware_updated_ok()
+    if not ready:
+        raise UnexpectedError(detail='Hardware reported not ready incorrectly')
+    return hardware
 
 
 async def get_thread_manager(

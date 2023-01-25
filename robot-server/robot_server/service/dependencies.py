@@ -5,7 +5,7 @@ from fastapi import Depends
 from opentrons.hardware_control import HardwareControlAPI, ThreadedAsyncLock
 
 from robot_server.util import call_once
-from robot_server.hardware import get_hardware
+from robot_server.hardware import get_ready_hardware
 from robot_server.service.session.manager import SessionManager
 
 
@@ -21,7 +21,7 @@ async def get_motion_lock() -> ThreadedAsyncLock:
 
 @call_once
 async def get_session_manager(
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
+    hardware_api: HardwareControlAPI = Depends(get_ready_hardware),
     motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
 ) -> SessionManager:
     """The single session manager instance"""

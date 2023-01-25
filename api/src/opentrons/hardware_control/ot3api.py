@@ -1795,3 +1795,7 @@ class OT3API(
             except KeyError:
                 pass
         return ret
+
+    async def firmware_updated_ok(self) -> bool:
+        # TODO: Implement based on connected microcontroller firmware versions
+        return True
