@@ -76,7 +76,7 @@ export const getSendAllProtocolsToOT3: (
 
 export const getProtocolsStoredSortKey: (
   state: State
-) => ProtocolsStoredSortKey | null = createSelector(
+) => Partial<ProtocolsStoredSortKey> | null = createSelector(
   getConfig,
   config => config?.protocols.protocolsStoredSortKey ?? null
 )

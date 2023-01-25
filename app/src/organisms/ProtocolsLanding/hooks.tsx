@@ -2,6 +2,7 @@ import { StoredProtocolData } from '../../redux/protocol-storage'
 import { getProtocolDisplayName } from './utils'
 import type { ProtocolsStoredSortKey } from '../../redux/config/types'
 
+// export type ProtocolSort = Partial<ProtocolsStoredSortKey>
 export type ProtocolSort = Exclude<
   ProtocolsStoredSortKey,
   'recentRun' | 'oldRun' | 'recentCreated' | 'oldCreated'

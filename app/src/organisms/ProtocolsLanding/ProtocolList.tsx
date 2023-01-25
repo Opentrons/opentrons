@@ -145,7 +145,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 paddingY={SPACING.spacing2}
                 data-testid="sortBy-label"
               >
-                {sortByLabelType[sortBy].label}
+                {sortByLabelType[sortBy as ProtocolSort].label}
               </StyledText>
               <Icon
                 paddingRight={SPACING.spacing3}
