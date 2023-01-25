@@ -352,6 +352,83 @@ async def _main() -> None:
                                                 home_pos[OT3Axis.by_mount(mount)]))
             # we don't need this, this is just for a placeholder
             flatness = await _jog_axis(hw_api, home_position)
+        elif args.test == 'flatness_with_move':
+            coordinates = [(515, 29, 294.16),
+                            (465, 29, 294.16),
+                            (415, 29, 294.16),
+                            (317.23, 29, 294.16),
+                            (317.23, 96.72, 294.16),
+                            (326.73, 96.72, 294.16),
+                            (326.73, 143.32, 294.16),
+                            (415, 143.32, 294.16),
+                            (465, 143.32, 294.16),
+                            (515, 143.32, 294.16),
+                            (317.24, 203.12, 294.16),
+                            (326.24, 250.11, 294.16),
+                            (415, 250.11, 294.16),
+                            (465, 250.11, 294.16),
+                            (515, 250.11, 294.16),
+                            (317.22, 303.62, 294.16),
+                            (326.25, 357.62, 294.16),
+                            (415, 357.62, 294.16),
+                            (465, 357.62, 294.16),
+                            (515, 357.62, 294.16),
+                            (317.22, 411.11, 294.16),
+                            (256.22, 29, 294.16),
+                            (268.28, 29, 294.16),
+                            (218.28, 29, 294.16),
+                            (154.29, 29, 294.16),
+                            (154.29, 96.72, 294.16),
+                            (162.29, 143.32, 294.16),
+                            (218.29, 143.32, 294.16),
+                            (268.29, 143.32, 294.16),
+                            (154.8, 203.12, 294.16),
+                            (162.3, 250.11, 294.16),
+                            (218.3, 250.11, 294.16),
+                            (268.3, 250.11, 294.16),
+                            (154.81, 303.62, 294.16),
+                            (162.31, 357.62, 294.16),
+                            (218.3, 357.62, 294.16),
+                            (268.31, 357.62, 294.16),
+                            (154.86, 411.11, 294.16),
+                            (-21.85, 29, 294.16),
+                            (62.85, 29, 294.16),
+                            (-21.85, 143.32, 294.16),
+                            (62.85, 143.32, 294.16),
+                            (-21.85, 250.11, 294.16),
+                            (62.85, 250.11, 294.16)]
+            home_position = await hw_api.current_position_ot3(mount)
+
+            array_num = 0
+            for coord in coordinates:
+                await hw_api.move_to(mount, Point(coord[0],
+                                                    coord[1],
+                                                home_pos[OT3Axis.by_mount(mount)]),
+                                                speed = 60)
+                await asyncio.sleep(1)
+                await hw_api.move_to(mount, Point(coord[0],
+                                                    coord[1],
+                                                    coord[2]), speed = 65)
+                await asyncio.sleep(3)
+                gauge_reading = gauge.read_stable(timeout=20)
+                position = await hw_api.current_position_ot3(mount)
+                test_data["X-Coordinate"] = round(position[OT3Axis.X], 2)
+                test_data["Y-Coordinate"] = round(position[OT3Axis.Y], 2)
+                test_data["Z-Coordinate"] = round(position[OT3Axis.by_mount(mount)], 2)
+                test_data["Deck Height(mm)"] = gauge_reading
+                print(test_data)
+                d_str = f"{round(position[OT3Axis.X], 2)}, \
+                        {round(position[OT3Axis.Y], 2)}, \
+                        {round(position[OT3Axis.by_mount(mount)], 2)}, \
+                        {gauge.read_stable(timeout=20)}, {gauge_reading}\n"
+                data.append_data_to_file(test_n, test_f, d_str)
+                await hw_api.move_to(mount, Point(coord[0],
+                                                    coord[1],
+                                                    home_pos[OT3Axis.by_mount(mount)]),
+                                                    speed = 65)
+                array_num += 1
+            # we don't need this, this is just for a placeholder
+            flatness = await _jog_axis(hw_api, home_position)
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     except KeyboardInterrupt:
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
@@ -368,7 +445,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--test",
         type=str,
-        help="pick_up_tip, tip_height_test, flatness",
+        help="pick_up_tip, tip_height_test, flatness, flatness_with_move",
         default="pick_up_tip",
     )
     parser.add_argument("--dial_indicator", action="store_true")
