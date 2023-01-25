@@ -32,11 +32,10 @@ class MoveType(int, Enum):
         mapping = {
             MoveStopCondition.none: cls.linear,
             MoveStopCondition.limit_switch: cls.home,
-            MoveStopCondition.cap_sensor: cls.calibration,
+            MoveStopCondition.sync_line: cls.calibration,
             MoveStopCondition.encoder_position: cls.linear,
             MoveStopCondition.gripper_force: cls.grip,
             MoveStopCondition.stall: cls.linear,
-            MoveStopCondition.pressure_sensor: cls.liquid_sense,
         }
         return mapping[condition]
 
