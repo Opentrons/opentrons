@@ -11,10 +11,13 @@ comma=,
 # string manipulations to extract the int version number
 ssh-version-output = $(shell ssh -V 2>&1)
 ssh-version-words=$(subst _, ,$(filter OpenSSH_%, $(ssh-version-output)))
-ssh-version-label=$(filter %p1$(comma),$(ssh-version-words))
+ssh-version-label=$(or $(filter %p1$(comma),$(ssh-version-words)), $(filter %p1,$(ssh-version-words)))
 ssh-version-number=$(subst ., ,$(firstword $(subst p, ,$(ssh-version-label))))
 checked-ssh-version=$(if $(ssh-version-number),$(ssh-version-number),"$(warning Could not find ssh version for version $(ssh-version-output), scp flags may be wrong")))
 is-in-version=$(findstring $(firstword $(checked-ssh-version)),$(allowed-ssh-versions))
+$(info $$ssh-version-words $(ssh-version-words))
+$(info $$ssh-version-label $(ssh-version-label))
+$(info $$ssh-version-number $(ssh-version-number))
 # when using an OpenSSH version larger than 8.9,
 # we need to add a flag to use legacy scp with SFTP protocol
 scp-legacy-option-flag = $(if $(is-in-version),,-O)
