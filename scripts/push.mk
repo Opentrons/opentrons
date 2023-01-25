@@ -18,7 +18,7 @@ is-in-version=$(findstring $(firstword $(checked-ssh-version)),$(allowed-ssh-ver
 # when using an OpenSSH version larger than 8.9,
 # we need to add a flag to use legacy scp with SFTP protocol
 scp-legacy-option-flag = $(if $(is-in-version),,-O)
-# when using windows, make is running against a different openSSH than the OS. 
+# when using windows, make is running against a different openSSH than the OS.
 # adding the -O flag to scp will fail if the openSSH on OS is less than 9.
 # if openSSH on OS is 9 or more please add the -O flag to scp.
 PLATFORM := $(shell uname -s)
@@ -80,7 +80,7 @@ ssh -i "$(2)" $(3)  root@$(1) \
 endef
 
 # push-systemd-unit: move a systemd unit file to the robot
-# 
+#
 # argument 1 is the host to push to
 # argument 2 is the identity key to use
 # argument 3 is any further ssh options, quoted
