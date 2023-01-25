@@ -32,6 +32,11 @@ class NetworkInfo:
     """This class is responsible for keeping track of nodes on the can bus."""
 
     def __init__(self, can_messenger: CanMessenger) -> None:
+        """Construct.
+
+        Args:
+            can_messenger: The Can messenger
+        """
         self._can_messenger = can_messenger
         self._device_info_cache: Dict[NodeId, DeviceInfoCache] = dict()
 
@@ -56,6 +61,10 @@ class NetworkInfo:
         The ideal call pattern is to build an expectation for nodes on the bus (i.e., fixed
         nodes such as gantry controllers and head plus whatever tools the head indicates
         are attached) and use this method to verify the assumption.
+
+        Args:
+            expected: Set of NodeIds to expect
+            timeout: time in seconds to wait for can message responses
         """
         event = asyncio.Event()
         nodes: Dict[NodeId, DeviceInfoCache] = dict()
@@ -100,6 +109,7 @@ class NetworkInfo:
 def _parse_device_info_response(
     message: MessageDefinition, arbitration_id: ArbitrationId
 ) -> Union[DeviceInfoCache, None]:
+    """Parses the DeviceInfoRequest message and returns DeviceInfoCache."""
     if arbitration_id.parts.message_id == MessageId.error_message:
         log.error(
             f"Recieved an error message {str(message)} from {str(arbitration_id.parts)}"
