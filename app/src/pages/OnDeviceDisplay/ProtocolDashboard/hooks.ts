@@ -1,18 +1,11 @@
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
+import type { ProtocolsStoredSortKey } from '../../../redux/config/types'
 
-export type ProtocolSortKeyType =
-  | 'alphabetical'
-  | 'reverse'
-  | 'recent'
-  | 'oldest'
-  | 'recentRun'
-  | 'oldRun'
-  | 'recentCreated'
-  | 'oldCreated'
+export type ProtocolSort = Exclude<ProtocolsStoredSortKey, 'recent' | 'oldest'>
 
 export function useSortProtocols(
-  sortBy: ProtocolSortKeyType,
+  sortBy: ProtocolSort,
   protocols: ProtocolResource[],
   runs: RunData[]
 ): ProtocolResource[] {
