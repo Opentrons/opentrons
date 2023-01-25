@@ -1,3 +1,4 @@
+import { InstrumentData } from '@opentrons/api-client'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
@@ -15,13 +16,11 @@ interface AttachedGripper {
   serialNumber: string
 }
 interface GripperCardProps {
-  attachedGripper: AttachedGripper | null
-  robotName: string
+  attachedGripper: InstrumentData | null
 }
 
 export function GripperCard({
   attachedGripper,
-  robotName,
 }: GripperCardProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
   const [
@@ -66,7 +65,7 @@ export function GripperCard({
     <>
       <InstrumentCard
         description={
-          attachedGripper != null ? attachedGripper.model : t('shared:empty')
+          attachedGripper != null ? attachedGripper.instrumentModel : t('shared:empty')
         }
         isGripperAttached={attachedGripper != null}
         label={t('shared:extension_mount')}

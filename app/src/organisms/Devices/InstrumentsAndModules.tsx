@@ -36,7 +36,6 @@ import { GripperCard } from '../GripperCard'
 import { fetchPipetteOffsetCalibrations } from '../../redux/calibration'
 
 import type { Dispatch } from '../../redux/types'
-import { id } from 'date-fns/locale'
 
 const EQUIPMENT_POLL_MS = 5000
 const FETCH_PIPETTE_LONG_POLL = 30000
@@ -62,9 +61,7 @@ export function InstrumentsAndModules({
   const {data: attachedInstruments} = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
-  
-  const extensionInstrument = attachedInstruments.data.find(i => i.mount === 'extension') ?? null
-  console.log(extensionInstrument)
+  const extensionInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
@@ -164,10 +161,7 @@ export function InstrumentsAndModules({
               />
               {/* extension mount here */}
               {isOT3 ? (
-                <GripperCard
-                  robotName={robotName}
-                  attachedGripper={extensionInstrument}
-                />
+                <GripperCard attachedGripper={extensionInstrument} />
               ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
