@@ -400,7 +400,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         description: Optional[str],
         display_color: Optional[str],
     ) -> Liquid:
-        """create a liquid to load into a well."""
+        """Define a liquid to load into a well."""
         liquid = self._engine_client.add_liquid(
             name=name, description=description, color=display_color
         )

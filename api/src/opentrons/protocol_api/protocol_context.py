@@ -759,11 +759,11 @@ class ProtocolContext(CommandPublisher):
         self, name: str, description: Optional[str], display_color: Optional[str]
     ) -> Liquid:
         """
-        Add a liquid to the protocol.
+        Define a liquid on the protocol.
 
         :param str name: A human-readable name for this liquid.
-        :param str description: An optional description of this liquid.
-        :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+        :param str description: A optional description of this liquid.
+        :param str display_color: A optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
         """
         return self._core.define_liquid(
             name=name,
