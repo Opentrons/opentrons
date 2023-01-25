@@ -405,8 +405,8 @@ class MoveScheduler:
                 group_id
             ] == MoveStopCondition.sync_line and ack_id != UInt8Field(2):
                 if ack_id == 1:
-                    condition = "Liquid Sensing timed out."
-                    log.warning(f"Liquid Sensing timed out. Condition: {condition}")
+                    condition = "Sensing timed out."
+                    log.warning(f"Sensing timed out. Condition: {condition}")
                     raise MoveConditionNotMet()
         except IndexError:
             # If we have two move group runners running at once, they each
