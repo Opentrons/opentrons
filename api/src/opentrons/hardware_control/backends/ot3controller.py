@@ -700,16 +700,19 @@ class OT3Controller:
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""
         with open(filename, "r") as f:
-            await firmware_update.run_update(
+            update_details = {
+                sub_system_to_node_id(target): f,
+            }
+            updater = firmware_update.RunUpdate(
                 messenger=self._messenger,
-                node_id=sub_system_to_node_id(target),
-                hex_file=f,
+                update_details=update_details,
                 # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
                 #  config values.
                 retry_count=3,
                 timeout_seconds=20,
                 erase=True,
             )
+            await updater.run_updates()
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""

@@ -13,9 +13,8 @@ from opentrons_hardware.firmware_update import (
     FirmwareUpdateInitiator,
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
-    run_update,
-    run_updates,
     HexRecordProcessor,
+    RunUpdate,
 )
 from opentrons_hardware.firmware_update.target import Target
 
@@ -64,7 +63,7 @@ async def test_run_update(
     mock_hex_record_builder.return_value = mock_hex_record_processor
 
     target = Target(system_node=NodeId.head)
-    await run_update(
+    await RunUpdate._run_update(
         messenger=mock_messenger,
         node_id=target.system_node,
         hex_file=mock_hex_file,
@@ -114,13 +113,14 @@ async def test_run_updates(
         target_1.system_node: hex_file_1,
         target_2.system_node: hex_file_2,
     }
-    await run_updates(
+    updater = RunUpdate(
         messenger=mock_messenger,
         update_details=update_details,
         retry_count=12,
         timeout_seconds=11,
         erase=should_erase,
     )
+    await updater.run_updates()
 
     mock_initiator_run.assert_has_calls(
         [

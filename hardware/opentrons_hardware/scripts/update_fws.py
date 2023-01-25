@@ -9,7 +9,7 @@ from typing_extensions import Final
 
 from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings import NodeId
-from opentrons_hardware.firmware_update.run import run_updates
+from opentrons_hardware.firmware_update.run import RunUpdate
 from .can_args import add_can_args, build_settings
 
 
@@ -58,13 +58,14 @@ async def run(args: argparse.Namespace) -> None:
     }
 
     async with build.can_messenger(build_settings(args)) as messenger:
-        await run_updates(
+        updater = RunUpdate(
             messenger=messenger,
             update_details=update_details,
             retry_count=retry_count,
             timeout_seconds=timeout_seconds,
             erase=erase,
         )
+        await updater.run_updates()
 
     logger.info("Done")
 
