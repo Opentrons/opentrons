@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
 import { last } from 'lodash'
 import { format } from 'date-fns'
+import styled from 'styled-components'
 import {
   COLORS,
   Flex,
   Icon,
   SIZE_2,
   SPACING,
-  TEXT_ALIGN_CENTER,
-  TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_START,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -27,7 +26,6 @@ import {
 import { StyledText } from '../../atoms/text'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { Protocol } from '@opentrons/api-client'
-import styled from 'styled-components'
 
 type ProtocolType = 'json' | 'python'
 type CreationMethod = 'Protocol Designer' | 'Python'
@@ -99,9 +97,10 @@ const Summary = (props: { protocolRecord: Protocol }): JSX.Element => {
   return (
     <Flex flexDirection="column" gridGap={SPACING.spacing2}>
       <Flex gridGap={SPACING.spacing2}>
-        <StyledText as="h2" textTransform={TEXT_TRANSFORM_CAPITALIZE}>{`${t(
-          'author'
-        )}: `}</StyledText>
+        <StyledText
+          as="h2"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+        >{`${t('author')}: `}</StyledText>
         <StyledText>{props.protocolRecord.data.metadata.author}</StyledText>
       </Flex>
       <StyledText>{props.protocolRecord.data.metadata.description}</StyledText>
@@ -217,7 +216,10 @@ export function ProtocolDetails(): JSX.Element | null {
             marginRight={SPACING.spacing4}
             name={'delete'}
           />
-          <StyledText color={COLORS.errorEnabled} alignSelf={TEXT_ALIGN_CENTER}>
+          <StyledText
+            color={COLORS.errorEnabled}
+            alignSelf={TYPOGRAPHY.textAlignCenter}
+          >
             {t('delete_protocol')}
           </StyledText>
         </Flex>
