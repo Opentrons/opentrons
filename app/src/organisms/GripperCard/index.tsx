@@ -17,16 +17,11 @@ interface AttachedGripper {
 interface GripperCardProps {
   attachedGripper: AttachedGripper | null
   robotName: string
-  /**
-   * TODO: remove this local gripper state setter once attached gripper is wired to robot server
-   */
-  tempSetAttachedGripper: (attachedGripper: AttachedGripper | null) => void
 }
 
 export function GripperCard({
   attachedGripper,
   robotName,
-  tempSetAttachedGripper,
 }: GripperCardProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
   const [
@@ -35,20 +30,15 @@ export function GripperCard({
   ] = React.useState<GripperWizardFlowType | null>(null)
 
   const handleAttach: React.MouseEventHandler<HTMLButtonElement> = () => {
-    tempSetAttachedGripper(TEMP_STUB_ATTACHED_GRIPPER)
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)
-    console.log('TODO: handle attach gripper', robotName)
   }
 
   const handleDetach: React.MouseEventHandler<HTMLButtonElement> = () => {
-    tempSetAttachedGripper(null)
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.DETACH)
-    console.log('TODO: handle detach gripper', robotName)
   }
 
   const handleCalibrate: React.MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE)
-    console.log('TODO: handle calibrate gripper', robotName)
   }
 
   const menuOverlayItems =
