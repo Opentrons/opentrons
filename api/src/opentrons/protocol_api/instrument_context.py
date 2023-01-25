@@ -538,30 +538,31 @@ class InstrumentContext(publisher.CommandPublisher):
             last_location = self._protocol_core.get_last_location()
             if not last_location:
                 raise RuntimeError("No valid current location cache present")
-            # type check below
-            well = last_location.labware
+            parent_labware, well = last_location.labware.get_parent_labware_and_well()
+            if not well:
+                raise RuntimeError(f"Last location {location} has no associated well.")
+        elif isinstance(location, labware.Well):
+            well = location
+            parent_labware = well.parent
         else:
-            well = LabwareLike(location)
-
-        if not well.is_well:
             raise TypeError(f"location should be a Well, but it is {location}")
 
-        if "touchTipDisabled" in well.quirks_from_any_parent():
+        if "touchTipDisabled" in parent_labware.quirks:
             _log.info(f"Ignoring touch tip on labware {well}")
             return self
-        if well.parent.as_labware().is_tiprack:
+        if parent_labware.is_tiprack:
             _log.warning(
                 "Touch_tip being performed on a tiprack. " "Please re-check your code"
             )
 
         if self.api_version < APIVersion(2, 4):
-            move_to_location = well.as_well().top()
+            move_to_location = well.top()
         else:
-            move_to_location = well.as_well().top(z=v_offset)
+            move_to_location = well.top(z=v_offset)
 
         self._core.touch_tip(
             location=move_to_location,
-            well_core=well.as_well()._core,
+            well_core=well._core,
             radius=radius,
             v_offset=v_offset,
             speed=checked_speed,
