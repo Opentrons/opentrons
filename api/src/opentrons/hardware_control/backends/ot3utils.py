@@ -40,9 +40,8 @@ from opentrons_hardware.hardware_control.motion import (
     create_tip_action_step,
 )
 
-GRIPPER_JAW_HOME_TIME: float = 120
-GRIPPER_JAW_GRIP_TIME: float = 1
-GRIPPER_JAW_HOME_DC: float = 100
+GRIPPER_JAW_HOME_TIME: float = 10
+GRIPPER_JAW_GRIP_TIME: float = 10
 
 PipetteAction = Literal["pick_up", "drop"]
 
@@ -269,10 +268,10 @@ def create_gripper_jaw_grip_group(
     return move_group
 
 
-def create_gripper_jaw_home_group() -> MoveGroup:
+def create_gripper_jaw_home_group(dc: float) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(GRIPPER_JAW_HOME_TIME),
-        duty_cycle=np.float32(GRIPPER_JAW_HOME_DC),
+        duty_cycle=np.float32(dc),
         stop_condition=MoveStopCondition.limit_switch,
         move_type=MoveType.home,
     )

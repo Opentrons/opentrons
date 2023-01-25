@@ -21,13 +21,9 @@ def test_load_to_slot(
     ][0]
     labware = ctx.load_labware(labware_name, "1")
 
-    assert labware._implementation.get_geometry().offset == types.Point(
-        *slot_1["position"]
-    )
+    assert labware._core.get_geometry().offset == types.Point(*slot_1["position"])
     other = ctx.load_labware(labware_name, 2)
-    assert other._implementation.get_geometry().offset == types.Point(
-        *slot_2["position"]
-    )
+    assert other._core.get_geometry().offset == types.Point(*slot_2["position"])
 
 
 def test_loaded(ctx: papi.ProtocolContext) -> None:
@@ -48,7 +44,7 @@ def test_get_mixed_case_labware_def() -> None:
 def test_load_label(ctx: papi.ProtocolContext) -> None:
     labware = ctx.load_labware(labware_name, "1", "my cool labware")
     assert "my cool labware" in str(labware)
-    assert labware._implementation.get_user_display_name() == "my cool labware"
+    assert labware._core.get_user_display_name() == "my cool labware"
 
 
 def test_deprecated_load(ctx: papi.ProtocolContext) -> None:

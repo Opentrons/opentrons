@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
-import { COLORS } from '@opentrons/components'
+import { COLORS, SPACING } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 import { TaskList } from '../TaskList'
 
@@ -42,6 +42,9 @@ export function CalibrationTaskList({
       }
       fullPage
       backgroundColor={COLORS.fundamentalsBackground}
+      childrenPadding={`${String(SPACING.spacing4)} ${String(
+        SPACING.spacing5
+      )} ${String(SPACING.spacing5)} ${String(SPACING.spacing2)}`}
     >
       <TaskList activeIndex={activeIndex} taskList={taskList} />
     </Modal>

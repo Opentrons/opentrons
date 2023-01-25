@@ -15,11 +15,12 @@ from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from ..protocol_api.well import WellImplementation
 
+from ..legacy.legacy_well_core import LegacyWellCore
+from ..legacy.legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContextSimulation
+    from .legacy_protocol_core import LegacyProtocolCoreSimulator
 
 
 _log = logging.getLogger()
@@ -28,12 +29,12 @@ _PRE_2_2_TIP_DROP_HEIGHT_MM = 10
 """In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
-class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
+class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     """A simulation of an instrument context."""
 
     def __init__(
         self,
-        protocol_interface: ProtocolContextSimulation,
+        protocol_interface: LegacyProtocolCoreSimulator,
         pipette_dict: PipetteDict,
         mount: types.Mount,
         instrument_name: str,
@@ -64,7 +65,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def aspirate(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
@@ -103,7 +104,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def dispense(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
@@ -115,7 +116,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def blow_out(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation],
+        well_core: Optional[LegacyWellCore],
         move_to_well: bool,
     ) -> None:
         if move_to_well:
@@ -131,14 +132,14 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
         )
 
     def touch_tip(
-        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+        self, location: LegacyWellCore, radius: float, v_offset: float, speed: float
     ) -> None:
         pass
 
     def pick_up_tip(
         self,
         location: types.Location,
-        well_core: WellImplementation,
+        well_core: LegacyWellCore,
         presses: Optional[int],
         increment: Optional[float],
         prep_after: bool = True,
@@ -171,7 +172,7 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def drop_tip(
         self,
         location: Optional[types.Location],
-        well_core: WellImplementation,
+        well_core: LegacyWellCore,
         home_after: bool,
     ) -> None:
         labware_core = well_core.geometry.parent
@@ -180,16 +181,12 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
             from opentrons.protocol_api.labware import Labware, Well
 
             labware = Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._api_version,
                 protocol_core=None,  # type: ignore[arg-type]
                 core_map=None,  # type: ignore[arg-type]
             )
-            well = Well(
-                parent=labware,
-                well_implementation=well_core,
-                api_version=self._api_version,
-            )
+            well = Well(parent=labware, core=well_core, api_version=self._api_version)
 
             if LabwareLike(labware).is_fixed_trash():
                 location = well.top()
@@ -233,12 +230,14 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     def move_to(
         self,
         location: types.Location,
-        well_core: Optional[WellImplementation] = None,
+        well_core: Optional[LegacyWellCore] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
+        self.flag_unsafe_move(location)
+
         last_location = self._protocol_interface.get_last_location()
         if last_location:
             from_loc = last_location
@@ -341,6 +340,29 @@ class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
             blow_out=blow_out,
         )
         self._update_flow_rate()
+
+    def flag_unsafe_move(self, location: types.Location) -> None:
+        """Check if a movement to a destination is potentially unsafe.
+
+        Args:
+            location: The movement destination.
+
+        Raises:
+            RuntimeError: The movement is unsafe.
+        """
+        from_loc = self._protocol_interface.get_last_location()
+
+        if not from_loc:
+            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
+
+        for mod in self._protocol_interface.get_module_cores():
+            if isinstance(mod, LegacyThermocyclerCore):
+                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+            elif isinstance(mod, LegacyHeaterShakerCore):
+                mod.flag_unsafe_move(
+                    to_loc=location,
+                    is_multichannel=self.get_channels() > 1,
+                )
 
     def _update_flow_rate(self) -> None:
         """Update cached speed and flow rates from hardware controller pipette."""

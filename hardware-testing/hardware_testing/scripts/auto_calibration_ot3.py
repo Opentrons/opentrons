@@ -56,6 +56,7 @@ async def _main(
     homed_pos = await api.gantry_position(mount)
     fast_home_pos = homed_pos + Point(-5, -5, -5)
     try:
+<<<<<<< HEAD
 
         # if mount == OT3Mount.GRIPPER:
         #     if id == "S1":
@@ -65,6 +66,8 @@ async def _main(
         # else:
         #     input("Attach calibration probe to the pipette and press Enter\n")
 
+=======
+>>>>>>> RLAB-222-calibration-hardware-testing-script
         for i in range(cycle):
             if mount == OT3Mount.GRIPPER:
                 if id != "S1":
@@ -72,12 +75,21 @@ async def _main(
                     if id == "all":
                         front_offset = offset
                         await api.home_z()
+<<<<<<< HEAD
+=======
+                        input("Add probe to gripper REAR, then press ENTER: ")
+>>>>>>> RLAB-222-calibration-hardware-testing-script
 
                 if id != "S0":
                     offset = await calibrate_gripper_jaw(api, GripperProbe.REAR, slot)
                     if id == "all":
                         rear_offset = offset
                         offset = await calibrate_gripper(api, front_offset, rear_offset)
+<<<<<<< HEAD
+=======
+                        await api.home_z()
+                        input("Add probe to gripper FRONT, then press ENTER: ")
+>>>>>>> RLAB-222-calibration-hardware-testing-script
             else:
                 offset = await calibrate_pipette(api, mount, slot)
 

@@ -22,9 +22,9 @@ from .core.common import (
     HeaterShakerCore,
 )
 from .core.core_map import LoadedCoreMap
-from .core.protocol_api.legacy_module_core import LegacyModuleCore
-from .core.protocol_api.module_geometry import ModuleGeometry as LegacyModuleGeometry
-from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.legacy.legacy_module_core import LegacyModuleCore
+from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
+from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -165,7 +165,7 @@ class ModuleContext(CommandPublisher):
             labware = self._core.add_labware_core(cast(LegacyLabwareCore, labware_core))
         else:
             labware = Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._api_version,
                 protocol_core=self._protocol_core,
                 core_map=self._core_map,

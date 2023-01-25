@@ -20,18 +20,18 @@ from ..labware import LabwareLoadParams
 
 from . import legacy_module_core, module_geometry
 from .deck import Deck
-from .instrument_context import InstrumentContextImplementation
+from .legacy_instrument_core import LegacyInstrumentCore
 from .labware_offset_provider import AbstractLabwareOffsetProvider
-from .labware import LabwareImplementation
+from .legacy_labware_core import LegacyLabwareCore
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
 
 
-class ProtocolContextImplementation(
+class LegacyProtocolCore(
     AbstractProtocol[
-        InstrumentContextImplementation,
-        LabwareImplementation,
+        LegacyInstrumentCore,
+        LegacyLabwareCore,
         legacy_module_core.LegacyModuleCore,
     ]
 ):
@@ -45,7 +45,7 @@ class ProtocolContextImplementation(
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
-        """Build a :py:class:`.ProtocolContextImplementation`.
+        """Build a :py:class:`.LegacyProtocolCore`.
 
         :param api_version: The API version to use. If this is ``None``, uses
                             the max supported version.
@@ -72,7 +72,7 @@ class ProtocolContextImplementation(
         self._equipment_broker = equipment_broker or EquipmentBroker()
         self._deck_layout = Deck() if deck_layout is None else deck_layout
 
-        self._instruments: Dict[Mount, Optional[InstrumentContextImplementation]] = {
+        self._instruments: Dict[Mount, Optional[LegacyInstrumentCore]] = {
             mount: None for mount in Mount
         }
         self._bundled_labware = bundled_labware
@@ -82,7 +82,7 @@ class ProtocolContextImplementation(
         self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
         self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
-        self._labware_cores: List[LabwareImplementation] = [self.fixed_trash]
+        self._labware_cores: List[LegacyLabwareCore] = [self.fixed_trash]
 
     @property
     def api_version(self) -> APIVersion:
@@ -144,7 +144,7 @@ class ProtocolContextImplementation(
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
-    ) -> LabwareImplementation:
+    ) -> LegacyLabwareCore:
         """Load a labware using its identifying parameters."""
         deck_slot = (
             location if isinstance(location, DeckSlotName) else location.get_deck_slot()
@@ -163,7 +163,7 @@ class ProtocolContextImplementation(
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware,
         )
-        labware_core = LabwareImplementation(
+        labware_core = LegacyLabwareCore(
             definition=labware_def,
             parent=parent,
             label=label,
@@ -202,7 +202,7 @@ class ProtocolContextImplementation(
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
-        labware_core: LabwareImplementation,
+        labware_core: LegacyLabwareCore,
         new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
@@ -279,7 +279,7 @@ class ProtocolContextImplementation(
 
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount
-    ) -> InstrumentContextImplementation:
+    ) -> LegacyInstrumentCore:
         """Load an instrument."""
         attached = {
             att_mount: instr.get("name", None)
@@ -289,7 +289,7 @@ class ProtocolContextImplementation(
         attached[mount] = instrument_name.value
         self._sync_hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
-        new_instr = InstrumentContextImplementation(
+        new_instr = LegacyInstrumentCore(
             api_version=self._api_version,
             protocol_interface=self,
             mount=mount,
@@ -310,7 +310,7 @@ class ProtocolContextImplementation(
 
     def get_loaded_instruments(
         self,
-    ) -> Dict[Mount, Optional[InstrumentContextImplementation]]:
+    ) -> Dict[Mount, Optional[LegacyInstrumentCore]]:
         """Get a mapping of mount to instrument."""
         return self._instruments
 
@@ -340,14 +340,14 @@ class ProtocolContextImplementation(
         return self._deck_layout
 
     @property
-    def fixed_trash(self) -> LabwareImplementation:
+    def fixed_trash(self) -> LegacyLabwareCore:
         """The trash fixed to slot 12 of the robot deck."""
         trash = self._deck_layout["12"]
 
-        if isinstance(trash, LabwareImplementation):
+        if isinstance(trash, LegacyLabwareCore):
             return trash
         if isinstance(trash, Labware):
-            return cast(LabwareImplementation, trash._implementation)
+            return cast(LegacyLabwareCore, trash._core)
 
         raise RuntimeError("Robot must have a trash container in 12")
 
@@ -386,20 +386,16 @@ class ProtocolContextImplementation(
         """Get loaded module cores."""
         return self._module_cores
 
-    def get_labware_cores(self) -> List[LabwareImplementation]:
+    def get_labware_cores(self) -> List[LegacyLabwareCore]:
         """Get all loaded labware cores."""
         return self._labware_cores
 
     def get_labware_on_module(
         self, module_core: legacy_module_core.LegacyModuleCore
-    ) -> Optional[LabwareImplementation]:
+    ) -> Optional[LegacyLabwareCore]:
         """Get the item on top of a given module, if any."""
         labware = module_core.geometry.labware
-        return (
-            cast(LabwareImplementation, labware._implementation)
-            if labware is not None
-            else None
-        )
+        return cast(LegacyLabwareCore, labware._core) if labware is not None else None
 
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
@@ -409,7 +405,7 @@ class ProtocolContextImplementation(
 
     def get_slot_item(
         self, slot_name: DeckSlotName
-    ) -> Union[LabwareImplementation, legacy_module_core.LegacyModuleCore, None]:
+    ) -> Union[LegacyLabwareCore, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
         raise NotImplementedError("LegacyProtocolCore.get_slot_item not implemented")
 
@@ -422,7 +418,7 @@ class ProtocolContextImplementation(
         raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
 
     def get_labware_location(
-        self, labware_core: LabwareImplementation
+        self, labware_core: LegacyLabwareCore
     ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
         """Get labware parent location."""
         raise NotImplementedError(
