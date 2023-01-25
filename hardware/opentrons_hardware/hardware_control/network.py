@@ -47,6 +47,7 @@ class NetworkInfo:
         self, expected: Optional[Set[NodeId]], timeout: float = 1.0
     ) -> Dict[NodeId, DeviceInfoCache]:
         """Probe the bus and discover connected devices.
+
         Sends a status request to the broadcast address and waits for responses. Ends either
         when all nodes in expected respond or when a timeout happens, whichever is first. A
         None timeout is infinite and is not recommended, but could be useful if this is

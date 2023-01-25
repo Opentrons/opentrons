@@ -112,9 +112,7 @@ async def test_completes_exact_equality(mock_can_messenger: AsyncMock) -> None:
     # doesn't raise, so wrap it in a smaller timeout so it will raise (it should
     # complete basically instantly)
     network_info = NetworkInfo(mock_can_messenger)
-    probed = set(
-        await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0)
-    )
+    probed = set(await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0))
     assert probed == {NodeId.gantry_x}
 
 
@@ -125,9 +123,7 @@ async def test_completes_more_than_expected(mock_can_messenger: AsyncMock) -> No
     )
     # same deal with the timeout
     network_info = NetworkInfo(mock_can_messenger)
-    probed = set(
-        await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0)
-    )
+    probed = set(await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0))
     # we should get everything we prepped the network with
     assert probed == {NodeId.gantry_x, NodeId.gantry_y}
 
@@ -137,8 +133,6 @@ async def test_handles_bad_node_ids(mock_can_messenger: AsyncMock) -> None:
     _ = MockStatusResponder(mock_can_messenger, [0x01, NodeId.gantry_x.value])
     # same deal with the timeout
     network_info = NetworkInfo(mock_can_messenger)
-    probed = set(
-        await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0)
-    )
+    probed = set(await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0))
     # we should get everything we prepped the network with and ignore the bad values
     assert probed == {NodeId.gantry_x}
