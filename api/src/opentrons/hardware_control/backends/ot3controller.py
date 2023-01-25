@@ -63,7 +63,7 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     update_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
-from opentrons_hardware.hardware_control.network import probe
+from opentrons_hardware.hardware_control.network import DeviceInfoCache, NetworkInfo
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,
@@ -74,7 +74,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware import firmware_update
-from opentrons_hardware.firmware_update.device_info import get_device_info
 from opentrons_hardware.firmware_update.firmware_manifest import (
     FirmwareUpdateType,
     UpdateInfo,
@@ -96,7 +95,6 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     MotorStatus,
     MustHomeError,
-    DeviceInfoCache,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -111,6 +109,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 
 if TYPE_CHECKING:
     from ..dev_types import (
@@ -159,6 +158,7 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
+        self._network_info = NetworkInfo(self._messenger)
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
@@ -275,6 +275,14 @@ class OT3Controller:
                 raise MustHomeError(f"Axis {node} has invalid encoder position")
         response = await update_motor_position_estimation(self._messenger, nodes)
         self._handle_motor_status_response(response)
+
+    @property
+    def grip_force_profile(self) -> Optional[GripForceProfile]:
+        return self._gripper_force_settings
+
+    @grip_force_profile.setter
+    def grip_force_profile(self, profile: Optional[GripForceProfile]) -> None:
+        self._gripper_force_settings = profile
 
     @property
     def motor_run_currents(self) -> OT3AxisMap[float]:
@@ -475,7 +483,7 @@ class OT3Controller:
         ]
         positions = await asyncio.gather(*coros)
         if OT3Axis.G in checked_axes:
-            await self.gripper_home_jaw()
+            await self.gripper_home_jaw(self._configuration.grip_jaw_home_duty_cycle)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
                 [OT3Axis.Q],
@@ -554,8 +562,8 @@ class OT3Controller:
         self._handle_motor_status_response(positions)
 
     @requires_update
-    async def gripper_home_jaw(self) -> None:
-        move_group = create_gripper_jaw_home_group()
+    async def gripper_home_jaw(self, duty_cycle: float) -> None:
+        move_group = create_gripper_jaw_home_group(duty_cycle)
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
@@ -611,7 +619,7 @@ class OT3Controller:
         model = gripper_config.info_num_to_model(attached.model)
         serial = attached.serial
         return {
-            "config": gripper_config.load(model, serial),
+            "config": gripper_config.load(model),
             "id": f"GRPV{attached.model}{serial}",
         }
 
@@ -907,9 +915,7 @@ class OT3Controller:
         a working machine, and no more.
         """
         core_nodes = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        core_present_info = await probe(self._messenger, core_nodes, timeout)
-        self._handle_device_info_response(core_present_info)
-        core_present = set(core_present_info.keys())
+        core_present = set(await self._network_info.probe(core_nodes, timeout))
         self._present_nodes = self._filter_probed_core_nodes(
             self._present_nodes, core_present
         )
@@ -938,9 +944,7 @@ class OT3Controller:
             "config", None
         ):
             expected.add(NodeId.gripper)
-        core_present_info = await probe(self._messenger, expected, timeout)
-        self._handle_device_info_response(core_present_info)
-        core_present = set(core_present_info.keys())
+        core_present = set(await self._network_info.probe(expected, timeout))
         self._present_nodes = self._replace_gripper_node(
             self._replace_head_node(core_present)
         )
@@ -999,19 +1003,3 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
-
-    async def update_device_info(self) -> None:
-        """Update the device info cache for all attached instruments"""
-        response = await get_device_info(self._messenger, self._present_nodes)
-        self._handle_device_info_response(response)
-
-    def _handle_device_info_response(
-        self, network_info: Dict[NodeId, DeviceInfoCache]
-    ) -> None:
-        subsystem_info_cache = {}
-        for node, device_info in network_info.items():
-            old_device_info = self._subsystem_info_cache.get(node)
-            if old_device_info is None or device_info != old_device_info:
-                log.debug(f"Updated node version cache {device_info}")
-                subsystem_info_cache[node] = device_info
-        self._subsystem_info_cache = subsystem_info_cache

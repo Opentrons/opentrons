@@ -314,7 +314,7 @@ async def test_probing(
     )
     passed_expected = None
 
-    async def fake_probe(can_messenger, expected, timeout):
+    async def fake_probe(expected, timeout):
         nonlocal passed_expected
         nonlocal call_count
         nonlocal fake_nodes
@@ -328,9 +328,9 @@ async def test_probing(
             OT3Mount.GRIPPER: {"config": "whateverelse"},
         }
 
-    with patch(
-        "opentrons.hardware_control.backends.ot3controller.probe", fake_probe
-    ), patch.object(controller, "get_attached_instruments", fake_gai):
+    with patch.object(controller._network_info, "probe", fake_probe), patch.object(
+        controller, "get_attached_instruments", fake_gai
+    ):
         await controller.probe_network(timeout=0.1)
         assert call_count == 1
         assert passed_expected == set(
@@ -370,7 +370,7 @@ async def test_probing(
             ),
             "P1KSV33hello",
             "GRPV0fake_serial",
-            "gripper",
+            "Gripper V1",
         ),
     ],
 )
@@ -382,29 +382,29 @@ async def test_get_attached_instruments(
     gripper_id: str,
     gripper_name: str,
 ):
-    async def fake_probe(can_messenger, expected, timeout):
+    async def fake_probe(expected, timeout):
         return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         assert await controller.get_attached_instruments({}) == {}
 
     mock_tool_detector.return_value = tool_summary
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         detected = await controller.get_attached_instruments({})
     assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == pipette_id
     assert detected[OT3Mount.GRIPPER]["id"] == gripper_id
-    assert detected[OT3Mount.GRIPPER]["config"].name == gripper_name
+    assert detected[OT3Mount.GRIPPER]["config"].display_name == gripper_name
 
 
 async def test_get_attached_instruments_handles_unknown_name(
     controller: OT3Controller, mock_tool_detector: OneshotToolDetector
 ) -> None:
-    async def fake_probe(can_messenger, expected, timeout):
+    async def fake_probe(expected, timeout):
         return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         assert await controller.get_attached_instruments({}) == {}
 
     tool_summary = ToolSummary(
@@ -416,7 +416,7 @@ async def test_get_attached_instruments_handles_unknown_name(
     )
     mock_tool_detector.return_value = tool_summary
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         with pytest.raises(InvalidPipetteName):
             await controller.get_attached_instruments({})
 
@@ -424,10 +424,10 @@ async def test_get_attached_instruments_handles_unknown_name(
 async def test_get_attached_instruments_handles_unknown_model(
     controller: OT3Controller, mock_tool_detector: OneshotToolDetector
 ) -> None:
-    async def fake_probe(can_messenger, expected, timeout):
+    async def fake_probe(expected, timeout):
         return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         assert await controller.get_attached_instruments({}) == {}
 
     tool_summary = ToolSummary(
@@ -442,7 +442,7 @@ async def test_get_attached_instruments_handles_unknown_model(
     )
     mock_tool_detector.return_value = tool_summary
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         with pytest.raises(InvalidPipetteModel):
             await controller.get_attached_instruments({})
 
@@ -476,7 +476,7 @@ def test_nodeid_filter_probed_core():
 
 
 async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
-    await controller.gripper_home_jaw()
+    await controller.gripper_home_jaw(25)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:

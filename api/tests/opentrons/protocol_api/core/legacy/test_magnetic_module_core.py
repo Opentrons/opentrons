@@ -118,7 +118,7 @@ def test_engage_height_from_labware(
 ) -> None:
     """It should engage height from the labware's defined position."""
     decoy.when(
-        mock_geometry.labware._implementation.get_default_magnet_engage_height(False)  # type: ignore[union-attr]
+        mock_geometry.labware._core.get_default_magnet_engage_height(False)  # type: ignore[union-attr]
     ).then_return(32.0)
 
     subject.engage_to_labware(offset=10.0)
@@ -145,7 +145,7 @@ def test_engage_height_from_labware_no_engage_height(
 ) -> None:
     """It should raise if the labware is not magnetic module compatible."""
     decoy.when(
-        mock_geometry.labware._implementation.get_default_magnet_engage_height(),  # type: ignore[union-attr]
+        mock_geometry.labware._core.get_default_magnet_engage_height(),  # type: ignore[union-attr]
         ignore_extra_args=True,
     ).then_return(None)
 
@@ -163,7 +163,7 @@ def test_engage_height_from_labware_with_gen1(
     decoy.when(mock_geometry.model).then_return(MagneticModuleModel.MAGNETIC_V1)
 
     decoy.when(
-        mock_geometry.labware._implementation.get_default_magnet_engage_height(False)  # type: ignore[union-attr]
+        mock_geometry.labware._core.get_default_magnet_engage_height(False)  # type: ignore[union-attr]
     ).then_return(32.0)
 
     subject.engage_to_labware(offset=10.0)
@@ -181,7 +181,7 @@ def test_engage_height_from_labware_with_gen1_preserve_half_mm(
     decoy.when(mock_geometry.model).then_return(MagneticModuleModel.MAGNETIC_V1)
 
     decoy.when(
-        mock_geometry.labware._implementation.get_default_magnet_engage_height(True)  # type: ignore[union-attr]
+        mock_geometry.labware._core.get_default_magnet_engage_height(True)  # type: ignore[union-attr]
     ).then_return(32.0)
 
     subject.engage_to_labware(offset=10.0, preserve_half_mm=True)

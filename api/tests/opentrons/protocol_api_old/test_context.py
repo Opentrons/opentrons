@@ -77,28 +77,28 @@ def get_labware_def(monkeypatch):
 async def test_motion(ctx, hardware):
     ctx.home()
     instr = ctx.load_instrument("p10_single", Mount.RIGHT)
-    old_pos = await hardware.current_position(instr._implementation.get_mount())
+    old_pos = await hardware.current_position(instr._core.get_mount())
     instr.home()
     assert instr.move_to(Location(Point(0, 0, 0), None)) is instr
     old_pos[Axis.X] = 0.0
     old_pos[Axis.Y] = 0.0
     old_pos[Axis.A] = 0.0
     old_pos[Axis.C] = 2.0
-    assert await hardware.current_position(
-        instr._implementation.get_mount()
-    ) == pytest.approx(old_pos)
+    assert await hardware.current_position(instr._core.get_mount()) == pytest.approx(
+        old_pos
+    )
 
 
 def test_max_speeds(ctx, monkeypatch, hardware):
     ctx.home()
-    with mock.patch.object(ctx._implementation.get_hardware(), "move_to") as mock_move:
+    with mock.patch.object(ctx._core.get_hardware(), "move_to") as mock_move:
         instr = ctx.load_instrument("p10_single", Mount.RIGHT)
         instr.move_to(Location(Point(0, 0, 0), None))
         assert all(
             kwargs["max_speeds"] == {} for args, kwargs in mock_move.call_args_list
         )
 
-    with mock.patch.object(ctx._implementation.get_hardware(), "move_to") as mock_move:
+    with mock.patch.object(ctx._core.get_hardware(), "move_to") as mock_move:
         ctx.max_speeds["x"] = 10
         instr.move_to(Location(Point(0, 0, 1), None))
         assert all(
@@ -106,7 +106,7 @@ def test_max_speeds(ctx, monkeypatch, hardware):
             for args, kwargs in mock_move.call_args_list
         )
 
-    with mock.patch.object(ctx._implementation.get_hardware(), "move_to") as mock_move:
+    with mock.patch.object(ctx._core.get_hardware(), "move_to") as mock_move:
         ctx.max_speeds["x"] = None
         instr.move_to(Location(Point(1, 0, 1), None))
         assert all(
@@ -182,8 +182,8 @@ def test_location_cache_two_pipettes_fails_pre_2_10(ctx, get_labware_def, hardwa
     ctx.home()
     left = ctx.load_instrument("p10_single", Mount.LEFT)
     right = ctx.load_instrument("p10_single", Mount.RIGHT)
-    left._implementation._api_version = APIVersion(2, 9)
-    right._implementation._api_version = APIVersion(2, 9)
+    left._core._api_version = APIVersion(2, 9)
+    right._core._api_version = APIVersion(2, 9)
 
     left_loc = Location(point=Point(1, 2, 3), labware="1")
     right_loc = Location(point=Point(3, 4, 5), labware="2")
@@ -205,7 +205,7 @@ def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
     ctx.home()
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move:
         right.move_to(lw.wells()[0].top())
         assert len(fake_move.call_args_list) == 3
@@ -219,7 +219,7 @@ def test_pipette_info(ctx):
     right = ctx.load_instrument("p300_multi", Mount.RIGHT)
     left = ctx.load_instrument("p1000_single", Mount.LEFT)
     assert right.type == "multi"
-    hardware = ctx._implementation.get_hardware()
+    hardware = ctx._core.get_hardware()
     name = hardware.attached_instruments[Mount.RIGHT]["name"]
     model = hardware.attached_instruments[Mount.RIGHT]["model"]
     assert right.name == name
@@ -239,7 +239,7 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
 
     instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+    pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
     target_location = tiprack["A1"].top()
@@ -265,7 +265,7 @@ def test_pick_up_without_prep_after(ctx, get_labware_def):
 
     instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+    pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
 
     # will not be prepared until after an aspirate
     instr.pick_up_tip(tiprack["A2"].top(), prep_after=False)
@@ -287,7 +287,7 @@ def test_pick_up_tip_old_version(hardware, get_labware_def):
 
     instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+    pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
 
     # will not be prepared until after an aspirate
     assert not pipette.has_tip
@@ -319,7 +319,7 @@ def test_return_tip_old_version(hardware, get_labware_def):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+    pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
 
     target_location = tiprack["A1"].top()
     instr.pick_up_tip(target_location)
@@ -345,7 +345,7 @@ def test_return_tip(ctx, get_labware_def):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+    pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
 
     target_location = tiprack["A1"].top()
     instr.pick_up_tip(target_location)
@@ -369,7 +369,7 @@ def test_use_filter_tips(ctx, get_labware_def):
     mount = Mount.LEFT
 
     instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
-    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+    pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
 
     assert pipette.available_volume == pipette.config.max_volume
 
@@ -395,7 +395,7 @@ def test_pick_up_tip_no_location(ctx, get_labware_def, pipette_model, tiprack_ki
 
     instr = ctx.load_instrument(pipette_model, mount, tip_racks=[tiprack1, tiprack2])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+    pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
 
@@ -454,9 +454,9 @@ def test_aspirate(ctx, get_labware_def):
     instr = ctx.load_instrument("p10_single", Mount.RIGHT, tip_racks=[tiprack])
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move, mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "aspirate"
+        ctx._core.get_hardware()._obj_to_adapt, "aspirate"
     ) as fake_hw_aspirate:
         instr.pick_up_tip()
         instr.aspirate(2.0, lw.wells()[0].bottom())
@@ -472,9 +472,9 @@ def test_aspirate(ctx, get_labware_def):
         )
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move, mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "aspirate"
+        ctx._core.get_hardware()._obj_to_adapt, "aspirate"
     ) as fake_hw_aspirate:
         instr.well_bottom_clearance.aspirate = 1.0
         instr.aspirate(2.0, lw.wells()[0])
@@ -486,11 +486,11 @@ def test_aspirate(ctx, get_labware_def):
         )
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move, mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "aspirate"
+        ctx._core.get_hardware()._obj_to_adapt, "aspirate"
     ) as fake_hw_aspirate:
-        hardware = ctx._implementation.get_hardware()
+        hardware = ctx._core.get_hardware()
         hardware._obj_to_adapt.hardware_instruments[Mount.RIGHT]._current_volume = 1
 
         instr.aspirate(2.0)
@@ -499,9 +499,9 @@ def test_aspirate(ctx, get_labware_def):
         instr.blow_out()
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move, mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "aspirate"
+        ctx._core.get_hardware()._obj_to_adapt, "aspirate"
     ) as fake_hw_aspirate:
         instr.aspirate(2.0)
         assert len(fake_move.call_args_list) == 2
@@ -524,9 +524,9 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
     instr = ctx.load_instrument("p10_single", Mount.RIGHT)
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move, mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "dispense"
+        ctx._core.get_hardware()._obj_to_adapt, "dispense"
     ) as fake_hw_dispense:
 
         instr.dispense(2.0, lw.wells()[0].bottom())
@@ -541,9 +541,9 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
         )
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move, mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "dispense"
+        ctx._core.get_hardware()._obj_to_adapt, "dispense"
     ) as fake_hw_dispense:
 
         instr.well_bottom_clearance.dispense = 2.0
@@ -555,9 +555,9 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
         )
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move, mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "dispense"
+        ctx._core.get_hardware()._obj_to_adapt, "dispense"
     ) as fake_hw_dispense:
 
         instr.well_bottom_clearance.dispense = 2.0
@@ -672,7 +672,7 @@ def test_touch_tip_default_args(monkeypatch, hardware):
 
     instr.aspirate(10, lw.wells()[0])
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move:
         instr.touch_tip()
         z_offset = Point(0, 0, 1)  # default z offset of 1mm
@@ -692,7 +692,7 @@ def test_touch_tip_default_args(monkeypatch, hardware):
     # Check that the old api version initial well move has the same z height
     # as the calculated edges.
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move:
         instr.touch_tip(v_offset=1)
         assert fake_move.call_args_list[0][0][1].z != old_z
@@ -719,7 +719,7 @@ def test_touch_tip_new_default_args(ctx, monkeypatch):
     ]
 
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move:
         instr.touch_tip()
         for i in range(1, 5):
@@ -731,7 +731,7 @@ def test_touch_tip_new_default_args(ctx, monkeypatch):
     # Check that the new api version initial well move has the same z height
     # as the calculated edges.
     with mock.patch.object(
-        ctx._implementation.get_hardware()._obj_to_adapt, "move_to"
+        ctx._core.get_hardware()._obj_to_adapt, "move_to"
     ) as fake_move:
         instr.touch_tip(v_offset=1)
         assert fake_move.call_args_list[0][0][1].z != old_z
@@ -764,7 +764,7 @@ def test_blow_out(ctx, monkeypatch):
         nonlocal move_location
         move_location = location
 
-    monkeypatch.setattr(instr._implementation, "move_to", fake_move)
+    monkeypatch.setattr(instr._core, "move_to", fake_move)
 
     instr.blow_out()
     # pipette should not move, if no location is passed
@@ -871,15 +871,13 @@ def test_transfer_options(ctx, monkeypatch):
 
 
 def test_flow_rate(ctx, monkeypatch):
-    old_sfm = ctx._implementation.get_hardware()
+    old_sfm = ctx._core.get_hardware()
 
     def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
         old_sfm(mount, aspirate=None, dispense=None, blow_out=None)
 
     set_flow_rate = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(
-        ctx._implementation.get_hardware(), "set_flow_rate", set_flow_rate
-    )
+    monkeypatch.setattr(ctx._core.get_hardware(), "set_flow_rate", set_flow_rate)
     instr = ctx.load_instrument("p300_single", Mount.RIGHT)
 
     ctx.home()
@@ -897,15 +895,13 @@ def test_flow_rate(ctx, monkeypatch):
 
 
 def test_pipette_speed(ctx, monkeypatch):
-    old_sfm = ctx._implementation.get_hardware()
+    old_sfm = ctx._core.get_hardware()
 
     def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
         old_sfm(aspirate=None, dispense=None, blow_out=None)
 
     set_speed = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(
-        ctx._implementation.get_hardware(), "set_pipette_speed", set_speed
-    )
+    monkeypatch.setattr(ctx._core.get_hardware(), "set_pipette_speed", set_speed)
     instr = ctx.load_instrument("p300_single", Mount.RIGHT)
 
     ctx.home()
@@ -1013,9 +1009,7 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     mock_load_tip_length = decoy.mock(func=instr_cal.load_tip_length_for_pipette)
     monkeypatch.setattr(instr_cal, "load_tip_length_for_pipette", mock_load_tip_length)
 
-    decoy.when(
-        mock_load_tip_length(None, tip_rack._implementation.get_definition())
-    ).then_return(
+    decoy.when(mock_load_tip_length(None, tip_rack._core.get_definition())).then_return(
         instr_cal.TipLengthCalibration(
             tip_length=2,
             last_modified=utc_now(),
@@ -1030,20 +1024,20 @@ def test_tip_length_for_caldata(ctx, decoy, monkeypatch):
     assert (
         instrument_support.tip_length_for(
             pipette=instr.hw_pipette,
-            tip_rack_definition=tip_rack._implementation.get_definition(),
+            tip_rack_definition=tip_rack._core.get_definition(),
         )
         == 2
     )
 
-    decoy.when(
-        mock_load_tip_length(None, tip_rack._implementation.get_definition())
-    ).then_raise(cs_types.TipLengthCalNotFound("oh no"))
+    decoy.when(mock_load_tip_length(None, tip_rack._core.get_definition())).then_raise(
+        cs_types.TipLengthCalNotFound("oh no")
+    )
 
     assert instrument_support.tip_length_for(
         pipette=instr.hw_pipette,
-        tip_rack_definition=tip_rack._implementation.get_definition(),
+        tip_rack_definition=tip_rack._core.get_definition(),
     ) == (
-        tip_rack._implementation.get_definition()["parameters"]["tipLength"]
+        tip_rack._core.get_definition()["parameters"]["tipLength"]
         - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
     )
 
@@ -1060,7 +1054,7 @@ def test_bundled_labware(get_labware_fixture, hardware):
 
     lw1 = ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
     assert ctx.loaded_labwares[3] == lw1
-    assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
+    assert ctx.loaded_labwares[3]._core.get_definition() == fixture_96_plate
 
 
 def test_bundled_labware_missing(get_labware_fixture, hardware):
@@ -1111,7 +1105,7 @@ def test_extra_labware(get_labware_fixture, hardware):
 
     ls1 = ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
     assert ctx.loaded_labwares[3] == ls1
-    assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
+    assert ctx.loaded_labwares[3]._core.get_definition() == fixture_96_plate
 
 
 def test_api_version_checking(hardware):

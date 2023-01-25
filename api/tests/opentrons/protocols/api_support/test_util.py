@@ -58,7 +58,7 @@ def test_max_speeds_userdict():
 def test_build_edges():
     lw_def = get_labware_definition("corning_96_wellplate_360ul_flat")
     test_lw = Labware(
-        implementation=LegacyLabwareCore(lw_def, Location(Point(0, 0, 0), None)),
+        core=LegacyLabwareCore(lw_def, Location(Point(0, 0, 0), None)),
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -102,7 +102,7 @@ def test_build_edges_left_pipette(ctx):
         test_lw["A12"],
         1.0,
         Mount.LEFT,
-        ctx._implementation.get_deck(),
+        ctx._core.get_deck(),
         version=APIVersion(2, 4),
     )
     assert res == left_pip_edges
@@ -118,7 +118,7 @@ def test_build_edges_left_pipette(ctx):
         test_lw2["A12"],
         1.0,
         Mount.LEFT,
-        ctx._implementation.get_deck(),
+        ctx._core.get_deck(),
         version=APIVersion(2, 4),
     )
     assert res2 == left_pip_edges
@@ -141,7 +141,7 @@ def test_build_edges_right_pipette(ctx):
         test_lw["A1"],
         1.0,
         Mount.RIGHT,
-        ctx._implementation._deck_layout,
+        ctx._core._deck_layout,
         version=APIVersion(2, 4),
     )
     assert res == right_pip_edges
@@ -158,7 +158,7 @@ def test_build_edges_right_pipette(ctx):
         test_lw2["A12"],
         1.0,
         Mount.RIGHT,
-        ctx._implementation.get_deck(),
+        ctx._core.get_deck(),
         version=APIVersion(2, 4),
     )
     assert res2 == right_pip_edges
