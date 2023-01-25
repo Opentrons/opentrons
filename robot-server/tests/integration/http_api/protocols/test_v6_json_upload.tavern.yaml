@@ -350,6 +350,8 @@ stages:
                       x: 0
                       y: 0
                       z: 11
+                  radius: 1.0
+                  vOffset: -1.0
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
