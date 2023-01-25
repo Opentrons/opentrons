@@ -40,7 +40,6 @@
     "@types/lodash": "^4.14.191",
     "@types/pump": "^1.1.0",
     "@types/uuid": "^3.4.7",
-    "ajv": "6.12.3",
     "dateformat": "3.0.3",
     "electron-debug": "3.0.1",
     "electron-devtools-installer": "3.2.0",
