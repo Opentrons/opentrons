@@ -214,7 +214,7 @@ describe('RobotOverview', () => {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration/dashboard'
+      '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
 
@@ -227,7 +227,7 @@ describe('RobotOverview', () => {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration/dashboard'
+      '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
 

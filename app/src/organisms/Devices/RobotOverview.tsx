@@ -191,7 +191,7 @@ export function RobotOverview({
             <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
               {calibrationStatusBannerText}
               <RouterLink
-                to={`/devices/${robotName}/robot-settings/calibration/dashboard`}
+                to={`/devices/${robotName}/robot-settings/calibration`}
               >
                 <StyledText
                   as="p"
