@@ -141,7 +141,7 @@ async def test_liquid_probe(
     position = await liquid_probe(
         messenger=mock_messenger,
         tool=target_node,
-        mount=motor_node,
+        head_node=motor_node,
         max_z_distance=40,
         mount_speed=10,
         plunger_speed=8,

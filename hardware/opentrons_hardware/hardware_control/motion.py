@@ -16,17 +16,6 @@ LOG = getLogger(__name__)
 NodeIdMotionValues = Dict[NodeId, np.float64]
 
 
-class MoveStopCondition(int, Enum):
-    """Move Stop Condition."""
-
-    none = 0x0
-    limit_switch = 0x1
-    cap_sensor = 0x2
-    pressure_sensor = 0x3
-    encoder_position = 0x4
-    gripper_force = 0x5
-
-
 @unique
 class MoveType(int, Enum):
     """Move Type."""
@@ -35,7 +24,6 @@ class MoveType(int, Enum):
     home = 0x1
     calibration = 0x2
     grip = 0x3
-    liquid_sense = 0x4
 
     @classmethod
     def get_move_type(cls, condition: MoveStopCondition) -> "MoveType":
