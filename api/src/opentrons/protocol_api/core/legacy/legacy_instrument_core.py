@@ -151,12 +151,12 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         edges = build_edges(
             where=Well(
                 parent=Labware(
-                    implementation=location.geometry.parent,
+                    core=location.geometry.parent,
                     api_version=self._api_version,
                     protocol_core=None,  # type: ignore[arg-type]
                     core_map=None,  # type: ignore[arg-type]
                 ),
-                well_implementation=location,
+                core=location,
                 api_version=self._api_version,
             ),
             offset=v_offset,
@@ -215,16 +215,12 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             from opentrons.protocol_api.labware import Labware, Well
 
             labware = Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._api_version,
                 protocol_core=None,  # type: ignore[arg-type]
                 core_map=None,  # type: ignore[arg-type]
             )
-            well = Well(
-                parent=labware,
-                well_implementation=well_core,
-                api_version=self._api_version,
-            )
+            well = Well(parent=labware, core=well_core, api_version=self._api_version)
 
             if LabwareLike(labware).is_fixed_trash():
                 location = well.top()

@@ -18,12 +18,9 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
     ChannelCount,
 )
-from opentrons_shared_data.gripper.dev_types import (
-    GripperName,
-    GripperModel,
-)
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
 
-InstrumentNameT = TypeVar("InstrumentNameT", bound=Union[GripperName, PipetteName])
+
 InstrumentModelT = TypeVar("InstrumentModelT", bound=Union[GripperModel, PipetteModel])
 InstrumentDataT = TypeVar("InstrumentDataT", bound=BaseModel)
 
@@ -49,16 +46,13 @@ class MountType(enum.Enum):
         return self.name.lower()
 
 
-class _GenericInstrument(
-    GenericModel, Generic[InstrumentNameT, InstrumentModelT, InstrumentDataT]
-):
+class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
     """Base instrument response."""
 
     mount: str = Field(..., description="The mount this instrument is attached to.")
     instrumentType: InstrumentType = Field(
         ..., description="Type of instrument- either a pipette or a gripper."
     )
-    instrumentName: InstrumentNameT = Field(..., description="Name of the instrument.")
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
     # TODO (spp, 2023-01-06): add firmware version field
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
@@ -86,7 +80,7 @@ class PipetteData(BaseModel):
     #  add calibration data as decided by https://opentrons.atlassian.net/browse/RSS-167
 
 
-class Pipette(_GenericInstrument[PipetteName, PipetteModel, PipetteData]):
+class Pipette(_GenericInstrument[PipetteModel, PipetteData]):
     """Attached pipette info & configuration."""
 
     instrumentType: Literal["pipette"] = "pipette"
@@ -95,11 +89,10 @@ class Pipette(_GenericInstrument[PipetteName, PipetteModel, PipetteData]):
     data: PipetteData
 
 
-class Gripper(_GenericInstrument[GripperName, GripperModel, GripperData]):
+class Gripper(_GenericInstrument[GripperModel, GripperData]):
     """Attached gripper info & configuration."""
 
     instrumentType: Literal["gripper"] = "gripper"
-    instrumentName: GripperName
     instrumentModel: GripperModel
     data: GripperData
 

@@ -261,7 +261,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
                 acceleration={},
                 duration=float64(args.mount_distance / args.mount_speed),
                 present_nodes=[target_z, target_pipette],
-                stop_condition=MoveStopCondition.cap_sensor,
+                stop_condition=MoveStopCondition.sync_line,
             ),
         ],
     ]

@@ -12,8 +12,8 @@ def test_move_to_well_with_optional_params():
     instruments = {"somePipetteId": pipette_mock}
 
     well = labware.Well(
-        parent=None,  # type: ignore[arg-type]
-        well_implementation=LegacyWellCore(
+        parent=None,
+        core=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",
@@ -66,8 +66,8 @@ def test_move_to_well_without_optional_params():
     instruments = {"somePipetteId": pipette_mock}
 
     well = labware.Well(
-        parent=None,  # type: ignore[arg-type]
-        well_implementation=LegacyWellCore(
+        parent=None,
+        core=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",
