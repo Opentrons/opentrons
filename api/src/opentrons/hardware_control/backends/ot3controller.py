@@ -102,6 +102,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 
 if TYPE_CHECKING:
     from ..dev_types import (
@@ -186,6 +187,14 @@ class OT3Controller:
                 raise MustHomeError(f"Axis {node} has invalid encoder position")
         response = await update_motor_position_estimation(self._messenger, nodes)
         self._handle_motor_status_response(response)
+
+    @property
+    def grip_force_profile(self) -> Optional[GripForceProfile]:
+        return self._gripper_force_settings
+
+    @grip_force_profile.setter
+    def grip_force_profile(self, profile: Optional[GripForceProfile]) -> None:
+        self._gripper_force_settings = profile
 
     @property
     def motor_run_currents(self) -> OT3AxisMap[float]:
@@ -384,7 +393,7 @@ class OT3Controller:
         ]
         positions = await asyncio.gather(*coros)
         if OT3Axis.G in checked_axes:
-            await self.gripper_home_jaw()
+            await self.gripper_home_jaw(self._configuration.grip_jaw_home_duty_cycle)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
                 [OT3Axis.Q],
@@ -459,8 +468,8 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
-    async def gripper_home_jaw(self) -> None:
-        move_group = create_gripper_jaw_home_group()
+    async def gripper_home_jaw(self, duty_cycle: float) -> None:
+        move_group = create_gripper_jaw_home_group(duty_cycle)
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
@@ -516,7 +525,7 @@ class OT3Controller:
         model = gripper_config.info_num_to_model(attached.model)
         serial = attached.serial
         return {
-            "config": gripper_config.load(model, serial),
+            "config": gripper_config.load(model),
             "id": f"GRPV{attached.model}{serial}",
         }
 

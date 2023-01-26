@@ -604,7 +604,10 @@ class OT3API(
         Home the jaw of the gripper.
         """
         gripper = self._gripper_handler.get_gripper()
-        await self._ungrip()
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+            gripper.default_home_force
+        )
+        await self._ungrip(duty_cycle=dc)
         gripper.state = GripperJawState.HOMED_READY
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
@@ -1123,10 +1126,10 @@ class OT3API(
             raise
 
     @ExecutionManagerProvider.wait_for_running
-    async def _ungrip(self) -> None:
+    async def _ungrip(self, duty_cycle: float) -> None:
         """Move the gripper jaw outward to reach the homing switch."""
         try:
-            await self._backend.gripper_home_jaw()
+            await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
             encoder_pos = await self._backend.update_encoder_position()
             self._encoder_current_position = deck_from_machine(
                 encoder_pos,
@@ -1144,18 +1147,15 @@ class OT3API(
     async def _hold_jaw_width(self, jaw_width_mm: float) -> None:
         """Move the gripper jaw to a specific width."""
         try:
-            if (
-                jaw_width_mm
-                < self._gripper_handler.get_gripper().config.jaw_sizes_mm["min"]
-                or jaw_width_mm
-                > self._gripper_handler.get_gripper().config.jaw_sizes_mm["max"]
-            ):
+            if not self._gripper_handler.is_valid_jaw_width(jaw_width_mm):
                 raise ValueError("Setting gripper jaw width out of bounds")
             await self._backend.gripper_hold_jaw(
                 int(
                     1000
                     * (
-                        self._gripper_handler.get_gripper().config.jaw_sizes_mm["max"]
+                        self._gripper_handler.get_gripper().config.geometry.jaw_width[
+                            "max"
+                        ]
                         - jaw_width_mm
                     )
                     / 2
@@ -1174,16 +1174,21 @@ class OT3API(
             self._log.exception("Gripper set width failed")
             raise
 
-    async def grip(self, force_newtons: float) -> None:
+    async def grip(self, force_newtons: Optional[float] = None) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+            force_newtons or self._gripper_handler.get_gripper().default_grip_force
+        )
         await self._grip(duty_cycle=dc)
         self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
 
-    async def ungrip(self) -> None:
+    async def ungrip(self, force_newtons: Optional[float] = None) -> None:
         # get default grip force for release if not provided
         self._gripper_handler.check_ready_for_jaw_move()
-        await self._ungrip()
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+            force_newtons or self._gripper_handler.get_gripper().default_home_force
+        )
+        await self._ungrip(duty_cycle=dc)
         self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
 
     async def hold_jaw_width(self, jaw_width_mm: int) -> None:

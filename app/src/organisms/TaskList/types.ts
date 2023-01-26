@@ -12,6 +12,7 @@ export interface SubTaskProps {
   cta?: SubTaskCTA
   footer?: string
   isComplete?: boolean
+  markedBad?: boolean
 }
 
 export interface TaskProps extends Omit<SubTaskProps, 'subTaskIndex'> {
@@ -24,4 +25,5 @@ export interface TaskListProps {
   // null activeIndex: all tasks complete
   activeIndex: [number, number] | null
   taskList: TaskProps[]
+  taskListStatus: string | null
 }

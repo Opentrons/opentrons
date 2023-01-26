@@ -374,10 +374,7 @@ def test_module_load_labware(ctx_with_tempdeck):
         labware_def["cornerOffsetFromSlot"]["y"],
         labware_def["cornerOffsetFromSlot"]["z"],
     )
-    assert (
-        lw._implementation.get_geometry().offset
-        == lw_offset + mod.geometry.location.point
-    )
+    assert lw._core.get_geometry().offset == lw_offset + mod.geometry.location.point
     assert lw.name == labware_name
 
 
