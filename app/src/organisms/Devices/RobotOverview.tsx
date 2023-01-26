@@ -17,6 +17,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -102,86 +103,89 @@ export function RobotOverview({
   )
 
   return robot != null ? (
-    <Flex
-      alignItems={ALIGN_START}
-      backgroundColor={COLORS.white}
-      borderBottom={BORDERS.lineBorder}
-      flexDirection={DIRECTION_COLUMN}
-      marginBottom={SPACING.spacing4}
-      padding={SPACING.spacing3}
-      position={POSITION_RELATIVE}
-      width="100%"
-    >
+    <>
       <Flex
-        flexDirection={DIRECTION_ROW}
-        marginBottom={SPACING.spacing4}
+        alignItems={ALIGN_START}
+        backgroundColor={COLORS.white}
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing3}
+        position={POSITION_RELATIVE}
         width="100%"
       >
-        <img
-          src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
-          style={{ paddingTop: SPACING.spacing3, width: '6.25rem' }}
-          id="RobotOverview_robotImage"
-        />
-        <Box padding={SPACING.spacing3} width="100%">
-          <ReachableBanner robot={robot} />
-          {robot != null ? (
-            <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
-          ) : null}
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <RobotStatusHeader
-              name={robot.name}
-              local={robot.local}
-              robotModel={robotModel}
-            />
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                paddingRight={SPACING.spacing4}
-              >
-                <StyledText
-                  as="h6"
-                  color={COLORS.darkGreyEnabled}
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  paddingBottom={SPACING.spacing2}
-                  textTransform={TYPOGRAPHY.textTransformUppercase}
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          marginBottom={SPACING.spacing4}
+          width="100%"
+        >
+          <img
+            src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+            style={{ paddingTop: SPACING.spacing3, width: '6.25rem' }}
+            id="RobotOverview_robotImage"
+          />
+          <Box padding={SPACING.spacing3} width="100%">
+            <ReachableBanner robot={robot} />
+            {robot != null ? (
+              <UpdateRobotBanner
+                robot={robot}
+                marginBottom={SPACING.spacing3}
+              />
+            ) : null}
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <RobotStatusHeader
+                name={robot.name}
+                local={robot.local}
+                robotModel={robotModel}
+              />
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing4}
                 >
-                  {t('controls')}
-                </StyledText>
-                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-                  <Flex paddingBottom={SPACING.spacing2}>
-                    <ToggleButton
-                      label={t('lights')}
-                      toggledOn={lightsOn != null ? lightsOn : false}
-                      disabled={
-                        lightsOn === null || robot.status !== CONNECTABLE
-                      }
-                      onClick={toggleLights}
-                      height="0.813rem"
-                      id="RobotOverview_lightsToggle"
-                    />
-                  </Flex>
                   <StyledText
-                    as="p"
-                    color={
-                      isRobotViewable
-                        ? COLORS.darkBlackEnabled
-                        : COLORS.errorDisabled
-                    }
+                    as="h6"
+                    color={COLORS.darkGreyEnabled}
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    paddingBottom={SPACING.spacing2}
+                    textTransform={TYPOGRAPHY.textTransformUppercase}
                   >
-                    {t('lights')}
+                    {t('controls')}
                   </StyledText>
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+                    <Flex paddingBottom={SPACING.spacing2}>
+                      <ToggleButton
+                        label={t('lights')}
+                        toggledOn={lightsOn != null ? lightsOn : false}
+                        disabled={
+                          lightsOn === null || robot.status !== CONNECTABLE
+                        }
+                        onClick={toggleLights}
+                        height="0.813rem"
+                        id="RobotOverview_lightsToggle"
+                      />
+                    </Flex>
+                    <StyledText
+                      as="p"
+                      color={
+                        isRobotViewable
+                          ? COLORS.darkBlackEnabled
+                          : COLORS.errorDisabled
+                      }
+                    >
+                      {t('lights')}
+                    </StyledText>
+                  </Flex>
                 </Flex>
               </Flex>
             </Flex>
-          </Flex>
-        </Box>
-        <Box
-          position={POSITION_ABSOLUTE}
-          top={SPACING.spacing2}
-          right="-.75rem"
-        >
-          <RobotOverviewOverflowMenu robot={robot} />
-        </Box>
+          </Box>
+          <Box
+            position={POSITION_ABSOLUTE}
+            top={SPACING.spacing2}
+            right="-.75rem"
+          >
+            <RobotOverviewOverflowMenu robot={robot} />
+          </Box>
+        </Flex>
       </Flex>
       {enableCalibrationWizards && !isRobotBusy && showCalibrationStatusBanner && (
         <Flex
@@ -190,7 +194,12 @@ export function RobotOverview({
           width="100%"
         >
           <Banner type={calibrationStatusBannerType as BannerType}>
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              width="100%"
+            >
               {calibrationStatusBannerText}
               <RouterLink
                 to={`/devices/${robotName}/robot-settings/calibration`}
@@ -198,6 +207,8 @@ export function RobotOverview({
                 <StyledText
                   as="p"
                   color={COLORS.darkBlackEnabled}
+                  paddingRight={SPACING.spacing4}
+                  textAlign={TEXT_ALIGN_RIGHT}
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 >
                   {t('robot_calibration:launch_calibration_link_text')}
@@ -207,6 +218,12 @@ export function RobotOverview({
           </Banner>
         </Flex>
       )}
-    </Flex>
+      <Flex
+        borderBottom={BORDERS.lineBorder}
+        marginBottom={SPACING.spacing4}
+        position={POSITION_RELATIVE}
+        width="100%"
+      />
+    </>
   ) : null
 }
