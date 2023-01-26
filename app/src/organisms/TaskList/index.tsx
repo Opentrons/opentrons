@@ -268,6 +268,15 @@ function Task({
   const isActiveTask = activeTaskIndex === taskIndex
   const hasSubTasks = subTasks.length > 0
 
+  React.useEffect(() => {
+    if (hasSubTasks && isActiveTask) {
+      setIsTaskOpen(true)
+    }
+    if (hasSubTasks && !isActiveTask) {
+      setIsTaskOpen(false)
+    }
+  }, [isActiveTask, hasSubTasks])
+
   return (
     <Flex key={title}>
       <ProgressTrackerItem
