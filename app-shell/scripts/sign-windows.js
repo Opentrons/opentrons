@@ -13,7 +13,7 @@ exports.default = async function (configuration) {
   const certContent = atob(certEncodedContent)
   const tempdir = await mkdtemp('keyfile')
   const certTempPath = path.join(tempdir, 'key.pfx')
-  const certFile = await open(certTempPath)
+  const certFile = await open(certTempPath, 'w')
   await certFile.writeFile(certContent)
   await certFile.close()
 
