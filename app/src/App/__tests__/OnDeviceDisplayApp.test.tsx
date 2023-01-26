@@ -11,6 +11,7 @@ import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
+import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import { SelectWifiNetwork } from '../../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../../pages/OnDeviceDisplay/SetWifiCred'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
@@ -23,6 +24,7 @@ jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/SelectWifiNetwork')
 jest.mock('../../pages/OnDeviceDisplay/SetWifiCred')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
+jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
 
 const mockInitialSplash = InitialSplash as jest.MockedFunction<
   typeof InitialSplash
@@ -46,6 +48,9 @@ const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
 const mockProtocolDashboard = ProtocolDashboard as jest.MockedFunction<
   typeof ProtocolDashboard
 >
+const mockProtocolSetup = ProtocolSetup as jest.MockedFunction<
+  typeof ProtocolSetup
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -68,6 +73,7 @@ describe('OnDeviceDisplayApp', () => {
     )
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
     mockProtocolDashboard.mockReturnValue(<div>Mock ProtocolDashboard</div>)
+    mockProtocolSetup.mockReturnValue(<div>Mock ProtocolSetup</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -111,5 +117,9 @@ describe('OnDeviceDisplayApp', () => {
   it('renders a ProtocolDashboard component from /protocols', () => {
     const [{ getByText }] = render('/protocols')
     getByText('Mock ProtocolDashboard')
+  })
+  it('renders a ProtocolSetup component from /protocols/:runId/setup', () => {
+    const [{ getByText }] = render('/protocols/my-protocol-id/setup')
+    getByText('Mock ProtocolSetup')
   })
 })
