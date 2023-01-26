@@ -205,11 +205,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             increment: Customize the movement "distance" of the pipette to press harder.
             prep_after: Not used by this core, pipette preparation will always happen.
         """
-        if presses is not None or increment is not None:
-            raise NotImplementedError(
-                "InstrumentCore.pick_up_tip with custom presses or increment not implemented"
-            )
-
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
@@ -224,6 +219,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            presses=presses,
+            increment=increment,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())

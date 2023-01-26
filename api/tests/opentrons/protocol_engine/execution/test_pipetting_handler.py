@@ -139,6 +139,8 @@ async def test_handle_pick_up_tip_request(
         labware_id="labware-id",
         well_name="B2",
         well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        presses=3,
+        increment=2.0
     )
 
     decoy.verify(
@@ -151,8 +153,8 @@ async def test_handle_pick_up_tip_request(
         await hardware_api.pick_up_tip(
             mount=Mount.LEFT,
             tip_length=42,
-            presses=None,
-            increment=None,
+            presses=3,
+            increment=2.0
         ),
         hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
         hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
@@ -209,6 +211,8 @@ async def test_handle_pick_up_tip_request_tip_length_fallback(
         labware_id="labware-id",
         well_name="B2",
         well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        presses=None,
+        increment=None,
     )
 
     decoy.verify(

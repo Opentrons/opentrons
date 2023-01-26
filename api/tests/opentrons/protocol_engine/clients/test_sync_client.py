@@ -250,7 +250,12 @@ def test_pick_up_tip(
     """It should execute a pick up tip command."""
     request = commands.PickUpTipCreate(
         params=commands.PickUpTipParams(
-            pipetteId="123", labwareId="456", wellName="A2", wellLocation=WellLocation()
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(),
+            presses=3,
+            increment=0.2,
         )
     )
     response = commands.PickUpTipResult()
@@ -258,7 +263,12 @@ def test_pick_up_tip(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.pick_up_tip(
-        pipette_id="123", labware_id="456", well_name="A2", well_location=WellLocation()
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(),
+        presses=3,
+        increment=0.2,
     )
 
     assert result == response

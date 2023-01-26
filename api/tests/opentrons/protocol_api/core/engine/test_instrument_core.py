@@ -227,7 +227,7 @@ def test_pick_up_tip(
     subject.pick_up_tip(
         location=location,
         well_core=well_core,
-        presses=None,
+        presses=3,
         increment=None,
     )
 
@@ -239,6 +239,8 @@ def test_pick_up_tip(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            presses=3,
+            increment=None,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )

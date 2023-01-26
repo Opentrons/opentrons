@@ -84,6 +84,8 @@ class PipettingHandler:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        presses: Optional[int],
+        increment: Optional[float],
     ) -> None:
         """Pick up a tip at the specified "well"."""
         hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
@@ -104,9 +106,8 @@ class PipettingHandler:
         await self._hardware_api.pick_up_tip(
             mount=hw_mount,
             tip_length=tip_length,
-            # TODO(mc, 2020-11-12): include these parameters in the request
-            presses=None,
-            increment=None,
+            presses=presses,
+            increment=increment,
         )
 
         # after a successful pickup, update the hardware controller state

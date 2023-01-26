@@ -195,6 +195,8 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        presses: Optional[int],
+        increment: Optional[float],
     ) -> commands.PickUpTipResult:
         """Execute a PickUpTip command and return the result."""
         request = commands.PickUpTipCreate(
@@ -203,6 +205,8 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                presses=presses,
+                increment=increment,
             )
         )
         result = self._transport.execute_command(request=request)

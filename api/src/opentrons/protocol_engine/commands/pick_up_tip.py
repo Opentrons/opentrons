@@ -1,6 +1,6 @@
 """Pick up tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
@@ -17,7 +17,15 @@ PickUpTipCommandType = Literal["pickUpTip"]
 class PickUpTipParams(PipetteIdMixin, WellLocationMixin):
     """Payload needed to move a pipette to a specific well."""
 
-    pass
+    presses: Optional[int] = Field(
+        None,
+        description="The number of times to lower and then raise the pipette when picking up a tip.",
+    )
+
+    increment: Optional[float] = Field(
+        None,
+        description="The additional distance to travel on each successive press",
+    )
 
 
 class PickUpTipResult(BaseModel):
@@ -39,6 +47,8 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+            presses=params.presses,
+            increment=params.increment
         )
 
         return PickUpTipResult()
