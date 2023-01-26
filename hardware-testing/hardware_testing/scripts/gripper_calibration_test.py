@@ -57,21 +57,17 @@ class Gripper_Calibration_Test:
             "X Center":"None",
             "Y Center":"None",
             "Deck Height":"None",
-            "Deck Encoder":"None",
-            "X Gauge Encoder":"None",
-            "Y Gauge Encoder":"None",
-            "Z Gauge Encoder":"None",
         }
         self.gauges = {}
         self.gauge_ports = {
-            # "X":"/dev/ttyUSB0",
-            # "Y":"/dev/ttyUSB1",
-            # "Z":"/dev/ttyUSB2",
+            "X":"/dev/ttyUSB0",
+            "Y":"/dev/ttyUSB1",
+            "Z":"/dev/ttyUSB2",
         }
         self.gauge_offsets = {
-            "X":Point(x=0, y=5, z=5),
-            "Y":Point(x=5, y=0, z=5),
-            "Z":Point(x=0, y=0, z=5),
+            "X":Point(x=0, y=-5, z=6),
+            "Y":Point(x=-5, y=0, z=6),
+            "Z":Point(x=0, y=0, z=6),
         }
 
     async def test_setup(self):
@@ -126,18 +122,15 @@ class Gripper_Calibration_Test:
         gauge_encoder = "{} Gauge Encoder".format(axis)
         gauge_position = self.slot_center + self.gauge_offsets[axis]
         if axis == "X":
-            jog_position = gauge_position._replace(x=gauge_position.x - self.CUTOUT_HALF)
+            jog_position = gauge_position._replace(x=gauge_position.x + self.CUTOUT_HALF)
         elif axis == "Y":
-            jog_position = gauge_position._replace(y=gauge_position.y + self.CUTOUT_HALF)
+            jog_position = gauge_position._replace(y=gauge_position.y - self.CUTOUT_HALF)
         elif axis == "Z":
             jog_position = self.slot_center
         # Move to gauge position
         await self.api.move_to(self.mount, gauge_position, speed=100)
         # Move to jog position
         await self.api.move_to(self.mount, jog_position, speed=self.jog_speed)
-        # Read encoder
-        encoder_position = await self._get_encoder()
-        self.test_data[gauge_encoder] = str(encoder_position).replace(", ",";")
         # Read gauge
         gauge = self.gauges[axis].read_stable(timeout=20)
         # Return to gauge position
@@ -167,8 +160,8 @@ class Gripper_Calibration_Test:
     async def _measure_gauges(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
-        # Add calibration tip
-        await api.add_tip(mount, api.config.calibration.probe_length)
+        # Add gripper probe
+        api.add_gripper_probe(GripperProbe.FRONT)
         # Move up
         current_pos = await api.gantry_position(mount)
         z_offset = current_pos + self.gauge_offsets["Z"]
@@ -191,8 +184,8 @@ class Gripper_Calibration_Test:
         z_gauge = await self._read_gauge("Z")
         self.test_data["Z Gauge"] = str(z_gauge)
         print(f"Z Gauge = ", self.test_data["Z Gauge"])
-        # Remove tip
-        await api.remove_tip(mount)
+        # Remove gripper probe
+        api.remove_gripper_probe()
 
     async def _record_data(self, cycle):
         elapsed_time = (time.time() - self.start_time)/60
@@ -206,24 +199,20 @@ class Gripper_Calibration_Test:
     ) -> None:
         # Calibrate gripper
         await api.home_gripper_jaw()
-        self.offset = await calibrate_gripper_jaw(api, GripperProbe.FRONT, slot)
-        # self.offset, self.slot_center, enc_pos = await calibrate_pipette(api, mount, slot)
-        # self.deck_encoder = self._encoder_tolist(enc_pos)
-        #
-        # print(f"New Deck Encoder: {self.deck_encoder}")
-        # print(f"New Slot Center: {self.slot_center}")
-        # print(f"New Pipette Offset: {self.offset}")
-        #
-        # self.test_data["X Center"] = str(self.slot_center.x)
-        # self.test_data["Y Center"] = str(self.slot_center.y)
-        # self.test_data["Deck Height"] = str(self.slot_center.z)
-        # self.test_data["Deck Encoder"] = str(self.deck_encoder).replace(", ",";")
+        self.offset, self.slot_center = await calibrate_gripper_jaw(api, GripperProbe.FRONT, slot)
+
+        print(f"New Slot Center: {self.slot_center}")
+        print(f"New Gripper Offset: {self.offset}")
+
+        self.test_data["X Center"] = str(self.slot_center.x)
+        self.test_data["Y Center"] = str(self.slot_center.y)
+        self.test_data["Deck Height"] = str(self.slot_center.z)
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Home grantry
-        await home_ot3(api, self.axes)
+        await api.home()
         self.home = await api.gantry_position(mount)
 
     async def _reset(
