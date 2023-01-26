@@ -63,7 +63,7 @@
   "launch_calibration": "Launch calibration",
   "manage_pipettes": "manage pipettes",
   "missing_calibration_data": "Missing calibration data",
-  "missing_calibration_data_long": "Robot is missing calibration data.",
+  "missing_calibration_data_long": "Robot is missing calibration data",
   "need_help": "Need help?",
   "no_pipette": "No pipette attached",
   "no_tip_length": "Calibrate your pipette to see saved tip length",

@@ -14,6 +14,7 @@ import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { fetchLights } from '../../../redux/robot-controls'
+import { useFeatureFlag } from '../../../redux/config'
 import { getRobotModelByName } from '../../../redux/discovery'
 import {
   HEALTH_STATUS_OK,
@@ -25,7 +26,11 @@ import {
   useRobot,
   useRunStatuses,
 } from '../hooks'
-import { expectedTaskList } from '../hooks/__fixtures__/taskListFixtures'
+import {
+  expectedFailedTaskList,
+  expectedIncompleteDeckCalTaskList,
+  expectedTaskList,
+} from '../hooks/__fixtures__/taskListFixtures'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotOverview } from '../RobotOverview'
@@ -37,6 +42,7 @@ import type { State } from '../../../redux/types'
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/config')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
@@ -80,6 +86,9 @@ const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 const mockRobotStatusHeader = RobotStatusHeader as jest.MockedFunction<
   typeof RobotStatusHeader
@@ -138,6 +147,7 @@ describe('RobotOverview', () => {
     })
     mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+    mockUseFeatureFlag.mockReturnValue(false)
     mockUseLights.mockReturnValue({
       lightsOn: false,
       toggleLights: mockToggleLights,
@@ -181,6 +191,22 @@ describe('RobotOverview', () => {
   it('renders a UpdateRobotBanner component', () => {
     const [{ getByText }] = render(props)
     getByText('Mock UpdateRobotBanner')
+  })
+
+  it('renders a missing calibration status label when the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedIncompleteDeckCalTaskList
+    )
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByText }] = render(props)
+    getByText('Robot is missing calibration data')
+  })
+
+  it('renders a recommended recalibration status label when the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedFailedTaskList)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByText }] = render(props)
+    getByText('Recalibration recommended')
   })
 
   it('fetches lights status', () => {
