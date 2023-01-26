@@ -79,7 +79,7 @@ export const LoadCommandText = ({
           robotSideAnalysis,
           command.params.location.moduleId
         )
-        moduleName =
+        const moduleName =
           moduleModel != null ? getModuleDisplayName(moduleModel) : ''
 
         commandText = t('load_labware_info_protocol_setup', {

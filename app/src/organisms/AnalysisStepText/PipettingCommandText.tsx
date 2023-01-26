@@ -71,14 +71,15 @@ export const PipettingCommandText = ({
     }
     case 'moveToWell': {
       const { wellName, labwareId } = command.params
-      const labwareEntity = labware.find(l => l.id === labwareId)
-      const definitionUri = labwareEntity?.definitionUri ?? ''
-      const location = labwareEntity?.location
 
       commandText = t('move_to_well', {
         well_name: wellName,
-        labware: definitionUri,
-        labware_location: JSON.stringify(location),
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: getLabwareDisplayLocation(
+          robotSideAnalysis,
+          labwareId,
+          t
+        )
       })
       break
     }
