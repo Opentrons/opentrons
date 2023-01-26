@@ -58,7 +58,7 @@ export function InstrumentsAndModules({
   const isOT3 = useIsOT3(robotName)
   const dispatch = useDispatch<Dispatch>()
 
-  const {data: attachedInstruments} = useInstrumentsQuery({
+  const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
   const extensionInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
@@ -159,10 +159,7 @@ export function InstrumentsAndModules({
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
               />
-              {/* extension mount here */}
-              {isOT3 ? (
-                <GripperCard attachedGripper={extensionInstrument} />
-              ) : null}
+              {extensionInstrument != null ? <GripperCard attachedGripper={extensionInstrument} /> : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
                   key={`moduleCard_${String(module.moduleType)}_${String(

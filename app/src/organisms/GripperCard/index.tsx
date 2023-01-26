@@ -6,15 +6,6 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 import { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
-const TEMP_STUB_ATTACHED_GRIPPER = {
-  model: 'temp_fake_gripper_model',
-  serialNumber: 'temp_fake_gripper_serial_number',
-}
-
-interface AttachedGripper {
-  model: string
-  serialNumber: string
-}
 interface GripperCardProps {
   attachedGripper: InstrumentData | null
 }
