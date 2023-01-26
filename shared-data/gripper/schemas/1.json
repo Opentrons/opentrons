@@ -43,7 +43,7 @@
     "GripperModel": {
       "title": "GripperModel",
       "description": "Gripper models.",
-      "enum": ["v1"]
+      "pattern": "^gripperV[0-9]+$"
     },
     "Geometry": {
       "title": "Geometry",
