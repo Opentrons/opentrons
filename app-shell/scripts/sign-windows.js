@@ -1,5 +1,5 @@
 'use strict'
-const {join} = require('path')
+const { join } = require('path')
 const { mkdtemp, open } = require('fs/promises')
 const { promisify } = require('util')
 const exec = promisify(require('child_process').exec)
@@ -24,7 +24,7 @@ exports.default = async function (configuration) {
     `Set-AuthenticodeSignature -Certificate $(Get-PfxCertificate -FilePath ${certTempPath} -Password ${certPassword}) -FilePath ${path}`,
     {
       stdio: 'inherit',
-      shell: 'powershell.exe'
+      shell: 'powershell.exe',
     }
   )
 }
