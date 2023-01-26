@@ -49,7 +49,7 @@ from .instruments.ot3.pipette import (
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints, head_node_for_mount
+from .backends.ot3utils import get_system_constraints
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -1698,14 +1698,22 @@ class OT3API(
 
         if not self._current_position:
             await self.home()
-        if probe_settings.home_plunger_at_start:
+        if (
+            probe_settings.home_plunger_at_start
+            or probe_settings.aspirate_while_sensing
+        ):
             await self.home_plunger(mount)
+        if probe_settings.aspirate_while_sensing:
+            direction = -1
+        else:
+            direction = 1
+
         try:
             await self._backend.liquid_probe(
                 mount,
                 probe_settings.max_z_distance,
                 probe_settings.mount_speed,
-                probe_settings.plunger_speed,
+                (probe_settings.plunger_speed * direction),
                 probe_settings.sensor_threshold_pascals,
                 probe_settings.starting_mount_height,
                 probe_settings.prep_move_speed,

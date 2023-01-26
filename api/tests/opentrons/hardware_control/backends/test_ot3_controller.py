@@ -97,6 +97,7 @@ def mock_driver(mock_messenger) -> AbstractCanDriver:
 def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Controller:
     return OT3Controller(mock_config, mock_driver)
 
+
 @pytest.fixture
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
@@ -110,11 +111,12 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         expected_liquid_height=109,
     )
 
+
 @pytest.fixture
 def mock_send_stop_threshold() -> None:
     with patch(
-            "opentrons_hardware.sensors.sensor_driver.SensorDriver.send_stop_threshold",
-            autospec=True,
+        "opentrons_hardware.sensors.sensor_driver.SensorDriver.send_stop_threshold",
+        autospec=True,
     ) as mock_stop_threshold:
         yield mock_stop_threshold
 
@@ -127,7 +129,6 @@ def mock_move_group_run():
     ) as mock_mgr_run:
         mock_mgr_run.return_value = {}
         yield mock_mgr_run
-
 
 
 @pytest.fixture
@@ -606,10 +607,7 @@ async def test_ready_for_movement(
 #   move this test into test_ot3_calibration or some other file, and make
 #       a new mock move group function in there
 #   or see if there's a way to do it in this file with decoy or smthz
-@pytest.mark.parametrize(
-    "mount",
-    [OT3Mount.LEFT, OT3Mount.RIGHT]
-)
+@pytest.mark.parametrize("mount", [OT3Mount.LEFT, OT3Mount.RIGHT])
 async def test_liquid_probe(
     mount: OT3Mount,
     controller: OT3Controller,
@@ -617,7 +615,7 @@ async def test_liquid_probe(
     mock_move_group_run,
 ) -> None:
     # mock tool_sensors liquid_probe
-    positions = await controller.liquid_probe(
+    await controller.liquid_probe(
         mount=mount,
         max_z_distance=fake_liquid_settings.max_z_distance,
         mount_speed=fake_liquid_settings.mount_speed,
@@ -637,9 +635,6 @@ async def test_liquid_probe(
         breakpoint()
         step = move_group[0][NodeId.pipette_left]
         assert step.stop_condition == MoveStopCondition.none
-
-
-
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
