@@ -258,8 +258,6 @@ function Task({
   taskListLength,
   isComplete,
 }: TaskProps): JSX.Element {
-  const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(false)
-
   const [activeTaskIndex] = activeIndex ?? []
 
   // TODO(bh, 2022-10-18): pass booleans to children as props
@@ -268,13 +266,12 @@ function Task({
   const isActiveTask = activeTaskIndex === taskIndex
   const hasSubTasks = subTasks.length > 0
 
+  const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(
+    hasSubTasks && isActiveTask
+  )
+
   React.useEffect(() => {
-    if (hasSubTasks && isActiveTask) {
-      setIsTaskOpen(true)
-    }
-    if (hasSubTasks && !isActiveTask) {
-      setIsTaskOpen(false)
-    }
+    setIsTaskOpen(hasSubTasks && isActiveTask)
   }, [isActiveTask, hasSubTasks])
 
   return (
