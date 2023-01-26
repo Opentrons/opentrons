@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { Link as RouterLink } from 'react-router-dom'
 
 import {
   Box,
@@ -187,7 +188,20 @@ export function RobotOverview({
           width="100%"
         >
           <Banner type={calibrationStatusBannerType as BannerType}>
-            {calibrationStatusBannerText}
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+              {calibrationStatusBannerText}
+              <RouterLink
+                to={`/devices/${robotName}/robot-settings/calibration/dashboard`}
+              >
+                <StyledText
+                  as="p"
+                  color={COLORS.darkBlackEnabled}
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                >
+                  {t('robot_calibration:launch_calibration_link_text')}
+                </StyledText>
+              </RouterLink>
+            </Flex>
           </Banner>
         </Flex>
       )}
