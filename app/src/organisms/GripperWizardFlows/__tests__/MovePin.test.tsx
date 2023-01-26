@@ -19,7 +19,6 @@ describe('MovePin', () => {
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
   const mockChainRunCommands = jest.fn()
-  const mockSetIsBetweenCommands = jest.fn()
   const mockRunId = 'fakeRunId'
 
   beforeEach(() => {
@@ -35,7 +34,6 @@ describe('MovePin', () => {
           isRobotMoving={false}
           isExiting={false}
           goBack={mockGoBack}
-          setIsBetweenCommands={mockSetIsBetweenCommands}
           movement={MOVE_PIN_TO_FRONT_JAW}
           {...props}
         />,

@@ -1,4 +1,5 @@
 import { InstrumentData } from '@opentrons/api-client'
+import { getGripperDisplayName, GripperModel } from '@opentrons/shared-data'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
@@ -56,7 +57,7 @@ export function GripperCard({
     <>
       <InstrumentCard
         description={
-          attachedGripper != null ? attachedGripper.instrumentModel : t('shared:empty')
+          attachedGripper != null ? getGripperDisplayName(attachedGripper.instrumentModel as GripperModel) : t('shared:empty')
         }
         isGripperAttached={attachedGripper != null}
         label={t('shared:extension_mount')}

@@ -13,19 +13,16 @@ export const UnmountGripper = (
     attachedGripper,
     isRobotMoving,
     goBack,
-    // chainRunCommands,
-    // setIsBetweenCommands,
+    chainRunCommands,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
-    // setIsBetweenCommands(true)
-    // chainRunCommands([
-    //  // TODO: move gantry to mount/unmount location here
-    // ]).then(() => {
-    //   setIsBetweenCommands(false)
-    //   proceed()
-    // })
+    chainRunCommands([
+     // TODO: move gantry to mount/unmount location here
+    ]).then(() => {
+      proceed()
+    })
     proceed()
   }
 

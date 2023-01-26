@@ -45,7 +45,7 @@ export const GripperWizardFlows = (
     runId
   )
 
-  const { isLoading: isCreateLoading } = useCreateRunMutation({
+  const { createRun, isLoading: isCreateLoading } = useCreateRunMutation({
     onSuccess: response => {
       setRunId(response.data.id)
     },
@@ -57,7 +57,7 @@ export const GripperWizardFlows = (
   const [isBetweenCommands, setIsBetweenCommands] = React.useState<boolean>(
     false
   )
-  const [isExiting] = React.useState<boolean>(false)
+  const [isExiting, setIsExiting] = React.useState<boolean>(false)
 
   const proceed = (): void => {
     if (
@@ -76,16 +76,11 @@ export const GripperWizardFlows = (
     }
   }
   const handleCleanUpAndClose = (): void => {
-    // setIsExiting(true)
-    // chainRunCommands([
-    //   {
-    //     commandType: 'home' as const,
-    //     params: {},
-    //   },
-    // ]).then(() => {
-    //   setIsExiting(false)
-    //   if (runId !== '') stopRun(runId)
-    // })
+    setIsExiting(true)
+    chainRunCommands([{commandType: 'home' as const, params: {}}], true).then(() => {
+      setIsExiting(false)
+      if (runId !== '') stopRun(runId)
+    })
     if (runId !== '') stopRun(runId)
   }
   const {
@@ -138,10 +133,7 @@ export const GripperWizardFlows = (
       <BeforeBeginning
         {...currentStep}
         {...sharedProps}
-        // createRun={createRun}
-        createRun={() => {
-          console.log('TODO: create run')
-        }}
+        createRun={createRun}
         isCreateLoading={isCreateLoading}
       />
     )

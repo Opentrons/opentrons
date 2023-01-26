@@ -68,5 +68,4 @@ export interface GripperWizardStepProps {
   isRobotMoving: boolean
   runId: string
   attachedGripper: {} | null
-  setIsBetweenCommands: React.Dispatch<React.SetStateAction<boolean>>
 }

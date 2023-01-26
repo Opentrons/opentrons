@@ -55,8 +55,7 @@ export const BeforeBeginning = (
     attachedGripper,
     isCreateLoading,
     isRobotMoving,
-    // chainRunCommands,
-    // setIsBetweenCommands,
+    chainRunCommands,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -65,16 +64,9 @@ export const BeforeBeginning = (
 
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
-    // setIsBetweenCommands(true)
-    // chainRunCommands([
-    //   {
-    //     commandType: 'home' as const,
-    //     params: {},
-    //   },
-    // ]).then(() => {
-    //   setIsBetweenCommands(false)
-    //   proceed()
-    // })
+    chainRunCommands([{commandType: 'home' as const, params: {}}], true).then(() => {
+      proceed()
+    })
     proceed()
   }
 

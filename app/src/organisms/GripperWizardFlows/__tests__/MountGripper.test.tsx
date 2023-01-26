@@ -13,7 +13,6 @@ describe('MountGripper', () => {
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
   const mockChainRunCommands = jest.fn()
-  const mockSetIsBetweenCommands = jest.fn()
   const mockRunId = 'fakeRunId'
 
   beforeEach(() => {
@@ -27,7 +26,6 @@ describe('MountGripper', () => {
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
           goBack={mockGoBack}
-          setIsBetweenCommands={mockSetIsBetweenCommands}
           {...props}
         />,
         { i18nInstance: i18n }

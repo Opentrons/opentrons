@@ -34,7 +34,6 @@ describe('BeforeBeginning', () => {
       runId: RUN_ID_1,
       attachedGripper: {},
       flowType: GRIPPER_FLOW_TYPES.ATTACH,
-      setIsBetweenCommands: jest.fn(),
       createRun: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,

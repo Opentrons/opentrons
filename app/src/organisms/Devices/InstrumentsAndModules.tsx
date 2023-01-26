@@ -104,7 +104,7 @@ export function InstrumentsAndModules({
     },
     allAttachedPipettesHaveOffsetCals
       ? FETCH_PIPETTE_LONG_POLL
-      : FETCH_PIPETTE_SHORT_POLL,
+      : EQUIPMENT_POLL_MS,
     true
   )
 
@@ -159,7 +159,7 @@ export function InstrumentsAndModules({
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
               />
-              {extensionInstrument != null ? <GripperCard attachedGripper={extensionInstrument} /> : null}
+              {isOT3 ? <GripperCard attachedGripper={extensionInstrument} /> : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
                   key={`moduleCard_${String(module.moduleType)}_${String(

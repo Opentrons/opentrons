@@ -21,37 +21,34 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     isRobotMoving,
     goBack,
     movement,
-    // chainRunCommands,
-    // setIsBetweenCommands,
+    chainRunCommands,
     // isExiting,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
-    // setIsBetweenCommands(true)
-    // chainRunCommands([
-    //   {
-    //     // @ts-expect-error calibration type not yet supported
-    //     commandType: 'calibration/calibrateGripper' as const,
-    //     params: { },
-    //   },
-    //   {
-    //     commandType: 'home' as const,
-    //     params: {
-    //       axes: [], // TODO: use gripper motor axis const here
-    //     },
-    //   },
-    //   {
-    //     // @ts-expect-error calibration type not yet supported
-    //     commandType: 'calibration/moveToLocation' as const,
-    //     params: {
-    //       location: 'attachOrDetach',
-    //     },
-    //   },
-    // ]).then(() => {
-    //   setIsBetweenCommands(false)
-    //   proceed()
-    // })
+    chainRunCommands([
+      // {
+      //   // @ts-expect-error calibration type not yet supported
+      //   commandType: 'calibration/calibrateGripper' as const,
+      //   params: { },
+      // },
+      {
+        commandType: 'home' as const,
+        params: {
+          axes: [], // TODO: use gripper motor axis const here
+        },
+      },
+      // {
+      //   // @ts-expect-error calibration type not yet supported
+      //   commandType: 'calibration/moveToLocation' as const,
+      //   params: {
+      //     location: 'attachOrDetach',
+      //   },
+      // },
+    ]).then(() => {
+      proceed()
+    })
     proceed()
   }
   const infoByMovement: {
