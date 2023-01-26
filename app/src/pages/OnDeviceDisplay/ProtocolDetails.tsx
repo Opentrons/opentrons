@@ -183,7 +183,7 @@ export function ProtocolDetails(): JSX.Element | null {
       history.push(`/protocols/${runId}/setup`)
     },
   })
-  const handleRunProtocol = () => {
+  const handleRunProtocol = (): void => {
     createRun({ protocolId })
   }
 
