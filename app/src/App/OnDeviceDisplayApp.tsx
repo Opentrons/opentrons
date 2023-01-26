@@ -26,6 +26,8 @@ import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
+import { Slider } from '../pages/OnDeviceDisplay/Slider'
+
 import type { RouteProps } from './types'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
@@ -183,6 +185,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'App Settings',
     path: '/app-settings',
+  },
+  {
+    Component: Slider,
+    exact: true,
+    name: 'slider test',
+    path: '/slider-test',
   },
 ]
 
