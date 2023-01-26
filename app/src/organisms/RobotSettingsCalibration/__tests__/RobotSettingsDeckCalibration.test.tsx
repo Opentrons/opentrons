@@ -123,6 +123,22 @@ describe('RobotSettingsDeckCalibration', () => {
     getByRole('button', { name: 'Calibrate now' })
   })
 
+  it('does not render the error banner when deck is not calibrated and when the calibration wizard feature flag is set', () => {
+    mockUseDeckCalibrationStatus.mockReturnValue(
+      Calibration.DECK_CAL_STATUS_IDENTITY
+    )
+    mockUseDeckCalibrationData.mockReturnValue({
+      deckCalibrationData: null,
+      isDeckCalibrated: false,
+    })
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ queryByRole, queryByText }] = render()
+    expect(queryByText('Deck calibration missing')).not.toBeInTheDocument()
+    expect(
+      queryByRole('button', { name: 'Calibrate now' })
+    ).not.toBeInTheDocument()
+  })
+
   it('deck cal button should be disabled if a button disabled reason is provided', () => {
     const [{ getByRole }] = render({
       buttonDisabledReason: 'otie is unreachable',

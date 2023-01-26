@@ -144,7 +144,7 @@ function ProgressTrackerItem({
                     // is in the past or list is complete
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blueEnabled
-                      : subTask.isComplete
+                      : subTask.isComplete === true
                       ? COLORS.medGreyHover
                       : 'initial'
                   }
