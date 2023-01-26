@@ -20,6 +20,11 @@ def _initialize_testing_data_base_dir() -> Path:
     return base
 
 
+def create_test_name_from_file(f: str) -> str:
+    """Create test name from file name."""
+    return os.path.basename(f).replace("_", "-").replace(".py", "")
+
+
 def create_folder_for_test_data(test_name: str) -> Path:
     """Create a folder for test data."""
     base = _initialize_testing_data_base_dir()
@@ -30,7 +35,7 @@ def create_folder_for_test_data(test_name: str) -> Path:
 
 def create_datetime_string() -> str:
     """Create datetime string."""
-    return datetime.now().strftime("%y%m%d%H%M%S")
+    return datetime.utcnow().strftime("%y-%m-%d-%H-%M-%S")
 
 
 def create_run_id() -> str:
@@ -50,18 +55,31 @@ def create_file_name(
     return f"{test_name}_{run_id}_{tag}.{extension}"
 
 
-def _save_data(test_name: str, file_name: str, data: str, perm: str = "w+") -> None:
+def _save_data(test_name: str, file_name: str, data: str, perm: str = "w+") -> Path:
     test_path = create_folder_for_test_data(test_name)
     data_path = test_path / file_name
     with open(data_path, perm) as f:
         f.write(data)
+    return data_path
 
 
-def dump_data_to_file(test_name: str, file_name: str, data: str) -> None:
+def dump_data_to_file(test_name: str, file_name: str, data: str) -> Path:
     """Save entire file contents to a file on disk."""
     return _save_data(test_name, file_name, data, perm="w+")
 
 
-def append_data_to_file(test_name: str, file_name: str, data: str) -> None:
+def append_data_to_file(test_name: str, file_name: str, data: str) -> Path:
     """Append new content to an already existing file on disk."""
     return _save_data(test_name, file_name, data, perm="a+")
+
+
+def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) -> None:
+    """Insert new data at a specified line."""
+    test_path = create_folder_for_test_data(test_name)
+    data_path = test_path / file_name
+    # read data from file, insert line, then overwrite previous file
+    with open(data_path, "r") as f:
+        contents = f.readlines()
+    contents.insert(line, data)
+    with open(data_path, "w") as f:
+        f.write("".join(contents))
