@@ -12,7 +12,7 @@ exports.default = async function (configuration) {
 
   const certEncodedContent = process.env.WIN_CSC_LINK
   const certPassword = process.env.WIN_CSC_KEY_PASSWORD
-  console.log(`Signing ${toSignPath} using powershell commandlets`)
+  console.log(`Signing ${path} using powershell commandlets`)
   const certContent = atob(certEncodedContent)
   const tempdir = await mkdtemp('keyfile')
   const certTempPath = join(tempdir, 'key.pfx')
