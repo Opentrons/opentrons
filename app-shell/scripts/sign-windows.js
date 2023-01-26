@@ -21,6 +21,7 @@ exports.default = async function (configuration) {
     `Set-AuthenticodeSignature -Certificate $(Get-PfxCertificate -FilePath ${certTempPath} -Password ${certPassword} ) -FilePath ${toSignPath}`,
     {
       stdio: 'inherit',
+      shell: 'powershell.exe'
     }
   )
 }
