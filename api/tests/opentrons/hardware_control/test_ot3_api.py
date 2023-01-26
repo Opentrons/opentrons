@@ -344,8 +344,8 @@ async def test_capacitive_probe(
     )
 
     original = moving.set_in_point(here, 0)
-    for call in mock_move_to.call_args_list:
-        this_point = moving.set_in_point(call[0][1], 0)
+    for probe_call in mock_move_to.call_args_list:
+        this_point = moving.set_in_point(probe_call[0][1], 0)
         assert this_point == original
 
 
