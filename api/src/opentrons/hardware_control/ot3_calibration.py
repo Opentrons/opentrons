@@ -510,6 +510,65 @@ async def find_slot_center_linear(
         z=(plus_x_edge.z + minus_x_edge.z + plus_y_edge.z + minus_y_edge.z) / 4,
     )
 
+async def _arc_move(
+    hcapi: OT3API, mount: OT3Mount, deck_height: float, position: Point, offset: float = 5
+) -> None:
+    # Move up
+    current_pos = await hcapi.gantry_position(mount)
+    z_offset = current_pos._replace(z=deck_height + offset)
+    await hcapi.move_to(mount, z_offset, speed=20)
+    # Move to position
+    end_position = position._replace(z=deck_height + offset)
+    await hcapi.move_to(mount, end_position, speed=20)
+
+async def find_slot_center_binary(
+    hcapi: OT3API, mount: OT3Mount, nominal_center: Point, deck_height: float
+) -> Tuple[float, float]:
+    """Find the center of the calibration slot by binary-searching its edges.
+    Returns the XY-center of the slot.
+    """
+    real_pos = nominal_center._replace(y=nominal_center.y + 3, z=deck_height)
+    # Find X left/right edges
+    plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, 1)
+    LOG.info(f"Found +x edge at {plus_x_edge}mm")
+    real_pos = real_pos._replace(x=plus_x_edge - (CALIBRATION_SQUARE_SIZE * 0.5))
+
+    # Move over Z-axis gauge plunger
+    await _arc_move(hcapi, mount, deck_height, position=real_pos + EDGES["left"])
+
+    minus_x_edge = await find_edge(
+        hcapi, mount, real_pos + EDGES["left"], OT3Axis.X, -1
+    )
+    LOG.info(f"Found -x edge at {minus_x_edge}mm")
+
+    x_center = (plus_x_edge + minus_x_edge) / 2
+    x_center_off = x_center + 3
+    real_pos = real_pos._replace(x=x_center_off)
+
+    # Move over Z-axis gauge plunger
+    await _arc_move(hcapi, mount, deck_height, position=real_pos)
+
+    # Find Y bottom/top edges
+    plus_y_edge = await find_edge(hcapi, mount, real_pos + EDGES["top"], OT3Axis.Y, 1)
+    LOG.info(f"Found +y edge at {plus_y_edge}mm")
+    real_pos = real_pos._replace(y=plus_y_edge - (CALIBRATION_SQUARE_SIZE * 0.5))
+
+    # Move over Z-axis gauge plunger
+    await _arc_move(hcapi, mount, deck_height, position=real_pos + EDGES["bottom"])
+
+    minus_y_edge = await find_edge(
+        hcapi, mount, real_pos + EDGES["bottom"], OT3Axis.Y, -1
+    )
+    LOG.info(f"Found -y edge at {minus_y_edge}mm")
+    y_center = (plus_y_edge + minus_y_edge) / 2
+    real_pos = real_pos._replace(y=y_center)
+    real_pos = real_pos._replace(x=x_center)
+
+    # Found XY center and the average of the edges' Zs
+    return estimated_center._replace(
+        z=(plus_x_edge.z + minus_x_edge.z + plus_y_edge.z + minus_y_edge.z) / 4,
+    )
+
 
 async def find_axis_center(
     hcapi: OT3API,
@@ -728,6 +787,7 @@ async def _calibrate_mount(
 
         offset = nominal_center - found_center
         # update center with values obtained during calibration
+
         LOG.info(f"Found calibration value {offset} for mount {mount.name}")
         return offset
 
@@ -786,7 +846,7 @@ async def calibrate_gripper_jaw(
         return offset
     finally:
         hcapi.remove_gripper_probe()
-        await hcapi.ungrip()
+        # await hcapi.ungrip()
 
 
 async def calibrate_gripper(
