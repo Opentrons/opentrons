@@ -1,4 +1,5 @@
 """Models and implementation for the calibrateGripper command."""
+
 from enum import Enum
 from typing import Optional, Type
 from typing_extensions import Literal
@@ -9,6 +10,9 @@ from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control import ot3_calibration
 from opentrons.hardware_control.types import OT3Mount, GripperProbe as HWAPIGripperProbe
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+)
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -21,7 +25,7 @@ from opentrons.protocol_engine.resources import ensure_ot3_hardware
 CalibrateGripperCommandType = Literal["calibration/calibrateGripper"]
 
 
-class CalibrateGripperParamsProbe(Enum):  # noqa: D101
+class CalibrateGripperParamsJaw(Enum):  # noqa: D101
     FRONT = "front"
     REAR = "rear"
 
@@ -29,15 +33,16 @@ class CalibrateGripperParamsProbe(Enum):  # noqa: D101
 class CalibrateGripperParams(BaseModel):
     """Parameters for a `calibrateGripper` command."""
 
-    probe: CalibrateGripperParamsProbe = Field(
+    jaw: CalibrateGripperParamsJaw = Field(
         ...,
         description=(
-            "Which of the gripper's probes to use to measure its offset."
+            "Which of the gripper's jaws to use to measure its offset."
             " The robot will assume that a human operator has already attached"
-            " this probe and removed the other probe, if there was one."
+            " the capacitive probe to the jaw and none is attached to the other jaw."
         ),
     )
-    otherProbeOffset: Optional[Vec3f] = Field(
+
+    otherJawOffset: Optional[Vec3f] = Field(
         None,
         description=(
             "If an offset for the other probe is already found, then specifying it here"
@@ -52,17 +57,18 @@ class CalibrateGripperParams(BaseModel):
 class CalibrateGripperResult(BaseModel):
     """The result of a successful `calibrateGripper` command."""
 
-    probeOffset: Vec3f = Field(
+    jawOffset: Vec3f = Field(
         ...,
         description=(
             "The offset from the probe's nominal position"
             " to its actual measured position."
         ),
     )
-    gripperOffset: Optional[Vec3f] = Field(
+
+    savedCalibration: Optional[GripperCalibrationOffset] = Field(
         None,
         description=(
-            "The total gripper offset calculated when `otherProbeOffset` is provided"
+            "Gripper calibration result data, when `otherJawOffset` is provided."
         ),
     )
 
@@ -90,10 +96,10 @@ class CalibrateGripperImplementation(
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
 
         probe_offset = await ot3_calibration.calibrate_gripper(
-            ot3_hardware_api, self._convert_to_hw_api_probe(params.probe)
+            hcapi=ot3_hardware_api, probe=self._convert_to_hw_api_probe(params.jaw)
         )
-        other_probe_offset = params.otherProbeOffset
-        total_offset: Optional[Point] = None
+        other_probe_offset = params.otherJawOffset
+        calibration_data: Optional[GripperCalibrationOffset] = None
         if other_probe_offset is not None:
             total_offset = 0.5 * (
                 probe_offset
@@ -103,28 +109,29 @@ class CalibrateGripperImplementation(
                     z=other_probe_offset.z,
                 )
             )
-            await ot3_hardware_api.save_instrument_offset(
+            result = await ot3_hardware_api.save_instrument_offset(
                 mount=OT3Mount.GRIPPER, delta=total_offset
             )
+            assert isinstance(result, GripperCalibrationOffset), (
+                f"Expected result to be GripperCalibrationOffset type, "
+                f"but received {type(result)}"
+            )
+            calibration_data = result
 
         return CalibrateGripperResult.construct(
-            probeOffset=Vec3f.construct(
+            jawOffset=Vec3f.construct(
                 x=probe_offset.x, y=probe_offset.y, z=probe_offset.z
             ),
-            gripperOffset=Vec3f.construct(
-                x=total_offset.x, y=total_offset.y, z=total_offset.z
-            )
-            if total_offset
-            else None,
+            savedCalibration=calibration_data,
         )
 
     @staticmethod
     def _convert_to_hw_api_probe(
-        probe_from_params: CalibrateGripperParamsProbe,
+        probe_from_params: CalibrateGripperParamsJaw,
     ) -> HWAPIGripperProbe:
-        if probe_from_params is CalibrateGripperParamsProbe.FRONT:
+        if probe_from_params is CalibrateGripperParamsJaw.FRONT:
             return HWAPIGripperProbe.FRONT
-        elif probe_from_params is CalibrateGripperParamsProbe.REAR:
+        elif probe_from_params is CalibrateGripperParamsJaw.REAR:
             return HWAPIGripperProbe.REAR
 
 

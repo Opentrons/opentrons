@@ -224,10 +224,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         else:
             self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
-    def save_pipette_offset(self, mount: OT3Mount, offset: Point) -> None:
+    def save_pipette_offset(
+        self, mount: OT3Mount, offset: Point
+    ) -> PipetteOffsetByPipetteMount:
         """Update the pipette offset to a new value."""
         save_pipette_offset_calibration(self._pipette_id, mount, offset)
         self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
+        return self._pipette_offset
 
     @property
     def name(self) -> PipetteName:
