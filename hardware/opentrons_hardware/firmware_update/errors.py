@@ -34,16 +34,3 @@ class BootloaderNotReady(FirmwareUpdateException):
     """Bootloader is not ready."""
 
     pass
-
-
-class FirmwareUpdateRequired(FirmwareUpdateException):
-    """At least one subsystem requires an update."""
-
-    message: MessageDefinition
-
-    def __init__(self, message: MessageDefinition) -> None:
-        """Constructor."""
-        self.message = message
-        super().__init__(
-            f"Operation not permited because a firmware update is required {message}."
-        )

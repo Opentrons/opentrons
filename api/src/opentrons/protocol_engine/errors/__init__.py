@@ -95,6 +95,7 @@ __all__ = [
     "HardwareNotSupportedError",
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
+    "FirmwareUpdateRequired",
     # error occurrence models
     "ErrorOccurrence",
 ]

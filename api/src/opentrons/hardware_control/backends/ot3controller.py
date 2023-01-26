@@ -76,7 +76,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware import firmware_update
-from opentrons_hardware.firmware_update.errors import FirmwareUpdateRequired
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
@@ -87,11 +86,14 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
+    MotorStatus,
+    InstrumentProbeType,
+)
+from opentrons.hardware_control.errors import (
+    MustHomeError,
     InvalidPipetteName,
     InvalidPipetteModel,
-    InstrumentProbeType,
-    MotorStatus,
-    MustHomeError,
+    FirmwareUpdateRequired,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
