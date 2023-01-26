@@ -24,7 +24,7 @@ async def test_pick_up_tip_implementation(
         wellName="A3",
         wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         presses=3,
-        increment=2.0
+        increment=2.0,
     )
 
     result = await subject.execute(data)
@@ -38,6 +38,6 @@ async def test_pick_up_tip_implementation(
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
             presses=3,
-            increment=2.0
+            increment=2.0,
         )
     )

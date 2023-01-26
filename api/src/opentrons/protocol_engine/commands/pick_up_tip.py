@@ -48,7 +48,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
             well_name=params.wellName,
             well_location=params.wellLocation,
             presses=params.presses,
-            increment=params.increment
+            increment=params.increment,
         )
 
         return PickUpTipResult()
