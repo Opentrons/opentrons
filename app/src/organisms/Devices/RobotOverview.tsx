@@ -35,6 +35,7 @@ import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import {
   useCalibrationTaskList,
+  useIsRobotBusy,
   useIsRobotViewable,
   useLights,
   useRobot,
@@ -58,6 +59,7 @@ export function RobotOverview({
   ])
 
   const { taskListStatus } = useCalibrationTaskList(robotName)
+  const isRobotBusy = useIsRobotBusy({ poll: true })
 
   // start off assuming we are missing calibrations
   let showCalibrationStatusBanner = true
@@ -181,7 +183,7 @@ export function RobotOverview({
           <RobotOverviewOverflowMenu robot={robot} />
         </Box>
       </Flex>
-      {enableCalibrationWizards && showCalibrationStatusBanner && (
+      {enableCalibrationWizards && !isRobotBusy && showCalibrationStatusBanner && (
         <Flex
           paddingBottom={SPACING.spacing4}
           flexDirection={DIRECTION_COLUMN}

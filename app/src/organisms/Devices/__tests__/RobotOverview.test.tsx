@@ -22,6 +22,7 @@ import {
 } from '../../../redux/discovery/constants'
 import {
   useCalibrationTaskList,
+  useIsRobotBusy,
   useLights,
   useRobot,
   useRunStatuses,
@@ -81,6 +82,9 @@ const MOCK_STATE: State = {
 
 const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
   typeof useCalibrationTaskList
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
@@ -148,6 +152,7 @@ describe('RobotOverview', () => {
     mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseFeatureFlag.mockReturnValue(false)
+    mockUseIsRobotBusy.mockReturnValue(false)
     mockUseLights.mockReturnValue({
       lightsOn: false,
       toggleLights: mockToggleLights,
@@ -229,6 +234,20 @@ describe('RobotOverview', () => {
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
+  })
+
+  it('does not render a calibration status label when robot is busy and the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedIncompleteDeckCalTaskList
+    )
+    mockUseIsRobotBusy.mockReturnValue(true)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ queryByRole }] = render(props)
+    expect(
+      queryByRole('link', {
+        name: 'Go to calibration',
+      })
+    ).not.toBeInTheDocument()
   })
 
   it('fetches lights status', () => {
