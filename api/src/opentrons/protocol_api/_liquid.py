@@ -4,12 +4,12 @@ from typing import Optional
 
 @dataclass(frozen=True)
 class Liquid:
-    """A Liquid to load into a well.
+    """A liquid to load into a well.
 
     Attributes:
-        name: A human-readable name for this liquid.
-        description: A optional description.
-        display_color: A optional display color of the liquid.
+        name: A human-readable name for the liquid.
+        description: An optional description.
+        display_color: An optional display color for the liquid.
     """
 
     _id: str
