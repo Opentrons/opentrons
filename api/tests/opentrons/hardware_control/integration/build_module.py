@@ -15,7 +15,6 @@ async def build_module(
     port: int,
     execution_manager: ExecutionManager,
     poll_interval_seconds: Optional[float] = None,
-    sim_model: Optional[str] = None,
 ) -> ModuleType:
     """Build a module emulator connected to a RFC-2217 network serial port.
 
@@ -33,8 +32,7 @@ async def build_module(
         execution_manager=execution_manager,
         usb_port=USBPort(name="", port_number=1, device_path="", hub=1),
         hw_control_loop=asyncio.get_running_loop(),
-        poll_interval_seconds=poll_interval_seconds,
-        sim_model=sim_model
+        poll_interval_seconds=poll_interval_seconds
     )
 
     return cast(ModuleType, module)
