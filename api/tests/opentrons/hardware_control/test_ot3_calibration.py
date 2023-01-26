@@ -15,7 +15,7 @@ from opentrons.hardware_control.ot3_calibration import (
     find_edge,
     find_axis_center,
     EarlyCapacitiveSenseTrigger,
-    find_deck_position,
+    find_deck_height,
     find_slot_center_binary,
     find_slot_center_noncontact,
     calibrate_pipette,
@@ -103,11 +103,6 @@ async def override_cal_config(ot3_hardware: ThreadManager[OT3API]) -> Iterator[N
             search_iteration_limit=3,
             overrun_tolerance_mm=0,
             early_sense_tolerance_mm=2,
-            plus_x_pos=plus_x_point,
-            plus_y_pos=plus_y_point,
-            minus_x_pos=minus_x_point,
-            minus_y_pos=minus_y_point,
-            nominal_center=nominal_centr,
         )
     )
     try:
@@ -156,8 +151,11 @@ async def test_find_edge(
     probe_results: Tuple[float, float, float],
     search_result: float,
 ) -> None:
+    def _return_one(*arg):
+        return 1
+
     await ot3_hardware.home()
-    mock_capacitive_probe.side_effect = probe_results
+    mock_capacitive_probe.side_effect = _return_one
     result = await find_edge(
         ot3_hardware,
         OT3Mount.RIGHT,
@@ -201,7 +199,7 @@ async def test_find_deck_checks_z_only(
     mock_move_to: AsyncMock,
     mount: OT3Mount,
 ) -> None:
-    await find_deck_position(ot3_hardware, mount)
+    await find_deck_height(ot3_hardware, mount)
     config_point = Point(*ot3_hardware.config.calibration.z_offset.point)
     first_move_point = mock_move_to.call_args_list[0][0][1]
     assert first_move_point.x == config_point.x
@@ -223,8 +221,8 @@ async def test_method_enum(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
         AsyncMock(spec=find_slot_center_noncontact),
     ) as noncontact, patch(
-        "opentrons.hardware_control.ot3_calibration.find_deck_position",
-        AsyncMock(spec=find_deck_position),
+        "opentrons.hardware_control.ot3_calibration.find_deck_height",
+        AsyncMock(spec=find_deck_height),
     ) as find_deck, patch.object(
         ot3_hardware.managed_obj, "reset_instrument_offset", AsyncMock()
     ) as reset_instrument_offset, patch.object(
