@@ -11,7 +11,7 @@ exports.default = async function (configuration) {
   const { toSignPath = path } = configuration
   console.log(`Signing ${toSignPath} using powershell commandlets`)
   const certContent = atob(certEncodedContent)
-  const tempdir = mkdtemp('keyfile')
+  const tempdir = await mkdtemp('keyfile')
   const certTempPath = path.join(tempdir, 'key.pfx')
   const certFile = await open(certTempPath)
   await certFile.writeFile(certContent)
