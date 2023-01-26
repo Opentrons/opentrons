@@ -4,8 +4,8 @@ const { mkdtemp, open } = require('fs/promises')
 const { promisify } = require('util')
 const exec = promisify(require('child_process').exec)
 
-const certEncodedContent = process.env('WIN_CSC_LINK')
-const certPassword = process.env('WIN_CSC_KEY_PASSWORD')
+const certEncodedContent = process.env.WIN_CSC_LINK
+const certPassword = process.env.WIN_CSC_KEY_PASSWORD
 
 exports.default = async function (configuration) {
   const { toSignPath = path } = configuration
