@@ -19,7 +19,13 @@ import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery/constants'
-import { useLights, useRobot, useRunStatuses } from '../hooks'
+import {
+  useCalibrationTaskList,
+  useLights,
+  useRobot,
+  useRunStatuses,
+} from '../hooks'
+import { expectedTaskList } from '../hooks/__fixtures__/taskListFixtures'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotOverview } from '../RobotOverview'
@@ -67,6 +73,9 @@ const MOCK_STATE: State = {
   },
 } as any
 
+const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
+  typeof useCalibrationTaskList
+>
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
@@ -127,6 +136,7 @@ describe('RobotOverview', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
+    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,

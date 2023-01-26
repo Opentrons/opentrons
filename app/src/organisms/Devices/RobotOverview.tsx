@@ -32,7 +32,12 @@ import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusHeader } from './RobotStatusHeader'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import { useCalibrationTaskList, useIsRobotViewable, useLights, useRobot } from './hooks'
+import {
+  useCalibrationTaskList,
+  useIsRobotViewable,
+  useLights,
+  useRobot,
+} from './hooks'
 
 import type { State } from '../../redux/types'
 
@@ -45,24 +50,33 @@ interface RobotOverviewProps {
 export function RobotOverview({
   robotName,
 }: RobotOverviewProps): JSX.Element | null {
-  const { t } = useTranslation(['device_details', 'shared', 'robot_calibration'])
+  const { t } = useTranslation([
+    'device_details',
+    'shared',
+    'robot_calibration',
+  ])
 
-  const { activeIndex, taskList } = useCalibrationTaskList(robotName)
+  const { taskListStatus } = useCalibrationTaskList(robotName)
 
   // start off assuming we are missing calibrations
   let showCalibrationStatusBanner = true
-  let calibrationStatusBannerType = "error"
-  let calibrationStatusBannerText = t('robot_calibration:missing_calibration_data_long')
+  let calibrationStatusBannerType = 'error'
+  let calibrationStatusBannerText = t(
+    'robot_calibration:missing_calibration_data_long'
+  )
 
   // if the tasklist is empty, though, all calibrations are good
-  if (activeIndex == null) {
+  if (taskListStatus === 'complete') {
     showCalibrationStatusBanner = false
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
-  } else if (taskList.every(tp => tp.isComplete === true || tp.markedBad)) {
-    calibrationStatusBannerType = "warning"
-    calibrationStatusBannerText = t('robot_calibration:recalibration_recommended')
+  } else if (taskListStatus === 'bad') {
+    calibrationStatusBannerType = 'warning'
+    calibrationStatusBannerText = t(
+      'robot_calibration:recalibration_recommended'
+    )
   }
+
   const [dispatchRequest] = useDispatchApiRequest()
 
   const enableCalibrationWizards = Config.useFeatureFlag(
@@ -95,7 +109,11 @@ export function RobotOverview({
       position={POSITION_RELATIVE}
       width="100%"
     >
-      <Flex flexDirection={DIRECTION_ROW} marginBottom={SPACING.spacing4} width="100%">
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        marginBottom={SPACING.spacing4}
+        width="100%"
+      >
         <img
           src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
           style={{ paddingTop: SPACING.spacing3, width: '6.25rem' }}
@@ -131,7 +149,9 @@ export function RobotOverview({
                     <ToggleButton
                       label={t('lights')}
                       toggledOn={lightsOn != null ? lightsOn : false}
-                      disabled={lightsOn === null || robot.status !== CONNECTABLE}
+                      disabled={
+                        lightsOn === null || robot.status !== CONNECTABLE
+                      }
                       onClick={toggleLights}
                       height="0.813rem"
                       id="RobotOverview_lightsToggle"
@@ -152,19 +172,25 @@ export function RobotOverview({
             </Flex>
           </Flex>
         </Box>
-        <Box position={POSITION_ABSOLUTE} top={SPACING.spacing2} right="-.75rem">
+        <Box
+          position={POSITION_ABSOLUTE}
+          top={SPACING.spacing2}
+          right="-.75rem"
+        >
           <RobotOverviewOverflowMenu robot={robot} />
         </Box>
       </Flex>
       {enableCalibrationWizards && showCalibrationStatusBanner && (
-          <Flex
-            paddingBottom={SPACING.spacing4}
-            flexDirection={DIRECTION_COLUMN}
-            width="100%"
-          >
-            <Banner type={calibrationStatusBannerType as BannerType}>{calibrationStatusBannerText}</Banner>
-          </Flex>
-        )}
+        <Flex
+          paddingBottom={SPACING.spacing4}
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+        >
+          <Banner type={calibrationStatusBannerType as BannerType}>
+            {calibrationStatusBannerText}
+          </Banner>
+        </Flex>
+      )}
     </Flex>
   ) : null
 }
