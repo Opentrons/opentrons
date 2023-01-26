@@ -3,9 +3,12 @@
 from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
+from functools import wraps
 import logging
 from copy import deepcopy
 from typing import (
+    Any,
+    Awaitable,
     Callable,
     Dict,
     List,
@@ -115,6 +118,19 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 MapPayload = TypeVar("MapPayload")
+Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
+
+
+def requires_update(func: Wrapped) -> Wrapped:
+    """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
+
+    @wraps(func)
+    async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
+        if self.update_required:
+            raise FirmwareUpdateRequired()
+        return await func(self, *args, **kwargs)
+
+    return cast(Wrapped, wrapper)
 
 
 class OT3Controller:
@@ -173,17 +189,8 @@ class OT3Controller:
         return None
 
     @property
-    def update_required(self):
+    def update_required(self) -> bool:
         return self._update_required
-
-    def requires_update(function: callable):
-        """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
-
-        async def wrapper(self, *args, **kwargs):
-            if self.update_required:
-                raise FirmwareUpdateRequired()
-            return await function(self, *args, **kwargs)
-        return wrapper
 
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""

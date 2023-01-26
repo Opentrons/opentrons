@@ -1,6 +1,5 @@
 """Firmware update exceptions."""
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.constants import NodeId
 
 
 class FirmwareUpdateException(Exception):
@@ -36,11 +35,15 @@ class BootloaderNotReady(FirmwareUpdateException):
 
     pass
 
+
 class FirmwareUpdateRequired(FirmwareUpdateException):
     """At least one subsystem requires an update."""
 
     message: MessageDefinition
 
-    def __init__(self, message: MessageDefinition = "") -> None:
+    def __init__(self, message: MessageDefinition) -> None:
+        """Constructor."""
         self.message = message
-        super().__init__(f"Operation not permited because a firmware update is required {message}.")
+        super().__init__(
+            f"Operation not permited because a firmware update is required {message}."
+        )
