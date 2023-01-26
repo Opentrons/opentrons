@@ -181,10 +181,10 @@ class Gripper_Calibration_Test:
         api.add_gripper_probe(GripperProbe.FRONT)
         # Move up
         current_pos = await api.gantry_position(mount)
-        z_offset = current_pos + self.gauge_offsets["Z"]
+        z_offset = current_pos + self.gauge_offsets_front["Z"]
         await api.move_to(mount, z_offset, speed=20)
         # Move above slot center
-        above_slot_center = self.slot_center + self.gauge_offsets["Z"]
+        above_slot_center = self.slot_center + self.gauge_offsets_front["Z"]
         await api.move_to(mount, above_slot_center, speed=20)
         # Measure X-axis gauge
         print("Measuring X Gauge...")
