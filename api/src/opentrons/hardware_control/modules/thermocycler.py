@@ -220,6 +220,13 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._wait_for_lid_status(ThermocyclerLidStatus.CLOSED)
         return ThermocyclerLidStatus.CLOSED
 
+    async def lift_plate(self) -> str:
+        """If the lid is open, lift the plate."""
+        await self.wait_for_is_running()
+        await self._driver.lift_plate()
+        await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
+        return ThermocyclerLidStatus.OPEN
+
     async def set_temperature(
         self,
         temperature: float,

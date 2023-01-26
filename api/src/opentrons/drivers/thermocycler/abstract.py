@@ -31,6 +31,10 @@ class AbstractThermocyclerDriver(ABC):
         ...
 
     @abstractmethod
+    async def lift_plate(self) -> None:
+        """Send the Plate Lift command."""
+
+    @abstractmethod
     async def get_lid_status(self) -> ThermocyclerLidStatus:
         """Send get lid status command"""
         ...
