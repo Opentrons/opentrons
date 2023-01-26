@@ -1,6 +1,7 @@
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import {
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
@@ -35,9 +36,13 @@ export function useLPCDisabledReason(
     missingModuleIds.length > 0 && isCalibrationComplete
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && !isCalibrationComplete
+  const labwareDefinitions =
+    protocolData?.commands != null
+      ? getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      : {}
 
   const tipRackLoadedInProtocol: boolean = some(
-    protocolData?.labwareDefinitions,
+    labwareDefinitions,
     def => def.parameters?.isTiprack
   )
   const tipsArePickedUp: boolean = some(

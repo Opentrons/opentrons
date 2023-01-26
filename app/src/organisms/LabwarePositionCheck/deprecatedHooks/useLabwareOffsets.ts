@@ -4,6 +4,7 @@ import {
   getModuleDisplayName,
   getLabwareDisplayName,
   getModuleType,
+  getLoadedLabwareDefinitionsByUri,
   LegacySchemaAdapterOutput,
   THERMOCYCLER_MODULE_TYPE,
   getVectorSum,
@@ -82,17 +83,20 @@ export const useLabwareOffsets = (
       )
       // skip if location is offDeck
       if (labwareOffsetLocation == null) return labwareOffsets
+      const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
+        protocolData.commands
+      )
       const labwareDefinitionUri = getLabwareDefinitionUri(
         labwareId,
         protocolData.labware,
-        protocolData.labwareDefinitions
+        labwareDefinitions
       )
       //   @ts-expect-error: when we remove schemav6Adapter, this logic will be correct
       const definitionUri = protocolData.labware.find(
         item => item.id === labwareId
       ).definitionUri
       const displayName = getLabwareDisplayName(
-        protocolData.labwareDefinitions[definitionUri]
+        labwareDefinitions[definitionUri]
       )
       const vectorPromise = offsetDataByLabwareId.then(result => ({
         ...result[labwareId],

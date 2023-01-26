@@ -3,6 +3,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
 import { createStore } from 'redux'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { i18n } from '../../../../i18n'
 import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
@@ -20,6 +21,13 @@ import type { State } from '../../../../redux/types'
 import type { StoredProtocolAnalysis } from '..'
 
 jest.mock('..')
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    getLoadedLabwareDefinitionsByUri: jest.fn(),
+  }
+})
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -35,6 +43,9 @@ const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFuncti
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
+>
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+  typeof getLoadedLabwareDefinitionsByUri
 >
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as LegacySchemaAdapterOutput
 
@@ -59,6 +70,9 @@ describe('useLPCDisabledReason', () => {
       missingModuleIds: [],
       remainingAttachedModules: [],
     })
+    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
+      _uncastedSimpleV6Protocol.labwareDefinitions as {}
+    )
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -129,9 +143,8 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if no tipracks in protocols', () => {
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: { ...simpleV6Protocol, labwareDefinitions: {} },
-    } as any)
+    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue({})
+
     const { result } = renderHook(
       () => useLPCDisabledReason('otie', RUN_ID_1),
       { wrapper }

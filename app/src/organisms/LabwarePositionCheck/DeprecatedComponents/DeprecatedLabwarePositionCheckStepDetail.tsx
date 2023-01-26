@@ -26,6 +26,7 @@ import {
   getPipetteNameSpecs,
   getVectorDifference,
   getVectorSum,
+  getLoadedLabwareDefinitionsByUri,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 import {
@@ -92,7 +93,10 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
   const labwareDefUri =
     protocolData.labware.find(item => item.id === labwareId)?.definitionUri ??
     ''
-  const labwareDef = protocolData.labwareDefinitions[labwareDefUri]
+  const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
+    protocolData.commands
+  )
+  const labwareDef = labwareDefinitionsByUri[labwareDefUri]
   // filter out the TC open lid command as it does not have an associated pipette id
   const stepMovementCommands = selectedStep.commands.filter(
     (

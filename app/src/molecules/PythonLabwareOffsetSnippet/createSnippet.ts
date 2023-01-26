@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { getLabwareDefinitionUri } from '../../organisms/Devices/ProtocolRun/utils/getLabwareDefinitionUri'
 import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -26,7 +27,10 @@ export function createSnippet(
           item => item.id === command.result.labwareId
         )
         if (loadedLabware == null) return acc
-        const { loadName } = protocol.labwareDefinitions[
+        const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
+          protocol.commands
+        )
+        const { loadName } = labwareDefinitions[
           loadedLabware.definitionUri
         ].parameters
         if (command.params.location === 'offDeck') {
@@ -50,7 +54,7 @@ export function createSnippet(
         const labwareDefUri = getLabwareDefinitionUri(
           command.result.labwareId,
           protocol.labware,
-          protocol.labwareDefinitions
+          labwareDefinitions
         )
 
         const offsetLocation = getLabwareOffsetLocation(

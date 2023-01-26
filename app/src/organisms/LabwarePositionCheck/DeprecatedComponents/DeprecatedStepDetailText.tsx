@@ -9,6 +9,7 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { DeprecatedLabwarePositionCheckStepDetailModal } from './DeprecatedLabwarePositionCheckStepDetailModal'
 import type { DeprecatedLabwarePositionCheckStep } from './types'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
@@ -38,7 +39,10 @@ export const DeprecatedStepDetailText = (
   //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
   const labwareDefId = protocolData.labware.find(item => item.id === labwareId)
     .definitionUri
-  const labwareDef = protocolData.labwareDefinitions[labwareDefId]
+  const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
+    protocolData.commands
+  )
+  const labwareDef = labwareDefinitions[labwareDefId]
   const { displayName } = labwareDef.metadata
   const { isTiprack } = labwareDef.parameters
 

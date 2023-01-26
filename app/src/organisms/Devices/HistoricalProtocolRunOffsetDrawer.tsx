@@ -13,6 +13,7 @@ import {
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
@@ -128,9 +129,15 @@ export function HistoricalProtocolRunOffsetDrawer(
         </StyledText>
       </Flex>
       {uniqueLabwareOffsets.map((offset, index) => {
-        const definition = Object.values(
-          protocolDetails.protocolData?.labwareDefinitions ?? {}
-        ).find(def => getLabwareDefURI(def) === offset.definitionUri)
+        const labwareDefinitions =
+          protocolDetails.protocolData?.commands != null
+            ? getLoadedLabwareDefinitionsByUri(
+                protocolDetails.protocolData?.commands
+              )
+            : {}
+        const definition = Object.values(labwareDefinitions).find(
+          def => getLabwareDefURI(def) === offset.definitionUri
+        )
         const labwareName =
           definition != null
             ? getLabwareDisplayName(definition)

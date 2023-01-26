@@ -6,6 +6,7 @@ import {
   Coordinates,
   getLabwareDefIsStandard,
   getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
   IDENTITY_VECTOR,
   LoadedLabware,
 } from '@opentrons/shared-data'
@@ -337,12 +338,16 @@ export function useDeprecatedLabwarePositionCheck(
 
   const ctaText = useLpcCtaText(currentCommand, currentRunId)
   const robotCommands = useCurrentRunCommands()
+  const labwareDefinitions =
+    protocolData?.commands != null
+      ? getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      : {}
   const titleText = useTitleText(
     isLoading,
     prevCommand,
     currentRunId,
     protocolData?.labware,
-    protocolData?.labwareDefinitions
+    labwareDefinitions
   )
   if (
     prevCommand != null &&

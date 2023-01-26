@@ -1,3 +1,4 @@
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { deprecatedGetPrimaryPipetteId } from './deprecatedGetPrimaryPipetteId'
 import { getPipetteWorkflow } from './getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from './getOnePipettePositionCheckSteps'
@@ -25,13 +26,13 @@ export const deprecatedGetLabwarePositionCheckSteps = (
       )
     )
     const pipetteNames = pipettes.map(({ pipetteName }) => pipetteName)
-
+    const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
+      protocolData.commands
+    )
     const labware = protocolData.labware.filter(
       labware =>
-        !protocolData.labwareDefinitions[labware.definitionUri]?.parameters
-          .isTiprack ||
-        (protocolData.labwareDefinitions[labware.definitionUri]?.parameters
-          .isTiprack &&
+        !labwareDefinitions[labware.definitionUri]?.parameters.isTiprack ||
+        (labwareDefinitions[labware.definitionUri]?.parameters.isTiprack &&
           protocolData.commands.some(
             command =>
               command.commandType === 'pickUpTip' &&
@@ -40,7 +41,6 @@ export const deprecatedGetLabwarePositionCheckSteps = (
     )
 
     const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
-    const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands
     const primaryPipetteId = deprecatedGetPrimaryPipetteId(pipettes, commands)
     const pipetteWorkflow = getPipetteWorkflow({

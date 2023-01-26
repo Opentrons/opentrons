@@ -1,5 +1,7 @@
 import { LabwareOffset } from '@opentrons/api-client'
 import { useRunQuery } from '@opentrons/react-api-client'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { getCurrentOffsetForLabwareInLocation } from '../../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
@@ -13,11 +15,13 @@ export function useLabwareOffsetForLabware(
   const { data: runRecord } = useRunQuery(runId)
 
   if (protocolData == null) return null
-
+  const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
+    protocolData.commands
+  )
   const labwareDefinitionUri = getLabwareDefinitionUri(
     labwareId,
     protocolData.labware,
-    protocolData.labwareDefinitions
+    labwareDefinitionsByUri
   )
 
   const labwareLocation = getLabwareOffsetLocation(

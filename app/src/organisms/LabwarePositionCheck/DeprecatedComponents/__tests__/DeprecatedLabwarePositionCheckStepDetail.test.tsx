@@ -7,6 +7,8 @@ import {
   Coordinates,
   getIsTiprack,
   getPipetteNameSpecs,
+  getLoadedLabwareDefinitionsByUri,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
@@ -42,6 +44,7 @@ jest.mock('@opentrons/shared-data', () => {
     ...actualSharedData,
     getPipetteNameSpecs: jest.fn(),
     getIsTiprack: jest.fn(),
+    getLoadedLabwareDefinitionsByUri: jest.fn(),
   }
 })
 jest.mock('@opentrons/react-api-client')
@@ -62,6 +65,9 @@ const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
 >
 const mockGetIsTiprack = getIsTiprack as jest.MockedFunction<
   typeof getIsTiprack
+>
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+  typeof getLoadedLabwareDefinitionsByUri
 >
 const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
   typeof useCommandQuery
@@ -174,9 +180,6 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
               loadName: 'someLoadName',
             },
           ],
-          labwareDefinitions: {
-            [LABWARE_DEF_URI]: LABWARE_DEF,
-          },
           pipettes: [
             {
               id: PRIMARY_PIPETTE_ID,
@@ -192,7 +195,10 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
       .mockReturnValue({ channels: 1 } as any)
 
     mockGetIsTiprack.mockReturnValue(false)
-
+    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue({
+      [LABWARE_DEF_URI]: LABWARE_DEF as LabwareDefinition2,
+      [TIPRACK_DEF_URI]: LABWARE_DEF as LabwareDefinition2,
+    })
     mockJogControls.mockReturnValue(<div></div>)
 
     when(mockRobotWorkSpace)
@@ -257,9 +263,6 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
               loadName: 'someLoadName',
             },
           ],
-          labwareDefinitions: {
-            [TIPRACK_DEF_URI]: LABWARE_DEF,
-          },
           pipettes: [
             {
               id: PRIMARY_PIPETTE_ID,

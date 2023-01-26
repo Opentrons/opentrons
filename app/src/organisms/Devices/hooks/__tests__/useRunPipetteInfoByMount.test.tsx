@@ -1,7 +1,11 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  getLoadedLabwareDefinitionsByUri,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import _tiprack10ul from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_10ul/1.json'
 
 import {
@@ -38,6 +42,7 @@ jest.mock('@opentrons/shared-data', () => {
   return {
     ...actualSharedData,
     getPipetteNameSpecs: jest.fn(),
+    getLoadedLabwareDefinitionsByUri: jest.fn(),
   }
 })
 jest.mock('../useAttachedPipetteCalibrations')
@@ -63,6 +68,9 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
 >
 const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
   typeof useStoredProtocolAnalysis
+>
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+  typeof getLoadedLabwareDefinitionsByUri
 >
 
 const PIPETTE_CALIBRATIONS = {
@@ -152,6 +160,13 @@ describe('useRunPipetteInfoByMount hook', () => {
       .mockReturnValue({
         displayName: 'P10 Single-Channel GEN1',
       } as PipetteNameSpecs)
+    when(mockGetLoadedLabwareDefinitionsByUri)
+      .calledWith(
+        _uncastedModifiedSimpleV6Protocol.commands as RunTimeCommand[]
+      )
+      .mockReturnValue(
+        _uncastedModifiedSimpleV6Protocol.labwareDefinitions as {}
+      )
   })
 
   afterEach(() => {

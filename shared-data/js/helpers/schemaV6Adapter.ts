@@ -12,14 +12,12 @@ import type {
   CompletedProtocolAnalysis,
   ModuleModel,
 } from '../types'
-import { getLoadedLabwareDefinitionsByUri } from './getLoadedLabwareDefinitionsByUri'
 // This adapter exists to resolve the interface mismatch between the PE analysis response
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
 
 export interface LegacySchemaAdapterOutput
   extends Omit<ProtocolAnalysisOutput, 'modules'> {
-  labwareDefinitions: ProtocolAnalysisFile['labwareDefinitions']
   modules: ProtocolAnalysisFile['modules']
 }
 
@@ -56,10 +54,6 @@ export const schemaV6Adapter = (
       }
     })
 
-    const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
-      protocolAnalysis.commands
-    )
-
     const modules: {
       [moduleId: string]: { model: ModuleModel }
     } = protocolAnalysis.commands
@@ -82,7 +76,6 @@ export const schemaV6Adapter = (
       ...protocolAnalysis,
       labware,
       modules,
-      labwareDefinitions,
     }
   }
   return null

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import withSinglechannelProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 import withMultiChannelProtocol from '@opentrons/shared-data/protocol/fixtures/4/pipetteMultiChannelProtocolV4.json'
 import {
@@ -15,12 +16,22 @@ import { DeprecatedStepDetailText } from '../DeprecatedStepDetailText'
 
 jest.mock('../DeprecatedLabwarePositionCheckStepDetailModal')
 jest.mock('../../../Devices/hooks')
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    getLoadedLabwareDefinitionsByUri: jest.fn(),
+  }
+})
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
 const mockDeprecatedLabwarePositionCheckStepDetailModal = DeprecatedLabwarePositionCheckStepDetailModal as jest.MockedFunction<
   typeof DeprecatedLabwarePositionCheckStepDetailModal
+>
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+  typeof getLoadedLabwareDefinitionsByUri
 >
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
@@ -71,7 +82,9 @@ describe('DeprecatedStepDetailText', () => {
       selectedStep: mockLabwarePositionCheckStepTipRack,
       runId: MOCK_RUN_ID,
     }
-
+    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
+      withSinglechannelProtocol.labwareDefinitions as {}
+    )
     when(mockDeprecatedLabwarePositionCheckStepDetailModal)
       .calledWith(
         componentPropsMatcher({
@@ -181,6 +194,9 @@ describe('DeprecatedStepDetailText', () => {
   })
   it('renders the 8 tips with tiprack text: labware_step_detail_tiprack_plural', () => {
     props = { ...props, pipetteChannels: 8 }
+    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
+      withMultiChannelProtocol.labwareDefinitions as {}
+    )
     when(mockUseProtocolDetailsForRun)
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({
@@ -241,6 +257,10 @@ describe('DeprecatedStepDetailText', () => {
       pipetteChannels: 8,
       runId: MOCK_RUN_ID,
     }
+    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
+      withMultiChannelProtocol.labwareDefinitions as {}
+    )
+
     when(mockUseProtocolDetailsForRun)
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({

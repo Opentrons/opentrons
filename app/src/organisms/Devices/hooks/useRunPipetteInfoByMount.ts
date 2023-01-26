@@ -1,5 +1,9 @@
 import last from 'lodash/last'
-import { getPipetteNameSpecs, getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  getLabwareDefURI,
+  getLoadedLabwareDefinitionsByUri,
+} from '@opentrons/shared-data'
 import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '../../../redux/pipettes'
 import {
   useAttachedPipetteCalibrations,
@@ -52,7 +56,8 @@ export function useRunPipetteInfoByMount(
   if (protocolData == null) {
     return EMPTY_MOUNTS
   }
-  const { pipettes, labware, labwareDefinitions, commands } = protocolData
+  const { pipettes, labware, commands } = protocolData
+  const labwareDefinitions = getLoadedLabwareDefinitionsByUri(commands)
   const loadPipetteCommands = commands.filter(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette'

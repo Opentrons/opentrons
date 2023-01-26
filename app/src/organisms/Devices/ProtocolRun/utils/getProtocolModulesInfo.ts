@@ -1,5 +1,9 @@
 import reduce from 'lodash/reduce'
-import { SPAN7_8_10_11_SLOT, getModuleDef2 } from '@opentrons/shared-data'
+import {
+  SPAN7_8_10_11_SLOT,
+  getModuleDef2,
+  getLoadedLabwareDefinitionsByUri,
+} from '@opentrons/shared-data'
 import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 import type {
@@ -51,9 +55,13 @@ export const getProtocolModulesInfo = (
         const nestedLabware = protocolData.labware.find(
           item => nestedLabwareId != null && item.id === nestedLabwareId
         )
+        const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
+          protocolData.commands
+        )
+
         const nestedLabwareDef =
           nestedLabware != null
-            ? protocolData.labwareDefinitions[nestedLabware.definitionUri]
+            ? labwareDefinitionsByUri[nestedLabware.definitionUri]
             : null
         const nestedLabwareDisplayName =
           nestedLabware?.displayName?.toString() ?? null

@@ -4,10 +4,7 @@ import {
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
 } from '@opentrons/api-client'
-import {
-  schemaV6Adapter,
-  getLoadedLabwareDefinitionsByUri,
-} from '@opentrons/shared-data'
+import { schemaV6Adapter } from '@opentrons/shared-data'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { getStoredProtocol } from '../../../redux/protocol-storage'
@@ -17,10 +14,7 @@ import type {
   ModuleModelsById,
   PipetteNamesById,
 } from '@opentrons/api-client'
-import type {
-  ProtocolAnalysisOutput,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
 // TODO(bc, 2022-09-26): StoredProtocolAnalysis can be wholesale replaced by ProtocolAnalysisOutput,
@@ -30,7 +24,6 @@ export interface StoredProtocolAnalysis
   pipettes: PipetteNamesById[]
   modules: ModuleModelsById
   labware: LoadedLabwareEntity[]
-  labwareDefinitions: { [defUri: string]: LabwareDefinition2 }
 }
 
 export const parseProtocolAnalysisOutput = (
@@ -45,16 +38,12 @@ export const parseProtocolAnalysisOutput = (
   const labwareById = parseInitialLoadedLabwareEntity(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
-    storedProtocolAnalysis?.commands ?? []
-  )
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
         pipettes: pipettesNamesById,
         modules: moduleModelsById,
         labware: labwareById,
-        labwareDefinitions: labwareDefinitionsByUri,
       }
     : null
 }
