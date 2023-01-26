@@ -438,7 +438,7 @@ class OT3Controller:
         axes: Sequence[OT3Axis],
         distance: float,
         speed: float,
-        tip_action: str = "drop",
+        tip_action: str = "home",
     ) -> None:
         move_group = create_tip_action_group(
             axes, distance, speed, cast(PipetteAction, tip_action)

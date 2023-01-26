@@ -161,7 +161,7 @@ def create_tip_action_step(
     step: MoveGroupStep = {}
     stop_condition = (
         MoveStopCondition.limit_switch
-        if action == PipetteTipActionType.drop
+        if action == PipetteTipActionType.home
         else MoveStopCondition.none
     )
     for axis_node in present_nodes:

@@ -1361,7 +1361,14 @@ class OT3API(
                 [OT3Axis.of_main_tool_actuator(mount)],
                 pipette_spec.pick_up_distance,
                 pipette_spec.speed,
-                "pick_up",
+                "clamp",
+            )
+            # back clamps off the adapter posts
+            await self._backend.tip_action(
+                [OT3Axis.of_main_tool_actuator(mount)],
+                pipette_spec.pick_up_distance,
+                pipette_spec.speed,
+                "home",
             )
             # Move to pick up position
             target_up = target_position_from_relative(
@@ -1457,7 +1464,7 @@ class OT3API(
                     [OT3Axis.of_main_tool_actuator(mount)],
                     move.target_position,
                     move.speed,
-                    "drop",
+                    "clamp",
                 )
             else:
                 target_pos = target_position_from_plunger(

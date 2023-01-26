@@ -8,11 +8,12 @@
     "presses": 0.0,
     "speed": 5.5,
     "increment": 0.0,
-    "distance": 13.75
+    "distance": 19.0
   },
   "dropTipConfigurations": {
     "current": 1.5,
-    "speed": 10
+    "speed": 10,
+    "distance": 25.5
   },
   "plungerMotorConfigurations": {
     "idle": 0.3,

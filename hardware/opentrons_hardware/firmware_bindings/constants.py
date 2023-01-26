@@ -257,8 +257,8 @@ class GearMotorId(int, Enum):
 class PipetteTipActionType(int, Enum):
     """Tip action types."""
 
-    pick_up = 0x0
-    drop = 0x01
+    clamp = 0x0
+    home = 0x01
 
 
 @unique

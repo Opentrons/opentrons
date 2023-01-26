@@ -4,7 +4,7 @@ from typing import Iterator, Union, Dict, Tuple, List
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch, Mock
+from mock import AsyncMock, patch, Mock, call
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
 from opentrons.hardware_control.dev_types import AttachedGripper, OT3AttachedPipette
 from opentrons.hardware_control.instruments.ot3.gripper_handler import (
@@ -794,7 +794,12 @@ async def test_pick_up_tip_full_tiprack(
         pipette_handler.plan_check_pick_up_tip.assert_called_once_with(
             OT3Mount.LEFT, 40.0, None, None
         )
-        tip_action.assert_called_once_with([OT3Axis.P_L], 0, 0, "pick_up")
+        tip_action.assert_has_calls(
+            calls=[
+                call([OT3Axis.P_L], 0, 0, "clamp"),
+                call([OT3Axis.P_L], 0, 0, "home"),
+            ]
+        )
 
 
 async def test_drop_tip_full_tiprack(
@@ -827,7 +832,7 @@ async def test_drop_tip_full_tiprack(
         )
         await ot3_hardware.drop_tip(Mount.LEFT)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
-        tip_action.assert_called_once_with([OT3Axis.P_L], 1, 1, "drop")
+        tip_action.assert_called_once_with([OT3Axis.P_L], 1, 1, "clamp")
 
 
 @pytest.mark.parametrize(
