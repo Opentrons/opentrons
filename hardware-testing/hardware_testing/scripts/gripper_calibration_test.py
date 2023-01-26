@@ -1,6 +1,7 @@
 """Gripper Calibration Test."""
 import asyncio
 import argparse
+import string
 import time
 
 from opentrons_shared_data.deck import load
@@ -19,6 +20,7 @@ from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Calibration Test')
+    arg_parser.add_argument('-p', '--probe', choices=['front','back'], required=False, help='The gripper probe position to be tested', default='front')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
@@ -26,7 +28,7 @@ def build_arg_parser():
 
 class Gripper_Calibration_Test:
     def __init__(
-        self, simulate: bool, cycles: int, slot: int
+        self, simulate: bool, probe: string, cycles: int, slot: int
     ) -> None:
         self.api = None
         self.mount = None
@@ -37,6 +39,7 @@ class Gripper_Calibration_Test:
         self.deck_encoder = None
         self.deck_z = None
         self.simulate = simulate
+        self.probe = probe
         self.cycles = cycles
         self.slot = slot
         self.jog_speed = 10 # mm/s
@@ -64,9 +67,14 @@ class Gripper_Calibration_Test:
             "Y":"/dev/ttyUSB1",
             "Z":"/dev/ttyUSB2",
         }
-        self.gauge_offsets = {
+        self.gauge_offsets_front = {
             "X":Point(x=0, y=-5, z=6),
             "Y":Point(x=-5, y=0, z=6),
+            "Z":Point(x=0, y=0, z=6),
+        }
+        self.gauge_offsets_back = {
+            "X":Point(x=0, y=5, z=6),
+            "Y":Point(x=5, y=0, z=6),
             "Z":Point(x=0, y=0, z=6),
         }
 
@@ -82,13 +90,13 @@ class Gripper_Calibration_Test:
         self.test_data["Gripper"] = str(self.gripper_id)
         self.test_data["Slot"] = str(self.slot)
         self.deck_definition = load("ot3_standard", version=3)
+        print(f"\nStarting Gripper Calibration Test on {self.probe.upper()} Probe!\n")
         self.start_time = time.time()
-        print(f"\nStarting Pipette Calibration Test!\n")
 
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"slot{self.slot}"
+        self.test_tag = f"slot{self.slot}_" + self.probe
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -120,11 +128,20 @@ class Gripper_Calibration_Test:
 
     async def _read_gauge(self, axis):
         gauge_encoder = "{} Gauge Encoder".format(axis)
-        gauge_position = self.slot_center + self.gauge_offsets[axis]
+        if self.probe == 'front':
+            gauge_position = self.slot_center + self.gauge_offsets_front[axis]
+        else:
+            gauge_position = self.slot_center + self.gauge_offsets_back[axis]
         if axis == "X":
-            jog_position = gauge_position._replace(x=gauge_position.x + self.CUTOUT_HALF)
+            if self.probe == 'front':
+                jog_position = gauge_position._replace(x=gauge_position.x + self.CUTOUT_HALF)
+            else:
+                jog_position = gauge_position._replace(x=gauge_position.x - self.CUTOUT_HALF)
         elif axis == "Y":
-            jog_position = gauge_position._replace(y=gauge_position.y - self.CUTOUT_HALF)
+            if self.probe == 'front':
+                jog_position = gauge_position._replace(y=gauge_position.y - self.CUTOUT_HALF)
+            else:
+                jog_position = gauge_position._replace(y=gauge_position.y + self.CUTOUT_HALF)
         elif axis == "Z":
             jog_position = self.slot_center
         # Move to gauge position
@@ -235,7 +252,7 @@ class Gripper_Calibration_Test:
             if self.api and self.mount:
                 if len(self.gauges) > 0:
                     self._zero_gauges()
-                input("Add probe to gripper FRONT, then press ENTER: ")
+                input(f"Add probe to gripper {self.probe.upper()}, then press ENTER: ")
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
@@ -259,5 +276,5 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper Calibration Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Calibration_Test(args.simulate, args.cycles, args.slot)
+    test = Gripper_Calibration_Test(args.simulate, args.probe, args.cycles, args.slot)
     asyncio.run(test.run())
