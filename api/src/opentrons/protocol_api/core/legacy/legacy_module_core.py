@@ -95,7 +95,7 @@ class LegacyModuleCore(AbstractModuleCore):
         """Add a labware to the module."""
         labware = self.geometry.add_labware(
             Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._protocol_core.api_version,
                 protocol_core=None,  # type: ignore[arg-type]
                 core_map=None,  # type: ignore[arg-type]
@@ -189,9 +189,7 @@ class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
                 " using `height_from_base` or `height`"
             )
 
-        engage_height = labware._implementation.get_default_magnet_engage_height(
-            preserve_half_mm
-        )
+        engage_height = labware._core.get_default_magnet_engage_height(preserve_half_mm)
 
         if engage_height is None:
             raise ValueError(

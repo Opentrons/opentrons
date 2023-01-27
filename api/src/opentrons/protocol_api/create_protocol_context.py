@@ -126,8 +126,8 @@ def create_protocol_context(
 
     return ProtocolContext(
         api_version=api_version,
+        core=cast(AbstractProtocolCore, core),
         broker=broker,
-        implementation=cast(AbstractProtocolCore, core),
         deck=deck,
         bundled_data=bundled_data,
     )

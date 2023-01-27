@@ -2,6 +2,7 @@
   "attached_pipettes": "attached pipette calibrations",
   "before_you_begin": "Before you begin",
   "calibrate": "Calibrate",
+  "calibrations_complete": "Calibrations complete!",
   "calibrate_deck": "calibrate deck",
   "calibration_dashboard": "Calibration Dashboard",
   "calibration_status": "Calibration Status",
