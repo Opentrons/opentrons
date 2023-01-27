@@ -265,6 +265,7 @@ Version 2.14
 
 Upcoming, not yet released.
 
+- :py:meth:`.ProtocolContext.define_liquid` and :py:meth:`.Well.load_liquid` added to allow you to define different liquid types and add them to wells at the beginning of your protocol.
 - :py:class:`.Labware` and :py:class:`.Well` objects will adhere to the protocol's API level setting. Prior to this version, they incorrectly ignore the setting.
 - :py:meth:`.ModuleContext.load_labware_object` will be deprecated.
 - :py:meth:`.MagneticModuleContext.calibrate` will be deprecated.
