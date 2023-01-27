@@ -22,7 +22,7 @@ import {
 import { BackButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import {
-  getProtocolsStoredSortKey,
+  getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '../../../redux/config'
 import { sortProtocols } from './utils'
@@ -64,7 +64,7 @@ export function ProtocolDashboard(): JSX.Element {
   const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
-  const sortBy = useSelector(getProtocolsStoredSortKey) ?? 'alphabetical'
+  const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
   const runData = runs.data?.data != null ? runs.data?.data : []
   const sortedProtocols = sortProtocols(sortBy, protocolsData, runData)
