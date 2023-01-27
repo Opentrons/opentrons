@@ -22,6 +22,16 @@ export type ProtocolsStoredSortKey =
   | 'recentCreated'
   | 'oldCreated'
 
+  export type protocolsOnDeviceSortKey =
+    | 'alphabetical'
+    | 'reverse'
+    | 'recent'
+    | 'oldest'
+    | 'recentRun'
+    | 'oldRun'
+    | 'recentCreated'
+    | 'oldCreated'
+
 export interface ConfigInitializedAction {
   type: typeof INITIALIZED
   payload: { config: Config }

@@ -64,10 +64,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(null)
 
-  const sortedStoredProtocols = useSortedProtocols(
-    sortBy as ProtocolSort,
-    storedProtocols
-  )
+  const sortedStoredProtocols = useSortedProtocols(sortBy, storedProtocols)
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -145,7 +142,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 paddingY={SPACING.spacing2}
                 data-testid="sortBy-label"
               >
-                {sortByLabelType[sortBy as ProtocolSort].label}
+                {sortByLabelType[sortBy].label}
               </StyledText>
               <Icon
                 paddingRight={SPACING.spacing3}

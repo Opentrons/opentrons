@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 
-import { useSortProtocols } from '../hooks'
+import { useSortProtocols } from '../utils'
 
 import type { Store } from 'redux'
 import type { ProtocolResource } from '@opentrons/shared-data'

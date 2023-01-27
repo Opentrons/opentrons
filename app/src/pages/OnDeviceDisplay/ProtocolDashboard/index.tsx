@@ -25,10 +25,10 @@ import {
   getProtocolsStoredSortKey,
   updateConfigValue,
 } from '../../../redux/config'
-import { useSortProtocols } from './hooks'
+import { sortProtocols } from './utils'
 
 import type { Dispatch } from '../../../redux/types'
-import type { ProtocolSort } from './hooks'
+import type { ProtocolSort } from './utils'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -67,7 +67,7 @@ export function ProtocolDashboard(): JSX.Element {
   const sortBy = useSelector(getProtocolsStoredSortKey) ?? 'alphabetical'
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
   const runData = runs.data?.data != null ? runs.data?.data : []
-  const sortedProtocols = useSortProtocols(
+  const sortedProtocols = sortProtocols(
     sortBy as ProtocolSort,
     protocolsData,
     runData

@@ -4,7 +4,7 @@ import type { ProtocolsStoredSortKey } from '../../../redux/config/types'
 
 export type ProtocolSort = Partial<ProtocolsStoredSortKey>
 
-export function useSortProtocols(
+export function sortProtocols(
   sortBy: ProtocolSort,
   protocols: ProtocolResource[],
   runs: RunData[]
