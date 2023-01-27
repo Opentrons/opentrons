@@ -44,6 +44,9 @@ const mockRoutes = [
   },
 ]
 
+// Change the name to follow the future name length rule
+mockConnectedRobot.name = 'opentrons-dev'
+
 const render = (props: React.ComponentProps<typeof Navigation>) => {
   return renderWithProviders(
     <MemoryRouter>
@@ -62,7 +65,7 @@ describe('Navigation', () => {
   })
   it('should render text and they have attribute', () => {
     const [{ getByRole, queryByText }] = render(props)
-    getByRole('link', { name: 'opentro...' }) // because of the truncate function
+    getByRole('link', { name: 'opentrons-dev' }) // because of the truncate function
     const allProtocols = getByRole('link', { name: 'All Protocols' })
     expect(allProtocols).toHaveAttribute('href', '/protocols')
 
