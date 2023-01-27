@@ -2,11 +2,10 @@
 import sqlalchemy
 
 from . import legacy_pickle
-from .utc_datetime import UTCDateTime
+from ._utc_datetime import UTCDateTime
 
 _metadata = sqlalchemy.MetaData()
 
-# table added in ver
 migration_table = sqlalchemy.Table(
     "migration",
     _metadata,
