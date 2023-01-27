@@ -1,4 +1,4 @@
-from unittest.mock import Mock, mock_open
+from unittest.mock import mock_open
 import pytest
 from typing import List, Optional, Set, Tuple, Any
 from itertools import chain
