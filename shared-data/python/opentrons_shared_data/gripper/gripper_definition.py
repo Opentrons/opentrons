@@ -17,10 +17,10 @@ def _snake_to_camel_case(snake: str) -> str:
 GripperModelStr = NewType("GripperModelStr", str)
 
 
-class GripperModel(Enum):
+class GripperModel(str, Enum):
     """Gripper models."""
 
-    v1 = enum.auto()
+    v1 = "gripperV1"
 
     def __str__(self) -> str:
         """Model name."""
