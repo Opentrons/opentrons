@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 import { isOT3Pipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
+import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Portal } from '../../../App/portal'
@@ -70,7 +71,11 @@ export function OverflowMenu({
   updateRobotStatus,
   pipetteName,
 }: OverflowMenuProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation([
+    'device_settings',
+    'shared',
+    'robot_calibration',
+  ])
   const doTrackEvent = useTrackEvent()
   const {
     menuOverlay,
@@ -211,17 +216,17 @@ export function OverflowMenu({
     }
   }, [isRunning, updateRobotStatus])
 
-  // TODO 5/6/2021 kj: This is scoped out from 6.0
-  // const handleDeleteCalibrationData = (
-  //   calType: 'pipetteOffset' | 'tipLength'
-  // ): void => {
-  //   // method del
-  //   // endpoint calibration/pipette_offset
-  //   // params pipet_id and mount
-  //   // endpoint calibration/tip_length
-  //   // params tiprack_hash and pipette_id
-  //   setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
-  // }
+  const handleDeleteCalibrationData = (
+    calType: 'pipetteOffset' | 'tipLength'
+  ): void => {
+    console.log('PLACEHOLDER')
+    //   // method del
+    //   // endpoint calibration/pipette_offset
+    //   // params pipet_id and mount
+    //   // endpoint calibration/tip_length
+    //   // params tiprack_hash and pipette_id
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
@@ -288,11 +293,10 @@ export function OverflowMenu({
               {t('download_calibration_data')}
             </MenuItem>
           ) : null}
-          {/* TODO 5/6/2021 kj: This is scoped out from 6.0 */}
-          {/* <Divider /> */}
-          {/* <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>
-          {t('overflow_menu_delete_data')}
-        </MenuItem> */}
+          <Divider />
+          <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>
+            {t('robot_calibration:delete_calibration_data')}
+          </MenuItem>
         </Flex>
       ) : null}
       {PipetteOffsetCalibrationWizard}
