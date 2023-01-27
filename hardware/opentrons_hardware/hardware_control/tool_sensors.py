@@ -111,6 +111,7 @@ def _build_pass_step(
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
+    stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
     # use any node present to calculate duration of the move, assuming the durations
     #   will be the same
@@ -122,7 +123,7 @@ def _build_pass_step(
         acceleration={},
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
-        stop_condition=MoveStopCondition.sync_line,
+        stop_condition=stop_condition,
     )
 
 
@@ -137,6 +138,7 @@ async def liquid_probe(
     prep_move_speed: float,
     threshold_pascals: float,
     log_pressure: bool = True,
+    read_only: bool = False,
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
     """Create and run liquid probing moves."""
@@ -156,10 +158,16 @@ async def liquid_probe(
         stop_threshold=threshold_fixed_point,
     )
 
+    if read_only:
+        stop_condition = MoveStopCondition.none
+    else:
+        stop_condition = MoveStopCondition.sync_line
+
     sensor_group = _build_pass_step(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
+        stop_condition=stop_condition,
     )
 
     prep_move = create_step(
@@ -183,6 +191,8 @@ async def liquid_probe(
         messenger.add_listener(sensor_capturer, None)
         binding = SensorOutputBinding.report | SensorOutputBinding.sync
         await sensor_capturer.start_timer()
+    elif read_only:
+        binding = SensorOutputBinding.report
     else:
         binding = SensorOutputBinding.sync
 
