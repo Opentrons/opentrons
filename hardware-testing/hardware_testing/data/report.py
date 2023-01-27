@@ -8,9 +8,9 @@ from hardware_testing import data as data_io
 
 
 class Result(enum.Enum):
-    SKIP = "Skip"
-    PASS = "Pass"
-    FAIL = "Fail"
+    SKIP = "SKIP"
+    PASS = "PASS"
+    FAIL = "FAIL"
 
     def __str__(self) -> str:
         return self.value
@@ -30,6 +30,7 @@ class Line:
         self._data: List[Any] = [None] * len(data)
         self._timestamp: Optional[float] = None
         self._start_time: Optional[float] = None
+        self._stored = False
 
     def __str__(self) -> str:
         data_str = ",".join(str(d) for d in self._data)
@@ -45,6 +46,10 @@ class Line:
     def timestamp(self) -> float:
         return self._timestamp
 
+    @property
+    def stored(self) -> bool:
+        return self._stored
+
     def cache_start_time(self, start_time: float) -> None:
         self._start_time = start_time
 
@@ -59,6 +64,7 @@ class Line:
                 raise ValueError(f"[{self.tag}] unexpected data type {d_type} "
                                  f"with value \"{data[i]}\" at index {i}")
             self._data[i] = data[i]
+        self._stored = True
 
 
 class LineRepeating:
@@ -66,8 +72,19 @@ class LineRepeating:
         self._lines: List[Line] = [Line(tag, data) for _ in range(repeat)]
 
     @property
+    def tag(self) -> str:
+        return self._lines[0].tag
+
+    @property
     def length(self) -> int:
         return len(self._lines)
+
+    @property
+    def stored(self) -> bool:
+        for line in self._lines:
+            if not line.stored:
+                return False
+        return True
 
     def __getitem__(self, item: int) -> Line:
         return self._lines[item]
@@ -79,21 +96,20 @@ class LineRepeating:
 class Section:
     def __init__(self, title: str, lines: List[Union[Line, LineRepeating]]) -> None:
         self._title = title
-        self._lines = lines
+        self._lines_and_repeating_lines = lines
 
-    def __getitem__(self, item: str) -> Line:
-        for line in self._lines:
+    def __getitem__(self, item: str) -> Union[Line, LineRepeating]:
+        for line in self._lines_and_repeating_lines:
             if line.tag == item:
                 return line
         raise ValueError(f"[{self._title}] unexpected line tag: {item}")
 
     def __str__(self) -> str:
         dashes = "-" * len(self.title)
-        lines = "\n".join([str(line) for line in self._lines])
-        all_lines = [line for line in self._lines]
-        stamps = [line.timestamp for line in self._lines if line.timestamp is not None]
+        lines = "\n".join([str(line) for line in self._lines_and_repeating_lines])
+        stamps = [line.timestamp for line in self.lines if line.timestamp is not None]
         if stamps:
-            min_timestamp = min([line.timestamp for line in self._lines if line.timestamp is not None])
+            min_timestamp = min([line.timestamp for line in self.lines if line.timestamp is not None])
             min_timestamp = round(min_timestamp, 1)
         else:
             min_timestamp = None
@@ -103,11 +119,25 @@ class Section:
 
     @property
     def lines(self) -> List[Line]:
-        return self._lines
+        all_lines: List[Line] = list()
+        for line in self._lines_and_repeating_lines:
+            if isinstance(line, LineRepeating):
+                for r_line in line:
+                    all_lines.append(r_line)
+            else:
+                all_lines.append(line)
+        return all_lines
 
     @property
     def title(self) -> str:
         return self._title
+
+    @property
+    def completed(self) -> bool:
+        for line in self.lines:
+            if not line.stored:
+                return False
+        return True
 
 
 def _generate_meta_data_section() -> Section:
@@ -148,6 +178,17 @@ class Report:
         _now = datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")
         self[META_DATA_TITLE][META_DATA_TEST_TIME_UTC].store(_now)
 
+    def __call__(self, *args) -> None:
+        if len(args) == 3:
+            self[args[0]][args[1]].store(*args[2])
+        elif len(args) == 4:
+            r_line = self[args[0]][args[1]]
+            if not isinstance(r_line, LineRepeating):
+                raise ValueError(f"line \"{args[1]}\" is not a repeating line and cannot be indexed")
+            self[args[0]][args[1]][args[2]].store(*args[3])
+        else:
+            raise ValueError(f"unexpected arguments to Report(): {args}")
+
     def __getitem__(self, item: str) -> Section:
         for s in self._sections:
             if s.title == item:
@@ -157,21 +198,26 @@ class Report:
     def __str__(self) -> str:
         return "\n".join([str(s) for s in self._sections])
 
+    @property
+    def completed(self) -> bool:
+        for s in self._sections:
+            if not s.completed:
+                return False
+        return True
+
     def _cache_start_time(self) -> None:
         start_time = time()
         for section in self._sections:
             for line in section.lines:
-                if isinstance(line, LineRepeating):
-                    for i in range(line.length):
-                        line[i].cache_start_time(start_time)
-                else:
-                    line.cache_start_time(start_time)
+                line.cache_start_time(start_time)
 
-    def setup(self, tag: str) -> None:
+    def set_tag(self, tag: str) -> None:
         self._tag = tag
         self[META_DATA_TITLE][META_DATA_TEST_TAG].store(self._tag)
         self._file_name = data_io.create_file_name(self._test_name, self._run_id, self._tag)
 
     def save_to_disk(self) -> Path:
+        if not self._tag:
+            raise RuntimeError("must set tag of report using `Report.set_tag()`")
         _report_str = str(self)
         return data_io.dump_data_to_file(self._test_name, self._file_name, _report_str + "\n")
