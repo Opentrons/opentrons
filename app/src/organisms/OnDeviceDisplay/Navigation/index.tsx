@@ -14,7 +14,6 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   ALIGN_END,
-  truncateString,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -24,12 +23,14 @@ import type { RouteProps } from '../../../App/types'
 
 const NavigationLink = styled(NavLink)`
   color: ${COLORS.black};
+  display: flex;
+  grid-gap: 0.5rem;
 
-  &:active {
+  &.active {
     color: ${COLORS.blueEnabled};
+    border-bottom: 4px solid #006cfa;
   }
 `
-const MAX_LETTERS = 20
 
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
@@ -52,23 +53,21 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
         gridGap="0.5rem"
       >
-        <NavLink to="/dashboard">
+        <NavigationLink to="/dashboard">
           <StyledText
-            color={COLORS.black}
             fontSize="1.625rem"
             fontWeight="700"
             lineHeight="1.9375rem"
           >
-            {truncateString(robotName, MAX_LETTERS)}
+            {robotName}
           </StyledText>
-        </NavLink>
+        </NavigationLink>
         <Icon name="wifi" size="2rem" />
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavigationLink key={name} to={navLinkTo as string}>
             <StyledText
-              color={COLORS.black}
               fontSize="1.625rem"
               fontWeight="600"
               lineHeight="1.9375rem"
