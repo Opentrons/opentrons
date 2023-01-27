@@ -90,7 +90,7 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.Y: 1000,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 50,
-        OT3AxisKind.Z_G: 100,
+        OT3AxisKind.Z_G: 50,
     },
     high_throughput={
         OT3AxisKind.X: 1000,
