@@ -1566,6 +1566,7 @@ class OT3API(
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:
+            self._log.info(f"Saving instrument offset: {delta} for gripper")
             self._gripper_handler.save_instrument_offset(delta)
         else:
             self._pipette_handler.save_instrument_offset(checked_mount, delta)
