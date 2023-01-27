@@ -23,8 +23,8 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=3,
             max_overrun_distance_mm=2,
-            speed_mm_per_s=1,
-            sensor_threshold_pf=1.0,
+            speed_mm_per_s=1.0,
+            sensor_threshold_pf=0.5,
         ),
     ),
     edge_sense=EdgeSenseSettings(
@@ -33,8 +33,8 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=0.2,
             max_overrun_distance_mm=0.5,
-            speed_mm_per_s=1,
-            sensor_threshold_pf=1.0,
+            speed_mm_per_s=0.5,
+            sensor_threshold_pf=0.5,
         ),
         search_initial_tolerance_mm=5.0,
         search_iteration_limit=10,
@@ -58,9 +58,9 @@ DEFAULT_GRIPPER_JAW_HOME_DUTY_CYCLE: Final = 25
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 500 / 2,
-        OT3AxisKind.Y: 500 / 2,
-        OT3AxisKind.Z: 65 / 2,
+        OT3AxisKind.X: 500,
+        OT3AxisKind.Y: 500,
+        OT3AxisKind.Z: 65,
         OT3AxisKind.P: 45,
         OT3AxisKind.Z_G: 65,
     },
@@ -72,23 +72,23 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.Q: 5.5,
     },
     low_throughput={
-        OT3AxisKind.X: 500 / 2,
-        OT3AxisKind.Y: 500 / 2,
-        OT3AxisKind.Z: 65 / 2,
+        OT3AxisKind.X: 500,
+        OT3AxisKind.Y: 500,
+        OT3AxisKind.Z: 65,
         OT3AxisKind.P: 45,
     },
     two_low_throughput={
-        OT3AxisKind.X: 500 / 2,
-        OT3AxisKind.Y: 500 / 2,
+        OT3AxisKind.X: 500,
+        OT3AxisKind.Y: 500,
     },
     gripper={OT3AxisKind.Z: 65},
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 1000 / 2,
-        OT3AxisKind.Y: 1000 / 2,
-        OT3AxisKind.Z: 100 / 2,
+        OT3AxisKind.X: 1000,
+        OT3AxisKind.Y: 1000,
+        OT3AxisKind.Z: 100,
         OT3AxisKind.P: 50,
         OT3AxisKind.Z_G: 100,
     },
@@ -100,9 +100,9 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.Q: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 1000 / 2,
-        OT3AxisKind.Y: 1000 / 2,
-        OT3AxisKind.Z: 100 / 2,
+        OT3AxisKind.X: 1000,
+        OT3AxisKind.Y: 1000,
+        OT3AxisKind.Z: 100,
         OT3AxisKind.P: 50,
     },
     two_low_throughput={
@@ -214,7 +214,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
         OT3AxisKind.P: 1.0,
-        OT3AxisKind.Z_G: 0.7,
+        OT3AxisKind.Z_G: 0.67,
     },
     high_throughput={
         OT3AxisKind.X: 1.4,

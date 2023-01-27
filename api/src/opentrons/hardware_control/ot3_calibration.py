@@ -12,9 +12,11 @@ from logging import getLogger
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
+from opentrons.hardware_control.backends.ot3utils import get_system_constraints
 import json
 
 from opentrons_shared_data.deck import load as load_deck
+from opentrons_hardware.hardware_control.motion_planning import SystemConstraints
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -193,14 +195,21 @@ async def _take_stride(
             # Use the most updated deck height for the next movement
             target = target._replace(z=found_height)
         else:
-            LOG.debug("Deck missed")
+            LOG.info("Deck missed")
         # If we're in our search direction, the goal is to find the deck.
         # Or if we're against the search direction, we want to miss the deck.
         goal_reached = touched_deck if in_search_direction else not touched_deck
+        LOG.info(
+            f"Goal reached for {stride_size} mm: {goal_reached}, stride_vector: {stride_vector}"
+        )
         if goal_reached or not repeat_if_failed:
+            # reverse direction if reached goal
             return (
                 target,
-                np.sign(stride_size * (-1 if goal_reached else 1)),
+                np.sign(
+                    (stride_size if stride_size != 0.0 else 1)
+                    * (-1 if goal_reached else 1)
+                ),
                 goal_reached,
             )
         else:
@@ -209,6 +218,7 @@ async def _take_stride(
             target += stride_vector
     # did not reach out goal before we ran out of strides, we should continue
     # going the same direction in the next stride size
+    LOG.info(f"Ran out of {stride_size} stride")
     return target, np.sign(stride_size), False
 
 
@@ -273,23 +283,18 @@ async def find_edge(
         )
 
     for s in REPEATABLE_STRIDES:
-        prev_stride = stride
         stride = np.copysign(s, next_dir)
         in_search_direction = search_direction == next_dir
-        # cap the number of times we allow the same stride to repeatå
-        max_stride_distance = min(
-            abs(prev_stride), abs(stride * edge_settings.search_iteration_limit)
-        )
         next_target, next_dir, goal_reached = await _take_stride(
             hcapi,
             mount,
             search_axis,
             next_target,
             stride,
-            max_stride_distance,
+            abs(s * edge_settings.search_iteration_limit),
             valid_z_range,
             in_search_direction,
-            False,
+            True,
         )
         if goal_reached and s <= CALIBRATION_MIN_VALID_STRIDE:
             LOG.info(f"Edge found at {next_target}, stride size: {s} in {search_axis}")
@@ -340,20 +345,19 @@ async def find_slot_center_binary(
         hcapi, mount, estimated_center + EDGES["top"], OT3Axis.Y, 1
     )
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
+    estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
 
     # Find -Y (bottom) edge
     minus_y_edge = await find_edge(
         hcapi, mount, estimated_center + EDGES["bottom"], OT3Axis.Y, -1
     )
     LOG.info(f"Found -y edge at {minus_y_edge}mm")
+    estimated_center = estimated_center._replace(y=(plus_y_edge.y + minus_y_edge.y) / 2)
 
     # Found XY center and the average of the edges' Zs
-    found_center = estimated_center._replace(
-        y=(plus_y_edge.y + minus_y_edge.y) / 2,
+    return estimated_center._replace(
         z=(plus_x_edge.z + minus_x_edge.z + plus_y_edge.z + minus_y_edge.z) / 4,
     )
-
-    return found_center
 
 
 async def find_axis_center(
@@ -550,7 +554,9 @@ async def _calibrate_mount(
     """
     nominal_center = _get_calibration_square_position_in_slot(slot)
     await hcapi.reset_instrument_offset(mount)
+    current_constraints = hcapi._move_manager._constraints
     try:
+        _limit_system_constraints(hcapi)
         # First, find the estimated deck height. This will be used to baseline the edge detection points.
         z_height = await find_deck_height(hcapi, mount, nominal_center)
         LOG.info(f"Found deck at {z_height}mm")
@@ -568,10 +574,10 @@ async def _calibrate_mount(
         else:
             raise RuntimeError("Unknown calibration method")
 
+        offset = nominal_center - found_center
         # update center with values obtained during calibration
-        LOG.info(f"Found calibration value {found_center} for mount {mount.name}")
-
-        return nominal_center - found_center
+        LOG.info(f"Found calibration value {offset} for mount {mount.name}")
+        return offset
 
     except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
         LOG.info(
@@ -580,6 +586,9 @@ async def _calibrate_mount(
         await hcapi.reset_instrument_offset(mount, to_default=False)
         # re-raise exception after resetting instrument offset
         raise
+    finally:
+        # revert motion constraints back to original values
+        hcapi._move_manager.update_constraints(current_constraints)
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
@@ -624,6 +633,7 @@ async def calibrate_gripper_jaw(
         hcapi.add_gripper_probe(probe)
         await hcapi.grip(GRIPPER_GRIP_FORCE)
         offset = await _calibrate_mount(hcapi, OT3Mount.GRIPPER, slot, method)
+        LOG.info(f"Gripper {probe.name} probe offset: {offset}")
         return offset
     finally:
         hcapi.remove_gripper_probe()
@@ -635,6 +645,7 @@ async def calibrate_gripper(
 ) -> Point:
     """Calibrate gripper."""
     offset = gripper_pin_offsets_mean(front=offset_front, rear=offset_rear)
+    LOG.info(f"Gripper calibration offset: {offset}")
     await hcapi.save_instrument_offset(OT3Mount.GRIPPER, offset)
     return offset
 

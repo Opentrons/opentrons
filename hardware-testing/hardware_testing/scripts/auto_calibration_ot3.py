@@ -1,4 +1,6 @@
 """OT-3 Auto Calibration."""
+import os
+import sys
 import asyncio
 import argparse
 import csv
@@ -10,6 +12,8 @@ from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper_jaw,
     calibrate_gripper,
 )
+
+os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
 
 from hardware_testing.opentrons_api.types import OT3Mount, GripperProbe, Point
 from hardware_testing.opentrons_api import helpers_ot3
@@ -29,10 +33,21 @@ LOG_CONFIG = {
             "level": logging.INFO,
             "backupCount": 3,
         },
+        "stream_handler": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stdout,
+            "formatter": "basic",
+            "level": logging.INFO,
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["stream_handler"],
+            "level": logging.INFO,
+            "propagate": True,
+        },
     },
 }
-
-logging.basicConfig(level=logging.INFO)
 
 
 async def fast_home_seq(api, mount, fast_home_pos):
@@ -75,8 +90,6 @@ async def _main(
             else:
                 offset = await calibrate_pipette(api, mount, slot)
 
-            print(f"Offset: {offset}")
-
             with open(f"/var/{mount}_{id}_auto_cal.csv", "a") as cv:
                 writer = csv.writer(cv)
                 writer.writerow(offset)
@@ -84,8 +97,10 @@ async def _main(
             await fast_home_seq(api, mount, fast_home_pos)
             await api.home()
     finally:
-        await fast_home_seq(api, mount, fast_home_pos)
-        await api.home()
+        cur_pos = await api.gantry_position(mount)
+        if cur_pos != homed_pos:
+            await fast_home_seq(api, mount, fast_home_pos)
+            await api.home()
 
 
 if __name__ == "__main__":
