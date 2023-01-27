@@ -128,6 +128,8 @@ class Plot:
         y_end = df[y_axis].iloc[-1]
         x_avg = df[x_axis].mean()
         y_avg = df[y_axis].mean()
+        x_off = 0.2
+        y_off = 0.2
 
         y_min = round(df[y_axis].min(), 3)
         y_min_id = df[y_axis].idxmin()
@@ -139,8 +141,13 @@ class Plot:
         y_max_xpos = df.loc[y_max_id][x_axis].item()
         y_max_text = f"Deck Max = {y_max}mm"
 
-        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=100)
+        y_avg = round(y_avg, 2)
+        y_avg_xpos = 0
+        y_avg_text = f"Deck Avg = {y_avg}mm"
+
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=100, ay_pos=100)
         annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=100, ay_pos=-100)
+        annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=-100)
 
         fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True)
         fig2 = px.line(x=[-self.LIMIT, self.LIMIT], y=[[y_avg, y_avg]], line_dash_sequence=["dash"], color_discrete_sequence=["black"])
@@ -158,9 +165,9 @@ class Plot:
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Deck Height (mm)"
         self.plot_param["x_range"] = [0, x_end]
-        self.plot_param["y_range"] = [-0.2, 0.2]
+        self.plot_param["y_range"] = [y_avg - y_off, y_avg + y_off]
         self.plot_param["legend"] = "Data"
-        self.plot_param["annotation"] = [annotation_ymin, annotation_ymax]
+        self.plot_param["annotation"] = [annotation_ymin, annotation_ymax, annotation_yavg]
         self.write_plot(self.plot_param)
 
     def slot_center_plot(self):
