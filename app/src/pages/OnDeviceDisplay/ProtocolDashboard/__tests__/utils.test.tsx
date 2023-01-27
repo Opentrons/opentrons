@@ -1,16 +1,7 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-
 import { sortProtocols } from '../utils'
 
-import type { Store } from 'redux'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
-import type { State } from '../../../../redux/types'
-
-// ToDo remove state part since there is no need to use that
 
 const mockProtocols = [
   {
@@ -100,24 +91,11 @@ const mockRuns = [
 ] as RunData[]
 
 describe('sortProtocols', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
-  beforeEach(() => {
-    store.dispatch = jest.fn()
-  })
-  afterEach(() => {
-    jest.restoreAllMocks()
-  })
   it('should return sorted protocols by protocol name a->z alphabetical', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
-    const { result } = renderHook(
-      () => sortProtocols('alphabetical', mockProtocols, mockRuns),
-      { wrapper }
-    )
-    const firstProtocol = result.current[0]
-    const secondProtocol = result.current[1]
-    const thirdProtocol = result.current[2]
+    const result = sortProtocols('alphabetical', mockProtocols, mockRuns)
+    const firstProtocol = result[0]
+    const secondProtocol = result[1]
+    const thirdProtocol = result[2]
 
     expect(firstProtocol.metadata.protocolName).toBe('hello mock protocol')
     expect(secondProtocol.metadata.protocolName).toBe('mock protocol')
@@ -125,16 +103,10 @@ describe('sortProtocols', () => {
   })
 
   it('should return sorted protocols by protocol name z->a reverse', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
-    const { result } = renderHook(
-      () => sortProtocols('reverse', mockProtocols, mockRuns),
-      { wrapper }
-    )
-    const firstProtocol = result.current[0]
-    const secondProtocol = result.current[1]
-    const thirdProtocol = result.current[2]
+    const result = sortProtocols('reverse', mockProtocols, mockRuns)
+    const firstProtocol = result[0]
+    const secondProtocol = result[1]
+    const thirdProtocol = result[2]
 
     expect(firstProtocol.metadata.protocolName).toBe('yay mock protocol')
     expect(secondProtocol.metadata.protocolName).toBe('mock protocol')
@@ -142,16 +114,10 @@ describe('sortProtocols', () => {
   })
 
   it('should return sorted protocols by last run recent->old recentRun', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
-    const { result } = renderHook(
-      () => sortProtocols('recentRun', mockProtocols, mockRuns),
-      { wrapper }
-    )
-    const firstProtocol = result.current[0]
-    const secondProtocol = result.current[1]
-    const thirdProtocol = result.current[2]
+    const result = sortProtocols('recentRun', mockProtocols, mockRuns)
+    const firstProtocol = result[0]
+    const secondProtocol = result[1]
+    const thirdProtocol = result[2]
 
     expect(firstProtocol.metadata.protocolName).toBe('hello mock protocol')
     expect(secondProtocol.metadata.protocolName).toBe('mock protocol')
@@ -159,16 +125,10 @@ describe('sortProtocols', () => {
   })
 
   it('should return sorted protocols by last run old->recent oldRun', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
-    const { result } = renderHook(
-      () => sortProtocols('oldRun', mockProtocols, mockRuns),
-      { wrapper }
-    )
-    const firstProtocol = result.current[0]
-    const secondProtocol = result.current[1]
-    const thirdProtocol = result.current[2]
+    const result = sortProtocols('oldRun', mockProtocols, mockRuns)
+    const firstProtocol = result[0]
+    const secondProtocol = result[1]
+    const thirdProtocol = result[2]
 
     expect(firstProtocol.metadata.protocolName).toBe('yay mock protocol')
     expect(secondProtocol.metadata.protocolName).toBe('mock protocol')
@@ -176,16 +136,10 @@ describe('sortProtocols', () => {
   })
 
   it('should return sorted protocols by date added recent->old recentCreated', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
-    const { result } = renderHook(
-      () => sortProtocols('recentCreated', mockProtocols, mockRuns),
-      { wrapper }
-    )
-    const firstProtocol = result.current[0]
-    const secondProtocol = result.current[1]
-    const thirdProtocol = result.current[2]
+    const result = sortProtocols('recentCreated', mockProtocols, mockRuns)
+    const firstProtocol = result[0]
+    const secondProtocol = result[1]
+    const thirdProtocol = result[2]
 
     expect(firstProtocol.metadata.protocolName).toBe('mock protocol')
     expect(secondProtocol.metadata.protocolName).toBe('hello mock protocol')
@@ -193,16 +147,10 @@ describe('sortProtocols', () => {
   })
 
   it('should return sorted protocols by date added old->recent oldCreated', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
-    const { result } = renderHook(
-      () => sortProtocols('oldCreated', mockProtocols, mockRuns),
-      { wrapper }
-    )
-    const firstProtocol = result.current[0]
-    const secondProtocol = result.current[1]
-    const thirdProtocol = result.current[2]
+    const result = sortProtocols('oldCreated', mockProtocols, mockRuns)
+    const firstProtocol = result[0]
+    const secondProtocol = result[1]
+    const thirdProtocol = result[2]
 
     expect(firstProtocol.metadata.protocolName).toBe('yay mock protocol')
     expect(secondProtocol.metadata.protocolName).toBe('hello mock protocol')
