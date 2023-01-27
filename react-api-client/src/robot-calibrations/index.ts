@@ -1,0 +1,1 @@
+export { useDeleteCalDataMutation } from './useDeleteCalDataMutation'

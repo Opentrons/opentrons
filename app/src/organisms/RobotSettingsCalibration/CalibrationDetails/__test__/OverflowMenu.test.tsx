@@ -4,6 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { saveAs } from 'file-saver'
 import { OT3_PIPETTES } from '@opentrons/shared-data'
 import { renderWithProviders, Mount } from '@opentrons/components'
+import { useDeleteCalDataMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
@@ -60,6 +61,10 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
 
+const mockUseDeleteCalDataMutation = useDeleteCalDataMutation as jest.MockedFunction<
+  typeof useDeleteCalDataMutation
+>
+
 const RUN_STATUSES = {
   isRunRunning: false,
   isRunStill: false,
@@ -87,6 +92,9 @@ describe('OverflowMenu', () => {
       isDeckCalibrated: true,
       deckCalibrationData: mockDeckCalData,
     })
+    mockUseDeleteCalDataMutation.mockReturnValue({
+      deleteCalData: jest.fn(),
+    } as any)
     when(mockUseFeatureFlag)
       .calledWith('enableCalibrationWizards')
       .mockReturnValue(false)
