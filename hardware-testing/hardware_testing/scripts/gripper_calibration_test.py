@@ -20,7 +20,7 @@ from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Calibration Test')
-    arg_parser.add_argument('-p', '--probe', choices=['front','back'], required=False, help='The gripper probe position to be tested', default='front')
+    arg_parser.add_argument('-p', '--probe', choices=['front','rear'], required=False, help='The gripper probe position to be tested', default='front')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
@@ -72,11 +72,15 @@ class Gripper_Calibration_Test:
             "Y":Point(x=-5, y=0, z=6),
             "Z":Point(x=0, y=0, z=6),
         }
-        self.gauge_offsets_back = {
+        self.gauge_offsets_rear = {
             "X":Point(x=0, y=5, z=6),
             "Y":Point(x=5, y=0, z=6),
             "Z":Point(x=0, y=0, z=6),
         }
+        if self.probe == 'front':
+            self.gripper_probe = GripperProbe.FRONT
+        else:
+            self.gripper_probe = GripperProbe.REAR
 
     async def test_setup(self):
         self.file_setup()
@@ -131,7 +135,7 @@ class Gripper_Calibration_Test:
         if self.probe == 'front':
             gauge_position = self.slot_center + self.gauge_offsets_front[axis]
         else:
-            gauge_position = self.slot_center + self.gauge_offsets_back[axis]
+            gauge_position = self.slot_center + self.gauge_offsets_rear[axis]
         if axis == "X":
             if self.probe == 'front':
                 jog_position = gauge_position._replace(x=gauge_position.x + self.CUTOUT_HALF)
@@ -178,7 +182,7 @@ class Gripper_Calibration_Test:
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Add gripper probe
-        api.add_gripper_probe(GripperProbe.FRONT)
+        api.add_gripper_probe(self.gripper_probe)
         # Move up
         current_pos = await api.gantry_position(mount)
         z_offset = current_pos + self.gauge_offsets_front["Z"]
@@ -216,7 +220,7 @@ class Gripper_Calibration_Test:
     ) -> None:
         # Calibrate gripper
         await api.home_gripper_jaw()
-        self.offset, self.slot_center = await calibrate_gripper_jaw(api, GripperProbe.FRONT, slot)
+        self.offset, self.slot_center = await calibrate_gripper_jaw(api, self.gripper_probe, slot)
 
         print(f"New Slot Center: {self.slot_center}")
         print(f"New Gripper Offset: {self.offset}")
