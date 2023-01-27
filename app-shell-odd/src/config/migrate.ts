@@ -7,7 +7,11 @@ import {
   OT3_MANIFEST_URL,
 } from '@opentrons/app/src/redux/config'
 
-import type { Config, ConfigV12 } from '@opentrons/app/src/redux/config/types'
+import type {
+  Config,
+  ConfigV12,
+  ConfigV13,
+} from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
 // any default values for later config versions are specified in the migration
@@ -60,18 +64,32 @@ export const DEFAULTS_V12: ConfigV12 = {
   },
 }
 
+// config version 13 migration and defaults
+const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 13 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      protocolsOnDeviceSortKey: null,
+    },
+  }
+  return nextConfig
+}
+
 // when we add our first migration, change to [(prevConfig: ConfigV12) => Config13]
-const MIGRATIONS: Array<(prevConfig: ConfigV12) => Config> = []
+const MIGRATIONS: [(prevConfig: ConfigV12) => ConfigV13] = [toVersion13]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
 
-export function migrate(prevConfig: ConfigV12): Config {
+export function migrate(prevConfig: ConfigV12 | ConfigV13): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig
 
   // loop through the migrations, skipping any migrations that are unnecessary
   for (let i: number = prevVersion; i < MIGRATIONS.length; i++) {
     const migrateVersion = MIGRATIONS[i]
+    // @ts-expect-error (kj: 01/27/2023): migrateVersion function input typed to never
     result = migrateVersion(result)
   }
 
@@ -81,5 +99,5 @@ export function migrate(prevConfig: ConfigV12): Config {
     )
   }
 
-  return result
+  return result as Config
 }

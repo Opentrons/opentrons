@@ -12,25 +12,6 @@ import type { Config } from './schema-types'
 export * from './schema-types'
 
 export type ConfigState = Config | null
-export type ProtocolsStoredSortKey =
-  | 'alphabetical'
-  | 'reverse'
-  | 'recent'
-  | 'oldest'
-  | 'recentRun'
-  | 'oldRun'
-  | 'recentCreated'
-  | 'oldCreated'
-
-  export type protocolsOnDeviceSortKey =
-    | 'alphabetical'
-    | 'reverse'
-    | 'recent'
-    | 'oldest'
-    | 'recentRun'
-    | 'oldRun'
-    | 'recentCreated'
-    | 'oldCreated'
 
 export interface ConfigInitializedAction {
   type: typeof INITIALIZED
