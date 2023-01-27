@@ -72,7 +72,7 @@ export function ProtocolDashboard(): JSX.Element {
   const handleProtocolsBySortKey = (
     sortKey: ProtocolsOnDeviceSortKey
   ): void => {
-    dispatch(updateConfigValue('protocols.protocolsStoredSortKey', sortKey))
+    dispatch(updateConfigValue('protocols.protocolsOnDeviceSortKey', sortKey))
   }
 
   const handleSortByName = (): void => {
