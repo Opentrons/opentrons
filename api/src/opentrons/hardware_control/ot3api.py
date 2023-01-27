@@ -498,6 +498,12 @@ class OT3API(
                 await self.cache_pipette(
                     mount, cast(OT3AttachedPipette, instrument_data), req_instr_name
                 )
+        if self._gripper_handler.gripper and OT3Mount.GRIPPER not in found.keys():
+            await self._gripper_handler.reset()
+        if self._pipette_handler.hardware_instruments[OT3Mount.LEFT] and OT3Mount.LEFT not in found.keys():
+            self._pipette_handler.hardware_instruments[OT3Mount.LEFT] = None
+        if self._pipette_handler.hardware_instruments[OT3Mount.RIGHT] and OT3Mount.RIGHT not in found.keys():
+            self._pipette_handler.hardware_instruments[OT3Mount.RIGHT] = None
 
         await self._backend.probe_network()
         await self._backend.update_motor_status()
