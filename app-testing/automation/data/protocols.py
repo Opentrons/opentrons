@@ -141,3 +141,22 @@ class Protocols:
         app_error=False,
         robot_error=False,
     )
+
+    OT2_P300M_P20S_TC_MM_TM_6_13_Smoke620Release: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_MM_TM_6_13_Smoke620Release",
+        file_extension="py",
+        protocol_name="🛠 Logo-Modules-CustomLabware 🛠",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["cpx_4_tuberack_100ul"],
+    )
+
+    OT2_P300SLeft_MM_TM_TM_5_2_6_MOAMTemps: Protocol = Protocol(
+        file_name="OT2_P300SLeft_MM_TM_TM_5_2_6_MOAMTemps",
+        file_extension="json",
+        protocol_name="MoaM",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )

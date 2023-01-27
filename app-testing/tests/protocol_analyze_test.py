@@ -6,6 +6,7 @@ from automation.data.protocol import Protocol
 from automation.data.protocols import Protocols
 from automation.driver.drag_drop import drag_and_drop_file
 from automation.menus.left_menu import LeftMenu
+from automation.pages.labware_landing import LabwareLanding
 from automation.pages.protocol_landing import ProtocolLanding
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -32,13 +33,35 @@ def test_analyses(
     protocol: Protocol,
 ) -> None:
     """Analyze a protocol in the app and validate its details."""
+    labware_landing: LabwareLanding = LabwareLanding(driver, console, request.node.nodeid)
     left_menu: LeftMenu = LeftMenu(driver, console, request.node.nodeid)
-    left_menu.base.click(left_menu.protocols)
-
     protocol_landing: ProtocolLanding = ProtocolLanding(driver, console, request.node.nodeid)
+
+    # Upload labware if any
+    if protocol.custom_labware:
+        for labware in protocol.labware_paths:
+            left_menu.navigate("labware")
+            labware_landing.click_import_button()
+            assert labware_landing.get_import_custom_labware_definition_header().is_displayed()
+            assert labware_landing.get_choose_file_button().is_displayed()
+            console.print(
+                f"uploading labware: {labware.resolve()}",
+                style="white on blue",
+            )
+            drag_and_drop_file(labware_landing.get_drag_drop_file_button(), labware)
+            if labware_landing.get_success_toast_message(
+                filename=labware.name
+            ) or labware_landing.get_duplicate_error_toast_message(filename=labware.name):
+                console.print(
+                    f"{labware.name} uploaded to app.",
+                    style="white on blue",
+                )
+            else:
+                raise AssertionError("No toast message that the labware was uploaded.")
+
+    left_menu.base.click(left_menu.protocols)
     # Clean up any protocols that did not get deleted
     protocol_landing.delete_all_protocols()
-
     console.print(f"uploading protocol: {protocol.file_path.resolve()}", style="white on blue")
     drag_and_drop_file(
         protocol_landing.get_drag_drop_file_button(),
