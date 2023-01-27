@@ -91,3 +91,15 @@ make remove file_path=$MONOREPOPATH/app-testing/ci-tools/ot2_with_all_modules.ya
 
 - Only have 1 robot connected at once.
   - Build locators like you have more than 1 to future proof.
+
+## Analysis Test
+
+The analysis test `pipenv run pytest -k test_analyses` is driven by the comma delimited string variable `APP_ANALYSIS_TEST_PROTOCOLS` in `.env`
+This allows us to run one or many.
+
+### Adding protocols
+
+1. add the protocol file named according to the naming convention in the files/protocols appropriate folder
+1. add the protocol stem to `protocol_files.py`
+1. add the protocol data as a property to `protocols.py`
+1. run `make print-protocols`

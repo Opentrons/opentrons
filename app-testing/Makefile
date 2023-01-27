@@ -44,3 +44,7 @@ teardown:
 .PHONY: format-readme
 format-readme:
 	yarn prettier --write README.md
+
+.PHONY: print-protocols
+print-protocols:
+	pipenv run python print_protocols.py

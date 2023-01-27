@@ -17,8 +17,8 @@ class Protocols:
         robot_error=False,
     )
 
-    OT2_Python_Syntax_Error: Protocol = Protocol(
-        file_name="OT2_Python_Syntax_Error",
+    OT2_None_None_2_13_PythonSyntaxError: Protocol = Protocol(
+        file_name="OT2_None_None_2_13_PythonSyntaxError",
         file_extension="py",
         protocol_name="bad import",
         robot="OT-2",
@@ -28,17 +28,17 @@ class Protocols:
         robot_analysis_error="?",
     )
 
-    OT2_P10S_P300M_All_Modules_Swift: Protocol = Protocol(
-        file_name="OT2_P10S_P300M_All_Modules_Swift",
+    OT2_P10S_P300M_TC1_TM_MM_2_11_Swift: Protocol = Protocol(
+        file_name="OT2_P10S_P300M_TC1_TM_MM_2_11_Swift",
         file_extension="py",
-        protocol_name="OT2_P10S_P300M_All_Modules_Swift.py",
+        protocol_name="OT2_P10S_P300M_TC1_TM_MM_2_11_Swift.py",
         robot="OT-2",
         app_error=False,
         robot_error=False,
     )
 
-    OT2_P300M_Mag_Temp_Zymo: Protocol = Protocol(
-        file_name="OT2_P300M_Mag_Temp_Zymo",
+    OT2_P300MLeft_MM_TM_2_4_Zymo: Protocol = Protocol(
+        file_name="OT2_P300MLeft_MM_TM_2_4_Zymo",
         file_extension="py",
         protocol_name="Zymo Direct-zol96 Magbead RNA",
         robot="OT-2",
@@ -68,8 +68,8 @@ class Protocols:
         robot_analysis_error="?",
     )
 
-    OT2_S20_M300_NoMods_6_1_TransferReTransferLiquid: Protocol = Protocol(
-        file_name="OT2_S20_M300_NoMods_6_1_TransferReTransferLiquid",
+    OT2_P20S_P300M_NoMods_6_1_TransferReTransferLiquid: Protocol = Protocol(
+        file_name="OT2_P20S_P300M_NoMods_6_1_TransferReTransferLiquid",
         file_extension="json",
         protocol_name="Transfer- Multi liquid (retransfer)",
         robot="OT-2",
@@ -88,8 +88,8 @@ class Protocols:
         robot_analysis_error="?",
     )
 
-    OT2_P20S_P300M_NoMod_6_1_MixTransferManyLiquids: Protocol = Protocol(
-        file_name="OT2_P20S_P300M_NoMod_6_1_MixTransferManyLiquids",
+    OT2_P300M_P20S_NoMod_6_1_MixTransferManyLiquids: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_NoMod_6_1_MixTransferManyLiquids",
         file_extension="json",
         protocol_name="Mix/transfer- several liquids",
         robot="OT-2",
@@ -97,8 +97,8 @@ class Protocols:
         robot_error=False,
     )
 
-    OT2_P20S_P300M_HS_6_1_HS_NormalUseWithTransfer: Protocol = Protocol(
-        file_name="OT2_P20S_P300M_HS_6_1_HS_NormalUseWithTransfer",
+    OT2_P300M_P300S_HS_6_1_HS_NormalUseWithTransfer: Protocol = Protocol(
+        file_name="OT2_P300M_P300S_HS_6_1_HS_NormalUseWithTransfer",
         file_extension="json",
         protocol_name="H/S normal use",
         robot="OT-2",
@@ -124,19 +124,19 @@ class Protocols:
             """,
     )
 
-    OT2_API_level_2_3: Protocol = Protocol(
-        file_name="OT2_API_level_2_3",
+    OT2_P300SLeft_MM1_MM_TM_2_3_Mix: Protocol = Protocol(
+        file_name="OT2_P300SLeft_MM1_MM_TM_2_3_Mix",
         file_extension="py",
-        protocol_name="OT2_API_level_2_3.py",
+        protocol_name="OT2_P300SLeft_MM1_MM_TM_2_3_Mix.py",
         robot="OT-2",
         app_error=False,
         robot_error=False,
     )
 
-    OT2_API_level_2_2: Protocol = Protocol(
-        file_name="OT2_API_level_2_2",
+    OT2_P300SLeft_MM1_MM_2_2_EngageMagHeightFromBase: Protocol = Protocol(
+        file_name="OT2_P300SLeft_MM1_MM_2_2_EngageMagHeightFromBase",
         file_extension="py",
-        protocol_name="OT2_API_level_2_2.py",
+        protocol_name="OT2_P300SLeft_MM1_MM_2_2_EngageMagHeightFromBase.py",
         robot="OT-2",
         app_error=False,
         robot_error=False,
