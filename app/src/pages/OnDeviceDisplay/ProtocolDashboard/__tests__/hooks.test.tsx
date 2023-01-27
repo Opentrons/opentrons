@@ -3,12 +3,14 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 
-import { useSortProtocols } from '../utils'
+import { sortProtocols } from '../utils'
 
 import type { Store } from 'redux'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
 import type { State } from '../../../../redux/types'
+
+// ToDo remove state part since there is no need to use that
 
 const mockProtocols = [
   {
@@ -97,7 +99,7 @@ const mockRuns = [
   },
 ] as RunData[]
 
-describe('useSortProtocols', () => {
+describe('sortProtocols', () => {
   const store: Store<State> = createStore(jest.fn(), {})
   beforeEach(() => {
     store.dispatch = jest.fn()
@@ -110,7 +112,7 @@ describe('useSortProtocols', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
-      () => useSortProtocols('alphabetical', mockProtocols, mockRuns),
+      () => sortProtocols('alphabetical', mockProtocols, mockRuns),
       { wrapper }
     )
     const firstProtocol = result.current[0]
@@ -127,7 +129,7 @@ describe('useSortProtocols', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
-      () => useSortProtocols('reverse', mockProtocols, mockRuns),
+      () => sortProtocols('reverse', mockProtocols, mockRuns),
       { wrapper }
     )
     const firstProtocol = result.current[0]
@@ -144,7 +146,7 @@ describe('useSortProtocols', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
-      () => useSortProtocols('recentRun', mockProtocols, mockRuns),
+      () => sortProtocols('recentRun', mockProtocols, mockRuns),
       { wrapper }
     )
     const firstProtocol = result.current[0]
@@ -161,7 +163,7 @@ describe('useSortProtocols', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
-      () => useSortProtocols('oldRun', mockProtocols, mockRuns),
+      () => sortProtocols('oldRun', mockProtocols, mockRuns),
       { wrapper }
     )
     const firstProtocol = result.current[0]
@@ -178,7 +180,7 @@ describe('useSortProtocols', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
-      () => useSortProtocols('recentCreated', mockProtocols, mockRuns),
+      () => sortProtocols('recentCreated', mockProtocols, mockRuns),
       { wrapper }
     )
     const firstProtocol = result.current[0]
@@ -195,7 +197,7 @@ describe('useSortProtocols', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
-      () => useSortProtocols('oldCreated', mockProtocols, mockRuns),
+      () => sortProtocols('oldCreated', mockProtocols, mockRuns),
       { wrapper }
     )
     const firstProtocol = result.current[0]
