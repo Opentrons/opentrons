@@ -24,9 +24,11 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
+    MotorStatus,
+)
+from opentrons.hardware_control.errors import (
     InvalidPipetteName,
     InvalidPipetteModel,
-    MotorStatus,
     MustHomeError,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field

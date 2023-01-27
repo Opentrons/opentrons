@@ -82,8 +82,6 @@ from opentrons_hardware.firmware_update.firmware_manifest import (
     UpdateInfo,
     load_firmware_manifest,
 )
-from opentrons_hardware.firmware_update.errors import FirmwareUpdateRequired
-
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
@@ -93,11 +91,14 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
+    MotorStatus,
+    InstrumentProbeType,
+)
+from opentrons.hardware_control.errors import (
+    MustHomeError,
     InvalidPipetteName,
     InvalidPipetteModel,
-    InstrumentProbeType,
-    MotorStatus,
-    MustHomeError,
+    FirmwareUpdateRequired,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -125,6 +126,19 @@ log = logging.getLogger(__name__)
 
 MapPayload = TypeVar("MapPayload")
 Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
+
+
+def requires_update(func: Wrapped) -> Wrapped:
+    """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
+
+    @wraps(func)
+    async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
+        if self.update_required:
+            raise FirmwareUpdateRequired()
+        return await func(self, *args, **kwargs)
+
+    return cast(Wrapped, wrapper)
+
 
 class OT3Controller:
     """OT3 Hardware Controller Backend."""
