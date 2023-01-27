@@ -26,10 +26,7 @@ export const UnmountGripper = (
         proceed()
       })
     } else {
-      chainRunCommands([{ commandType: 'home' as const, params: {} }], true).then(() => {
-        setShowGripperStillDetected(true)
-      })
-
+      setShowGripperStillDetected(true)
     }
   }
 
