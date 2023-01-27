@@ -14,6 +14,8 @@ import {
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
+import { CreateCommand, LEFT, RunTimeCommand } from '@opentrons/shared-data'
+import { flow } from 'lodash'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -62,12 +64,26 @@ export const BeforeBeginning = (
     createRun({})
   }, [])
 
+  let commandsOnProceed: CreateCommand[] = [
+    {
+      // @ts-expect-error calibration type not yet supported
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+      },
+    },
+  ]
+  if (flowType === GRIPPER_FLOW_TYPES.ATTACH || flowType === GRIPPER_FLOW_TYPES.RECALIBRATE) {
+    commandsOnProceed = [{ commandType: 'home' as const, params: {} }, ...commandsOnProceed]
+  }
+
+
+
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
-    chainRunCommands([{commandType: 'home' as const, params: {}}], true).then(() => {
+    chainRunCommands(commandsOnProceed, true).then(() => {
       proceed()
     })
-    proceed()
   }
 
   const equipmentInfoByLoadName: {

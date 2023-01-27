@@ -33,5 +33,7 @@
   "remove_probe": "Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.",
   "stand_back_gripper_is_calibrating": "Stand Back, Gripper is Calibrating",
   "t10_torx_screwdriver": "T10 Torx Screwdriver",
-  "progress_will_be_lost": "{{flow}} progress will be lost"
+  "progress_will_be_lost": "{{flow}} progress will be lost",
+  "gripper_still_attached": "Gripper Still Attached",
+  "please_retry_gripper_detach": "Please retry the detachment process to successfully detach the Gripper."
 }
