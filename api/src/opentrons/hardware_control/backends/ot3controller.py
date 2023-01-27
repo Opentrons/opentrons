@@ -188,11 +188,14 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+        self._attached_tools: ohc_tool_types.ToolSummary = None
 
         # firmware update variables
         self._update_required = False
         self._firmware_update_list: Dict[DeviceInfoCache, UpdateInfo] = {}
         self._known_firmware = load_firmware_manifest()
+        # starts subsystem updates
+        self.do_firmware_updates()
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -203,20 +206,28 @@ class OT3Controller:
     def update_required(self) -> bool:
         return self._update_required
 
-    def requires_update(self, func: Wrapped) -> Wrapped:
-        """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
-        @wraps(func)
-        async def wrapper(*args: Any, **kwargs: Any) -> Any:
-            if self.update_required:
-                raise FirmwareUpdateRequired()
-            return await func(*args, **kwargs)
-        return cast(Wrapped, wrapper)
-
     def get_update_type(self, node_id: NodeId) -> FirmwareUpdateType:
-        if "pipette" in node_id.name:
-            # TODO check model number here
-            pass
-        return FirmwareUpdateType.from_string(node_id.name)
+        """This will return the FirmwareUpdateType of a given NodeId.
+
+        The FirmwareUpdateType enum shares the same names as they keys in the firmware manifest file like so,
+        head, gantry-x, gantry-y, gripper.
+
+        However the serialized pipette firmware has different types (single, multi, etc) so we need to be able to
+        get the corresponding FirmwareUpdateType for the given pipette NodeId (NodeId.pipette_left, NodeId.pipette_right).
+        """
+        if self._attached_tools is None:
+            return None
+        elif "pipette" in node_id.name:
+            if node_id == NodeId.pipette_left:
+                pipette_name = self._attached_tools.left.name
+            elif node_id == NodeId.pipette_right:
+                pipette_name = self._attached_tools.right.name
+            name_type = str(pipette_name.name).split("_")
+            update_type = [type for type in FirmwareUpdateType.__members__ if name_type in type]
+            if update_type:
+                return update_type[0]
+        else:
+            return FirmwareUpdateType.from_string(node_id.name)
 
     def check_firmware_updates(
         self, update: bool = False
@@ -225,19 +236,21 @@ class OT3Controller:
         firmware_update_list = dict()
         for node, version_cache in self._network_info.device_info.items():
             update_type = self.get_update_type(node)
+            if update_type == FirmwareUpdateType.unknown:
+                log.error(f"Unknown firmware update type {update_type}")
+                continue
             update_info = self._known_firmware.get(update_type)
             if not update_info:
                 log.warning(f"No firmware update found for {node}")
                 continue
-            # TODO: BEWARE! the shortsha we get from devices is short one character.
             if version_cache.shortsha != update_info.shortsha:
                 log.debug(
                     f"Subsystem {node} requires an update '{version_cache.shortsha} != {update_info.shortsha}'"
                 )
-                self._update_required = (
-                    True  # TODO need to unset this after updates are done.
-                )
                 firmware_update_list[version_cache] = update_info
+        if firmware_update_list:
+            log.info("Updates Are Required, Settting Flag.")
+            self._update_required = True
         return firmware_update_list
 
     async def do_firmware_updates(self) -> None:
@@ -250,7 +263,6 @@ class OT3Controller:
             )
             await self.update_firmware(update_info.filepath, subsystem)
 
-    @requires_update
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware for a single subsystem."""
         with open(filename, "r") as f:
@@ -670,9 +682,9 @@ class OT3Controller:
             A map of mount to instrument name.
         """
         await self._probe_core()
-        attached = await self._tool_detector.detect()
+        self._attached_tools = await self._tool_detector.detect()
 
-        current_tools = dict(OT3Controller._generate_attached_instrs(attached))
+        current_tools = dict(OT3Controller._generate_attached_instrs(self._attached_tools))
         self._present_nodes -= set(
             axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )

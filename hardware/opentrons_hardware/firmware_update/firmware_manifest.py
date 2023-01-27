@@ -25,6 +25,7 @@ class FirmwareUpdateType(Enum):
     pipettes_multi = 5
     pipettes_96 = 6
     pipettes_384 = 7
+    unknown = -1
 
     def __str__(self) -> str:
         return self.name
@@ -35,8 +36,6 @@ class FirmwareUpdateType(Enum):
         sanitized_name = name.replace("-", "_")
         return cls.__members__.get(sanitized_name)
 
-    def from_model(cls, model: str) -> "FirmwareUpdateType":
-        return cls.__members__.get('head')  # TODO: static for now
 
 @dataclass
 class UpdateInfo:
@@ -76,13 +75,14 @@ def load_firmware_manifest(
 
     subsystems = manifest.get("subsystems")
     for subsystem_name, version_info in subsystems.items():
+        log.info(f"subsystem_name: {subsystem_name}")
         update_type = FirmwareUpdateType.from_string(subsystem_name)
         if not update_type:
-            log.warning(f"Invalid update type {subsystem_name}")
+            log.debug(f"Invalid update type {subsystem_name}")
             continue
         update_info = _generate_firmware_info(update_type, version_info)
         if not update_info:
-            log.warning(f"Invalid update info {subsystem_name} {version_info}")
+            log.debug(f"Invalid update info {subsystem_name} {version_info}")
             continue
         opentrons_manifest[update_type] = update_info
     return opentrons_manifest
