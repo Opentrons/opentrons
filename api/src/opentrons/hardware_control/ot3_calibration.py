@@ -12,11 +12,9 @@ from logging import getLogger
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
-from opentrons.hardware_control.backends.ot3utils import get_system_constraints
 import json
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_hardware.hardware_control.motion_planning import SystemConstraints
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -554,9 +552,7 @@ async def _calibrate_mount(
     """
     nominal_center = _get_calibration_square_position_in_slot(slot)
     await hcapi.reset_instrument_offset(mount)
-    current_constraints = hcapi._move_manager._constraints
     try:
-        _limit_system_constraints(hcapi)
         # First, find the estimated deck height. This will be used to baseline the edge detection points.
         z_height = await find_deck_height(hcapi, mount, nominal_center)
         LOG.info(f"Found deck at {z_height}mm")
@@ -586,9 +582,6 @@ async def _calibrate_mount(
         await hcapi.reset_instrument_offset(mount, to_default=False)
         # re-raise exception after resetting instrument offset
         raise
-    finally:
-        # revert motion constraints back to original values
-        hcapi._move_manager.update_constraints(current_constraints)
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
