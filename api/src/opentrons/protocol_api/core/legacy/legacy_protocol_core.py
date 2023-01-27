@@ -11,10 +11,11 @@ from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
+from opentrons.protocols.api_support.util import AxisMaxSpeeds, APIVersionError
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
+from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -211,9 +212,7 @@ class LegacyProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move labware to new location."""
-        raise UnsupportedAPIError(
-            "Labware movement is not supported in this API version"
-        )
+        raise APIVersionError("Labware movement is not supported in this API version")
 
     def load_module(
         self,
@@ -416,6 +415,12 @@ class LegacyProtocolCore(
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
         raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
+
+    def define_liquid(
+        self, name: str, description: Optional[str], display_color: Optional[str]
+    ) -> Liquid:
+        """Define a liquid to load into a well."""
+        raise APIVersionError("Defining a liquid is not supported in this API version.")
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore

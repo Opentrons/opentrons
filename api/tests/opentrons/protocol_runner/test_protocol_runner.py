@@ -315,7 +315,7 @@ def test_load_json_liquids_ff_on(
     ]
 
     liquids: List[Liquid] = [
-        Liquid(id="water-id", displayName="water", description=" water desc")
+        Liquid(id="water-id", displayName="water", description="water desc")
     ]
 
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
@@ -326,7 +326,7 @@ def test_load_json_liquids_ff_on(
 
     decoy.verify(
         protocol_engine.add_liquid(
-            liquid=Liquid(id="water-id", displayName="water", description=" water desc")
+            id="water-id", name="water", description="water desc", color=None
         ),
         protocol_engine.add_command(
             request=pe_commands.LoadLiquidCreate(

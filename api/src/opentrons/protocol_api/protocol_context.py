@@ -20,6 +20,7 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.common import ModuleCore, ProtocolCore
+from ._liquid import Liquid
 from .core.core_map import LoadedCoreMap
 from .core.module import (
     AbstractTemperatureModuleCore,
@@ -750,6 +751,25 @@ class ProtocolContext(CommandPublisher):
         :param bool on: If true, turn on rail lights; otherwise, turn off.
         """
         self._core.set_rail_lights(on=on)
+
+    # TODO (tz, 12-19-22): Limit to api version 2.14.
+    # https://opentrons.atlassian.net/browse/RCORE-537
+    @requires_version(2, 13)
+    def define_liquid(
+        self, name: str, description: Optional[str], display_color: Optional[str]
+    ) -> Liquid:
+        """
+        Define a liquid within a protocol.
+
+        :param str name: A human-readable name for the liquid.
+        :param str description: An optional description of the liquid.
+        :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+        """
+        return self._core.define_liquid(
+            name=name,
+            description=description,
+            display_color=display_color,
+        )
 
     @property  # type: ignore
     @requires_version(2, 5)
