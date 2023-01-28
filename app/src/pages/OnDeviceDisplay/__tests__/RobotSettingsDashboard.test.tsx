@@ -6,13 +6,17 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+
 import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
 
 jest.mock('../../../redux/discovery')
+jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
+const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 
 const render = () => {
   return renderWithProviders(
@@ -29,12 +33,18 @@ const render = () => {
 describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
+    mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
   })
 
-  it('should render text', () => {
+  it('should render Navigation', () => {
+    const [{ getByText }] = render()
+    getByText('Mock Navigation')
+  })
+
+  it('should render setting buttons', () => {
     const [{ getByText }] = render()
     getByText('Robot Name')
-    getByText(mockConnectedRobot.name)
+    getByText('opentrons-robot-name')
     getByText('Robot System Version')
     getByText('Network Settings')
     getByText('Display Sleep Settings')
