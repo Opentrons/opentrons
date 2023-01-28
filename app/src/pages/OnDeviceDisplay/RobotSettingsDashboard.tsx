@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+import { Link } from 'react-router-dom'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -14,10 +16,14 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
+import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
+import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -40,7 +46,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       columnGap={SPACING.spacing3}
     >
-      {'header will be here'}
+      <Navigation routes={onDeviceDisplayRoutes} />
       {/* Robot Name */}
       <RobotSettingButton
         settingName={t('robot_name')}
@@ -70,6 +76,16 @@ export function RobotSettingsDashboard(): JSX.Element {
 
       {/* Device Reset */}
       <RobotSettingButton settingName={t('device_reset')} />
+
+      <Flex
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
+      >
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
+      </Flex>
     </Flex>
   )
 }
