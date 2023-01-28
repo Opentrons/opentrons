@@ -10,7 +10,12 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+
+import { PrimaryButton } from '../../atoms/buttons'
+import { StatusLabel } from '../../atoms/StatusLabel'
+import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { TaskList } from '../TaskList'
 
@@ -19,8 +24,6 @@ import { useCalibrationTaskList } from '../Devices/hooks'
 import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import type { DashboardCalDeckInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
-import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 interface CalibrationTaskListProps {
   robotName: string
@@ -42,7 +45,7 @@ export function CalibrationTaskList({
   ] = React.useState<boolean>(false)
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
   const history = useHistory()
-  const { activeIndex, taskList } = useCalibrationTaskList(
+  const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(
     robotName,
     pipOffsetCalLauncher,
     tipLengthCalLauncher,
@@ -55,6 +58,24 @@ export function CalibrationTaskList({
     }
     prevActiveIndex.current = activeIndex
   }, [activeIndex])
+
+  // start off assuming we are missing calibrations
+  let statusLabelBackgroundColor = COLORS.errorEnabled
+  let statusLabelIconColor = COLORS.errorEnabled
+  let statusLabelText = t('missing_calibration_data')
+
+  // if the tasklist is empty, though, all calibrations are good
+  if (taskListStatus === 'complete') {
+    statusLabelBackgroundColor = COLORS.successEnabled
+    statusLabelIconColor = COLORS.successEnabled
+    statusLabelText = t('calibration_complete')
+    // if we have tasks and they are all marked bad, then we should
+    // strongly suggest they re-do those calibrations
+  } else if (taskListStatus === 'bad') {
+    statusLabelBackgroundColor = COLORS.warningEnabled
+    statusLabelIconColor = COLORS.warningEnabled
+    statusLabelText = t('calibration_recommended')
+  }
 
   return (
     <Modal
@@ -92,7 +113,33 @@ export function CalibrationTaskList({
           </Flex>
         </Flex>
       ) : (
-        <TaskList activeIndex={activeIndex} taskList={taskList} />
+        <>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            gridGap={SPACING.spacing3}
+            padding={SPACING.spacing4}
+            paddingBottom={SPACING.spacing6}
+          >
+            <StyledText css={TYPOGRAPHY.h2SemiBold}>
+              {t('calibration_status')}
+            </StyledText>
+            <StatusLabel
+              status={statusLabelText}
+              backgroundColor={`${String(statusLabelBackgroundColor)}${String(
+                COLORS.opacity12HexCode
+              )}`}
+              iconColor={statusLabelIconColor}
+              textColor={COLORS.darkBlackEnabled}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              iconSize="0.313rem"
+            />
+          </Flex>
+          <TaskList
+            activeIndex={activeIndex}
+            taskList={taskList}
+            taskListStatus={taskListStatus}
+          />
+        </>
       )}
     </Modal>
   )

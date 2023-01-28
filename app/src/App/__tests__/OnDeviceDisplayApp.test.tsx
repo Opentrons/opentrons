@@ -7,7 +7,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../i18n'
 import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
-import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
@@ -17,7 +16,6 @@ import { SetWifiCred } from '../../pages/OnDeviceDisplay/SetWifiCred'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
 jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
-jest.mock('../../pages/OnDeviceDisplay/InitialSplash')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
@@ -26,9 +24,6 @@ jest.mock('../../pages/OnDeviceDisplay/SelectWifiNetwork')
 jest.mock('../../pages/OnDeviceDisplay/SetWifiCred')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 
-const mockInitialSplash = InitialSplash as jest.MockedFunction<
-  typeof InitialSplash
->
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
   typeof NetworkSetupMenu
 >
@@ -63,7 +58,6 @@ const render = (path = '/') => {
 
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
-    mockInitialSplash.mockReturnValue(<div>Mock InitialSplash</div>)
     mockNetworkSetupMenu.mockReturnValue(<div>Mock NetworkSetupMenu</div>)
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
     mockSelectWifiNetwork.mockReturnValue(<div>Mock SelectWifiNetwork</div>)
@@ -79,11 +73,6 @@ describe('OnDeviceDisplayApp', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
-  })
-
-  it('renders a InitialSplash component component from /', () => {
-    const [{ getByText }] = render('/')
-    getByText('Mock InitialSplash')
   })
 
   it('renders a NetworkSetupMenu component from /network-setup', () => {
