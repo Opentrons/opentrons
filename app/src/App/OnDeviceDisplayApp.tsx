@@ -17,6 +17,7 @@ import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
+import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
@@ -135,14 +136,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   },
   // insert attach instruments subroutes
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>robot settings dashboard</Box>
-      </>
-    ),
+    Component: RobotSettingsDashboard,
     exact: true,
-    // 'Robot Settings Dashboard',
     name: 'Settings',
     navLinkTo: '/robot-settings',
     path: '/robot-settings',
