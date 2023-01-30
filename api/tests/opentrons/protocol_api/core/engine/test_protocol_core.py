@@ -37,6 +37,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.protocol_engine.state.labware import (
     LabwareLoadParams as EngineLabwareLoadParams,
@@ -50,6 +51,7 @@ from opentrons.protocol_api.core.engine import (
     ModuleCore,
     load_labware_params,
 )
+from opentrons.protocol_api._liquid import Liquid
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
@@ -690,3 +692,36 @@ def test_get_highest_z(
     result = subject.get_highest_z()
 
     assert result == 9001
+
+
+def test_add_liquid(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should return the created liquid."""
+    liquid = PE_Liquid.construct(
+        id="water-id",
+        displayName="water",
+        description="water desc",
+        displayColor=HexColor(__root__="#fff"),
+    )
+
+    expected_result = Liquid(
+        _id="water-id",
+        name="water",
+        description="water desc",
+        display_color="#fff",
+    )
+
+    decoy.when(
+        mock_engine_client.add_liquid(
+            name="water", color="#fff", description="water desc"
+        )
+    ).then_return(liquid)
+
+    result = subject.define_liquid(
+        name="water", description="water desc", display_color="#fff"
+    )
+
+    assert result == expected_result

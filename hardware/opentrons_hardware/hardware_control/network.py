@@ -19,15 +19,12 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class DeviceInfoCache:
-    """Holds Device Info data."""
-
     node_id: NodeId
     version: int
     shortsha: str
     flags: Any
 
     def __repr__(self) -> str:
-        """Readable representation of the device info."""
         return f"<{self.__class__.__name__}: node={self.node_id}, version={self.version}, sha={self.shortsha}>"
 
 
