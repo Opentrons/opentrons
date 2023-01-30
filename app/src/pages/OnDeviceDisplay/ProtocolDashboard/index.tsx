@@ -14,7 +14,6 @@ import {
   truncateString,
   Btn,
   Icon,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
