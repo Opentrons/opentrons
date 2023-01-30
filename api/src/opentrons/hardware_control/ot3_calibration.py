@@ -301,7 +301,6 @@ async def find_edge(
             )
 
     if not abs_position:
-        await hcapi.home_z()
         raise RuntimeError(
             f"Unable to find edge for {search_direction} {search_axis} direction."
         )
