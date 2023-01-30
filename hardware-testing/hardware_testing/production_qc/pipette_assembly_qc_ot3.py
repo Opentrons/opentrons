@@ -468,6 +468,31 @@ async def _test_diagnostics_environment(
     celsius_pass = True
     humidity_pass = True
 
+    # ROOM
+    if not api.is_simulator:
+
+        def _get_float_from_user(msg: str) -> float:
+            try:
+                return float(input(msg))
+            except ValueError:
+                return _get_room_celsius()
+
+        def _get_room_celsius() -> float:
+            return _get_float_from_user(
+                'Enter the ROOM temperature (Celsius) (example: "23.2"): '
+            )
+
+        def _get_room_humidity() -> float:
+            return _get_float_from_user(
+                'Enter the ROOM humidity (%) (example: "54.0"): '
+            )
+
+        room_celsius = _get_room_celsius()
+        room_humidity = _get_room_humidity()
+    else:
+        room_celsius = 25.0
+        room_humidity = 50.0
+
     # CELSIUS
     celsius = await _read_pipette_sensor_repeatedly_and_average(
         api, mount, SensorType.temperature, 10
@@ -476,7 +501,7 @@ async def _test_diagnostics_environment(
     if celsius < TEMP_THRESH[0] or celsius > TEMP_THRESH[1]:
         print(f"FAIL: celsius {celsius} is out of range")
         celsius_pass = False
-    write_cb(["celsius", celsius, _bool_to_pass_fail(celsius_pass)])
+    write_cb(["celsius", room_celsius, celsius, _bool_to_pass_fail(celsius_pass)])
 
     # HUMIDITY
     humidity = await _read_pipette_sensor_repeatedly_and_average(
@@ -486,7 +511,7 @@ async def _test_diagnostics_environment(
     if humidity < HUMIDITY_THRESH[0] or humidity > HUMIDITY_THRESH[1]:
         print(f"FAIL: humidity {humidity} is out of range")
         humidity_pass = False
-    write_cb(["humidity", humidity, _bool_to_pass_fail(humidity_pass)])
+    write_cb(["humidity", room_humidity, humidity, _bool_to_pass_fail(humidity_pass)])
 
     return celsius_pass and humidity_pass
 
@@ -769,6 +794,8 @@ async def _reduce_speeds_and_accelerations(
 
 @dataclass
 class CSVCallbacks:
+    """CSV Callbacks."""
+
     write: Callable
     pressure: Callable
     results: Callable
@@ -776,6 +803,8 @@ class CSVCallbacks:
 
 @dataclass
 class CSVProperties:
+    """CSV Properties."""
+
     id: str
     name: str
     path: str
