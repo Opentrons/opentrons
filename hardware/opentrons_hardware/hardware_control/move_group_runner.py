@@ -36,7 +36,11 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     TipActionRequestPayload,
     EmptyPayload,
 )
-from .constants import interrupts_per_sec, brushed_motor_interrupts_per_sec
+from .constants import (
+    interrupts_per_sec,
+    tip_interrupts_per_sec,
+    brushed_motor_interrupts_per_sec,
+)
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -283,8 +287,10 @@ class MoveGroupRunner:
         tip_action_payload = TipActionRequestPayload(
             group_id=UInt8Field(group),
             seq_id=UInt8Field(seq),
-            duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-            velocity=self._convert_velocity(step.velocity_mm_sec, interrupts_per_sec),
+            duration=UInt32Field(int(step.duration_sec * tip_interrupts_per_sec)),
+            velocity=self._convert_velocity(
+                step.velocity_mm_sec, tip_interrupts_per_sec
+            ),
             action=PipetteTipActionTypeField(step.action),
             request_stop_condition=MoveStopConditionField(step.stop_condition),
         )
@@ -384,7 +390,7 @@ class MoveScheduler:
             self._event.set()
             raise RuntimeError("Firmware Error Received", message)
 
-    def _handle_move_completed(self, message: MoveCompleted) -> None:
+    def _handle_move_completed(self, message: _AcceptableMoves) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
         try:
@@ -400,26 +406,6 @@ class MoveScheduler:
             # pick up groups they don't care about, and need to not fail.
             pass
 
-    def _handle_tip_action(self, message: TipActionResponse) -> None:
-        group_id = message.payload.group_id.value - self._start_at_index
-        ack_id = message.payload.ack_id.value
-        try:
-            limit_switch = bool(
-                self._stop_condition[group_id] == MoveStopCondition.limit_switch
-            )
-        except IndexError:
-            return
-        success = message.payload.success.value
-        # TODO need to add tip action type to the response message.
-        if limit_switch and limit_switch != ack_id and not success:
-            condition = "Tip still detected."
-            log.warning(f"Drop tip failed. Condition {condition}")
-            raise MoveConditionNotMet()
-        elif not limit_switch and not success:
-            condition = "Tip not detected."
-            log.warning(f"Pick up tip failed. Condition {condition}")
-            raise MoveConditionNotMet()
-
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
@@ -429,7 +415,7 @@ class MoveScheduler:
             self._handle_move_completed(message)
         elif isinstance(message, TipActionResponse):
             self._remove_move_group(message, arbitration_id)
-            self._handle_tip_action(message)
+            self._handle_move_completed(message)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
         elif isinstance(message, Acknowledgement):

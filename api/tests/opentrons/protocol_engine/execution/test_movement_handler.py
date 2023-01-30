@@ -8,8 +8,8 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
     Axis as HardwareAxis,
-    MustHomeError as HardwareMustHomeError,
 )
+from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
 from opentrons.motion_planning import Waypoint
 
 from opentrons.protocol_engine.errors import MustHomeError

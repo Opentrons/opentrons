@@ -92,7 +92,7 @@ export function RobotSettingsDeckCalibration({
   }
 
   const deckCalibrationButtonText =
-    deckCalibrationStatus &&
+    deckCalibrationStatus != null &&
     deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
       ? t('recalibrate_deck')
       : t('calibrate_deck')
@@ -176,7 +176,7 @@ export function RobotSettingsDeckCalibration({
 
   return (
     <>
-      {deckCalibrationBanner}
+      {!enableCalibrationWizards && deckCalibrationBanner}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
