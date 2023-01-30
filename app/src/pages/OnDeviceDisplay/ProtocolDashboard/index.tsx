@@ -14,6 +14,7 @@ import {
   truncateString,
   Btn,
   Icon,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
@@ -116,7 +117,7 @@ export function ProtocolDashboard(): JSX.Element {
                   <StyledText
                     fontSize="1.25rem"
                     lineHeight="1.6875rem"
-                    fontWeight="600"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
                     {t('protocol_name_title')}
                   </StyledText>
@@ -137,7 +138,7 @@ export function ProtocolDashboard(): JSX.Element {
                   <StyledText
                     fontSize="1.25rem"
                     lineHeight="1.6875rem"
-                    fontWeight="600"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
                     {t('last_run')}
                   </StyledText>
@@ -158,7 +159,7 @@ export function ProtocolDashboard(): JSX.Element {
                   <StyledText
                     fontSize="1.25rem"
                     lineHeight="1.6875rem"
-                    fontWeight="600"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
                     {t('date_added')}
                   </StyledText>
@@ -194,7 +195,7 @@ export function ProtocolDashboard(): JSX.Element {
                   <StyledText
                     fontSize="1.5rem"
                     lineHeight="2.0625rem"
-                    fontWeight="600"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
                     {truncateString(protocolName, 88, 66)}
                   </StyledText>
@@ -203,7 +204,7 @@ export function ProtocolDashboard(): JSX.Element {
                   <StyledText
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
-                    fontWeight="400"
+                    fontWeight={TYPOGRAPHY.fontWeightRegular}
                   >
                     {lastRun != null
                       ? formatDistance(new Date(lastRun), new Date(), {
@@ -216,7 +217,7 @@ export function ProtocolDashboard(): JSX.Element {
                   <StyledText
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
-                    fontWeight="400"
+                    fontWeight={TYPOGRAPHY.fontWeightRegular}
                   >
                     {format(new Date(protocol.createdAt), 'Pp')}
                   </StyledText>
