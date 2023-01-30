@@ -65,8 +65,8 @@ def get_edge_point_list(
     )
 
     if edge_path_type == EdgePathType.LEFT:
-        return [edges.left, edges.center, edges.up, edges.down]
+        return [edges.left, edges.center, edges.up, edges.down, edges.center]
     elif edge_path_type == EdgePathType.RIGHT:
-        return [edges.right, edges.center, edges.up, edges.down]
+        return [edges.right, edges.center, edges.up, edges.down, edges.center]
     else:
-        return [edges.right, edges.left, edges.center, edges.up, edges.down]
+        return [edges.right, edges.left, edges.center, edges.up, edges.down, edges.center]
