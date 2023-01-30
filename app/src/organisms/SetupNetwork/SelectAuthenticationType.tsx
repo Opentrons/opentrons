@@ -32,7 +32,7 @@ interface SelectAuthenticationTypeProps {
   setShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
-  setSelectedAuthType: (authType: 'wpa-psk' | 'none') => void
+  setSelectedAuthType: (authType: AuthType) => void
   setChangeState: (changeState: NetworkChangeState) => void
 }
 
