@@ -34,7 +34,7 @@ async def flash_serials(
         rect = await get_and_update_serial_once(
             messenger, which_pipette, base_log, trace_log
         )
-        if rect:
+        if rect != []:
             print("flash_serials_pass--name:{}, model:{}, data:{}".format(rect[0], rect[1], str(rect[2],"UTF-8")))
         else:
             print("flash_serials_err")
@@ -58,7 +58,7 @@ async def get_and_update_serial_once(
     except Exception:
         base_log.exception("Update failed")
         trace_log.info(f"FAILURE,{name.name},{model},{data!r}")
-        raise 
+        return [] 
 
 async def get_serial(
     prompt: str, base_log: logging.Logger
@@ -73,7 +73,7 @@ async def get_serial(
             base_log.exception("invalid serial")
             if isinstance(Exception, KeyboardInterrupt):
                 raise
-            print(str(e))
+            
         else:
             base_log.info(
                 f"parsed name {name} model {model} datecode {data!r} from {serial}"
