@@ -57,7 +57,6 @@ from .util import DeckTransformState
 from .types import (
     Axis,
     CriticalPoint,
-    MustHomeError,
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
@@ -72,8 +71,8 @@ from .types import (
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
-    GripperNotAttachedError,
 )
+from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
 from .robot_calibration import (
     OT3Transforms,
@@ -932,14 +931,13 @@ class OT3API(
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
-        bounds = self._backend.axis_bounds
+        bounds = self._backend.phony_bounds
         to_check = {
             ax: machine_pos[ax]
             for ax in target_position.keys()
             if ax in OT3Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 400
         self._move_manager.update_constraints(
@@ -1699,18 +1697,27 @@ class OT3API(
 
         if not self._current_position:
             await self.home()
-        if probe_settings.home_plunger_at_start:
+        if (
+            probe_settings.home_plunger_at_start
+            or probe_settings.aspirate_while_sensing
+        ):
             await self.home_plunger(mount)
+        if probe_settings.aspirate_while_sensing:
+            direction = -1
+        else:
+            direction = 1
+
         try:
             await self._backend.liquid_probe(
                 mount,
                 probe_settings.max_z_distance,
                 probe_settings.mount_speed,
-                probe_settings.plunger_speed,
+                (probe_settings.plunger_speed * direction),
                 probe_settings.sensor_threshold_pascals,
                 probe_settings.starting_mount_height,
                 probe_settings.prep_move_speed,
                 probe_settings.log_pressure,
+                probe_settings.read_only,
             )
         except MoveConditionNotMet:
             self._log.exception("Liquid Sensing failed- threshold never reached.")
@@ -1741,7 +1748,6 @@ class OT3API(
                     "Liquid Sensing failed- threshold reached too early."
                 )
                 raise ThresholdReachedTooEarly
-
             await self.home_plunger(mount)
 
             return position[mount_axis], encoder_position[mount_axis]

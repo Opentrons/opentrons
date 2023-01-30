@@ -1,3 +1,4 @@
+from unittest.mock import mock_open
 import pytest
 from typing import List, Optional, Set, Tuple, Any
 from itertools import chain
@@ -12,7 +13,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallbackFilter,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, LiquidProbeSettings
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -24,9 +25,13 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
+    MotorStatus,
+    OT3SubSystem,
+)
+from opentrons.hardware_control.errors import (
+    FirmwareUpdateRequired,
     InvalidPipetteName,
     InvalidPipetteModel,
-    MotorStatus,
     MustHomeError,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
@@ -96,6 +101,29 @@ def mock_driver(mock_messenger) -> AbstractCanDriver:
 @pytest.fixture
 def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Controller:
     return OT3Controller(mock_config, mock_driver)
+
+
+@pytest.fixture
+def fake_liquid_settings() -> LiquidProbeSettings:
+    return LiquidProbeSettings(
+        starting_mount_height=100,
+        prep_move_speed=6,
+        max_z_distance=15,
+        min_z_distance=5,
+        mount_speed=40,
+        plunger_speed=10,
+        sensor_threshold_pascals=15,
+        expected_liquid_height=109,
+    )
+
+
+@pytest.fixture
+def mock_send_stop_threshold() -> None:
+    with patch(
+        "opentrons_hardware.sensors.sensor_driver.SensorDriver.send_stop_threshold",
+        autospec=True,
+    ) as mock_stop_threshold:
+        yield mock_stop_threshold
 
 
 @pytest.fixture
@@ -314,7 +342,7 @@ async def test_probing(
     )
     passed_expected = None
 
-    async def fake_probe(can_messenger, expected, timeout):
+    async def fake_probe(expected, timeout):
         nonlocal passed_expected
         nonlocal call_count
         nonlocal fake_nodes
@@ -328,9 +356,9 @@ async def test_probing(
             OT3Mount.GRIPPER: {"config": "whateverelse"},
         }
 
-    with patch(
-        "opentrons.hardware_control.backends.ot3controller.probe", fake_probe
-    ), patch.object(controller, "get_attached_instruments", fake_gai):
+    with patch.object(controller._network_info, "probe", fake_probe), patch.object(
+        controller, "get_attached_instruments", fake_gai
+    ):
         await controller.probe_network(timeout=0.1)
         assert call_count == 1
         assert passed_expected == set(
@@ -382,15 +410,15 @@ async def test_get_attached_instruments(
     gripper_id: str,
     gripper_name: str,
 ):
-    async def fake_probe(can_messenger, expected, timeout):
+    async def fake_probe(expected, timeout):
         return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         assert await controller.get_attached_instruments({}) == {}
 
     mock_tool_detector.return_value = tool_summary
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         detected = await controller.get_attached_instruments({})
     assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == pipette_id
@@ -401,10 +429,10 @@ async def test_get_attached_instruments(
 async def test_get_attached_instruments_handles_unknown_name(
     controller: OT3Controller, mock_tool_detector: OneshotToolDetector
 ) -> None:
-    async def fake_probe(can_messenger, expected, timeout):
+    async def fake_probe(expected, timeout):
         return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         assert await controller.get_attached_instruments({}) == {}
 
     tool_summary = ToolSummary(
@@ -416,7 +444,7 @@ async def test_get_attached_instruments_handles_unknown_name(
     )
     mock_tool_detector.return_value = tool_summary
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         with pytest.raises(InvalidPipetteName):
             await controller.get_attached_instruments({})
 
@@ -424,10 +452,10 @@ async def test_get_attached_instruments_handles_unknown_name(
 async def test_get_attached_instruments_handles_unknown_model(
     controller: OT3Controller, mock_tool_detector: OneshotToolDetector
 ) -> None:
-    async def fake_probe(can_messenger, expected, timeout):
+    async def fake_probe(expected, timeout):
         return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         assert await controller.get_attached_instruments({}) == {}
 
     tool_summary = ToolSummary(
@@ -442,7 +470,7 @@ async def test_get_attached_instruments_handles_unknown_model(
     )
     mock_tool_detector.return_value = tool_summary
 
-    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+    with patch.object(controller._network_info, "probe", fake_probe):
         with pytest.raises(InvalidPipetteModel):
             await controller.get_attached_instruments({})
 
@@ -578,6 +606,40 @@ async def test_ready_for_movement(
 
     axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
     assert controller.check_ready_for_movement(axes) == ready
+
+
+# for mocking sensor_driver.send_stop_threshold, can either
+#   move this test into test_ot3_calibration or some other file, and make
+#       a new mock move group function in there
+#   or see if there's a way to do it in this file with decoy or smthz
+@pytest.mark.parametrize("mount", [OT3Mount.LEFT, OT3Mount.RIGHT])
+async def test_liquid_probe(
+    mount: OT3Mount,
+    controller: OT3Controller,
+    fake_liquid_settings: LiquidProbeSettings,
+    mock_move_group_run,
+) -> None:
+    # mock tool_sensors liquid_probe
+    await controller.liquid_probe(
+        mount=mount,
+        max_z_distance=fake_liquid_settings.max_z_distance,
+        mount_speed=fake_liquid_settings.mount_speed,
+        plunger_speed=fake_liquid_settings.plunger_speed,
+        threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
+        starting_mount_height=fake_liquid_settings.starting_mount_height,
+        prep_move_speed=fake_liquid_settings.prep_move_speed,
+    )
+    breakpoint()
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 2
+        # we should be sending this command to the pipette axes to process.
+        # assert list(move_group[0].keys()) == [NodeId.pipette_left]
+        breakpoint()
+        step = move_group[0][NodeId.pipette_left]
+        assert step.stop_condition == MoveStopCondition.none
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
@@ -749,3 +811,46 @@ async def test_set_hold_current(
             expected_call[0],
             use_tip_motor_message_for=expected_call[1],
         )
+
+
+async def test_update_required_flag(
+    mock_messenger: CanMessenger, controller: OT3Controller
+) -> None:
+    axes = [OT3Axis.X, OT3Axis.Y]
+    controller._present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
+
+    async def fake_umpe(
+        can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
+    ):
+        return {node: (0.223, 0.323, False, True) for node in nodes}
+
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
+        fake_umpe,
+    ), patch(
+        "opentrons.hardware_control.backends.ot3controller.firmware_update.run_update"
+    ), patch(
+        "builtins.open", mock_open()
+    ):
+        # raise FirmwareUpdateRequired if the _update_required flag is set
+        controller._update_required = True
+        with pytest.raises(FirmwareUpdateRequired):
+            await controller.update_motor_estimation(axes)
+
+        # do not raise for update_firmware
+        controller._update_required = True
+        try:
+            await controller.update_firmware("/some/path", OT3SubSystem.head)
+        except FirmwareUpdateRequired:
+            assert False, "update_firmware raised an exception."
+
+        # do not raise if _update_required is False
+        controller._update_required = False
+        for node in controller._present_nodes:
+            controller._motor_status.update(
+                {node: MotorStatus(motor_ok=False, encoder_ok=True)}
+            )
+        try:
+            await controller.update_motor_estimation(axes)
+        except FirmwareUpdateRequired:
+            assert False, "update_motor_estimation raised an exception."

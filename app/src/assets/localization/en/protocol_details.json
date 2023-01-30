@@ -1,8 +1,10 @@
 {
+  "author": "author",
   "choose_robot_to_run": "Choose Robot to Run\n{{protocol_name}}",
   "clear_and_proceed_to_setup": "Clear and proceed to setup",
   "creation_method": "creation method",
   "deck_view": "Deck View",
+  "delete_protocol": "Delete Protocol",
   "description": "description",
   "labware": "labware",
   "last_analyzed": "last analyzed",

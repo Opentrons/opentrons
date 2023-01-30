@@ -22,8 +22,8 @@ from .instrument_calibration import (
 from opentrons.hardware_control.types import (
     CriticalPoint,
     BoardRevision,
-    InvalidMoveError,
 )
+from opentrons.hardware_control.errors import InvalidMoveError
 
 
 from opentrons_shared_data.pipette.dev_types import (

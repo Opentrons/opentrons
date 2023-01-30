@@ -88,6 +88,10 @@ class Capturer:
         ]
         self.csv_writer.writerows([heading, first_row])
 
+    async def start_timer(self) -> None:
+        """Records time when sensing move starts."""
+        self.start_time = time.time()
+
     def __call__(
         self,
         message: MessageDefinition,
@@ -99,14 +103,15 @@ class Capturer:
                 message.payload.sensor_data, message.payload.sensor
             ).to_float()
             self.response_queue.put_nowait(data)
-            self.csv_writer.writerow([data, (time.time() - self.start_time)])
+            current_time = time.time() - self.start_time
+            self.csv_writer.writerow([data, current_time])
 
 
 def _build_pass_step(
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
-    sensor_stop_condition: MoveStopCondition = MoveStopCondition.cap_sensor,
+    stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
     # use any node present to calculate duration of the move, assuming the durations
     #   will be the same
@@ -118,27 +123,32 @@ def _build_pass_step(
         acceleration={},
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
-        stop_condition=sensor_stop_condition,
+        stop_condition=stop_condition,
     )
 
 
 async def liquid_probe(
     messenger: CanMessenger,
     tool: ProbeTarget,
-    mount: NodeId,
+    head_node: NodeId,
     max_z_distance: float,
     plunger_speed: float,
     mount_speed: float,
     starting_mount_height: float,
     prep_move_speed: float,
-    threshold_pascals: float = 1.0,
+    threshold_pascals: float,
     log_pressure: bool = True,
+    read_only: bool = False,
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
     """Create and run liquid probing moves."""
     """Move the mount down to the starting height, then move the
     mount and pipette while reading from the pressure sensor.
     """
+    sensor_capturer = Capturer()
+    sensor_capturer.set_mount(head_node)
+    sensor_capturer.create_csv_header(mount_speed, plunger_speed, threshold_pascals)
+    messenger.add_listener(sensor_capturer, None)
 
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
@@ -148,19 +158,24 @@ async def liquid_probe(
         stop_threshold=threshold_fixed_point,
     )
 
+    if read_only:
+        stop_condition = MoveStopCondition.none
+    else:
+        stop_condition = MoveStopCondition.sync_line
+
     sensor_group = _build_pass_step(
-        movers=[mount, tool],
-        distance={mount: max_z_distance, tool: max_z_distance},
-        speed={mount: mount_speed, tool: plunger_speed},
-        sensor_stop_condition=MoveStopCondition.cap_sensor,
+        movers=[head_node, tool],
+        distance={head_node: max_z_distance, tool: max_z_distance},
+        speed={head_node: mount_speed, tool: plunger_speed},
+        stop_condition=stop_condition,
     )
 
     prep_move = create_step(
-        distance={mount: float64(abs(starting_mount_height))},
-        velocity={mount: float64(prep_move_speed)},
+        distance={head_node: float64(abs(starting_mount_height))},
+        velocity={head_node: float64(prep_move_speed)},
         acceleration={},
         duration=float64(abs(starting_mount_height / prep_move_speed)),
-        present_nodes=[mount],
+        present_nodes=[head_node],
         stop_condition=MoveStopCondition.none,
     )
 
@@ -171,10 +186,13 @@ async def liquid_probe(
 
     if log_pressure:
         sensor_capturer = Capturer()
-        sensor_capturer.set_mount(mount)
+        sensor_capturer.set_mount(head_node)
         sensor_capturer.create_csv_header(mount_speed, plunger_speed, threshold_pascals)
         messenger.add_listener(sensor_capturer, None)
         binding = SensorOutputBinding.report | SensorOutputBinding.sync
+        await sensor_capturer.start_timer()
+    elif read_only:
+        binding = SensorOutputBinding.report
     else:
         binding = SensorOutputBinding.sync
 
@@ -185,7 +203,6 @@ async def liquid_probe(
     ):
         positions = await sensor_runner.run(can_messenger=messenger)
         if log_pressure:
-            sensor_capturer.start_time = time.time()
             sensor_capturer.get_all()
             sensor_capturer.data_file.close()
         return positions

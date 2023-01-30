@@ -26,8 +26,6 @@ from opentrons.hardware_control.instruments.ot3.pipette_handler import (
 from opentrons.hardware_control.types import (
     OT3Mount,
     OT3Axis,
-    GripperNotAttachedError,
-    InvalidMoveError,
     CriticalPoint,
     GripperProbe,
     InstrumentProbeType,
@@ -35,6 +33,10 @@ from opentrons.hardware_control.types import (
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
     ThresholdReachedTooEarly,
+)
+from opentrons.hardware_control.errors import (
+    GripperNotAttachedError,
+    InvalidMoveError,
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
