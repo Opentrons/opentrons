@@ -12,8 +12,8 @@
   },
   "dropTipConfigurations": {
     "current": 1.5,
-    "speed": 10,
-    "distance": 25.5
+    "speed": 5.5,
+    "distance": 26.5
   },
   "plungerMotorConfigurations": {
     "idle": 0.3,
