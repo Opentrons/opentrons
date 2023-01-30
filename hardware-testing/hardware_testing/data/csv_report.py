@@ -24,6 +24,8 @@ META_DATA_TEST_NAME = "test-name"
 META_DATA_TEST_TAG = "test-tag"
 META_DATA_TEST_RUN_ID = "test-run-id"
 META_DATA_TEST_TIME_UTC = "test-time-utc"
+META_DATA_TEST_OPERATOR = "test-operator"
+META_DATA_TEST_VERSION = "test-version"
 
 RESULTS_OVERVIEW_TITLE = "RESULTS-OVERVIEW"
 
@@ -222,6 +224,8 @@ def _generate_meta_data_section() -> CSVSection:
             CSVLine(tag=META_DATA_TEST_TAG, data=[str]),
             CSVLine(tag=META_DATA_TEST_RUN_ID, data=[str]),
             CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
+            CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str]),
+            CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
         ],
     )
 
@@ -315,6 +319,12 @@ class CSVReport:
         self._file_name = data_io.create_file_name(
             self._test_name, self._run_id, self._tag
         )
+
+    def set_operator(self, operator: str) -> None:
+        self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator])
+
+    def set_version(self, version: str) -> None:
+        self(META_DATA_TITLE, META_DATA_TEST_VERSION, [version])
 
     def save_to_disk(self) -> Path:
         """CSV Report save to disk."""

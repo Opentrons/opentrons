@@ -11,22 +11,37 @@ GANTRY_AXES = [types.OT3Axis.X, types.OT3Axis.Y, types.OT3Axis.Z_L, types.OT3Axi
 
 
 async def _main(cfg: TestConfig) -> None:
+    # GET INFO
     if not cfg.simulate:
         robot_id = input("enter robot serial number: ")
+        operator = input("enter operator name: ")
     else:
         robot_id = "ot3-simulated-A01"
-    report = build_report(__file__)
+        operator = "simulation"
+    software_version = "unknown"
+
+    # BUILD REPORT
+    report = build_report(__file__)  # FIXME: get name of parent directory
     report.set_tag(robot_id)
+    report.set_operator(operator)
+    report.set_version(software_version)
+
+    # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=cfg.simulate,
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",
     )
+
+    # RUN TESTS
     for section, test_run in cfg.tests.items():
         await test_run(api, report, section.value)
+
+    # SAVE REPORT
     report_path = report.save_to_disk()
     complete_msg = "complete" if report.completed else "incomplete"
     print(f"done, {complete_msg} report -> {report_path}")
+    print(report)
 
 
 if __name__ == "__main__":
