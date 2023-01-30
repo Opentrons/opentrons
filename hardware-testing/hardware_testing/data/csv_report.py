@@ -36,7 +36,7 @@ class CSVLine:
         self._tag: str = tag
         self._data_types: List[Any] = data
         self._data: List[Any] = [None] * len(data)
-        self._timestamp: Optional[float] = None
+        self._elapsed_time: Optional[float] = None
         self._start_time: Optional[float] = None
         self._stored = False
 
@@ -45,8 +45,8 @@ class CSVLine:
         data_str = ",".join(str(d) for d in self._data)
         full_str = f"{self._tag},{data_str}"
         _elapsed: Optional[float] = None
-        if self._start_time:
-            _elapsed = round(time() - self._start_time, 1)
+        if self._elapsed_time is not None:
+            _elapsed = round(self._elapsed_time, 1)
         return f"{_elapsed},{full_str}"
 
     @property
@@ -57,7 +57,7 @@ class CSVLine:
     @property
     def timestamp(self) -> Optional[float]:
         """Line timestamp."""
-        return self._timestamp
+        return self._elapsed_time
 
     @property
     def stored(self) -> bool:
@@ -84,7 +84,7 @@ class CSVLine:
                 f"should equal {len(self._data_types)}"
             )
         assert self._start_time, "no start time saved"
-        self._timestamp = time() - self._start_time
+        self._elapsed_time = time() - self._start_time
         for i, expected_type in enumerate(self._data_types):
             d_type = type(data[i])
             if d_type != expected_type:
