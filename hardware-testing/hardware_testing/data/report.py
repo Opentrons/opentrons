@@ -8,7 +8,6 @@ from hardware_testing import data as data_io
 
 
 class Result(enum.Enum):
-    SKIP = "SKIP"
     PASS = "PASS"
     FAIL = "FAIL"
 
@@ -21,6 +20,8 @@ META_DATA_TEST_NAME = "test-name"
 META_DATA_TEST_TAG = "test-tag"
 META_DATA_TEST_RUN_ID = "test-run-id"
 META_DATA_TEST_TIME_UTC = "test-time-utc"
+
+RESULTS_OVERVIEW_TITLE = "RESULTS-OVERVIEW"
 
 
 class Line:
@@ -53,6 +54,13 @@ class Line:
     def cache_start_time(self, start_time: float) -> None:
         self._start_time = start_time
 
+    @property
+    def result_passed(self) -> bool:
+        for i, expected_type in enumerate(self._data_types):
+            if expected_type == Result and self._data[i] != Result.PASS:
+                return False
+        return True
+
     def store(self, *data: Any):
         if len(data) != len(self._data_types):
             raise ValueError(f"[{self.tag}] unexpected data length ({len(data)}), "
@@ -75,14 +83,20 @@ class LineRepeating:
     def tag(self) -> str:
         return self._lines[0].tag
 
-    @property
-    def length(self) -> int:
+    def __len__(self) -> int:
         return len(self._lines)
 
     @property
     def stored(self) -> bool:
         for line in self._lines:
             if not line.stored:
+                return False
+        return True
+
+    @property
+    def result_passed(self) -> bool:
+        for line in self._lines:
+            if not line.result_passed:
                 return False
         return True
 
@@ -104,15 +118,26 @@ class Section:
                 return line
         raise ValueError(f"[{self._title}] unexpected line tag: {item}")
 
-    def __str__(self) -> str:
-        dashes = "-" * len(self.title)
-        lines = "\n".join([str(line) for line in self._lines_and_repeating_lines])
-        stamps = [line.timestamp for line in self.lines if line.timestamp is not None]
+    def _get_earliest_line_timestamp(self) -> float:
+        all_lines: List[Line] = []
+        for line in self._lines_and_repeating_lines:
+            if isinstance(line, LineRepeating):
+                for i in range(len(line)):
+                    all_lines.append(line[i])
+            else:
+                all_lines.append(line)
+        stamps = [line.timestamp for line in all_lines if line.timestamp is not None]
         if stamps:
             min_timestamp = min([line.timestamp for line in self.lines if line.timestamp is not None])
             min_timestamp = round(min_timestamp, 1)
         else:
             min_timestamp = None
+        return min_timestamp
+
+    def __str__(self) -> str:
+        dashes = "-" * len(self.title)
+        lines = "\n".join([str(line) for line in self._lines_and_repeating_lines])
+        min_timestamp = self._get_earliest_line_timestamp()
         return f"{min_timestamp},{dashes}\n" \
                f"{min_timestamp},{self.title}\n" \
                f"{lines}"
@@ -136,6 +161,13 @@ class Section:
     def completed(self) -> bool:
         for line in self.lines:
             if not line.stored:
+                return False
+        return True
+
+    @property
+    def result_passed(self) -> bool:
+        for line in self.lines:
+            if not line.result_passed:
                 return False
         return True
 
@@ -164,6 +196,13 @@ def _generate_meta_data_section() -> Section:
     )
 
 
+def _generate_results_overview_section(tags: List[str]) -> Section:
+    return Section(
+        title=RESULTS_OVERVIEW_TITLE,
+        lines=[Line(tag=tag, data=[Result]) for tag in tags]
+    )
+
+
 class Report:
     def __init__(self, script_path: str, sections: List[Section]) -> None:
         self._script_path = script_path
@@ -171,7 +210,10 @@ class Report:
         self._run_id = data_io.create_run_id()
         self._tag: Optional[str] = None
         self._file_name: Optional[str] = None
-        self._sections = [_generate_meta_data_section()] + sections
+        _section_meta = _generate_meta_data_section()
+        _section_titles = [s.title for s in sections]
+        _section_results = _generate_results_overview_section(_section_titles)
+        self._sections = [_section_meta, _section_results] + sections
         self._cache_start_time()  # must happen before storing any data
         self[META_DATA_TITLE][META_DATA_TEST_NAME].store(self._test_name)
         self[META_DATA_TITLE][META_DATA_TEST_RUN_ID].store(self._run_id)
@@ -195,7 +237,16 @@ class Report:
                 return s
         raise ValueError(f"unexpected section title: {item}")
 
+    def _refresh_results_overview_values(self) -> None:
+        for s in self._sections[2:]:
+            if s.result_passed:
+                self(RESULTS_OVERVIEW_TITLE, s.title, [Result.PASS])
+            else:
+                self(RESULTS_OVERVIEW_TITLE, s.title, [Result.FAIL])
+
     def __str__(self) -> str:
+        # set the results of each section based on current
+        self._refresh_results_overview_values()
         return "\n".join([str(s) for s in self._sections])
 
     @property
@@ -209,7 +260,11 @@ class Report:
         start_time = time()
         for section in self._sections:
             for line in section.lines:
-                line.cache_start_time(start_time)
+                if isinstance(line, LineRepeating):
+                    for i in range(len(line)):
+                        line[i].cache_start_time(start_time)
+                else:
+                    line.cache_start_time(start_time)
 
     def set_tag(self, tag: str) -> None:
         self._tag = tag
