@@ -14,7 +14,6 @@ import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSetting
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
-jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
