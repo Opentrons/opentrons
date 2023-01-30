@@ -70,7 +70,6 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key=None,
     )

@@ -16,6 +16,7 @@ from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSch
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
+from opentrons import protocol_reader
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -107,6 +108,18 @@ def legacy_context_creator(decoy: Decoy) -> LegacyContextCreator:
 def legacy_executor(decoy: Decoy) -> LegacyExecutor:
     """Get a mocked out LegacyExecutor dependency."""
     return decoy.mock(cls=LegacyExecutor)
+
+
+@pytest.fixture(autouse=True)
+def use_mock_extract_labware_definitions(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Replace protocol_reader.extract_labware_definitions() with a Decoy mock."""
+    monkeypatch.setattr(
+        protocol_reader,
+        "extract_labware_definitions",
+        decoy.mock(func=protocol_reader.extract_labware_definitions),
+    )
 
 
 @pytest.fixture
@@ -218,7 +231,7 @@ async def test_run(
     )
 
 
-def test_load_json(
+async def test_load_json(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
     json_translator: JsonTranslator,
@@ -227,6 +240,8 @@ def test_load_json(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a JSON protocol file."""
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
@@ -234,7 +249,6 @@ def test_load_json(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=6),
-        labware_definitions=[],
     )
 
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
@@ -257,13 +271,17 @@ def test_load_json(
         Liquid(id="water-id", displayName="water", description=" water desc")
     ]
 
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(json_protocol_source)
+    ).then_return([labware_definition])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
     decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
-    subject.load(json_protocol_source)
+    await subject.load(json_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_command(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="hello")
@@ -285,7 +303,7 @@ def test_load_json(
     )
 
 
-def test_load_json_liquids_ff_on(
+async def test_load_json_liquids_ff_on(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
     json_translator: JsonTranslator,
@@ -294,6 +312,8 @@ def test_load_json_liquids_ff_on(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a JSON protocol file."""
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
@@ -301,7 +321,6 @@ def test_load_json_liquids_ff_on(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=6),
-        labware_definitions=[],
     )
 
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
@@ -318,13 +337,17 @@ def test_load_json_liquids_ff_on(
         Liquid(id="water-id", displayName="water", description=" water desc")
     ]
 
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(json_protocol_source)
+    ).then_return([labware_definition])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
     decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
-    subject.load(json_protocol_source)
+    await subject.load(json_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_liquid(
             liquid=Liquid(id="water-id", displayName="water", description=" water desc")
         ),
@@ -339,7 +362,7 @@ def test_load_json_liquids_ff_on(
     )
 
 
-def test_load_python(
+async def test_load_python(
     decoy: Decoy,
     python_file_reader: PythonFileReader,
     python_context_creator: PythonContextCreator,
@@ -349,6 +372,8 @@ def test_load_python(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a Python protocol file."""
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+
     python_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.py"),
@@ -356,12 +381,14 @@ def test_load_python(
         metadata={},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(3, 0)),
-        labware_definitions=[],
     )
 
     python_protocol = decoy.mock(cls=PythonProtocol)
     protocol_context = decoy.mock(cls=ProtocolContext)
 
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(python_protocol_source)
+    ).then_return([labware_definition])
     decoy.when(python_file_reader.read(python_protocol_source)).then_return(
         python_protocol
     )
@@ -369,9 +396,10 @@ def test_load_python(
         protocol_context
     )
 
-    subject.load(python_protocol_source)
+    await subject.load(python_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
         task_queue.set_run_func(
             func=python_executor.execute,
             protocol=python_protocol,
@@ -380,7 +408,7 @@ def test_load_python(
     )
 
 
-def test_load_legacy_python(
+async def test_load_legacy_python(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
@@ -399,7 +427,6 @@ def test_load_legacy_python(
         metadata={},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
-        labware_definitions=[labware_definition],
     )
 
     extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
@@ -418,9 +445,15 @@ def test_load_legacy_python(
 
     legacy_context = decoy.mock(cls=LegacyProtocolContext)
 
-    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
-        legacy_protocol
-    )
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(legacy_protocol_source)
+    ).then_return([labware_definition])
+    decoy.when(
+        legacy_file_reader.read(
+            protocol_source=legacy_protocol_source,
+            labware_definitions=[labware_definition],
+        )
+    ).then_return(legacy_protocol)
     decoy.when(
         legacy_context_creator.create(
             protocol=legacy_protocol,
@@ -429,7 +462,7 @@ def test_load_legacy_python(
         )
     ).then_return(legacy_context)
 
-    subject.load(legacy_protocol_source)
+    await subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
@@ -444,7 +477,7 @@ def test_load_legacy_python(
 
 # TODO(mc, 2022-08-30): remove enableProtocolEnginePAPICore FF
 # to promote feature to production
-def test_load_legacy_python_with_pe_papi_core(
+async def test_load_legacy_python_with_pe_papi_core(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
@@ -460,7 +493,6 @@ def test_load_legacy_python_with_pe_papi_core(
         metadata={},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
-        labware_definitions=[],
     )
 
     legacy_protocol = LegacyPythonProtocol(
@@ -479,21 +511,26 @@ def test_load_legacy_python_with_pe_papi_core(
 
     decoy.when(feature_flags.enable_protocol_engine_papi_core()).then_return(True)
 
-    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
-        legacy_protocol
-    )
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(legacy_protocol_source)
+    ).then_return([])
+    decoy.when(
+        legacy_file_reader.read(
+            protocol_source=legacy_protocol_source, labware_definitions=[]
+        )
+    ).then_return(legacy_protocol)
     decoy.when(
         legacy_context_creator.create(
             protocol=legacy_protocol, broker=None, equipment_broker=None
         )
     ).then_return(legacy_context)
 
-    subject.load(legacy_protocol_source)
+    await subject.load(legacy_protocol_source)
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
 
 
-def test_load_legacy_json(
+async def test_load_legacy_json(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
@@ -512,7 +549,6 @@ def test_load_legacy_json(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=5),
-        labware_definitions=[labware_definition],
     )
 
     legacy_protocol = LegacyJsonProtocol(
@@ -526,9 +562,15 @@ def test_load_legacy_json(
 
     legacy_context = decoy.mock(cls=LegacyProtocolContext)
 
-    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
-        legacy_protocol
-    )
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(legacy_protocol_source)
+    ).then_return([labware_definition])
+    decoy.when(
+        legacy_file_reader.read(
+            protocol_source=legacy_protocol_source,
+            labware_definitions=[labware_definition],
+        )
+    ).then_return(legacy_protocol)
     decoy.when(
         legacy_context_creator.create(
             legacy_protocol,
@@ -537,7 +579,7 @@ def test_load_legacy_json(
         )
     ).then_return(legacy_context)
 
-    subject.load(legacy_protocol_source)
+    await subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
