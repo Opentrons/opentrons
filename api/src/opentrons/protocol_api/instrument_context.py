@@ -693,7 +693,9 @@ class InstrumentContext(publisher.CommandPublisher):
                         will result in the pipette hovering over the tip but
                         not picking it up--generally not desirable, but could
                         be used for dry-run).
+
                         .. deprecated:: 2.14
+                            Use the Opentrons App to change pipette pick-up settings.
         :type presses: int
         :param increment: The additional distance to travel on each successive
                           press (e.g.: if `presses=3` and `increment=1.0`, then
