@@ -190,7 +190,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         labware_id = well_core.labware_id
 
         well_location = WellLocation(
-            origin=WellOrigin.CENTER, offset=WellOffset(x=0, y=0, z=z_offset)
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=z_offset)
         )
 
         self._engine_client.touch_tip(

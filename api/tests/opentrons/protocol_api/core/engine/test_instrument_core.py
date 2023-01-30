@@ -541,7 +541,7 @@ def test_touch_tip(
             labware_id="123abc",
             well_name="my cool well",
             well_location=WellLocation(
-                origin=WellOrigin.CENTER, offset=WellOffset(x=0, y=0, z=4.56)
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=4.56)
             ),
             radius=1.23,
             speed=7.89,
