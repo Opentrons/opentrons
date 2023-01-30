@@ -100,37 +100,48 @@ export function ConnectViaWifi(): JSX.Element {
       )
       // This condition might be changed for manual connect
     } else if (changeState.ssid != null && currentRequestState === null) {
-
-        return (
-          <SetWifiCred
-            ssid={changeState.ssid}
-            setShowSelectAuthenticationType={setShowSelectAuthenticationType}
-            authType={selectedAuthType}
-            password={password}
-            setPassword={setPassword}
-            handleConnect={handleConnect}
-          />
-        )
-    } else if (changeState.ssid != null && currentRequestState !==null && currentRequestState.status === RobotApi.PENDING) {
-        return <ConnectingNetwork />
-    } else if (changeState.ssid != null && currentRequestState !==null && currentRequestState.status === RobotApi.SUCCESS) {
-        return (
-          <SucceededToConnect
-            ssid={changeState.ssid}
-            authType={selectedAuthType}
-          />
-        )
-      } else if(changeState.ssid != null && currentRequestState !==null && currentRequestState.status === RobotApi.FAILURE) {
-        return (
-          <FailedToConnect
-            ssid={changeState.ssid}
-            requestState={currentRequestState}
-            type={changeState.type}
-            onConnect={handleConnect}
-            setChangeState={setChangeState}
-            setCurrentRequestState={setCurrentRequestState}
-          />
-        )
+      return (
+        <SetWifiCred
+          ssid={changeState.ssid}
+          setShowSelectAuthenticationType={setShowSelectAuthenticationType}
+          authType={selectedAuthType}
+          password={password}
+          setPassword={setPassword}
+          handleConnect={handleConnect}
+        />
+      )
+    } else if (
+      changeState.ssid != null &&
+      currentRequestState !== null &&
+      currentRequestState.status === RobotApi.PENDING
+    ) {
+      return <ConnectingNetwork />
+    } else if (
+      changeState.ssid != null &&
+      currentRequestState !== null &&
+      currentRequestState.status === RobotApi.SUCCESS
+    ) {
+      return (
+        <SucceededToConnect
+          ssid={changeState.ssid}
+          authType={selectedAuthType}
+        />
+      )
+    } else if (
+      changeState.ssid != null &&
+      currentRequestState !== null &&
+      currentRequestState.status === RobotApi.FAILURE
+    ) {
+      return (
+        <FailedToConnect
+          ssid={changeState.ssid}
+          requestState={currentRequestState}
+          type={changeState.type}
+          onConnect={handleConnect}
+          setChangeState={setChangeState}
+          setCurrentRequestState={setCurrentRequestState}
+        />
+      )
     } else {
       return null
     }
