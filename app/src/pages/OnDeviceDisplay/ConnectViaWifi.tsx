@@ -99,8 +99,8 @@ export function ConnectViaWifi(): JSX.Element {
         />
       )
       // This condition might be changed for manual connect
-    } else if (changeState.ssid != null) {
-      if (currentRequestState === null) {
+    } else if (changeState.ssid != null && currentRequestState === null) {
+
         return (
           <SetWifiCred
             ssid={changeState.ssid}
@@ -111,16 +111,16 @@ export function ConnectViaWifi(): JSX.Element {
             handleConnect={handleConnect}
           />
         )
-      } else if (currentRequestState.status === RobotApi.PENDING) {
+    } else if (changeState.ssid != null && currentRequestState !==null && currentRequestState.status === RobotApi.PENDING) {
         return <ConnectingNetwork />
-      } else if (currentRequestState.status === RobotApi.SUCCESS) {
+    } else if (changeState.ssid != null && currentRequestState !==null && currentRequestState.status === RobotApi.SUCCESS) {
         return (
           <SucceededToConnect
             ssid={changeState.ssid}
             authType={selectedAuthType}
           />
         )
-      } else {
+      } else if(changeState.ssid != null && currentRequestState !==null && currentRequestState.status === RobotApi.FAILURE) {
         return (
           <FailedToConnect
             ssid={changeState.ssid}
@@ -131,7 +131,6 @@ export function ConnectViaWifi(): JSX.Element {
             setCurrentRequestState={setCurrentRequestState}
           />
         )
-      }
     } else {
       return null
     }
