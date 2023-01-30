@@ -31,6 +31,7 @@ package_entries = {
     'notify-server': PackageEntry('notify_server'),
     'hardware': PackageEntry('opentrons_hardware'),
     'usb-bridge': PackageEntry('usb_bridge'),
+    'system-server': PackageEntry('system_server'),
 }
 
 project_entries = {

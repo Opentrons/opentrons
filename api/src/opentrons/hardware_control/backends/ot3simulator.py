@@ -54,7 +54,7 @@ from opentrons.hardware_control.types import (
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-from opentrons_shared_data.gripper.dev_types import GripperModel
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
     PipetteSpec,
@@ -63,6 +63,7 @@ from opentrons.hardware_control.dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
+from opentrons.util.async_helpers import ensure_yield
 
 log = logging.getLogger(__name__)
 
@@ -124,7 +125,7 @@ class OT3Simulator:
             if mount is OT3Mount.GRIPPER:
                 gripper_spec: GripperSpec = {"model": None, "id": None}
                 if passed_ai and passed_ai.get("model"):
-                    gripper_spec["model"] = GripperModel.V1
+                    gripper_spec["model"] = GripperModel.v1
                     gripper_spec["id"] = passed_ai.get("id")
                 return gripper_spec
 
@@ -176,6 +177,7 @@ class OT3Simulator:
         """Set the module controls"""
         self._module_controls = module_controls
 
+    @ensure_yield
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
             self._configuration.current_settings, gantry_load
@@ -188,6 +190,7 @@ class OT3Simulator:
             (node, MotorStatus(True, True)) for node in response.keys()
         )
 
+    @ensure_yield
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
         # Simulate condition at boot, status would not be ok
@@ -195,6 +198,7 @@ class OT3Simulator:
             (node, MotorStatus(False, False)) for node in self._present_nodes
         )
 
+    @ensure_yield
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         # Simulate conditions as if there are no stalls, aka do nothing
@@ -209,14 +213,17 @@ class OT3Simulator:
             for status in get_stat(axes)
         )
 
+    @ensure_yield
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
 
+    @ensure_yield
     async def update_encoder_position(self) -> OT3AxisMap[float]:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
 
+    @ensure_yield
     async def move(
         self,
         origin: Coordinates[OT3Axis, float],
@@ -238,6 +245,7 @@ class OT3Simulator:
         self._position.update(final_positions)
         self._encoder_position.update(final_positions)
 
+    @ensure_yield
     async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
         """Home axes.
 
@@ -255,6 +263,7 @@ class OT3Simulator:
             self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
+    @ensure_yield
     async def fast_home(
         self, axes: Sequence[OT3Axis], margin: float
     ) -> OT3AxisMap[float]:
@@ -272,6 +281,7 @@ class OT3Simulator:
             self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
+    @ensure_yield
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,
@@ -280,17 +290,20 @@ class OT3Simulator:
         """Move gripper inward."""
         _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
 
-    async def gripper_home_jaw(self) -> None:
+    @ensure_yield
+    async def gripper_home_jaw(self, duty_cycle: float) -> None:
         """Move gripper outward."""
-        _ = create_gripper_jaw_home_group()
+        _ = create_gripper_jaw_home_group(duty_cycle)
         self._motor_status[NodeId.gripper_g] = MotorStatus(True, True)
 
+    @ensure_yield
     async def gripper_hold_jaw(
         self,
         encoder_position_um: int,
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
 
+    @ensure_yield
     async def tip_action(
         self,
         axes: Sequence[OT3Axis],
@@ -316,7 +329,7 @@ class OT3Simulator:
         found_model = init_instr["model"]
         if found_model:
             return {
-                "config": gripper_config.load(GripperModel.V1),
+                "config": gripper_config.load(GripperModel.v1),
                 "id": init_instr["id"],
             }
         else:
@@ -377,6 +390,7 @@ class OT3Simulator:
             # No instrument detected or expected
             return {"config": None, "id": None}
 
+    @ensure_yield
     async def get_attached_instruments(
         self, expected: Mapping[OT3Mount, Optional[PipetteName]]
     ) -> Mapping[OT3Mount, OT3AttachedInstruments]:
@@ -393,10 +407,12 @@ class OT3Simulator:
             for mount in OT3Mount
         }
 
+    @ensure_yield
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
         return {}
 
+    @ensure_yield
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
@@ -413,6 +429,7 @@ class OT3Simulator:
         """Save the current."""
         yield
 
+    @ensure_yield
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         new_mods_at_ports = [
             modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
@@ -444,6 +461,7 @@ class OT3Simulator:
         """Get the firmware version."""
         return None
 
+    @ensure_yield
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""
         pass
@@ -452,10 +470,12 @@ class OT3Simulator:
         """Get engaged axes."""
         return {}
 
+    @ensure_yield
     async def disengage_axes(self, axes: List[OT3Axis]) -> None:
         """Disengage axes."""
         return None
 
+    @ensure_yield
     async def engage_axes(self, axes: List[OT3Axis]) -> None:
         """Engage axes."""
         return None
@@ -476,22 +496,27 @@ class OT3Simulator:
         """Resume the controller activity."""
         return None
 
+    @ensure_yield
     async def halt(self) -> None:
         """Halt the motors."""
         return None
 
+    @ensure_yield
     async def hard_halt(self) -> None:
         """Halt the motors."""
         return None
 
+    @ensure_yield
     async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
         return {}
 
+    @ensure_yield
     async def clean_up(self) -> None:
         """Clean up."""
         pass
 
+    @ensure_yield
     async def configure_mount(
         self, mount: OT3Mount, config: InstrumentHardwareConfigs
     ) -> None:
@@ -517,6 +542,7 @@ class OT3Simulator:
             node_to_axis(k): v for k, v in OT3Simulator._get_home_position().items()
         }
 
+    @ensure_yield
     async def probe_network(self) -> None:
         nodes = set((NodeId.head_l, NodeId.head_r, NodeId.gantry_x, NodeId.gantry_y))
         if self._attached_instruments[OT3Mount.LEFT].get("model", None):
@@ -529,6 +555,7 @@ class OT3Simulator:
             nodes.add(NodeId.gripper)
         self._present_nodes = nodes
 
+    @ensure_yield
     async def capacitive_probe(
         self,
         mount: OT3Mount,
@@ -540,6 +567,7 @@ class OT3Simulator:
     ) -> None:
         self._position[axis_to_node(moving)] += distance_mm
 
+    @ensure_yield
     async def capacitive_pass(
         self,
         mount: OT3Mount,

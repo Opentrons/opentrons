@@ -7,34 +7,28 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../i18n'
 import { ConnectedNetworkInfo } from '../../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
-import { ConfirmRobotName } from '../../pages/OnDeviceDisplay/ConfirmRobotName'
-import { InitialSplash } from '../../pages/OnDeviceDisplay/InitialSplash'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
+import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
 import { SelectWifiNetwork } from '../../pages/OnDeviceDisplay/SelectWifiNetwork'
 import { SetWifiCred } from '../../pages/OnDeviceDisplay/SetWifiCred'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
 jest.mock('../../pages/OnDeviceDisplay/ConnectedNetworkInfo')
-jest.mock('../../pages/OnDeviceDisplay/InitialSplash')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
-jest.mock('../../pages/OnDeviceDisplay/ConfirmRobotName')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
+jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/SelectWifiNetwork')
 jest.mock('../../pages/OnDeviceDisplay/SetWifiCred')
+jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 
-const mockInitialSplash = InitialSplash as jest.MockedFunction<
-  typeof InitialSplash
->
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
   typeof NetworkSetupMenu
 >
 const mockConnectViaUSB = ConnectViaUSB as jest.MockedFunction<
   typeof ConnectViaUSB
->
-const mockConfirmRobotName = ConfirmRobotName as jest.MockedFunction<
-  typeof ConfirmRobotName
 >
 const mockSelectWifiNetwork = SelectWifiNetwork as jest.MockedFunction<
   typeof SelectWifiNetwork
@@ -45,6 +39,12 @@ const mockConnectedNetworkInfo = ConnectedNetworkInfo as jest.MockedFunction<
 >
 const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
   typeof RobotDashboard
+>
+const mockProtocolDashboard = ProtocolDashboard as jest.MockedFunction<
+  typeof ProtocolDashboard
+>
+const mockRobotSettingsDashboard = RobotSettingsDashboard as jest.MockedFunction<
+  typeof RobotSettingsDashboard
 >
 
 const render = (path = '/') => {
@@ -58,24 +58,21 @@ const render = (path = '/') => {
 
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
-    mockInitialSplash.mockReturnValue(<div>Mock InitialSplash</div>)
     mockNetworkSetupMenu.mockReturnValue(<div>Mock NetworkSetupMenu</div>)
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
-    mockConfirmRobotName.mockReturnValue(<div>Mock ConfirmRobotName</div>)
     mockSelectWifiNetwork.mockReturnValue(<div>Mock SelectWifiNetwork</div>)
     mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
     mockConnectedNetworkInfo.mockReturnValue(
       <div>Mock ConnectedNetworkInfo</div>
     )
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
+    mockProtocolDashboard.mockReturnValue(<div>Mock ProtocolDashboard</div>)
+    mockRobotSettingsDashboard.mockReturnValue(
+      <div>Mock RobotSettingsDashboard</div>
+    )
   })
   afterEach(() => {
     jest.resetAllMocks()
-  })
-
-  it('renders a InitialSplash component component from /', () => {
-    const [{ getByText }] = render('/')
-    getByText('Mock InitialSplash')
   })
 
   it('renders a NetworkSetupMenu component from /network-setup', () => {
@@ -107,5 +104,13 @@ describe('OnDeviceDisplayApp', () => {
   it('renders a RobotDashboard component from /dashboard', () => {
     const [{ getByText }] = render('/dashboard')
     getByText('Mock RobotDashboard')
+  })
+  it('renders a ProtocolDashboard component from /protocols', () => {
+    const [{ getByText }] = render('/protocols')
+    getByText('Mock ProtocolDashboard')
+  })
+  it('renders a RobotSettingsDashboard component from /robot-settings', () => {
+    const [{ getByText }] = render('/robot-settings')
+    getByText('Mock RobotSettingsDashboard')
   })
 })

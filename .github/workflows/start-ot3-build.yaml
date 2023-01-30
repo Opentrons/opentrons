@@ -8,6 +8,7 @@ on:
       - release*
     tags:
       - v*
+      - ot3@*
   pull_request:
     types:
       - opened
@@ -18,7 +19,7 @@ jobs:
   handle-push:
     runs-on: 'ubuntu-latest'
     if: github.event_name == 'push'
-    name: "Start an OT-3 build for a branch push"
+    name: "Start an OT-3 build for a branch/tag push"
     steps:
       - name: 'start build'
         uses: octokit/request-action@v2.x

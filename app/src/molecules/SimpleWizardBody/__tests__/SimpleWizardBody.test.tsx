@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
+import { Skeleton } from '../../../atoms/Skeleton'
 import { SimpleWizardBody } from '..'
+
+jest.mock('../../../atoms/Skeleton')
+
+const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
 
 const render = (props: React.ComponentProps<typeof SimpleWizardBody>) => {
   return renderWithProviders(<SimpleWizardBody {...props} />)[0]
@@ -32,5 +37,14 @@ describe('SimpleWizardBody', () => {
     getByText('header')
     getByText('subheader')
     getByLabelText('ot-check')
+  })
+  it('renders a few skeletons  when it is pending', () => {
+    props = {
+      ...props,
+      isPending: true,
+    }
+    mockSkeleton.mockReturnValue(<div>mock skeleton</div>)
+    const { getAllByText } = render(props)
+    getAllByText('mock skeleton')
   })
 })

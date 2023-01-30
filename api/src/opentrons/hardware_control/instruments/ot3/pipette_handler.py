@@ -20,10 +20,12 @@ from opentrons import types as top_types
 from opentrons.hardware_control.types import (
     CriticalPoint,
     HardwareAction,
-    TipAttachedError,
-    NoTipAttachedError,
     OT3Axis,
     OT3Mount,
+)
+from opentrons.hardware_control.errors import (
+    TipAttachedError,
+    NoTipAttachedError,
 )
 from opentrons.hardware_control.constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -657,8 +659,8 @@ class PipetteHandlerProvider:
                     retract_target=instrument.pick_up_configurations.distance,
                     pick_up_motor_actions=TipMotorPickUpTipSpec(
                         # Move onto the posts
-                        tiprack_down=top_types.Point(0, 0, -5),
-                        tiprack_up=top_types.Point(0, 0, 7),
+                        tiprack_down=top_types.Point(0, 0, -7),
+                        tiprack_up=top_types.Point(0, 0, 2),
                         pick_up_distance=instrument.pick_up_configurations.distance,
                         speed=instrument.pick_up_configurations.speed,
                         currents={OT3Axis.Q: instrument.pick_up_configurations.current},
@@ -757,8 +759,14 @@ class PipetteHandlerProvider:
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
 
+        is_96_chan = instrument.channels.value == 96
+
         bottom = instrument.plunger_positions.bottom
-        droptip = instrument.plunger_positions.drop_tip
+        droptip = (
+            instrument.drop_configurations.distance
+            if is_96_chan
+            else instrument.plunger_positions.drop_tip
+        )
         speed = instrument.drop_configurations.speed
         shakes: List[Tuple[top_types.Point, Optional[float]]] = []
 
@@ -767,6 +775,9 @@ class PipetteHandlerProvider:
             instrument.current_tiprack_diameter = 0.0
             instrument.remove_tip()
 
+        drop_tip_current_axis = (
+            OT3Axis.Q if is_96_chan else OT3Axis.of_main_tool_actuator(mount)
+        )
         seq_builder_ot3 = self._droptip_sequence_builder(
             bottom,
             droptip,
@@ -775,15 +786,11 @@ class PipetteHandlerProvider:
                     mount
                 ): instrument.plunger_motor_current.run
             },
-            {
-                OT3Axis.of_main_tool_actuator(
-                    mount
-                ): instrument.drop_configurations.current
-            },
+            {drop_tip_current_axis: instrument.drop_configurations.current},
             speed,
             home_after,
             (OT3Axis.of_main_tool_actuator(mount),),
-            instrument.channels.value == 96,
+            is_96_chan,
         )
 
         seq_ot3 = seq_builder_ot3()

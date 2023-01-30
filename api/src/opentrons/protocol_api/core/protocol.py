@@ -7,16 +7,17 @@ from typing import Dict, Generic, List, Optional, Union, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
+from .._liquid import Liquid
 
 
 class AbstractProtocol(
@@ -175,3 +176,15 @@ class AbstractProtocol(
     @abstractmethod
     def get_module_cores(self) -> List[ModuleCoreType]:
         """Get all loaded module cores."""
+
+    @abstractmethod
+    def define_liquid(
+        self, name: str, description: Optional[str], display_color: Optional[str]
+    ) -> Liquid:
+        """Define a liquid to load into a well."""
+
+    @abstractmethod
+    def get_labware_location(
+        self, labware_core: LabwareCoreType
+    ) -> Union[DeckSlotName, ModuleCoreType, None]:
+        """Get labware parent location."""
