@@ -47,8 +47,6 @@ SPEED_REDUCTION_PERCENTAGE = 0.3
 # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
 #       so here we cache these readings, and append them to the CSV in the end
 PRESSURE_DATA_CACHE = []
-# NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
-#       so here we cache these readings, and append them to the CSV in the end
 # save final test results, to be saved and displayed at the end
 FINAL_TEST_RESULTS = []
 
@@ -104,8 +102,11 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     fixture=None,
 )
 
+# THRESHOLDS: environment sensor
 TEMP_THRESH = [20, 40]
 HUMIDITY_THRESH = [10, 90]
+
+# THRESHOLDS: capacitive sensor
 CAP_THRESH_OPEN_AIR = [0.0, 10.0]
 CAP_THRESH_PROBE = [0.0, 20.0]
 CAP_PROBE_DISTANCE = 50.0
@@ -117,6 +118,7 @@ CAP_PROBE_SETTINGS = CapacitivePassSettings(
     sensor_threshold_pf=1.0,
 )
 
+# THRESHOLDS: air-pressure sensor
 PRESSURE_ASPIRATE_VOL = {50: 10.0, 1000: 100.0}
 PRESSURE_MAX_VALUE_ABS = 7500
 PRESSURE_THRESH_OPEN_AIR = [-300, 300]
@@ -297,6 +299,19 @@ async def _aspirate_and_look_for_droplets(
     return leak_test_passed
 
 
+def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
+    if not test_config.simulate and not test_config.skip_fixture:
+        if not test_config.fixture_port:
+            _port = list_ports_and_select("pressure-fixture")
+        else:
+            _port = ""
+        fixture = PressureFixture.create(port=_port, slot_side=test_config.fixture_side)
+    else:
+        fixture = SimPressureFixture()  # type: ignore[assignment]
+    fixture.connect()
+    return fixture
+
+
 async def _read_pressure_and_check_results(
     api: OT3API,
     fixture: PressureFixture,
@@ -448,17 +463,32 @@ async def _test_for_leak_by_eye(
     )
 
 
-def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
-    if not test_config.simulate and not test_config.skip_fixture:
-        if not test_config.fixture_port:
-            _port = list_ports_and_select("pressure-fixture")
-        else:
-            _port = ""
-        fixture = PressureFixture.create(port=_port, slot_side=test_config.fixture_side)
-    else:
-        fixture = SimPressureFixture()  # type: ignore[assignment]
-    fixture.connect()
-    return fixture
+async def _read_pipette_sensor_repeatedly_and_average(
+    api: OT3API, mount: OT3Mount, sensor_type: SensorType, num_readings: int
+) -> float:
+    # FIXME: this while loop is required b/c the command does not always
+    #        return a value, not sure what's the source of this issue
+    readings: List[float] = []
+    while len(readings) < num_readings:
+        try:
+            if sensor_type == SensorType.capacitive:
+                r = await helpers_ot3.get_capacitance_ot3(api, mount)
+            elif sensor_type == SensorType.pressure:
+                r = await helpers_ot3.get_pressure_ot3(api, mount)
+            elif sensor_type == SensorType.temperature:
+                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                r = res[0]
+            elif sensor_type == SensorType.humidity:
+                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+                r = res[1]
+            else:
+                raise ValueError(f"unexpected sensor type: {sensor_type}")
+        except helpers_ot3.SensorResponseBad:
+            continue
+        readings.append(r)
+    readings.sort()
+    readings = readings[1:-1]
+    return sum(readings) / len(readings)
 
 
 async def _test_diagnostics_environment(
@@ -552,34 +582,6 @@ async def _test_diagnostics_encoder(
     print("homing plunger")
     await api.home([pip_axis])
     return encoder_home_pass and encoder_move_pass and encoder_stall_pass
-
-
-async def _read_pipette_sensor_repeatedly_and_average(
-    api: OT3API, mount: OT3Mount, sensor_type: SensorType, num_readings: int
-) -> float:
-    # FIXME: this while loop is required b/c the command does not always
-    #        return a value, not sure if issue is in firmware or CAN
-    readings: List[float] = []
-    while len(readings) < num_readings:
-        try:
-            if sensor_type == SensorType.capacitive:
-                r = await helpers_ot3.get_capacitance_ot3(api, mount)
-            elif sensor_type == SensorType.pressure:
-                r = await helpers_ot3.get_pressure_ot3(api, mount)
-            elif sensor_type == SensorType.temperature:
-                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
-                r = res[0]
-            elif sensor_type == SensorType.humidity:
-                res = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
-                r = res[1]
-            else:
-                raise ValueError(f"unexpected sensor type: {sensor_type}")
-        except helpers_ot3.SensorResponseBad:
-            continue
-        readings.append(r)
-    readings.sort()
-    readings = readings[1:-1]
-    return sum(readings) / len(readings)
 
 
 async def _test_diagnostics_capacitive(
@@ -794,7 +796,7 @@ async def _reduce_speeds_and_accelerations(
 
 @dataclass
 class CSVCallbacks:
-    """CSV Callbacks."""
+    """CSV callback functions."""
 
     write: Callable
     pressure: Callable
@@ -803,7 +805,7 @@ class CSVCallbacks:
 
 @dataclass
 class CSVProperties:
-    """CSV Properties."""
+    """CSV properties."""
 
     id: str
     name: str
@@ -824,24 +826,27 @@ def _create_csv_and_get_callbacks(
     def _append_csv_data(
         data_list: List[Any],
         line_number: Optional[int] = None,
-        elapsed_seconds: Optional[float] = None,
-        timestamp_included: bool = False,
+        first_row_value: Optional[str] = None,
+        first_row_value_included: bool = False,
     ) -> None:
         # every line in the CSV file begins with the elapsed seconds
-        if not timestamp_included:
-            if elapsed_seconds is None:
-                elapsed_seconds = round(time() - start_time, 2)
-            data_list = [elapsed_seconds] + data_list
+        if not first_row_value_included:
+            if first_row_value is None:
+                first_row_value = str(round(time() - start_time, 2))
+            data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
             data.append_data_to_file(test_name, file_name, data_str + "\n")
         else:
             data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
 
-    def _cache_pressure_data_callback(d: List[Any]) -> None:
-        elapsed_seconds = round(time() - start_time, 2)
-        data_list_with_time = [elapsed_seconds] + d
-        PRESSURE_DATA_CACHE.append(data_list_with_time)
+    def _cache_pressure_data_callback(
+        d: List[Any], first_row_value: Optional[str] = None
+    ) -> None:
+        if first_row_value is None:
+            first_row_value = str(round(time() - start_time, 2))
+        data_list = [first_row_value] + d
+        PRESSURE_DATA_CACHE.append(data_list)
 
     def _handle_final_test_results(t: str, r: bool) -> None:
         # save final test results to both the CSV and to display at end of script
@@ -905,19 +910,21 @@ async def _main(test_config: TestConfig) -> None:
         FINAL_TEST_RESULTS = []
         PRESSURE_DATA_CACHE = []
         csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
-        csv_cb.pressure(PRESSURE_DATA_HEADER)
+        # cache the pressure-data header
+        csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
 
         # add metadata to CSV
+        # FIXME: create a set of CSV helpers, such that you can define a test-report
+        #        schema/format/line-length/etc., before having to fill its contents.
+        #        This would be very helpful, because changes to CVS length/contents
+        #        will break the analysis done in our Sheets
         csv_cb.write(["--------"])
         csv_cb.write(["METADATA"])
         csv_cb.write(["test-name", csv_props.name])
         csv_cb.write(["operator-name", test_config.operator_name])
         csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
         csv_cb.write(["pipette", pipette_sn])
-        if test_config.simulate:
-            csv_cb.write(["simulating"])
-        else:
-            csv_cb.write(["live"])
+        csv_cb.write(["simulating" if test_config.simulate else "live"])
         # add test configurations to CSV
         csv_cb.write(["-------------------"])
         csv_cb.write(["TEST-CONFIGURATIONS"])
@@ -952,18 +959,20 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["TEST"])
         print("homing")
         await api.home()
+
         if not test_config.skip_plunger or not test_config.skip_diagnostics:
             print("moving over slot 3")
             pos_slot_2 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
             current_pos = await api.gantry_position(mount)
             hover_over_slot_2 = pos_slot_2._replace(z=current_pos.z)
             await api.move_to(mount, hover_over_slot_2)
-        if not test_config.skip_diagnostics:
-            test_passed = await _test_diagnostics(api, mount, csv_cb.write)
-            csv_cb.results("diagnostics", test_passed)
-        if not test_config.skip_plunger:
-            test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
-            csv_cb.results("plunger", test_passed)
+            if not test_config.skip_diagnostics:
+                test_passed = await _test_diagnostics(api, mount, csv_cb.write)
+                csv_cb.results("diagnostics", test_passed)
+            if not test_config.skip_plunger:
+                test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
+                csv_cb.results("plunger", test_passed)
+
         if not test_config.skip_liquid:
             for i, tip in enumerate(tips_used):
                 droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
@@ -971,6 +980,7 @@ async def _main(test_config: TestConfig) -> None:
                     api, mount, test_config, tip, droplet_wait_seconds
                 )
                 csv_cb.results("droplets", test_passed)
+
         if not test_config.skip_fixture:
             test_passed = await _test_for_leak(
                 api,
@@ -987,13 +997,17 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["-------------"])
         csv_cb.write(["PRESSURE-DATA"])
         for press_data in PRESSURE_DATA_CACHE:
-            csv_cb.write(press_data, timestamp_included=True)
+            csv_cb.write(press_data, first_row_value_included=True)
 
         # put the top-line results at the top of the CSV file
         # so here we cache each data line, then add them to the top
         # of the file in reverse order
         _results_csv_lines = list()
-        _results_csv_lines.append(["-------"])
+        # add extra entries of black cells to the top of the CSV
+        # to help operators when the copy/paste
+        _results_csv_lines.append(
+            ["-------"] + ["---" for _ in range(len(PRESSURE_DATA_HEADER) - 1)]
+        )
         _results_csv_lines.append(["RESULTS"])
         print("final test results:")
         for result in FINAL_TEST_RESULTS:
@@ -1001,7 +1015,7 @@ async def _main(test_config: TestConfig) -> None:
             print(" - " + "\t".join(result))
         _results_csv_lines.reverse()
         for r in _results_csv_lines:
-            csv_cb.write(r, line_number=0, elapsed_seconds=0.0)
+            csv_cb.write(r, line_number=0, first_row_value="0.0")
 
         # print the filepath again, to help debugging
         print(f"CSV: {csv_props.name}")
