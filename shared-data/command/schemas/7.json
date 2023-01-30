@@ -1617,12 +1617,6 @@
           "default": 1.0,
           "type": "number"
         },
-        "vOffset": {
-          "title": "Voffset",
-          "description": "Offset in mm from the top of the well to touch tip. A positive offset moves the tip higher above the well while a negative offset moves it lower.",
-          "default": -1.0,
-          "type": "number"
-        },
         "speed": {
           "title": "Speed",
           "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",

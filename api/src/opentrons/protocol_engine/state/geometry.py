@@ -19,22 +19,12 @@ from ..types import (
     LabwareOffsetVector,
     DeckType,
 )
-from .labware import LabwareView, EdgePathType
+from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import CurrentWell
+from . import move_types
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
-
-
-@dataclass
-class EdgeList:
-    """Potential points for a touch tip operation."""
-
-    right: Point
-    left: Point
-    center: Point
-    up: Point
-    down: Point
 
 
 @dataclass(frozen=True)
@@ -217,51 +207,30 @@ class GeometryView:
         well_def = self._labware.get_well_definition(labware_id, well_name)
         return well_def.depth
 
-    def determine_edge_path(
+    def get_touch_points(
         self,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
         mount: MountType,
-        edges: EdgeList,
+        radius: float = 1.0,
     ) -> List[Point]:
-        """Determine the safe list of points to touch the pipette tip to."""
+        """Get a list of touch points for a touch tip operation."""
         labware_slot = self.get_ancestor_slot_name(labware_id)
         next_to_module = self._modules.is_edge_move_unsafe(mount, labware_slot)
         edge_path_type = self._labware.get_edge_path_type(
             labware_id, well_name, mount, labware_slot, next_to_module
         )
 
-        if edge_path_type == EdgePathType.LEFT:
-            return [edges.left, edges.center, edges.up, edges.down]
-        elif edge_path_type == EdgePathType.RIGHT:
-            return [edges.right, edges.center, edges.up, edges.down]
-        else:
-            return [edges.right, edges.left, edges.center, edges.up, edges.down]
-
-    def get_well_edges(
-        self,
-        labware_id: str,
-        well_name: str,
-        radius: float = 1.0,
-        offset: float = -1.0,
-    ) -> EdgeList:
-        """Get list of absolute positions of four cardinal edges and center of well."""
-        x_size, y_size, z_size = self._labware.get_well_size(labware_id, well_name)
-
-        x_offset = x_size / 2.0 * radius
-        y_offset = y_size / 2.0 * radius
-        z_offset = z_size / 2.0 + offset
-
-        center = self.get_well_position(
-            labware_id, well_name, well_location=WellLocation(origin=WellOrigin.CENTER)
+        center_point = self.get_well_position(
+            labware_id, well_name, well_location=well_location
         )
 
-        return EdgeList(
-            right=center + Point(x=x_offset, y=0, z=z_offset),
-            left=center + Point(x=-x_offset, y=0, z=z_offset),
-            center=center + Point(x=0, y=0, z=z_offset),
-            up=center + Point(x=0, y=y_offset, z=z_offset),
-            down=center + Point(x=0, y=-y_offset, z=z_offset),
+        x_offset, y_offset = self._labware.get_well_radial_offsets(
+            labware_id, well_name, radius
+        )
+        return move_types.get_edge_point_list(
+            center_point, x_offset, y_offset, edge_path_type
         )
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:

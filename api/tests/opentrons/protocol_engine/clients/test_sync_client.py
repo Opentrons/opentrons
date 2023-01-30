@@ -378,7 +378,6 @@ def test_touch_tip(
             wellName="A2",
             wellLocation=WellLocation(),
             radius=7.89,
-            vOffset=9.87,
             speed=65.4,
         )
     )
@@ -393,7 +392,6 @@ def test_touch_tip(
         well_name="A2",
         well_location=WellLocation(),
         radius=7.89,
-        v_offset=9.87,
         speed=65.4,
     )
 

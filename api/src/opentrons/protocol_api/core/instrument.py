@@ -81,7 +81,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         location: types.Location,
         well_core: WellCoreType,
         radius: float,
-        v_offset: float,
+        z_offset: float,
         speed: float,
     ) -> None:
         ...

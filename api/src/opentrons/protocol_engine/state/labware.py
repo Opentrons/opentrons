@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
 from typing import (
     Any,
     Dict,
@@ -49,6 +48,7 @@ from ..actions import (
     AddLabwareDefinitionAction,
 )
 from .abstract_store import HasState, HandlesActions
+from .move_types import EdgePathType
 
 
 # URIs of labware whose definitions accidentally specify an engage height
@@ -68,14 +68,6 @@ class LabwareLoadParams(NamedTuple):
     load_name: str
     namespace: str
     version: int
-
-
-class EdgePathType(str, Enum):
-    """Types of well edge point paths for touch tip."""
-
-    LEFT = "left"
-    RIGHT = "right"
-    DEFAULT = "default"
 
 
 @dataclass
@@ -386,22 +378,12 @@ class LabwareView(HasState[LabwareState]):
 
         return x_size, y_size, well_definition.depth
 
-    def validate_liquid_allowed_in_labware(
-        self, labware_id: str, wells: Mapping[str, Any]
-    ) -> List[str]:
-        """Check if wells associated to a labware_id has well by name and that labware is not tiprack."""
-        labware_definition = self.get_definition(labware_id)
-        labware_wells = labware_definition.wells
-        contains_wells = all(well_name in labware_wells for well_name in iter(wells))
-        if labware_definition.parameters.isTiprack:
-            raise errors.LabwareIsTipRackError(
-                f"Given labware: {labware_id} is a tiprack. Can not load liquid."
-            )
-        if not contains_wells:
-            raise errors.WellDoesNotExistError(
-                f"Some of the supplied wells do not match the labwareId: {labware_id}."
-            )
-        return list(wells)
+    def get_well_radial_offsets(
+        self, labware_id: str, well_name: str, radius_percentage: float
+    ) -> Tuple[float, float]:
+        """Get x and y radius offsets modified by radius percentage."""
+        x_size, y_size, z_size = self.get_well_size(labware_id, well_name)
+        return (x_size / 2.0) * radius_percentage, (y_size / 2.0) * radius_percentage
 
     def get_edge_path_type(
         self,
@@ -431,6 +413,23 @@ class LabwareView(HasState[LabwareState]):
             return EdgePathType.RIGHT
         else:
             return EdgePathType.DEFAULT
+
+    def validate_liquid_allowed_in_labware(
+        self, labware_id: str, wells: Mapping[str, Any]
+    ) -> List[str]:
+        """Check if wells associated to a labware_id has well by name and that labware is not tiprack."""
+        labware_definition = self.get_definition(labware_id)
+        labware_wells = labware_definition.wells
+        contains_wells = all(well_name in labware_wells for well_name in iter(wells))
+        if labware_definition.parameters.isTiprack:
+            raise errors.LabwareIsTipRackError(
+                f"Given labware: {labware_id} is a tiprack. Can not load liquid."
+            )
+        if not contains_wells:
+            raise errors.WellDoesNotExistError(
+                f"Some of the supplied wells do not match the labwareId: {labware_id}."
+            )
+        return list(wells)
 
     def get_tip_length(self, labware_id: str) -> float:
         """Get the tip length of a tip rack."""

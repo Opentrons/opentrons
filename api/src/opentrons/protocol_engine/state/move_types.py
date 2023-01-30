@@ -1,9 +1,31 @@
 """Getters for Protocol Engine motion planning."""
-from typing import Optional
+from dataclasses import dataclass
+from enum import Enum
+from typing import List, Optional
 
+from opentrons.types import Point
 from opentrons.motion_planning.types import MoveType
 
 from .pipettes import CurrentWell
+
+
+@dataclass
+class EdgeList:
+    """Potential points for a touch tip operation."""
+
+    right: Point
+    left: Point
+    center: Point
+    up: Point
+    down: Point
+
+
+class EdgePathType(str, Enum):
+    """Types of well edge point paths for touch tip."""
+
+    LEFT = "left"
+    RIGHT = "right"
+    DEFAULT = "default"
 
 
 def get_move_type_to_well(
@@ -28,3 +50,23 @@ def get_move_type_to_well(
         )
     else:
         return MoveType.GENERAL_ARC
+
+
+def get_edge_point_list(
+    center: Point, x_radius: float, y_radius: float, edge_path_type: EdgePathType
+) -> List[Point]:
+    """Get list of edge points dependent on edge path type."""
+    edges = EdgeList(
+        right=center + Point(x=x_radius, y=0, z=0),
+        left=center + Point(x=-x_radius, y=0, z=0),
+        center=center,
+        up=center + Point(x=0, y=y_radius, z=0),
+        down=center + Point(x=0, y=-y_radius, z=0),
+    )
+
+    if edge_path_type == EdgePathType.LEFT:
+        return [edges.left, edges.center, edges.up, edges.down]
+    elif edge_path_type == EdgePathType.RIGHT:
+        return [edges.right, edges.center, edges.up, edges.down]
+    else:
+        return [edges.right, edges.left, edges.center, edges.up, edges.down]

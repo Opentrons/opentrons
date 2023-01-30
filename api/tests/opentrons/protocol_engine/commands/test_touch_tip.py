@@ -26,7 +26,6 @@ async def test_touch_tip_implementation(
         wellName="A3",
         wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         radius=0.456,
-        vOffset=-7.89,
         speed=42.0,
     )
 
@@ -41,7 +40,6 @@ async def test_touch_tip_implementation(
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
             radius=0.456,
-            v_offset=-7.89,
             speed=42.0,
         )
     )

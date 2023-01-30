@@ -26,14 +26,6 @@ class TouchTipParams(PipetteIdMixin, WellLocationMixin):
         ),
     )
 
-    vOffset: float = Field(
-        -1.0,
-        description=(
-            "Offset in mm from the top of the well to touch tip. A positive offset moves the tip higher above the well"
-            " while a negative offset moves it lower."
-        ),
-    )
-
     speed: Optional[float] = Field(
         None,
         description=(
@@ -76,7 +68,6 @@ class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]
             well_name=params.wellName,
             well_location=params.wellLocation,
             radius=params.radius,
-            v_offset=params.vOffset,
             speed=params.speed,
         )
 

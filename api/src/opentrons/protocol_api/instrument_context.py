@@ -539,8 +539,10 @@ class InstrumentContext(publisher.CommandPublisher):
             if not last_location:
                 raise RuntimeError("No valid current location cache present")
             parent_labware, well = last_location.labware.get_parent_labware_and_well()
-            if not well:
-                raise RuntimeError(f"Last location {location} has no associated well.")
+            if not well or not parent_labware:
+                raise RuntimeError(
+                    f"Last location {location} has no associated well or labware."
+                )
         elif isinstance(location, labware.Well):
             well = location
             parent_labware = well.parent
@@ -564,7 +566,7 @@ class InstrumentContext(publisher.CommandPublisher):
             location=move_to_location,
             well_core=well._core,
             radius=radius,
-            v_offset=v_offset,
+            z_offset=v_offset,
             speed=checked_speed,
         )
         return self

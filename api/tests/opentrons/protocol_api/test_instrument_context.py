@@ -590,7 +590,7 @@ def test_touch_tip(
             location=Location(point=Point(1, 2, 3), labware=mock_well),
             well_core=mock_well._core,
             radius=0.123,
-            v_offset=4.56,
+            z_offset=4.56,
             speed=42.0,
         )
     )

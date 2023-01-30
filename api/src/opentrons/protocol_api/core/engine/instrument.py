@@ -7,7 +7,7 @@ from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates
-from opentrons.protocol_engine import DeckPoint, WellLocation
+from opentrons.protocol_engine import DeckPoint, WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -183,16 +183,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         location: Location,
         well_core: WellCore,
         radius: float,
-        v_offset: float,
+        z_offset: float,
         speed: float,
     ) -> None:
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
-        well_location = self._engine_client.state.geometry.get_relative_well_location(
-            labware_id=labware_id,
-            well_name=well_name,
-            absolute_point=location.point,
+        well_location = WellLocation(
+            origin=WellOrigin.CENTER, offset=WellOffset(x=0, y=0, z=z_offset)
         )
 
         self._engine_client.touch_tip(
@@ -201,7 +199,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
             radius=radius,
-            v_offset=v_offset,
             speed=speed,
         )
 

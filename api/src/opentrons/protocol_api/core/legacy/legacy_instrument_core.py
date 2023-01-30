@@ -140,7 +140,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         location: types.Location,
         well_core: LegacyWellCore,
         radius: float,
-        v_offset: float,
+        z_offset: float,
         speed: float,
     ) -> None:
         """
@@ -166,7 +166,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                 core=well_core,
                 api_version=self._api_version,
             ),
-            offset=v_offset,
+            offset=z_offset,
             mount=self._mount,
             deck=self._protocol_interface.get_deck(),
             radius=radius,

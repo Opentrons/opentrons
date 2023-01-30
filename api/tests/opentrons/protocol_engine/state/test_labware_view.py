@@ -21,12 +21,11 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleLocation,
 )
-
+from opentrons.protocol_engine.state.move_types import EdgePathType
 from opentrons.protocol_engine.state.labware import (
     LabwareState,
     LabwareView,
     LabwareLoadParams,
-    EdgePathType,
 )
 
 

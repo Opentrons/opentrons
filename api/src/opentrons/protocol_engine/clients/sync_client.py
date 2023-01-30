@@ -303,7 +303,6 @@ class SyncClient:
         well_name: str,
         well_location: WellLocation,
         radius: float,
-        v_offset: float,
         speed: float,
     ) -> commands.TouchTipResult:
         """Execute a ``Touch Tip`` command and return the result."""
@@ -314,7 +313,6 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 radius=radius,
-                vOffset=v_offset,
                 speed=speed,
             )
         )

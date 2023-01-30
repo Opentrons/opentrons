@@ -1,4 +1,6 @@
 """Test state getters for retrieving geometry views of state."""
+import inspect
+
 import pytest
 from decoy import Decoy
 from typing import cast, List, Tuple, Union, Optional
@@ -23,9 +25,10 @@ from opentrons.protocol_engine.types import (
     Dimensions,
     DeckType,
 )
-from opentrons.protocol_engine.state.labware import LabwareView, EdgePathType
+from opentrons.protocol_engine.state import move_types
+from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.geometry import GeometryView, EdgeList
+from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.pipettes import CurrentWell
 
 
@@ -39,6 +42,13 @@ def labware_view(decoy: Decoy) -> LabwareView:
 def module_view(decoy: Decoy) -> ModuleView:
     """Get a mock in the shape of a ModuleView."""
     return decoy.mock(cls=ModuleView)
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out move_types.py functions."""
+    for name, func in inspect.getmembers(move_types, inspect.isfunction):
+        monkeypatch.setattr(move_types, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -478,77 +488,11 @@ def test_get_well_height(
     assert subject.get_well_height("labware-id", "B2") == 10.67
 
 
-@pytest.mark.parametrize(
-    ["edge_path_type", "expected_result"],
-    [
-        (
-            EdgePathType.LEFT,
-            [Point(1, 1, 1), Point(2, 2, 2), Point(3, 3, 3), Point(4, 4, 4)],
-        ),
-        (
-            EdgePathType.RIGHT,
-            [Point(0, 0, 0), Point(2, 2, 2), Point(3, 3, 3), Point(4, 4, 4)],
-        ),
-        (
-            EdgePathType.DEFAULT,
-            [
-                Point(0, 0, 0),
-                Point(1, 1, 1),
-                Point(2, 2, 2),
-                Point(3, 3, 3),
-                Point(4, 4, 4),
-            ],
-        ),
-    ],
-)
-def test_determine_edge_path(
-    decoy: Decoy,
-    labware_view: LabwareView,
-    module_view: ModuleView,
-    edge_path_type: EdgePathType,
-    expected_result: List[Point],
-    subject: GeometryView,
-) -> None:
-    """It should determine the correct list of touch points."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-
-    decoy.when(
-        module_view.is_edge_move_unsafe(MountType.LEFT, DeckSlotName.SLOT_4)
-    ).then_return(True)
-
-    decoy.when(
-        labware_view.get_edge_path_type(
-            "labware-id", "well-name", MountType.LEFT, DeckSlotName.SLOT_4, True
-        )
-    ).then_return(edge_path_type)
-
-    result = subject.determine_edge_path(
-        labware_id="labware-id",
-        well_name="well-name",
-        mount=MountType.LEFT,
-        edges=EdgeList(
-            right=Point(0, 0, 0),
-            left=Point(1, 1, 1),
-            center=Point(2, 2, 2),
-            up=Point(3, 3, 3),
-            down=Point(4, 4, 4),
-        ),
-    )
-
-    assert result == expected_result
-
-
-def test_get_well_edges(
+def test_get_touch_points(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    module_view: ModuleView,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware."""
@@ -575,29 +519,43 @@ def test_get_well_edges(
         well_def
     )
 
-    assert well_def.diameter is not None
-    decoy.when(labware_view.get_well_size("labware-id", "B2")).then_return(
-        (well_def.diameter, well_def.diameter, well_def.depth)
-    )
-
-    result = subject.get_well_edges("labware-id", "B2", radius=0.5, offset=1.0)
-
     expected_center = Point(
         x=slot_pos[0] + 1 + well_def.x,
         y=slot_pos[1] - 2 + well_def.y,
-        z=slot_pos[2] + 3 + well_def.z + well_def.depth / 2.0,
+        z=slot_pos[2] + 3 + well_def.z + well_def.depth / 2.0 + 42,
     )
 
-    expected_xy_offset = well_def.diameter / 4.0
-    expected_z_offset = well_def.depth / 2.0 + 1
+    decoy.when(
+        module_view.is_edge_move_unsafe(MountType.LEFT, DeckSlotName.SLOT_4)
+    ).then_return(True)
 
-    assert result == EdgeList(
-        right=expected_center + Point(x=expected_xy_offset, y=0, z=expected_z_offset),
-        left=expected_center + Point(x=-expected_xy_offset, y=0, z=expected_z_offset),
-        center=expected_center + Point(x=0, y=0, z=expected_z_offset),
-        up=expected_center + Point(x=0, y=expected_xy_offset, z=expected_z_offset),
-        down=expected_center + Point(x=0, y=-expected_xy_offset, z=expected_z_offset),
+    decoy.when(
+        labware_view.get_edge_path_type(
+            "labware-id", "B2", MountType.LEFT, DeckSlotName.SLOT_4, True
+        )
+    ).then_return(move_types.EdgePathType.RIGHT)
+
+    decoy.when(
+        labware_view.get_well_radial_offsets("labware-id", "B2", 0.123)
+    ).then_return((1.2, 3.4))
+
+    decoy.when(
+        move_types.get_edge_point_list(
+            expected_center, 1.2, 3.4, move_types.EdgePathType.RIGHT
+        )
+    ).then_return([Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)])
+
+    result = subject.get_touch_points(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=WellLocation(
+            origin=WellOrigin.CENTER, offset=WellOffset(x=0, y=0, z=42)
+        ),
+        mount=MountType.LEFT,
+        radius=0.123,
     )
+
+    assert result == [Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)]
 
 
 def test_get_module_labware_well_position(
