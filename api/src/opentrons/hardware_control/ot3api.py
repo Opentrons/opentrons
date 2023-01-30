@@ -1370,13 +1370,6 @@ class OT3API(
                 pipette_spec.speed,
                 "home",
             )
-            # Move to pick up position
-            target_up = target_position_from_relative(
-                mount,
-                pipette_spec.tiprack_up,
-                self._current_position,
-            )
-            await self._move(target_up)
 
     async def pick_up_tip(
         self,
@@ -1391,18 +1384,6 @@ class OT3API(
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
-
-        target_absolute = target_position_from_plunger(
-            realmount, spec.plunger_prep_pos, self._current_position
-        )
-        async with self._backend.restore_current():
-            await self._backend.set_active_current(
-                {axis: current for axis, current in spec.plunger_currents.items()}
-            )
-            await self._move(
-                target_absolute,
-                home_flagged_axes=False,
-            )
 
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
@@ -1465,6 +1446,12 @@ class OT3API(
                     move.target_position,
                     move.speed,
                     "clamp",
+                )
+                await self._backend.tip_action(
+                    [OT3Axis.of_main_tool_actuator(mount)],
+                    move.target_position,
+                    move.speed,
+                    "home",
                 )
             else:
                 target_pos = target_position_from_plunger(
