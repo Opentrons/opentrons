@@ -29,12 +29,12 @@ from ..module import (
     AbstractHeaterShakerCore,
 )
 
-from .labware import LabwareImplementation
+from .legacy_labware_core import LegacyLabwareCore
 from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
 from ...labware import Labware
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContextImplementation
+    from .legacy_protocol_core import LegacyProtocolCore
 
 
 _log = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ class LegacyModuleCore(AbstractModuleCore):
         sync_module_hardware: SynchronousAdapter[hw_modules.AbstractModule],
         requested_model: ModuleModel,
         geometry: ModuleGeometry,
-        protocol_core: ProtocolContextImplementation,
+        protocol_core: LegacyProtocolCore,
     ) -> None:
         self._sync_module_hardware = sync_module_hardware
         self._requested_model = requested_model
@@ -91,11 +91,11 @@ class LegacyModuleCore(AbstractModuleCore):
         """Get the module's display name."""
         return self._geometry.display_name
 
-    def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
+    def add_labware_core(self, labware_core: LegacyLabwareCore) -> Labware:
         """Add a labware to the module."""
         labware = self.geometry.add_labware(
             Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._protocol_core.api_version,
                 protocol_core=None,  # type: ignore[arg-type]
                 core_map=None,  # type: ignore[arg-type]
@@ -189,9 +189,7 @@ class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
                 " using `height_from_base` or `height`"
             )
 
-        engage_height = labware._implementation.get_default_magnet_engage_height(
-            preserve_half_mm
-        )
+        engage_height = labware._core.get_default_magnet_engage_height(preserve_half_mm)
 
         if engage_height is None:
             raise ValueError(
@@ -220,7 +218,7 @@ class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
         """Get the module's current magnet status."""
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
-    def add_labware_core(self, labware_core: LabwareImplementation) -> Labware:
+    def add_labware_core(self, labware_core: LegacyLabwareCore) -> Labware:
         """Add a labware to the module."""
         labware = super().add_labware_core(labware_core)
         if labware_core.get_default_magnet_engage_height() is None:
@@ -560,7 +558,7 @@ def create_module_core(
     module_hardware_api: hw_modules.AbstractModule,
     requested_model: ModuleModel,
     geometry: ModuleGeometry,
-    protocol_core: ProtocolContextImplementation,
+    protocol_core: LegacyProtocolCore,
 ) -> LegacyModuleCore:
     core_cls = LegacyModuleCore
 

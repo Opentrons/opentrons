@@ -34,7 +34,7 @@ from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_hardware.hardware_control.network import probe
+from opentrons_hardware.hardware_control.network import NetworkInfo
 
 
 IS_LINUX = sys.platform.startswith("linux")
@@ -246,7 +246,8 @@ async def _do_test(
     messenger = CanMessenger(driver)
     messenger.start()
     warner = WarningsWithCooldown()
-    present = await probe(messenger, None, 1)
+    network_info = NetworkInfo(messenger)
+    present = set(await network_info.probe(None, 1))
     if not present and mode != StimulusMode.ONE_TO_NONE:
         raise RuntimeError(
             f"No nodes are present and test mode {mode.name} requires at least "

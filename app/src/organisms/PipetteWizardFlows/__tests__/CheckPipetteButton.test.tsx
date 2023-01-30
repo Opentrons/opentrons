@@ -1,31 +1,22 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import * as RobotApi from '../../../redux/robot-api'
-import { fetchPipettes } from '../../../redux/pipettes'
+import { FAILURE, SUCCESS } from '../../../redux/robot-api'
 import { CheckPipetteButton } from '../CheckPipetteButton'
+import { useCheckPipettes } from '../hooks'
 
-import { DispatchApiRequestType } from '../../../redux/robot-api'
+jest.mock('../hooks')
 
-jest.mock('../../../redux/robot-api')
-jest.mock('../../../redux/pipettes')
+const mockUseCheckPipettes = useCheckPipettes as jest.MockedFunction<
+  typeof useCheckPipettes
+>
 
-const mockFetchPipettes = fetchPipettes as jest.MockedFunction<
-  typeof fetchPipettes
->
-const mockUseDispatchApiRequests = RobotApi.useDispatchApiRequests as jest.MockedFunction<
-  typeof RobotApi.useDispatchApiRequests
->
-const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
-  typeof RobotApi.getRequestById
->
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
   return renderWithProviders(<CheckPipetteButton {...props} />)[0]
 }
 
 describe('CheckPipetteButton', () => {
   let props: React.ComponentProps<typeof CheckPipetteButton>
-  let dispatchApiRequest: DispatchApiRequestType
+  const mockCheckPipette = jest.fn()
   beforeEach(() => {
     props = {
       robotName: 'otie',
@@ -34,15 +25,29 @@ describe('CheckPipetteButton', () => {
       setPending: jest.fn(),
       isDisabled: false,
     }
-    dispatchApiRequest = jest.fn()
-    mockGetRequestById.mockReturnValue(null)
-    mockUseDispatchApiRequests.mockReturnValue([dispatchApiRequest, ['id']])
+    mockUseCheckPipettes.mockReturnValue({
+      requestStatus: SUCCESS,
+      isPending: false,
+      handleCheckPipette: mockCheckPipette,
+    })
   })
-  it('clicking on the button dispatches api request', () => {
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+  it('clicking on the button calls checkPipette success', () => {
     const { getByRole } = render(props)
-    const proceedBtn = getByRole('button', { name: 'continue' })
-    fireEvent.click(proceedBtn)
-    expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+    getByRole('button', { name: 'continue' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
+  })
+  it('clicking on the button calls checkPipette failure', () => {
+    mockUseCheckPipettes.mockReturnValue({
+      requestStatus: FAILURE,
+      isPending: false,
+      handleCheckPipette: mockCheckPipette,
+    })
+    const { getByRole } = render(props)
+    getByRole('button', { name: 'continue' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
   })
   it('renders button disbaled when isDisabled is true', () => {
     props = {

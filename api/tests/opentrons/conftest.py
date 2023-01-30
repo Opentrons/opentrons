@@ -53,7 +53,7 @@ from opentrons.protocol_api import (
     Labware,
     create_protocol_context,
 )
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 
 from opentrons.types import Location, Point
 
@@ -617,23 +617,23 @@ def minimal_labware_def2() -> LabwareDefinition:
 
 
 @pytest.fixture()
-def min_lw_impl(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
-    return LabwareImplementation(
+def min_lw_impl(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
+    return LegacyLabwareCore(
         definition=minimal_labware_def, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
 @pytest.fixture()
-def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LabwareImplementation:
-    return LabwareImplementation(
+def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LegacyLabwareCore:
+    return LegacyLabwareCore(
         definition=minimal_labware_def2, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
 @pytest.fixture()
-def min_lw(min_lw_impl: LabwareImplementation) -> Labware:
+def min_lw(min_lw_impl: LegacyLabwareCore) -> Labware:
     return Labware(
-        implementation=min_lw_impl,
+        core=min_lw_impl,
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
@@ -641,9 +641,9 @@ def min_lw(min_lw_impl: LabwareImplementation) -> Labware:
 
 
 @pytest.fixture()
-def min_lw2(min_lw2_impl: LabwareImplementation) -> Labware:
+def min_lw2(min_lw2_impl: LegacyLabwareCore) -> Labware:
     return Labware(
-        implementation=min_lw2_impl,
+        core=min_lw2_impl,
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
