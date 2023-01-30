@@ -42,6 +42,8 @@ _log = logging.getLogger(__name__)
 
 _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
 """The version after which the pick-up tip procedure should also prepare the plunger."""
+_PRESSES_INCREMENT_DEPRECATE_FROM = APIVersion(2, 14)
+"""The version after which the pick-up tip procedure should also prepare the plunger."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -648,7 +650,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 0)
+    @requires_version(2, 0)  # noqa: C901
     def pick_up_tip(
         self,
         location: Union[types.Location, labware.Well, labware.Labware, None] = None,
@@ -691,11 +693,13 @@ class InstrumentContext(publisher.CommandPublisher):
                         will result in the pipette hovering over the tip but
                         not picking it up--generally not desirable, but could
                         be used for dry-run).
+                        .. deprecated:: 2.14
         :type presses: int
         :param increment: The additional distance to travel on each successive
                           press (e.g.: if `presses=3` and `increment=1.0`, then
                           the first press will travel down into the tip by
                           3.5mm, the second by 4.5mm, and the third by 5.5mm).
+                          .. deprecated:: 2.14
         :type increment: float
         :param prep_after: Whether the pipette plunger should prepare itself
                            to aspirate immediately after picking up a tip.
@@ -728,6 +732,22 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
+
+        if (
+            presses is not None
+            and self._api_version >= _PRESSES_INCREMENT_DEPRECATE_FROM
+        ):
+            raise APIVersionError(
+                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_DEPRECATE_FROM},"
+                f" but you are using API {self._api_version}."
+            )
+
+        if increment is not None and self._api_version >= _PRESSES_INCREMENT_DEPRECATE_FROM:
+            raise APIVersionError(
+                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_DEPRECATE_FROM},"
+                f" but you are using API {self._api_version}."
+            )
+
         if prep_after is not None and self._api_version < _PREP_AFTER_ADDED_IN:
             raise APIVersionError(
                 f"prep_after is only available in API {_PREP_AFTER_ADDED_IN} and newer,"
