@@ -57,7 +57,6 @@ from .util import DeckTransformState
 from .types import (
     Axis,
     CriticalPoint,
-    MustHomeError,
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
@@ -72,8 +71,8 @@ from .types import (
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
-    GripperNotAttachedError,
 )
+from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
 from .robot_calibration import (
     OT3Transforms,

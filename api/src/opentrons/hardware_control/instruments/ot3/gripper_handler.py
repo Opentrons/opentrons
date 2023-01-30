@@ -8,6 +8,8 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperJawState,
     GripperProbe,
+)
+from opentrons.hardware_control.errors import (
     InvalidMoveError,
     GripperNotAttachedError,
 )
