@@ -15,7 +15,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { isOT3Pipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-import { useDeleteCalDataMutation } from '@opentrons/react-api-client'
+import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
 
 import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -221,9 +221,9 @@ export function OverflowMenu({
     }
   }, [isRunning, updateRobotStatus])
 
-  const { deleteCalData } = useDeleteCalDataMutation()
+  const { deleteCalibration } = useDeleteCalibrationMutation()
 
-  const handleDeleteCalibrationData = (
+  const handleDeleteCalibration = (
     calType: 'pipetteOffset' | 'tipLength',
     e: React.MouseEvent
   ): void => {
@@ -245,7 +245,7 @@ export function OverflowMenu({
       }
     }
 
-    deleteCalData(params)
+    deleteCalibration(params)
 
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
@@ -316,7 +316,7 @@ export function OverflowMenu({
             </MenuItem>
           ) : null}
           <Divider />
-          <MenuItem onClick={e => handleDeleteCalibrationData(calType, e)}>
+          <MenuItem onClick={e => handleDeleteCalibration(calType, e)}>
             {t('robot_calibration:delete_calibration_data')}
           </MenuItem>
         </Flex>

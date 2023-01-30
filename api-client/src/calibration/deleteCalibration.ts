@@ -4,7 +4,7 @@ import type { ResponsePromise } from '../request'
 import type { HostConfig, EmptyResponse } from '../types'
 import type { DeleteCalRequestParams } from './types'
 
-export function deleteCalData(
+export function deleteCalibration(
   config: HostConfig,
   params: DeleteCalRequestParams
 ): ResponsePromise<EmptyResponse> {

@@ -1,5 +1,5 @@
 import { useMutation } from 'react-query'
-import { deleteCalData } from '@opentrons/api-client'
+import { deleteCalibration } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type {
@@ -13,32 +13,32 @@ import type {
   DeleteCalRequestParams,
 } from '@opentrons/api-client'
 
-export type UseDeleteCalDataMutationResult = UseMutationResult<
+export type UseDeleteCalibrationMutationResult = UseMutationResult<
   EmptyResponse,
   unknown,
   DeleteCalRequestParams
 > & {
-  deleteCalData: UseMutateFunction<
+  deleteCalibration: UseMutateFunction<
     EmptyResponse,
     unknown,
     DeleteCalRequestParams
   >
 }
 
-export type UseDeleteCalDataMutationOptions = UseMutationOptions<
+export type UseDeleteCalibrationMutationOptions = UseMutationOptions<
   EmptyResponse,
   unknown,
   DeleteCalRequestParams
 >
 
-export function useDeleteCalDataMutation(
-  options: UseDeleteCalDataMutationOptions = {}
-): UseDeleteCalDataMutationResult {
+export function useDeleteCalibrationMutation(
+  options: UseDeleteCalibrationMutationOptions = {}
+): UseDeleteCalibrationMutationResult {
   const host = useHost()
 
   const mutation = useMutation<EmptyResponse, unknown, DeleteCalRequestParams>(
     (requestParams: DeleteCalRequestParams) =>
-      deleteCalData(host as HostConfig, requestParams).then(
+      deleteCalibration(host as HostConfig, requestParams).then(
         response => response.data
       ),
     options
@@ -46,6 +46,6 @@ export function useDeleteCalDataMutation(
 
   return {
     ...mutation,
-    deleteCalData: mutation.mutate,
+    deleteCalibration: mutation.mutate,
   }
 }
