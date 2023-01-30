@@ -406,26 +406,6 @@ class MoveScheduler:
             # pick up groups they don't care about, and need to not fail.
             pass
 
-    def _handle_tip_action(self, message: TipActionResponse) -> None:
-        group_id = message.payload.group_id.value - self._start_at_index
-        ack_id = message.payload.ack_id.value
-        try:
-            limit_switch = bool(
-                self._stop_condition[group_id] == MoveStopCondition.limit_switch
-            )
-        except IndexError:
-            return
-        success = message.payload.success.value
-        # TODO need to add tip action type to the response message.
-        if limit_switch and limit_switch != ack_id and not success:
-            condition = "Tip still detected."
-            log.warning(f"Drop tip failed. Condition {condition}")
-            raise MoveConditionNotMet()
-        elif not limit_switch and not success:
-            condition = "Tip not detected."
-            log.warning(f"Pick up tip failed. Condition {condition}")
-            raise MoveConditionNotMet()
-
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
@@ -435,7 +415,7 @@ class MoveScheduler:
             self._handle_move_completed(message)
         elif isinstance(message, TipActionResponse):
             self._remove_move_group(message, arbitration_id)
-            self._handle_tip_action(message)
+            self._handle_move_completed(message)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
         elif isinstance(message, Acknowledgement):
