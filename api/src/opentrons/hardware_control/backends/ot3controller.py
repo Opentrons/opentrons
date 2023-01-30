@@ -179,6 +179,7 @@ class OT3Controller:
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._update_required = False
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -265,6 +266,29 @@ class OT3Controller:
 
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware for a single subsystem."""
+        with open(filename, "r") as f:
+            await firmware_update.run_update(
+                messenger=self._messenger,
+                node_id=sub_system_to_node_id(target),
+                hex_file=f,
+                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
+                #  config values.
+                retry_count=3,
+                timeout_seconds=20,
+                erase=True,
+            )
+
+    @property
+    def fw_version(self) -> Optional[str]:
+        """Get the firmware version."""
+        return None
+
+    @property
+    def update_required(self) -> bool:
+        return self._update_required
+
+    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
+        """Update the firmware."""
         with open(filename, "r") as f:
             await firmware_update.run_update(
                 messenger=self._messenger,

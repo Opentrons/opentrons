@@ -1,3 +1,4 @@
+from unittest.mock import mock_open
 import pytest
 from typing import List, Optional, Set, Tuple, Any
 from itertools import chain
@@ -25,8 +26,10 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     MotorStatus,
+    OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
+    FirmwareUpdateRequired,
     InvalidPipetteName,
     InvalidPipetteModel,
     MustHomeError,
@@ -751,3 +754,46 @@ async def test_set_hold_current(
             expected_call[0],
             use_tip_motor_message_for=expected_call[1],
         )
+
+
+async def test_update_required_flag(
+    mock_messenger: CanMessenger, controller: OT3Controller
+) -> None:
+    axes = [OT3Axis.X, OT3Axis.Y]
+    controller._present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
+
+    async def fake_umpe(
+        can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
+    ):
+        return {node: (0.223, 0.323, False, True) for node in nodes}
+
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
+        fake_umpe,
+    ), patch(
+        "opentrons.hardware_control.backends.ot3controller.firmware_update.run_update"
+    ), patch(
+        "builtins.open", mock_open()
+    ):
+        # raise FirmwareUpdateRequired if the _update_required flag is set
+        controller._update_required = True
+        with pytest.raises(FirmwareUpdateRequired):
+            await controller.update_motor_estimation(axes)
+
+        # do not raise for update_firmware
+        controller._update_required = True
+        try:
+            await controller.update_firmware("/some/path", OT3SubSystem.head)
+        except FirmwareUpdateRequired:
+            assert False, "update_firmware raised an exception."
+
+        # do not raise if _update_required is False
+        controller._update_required = False
+        for node in controller._present_nodes:
+            controller._motor_status.update(
+                {node: MotorStatus(motor_ok=False, encoder_ok=True)}
+            )
+        try:
+            await controller.update_motor_estimation(axes)
+        except FirmwareUpdateRequired:
+            assert False, "update_motor_estimation raised an exception."

@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class DeviceInfoCache:
-    """Holds Device Info data."""
+    """Holds version information for a device on the network."""
 
     node_id: NodeId
     version: int

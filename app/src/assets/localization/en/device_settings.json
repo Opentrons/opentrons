@@ -77,6 +77,7 @@
   "networking": "Networking",
   "new_features": "New Features",
   "not_calibrated": "Not calibrated yet",
+  "not_calibrated_short": "Not calibrated",
   "not_connected_via_wifi": "Not connected via Wi-Fi",
   "not_connected_via_wired_usb": "Not connected via wired USB",
   "password": "Password",
@@ -203,5 +204,11 @@
   "finish_setup": "Finish setup",
   "restarting_robot": "Restarting robot...",
   "welcome_title": "Welcome to your OT-3!",
-  "welcome_description": "Quickly run protocols and check on your robot's status right on your lab bench."
+  "welcome_description": "Quickly run protocols and check on your robot's status right on your lab bench.",
+  "robot_system_version": "Robot System Version",
+  "network_settings": "Network Settings",
+  "display_sleep_settings": "Display Sleep Settings",
+  "display_brightness": "Display Brightness",
+  "display_text_size": "Display Text Size",
+  "device_reset": "Device Reset"
 }
