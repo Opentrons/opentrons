@@ -553,7 +553,7 @@ class InstrumentContext(publisher.CommandPublisher):
             return self
         if parent_labware.is_tiprack:
             _log.warning(
-                "Touch_tip being performed on a tiprack. " "Please re-check your code"
+                "Touch_tip being performed on a tiprack. Please re-check your code"
             )
 
         if self.api_version < APIVersion(2, 4):

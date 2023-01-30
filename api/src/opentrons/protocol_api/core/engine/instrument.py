@@ -186,9 +186,19 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         z_offset: float,
         speed: float,
     ) -> None:
+        """Touch pipette tip to edges of the well
+
+        Args:
+            location: Location moved to, only used for ProtocolCore location cache.
+            well_core: The target well for touch tip.
+            radius: Percentage modifier for well radius to touch.
+            z_offset: Vertical offset for pipette tip during touch tip.
+            speed: Speed for the touch tip movements.
+        """
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
+        # Touch tip is always done from the top of the well.
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=z_offset)
         )
