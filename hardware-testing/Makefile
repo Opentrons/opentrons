@@ -74,6 +74,7 @@ test-cov:
 .PHONY: test-integration
 test-integration:
 	$(python) protocols/ot2_p300_single_channel_gravimetric.py --simulate
+	$(python) -m hardware_testing.examples.test_report
 	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
 	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
 	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
