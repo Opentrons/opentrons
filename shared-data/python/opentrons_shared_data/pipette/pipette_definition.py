@@ -158,18 +158,15 @@ class TipHandlingConfigurations(BaseModel):
         ...,
         description="The speed to move the z or plunger axis for tip pickup or drop off.",
     )
-
-
-class PickUpTipConfigurations(TipHandlingConfigurations):
     presses: int = Field(
-        ..., description="The number of tries required to force pick up a tip."
+        default=0.0, description="The number of tries required to force pick up a tip."
     )
     increment: float = Field(
-        ...,
+        default=0.0,
         description="The increment to move the pipette down for force tip pickup retries.",
     )
     distance: float = Field(
-        ..., description="The distance to begin a pick up tip from."
+        default=0.0, description="The distance to begin a pick up tip from."
     )
 
 
@@ -208,7 +205,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     display_category: PipetteGenerationType = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
     )
-    pick_up_tip_configurations: PickUpTipConfigurations = Field(
+    pick_up_tip_configurations: TipHandlingConfigurations = Field(
         ..., alias="pickUpTipConfigurations"
     )
     drop_tip_configurations: TipHandlingConfigurations = Field(

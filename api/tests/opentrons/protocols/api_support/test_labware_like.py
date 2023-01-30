@@ -4,8 +4,8 @@ import pytest
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
-from opentrons.protocol_api.core.protocol_api import module_geometry
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy import module_geometry
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -107,9 +107,7 @@ def test_first_parent(trough, module, mod_trough):
     # Set up recursion cycle test.
     mock_labware_geometry = MagicMock()
     mock_labware_geometry.parent = Location(point=None, labware=mod_trough)
-    mod_trough._implementation.get_geometry = MagicMock(
-        return_value=mock_labware_geometry
-    )
+    mod_trough._core.get_geometry = MagicMock(return_value=mock_labware_geometry)
 
     with pytest.raises(RuntimeError):
         # make sure we catch cycles

@@ -1,8 +1,8 @@
 import asyncio
 import functools
 from typing import Set, TypeVar, Type, cast, Callable, Any, Awaitable, overload
-from .types import ExecutionState, ExecutionCancelledError
-
+from .types import ExecutionState
+from .errors import ExecutionCancelledError
 
 TaskContents = TypeVar("TaskContents")
 

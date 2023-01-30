@@ -346,4 +346,82 @@ describe('useCalibrationTaskList hook', () => {
       expectedTaskList.taskList[2].subTasks[1].footer
     )
   })
+
+  it('passes the launcher function to cta onclick handlers for recalibration', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompletePipetteOffsetCalibrations)
+
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    result.current.taskList[0].cta?.onClick()
+    expect(mockDeckCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[1].subTasks[0].cta?.onClick()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[1].subTasks[1].cta?.onClick()
+    expect(mockPipOffsetCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[2].subTasks[0].cta?.onClick()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalledTimes(2)
+    result.current.taskList[2].subTasks[1].cta?.onClick()
+    expect(mockPipOffsetCalLauncher).toHaveBeenCalledTimes(2)
+  })
+
+  it('passes the launcher function to cta onclick handlers for calibration', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompletePipetteOffsetCalibrations)
+
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    result.current.taskList[0].cta?.onClick()
+    expect(mockDeckCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[1].subTasks[0].cta?.onClick()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[1].subTasks[1].cta?.onClick()
+    expect(mockPipOffsetCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[2].subTasks[0].cta?.onClick()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalledTimes(2)
+    result.current.taskList[2].subTasks[1].cta?.onClick()
+    expect(mockPipOffsetCalLauncher).toHaveBeenCalledTimes(2)
+  })
 })

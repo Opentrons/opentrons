@@ -5,6 +5,7 @@ from decoy import Decoy
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
 from opentrons.protocol_api.core.common import WellCore
+from opentrons.protocol_api._liquid import Liquid
 from opentrons.types import Point, Location
 
 
@@ -33,11 +34,7 @@ def subject(
     mock_parent: Labware, mock_well_core: WellCore, api_version: APIVersion
 ) -> Well:
     """Get a Well test subject with its dependencies mocked out."""
-    return Well(
-        parent=mock_parent,
-        well_implementation=mock_well_core,
-        api_version=api_version,
-    )
+    return Well(parent=mock_parent, core=mock_well_core, api_version=api_version)
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
@@ -111,6 +108,26 @@ def test_has_tip(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
 
     decoy.when(mock_well_core.has_tip()).then_return(False)
     assert subject.has_tip is False
+
+
+def test_load_liquid(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
+    """It should load a liquid to a location."""
+    mocked_liquid = Liquid(
+        _id="liquid-id", name="water", description=None, display_color=None
+    )
+
+    subject.load_liquid(
+        liquid=mocked_liquid,
+        volume=20,
+    )
+
+    decoy.verify(
+        mock_well_core.load_liquid(
+            liquid=mocked_liquid,
+            volume=20,
+        ),
+        times=1,
+    )
 
 
 def test_diameter(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:

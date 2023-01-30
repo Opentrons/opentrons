@@ -3,13 +3,16 @@ from typing import Optional
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
+from opentrons.protocols.api_support.util import APIVersionError
+
 from opentrons.types import Point
 
 from .well_geometry import WellGeometry
 from ..well import AbstractWellCore
+from ..._liquid import Liquid
 
 
-class WellImplementation(AbstractWellCore):
+class LegacyWellCore(AbstractWellCore):
     """Well implementation core based on legacy PAPIv2 behavior.
 
     Args:
@@ -103,6 +106,14 @@ class WellImplementation(AbstractWellCore):
         """Get the coordinate of the well's center."""
         return self._geometry.center()
 
+    def load_liquid(
+        self,
+        liquid: Liquid,
+        volume: float,
+    ) -> None:
+        """Load liquid into a well."""
+        raise APIVersionError("Loading a liquid is not supported in this API version.")
+
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """Gets point in deck coordinates based on percentage of the radius of each axis."""
         return self._geometry.from_center_cartesian(x, y, z)
@@ -115,7 +126,4 @@ class WellImplementation(AbstractWellCore):
     # TODO(mc, 2022-08-24): comparing only names seems insufficient
     def __eq__(self, other: object) -> bool:
         """Assume that if name is the same then it's the same well."""
-        return (
-            isinstance(other, WellImplementation)
-            and self.get_name() == other.get_name()
-        )
+        return isinstance(other, LegacyWellCore) and self.get_name() == other.get_name()

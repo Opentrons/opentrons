@@ -13,7 +13,7 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
 )
 from opentrons.hardware_control.types import GripperJawState
 from opentrons.types import Point, Mount
-from opentrons_shared_data.gripper.dev_types import GripperModel
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
 from robot_server.instruments.instrument_models import (
@@ -91,8 +91,7 @@ async def test_get_all_attached_instruments(
     """It should get data of all attached instruments."""
     decoy.when(ot3_hardware_api.attached_gripper).then_return(
         {
-            "name": "gripper",
-            "model": GripperModel.V1,
+            "model": GripperModel.v1,
             "gripper_id": "GripperID321",
             "display_name": "my-special-gripper",
             "state": GripperJawState.UNHOMED,
@@ -147,8 +146,7 @@ async def test_get_all_attached_instruments(
         Gripper.construct(
             mount="extension",
             instrumentType="gripper",
-            instrumentName="gripper",
-            instrumentModel=GripperModel.V1,
+            instrumentModel=GripperModel.v1,
             serialNumber="GripperID321",
             data=GripperData(
                 jawState=GripperJawState.UNHOMED,

@@ -7,7 +7,7 @@ from opentrons.hardware_control.util import plan_arc
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.calibration_storage import (
     helpers,
     create_tip_length_data,
@@ -204,7 +204,7 @@ def save_tip_length_calibration(
     # tip length data, hence the empty string, we should remove it
     # from create_tip_length_data in a refactor
     tip_length_data = create_tip_length_data(
-        tip_rack._implementation.get_definition(), tip_length_offset
+        tip_rack._core.get_definition(), tip_length_offset
     )
     cal_storage_save_tip_length(pipette_id, tip_length_data)
 

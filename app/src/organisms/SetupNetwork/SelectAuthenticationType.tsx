@@ -22,27 +22,29 @@ import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 
 import type { Dispatch, State } from '../../redux/types'
-import { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
+import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
+import type { AuthType } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
 
 interface SelectAuthenticationTypeProps {
   ssid: string
   fromWifiList?: boolean
+  selectedAuthType: AuthType
   setShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
-  setSelectedAuthType: (authType: 'wpa-psk' | 'none') => void
+  setSelectedAuthType: (authType: AuthType) => void
   setChangeState: (changeState: NetworkChangeState) => void
 }
 
 export function SelectAuthenticationType({
   ssid,
   fromWifiList,
+  selectedAuthType,
   setShowSelectAuthenticationType,
   setSelectedAuthType,
   setChangeState,
 }: SelectAuthenticationTypeProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const [isWpaTapped, setIsWpaTapped] = React.useState<boolean>(true)
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
@@ -125,12 +127,13 @@ export function SelectAuthenticationType({
           gridGap="1.375rem"
         >
           <Btn
-            backgroundColor={isWpaTapped ? COLORS.medBlue : ''}
+            backgroundColor={
+              selectedAuthType === 'wpa-psk' ? COLORS.medBlue : ''
+            }
             padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
             borderRadius="3.5625rem"
             onClick={() => {
               setSelectedAuthType('wpa-psk')
-              setIsWpaTapped(true)
             }}
           >
             <StyledText
@@ -143,12 +146,11 @@ export function SelectAuthenticationType({
             </StyledText>
           </Btn>
           <Btn
-            backgroundColor={!isWpaTapped ? COLORS.medBlue : ''}
+            backgroundColor={selectedAuthType === 'none' ? COLORS.medBlue : ''}
             borderRadius="3.5625rem"
             padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
             onClick={() => {
               setSelectedAuthType('none')
-              setIsWpaTapped(false)
             }}
           >
             <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="600">

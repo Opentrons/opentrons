@@ -13,7 +13,6 @@ import {
   COLORS,
   TYPOGRAPHY,
   ALIGN_CENTER,
-  useInterval,
   ALIGN_FLEX_END,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
@@ -28,14 +27,12 @@ import {
 import { getLocalRobot } from '../../redux/discovery'
 
 import type { State, Dispatch } from '../../redux/types'
-import { SimpleInterfaceStatus } from '../../redux/networking/types'
-
-const STATUS_REFRESH_MS = 5000
-const LIST_REFRESH_MS = 10000
+import type { SimpleInterfaceStatus } from '../../redux/networking/types'
+import type { AuthType } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
 
 interface SucceededToConnectProps {
   ssid: string
-  authType: 'wpa-psk' | 'none'
+  authType: AuthType
 }
 
 export function SucceededToConnect({
@@ -48,9 +45,6 @@ export function SucceededToConnect({
   const { wifi } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
-
-  useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
-  useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
 
   React.useEffect(() => {
     dispatch(fetchStatus(robotName))

@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 
 if TYPE_CHECKING:
-    from .labware import LabwareImplementation
+    from .legacy_labware_core import LegacyLabwareCore
 
 
 class WellGeometry:
@@ -18,7 +18,7 @@ class WellGeometry:
         self,
         well_props: WellDefinition,
         parent_point: Point,
-        parent_object: LabwareImplementation,
+        parent_object: LegacyLabwareCore,
     ):
         """
         Construct a well geometry object.
@@ -62,7 +62,7 @@ class WellGeometry:
         self._depth = well_props["depth"]
 
     @property
-    def parent(self) -> LabwareImplementation:
+    def parent(self) -> LegacyLabwareCore:
         return self._parent
 
     @property

@@ -56,6 +56,7 @@ describe('SelectAuthenticationType', () => {
     props = {
       ssid: 'mockWifi',
       fromWifiList: undefined,
+      selectedAuthType: 'wpa-psk',
       setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
       setSelectedAuthType: mockSetSelectedAuthType,
       setChangeState: mockSetChangeState,

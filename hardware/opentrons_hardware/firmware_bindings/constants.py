@@ -246,11 +246,19 @@ class SensorThresholdMode(int, Enum):
 
 
 @unique
+class GearMotorId(int, Enum):
+    """Tip action types."""
+
+    left = 0x0
+    right = 0x01
+
+
+@unique
 class PipetteTipActionType(int, Enum):
     """Tip action types."""
 
-    pick_up = 0x0
-    drop = 0x01
+    clamp = 0x0
+    home = 0x01
 
 
 @unique
@@ -271,7 +279,7 @@ class MoveStopCondition(int, Enum):
 
     none = 0x0
     limit_switch = 0x1
-    cap_sensor = 0x2
+    sync_line = 0x2
     encoder_position = 0x4
     gripper_force = 0x8
     stall = 0x10

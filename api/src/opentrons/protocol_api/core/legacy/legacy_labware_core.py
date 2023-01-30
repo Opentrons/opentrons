@@ -8,7 +8,7 @@ from opentrons.types import DeckSlotName, Location, Point
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 from ..labware import AbstractLabware, LabwareLoadParams
-from .well import WellImplementation
+from .legacy_well_core import LegacyWellCore
 from .well_geometry import WellGeometry
 
 
@@ -21,7 +21,7 @@ _MAGDECK_HALF_MM_LABWARE = {
 }
 
 
-class LabwareImplementation(AbstractLabware[WellImplementation]):
+class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
     """Labware implementation core based on legacy PAPIv2 behavior.
 
     Args:
@@ -61,7 +61,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
 
         # flatten list of list of well names.
         self._wells_by_name = {
-            well_name: WellImplementation(
+            well_name: LegacyWellCore(
                 well_geometry=WellGeometry(
                     well_props=self._well_definition[well_name],
                     parent_point=self._calibrated_offset,
@@ -150,7 +150,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
                 well.set_has_tip(True)
 
     def get_next_tip(
-        self, num_tips: int, starting_tip: Optional[WellImplementation]
+        self, num_tips: int, starting_tip: Optional[LegacyWellCore]
     ) -> Optional[str]:
         next_well = self._tip_tracker.next_tip(num_tips, starting_tip)
         return next_well.get_name() if next_well else None
@@ -197,7 +197,7 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
 
         return default_engage_height
 
-    def get_well_core(self, well_name: str) -> WellImplementation:
+    def get_well_core(self, well_name: str) -> LegacyWellCore:
         return self._wells_by_name[well_name]
 
     def get_deck_slot(self) -> Optional[DeckSlotName]:
