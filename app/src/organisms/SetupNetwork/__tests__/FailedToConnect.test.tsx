@@ -7,8 +7,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { mockFetchModulesSuccessMeta } from '../../../redux/modules/__fixtures__'
 import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
-// import { DisplayWifiList } from '../DisplayWifiList'
-// import { SetWifiCred } from '../SetWifiCred'
 import { FailedToConnect } from '../FailedToConnect'
 
 import type { RequestState } from '../../../redux/robot-api/types'
@@ -27,11 +25,6 @@ const render = (props: React.ComponentProps<typeof FailedToConnect>) => {
 const mockFunc = jest.fn()
 const mockSetChangeState = jest.fn()
 const mockSetCurrentRequestState = jest.fn()
-
-// const mockDisplayWifiList = DisplayWifiList as jest.MockedFunction<
-//   typeof DisplayWifiList
-// >
-// const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
 
 const failureState = {
   status: 'failure',
@@ -53,8 +46,6 @@ describe('ConnectedResult', () => {
       setChangeState: mockSetChangeState,
       setCurrentRequestState: mockSetCurrentRequestState,
     }
-    // mockDisplayWifiList.mockReturnValue(<div>Mock DisplayList</div>)
-    // mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
   })
 
   it('should render a failure screen - incorrect password', () => {

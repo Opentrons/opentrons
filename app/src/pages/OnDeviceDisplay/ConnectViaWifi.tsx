@@ -5,7 +5,7 @@ import last from 'lodash/last'
 import {
   Flex,
   DIRECTION_COLUMN,
-  useInterval,
+  // useInterval,
   SPACING,
 } from '@opentrons/components'
 
@@ -29,7 +29,7 @@ import type { RequestState } from '../../redux/robot-api/types'
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 
-const LIST_REFRESH_MS = 10000
+export type AuthType = 'wpa-psk' | 'none'
 
 export function ConnectViaWifi(): JSX.Element {
   const [isSearching, setIsSearching] = React.useState<boolean>(true)
@@ -38,9 +38,9 @@ export function ConnectViaWifi(): JSX.Element {
     showSelectAuthenticationType,
     setShowSelectAuthenticationType,
   ] = React.useState<boolean>(false)
-  const [selectedAuthType, setSelectedAuthType] = React.useState<
-    'wpa-psk' | 'none'
-  >('wpa-psk')
+  const [selectedAuthType, setSelectedAuthType] = React.useState<AuthType>(
+    'wpa-psk'
+  )
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
@@ -92,6 +92,7 @@ export function ConnectViaWifi(): JSX.Element {
         <SelectAuthenticationType
           ssid={selectedSsid}
           fromWifiList={true}
+          selectedAuthType={selectedAuthType}
           setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setSelectedAuthType={setSelectedAuthType}
           setChangeState={setChangeState}
@@ -132,7 +133,6 @@ export function ConnectViaWifi(): JSX.Element {
         )
       }
     } else {
-      console.log('here')
       return null
     }
   }
@@ -140,12 +140,6 @@ export function ConnectViaWifi(): JSX.Element {
   React.useEffect(() => {
     dispatch(Networking.fetchWifiList(robotName))
   }, [dispatch, robotName])
-
-  useInterval(
-    () => dispatch(Networking.fetchWifiList(robotName)),
-    LIST_REFRESH_MS,
-    true
-  )
 
   React.useEffect(() => {
     if (list != null && list.length > 0) {
@@ -158,6 +152,7 @@ export function ConnectViaWifi(): JSX.Element {
   }, [requestState])
 
   React.useEffect(() => {
+    // TODO kj 01/30/2023 This authType None will be fixed in a following PR
     // a user selects none as authType
     if (selectedSsid !== '' && selectedAuthType === 'none') {
       const network = list.find((nw: WifiNetwork) => nw.ssid === selectedSsid)
