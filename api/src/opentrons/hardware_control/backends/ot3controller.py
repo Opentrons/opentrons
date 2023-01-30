@@ -62,7 +62,7 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     update_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
-from opentrons_hardware.hardware_control.network import probe
+from opentrons_hardware.hardware_control.network import NetworkInfo
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,
@@ -151,6 +151,7 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
+        self._network_info = NetworkInfo(self._messenger)
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
@@ -836,7 +837,7 @@ class OT3Controller:
         a working machine, and no more.
         """
         core_nodes = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        core_present = await probe(self._messenger, core_nodes, timeout)
+        core_present = set(await self._network_info.probe(core_nodes, timeout))
         self._present_nodes = self._filter_probed_core_nodes(
             self._present_nodes, core_present
         )
@@ -865,9 +866,9 @@ class OT3Controller:
             "config", None
         ):
             expected.add(NodeId.gripper)
-        present = await probe(self._messenger, expected, timeout)
+        core_present = set(await self._network_info.probe(expected, timeout))
         self._present_nodes = self._replace_gripper_node(
-            self._replace_head_node(present)
+            self._replace_head_node(core_present)
         )
         log.info(f"The present nodes are now {self._present_nodes}")
 
