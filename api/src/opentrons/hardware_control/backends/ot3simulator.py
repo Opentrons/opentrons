@@ -235,6 +235,7 @@ class OT3Simulator:
         starting_mount_height: float,
         prep_move_speed: float,
         log_pressure: bool = True,
+        read_only: bool = False,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
         return

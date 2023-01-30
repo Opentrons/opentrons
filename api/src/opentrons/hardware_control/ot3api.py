@@ -1718,6 +1718,7 @@ class OT3API(
                 probe_settings.starting_mount_height,
                 probe_settings.prep_move_speed,
                 probe_settings.log_pressure,
+                probe_settings.read_only,
             )
         except MoveConditionNotMet:
             self._log.exception("Liquid Sensing failed- threshold never reached.")

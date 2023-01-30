@@ -922,6 +922,7 @@ class OT3Controller:
         starting_mount_height: float,
         prep_move_speed: float,
         log_pressure: bool = True,
+        read_only: bool = False,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
         head_node = head_node_for_mount(OT3Mount(mount.value))
@@ -937,6 +938,7 @@ class OT3Controller:
             prep_move_speed,
             threshold_pascals,
             log_pressure,
+            read_only,
             sensor_id,
         )
         pos_axes = dict()

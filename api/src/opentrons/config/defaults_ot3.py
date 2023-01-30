@@ -31,6 +31,7 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     log_pressure=True,
     home_plunger_at_start=False,
     aspirate_while_sensing=False,
+    read_only=False,
 )
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
@@ -372,6 +373,7 @@ def _build_default_liquid_probe(
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
         ),
+        read_only=from_conf.get("read_only", default.read_only),
     )
 
 
