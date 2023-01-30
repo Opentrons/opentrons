@@ -33,6 +33,7 @@ from opentrons.hardware_control.types import (
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
     ThresholdReachedTooEarly,
+)
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
     InvalidMoveError,
