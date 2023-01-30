@@ -16,8 +16,8 @@ class EdgeList:
     right: Point
     left: Point
     center: Point
-    up: Point
-    down: Point
+    forward: Point
+    back: Point
 
 
 class EdgePathType(str, Enum):
@@ -60,13 +60,20 @@ def get_edge_point_list(
         right=center + Point(x=x_radius, y=0, z=0),
         left=center + Point(x=-x_radius, y=0, z=0),
         center=center,
-        up=center + Point(x=0, y=y_radius, z=0),
-        down=center + Point(x=0, y=-y_radius, z=0),
+        forward=center + Point(x=0, y=y_radius, z=0),
+        back=center + Point(x=0, y=-y_radius, z=0),
     )
 
     if edge_path_type == EdgePathType.LEFT:
-        return [edges.left, edges.center, edges.up, edges.down, edges.center]
+        return [edges.left, edges.center, edges.forward, edges.back, edges.center]
     elif edge_path_type == EdgePathType.RIGHT:
-        return [edges.right, edges.center, edges.up, edges.down, edges.center]
+        return [edges.right, edges.center, edges.forward, edges.back, edges.center]
     else:
-        return [edges.right, edges.left, edges.center, edges.up, edges.down, edges.center]
+        return [
+            edges.right,
+            edges.left,
+            edges.center,
+            edges.forward,
+            edges.back,
+            edges.center,
+        ]

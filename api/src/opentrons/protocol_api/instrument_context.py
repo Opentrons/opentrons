@@ -14,7 +14,6 @@ from opentrons.protocols.advanced_control import transfers
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
-from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
