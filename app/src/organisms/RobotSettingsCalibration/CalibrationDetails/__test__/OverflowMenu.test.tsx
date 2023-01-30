@@ -14,9 +14,15 @@ import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCa
 import {
   useDeckCalibrationData,
   useRunStatuses,
+  useTipLengthCalibrations,
+  usePipetteOffsetCalibrations,
 } from '../../../../organisms/Devices/hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
+import {
+  mockPipetteOffsetCalibrationsResponse,
+  mockTipLengthCalibrationResponse,
+} from '../__fixtures__'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>
@@ -54,6 +60,12 @@ const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFu
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
+const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
+  typeof usePipetteOffsetCalibrations
+>
+const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
+  typeof useTipLengthCalibrations
+>
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
 >
@@ -76,6 +88,7 @@ const mockUpdateRobotStatus = jest.fn()
 
 describe('OverflowMenu', () => {
   let props: React.ComponentProps<typeof OverflowMenu>
+  const mockDeleteCalData = jest.fn()
 
   beforeEach(() => {
     props = {
@@ -93,7 +106,7 @@ describe('OverflowMenu', () => {
       deckCalibrationData: mockDeckCalData,
     })
     mockUseDeleteCalDataMutation.mockReturnValue({
-      deleteCalData: jest.fn(),
+      deleteCalData: mockDeleteCalData,
     } as any)
     when(mockUseFeatureFlag)
       .calledWith('enableCalibrationWizards')
@@ -110,6 +123,7 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     getByText('Calibrate Pipette Offset')
     getByText('Download calibration data')
+    getByText('Delete calibration data')
   })
 
   it('download pipette offset calibrations data', async () => {
@@ -151,6 +165,7 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     getByText('Recalibrate Tip Length and Pipette Offset')
     getByText('Download calibration data')
+    getByText('Delete calibration data')
   })
 
   it('should render Overflow tip length calibration button when the calibration wizard feature flag is set and no calibration exists', () => {
@@ -254,5 +269,65 @@ describe('OverflowMenu', () => {
     ).not.toBeInTheDocument()
     fireEvent.click(cal)
     getByText('mock pipette wizard flows')
+  })
+
+  it('deletes calibration data when delete button is clicked - pipette offset', () => {
+    const expectedCallParams = {
+      calType: CAL_TYPE,
+      mount: 'left',
+      pipette_id: mockPipetteOffsetCalibrationsResponse.pipette,
+    }
+    mockUsePipetteOffsetCalibrations.mockReturnValue([
+      mockPipetteOffsetCalibrationsResponse,
+    ])
+    const [{ getByText, getByLabelText }] = render(props)
+    const button = getByLabelText('CalibrationOverflowMenu_button')
+    fireEvent.click(button)
+    const deleteBtn = getByText('Delete calibration data')
+    fireEvent.click(deleteBtn)
+    expect(mockDeleteCalData).toHaveBeenCalledWith(expectedCallParams)
+  })
+
+  it('deletes calibration data when delete button is clicked - tip length', () => {
+    props = {
+      ...props,
+      calType: 'tipLength',
+    }
+    const expectedCallParams = {
+      calType: 'tipLength',
+      tiprack_hash: mockTipLengthCalibrationResponse.tiprack,
+      pipette_id: mockTipLengthCalibrationResponse.pipette,
+    }
+    mockUseTipLengthCalibrations.mockReturnValue([
+      mockTipLengthCalibrationResponse,
+    ])
+    const [{ getByText, getByLabelText }] = render(props)
+    const button = getByLabelText('CalibrationOverflowMenu_button')
+    fireEvent.click(button)
+    const deleteBtn = getByText('Delete calibration data')
+    fireEvent.click(deleteBtn)
+    expect(mockDeleteCalData).toHaveBeenCalledWith(expectedCallParams)
+  })
+
+  it('does nothing when delete is clicked and there is no matching calibration data to delete - pipette offset', () => {
+    const [{ getByText, getByLabelText }] = render(props)
+    const button = getByLabelText('CalibrationOverflowMenu_button')
+    fireEvent.click(button)
+    const deleteBtn = getByText('Delete calibration data')
+    fireEvent.click(deleteBtn)
+    expect(mockDeleteCalData).toHaveBeenCalledTimes(0)
+  })
+
+  it('does nothing when delete is clicked and there is no matching calibration data to delete - tip length', () => {
+    props = {
+      ...props,
+      calType: 'tipLength',
+    }
+    const [{ getByText, getByLabelText }] = render(props)
+    const button = getByLabelText('CalibrationOverflowMenu_button')
+    fireEvent.click(button)
+    const deleteBtn = getByText('Delete calibration data')
+    fireEvent.click(deleteBtn)
+    expect(mockDeleteCalData).toHaveBeenCalledTimes(0)
   })
 })
