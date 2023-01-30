@@ -114,7 +114,7 @@ describe('config migration', () => {
     expect(result).toEqual(MOCK_CONFIG_V13)
   })
 
-  it('should keep version 12 to latest', () => {
+  it('should migrate version 12 to latest', () => {
     const v12Config = MOCK_CONFIG_V12
     const result = migrate(v12Config)
 

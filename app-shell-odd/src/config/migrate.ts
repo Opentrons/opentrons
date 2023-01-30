@@ -64,6 +64,8 @@ export const DEFAULTS_V12: ConfigV12 = {
   },
 }
 
+const BASE_CONFIG_VERSION = Number(DEFAULTS_V12.version)
+
 // config version 13 migration and defaults
 const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
   const nextConfig = {
@@ -77,19 +79,20 @@ const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
   return nextConfig
 }
 
-// when we add our first migration, change to [(prevConfig: ConfigV12) => Config13]
 const MIGRATIONS: [(prevConfig: ConfigV12) => ConfigV13] = [toVersion13]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
 
 export function migrate(prevConfig: ConfigV12 | ConfigV13): Config {
   let result = prevConfig
-
   // loop through the migrations, skipping any migrations that are unnecessary
-  // Note: app-shell uses prevVersion = prevConfig.version for loop index but for app-shell-odd
-  // the default version is from 12 and always skip this loop so needed to change the index to 0
-  for (let i: number = 0; i < MIGRATIONS.length; i++) {
-    const migrateVersion = MIGRATIONS[i]
+  // Note: the default version of app-shell-odd is version 12 (need to adjust the index range)
+  for (
+    let i: number = prevConfig.version;
+    i < BASE_CONFIG_VERSION + MIGRATIONS.length;
+    i++
+  ) {
+    const migrateVersion = MIGRATIONS[i - BASE_CONFIG_VERSION]
     // @ts-expect-error (kj: 01/27/2023): migrateVersion function input typed to never
     result = migrateVersion(result)
   }
