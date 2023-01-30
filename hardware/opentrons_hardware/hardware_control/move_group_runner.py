@@ -390,7 +390,7 @@ class MoveScheduler:
             self._event.set()
             raise RuntimeError("Firmware Error Received", message)
 
-    def _handle_move_completed(self, message: MoveCompleted) -> None:
+    def _handle_move_completed(self, message: _AcceptableMoves) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
         try:
