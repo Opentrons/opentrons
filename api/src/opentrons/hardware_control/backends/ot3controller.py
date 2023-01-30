@@ -3,9 +3,12 @@
 from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
+from functools import wraps
 import logging
 from copy import deepcopy
 from typing import (
+    Any,
+    Awaitable,
     Callable,
     Dict,
     List,
@@ -83,11 +86,14 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
+    MotorStatus,
+    InstrumentProbeType,
+)
+from opentrons.hardware_control.errors import (
+    MustHomeError,
     InvalidPipetteName,
     InvalidPipetteModel,
-    InstrumentProbeType,
-    MotorStatus,
-    MustHomeError,
+    FirmwareUpdateRequired,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -114,6 +120,19 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 MapPayload = TypeVar("MapPayload")
+Wrapped = TypeVar("Wrapped", bound=Callable[..., Awaitable[Any]])
+
+
+def requires_update(func: Wrapped) -> Wrapped:
+    """Decorator that raises FirmwareUpdateRequired if the update_required flag is set."""
+
+    @wraps(func)
+    async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
+        if self.update_required:
+            raise FirmwareUpdateRequired()
+        return await func(self, *args, **kwargs)
+
+    return cast(Wrapped, wrapper)
 
 
 class OT3Controller:
@@ -155,6 +174,7 @@ class OT3Controller:
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._update_required = False
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -165,18 +185,43 @@ class OT3Controller:
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
+    @property
+    def fw_version(self) -> Optional[str]:
+        """Get the firmware version."""
+        return None
+
+    @property
+    def update_required(self) -> bool:
+        return self._update_required
+
+    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
+        """Update the firmware."""
+        with open(filename, "r") as f:
+            await firmware_update.run_update(
+                messenger=self._messenger,
+                node_id=sub_system_to_node_id(target),
+                hex_file=f,
+                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
+                #  config values.
+                retry_count=3,
+                timeout_seconds=20,
+                erase=True,
+            )
+
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
             self._configuration.current_settings, gantry_load
         )
         await self.set_default_currents()
 
+    @requires_update
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
         assert len(self._present_nodes)
         response = await get_motor_position(self._messenger, self._present_nodes)
         self._handle_motor_status_response(response)
 
+    @requires_update
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
@@ -271,6 +316,7 @@ class OT3Controller:
                 {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3])}
             )
 
+    @requires_update
     async def move(
         self,
         origin: Coordinates[OT3Axis, float],
@@ -370,6 +416,7 @@ class OT3Controller:
             return MoveGroupRunner(move_groups=move_group_gantry_z)
         return None
 
+    @requires_update
     async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
 
@@ -420,6 +467,7 @@ class OT3Controller:
             )
         return new_group
 
+    @requires_update
     async def fast_home(
         self, axes: Sequence[OT3Axis], margin: float
     ) -> OT3AxisMap[float]:
@@ -450,6 +498,7 @@ class OT3Controller:
             self._position.update({axis: point[0]})
             self._encoder_position.update({axis: point[1]})
 
+    @requires_update
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,
@@ -460,6 +509,7 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
+    @requires_update
     async def gripper_hold_jaw(
         self,
         encoder_position_um: int,
@@ -469,6 +519,7 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
+    @requires_update
     async def gripper_home_jaw(self, duty_cycle: float) -> None:
         move_group = create_gripper_jaw_home_group(duty_cycle)
         runner = MoveGroupRunner(move_groups=[move_group])
@@ -572,6 +623,7 @@ class OT3Controller:
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
         return current_tools
 
+    @requires_update
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
         assert (
@@ -584,6 +636,7 @@ class OT3Controller:
     def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
         return [axis_to_node(OT3Axis.Q)] if OT3Axis.Q in axis_current_keys else []
 
+    @requires_update
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
@@ -597,6 +650,7 @@ class OT3Controller:
             ),
         )
 
+    @requires_update
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
@@ -615,6 +669,7 @@ class OT3Controller:
         for axis, current in axis_currents.items():
             self._current_settings[axis].run_current = current
 
+    @requires_update
     async def set_hold_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the hold current for motor.
 
@@ -692,25 +747,6 @@ class OT3Controller:
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
         return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
-
-    @property
-    def fw_version(self) -> Optional[str]:
-        """Get the firmware version."""
-        return None
-
-    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
-        """Update the firmware."""
-        with open(filename, "r") as f:
-            await firmware_update.run_update(
-                messenger=self._messenger,
-                node_id=sub_system_to_node_id(target),
-                hex_file=f,
-                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
-                #  config values.
-                retry_count=3,
-                timeout_seconds=20,
-                erase=True,
-            )
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""

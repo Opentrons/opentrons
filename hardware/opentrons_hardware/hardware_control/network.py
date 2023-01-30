@@ -19,12 +19,15 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class DeviceInfoCache:
+    """Holds version information for a device on the network."""
+
     node_id: NodeId
     version: int
     shortsha: str
     flags: Any
 
     def __repr__(self) -> str:
+        """Readable representation of this class."""
         return f"<{self.__class__.__name__}: node={self.node_id}, version={self.version}, sha={self.shortsha}>"
 
 
@@ -42,10 +45,12 @@ class NetworkInfo:
 
     @property
     def device_info(self) -> Dict[NodeId, DeviceInfoCache]:
+        """Dictionary containing known nodes and their device info."""
         return self._device_info_cache
 
     @property
     def nodes(self) -> Set[NodeId]:
+        """Set of NodeIds on the network."""
         return set(self._device_info_cache)
 
     async def probe(
