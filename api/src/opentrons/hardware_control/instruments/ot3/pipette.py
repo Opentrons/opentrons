@@ -12,7 +12,6 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteTipType,
     PlungerPositions,
     MotorConfigurations,
-    PickUpTipConfigurations,
     SupportedTipsDefinition,
     TipHandlingConfigurations,
     PipetteModelType,
@@ -165,11 +164,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._plunger_motor_current
 
     @property
-    def pick_up_configurations(self) -> PickUpTipConfigurations:
+    def pick_up_configurations(self) -> TipHandlingConfigurations:
         return self._pick_up_configurations
 
     @pick_up_configurations.setter
-    def pick_up_configurations(self, pick_up_configs: PickUpTipConfigurations) -> None:
+    def pick_up_configurations(
+        self, pick_up_configs: TipHandlingConfigurations
+    ) -> None:
         self._pick_up_configurations = pick_up_configs
 
     @property

@@ -446,8 +446,7 @@ class OT3Controller:
             await self.tip_action(
                 [OT3Axis.Q],
                 self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
-                -1
-                * self._configuration.motion_settings.default_max_speed.high_throughput[
+                self._configuration.motion_settings.default_max_speed.high_throughput[
                     OT3Axis.to_kind(OT3Axis.Q)
                 ],
             )
@@ -487,8 +486,10 @@ class OT3Controller:
         axes: Sequence[OT3Axis],
         distance: float,
         speed: float,
-        tip_action: str = "drop",
+        tip_action: str = "home",
     ) -> None:
+        if tip_action == "home":
+            speed = speed * -1
         move_group = create_tip_action_group(
             axes, distance, speed, cast(PipetteAction, tip_action)
         )
