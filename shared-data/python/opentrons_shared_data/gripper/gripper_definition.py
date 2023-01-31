@@ -1,5 +1,4 @@
 """Gripper configurations."""
-import enum
 
 from typing_extensions import Literal
 from typing import TYPE_CHECKING, List, Dict, Tuple, Any, NewType
