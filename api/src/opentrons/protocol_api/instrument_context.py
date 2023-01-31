@@ -701,7 +701,9 @@ class InstrumentContext(publisher.CommandPublisher):
                           press (e.g.: if `presses=3` and `increment=1.0`, then
                           the first press will travel down into the tip by
                           3.5mm, the second by 4.5mm, and the third by 5.5mm).
-                          .. deprecated:: 2.14
+
+                        .. deprecated:: 2.14
+                            Use the Opentrons App to change pipette pick-up settings.
         :type increment: float
         :param prep_after: Whether the pipette plunger should prepare itself
                            to aspirate immediately after picking up a tip.
@@ -744,7 +746,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" but you are using API {self._api_version}."
             )
 
-        if increment is not None and self._api_version >= _PRESSES_INCREMENT_DEPRECATE_FROM:
+        if (
+            increment is not None
+            and self._api_version >= _PRESSES_INCREMENT_DEPRECATE_FROM
+        ):
             raise APIVersionError(
                 f"increment is only available in API versions lower than {_PRESSES_INCREMENT_DEPRECATE_FROM},"
                 f" but you are using API {self._api_version}."
