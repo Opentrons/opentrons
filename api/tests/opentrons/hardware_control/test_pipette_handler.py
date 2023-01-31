@@ -84,8 +84,8 @@ def test_plan_check_pick_up_tip_with_presses_argument(
             0,
             96,
             TipMotorPickUpTipSpec(
-                tiprack_down=types.Point(0, 0, -5),
-                tiprack_up=types.Point(0, 0, 7),
+                tiprack_down=types.Point(0, 0, -7),
+                tiprack_up=types.Point(0, 0, 2),
                 pick_up_distance=0,
                 speed=10,
                 currents={OT3Axis.Q: 1},

@@ -5,6 +5,8 @@ from typing import TypeVar, Optional
 
 from opentrons.types import Point
 
+from .._liquid import Liquid
+
 
 class AbstractWellCore(ABC):
     """Well core interface."""
@@ -68,6 +70,14 @@ class AbstractWellCore(ABC):
     @abstractmethod
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
+
+    @abstractmethod
+    def load_liquid(
+        self,
+        liquid: Liquid,
+        volume: float,
+    ) -> None:
+        """Load liquid into a well."""
 
     @abstractmethod
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:

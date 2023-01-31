@@ -23,6 +23,7 @@ import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
 import { FLOWS, SECTIONS } from '../constants'
+import { UnskippableModal } from '../UnskippableModal'
 import { PipetteWizardFlows } from '..'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
@@ -36,6 +37,7 @@ jest.mock('../ExitModal')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/pipettes')
+jest.mock('../UnskippableModal')
 
 const mockFetchPipettes = fetchPipettes as jest.MockedFunction<
   typeof fetchPipettes
@@ -68,6 +70,9 @@ const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
 >
 const mockExitModal = ExitModal as jest.MockedFunction<typeof ExitModal>
+const mockUnskippableModal = UnskippableModal as jest.MockedFunction<
+  typeof UnskippableModal
+>
 const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
   return renderWithProviders(<PipetteWizardFlows {...props} />, {
     i18nInstance: i18n,
@@ -139,6 +144,7 @@ describe('PipetteWizardFlows', () => {
     dispatchApiRequest = jest.fn()
     mockGetRequestById.mockReturnValue(null)
     mockUseDispatchApiRequests.mockReturnValue([dispatchApiRequest, ['id']])
+    mockUnskippableModal.mockReturnValue(<div>mock unskippable modal</div>)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
     const { getByText, getByRole } = render(props)
@@ -227,6 +233,28 @@ describe('PipetteWizardFlows', () => {
     //   expect(props.closeFlow).toHaveBeenCalled()
     // })
   })
+  it('renders 3rd page and clicking back button redirects to the first page', async () => {
+    const { getByText, getByRole } = render(props)
+    //  first page
+    getByText('Before you begin')
+    getByRole('button', { name: 'Get started' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalled()
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // second page
+    getByText('Attach Calibration Probe')
+    getByRole('button', { name: 'Begin calibration' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalled()
+    })
+    //  third page
+    getByText('Remove Calibration Probe')
+    getByRole('button', { name: 'back' }).click()
+    //   first page
+    getByText('Before you begin')
+  })
+
   it('renders the correct information, calling the correct commands for the detach flow', () => {
     props = {
       ...props,
@@ -597,5 +625,108 @@ describe('PipetteWizardFlows', () => {
         false
       )
     })
+  })
+  it('renders the unskippable modal when you try to exit out of a 96 channel detach flow from a the detach pipette unskippable page', async () => {
+    mockGetAttachedPipettes.mockReturnValue({
+      left: {
+        id: 'abc',
+        name: 'p1000_96',
+        model: 'p1000_96_v1',
+        tip_length: 42,
+        mount_axis: 'c',
+        plunger_axis: 'd',
+        modelSpecs: mockGen3P1000PipetteSpecs,
+      },
+      right: null,
+    })
+    props = {
+      ...props,
+      flowType: FLOWS.DETACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+    ])
+    const { getByText, getByRole, getByLabelText } = render(props)
+    // page 1
+    getByRole('button', { name: 'Get started' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalled()
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // page 2
+    getByText('Loosen Screws and Detach 96-Channel Pipette')
+    getByLabelText('Exit').click()
+    getByText('mock unskippable modal')
+  })
+  it('renders the 96 channel attach flow carriage unskippable step page', async () => {
+    mockGetAttachedPipettes.mockReturnValue({ left: null, right: null })
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      selectedPipette: NINETY_SIX_CHANNEL,
+    }
+    mockGetPipetteWizardSteps.mockReturnValue([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+    ])
+    const { getByText, getByRole, getByLabelText } = render(props)
+    // page 1
+    getByRole('button', { name: 'Move gantry to front' }).click()
+    await waitFor(() => {
+      expect(mockChainRunCommands).toHaveBeenCalled()
+      expect(mockCreateRun).toHaveBeenCalled()
+    })
+    // page 2
+    getByText('Unscrew Z-axis Carriage')
+    getByLabelText('Exit').click()
+    getByText('mock unskippable modal')
   })
 })

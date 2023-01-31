@@ -1,10 +1,23 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '..'
+import { useCalibrationTaskList } from '../../Devices/hooks'
+import {
+  expectedFailedTaskList,
+  expectedIncompleteDeckCalTaskList,
+  expectedTaskList,
+} from '../../Devices/hooks/__fixtures__/taskListFixtures'
+
+jest.mock('../../Devices/hooks')
+
+const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
+  typeof useCalibrationTaskList
+>
 
 const render = (props: React.ComponentProps<typeof CalibrationStatusCard>) => {
   return renderWithProviders(
@@ -20,6 +33,15 @@ const render = (props: React.ComponentProps<typeof CalibrationStatusCard>) => {
 const mockSetShowHowCalibrationWorksModal = jest.fn()
 
 describe('CalibrationStatusCard', () => {
+  beforeEach(() => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+    resetAllWhenMocks()
+  })
+
   const props: React.ComponentProps<typeof CalibrationStatusCard> = {
     robotName: 'otie',
     setShowHowCalibrationWorksModal: mockSetShowHowCalibrationWorksModal,
@@ -34,9 +56,23 @@ describe('CalibrationStatusCard', () => {
     )
   })
 
-  it('renders a status label', () => {
+  it('renders a complete status label', () => {
+    const [{ getByText }] = render(props)
+    getByText('Calibration complete')
+  })
+
+  it('renders a missing status label', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedIncompleteDeckCalTaskList
+    )
     const [{ getByText }] = render(props)
     getByText('Missing calibration data')
+  })
+
+  it('renders a recommended status label', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedFailedTaskList)
+    const [{ getByText }] = render(props)
+    getByText('Calibration recommended')
   })
 
   it('renders a "See how robot calibration works button"', () => {

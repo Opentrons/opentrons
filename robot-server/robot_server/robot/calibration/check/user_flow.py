@@ -26,7 +26,7 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -357,7 +357,7 @@ class CheckCalibrationUserFlow:
                 version=details.version,
                 parent=position,
             )
-            tiprack_def = tiprack._implementation.get_definition()
+            tiprack_def = tiprack._core.get_definition()
         else:
             tiprack_def = get_custom_tiprack_definition_for_tlc(pip_offset.uri)
         return load_tip_length_calibration(pipette.pipette_id, tiprack_def)
@@ -532,9 +532,9 @@ class CheckCalibrationUserFlow:
                 name=hw_pip.name,
                 tipLength=hw_pip.config.tip_length,
                 tipRackLoadName=info_pip.tip_rack.load_name,
-                tipRackDisplay=info_pip.tip_rack._implementation.get_definition()[
-                    "metadata"
-                ]["displayName"],
+                tipRackDisplay=info_pip.tip_rack._core.get_definition()["metadata"][
+                    "displayName"
+                ],
                 tipRackUri=info_pip.tip_rack.uri,
                 rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
@@ -549,9 +549,9 @@ class CheckCalibrationUserFlow:
         # type of AttachedPipette.serial
         assert self.hw_pipette
         assert self.active_pipette
-        display_name = self.active_pipette.tip_rack._implementation.get_definition()[
-            "metadata"
-        ]["displayName"]
+        display_name = self.active_pipette.tip_rack._core.get_definition()["metadata"][
+            "displayName"
+        ]
         return CheckAttachedPipette(
             model=self.hw_pipette.model,
             name=self.hw_pipette.name,
@@ -670,7 +670,7 @@ class CheckCalibrationUserFlow:
             calibration = mark_bad_calibration.mark_bad(
                 self._tip_lengths[active_mount], cal_types.SourceType.calibration_check
             )
-            tip_definition = self.active_tiprack._implementation.get_definition()
+            tip_definition = self.active_tiprack._core.get_definition()
             tip_length_dict = create_tip_length_data(
                 definition=tip_definition,
                 length=calibration.tip_length,
@@ -834,7 +834,7 @@ class CheckCalibrationUserFlow:
         try:
             return load_tip_length_calibration(
                 pip_id,
-                self.active_tiprack._implementation.get_definition(),
+                self.active_tiprack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
             tip_overlap = self.hw_pipette.config.tip_overlap.get(

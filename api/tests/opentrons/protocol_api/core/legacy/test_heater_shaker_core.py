@@ -12,13 +12,13 @@ from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
     SpeedStatus,
 )
-from opentrons.protocol_api.core.protocol_api.module_geometry import (
+from opentrons.protocol_api.core.legacy.module_geometry import (
     HeaterShakerGeometry,
 )
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
-from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
+from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyHeaterShakerCore,
     create_module_core,
     CannotPerformModuleAction,
@@ -49,9 +49,9 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 @pytest.fixture
 def mock_protocol_core(
     decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI
-) -> ProtocolContextImplementation:
+) -> LegacyProtocolCore:
     """Get a mock protocol core."""
-    mock_protocol_core = decoy.mock(cls=ProtocolContextImplementation)
+    mock_protocol_core = decoy.mock(cls=LegacyProtocolCore)
     decoy.when(mock_protocol_core.get_hardware()).then_return(mock_sync_hardware_api)
     return mock_protocol_core
 
@@ -60,7 +60,7 @@ def mock_protocol_core(
 def subject(
     mock_geometry: HeaterShakerGeometry,
     mock_sync_module_hardware: SyncHeaterShakerHardware,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> LegacyHeaterShakerCore:
     """Get a legacy module implementation core with mocked out dependencies."""
     return LegacyHeaterShakerCore(
@@ -74,7 +74,7 @@ def subject(
 def test_create(
     decoy: Decoy,
     mock_geometry: HeaterShakerGeometry,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> None:
     """It should be able to create a magnetic module core."""
     mock_module_hardware_api = decoy.mock(cls=HeaterShaker)
@@ -211,7 +211,7 @@ def test_set_and_wait_for_shake_speed(
     mock_sync_module_hardware: SyncHeaterShakerHardware,
     mock_geometry: HeaterShakerGeometry,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
     subject: LegacyHeaterShakerCore,
 ) -> None:
     """It should set and wait for the target speed with the hardware."""
@@ -241,7 +241,7 @@ def test_set_and_wait_for_shake_speed_no_prep(
     mock_sync_module_hardware: SyncHeaterShakerHardware,
     mock_geometry: HeaterShakerGeometry,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
     subject: LegacyHeaterShakerCore,
 ) -> None:
     """It should set and wait for the target speed with the hardware."""
@@ -290,7 +290,7 @@ def test_open_labware_latch(
     mock_sync_module_hardware: SyncHeaterShakerHardware,
     mock_geometry: HeaterShakerGeometry,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
     subject: LegacyHeaterShakerCore,
 ) -> None:
     """It should open the labware latch with the hardware."""
@@ -318,7 +318,7 @@ def test_open_labware_latch_no_prep(
     mock_sync_module_hardware: SyncHeaterShakerHardware,
     mock_geometry: HeaterShakerGeometry,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
     subject: LegacyHeaterShakerCore,
 ) -> None:
     """It should open the labware latch with the hardware."""

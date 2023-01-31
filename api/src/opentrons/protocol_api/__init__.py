@@ -20,6 +20,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     HeaterShakerContext,
 )
+from ._liquid import Liquid
 
 from .create_protocol_context import create_protocol_context
 
@@ -36,5 +37,6 @@ __all__ = [
     "HeaterShakerContext",
     "Labware",
     "Well",
+    "Liquid",
     "create_protocol_context",
 ]
