@@ -1,5 +1,8 @@
 """Protocol run control and management."""
+import asyncio
 from typing import Iterable, List, NamedTuple, Optional
+
+import anyio
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -104,13 +107,15 @@ class ProtocolRunner:
             protocol_source=protocol_source
         )
         for definition in labware_definitions:
+            # Assume adding a labware definition is fast and there are not many labware
+            # definitions, so we don't need to yield here.
             self._protocol_engine.add_labware_definition(definition)
 
         if isinstance(config, JsonProtocolConfig):
             schema_version = config.schema_version
 
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
-                self._load_json(protocol_source)
+                await self._load_json(protocol_source)
             else:
                 self._load_legacy(protocol_source, labware_definitions)
 
@@ -159,18 +164,36 @@ class ProtocolRunner:
         commands = self._protocol_engine.state_view.commands.get_all()
         return ProtocolRunResult(commands=commands, state_summary=run_data)
 
-    def _load_json(self, protocol_source: ProtocolSource) -> None:
-        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
-        # the event loop. Jira RSS-165.
-        protocol = self._json_file_reader.read(protocol_source)
-        commands = self._json_translator.translate_commands(protocol)
+    async def _load_json(self, protocol_source: ProtocolSource) -> None:
+        protocol = await anyio.to_thread.run_sync(
+            self._json_file_reader.read,
+            protocol_source,
+        )
 
-        liquids = self._json_translator.translate_liquids(protocol)
+        commands = await anyio.to_thread.run_sync(
+            self._json_translator.translate_commands,
+            protocol,
+        )
+
+        # Add commands and liquids to the ProtocolEngine.
+        #
+        # We yield on every iteration so that loading large protocols doesn't block the
+        # event loop. With a 24-step 10k-command protocol (See RQA-443), adding all the
+        # commands can take 3 to 7 seconds.
+        #
+        # It wouldn't be safe to do this in a worker thread because each addition
+        # invokes the ProtocolEngine's ChangeNotifier machinery, which is not
+        # thread-safe.
+        liquids = await anyio.to_thread.run_sync(
+            self._json_translator.translate_liquids, protocol
+        )
         for liquid in liquids:
             self._protocol_engine.add_liquid(liquid=liquid)
-
+            await _yield()
         for command in commands:
             self._protocol_engine.add_command(request=command)
+            await _yield()
+
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:
@@ -214,3 +237,8 @@ class ProtocolRunner:
             protocol=protocol,
             context=context,
         )
+
+
+async def _yield() -> None:
+    """Yield execution to the event loop, giving other tasks a chance to run."""
+    await asyncio.sleep(0)
