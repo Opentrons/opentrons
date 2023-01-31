@@ -12,6 +12,7 @@ import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
+import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
@@ -21,6 +22,7 @@ jest.mock('../../pages/OnDeviceDisplay/ConnectViaWifi')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
+jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
 
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
   typeof NetworkSetupMenu
@@ -39,6 +41,9 @@ const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
 >
 const mockProtocolDashboard = ProtocolDashboard as jest.MockedFunction<
   typeof ProtocolDashboard
+>
+const mockProtocolSetup = ProtocolSetup as jest.MockedFunction<
+  typeof ProtocolSetup
 >
 const mockRobotSettingsDashboard = RobotSettingsDashboard as jest.MockedFunction<
   typeof RobotSettingsDashboard
@@ -61,6 +66,7 @@ describe('OnDeviceDisplayApp', () => {
     mockConnectViaWifi.mockReturnValue(<div>Mock ConnectViaWifi</div>)
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
     mockProtocolDashboard.mockReturnValue(<div>Mock ProtocolDashboard</div>)
+    mockProtocolSetup.mockReturnValue(<div>Mock ProtocolSetup</div>)
     mockRobotSettingsDashboard.mockReturnValue(
       <div>Mock RobotSettingsDashboard</div>
     )
@@ -96,6 +102,10 @@ describe('OnDeviceDisplayApp', () => {
   it('renders a ProtocolDashboard component from /protocols', () => {
     const [{ getByText }] = render('/protocols')
     getByText('Mock ProtocolDashboard')
+  })
+  it('renders a ProtocolSetup component from /protocols/:runId/setup', () => {
+    const [{ getByText }] = render('/protocols/my-protocol-id/setup')
+    getByText('Mock ProtocolSetup')
   })
   it('renders a RobotSettingsDashboard component from /robot-settings', () => {
     const [{ getByText }] = render('/robot-settings')

@@ -15,6 +15,7 @@ import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
+import { ProtocolSetup } from '../pages/OnDeviceDisplay/ProtocolSetup'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
@@ -86,15 +87,10 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   // TODO(bh: 2022-12-5): these "protocol run" page are a rough guess based on existing designs and site map
   // expect to change or add additional route params
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>protocol setup</Box>
-      </>
-    ),
+    Component: ProtocolSetup,
     exact: true,
     name: 'Protocol Setup',
-    path: '/protocols/:protocolId/:runId/setup',
+    path: '/protocols/:runId/setup',
   },
   {
     Component: () => (
@@ -105,7 +101,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     ),
     exact: true,
     name: 'Protocol Run',
-    path: '/protocols/:protocolId/:runId/run',
+    path: '/protocols/:runId/run',
   },
   {
     Component: () => (
