@@ -1,10 +1,15 @@
 """Test Instruments."""
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union
 
 from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.data.csv_report import CSVReport, CSVResult, CSVLine
+from hardware_testing.data.csv_report import (
+    CSVReport,
+    CSVResult,
+    CSVLine,
+    CSVLineRepeating,
+)
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point, GripperProbe
 
@@ -44,14 +49,14 @@ GRIPPER_TESTS = {
 }
 
 
-def build_csv_lines() -> List[CSVLine]:
+def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    tests: List[CSVLine] = []
+    tests: List[Union[CSVLine, CSVLineRepeating]] = list()
     for t, d in PIPETTE_TESTS.items():
         for m in ["left", "right"]:
-            tests.append(CSVLine(f"{m}-{t}", d))
+            tests.append(CSVLine(f"{m}-{t}", d))  # type: ignore[arg-type]
     for t, d in GRIPPER_TESTS.items():
-        tests.append(CSVLine(f"gripper-{t}", d))
+        tests.append(CSVLine(f"gripper-{t}", d))  # type: ignore[arg-type]
     return tests
 
 
@@ -95,9 +100,7 @@ async def _probe_mount_and_record_result(
 
     # attach probe
     if mount == OT3Mount.GRIPPER:
-        assert (
-            probe
-        ), "you must specify which gripper probe (front/rear) you are using"
+        assert probe, "you must specify which gripper probe (front/rear) you are using"
         await api.grip(GRIPPER_GRIP_FORCE)
         if not api.is_simulator:
             input(f"attach {probe.name} calibration probe, then press ENTER:")
@@ -141,9 +144,9 @@ async def _test_pipette(
 ) -> None:
     mnt_tag = mount.name.lower()
     pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
     pip_id = helpers_ot3.get_pipette_serial_ot3(pip)
     pip_ax = OT3Axis.of_main_tool_actuator(mount)
-    z_ax = OT3Axis.by_mount(mount)
     top, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
 
     # PIPETTE-ID
@@ -196,7 +199,7 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
         user_id = str(gripper_id)
     result = CSVResult.from_bool(gripper_id == user_id.strip())
     print(f"gripper id ({gripper_id}): {str(result)}")
-    report(section, f"gripper-id", [gripper_id, user_id, result])
+    report(section, "gripper-id", [gripper_id, user_id, result])
 
     # NO-SKIP
     async def _z_is_hitting_endstop() -> bool:
@@ -242,7 +245,9 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
         _width = jaw_widths["max"] - _encoders[jaw_ax]
         _diff = abs(_width - jaw_widths[min_max])
         _result = CSVResult.from_bool(_diff < GRIPPER_JAW_WIDTH_TOLERANCE_MM)
-        report(section, f"gripper-jaw-{min_max}", [_width, jaw_widths[min_max], result])
+        report(
+            section, f"gripper-jaw-{min_max}", [_width, jaw_widths[min_max], _result]
+        )
 
     await api.home([jaw_ax])
     await api.grip(GRIPPER_GRIP_FORCE)
@@ -267,15 +272,15 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # PIPETTES
     for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
-        while not api.is_simulator and mount not in _get_pip_mounts(api):
+        while not api.is_simulator and mount not in await _get_pip_mounts(api):
             input(f"attached a pipette to the {mount.name} mount, then press ENTER")
         await _test_pipette(api, mount, report, section)
-        while not api.is_simulator and mount in _get_pip_mounts(api):
+        while not api.is_simulator and mount in await _get_pip_mounts(api):
             input(f"remove the pipette from the {mount.name} mount, then press ENTER")
 
     # GRIPPER
     while not api.is_simulator and not await _has_gripper(api):
-        input(f"attached a gripper, then press ENTER")
+        input("attached a gripper, then press ENTER")
     await _test_gripper(api, report, section)
     while not api.is_simulator and await _has_gripper(api):
-        input(f"remove the gripper, then press ENTER")
+        input("remove the gripper, then press ENTER")

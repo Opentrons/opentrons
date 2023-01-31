@@ -2,7 +2,7 @@
 import asyncio
 from math import copysign
 from numpy import float64
-from typing import List
+from typing import List, Union
 
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -11,10 +11,16 @@ from opentrons_hardware.hardware_control.motion import (
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
 
-from hardware_testing.data.csv_report import CSVReport, CSVResult, CSVLine
+from hardware_testing.data.csv_report import (
+    CSVReport,
+    CSVResult,
+    CSVLine,
+    CSVLineRepeating,
+)
 from hardware_testing.opentrons_api.types import OT3Axis, Point
 
 MOVING_Z_AXIS = OT3Axis.Z_L
@@ -43,7 +49,7 @@ def _build_move_group(
     )
 
 
-def build_csv_lines() -> List[CSVLine]:
+def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     return [
         CSVLine("nsync-target-pos", [float, float, float]),
@@ -56,7 +62,7 @@ def build_csv_lines() -> List[CSVLine]:
 async def _move_and_trigger_stop_signal(
     api: OT3API, nsync: bool = False, estop: bool = True
 ) -> None:
-    assert nsync or estop, f"either nsync or estop must be used as a stop signal"
+    assert nsync or estop, "either nsync or estop must be used as a stop signal"
     if nsync:
         stop = MoveStopCondition.sync_line
     else:
@@ -66,6 +72,7 @@ async def _move_and_trigger_stop_signal(
     if not api.is_simulator:
         # initialize the GPIO pin
         backend = api._backend
+        assert isinstance(backend, OT3Controller)
         gpio = backend.gpio_chardev
         if nsync:
             _activate = gpio.activate_nsync_out

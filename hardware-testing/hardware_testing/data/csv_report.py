@@ -15,7 +15,8 @@ class CSVResult(enum.Enum):
     FAIL = "FAIL"
 
     def __bool__(self) -> bool:
-        return self.value == self.PASS.value
+        """Bool."""
+        return self.value == self.PASS.value  # type: ignore[attr-defined]
 
     def __str__(self) -> str:
         """String."""
@@ -23,6 +24,7 @@ class CSVResult(enum.Enum):
 
     @classmethod
     def from_bool(cls, b: bool) -> "CSVResult":
+        """From bool."""
         return cls.PASS if b else cls.FAIL
 
 
@@ -328,9 +330,11 @@ class CSVReport:
         )
 
     def set_operator(self, operator: str) -> None:
+        """Set operator."""
         self(META_DATA_TITLE, META_DATA_TEST_OPERATOR, [operator])
 
     def set_version(self, version: str) -> None:
+        """Set version."""
         self(META_DATA_TITLE, META_DATA_TEST_VERSION, [version])
 
     def save_to_disk(self) -> Path:

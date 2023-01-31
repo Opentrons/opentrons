@@ -15,6 +15,8 @@ from . import (
 
 
 class TestSection(enum.Enum):
+    """Test Section."""
+
     GANTRY = "GANTRY"
     SIGNALS = "SIGNALS"
     INSTRUMENTS = "INSTRUMENTS"
@@ -24,6 +26,8 @@ class TestSection(enum.Enum):
 
 @dataclass
 class TestConfig:
+    """Test Config."""
+
     simulate: bool
     tests: Dict[TestSection, Callable]
 
@@ -53,6 +57,7 @@ TESTS = [
 
 
 def build_report(script_path: str) -> CSVReport:
+    """Build report."""
     return CSVReport(
         script_path=script_path,
         sections=[

@@ -3,7 +3,7 @@ import argparse
 import asyncio
 from pathlib import Path
 
-from hardware_testing.opentrons_api import helpers_ot3, types
+from hardware_testing.opentrons_api import helpers_ot3
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
@@ -30,7 +30,7 @@ async def _main(cfg: TestConfig) -> None:
         is_simulating=cfg.simulate,
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",
-        gripper="GRPV102"
+        gripper="GRPV102",
     )
 
     # RUN TESTS

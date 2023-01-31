@@ -1,12 +1,17 @@
 """Test Connectivity."""
-from typing import List
+from typing import List, Union
 
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.data.csv_report import CSVReport, CSVResult, CSVLine
+from hardware_testing.data.csv_report import (
+    CSVReport,
+    CSVResult,
+    CSVLine,
+    CSVLineRepeating,
+)
 
 
-def build_csv_lines() -> List[CSVLine]:
+def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     return [
         CSVLine("ethernet", [str, CSVResult]),

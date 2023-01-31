@@ -1,10 +1,15 @@
 """Test Gantry."""
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Optional
+from typing import List, Tuple, Dict, Optional, Union
 
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.data.csv_report import CSVReport, CSVResult, CSVLine
+from hardware_testing.data.csv_report import (
+    CSVReport,
+    CSVResult,
+    CSVLine,
+    CSVLineRepeating,
+)
 from hardware_testing.opentrons_api import types, helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis
 
@@ -42,6 +47,7 @@ class AxisStatus:
     aligned: bool
 
     def as_lists(self) -> Tuple[List[float], List[float]]:
+        """As lists."""
         est = [self.estimate[ax] for ax in GANTRY_AXES]
         enc = [self.encoder[ax] for ax in GANTRY_AXES]
         return est, enc
@@ -76,9 +82,10 @@ async def _read_gantry_position_and_check_alignment(
     return AxisStatus(estimate=estimate, encoder=encoder, aligned=aligned)
 
 
-def build_csv_lines() -> List[CSVLine]:
+def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    lines: List[CSVLine] = [CSVLine("run-currents", GANTRY_POS_AS_LIST)]
+    lines: List[Union[CSVLine, CSVLineRepeating]] = list()
+    lines.append(CSVLine("run-currents", GANTRY_POS_AS_LIST))
     for t in GANTRY_TESTS:
         lines.append(CSVLine(f"{t}-estimate", GANTRY_POS_AS_LIST))
         lines.append(CSVLine(f"{t}-encoder", GANTRY_POS_AS_LIST))
@@ -109,6 +116,8 @@ def _move_rel_point_for_axis(axis: OT3Axis, distance: float) -> types.Point:
         return types.Point(y=distance)
     elif axis == OT3Axis.Z_L or axis == OT3Axis.Z_R:
         return types.Point(z=distance)
+    else:
+        raise ValueError(f"unexpected axis: {axis}")
 
 
 async def _move_along_axis_and_record_test_results(
