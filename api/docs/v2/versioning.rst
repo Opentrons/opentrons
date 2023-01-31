@@ -248,3 +248,6 @@ Upcoming, not yet released.
     - The ``Well.has_tip`` setter, which will cease to function in a future upgrade to the Python protocol execution system. The corresponding ``Well.has_tip`` getter will not be deprecated.
 - :py:meth:`.ModuleContext.geometry` will be deprecated
     - The ``model`` and ``type`` properties of this interface will be replaced by :py:meth:`.ModuleContext.model` and :py:meth:`.ModuleContext.type`, respectively
+- :py:meth:`.ProtocolContext.load_labware` will favor loading custom labware over Opentrons defaults if a name shadows a default and no namespace is included.
+ - :py:meth:`.InstrumentContext.touch_tip` will end with the pipette tip in the center of the well instead of on the edge closest to the front of the machine.
+ 
