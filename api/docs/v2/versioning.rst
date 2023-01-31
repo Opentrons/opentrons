@@ -3,21 +3,21 @@
 Versioning
 ==========
 
-The Python Protocol API has its own versioning system, which is separate from the version of the robot server software or the Opentrons App. This separation allows you to specify the Protocol API version that your protocol requires without being concerned with what root software versions it will work with. The Python Protocol API version will only increase based on changes that affect protocol behavior.
+The Python Protocol API has its own versioning system, which is separate from the version of the robot server software or the Opentrons App. This allows you to specify the Protocol API version that your protocol requires without worrying about what robot software versions it will work with. 
 
 Major and Minor Versions
 ------------------------
 
-The API uses a major and minor version number; there are no patch version numbers.For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers. ``2.10`` indicates major version 2 and minor version 10, which is 9 minor versions newer than ``2.1``.
+The API uses a major and minor version number; there are no patch version numbers. For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers, so ``2.10`` indicates major version 2 and minor version 10, which is 9 minor versions newer than ``2.1``. The Python Protocol API version will only increase based on changes that affect protocol behavior.
 
-The major version of the API increases whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because protocols must now have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. Protocols written with version 1 of the API will not run without modification in version 2. A similar level of structural change would require a major version 3. This documentation only deals with features found in major version 2 of the API; see the `archived version 1 documentation <https://docs.opentrons.com/v1/index.html>`_ for information on older protocols.
+The major version of the API increases whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because it required protocols to have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. Protocols written with major version 1 of the API will not run without modification in major version 2. A similar level of structural change would require a major version 3. This documentation only deals with features found in major version 2 of the API; see the `archived version 1 documentation <https://docs.opentrons.com/v1/index.html>`_ for information on older protocols.
 
-The minor version of the API is increased whenever there is new functionality that might change the way a protocol is written, or when there is a behavior change in one aspect of the API but not the whole thing. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API. 
+The minor version of the API increases whenever there is new functionality that might change the way a protocol is written, or when a behavior changes in one aspect of the API but does not affect all protocols. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API. 
 
 Specifying Versions
 -------------------
 
-You must specify the minimum API version you are targeting at the top of your Python protocol. This is done in the ``metadata`` block, using the key ``'apiLevel'`` alongside any other metadata elements:
+You must specify the minimum API version you are targeting at the top of your Python protocol. This is done in the ``metadata`` block, using the ``'apiLevel'`` key, alongside any other metadata elements:
 
 .. code-block:: python
   :substitutions:
@@ -39,16 +39,16 @@ The version you specify determines the features and behaviors available to your 
 In general, you should closely consider what features you need in your protocol, and keep your specified API level as low as possible. This makes your protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot server.
 
 
-Determining What Version Is Available
--------------------------------------
+Maximum Supported Versions
+--------------------------
 
-From version 3.15.0 to 5.0.2 of the OT-2 software and Opentrons App, the maximum supported API level is listed in the robot's Information card in the Opentrons App. Since version 6.0.0, the same information is listed under Robot Settings > Advanced.
+From version 3.15.0 to 5.0.2 of the OT-2 software and Opentrons App, the maximum supported API level was listed in the robot's Information card in the app. Since version 6.0.0, the same information is listed under Robot Settings > Advanced.
 
-If you upload a protocol that specifies a higher API level than the maximum supported by your OT-2, it won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your OT-2 to the latest robot server and Opentrons App. All OT-2 hardware is capable of running any minor version of the API v2, as long as its software is up to date.
+If you upload a protocol that specifies a higher API level than the maximum supported by your OT-2, it won't be able to analyze or run your protocol. You may be able to increase the maximum supported version by updating your OT-2 to the latest robot server and Opentrons App. All OT-2 hardware is capable of running protocols specifying any minor version of the API v2, as long as its software is up to date.
 
 
-Determining What Features Are In What Version
----------------------------------------------
+When Features Were Added to the API
+-----------------------------------
 
 As you read the documentation on this site, you will notice that all documentation on features, function calls, available properties, and everything else about the Python Protocol API notes which API version it was introduced in. Keep this information in mind when specifying your protocol's API version. The version statement will look like this:
 
@@ -104,7 +104,7 @@ Changes in API Versions
 Version 2.0
 +++++++++++
 
-Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow `this migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_.
+Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow this `migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_.
 
 We've also published a `more in-depth discussion <http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2>`_ of why we developed version 2 of the API and how it differs from version 1.
 
@@ -248,5 +248,3 @@ Upcoming, not yet released.
     - The ``Well.has_tip`` setter, which will cease to function in a future upgrade to the Python protocol execution system. The corresponding ``Well.has_tip`` getter will not be deprecated.
 - :py:meth:`.ModuleContext.geometry` will be deprecated
     - The ``model`` and ``type`` properties of this interface will be replaced by :py:meth:`.ModuleContext.model` and :py:meth:`.ModuleContext.type`, respectively
-- :py:meth:`.ProtocolContext.load_labware` will favor loading custom labware over Opentrons defaults if a name shadows a default and no namespace is included.
-- :py:meth:`.InstrumentContext.touch_tip` will end with the pipette tip in the center of the well instead of on the edge closest to the front of the machine.
