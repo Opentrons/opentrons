@@ -10,17 +10,15 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
-import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
+import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { ProtocolSetup } from '../pages/OnDeviceDisplay/ProtocolSetup'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
-import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
@@ -55,22 +53,10 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup',
   },
   {
-    Component: SelectWifiNetwork,
+    Component: ConnectViaWifi,
     exact: true,
     name: 'Select Network',
     path: '/network-setup/wifi',
-  },
-  {
-    Component: SetWifiCred,
-    exact: true,
-    name: 'Set Wifi Cred',
-    path: '/network-setup/wifi/set-wifi-cred/:ssid',
-  },
-  {
-    Component: ConnectedNetworkInfo,
-    exact: true,
-    name: 'Connected Network Info',
-    path: '/network-setup/wifi/connected-network-info/:ssid',
   },
   {
     Component: ConnectViaEthernet,
