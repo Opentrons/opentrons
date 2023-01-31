@@ -160,3 +160,80 @@ class Protocols:
         app_error=False,
         robot_error=False,
     )
+
+    OT2_P20SRight_None_6_1_SimpleTransferError: Protocol = Protocol(
+        file_name="OT2_P20SRight_None_6_1_SimpleTransferError",
+        file_extension="json",
+        protocol_name="Have Pipette",
+        robot="OT-2",
+        app_error=True,
+        robot_error=True,
+        app_analysis_error="Cannot aspirate more than pipette max volume",
+        robot_analysis_error="?",
+    )
+
+    OT2_P300M_P20S_MM_TM_TC1_5_2_6_PD40: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_MM_TM_TC1_5_2_6_PD40",
+        file_extension="json",
+        protocol_name="script_pur_sample_1",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P300M_P20S_None_2_12_FailOnRun: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_None_2_12_FailOnRun",
+        file_extension="py",
+        protocol_name="Will fail on run",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P300SG1_None_5_2_6_Gen1PipetteSimple: Protocol = Protocol(
+        file_name="OT2_P300SG1_None_5_2_6_Gen1PipetteSimple",
+        file_extension="json",
+        protocol_name="gen1 pipette",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P1000SLeft_None_6_1_SimpleTransfer: Protocol = Protocol(
+        file_name="OT2_P1000SLeft_None_6_1_SimpleTransfer",
+        file_extension="json",
+        protocol_name="Need Pipette",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P300M_P20S_HS_6_1_Smoke620release: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_HS_6_1_Smoke620release",
+        file_extension="json",
+        protocol_name="H/S normal use",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P300M_P20S_MM_TM_TC1_5_2_6_PD40Error: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_MM_TM_TC1_5_2_6_PD40Error",
+        file_extension="json",
+        protocol_name="script_pur_sample_1",
+        robot="OT-2",
+        app_error=True,
+        robot_error=True,
+        app_analysis_error="Cannot aspirate more than pipette max volume",
+        robot_analysis_error="?",
+    )
+
+    OT2_None_None_2_12_Python310SyntaxRobotAnalysisOnlyError: Protocol = Protocol(
+        file_name="OT2_None_None_2_12_Python310SyntaxRobotAnalysisOnlyError",
+        file_extension="py",
+        protocol_name="🛠 3.10 only Python 🛠",
+        robot="OT-2",
+        app_error=False,
+        robot_error=True,
+        robot_analysis_error="?",
+    )

@@ -86,6 +86,7 @@ def test_analyses(
         assert protocol_landing.get_error_details_safe() is None, "Unexpected analysis error."
 
     # Verifying elements on Protocol Landing Page
+    # todo fix next line needs to be safe and print name not found
     assert protocol_landing.get_deckMap_protocol_landing(protocol_name=protocol.protocol_name).is_displayed()
     assert (
         protocol_landing.get_protocol_name_text_protocol_landing(protocol_name=protocol.protocol_name)
