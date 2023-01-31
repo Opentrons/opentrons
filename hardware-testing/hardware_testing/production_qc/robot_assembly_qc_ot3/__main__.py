@@ -1,19 +1,17 @@
 """Robot assembly QC OT3."""
 import argparse
 import asyncio
+from pathlib import Path
 
 from hardware_testing.opentrons_api import helpers_ot3, types
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
 
-GANTRY_AXES = [types.OT3Axis.X, types.OT3Axis.Y, types.OT3Axis.Z_L, types.OT3Axis.Z_R]
-
-
 async def _main(cfg: TestConfig) -> None:
     # GET INFO
     if not cfg.simulate:
-        robot_id = input("enter robot serial number: ")
+        robot_id = input("enter robot sderial number: ")
         operator = input("enter operator name: ")
     else:
         robot_id = "ot3-simulated-A01"
@@ -21,7 +19,8 @@ async def _main(cfg: TestConfig) -> None:
     software_version = "unknown"
 
     # BUILD REPORT
-    report = build_report(__file__)  # FIXME: get name of parent directory
+    test_name = Path(__file__).parent.name
+    report = build_report(test_name)
     report.set_tag(robot_id)
     report.set_operator(operator)
     report.set_version(software_version)
@@ -47,6 +46,7 @@ async def _main(cfg: TestConfig) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    # add each test-section as a skippable argument (eg: --skip-gantry)
     for s in TestSection:
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
     args = parser.parse_args()

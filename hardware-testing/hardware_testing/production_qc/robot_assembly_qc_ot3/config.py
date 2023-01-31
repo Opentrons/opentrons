@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import enum
 from typing import Dict, Callable
 
-from hardware_testing.data.csv_report import CSVReport, CSVSection, CSVLine
+from hardware_testing.data.csv_report import CSVReport, CSVSection
 
 from . import (
     test_gantry,
