@@ -577,22 +577,28 @@ async def test_touch_tip(
     )
 
     decoy.when(
-        state_store.geometry.get_well_edges(
+        state_store.geometry.get_touch_points(
             labware_id="labware-id",
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            mount=MountType.LEFT,
+            radius=1.23,
         )
-    ).then_return([Point(x=0, y=1, z=2), Point(x=3, y=4, z=5)])
+    ).then_return([Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)])
 
     decoy.when(
-        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
-    ).then_return(39339.5)
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=987
+        )
+    ).then_return(9001)
 
     await subject.touch_tip(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="A3",
         well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        radius=1.23,
+        speed=987,
     )
 
     decoy.verify(
@@ -605,13 +611,13 @@ async def test_touch_tip(
         await hardware_api.move_to(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=0, y=1, z=2),
-            speed=39339.5,
+            abs_position=Point(x=11, y=22, z=33),
+            speed=9001,
         ),
         await hardware_api.move_to(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=3, y=4, z=5),
-            speed=39339.5,
+            abs_position=Point(x=44, y=55, z=66),
+            speed=9001,
         ),
     )
