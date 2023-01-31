@@ -18,6 +18,7 @@ from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
     AddPipetteConfigAction,
+    SetWorkingPipetteVolumeAction,
 )
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
@@ -52,6 +53,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
     assert result == PipetteState(
         pipettes_by_id={},
         aspirated_volume_by_id={},
+        working_volume_by_id={},
         current_well=None,
         attached_tip_labware_by_id={},
         movement_speed_by_id={},
@@ -563,3 +565,33 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
     assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
         model="pipette-model", min_volume=1.23, max_volume=4.56
     )
+    assert subject.state.working_volume_by_id["pipette-id"] == 4.56
+
+
+def test_set_working_pipette_volume(subject: PipetteStore) -> None:
+    """It should set the working volume to the minimum between tip volume and max volume."""
+
+    """It should issue an action to add a pipette config."""
+    subject.handle_action(
+        AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            model="pipette-model",
+            min_volume=1.23,
+            max_volume=42,
+            channels=1,
+        )
+    )
+
+    assert subject.state.working_volume_by_id["pipette-id"] == 42
+
+    subject.handle_action(
+        SetWorkingPipetteVolumeAction(pipette_id="pipette-id", tip_volume=21)
+    )
+
+    assert subject.state.working_volume_by_id["pipette-id"] == 21
+
+    subject.handle_action(
+        SetWorkingPipetteVolumeAction(pipette_id="pipette-id", tip_volume=84)
+    )
+
+    assert subject.state.working_volume_by_id["pipette-id"] == 42

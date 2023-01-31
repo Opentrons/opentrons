@@ -4,6 +4,7 @@ from typing import Optional
 
 from opentrons.hardware_control import HardwareControlAPI
 from ..resources.ot3_validation import ensure_ot3_hardware
+from ..actions import ActionDispatcher
 from ..state import StateStore
 from ..types import MotorAxis, WellLocation
 from ..errors import PipetteNotAttachedError, HardwareNotSupportedError
@@ -26,6 +27,7 @@ class HardwareStopper:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
+        action_dispatcher: ActionDispatcher,
         movement: Optional[MovementHandler] = None,
         pipetting: Optional[PipettingHandler] = None,
     ) -> None:
@@ -41,6 +43,7 @@ class HardwareStopper:
             hardware_api=hardware_api,
             state_store=state_store,
             movement_handler=self._movement_handler,
+            action_dispatcher=action_dispatcher,
         )
 
     async def _drop_tip(self) -> None:

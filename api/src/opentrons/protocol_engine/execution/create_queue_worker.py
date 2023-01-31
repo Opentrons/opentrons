@@ -45,6 +45,7 @@ def create_queue_worker(
         hardware_api=hardware_api,
         state_store=state_store,
         movement_handler=movement_handler,
+        action_dispatcher=action_dispatcher,
     )
 
     run_control_handler = RunControlHandler(

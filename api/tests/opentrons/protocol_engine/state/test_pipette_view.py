@@ -23,6 +23,7 @@ from opentrons.protocol_engine.state.pipettes import (
 def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
     aspirated_volume_by_id: Optional[Dict[str, float]] = None,
+    working_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
     attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
@@ -32,6 +33,7 @@ def get_pipette_view(
     state = PipetteState(
         pipettes_by_id=pipettes_by_id or {},
         aspirated_volume_by_id=aspirated_volume_by_id or {},
+        working_volume_by_id=working_volume_by_id or {},
         current_well=current_well,
         attached_tip_labware_by_id=attached_tip_labware_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
@@ -197,11 +199,21 @@ def test_pipette_volume_raises_if_bad_id() -> None:
         subject.get_aspirated_volume("pipette-id")
 
 
-def test_get_pipette_volume() -> None:
+def test_get_pipette_aspirated_volume() -> None:
     """It should get the aspirate volume for a pipette."""
     subject = get_pipette_view(aspirated_volume_by_id={"pipette-id": 42})
 
     assert subject.get_aspirated_volume("pipette-id") == 42
+
+
+def test_get_pipette_available_volume() -> None:
+    """It should get the available volume for a pipette."""
+    subject = get_pipette_view(
+        working_volume_by_id={"pipette-id": 100},
+        aspirated_volume_by_id={"pipette-id": 58},
+    )
+
+    assert subject.get_available_volume("pipette-id") == 42
 
 
 def test_pipette_is_ready_to_aspirate_if_has_volume() -> None:

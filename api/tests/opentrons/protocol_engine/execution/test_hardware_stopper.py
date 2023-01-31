@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine import WellLocation, errors
+from opentrons.protocol_engine.actions import ActionDispatcher
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.execution import (
     MovementHandler,
@@ -45,9 +46,16 @@ def pipetting(decoy: Decoy) -> PipettingHandler:
 
 
 @pytest.fixture
+def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
+    """Get a mocked out ActionDispatcher instance."""
+    return decoy.mock(cls=ActionDispatcher)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareAPI,
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     movement: MovementHandler,
     pipetting: PipettingHandler,
 ) -> HardwareStopper:
@@ -55,6 +63,7 @@ def subject(
     return HardwareStopper(
         hardware_api=hardware_api,
         state_store=state_store,
+        action_dispatcher=action_dispatcher,
         movement=movement,
         pipetting=pipetting,
     )
@@ -170,6 +179,7 @@ async def test_hardware_stopping_sequence_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
     ot3_hardware_api: OT3API,
+    action_dispatcher: ActionDispatcher,
     movement: MovementHandler,
     pipetting: PipettingHandler,
 ) -> None:
@@ -177,6 +187,7 @@ async def test_hardware_stopping_sequence_with_gripper(
     subject = HardwareStopper(
         hardware_api=ot3_hardware_api,
         state_store=state_store,
+        action_dispatcher=action_dispatcher,
         movement=movement,
         pipetting=pipetting,
     )

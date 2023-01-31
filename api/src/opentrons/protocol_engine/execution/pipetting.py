@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from opentrons.types import Mount as HardwareMount
 from opentrons.hardware_control import HardwareControlAPI
 
+from ..actions import ActionDispatcher, SetWorkingPipetteVolumeAction
 from ..state import StateStore, CurrentWell, HardwarePipette
 from ..resources import LabwareDataProvider
 from ..types import WellLocation, WellOrigin
@@ -30,12 +31,14 @@ class PipettingHandler:
         state_store: StateStore,
         hardware_api: HardwareControlAPI,
         movement_handler: MovementHandler,
+        action_dispatcher: ActionDispatcher,
         labware_data_provider: Optional[LabwareDataProvider] = None,
     ) -> None:
         """Initialize a PipettingHandler instance."""
         self._state_store = state_store
         self._hardware_api = hardware_api
         self._movement_handler = movement_handler
+        self._action_dispatcher = action_dispatcher
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
 
     async def _get_tip_details(
@@ -109,7 +112,7 @@ class PipettingHandler:
             increment=None,
         )
 
-        # after a successful pickup, update the hardware controller state
+        # after a successful pickup, update the hardware controller state and state store
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
             tiprack_diameter=tip_diameter,
@@ -117,6 +120,10 @@ class PipettingHandler:
         self._hardware_api.set_working_volume(
             mount=hw_mount,
             tip_volume=tip_volume,
+        )
+
+        self._action_dispatcher.dispatch(
+            SetWorkingPipetteVolumeAction(pipette_id=pipette_id, tip_volume=tip_volume)
         )
 
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
@@ -135,6 +142,9 @@ class PipettingHandler:
             tiprack_diameter=tip_diameter,
         )
         self._hardware_api.set_working_volume(mount=hw_mount, tip_volume=tip_volume)
+        self._action_dispatcher.dispatch(
+            SetWorkingPipetteVolumeAction(pipette_id=pipette_id, tip_volume=tip_volume)
+        )
 
     async def drop_tip(
         self,

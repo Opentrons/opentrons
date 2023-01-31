@@ -25,6 +25,7 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     AddPipetteConfigAction,
+    SetWorkingPipetteVolumeAction,
 )
 
 __all__ = [
@@ -50,6 +51,7 @@ __all__ = [
     "ResetTipsAction",
     "SetPipetteMovementSpeedAction",
     "AddPipetteConfigAction",
+    "SetWorkingPipetteVolumeAction",
     # action payload values
     "PauseSource",
     "FinishErrorDetails",

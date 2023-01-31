@@ -31,6 +31,7 @@ from ..actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
     AddPipetteConfigAction,
+    SetWorkingPipetteVolumeAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -67,6 +68,7 @@ class PipetteState:
 
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, float]
+    working_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
     attached_tip_labware_by_id: Dict[str, str]
     movement_speed_by_id: Dict[str, Optional[float]]
@@ -83,6 +85,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self._state = PipetteState(
             pipettes_by_id={},
             aspirated_volume_by_id={},
+            working_volume_by_id={},
             current_well=None,
             attached_tip_labware_by_id={},
             movement_speed_by_id={},
@@ -100,6 +103,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 model=action.model,
                 min_volume=action.min_volume,
                 max_volume=action.max_volume,
+            )
+            self._state.working_volume_by_id[action.pipette_id] = action.max_volume
+        elif isinstance(action, SetWorkingPipetteVolumeAction):
+            self._state.working_volume_by_id[action.pipette_id] = min(
+                action.tip_volume,
+                self._state.static_config_by_id[action.pipette_id].max_volume,
             )
 
     def _handle_command(self, command: Command) -> None:
@@ -279,6 +288,18 @@ class PipetteView(HasState[PipetteState]):
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get current volume."
             )
+
+    def get_available_volume(self, pipette_id: str) -> float:
+        """Get the available volume of a pipette by ID."""
+        try:
+            working_volume = self._state.working_volume_by_id[pipette_id]
+        except KeyError:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to get available volume."
+            )
+        current_volume = self.get_aspirated_volume(pipette_id)
+
+        return max(0.0, working_volume - current_volume)
 
     def get_is_ready_to_aspirate(
         self,
