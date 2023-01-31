@@ -128,7 +128,7 @@ async def run_gear_motors(args: argparse.Namespace) -> None:
                         velocity_mm_sec=float64(5.5),
                         duration_sec=float64(2.5),
                         stop_condition=MoveStopCondition.none,
-                        action=PipetteTipActionType.pick_up,
+                        action=PipetteTipActionType.clamp,
                     )
                 }
             ]
@@ -139,10 +139,10 @@ async def run_gear_motors(args: argparse.Namespace) -> None:
             [
                 {
                     pipette_node: MoveGroupTipActionStep(
-                        velocity_mm_sec=float64(-5.5),
+                        velocity_mm_sec=float64(-5.0),
                         duration_sec=float64(6),
                         stop_condition=MoveStopCondition.limit_switch,
-                        action=PipetteTipActionType.drop,
+                        action=PipetteTipActionType.home,
                     )
                 }
             ]
@@ -167,6 +167,11 @@ async def run_gear_motors(args: argparse.Namespace) -> None:
     try:
         # Home the gear motors and Z before performing the test
         await home_z.run(can_messenger=messenger)
+
+        currents = {pipette_node: (float(args.hold_current), float(args.run_current))}
+        await set_currents(
+            messenger, currents, use_tip_motor_message_for=[pipette_node]
+        )
         await drop_tip_runner.run(can_messenger=messenger)
         await asyncio.sleep(0.1)
         # # Move to the tiprack
@@ -176,10 +181,11 @@ async def run_gear_motors(args: argparse.Namespace) -> None:
             # Pick up tips
             await pick_up_tip_runner.run(can_messenger=messenger)
             await asyncio.sleep(delay)
-
+            input("Drop Tip")
             # Drop the tips
             await drop_tip_runner.run(can_messenger=messenger)
             await asyncio.sleep(delay)
+            input("Pick up Tip")
     except asyncio.CancelledError:
         pass
     finally:

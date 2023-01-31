@@ -25,6 +25,8 @@ async def test_touch_tip_implementation(
         labwareId="123",
         wellName="A3",
         wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        radius=0.456,
+        speed=42.0,
     )
 
     result = await subject.execute(data)
@@ -37,5 +39,7 @@ async def test_touch_tip_implementation(
             labware_id="123",
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            radius=0.456,
+            speed=42.0,
         )
     )

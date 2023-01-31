@@ -10,15 +10,14 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
-import { ConnectedNetworkInfo } from '../pages/OnDeviceDisplay/ConnectedNetworkInfo'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
+import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
-import { SelectWifiNetwork } from '../pages/OnDeviceDisplay/SelectWifiNetwork'
-import { SetWifiCred } from '../pages/OnDeviceDisplay/SetWifiCred'
+import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
@@ -53,22 +52,10 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup',
   },
   {
-    Component: SelectWifiNetwork,
+    Component: ConnectViaWifi,
     exact: true,
     name: 'Select Network',
     path: '/network-setup/wifi',
-  },
-  {
-    Component: SetWifiCred,
-    exact: true,
-    name: 'Set Wifi Cred',
-    path: '/network-setup/wifi/set-wifi-cred/:ssid',
-  },
-  {
-    Component: ConnectedNetworkInfo,
-    exact: true,
-    name: 'Connected Network Info',
-    path: '/network-setup/wifi/connected-network-info/:ssid',
   },
   {
     Component: ConnectViaEthernet,
@@ -83,44 +70,10 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/network-setup/usb',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>robot settings dashboard</Box>
-      </>
-    ),
-    exact: true,
-    name: 'Robot Settings Dashboard',
-    path: '/robot-settings',
-  },
-  // insert robot settings subroutes
-  {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>factory reset</Box>
-      </>
-    ),
-    exact: true,
-    name: 'Factory Reset',
-    path: '/robot-settings/factory-reset',
-  },
-  {
-    Component: NameRobot,
-    exact: true,
-    name: 'Rename Robot',
-    path: '/robot-settings/rename-robot',
-  },
-  {
-    Component: UpdateRobot,
-    exact: true,
-    name: 'Update Robot',
-    path: '/robot-settings/update-robot',
-  },
-  {
     Component: ProtocolDashboard,
     exact: true,
-    name: 'Protocol Dashboard',
+    name: 'All Protocols',
+    navLinkTo: '/protocols',
     path: '/protocols',
   },
   // insert protocol subroutes
@@ -162,10 +115,43 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
       </>
     ),
     exact: true,
-    name: 'Attach Instruments Dashboard',
+    // 'Attach Instruments Dashboard',
+    name: 'Instruments',
+    navLinkTo: '/attach-instruments',
     path: '/attach-instruments',
   },
   // insert attach instruments subroutes
+  {
+    Component: RobotSettingsDashboard,
+    exact: true,
+    name: 'Settings',
+    navLinkTo: '/robot-settings',
+    path: '/robot-settings',
+  },
+  // insert robot settings subroutes
+  {
+    Component: () => (
+      <>
+        <BackButton />
+        <Box>factory reset</Box>
+      </>
+    ),
+    exact: true,
+    name: 'Factory Reset',
+    path: '/robot-settings/factory-reset',
+  },
+  {
+    Component: NameRobot,
+    exact: true,
+    name: 'Rename Robot',
+    path: '/robot-settings/rename-robot',
+  },
+  {
+    Component: UpdateRobot,
+    exact: true,
+    name: 'Update Robot',
+    path: '/robot-settings/update-robot',
+  },
   {
     Component: () => (
       <>

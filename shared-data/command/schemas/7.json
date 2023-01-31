@@ -145,7 +145,7 @@
     "WellOrigin": {
       "title": "WellOrigin",
       "description": "Origin of WellLocation offset.",
-      "enum": ["top", "bottom"],
+      "enum": ["top", "bottom", "center"],
       "type": "string"
     },
     "WellOffset": {
@@ -1610,6 +1610,17 @@
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "radius": {
+          "title": "Radius",
+          "description": "The proportion of the target well's radius the pipette tip will move towards.",
+          "default": 1.0,
+          "type": "number"
+        },
+        "speed": {
+          "title": "Speed",
+          "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+          "type": "number"
         }
       },
       "required": ["labwareId", "wellName", "pipetteId"]
