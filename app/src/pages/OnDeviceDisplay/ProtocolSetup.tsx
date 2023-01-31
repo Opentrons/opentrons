@@ -9,6 +9,7 @@ import {
   Flex,
   Icon,
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   JUSTIFY_CENTER,
@@ -43,9 +44,9 @@ interface ProtocolSetupStepProps {
   status: 'ready' | 'not ready' | 'general'
   title: string
   // first line of detail text
-  detail?: string
+  detail?: string | null
   // second line of detail text
-  subDetail?: string
+  subDetail?: string | null
 }
 
 function ProtocolSetupStep({
@@ -56,9 +57,9 @@ function ProtocolSetupStep({
   subDetail,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
-    ready: 'rgba(4, 170, 101, 0.2)',
-    'not ready': '#FCF0D8',
-    general: '#E0E0E0',
+    ready: `${COLORS.successEnabled}${COLORS.opacity20HexCode}`,
+    'not ready': COLORS.warningBackgroundMed,
+    general: COLORS.greyDisabled,
   }
   return (
     <Btn onClick={onClickSetupStep} width="100%">
@@ -71,7 +72,9 @@ function ProtocolSetupStep({
       >
         {status !== 'general' ? (
           <Icon
-            color={status === 'ready' ? '#04AA65' : '#F09D20'}
+            color={
+              status === 'ready' ? COLORS.successEnabled : COLORS.warningEnabled
+            }
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
@@ -98,7 +101,7 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      border="2px solid #BF0000"
+      border={`2px solid ${COLORS.errorEnabled}`}
       borderRadius="4.25rem"
       display={DISPLAY_FLEX}
       height="4.25rem"
@@ -107,7 +110,7 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
       onClick={onClose}
       aria-label="close"
     >
-      <Icon color="#BF0000" name="ot-close" size="2rem" />
+      <Icon color={COLORS.errorEnabled} name="ot-close" size="2rem" />
     </Btn>
   )
 }
@@ -121,7 +124,7 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? '#8F8F8F' : '#006CFA'}
+      backgroundColor={disabled ? COLORS.successDisabled : COLORS.blueEnabled}
       borderRadius="4.25rem"
       display={DISPLAY_FLEX}
       height="4.25rem"
@@ -131,7 +134,7 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
       onClick={onPlay}
       aria-label="play"
     >
-      <Icon color="#FFFFFF" marginLeft="0.25rem" name="play" size="2rem" />
+      <Icon color={COLORS.white} marginLeft="0.25rem" name="play" size="2rem" />
     </Btn>
   )
 }
@@ -231,9 +234,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
     ? missingModulesText
     : connectedModulesText
   const modulesSubDetail =
-    isMissingModules && isUnmatchedModules
-      ? t('module_mismatch_error')
-      : undefined
+    isMissingModules && isUnmatchedModules ? t('module_mismatch_error') : null
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
@@ -245,11 +246,11 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
   const labwareDetail =
     onDeckLabwareCount > 0
       ? t('on-deck_labware', { count: onDeckLabwareCount })
-      : undefined
+      : null
   const labwareSubDetail =
     additionalLabwareCount > 0
       ? t('additional_labware', { count: additionalLabwareCount })
-      : undefined
+      : null
 
   return (
     <>
@@ -262,7 +263,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
             <StyledText fontSize="2rem">{t('prepare_to_run')}</StyledText>
-            <StyledText fontSize="2rem" color="#707075">
+            <StyledText fontSize="2rem" color={COLORS.darkGreyEnabled}>
               {protocolName}
             </StyledText>
           </Flex>
@@ -272,11 +273,14 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
           </Flex>
         </Flex>
         <Flex gridGap="1rem">
-          <Flex backgroundColor="#EEEEEE" padding="0.25rem 0.5rem">
+          <Flex
+            backgroundColor={COLORS.fundamentalsBackgroundShade}
+            padding="0.25rem 0.5rem"
+          >
             {`Run: ${createdAtTimestamp}`}
           </Flex>
           <Flex
-            backgroundColor="#EEEEEE"
+            backgroundColor={COLORS.fundamentalsBackgroundShade}
             padding="0.25rem 0.5rem"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
