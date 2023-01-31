@@ -48,9 +48,9 @@ export const DisconnectModal = ({
 }: DisconnectModalProps): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared'])
 
-  const list = useSelector((state: State) => getWifiList(state, robotName))
+  const wifiList = useSelector((state: State) => getWifiList(state, robotName))
 
-  const activeNetwork = list?.find(nw => nw.active)
+  const activeNetwork = wifiList?.find(nw => nw.active)
   const ssid = activeNetwork?.ssid ?? null
 
   const [dispatchApi, requestIds] = useDispatchApiRequest()
