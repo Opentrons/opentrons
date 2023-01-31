@@ -28,8 +28,6 @@ const NavigationLink = styled(NavLink)`
 
   &.active {
     color: ${COLORS.blueEnabled};
-    border-bottom: 4px solid #006cfa;
-    width: fit-content;
   }
 `
 
@@ -45,7 +43,8 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`${SPACING.spacing4} ${SPACING.spacing1}`}
+      paddingX={SPACING.spacing1}
+      paddingBottom="0.75rem"
       height="7rem"
     >
       <Flex
