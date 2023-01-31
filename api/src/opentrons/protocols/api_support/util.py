@@ -25,7 +25,7 @@ from opentrons.hardware_control.types import Axis
 if TYPE_CHECKING:
     from opentrons.protocol_api.core.instrument import AbstractInstrument
     from opentrons.protocol_api.labware import Well, Labware
-    from opentrons.protocol_api.core.protocol_api.deck import Deck
+    from opentrons.protocol_api.core.legacy.deck import Deck
 
 MODULE_LOG = logging.getLogger(__name__)
 

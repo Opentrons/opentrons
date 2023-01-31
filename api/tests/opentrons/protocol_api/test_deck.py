@@ -1,4 +1,4 @@
-"""Tests for opentrons.protocol_api.Deck."""
+"""Tests for opentrons.legacy.Deck."""
 import inspect
 from typing import cast
 
@@ -25,7 +25,7 @@ def deck_definition() -> DeckDefinitionV3:
 
 @pytest.fixture(autouse=True)
 def _mock_validation_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out opentrons.protocol_api.validation functions."""
+    """Mock out opentrons.legacy.validation functions."""
     for name, func in inspect.getmembers(mock_validation, inspect.isfunction):
         monkeypatch.setattr(mock_validation, name, decoy.mock(func=func))
 

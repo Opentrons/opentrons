@@ -231,7 +231,7 @@ describe('BeforeBeginning', () => {
         'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
       )
       getByText(
-        'The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process'
+        'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
@@ -275,7 +275,7 @@ describe('BeforeBeginning', () => {
         'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
       )
       getByText(
-        'The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process'
+        'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
@@ -326,7 +326,7 @@ describe('BeforeBeginning', () => {
         'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
       )
       getByText(
-        'The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process'
+        'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
@@ -372,13 +372,12 @@ describe('BeforeBeginning', () => {
       const { getByText, getByAltText, getByRole } = render(props)
       getByText('Before you begin')
       getByText(
-        'The 96-channel pipette is <weight> so be cautious during uninstall. Having a helper near by can be really useful for this process'
+        'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
       )
       getByText(
         'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
       )
       getByAltText('2.5 mm Hex Screwdriver')
-      getByAltText('Calibration Probe')
       const proceedBtn = getByRole('button', { name: 'Get started' })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(

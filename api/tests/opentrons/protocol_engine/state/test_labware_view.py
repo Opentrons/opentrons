@@ -6,6 +6,7 @@ from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.labware.labware_definition import Parameters
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point
 
@@ -21,7 +22,11 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
 )
 
-from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
+from opentrons.protocol_engine.state.labware import (
+    LabwareState,
+    LabwareView,
+    LabwareLoadParams,
+)
 
 
 plate = LoadedLabware(
@@ -137,6 +142,39 @@ def test_get_labware_definition_bad_id() -> None:
 
     with pytest.raises(errors.LabwareDefinitionDoesNotExistError):
         subject.get_definition_by_uri(cast(LabwareUri, "not-a-uri"))
+
+
+@pytest.mark.parametrize(
+    argnames=["namespace", "version"],
+    argvalues=[("world", 123), (None, 123), ("world", None), (None, None)],
+)
+def test_find_custom_labware_params(
+    namespace: Optional[str], version: Optional[int]
+) -> None:
+    """It should find the missing (if any) load labware parameters."""
+    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+        parameters=Parameters.construct(loadName="hello"),  # type: ignore[call-arg]
+        namespace="world",
+        version=123,
+    )
+    standard_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+        parameters=Parameters.construct(loadName="goodbye"),  # type: ignore[call-arg]
+        namespace="opentrons",
+        version=456,
+    )
+
+    subject = get_labware_view(
+        definitions_by_uri={
+            "some-labware-uri": labware_def,
+            "some-standard-uri": standard_def,
+        },
+    )
+
+    result = subject.find_custom_labware_load_params()
+
+    assert result == [
+        LabwareLoadParams(load_name="hello", namespace="world", version=123)
+    ]
 
 
 def test_get_all_labware(

@@ -22,9 +22,9 @@ from .core.common import (
     HeaterShakerCore,
 )
 from .core.core_map import LoadedCoreMap
-from .core.protocol_api.legacy_module_core import LegacyModuleCore
-from .core.protocol_api.module_geometry import ModuleGeometry as LegacyModuleGeometry
-from .core.protocol_api.labware import LabwareImplementation as LegacyLabwareCore
+from .core.legacy.legacy_module_core import LegacyModuleCore
+from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
+from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
@@ -115,8 +115,9 @@ class ModuleContext(CommandPublisher):
 
         _log.warning(deprecation_message)
 
+        # Type ignoring to preserve backwards compatibility
         assert (
-            labware.parent == self._core.geometry
+            labware.parent == self._core.geometry  # type: ignore[comparison-overlap]
         ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)
@@ -164,8 +165,10 @@ class ModuleContext(CommandPublisher):
             labware = self._core.add_labware_core(cast(LegacyLabwareCore, labware_core))
         else:
             labware = Labware(
-                implementation=labware_core,
+                core=labware_core,
                 api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
             )
 
         self._core_map.add(labware_core, labware)
@@ -218,6 +221,13 @@ class ModuleContext(CommandPublisher):
         labware_core = self._protocol_core.get_labware_on_module(self._core)
         return self._core_map.get(labware_core)
 
+    # TODO (tz, 1-7-23): change this to version 2.14
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
+    def parent(self) -> str:
+        """The name of the slot the module is on."""
+        return self._core.get_deck_slot().value
+
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def geometry(self) -> LegacyModuleGeometry:
@@ -236,9 +246,12 @@ class ModuleContext(CommandPublisher):
         )
 
     def __repr__(self) -> str:
-        return "{} at {} lw {}".format(
-            self.__class__.__name__, self.geometry, self.labware
-        )
+
+        class_name = self.__class__.__name__
+        display_name = self._core.get_display_name()
+        location = self._core.get_deck_slot().value
+
+        return f"{class_name} at {display_name} on {location} lw {self.labware}"
 
 
 class TemperatureModuleContext(ModuleContext):

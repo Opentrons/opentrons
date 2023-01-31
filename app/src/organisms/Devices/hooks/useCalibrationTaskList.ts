@@ -1,4 +1,8 @@
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+
+import { useInterval } from '@opentrons/components'
+
 import {
   useAttachedPipettes,
   useDeckCalibrationData,
@@ -7,6 +11,13 @@ import {
 } from '.'
 
 import { formatTimestamp } from '../utils'
+import {
+  INTENT_CALIBRATE_PIPETTE_OFFSET,
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
+} from '../../DeprecatedCalibrationPanels'
+import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
+import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
+import { fetchCalibrationStatus } from '../../../redux/calibration'
 
 import type {
   SubTaskProps,
@@ -14,14 +25,26 @@ import type {
   TaskProps,
 } from '../../TaskList/types'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
 
-export function useCalibrationTaskList(robotName: string): TaskListProps {
+const CALIBRATION_DATA_POLL_MS = 5000
+
+export function useCalibrationTaskList(
+  robotName: string,
+  pipOffsetCalLauncher: DashboardCalOffsetInvoker = () => {},
+  tipLengthCalLauncher: DashboardCalTipLengthInvoker = () => {},
+  deckCalLauncher: DashboardCalDeckInvoker = () => {}
+): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
+  const dispatch = useDispatch()
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
   let activeTaskIndices: [number, number] | null = null
   const taskList: TaskListProps = {
     activeIndex: null,
+    taskListStatus: 'incomplete',
     taskList: [],
   }
   // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
@@ -32,6 +55,16 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
   // get calibration data for mounted pipette subtasks
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
+
+  useInterval(
+    () => {
+      dispatch(fetchPipetteOffsetCalibrations(robotName))
+      dispatch(fetchTipLengthCalibrations(robotName))
+      dispatch(fetchCalibrationStatus(robotName))
+    },
+    CALIBRATION_DATA_POLL_MS,
+    true
+  )
 
   // first create the shape of the deck calibration task, then update values based on calibration status
   const deckTask: TaskProps = {
@@ -54,12 +87,12 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
             timestamp: formatTimestamp(deckCalibrationData.lastModified),
           })
         : ''
-    // todo(jb, 2022-12-14): wire up ctas to actually launch wizards (RAUT-292)
-    deckTask.cta = { label: t('recalibrate'), onClick: () => {} }
+    deckTask.cta = { label: t('recalibrate'), onClick: deckCalLauncher }
   } else {
     activeTaskIndices = [0, 0]
     deckTask.description = t('start_with_deck_calibration')
-    deckTask.cta = { label: t('calibrate'), onClick: () => {} }
+    deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
+    deckTask.markedBad = deckCalibrationData !== undefined
   }
 
   taskList.taskList.push(deckTask)
@@ -130,7 +163,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
         })
         tipLengthSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () => {},
+          onClick: () =>
+            tipLengthCalLauncher({
+              params: { mount },
+              hasBlockModalResponse: null,
+            }),
         }
         tipLengthSubTask.isComplete = true
 
@@ -139,7 +176,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
         })
         offsetSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () => {},
+          onClick: () =>
+            pipOffsetCalLauncher({
+              params: { mount },
+              withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+            }),
         }
         offsetSubTask.isComplete = true
 
@@ -149,6 +190,8 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
         // add the subTasks to the parent task, increment the taskIndex if we aren't at the end, then continue the loop
         pipetteTask.subTasks.push(tipLengthSubTask)
         pipetteTask.subTasks.push(offsetSubTask)
+
+        pipetteTask.markedBad = pipetteTask.subTasks.every(st => st.markedBad)
 
         taskList.taskList.push(pipetteTask)
 
@@ -173,8 +216,13 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           )
           tipLengthSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () => {},
+            onClick: () =>
+              tipLengthCalLauncher({
+                params: { mount },
+                hasBlockModalResponse: null,
+              }),
           }
+          tipLengthSubTask.markedBad = tipLengthCalForPipette !== undefined
         } else {
           // the tip length calibration is present and valid
           tipLengthSubTask.footer = t('robot_calibration:last_completed_on', {
@@ -182,7 +230,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           })
           tipLengthSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () => {},
+            onClick: () =>
+              tipLengthCalLauncher({
+                params: { mount },
+                hasBlockModalResponse: null,
+              }),
           }
           tipLengthSubTask.isComplete = true
         }
@@ -203,8 +255,13 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           )
           offsetSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () => {},
+            onClick: () =>
+              pipOffsetCalLauncher({
+                params: { mount },
+                withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
+              }),
           }
+          offsetSubTask.markedBad = offsetCalForPipette !== undefined
         } else {
           // the offset calibration is present and valid
           offsetSubTask.footer = t('robot_calibration:last_completed_on', {
@@ -212,7 +269,11 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
           })
           offsetSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () => {},
+            onClick: () =>
+              pipOffsetCalLauncher({
+                params: { mount },
+                withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
+              }),
           }
           offsetSubTask.isComplete = true
         }
@@ -220,6 +281,9 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
         // We've got the appropriately constructed subtasks, push them to the pipette task, then the task list
         pipetteTask.subTasks.push(tipLengthSubTask)
         pipetteTask.subTasks.push(offsetSubTask)
+
+        pipetteTask.markedBad = pipetteTask.subTasks.every(st => st.markedBad)
+
         taskList.taskList.push(pipetteTask)
 
         if (taskIndex < TASK_LIST_LENGTH - 1) {
@@ -231,5 +295,22 @@ export function useCalibrationTaskList(robotName: string): TaskListProps {
   }
 
   taskList.activeIndex = activeTaskIndices
+
+  // Set top-level state of calibration status
+  // if the tasklist is empty, though, all calibrations are good
+
+  let calibrationStatus = 'incomplete'
+
+  if (activeTaskIndices == null) {
+    calibrationStatus = 'complete'
+    // if we have tasks and they are all marked bad, then we should
+    // strongly suggest they re-do those calibrations
+  } else if (
+    taskList.taskList.every(tp => tp.isComplete === true || tp.markedBad)
+  ) {
+    calibrationStatus = 'bad'
+  }
+  taskList.taskListStatus = calibrationStatus
+
   return taskList
 }

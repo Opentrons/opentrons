@@ -14,7 +14,6 @@ from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
 )
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -30,6 +29,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
+from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
@@ -42,6 +42,7 @@ from .module_core import (
     HeaterShakerModuleCore,
 )
 from .exceptions import InvalidModuleLocationError
+from . import load_labware_params
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
@@ -140,11 +141,18 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         else:
             module_location = DeckSlotLocation(slotName=location)
 
+        custom_labware_params = (
+            self._engine_client.state.labware.find_custom_labware_load_params()
+        )
+        namespace, version = load_labware_params.resolve(
+            load_name, namespace, version, custom_labware_params
+        )
+
         load_result = self._engine_client.load_labware(
             load_name=load_name,
             location=module_location,
-            namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
-            version=version or 1,
+            namespace=namespace,
+            version=version,
             display_name=label,
         )
         labware_core = LabwareCore(
@@ -385,3 +393,36 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def get_module_cores(self) -> List[ModuleCore]:
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
+
+    def define_liquid(
+        self,
+        name: str,
+        description: Optional[str],
+        display_color: Optional[str],
+    ) -> Liquid:
+        """Define a liquid to load into a well."""
+        liquid = self._engine_client.add_liquid(
+            name=name, description=description, color=display_color
+        )
+
+        return Liquid(
+            _id=liquid.id,
+            name=liquid.displayName,
+            description=liquid.description,
+            display_color=(
+                liquid.displayColor.__root__ if liquid.displayColor else None
+            ),
+        )
+
+    def get_labware_location(
+        self, labware_core: LabwareCore
+    ) -> Union[DeckSlotName, ModuleCore, None]:
+        """Get labware parent location."""
+        labware_location = self._engine_client.state.labware.get_location(
+            labware_core.labware_id
+        )
+        if isinstance(labware_location, DeckSlotLocation):
+            return labware_location.slotName
+        elif isinstance(labware_location, ModuleLocation):
+            return self._module_cores_by_id.get(labware_location.moduleId)
+        return None

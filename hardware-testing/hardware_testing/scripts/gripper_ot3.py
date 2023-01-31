@@ -37,7 +37,11 @@ LABWARE_SIZE = {
     "reservoir": LABWARE_SIZE_RESERVOIR,
 }
 LABWARE_KEYS = list(LABWARE_SIZE.keys())
-LABWARE_GRIP_HEIGHT = {k: LABWARE_SIZE[k].z * 0.5 for k in LABWARE_KEYS}
+LABWARE_GRIP_HEIGHT = {
+    "plate": LABWARE_SIZE_ARMADILLO.z * 0.5,
+    "tiprack": LABWARE_SIZE_EVT_TIPRACK.z * 0.4,
+    "reservoir": LABWARE_SIZE_RESERVOIR.z * 0.5,
+}
 LABWARE_GRIP_FORCE = {k: 15 for k in LABWARE_KEYS}
 LABWARE_WARP = types.Point()
 
@@ -375,16 +379,24 @@ async def _main(
     force: Optional[float] = None,
     warp: Optional[float] = None,
     adapter: Optional[str] = None,
+    cycles: int = 1,
 ) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
 
     if len(slot_states.slots) == 1:
         slot_states.slots += [slot_states.slots[0]]
+    elif cycles > 1 and slot_states.slots[0] != slot_states.slots[-1]:
+        slot_states.slots.append(slot_states.slots[0])
 
     while True:
-        await _inspect(api)
-        await _run(api, labware_key, slot_states, inspect, force, warp, adapter)
+        if not api.is_simulator:
+            await _inspect(api)
+        for c in range(cycles):
+            print(f"Cycle {c + 1}/{cycles}")
+            await _run(api, labware_key, slot_states, inspect, force, warp, adapter)
+        if api.is_simulator:
+            break
 
 
 def _gather_and_test_slots(args: Any) -> GripperSlotStates:
@@ -447,6 +459,7 @@ if __name__ == "__main__":
     parser.add_argument("--inspect", action="store_true")
     parser.add_argument("--slots", nargs="+", required=True)
     parser.add_argument("--labware", choices=LABWARE_KEYS, required=True)
+    parser.add_argument("--cycles", type=int, default=1)
     parser.add_argument("--force", type=int, default=5.0)
     parser.add_argument("--warp", type=float)
     parser.add_argument("--temp-module-slots", nargs="+")
@@ -465,5 +478,6 @@ if __name__ == "__main__":
             force=args_parsed.force,
             warp=args_parsed.warp,
             adapter=args_parsed.adapter,
+            cycles=args_parsed.cycles,
         )
     )

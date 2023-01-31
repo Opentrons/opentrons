@@ -199,3 +199,7 @@ class LabwareMovementNotAllowedError(ProtocolEngineError):
 
 class LocationIsOccupiedError(ProtocolEngineError):
     """An error raised when attempting to place labware in a non-empty location."""
+
+
+class FirmwareUpdateRequired(ProtocolEngineError):
+    """An error raised when the firmware needs to be updated."""

@@ -14,12 +14,24 @@ import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { fetchLights } from '../../../redux/robot-controls'
+import { useFeatureFlag } from '../../../redux/config'
 import { getRobotModelByName } from '../../../redux/discovery'
 import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery/constants'
-import { useLights, useRobot, useRunStatuses } from '../hooks'
+import {
+  useCalibrationTaskList,
+  useIsRobotBusy,
+  useLights,
+  useRobot,
+  useRunStatuses,
+} from '../hooks'
+import {
+  expectedFailedTaskList,
+  expectedIncompleteDeckCalTaskList,
+  expectedTaskList,
+} from '../hooks/__fixtures__/taskListFixtures'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotOverview } from '../RobotOverview'
@@ -31,6 +43,7 @@ import type { State } from '../../../redux/types'
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/config')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
@@ -67,10 +80,19 @@ const MOCK_STATE: State = {
   },
 } as any
 
+const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
+  typeof useCalibrationTaskList
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 const mockRobotStatusHeader = RobotStatusHeader as jest.MockedFunction<
   typeof RobotStatusHeader
@@ -127,7 +149,10 @@ describe('RobotOverview', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
+    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+    mockUseFeatureFlag.mockReturnValue(false)
+    mockUseIsRobotBusy.mockReturnValue(false)
     mockUseLights.mockReturnValue({
       lightsOn: false,
       toggleLights: mockToggleLights,
@@ -171,6 +196,58 @@ describe('RobotOverview', () => {
   it('renders a UpdateRobotBanner component', () => {
     const [{ getByText }] = render(props)
     getByText('Mock UpdateRobotBanner')
+  })
+
+  it('does not render a calibration status label when calibration is good and the calibration wizard feature flag is set', () => {
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ queryByRole }] = render(props)
+    expect(
+      queryByRole('link', {
+        name: 'Go to calibration',
+      })
+    ).not.toBeInTheDocument()
+  })
+
+  it('renders a missing calibration status label when the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedIncompleteDeckCalTaskList
+    )
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(props)
+    getByText('Robot is missing calibration data')
+    const calibrationDashboardLink = getByRole('link', {
+      name: 'Go to calibration',
+    })
+    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+      '/devices/opentrons-robot-name/robot-settings/calibration'
+    )
+  })
+
+  it('renders a recommended recalibration status label when the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedFailedTaskList)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(props)
+    getByText('Recalibration recommended')
+    const calibrationDashboardLink = getByRole('link', {
+      name: 'Go to calibration',
+    })
+    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+      '/devices/opentrons-robot-name/robot-settings/calibration'
+    )
+  })
+
+  it('does not render a calibration status label when robot is busy and the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedIncompleteDeckCalTaskList
+    )
+    mockUseIsRobotBusy.mockReturnValue(true)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ queryByRole }] = render(props)
+    expect(
+      queryByRole('link', {
+        name: 'Go to calibration',
+      })
+    ).not.toBeInTheDocument()
   })
 
   it('fetches lights status', () => {

@@ -10,6 +10,7 @@ from opentrons.types import Point
 
 from . import point_calculations
 from ..well import AbstractWellCore
+from ..._liquid import Liquid
 
 
 class WellCore(AbstractWellCore):
@@ -120,6 +121,18 @@ class WellCore(AbstractWellCore):
             labware_id=self.labware_id, well_name=self._name
         )
         return self.get_bottom(z_offset=well_height / 2)
+
+    def load_liquid(
+        self,
+        liquid: Liquid,
+        volume: float,
+    ) -> None:
+        """Load liquid into a well."""
+        self._engine_client.load_liquid(
+            labware_id=self._labware_id,
+            liquid_id=liquid._id,
+            volume_by_well={self._name: volume},
+        )
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """Gets point in deck coordinates based on percentage of the radius of each axis."""

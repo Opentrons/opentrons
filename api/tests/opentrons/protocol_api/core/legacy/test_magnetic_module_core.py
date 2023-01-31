@@ -5,12 +5,12 @@ from decoy import Decoy
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import MagDeck, MagneticStatus
 from opentrons.hardware_control.modules.types import MagneticModuleModel
-from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
-from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
+from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyMagneticModuleCore,
     create_module_core,
 )
@@ -29,16 +29,16 @@ def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[MagDeck]:
 
 
 @pytest.fixture
-def mock_protocol_core(decoy: Decoy) -> ProtocolContextImplementation:
+def mock_protocol_core(decoy: Decoy) -> LegacyProtocolCore:
     """Get a mock protocol core."""
-    return decoy.mock(cls=ProtocolContextImplementation)
+    return decoy.mock(cls=LegacyProtocolCore)
 
 
 @pytest.fixture
 def subject(
     mock_geometry: ModuleGeometry,
     mock_sync_module_hardware: SynchronousAdapter[MagDeck],
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> LegacyMagneticModuleCore:
     """Get a legacy module implementation core with mocked out dependencies."""
     return LegacyMagneticModuleCore(
@@ -52,7 +52,7 @@ def subject(
 def test_create(
     decoy: Decoy,
     mock_geometry: ModuleGeometry,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> None:
     """It should be able to create a magnetic module core."""
     mock_module_hardware_api = decoy.mock(cls=MagDeck)
@@ -118,7 +118,7 @@ def test_engage_height_from_labware(
 ) -> None:
     """It should engage height from the labware's defined position."""
     decoy.when(
-        mock_geometry.labware._implementation.get_default_magnet_engage_height(False)  # type: ignore[union-attr]
+        mock_geometry.labware._core.get_default_magnet_engage_height(False)  # type: ignore[union-attr]
     ).then_return(32.0)
 
     subject.engage_to_labware(offset=10.0)
@@ -145,7 +145,7 @@ def test_engage_height_from_labware_no_engage_height(
 ) -> None:
     """It should raise if the labware is not magnetic module compatible."""
     decoy.when(
-        mock_geometry.labware._implementation.get_default_magnet_engage_height(),  # type: ignore[union-attr]
+        mock_geometry.labware._core.get_default_magnet_engage_height(),  # type: ignore[union-attr]
         ignore_extra_args=True,
     ).then_return(None)
 
@@ -163,7 +163,7 @@ def test_engage_height_from_labware_with_gen1(
     decoy.when(mock_geometry.model).then_return(MagneticModuleModel.MAGNETIC_V1)
 
     decoy.when(
-        mock_geometry.labware._implementation.get_default_magnet_engage_height(False)  # type: ignore[union-attr]
+        mock_geometry.labware._core.get_default_magnet_engage_height(False)  # type: ignore[union-attr]
     ).then_return(32.0)
 
     subject.engage_to_labware(offset=10.0)
@@ -181,7 +181,7 @@ def test_engage_height_from_labware_with_gen1_preserve_half_mm(
     decoy.when(mock_geometry.model).then_return(MagneticModuleModel.MAGNETIC_V1)
 
     decoy.when(
-        mock_geometry.labware._implementation.get_default_magnet_engage_height(True)  # type: ignore[union-attr]
+        mock_geometry.labware._core.get_default_magnet_engage_height(True)  # type: ignore[union-attr]
     ).then_return(32.0)
 
     subject.engage_to_labware(offset=10.0, preserve_half_mm=True)
