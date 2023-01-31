@@ -136,7 +136,12 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         self._protocol_interface.get_hardware().blow_out(self._mount)
 
     def touch_tip(
-        self, location: LegacyWellCore, radius: float, v_offset: float, speed: float
+        self,
+        location: types.Location,
+        well_core: LegacyWellCore,
+        radius: float,
+        z_offset: float,
+        speed: float,
     ) -> None:
         """
         Touch the pipette tip to the sides of a well, with the intent of
@@ -148,18 +153,20 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         #  Also, build_edges should not require api_version.
         from opentrons.protocol_api.labware import Labware, Well
 
+        self.move_to(location=location)
+
         edges = build_edges(
             where=Well(
                 parent=Labware(
-                    core=location.geometry.parent,
+                    core=well_core.geometry.parent,
                     api_version=self._api_version,
                     protocol_core=None,  # type: ignore[arg-type]
                     core_map=None,  # type: ignore[arg-type]
                 ),
-                core=location,
+                core=well_core,
                 api_version=self._api_version,
             ),
-            offset=v_offset,
+            offset=z_offset,
             mount=self._mount,
             deck=self._protocol_interface.get_deck(),
             radius=radius,

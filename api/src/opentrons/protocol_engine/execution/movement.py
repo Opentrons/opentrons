@@ -10,8 +10,8 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
     Axis as HardwareAxis,
-    MustHomeError as HardwareMustHomeError,
 )
+from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
 
 from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis
 from ..state import StateStore, CurrentWell

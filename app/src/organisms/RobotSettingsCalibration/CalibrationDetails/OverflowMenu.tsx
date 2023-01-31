@@ -281,16 +281,6 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {enableCalibrationWizards &&
-            calType === 'pipetteOffset' &&
-            applicablePipetteOffsetCal == null && (
-              <MenuItem
-                onClick={e => handleCalibration(e)}
-                disabled={disabledReason !== null}
-              >
-                {t('calibrate_pipette')}
-              </MenuItem>
-            )}
           {!enableCalibrationWizards && mount != null && (
             <MenuItem
               onClick={e => handleCalibration(e)}

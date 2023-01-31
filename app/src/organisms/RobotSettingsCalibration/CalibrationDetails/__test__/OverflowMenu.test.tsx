@@ -168,14 +168,12 @@ describe('OverflowMenu', () => {
     getByText('Delete calibration data')
   })
 
-  it('should render Overflow tip length calibration button when the calibration wizard feature flag is set and no calibration exists', () => {
+  it('should not render Overflow tip length calibration button when the calibration wizard feature flag is set and no calibration exists', () => {
     mockUseFeatureFlag.mockReturnValue(true)
-    const [{ getByLabelText, getByText }] = render(props)
+    const [{ getByLabelText, queryByText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
-    const calibrationButton = getByText('Calibrate Pipette Offset')
-    fireEvent.click(calibrationButton)
-    expect(startCalibration).toHaveBeenCalled()
+    expect(queryByText('Calibrate Pipette Offset')).not.toBeInTheDocument()
   })
 
   it('should not render Overflow tip length recalibration button when the calibration wizard feature flag is set', () => {

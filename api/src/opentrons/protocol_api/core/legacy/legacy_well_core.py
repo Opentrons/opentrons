@@ -3,10 +3,13 @@ from typing import Optional
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
+from opentrons.protocols.api_support.util import APIVersionError
+
 from opentrons.types import Point
 
 from .well_geometry import WellGeometry
 from ..well import AbstractWellCore
+from ..._liquid import Liquid
 
 
 class LegacyWellCore(AbstractWellCore):
@@ -102,6 +105,14 @@ class LegacyWellCore(AbstractWellCore):
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
         return self._geometry.center()
+
+    def load_liquid(
+        self,
+        liquid: Liquid,
+        volume: float,
+    ) -> None:
+        """Load liquid into a well."""
+        raise APIVersionError("Loading a liquid is not supported in this API version.")
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """Gets point in deck coordinates based on percentage of the radius of each axis."""

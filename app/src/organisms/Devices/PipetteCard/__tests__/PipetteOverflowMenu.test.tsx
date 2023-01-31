@@ -103,12 +103,12 @@ describe('PipetteOverflowMenu', () => {
     expect(props.handleCalibrate).toHaveBeenCalled()
   })
 
-  it('should render calibrate pipette offset text when the calibration wizard feature flag is set and no calibration exists', () => {
+  it('should not render calibrate pipette offset text when the calibration wizard feature flag is set and no calibration exists', () => {
     mockUseFeatureFlag.mockReturnValue(true)
-    const { getByRole } = render(props)
-    const calibrate = getByRole('button', { name: 'Calibrate pipette offset' })
-    fireEvent.click(calibrate)
-    expect(props.handleCalibrate).toHaveBeenCalled()
+    const { queryByRole } = render(props)
+    expect(
+      queryByRole('button', { name: 'Calibrate pipette offset' })
+    ).not.toBeInTheDocument()
   })
 
   it('does not render recalibrate pipette offset text when the calibration wizard feature flag is set', () => {
@@ -145,13 +145,13 @@ describe('PipetteOverflowMenu', () => {
     expect(props.handleCalibrate).toHaveBeenCalled()
   })
 
-  it('should render calibrate pipette text for OT-3 pipette when the calibration wizard feature flag is set and no calibration exists', () => {
+  it('should not render calibrate pipette text for OT-3 pipette when the calibration wizard feature flag is set and no calibration exists', () => {
     mockIsOT3Pipette.mockReturnValue(true)
     mockUseFeatureFlag.mockReturnValue(true)
-    const { getByRole } = render(props)
-    const calibrate = getByRole('button', { name: 'Calibrate pipette' })
-    fireEvent.click(calibrate)
-    expect(props.handleCalibrate).toHaveBeenCalled()
+    const { queryByRole } = render(props)
+    expect(
+      queryByRole('button', { name: 'Calibrate pipette' })
+    ).not.toBeInTheDocument()
   })
 
   it('does not render recalibrate pipette text for OT-3 pipette when the calibration wizard feature flag is set', () => {
