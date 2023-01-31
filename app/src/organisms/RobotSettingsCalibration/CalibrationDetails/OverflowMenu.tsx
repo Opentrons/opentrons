@@ -156,10 +156,7 @@ export function OverflowMenu({
     !isDeckCalibrated
   )
 
-  const handleCalibration = (
-    calType: 'pipetteOffset' | 'tipLength',
-    e: React.MouseEvent
-  ): void => {
+  const handleCalibration = (e: React.MouseEvent): void => {
     e.preventDefault()
     if (!isRunning) {
       if (calType === 'pipetteOffset' && pipetteName != null) {
@@ -186,10 +183,7 @@ export function OverflowMenu({
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
-  const handleDownload = (
-    calType: 'pipetteOffset' | 'tipLength',
-    e: React.MouseEvent
-  ): void => {
+  const handleDownload = (e: React.MouseEvent): void => {
     e.preventDefault()
     doTrackEvent({
       name: EVENT_CALIBRATION_DOWNLOADED,
@@ -223,10 +217,7 @@ export function OverflowMenu({
 
   const { deleteCalibration } = useDeleteCalibrationMutation()
 
-  const handleDeleteCalibration = (
-    calType: 'pipetteOffset' | 'tipLength',
-    e: React.MouseEvent
-  ): void => {
+  const handleDeleteCalibration = (e: React.MouseEvent): void => {
     e.preventDefault()
     let params: DeleteCalRequestParams
     if (calType === 'pipetteOffset') {
@@ -292,7 +283,7 @@ export function OverflowMenu({
             calType === 'pipetteOffset' &&
             applicablePipetteOffsetCal == null && (
               <MenuItem
-                onClick={e => handleCalibration(calType, e)}
+                onClick={e => handleCalibration(e)}
                 disabled={disabledReason !== null}
               >
                 {t('calibrate_pipette')}
@@ -300,7 +291,7 @@ export function OverflowMenu({
             )}
           {!enableCalibrationWizards && mount != null && (
             <MenuItem
-              onClick={e => handleCalibration(calType, e)}
+              onClick={e => handleCalibration(e)}
               disabled={disabledReason !== null}
             >
               {calType === 'pipetteOffset'
@@ -311,12 +302,12 @@ export function OverflowMenu({
             </MenuItem>
           )}
           {!Boolean(isGen3Pipette) ? (
-            <MenuItem onClick={e => handleDownload(calType, e)}>
+            <MenuItem onClick={e => handleDownload(e)}>
               {t('download_calibration_data')}
             </MenuItem>
           ) : null}
           <Divider />
-          <MenuItem onClick={e => handleDeleteCalibration(calType, e)}>
+          <MenuItem onClick={e => handleDeleteCalibration(e)}>
             {t('robot_calibration:delete_calibration_data')}
           </MenuItem>
         </Flex>
