@@ -11,7 +11,7 @@ from .config import TestSection, TestConfig, build_report, TESTS
 async def _main(cfg: TestConfig) -> None:
     # GET INFO
     if not cfg.simulate:
-        robot_id = input("enter robot sderial number: ")
+        robot_id = input("enter robot serial number: ")
         operator = input("enter operator name: ")
     else:
         robot_id = "ot3-simulated-A01"

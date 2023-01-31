@@ -107,6 +107,7 @@ async def _record_test_status(
     report(section, f"{test}-estimate", estimate)
     report(section, f"{test}-encoder", encoder)
     report(section, f"{test}-aligned", [status.result])
+    print(f"test \"{test}\": {status.result}")
 
 
 def _move_rel_point_for_axis(axis: OT3Axis, distance: float) -> types.Point:
@@ -127,43 +128,42 @@ async def _move_along_axis_and_record_test_results(
     ax_str = str(axis.name).lower().replace("_", "")
     safety_mm = COLLISION_AVOID_MARGIN[axis]
     rel_distance = MAX_TRAVEL[axis] - (safety_mm * 2)
-    # slowly move away from endstop
+    print("retracting from endstop")
     await api.move_rel(mount, _move_rel_point_for_axis(axis, -safety_mm), speed=5)
-    # quickly move to other side of machine
+    print("quickly move to axis max")
     await api.move_rel(mount, _move_rel_point_for_axis(axis, -rel_distance))
     await _record_test_status(f"{ax_str}-min", api, report, section, axis=axis)
-    # quickly move back near endstop
+    print("quickly move to endstop")
     await api.move_rel(mount, _move_rel_point_for_axis(axis, rel_distance))
     await _record_test_status(f"{ax_str}-max", api, report, section, axis=axis)
-    # home the axis
+    print("homing")
     await api.home([axis])
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    # save the gantry's default motor currents
+    print(f"lowering gantry currents to {int(CURRENT_PERCENTAGE * 100)}% of defaults")
     settings: Dict[OT3Axis, helpers_ot3.GantryLoadSettings] = {
         ax: helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
         for ax in GANTRY_AXES
     }
     old_currents = {ax: settings[ax].run_current for ax in GANTRY_AXES}
-    # reduce currents during test
     for ax in settings.keys():
         settings[ax].run_current = old_currents[ax] * CURRENT_PERCENTAGE
     await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, settings)
     report(section, "run-currents", [settings[ax].run_current for ax in GANTRY_AXES])
-    # home
+    print("homing")
     await api.home(GANTRY_AXES)
     await _record_test_status("home-start", api, report, section)
-    # test each gantry axis
+    print("testing each axis min/max")
     await _move_along_axis_and_record_test_results(OT3Axis.X, api, report, section)
     await _move_along_axis_and_record_test_results(OT3Axis.Y, api, report, section)
     await _move_along_axis_and_record_test_results(OT3Axis.Z_L, api, report, section)
     await _move_along_axis_and_record_test_results(OT3Axis.Z_R, api, report, section)
-    # home
+    print("homing")
     await api.home(GANTRY_AXES)
     await _record_test_status("home-end", api, report, section)
-    # restore default currents
+    print("restoring default currents")
     for ax in settings.keys():
         settings[ax].run_current = old_currents[ax]
     await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, settings)

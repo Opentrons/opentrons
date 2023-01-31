@@ -97,13 +97,13 @@ class CSVLine:
         assert self._start_time, "no start time saved"
         self._elapsed_time = time() - self._start_time
         for i, expected_type in enumerate(self._data_types):
-            d_type = type(data[i])
-            if d_type != expected_type:
+            try:
+                self._data[i] = expected_type(data[i])
+            except ValueError:
                 raise ValueError(
-                    f"[{self.tag}] unexpected data type {d_type} "
+                    f"[{self.tag}] unexpected data type {type(data[i])} "
                     f'with value "{data[i]}" at index {i}'
                 )
-            self._data[i] = data[i]
         self._stored = True
 
 

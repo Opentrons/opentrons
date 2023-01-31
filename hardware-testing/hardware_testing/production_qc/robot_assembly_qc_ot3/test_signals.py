@@ -70,38 +70,59 @@ async def _move_and_trigger_stop_signal(
     _move_group_nsync = _build_move_group(MOVING_DISTANCE, MOVING_SPEED, stop)
     runner = MoveGroupRunner(move_groups=[[_move_group_nsync]])
     if not api.is_simulator:
-        # initialize the GPIO pin
+        sig_msg = "nsync" if nsync else "estop"
         backend = api._backend
         assert isinstance(backend, OT3Controller)
         gpio = backend.gpio_chardev
         if nsync:
+            _sig_msg = "nsync"
             _activate = gpio.activate_nsync_out
             _deactivate = gpio.deactivate_nsync_out
         else:
+            _sig_msg = "estop"
             _activate = gpio.activate_estop
             _deactivate = gpio.deactivate_estop
 
         async def _sleep_then_active_stop_signal() -> None:
+            print(f"pausing 1 second before activating {_sig_msg}")
             await asyncio.sleep(1)
+            print(f"activating {_sig_msg}")
             _activate()
+            print(f"pausing 1 second before deactivating {_sig_msg}")
             await asyncio.sleep(1)
+            print(f"deactivating {_sig_msg}")
             _deactivate()
 
+        async def _do_the_moving() -> None:
+            if nsync:
+                await runner.run(can_messenger=backend._messenger)
+            else:
+                try:
+                    await runner.run(can_messenger=backend._messenger)
+                except RuntimeError:
+                    print("caught runtime error from estop")
+
+
+
+        print(f"deactivate {sig_msg}")
         _deactivate()
+        print("pause 0.5 seconds")
         await asyncio.sleep(0.5)
-        move_coro = runner.run(can_messenger=backend._messenger)
+        move_coro = _do_the_moving()
         stop_coro = _sleep_then_active_stop_signal()
+        print(f"moving {MOVING_DISTANCE} at speed {MOVING_SPEED}")
         await asyncio.gather(stop_coro, move_coro)
     await api.refresh_current_position_ot3()
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
+    print("homing")
     await api.home()
     mount = OT3Axis.to_mount(MOVING_Z_AXIS)
     home_pos = await api.gantry_position(mount)
 
-    # NSYNC
+    print("testing sync signal")
     target_pos = home_pos + Point(
         x=-MOVING_DISTANCE, y=-MOVING_DISTANCE, z=-MOVING_DISTANCE
     )
@@ -117,10 +138,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         "nsync-stop-pos",
         [float(stop_pos.x), float(stop_pos.y), float(stop_pos.z)],
     )
-    if home_pos.magnitude_to(stop_pos) < MOVING_DISTANCE / 2:
-        report(section, "nsync-result", [CSVResult.PASS])
-    else:
-        report(section, "nsync-result", [CSVResult.FAIL])
+    result = CSVResult.from_bool(home_pos.magnitude_to(stop_pos) < MOVING_DISTANCE / 2)
+    print(f"nsync result: {result}")
+    report(section, "nsync-result", [result])
 
     # E-STOP
     await _move_and_trigger_stop_signal(api, estop=True)
