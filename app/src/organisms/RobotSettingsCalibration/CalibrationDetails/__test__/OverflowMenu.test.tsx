@@ -292,6 +292,7 @@ describe('OverflowMenu', () => {
     props = {
       ...props,
       calType: 'tipLength',
+      tiprackDefURI: mockTipLengthCalibrationResponse.uri,
     }
     const expectedCallParams = {
       calType: 'tipLength',

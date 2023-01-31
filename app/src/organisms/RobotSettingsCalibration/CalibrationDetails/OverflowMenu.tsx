@@ -63,6 +63,7 @@ interface OverflowMenuProps {
   serialNumber: string | null
   updateRobotStatus: (isRobotBusy: boolean) => void
   pipetteName?: string | null
+  tiprackDefURI?: string | null
 }
 
 export function OverflowMenu({
@@ -72,6 +73,7 @@ export function OverflowMenu({
   serialNumber,
   updateRobotStatus,
   pipetteName,
+  tiprackDefURI = null,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -144,7 +146,7 @@ export function OverflowMenu({
     p => p.mount === mount && p.pipette === serialNumber
   )
   const applicableTipLengthCal = tipLengthCalibrations?.find(
-    cal => cal.pipette === serialNumber
+    cal => cal.pipette === serialNumber && cal.uri === tiprackDefURI
   )
 
   const {
