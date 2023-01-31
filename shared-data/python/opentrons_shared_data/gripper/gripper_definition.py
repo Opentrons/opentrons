@@ -16,6 +16,8 @@ def _snake_to_camel_case(snake: str) -> str:
 GripperModelStr = NewType("GripperModelStr", str)
 
 
+# TODO (spp, 2023-01-31): figure out if we want to keep this a string enum or revert to
+#  a regular enum with custom stringification
 class GripperModel(str, Enum):
     """Gripper models."""
 

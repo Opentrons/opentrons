@@ -468,6 +468,7 @@ class OT3API(
             OT3Mount.GRIPPER: self.attached_gripper,
         }
 
+    # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
