@@ -30,6 +30,7 @@ async def _main(cfg: TestConfig) -> None:
         is_simulating=cfg.simulate,
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",
+        gripper="GRPV102"
     )
 
     # RUN TESTS
