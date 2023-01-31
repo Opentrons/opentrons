@@ -1,5 +1,10 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import last from 'lodash/last'
+import { css } from 'styled-components'
 import {
+  COLORS,
+  BORDERS,
   Flex,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
@@ -13,14 +18,13 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import last from 'lodash/last'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { RunProgressMeter } from '../RunProgressMeter'
-import { useRunStatus } from '../../RunTimeControl/hooks'
-import { StyledText } from '../../../atoms/text'
-import { useTranslation } from 'react-i18next'
-import { AnalysisStepText } from '../../AnalysisStepText'
-import { useLastRunCommandKey } from '../hooks/useLastRunCommandKey'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { StyledText } from '../../atoms/text'
+import { CommandText } from '../CommandText'
+import { useRunStatus } from '../RunTimeControl/hooks'
+import { ProgressBar } from '../../atoms/ProgressBar'
+import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
+import { Tick } from './Tick'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -30,8 +34,11 @@ const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
 ]
+// percent of the entire analysis that two individual
+// ticks could appear within before being grouped
 const MIN_AGGREGATION_PERCENT = 0.6
 const TICKED_COMMAND_TYPES = ['waitForResume', 'moveLabware']
+
 interface ProtocolRunProgressMeterProps {
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
@@ -45,6 +52,13 @@ export function ProtocolRunProgressMeter(
   const lastRunCommandKey = useLastRunCommandKey(runId)
   const analysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = analysis?.commands ?? []
+
+  /**
+   * if it exists, find the command within the analysis
+   * that has the same commandKey as the most recent 
+   * command from the run record. NOTE: the most recent
+   * command may not always be "current", for instance if 
+   * the run has completed/failed there will be no current command */ 
   const lastRunCommandIndex =
     analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
   const commandAggregationCount =
@@ -86,7 +100,7 @@ export function ProtocolRunProgressMeter(
   let currentStepContents: React.ReactNode = null
   if (analysis != null && analysisCommands[lastRunCommandIndex] != null) {
     currentStepContents = (
-      <AnalysisStepText
+      <CommandText
         robotSideAnalysis={analysis}
         command={analysisCommands[lastRunCommandIndex]}
       />
@@ -110,21 +124,45 @@ export function ProtocolRunProgressMeter(
         <Flex gridGap={SPACING.spacing3}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
-          )} ${countOfTotalText}${
-            currentStepContents != null ? ': ' : ''
-          }`}</StyledText>
+          )} ${countOfTotalText}${currentStepContents != null ? ': ' : ''
+            }`}</StyledText>
           {currentStepContents}
         </Flex>
       </Flex>
       {analysis != null ? (
-        <RunProgressMeter
-          {...{
-            ticks,
-            makeHandleJumpToStep,
-            analysisCommands,
-            lastRunCommandIndex,
-          }}
-        />
+
+        <ProgressBar
+          percentComplete={
+            lastRunCommandIndex > 0
+              ? ((lastRunCommandIndex + 1) / analysisCommands.length) * 100
+              : 0
+          }
+          outerStyles={css`
+            height: 0.375rem;
+            background-color: ${COLORS.medGreyEnabled};
+            border-radius: ${BORDERS.radiusSoftCorners};
+            position: relative;
+            overflow: initial;
+          `}
+          innerStyles={css`
+            height: 0.375rem;
+            background-color: ${COLORS.darkBlackEnabled};
+            border-radius: ${BORDERS.radiusSoftCorners};
+          `}
+        >
+
+          {ticks.map(tick => (
+            <Tick
+              key={tick.index}
+              {...{
+                ...tick,
+                makeHandleJumpToStep,
+                firstCommandType: analysisCommands[tick.index]?.commandType,
+              }}
+              total={analysisCommands.length}
+            />
+          ))}
+        </ProgressBar>
       ) : null}
     </Flex>
   )

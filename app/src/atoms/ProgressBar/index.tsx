@@ -7,8 +7,11 @@ import type { FlattenSimpleInterpolation } from 'styled-components'
 interface ProgressBarProps {
   /** the completed progress the range 0-100  */
   percentComplete: number
+  /** extra styles to be applied to container  */
   outerStyles?: FlattenSimpleInterpolation
+  /** extra styles to be filled progress element */
   innerStyles?: FlattenSimpleInterpolation
+  /** extra elements to be rendered within container */
   children?: React.ReactNode
 }
 

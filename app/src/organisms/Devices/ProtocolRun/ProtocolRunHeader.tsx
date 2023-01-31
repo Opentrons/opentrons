@@ -362,7 +362,7 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
         >
           <animate
             attributeName="fill"
-            values={`${String(COLORS.blueEnabled)}; transparent`}
+            values={`${COLORS.blueEnabled}; transparent`}
             dur="1s"
             calcMode="discrete"
             repeatCount="indefinite"

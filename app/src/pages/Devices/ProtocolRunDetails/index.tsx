@@ -30,7 +30,7 @@ import {
   useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { AnalyzedSteps } from '../../../organisms/Devices/ProtocolRun/AnalyzedSteps'
+import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
@@ -199,7 +199,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
     'run-preview': (
-      <AnalyzedSteps
+      <RunPreview
         runId={runId}
         ref={listRef}
         jumpedIndex={jumpedIndex}
@@ -226,7 +226,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       <Flex>
         <SetupTab robotName={robotName} runId={runId} />
         <ModuleControlsTab robotName={robotName} runId={runId} />
-        <AnalyzedStepsTab robotName={robotName} runId={runId} />
+        <RunPreviewTab robotName={robotName} runId={runId} />
       </Flex>
       <Box
         backgroundColor={COLORS.white}
@@ -323,7 +323,7 @@ const ModuleControlsTab = (
   )
 }
 
-const AnalyzedStepsTab = (props: SetupTabProps): JSX.Element | null => {
+const RunPreviewTab = (props: SetupTabProps): JSX.Element | null => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
 

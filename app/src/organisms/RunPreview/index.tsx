@@ -17,28 +17,28 @@ import {
   SIZE_1,
 } from '@opentrons/components'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
-import { PrimaryButton } from '../../../atoms/buttons'
-import { StyledText } from '../../../atoms/text'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { PrimaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
-import { AnalysisStepText } from '../../AnalysisStepText'
-import { Divider } from '../../../atoms/structure'
-import { NAV_BAR_WIDTH } from '../../../App/constants'
-import { useLastRunCommandKey } from '../hooks/useLastRunCommandKey'
+import { CommandText } from '../CommandText'
+import { Divider } from '../../atoms/structure'
+import { NAV_BAR_WIDTH } from '../../App/constants'
+import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 
 const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
   pause: 'pause-circle',
   waitForResume: 'pause-circle',
 }
 const COLOR_FADE_MS = 500
-interface AnalyzedStepsProps {
+interface RunPreviewProps {
   runId: string
   jumpedIndex: number | null
   makeHandleJumpToStep: (index: number) => () => void
 }
-export const AnalyzedSteps = React.forwardRef(
+export const RunPreview = React.forwardRef(
   (
-    { runId, jumpedIndex, makeHandleJumpToStep }: AnalyzedStepsProps,
+    { runId, jumpedIndex, makeHandleJumpToStep }: RunPreviewProps,
     ref: React.ForwardedRef<ViewportListRef>
   ): JSX.Element | null => {
     const { t } = useTranslation('run_details')
@@ -139,7 +139,7 @@ export const AnalyzedSteps = React.forwardRef(
                       flex="0 0 auto"
                     />
                   ) : null}
-                  <AnalysisStepText
+                  <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
                   />

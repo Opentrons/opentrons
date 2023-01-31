@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { RunTimeCommand } from '@opentrons/shared-data'
-import { css } from 'styled-components'
 import {
   Flex,
   Icon,
@@ -8,66 +7,15 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   COLORS,
-  BORDERS,
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { Tooltip } from '../../../atoms/Tooltip'
-import { Portal } from '../../../App/portal'
-import { ProgressBar } from '../../../atoms/ProgressBar'
-import { StyledText } from '../../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
+import { Portal } from '../../App/portal'
+import { StyledText } from '../../atoms/text'
 import { useTranslation } from 'react-i18next'
 import type { IconName } from '@opentrons/components'
-
-interface RunProgressMeterProps {
-  analysisCommands: RunTimeCommand[]
-  ticks: Array<{ index: number; count: number; range: number }>
-  makeHandleJumpToStep: (i: number) => () => void
-  lastRunCommandIndex: number
-}
-
-export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
-  const {
-    ticks,
-    analysisCommands,
-    makeHandleJumpToStep,
-    lastRunCommandIndex,
-  } = props
-  return (
-    <ProgressBar
-      percentComplete={
-        lastRunCommandIndex > 0
-          ? ((lastRunCommandIndex + 1) / analysisCommands.length) * 100
-          : 0
-      }
-      outerStyles={css`
-        height: 0.375rem;
-        background-color: ${COLORS.medGreyEnabled};
-        border-radius: ${BORDERS.radiusSoftCorners};
-        position: relative;
-        overflow: initial;
-      `}
-      innerStyles={css`
-        height: 0.375rem;
-        background-color: ${COLORS.darkBlackEnabled};
-        border-radius: ${BORDERS.radiusSoftCorners};
-      `}
-    >
-      {ticks.map(tick => (
-        <Tick
-          key={tick.index}
-          {...{
-            ...tick,
-            makeHandleJumpToStep,
-            firstCommandType: analysisCommands[tick.index]?.commandType,
-          }}
-          total={analysisCommands.length}
-        />
-      ))}
-    </ProgressBar>
-  )
-}
 
 interface TickProps {
   index: number
@@ -78,7 +26,7 @@ interface TickProps {
   total: number
 }
 
-function Tick(props: TickProps): JSX.Element {
+export function Tick(props: TickProps): JSX.Element {
   const {
     index,
     count,
@@ -108,12 +56,12 @@ function Tick(props: TickProps): JSX.Element {
 
   const commandTKey =
     firstCommandType in tKeyByCommandType &&
-    tKeyByCommandType[firstCommandType] != null
+      tKeyByCommandType[firstCommandType] != null
       ? tKeyByCommandType[firstCommandType] ?? null
       : null
   const iconName =
     firstCommandType in iconByCommandType &&
-    iconByCommandType[firstCommandType] != null
+      iconByCommandType[firstCommandType] != null
       ? iconByCommandType[firstCommandType] ?? null
       : null
   return (

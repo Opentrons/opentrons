@@ -14,6 +14,7 @@ import { PipettingCommandText } from './PipettingCommandText'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
+import { TemperatureCommandText } from './TemperatureCommandText'
 
 const SIMPLE_T_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
@@ -42,7 +43,7 @@ interface Props {
   command: RunTimeCommand
   robotSideAnalysis: CompletedProtocolAnalysis
 }
-export function AnalysisStepText(props: Props): JSX.Element | null {
+export function CommandText(props: Props): JSX.Element | null {
   const { command, robotSideAnalysis } = props
   const { t } = useTranslation('protocol_command_text')
 
@@ -77,44 +78,22 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
     case 'moveToWell':
     case 'dropTip':
     case 'pickUpTip': {
-      messageNode = (
-        <PipettingCommandText
-          command={command}
-          robotSideAnalysis={robotSideAnalysis}
-        />
-      )
+      messageNode = <PipettingCommandText {...{command, robotSideAnalysis}} />
       break
     }
     case 'loadLabware':
     case 'loadPipette':
     case 'loadModule':
     case 'loadLiquid': {
-      messageNode = (
-        <LoadCommandText
-          command={command}
-          robotSideAnalysis={robotSideAnalysis}
-        />
-      )
+      messageNode = <LoadCommandText {...{command, robotSideAnalysis}} />
       break
     }
-    case 'temperatureModule/setTargetTemperature': {
-      const { celsius } = command.params
-      messageNode = t('setting_temperature_module_temp', { temp: celsius })
-      break
-    }
-    case 'temperatureModule/waitForTemperature': {
-      const { celsius } = command.params
-      messageNode = t('waiting_to_reach_temp_module', { temp: celsius })
-      break
-    }
-    case 'thermocycler/setTargetBlockTemperature': {
-      const { celsius } = command.params
-      messageNode = t('setting_thermocycler_block_temp', { temp: celsius })
-      break
-    }
-    case 'thermocycler/setTargetLidTemperature': {
-      const { celsius } = command.params
-      messageNode = t('setting_thermocycler_lid_temp', { temp: celsius })
+    case 'temperatureModule/setTargetTemperature': 
+    case 'temperatureModule/waitForTemperature': 
+    case 'thermocycler/setTargetBlockTemperature': 
+    case 'thermocycler/setTargetLidTemperature': 
+    case 'heaterShaker/setTargetTemperature': {
+      messageNode = <TemperatureCommandText command={command} />
       break
     }
     case 'thermocycler/runProfile': {
@@ -141,49 +120,32 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
       )
       break
     }
-    case 'heaterShaker/setTargetTemperature': {
-      const { celsius } = command.params
-      messageNode = t('setting_hs_temp', { temp: celsius })
-      break
-    }
+    
     case 'heaterShaker/setAndWaitForShakeSpeed': {
       const { rpm } = command.params
-      messageNode = t('set_and_await_hs_shake', { rpm: rpm })
+      messageNode = t('set_and_await_hs_shake', { rpm })
       break
     }
     case 'waitForDuration': {
       const { seconds, message } = command.params
-      messageNode = t('wait_for_duration', {
-        seconds: seconds,
-        message: message,
-      })
+      messageNode = t('wait_for_duration', { seconds, message })
       break
     }
     case 'moveToSlot': {
       const { slotName } = command.params
-      messageNode = t('move_to_slot', {
-        slot_name: slotName,
-      })
+      messageNode = t('move_to_slot', { slot_name: slotName })
       break
     }
     case 'moveRelative': {
       const { axis, distance } = command.params
-      messageNode = t('move_relative', {
-        axis: axis,
-        distance: distance,
-      })
+      messageNode = t('move_relative', { axis, distance })
       break
     }
     case 'moveToCoordinates': {
       const { coordinates } = command.params
-      messageNode = t('move_to_coordinates', {
-        x: coordinates.x,
-        y: coordinates.y,
-        z: coordinates.z,
-      })
+      messageNode = t('move_to_coordinates', coordinates)
       break
     }
-
     case 'touchTip':
     case 'home':
     case 'savePosition':
@@ -218,7 +180,7 @@ export function AnalysisStepText(props: Props): JSX.Element | null {
     }
     default: {
       console.warn(
-        'Step Text encountered a command with an unrecognized commandType: ',
+        'Analysis Step Text encountered a command with an unrecognized commandType: ',
         command
       )
       messageNode = JSON.stringify(command)

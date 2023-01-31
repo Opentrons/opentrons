@@ -16,7 +16,7 @@ import {
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { AnalyzedSteps } from '../../../../organisms/Devices/ProtocolRun/AnalyzedSteps'
+import { RunPreview } from '../../../../organisms/RunPreview'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { ProtocolRunDetails } from '..'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -26,7 +26,7 @@ import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
-jest.mock('../../../../organisms/Devices/ProtocolRun/AnalyzedSteps')
+jest.mock('../../../../organisms/Devices/ProtocolRun/RunPreview')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 
@@ -37,8 +37,8 @@ const mockUseSyncRobotClock = useSyncRobotClock as jest.MockedFunction<
 const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
   typeof ProtocolRunHeader
 >
-const mockAnalyzedSteps = AnalyzedSteps as jest.MockedFunction<
-  typeof AnalyzedSteps
+const mockRunPreview = RunPreview as jest.MockedFunction<
+  typeof RunPreview
 >
 const mockProtocolRunSetup = ProtocolRunSetup as jest.MockedFunction<
   typeof ProtocolRunSetup
@@ -103,7 +103,7 @@ describe('ProtocolRunDetails', () => {
       isRunIdle: true,
     })
     mockProtocolRunHeader.mockReturnValue(<div>Mock ProtocolRunHeader</div>)
-    mockAnalyzedSteps.mockReturnValue(<div>Mock AnalyzedSteps</div>)
+    mockRunPreview.mockReturnValue(<div>Mock RunPreview</div>)
     mockProtocolRunSetup.mockReturnValue(<div>Mock ProtocolRunSetup</div>)
     mockProtocolRunModuleControls.mockReturnValue(
       <div>Mock ProtocolRunModuleControls</div>
@@ -179,10 +179,10 @@ describe('ProtocolRunDetails', () => {
       `/devices/otie/protocol-runs/${RUN_ID}`
     )
 
-    expect(queryByText('Mock AnalyzedSteps')).toBeFalsy()
+    expect(queryByText('Mock RunPreview')).toBeFalsy()
     const runTab = getByText('Run Log')
     runTab.click()
-    getByText('Mock AnalyzedSteps')
+    getByText('Mock RunPreview')
   })
 
   it('renders protocol run setup when the setup tab is clicked', () => {
@@ -193,7 +193,7 @@ describe('ProtocolRunDetails', () => {
     const setupTab = getByText('Setup')
     const runTab = getByText('Run Log')
     runTab.click()
-    getByText('Mock AnalyzedSteps')
+    getByText('Mock RunPreview')
     expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
     setupTab.click()
     getByText('Mock ProtocolRunSetup')
@@ -251,9 +251,9 @@ describe('ProtocolRunDetails', () => {
 
     const runTab = getByText('Run Log')
     getByText('Mock ProtocolRunSetup')
-    expect(queryByText('Mock AnalyzedSteps')).toBeFalsy()
+    expect(queryByText('Mock RunPreview')).toBeFalsy()
     runTab.click()
-    expect(queryByText('Mock AnalyzedSteps')).toBeFalsy()
+    expect(queryByText('Mock RunPreview')).toBeFalsy()
   })
 
   it('redirects to the run log tab when the run is not current', () => {
@@ -262,7 +262,7 @@ describe('ProtocolRunDetails', () => {
       `/devices/otie/protocol-runs/${RUN_ID}/setup`
     )
 
-    getByText('Mock AnalyzedSteps')
+    getByText('Mock RunPreview')
     expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
   })
 })
