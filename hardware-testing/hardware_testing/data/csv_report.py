@@ -14,9 +14,16 @@ class CSVResult(enum.Enum):
     PASS = "PASS"
     FAIL = "FAIL"
 
+    def __bool__(self) -> bool:
+        return self.value == self.PASS.value
+
     def __str__(self) -> str:
         """String."""
         return self.value
+
+    @classmethod
+    def from_bool(cls, b: bool) -> "CSVResult":
+        return cls.PASS if b else cls.FAIL
 
 
 META_DATA_TITLE = "META-DATA"
