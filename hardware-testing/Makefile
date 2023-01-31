@@ -73,6 +73,7 @@ test-cov:
 
 .PHONY: test-integration
 test-integration:
+	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) protocols/ot2_p300_single_channel_gravimetric.py --simulate
 	$(python) -m hardware_testing.examples.test_report
 	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
