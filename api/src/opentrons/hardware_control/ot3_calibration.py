@@ -256,7 +256,8 @@ async def find_slot_center_binary(
     """Find the center of the calibration slot by binary-searching its edges.
     Returns the XY-center of the slot.
     """
-    real_pos = nominal_center._replace(y=nominal_center.y + 3, z=deck_height)
+    # real_pos = nominal_center._replace(y=nominal_center.y + 3, z=deck_height) # front
+    real_pos = nominal_center._replace(y=nominal_center.y - 3, z=deck_height) # rear
     # Find X left/right edges
     plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, 1)
     LOG.info(f"Found +x edge at {plus_x_edge}mm")
@@ -271,7 +272,8 @@ async def find_slot_center_binary(
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
 
     x_center = (plus_x_edge + minus_x_edge) / 2
-    x_center_off = x_center + 3
+    # x_center_off = x_center + 3 # front
+    x_center_off = x_center - 3 # rear
     real_pos = real_pos._replace(x=x_center_off)
 
     # Move over Z-axis gauge plunger
@@ -491,6 +493,8 @@ async def _calibrate_mount(
     """
     # reset instrument offset
     nominal_center = _get_calibration_square_position_in_slot(slot)
+    # nominal_center = nominal_center._replace(y=nominal_center.y + 0) # front
+    nominal_center = nominal_center._replace(y=nominal_center.y - 3) # rear
     await hcapi.reset_instrument_offset(mount)
     try:
         # First, find the deck. This will become our z offset value, and will
@@ -512,6 +516,7 @@ async def _calibrate_mount(
             raise RuntimeError("Unknown calibration method")
 
         # update center with values obtained during calibration
+        nominal_center = _get_calibration_square_position_in_slot(slot)
         center = Point(x_center, y_center, z_pos)
         offset = nominal_center - center
         LOG.info(f"Found calibration value {center} for mount {mount.name}")
