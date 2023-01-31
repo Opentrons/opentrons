@@ -527,7 +527,8 @@ async def find_slot_center_binary(
     """Find the center of the calibration slot by binary-searching its edges.
     Returns the XY-center of the slot.
     """
-    real_pos = nominal_center._replace(y=nominal_center.y + 3, z=deck_height)
+    # real_pos = nominal_center._replace(y=nominal_center.y + 3, z=deck_height) # front
+    real_pos = nominal_center._replace(y=nominal_center.y - 3, z=deck_height) # rear
     # Find X left/right edges
     plus_x_edge = await find_edge(hcapi, mount, real_pos + EDGES["right"], OT3Axis.X, 1)
     LOG.info(f"Found +x edge at {plus_x_edge}mm")
@@ -542,7 +543,8 @@ async def find_slot_center_binary(
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
 
     x_center = (plus_x_edge + minus_x_edge) / 2
-    x_center_off = x_center + 3
+    # x_center_off = x_center + 3 # front
+    x_center_off = x_center - 3 # rear
     real_pos = real_pos._replace(x=x_center_off)
 
     # Move over Z-axis gauge plunger
