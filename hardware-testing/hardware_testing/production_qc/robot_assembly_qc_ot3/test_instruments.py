@@ -62,7 +62,9 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 async def _get_pip_mounts(api: OT3API) -> List[OT3Mount]:
     await api.cache_instruments()
-    return [OT3Mount.from_mount(_m) for _m, _p in api.hardware_pipettes.items() if _p]
+    pip_mounts = [OT3Mount.from_mount(_m) for _m, _p in api.hardware_pipettes.items() if _p]
+    print(f"found pipettes: {pip_mounts}")
+    return pip_mounts
 
 
 async def _has_gripper(api: OT3API) -> bool:
@@ -105,7 +107,7 @@ async def _probe_mount_and_record_result(
         if not api.is_simulator:
             input(f"attach {probe.name} calibration probe, then press ENTER:")
         api.add_gripper_probe(probe)
-    if mount == OT3Mount.GRIPPER:
+    else:
         if not api.is_simulator:
             input("attach calibration probe, then press ENTER:")
         await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
