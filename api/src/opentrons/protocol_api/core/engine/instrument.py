@@ -7,7 +7,7 @@ from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates
-from opentrons.protocol_engine import DeckPoint, WellLocation
+from opentrons.protocol_engine import DeckPoint, WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -180,12 +180,39 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def touch_tip(
         self,
-        location: WellCore,
+        location: Location,
+        well_core: WellCore,
         radius: float,
-        v_offset: float,
+        z_offset: float,
         speed: float,
     ) -> None:
-        raise NotImplementedError("InstrumentCore.touch_tip not implemented")
+        """Touch pipette tip to edges of the well
+
+        Args:
+            location: Location moved to, only used for ProtocolCore location cache.
+            well_core: The target well for touch tip.
+            radius: Percentage modifier for well radius to touch.
+            z_offset: Vertical offset for pipette tip during touch tip.
+            speed: Speed for the touch tip movements.
+        """
+        well_name = well_core.get_name()
+        labware_id = well_core.labware_id
+
+        # Touch tip is always done from the top of the well.
+        well_location = WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=z_offset)
+        )
+
+        self._engine_client.touch_tip(
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            radius=radius,
+            speed=speed,
+        )
+
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def pick_up_tip(
         self,
