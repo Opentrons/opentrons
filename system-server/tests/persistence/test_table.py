@@ -24,7 +24,7 @@ EXPECTED_STATEMENTS = [
         agent VARCHAR(255),
         agent_id VARCHAR(255),
         token JSON,
-        schema_version INTEGER NOT NULL,
+        schema_version INTEGER DEFAULT \'0\' NOT NULL,
         PRIMARY KEY (registration_id),
         UNIQUE (subject, agent, agent_id)
     )

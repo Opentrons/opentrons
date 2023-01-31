@@ -4,11 +4,6 @@ from sqlalchemy import Column, VARCHAR, Integer, JSON
 
 _metadata = sqlalchemy.MetaData()
 
-"""
-Column(
-    
-),
-"""
 
 registrations_table = sqlalchemy.Table(
     "registrations",
@@ -18,7 +13,7 @@ registrations_table = sqlalchemy.Table(
     Column("agent", VARCHAR(255)),
     Column("agent_id", VARCHAR(255)),
     Column("token", JSON),
-    Column("schema_version", Integer, nullable=False, default=0),
+    Column("schema_version", Integer, nullable=False, default=0, server_default="0"),
     sqlalchemy.UniqueConstraint("subject", "agent", "agent_id"),
 )
 
