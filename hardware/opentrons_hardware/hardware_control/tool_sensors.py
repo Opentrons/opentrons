@@ -88,7 +88,7 @@ class Capturer:
         ]
         self.csv_writer.writerows([heading, first_row])
 
-    async def start_timer(self) -> None:
+    def start_timer(self) -> None:
         """Records time when sensing move starts."""
         self.start_time = time.time()
 
@@ -103,7 +103,7 @@ class Capturer:
                 message.payload.sensor_data, message.payload.sensor
             ).to_float()
             self.response_queue.put_nowait(data)
-            current_time = time.time() - self.start_time
+            current_time = round((time.time() - self.start_time), 3)
             self.csv_writer.writerow([data, current_time])
 
 
@@ -190,7 +190,7 @@ async def liquid_probe(
         sensor_capturer.create_csv_header(mount_speed, plunger_speed, threshold_pascals)
         messenger.add_listener(sensor_capturer, None)
         binding = SensorOutputBinding.report | SensorOutputBinding.sync
-        await sensor_capturer.start_timer()
+        sensor_capturer.start_timer()
     elif read_only:
         binding = SensorOutputBinding.report
     else:
