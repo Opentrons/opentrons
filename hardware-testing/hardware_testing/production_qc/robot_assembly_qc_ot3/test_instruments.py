@@ -53,6 +53,11 @@ async def _get_pip_mounts(api: OT3API) -> List[OT3Mount]:
     return [OT3Mount.from_mount(_m) for _m, _p in api.hardware_pipettes.items() if _p]
 
 
+async def _has_gripper(api: OT3API) -> bool:
+    await api.cache_instruments()
+    return api.has_gripper()
+
+
 async def _get_plunger_positions(api: OT3API, mount: OT3Mount) -> Tuple[float, float]:
     axis = OT3Axis.of_main_tool_actuator(mount)
     estimates = await api.current_position_ot3(mount)
@@ -69,70 +74,88 @@ async def _test_current_position_and_record_result(
     report(section, tag, [estimate, encoder, result])
 
 
+async def _test_pipette(
+    api: OT3API, mount: OT3Mount, report: CSVReport, section: str
+) -> None:
+    mnt_tag = mount.name.lower()
+    pip = api.hardware_pipettes[mount.to_mount()]
+    pip_id = helpers_ot3.get_pipette_serial_ot3(pip)
+    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    z_ax = OT3Axis.by_mount(mount)
+    top, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
+
+    # PIPETTE-ID
+    if not api.is_simulator:
+        user_id = input("scan pipette serial number: ").strip()
+    else:
+        user_id = str(pip_id)
+    result = CSVResult.from_bool(pip_id == user_id.strip())
+    print(f"{mnt_tag} pipette id: {str(result)}")
+    report(section, f"{mnt_tag}-id", [pip_id, user_id, result])
+
+    # PLUNGER-HOME
+    print("homing plunger...")
+    await api.home([pip_ax])
+    await _test_current_position_and_record_result(
+        api, mount, report, section, f"{mnt_tag}-plunger-home"
+    )
+    # PLUNGER-MAX
+    print(f"moving to 1mm above drop_tip ({drop_tip - 1}mm)")
+    await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip - 1)
+    await _test_current_position_and_record_result(
+        api, mount, report, section, f"{mnt_tag}-plunger-max"
+    )
+    # PLUNGER-MIN
+    print(f"moving to 1mm below top ({top + 1}mm)")
+    await helpers_ot3.move_plunger_absolute_ot3(api, mount, top + 1)
+    await _test_current_position_and_record_result(
+        api, mount, report, section, f"{mnt_tag}-plunger-min"
+    )
+
+    # PROBE-DISTANCE
+    await api.home([z_ax])
+    pos = await api.gantry_position(mount)
+    height_of_probe_full_travel = pos.z - Z_PROBE_DISTANCE_MM
+    if not api.is_simulator:
+        input("attach calibration probe, then press ENTER:")
+    await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
+    height_of_probe_stopped = await api.capacitive_probe(
+        mount, z_ax, height_of_probe_full_travel, PROBE_SETTINGS
+    )
+    height_diff = height_of_probe_stopped - height_of_probe_full_travel
+    result = CSVResult.from_bool(abs(height_diff) > 1)
+    print(f"{mnt_tag} probe distance: {str(result)}")
+    results = [
+        float(height_of_probe_full_travel),
+        float(height_of_probe_stopped),
+        result,
+    ]
+    report(section, f"{mnt_tag}-probe-distance", results)
+    if not api.is_simulator:
+        input("remove calibration probe, then press ENTER:")
+    await api.remove_tip(mount)
+
+
+async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
+    return
+
+
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    while not api.is_simulator and (_get_pip_mounts(api) or api.has_gripper()):
+    while not api.is_simulator and (await _get_pip_mounts(api) or api.has_gripper()):
         input("remove all attached instruments, then press ENTER:")
     await api.home()
-
+    # test both mounts
     for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
-        mnt_tag = mount.name.lower()
         while not api.is_simulator and mount not in _get_pip_mounts(api):
             input(f"attached a pipette to the {mount.name} mount, then press ENTER")
-
-        pip = api.hardware_pipettes[mount.to_mount()]
-        pip_id = helpers_ot3.get_pipette_serial_ot3(pip)
-        pip_ax = OT3Axis.of_main_tool_actuator(mount)
-        z_ax = OT3Axis.by_mount(mount)
-        top, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
-
-        # PIPETTE-ID
-        if not api.is_simulator:
-            user_id = input("scan pipette serial number: ").strip()
-        else:
-            user_id = str(pip_id)
-        result = CSVResult.from_bool(pip_id == user_id.strip())
-        print(f"{mnt_tag} pipette id: {str(result)}")
-        report(section, f"{mnt_tag}-id", [pip_id, user_id, result])
-
-        # PLUNGER-HOME
-        print("homing plunger...")
-        await api.home([pip_ax])
-        await _test_current_position_and_record_result(
-            api, mount, report, section, f"{mnt_tag}-plunger-home"
-        )
-        # PLUNGER-MAX
-        print(f"moving to 1mm above drop_tip ({drop_tip - 1}mm)")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip - 1)
-        await _test_current_position_and_record_result(
-            api, mount, report, section, f"{mnt_tag}-plunger-max"
-        )
-        # PLUNGER-MIN
-        print(f"moving to 1mm below top ({top + 1}mm)")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top + 1)
-        await _test_current_position_and_record_result(
-            api, mount, report, section, f"{mnt_tag}-plunger-min"
-        )
-
-        # PROBE-DISTANCE
-        await api.home([z_ax])
-        pos = await api.gantry_position(mount)
-        height_of_probe_full_travel = pos.z - Z_PROBE_DISTANCE_MM
-        if not api.is_simulator:
-            input("attach calibration probe, then press ENTER:")
-        await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
-        height_of_probe_stopped = await api.capacitive_probe(
-            mount, z_ax, height_of_probe_full_travel, PROBE_SETTINGS
-        )
-        height_diff = height_of_probe_stopped - height_of_probe_full_travel
-        result = CSVResult.from_bool(abs(height_diff) > 1)
-        print(f"{mnt_tag} probe distance: {str(result)}")
-        results = [
-            float(height_of_probe_full_travel),
-            float(height_of_probe_stopped),
-            result,
-        ]
-        report(section, f"{mnt_tag}-probe-distance", results)
-        if not api.is_simulator:
-            input("remove calibration probe, then press ENTER:")
-        await api.remove_tip(mount)
+        await _test_pipette(api, mount, report, section)
+        while not api.is_simulator and mount in _get_pip_mounts(api):
+            input(f"remove the pipette from the {mount.name} mount, then press ENTER")
+    # test gripper
+    await api.cache_instruments()
+    while not api.is_simulator and not await _has_gripper(api):
+        input(f"attached a gripper, then press ENTER")
+    await _test_gripper(api, report, section)
+    while not api.is_simulator and await _has_gripper(api):
+        input(f"remove the gripper, then press ENTER")
