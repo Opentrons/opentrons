@@ -277,6 +277,7 @@ class Plot:
             y_axis = f"{axis} Gauge"
             filename = f"plot_gauge_{axis}"
             title = f"(Original) {axis} Gauge Data"
+
         x_start = df[x_axis].iloc[0]
         x_end = df[x_axis].iloc[-1]
         y_avg = df[y_axis].mean()
@@ -295,8 +296,14 @@ class Plot:
         y_avg_xpos = 0
         y_avg_text = f"{axis} Avg = {y_avg}mm"
 
-        y_start = round(y_min, 2) - 0.05
-        y_end = round(y_max, 2) + 0.05
+        if zero:
+            y_start = -1
+            y_end = 1
+            # y_start = round(y_min, 2) - 0.05
+            # y_end = round(y_max, 2) + 0.05
+        else:
+            y_start = round(y_min, 2) - 0.05
+            y_end = round(y_max, 2) + 0.05
 
         if axis == "Z":
             annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=100)
