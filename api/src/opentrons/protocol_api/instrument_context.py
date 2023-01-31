@@ -42,7 +42,7 @@ _log = logging.getLogger(__name__)
 
 _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
 """The version after which the pick-up tip procedure should also prepare the plunger."""
-_PRESSES_INCREMENT_DEPRECATE_FROM = APIVersion(2, 14)
+_PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
 
 
@@ -737,21 +737,15 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: This instance
         """
 
-        if (
-            presses is not None
-            and self._api_version >= _PRESSES_INCREMENT_DEPRECATE_FROM
-        ):
+        if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
             raise APIVersionError(
-                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_DEPRECATE_FROM},"
+                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
                 f" but you are using API {self._api_version}."
             )
 
-        if (
-            increment is not None
-            and self._api_version >= _PRESSES_INCREMENT_DEPRECATE_FROM
-        ):
+        if increment is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
             raise APIVersionError(
-                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_DEPRECATE_FROM},"
+                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
                 f" but you are using API {self._api_version}."
             )
 
