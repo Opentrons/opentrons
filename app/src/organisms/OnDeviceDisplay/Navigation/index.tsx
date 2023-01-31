@@ -29,6 +29,7 @@ const NavigationLink = styled(NavLink)`
   &.active {
     color: ${COLORS.blueEnabled};
     border-bottom: 4px solid #006cfa;
+    width: fit-content;
   }
 `
 

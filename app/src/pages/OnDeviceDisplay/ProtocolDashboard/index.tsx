@@ -14,18 +14,23 @@ import {
   truncateString,
   Btn,
   Icon,
+  JUSTIFY_CENTER,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
-import { BackButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
+import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import {
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '../../../redux/config'
 import { sortProtocols } from './utils'
+
+import imgSrc from '../../../assets/images/odd/abstract@x2.png'
 
 import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
@@ -106,126 +111,156 @@ export function ProtocolDashboard(): JSX.Element {
       padding={SPACING.spacing6}
       minHeight="25rem"
     >
-      <BackButton />
-      <Table>
-        <thead>
-          <tr>
-            <TableHeader>
-              <Flex flexDirection="row" alignItems="center">
-                <Btn onClick={handleSortByName}>
-                  <StyledText
-                    fontSize="1.25rem"
-                    lineHeight="1.6875rem"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >
-                    {t('protocol_name_title')}
-                  </StyledText>
-                </Btn>
-                {sortBy === 'alphabetical' || sortBy === 'reverse' ? (
-                  <Icon
-                    name={
-                      sortBy === 'alphabetical' ? 'chevron-down' : 'chevron-up'
-                    }
-                    size="1rem"
-                  />
-                ) : null}
-              </Flex>
-            </TableHeader>
-            <TableHeader>
-              <Flex flexDirection="row" alignItems="center">
-                <Btn onClick={handleSortByLastRun}>
-                  <StyledText
-                    fontSize="1.25rem"
-                    lineHeight="1.6875rem"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >
-                    {t('last_run')}
-                  </StyledText>
-                </Btn>
-                {sortBy === 'recentRun' || sortBy === 'oldRun' ? (
-                  <Icon
-                    name={
-                      sortBy === 'recentRun' ? 'chevron-down' : 'chevron-up'
-                    }
-                    size="1rem"
-                  />
-                ) : null}
-              </Flex>
-            </TableHeader>
-            <TableHeader>
-              <Flex flexDirection="row" alignItems="center">
-                <Btn onClick={handleSortByDate}>
-                  <StyledText
-                    fontSize="1.25rem"
-                    lineHeight="1.6875rem"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >
-                    {t('date_added')}
-                  </StyledText>
-                </Btn>
-                {sortBy === 'recentCreated' || sortBy === 'oldCreated' ? (
-                  <Icon
-                    name={
-                      sortBy === 'recentCreated' ? 'chevron-down' : 'chevron-up'
-                    }
-                    size="1rem"
-                  />
-                ) : null}
-              </Flex>
-            </TableHeader>
-          </tr>
-        </thead>
+      <Navigation routes={onDeviceDisplayRoutes} />
+      {sortedProtocols.length > 0 ? (
+        <Table>
+          <thead>
+            <tr>
+              <TableHeader>
+                <Flex flexDirection="row" alignItems="center">
+                  <Btn onClick={handleSortByName}>
+                    <StyledText
+                      fontSize="1.25rem"
+                      lineHeight="1.6875rem"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {t('protocol_name_title')}
+                    </StyledText>
+                  </Btn>
+                  {sortBy === 'alphabetical' || sortBy === 'reverse' ? (
+                    <Icon
+                      name={
+                        sortBy === 'alphabetical'
+                          ? 'chevron-down'
+                          : 'chevron-up'
+                      }
+                      size="1rem"
+                    />
+                  ) : null}
+                </Flex>
+              </TableHeader>
+              <TableHeader>
+                <Flex flexDirection="row" alignItems="center">
+                  <Btn onClick={handleSortByLastRun}>
+                    <StyledText
+                      fontSize="1.25rem"
+                      lineHeight="1.6875rem"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {t('last_run')}
+                    </StyledText>
+                  </Btn>
+                  {sortBy === 'recentRun' || sortBy === 'oldRun' ? (
+                    <Icon
+                      name={
+                        sortBy === 'recentRun' ? 'chevron-down' : 'chevron-up'
+                      }
+                      size="1rem"
+                    />
+                  ) : null}
+                </Flex>
+              </TableHeader>
+              <TableHeader>
+                <Flex flexDirection="row" alignItems="center">
+                  <Btn onClick={handleSortByDate}>
+                    <StyledText
+                      fontSize="1.25rem"
+                      lineHeight="1.6875rem"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {t('date_added')}
+                    </StyledText>
+                  </Btn>
+                  {sortBy === 'recentCreated' || sortBy === 'oldCreated' ? (
+                    <Icon
+                      name={
+                        sortBy === 'recentCreated'
+                          ? 'chevron-down'
+                          : 'chevron-up'
+                      }
+                      size="1rem"
+                    />
+                  ) : null}
+                </Flex>
+              </TableHeader>
+            </tr>
+          </thead>
 
-        <tbody>
-          {sortedProtocols.map((protocol, index) => {
-            const lastRun = runs.data?.data.find(
-              run => run.protocolId === protocol.id
-            )?.createdAt
+          <tbody>
+            {sortedProtocols.map((protocol, index) => {
+              const lastRun = runs.data?.data.find(
+                run => run.protocolId === protocol.id
+              )?.createdAt
 
-            const protocolName =
-              protocol.metadata.protocolName ?? protocol.files[0].name
+              const protocolName =
+                protocol.metadata.protocolName ?? protocol.files[0].name
 
-            return (
-              <TableRow
-                key={protocol.key ?? index}
-                onClick={() => history.push(`/protocols/${protocol.id}`)}
-              >
-                <TableDatum>
-                  <StyledText
-                    fontSize="1.5rem"
-                    lineHeight="2.0625rem"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >
-                    {truncateString(protocolName, 88, 66)}
-                  </StyledText>
-                </TableDatum>
-                <TableDatum>
-                  <StyledText
-                    fontSize="1.375rem"
-                    lineHeight="1.75rem"
-                    fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  >
-                    {lastRun != null
-                      ? formatDistance(new Date(lastRun), new Date(), {
-                          addSuffix: true,
-                        })
-                      : t('no_history')}
-                  </StyledText>
-                </TableDatum>
-                <TableDatum>
-                  <StyledText
-                    fontSize="1.375rem"
-                    lineHeight="1.75rem"
-                    fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  >
-                    {format(new Date(protocol.createdAt), 'Pp')}
-                  </StyledText>
-                </TableDatum>
-              </TableRow>
-            )
-          })}
-        </tbody>
-      </Table>
+              return (
+                <TableRow
+                  key={protocol.key ?? index}
+                  onClick={() => history.push(`/protocols/${protocol.id}`)}
+                >
+                  <TableDatum>
+                    <StyledText
+                      fontSize="1.5rem"
+                      lineHeight="2.0625rem"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {truncateString(protocolName, 88, 66)}
+                    </StyledText>
+                  </TableDatum>
+                  <TableDatum>
+                    <StyledText
+                      fontSize="1.375rem"
+                      lineHeight="1.75rem"
+                      fontWeight={TYPOGRAPHY.fontWeightRegular}
+                    >
+                      {lastRun != null
+                        ? formatDistance(new Date(lastRun), new Date(), {
+                            addSuffix: true,
+                          })
+                        : t('no_history')}
+                    </StyledText>
+                  </TableDatum>
+                  <TableDatum>
+                    <StyledText
+                      fontSize="1.375rem"
+                      lineHeight="1.75rem"
+                      fontWeight={TYPOGRAPHY.fontWeightRegular}
+                    >
+                      {format(new Date(protocol.createdAt), 'Pp')}
+                    </StyledText>
+                  </TableDatum>
+                </TableRow>
+              )
+            })}
+          </tbody>
+        </Table>
+      ) : (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          height="27.75rem"
+          backgroundColor={COLORS.medGreyEnabled}
+        >
+          <img src={imgSrc} />
+          <StyledText
+            fontSize="2rem"
+            lineHeight="2.75rem"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            {t('nothing_here_yet')}
+          </StyledText>
+          <StyledText
+            fontSize="1.25rem"
+            lineHeight="1.6875rem"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+          >
+            {t('send_a_protocol_to_store')}
+          </StyledText>
+        </Flex>
+      )}
     </Flex>
   )
 }
