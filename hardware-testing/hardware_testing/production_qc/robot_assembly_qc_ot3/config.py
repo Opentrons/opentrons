@@ -28,13 +28,28 @@ class TestConfig:
     tests: Dict[TestSection, Callable]
 
 
-TESTS = {
-    TestSection.GANTRY: test_gantry.run,
-    TestSection.SIGNALS: test_signals.run,
-    TestSection.INSTRUMENTS: test_instruments.run,
-    TestSection.CONNECTIVITY: test_connectivity.run,
-    TestSection.PERIPHERALS: test_peripherals.run,
-}
+TESTS = [
+    (
+        TestSection.GANTRY,
+        test_gantry.run,
+    ),
+    (
+        TestSection.SIGNALS,
+        test_signals.run,
+    ),
+    (
+        TestSection.INSTRUMENTS,
+        test_instruments.run,
+    ),
+    (
+        TestSection.CONNECTIVITY,
+        test_connectivity.run,
+    ),
+    (
+        TestSection.PERIPHERALS,
+        test_peripherals.run,
+    ),
+]
 
 
 def build_report(script_path: str) -> CSVReport:

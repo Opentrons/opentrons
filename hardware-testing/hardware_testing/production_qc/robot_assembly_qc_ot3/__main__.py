@@ -51,7 +51,7 @@ if __name__ == "__main__":
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
     args = parser.parse_args()
     _t_sections = {
-        s: f for s, f in TESTS.items() if not getattr(args, f"skip_{s.value.lower()}")
+        s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
     }
     _config = TestConfig(simulate=args.simulate, tests=_t_sections)
     asyncio.run(_main(_config))

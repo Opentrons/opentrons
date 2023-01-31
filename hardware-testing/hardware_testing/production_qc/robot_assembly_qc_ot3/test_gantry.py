@@ -29,13 +29,14 @@ GANTRY_TESTS = [
     "zl-min",
     "zr-max",
     "zr-min",
-    "home-end"
+    "home-end",
 ]
 
 
 @dataclass
 class AxisStatus:
     """Axis Status."""
+
     estimate: Dict[OT3Axis, float]
     encoder: Dict[OT3Axis, float]
     aligned: bool
@@ -51,7 +52,9 @@ class AxisStatus:
         return CSVResult.PASS if self.aligned else CSVResult.FAIL
 
 
-async def _read_gantry_position_and_check_alignment(api: OT3API, aligned_axis: Optional[OT3Axis]) -> AxisStatus:
+async def _read_gantry_position_and_check_alignment(
+    api: OT3API, aligned_axis: Optional[OT3Axis]
+) -> AxisStatus:
     await api.refresh_current_position_ot3()
     if not api.is_simulator:
         estimate = {ax: api._current_position[ax] for ax in GANTRY_AXES}
@@ -75,9 +78,7 @@ async def _read_gantry_position_and_check_alignment(api: OT3API, aligned_axis: O
 
 def build_csv_lines() -> List[CSVLine]:
     """Build CSV Lines."""
-    lines: List[CSVLine] = [
-        CSVLine("run-currents", GANTRY_POS_AS_LIST)
-    ]
+    lines: List[CSVLine] = [CSVLine("run-currents", GANTRY_POS_AS_LIST)]
     for t in GANTRY_TESTS:
         lines.append(CSVLine(f"{t}-estimate", GANTRY_POS_AS_LIST))
         lines.append(CSVLine(f"{t}-encoder", GANTRY_POS_AS_LIST))
@@ -85,7 +86,13 @@ def build_csv_lines() -> List[CSVLine]:
     return lines
 
 
-async def _record_test_status(test: str, api: OT3API, report: CSVReport, section: str, axis: Optional[OT3Axis] = None) -> None:
+async def _record_test_status(
+    test: str,
+    api: OT3API,
+    report: CSVReport,
+    section: str,
+    axis: Optional[OT3Axis] = None,
+) -> None:
     if test not in GANTRY_TESTS:
         raise ValueError(f"unexpected gantry test: {test}")
     status = await _read_gantry_position_and_check_alignment(api, axis)
@@ -104,7 +111,9 @@ def _move_rel_point_for_axis(axis: OT3Axis, distance: float) -> types.Point:
         return types.Point(z=distance)
 
 
-async def _move_along_axis_and_record_test_results(axis: OT3Axis, api: OT3API, report: CSVReport, section: str) -> None:
+async def _move_along_axis_and_record_test_results(
+    axis: OT3Axis, api: OT3API, report: CSVReport, section: str
+) -> None:
     mount = types.OT3Mount.RIGHT if axis == OT3Axis.Z_R else types.OT3Mount.LEFT
     ax_str = str(axis.name).lower().replace("_", "")
     safety_mm = COLLISION_AVOID_MARGIN[axis]
