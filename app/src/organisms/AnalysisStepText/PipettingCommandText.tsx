@@ -79,7 +79,7 @@ export const PipettingCommandText = ({
           robotSideAnalysis,
           labwareId,
           t
-        )
+        ),
       })
       break
     }

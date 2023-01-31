@@ -45,7 +45,8 @@ export function ProtocolRunProgressMeter(
   const lastRunCommandKey = useLastRunCommandKey(runId)
   const analysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = analysis?.commands ?? []
-  const lastRunCommandIndex = analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
+  const lastRunCommandIndex =
+    analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
   const commandAggregationCount =
     analysisCommands.length > 100
       ? analysisCommands.length * 0.01 * MIN_AGGREGATION_PERCENT
