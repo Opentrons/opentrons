@@ -35,7 +35,15 @@ const SETTING_BUTTON_STYLE = css`
   border-radius: 16px;
 `
 
-export type RenderContentType = 'networkSettings' | null
+export type RenderContentType =
+  | 'robotName'
+  | 'robotSystemVersion'
+  | 'networkSettings'
+  | 'displaySleepSettings'
+  | 'displayBrightness'
+  | 'displayTextSize'
+  | 'deviceReset'
+  | null
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -75,12 +83,16 @@ export function RobotSettingsDashboard(): JSX.Element {
           <RobotSettingButton
             settingName={t('robot_name')}
             settingInfo={robotName}
+            renderContent={'robotName'}
+            setRenderContent={setRenderContent}
           />
 
           {/* Robot System Version */}
           <RobotSettingButton
             settingName={t('robot_system_version')}
             settingInfo={'v7.0.0'}
+            renderContent={'robotSystemVersion'}
+            setRenderContent={setRenderContent}
           />
 
           {/* Network Settings */}
@@ -92,16 +104,32 @@ export function RobotSettingsDashboard(): JSX.Element {
           />
 
           {/* Display Sleep Settings */}
-          <RobotSettingButton settingName={t('display_sleep_settings')} />
+          <RobotSettingButton
+            settingName={t('display_sleep_settings')}
+            renderContent={'displaySleepSettings'}
+            setRenderContent={setRenderContent}
+          />
 
           {/* Display Brightness */}
-          <RobotSettingButton settingName={t('display_brightness')} />
+          <RobotSettingButton
+            settingName={t('display_brightness')}
+            renderContent={'displayBrightness'}
+            setRenderContent={setRenderContent}
+          />
 
           {/* Display Text Size */}
-          <RobotSettingButton settingName={t('display_text_size')} />
+          <RobotSettingButton
+            settingName={t('display_text_size')}
+            renderContent={'displayTextSize'}
+            setRenderContent={setRenderContent}
+          />
 
           {/* Device Reset */}
-          <RobotSettingButton settingName={t('device_reset')} />
+          <RobotSettingButton
+            settingName={t('device_reset')}
+            renderContent={'deviceReset'}
+            setRenderContent={setRenderContent}
+          />
 
           <Flex
             alignSelf={ALIGN_FLEX_END}
@@ -121,8 +149,8 @@ export function RobotSettingsDashboard(): JSX.Element {
 interface RobotSettingButtonProps {
   settingName: string
   settingInfo?: string
-  renderContent?: RenderContentType
-  setRenderContent?: (renderContentType: RenderContentType) => void
+  renderContent: RenderContentType
+  setRenderContent: (renderContentType: RenderContentType) => void
 
   // onClick?: () => void // Note: kj 01/25/2023 optional is temp for bare-bones
 }
@@ -133,11 +161,11 @@ function RobotSettingButton({
   renderContent,
   setRenderContent,
 }: RobotSettingButtonProps): JSX.Element {
+  const handleClick = (): void => {
+    setRenderContent(renderContent)
+  }
   return (
-    <Btn
-      css={SETTING_BUTTON_STYLE}
-      onClick={() => renderContent != null && setRenderContent(renderContent)}
-    >
+    <Btn css={SETTING_BUTTON_STYLE} onClick={handleClick}>
       <Flex
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing5}
