@@ -214,5 +214,6 @@
   "display_sleep_settings": "Display Sleep Settings",
   "display_brightness": "Display Brightness",
   "display_text_size": "Display Text Size",
-  "device_reset": "Device Reset"
+  "device_reset": "Device Reset",
+  "not_connected": "Not connected"
 }

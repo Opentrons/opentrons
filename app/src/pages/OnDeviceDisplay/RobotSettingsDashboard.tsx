@@ -23,6 +23,7 @@ import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
+import { NetworkSettings } from '../../organisms/RobotSettingsDashboard/NetworkSettings'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 
 const SETTING_BUTTON_STYLE = css`
@@ -34,76 +35,108 @@ const SETTING_BUTTON_STYLE = css`
   border-radius: 16px;
 `
 
+export type RenderContentType = 'networkSettings' | null
+
 export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const [renderContent, setRenderContent] = React.useState<RenderContentType>(
+    null
+  )
+
+  const renderSetting = (): JSX.Element | null => {
+    console.log('renderContent', renderContent)
+    switch (renderContent) {
+      case 'networkSettings':
+        return (
+          <NetworkSettings
+            robotName={robotName}
+            setRenderContent={setRenderContent}
+          />
+        )
+      default:
+        return null
+    }
+  }
+
   return (
-    <Flex
-      padding={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
-      flexDirection={DIRECTION_COLUMN}
-      columnGap={SPACING.spacing3}
-    >
-      <Navigation routes={onDeviceDisplayRoutes} />
-      {/* Robot Name */}
-      <RobotSettingButton
-        settingName={t('robot_name')}
-        settingInfo={robotName}
-      />
+    <>
+      {renderSetting() != null ? (
+        renderSetting()
+      ) : (
+        <Flex
+          padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+          flexDirection={DIRECTION_COLUMN}
+          columnGap={SPACING.spacing3}
+        >
+          <Navigation routes={onDeviceDisplayRoutes} />
+          {/* Robot Name */}
+          <RobotSettingButton
+            settingName={t('robot_name')}
+            settingInfo={robotName}
+          />
 
-      {/* Robot System Version */}
-      <RobotSettingButton
-        settingName={t('robot_system_version')}
-        settingInfo={'v7.0.0'}
-      />
+          {/* Robot System Version */}
+          <RobotSettingButton
+            settingName={t('robot_system_version')}
+            settingInfo={'v7.0.0'}
+          />
 
-      {/* Network Settings */}
-      <RobotSettingButton
-        settingName={t('network_settings')}
-        settingInfo={'Not connected'}
-      />
+          {/* Network Settings */}
+          <RobotSettingButton
+            settingName={t('network_settings')}
+            settingInfo={'Not connected'}
+            renderContent={'networkSettings'}
+            setRenderContent={setRenderContent}
+          />
 
-      {/* Display Sleep Settings */}
-      <RobotSettingButton settingName={t('display_sleep_settings')} />
+          {/* Display Sleep Settings */}
+          <RobotSettingButton settingName={t('display_sleep_settings')} />
 
-      {/* Display Brightness */}
-      <RobotSettingButton settingName={t('display_brightness')} />
+          {/* Display Brightness */}
+          <RobotSettingButton settingName={t('display_brightness')} />
 
-      {/* Display Text Size */}
-      <RobotSettingButton settingName={t('display_text_size')} />
+          {/* Display Text Size */}
+          <RobotSettingButton settingName={t('display_text_size')} />
 
-      {/* Device Reset */}
-      <RobotSettingButton settingName={t('device_reset')} />
+          {/* Device Reset */}
+          <RobotSettingButton settingName={t('device_reset')} />
 
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
-      </Flex>
-    </Flex>
+          <Flex
+            alignSelf={ALIGN_FLEX_END}
+            marginTop={SPACING.spacing5}
+            width="fit-content"
+          >
+            <Link to="menu">
+              <TertiaryButton>To ODD Menu</TertiaryButton>
+            </Link>
+          </Flex>
+        </Flex>
+      )}
+    </>
   )
 }
 
 interface RobotSettingButtonProps {
   settingName: string
   settingInfo?: string
-  onClick?: () => void // Note: kj 01/25/2023 optional is temp for bare-bones
+  renderContent?: RenderContentType
+  setRenderContent?: (renderContentType: RenderContentType) => void
+
+  // onClick?: () => void // Note: kj 01/25/2023 optional is temp for bare-bones
 }
 
 function RobotSettingButton({
   settingName,
   settingInfo,
+  renderContent,
+  setRenderContent,
 }: RobotSettingButtonProps): JSX.Element {
   return (
     <Btn
       css={SETTING_BUTTON_STYLE}
-      onClick={() => console.log('show robot name')}
+      onClick={() => renderContent != null && setRenderContent(renderContent)}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

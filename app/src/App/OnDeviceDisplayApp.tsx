@@ -24,6 +24,8 @@ import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
+import { NetworkSettings } from '../organisms/RobotSettingsDashboard/NetworkSettings'
+
 import type { RouteProps } from './types'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
@@ -162,6 +164,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'App Settings',
     path: '/app-settings',
+  },
+  {
+    Component: NetworkSettings,
+    exact: true,
+    name: 'temp test',
+    path: '/temp',
   },
 ]
 
