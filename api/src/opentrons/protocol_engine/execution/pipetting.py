@@ -243,6 +243,23 @@ class PipettingHandler:
 
         return volume
 
+    async def aspirate_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> float:
+        """Aspirate liquid without moving the pipette."""
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+
+        with self.set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
+            await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
+
+        return volume
+
     async def touch_tip(
         self,
         pipette_id: str,

@@ -446,6 +446,46 @@ async def test_handle_dispense_in_place_request(
     )
 
 
+async def test_handle_aspirate_in_place_request(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
+    subject: PipettingHandler,
+) -> None:
+    """It should find the pipette by ID and use it to aspirate."""
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=mock_hw_pipettes.right_config,
+        )
+    )
+
+    volume = await subject.aspirate_in_place(
+        pipette_id="pipette-id",
+        volume=25,
+        flow_rate=2.5,
+    )
+
+    assert volume == 25
+
+    decoy.verify(
+        hardware_api.set_flow_rate(
+            mount=Mount.RIGHT, aspirate=None, dispense=2.5, blow_out=None
+        ),
+        await hardware_api.aspirate(mount=Mount.RIGHT, volume=25),
+        hardware_api.set_flow_rate(
+            mount=Mount.RIGHT, aspirate=1.23, dispense=1.23, blow_out=1.23
+        ),
+    )
+
+
 async def test_handle_add_tip(
     decoy: Decoy,
     state_store: StateStore,
