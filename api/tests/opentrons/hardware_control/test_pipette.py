@@ -12,7 +12,6 @@ from opentrons.hardware_control.instruments.ot3 import (
     pipette as ot3_pipette,
     instrument_calibration as ot3_calibration,
 )
-from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
 from opentrons.hardware_control import types
 from opentrons.config import pipette_config, ot3_pipette_config
 

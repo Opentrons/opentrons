@@ -2,7 +2,6 @@ from __future__ import annotations
 
 """ Classes and functions for gripper state tracking
 """
-from dataclasses import asdict
 import logging
 from typing import Any, Optional, Set
 
