@@ -20,6 +20,9 @@ from typing import (
 
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
+from opentrons.types import Mount
+from opentrons_hardware.firmware_update.utils import UpdateInfo
+from opentrons_hardware.hardware_control.network import DeviceInfoCache
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -57,6 +60,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
+    PipetteDict,
     PipetteSpec,
     GripperSpec,
     OT3AttachedPipette,
@@ -118,6 +122,7 @@ class OT3Simulator:
         self._loop = loop
         self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
+        self._update_required = False
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -461,8 +466,22 @@ class OT3Simulator:
         """Get the firmware version."""
         return None
 
+    @property
+    def update_required(self) -> bool:
+        return self._update_required
+
+    @update_required.setter
+    def update_required(self, value: bool) -> None:
+        if value != self._update_required:
+            log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
+            self._update_required = value
+
+    def check_firmware_updates(self, attached_instruments: Dict[Union[Mount, OT3Mount], PipetteDict]) -> Dict[NodeId, Tuple[DeviceInfoCache, UpdateInfo]]:
+        # need the pipette channels to determine the update type
+        return {}
+
     @ensure_yield
-    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
+    async def update_firmware(self, filename: str, target: NodeId) -> None:
         """Update the firmware."""
         pass
 

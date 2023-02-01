@@ -7,7 +7,7 @@ from .downloader import FirmwareUpdateDownloader
 from .hex_file import from_hex_file_path, from_hex_file, HexRecordProcessor
 from .eraser import FirmwareUpdateEraser
 from .run import run_update, run_updates
-from .firmware_manifest import load_firmware_manifest
+from .utils import check_firmware_updates
 
 __all__ = [
     "FirmwareUpdateDownloader",
@@ -18,5 +18,5 @@ __all__ = [
     "HexRecordProcessor",
     "run_update",
     "run_updates",
-    "load_firmware_manifest"
+    "check_firmware_updates",
 ]

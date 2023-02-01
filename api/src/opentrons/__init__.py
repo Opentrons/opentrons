@@ -54,6 +54,7 @@ log = logging.getLogger(__name__)
 
 
 SMOOTHIE_HEX_RE = re.compile("smoothie-(.*).hex")
+OT3_FIRMWARE_MANIFEST_PATH = os.path.abspath("/usr/lib/firmware/opentrons-firmware.json")
 
 
 def _find_smoothie_file() -> Tuple[Path, str]:
@@ -159,13 +160,18 @@ async def initialize() -> ThreadManagedHardware:
     # is returned. Do our own blinking here to keep it going while we home the robot.
     blink_task = asyncio.create_task(_blink())
 
+    # check for and start firmware updates if OT3
+    async def _do_updates() -> None:
+        if should_use_ot3():
+            await hardware.do_firmware_updates()
+    asyncio.create_task(_do_updates())
+    
     try:
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
             await hardware.home_z()
 
         await hardware.set_lights(button=True)
-
         return hardware
     finally:
         blink_task.cancel()

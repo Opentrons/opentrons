@@ -17,6 +17,7 @@ from typing import (
     TYPE_CHECKING,
     Sequence,
     AsyncIterator,
+    Union,
     cast,
     Set,
     TypeVar,
@@ -25,15 +26,15 @@ from typing import (
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.types import Mount
 from .ot3utils import (
     axis_convert,
     create_move_group,
     axis_to_node,
     get_current_settings,
     create_home_group,
-    node_id_to_subsystem,
     node_to_axis,
-    sub_system_to_node_id,
     sensor_node_for_mount,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
@@ -77,11 +78,9 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware import firmware_update
-from opentrons_hardware.firmware_update.firmware_manifest import (
-    FirmwareUpdateType,
-    UpdateInfo,
-    load_firmware_manifest,
-)
+from opentrons_hardware.firmware_update.utils import UpdateInfo, load_firmware_manifest
+
+
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
@@ -189,14 +188,6 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
-        self._attached_tools: ohc_tool_types.ToolSummary = None
-
-        # firmware update variables
-        self._update_required = False
-        self._firmware_update_list: Dict[DeviceInfoCache, UpdateInfo] = {}
-        self._known_firmware = load_firmware_manifest()
-        # starts subsystem updates
-        self.do_firmware_updates()
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -207,95 +198,27 @@ class OT3Controller:
     def update_required(self) -> bool:
         return self._update_required
 
-    def get_update_type(self, node_id: NodeId) -> FirmwareUpdateType:
-        """This will return the FirmwareUpdateType of a given NodeId.
+    @update_required.setter
+    def update_required(self, value: bool) -> None:
+        if value != self._update_required:
+            log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
+            self._update_required = value
 
-        The FirmwareUpdateType enum shares the same names as they keys in the firmware manifest file like so,
-        head, gantry-x, gantry-y, gripper.
+    def check_firmware_updates(self, attached_instruments: Dict[Union[Mount, OT3Mount], PipetteDict]) -> Dict[NodeId, Tuple[DeviceInfoCache, UpdateInfo]]:
+        # need the pipette channels to determine the update type
+        attached_pipettes: Dict[NodeId, int] = dict()
+        for mount, pipette in attached_instruments.items():
+            node_id = sensor_node_for_mount(OT3Mount.from_mount(mount))
+            attached_pipettes[node_id] = pipette.get('channels', 0)
+        return firmware_update.check_firmware_updates(self._network_info.device_info, attached_pipettes)
 
-        However the serialized pipette firmware has different types (single, multi, etc) so we need to be able to
-        get the corresponding FirmwareUpdateType for the given pipette NodeId (NodeId.pipette_left, NodeId.pipette_right).
-        """
-        if self._attached_tools is None:
-            return None
-        elif "pipette" in node_id.name:
-            if node_id == NodeId.pipette_left:
-                pipette_name = self._attached_tools.left.name
-            elif node_id == NodeId.pipette_right:
-                pipette_name = self._attached_tools.right.name
-            name_type = str(pipette_name.name).split("_")
-            update_type = [type for type in FirmwareUpdateType.__members__ if name_type in type]
-            if update_type:
-                return update_type[0]
-        else:
-            return FirmwareUpdateType.from_string(node_id.name)
-
-    def check_firmware_updates(
-        self, update: bool = False
-    ) -> Dict[DeviceInfoCache, UpdateInfo]:
-        """Returns a dict of NodeIds that require a firmware update."""
-        firmware_update_list = dict()
-        for node, version_cache in self._network_info.device_info.items():
-            update_type = self.get_update_type(node)
-            if update_type == FirmwareUpdateType.unknown:
-                log.error(f"Unknown firmware update type {update_type}")
-                continue
-            update_info = self._known_firmware.get(update_type)
-            if not update_info:
-                log.warning(f"No firmware update found for {node}")
-                continue
-            if version_cache.shortsha != update_info.shortsha:
-                log.debug(
-                    f"Subsystem {node} requires an update '{version_cache.shortsha} != {update_info.shortsha}'"
-                )
-                firmware_update_list[version_cache] = update_info
-        if firmware_update_list:
-            log.info("Updates Are Required, Settting Flag.")
-            self._update_required = True
-        return firmware_update_list
-
-    async def do_firmware_updates(self) -> None:
-        """Update all the firmware."""
-        firmware_update_list = self.check_firmware_updates()
-        async for device_info, update_info in firmware_update_list.items():
-            subsystem = node_id_to_subsystem(device_info.node_id)
-            log.info(
-                f"starting firmware update for {subsystem} {device_info.version} -> {update_info.version}"
-            )
-            await self.update_firmware(update_info.filepath, subsystem)
-
-    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
-        """Update the firmware for a single subsystem."""
-        with open(filename, "r") as f:
-            await firmware_update.run_update(
-                messenger=self._messenger,
-                node_id=sub_system_to_node_id(target),
-                hex_file=f,
-                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
-                #  config values.
-                retry_count=3,
-                timeout_seconds=20,
-                erase=True,
-            )
-
-    @property
-    def fw_version(self) -> Optional[str]:
-        """Get the firmware version."""
-        return None
-
-    @property
-    def update_required(self) -> bool:
-        return self._update_required
-
-    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
+    async def update_firmware(self, filename: str, target: NodeId) -> None:
         """Update the firmware."""
         with open(filename, "r") as f:
             await firmware_update.run_update(
                 messenger=self._messenger,
-                node_id=sub_system_to_node_id(target),
+                node_id=target,
                 hex_file=f,
-                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
-                #  config values.
                 retry_count=3,
                 timeout_seconds=20,
                 erase=True,
@@ -706,9 +629,9 @@ class OT3Controller:
             A map of mount to instrument name.
         """
         await self._probe_core()
-        self._attached_tools = await self._tool_detector.detect()
+        attached_tools = await self._tool_detector.detect()
 
-        current_tools = dict(OT3Controller._generate_attached_instrs(self._attached_tools))
+        current_tools = dict(OT3Controller._generate_attached_instrs(attached_tools))
         self._present_nodes -= set(
             axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )

@@ -396,13 +396,20 @@ class OT3API(
             sim_model=model.value,
         )
 
-    async def update_firmware(
-        self,
-        firmware_file: str,
-        target: OT3SubSystem,
-    ) -> None:
-        """Update the firmware on the hardware."""
-        await self._backend.update_firmware(firmware_file, target)
+    async def do_firmware_updates(self) -> None:
+        """Update all the firmware."""
+        attached_pipettes = self.get_attached_pipettes()
+        firmware_updates = self._backend.check_firmware_updates(attached_pipettes)
+        if firmware_updates:
+            self._backend.update_required = True
+            for node, update in firmware_updates.items():
+                device_info, update_info = update
+                mod_log.info(
+                    f"Starting firmware update for node: {node.name} shortsha: {device_info.shortsha} -> {update_info.shortsha}"
+                )
+                await self._backend.update_firmware(update_info.filepath, node)
+            # TODO: This might change once we have the ability to see the update status
+            self._backend.update_required = False
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
