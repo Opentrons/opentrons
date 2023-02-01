@@ -101,3 +101,9 @@ push-ot3: sdist
 dev: export OT_SYSTEM_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
 	$(pipenv) run python -m system_server
+
+.PHONY: docs
+docs: settings_schema.json
+
+settings_schema.json: system_server/settings/settings.py
+	$(python) -m scripts.settings_schema $@
