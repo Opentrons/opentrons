@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 import hashlib
 from dataclasses import dataclass
 from fastapi import UploadFile
@@ -47,7 +48,8 @@ def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
     return FileMeta(path=path, content_hash=content_hash)
 
 
-CALL_ONCE_RESULT_ATTR: Final = "_call_once_result"
+_CALL_ONCE_TASK_ATTR: Final = "_call_once_task"
+
 
 AsyncFuncT = TypeVar("AsyncFuncT", bound=Callable[..., Awaitable[Any]])
 
@@ -55,7 +57,7 @@ AsyncFuncT = TypeVar("AsyncFuncT", bound=Callable[..., Awaitable[Any]])
 def call_once(fn: AsyncFuncT) -> AsyncFuncT:
     """
     Decorator used to ensure an async function is called only once. Subsequent
-     calls will return the result of ths initial call regardless of arguments.
+     calls will return the result of the initial call regardless of arguments.
 
      Intended for use in initializing a singleton.
 
@@ -64,10 +66,12 @@ def call_once(fn: AsyncFuncT) -> AsyncFuncT:
 
     @wraps(fn)
     async def wrapped(*args: Any, **kwargs: Any) -> Any:
-        if not hasattr(wrapped, CALL_ONCE_RESULT_ATTR):
-            result = await fn(*args, **kwargs)
-            setattr(wrapped, CALL_ONCE_RESULT_ATTR, result)
+        if not hasattr(wrapped, _CALL_ONCE_TASK_ATTR):
+            setattr(
+                wrapped, _CALL_ONCE_TASK_ATTR, asyncio.create_task(fn(*args, **kwargs))
+            )
 
-        return getattr(wrapped, CALL_ONCE_RESULT_ATTR)
+        result_task = getattr(wrapped, _CALL_ONCE_TASK_ATTR)
+        return await result_task
 
     return cast(AsyncFuncT, wrapped)

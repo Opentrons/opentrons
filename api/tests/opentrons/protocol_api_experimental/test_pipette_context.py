@@ -87,27 +87,3 @@ def test_dispense(
             flow_rate=3.0,
         )
     )
-
-
-def test_touch_tip(
-    decoy: Decoy,
-    engine_client: EngineClient,
-    pipette_id: str,
-    labware_id: str,
-    well: Well,
-    subject: PipetteContext,
-) -> None:
-    """It should send a touch tip command."""
-    subject.touch_tip(location=well, v_offset=-0.5)
-
-    decoy.verify(
-        engine_client.touch_tip(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well.well_name,
-            well_location=WellLocation(
-                origin=WellOrigin.TOP,
-                offset=WellOffset(x=0, y=0, z=-0.5),
-            ),
-        )
-    )

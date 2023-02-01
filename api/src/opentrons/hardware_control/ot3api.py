@@ -55,7 +55,6 @@ from .util import DeckTransformState
 from .types import (
     Axis,
     CriticalPoint,
-    MustHomeError,
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
@@ -70,8 +69,8 @@ from .types import (
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
-    GripperNotAttachedError,
 )
+from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
 from .robot_calibration import (
     OT3Transforms,
@@ -468,6 +467,7 @@ class OT3API(
             OT3Mount.GRIPPER: self.attached_gripper,
         }
 
+    # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -490,14 +490,22 @@ class OT3API(
             # of simulation and it feels like a lot of work for this function
             # actually be doing.
             found = await self._backend.get_attached_instruments(checked_require)
-        for mount, instrument_data in found.items():
-            if mount == OT3Mount.GRIPPER:
-                await self.cache_gripper(cast(AttachedGripper, instrument_data))
-            else:
-                req_instr_name = checked_require.get(mount, None)
+
+        if OT3Mount.GRIPPER in found.keys():
+            await self.cache_gripper(cast(AttachedGripper, found.get(OT3Mount.GRIPPER)))
+        elif self._gripper_handler.gripper:
+            await self._gripper_handler.reset()
+
+        for pipette_mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            if pipette_mount in found.keys():
+                req_instr_name = checked_require.get(pipette_mount, None)
                 await self.cache_pipette(
-                    mount, cast(OT3AttachedPipette, instrument_data), req_instr_name
+                    pipette_mount,
+                    cast(OT3AttachedPipette, found.get(pipette_mount)),
+                    req_instr_name,
                 )
+            else:
+                self._pipette_handler.hardware_instruments[pipette_mount] = None
 
         await self._backend.probe_network()
         await self._backend.update_motor_status()
@@ -1361,15 +1369,15 @@ class OT3API(
                 [OT3Axis.of_main_tool_actuator(mount)],
                 pipette_spec.pick_up_distance,
                 pipette_spec.speed,
-                "pick_up",
+                "clamp",
             )
-            # Move to pick up position
-            target_up = target_position_from_relative(
-                mount,
-                pipette_spec.tiprack_up,
-                self._current_position,
+            # back clamps off the adapter posts
+            await self._backend.tip_action(
+                [OT3Axis.of_main_tool_actuator(mount)],
+                pipette_spec.pick_up_distance,
+                pipette_spec.speed,
+                "home",
             )
-            await self._move(target_up)
 
     async def pick_up_tip(
         self,
@@ -1384,18 +1392,6 @@ class OT3API(
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
-
-        target_absolute = target_position_from_plunger(
-            realmount, spec.plunger_prep_pos, self._current_position
-        )
-        async with self._backend.restore_current():
-            await self._backend.set_active_current(
-                {axis: current for axis, current in spec.plunger_currents.items()}
-            )
-            await self._move(
-                target_absolute,
-                home_flagged_axes=False,
-            )
 
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
@@ -1457,7 +1453,13 @@ class OT3API(
                     [OT3Axis.of_main_tool_actuator(mount)],
                     move.target_position,
                     move.speed,
-                    "drop",
+                    "clamp",
+                )
+                await self._backend.tip_action(
+                    [OT3Axis.of_main_tool_actuator(mount)],
+                    move.target_position,
+                    move.speed,
+                    "home",
                 )
             else:
                 target_pos = target_position_from_plunger(
