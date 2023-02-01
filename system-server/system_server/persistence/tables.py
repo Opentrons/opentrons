@@ -8,7 +8,7 @@ _metadata = sqlalchemy.MetaData()
 registration_table = sqlalchemy.Table(
     "registration",
     _metadata,
-    Column("registration_id", Integer, primary_key=True, nullable=False),
+    Column("id", Integer, primary_key=True, nullable=False),
     Column("subject", sqlalchemy.String, nullable=True),
     Column("agent", sqlalchemy.String, nullable=True),
     Column("agent_id", sqlalchemy.String, nullable=True),
