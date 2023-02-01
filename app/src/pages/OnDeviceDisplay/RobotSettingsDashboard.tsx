@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -36,7 +36,6 @@ const SETTING_BUTTON_STYLE = css`
 `
 
 export type RenderContentType =
-  | 'robotName'
   | 'robotSystemVersion'
   | 'networkSettings'
   | 'displaySleepSettings'
@@ -82,8 +81,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           <RobotSettingButton
             settingName={t('robot_name')}
             settingInfo={robotName}
-            renderContent={'robotName'}
-            setRenderContent={setRenderContent}
+            forwardPath="/robot-settings/rename-robot"
           />
 
           {/* Robot System Version */}
@@ -148,10 +146,9 @@ export function RobotSettingsDashboard(): JSX.Element {
 interface RobotSettingButtonProps {
   settingName: string
   settingInfo?: string
-  renderContent: RenderContentType
-  setRenderContent: (renderContentType: RenderContentType) => void
-
-  // onClick?: () => void // Note: kj 01/25/2023 optional is temp for bare-bones
+  renderContent?: RenderContentType
+  setRenderContent?: (renderContentType: RenderContentType) => void
+  forwardPath?: string
 }
 
 function RobotSettingButton({
@@ -159,9 +156,17 @@ function RobotSettingButton({
   settingInfo,
   renderContent,
   setRenderContent,
+  forwardPath,
 }: RobotSettingButtonProps): JSX.Element {
+  const history = useHistory()
   const handleClick = (): void => {
-    setRenderContent(renderContent)
+    if (forwardPath != null) {
+      history.push(forwardPath)
+    } else {
+      renderContent != null &&
+        setRenderContent != null &&
+        setRenderContent(renderContent)
+    }
   }
   return (
     <Btn css={SETTING_BUTTON_STYLE} onClick={handleClick}>
