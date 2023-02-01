@@ -35,7 +35,7 @@ export function getLabwareSetupItemGroups(
           const loadModuleCommand = commands.find(
             (c): c is LoadModuleRunTimeCommand =>
               c.commandType === 'loadModule' &&
-              c.params.moduleId === location.moduleId
+              c.result.moduleId === location.moduleId
           )
           if (loadModuleCommand == null) {
             console.error(

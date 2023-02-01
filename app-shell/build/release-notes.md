@@ -6,11 +6,25 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.2.0
+## Opentrons App Changes in 6.2.1
+
+Welcome to the v6.2.1 release of the Opentrons App!
+
+## Bug Fixes
+
+- Fixed a problem where certain kinds of robot errors would block you from accessing the robot's settings.
+
+## Improved Features
+
+- The device details page now loads faster.
+
+---
+
+## Opentrons App Changes in 6.2.0
 
 Welcome to the v6.2.0 release of the Opentrons App! This release focuses on adding support for the Thermocycler Module GEN2.
 
-## New Features
+### New Features
 
 - Thermocycler GEN2 support: analyze, upload, and run protocols that include the Thermocycler GEN2
 - Added a privacy preference for sharing anonymous robot logs with Opentrons.

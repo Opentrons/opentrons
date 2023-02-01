@@ -31,7 +31,7 @@ from typing_extensions import Final
 
 import sqlalchemy
 
-from .tables import migration_table, run_table
+from ._tables import migration_table, run_table
 
 _LATEST_SCHEMA_VERSION: Final = 1
 
