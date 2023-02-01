@@ -112,5 +112,5 @@ export const PipettingCommandText = ({
     }
   }
 
-  return <StyledText as="p">{commandText}</StyledText>
+  return commandText
 }

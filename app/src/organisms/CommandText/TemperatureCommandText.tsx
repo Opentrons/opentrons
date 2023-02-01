@@ -32,11 +32,8 @@ const T_KEYS_BY_COMMAND_TYPE: { [commandType: TemperatureCreateCommand]: string 
 }
 
 export const TemperatureCommandText = ({ command }: TemperatureCommandTextProps): JSX.Element | null => {
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation('protocol_command_text')
 
-  return (
-    <StyledText as="p">
-      {t(T_KEYS_BY_COMMAND_TYPE[commandType], { temp: command.params.celsius })}
-    </StyledText>
-  )
+  return t(T_KEYS_BY_COMMAND_TYPE[command.commandType], { temp: command.params.celsius })
+  
 }

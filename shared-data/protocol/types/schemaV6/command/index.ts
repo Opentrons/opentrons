@@ -16,7 +16,7 @@ export interface CommonCommandRunTimeInfo {
   key?: string
   id: string
   status: CommandStatus
-  error: string | null
+  error?: string | null
   createdAt: string
   startedAt: string | null
   completedAt: string | null

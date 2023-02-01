@@ -82,7 +82,7 @@ import { EMPTY_TIMESTAMP } from '../constants'
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { ProtocolRunProgressMeter } from './ProtocolRunProgressMeter'
+import { RunProgressMeter } from '../../RunProgressMeter'
 
 const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
@@ -315,7 +315,7 @@ export function ProtocolRunHeader({
           </Flex>
         </Box>
       ) : null}
-      <ProtocolRunProgressMeter {...{ makeHandleJumpToStep, runId }} />
+      <RunProgressMeter {...{ makeHandleJumpToStep, runId }} />
       {showConfirmCancelModal ? (
         <ConfirmCancelModal
           onClose={() => setShowConfirmCancelModal(false)}
