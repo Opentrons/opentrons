@@ -18,6 +18,9 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 import logging
 logging.basicConfig(level=logging.INFO)
 
+BASE_DIRECTORY = '/userfs/data/testing_data/speed_accel_profile/'
+SAVE_NAME = 'speed_test_output_'
+
 CYCLES = 1
 
 TEST_LIST = {}
@@ -65,21 +68,21 @@ TEST_PARAMETERS = {
         'X': {
             'SPEED': {
                 'MIN': 500,
-                'MAX': 1000,
+                'MAX': 700,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
+                'MIN': 1800,
+                'MAX': 2200,
                 'INC': 200}},
         'Y': {
             'SPEED': {
                 'MIN': 500,
-                'MAX': 1000,
+                'MAX': 700,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
-                'INC': 200}},
+                'MIN': 1200,
+                'MAX': 1300,
+                'INC': 50}},
         'L': {
             'SPEED': {
                 'MIN': 40,
@@ -102,26 +105,26 @@ TEST_PARAMETERS = {
     GantryLoad.TWO_LOW_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 500,
-                'MAX': 1000,
+                'MIN': 650,
+                'MAX': 800,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
+                'MIN': 1400,
+                'MAX': 1800,
                 'INC': 200}},
         'Y': {
             'SPEED': {
                 'MIN': 500,
-                'MAX': 1000,
+                'MAX': 700,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
-                'INC': 200}},
+                'MIN': 1200,
+                'MAX': 1300,
+                'INC': 50}},
         'L': {
             'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
+                'MIN': 150,
+                'MAX': 160,
                 'INC': 10},
             'ACCEL': {
                 'MIN': 800,
@@ -129,8 +132,8 @@ TEST_PARAMETERS = {
                 'INC': 200}},
         'R': {
             'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
+                'MIN': 150,
+                'MAX': 160,
                 'INC': 10},
             'ACCEL': {
                 'MIN': 600,
@@ -318,7 +321,7 @@ async def _main(is_simulating: bool) -> None:
     try:
         #run the test while recording raw results
         table_results = {}
-        with open('speed_test_output_' + AXIS + '.csv', mode='w') as csv_file:
+        with open(BASE_DIRECTORY + SAVE_NAME + AXIS + '.csv', mode='w') as csv_file:
             fieldnames = ['axis','speed', 'acceleration', 'error', 'cycles']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
@@ -374,7 +377,7 @@ async def _main(is_simulating: bool) -> None:
         # print(table_results)
         test_axis_list = list(AXIS)
         for test_axis in test_axis_list:
-            with open('speed_test_output_' + test_axis + '_table.csv', mode='w') as csv_file:
+            with open(BASE_DIRECTORY + SAVE_NAME + test_axis + '_table.csv', mode='w') as csv_file:
                 fieldnames = ['Speed'] + [*parameter_range(LOAD, test_axis, 'ACCEL')]
                 # print(fieldnames)
                 writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
