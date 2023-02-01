@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "626ff01d9fe0cfb56d9a141acd02d80ca80e948b911882d7d94d425b17677e9b"
+            "sha256": "7be3477cc7fa54472bf004a9195b975bcc282ae5594e18d64be1173c2170aaaf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,14 @@
         ]
     },
     "default": {
+        "anyio": {
+            "hashes": [
+                "sha256:929a6852074397afe1d989002aa96d457e3e1e5441357c60d03e7eea0e65e1b0",
+                "sha256:ae57a67583e5ff8b4af47666ff5651c3732d45fd26c929253748e796af860374"
+            ],
+            "index": "pypi",
+            "version": "==3.3.0"
+        },
         "asgiref": {
             "hashes": [
                 "sha256:71e68008da809b957b7ee4b43dbccff33d1b23519fb8344e33f049897077afac",
@@ -114,6 +122,14 @@
             "markers": "python_version >= '3.7'",
             "version": "==0.14.0"
         },
+        "idna": {
+            "hashes": [
+                "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4",
+                "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"
+            ],
+            "markers": "python_version >= '3.5'",
+            "version": "==3.4"
+        },
         "importlib-metadata": {
             "hashes": [
                 "sha256:8a8a81bcf996e74fee46f0d16bd3eaa382a7eb20fd82445c3ad11f4090334116",
@@ -180,6 +196,14 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.16.0"
+        },
+        "sniffio": {
+            "hashes": [
+                "sha256:e60305c5e5d314f5389259b7f22aaa33d8f7dee49763119234af3755c55b9101",
+                "sha256:eecefdce1e5bbfb7ad2eeaabf7c1eeb404d7757c379bd1f7e5cce9d8bf425384"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==1.3.0"
         },
         "sqlalchemy": {
             "hashes": [
@@ -496,7 +520,7 @@
                 "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4",
                 "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"
             ],
-            "markers": "python_version >= '3'",
+            "markers": "python_version >= '3.5'",
             "version": "==3.4"
         },
         "importlib-metadata": {

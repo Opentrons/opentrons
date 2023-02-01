@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 fastapi = "==0.68.1"
 uvicorn = "==0.14.0"
+anyio = "==3.3.0"
 typing-extensions = ">=4.0.0,<5"
 pyjwt = "==2.6.0"
 python-dotenv = "==0.19.0"
