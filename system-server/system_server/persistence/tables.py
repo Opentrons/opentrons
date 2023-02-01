@@ -1,18 +1,18 @@
 """SQLite table schemas."""
 import sqlalchemy
-from sqlalchemy import Column, VARCHAR, Integer, JSON
+from sqlalchemy import Column, Integer
 
 _metadata = sqlalchemy.MetaData()
 
 
-registrations_table = sqlalchemy.Table(
-    "registrations",
+registration_table = sqlalchemy.Table(
+    "registration",
     _metadata,
     Column("registration_id", Integer, primary_key=True, nullable=False),
-    Column("subject", VARCHAR(255)),
-    Column("agent", VARCHAR(255)),
-    Column("agent_id", VARCHAR(255)),
-    Column("token", JSON),
+    Column("subject", sqlalchemy.String, nullable=True),
+    Column("agent", sqlalchemy.String, nullable=True),
+    Column("agent_id", sqlalchemy.String, nullable=True),
+    Column("token", sqlalchemy.String, nullable=True),
     Column("schema_version", Integer, nullable=False, default=0, server_default="0"),
     sqlalchemy.UniqueConstraint("subject", "agent", "agent_id"),
 )

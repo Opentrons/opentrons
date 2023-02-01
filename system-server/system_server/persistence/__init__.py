@@ -9,7 +9,7 @@ import sqlalchemy
 
 
 from .database import create_sql_engine
-from .tables import registrations_table
+from .tables import registration_table
 
 from system_server.app_state import AppState, AppStateAccessor, get_app_state
 from system_server.settings import get_settings
@@ -72,5 +72,5 @@ async def get_sql_engine(
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
-    "registrations_table",
+    "registration_table",
 ]

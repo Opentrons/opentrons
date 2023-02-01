@@ -18,12 +18,12 @@ from system_server.persistence.tables import add_tables_to_db
 # Whitespace and formatting changes, on the other hand, are allowed.
 EXPECTED_STATEMENTS = [
     """
-    CREATE TABLE registrations (
+    CREATE TABLE registration (
         registration_id INTEGER NOT NULL,
-        subject VARCHAR(255),
-        agent VARCHAR(255),
-        agent_id VARCHAR(255),
-        token JSON,
+        subject VARCHAR,
+        agent VARCHAR,
+        agent_id VARCHAR,
+        token VARCHAR,
         schema_version INTEGER DEFAULT \'0\' NOT NULL,
         PRIMARY KEY (registration_id),
         UNIQUE (subject, agent, agent_id)
