@@ -20,7 +20,6 @@ import {
   fetchStatus,
   fetchWifiList,
   getNetworkInterfaces,
-  getWifiKeys,
   getWifiList,
 } from '../../redux/networking'
 
@@ -42,8 +41,6 @@ export function NetworkSettings({
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
-  const isEAPTLS =
-    useSelector((state: State) => getWifiKeys(state, robotName)).length > 0
   const activeNetwork = list.find(nw => nw.active)
 
   React.useEffect(() => {
@@ -91,7 +88,8 @@ export function NetworkSettings({
           buttonTitle={t('usb')}
           iconName="usb"
           chipIconName="ot-check"
-          isConnected={isEAPTLS}
+          // Note: kj 02/01/2023 currently hard-coded because this needs to detect USB connection
+          isConnected={false}
         />
       </Flex>
     </>
