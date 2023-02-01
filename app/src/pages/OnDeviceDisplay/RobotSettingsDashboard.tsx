@@ -54,7 +54,6 @@ export function RobotSettingsDashboard(): JSX.Element {
   )
 
   const renderSetting = (): JSX.Element | null => {
-    console.log('renderContent', renderContent)
     switch (renderContent) {
       case 'networkSettings':
         return (
