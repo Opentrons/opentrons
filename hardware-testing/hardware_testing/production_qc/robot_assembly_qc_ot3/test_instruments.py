@@ -273,9 +273,11 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
+    await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
     while not api.is_simulator and (await _get_pip_mounts(api) or api.has_gripper()):
         input("remove all attached instruments, then press ENTER:")
     await api.home()
+    await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
 
     # PIPETTES
     for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
