@@ -56,12 +56,12 @@ export function Tick(props: TickProps): JSX.Element {
 
   const commandTKey =
     firstCommandType in tKeyByCommandType &&
-      tKeyByCommandType[firstCommandType] != null
+    tKeyByCommandType[firstCommandType] != null
       ? tKeyByCommandType[firstCommandType] ?? null
       : null
   const iconName =
     firstCommandType in iconByCommandType &&
-      iconByCommandType[firstCommandType] != null
+    iconByCommandType[firstCommandType] != null
       ? iconByCommandType[firstCommandType] ?? null
       : null
   return (

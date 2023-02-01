@@ -8,12 +8,12 @@ import type { RunTimeCommand } from '@opentrons/shared-data'
 const MIN_AGGREGATION_PERCENT = 0.6
 const TICKED_COMMAND_TYPES = ['waitForResume', 'moveLabware']
 
-interface InterventionTicksProps{
+interface InterventionTicksProps {
   analysisCommands: RunTimeCommand[]
   makeHandleJumpToStep: (index: number) => () => void
 }
 export function InterventionTicks(props: InterventionTicksProps): JSX.Element {
-  const {analysisCommands, makeHandleJumpToStep} = props
+  const { analysisCommands, makeHandleJumpToStep } = props
 
   // calculate the number of adjacent commands that will appear as separate ticks
   const commandAggregationCount =

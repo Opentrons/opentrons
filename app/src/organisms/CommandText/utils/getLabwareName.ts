@@ -13,7 +13,6 @@ export function getLabwareName(
   labwareId: string
 ): string {
   const loadedLabware = getLoadedLabware(analysis, labwareId)
-  console.log(loadedLabware)
   if (loadedLabware == null) {
     return ''
   } else if (loadedLabware.definitionUri === FIXED_TRASH_DEF_URI) {

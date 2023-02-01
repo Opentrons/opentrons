@@ -3,18 +3,18 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 
-import type {
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   TemperatureModuleAwaitTemperatureCreateCommand,
   TemperatureModuleSetTargetTemperatureCreateCommand,
   ThermocyclerSetTargetBlockTemperatureCreateCommand,
   ThermocyclerSetTargetLidTemperatureCreateCommand,
-  HeaterShakerSetTargetTemperatureCreateCommand
+  HeaterShakerSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
-interface TemperatureCommandTextProps { command: RunTimeCommand }
+interface TemperatureCommandTextProps {
+  command: RunTimeCommand
+}
 
 type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand
@@ -23,7 +23,9 @@ type TemperatureCreateCommand =
   | ThermocyclerSetTargetLidTemperatureCreateCommand
   | HeaterShakerSetTargetTemperatureCreateCommand
 
-const T_KEYS_BY_COMMAND_TYPE: { [commandType: TemperatureCreateCommand]: string } = {
+const T_KEYS_BY_COMMAND_TYPE: {
+  [commandType: TemperatureCreateCommand]: string
+} = {
   'temperatureModule/setTargetTemperature': 'setting_temperature_module_temp',
   'temperatureModule/waitForTemperature': 'waiting_to_reach_temp_module',
   'thermocycler/setTargetBlockTemperature': 'setting_thermocycler_block_temp',
@@ -31,9 +33,12 @@ const T_KEYS_BY_COMMAND_TYPE: { [commandType: TemperatureCreateCommand]: string 
   'heaterShaker/setTargetTemperature': 'setting_hs_temp',
 }
 
-export const TemperatureCommandText = ({ command }: TemperatureCommandTextProps): JSX.Element | null => {
+export const TemperatureCommandText = ({
+  command,
+}: TemperatureCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
-  return t(T_KEYS_BY_COMMAND_TYPE[command.commandType], { temp: command.params.celsius })
-  
+  return t(T_KEYS_BY_COMMAND_TYPE[command.commandType], {
+    temp: command.params.celsius,
+  })
 }

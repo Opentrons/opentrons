@@ -93,12 +93,13 @@ export const LoadCommandText = ({
         })
       } else {
         const labware = command.result?.definition.metadata.displayName
-        commandText = command.params.location === 'offDeck'
-          ? t('load_labware_info_protocol_setup_off_deck', { labware })
-          : t('load_labware_info_protocol_setup_no_module', {
-            labware,
-            slot_name: command.params.location?.slotName,
-          })
+        commandText =
+          command.params.location === 'offDeck'
+            ? t('load_labware_info_protocol_setup_off_deck', { labware })
+            : t('load_labware_info_protocol_setup_no_module', {
+                labware,
+                slot_name: command.params.location?.slotName,
+              })
       }
       break
     }

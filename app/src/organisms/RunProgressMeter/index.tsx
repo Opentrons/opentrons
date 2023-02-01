@@ -38,9 +38,7 @@ interface RunProgressMeterProps {
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
 }
-export function RunProgressMeter(
-  props: RunProgressMeterProps
-): JSX.Element {
+export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { runId, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
@@ -49,17 +47,13 @@ export function RunProgressMeter(
 
   /**
    * find the analysis command within the analysis
-   * that has the same commandKey as the most recent 
+   * that has the same commandKey as the most recent
    * command from the run record. NOTE: the most recent
-   * command may not always be "current", for instance if 
+   * command may not always be "current", for instance if
    * the run has completed/failed */
   const lastRunCommandKey = useLastRunCommandKey(runId)
   const lastRunCommandIndex =
     analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
-    console.table({
-      lastRunCommandIndex,
-      lastRunCommandKey
-    })
   let countOfTotalText = ''
   if (
     lastRunCommandIndex >= 0 &&
@@ -97,8 +91,9 @@ export function RunProgressMeter(
         <Flex gridGap={SPACING.spacing3}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
-          )} ${countOfTotalText}${currentStepContents != null ? ': ' : ''
-            }`}</StyledText>
+          )} ${countOfTotalText}${
+            currentStepContents != null ? ': ' : ''
+          }`}</StyledText>
           {currentStepContents}
         </Flex>
       </Flex>
@@ -122,7 +117,7 @@ export function RunProgressMeter(
             border-radius: ${BORDERS.radiusSoftCorners};
           `}
         >
-          <InterventionTicks {...{makeHandleJumpToStep, analysisCommands}}/>
+          <InterventionTicks {...{ makeHandleJumpToStep, analysisCommands }} />
         </ProgressBar>
       ) : null}
     </Flex>

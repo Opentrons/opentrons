@@ -1,5 +1,5 @@
 {
-  "pickup_tip": "Picking up tip from {{well_name}} of {{labware}}",
+  "pickup_tip": "Picking up tip from {{well_name}} of {{labware}} in {{labware_location}}",
   "drop_tip": "Dropping tip in {{well_name}} of {{labware}}",
   "engaging_magnetic_module": "Engaging Magnetic Module",
   "disengaging_magnetic_module": "Disengaging Magnetic Module",
@@ -25,11 +25,11 @@
   "deactivate_hs_shake": "Deactivating shaker",
   "wait_for_duration": "Pausing for {{seconds}} seconds. {{message}}",
   "tc_run_profile_steps": "temperature: {{celsius}}°C, seconds: {{seconds}}",
-  "aspirate": "Aspirating {{volume}} uL from well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} uL/sec",
-  "dispense": "Dispensing {{volume}} uL into well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} uL/sec",
-  "blowout": "Blowing out at well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} uL/sec",
+  "aspirate": "Aspirating {{volume}} µL from well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
+  "dispense": "Dispensing {{volume}} µL into well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
+  "blowout": "Blowing out at well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
   "touch_tip": "Touching tip",
-  "move_to_slot": "Moving to {{slot_name}}",
+  "move_to_slot": "Moving to Slot {{slot_name}}",
   "move_to_well": "Moving to well {{well_name}} of {{labware}} in {{labware_location}}",
   "move_relative": "Moving {{distance}} mm along {{axis}} axis",
   "move_to_coordinates": "Moving to (X: {{x}}, Y: {{y}}, Z: {{z}})",
@@ -38,6 +38,7 @@
   "comment": "Comment",
   "wait_for_resume": "Pausing protocol",
   "slot": "Slot {{slot_name}}",
-  "module_in_slot": "{{module_name}} in Slot {{slot_name}}",
+  "module_in_slot": "{{module}} in Slot {{slot_name}}",
+  "module_in_slot_plural": "{{module}}",
   "fixed_trash": "Fixed Trash"
 }

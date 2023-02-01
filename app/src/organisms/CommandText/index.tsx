@@ -47,54 +47,39 @@ export function CommandText(props: Props): JSX.Element | null {
   const { command, robotSideAnalysis } = props
   const { t } = useTranslation('protocol_command_text')
 
-  let messageNode = null
-
   switch (command.commandType) {
-    case 'delay': {
-      messageNode = (
-        <>
-          <Flex
-            textTransform={TYPOGRAPHY.textTransformUppercase}
-            padding={SPACING.spacing2}
-          >
-            {t('comment')}
-          </Flex>
-          {command != null ? command.result : null}
-        </>
-      )
-      break
-    }
-    case 'pause':
-    case 'waitForResume': {
-      messageNode =
-        command.params?.message && command.params.message !== ''
-          ? command.params.message
-          : t('wait_for_resume')
-      break
-    }
     case 'aspirate':
     case 'dispense':
     case 'blowout':
     case 'moveToWell':
     case 'dropTip':
     case 'pickUpTip': {
-      messageNode = <PipettingCommandText {...{command, robotSideAnalysis}} />
-      break
+      return (
+        <StyledText as="p">
+          <PipettingCommandText {...{ command, robotSideAnalysis }} />
+        </StyledText>
+      )
     }
     case 'loadLabware':
     case 'loadPipette':
     case 'loadModule':
     case 'loadLiquid': {
-      messageNode = <LoadCommandText {...{command, robotSideAnalysis}} />
-      break
+      return (
+        <StyledText as="p">
+          <LoadCommandText {...{ command, robotSideAnalysis }} />
+        </StyledText>
+      )
     }
-    case 'temperatureModule/setTargetTemperature': 
-    case 'temperatureModule/waitForTemperature': 
-    case 'thermocycler/setTargetBlockTemperature': 
-    case 'thermocycler/setTargetLidTemperature': 
+    case 'temperatureModule/setTargetTemperature':
+    case 'temperatureModule/waitForTemperature':
+    case 'thermocycler/setTargetBlockTemperature':
+    case 'thermocycler/setTargetLidTemperature':
     case 'heaterShaker/setTargetTemperature': {
-      messageNode = <TemperatureCommandText command={command} />
-      break
+      return (
+        <StyledText as="p">
+          <TemperatureCommandText command={command} />
+        </StyledText>
+      )
     }
     case 'thermocycler/runProfile': {
       const { profile } = command.params
@@ -102,7 +87,7 @@ export function CommandText(props: Props): JSX.Element | null {
         ({ holdSeconds, celsius }: { holdSeconds: number; celsius: number }) =>
           t('tc_run_profile_steps', { celsius: celsius, seconds: holdSeconds })
       )
-      messageNode = (
+      return (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText marginBottom={SPACING.spacing2}>
             {t('tc_starting_profile', {
@@ -118,33 +103,32 @@ export function CommandText(props: Props): JSX.Element | null {
           </Flex>
         </Flex>
       )
-      break
     }
-    
     case 'heaterShaker/setAndWaitForShakeSpeed': {
       const { rpm } = command.params
-      messageNode = t('set_and_await_hs_shake', { rpm })
-      break
-    }
-    case 'waitForDuration': {
-      const { seconds, message } = command.params
-      messageNode = t('wait_for_duration', { seconds, message })
-      break
+      return (
+        <StyledText as="p">{t('set_and_await_hs_shake', { rpm })}</StyledText>
+      )
     }
     case 'moveToSlot': {
       const { slotName } = command.params
-      messageNode = t('move_to_slot', { slot_name: slotName })
-      break
+      return (
+        <StyledText as="p">
+          {t('move_to_slot', { slot_name: slotName })}
+        </StyledText>
+      )
     }
     case 'moveRelative': {
       const { axis, distance } = command.params
-      messageNode = t('move_relative', { axis, distance })
-      break
+      return (
+        <StyledText as="p">{t('move_relative', { axis, distance })}</StyledText>
+      )
     }
     case 'moveToCoordinates': {
       const { coordinates } = command.params
-      messageNode = t('move_to_coordinates', coordinates)
-      break
+      return (
+        <StyledText as="p">{t('move_to_coordinates', coordinates)}</StyledText>
+      )
     }
     case 'touchTip':
     case 'home':
@@ -165,8 +149,51 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'heaterShaker/deactivateShaker':
     case 'heaterShaker/waitForTemperature': {
       const simpleTKey = SIMPLE_T_KEY_BY_COMMAND_TYPE[command.commandType]
-      messageNode = simpleTKey != null ? t(simpleTKey) : null
-      break
+      return (
+        <StyledText as="p">
+          {simpleTKey != null ? t(simpleTKey) : null}
+        </StyledText>
+      )
+    }
+    case 'waitForDuration': {
+      const { seconds, message } = command.params
+      return (
+        <StyledText as="p">
+          {t('wait_for_duration', { seconds, message })}
+        </StyledText>
+      )
+    }
+    case 'pause': // deprecated pause command
+    case 'waitForResume': {
+      return (
+        <StyledText as="p">
+          {command.params?.message && command.params.message !== ''
+            ? command.params.message
+            : t('wait_for_resume')}
+        </StyledText>
+      )
+    }
+    case 'delay': {
+      // deprecated delay command
+      const { message = '' } = command.params
+      if ('waitForResume' in command.params) {
+        return (
+          <StyledText as="p">
+            {command.params?.message && command.params.message !== ''
+              ? command.params.message
+              : t('wait_for_resume')}
+          </StyledText>
+        )
+      } else {
+        return (
+          <StyledText as="p">
+            {t('wait_for_duration', {
+              seconds: command.params.seconds,
+              message,
+            })}
+          </StyledText>
+        )
+      }
     }
     case 'custom': {
       const { legacyCommandText } = command.params ?? {}
@@ -174,23 +201,20 @@ export function CommandText(props: Props): JSX.Element | null {
         typeof legacyCommandText === 'object'
           ? JSON.stringify(legacyCommandText)
           : String(legacyCommandText)
-      messageNode =
-        legacyCommandText != null ? sanitizedCommandText : command.commandType
-      break
+      return (
+        <StyledText as="p">
+          {legacyCommandText != null
+            ? sanitizedCommandText
+            : `${command.commandType}: ${JSON.stringify(command.params)}`}
+        </StyledText>
+      )
     }
     default: {
       console.warn(
         'Analysis Step Text encountered a command with an unrecognized commandType: ',
         command
       )
-      messageNode = JSON.stringify(command)
-      break
+      return <StyledText as="p">{JSON.stringify(command)}</StyledText>
     }
   }
-
-  return (
-    <Flex alignItems={ALIGN_CENTER}>
-      <StyledText as="p">{messageNode}</StyledText>
-    </Flex>
-  )
 }
