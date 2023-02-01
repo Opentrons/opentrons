@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 app = FastAPI(
     title="Opentrons System Server HTTP API Spec",
     description=(
-        "This OpenAPI spec describes the HTTP API of the Opentrons " "System Server."
+        "This OpenAPI spec describes the HTTP API of the Opentrons System Server."
     ),
     version=version,
 )
