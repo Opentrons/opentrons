@@ -528,8 +528,9 @@ def _reload_and_check_skip(
             p = Pipette(new_config, pipette_offset, attached_instr._pipette_id)
             p.act_as(attached_instr.acting_as)
             return p, False
-    # Good to skip
-    return attached_instr, True
+        # Good to skip, just need to update calibration offset
+        attached_instr._pipette_offset = pipette_offset
+        return attached_instr, True
 
 
 def load_from_config_and_check_skip(

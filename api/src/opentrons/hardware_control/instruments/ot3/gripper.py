@@ -2,7 +2,6 @@ from __future__ import annotations
 
 """ Classes and functions for gripper state tracking
 """
-from dataclasses import asdict
 import logging
 from typing import Any, Optional, Set
 
@@ -249,8 +248,8 @@ def _reload_gripper(
         # Same config, good enough
         return attached_instr
     else:
-        newdict = asdict(new_config)
-        olddict = asdict(attached_instr.config)
+        newdict = new_config.dict()
+        olddict = attached_instr.config.dict()
         changed: Set[str] = set()
         for k in newdict.keys():
             if newdict[k] != olddict[k]:
@@ -258,7 +257,10 @@ def _reload_gripper(
         if changed.intersection(RECONFIG_KEYS):
             # Something has changed that requires reconfig
             return Gripper(new_config, cal_offset, attached_instr._gripper_id)
-    return attached_instr
+        else:
+            # update just the cal offset
+            attached_instr._calibration_offset = cal_offset
+            return attached_instr
 
 
 def compare_gripper_config_and_check_skip(
