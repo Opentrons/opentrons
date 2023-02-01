@@ -282,6 +282,11 @@ class CSVReport:
             r_line[args[2]].store(*args[3])
         else:
             raise ValueError(f"unexpected arguments to Report(): {args}")
+        # set the results of each section based on current
+        self._refresh_results_overview_values()
+        # save to disk after storing new values
+        if self._file_name:
+            self.save_to_disk()
 
     def __getitem__(self, item: str) -> CSVSection:
         """CSV Report get item."""
@@ -292,15 +297,17 @@ class CSVReport:
 
     def _refresh_results_overview_values(self) -> None:
         for s in self._sections[2:]:
+            section = self[RESULTS_OVERVIEW_TITLE]
+            line = section[s.title]
+            line.store(CSVResult.PASS)
             if s.result_passed:
-                self(RESULTS_OVERVIEW_TITLE, s.title, [CSVResult.PASS])
+                result = CSVResult.PASS
             else:
-                self(RESULTS_OVERVIEW_TITLE, s.title, [CSVResult.FAIL])
+                result = CSVResult.FAIL
+            line.store(result)
 
     def __str__(self) -> str:
         """CSV Report string."""
-        # set the results of each section based on current
-        self._refresh_results_overview_values()
         return "\n".join([str(s) for s in self._sections])
 
     @property
