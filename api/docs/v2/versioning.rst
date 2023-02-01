@@ -3,7 +3,7 @@
 Versioning
 ==========
 
-The Python Protocol API has its own versioning system, which is separate from the version of the robot server software or the Opentrons App. This allows you to specify the Protocol API version that your protocol requires without worrying about what robot software versions it will work with. 
+The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot server software and the Opentrons App. This allows you to specify the API version that your protocol requires without worrying about what robot software versions it will work with. 
 
 Major and Minor Versions
 ------------------------
@@ -32,7 +32,7 @@ You must specify the minimum API version you are targeting at the top of your Py
        protocol.comment('Hello, world!')
 
 
-Version specification is required by the system. If you do not specify your target API version, you will not be able to simulate or run your protocol.
+Version specification is required by the system. If you do not specify a target API version, you will not be able to simulate or run your protocol.
 
 The version you specify determines the features and behaviors available to your protocol. For example, support for the Heater-Shaker Module was added in version 2.13, so you can't specify a lower version and then call ``HeaterShakerContext`` methods without causing an error. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
 
