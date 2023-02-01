@@ -401,13 +401,16 @@ class MoveScheduler:
     def _handle_move_completed(self, message: _AcceptableMoves) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
+        stop_condition = self._stop_condition[group_id]
         try:
-            if self._stop_condition[
-                group_id
-            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
-                if ack_id == UInt8Field(1):
+            if ack_id == UInt8Field(1):
+                if stop_condition == MoveStopCondition.limit_switch:
                     condition = "Homing timed out."
                     log.warning(f"Homing failed. Condition: {condition}")
+                    raise MoveConditionNotMet()
+                elif stop_condition == MoveStopCondition.sync_line:
+
+                    log.warning(f"Capacitive probing failed.")
                     raise MoveConditionNotMet()
         except IndexError:
             # If we have two move group runners running at once, they each

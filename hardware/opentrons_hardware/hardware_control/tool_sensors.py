@@ -21,6 +21,9 @@ from opentrons_hardware.hardware_control.motion import (
     create_step,
     MoveGroupStep,
 )
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 LOG = getLogger(__name__)
@@ -76,8 +79,11 @@ async def capacitive_probe(
         messenger,
         do_log=log_sensor_values,
     ):
-        position = await runner.run(can_messenger=messenger)
-        return position[mover][:2]
+        try:
+            position = await runner.run(can_messenger=messenger)
+            return position[mover][:2]
+        except MoveConditionNotMet:
+            raise
 
 
 async def capacitive_pass(
