@@ -67,7 +67,7 @@ async def get_serial(
             base_log.exception("invalid serial")
             if isinstance(Exception, KeyboardInterrupt):
                 raise
-            print(str(e))
+            print("flash_serials_tryerr")
         else:
             base_log.info(
                 f"parsed name {name} model {model} datecode {data!r} from {serial}"
@@ -118,7 +118,7 @@ async def update_serial_and_confirm(
                             and message.payload.serial == fields.SerialField(data)
                         ):
                             base_log.info(f"serial confirmed on attempt {attempt}")
-                            return
+                            return True
                         else:
                             base_log.debug("message relevant serial NOT confirmed")
                     base_log.debug(f"message {type(message)} is not relevant")
@@ -127,6 +127,7 @@ async def update_serial_and_confirm(
                     )
         except asyncio.TimeoutError:
             continue
+    return False
 
 
 async def get_and_update_serial_once(

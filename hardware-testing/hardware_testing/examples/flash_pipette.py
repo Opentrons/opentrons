@@ -34,11 +34,14 @@ async def flash_serials(
         rect = await get_and_update_serial_once(
             messenger, which_pipette, base_log, trace_log
         )
-        if rect != []:
-            print("flash_serials_pass--name:{}, model:{}, data:{}".format(rect[0], rect[1], str(rect[2],"UTF-8")))
-        else:
+        try:
+            if rect != []:
+                print("flash_serials_pass--name:{}, model:{}, data:{}".format(rect[0], rect[1], str(rect[2],"UTF-8")))
+            else:
+                print("flash_serials_err")
+        except:
             print("flash_serials_err")
-        
+            
 async def get_and_update_serial_once(
     messenger: CanMessenger,
     which_pipette: NodeId,
@@ -50,15 +53,18 @@ async def get_and_update_serial_once(
         f'Enter serial for pipette on {which_pipette.name.split("_")[-1]}: ', base_log
     )
     try:
-        await provision_pipette.update_serial_and_confirm(
+        rect = await provision_pipette.update_serial_and_confirm(
             messenger, which_pipette, name, model, data, base_log, trace_log
         )
-        trace_log.info(f"SUCCESS,{name.name},{model},{data!r}")
-        return [name, model, data]
+        if rect:
+            trace_log.info(f"SUCCESS,{name.name},{model},{data!r}")
+            return [name, model, data]
+        else:
+            return []
     except Exception:
         base_log.exception("Update failed")
         trace_log.info(f"FAILURE,{name.name},{model},{data!r}")
-        return [] 
+        raise
 
 async def get_serial(
     prompt: str, base_log: logging.Logger
