@@ -7,7 +7,7 @@ from typing import List, Any
 from system_server._version import version
 from system_server.settings import get_settings
 from system_server.persistence import get_sql_engine, get_persistence_directory
-from system_server.router import router\
+from system_server.router import router
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ app = FastAPI(
     description=(
         "This OpenAPI spec describes the HTTP API of the Opentrons " "System Server."
     ),
-    version=version
+    version=version,
 )
 
 # cors
