@@ -569,9 +569,7 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
 
 
 def test_set_working_pipette_volume(subject: PipetteStore) -> None:
-    """It should set the working volume to the minimum between tip volume and max volume."""
-
-    """It should issue an action to add a pipette config."""
+    """It should set the working volume to the minimum of either tip volume or max volume."""
     subject.handle_action(
         AddPipetteConfigAction(
             pipette_id="pipette-id",
