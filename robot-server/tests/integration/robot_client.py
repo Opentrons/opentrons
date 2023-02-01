@@ -120,12 +120,14 @@ class RobotClient:
 
     async def post_protocol(self, files: List[Path]) -> Response:
         """POST /protocols."""
-        file_payload = []
-        for file in files:
-            file_payload.append(("files", open(file, "rb")))
-        response = await self.httpx_client.post(
-            url=f"{self.base_url}/protocols", files=file_payload
-        )
+        with contextlib.ExitStack() as file_exit_stack:
+            file_payload = [
+                ("files", file_exit_stack.enter_context(path.open("rb")))
+                for path in files
+            ]
+            response = await self.httpx_client.post(
+                url=f"{self.base_url}/protocols", files=file_payload
+            )
         response.raise_for_status()
         return response
 
