@@ -4,6 +4,7 @@ from math import copysign
 from numpy import float64
 from typing import List, Union
 
+from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     create_step,
@@ -69,10 +70,18 @@ async def _move_and_trigger_stop_signal(
         stop = MoveStopCondition.none
     _move_group_nsync = _build_move_group(MOVING_DISTANCE, MOVING_SPEED, stop)
     runner = MoveGroupRunner(move_groups=[[_move_group_nsync]])
-    if not api.is_simulator:
+    if api.is_simulator:
+        # test that the required functionality exists
+        assert runner.run
+        assert OT3Controller.gpio_chardev
+        assert OT3GPIO.activate_nsync_out
+        assert OT3GPIO.deactivate_nsync_out
+        assert OT3GPIO.activate_estop
+        assert OT3GPIO.deactivate_estop
+    else:
         sig_msg = "nsync" if nsync else "estop"
-        backend = api._backend
-        assert isinstance(backend, OT3Controller)
+        backend: OT3Controller = api._backend  # type: ignore[assignment]
+        messenger = backend._messenger
         gpio = backend.gpio_chardev
         if nsync:
             _sig_msg = "nsync"
@@ -95,14 +104,12 @@ async def _move_and_trigger_stop_signal(
 
         async def _do_the_moving() -> None:
             if nsync:
-                await runner.run(can_messenger=backend._messenger)
+                await runner.run(can_messenger=messenger)
             else:
                 try:
-                    await runner.run(can_messenger=backend._messenger)
+                    await runner.run(can_messenger=messenger)
                 except RuntimeError:
                     print("caught runtime error from estop")
-
-
 
         print(f"deactivate {sig_msg}")
         _deactivate()

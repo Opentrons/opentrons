@@ -107,7 +107,7 @@ async def _record_test_status(
     report(section, f"{test}-estimate", estimate)
     report(section, f"{test}-encoder", encoder)
     report(section, f"{test}-aligned", [status.result])
-    print(f"test \"{test}\": {status.result}")
+    print(f'test "{test}": {status.result}')
 
 
 def _move_rel_point_for_axis(axis: OT3Axis, distance: float) -> types.Point:
