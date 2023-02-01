@@ -18,7 +18,7 @@ GANTRY_AXES = [types.OT3Axis.X, types.OT3Axis.Y, types.OT3Axis.Z_L, types.OT3Axi
 
 # NOTE: max travel distances are from EVT robot extents document
 MAX_TRAVEL = {OT3Axis.X: 537.49, OT3Axis.Y: 405.815, OT3Axis.Z_L: 215, OT3Axis.Z_R: 215}
-COLLISION_AVOID_MARGIN = {OT3Axis.X: 2, OT3Axis.Y: 2, OT3Axis.Z_L: 2, OT3Axis.Z_R: 2}
+COLLISION_AVOID_MARGIN = {OT3Axis.X: 0, OT3Axis.Y: 0, OT3Axis.Z_L: 0, OT3Axis.Z_R: 0}
 ALIGNMENT_THRESHOLD_MM = 0.2
 CURRENT_PERCENTAGE = 0.66
 
