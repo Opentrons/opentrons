@@ -4,7 +4,6 @@ from math import copysign
 from numpy import float64
 from typing import List, Union
 
-from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     create_step,
@@ -25,8 +24,9 @@ from hardware_testing.data.csv_report import (
 from hardware_testing.opentrons_api.types import OT3Axis, Point
 
 MOVING_Z_AXIS = OT3Axis.Z_L
-MOVING_SPEED = 10
 MOVING_DISTANCE = 100
+MOVE_SECONDS = 2
+MOVING_SPEED = MOVING_DISTANCE / MOVE_SECONDS
 
 
 def _build_move_group(
@@ -73,34 +73,28 @@ async def _move_and_trigger_stop_signal(
     if api.is_simulator:
         # test that the required functionality exists
         assert runner.run
-        assert OT3Controller.gpio_chardev
-        assert OT3GPIO.activate_nsync_out
-        assert OT3GPIO.deactivate_nsync_out
-        assert OT3GPIO.activate_estop
-        assert OT3GPIO.deactivate_estop
+        # TODO: add estop/nsync functionality once implemented
     else:
         sig_msg = "nsync" if nsync else "estop"
         backend: OT3Controller = api._backend  # type: ignore[assignment]
         messenger = backend._messenger
-        gpio = backend.gpio_chardev
         if nsync:
             _sig_msg = "nsync"
-            _activate = gpio.activate_nsync_out
-            _deactivate = gpio.deactivate_nsync_out
         else:
             _sig_msg = "estop"
-            _activate = gpio.activate_estop
-            _deactivate = gpio.deactivate_estop
 
         async def _sleep_then_active_stop_signal() -> None:
-            print(f"pausing 1 second before activating {_sig_msg}")
-            await asyncio.sleep(1)
+            pause_seconds = MOVE_SECONDS / 2
+            print(
+                f"pausing {round(pause_seconds, 1)} second before activating {_sig_msg}"
+            )
+            await asyncio.sleep(pause_seconds)
             print(f"activating {_sig_msg}")
-            _activate()
+            # TODO: add estop/nsync functionality once implemented
             print(f"pausing 1 second before deactivating {_sig_msg}")
             await asyncio.sleep(1)
             print(f"deactivating {_sig_msg}")
-            _deactivate()
+            # TODO: add estop/nsync functionality once implemented
 
         async def _do_the_moving() -> None:
             if nsync:
@@ -112,7 +106,7 @@ async def _move_and_trigger_stop_signal(
                     print("caught runtime error from estop")
 
         print(f"deactivate {sig_msg}")
-        _deactivate()
+        # TODO: add estop/nsync functionality once implemented
         print("pause 0.5 seconds")
         await asyncio.sleep(0.5)
         move_coro = _do_the_moving()

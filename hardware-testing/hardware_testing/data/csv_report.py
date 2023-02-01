@@ -299,6 +299,7 @@ class CSVReport:
         for s in self._sections[2:]:
             section = self[RESULTS_OVERVIEW_TITLE]
             line = section[s.title]
+            assert isinstance(line, CSVLine)
             line.store(CSVResult.PASS)
             if s.result_passed:
                 result = CSVResult.PASS
