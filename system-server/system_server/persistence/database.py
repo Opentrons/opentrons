@@ -22,7 +22,7 @@ sqlite_rowid = sqlalchemy.column("_ROWID_")
 
 def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
     """Create a SQL engine with tables and migrations."""
-    sql_engine = _open_db_no_cleanup(db_file_path=path)
+    sql_engine = _open_db(db_file_path=path)
 
     try:
         add_tables_to_db(sql_engine)
@@ -33,7 +33,7 @@ def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
     return sql_engine
 
 
-def _open_db_no_cleanup(db_file_path: Path) -> sqlalchemy.engine.Engine:
+def _open_db(db_file_path: Path) -> sqlalchemy.engine.Engine:
     """Create a database engine for performing transactions."""
     engine = sqlalchemy.create_engine(
         # sqlite://<hostname>/<path>
