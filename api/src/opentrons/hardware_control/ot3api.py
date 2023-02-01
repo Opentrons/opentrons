@@ -467,6 +467,7 @@ class OT3API(
             OT3Mount.GRIPPER: self.attached_gripper,
         }
 
+    # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -489,14 +490,22 @@ class OT3API(
             # of simulation and it feels like a lot of work for this function
             # actually be doing.
             found = await self._backend.get_attached_instruments(checked_require)
-        for mount, instrument_data in found.items():
-            if mount == OT3Mount.GRIPPER:
-                await self.cache_gripper(cast(AttachedGripper, instrument_data))
-            else:
-                req_instr_name = checked_require.get(mount, None)
+
+        if OT3Mount.GRIPPER in found.keys():
+            await self.cache_gripper(cast(AttachedGripper, found.get(OT3Mount.GRIPPER)))
+        elif self._gripper_handler.gripper:
+            await self._gripper_handler.reset()
+
+        for pipette_mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            if pipette_mount in found.keys():
+                req_instr_name = checked_require.get(pipette_mount, None)
                 await self.cache_pipette(
-                    mount, cast(OT3AttachedPipette, instrument_data), req_instr_name
+                    pipette_mount,
+                    cast(OT3AttachedPipette, found.get(pipette_mount)),
+                    req_instr_name,
                 )
+            else:
+                self._pipette_handler.hardware_instruments[pipette_mount] = None
 
         await self._backend.probe_network()
         await self._backend.update_motor_status()
