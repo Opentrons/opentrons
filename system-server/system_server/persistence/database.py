@@ -3,6 +3,7 @@ from pathlib import Path
 
 import sqlalchemy
 from .tables import add_tables_to_db
+from .migrations import migrate
 
 
 # A reference to SQLite's built-in ROWID column.
@@ -26,6 +27,7 @@ def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
 
     try:
         add_tables_to_db(sql_engine)
+        migrate(sql_engine)
     except Exception:
         sql_engine.dispose()
         raise

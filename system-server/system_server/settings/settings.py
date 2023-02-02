@@ -44,8 +44,8 @@ class SystemServerSettings(BaseSettings):
     OT_SYSTEM_SERVER_.
     """
 
-    persistence_directory: str = Field(
-        "/var/lib/opentrons-system-server/",
+    persistence_directory: typing.Optional[str] = Field(
+        None,
         description=(
             "A directory for the server to store things persistently across boots."
             " If this directory doesn't already exist, the server will create it."

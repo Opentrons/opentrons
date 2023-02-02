@@ -9,7 +9,7 @@ import sqlalchemy
 
 
 from .database import create_sql_engine
-from .tables import registration_table
+from .tables import registration_table, migration_table
 
 from system_server.app_state import AppState, AppStateAccessor, get_app_state
 from system_server.settings import get_settings
@@ -32,6 +32,11 @@ async def get_persistence_directory(
 
     if persistence_dir is None:
         setting = get_settings().persistence_directory
+        if setting is None:
+            raise RuntimeError(
+                "No persistence path was specified.\n"
+                "Configure a persistence path with OT_SYSTEM_SERVER_persistence_directory"
+            )
         if setting == "automatically_make_temporary":
             # It's bad for this blocking I/O to be in this async function,
             # but we don't have an async mkdtemp().
@@ -73,4 +78,5 @@ __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
     "registration_table",
+    "migration_table",
 ]
