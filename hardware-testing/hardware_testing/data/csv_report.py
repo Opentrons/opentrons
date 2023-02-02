@@ -347,7 +347,7 @@ class CSVReport:
 
     def save_to_disk(self) -> Path:
         """CSV Report save to disk."""
-        if not self._tag:
+        if not self._file_name:
             raise RuntimeError("must set tag of report using `Report.set_tag()`")
         _report_str = str(self)
         assert self._file_name, "must set tag before saving to disk"

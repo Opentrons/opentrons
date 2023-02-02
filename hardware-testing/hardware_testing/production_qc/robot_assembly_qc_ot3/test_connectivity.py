@@ -1,6 +1,6 @@
 """Test Connectivity."""
 import asyncio
-from typing import List, Union
+from typing import List, Union, Optional
 
 from opentrons.drivers.rpi_drivers.usb import USBBus
 from opentrons.hardware_control.ot3api import OT3API
@@ -37,12 +37,78 @@ AUX_PORT_TESTS = [
     "aux-right-door-switch",
 ]
 
+ALLOWED_SECURITY_TYPES = {
+    nmcli.SECURITY_TYPES.NONE.value: nmcli.SECURITY_TYPES.NONE,
+    nmcli.SECURITY_TYPES.WPA_EAP.value: nmcli.SECURITY_TYPES.WPA_EAP,
+    nmcli.SECURITY_TYPES.WPA_PSK.value: nmcli.SECURITY_TYPES.WPA_PSK
+}
+
 
 def _count_usb_listings(api: OT3API) -> int:
     board_rev = api._backend.board_revision
     ports = USBBus(board_rev)._read_bus()
     ports_len = len(ports)
     return max(ports_len - USB_READ_BUS_LENGTH_NO_CONNECTION, 0)
+
+
+async def _test_wifi(report: CSVReport, section: str) -> None:
+    ssid = ""
+    password: Optional[str] = None
+    result = CSVResult.FAIL
+
+    def _finish() -> None:
+        print(f"wifi connected: {result}")
+        report(section, "wifi", [ssid, password, wifi_ip, result])
+
+    wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
+    wifi_ip = wifi_status["ipAddress"]
+    if wifi_ip:
+        result = CSVResult.PASS
+        return _finish()
+
+    print("scanning wifi networks...")
+    ssids = await nmcli.available_ssids()
+    if not ssids:
+        print("no ssids found")
+        return _finish()
+    checked_ssids = [
+        s
+        for s in ssids
+        if s["securityType"] in list(ALLOWED_SECURITY_TYPES.keys())
+    ]
+    if not checked_ssids:
+        print("no ssids found with compatible security types")
+        return _finish()
+    # get just the first x10 names, removing repetitions
+    ssid_names_list: List[str] = list()
+    for s in checked_ssids:
+        if s["ssid"] not in ssid_names_list:
+            ssid_names_list.append(s["ssid"])
+    print("found wifi networks:")
+    for i, n in enumerate(ssid_names_list[:10]):
+        print(f"\t{i + 1}: {n}")
+    res = input("select wifi number: ")
+    try:
+        ssid = ssid_names_list[int(res) - 1]
+        print(f"\"{ssid}\"")
+    except (ValueError, KeyError) as e:
+        print(e)
+        _finish()
+    found_ssids = [s for s in ssids if ssid == s["ssid"]]
+    ssid_info = found_ssids[0]
+    sec = ALLOWED_SECURITY_TYPES[ssid_info["securityType"]]
+    if sec != nmcli.SECURITY_TYPES.NONE:
+        password = input("enter wifi password: ")
+    try:
+        print("connecting...")
+        await nmcli.configure(ssid, sec, psk=password)
+    except ValueError as e:
+        print(e)
+        return _finish()
+    wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
+    wifi_ip = wifi_status["ipAddress"]
+    result = CSVResult.from_bool(bool(wifi_ip))
+    return _finish()
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -79,26 +145,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # WIFI
     if not api.is_simulator:
-        wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
-        wifi_ip = wifi_status["ipAddress"]
-        if wifi_ip:
-            print("wifi already connected: PASS")
-            result = CSVResult.PASS
-            report(section, "wifi", ["", "", wifi_ip, result])
-        else:
-            ssid = input("enter wifi ssid: ")
-            password = input("enter wifi password: ")
-            await nmcli.wifi_disconnect(ssid)
-            res = await nmcli.configure(
-                ssid, nmcli.SECURITY_TYPES.WPA_EAP, psk=password
-            )
-            if not res[0]:
-                result = CSVResult.FAIL
-            else:
-                result = CSVResult.PASS
-                wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
-                wifi_ip = wifi_status["ipAddress"]
-            report(section, "wifi", [ssid, password, wifi_ip, result])
+        await _test_wifi(report, section)
     else:
         report(section, "wifi", ["", "", "0.0.0.0", CSVResult.PASS])
         assert nmcli.iface_info
@@ -133,7 +180,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         print("unplug all USB devices")
         while not api.is_simulator and await _is_usb_device_connected():
             await asyncio.sleep(0.5)
-        print(f"[{tag}] connect a USB device (waiting...)")
+        print(f"[{tag}] connect a USB device (waiting {USB_WAIT_TIMEOUT_SECONDS} seconds...)")
         result = CSVResult.from_bool(await _is_usb_device_connected(wait=True))
         print(f"{tag}: {result}")
         report(section, tag, [result])
