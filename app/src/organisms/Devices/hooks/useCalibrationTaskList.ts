@@ -93,6 +93,10 @@ export function useCalibrationTaskList(
     deckTask.description = t('start_with_deck_calibration')
     deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
     deckTask.markedBad = deckCalibrationData !== undefined
+    deckTask.footer =
+      deckCalibrationData !== undefined
+        ? t('calibration_recommended')
+        : undefined
   }
 
   taskList.taskList.push(deckTask)
@@ -191,7 +195,7 @@ export function useCalibrationTaskList(
         pipetteTask.subTasks.push(tipLengthSubTask)
         pipetteTask.subTasks.push(offsetSubTask)
 
-        pipetteTask.markedBad = pipetteTask.subTasks.every(st => st.markedBad)
+        pipetteTask.markedBad = pipetteTask.subTasks.some(st => st.markedBad)
 
         taskList.taskList.push(pipetteTask)
 
@@ -223,6 +227,10 @@ export function useCalibrationTaskList(
               }),
           }
           tipLengthSubTask.markedBad = tipLengthCalForPipette !== undefined
+          tipLengthSubTask.footer =
+            tipLengthCalForPipette !== undefined
+              ? t('calibration_recommended')
+              : undefined
         } else {
           // the tip length calibration is present and valid
           tipLengthSubTask.footer = t('robot_calibration:last_completed_on', {
@@ -262,6 +270,10 @@ export function useCalibrationTaskList(
               }),
           }
           offsetSubTask.markedBad = offsetCalForPipette !== undefined
+          offsetSubTask.footer =
+            offsetCalForPipette !== undefined
+              ? t('calibration_recommended')
+              : undefined
         } else {
           // the offset calibration is present and valid
           offsetSubTask.footer = t('robot_calibration:last_completed_on', {
@@ -282,7 +294,7 @@ export function useCalibrationTaskList(
         pipetteTask.subTasks.push(tipLengthSubTask)
         pipetteTask.subTasks.push(offsetSubTask)
 
-        pipetteTask.markedBad = pipetteTask.subTasks.every(st => st.markedBad)
+        pipetteTask.markedBad = pipetteTask.subTasks.some(st => st.markedBad)
 
         taskList.taskList.push(pipetteTask)
 

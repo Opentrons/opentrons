@@ -51,6 +51,14 @@ export const mockSingleAttachedPipetteResponse: AttachedPipettesByMount = {
   right: null,
 }
 
+export const mockBadDeckCalibration = {
+  isDeckCalibrated: false,
+  deckCalibrationData: {
+    lastModified: '2022-01-01T12:00:00.000000+00:00',
+  } as DeckCalibrationInfo,
+  markedBad: true,
+}
+
 export const mockCompleteDeckCalibration = {
   isDeckCalibrated: true,
   deckCalibrationData: {
@@ -62,6 +70,27 @@ export const mockIncompleteDeckCalibration = {
   isDeckCalibrated: false,
   deckCalibrationData: null,
 }
+
+export const mockBadTipLengthCalibrations: TipLengthCalibration[] = [
+  {
+    tipLength: 0,
+    lastModified: '2022-01-02T12:00:00.000000+00:00',
+    tiprack: 'test_tip_rack',
+    pipette: 'test-left',
+    source: 'user',
+    status: { markedBad: true, source: null, markedAt: null },
+    id: 'test-tip-length-id-1',
+  },
+  {
+    tipLength: 0,
+    lastModified: '2022-01-03T12:00:00.000000+00:00',
+    tiprack: 'test_tip_rack',
+    pipette: 'test-right',
+    source: 'user',
+    status: { markedBad: true, source: null, markedAt: null },
+    id: 'test-tip-length-id-2',
+  },
+]
 
 export const mockCompleteTipLengthCalibrations: TipLengthCalibration[] = [
   {
@@ -93,6 +122,31 @@ export const mockIncompleteTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: false, source: null, markedAt: null },
     id: 'test-tip-length-id-2',
+  },
+]
+
+export const mockBadPipetteOffsetCalibrations: PipetteOffsetCalibration[] = [
+  {
+    pipette: 'test-left',
+    mount: 'left',
+    offset: [0, 0, 0],
+    tiprack: 'test-tip-rack',
+    tiprackUri: 'test/tiprack/uri',
+    lastModified: '2022-01-04T12:00:00,000000+00:00',
+    source: 'user',
+    status: { markedBad: true, markedAt: null, source: null },
+    id: 'test-offset-id-1',
+  },
+  {
+    pipette: 'test-right',
+    mount: 'right',
+    offset: [0, 0, 0],
+    tiprack: 'test-tip-rack',
+    tiprackUri: 'test/tiprack/uri',
+    lastModified: '2022-01-05T12:00:00,000000+00:00',
+    source: 'user',
+    status: { markedBad: true, markedAt: null, source: null },
+    id: 'test-offset-id-2',
   },
 ]
 

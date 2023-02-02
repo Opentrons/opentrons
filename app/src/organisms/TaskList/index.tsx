@@ -233,15 +233,15 @@ function SubTask({
             flexDirection={DIRECTION_ROW}
             gridGap={SPACING.spacing3}
           >
-            {markedBad === true &&
+            {markedBad === true && (
               <Icon
-                name='alert-circle'
+                name="alert-circle"
                 backgroundColor={COLORS.warningBackgroundLight}
                 color={COLORS.warningEnabled}
-                height='1rem'
+                height="1rem"
                 aria-label={`icon_warning`}
               />
-            }
+            )}
             {title}
           </Flex>
         </StyledText>
@@ -253,15 +253,15 @@ function SubTask({
               flexDirection={DIRECTION_ROW}
               gridGap={SPACING.spacing3}
             >
-              {markedBad === true &&
+              {markedBad === true && (
                 <Icon
-                  name='alert-circle'
+                  name="alert-circle"
                   backgroundColor={COLORS.warningBackgroundLight}
                   color={COLORS.warningEnabled}
-                  height='1rem'
+                  height="1rem"
                   aria-label={`icon_warning`}
                 />
-              }
+              )}
               {footer}
             </Flex>
           </StyledText>
@@ -349,15 +349,15 @@ function Task({
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing3}
               >
-                {markedBad === true &&
+                {markedBad === true && (
                   <Icon
-                    name='alert-circle'
+                    name="alert-circle"
                     backgroundColor={COLORS.warningBackgroundLight}
                     color={COLORS.warningEnabled}
-                    height='1rem'
+                    height="1rem"
                     aria-label={`icon_warning`}
                   />
-                }
+                )}
                 {title}
               </Flex>
             </StyledText>
@@ -369,15 +369,15 @@ function Task({
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing3}
                 >
-                  {markedBad === true &&
+                  {markedBad === true && (
                     <Icon
-                      name='alert-circle'
+                      name="alert-circle"
                       backgroundColor={COLORS.warningBackgroundLight}
                       color={COLORS.warningEnabled}
-                      height='1rem'
+                      height="1rem"
                       aria-label={`icon_warning`}
                     />
-                  }
+                  )}
                   {footer}
                 </Flex>
               </StyledText>
