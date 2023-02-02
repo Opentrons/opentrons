@@ -215,5 +215,6 @@
   "display_brightness": "Display Brightness",
   "display_text_size": "Display Text Size",
   "device_reset": "Device Reset",
-  "not_connected": "Not connected"
+  "not_connected": "Not connected",
+  "connected_via": "Connected via {{networkInterface}}"
 }

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Flex,
@@ -17,35 +16,27 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Chip } from '../../atoms/Chip'
-import {
-  fetchStatus,
-  fetchWifiList,
-  getNetworkInterfaces,
-  getWifiList,
-} from '../../redux/networking'
 
 import type { IconName } from '@opentrons/components'
-import type { Dispatch, State } from '../../redux/types'
 import type { RenderContentType } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { NetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
 
 interface NetworkSettingsProps {
-  robotName: string
+  networkConnection: NetworkConnection
   setRenderContent: (renderContentType: RenderContentType) => void
 }
 
 export function NetworkSettings({
-  robotName,
+  networkConnection,
   setRenderContent,
 }: NetworkSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
-  const list = useSelector((state: State) => getWifiList(state, robotName))
-  const { wifi, ethernet } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
-  const activeNetwork = list.find(nw => nw.active)
-  const isWifiConnected = wifi?.ipAddress != null
-  const isEthernetConnected = ethernet?.ipAddress != null
+  const {
+    isWifiConnected,
+    isEthernetConnected,
+    isUsbConnected,
+    activeSsid,
+  } = networkConnection
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
     isConnected ? COLORS.successBackgroundMed : COLORS.medGreyEnabled
@@ -58,11 +49,6 @@ export function NetworkSettings({
 
   const handleChipIconColor = (isConnected: boolean): string =>
     isConnected ? COLORS.successEnabled : COLORS.successDisabled
-
-  React.useEffect(() => {
-    dispatch(fetchStatus(robotName))
-    dispatch(fetchWifiList(robotName))
-  }, [])
 
   return (
     <>
@@ -93,7 +79,7 @@ export function NetworkSettings({
           chipTextColor={handleChipTextColor(isWifiConnected)}
           chipIconName="ot-check"
           chipIconColor={handleChipIconColor(isWifiConnected)}
-          networkName={activeNetwork?.ssid}
+          networkName={activeSsid}
         />
         {/* ethernet */}
         <NetworkSettingButton
@@ -110,12 +96,12 @@ export function NetworkSettings({
         {/* usb hard-coded */}
         <NetworkSettingButton
           buttonTitle={t('usb')}
-          buttonBackgroundColor={handleButtonBackgroundColor(false)}
+          buttonBackgroundColor={handleButtonBackgroundColor(isUsbConnected)}
           iconName="usb"
-          chipText={handleChipText(false)}
-          chipTextColor={handleChipTextColor(false)}
+          chipText={handleChipText(isUsbConnected)}
+          chipTextColor={handleChipTextColor(isUsbConnected)}
           chipIconName="ot-check"
-          chipIconColor={handleChipIconColor(false)}
+          chipIconColor={handleChipIconColor(isUsbConnected)}
         />
       </Flex>
     </>

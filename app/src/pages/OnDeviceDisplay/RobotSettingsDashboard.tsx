@@ -25,6 +25,7 @@ import { getLocalRobot } from '../../redux/discovery'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { NetworkSettings } from '../../organisms/RobotSettingsDashboard/NetworkSettings'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import { useNetworkConnection } from './hooks'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -48,6 +49,7 @@ export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const networkConnection = useNetworkConnection(robotName)
   const [renderContent, setRenderContent] = React.useState<RenderContentType>(
     null
   )
@@ -57,7 +59,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       case 'networkSettings':
         return (
           <NetworkSettings
-            robotName={robotName}
+            networkConnection={networkConnection}
             setRenderContent={setRenderContent}
           />
         )
@@ -95,7 +97,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           {/* Network Settings */}
           <RobotSettingButton
             settingName={t('network_settings')}
-            settingInfo={'Not connected'}
+            settingInfo={networkConnection.connectionStatus}
             renderContent={'networkSettings'}
             setRenderContent={setRenderContent}
           />
