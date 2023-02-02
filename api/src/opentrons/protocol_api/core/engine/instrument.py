@@ -66,7 +66,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def aspirate(
         self,
-        location: Location,
+        location: Optional[Location],
         well_core: Optional[WellCore],
         volume: float,
         rate: float,
@@ -80,30 +80,29 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to aspirate at.
         """
-        if well_core is None:
-            raise NotImplementedError(
-                "InstrumentCore.aspirate with well_core value of None not implemented"
+        if well_core is None and location is None:
+            self._engine_client.aspirate_in_place(pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate)
+
+        else:
+            well_name = well_core.get_name()
+            labware_id = well_core.labware_id
+
+            well_location = self._engine_client.state.geometry.get_relative_well_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                absolute_point=location.point,
             )
 
-        well_name = well_core.get_name()
-        labware_id = well_core.labware_id
+            self._engine_client.aspirate(
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=well_location,
+                volume=volume,
+                flow_rate=flow_rate,
+            )
 
-        well_location = self._engine_client.state.geometry.get_relative_well_location(
-            labware_id=labware_id,
-            well_name=well_name,
-            absolute_point=location.point,
-        )
-
-        self._engine_client.aspirate(
-            pipette_id=self._pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            volume=volume,
-            flow_rate=flow_rate,
-        )
-
-        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+            self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def dispense(
         self,

@@ -307,6 +307,24 @@ def test_aspirate_from_well(
     )
 
 
+def test_aspirate_in_place(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should aspirate in place."""
+    subject.aspirate(volume=12.34, rate=5.6, flow_rate=7.8, well_core=None, location=None)
+
+    decoy.verify(
+        mock_engine_client.aspirate_in_place(
+            pipette_id="abc123",
+            volume=12.34,
+            flow_rate=7.8,
+        ),
+    )
+
+
 def test_blow_out_to_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
