@@ -143,12 +143,10 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
         skip = "skip" in inp
     if not skip:
         for tag in USB_PORTS_TO_TEST:
-            print("unplug all USB devices")
             while not api.is_simulator and await _is_usb_device_connected():
-                await asyncio.sleep(0.5)
-            print(
-                f"[{tag}] connect a USB device (waiting {USB_WAIT_TIMEOUT_SECONDS} seconds...)"
-            )
+                input("unplug all USB devices, press ENTER when ready")
+            if not api.is_simulator:
+                input(f"[{tag}] connect a USB device, press ENTER when ready)")
             result = CSVResult.from_bool(await _is_usb_device_connected(wait=True))
             print(f"{tag}: {result}")
             report(section, tag, [result])

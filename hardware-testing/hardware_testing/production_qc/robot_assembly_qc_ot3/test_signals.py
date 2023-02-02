@@ -137,8 +137,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         else:
             if not api.is_simulator and "external" in sig_name:
                 input(f"connect {sig_name.upper()}, press ENTER when ready:")
-                print("HIT the E-STOP...")
+                print("gantry will now start moving, get ready to hit the E-STOP")
+                input("press ENTER when ready:")
             await _move_and_interrupt_with_signal(api, sig_name)
+            if not api.is_simulator and "external" in sig_name:
+                input("release the E-STOP, press ENTER when ready:")
         stop_pos = await api.gantry_position(mount)
         report(
             section,
