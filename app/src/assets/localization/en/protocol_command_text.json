@@ -42,5 +42,6 @@
   "slot": "Slot {{slot_name}}",
   "module_in_slot": "{{module}} in Slot {{slot_name}}",
   "module_in_slot_plural": "{{module}}",
-  "fixed_trash": "Fixed Trash"
+  "fixed_trash": "Fixed Trash",
+  "off_deck": "off deck"
 }

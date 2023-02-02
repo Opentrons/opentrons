@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getModuleDisplayName,
@@ -20,7 +21,6 @@ import {
   getModuleDisplayLocation,
   getLiquidDisplayName,
 } from './utils'
-import { StyledText } from '../../atoms/text'
 
 interface LoadCommandTextProps {
   command: RunTimeCommand
@@ -30,7 +30,7 @@ interface LoadCommandTextProps {
 export const LoadCommandText = ({
   command,
   robotSideAnalysis,
-}: LoadCommandTextProps): JSX.Element => {
+}: LoadCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('run_details')
 
   switch (command.commandType) {
@@ -107,7 +107,7 @@ export const LoadCommandText = ({
         'LoadCommandText encountered a command with an unrecognized commandType: ',
         command
       )
-      return <span>{command.commandType}</span>
+      return null
     }
   }
 }

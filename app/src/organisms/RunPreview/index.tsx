@@ -116,10 +116,11 @@ export const RunPreview = React.forwardRef(
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing2}
                 width="100%"
-                border={`solid 1px ${index === jumpedIndex
+                border={`solid 1px ${
+                  index === jumpedIndex
                     ? COLORS.blueEnabled
                     : COLORS.transparent
-                  }`}
+                }`}
                 backgroundColor={
                   index === jumpedIndex
                     ? COLORS.lightBlue
@@ -165,4 +166,3 @@ export const RunPreview = React.forwardRef(
     )
   }
 )
-

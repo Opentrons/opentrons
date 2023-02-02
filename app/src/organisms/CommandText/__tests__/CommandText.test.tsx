@@ -764,4 +764,116 @@ describe('CommandText', () => {
       'custom: {"thunderBolts":true,"lightning":"yup","veryVeryFrightening":1}'
     )
   })
+  it('renders correct text for move labware manually off deck', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'moveLabware',
+          params: {
+            strategy: 'manualMoveWithPause',
+            labwareId: mockRobotSideAnalysis.labware[2].id,
+            newLocation: 'offDeck',
+          },
+          id: 'def456',
+          result: { offsetId: 'fake_offset_id' },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText(
+      'Manually move Opentrons 96 Tip Rack 300 µL from Slot 9 to off deck'
+    )
+  })
+  it('renders correct text for move labware manually to module', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'moveLabware',
+          params: {
+            strategy: 'manualMoveWithPause',
+            labwareId: mockRobotSideAnalysis.labware[3].id,
+            newLocation: { moduleId: mockRobotSideAnalysis.modules[0].id },
+          },
+          id: 'def456',
+          result: { offsetId: 'fake_offset_id' },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText(
+      'Manually move NEST 96 Well Plate 100 µL PCR Full Skirt (1) from Magnetic Module GEN2 in Slot 1 to Magnetic Module GEN2 in Slot 1'
+    )
+  })
+  it('renders correct text for move labware with gripper off deck', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'moveLabware',
+          params: {
+            strategy: 'usingGripper',
+            labwareId: mockRobotSideAnalysis.labware[2].id,
+            newLocation: 'offDeck',
+          },
+          id: 'def456',
+          result: { offsetId: 'fake_offset_id' },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText(
+      'Moving Opentrons 96 Tip Rack 300 µL using gripper from Slot 9 to off deck'
+    )
+  })
+  it('renders correct text for move labware with gripper to module', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'moveLabware',
+          params: {
+            strategy: 'usingGripper',
+            labwareId: mockRobotSideAnalysis.labware[3].id,
+            newLocation: { moduleId: mockRobotSideAnalysis.modules[0].id },
+          },
+          id: 'def456',
+          result: { offsetId: 'fake_offset_id' },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText(
+      'Moving NEST 96 Well Plate 100 µL PCR Full Skirt (1) using gripper from Magnetic Module GEN2 in Slot 1 to Magnetic Module GEN2 in Slot 1'
+    )
+  })
 })

@@ -14,7 +14,10 @@ interface CommandIconProps {
 export function CommandIcon(props: CommandIconProps) {
   const { command } = props
   let iconName = null
-  if (command.commandType === 'moveLabware' && command.params.strategy === 'manualMoveWithPause') {
+  if (
+    command.commandType === 'moveLabware' &&
+    command.params.strategy === 'manualMoveWithPause'
+  ) {
     iconName = 'pause-circle' as IconName
   } else {
     iconName = ICON_BY_COMMAND_TYPE[command.commandType] ?? null

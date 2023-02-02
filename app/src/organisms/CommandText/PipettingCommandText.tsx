@@ -1,14 +1,26 @@
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { getLabwareName } from './utils'
-import { LabwareDisplayLocation } from './LabwareDisplayLocation'
-
+import { getLabwareName, getLabwareDisplayLocation } from './utils'
 import type {
-  RunTimeCommand,
   CompletedProtocolAnalysis,
+  AspirateRunTimeCommand,
+  DispenseRunTimeCommand,
+  BlowoutRunTimeCommand,
+  MoveToWellRunTimeCommand,
+  DropTipRunTimeCommand,
+  PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
+import { getLoadedLabware } from './utils/accessors'
 
+type PipettingRunTimeCommmand =
+  | AspirateRunTimeCommand
+  | DispenseRunTimeCommand
+  | BlowoutRunTimeCommand
+  | MoveToWellRunTimeCommand
+  | DropTipRunTimeCommand
+  | PickUpTipRunTimeCommand
 interface PipettingCommandTextProps {
-  command: RunTimeCommand
+  command: PipettingRunTimeCommmand
   robotSideAnalysis: CompletedProtocolAnalysis
 }
 
@@ -18,84 +30,62 @@ export const PipettingCommandText = ({
 }: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
+  const { labwareId, wellName } = command.params
+  const labwareLocation = getLoadedLabware(robotSideAnalysis, labwareId)
+    ?.location
+  const displayLocation =
+    labwareLocation != null
+      ? getLabwareDisplayLocation(robotSideAnalysis, labwareLocation, t)
+      : ''
   switch (command.commandType) {
     case 'aspirate': {
-      const { wellName, labwareId, volume, flowRate } = command.params
+      const { volume, flowRate } = command.params
       return t('aspirate', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: (
-          <LabwareDisplayLocation
-            {...{ robotSideAnalysis, labwareId }}
-          />
-        ),
+        labware_location: displayLocation,
         volume: volume,
         flow_rate: flowRate,
       })
     }
     case 'dispense': {
-      const { wellName, labwareId, volume, flowRate } = command.params
+      const { volume, flowRate } = command.params
       return t('dispense', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: (
-          <LabwareDisplayLocation
-            {...{ robotSideAnalysis, labwareId }}
-          />
-        ),
+        labware_location: displayLocation,
         volume: volume,
         flow_rate: flowRate,
       })
     }
     case 'blowout': {
-      const { wellName, labwareId, flowRate } = command.params
+      const { flowRate } = command.params
       return t('blowout', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: (
-          <LabwareDisplayLocation
-            {...{ robotSideAnalysis, labwareId }}
-          />
-        ),
+        labware_location: displayLocation,
         flow_rate: flowRate,
       })
     }
     case 'moveToWell': {
-      const { wellName, labwareId } = command.params
-
       return t('move_to_well', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: (
-          <LabwareDisplayLocation
-            {...{ robotSideAnalysis, labwareId }}
-          />
-        ),
+        labware_location: displayLocation,
       })
     }
     case 'dropTip': {
-      const { wellName, labwareId } = command.params
-
       return t('drop_tip', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: (
-          <LabwareDisplayLocation
-            {...{ robotSideAnalysis, labwareId }}
-          />
-        ),
+        labware_location: displayLocation,
       })
     }
     case 'pickUpTip': {
-      const { wellName, labwareId } = command.params
       return t('pickup_tip', {
         well_name: wellName,
         labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: (
-          <LabwareDisplayLocation
-            {...{ robotSideAnalysis, labwareId }}
-          />
-        ),
+        labware_location: displayLocation,
       })
     }
     default: {
@@ -103,7 +93,7 @@ export const PipettingCommandText = ({
         'PipettingCommandText encountered a command with an unrecognized commandType: ',
         command
       )
-      return <span>{command.commandType}</span>
+      return null
     }
   }
 }
