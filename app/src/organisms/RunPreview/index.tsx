@@ -25,6 +25,7 @@ import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
 import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
+import { CommandIcon } from './CommandIcon'
 
 const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
   delay: 'pause-circle',
@@ -115,11 +116,10 @@ export const RunPreview = React.forwardRef(
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing2}
                 width="100%"
-                border={`solid 1px ${
-                  index === jumpedIndex
+                border={`solid 1px ${index === jumpedIndex
                     ? COLORS.blueEnabled
                     : COLORS.transparent
-                }`}
+                  }`}
                 backgroundColor={
                   index === jumpedIndex
                     ? COLORS.lightBlue
@@ -134,13 +134,7 @@ export const RunPreview = React.forwardRef(
                 `}
               >
                 <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-                  {command.commandType in ICON_BY_COMMAND_TYPE ? (
-                    <Icon
-                      name={ICON_BY_COMMAND_TYPE[command.commandType]}
-                      size={SPACING.spacingM}
-                      flex="0 0 auto"
-                    />
-                  ) : null}
+                  <CommandIcon command={command} />
                   <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
@@ -171,3 +165,4 @@ export const RunPreview = React.forwardRef(
     )
   }
 )
+

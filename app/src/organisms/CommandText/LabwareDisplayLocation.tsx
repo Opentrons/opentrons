@@ -1,4 +1,3 @@
-import { getLoadedLabware } from './accessors'
 import {
   CompletedProtocolAnalysis,
   getModuleDisplayName,
@@ -6,16 +5,22 @@ import {
   getOccludedSlotCountForModule,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
-import { TFunction } from 'react-i18next'
-import { getModuleDisplayLocation } from './getModuleDisplayLocation'
-import { getModuleModel } from './getModuleModel'
+import { useTranslation } from 'react-i18next'
+import { getLoadedLabware } from './utils/accessors'
+import { getModuleDisplayLocation } from './utils/getModuleDisplayLocation'
+import { getModuleModel } from './utils/getModuleModel'
 
-export function getLabwareDisplayLocation(
-  analysis: CompletedProtocolAnalysis,
-  labwareId: string,
-  t: TFunction
-): string {
-  const loadedLabware = getLoadedLabware(analysis, labwareId)
+interface LabwareDisplayLocationProps {
+  robotSideAnalysis: CompletedProtocolAnalysis
+  labwareId: string
+}
+
+export function LabwareDisplayLocation(
+  props: LabwareDisplayLocationProps
+): JSX.Element | null {
+  const { t } = useTranslation('protocol_command_text')
+  const { robotSideAnalysis, labwareId } = props
+  const loadedLabware = getLoadedLabware(robotSideAnalysis, labwareId)
 
   if (loadedLabware == null || loadedLabware.location === 'offDeck') {
     return t('off_deck')
@@ -23,26 +28,30 @@ export function getLabwareDisplayLocation(
     return t('slot', { slot_name: loadedLabware.location.slotName })
   } else if ('moduleId' in loadedLabware.location) {
     const moduleModel = getModuleModel(
-      analysis,
+      robotSideAnalysis,
       loadedLabware.location.moduleId
     )
     if (moduleModel == null) {
       console.warn('labware is located on an unknown module model')
-      return ''
+      return null
     }
     const occludedSlotCount = getOccludedSlotCountForModule(
       getModuleType(moduleModel),
-      analysis.robotType ?? OT2_STANDARD_MODEL
+      robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
     )
     return t('module_in_slot', {
       count: occludedSlotCount,
       module: getModuleDisplayName(moduleModel),
       slot_name: getModuleDisplayLocation(
-        analysis,
+        robotSideAnalysis,
         loadedLabware.location.moduleId
       ),
     })
   } else {
-    return ''
+    console.warn(
+      'display location could not be established for labware with id: ',
+      labwareId
+    )
+    return null
   }
 }

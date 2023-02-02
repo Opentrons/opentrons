@@ -1,5 +1,3 @@
-// @ts-nocheck
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getModuleDisplayName,
@@ -10,8 +8,6 @@ import {
   getPipetteNameSpecs,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data/js'
-
-import { StyledText } from '../../atoms/text'
 
 import type {
   RunTimeCommand,
@@ -24,6 +20,7 @@ import {
   getModuleDisplayLocation,
   getLiquidDisplayName,
 } from './utils'
+import { StyledText } from '../../atoms/text'
 
 interface LoadCommandTextProps {
   command: RunTimeCommand
@@ -33,10 +30,8 @@ interface LoadCommandTextProps {
 export const LoadCommandText = ({
   command,
   robotSideAnalysis,
-}: LoadCommandTextProps): JSX.Element | null => {
+}: LoadCommandTextProps): JSX.Element => {
   const { t } = useTranslation('run_details')
-
-  let commandText
 
   switch (command.commandType) {
     case 'loadPipette': {
@@ -44,31 +39,24 @@ export const LoadCommandText = ({
         robotSideAnalysis,
         command.params.mount
       )
-      commandText = t('load_pipette_protocol_setup', {
+      return t('load_pipette_protocol_setup', {
         pipette_name:
           pipetteModel != null
             ? getPipetteNameSpecs(pipetteModel)?.displayName ?? ''
             : '',
         mount_name: command.params.mount === 'left' ? t('left') : t('right'),
       })
-      break
     }
     case 'loadModule': {
       const occludedSlotCount = getOccludedSlotCountForModule(
-        getModuleType(
-          command.params.model,
-          robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
-        )
+        getModuleType(command.params.model),
+        robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
       )
-      commandText = t('load_module_protocol_setup', {
+      return t('load_module_protocol_setup', {
         count: occludedSlotCount,
         module: getModuleDisplayName(command.params.model),
-        slot_name:
-          command.params.location === 'offDeck'
-            ? t('off_deck')
-            : command.params.location?.slotName,
+        slot_name: command.params.location.slotName,
       })
-      break
     }
     case 'loadLabware': {
       if (
@@ -82,8 +70,14 @@ export const LoadCommandText = ({
         const moduleName =
           moduleModel != null ? getModuleDisplayName(moduleModel) : ''
 
-        commandText = t('load_labware_info_protocol_setup', {
-          count: getOccludedSlotCountForModule(getModuleType(moduleModel)),
+        return t('load_labware_info_protocol_setup', {
+          count:
+            moduleModel != null
+              ? getOccludedSlotCountForModule(
+                  getModuleType(moduleModel),
+                  robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
+                )
+              : 1,
           labware: command.result?.definition.metadata.displayName,
           slot_name: getModuleDisplayLocation(
             robotSideAnalysis,
@@ -93,25 +87,27 @@ export const LoadCommandText = ({
         })
       } else {
         const labware = command.result?.definition.metadata.displayName
-        commandText =
-          command.params.location === 'offDeck'
-            ? t('load_labware_info_protocol_setup_off_deck', { labware })
-            : t('load_labware_info_protocol_setup_no_module', {
-                labware,
-                slot_name: command.params.location?.slotName,
-              })
+        return command.params.location === 'offDeck'
+          ? t('load_labware_info_protocol_setup_off_deck', { labware })
+          : t('load_labware_info_protocol_setup_no_module', {
+              labware,
+              slot_name: command.params.location?.slotName,
+            })
       }
-      break
     }
     case 'loadLiquid': {
       const { liquidId, labwareId } = command.params
-      commandText = t('load_liquids_info_protocol_setup', {
+      return t('load_liquids_info_protocol_setup', {
         liquid: getLiquidDisplayName(robotSideAnalysis, liquidId),
         labware: getLabwareName(robotSideAnalysis, labwareId),
       })
-      break
+    }
+    default: {
+      console.warn(
+        'LoadCommandText encountered a command with an unrecognized commandType: ',
+        command
+      )
+      return <span>{command.commandType}</span>
     }
   }
-
-  return commandText
 }

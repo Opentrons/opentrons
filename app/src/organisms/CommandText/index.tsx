@@ -3,18 +3,17 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { LoadCommandText } from './LoadCommandText'
 import { PipettingCommandText } from './PipettingCommandText'
+import { TemperatureCommandText } from './TemperatureCommandText'
+import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
-import { TemperatureCommandText } from './TemperatureCommandText'
 
 const SIMPLE_T_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
@@ -130,6 +129,13 @@ export function CommandText(props: Props): JSX.Element | null {
         <StyledText as="p">{t('move_to_coordinates', coordinates)}</StyledText>
       )
     }
+    case 'moveLabware': {
+      return (
+        <StyledText as="p">
+          <MoveLabwareCommandText {...{ command, robotSideAnalysis }} />
+        </StyledText>
+      )
+    }
     case 'touchTip':
     case 'home':
     case 'savePosition':
@@ -211,7 +217,7 @@ export function CommandText(props: Props): JSX.Element | null {
     }
     default: {
       console.warn(
-        'Analysis Step Text encountered a command with an unrecognized commandType: ',
+        'CommandText encountered a command with an unrecognized commandType: ',
         command
       )
       return <StyledText as="p">{JSON.stringify(command)}</StyledText>

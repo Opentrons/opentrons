@@ -33,6 +33,8 @@
   "move_to_well": "Moving to well {{well_name}} of {{labware}} in {{labware_location}}",
   "move_relative": "Moving {{distance}} mm along {{axis}} axis",
   "move_to_coordinates": "Moving to (X: {{x}}, Y: {{y}}, Z: {{z}})",
+  "move_labware_using_gripper": "Moving {{labware}} using gripper from {{old_location}} to {{new_location}}",
+  "move_labware_manually": "Manually move {{labware}} from {{old_location}} to {{new_location}}",
   "home_gantry": "Homing all gantry, pipette, and plunger axes",
   "save_position": "Saving position",
   "comment": "Comment",

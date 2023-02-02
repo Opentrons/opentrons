@@ -1,30 +1,27 @@
-// @ts-nocheck
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   TemperatureModuleAwaitTemperatureCreateCommand,
   TemperatureModuleSetTargetTemperatureCreateCommand,
-  ThermocyclerSetTargetBlockTemperatureCreateCommand,
-  ThermocyclerSetTargetLidTemperatureCreateCommand,
+  TCSetTargetBlockTemperatureCreateCommand,
+  TCSetTargetLidTemperatureCreateCommand,
   HeaterShakerSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-
-interface TemperatureCommandTextProps {
-  command: RunTimeCommand
-}
 
 type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand
   | TemperatureModuleAwaitTemperatureCreateCommand
-  | ThermocyclerSetTargetBlockTemperatureCreateCommand
-  | ThermocyclerSetTargetLidTemperatureCreateCommand
+  | TCSetTargetBlockTemperatureCreateCommand
+  | TCSetTargetLidTemperatureCreateCommand
   | HeaterShakerSetTargetTemperatureCreateCommand
 
+interface TemperatureCommandTextProps {
+  command: TemperatureCreateCommand
+}
+
 const T_KEYS_BY_COMMAND_TYPE: {
-  [commandType: TemperatureCreateCommand]: string
+  [commandType in TemperatureCreateCommand['commandType']]: string
 } = {
   'temperatureModule/setTargetTemperature': 'setting_temperature_module_temp',
   'temperatureModule/waitForTemperature': 'waiting_to_reach_temp_module',
