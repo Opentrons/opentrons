@@ -6,7 +6,6 @@ from typing import List, Any
 
 from system_server._version import version
 from system_server.settings import get_settings
-from system_server.persistence import get_sql_engine, get_persistence_directory
 from system_server.router import router
 
 log = logging.getLogger(__name__)
@@ -39,11 +38,6 @@ async def on_startup() -> None:
     # Load settings and (throw away the result) so that we detect errors early
     # on in startup, instead of the first time someone happens to use a setting.
     get_settings()
-
-    # Initialize the persistent directory & sql database on startup to ensure
-    # both are loaded when any requests need them
-    persistence_directory = await get_persistence_directory(app.state)
-    await get_sql_engine(app.state, persistence_directory)
 
 
 @app.on_event("shutdown")
