@@ -3,12 +3,12 @@
 Versioning
 ==========
 
-The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot server software and the Opentrons App. This allows you to specify the API version that your protocol requires without worrying about what robot software versions it will work with. 
+The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows you to specify the API version that your protocol requires without worrying about what robot software versions it will work with. 
 
 Major and Minor Versions
 ------------------------
 
-The API uses a major and minor version number; there are no patch version numbers. For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers, so ``2.10`` indicates major version 2 and minor version 10, which is 9 minor versions newer than ``2.1``. The Python Protocol API version will only increase based on changes that affect protocol behavior.
+The API uses a major and minor version number and does not use patch version numbers. For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers, so ``2.10`` indicates major version 2 and minor version 10, which is 9 minor versions newer than ``2.1``. The Python Protocol API version will only increase based on changes that affect protocol behavior.
 
 The major version of the API increases whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because it required protocols to have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. Protocols written with major version 1 of the API will not run without modification in major version 2. A similar level of structural change would require a major version 3. This documentation only deals with features found in major version 2 of the API; see the `archived version 1 documentation <https://docs.opentrons.com/v1/index.html>`_ for information on older protocols.
 
@@ -17,7 +17,7 @@ The minor version of the API increases whenever there is new functionality that 
 Specifying Versions
 -------------------
 
-You must specify the minimum API version you are targeting at the top of your Python protocol. This is done in the ``metadata`` block, using the ``'apiLevel'`` key, alongside any other metadata elements:
+You must specify the API version you are targeting in the ``metadata`` block at the top of your Python protocol. Use the ``'apiLevel'`` key, alongside any other metadata elements:
 
 .. code-block:: python
   :substitutions:
@@ -36,67 +36,67 @@ Version specification is required by the system. If you do not specify a target 
 
 The version you specify determines the features and behaviors available to your protocol. For example, support for the Heater-Shaker Module was added in version 2.13, so you can't specify a lower version and then call ``HeaterShakerContext`` methods without causing an error. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
 
-In general, you should closely consider what features you need in your protocol, and keep your specified API level as low as possible. This makes your protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot server.
+In general, consider what features you need in your protocol and keep the API level as low as possible. Using the lowest API version is good protocol design, as it helps the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software.
 
 
 Maximum Supported Versions
 --------------------------
 
-From version 3.15.0 to 5.0.2 of the OT-2 software and Opentrons App, the maximum supported API level was listed in the robot's Information card in the app. Since version 6.0.0, the same information is listed under Robot Settings > Advanced.
+From version 3.15.0 to 5.0.2 of the OT-2 software and Opentrons App, the maximum supported API level was listed in the robot's **Information** card in the app. Since version 6.0.0, the same information is listed under **Robot Settings > Advanced**.
 
-If you upload a protocol that specifies a higher API level than the maximum supported by your OT-2, it won't be able to analyze or run your protocol. You may be able to increase the maximum supported version by updating your OT-2 to the latest robot server and Opentrons App. All OT-2 hardware is capable of running protocols specifying any minor version of the API v2, as long as its software is up to date.
+If you upload a protocol that specifies a higher API level than the maximum supported by your OT-2, it won't be able to analyze or run your protocol. You may be able to increase the maximum supported version by updating your OT-2 to the latest robot software and Opentrons App. All OT-2 hardware is capable of running protocols specifying any minor version of the API v2, as long as its software is up to date.
 
 
-When Features Were Added to the API
------------------------------------
+Added Features
+--------------
 
-As you read the documentation on this site, you will notice that all documentation on features, function calls, available properties, and everything else about the Python Protocol API notes which API version it was introduced in. Keep this information in mind when specifying your protocol's API version. The version statement will look like this:
+Throughout the Python Protocol API documentation, there are version statements indicating when elements (features, function calls, available properties, etc.) were introduced. Keep these in mind when specifying your protocol's API version. Version statements look like this:
 
 .. versionadded:: 2.0
 
 
 .. _version-table:
 
-API and OT-2 Software Versions
+API and Robot Software Versions
 -------------------------------
 
 This table lists the correspondence between Protocol API versions and robot software versions.
 
-+-------------+-----------------------------+
-| API Version | Introduced in OT-2 Software |
-+=============+=============================+
-|     1.0     |           3.0.0             |
-+-------------+-----------------------------+
-|     2.0     |          3.14.0             |
-+-------------+-----------------------------+
-|     2.1     |          3.15.2             |
-+-------------+-----------------------------+
-|     2.2     |          3.16.0             |
-+-------------+-----------------------------+
-|     2.3     |          3.17.0             |
-+-------------+-----------------------------+
-|     2.4     |          3.17.1             |
-+-------------+-----------------------------+
-|     2.5     |          3.19.0             |
-+-------------+-----------------------------+
-|     2.6     |          3.20.0             |
-+-------------+-----------------------------+
-|     2.7     |          3.21.0             |
-+-------------+-----------------------------+
-|     2.8     |          4.0.0              |
-+-------------+-----------------------------+
-|     2.9     |          4.1.0              |
-+-------------+-----------------------------+
-|     2.10    |          4.3.0              |
-+-------------+-----------------------------+
-|     2.11    |          4.4.0              |
-+-------------+-----------------------------+
-|     2.12    |          5.0.0              |
-+-------------+-----------------------------+
-|     2.13    |          6.1.0              |
-+-------------+-----------------------------+
-|     2.14    |        unreleased           |
-+-------------+-----------------------------+
++-------------+------------------------------+
+| API Version | Introduced in Robot Software |
++=============+==============================+
+|     1.0     |           3.0.0              |
++-------------+------------------------------+
+|     2.0     |          3.14.0              |
++-------------+------------------------------+
+|     2.1     |          3.15.2              |
++-------------+------------------------------+
+|     2.2     |          3.16.0              |
++-------------+------------------------------+
+|     2.3     |          3.17.0              |
++-------------+------------------------------+
+|     2.4     |          3.17.1              |
++-------------+------------------------------+
+|     2.5     |          3.19.0              |
++-------------+------------------------------+
+|     2.6     |          3.20.0              |
++-------------+------------------------------+
+|     2.7     |          3.21.0              |
++-------------+------------------------------+
+|     2.8     |          4.0.0               |
++-------------+------------------------------+
+|     2.9     |          4.1.0               |
++-------------+------------------------------+
+|     2.10    |          4.3.0               |
++-------------+------------------------------+
+|     2.11    |          4.4.0               |
++-------------+------------------------------+
+|     2.12    |          5.0.0               |
++-------------+------------------------------+
+|     2.13    |          6.1.0               |
++-------------+------------------------------+
+|     2.14    |        unreleased            |
++-------------+------------------------------+
 
 Changes in API Versions
 -----------------------
@@ -179,7 +179,7 @@ Version 2.7
 
   .. note::
 
-      This feature has since been removed from the Python Protocol API.
+      This feature has been removed from the Python Protocol API.
 
 - Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
   has a tip attached or not.
