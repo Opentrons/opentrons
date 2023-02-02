@@ -338,5 +338,58 @@ export function useCalibrationTaskList(
     }
   }
 
+  // Recalibrating Tip Length for a mount clears that mount's pipette offset calibration
+  if (
+    (taskList.taskList[1]?.subTasks[0]?.isComplete === true ||
+      taskList.taskList[1]?.subTasks[0]?.markedBad === true) &&
+    (taskList.taskList[1]?.subTasks[1]?.isComplete === true ||
+      taskList.taskList[1]?.subTasks[1]?.markedBad === true)
+  ) {
+    const invalidateHandler = (): void => {
+      const offsetCal = offsetCalibrations?.find(cal => cal.mount === 'left')
+      if (offsetCal != null) {
+        deleteCalibration({
+          calType: 'pipetteOffset',
+          mount: 'left',
+          pipette_id: offsetCal.pipette,
+        })
+      }
+    }
+    if (taskList.taskList[1].subTasks[0].cta != null) {
+      taskList.taskList[1].subTasks[0].cta.onClick = () =>
+        tipLengthCalLauncher({
+          params: { mount: 'left' },
+          hasBlockModalResponse: null,
+          invalidateHandler,
+        })
+    }
+  }
+
+  if (
+    (taskList.taskList[2]?.subTasks[0]?.isComplete === true ||
+      taskList.taskList[2]?.subTasks[0]?.markedBad === true) &&
+    (taskList.taskList[2]?.subTasks[1]?.isComplete === true ||
+      taskList.taskList[2]?.subTasks[1]?.markedBad === true)
+  ) {
+    const invalidateHandler = (): void => {
+      const offsetCal = offsetCalibrations?.find(cal => cal.mount === 'right')
+      if (offsetCal != null) {
+        deleteCalibration({
+          calType: 'pipetteOffset',
+          mount: 'right',
+          pipette_id: offsetCal.pipette,
+        })
+      }
+    }
+    if (taskList.taskList[2].subTasks[0].cta != null) {
+      taskList.taskList[2].subTasks[0].cta.onClick = () =>
+        tipLengthCalLauncher({
+          params: { mount: 'right' },
+          hasBlockModalResponse: null,
+          invalidateHandler,
+        })
+    }
+  }
+
   return taskList
 }
