@@ -1,12 +1,13 @@
 """Wrappers for the legacy, Protocol API v2 execution pipeline."""
 import asyncio
-from typing import Optional, cast
+from typing import Dict, Iterable, Optional, cast
 
 from anyio import to_thread
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LegacyLabwareDefinition,
 )
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
@@ -64,10 +65,21 @@ class LegacyFileReader:
     """Interface to read Protocol API v2 protocols prior to execution."""
 
     @staticmethod
-    def read(protocol_source: ProtocolSource) -> LegacyProtocol:
+    def read(
+        protocol_source: ProtocolSource,
+        labware_definitions: Iterable[LabwareDefinition],
+    ) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
         protocol_contents = protocol_file_path.read_text(encoding="utf-8")
+        legacy_labware_definitions: Dict[str, LegacyLabwareDefinition] = {
+            uri_from_details(
+                namespace=lw.namespace,
+                load_name=lw.parameters.loadName,
+                version=lw.version,
+            ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
+            for lw in labware_definitions
+        }
         data_file_paths = [
             data_file.path
             for data_file in protocol_source.files
@@ -77,14 +89,7 @@ class LegacyFileReader:
         return parse(
             protocol_file=protocol_contents,
             filename=protocol_file_path.name,
-            extra_labware={
-                uri_from_details(
-                    namespace=lw.namespace,
-                    load_name=lw.parameters.loadName,
-                    version=lw.version,
-                ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
-                for lw in protocol_source.labware_definitions
-            },
+            extra_labware=legacy_labware_definitions,
             extra_data={
                 data_path.name: data_path.read_bytes() for data_path in data_file_paths
             },

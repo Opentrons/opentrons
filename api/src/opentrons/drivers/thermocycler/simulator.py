@@ -3,6 +3,8 @@ from typing import Optional, Dict
 from opentrons.util.async_helpers import ensure_yield
 from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
+from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
+from opentrons.drivers.asyncio.communication.errors import ErrorResponse
 
 
 class SimulatingDriver(AbstractThermocyclerDriver):
@@ -39,6 +41,14 @@ class SimulatingDriver(AbstractThermocyclerDriver):
     @ensure_yield
     async def close_lid(self) -> None:
         self._lid_status = ThermocyclerLidStatus.CLOSED
+
+    @ensure_yield
+    async def lift_plate(self) -> None:
+        if self._model == ThermocyclerModuleModel.THERMOCYCLER_V1.value:
+            raise NotImplementedError()
+        if self._lid_status != ThermocyclerLidStatus.OPEN:
+            raise ErrorResponse(port="sim_port", response="Lid is not open")
+        self._lid_status = ThermocyclerLidStatus.OPEN
 
     @ensure_yield
     async def get_lid_status(self) -> ThermocyclerLidStatus:

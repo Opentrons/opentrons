@@ -66,7 +66,7 @@ export function TipLengthCalibrationItems({
         mount: formattedPipetteOffsetCalibrations.find(
           p => p.serialNumber === tipLength.pipette
         )?.mount,
-        tiprack: tipLength.uri,
+        tiprackDefURI: tipLength.uri,
         lastCalibrated: tipLength.lastCalibrated,
       }
     }
@@ -95,9 +95,9 @@ export function TipLengthCalibrationItems({
           <StyledTableRow key={index}>
             <StyledTableCell>
               <StyledText as="p">
-                {calibration.tiprack &&
+                {calibration.tiprackDefURI &&
                   getDisplayNameForTipRack(
-                    calibration.tiprack,
+                    calibration.tiprackDefURI,
                     customLabwareDefs
                   )}
               </StyledText>
@@ -122,6 +122,7 @@ export function TipLengthCalibrationItems({
                     : checkMountWithAttachedPipettes(calibration.serialNumber)
                 }
                 updateRobotStatus={updateRobotStatus}
+                tiprackDefURI={calibration.tiprackDefURI}
               />
             </StyledTableCell>
           </StyledTableRow>

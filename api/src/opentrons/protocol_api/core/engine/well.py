@@ -112,15 +112,13 @@ class WellCore(AbstractWellCore):
             ),
         )
 
-    # TODO(mc, 2022-11-01): implement this with a new `WellOrigin.CENTER` value
-    # Make this change carefully with respect to the robot-server because
-    # `WellOrigin` is a public enum that may be persisted
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
-        well_height = self._engine_client.state.geometry.get_well_height(
-            labware_id=self.labware_id, well_name=self._name
+        return self._engine_client.state.geometry.get_well_position(
+            well_name=self._name,
+            labware_id=self._labware_id,
+            well_location=WellLocation(origin=WellOrigin.CENTER),
         )
-        return self.get_bottom(z_offset=well_height / 2)
 
     def load_liquid(
         self,
