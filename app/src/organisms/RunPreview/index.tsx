@@ -12,7 +12,6 @@ import {
   BORDERS,
   COLORS,
   Icon,
-  IconName,
   POSITION_FIXED,
   SIZE_1,
 } from '@opentrons/components'
@@ -27,12 +26,6 @@ import { NAV_BAR_WIDTH } from '../../App/constants'
 import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { CommandIcon } from './CommandIcon'
 
-const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
-  delay: 'pause-circle',
-  pause: 'pause-circle',
-  waitForDuration: 'pause-circle',
-  waitForResume: 'pause-circle',
-}
 const COLOR_FADE_MS = 500
 interface RunPreviewProps {
   runId: string

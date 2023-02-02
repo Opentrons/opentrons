@@ -11,7 +11,7 @@ const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
 interface CommandIconProps {
   command: RunTimeCommand
 }
-export function CommandIcon(props: CommandIconProps) {
+export function CommandIcon(props: CommandIconProps): JSX.Element | null {
   const { command } = props
   let iconName = null
   if (

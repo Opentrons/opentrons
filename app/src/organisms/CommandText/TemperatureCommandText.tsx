@@ -1,6 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   TemperatureModuleAwaitTemperatureCreateCommand,
   TemperatureModuleSetTargetTemperatureCreateCommand,
