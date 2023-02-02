@@ -405,7 +405,10 @@ function Task({
             gridGap={SPACING.spacing3}
           >
             {subTasks.map(
-              ({ title, description, cta, footer }, subTaskIndex) => (
+              (
+                { title, description, cta, footer, markedBad },
+                subTaskIndex
+              ) => (
                 <SubTask
                   key={title}
                   title={title}
