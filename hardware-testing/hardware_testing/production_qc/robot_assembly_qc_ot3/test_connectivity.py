@@ -30,10 +30,8 @@ USB_PORTS_TO_TEST = [
 # TODO: work with EEs to get Aux-Port tests implemented
 AUX_PORT_TESTS = [
     "aux-left-can",
-    "aux-left-estop",
     "aux-left-door-switch",
     "aux-right-can",
-    "aux-right-estop",
     "aux-right-door-switch",
 ]
 
@@ -49,6 +47,25 @@ def _count_usb_listings(api: OT3API) -> int:
     ports = USBBus(board_rev)._read_bus()
     ports_len = len(ports)
     return max(ports_len - USB_READ_BUS_LENGTH_NO_CONNECTION, 0)
+
+
+async def _test_ethernet(api: OT3API, report: CSVReport, section: str) -> None:
+    if not api.is_simulator:
+        input("connect ethernet, then press ENTER:")
+        ethernet_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.ETH_LL)
+        # {
+        #   'ipAddress': '192.168.1.105/24',
+        #   'macAddress': '00:14:2D:69:43:79',
+        #   'gatewayAddress': '192.168.1.1',
+        #   'state': 'connected',
+        #   'type': 'ethernet'
+        # }
+        eth_ip = ethernet_status["ipAddress"]
+    else:
+        eth_ip = "0.0.0.0"
+    result = CSVResult.from_bool(bool(eth_ip))
+    print(f"ethernet IP: {eth_ip} - {result}")
+    report(section, "ethernet", [eth_ip, result])
 
 
 async def _test_wifi(report: CSVReport, section: str) -> None:
@@ -109,6 +126,52 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     return _finish()
 
 
+async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> None:
+    async def _is_usb_device_connected(wait: bool = False) -> bool:
+        if api.is_simulator:
+            return True
+        for _ in range(USB_WAIT_TIMEOUT_SECONDS):
+            if wait:
+                await asyncio.sleep(1)
+            if _count_usb_listings(api) > 0:
+                return True
+        return False
+
+    skip = False
+    if not api.is_simulator:
+        inp = input('prepare to test USB, press ENTER when ready ("skip" to skip): ')
+        skip = "skip" in inp
+    if not skip:
+        for tag in USB_PORTS_TO_TEST:
+            print("unplug all USB devices")
+            while not api.is_simulator and await _is_usb_device_connected():
+                await asyncio.sleep(0.5)
+            print(
+                f"[{tag}] connect a USB device (waiting {USB_WAIT_TIMEOUT_SECONDS} seconds...)"
+            )
+            result = CSVResult.from_bool(await _is_usb_device_connected(wait=True))
+            print(f"{tag}: {result}")
+            report(section, tag, [result])
+
+
+async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
+    # TODO: work with EEs to get Aux-Port tests implemented
+    #       - can analyzer
+    #       - door switch detection
+    for test_name in AUX_PORT_TESTS:
+        result = CSVResult.FAIL
+        if not api.is_simulator:
+            input(f"testing {test_name.upper()}, press ENTER when ready")
+        if "can" in test_name:
+            # send some arbitrary CAN data, to inspect externally
+            await api.refresh_current_position_ot3()
+        if not api.is_simulator:
+            inp = input(f"does {test_name.upper()} signal look good? (y/n): ")
+            result = CSVResult.from_bool("y" in inp)
+        print(f"{test_name}: {result}")
+        report(section, test_name, [result])
+
+
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     usb_a_tests = [CSVLine(t, [CSVResult]) for t in USB_PORTS_TO_TEST]
@@ -124,22 +187,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     # ETHERNET
-    if not api.is_simulator:
-        input("connect ethernet, then press ENTER:")
-        ethernet_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.ETH_LL)
-        # {
-        #   'ipAddress': '192.168.1.105/24',
-        #   'macAddress': '00:14:2D:69:43:79',
-        #   'gatewayAddress': '192.168.1.1',
-        #   'state': 'connected',
-        #   'type': 'ethernet'
-        # }
-        eth_ip = ethernet_status["ipAddress"]
-    else:
-        eth_ip = "0.0.0.0"
-    result = CSVResult.from_bool(bool(eth_ip))
-    print(f"ethernet IP: {eth_ip} - {result}")
-    report(section, "ethernet", [eth_ip, result])
+    await _test_ethernet(api, report, section)
 
     # WIFI
     if not api.is_simulator:
@@ -162,32 +210,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     report(section, "usb-b-rear", [result])
 
     # USB-A
-    async def _is_usb_device_connected(wait: bool = False) -> bool:
-        if api.is_simulator:
-            return True
-        for _ in range(USB_WAIT_TIMEOUT_SECONDS):
-            if wait:
-                await asyncio.sleep(1)
-            if _count_usb_listings(api) > 0:
-                return True
-        return False
-
-    if not api.is_simulator:
-        input("prepare to test USB, press ENTER when ready:")
-    for tag in USB_PORTS_TO_TEST:
-        print("unplug all USB devices")
-        while not api.is_simulator and await _is_usb_device_connected():
-            await asyncio.sleep(0.5)
-        print(
-            f"[{tag}] connect a USB device (waiting {USB_WAIT_TIMEOUT_SECONDS} seconds...)"
-        )
-        result = CSVResult.from_bool(await _is_usb_device_connected(wait=True))
-        print(f"{tag}: {result}")
-        report(section, tag, [result])
+    await _test_usb_a_ports(api, report, section)
 
     # AUX
-    # TODO: work with EEs to get Aux-Port tests implemented
-    #       - external E-Stop button
-    #       - can analyzer
-    #       - door switch detection
-    #       - anything else?
+    await _test_aux(api, report, section)
