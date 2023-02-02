@@ -60,6 +60,7 @@ import {
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
+import { RunProgressMeter } from '../../../RunProgressMeter'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
@@ -92,6 +93,7 @@ jest.mock('../../hooks')
 jest.mock('../../HeaterShakerIsRunningModal')
 jest.mock('../../../ModuleCard/ConfirmAttachmentModal')
 jest.mock('../../../ModuleCard/hooks')
+jest.mock('../../../RunProgressMeter')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/buildroot/selectors')
@@ -153,6 +155,9 @@ const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.Mock
 >
 const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
   typeof ConfirmAttachmentModal
+>
+const mockRunProgressMeter = RunProgressMeter as jest.MockedFunction<
+  typeof RunProgressMeter
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
@@ -230,6 +235,7 @@ describe('ProtocolRunHeader', () => {
 
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
+    mockRunProgressMeter.mockReturnValue(<div>Mock RunProgressMeter</div>)
     mockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
     )
@@ -366,6 +372,7 @@ describe('ProtocolRunHeader', () => {
     queryByText('Protocol end')
     getByRole('button', { name: 'Cancel run' }).click()
     getByText('Mock ConfirmCancelModal')
+    getByText('Mock RunProgressMeter')
   })
 
   it('calls trackProtocolRunEvent when start run button clicked', () => {

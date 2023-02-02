@@ -81,9 +81,9 @@ const QuaternaryButtonTemplate: Story<
   )
 }
 
-export const SecondaryTertiary = QuaternaryButtonTemplate.bind({})
-SecondaryTertiary.args = {
-  children: 'secondary tertiary button',
+export const Quaternary = QuaternaryButtonTemplate.bind({})
+Quaternary.args = {
+  children: 'quaternary button',
 }
 
 const SubmitPrimaryButtonTemplate: Story<

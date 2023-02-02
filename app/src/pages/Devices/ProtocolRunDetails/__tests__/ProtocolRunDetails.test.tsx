@@ -26,7 +26,7 @@ import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
-jest.mock('../../../../organisms/Devices/ProtocolRun/RunPreview')
+jest.mock('../../../../organisms/RunPreview')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 
