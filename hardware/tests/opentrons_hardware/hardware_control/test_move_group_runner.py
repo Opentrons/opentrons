@@ -708,9 +708,9 @@ async def test_tip_action_move_runner_position_updated(
     mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    position = await subject.run(can_messenger=mock_can_messenger)
-    assert len(position) == 1
-    assert position[0][1].payload.current_position_um.value == 2000
+    completion_message = await subject.run(can_messenger=mock_can_messenger)
+    assert len(completion_message) == 1
+    assert completion_message[0][1].payload.current_position_um.value == 2000
 
 
 async def test_tip_action_move_runner_fail_receives_one_response(
@@ -1051,6 +1051,28 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                 NodeId.gantry_x: (10, 40, False, False),
                 NodeId.gantry_y: (30, 40, False, False),
             },
+        ),
+        (
+            # tip action response, should not update position
+            [
+                (
+                    _build_arb(NodeId.pipette_left),
+                    md.TipActionResponse(
+                        payload=TipActionResponsePayload(
+                            ack_id=UInt8Field(0),
+                            group_id=UInt8Field(2),
+                            seq_id=UInt8Field(2),
+                            current_position_um=UInt32Field(10000),
+                            encoder_position_um=Int32Field(0),
+                            position_flags=MotorPositionFlagsField(0),
+                            action=PipetteTipActionTypeField(0),
+                            success=UInt8Field(1),
+                            gear_motor_id=GearMotorIdField(1),
+                        )
+                    ),
+                ),
+            ],
+            {},
         ),
         (
             # empty base case

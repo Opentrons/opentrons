@@ -45,6 +45,10 @@ from .instruments.ot3.pipette import (
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+    PipetteOffsetByPipetteMount,
+)
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import get_system_constraints
@@ -1562,14 +1566,14 @@ class OT3API(
 
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
-    ) -> None:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount]:
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:
             self._log.info(f"Saving instrument offset: {delta} for gripper")
-            self._gripper_handler.save_instrument_offset(delta)
+            return self._gripper_handler.save_instrument_offset(delta)
         else:
-            self._pipette_handler.save_instrument_offset(checked_mount, delta)
+            return self._pipette_handler.save_instrument_offset(checked_mount, delta)
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
