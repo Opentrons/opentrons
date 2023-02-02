@@ -19,6 +19,7 @@ from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.hardware import get_robot_type
 from robot_server.persistence import get_sql_engine, get_persistence_directory
+from robot_server.settings import get_settings
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_store import (
@@ -114,5 +115,7 @@ async def get_protocol_auto_deleter(
     """Get a `ProtocolAutoDeleter` to delete old protocols."""
     return ProtocolAutoDeleter(
         protocol_store=protocol_store,
-        deletion_planner=ProtocolDeletionPlanner(),
+        deletion_planner=ProtocolDeletionPlanner(
+            maximum_unused_protocols=get_settings().maximum_unused_protocols
+        ),
     )
