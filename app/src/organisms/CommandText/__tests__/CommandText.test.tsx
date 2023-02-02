@@ -534,7 +534,8 @@ describe('CommandText', () => {
             i18nInstance: i18n,
           }
         )[0]
-        getByText(expectedCopy)
+        expect(expectedCopy).not.toBeUndefined()
+        if (expectedCopy != null) getByText(expectedCopy)
       }
     )
   })
