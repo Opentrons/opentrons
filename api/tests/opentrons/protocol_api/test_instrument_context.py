@@ -233,7 +233,6 @@ def test_blow_out_to_well(
         mock_instrument_core.blow_out(
             location=top_location,
             well_core=mock_well._core,
-            move_to_well=True,
         ),
         times=1,
     )
@@ -256,7 +255,6 @@ def test_blow_out_to_location(
         mock_instrument_core.blow_out(
             location=mock_location,
             well_core=mock_well._core,
-            move_to_well=True,
         ),
         times=1,
     )
@@ -280,7 +278,6 @@ def test_blow_out_in_place(
         mock_instrument_core.blow_out(
             location=location,
             well_core=mock_well._core,
-            move_to_well=False,
         ),
         times=1,
     )

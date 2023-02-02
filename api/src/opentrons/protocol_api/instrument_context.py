@@ -435,8 +435,6 @@ class InstrumentContext(publisher.CommandPublisher):
         """
 
         well: Optional[labware.Well]
-        # TODO(jbl 2022-11-10) refactor this boolean out and make location optional when PE blow-out in place exists
-        move_to_well = True
         last_location = self._protocol_core.get_last_location()
 
         if isinstance(location, labware.Well):
@@ -457,10 +455,6 @@ class InstrumentContext(publisher.CommandPublisher):
         elif last_location:
             checked_loc = last_location
             _, well = checked_loc.labware.get_parent_labware_and_well()
-            # if no explicit location given but location cache exists,
-            # pipette blows out immediately at
-            # current location, no movement is needed
-            move_to_well = False
         else:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
@@ -476,7 +470,6 @@ class InstrumentContext(publisher.CommandPublisher):
             self._core.blow_out(
                 location=checked_loc,
                 well_core=well._core if well is not None else None,
-                move_to_well=move_to_well,
             )
 
         return self

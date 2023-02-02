@@ -314,9 +314,19 @@ def test_aspirate_in_place(
     subject: InstrumentCore,
 ) -> None:
     """It should aspirate in place."""
-    subject.aspirate(volume=12.34, rate=5.6, flow_rate=7.8, well_core=None, location=None)
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.aspirate(
+        volume=12.34, rate=5.6, flow_rate=7.8, well_core=None, location=location
+    )
 
     decoy.verify(
+        mock_engine_client.move_to_coordinates(
+            pipette_id="abc123",
+            coordinates=DeckPoint(x=1, y=2, z=3),
+            minimum_z_height=None,
+            force_direct=False,
+            speed=None,
+        ),
         mock_engine_client.aspirate_in_place(
             pipette_id="abc123",
             volume=12.34,
@@ -331,7 +341,7 @@ def test_blow_out_to_well(
     mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
-    """It should aspirate from a well."""
+    """It should blow out from a well."""
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
@@ -344,7 +354,7 @@ def test_blow_out_to_well(
         )
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
-    subject.blow_out(location=location, well_core=well_core, move_to_well=True)
+    subject.blow_out(location=location, well_core=well_core)
 
     decoy.verify(
         mock_engine_client.blow_out(
@@ -354,6 +364,33 @@ def test_blow_out_to_well(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            flow_rate=1.23,
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_blow_out_in_place(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should blow out in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    subject.blow_out(location=location, well_core=None)
+
+    decoy.verify(
+        mock_engine_client.move_to_coordinates(
+            pipette_id="abc123",
+            coordinates=DeckPoint(x=1, y=2, z=3),
+            minimum_z_height=None,
+            speed=None,
+            force_direct=False,
+        ),
+        mock_engine_client.blow_out_in_place(
+            pipette_id="abc123",
             flow_rate=1.23,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
@@ -395,6 +432,34 @@ def test_dispense_to_well(
             flow_rate=6.0,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_dispense_in_place(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should dispense in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.dispense(
+        volume=12.34, rate=5.6, flow_rate=7.8, well_core=None, location=location
+    )
+
+    decoy.verify(
+        mock_engine_client.move_to_coordinates(
+            pipette_id="abc123",
+            coordinates=DeckPoint(x=1, y=2, z=3),
+            minimum_z_height=None,
+            force_direct=False,
+            speed=None,
+        ),
+        mock_engine_client.dispense_in_place(
+            pipette_id="abc123",
+            volume=12.34,
+            flow_rate=7.8,
+        ),
     )
 
 
