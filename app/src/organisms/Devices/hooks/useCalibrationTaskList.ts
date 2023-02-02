@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import { useInterval } from '@opentrons/components'
+import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
 
 import {
   useAttachedPipettes,
@@ -38,6 +39,7 @@ export function useCalibrationTaskList(
   deckCalLauncher: DashboardCalDeckInvoker = () => {}
 ): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
+  const { deleteCalibration } = useDeleteCalibrationMutation()
   const dispatch = useDispatch()
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
@@ -311,6 +313,30 @@ export function useCalibrationTaskList(
     calibrationStatus = 'bad'
   }
   taskList.taskListStatus = calibrationStatus
+
+  // now that the task list is constructed we can check and see if tasks
+  // in 'recalibration' state need to invalidate calibration data of later tasks if performed
+
+  // Recalibrating the Deck will clear all pipette offset calibrations
+  if (
+    (taskList.taskList[0].isComplete === true ||
+      taskList.taskList[0].markedBad === true) &&
+    offsetCalibrations != null
+  ) {
+    const invalidateHandler = (): void => {
+      for (const cal of offsetCalibrations) {
+        deleteCalibration({
+          calType: 'pipetteOffset',
+          mount: cal.mount,
+          pipette_id: cal.pipette,
+        })
+      }
+    }
+    if (taskList.taskList[0].cta != null) {
+      taskList.taskList[0].cta.onClick = () =>
+        deckCalLauncher({ invalidateHandler })
+    }
+  }
 
   return taskList
 }

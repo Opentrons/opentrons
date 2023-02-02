@@ -50,6 +50,11 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     instruments?.map(instr => instr.tipRackLoadName)
   )
 
+  const shouldInvalidate =
+    (sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
+      sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION) &&
+    calInvalidationHandler !== undefined
+
   let equipmentList: Array<{ loadName: string; displayName: string }> =
     uniqueTipRacks.size > 1
       ? instruments?.map(instr => ({
@@ -93,7 +98,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   }
 
   const proceed = (): void => {
-    if (calInvalidationHandler !== undefined) {
+    if (shouldInvalidate) {
       calInvalidationHandler()
     }
     if (
@@ -136,8 +141,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
             {t('before_you_begin')}
           </StyledText>
 
-          {(sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
-            sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION) && (
+          {shouldInvalidate && (
             <InvalidationWarning sessionType={sessionType} />
           )}
           <Body sessionType={sessionType} />
