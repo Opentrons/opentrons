@@ -56,4 +56,3 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # CAMERA:
     # TODO: read camera image once ffmpeg (or other tool) is implemented in OS
-

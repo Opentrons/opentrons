@@ -31,6 +31,9 @@ PROBE_SETTINGS = CapacitivePassSettings(
     sensor_threshold_pf=1.0,
 )
 
+RELATIVE_MOVE_FROM_HOME_DELTA = Point(x=-500, y=-300)
+RELATIVE_MOVE_FROM_HOME_SPEED = 200
+
 
 PIPETTE_TESTS = {
     "id": [str, str, CSVResult],
@@ -277,7 +280,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     while not api.is_simulator and (await _get_pip_mounts(api) or api.has_gripper()):
         input("remove all attached instruments, then press ENTER:")
     await api.home()
-    await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
+    await api.move_rel(
+        OT3Mount.LEFT,
+        RELATIVE_MOVE_FROM_HOME_DELTA,
+        speed=RELATIVE_MOVE_FROM_HOME_SPEED,
+    )
 
     # PIPETTES
     for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
@@ -306,3 +313,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await _test_gripper(api, report, section)
         while not api.is_simulator and await _has_gripper(api):
             input("remove the gripper, then press ENTER")
+
+    await api.move_rel(
+        OT3Mount.LEFT,
+        RELATIVE_MOVE_FROM_HOME_DELTA * -1.0,
+        speed=RELATIVE_MOVE_FROM_HOME_SPEED,
+    )

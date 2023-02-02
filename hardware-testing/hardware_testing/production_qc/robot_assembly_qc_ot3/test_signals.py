@@ -56,6 +56,8 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
         CSVLine("nsync-target-pos", [float, float, float]),
         CSVLine("nsync-stop-pos", [float, float, float]),
         CSVLine("nsync-result", [CSVResult]),
+        CSVLine("estop-target-pos", [float, float, float]),
+        CSVLine("estop-stop-pos", [float, float, float]),
         CSVLine("estop-result", [CSVResult]),
     ]
 
@@ -121,29 +123,31 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     print("homing")
     await api.home()
     mount = OT3Axis.to_mount(MOVING_Z_AXIS)
-    home_pos = await api.gantry_position(mount)
 
-    print("testing sync signal")
-    target_pos = home_pos + Point(
-        x=-MOVING_DISTANCE, y=-MOVING_DISTANCE, z=-MOVING_DISTANCE
-    )
-    report(
-        section,
-        "nsync-target-pos",
-        [float(target_pos.x), float(target_pos.y), float(target_pos.z)],
-    )
-    await _move_and_trigger_stop_signal(api, nsync=True)
-    stop_pos = await api.gantry_position(mount)
-    report(
-        section,
-        "nsync-stop-pos",
-        [float(stop_pos.x), float(stop_pos.y), float(stop_pos.z)],
-    )
-    result = CSVResult.from_bool(home_pos.magnitude_to(stop_pos) < MOVING_DISTANCE / 2)
-    print(f"nsync result: {result}")
-    report(section, "nsync-result", [result])
-
-    # E-STOP
-    await _move_and_trigger_stop_signal(api, estop=True)
-    # TODO: check to see what happens here
-    report(section, "estop-result", [CSVResult.PASS])
+    for sig_name in ["nsync", "estop"]:
+        print(f"testing {sig_name} signal")
+        start_pos = await api.gantry_position(mount)
+        target_pos = start_pos + Point(
+            x=-MOVING_DISTANCE, y=-MOVING_DISTANCE, z=-MOVING_DISTANCE
+        )
+        report(
+            section,
+            f"{sig_name}-target-pos",
+            [float(target_pos.x), float(target_pos.y), float(target_pos.z)],
+        )
+        # TODO: enable once implemented in firmware
+        # if sig_name == "nsync":
+        #     await _move_and_trigger_stop_signal(api, nsync=True)
+        # else:
+        #     await _move_and_trigger_stop_signal(api, estop=True)
+        stop_pos = await api.gantry_position(mount)
+        report(
+            section,
+            f"{sig_name}-stop-pos",
+            [float(stop_pos.x), float(stop_pos.y), float(stop_pos.z)],
+        )
+        result = CSVResult.from_bool(
+            1 < start_pos.magnitude_to(stop_pos) < MOVING_DISTANCE
+        )
+        print(f"{sig_name} result: {result}")
+        report(section, f"{sig_name}-result", [result])

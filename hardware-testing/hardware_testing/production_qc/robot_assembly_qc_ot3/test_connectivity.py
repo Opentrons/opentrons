@@ -40,7 +40,7 @@ AUX_PORT_TESTS = [
 ALLOWED_SECURITY_TYPES = {
     nmcli.SECURITY_TYPES.NONE.value: nmcli.SECURITY_TYPES.NONE,
     nmcli.SECURITY_TYPES.WPA_EAP.value: nmcli.SECURITY_TYPES.WPA_EAP,
-    nmcli.SECURITY_TYPES.WPA_PSK.value: nmcli.SECURITY_TYPES.WPA_PSK
+    nmcli.SECURITY_TYPES.WPA_PSK.value: nmcli.SECURITY_TYPES.WPA_PSK,
 }
 
 
@@ -72,9 +72,7 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
         print("no ssids found")
         return _finish()
     checked_ssids = [
-        s
-        for s in ssids
-        if s["securityType"] in list(ALLOWED_SECURITY_TYPES.keys())
+        s for s in ssids if s["securityType"] in list(ALLOWED_SECURITY_TYPES.keys())
     ]
     if not checked_ssids:
         print("no ssids found with compatible security types")
@@ -90,7 +88,7 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     res = input("select wifi number: ")
     try:
         ssid = ssid_names_list[int(res) - 1]
-        print(f"\"{ssid}\"")
+        print(f'"{ssid}"')
     except (ValueError, KeyError) as e:
         print(e)
         _finish()
@@ -180,10 +178,16 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         print("unplug all USB devices")
         while not api.is_simulator and await _is_usb_device_connected():
             await asyncio.sleep(0.5)
-        print(f"[{tag}] connect a USB device (waiting {USB_WAIT_TIMEOUT_SECONDS} seconds...)")
+        print(
+            f"[{tag}] connect a USB device (waiting {USB_WAIT_TIMEOUT_SECONDS} seconds...)"
+        )
         result = CSVResult.from_bool(await _is_usb_device_connected(wait=True))
         print(f"{tag}: {result}")
         report(section, tag, [result])
 
     # AUX
     # TODO: work with EEs to get Aux-Port tests implemented
+    #       - external E-Stop button
+    #       - can analyzer
+    #       - door switch detection
+    #       - anything else?
