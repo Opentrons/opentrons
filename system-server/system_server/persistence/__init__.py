@@ -1,15 +1,14 @@
 """system_server.persistence: provides interface for persistent database storage."""
 import logging
 from pathlib import Path
-from anyio import Path as AsyncPath
 from fastapi import Depends
-from tempfile import mkdtemp
 from typing_extensions import Final
 import sqlalchemy
 
 
 from .database import create_sql_engine
 from .tables import registration_table, migration_table
+from .persistent_directory import create_persistent_directory
 
 from system_server.app_state import AppState, AppStateAccessor, get_app_state
 from system_server.settings import get_settings
@@ -18,7 +17,6 @@ from system_server.settings import get_settings
 _sql_engine_accessor = AppStateAccessor[sqlalchemy.engine.Engine]("sql_engine")
 _persistence_directory_accessor = AppStateAccessor[Path]("persistence_directory")
 
-_TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-system-server-"
 _DATABASE_FILE: Final = "system_server.db"
 
 _log = logging.getLogger(__name__)
@@ -32,25 +30,17 @@ async def get_persistence_directory(
 
     if persistence_dir is None:
         setting = get_settings().persistence_directory
+
+        # There is no appropriate default to this setting, so raise an
+        # exception and bail if it isn't specified.
         if setting is None:
             raise RuntimeError(
                 "No persistence path was specified.\n"
                 "Configure a persistence path with OT_SYSTEM_SERVER_persistence_directory"
             )
-        if setting == "automatically_make_temporary":
-            # It's bad for this blocking I/O to be in this async function,
-            # but we don't have an async mkdtemp().
-            persistence_dir = Path(mkdtemp(prefix=_TEMP_PERSISTENCE_DIR_PREFIX))
-            _log.info(
-                f"Using auto-created temporary directory {persistence_dir}"
-                f" for persistence."
-            )
-        else:
-            persistence_dir = Path(setting)
-
-            await AsyncPath(persistence_dir).mkdir(parents=True, exist_ok=True)
-            _log.info(f"Using directory {persistence_dir} for persistence.")
-
+        persistence_dir = await create_persistent_directory(
+            None if setting == "automatically_make_temporary" else Path(setting)
+        )
         _persistence_directory_accessor.set_on(app_state, persistence_dir)
 
     return persistence_dir

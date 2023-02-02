@@ -2,13 +2,11 @@
 
 import os
 
-from pytest import MonkeyPatch
 
 from system_server.persistence import (
-    get_persistence_directory,
     get_sql_engine,
-    _persistence_directory_accessor,
 )
+from system_server.persistence.persistent_directory import create_persistent_directory
 
 from fastapi import FastAPI
 from pathlib import Path
@@ -27,33 +25,24 @@ async def test_database_generation_on_init(tmpdir: Path) -> None:
     assert not expected.exists()
 
 
-async def test_create_tmpdir(monkeypatch: MonkeyPatch, tmpdir: Path) -> None:
-    # Mock out the settings
+async def test_persistent_directory_generation(tmpdir: Path) -> None:
+    # Test creating the directory when it exists
+    assert tmpdir == await create_persistent_directory(tmpdir)
+    assert tmpdir.exists()
 
-    class MockSettings:
-        def __init__(self, path: Path) -> None:
-            self.persistence_directory = path
+    subdir = tmpdir / "testing"
+    assert not subdir.exists()
+    assert subdir == await create_persistent_directory(subdir)
+    assert subdir.exists()
 
-    expected = tmpdir / "new_folder"
+    # Make sure opening the directory doesn't overwrite things
+    subfile = subdir / "test.txt"
+    assert not subfile.exists()
+    open(str(subfile), "w").write("Test string\n")
+    assert subdir == await create_persistent_directory(subdir)
+    assert open(subfile, "r").readline() == "Test string\n"
 
-    def mock_get_settings() -> MockSettings:
-        return MockSettings(expected)
-
-    monkeypatch.setattr("system_server.persistence.get_settings", mock_get_settings)
-
-    app = FastAPI()
-    # Test that directory gets written
-    assert not expected.exists()
-    await get_persistence_directory(app.state)
-    assert expected.exists()
-
-    # Now test autogenerating a temporary directory
-
-    expected = Path("automatically_make_temporary")
-    app = FastAPI()
-    # Test that directory gets written
-    await get_persistence_directory(app.state)
-    generated = _persistence_directory_accessor.get_from(app.state)
-    assert generated is not None
-    assert generated.exists()
-    assert generated.is_dir()
+    # Make sure the function can make a new tempdir
+    temp = await create_persistent_directory(None)
+    assert temp.exists()
+    assert str(temp).find("opentrons-system-server") > -1
