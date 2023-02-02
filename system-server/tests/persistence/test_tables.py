@@ -29,6 +29,14 @@ EXPECTED_STATEMENTS = [
         UNIQUE (subject, agent, agent_id)
     )
     """,
+    """
+    CREATE TABLE migration (
+        id INTEGER NOT NULL,
+        created_at DATETIME NOT NULL,
+        version INTEGER NOT NULL,
+        PRIMARY KEY (id)
+    )
+    """,
 ]
 
 

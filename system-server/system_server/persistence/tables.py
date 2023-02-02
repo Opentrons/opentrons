@@ -17,6 +17,18 @@ registration_table = sqlalchemy.Table(
     sqlalchemy.UniqueConstraint("subject", "agent", "agent_id"),
 )
 
+migration_table = sqlalchemy.Table(
+    "migration",
+    _metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
+    sqlalchemy.Column(
+        "version",
+        sqlalchemy.Integer,
+        nullable=False,
+    ),
+)
+
 
 def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
     """Create the necessary database tables to back all data stores.
