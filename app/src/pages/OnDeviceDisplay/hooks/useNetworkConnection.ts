@@ -72,6 +72,10 @@ export function useNetworkConnection(robotName: string): NetworkConnection {
     connectionStatus = activeSsid != null ? activeSsid : ''
   }
 
+  if (!isWifiConnected && !isEthernetConnected && !isUsbConnected) {
+    connectionStatus = t('not_connected')
+  }
+
   return {
     isWifiConnected,
     isEthernetConnected,
