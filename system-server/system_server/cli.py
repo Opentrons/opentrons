@@ -8,7 +8,7 @@ import argparse
 
 def build_root_parser() -> argparse.ArgumentParser:
     """Constructs the basic CLI parser for the application."""
-    parser = argparse.ArgumentParser(description="Opentrons update server")
+    parser = argparse.ArgumentParser(description="Opentrons system server")
     parser.add_argument(
         "-p",
         "--port",
