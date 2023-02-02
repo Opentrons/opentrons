@@ -24,7 +24,7 @@ export function useDeckCalibrationData(
 ): {
   deckCalibrationData: DeckCalibrationData | null
   isDeckCalibrated: boolean
-  markedBad: boolean
+  markedBad?: boolean
 } {
   const [dispatchRequest] = useDispatchApiRequest()
 
