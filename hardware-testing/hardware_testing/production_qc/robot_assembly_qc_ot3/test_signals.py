@@ -28,6 +28,8 @@ MOVING_DISTANCE = 100
 MOVE_SECONDS = 2
 MOVING_SPEED = MOVING_DISTANCE / MOVE_SECONDS
 
+SIGNAL_TEST_NAMES = ["nsync", "estop", "estop-external-left", "estop-external-right"]
+
 
 def _build_move_group(
     distance: float, speed: float, stop: MoveStopCondition
@@ -52,21 +54,17 @@ def _build_move_group(
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    return [
-        CSVLine("nsync-target-pos", [float, float, float]),
-        CSVLine("nsync-stop-pos", [float, float, float]),
-        CSVLine("nsync-result", [CSVResult]),
-        CSVLine("estop-target-pos", [float, float, float]),
-        CSVLine("estop-stop-pos", [float, float, float]),
-        CSVLine("estop-result", [CSVResult]),
-    ]
+    lines: List[CSVLine] = list()
+    for sig_name in SIGNAL_TEST_NAMES:
+        lines.append(CSVLine(f"{sig_name}-target-pos", [float, float, float]))
+        lines.append(CSVLine(f"{sig_name}-stop-pos", [float, float, float]))
+        lines.append(CSVLine(f"{sig_name}-result", [CSVResult]))
+    return lines  # type: ignore[return-value]
 
 
-async def _move_and_trigger_stop_signal(
-    api: OT3API, nsync: bool = False, estop: bool = True
-) -> None:
-    assert nsync or estop, "either nsync or estop must be used as a stop signal"
-    if nsync:
+async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
+    assert sig_name in SIGNAL_TEST_NAMES
+    if sig_name == "nsync":
         stop = MoveStopCondition.sync_line
     else:
         stop = MoveStopCondition.none
@@ -77,29 +75,27 @@ async def _move_and_trigger_stop_signal(
         assert runner.run
         # TODO: add estop/nsync functionality once implemented
     else:
-        sig_msg = "nsync" if nsync else "estop"
         backend: OT3Controller = api._backend  # type: ignore[assignment]
         messenger = backend._messenger
-        if nsync:
-            _sig_msg = "nsync"
-        else:
-            _sig_msg = "estop"
 
         async def _sleep_then_active_stop_signal() -> None:
+            if "external" in sig_name:
+                print("waiting for EXTERNAL E-Stop button")
+                return
             pause_seconds = MOVE_SECONDS / 2
             print(
-                f"pausing {round(pause_seconds, 1)} second before activating {_sig_msg}"
+                f"pausing {round(pause_seconds, 1)} second before activating {sig_name}"
             )
             await asyncio.sleep(pause_seconds)
-            print(f"activating {_sig_msg}")
+            print(f"activating {sig_name}")
             # TODO: add estop/nsync functionality once implemented
-            print(f"pausing 1 second before deactivating {_sig_msg}")
+            print(f"pausing 1 second before deactivating {sig_name}")
             await asyncio.sleep(1)
-            print(f"deactivating {_sig_msg}")
+            print(f"deactivating {sig_name}")
             # TODO: add estop/nsync functionality once implemented
 
         async def _do_the_moving() -> None:
-            if nsync:
+            if sig_name == "nsync":
                 await runner.run(can_messenger=messenger)
             else:
                 try:
@@ -107,7 +103,7 @@ async def _move_and_trigger_stop_signal(
                 except RuntimeError:
                     print("caught runtime error from estop")
 
-        print(f"deactivate {sig_msg}")
+        print(f"deactivate {sig_name}")
         # TODO: add estop/nsync functionality once implemented
         print("pause 0.5 seconds")
         await asyncio.sleep(0.5)
@@ -124,7 +120,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await api.home()
     mount = OT3Axis.to_mount(MOVING_Z_AXIS)
 
-    for sig_name in ["nsync", "estop"]:
+    for sig_name in SIGNAL_TEST_NAMES:
         print(f"testing {sig_name} signal")
         start_pos = await api.gantry_position(mount)
         target_pos = start_pos + Point(
@@ -135,11 +131,14 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             f"{sig_name}-target-pos",
             [float(target_pos.x), float(target_pos.y), float(target_pos.z)],
         )
-        # TODO: enable once implemented in firmware
-        # if sig_name == "nsync":
-        #     await _move_and_trigger_stop_signal(api, nsync=True)
-        # else:
-        #     await _move_and_trigger_stop_signal(api, estop=True)
+        if sig_name == "nsync" or sig_name == "estop":
+            # TODO: enable once implemented in firmware
+            pass
+        else:
+            if not api.is_simulator and "external" in sig_name:
+                input(f"connect {sig_name.upper()}, press ENTER when ready:")
+                print("HIT the E-STOP...")
+            await _move_and_interrupt_with_signal(api, sig_name)
         stop_pos = await api.gantry_position(mount)
         report(
             section,
@@ -151,3 +150,5 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         )
         print(f"{sig_name} result: {result}")
         report(section, f"{sig_name}-result", [result])
+
+    await api.home()
