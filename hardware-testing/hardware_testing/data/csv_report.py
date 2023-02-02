@@ -319,6 +319,11 @@ class CSVReport:
                 return False
         return True
 
+    @property
+    def parent(self) -> Path:
+        """Parent directory of this report file."""
+        return data_io.create_folder_for_test_data(self._test_name)
+
     def _cache_start_time(self) -> None:
         start_time = time()
         for section in self._sections:

@@ -175,13 +175,13 @@ async def _test_pipette(
         api, mount, report, section, f"{mnt_tag}-plunger-home"
     )
     # PLUNGER-MAX
-    print(f"moving to 1mm above drop_tip ({drop_tip - 1}mm)")
+    print(f"moving to drop_tip ({drop_tip}mm)")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip - 1)
     await _test_current_position_and_record_result(
         api, mount, report, section, f"{mnt_tag}-plunger-max"
     )
     # PLUNGER-MIN
-    print(f"moving to 1mm below top ({top + 1}mm)")
+    print(f"moving to top ({top}mm)")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, top + 1)
     await _test_current_position_and_record_result(
         api, mount, report, section, f"{mnt_tag}-plunger-min"

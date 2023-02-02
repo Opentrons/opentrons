@@ -8,14 +8,15 @@ from typing import Tuple
 from opentrons.config import infer_config_base_dir
 
 
-def _infer_testing_data_base_dir() -> Path:
+def get_testing_data_directory() -> Path:
+    """Get testing_data directory."""
     if "TESTING_DATA_DIR" in os.environ:
         return Path(os.environ["TESTING_DATA_DIR"])
     return infer_config_base_dir() / "testing_data"
 
 
 def _initialize_testing_data_base_dir() -> Path:
-    base = _infer_testing_data_base_dir()
+    base = get_testing_data_directory()
     base.mkdir(parents=True, exist_ok=True)
     return base
 
