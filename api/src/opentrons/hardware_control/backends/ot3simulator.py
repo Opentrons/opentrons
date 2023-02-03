@@ -476,13 +476,10 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    def check_firmware_updates(self, attached_instruments: Dict[Union[Mount, OT3Mount], PipetteDict]) -> Dict[NodeId, Tuple[DeviceInfoCache, UpdateInfo]]:
-        # need the pipette channels to determine the update type
-        return {}
-
-    @ensure_yield
-    async def update_firmware(self, filename: str, target: NodeId) -> None:
-        """Update the firmware."""
+    async def do_firmware_updates(
+        self, attached_pipettes: Dict[OT3Mount, PipetteDict]
+    ) -> None:
+        """Updates the firmware on the OT3."""
         pass
 
     def engaged_axes(self) -> OT3AxisMap[bool]:

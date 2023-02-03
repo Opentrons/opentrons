@@ -57,7 +57,7 @@ async def run(args: argparse.Namespace) -> None:
         await run_update(
             messenger=messenger,
             node_id=target,
-            hex_file=args.file,
+            filepath=args.file,
             retry_count=retry_count,
             timeout_seconds=timeout_seconds,
             erase=erase,
@@ -81,7 +81,7 @@ def main() -> None:
     parser.add_argument(
         "--file",
         help="Path to hex file containing the FW executable.",
-        type=argparse.FileType("r"),
+        type=str,
         required=True,
     )
     parser.add_argument(

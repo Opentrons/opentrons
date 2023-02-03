@@ -398,18 +398,9 @@ class OT3API(
 
     async def do_firmware_updates(self) -> None:
         """Update all the firmware."""
-        attached_pipettes = self.get_attached_pipettes()
-        firmware_updates = self._backend.check_firmware_updates(attached_pipettes)
-        if firmware_updates:
-            self._backend.update_required = True
-            for node, update in firmware_updates.items():
-                device_info, update_info = update
-                mod_log.info(
-                    f"Starting firmware update for node: {node.name} shortsha: {device_info.shortsha} -> {update_info.shortsha}"
-                )
-                await self._backend.update_firmware(update_info.filepath, node)
-            # TODO: This might change once we have the ability to see the update status
-            self._backend.update_required = False
+        # get the attached instruments so we can get the type of pipettes attached
+        attached_pipettes = self._pipette_handler.get_attached_instruments()
+        await self._backend.do_firmware_updates(attached_pipettes)
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""

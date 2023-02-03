@@ -17,7 +17,6 @@ from typing import (
     TYPE_CHECKING,
     Sequence,
     AsyncIterator,
-    Union,
     cast,
     Set,
     TypeVar,
@@ -27,7 +26,6 @@ from typing import (
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.types import Mount
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -67,7 +65,7 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     update_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
-from opentrons_hardware.hardware_control.network import DeviceInfoCache, NetworkInfo
+from opentrons_hardware.hardware_control.network import NetworkInfo
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,
@@ -78,7 +76,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware import firmware_update
-from opentrons_hardware.firmware_update.utils import UpdateInfo, load_firmware_manifest
 
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -200,29 +197,40 @@ class OT3Controller:
 
     @update_required.setter
     def update_required(self, value: bool) -> None:
-        if value != self._update_required:
+        if self._update_required != value:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    def check_firmware_updates(self, attached_instruments: Dict[Union[Mount, OT3Mount], PipetteDict]) -> Dict[NodeId, Tuple[DeviceInfoCache, UpdateInfo]]:
+    async def do_firmware_updates(
+        self, attached_pipettes: Dict[OT3Mount, PipetteDict]
+    ) -> None:
+        """Updates the firmware on the OT3."""
         # need the pipette channels to determine the update type
-        attached_pipettes: Dict[NodeId, int] = dict()
-        for mount, pipette in attached_instruments.items():
-            node_id = sensor_node_for_mount(OT3Mount.from_mount(mount))
-            attached_pipettes[node_id] = pipette.get('channels', 0)
-        return firmware_update.check_firmware_updates(self._network_info.device_info, attached_pipettes)
+        pipettes: Dict[NodeId, int] = dict()
+        for mount, pipette in attached_pipettes.items():
+            # remove gripper from list of attached tools
+            node_id = sensor_node_for_mount(mount)
+            if node_id != NodeId.gripper:
+                pipettes[node_id] = pipette.get("channels", 0)
 
-    async def update_firmware(self, filename: str, target: NodeId) -> None:
-        """Update the firmware."""
-        with open(filename, "r") as f:
-            await firmware_update.run_update(
+        # start firmware updates if we have any
+        firmware_updates = firmware_update.check_firmware_updates(
+            self._network_info.device_info, pipettes, force=True
+        )
+        if firmware_updates:
+            log.info(f"Firmware updates are available.")
+            self.update_required = True
+            update_details = {
+                node_id: update.filepath for node_id, update in firmware_updates.items()
+            }
+            await firmware_update.run_updates(
                 messenger=self._messenger,
-                node_id=target,
-                hex_file=f,
+                update_details=update_details,
                 retry_count=3,
                 timeout_seconds=20,
                 erase=True,
             )
+            self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
