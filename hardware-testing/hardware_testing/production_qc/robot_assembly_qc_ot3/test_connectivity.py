@@ -1,8 +1,8 @@
 """Test Connectivity."""
 import asyncio
+from subprocess import run as run_subprocess
 from typing import List, Union, Optional
 
-from opentrons.drivers.rpi_drivers.usb import USBBus
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.system import nmcli
 
@@ -42,24 +42,10 @@ ALLOWED_SECURITY_TYPES = {
 }
 
 
-def _count_usb_listings(api: OT3API) -> int:
-    board_rev = api._backend.board_revision
-    ports = USBBus(board_rev)._read_bus()
-    ports_len = len(ports)
-    return max(ports_len - USB_READ_BUS_LENGTH_NO_CONNECTION, 0)
-
-
 async def _test_ethernet(api: OT3API, report: CSVReport, section: str) -> None:
     if not api.is_simulator:
         input("connect ethernet, then press ENTER:")
         ethernet_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.ETH_LL)
-        # {
-        #   'ipAddress': '192.168.1.105/24',
-        #   'macAddress': '00:14:2D:69:43:79',
-        #   'gatewayAddress': '192.168.1.1',
-        #   'state': 'connected',
-        #   'type': 'ethernet'
-        # }
         eth_ip = ethernet_status["ipAddress"]
     else:
         eth_ip = "0.0.0.0"
@@ -127,29 +113,20 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
 
 
 async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> None:
-    async def _is_usb_device_connected(wait: bool = False) -> bool:
-        if api.is_simulator:
-            return True
-        for _ in range(USB_WAIT_TIMEOUT_SECONDS):
-            if wait:
-                await asyncio.sleep(1)
-            if _count_usb_listings(api) > 0:
-                return True
-        return False
-
-    skip = False
     if not api.is_simulator:
-        inp = input('prepare to test USB, press ENTER when ready ("skip" to skip): ')
-        skip = "skip" in inp
-    if not skip:
-        for tag in USB_PORTS_TO_TEST:
-            while not api.is_simulator and await _is_usb_device_connected():
-                input("unplug all USB devices, press ENTER when ready")
-            if not api.is_simulator:
-                input(f"[{tag}] connect a USB device, press ENTER when ready)")
-            result = CSVResult.from_bool(await _is_usb_device_connected(wait=True))
-            print(f"{tag}: {result}")
-            report(section, tag, [result])
+        input('insert USB drives into all x9 USB-A ports, press ENTER when ready: ')
+        print("pausing 2 seconds before reading USB data")
+        await asyncio.sleep(2)
+        res = run_subprocess(["blkid"], capture_output=True, text=True)
+        output = res.stdout
+    else:
+        output = "\n".join(USB_PORTS_TO_TEST)
+
+    print(output)
+    for tag in USB_PORTS_TO_TEST:
+        result = CSVResult.from_bool(tag in output)
+        print(f"{tag}: {result}")
+        report(section, tag, [result])
 
 
 async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
