@@ -94,9 +94,8 @@ export function useCalibrationTaskList(
     activeTaskIndices = [0, 0]
     deckTask.description = t('start_with_deck_calibration')
     deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
-    if (markedBad) {
+    if (markedBad === true) {
       deckTask.markedBad = true
-      deckTask.footer = t('calibration_recommended')
     }
   }
 
