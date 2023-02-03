@@ -151,6 +151,7 @@ async def _probe_mount_and_record_result(
 async def _test_pipette(
     api: OT3API, mount: OT3Mount, report: CSVReport, section: str
 ) -> None:
+    await api.cache_instruments()
     mnt_tag = mount.name.lower()
     pip = api.hardware_pipettes[mount.to_mount()]
     if not pip:
@@ -195,6 +196,7 @@ async def _test_pipette(
 
 
 async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
+    await api.cache_instruments()
     mount = OT3Mount.GRIPPER
     z_ax = OT3Axis.by_mount(mount)
     jaw_ax = OT3Axis.of_main_tool_actuator(mount)
@@ -300,7 +302,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # GRIPPER
     ui.print_header("GRIPPER")
-    while not api.is_simulator:
+    if not api.is_simulator:
         ui.get_user_ready("attach a gripper")
     await _test_gripper(api, report, section)
     while not api.is_simulator and await _has_gripper(api):
