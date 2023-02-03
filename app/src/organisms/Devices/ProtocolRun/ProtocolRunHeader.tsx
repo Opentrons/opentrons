@@ -263,9 +263,11 @@ export function ProtocolRunHeader({
       {runStatus === RUN_STATUS_STOPPED ? (
         <Banner type="warning">{t('run_canceled')}</Banner>
       ) : null}
-      <TerminalRunBanner
-        {...{ runStatus, handleClearClick, isClosingCurrentRun }}
-      />
+      {isRunCurrent ? (
+        <TerminalRunBanner
+          {...{ runStatus, handleClearClick, isClosingCurrentRun }}
+        />
+      ) : null}
       <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
         <LabeledValue label={t('run')} value={createdAtTimestamp} />
         <LabeledValue

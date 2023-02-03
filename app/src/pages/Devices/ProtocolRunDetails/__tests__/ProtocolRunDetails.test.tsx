@@ -2,27 +2,29 @@ import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
-import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 
 import { i18n } from '../../../../i18n'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import {
   useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
   useRobot,
   useRunStatuses,
   useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { RunPreview } from '../../../../organisms/RunPreview'
+import { RunPreviewComponent } from '../../../../organisms/RunPreview'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { ProtocolRunDetails } from '..'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
+import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
 
+jest.mock(
+  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+)
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
@@ -37,7 +39,9 @@ const mockUseSyncRobotClock = useSyncRobotClock as jest.MockedFunction<
 const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
   typeof ProtocolRunHeader
 >
-const mockRunPreview = RunPreview as jest.MockedFunction<typeof RunPreview>
+const mockRunPreview = RunPreviewComponent as jest.MockedFunction<
+  typeof RunPreviewComponent
+>
 const mockProtocolRunSetup = ProtocolRunSetup as jest.MockedFunction<
   typeof ProtocolRunSetup
 >
@@ -53,8 +57,8 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
@@ -120,12 +124,7 @@ describe('ProtocolRunDetails', () => {
       },
     } as any)
     mockUseCurrentRunId.mockReturnValue(RUN_ID)
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: (noModulesProtocol as unknown) as LegacySchemaAdapterOutput,
-      displayName: 'mock display name',
-      protocolKey: 'fakeProtocolKey',
-      robotType: 'OT-2 Standard',
-    })
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(mockRobotSideAnalysis)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -161,7 +160,7 @@ describe('ProtocolRunDetails', () => {
 
     getByText('Setup')
     getByText('Module Controls')
-    getByText('Run Log')
+    getByText('Run Preview')
   })
 
   it('defaults to setup content when given an unspecified tab', () => {
@@ -172,13 +171,13 @@ describe('ProtocolRunDetails', () => {
     getByText('Mock ProtocolRunSetup')
   })
 
-  it('renders a run log when the run log tab is clicked', () => {
+  it('renders a run  when the run  tab is clicked', () => {
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}`
     )
 
     expect(queryByText('Mock RunPreview')).toBeFalsy()
-    const runTab = getByText('Run Log')
+    const runTab = getByText('Run Preview')
     runTab.click()
     getByText('Mock RunPreview')
   })
@@ -189,7 +188,7 @@ describe('ProtocolRunDetails', () => {
     )
 
     const setupTab = getByText('Setup')
-    const runTab = getByText('Run Log')
+    const runTab = getByText('Run Preview')
     runTab.click()
     getByText('Mock RunPreview')
     expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
@@ -236,25 +235,20 @@ describe('ProtocolRunDetails', () => {
     expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
   })
 
-  it('disables run log tab if robot-analyzed protocol data is null', () => {
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: null,
-      displayName: null,
-      protocolKey: null,
-      robotType: 'OT-2 Standard',
-    })
+  it('disables run  tab if robot-analyzed protocol data is null', () => {
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}`
     )
 
-    const runTab = getByText('Run Log')
+    const runTab = getByText('Run Preview')
     getByText('Mock ProtocolRunSetup')
     expect(queryByText('Mock RunPreview')).toBeFalsy()
     runTab.click()
     expect(queryByText('Mock RunPreview')).toBeFalsy()
   })
 
-  it('redirects to the run log tab when the run is not current', () => {
+  it('redirects to the run  tab when the run is not current', () => {
     mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}/setup`

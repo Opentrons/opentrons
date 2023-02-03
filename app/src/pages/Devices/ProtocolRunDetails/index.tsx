@@ -184,7 +184,6 @@ function PageContents(props: PageContentsProps): JSX.Element {
     listRef.current?.scrollToIndex(i)
     setJumpedIndex(i)
   }
-
   const protocolRunDetailsContentByTab: {
     [K in ProtocolRunDetailsTab]: JSX.Element | null
   } = {

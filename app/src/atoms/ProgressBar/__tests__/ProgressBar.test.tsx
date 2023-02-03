@@ -47,7 +47,7 @@ describe('ProgressBar', () => {
   it('renders LinerProgress Bar at 50% + red width', () => {
     props.percentComplete = 50
     props.innerStyles = css`
-      background: COLORS.errorEnabled;
+      background: ${COLORS.errorEnabled};
     `
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
