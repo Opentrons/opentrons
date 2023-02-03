@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -53,5 +54,61 @@ describe('RobotSettingsDashboard', () => {
     getByText('Device Reset')
   })
 
-  // ToDo kj 01/25/2023 add test cases when tapping each button
+  // Note(kj: 02/03/2023) This case will be changed in a following PR
+  it('should render component when tapping robot name button', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Robot Name')
+    fireEvent.click(button)
+    getByText('RobotName')
+  })
+
+  it('should render component when tapping robot system version', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Robot System Version')
+    fireEvent.click(button)
+    getByText('RobotSystemVersion')
+  })
+
+  it('should render component when tapping network settings', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Network Settings')
+    fireEvent.click(button)
+    getByText('NetworkSettings')
+  })
+
+  it('should render component when tapping display sleep settings', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Display Sleep Settings')
+    fireEvent.click(button)
+    getByText('DisplaySleepSettings')
+  })
+
+  it('should render component when tapping display brightness', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Display Brightness')
+    fireEvent.click(button)
+    getByText('DisplayBrightness')
+  })
+
+  it('should render component when tapping display text size', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Display Text Size')
+    fireEvent.click(button)
+    getByText('DisplayTextSize')
+  })
+
+  it('should render component when tapping device rest', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Device Reset')
+    fireEvent.click(button)
+    getByText('DeviceReset')
+  })
+
+  // The following cases will be activate when RobotSettings PRs are ready
+  // it('should render connection status - only wifi', () => {})
+  // it('should render connection status - wifi + ethernet', () => {})
+  // it('should render connection status - wifi + usb', () => {})
+  // it('should render connection status - ethernet + usb', () => {})
+  // it('should render connection status - all connected', () => {})
+  // it('should render connection status - all not connected', () => {})
 })
