@@ -16,18 +16,14 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 
-SERVER_PORT = 8001
-SERVER_CMD = "python -m http.server {0} --directory {1}"
+SERVER_PORT = 8083
+SERVER_CMD = "{0} -m http.server {1} --directory {2}"
 
 CAM_PIC_FILE_NAME = "camera_{0}.jpg"
 
 CAM_CMD_OT3 = (
     "v4l2-ctl --device /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
-)
-
-INTERNET_IMAGE = (
-    "https://upload.wikimedia.org/wikipedia/commons/f/fb/Small_pict_test.JPG"
 )
 
 
@@ -46,7 +42,7 @@ async def _get_ip(api: OT3API) -> Optional[str]:
     return _ip
 
 
-async def _take_picture(api: OT3API, report: CSVReport, section: str) -> Path:
+async def _take_picture(api: OT3API, report: CSVReport, section: str) -> Optional[Path]:
     cam_pic_name = CAM_PIC_FILE_NAME.format(create_datetime_string())
     if api.is_simulator:
         cam_pic_name = cam_pic_name.replace(".jpg", ".txt")
@@ -66,45 +62,60 @@ async def _take_picture(api: OT3API, report: CSVReport, section: str) -> Path:
         result = CSVResult.FAIL
     print(f"camera-active: {result}")
     report(section, "camera-active", [result])
-    return cam_pic_path
+    if bool(result):
+        return cam_pic_path
+    else:
+        return None
 
 
 async def _run_image_check_server(
     api: OT3API, report: CSVReport, section: str, file_path: Path
 ) -> None:
-    _ip = await _get_ip(api)
-    if not _ip:
-        result = CSVResult.FAIL
-    else:
+    result = CSVResult.FAIL
+    server_process: Optional[Popen] = None
+
+    async def _run_check() -> None:
+        nonlocal result
+        nonlocal server_process
+        _ip = await _get_ip(api)
+        if not _ip:
+            print("error: no IP address")
+            return
         server_address = f"{_ip}:{SERVER_PORT}"
-        process_cmd = f"{SERVER_CMD.format(SERVER_PORT, str(file_path.parent))}"
-        server_process: Optional[Popen] = None
-        try:
-            server_process = Popen(process_cmd.split(" "))
-            await asyncio.sleep(0.5)  # give server time to start
-            address = f"http://{server_address}/{file_path.name}"
-            print(f"\n\nopen your web browser, and go to:\n\n\t{address}\n\n")
-            if api.is_simulator:
-                try:
-                    contents = urlopen(address).read()
-                    result = CSVResult.from_bool(
-                        contents.decode("utf-8") == file_path.name
-                    )
-                except Exception as e:
-                    print(e)
-                    result = CSVResult.FAIL
-            else:
-                inp = input("image OK? (y/n): ")
-                result = CSVResult.from_bool("y" in inp)
-        except Exception as e:
-            print(e)
-            result = CSVResult.FAIL
-        finally:
-            file_path.unlink()
-            if server_process:
-                server_process.kill()
-    print(f"camera-image: {result}")
-    report(section, "camera-image", [result])
+        for py in ["python3", "python"]:
+            process_cmd = SERVER_CMD.format(py, SERVER_PORT, str(file_path.parent))
+            print(process_cmd)
+            try:
+                server_process = Popen(process_cmd.split(" "))
+                break
+            except Exception as e:
+                print(e)
+        if not server_process:
+            print("error: unable to start http server")
+            return
+        await asyncio.sleep(0.5)  # give server time to start
+        address = f"http://{server_address}/{file_path.name}"
+        print(f"\n\nopen your web browser, and go to:\n\n\t{address}\n\n")
+        if api.is_simulator:
+            try:
+                contents = urlopen(address).read()
+            except Exception as e:
+                print(e)
+                return
+            result = CSVResult.from_bool(
+                contents.decode("utf-8") == file_path.name
+            )
+        else:
+            inp = input("image OK? (y/n): ")
+            result = CSVResult.from_bool("y" in inp)
+
+    try:
+        await _run_check()
+    finally:
+        if server_process:
+            server_process.kill()
+        print(f"camera-image: {result}")
+        report(section, "camera-image", [result])
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -152,4 +163,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # CAMERA
     cam_pic_path = await _take_picture(api, report, section)
-    await _run_image_check_server(api, report, section, cam_pic_path)
+    if cam_pic_path:
+        await _run_image_check_server(api, report, section, cam_pic_path)
+        cam_pic_path.unlink()
+    else:
+        print("skipping checking the image, because taking a picture failed")
