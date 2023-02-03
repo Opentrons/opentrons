@@ -311,6 +311,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     print("moving back near home position")
     await api.move_rel(
         OT3Mount.LEFT,
-        RELATIVE_MOVE_FROM_HOME_DELTA * -1.0,
+        RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,
         speed=RELATIVE_MOVE_FROM_HOME_SPEED,
     )

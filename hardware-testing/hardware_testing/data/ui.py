@@ -12,7 +12,9 @@ PRINT_HEADER_ASTERISK = "*"
 def get_user_answer(question: str) -> bool:
     while True:
         inp = input(f"QUESTION: {question}? (y/n): ").strip().lower()
-        if inp[0] == "y":
+        if not inp:
+            continue
+        elif inp[0] == "y":
             return True
         elif inp[0] == "n":
             return False

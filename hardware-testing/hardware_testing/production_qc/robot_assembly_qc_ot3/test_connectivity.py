@@ -18,15 +18,15 @@ from hardware_testing.data.csv_report import (
 USB_WAIT_TIMEOUT_SECONDS = 10
 USB_READ_BUS_LENGTH_NO_CONNECTION = 4
 USB_PORTS_TO_TEST = [
-    "usb-a-front",
-    "usb-a-right-1",
-    "usb-a-right-2",
-    "usb-a-right-3",
-    "usb-a-right-4",
-    "usb-a-left-1",
-    "usb-a-left-2",
-    "usb-a-left-3",
-    "usb-a-left-4",
+    "usb-1",
+    "usb-2",
+    "usb-3",
+    "usb-4",
+    "usb-5",
+    "usb-6",
+    "usb-7",
+    "usb-8",
+    "usb-9",
 ]
 # TODO: work with EEs to get Aux-Port tests implemented
 AUX_PORT_TESTS = [
@@ -123,7 +123,8 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
 
     print(f"output from blkid:\n{output}\n")
     for tag in USB_PORTS_TO_TEST:
-        result = CSVResult.from_bool(tag in output)
+        found = f"OT3-{tag.upper()}" in output
+        result = CSVResult.from_bool(found)
         report(section, tag, [result])
 
 
@@ -140,7 +141,7 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
             await api.refresh_current_position_ot3()
         if not api.is_simulator:
             inp = ui.get_user_answer(f"does {test_name.upper()} signal look good")
-            result = CSVResult.from_bool("y" in inp)
+            result = CSVResult.from_bool(inp)
         report(section, test_name, [result])
 
 
@@ -175,10 +176,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # USB-B-REAR
     ui.print_header("USB-B-REAR")
     if not api.is_simulator:
-        usb_b_res = input(
-            "Connect USB-B to computer. Does computer detect device? (y/n): "
+        inp = ui.get_user_answer(
+            "Connect USB-B to computer, does computer detect device"
         )
-        result = CSVResult.from_bool("y" in usb_b_res.lower())
+        result = CSVResult.from_bool(inp)
     else:
         result = CSVResult.PASS
     report(section, "usb-b-rear", [result])

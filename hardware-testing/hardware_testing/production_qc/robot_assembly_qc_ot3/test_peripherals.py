@@ -40,7 +40,7 @@ async def _get_ip(api: OT3API) -> Optional[str]:
             _ip = ethernet_status["ipAddress"]
         elif wifi_status["ipAddress"]:
             _ip = wifi_status["ipAddress"]
-    return _ip
+    return _ip.split("/")[0]
 
 
 async def _take_picture(api: OT3API, report: CSVReport, section: str) -> Optional[Path]:
@@ -139,22 +139,22 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # DISPLAY
     ui.print_header("DISPLAY")
-    result = _get_user_confirmation("is ODD on?")
+    result = _get_user_confirmation("is ODD on")
     report(section, "screen-on", [CSVResult.from_bool(result)])
-    result = _get_user_confirmation("is ODD touchscreen working?")
+    result = _get_user_confirmation("is ODD touchscreen working")
     report(section, "screen-touch", [CSVResult.from_bool(result)])
 
     # DECK LIGHTS
     ui.print_header("DECK LIGHTS")
-    result = _get_user_confirmation("are the DECK-LIGHTS on?")
+    result = _get_user_confirmation("are the DECK-LIGHTS on")
     report(section, "deck-lights-on", [CSVResult.from_bool(result)])
     # TODO: enable once we are able to turn off the deck lights
-    # result = "y" in input("are the DECK-LIGHTS off? (y/n): ")
+    # result = "y" in input("are the DECK-LIGHTS off (y/n): ")
     # report(section, "deck-lights-off", [CSVResult.from_bool(result)])
 
     # STATUS LIGHTS
     ui.print_header("STATUS LIGHT")
-    result = _get_user_confirmation("is the STATUS-LIGHT on?")
+    result = _get_user_confirmation("is the STATUS-LIGHT on")
     report(section, "status-light-on", [CSVResult.from_bool(result)])
     # TODO: do more testing (colors, on/off, etc.) once implemented
 
