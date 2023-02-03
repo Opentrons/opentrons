@@ -114,7 +114,7 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
 
 async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> None:
     if not api.is_simulator:
-        input('insert USB drives into all x9 USB-A ports, press ENTER when ready: ')
+        input("insert USB drives into all x9 USB-A ports, press ENTER when ready: ")
         print("pausing 2 seconds before reading USB data")
         await asyncio.sleep(2)
         res = run_subprocess(["blkid"], capture_output=True, text=True)

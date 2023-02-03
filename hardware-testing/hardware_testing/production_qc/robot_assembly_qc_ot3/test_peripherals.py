@@ -102,9 +102,7 @@ async def _run_image_check_server(
             except Exception as e:
                 print(e)
                 return
-            result = CSVResult.from_bool(
-                contents.decode("utf-8") == file_path.name
-            )
+            result = CSVResult.from_bool(contents.decode("utf-8") == file_path.name)
         else:
             inp = input("image OK? (y/n): ")
             result = CSVResult.from_bool("y" in inp)
