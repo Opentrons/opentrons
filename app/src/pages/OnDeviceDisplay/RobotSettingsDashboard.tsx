@@ -21,7 +21,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
-import { getLocalRobot } from '../../redux/discovery'
+import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
@@ -63,6 +63,9 @@ export function RobotSettingsDashboard(): JSX.Element {
     currentOption,
     setCurrentOption,
   ] = React.useState<SettingOption | null>(null)
+  const robotServerVersion =
+    localRobot?.status != null ? getRobotApiVersion(localRobot) : null
+
   return (
     <Flex
       padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
@@ -88,11 +91,14 @@ export function RobotSettingsDashboard(): JSX.Element {
           {/* Robot System Version */}
           <RobotSettingButton
             settingName={t('robot_system_version')}
-            settingInfo={'v7.0.0'}
+            settingInfo={
+              robotServerVersion != null
+                ? `v${robotServerVersion}`
+                : t('robot_settings_advanced_unknown')
+            }
             currentOption="RobotSystemVersion"
             setCurrentOption={setCurrentOption}
           />
-
           {/* Network Settings */}
           <RobotSettingButton
             settingName={t('network_settings')}
