@@ -11,6 +11,7 @@ import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
 
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/buildroot')
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<

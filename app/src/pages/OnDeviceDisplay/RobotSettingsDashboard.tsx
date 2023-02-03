@@ -22,6 +22,8 @@ import {
 import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
+import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
+import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
@@ -33,6 +35,8 @@ import {
   RobotName,
   RobotSystemVersion,
 } from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
+
+import type { State } from '../../redux/types'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -66,6 +70,12 @@ export function RobotSettingsDashboard(): JSX.Element {
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
+  const robotUpdateType = useSelector((state: State) => {
+    return localRobot != null && localRobot.status !== UNREACHABLE
+      ? getBuildrootUpdateAvailable(state, localRobot)
+      : null
+  })
+
   return (
     <Flex
       padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
@@ -76,6 +86,8 @@ export function RobotSettingsDashboard(): JSX.Element {
         <SettingsContent
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
+          robotServerVersion={robotServerVersion ?? 'Unknown'}
+          isUpdateAvailable={robotUpdateType === 'upgrade'}
         />
       ) : (
         <>
@@ -136,16 +148,6 @@ export function RobotSettingsDashboard(): JSX.Element {
           />
         </>
       )}
-
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
-      </Flex>
     </Flex>
   )
 }
@@ -157,12 +159,12 @@ interface RobotSettingButtonProps {
   setCurrentOption: (currentOption: SettingOption) => void
 }
 
-function RobotSettingButton({
+const RobotSettingButton = ({
   settingName,
   settingInfo,
   currentOption,
   setCurrentOption,
-}: RobotSettingButtonProps): JSX.Element {
+}: RobotSettingButtonProps): JSX.Element => {
   return (
     <Btn
       css={SETTING_BUTTON_STYLE}
@@ -210,10 +212,14 @@ function RobotSettingButton({
 interface SettingsContentProps {
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption | null) => void
+  robotServerVersion: string
+  isUpdateAvailable: boolean
 }
 const SettingsContent = ({
   currentOption,
   setCurrentOption,
+  robotServerVersion,
+  isUpdateAvailable,
 }: SettingsContentProps): JSX.Element => {
   let settingOption
   switch (currentOption) {
@@ -221,7 +227,13 @@ const SettingsContent = ({
       settingOption = <RobotName setCurrentOption={setCurrentOption} />
       break
     case 'RobotSystemVersion':
-      settingOption = <RobotSystemVersion setCurrentOption={setCurrentOption} />
+      settingOption = (
+        <RobotSystemVersion
+          currentVersion={robotServerVersion}
+          isUpdateAvailable={isUpdateAvailable}
+          setCurrentOption={setCurrentOption}
+        />
+      )
       break
     case 'NetworkSettings':
       settingOption = <NetworkSettings setCurrentOption={setCurrentOption} />
