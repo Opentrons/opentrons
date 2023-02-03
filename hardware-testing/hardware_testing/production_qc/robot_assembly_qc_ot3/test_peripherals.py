@@ -15,6 +15,7 @@ from hardware_testing.data.csv_report import (
     CSVLine,
     CSVLineRepeating,
 )
+from hardware_testing.data import ui
 
 SERVER_PORT = 8083
 SERVER_CMD = "{0} -m http.server {1} --directory {2}"
@@ -49,7 +50,7 @@ async def _take_picture(api: OT3API, report: CSVReport, section: str) -> Optiona
     cam_pic_path = report.parent / cam_pic_name
 
     process_cmd = CAM_CMD_OT3.format(str(cam_pic_path))
-    print(process_cmd)
+    print(f"command to take a picture: \"{process_cmd}\"")
     try:
         if api.is_simulator:
             with open(cam_pic_path, "w") as f:
@@ -58,9 +59,8 @@ async def _take_picture(api: OT3API, report: CSVReport, section: str) -> Optiona
             run_subprocess(process_cmd.split(" "))  # take a picture
         result = CSVResult.from_bool(cam_pic_path.exists())
     except CalledProcessError as e:
-        print(e)
+        ui.print_error(str(e))
         result = CSVResult.FAIL
-    print(f"camera-active: {result}")
     report(section, "camera-active", [result])
     if bool(result):
         return cam_pic_path
@@ -79,19 +79,19 @@ async def _run_image_check_server(
         nonlocal server_process
         _ip = await _get_ip(api)
         if not _ip:
-            print("error: no IP address")
+            ui.print_error("no IP address")
             return
         server_address = f"{_ip}:{SERVER_PORT}"
         for py in ["python3", "python"]:
             process_cmd = SERVER_CMD.format(py, SERVER_PORT, str(file_path.parent))
-            print(process_cmd)
+            print(f"command to start http server: \"{process_cmd}\"")
             try:
                 server_process = Popen(process_cmd.split(" "))
                 break
             except Exception as e:
-                print(e)
+                ui.print_error(str(e))
         if not server_process:
-            print("error: unable to start http server")
+            ui.print_error("unable to start http server")
             return
         await asyncio.sleep(0.5)  # give server time to start
         address = f"http://{server_address}/{file_path.name}"
@@ -100,19 +100,18 @@ async def _run_image_check_server(
             try:
                 contents = urlopen(address).read()
             except Exception as e:
-                print(e)
+                ui.print_error(str(e))
                 return
             result = CSVResult.from_bool(contents.decode("utf-8") == file_path.name)
         else:
-            inp = input("image OK? (y/n): ")
-            result = CSVResult.from_bool("y" in inp)
+            inp = ui.get_user_answer("is image OK")
+            result = CSVResult.from_bool(inp)
 
     try:
         await _run_check()
     finally:
         if server_process:
             server_process.kill()
-        print(f"camera-image: {result}")
         report(section, "camera-image", [result])
 
 
@@ -136,15 +135,17 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     def _get_user_confirmation(question: str) -> bool:
         if api.is_simulator:
             return True
-        return "y" in input(f"{question} (y/n): ").lower()
+        return ui.get_user_answer(question)
 
-    # ODD
+    # DISPLAY
+    ui.print_header("DISPLAY")
     result = _get_user_confirmation("is ODD on?")
     report(section, "screen-on", [CSVResult.from_bool(result)])
     result = _get_user_confirmation("is ODD touchscreen working?")
     report(section, "screen-touch", [CSVResult.from_bool(result)])
 
     # DECK LIGHTS
+    ui.print_header("DECK LIGHTS")
     result = _get_user_confirmation("are the DECK-LIGHTS on?")
     report(section, "deck-lights-on", [CSVResult.from_bool(result)])
     # TODO: enable once we are able to turn off the deck lights
@@ -152,14 +153,17 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # report(section, "deck-lights-off", [CSVResult.from_bool(result)])
 
     # STATUS LIGHTS
+    ui.print_header("STATUS LIGHT")
     result = _get_user_confirmation("is the STATUS-LIGHT on?")
     report(section, "status-light-on", [CSVResult.from_bool(result)])
     # TODO: do more testing (colors, on/off, etc.) once implemented
 
     # DOOR SWITCH
+    ui.print_header("DOOR SWITCH")
     # TODO: add test once implemented
 
     # CAMERA
+    ui.print_header("CAMERA")
     cam_pic_path = await _take_picture(api, report, section)
     if cam_pic_path:
         await _run_image_check_server(api, report, section, cam_pic_path)

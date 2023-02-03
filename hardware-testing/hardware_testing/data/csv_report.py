@@ -28,6 +28,15 @@ class CSVResult(enum.Enum):
         return cls.PASS if b else cls.FAIL
 
 
+def print_csv_result(test: str, result: CSVResult) -> None:
+    """Print CSV Result."""
+    if bool(result):
+        highlight = ""
+    else:
+        highlight = "\t\t<-- !!! failure"
+    print(f"RESULT: {test} - {result}{highlight}\n")
+
+
 META_DATA_TITLE = "META-DATA"
 META_DATA_TEST_NAME = "test-name"
 META_DATA_TEST_TAG = "test-tag"
@@ -87,7 +96,7 @@ class CSVLine:
                 return False
         return True
 
-    def store(self, *data: Any) -> None:
+    def store(self, *data: Any, print_results: bool = True) -> None:
         """Line store data."""
         if len(data) != len(self._data_types):
             raise ValueError(
@@ -105,6 +114,8 @@ class CSVLine:
                     f'with value "{data[i]}" at index {i}'
                 )
         self._stored = True
+        if print_results and CSVResult in self._data_types:
+            print_csv_result(self.tag, CSVResult.from_bool(self.result_passed))
 
 
 class CSVLineRepeating:
@@ -300,12 +311,12 @@ class CSVReport:
             section = self[RESULTS_OVERVIEW_TITLE]
             line = section[s.title]
             assert isinstance(line, CSVLine)
-            line.store(CSVResult.PASS)
+            line.store(CSVResult.PASS, print_results=False)
             if s.result_passed:
                 result = CSVResult.PASS
             else:
                 result = CSVResult.FAIL
-            line.store(result)
+            line.store(result, print_results=False)
 
     def __str__(self) -> str:
         """CSV Report string."""

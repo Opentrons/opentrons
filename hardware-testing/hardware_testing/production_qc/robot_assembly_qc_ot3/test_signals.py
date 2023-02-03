@@ -15,6 +15,7 @@ from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
 
+from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -103,9 +104,7 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
                 except RuntimeError:
                     print("caught runtime error from estop")
 
-        print(f"deactivate {sig_name}")
         # TODO: add estop/nsync functionality once implemented
-        print("pause 0.5 seconds")
         await asyncio.sleep(0.5)
         move_coro = _do_the_moving()
         stop_coro = _sleep_then_active_stop_signal()
@@ -121,7 +120,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     mount = OT3Axis.to_mount(MOVING_Z_AXIS)
 
     for sig_name in SIGNAL_TEST_NAMES:
-        print(f"testing {sig_name} signal")
+        ui.print_header(sig_name.upper())
         start_pos = await api.gantry_position(mount)
         target_pos = start_pos + Point(
             x=-MOVING_DISTANCE, y=-MOVING_DISTANCE, z=-MOVING_DISTANCE
@@ -136,12 +135,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             pass
         else:
             if not api.is_simulator and "external" in sig_name:
-                input(f"connect {sig_name.upper()}, press ENTER when ready:")
-                print("gantry will now start moving, get ready to hit the E-STOP")
-                input("press ENTER when ready:")
+                ui.get_user_ready(f"connect {sig_name.upper()}")
+                ui.get_user_ready("prepare to hit the E-STOP")
             await _move_and_interrupt_with_signal(api, sig_name)
             if not api.is_simulator and "external" in sig_name:
-                input("release the E-STOP, press ENTER when ready:")
+                ui.get_user_ready("release the E-STOP")
         stop_pos = await api.gantry_position(mount)
         report(
             section,
@@ -151,7 +149,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         result = CSVResult.from_bool(
             1 < start_pos.magnitude_to(stop_pos) < MOVING_DISTANCE
         )
-        print(f"{sig_name} result: {result}")
         report(section, f"{sig_name}-result", [result])
 
     await api.home()

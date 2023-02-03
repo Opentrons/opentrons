@@ -6,6 +6,7 @@ from typing import List, Union, Optional
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.system import nmcli
 
+from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -44,13 +45,12 @@ ALLOWED_SECURITY_TYPES = {
 
 async def _test_ethernet(api: OT3API, report: CSVReport, section: str) -> None:
     if not api.is_simulator:
-        input("connect ethernet, then press ENTER:")
+        ui.get_user_ready("connect ethernet cable")
         ethernet_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.ETH_LL)
         eth_ip = ethernet_status["ipAddress"]
     else:
         eth_ip = "0.0.0.0"
     result = CSVResult.from_bool(bool(eth_ip))
-    print(f"ethernet IP: {eth_ip} - {result}")
     report(section, "ethernet", [eth_ip, result])
 
 
@@ -60,7 +60,6 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     result = CSVResult.FAIL
 
     def _finish() -> None:
-        print(f"wifi connected: {result}")
         report(section, "wifi", [ssid, password, wifi_ip, result])
 
     wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
@@ -72,13 +71,13 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     print("scanning wifi networks...")
     ssids = await nmcli.available_ssids()
     if not ssids:
-        print("no ssids found")
+        ui.print_error("no ssids found")
         return _finish()
     checked_ssids = [
         s for s in ssids if s["securityType"] in list(ALLOWED_SECURITY_TYPES.keys())
     ]
     if not checked_ssids:
-        print("no ssids found with compatible security types")
+        ui.print_error("no ssids found with compatible security types")
         return _finish()
     # get just the first x10 names, removing repetitions
     ssid_names_list: List[str] = list()
@@ -93,7 +92,7 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
         ssid = ssid_names_list[int(res) - 1]
         print(f'"{ssid}"')
     except (ValueError, KeyError) as e:
-        print(e)
+        ui.print_error(str(e))
         _finish()
     found_ssids = [s for s in ssids if ssid == s["ssid"]]
     ssid_info = found_ssids[0]
@@ -104,7 +103,7 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
         print("connecting...")
         await nmcli.configure(ssid, sec, psk=password)
     except ValueError as e:
-        print(e)
+        ui.print_error(str(e))
         return _finish()
     wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
     wifi_ip = wifi_status["ipAddress"]
@@ -114,18 +113,17 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
 
 async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> None:
     if not api.is_simulator:
-        input("insert USB drives into all x9 USB-A ports, press ENTER when ready: ")
+        ui.get_user_ready("insert USB drives into all x9 USB-A ports")
         print("pausing 2 seconds before reading USB data")
         await asyncio.sleep(2)
         res = run_subprocess(["blkid"], capture_output=True, text=True)
         output = res.stdout
     else:
-        output = "\n".join(USB_PORTS_TO_TEST)
+        output = " ".join(USB_PORTS_TO_TEST)
 
-    print(output)
+    print(f"output from blkid:\n{output}\n")
     for tag in USB_PORTS_TO_TEST:
         result = CSVResult.from_bool(tag in output)
-        print(f"{tag}: {result}")
         report(section, tag, [result])
 
 
@@ -136,14 +134,13 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
     for test_name in AUX_PORT_TESTS:
         result = CSVResult.FAIL
         if not api.is_simulator:
-            input(f"testing {test_name.upper()}, press ENTER when ready")
+            ui.get_user_ready(f"testing {test_name.upper()}")
         if "can" in test_name:
             # send some arbitrary CAN data, to inspect externally
             await api.refresh_current_position_ot3()
         if not api.is_simulator:
-            inp = input(f"does {test_name.upper()} signal look good? (y/n): ")
+            inp = ui.get_user_answer(f"does {test_name.upper()} signal look good")
             result = CSVResult.from_bool("y" in inp)
-        print(f"{test_name}: {result}")
         report(section, test_name, [result])
 
 
@@ -162,9 +159,11 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     # ETHERNET
+    ui.print_header("ETHERNET")
     await _test_ethernet(api, report, section)
 
     # WIFI
+    ui.print_header("WIFI")
     if not api.is_simulator:
         await _test_wifi(report, section)
     else:
@@ -174,6 +173,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         assert nmcli.wifi_disconnect
 
     # USB-B-REAR
+    ui.print_header("USB-B-REAR")
     if not api.is_simulator:
         usb_b_res = input(
             "Connect USB-B to computer. Does computer detect device? (y/n): "
@@ -181,11 +181,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         result = CSVResult.from_bool("y" in usb_b_res.lower())
     else:
         result = CSVResult.PASS
-    print(f"rear USB-B: {result}")
     report(section, "usb-b-rear", [result])
 
     # USB-A
+    ui.print_header("USB-A")
     await _test_usb_a_ports(api, report, section)
 
     # AUX
+    ui.print_header("AUX")
     await _test_aux(api, report, section)

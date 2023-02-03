@@ -12,6 +12,7 @@ from hardware_testing.data.csv_report import (
 )
 from hardware_testing.opentrons_api import types, helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis
+from hardware_testing.data import ui
 
 
 GANTRY_AXES = [types.OT3Axis.X, types.OT3Axis.Y, types.OT3Axis.Z_L, types.OT3Axis.Z_R]
@@ -108,10 +109,10 @@ async def _record_test_status(
         raise ValueError(f"unexpected gantry test: {test}")
     status = await _read_gantry_position_and_check_alignment(api, axis)
     estimate, encoder = status.as_lists()
+    print(f"estimate: {estimate}, encoder: {encoder}")
     report(section, f"{test}-estimate", estimate)
     report(section, f"{test}-encoder", encoder)
     report(section, f"{test}-aligned", [status.result])
-    print(f'test "{test}": {status.result}')
 
 
 def _move_rel_point_for_axis(axis: OT3Axis, distance: float) -> types.Point:
@@ -156,15 +157,13 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         settings[ax].run_current = old_currents[ax] * CURRENT_PERCENTAGE
     await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, settings)
     report(section, "run-currents", [settings[ax].run_current for ax in GANTRY_AXES])
-    print("homing")
+    ui.print_header("homing")
     await api.home(GANTRY_AXES)
     await _record_test_status("home-start", api, report, section)
-    print("testing each axis min/max")
-    await _move_along_axis_and_record_test_results(OT3Axis.X, api, report, section)
-    await _move_along_axis_and_record_test_results(OT3Axis.Y, api, report, section)
-    await _move_along_axis_and_record_test_results(OT3Axis.Z_L, api, report, section)
-    await _move_along_axis_and_record_test_results(OT3Axis.Z_R, api, report, section)
-    print("homing")
+    for ax in GANTRY_AXES:
+        ui.print_header(f"Axis {ax.name} - MIN/MAX")
+        await _move_along_axis_and_record_test_results(ax, api, report, section)
+    ui.print_header("homing")
     await api.home(GANTRY_AXES)
     await _record_test_status("home-end", api, report, section)
     print("restoring default currents")

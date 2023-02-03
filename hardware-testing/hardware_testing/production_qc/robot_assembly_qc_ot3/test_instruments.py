@@ -12,6 +12,7 @@ from hardware_testing.data.csv_report import (
 )
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point, GripperProbe
+from hardware_testing.data import ui
 
 PLUNGER_TOLERANCE_MM = 0.2
 GRIPPER_NO_SKIP_TOLERANCE_MM = 0.2
@@ -89,7 +90,6 @@ async def _test_current_position_and_record_result(
 ) -> None:
     estimate, encoder = await _get_plunger_positions(api, mount)
     result = CSVResult.from_bool(abs(estimate - encoder) < PLUNGER_TOLERANCE_MM)
-    print(f"{tag}: {str(result)}")
     report(section, tag, [estimate, encoder, result])
 
 
@@ -112,7 +112,7 @@ async def _probe_mount_and_record_result(
         assert probe, "you must specify which gripper probe (front/rear) you are using"
         await api.grip(GRIPPER_GRIP_FORCE)
         if not api.is_simulator:
-            input(f"attach {probe.name} calibration probe, then press ENTER:")
+            ui.get_user_ready(f"attach {probe.name} calibration probe")
         api.add_gripper_probe(probe)
     else:
         await api.add_tip(mount, 0.1)
@@ -121,7 +121,7 @@ async def _probe_mount_and_record_result(
     pos = await api.gantry_position(mount)
     height_of_probe_full_travel = pos.z - Z_PROBE_DISTANCE_MM
     if not api.is_simulator:
-        input("press ENTER to probe down:")
+        ui.get_user_ready("about to probe DOWN")
     print("touch with your finger to stop the probing motion")
     height_of_probe_stopped = await api.capacitive_probe(
         mount, z_ax, height_of_probe_full_travel, PROBE_SETTINGS
@@ -131,18 +131,17 @@ async def _probe_mount_and_record_result(
     # and position if we did a full travel
     height_diff = height_of_probe_stopped - height_of_probe_full_travel
     result = CSVResult.from_bool(Z_PROBE_DISTANCE_MM - 1 > abs(height_diff) > 1)
-    print(f"{tag}: {str(result)}")
     results = [
         float(height_of_probe_full_travel),
         float(height_of_probe_stopped),
         result,
     ]
-    report(section, f"{tag}", results)
+    report(section, tag, results)
 
     # remove probe
     if mount == OT3Mount.GRIPPER:
         if not api.is_simulator:
-            input("remove calibration probe, then press ENTER:")
+            ui.get_user_ready("remove calibration probe")
         api.remove_gripper_probe()
         await api.ungrip()
     else:
@@ -154,7 +153,9 @@ async def _test_pipette(
 ) -> None:
     mnt_tag = mount.name.lower()
     pip = api.hardware_pipettes[mount.to_mount()]
-    assert pip
+    if not pip:
+        ui.print_error(f"no pipette found on {mount.value} mount")
+        return
     pip_id = helpers_ot3.get_pipette_serial_ot3(pip)
     pip_ax = OT3Axis.of_main_tool_actuator(mount)
     top, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
@@ -165,7 +166,7 @@ async def _test_pipette(
     else:
         user_id = str(pip_id)
     result = CSVResult.from_bool(pip_id == user_id.strip())
-    print(f"{mnt_tag} pipette id ({pip_id}): {str(result)}")
+    print(f"pipette: {pip_id}, barcode={user_id.strip()}")
     report(section, f"{mnt_tag}-id", [pip_id, user_id, result])
 
     # PLUNGER-HOME
@@ -198,7 +199,9 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     z_ax = OT3Axis.by_mount(mount)
     jaw_ax = OT3Axis.of_main_tool_actuator(mount)
     gripper = api._gripper_handler.gripper
-    assert gripper, "no gripper found"
+    if not gripper:
+        ui.print_error("no gripper found")
+        return
     gripper_id = gripper.gripper_id
     jaw_widths = gripper.config.geometry.jaw_width
 
@@ -208,7 +211,7 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     else:
         user_id = str(gripper_id)
     result = CSVResult.from_bool(gripper_id == user_id.strip())
-    print(f"gripper id ({gripper_id}): {str(result)}")
+    print(f"gripper: {gripper_id}, barcode: {user_id}")
     report(section, "gripper-id", [gripper_id, user_id, result])
 
     # NO-SKIP
@@ -245,7 +248,6 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     except AssertionError as e:
         print(str(e))
         result = CSVResult.FAIL
-    print(f"gripper no-skip: {str(result)}")
     report(section, "gripper-no-skip", [result])
     await api.home([z_ax])
 
@@ -276,10 +278,11 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
     while not api.is_simulator and (await _get_pip_mounts(api) or api.has_gripper()):
-        input("remove all attached instruments, then press ENTER:")
+        ui.get_user_ready("remove all attached instruments")
+    print("homing")
     await api.home()
+    print("moving to front of machine")
     await api.move_rel(
         OT3Mount.LEFT,
         RELATIVE_MOVE_FROM_HOME_DELTA,
@@ -288,32 +291,22 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # PIPETTES
     for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
-        skip = False
-        while (
-            not api.is_simulator
-            and mount not in await _get_pip_mounts(api)
-            and not skip
-        ):
-            inp = input(
-                f"attached a pipette to the {mount.name} mount, "
-                f'then press ENTER ("skip" to skip): '
-            )
-            skip = inp.strip() == "skip"
-        if not skip:
-            await _test_pipette(api, mount, report, section)
+        ui.print_header(f"PIPETTE - {mount.name}")
+        if not api.is_simulator:
+            ui.get_user_ready(f"attached a pipette to the {mount.name} mount")
+        await _test_pipette(api, mount, report, section)
     while not api.is_simulator and await _get_pip_mounts(api):
-        input("remove all pipettes, then press ENTER")
+        ui.get_user_ready("remove all pipettes")
 
     # GRIPPER
-    skip = False
-    while not api.is_simulator and not await _has_gripper(api) and not skip:
-        inp = input('attached a gripper, then press ENTER ("skip" to skip): ')
-        skip = inp.strip() == "skip"
-    if not skip:
-        await _test_gripper(api, report, section)
-        while not api.is_simulator and await _has_gripper(api):
-            input("remove the gripper, then press ENTER")
+    ui.print_header("GRIPPER")
+    while not api.is_simulator:
+        ui.get_user_ready("attach a gripper")
+    await _test_gripper(api, report, section)
+    while not api.is_simulator and await _has_gripper(api):
+        ui.get_user_ready("remove the gripper")
 
+    print("moving back near home position")
     await api.move_rel(
         OT3Mount.LEFT,
         RELATIVE_MOVE_FROM_HOME_DELTA * -1.0,

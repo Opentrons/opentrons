@@ -3,12 +3,18 @@ import argparse
 import asyncio
 from pathlib import Path
 
+from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
 
 async def _main(cfg: TestConfig) -> None:
+    # BUILD REPORT
+    test_name = Path(__file__).parent.name
+    report = build_report(test_name)
+    ui.print_title(test_name.replace("_", " ").upper())
+
     # GET INFO
     if not cfg.simulate:
         robot_id = input("enter robot serial number: ")
@@ -16,11 +22,7 @@ async def _main(cfg: TestConfig) -> None:
     else:
         robot_id = "ot3-simulated-A01"
         operator = "simulation"
-    software_version = "unknown"
-
-    # BUILD REPORT
-    test_name = Path(__file__).parent.name
-    report = build_report(test_name)
+    software_version = "unknown"  # FIXME: figure out what this should be
     report.set_tag(robot_id)
     report.set_operator(operator)
     report.set_version(software_version)
@@ -35,13 +37,16 @@ async def _main(cfg: TestConfig) -> None:
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
+        ui.print_title(section.value)
         await test_run(api, report, section.value)
+
+    ui.print_title("DONE")
 
     # SAVE REPORT
     report_path = report.save_to_disk()
     complete_msg = "complete" if report.completed else "incomplete"
     print(f"done, {complete_msg} report -> {report_path}")
-    print(report)
+    # print(report)
 
 
 if __name__ == "__main__":
