@@ -143,26 +143,26 @@ TEST_PARAMETERS = {
     GantryLoad.HIGH_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 500,
-                'MAX': 1000,
+                'MIN': 400,
+                'MAX': 500,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
+                'MIN': 600,
+                'MAX': 1800,
                 'INC': 200}},
         'Y': {
             'SPEED': {
-                'MIN': 500,
-                'MAX': 1000,
+                'MIN': 400,
+                'MAX': 500,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
+                'MIN': 600,
+                'MAX': 1800,
                 'INC': 200}},
         'L': {
             'SPEED': {
                 'MIN': 40,
-                'MAX': 140,
+                'MAX': 60,
                 'INC': 10},
             'ACCEL': {
                 'MIN': 800,
@@ -171,7 +171,7 @@ TEST_PARAMETERS = {
         'R': {
             'SPEED': {
                 'MIN': 40,
-                'MAX': 140,
+                'MAX': 60,
                 'INC': 10},
             'ACCEL': {
                 'MIN': 600,
@@ -199,19 +199,19 @@ SETTINGS = {
         run_current=1.5
     ),
     OT3Axis.Z_L: GantryLoadSettings(
-        max_speed=60,
-        acceleration=300,
+        max_speed=35,
+        acceleration=100,
         max_start_stop_speed=10,
         max_change_dir_speed=1,
-        hold_current=0.7,
+        hold_current=1.5,
         run_current=1.5
     ),
     OT3Axis.Z_R: GantryLoadSettings(
-        max_speed=60,
-        acceleration=400,
+        max_speed=35,
+        acceleration=100,
         max_start_stop_speed=10,
         max_change_dir_speed=1,
-        hold_current=0.7,
+        hold_current=1.5,
         run_current=1.5
     )
 }
@@ -233,11 +233,12 @@ GANTRY_LOAD_MAP = {'NONE': GantryLoad.NONE,
 }
 
 
-step_x = 530
+step_x = 520
 step_y = 400
+xy_home_offset = 5
 step_z = 200
-POINT_MAP = {'Y': Point(y=step_y),
-             'X': Point(x=step_x),
+POINT_MAP = {'Y': Point(y=step_y-xy_home_offset),
+             'X': Point(x=step_x-xy_home_offset),
              'L': Point(z=step_z),
              'R': Point(z=step_z)}
 
@@ -276,6 +277,8 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
             MOUNT = OT3Mount.LEFT
         else:
             MOUNT = OT3Mount.RIGHT
+
+        #move away from homed position
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
@@ -285,25 +288,38 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
 
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[axis], speed=cur_speed)
 
+        #check if we moved to correct position with encoder
         move_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         print("inital_pos: " + str(inital_pos))
         print("mov_pos: " + str(move_pos))
         delta_move_pos = get_pos_delta(move_pos, inital_pos)
         delta_move_axis = delta_move_pos[AXIS_MAP[axis]]
         move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[axis], axis)
+        #if we had error in the move stop move
+        print(axis + ' Error: ' + str(move_error))
         if(move_error >= 0.1):
+            #attempt to move closer to the home position quickly
+            move_error_correction = POINT_MAP[axis] - abs(move_error)
+            print('ERROR IN NEG MOVE, CORRECTING: ' + str(move_error_correction))
+            await api.move_rel(mount=MOUNT, delta=POINT_MAP[axis], speed=100)
             return (move_error, c+1)
 
+        #record the current position
+        inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
+
+        #move back to near homed position
         await api.move_rel(mount=MOUNT, delta=POINT_MAP[axis], speed=cur_speed)
 
         final_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         delta_pos = get_pos_delta(final_pos, inital_pos)
         delta_pos_axis = delta_pos[AXIS_MAP[axis]]
-        print(axis + ' Error: ' + str(delta_pos_axis))
-        if(abs(delta_pos_axis) >= 0.1):
-            return (delta_pos_axis, c+1);
+        move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[axis], axis)
+        print(axis + ' Error: ' + str(move_error))
+        if(abs(move_error) >= 0.1):
+            print('ERROR IN POS MOVE')
+            return (move_error, c+1);
         else:
-            avg_error.append(delta_pos_axis)
+            avg_error.append(move_error)
     return (sum(avg_error)/len(avg_error), c+1)
 
 
@@ -318,6 +334,7 @@ async def match_z_settings(axis, speed, accel):
 
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
+    await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     try:
         #run the test while recording raw results
         table_results = {}
@@ -348,7 +365,8 @@ async def _main(is_simulating: bool) -> None:
                                                     load=LOAD)
 
                     #attempt to cycle with the test settings
-                    await api.home([AXIS_MAP[test_axis]])
+                    # await api.home([AXIS_MAP[test_axis]])
+                    await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
                     move_output_tuple = await _single_axis_move(test_axis,
                                                                 api,
                                                                 cycles=CYCLES)
