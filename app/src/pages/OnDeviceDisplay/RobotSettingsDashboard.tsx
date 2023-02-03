@@ -17,6 +17,7 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   ALIGN_FLEX_END,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -75,6 +76,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       ? getBuildrootUpdateAvailable(state, localRobot)
       : null
   })
+  const isUpdateAvailable = robotUpdateType === 'upgrade'
 
   return (
     <Flex
@@ -87,7 +89,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
           robotServerVersion={robotServerVersion ?? 'Unknown'}
-          isUpdateAvailable={robotUpdateType === 'upgrade'}
+          isUpdateAvailable={isUpdateAvailable}
         />
       ) : (
         <>
@@ -110,6 +112,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             }
             currentOption="RobotSystemVersion"
             setCurrentOption={setCurrentOption}
+            isUpdateAvailable={isUpdateAvailable}
           />
           {/* Network Settings */}
           <RobotSettingButton
@@ -157,6 +160,7 @@ interface RobotSettingButtonProps {
   settingInfo?: string
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption) => void
+  isUpdateAvailable?: boolean
 }
 
 const RobotSettingButton = ({
@@ -164,7 +168,9 @@ const RobotSettingButton = ({
   settingInfo,
   currentOption,
   setCurrentOption,
+  isUpdateAvailable,
 }: RobotSettingButtonProps): JSX.Element => {
+  const { t } = useTranslation('app_settings')
   return (
     <Btn
       css={SETTING_BUTTON_STYLE}
@@ -203,6 +209,29 @@ const RobotSettingButton = ({
             ) : null}
           </Flex>
         </Flex>
+        {isUpdateAvailable ?? false ? (
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap="0.75rem"
+            alignItems={ALIGN_CENTER}
+            backgroundColor={COLORS.warningBackgroundMed}
+            padding={`0.75rem ${SPACING.spacing4}`}
+            borderRadius="16px"
+          >
+            <Icon
+              name="ot-alert"
+              size="1.75rem"
+              color={COLORS.warningEnabled}
+            />
+            <StyledText
+              fontSize="1.375rem"
+              lineHeight="1.625rem"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {t('update_available')}
+            </StyledText>
+          </Flex>
+        ) : null}
         <Icon name="chevron-right" size="3rem" />
       </Flex>
     </Btn>
