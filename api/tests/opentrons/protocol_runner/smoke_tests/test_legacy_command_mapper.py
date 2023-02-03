@@ -731,7 +731,7 @@ async def test_comment_commands(comment_protocol_file: Path) -> None:
             startedAt=matchers.IsA(datetime),
             completedAt=matchers.IsA(datetime),
             params=commands.CommentParams(message=expected_message),
-            result = commands.CommentResult()
+            result=commands.CommentResult(),
         )
         for expected_message in expected_messages
     ]
