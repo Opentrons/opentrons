@@ -21,7 +21,7 @@ import {
 } from '@opentrons/react-api-client'
 import {
   BackButton,
-  SecondaryTertiaryButton,
+  QuaternaryButton,
   TertiaryButton,
 } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -85,7 +85,7 @@ const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
         const Button =
           option === props.currentOption
             ? TertiaryButton
-            : SecondaryTertiaryButton
+            : QuaternaryButton
         return (
           <Button key={option} onClick={() => props.setCurrentOption(option)}>
             {option}
