@@ -40,7 +40,9 @@ async def _get_ip(api: OT3API) -> Optional[str]:
             _ip = ethernet_status["ipAddress"]
         elif wifi_status["ipAddress"]:
             _ip = wifi_status["ipAddress"]
-    return _ip.split("/")[0]
+        if _ip:
+            _ip = _ip.split("/")[0]
+    return _ip
 
 
 async def _take_picture(api: OT3API, report: CSVReport, section: str) -> Optional[Path]:
@@ -50,7 +52,7 @@ async def _take_picture(api: OT3API, report: CSVReport, section: str) -> Optiona
     cam_pic_path = report.parent / cam_pic_name
 
     process_cmd = CAM_CMD_OT3.format(str(cam_pic_path))
-    print(f"command to take a picture: \"{process_cmd}\"")
+    print(f'command to take a picture: "{process_cmd}"')
     try:
         if api.is_simulator:
             with open(cam_pic_path, "w") as f:
@@ -84,7 +86,7 @@ async def _run_image_check_server(
         server_address = f"{_ip}:{SERVER_PORT}"
         for py in ["python3", "python"]:
             process_cmd = SERVER_CMD.format(py, SERVER_PORT, str(file_path.parent))
-            print(f"command to start http server: \"{process_cmd}\"")
+            print(f'command to start http server: "{process_cmd}"')
             try:
                 server_process = Popen(process_cmd.split(" "))
                 break

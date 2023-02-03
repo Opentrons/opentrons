@@ -1,5 +1,4 @@
 """Production QC User Interface."""
-from hardware_testing.data.csv_report import CSVResult
 
 
 PRINT_HEADER_NUM_SPACES = 4
@@ -10,6 +9,7 @@ PRINT_HEADER_ASTERISK = "*"
 
 
 def get_user_answer(question: str) -> bool:
+    """Get user answer."""
     while True:
         inp = input(f"QUESTION: {question}? (y/n): ").strip().lower()
         if not inp:
@@ -21,10 +21,12 @@ def get_user_answer(question: str) -> bool:
 
 
 def get_user_ready(message: str) -> None:
+    """Get user ready."""
     input(f"WAIT: {message}, press ENTER when ready: ")
 
 
 def print_title(title: str) -> None:
+    """Print title."""
     """
     #####################
     #   Example Title   #
@@ -32,13 +34,12 @@ def print_title(title: str) -> None:
     """
     length = len(title)
     pounds = PRINT_TITLE_POUNDS + ("#" * length) + PRINT_TITLE_POUNDS
-    middle = f"#{PRINT_HEADER_SPACES}" \
-             f"{title}" \
-             f"{PRINT_HEADER_SPACES}#"
+    middle = f"#{PRINT_HEADER_SPACES}" f"{title}" f"{PRINT_HEADER_SPACES}#"
     print(f"\n{pounds}\n{middle}\n{pounds}\n")
 
 
 def print_header(header: str) -> None:
+    """Print header."""
     """
     ----------------------
     |   Example Header   |
@@ -51,4 +52,5 @@ def print_header(header: str) -> None:
 
 
 def print_error(message: str) -> None:
+    """Print error."""
     print(f"ERROR: {message}")
