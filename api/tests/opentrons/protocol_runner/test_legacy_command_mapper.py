@@ -52,13 +52,16 @@ def test_map_before_command() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Comment.construct(
+            pe_commands.Custom.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
-                params=pe_commands.CommentParams(message="hello world"),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="hello world",
+                ),
             )
         )
     ]
@@ -88,15 +91,18 @@ def test_map_after_command() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Comment.construct(
+            pe_commands.Custom.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
                 completedAt=matchers.IsA(datetime),
-                params=pe_commands.CommentParams(message="hello world"),
-                result=pe_commands.CommentResult(),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="hello world",
+                ),
+                result=pe_commands.CustomResult(),
             )
         )
     ]
@@ -177,35 +183,44 @@ def test_command_stack() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Comment.construct(
+            pe_commands.Custom.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
-                params=pe_commands.CommentParams(message="hello"),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="hello",
+                ),
             )
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.Comment.construct(
+            pe_commands.Custom.construct(
                 id="command.COMMENT-1",
                 key="command.COMMENT-1",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
-                params=pe_commands.CommentParams(message="goodbye"),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="goodbye",
+                ),
             )
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.Comment.construct(
+            pe_commands.Custom.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
                 completedAt=matchers.IsA(datetime),
-                params=pe_commands.CommentParams(message="hello"),
-                result=pe_commands.CommentResult(),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="hello",
+                ),
+                result=pe_commands.CustomResult(),
             )
         ),
         pe_actions.FailCommandAction(
