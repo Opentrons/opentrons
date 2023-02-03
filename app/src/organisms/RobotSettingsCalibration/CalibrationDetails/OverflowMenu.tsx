@@ -15,7 +15,9 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { isOT3Pipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
 
+import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Portal } from '../../../App/portal'
@@ -40,6 +42,7 @@ import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalib
 import { DeckCalibrationConfirmModal } from '../DeckCalibrationConfirmModal'
 
 import type { PipetteName } from '@opentrons/shared-data'
+import type { DeleteCalRequestParams } from '@opentrons/api-client'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'
@@ -60,6 +63,7 @@ interface OverflowMenuProps {
   serialNumber: string | null
   updateRobotStatus: (isRobotBusy: boolean) => void
   pipetteName?: string | null
+  tiprackDefURI?: string | null
 }
 
 export function OverflowMenu({
@@ -69,8 +73,13 @@ export function OverflowMenu({
   serialNumber,
   updateRobotStatus,
   pipetteName,
+  tiprackDefURI = null,
 }: OverflowMenuProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation([
+    'device_settings',
+    'shared',
+    'robot_calibration',
+  ])
   const doTrackEvent = useTrackEvent()
   const {
     menuOverlay,
@@ -136,6 +145,9 @@ export function OverflowMenu({
   const applicablePipetteOffsetCal = pipetteOffsetCalibrations?.find(
     p => p.mount === mount && p.pipette === serialNumber
   )
+  const applicableTipLengthCal = tipLengthCalibrations?.find(
+    cal => cal.pipette === serialNumber && cal.uri === tiprackDefURI
+  )
 
   const {
     showConfirmation: showConfirmStart,
@@ -146,10 +158,7 @@ export function OverflowMenu({
     !isDeckCalibrated
   )
 
-  const handleCalibration = (
-    calType: 'pipetteOffset' | 'tipLength',
-    e: React.MouseEvent
-  ): void => {
+  const handleCalibration = (e: React.MouseEvent): void => {
     e.preventDefault()
     if (!isRunning) {
       if (calType === 'pipetteOffset' && pipetteName != null) {
@@ -176,10 +185,7 @@ export function OverflowMenu({
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
-  const handleDownload = (
-    calType: 'pipetteOffset' | 'tipLength',
-    e: React.MouseEvent
-  ): void => {
+  const handleDownload = (e: React.MouseEvent): void => {
     e.preventDefault()
     doTrackEvent({
       name: EVENT_CALIBRATION_DOWNLOADED,
@@ -211,17 +217,31 @@ export function OverflowMenu({
     }
   }, [isRunning, updateRobotStatus])
 
-  // TODO 5/6/2021 kj: This is scoped out from 6.0
-  // const handleDeleteCalibrationData = (
-  //   calType: 'pipetteOffset' | 'tipLength'
-  // ): void => {
-  //   // method del
-  //   // endpoint calibration/pipette_offset
-  //   // params pipet_id and mount
-  //   // endpoint calibration/tip_length
-  //   // params tiprack_hash and pipette_id
-  //   setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
-  // }
+  const { deleteCalibration } = useDeleteCalibrationMutation()
+
+  const handleDeleteCalibration = (e: React.MouseEvent): void => {
+    e.preventDefault()
+    let params: DeleteCalRequestParams
+    if (calType === 'pipetteOffset') {
+      if (applicablePipetteOffsetCal == null) return
+      params = {
+        calType,
+        mount,
+        pipette_id: applicablePipetteOffsetCal.pipette,
+      }
+    } else {
+      if (applicableTipLengthCal == null) return
+      params = {
+        calType,
+        tiprack_hash: applicableTipLengthCal.tiprack,
+        pipette_id: applicableTipLengthCal.pipette,
+      }
+    }
+
+    deleteCalibration(params)
+
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
@@ -261,19 +281,9 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {enableCalibrationWizards &&
-            calType === 'pipetteOffset' &&
-            applicablePipetteOffsetCal == null && (
-              <MenuItem
-                onClick={e => handleCalibration(calType, e)}
-                disabled={disabledReason !== null}
-              >
-                {t('calibrate_pipette')}
-              </MenuItem>
-            )}
           {!enableCalibrationWizards && mount != null && (
             <MenuItem
-              onClick={e => handleCalibration(calType, e)}
+              onClick={e => handleCalibration(e)}
               disabled={disabledReason !== null}
             >
               {calType === 'pipetteOffset'
@@ -284,15 +294,14 @@ export function OverflowMenu({
             </MenuItem>
           )}
           {!Boolean(isGen3Pipette) ? (
-            <MenuItem onClick={e => handleDownload(calType, e)}>
+            <MenuItem onClick={e => handleDownload(e)}>
               {t('download_calibration_data')}
             </MenuItem>
           ) : null}
-          {/* TODO 5/6/2021 kj: This is scoped out from 6.0 */}
-          {/* <Divider /> */}
-          {/* <MenuItem onClick={() => handleDeleteCalibrationData(calType)}>
-          {t('overflow_menu_delete_data')}
-        </MenuItem> */}
+          <Divider />
+          <MenuItem onClick={e => handleDeleteCalibration(e)}>
+            {t('robot_calibration:delete_calibration_data')}
+          </MenuItem>
         </Flex>
       ) : null}
       {PipetteOffsetCalibrationWizard}

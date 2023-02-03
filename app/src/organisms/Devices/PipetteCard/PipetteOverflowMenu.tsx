@@ -85,18 +85,7 @@ export const PipetteOverflowMenu = (
           </MenuItem>
         ) : (
           <>
-            {enableCalibrationWizards ? (
-              // Only show calibration option [RAUT-93]
-              isPipetteCalibrated ? null : (
-                <MenuItem
-                  key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
-                  onClick={() => handleCalibrate()}
-                  data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
-                >
-                  {t(calibratePipetteText)}
-                </MenuItem>
-              )
-            ) : (
+            {!enableCalibrationWizards && (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
                 onClick={() => handleCalibrate()}

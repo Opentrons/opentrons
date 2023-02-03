@@ -20,13 +20,13 @@ from .protocol_context import ProtocolContext
 from .deck import Deck
 
 from .core.common import ProtocolCore as AbstractProtocolCore
-from .core.protocol_api.protocol_context import ProtocolContextImplementation
-from .core.protocol_api.labware_offset_provider import (
+from .core.legacy.legacy_protocol_core import LegacyProtocolCore
+from .core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     LabwareOffsetProvider,
     NullLabwareOffsetProvider,
 )
-from .core.simulator.protocol_context import ProtocolContextSimulation
+from .core.legacy_simulator.legacy_protocol_core import LegacyProtocolCoreSimulator
 from .core.engine import ProtocolCore
 
 
@@ -70,7 +70,7 @@ def create_protocol_context(
     """
     sync_hardware: SynchronousAdapter[HardwareControlAPI]
     labware_offset_provider: AbstractLabwareOffsetProvider
-    core: Union[ProtocolCore, ProtocolContextSimulation, ProtocolContextImplementation]
+    core: Union[ProtocolCore, LegacyProtocolCoreSimulator, LegacyProtocolCore]
 
     if isinstance(hardware_api, ThreadManager):
         sync_hardware = hardware_api.sync
@@ -101,7 +101,7 @@ def create_protocol_context(
 
     # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
-        core = ProtocolContextSimulation(
+        core = LegacyProtocolCoreSimulator(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
             equipment_broker=equipment_broker,
@@ -111,7 +111,7 @@ def create_protocol_context(
         )
 
     else:
-        core = ProtocolContextImplementation(
+        core = LegacyProtocolCore(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
             equipment_broker=equipment_broker,
@@ -126,8 +126,8 @@ def create_protocol_context(
 
     return ProtocolContext(
         api_version=api_version,
+        core=cast(AbstractProtocolCore, core),
         broker=broker,
-        implementation=cast(AbstractProtocolCore, core),
         deck=deck,
         bundled_data=bundled_data,
     )

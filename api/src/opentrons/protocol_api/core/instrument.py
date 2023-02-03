@@ -77,7 +77,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def touch_tip(
-        self, location: WellCoreType, radius: float, v_offset: float, speed: float
+        self,
+        location: types.Location,
+        well_core: WellCoreType,
+        radius: float,
+        z_offset: float,
+        speed: float,
     ) -> None:
         ...
 

@@ -59,7 +59,6 @@ async def test_insert_and_get_protocol(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )
@@ -87,7 +86,6 @@ async def test_insert_with_duplicate_key_raises(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )
@@ -101,7 +99,6 @@ async def test_insert_with_duplicate_key_raises(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-222",
     )
@@ -138,7 +135,6 @@ async def test_get_all_protocols(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )
@@ -152,7 +148,6 @@ async def test_get_all_protocols(
             files=[],
             metadata={},
             robot_type="OT-3 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-222",
     )
@@ -188,7 +183,6 @@ async def test_remove_protocol(
             ],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )
@@ -227,7 +221,6 @@ def test_remove_protocol_conflict(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key=None,
     )
@@ -261,7 +254,6 @@ def test_get_usage_info(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key=None,
     )
@@ -275,7 +267,6 @@ def test_get_usage_info(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key=None,
     )

@@ -47,6 +47,19 @@ async def test_close_lid(
     connection.send_command.assert_called_once_with(command=expected, retries=3)
 
 
+async def test_plate_lift(
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
+) -> None:
+    """It should send a Plate Lift command."""
+    await subject.lift_plate()
+
+    expected = CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR).add_gcode(
+        gcode="M128"
+    )
+
+    connection.send_command.assert_called_once_with(command=expected, retries=3)
+
+
 async def test_get_lid_status(
     subject: driver.ThermocyclerDriverV2, connection: AsyncMock
 ) -> None:

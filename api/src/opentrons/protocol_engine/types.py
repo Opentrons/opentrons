@@ -80,6 +80,7 @@ class WellOrigin(str, Enum):
 
     TOP = "top"
     BOTTOM = "bottom"
+    CENTER = "center"
 
 
 # This is deliberately a separate type from Vec3f to let components default to 0.
@@ -114,6 +115,14 @@ class DeckPoint(BaseModel):
     x: float
     y: float
     z: float
+
+
+class DeckType(str, Enum):
+    """Types of deck available."""
+
+    OT2_STANDARD = "ot2_standard"
+    OT2_SHORT_TRASH = "ot2_short_trash"
+    OT3_STANDARD = "ot3_standard"
 
 
 class LoadedPipette(BaseModel):

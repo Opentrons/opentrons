@@ -7,7 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from opentrons import __version__
 
 from .errors import exception_handlers
-from .hardware import initialize_hardware, cleanup_hardware
+from .hardware import start_initializing_hardware, clean_up_hardware
+from .persistence import start_initializing_persistence, clean_up_persistence
 from .router import router
 from .service import initialize_logging
 from .service.task_runner import (
@@ -48,20 +49,27 @@ app.include_router(router=router)
 @app.on_event("startup")
 async def on_startup() -> None:
     """Handle app startup."""
-    # Load settings and (throw away the result) so that we detect errors early
-    # on in startup, instead of the first time someone happens to use a setting.
-    get_settings()
+    settings = get_settings()
 
     initialize_logging()
-    initialize_hardware(app.state)
-    initialize_task_runner(app.state)
+    start_initializing_hardware(app_state=app.state)
+    start_initializing_persistence(
+        app_state=app.state,
+        persistence_directory=(
+            None
+            if settings.persistence_directory == "automatically_make_temporary"
+            else settings.persistence_directory
+        ),
+    )
+    initialize_task_runner(app_state=app.state)
 
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
     shutdown_results = await asyncio.gather(
-        cleanup_hardware(app.state),
+        clean_up_hardware(app.state),
+        clean_up_persistence(app.state),
         clean_up_task_runner(app.state),
         return_exceptions=True,
     )

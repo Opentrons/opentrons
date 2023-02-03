@@ -22,7 +22,7 @@ from opentrons.calibration_storage.types import (
 )
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand
@@ -304,7 +304,7 @@ class PipetteOffsetCalibrationUserFlow:
         try:
             return load_tip_length_calibration(
                 self._hw_pipette.pipette_id,
-                self._tip_rack._implementation.get_definition(),
+                self._tip_rack._core.get_definition(),
             ).tipLength
         except TipLengthCalNotFound:
             return None
@@ -438,7 +438,7 @@ class PipetteOffsetCalibrationUserFlow:
                     critical_point=CriticalPoint.FRONT_NOZZLE
                 )
             tiprack_hash = helpers.hash_labware_def(
-                self._tip_rack._implementation.get_definition()
+                self._tip_rack._core.get_definition()
             )
             offset = self._cal_ref_point - cur_pt
             save_pipette_calibration(

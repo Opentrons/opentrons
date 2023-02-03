@@ -432,6 +432,8 @@ def test_get_command_slice(
 @pytest.mark.parametrize(
     ("input_cursor", "input_length", "expected_cursor", "expected_command_ids"),
     [
+        (0, 0, 0, []),
+        (None, 0, 2, []),
         (0, 3, 0, ["pause-1", "pause-2", "pause-3"]),
         (0, 1, 0, ["pause-1"]),
         (1, 2, 1, ["pause-2", "pause-3"]),

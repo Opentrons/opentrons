@@ -53,7 +53,7 @@ export function RobotSettingsPipetteOffsetCalibration({
 
   return (
     <>
-      {showPipetteOffsetCalibrationBanner && (
+      {!enableCalibrationWizards && showPipetteOffsetCalibrationBanner && (
         <Banner
           type={pipetteOffsetCalBannerType === 'error' ? 'error' : 'warning'}
         >

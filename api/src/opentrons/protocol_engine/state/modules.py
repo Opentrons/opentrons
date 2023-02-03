@@ -21,8 +21,11 @@ from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
 )
 from opentrons.hardware_control.modules.types import LiveData
-
-from opentrons.types import DeckSlotName
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_east_slot,
+    get_west_slot,
+)
+from opentrons.types import DeckSlotName, MountType
 
 from ..types import (
     LoadedModule,
@@ -34,6 +37,7 @@ from ..types import (
     LabwareOffsetVector,
     HeaterShakerMovementRestrictors,
     ModuleLocation,
+    DeckType,
 )
 from .. import errors
 from ..commands import (
@@ -541,25 +545,34 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_module_offset(self, module_id: str) -> LabwareOffsetVector:
+    def get_module_offset(
+        self, module_id: str, deck_type: DeckType
+    ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
         slot = self.get_location(module_id).slotName.value
+
         pre_transform = array(
-            (definition.labwareOffset.x, definition.labwareOffset.y, 1)
+            (
+                definition.labwareOffset.x,
+                definition.labwareOffset.y,
+                definition.labwareOffset.z,
+                1,
+            )
         )
-        xforms_ser = definition.slotTransforms.get("ot2_standard", {}).get(
-            slot, {"labwareOffset": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]}
+        xforms_ser = definition.slotTransforms.get(str(deck_type.value), {}).get(
+            slot,
+            {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]},
         )
-        xforms_ser = xforms_ser["labwareOffset"]
+        xforms_ser_offset = xforms_ser["labwareOffset"]
 
         # Apply the slot transform, if any
-        xform = array(xforms_ser)
+        xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
-            z=definition.labwareOffset.z,
+            z=xformed[2],
         )
 
     def get_overall_height(self, module_id: str) -> float:
@@ -702,6 +715,27 @@ class ModuleView(HasState[ModuleState]):
             if transit in _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
                 return True
         return False
+
+    def is_edge_move_unsafe(self, mount: MountType, target_slot: DeckSlotName) -> bool:
+        """Check if the slot next to target contains a module to be avoided, depending on mount."""
+        slot_int = target_slot.as_int()
+
+        if mount is MountType.RIGHT:
+            # Check left of the target
+            neighbor_int = get_west_slot(slot_int)
+            if neighbor_int is None:
+                return False
+            else:
+                neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
+        else:
+            # Check right of the target
+            neighbor_int = get_east_slot(slot_int)
+            if neighbor_int is None:
+                return False
+            else:
+                neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
+
+        return neighbor_slot in self._state.slot_by_module_id.values()
 
     def select_hardware_module_to_load(
         self,
