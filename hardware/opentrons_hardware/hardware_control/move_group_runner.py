@@ -160,6 +160,8 @@ class MoveGroupRunner:
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
         for arbid, completion in completions:
+            if isinstance(completion, TipActionResponse):
+                continue
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
                     (
