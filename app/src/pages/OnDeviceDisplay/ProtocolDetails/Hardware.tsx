@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { useRequiredProtocolHardware } from '../../Protocols/hooks'
-import type { ProtocolHardware } from '../../Protocols/hooks'
-import type { TFunction } from 'react-i18next'
 import {
   getModuleDisplayName,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
+import { useRequiredProtocolHardware } from '../../Protocols/hooks'
+import type { ProtocolHardware } from '../../Protocols/hooks'
+import type { TFunction } from 'react-i18next'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
