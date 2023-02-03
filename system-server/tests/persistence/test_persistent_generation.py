@@ -38,9 +38,9 @@ async def test_persistent_directory_generation(tmpdir: Path) -> None:
     # Make sure opening the directory doesn't overwrite things
     subfile = subdir / "test.txt"
     assert not subfile.exists()
-    open(str(subfile), "w").write("Test string\n")
+    subfile.write_text("Test string\n")
     assert subdir == await create_persistent_directory(subdir)
-    assert open(subfile, "r").readline() == "Test string\n"
+    assert subfile.read_text() == "Test string\n"
 
     # Make sure the function can make a new tempdir
     temp = await create_persistent_directory(None)
