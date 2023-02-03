@@ -1,32 +1,29 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
-import { last } from 'lodash'
 import { format } from 'date-fns'
-import styled from 'styled-components'
 import {
   COLORS,
   Flex,
   Icon,
   SIZE_2,
   SPACING,
-  JUSTIFY_FLEX_START,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
   useDeleteProtocolMutation,
-  useProtocolAnalysesQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import {
   BackButton,
   SecondaryTertiaryButton,
   TertiaryButton,
-} from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import type { OnDeviceRouteParams } from '../../App/types'
-import type { Protocol } from '@opentrons/api-client'
+} from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import type { OnDeviceRouteParams } from '../../../App/types'
+import { Hardware } from './Hardware'
+import { ProtocolMetadata } from '@opentrons/shared-data'
 
 type ProtocolType = 'json' | 'python'
 type CreationMethod = 'Protocol Designer' | 'Python'
@@ -96,7 +93,10 @@ const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
   )
 }
 
-const Summary = (props: { protocolRecord: Protocol }): JSX.Element => {
+const Summary = (props: {
+  author: string | null
+  description: string | null
+}): JSX.Element => {
   const { t } = useTranslation('protocol_details')
   return (
     <Flex flexDirection="column" gridGap={SPACING.spacing2}>
@@ -105,44 +105,16 @@ const Summary = (props: { protocolRecord: Protocol }): JSX.Element => {
           as="h2"
           textTransform={TYPOGRAPHY.textTransformCapitalize}
         >{`${t('author')}: `}</StyledText>
-        <StyledText>{props.protocolRecord.data.metadata.author}</StyledText>
+        <StyledText>{props.author}</StyledText>
       </Flex>
-      <StyledText>{props.protocolRecord.data.metadata.description}</StyledText>
+      <StyledText>{props.description}</StyledText>
     </Flex>
   )
 }
 
-const Table = styled('table')`
-  ${TYPOGRAPHY.labelRegular}
-  border-collapse: collapse;
-  table-layout: auto;
-  width: 100%;
-  border-spacing: 0 ${SPACING.spacing2};
-  margin: ${SPACING.spacing4} 0;
-  text-align: left;
-`
-const TableHeader = styled('th')`
-  text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.darkBlackEnabled};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSizeCaption};
-  padding: ${SPACING.spacing2};
-`
-
-const Hardware = (): JSX.Element => (
-  <Table>
-    <thead>
-      <tr>
-        <TableHeader>Location</TableHeader>
-        <TableHeader>Hardware</TableHeader>
-        <TableHeader>Connected Status</TableHeader>
-      </tr>
-    </thead>
-  </Table>
-)
-
 interface ProtocolSectionContentProps {
-  protocolRecord: Protocol
+  protocolId: string
+  metadata: ProtocolMetadata
   currentOption: TabOption
 }
 const ProtocolSectionContent = (
@@ -151,10 +123,15 @@ const ProtocolSectionContent = (
   let protocolSection
   switch (props.currentOption) {
     case 'Summary':
-      protocolSection = <Summary protocolRecord={props.protocolRecord} />
+      protocolSection = (
+        <Summary
+          author={props.metadata.author ?? null}
+          description={props.metadata.description ?? null}
+        />
+      )
       break
     case 'Hardware':
-      protocolSection = <Hardware />
+      protocolSection = <Hardware protocolId={props.protocolId} />
       break
     case 'Labware':
       break
@@ -188,20 +165,15 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const { deleteProtocol } = useDeleteProtocolMutation(protocolId)
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
-  if (mostRecentAnalysis?.status !== 'completed' || protocolRecord == null)
-    return null
+  if (protocolRecord == null) return null
 
   const displayName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
 
   return (
-    <Flex flexDirection="column" alignItems={JUSTIFY_FLEX_START}>
+    <Flex flexDirection="column" padding={SPACING.spacing6}>
       <BackButton />
       <ProtocolHeader
         title={displayName}
@@ -214,7 +186,8 @@ export function ProtocolDetails(): JSX.Element | null {
         setCurrentOption={setCurrentOption}
       />
       <ProtocolSectionContent
-        protocolRecord={protocolRecord}
+        protocolId={protocolId}
+        metadata={protocolRecord.data.metadata}
         currentOption={currentOption}
       />
       <Flex margin={SPACING.spacing4}>

@@ -40,6 +40,7 @@
   "send": "Send",
   "sending": "Sending",
   "send_protocol_to_ot3": "Send protocol to an OT-3",
+  "slot": "Slot {{slotName}}",
   "successfully_sent": "Successfully sent",
   "unsuccessfully_sent": "Unsuccessfully sent"
 }
