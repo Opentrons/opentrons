@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { Link } from 'react-router-dom'
 
 import {
   Flex,
@@ -16,12 +15,10 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
-  ALIGN_FLEX_END,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
 import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
 import { UNREACHABLE } from '../../redux/discovery/constants'
