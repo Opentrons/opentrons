@@ -4,6 +4,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import {
   COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
   SIZE_2,
@@ -40,7 +41,7 @@ const ProtocolHeader = (props: {
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const { title, date, protocolType, handleRunProtocol } = props
   return (
-    <Flex flexDirection="column" margin={SPACING.spacing5}>
+    <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacing5}>
       <Flex gridGap={SPACING.spacing5} marginBottom={SPACING.spacing3}>
         <StyledText as="h1">{title}</StyledText>
         <TertiaryButton onClick={handleRunProtocol}>
@@ -99,7 +100,7 @@ const Summary = (props: {
 }): JSX.Element => {
   const { t } = useTranslation('protocol_details')
   return (
-    <Flex flexDirection="column" gridGap={SPACING.spacing2}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
       <Flex gridGap={SPACING.spacing2}>
         <StyledText
           as="h2"
@@ -173,7 +174,7 @@ export function ProtocolDetails(): JSX.Element | null {
     protocolRecord?.data.files[0].name
 
   return (
-    <Flex flexDirection="column" padding={SPACING.spacing6}>
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
       <BackButton />
       <ProtocolHeader
         title={displayName}

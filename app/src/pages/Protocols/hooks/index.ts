@@ -10,7 +10,7 @@ interface ProtocolPipette {
   hardwareType: 'pipette'
   pipetteName: PipetteName
   mount: 'left' | 'right'
-  connected: true | false
+  connected: boolean
 }
 
 // TODO: change this to new slot naming system with an imported type from shared data
@@ -20,7 +20,7 @@ interface ProtocolModule {
   hardwareType: 'module'
   moduleModel: ModuleModel
   slot: Slot
-  connected: true | false
+  connected: boolean
 }
 
 export type ProtocolHardware = ProtocolPipette | ProtocolModule

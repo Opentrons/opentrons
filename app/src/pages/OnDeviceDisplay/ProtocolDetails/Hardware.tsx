@@ -21,7 +21,6 @@ const Table = styled('table')`
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.darkBlackEnabled};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing2};
