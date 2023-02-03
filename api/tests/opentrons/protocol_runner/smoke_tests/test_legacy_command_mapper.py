@@ -722,8 +722,18 @@ async def test_comment_commands(comment_protocol_file: Path) -> None:
     """It should map comment() calls to Protocol Engine comment commands."""
     result_commands = await simulate_and_get_commands(comment_protocol_file)
     expected_messages = ["", "Hello, world!", "😎"]
+    expected_commands = [
+        commands.Comment.construct(
+            id=matchers.IsA(str),
+            key=matchers.IsA(str),
+            status=commands.CommandStatus.SUCCEEDED,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            completedAt=matchers.IsA(datetime),
+            params=commands.CommentParams(message=expected_message),
+            result = commands.CommentResult()
+        )
+        for expected_message in expected_messages
+    ]
 
-    assert len(result_commands) == len(expected_messages)
-    for result_command, expected_message in zip(result_commands, expected_messages):
-        assert isinstance(result_command, commands.Comment)
-        assert result_command.params == commands.CommentParams(message=expected_message)
+    assert result_commands == expected_commands
