@@ -50,9 +50,11 @@ export function useCalibrationTaskList(
     taskList: [],
   }
   // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
-  const { isDeckCalibrated, deckCalibrationData } = useDeckCalibrationData(
-    robotName
-  )
+  const {
+    isDeckCalibrated,
+    deckCalibrationData,
+    markedBad,
+  } = useDeckCalibrationData(robotName)
   const attachedPipettes = useAttachedPipettes()
   // get calibration data for mounted pipette subtasks
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
@@ -94,7 +96,9 @@ export function useCalibrationTaskList(
     activeTaskIndices = [0, 0]
     deckTask.description = t('start_with_deck_calibration')
     deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
-    deckTask.markedBad = deckCalibrationData !== undefined
+    if (markedBad === true) {
+      deckTask.markedBad = true
+    }
   }
 
   taskList.taskList.push(deckTask)
@@ -193,7 +197,7 @@ export function useCalibrationTaskList(
         pipetteTask.subTasks.push(tipLengthSubTask)
         pipetteTask.subTasks.push(offsetSubTask)
 
-        pipetteTask.markedBad = pipetteTask.subTasks.every(st => st.markedBad)
+        pipetteTask.markedBad = pipetteTask.subTasks.some(st => st.markedBad)
 
         taskList.taskList.push(pipetteTask)
 
@@ -224,7 +228,11 @@ export function useCalibrationTaskList(
                 hasBlockModalResponse: null,
               }),
           }
-          tipLengthSubTask.markedBad = tipLengthCalForPipette !== undefined
+
+          if (tipLengthCalForPipette?.status.markedBad === true) {
+            tipLengthSubTask.markedBad = true
+            tipLengthSubTask.footer = t('calibration_recommended')
+          }
         } else {
           // the tip length calibration is present and valid
           tipLengthSubTask.footer = t('robot_calibration:last_completed_on', {
@@ -263,7 +271,11 @@ export function useCalibrationTaskList(
                 withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
               }),
           }
-          offsetSubTask.markedBad = offsetCalForPipette !== undefined
+
+          if (offsetCalForPipette?.status.markedBad === true) {
+            offsetSubTask.markedBad = true
+            offsetSubTask.footer = t('calibration_recommended')
+          }
         } else {
           // the offset calibration is present and valid
           offsetSubTask.footer = t('robot_calibration:last_completed_on', {
@@ -284,7 +296,7 @@ export function useCalibrationTaskList(
         pipetteTask.subTasks.push(tipLengthSubTask)
         pipetteTask.subTasks.push(offsetSubTask)
 
-        pipetteTask.markedBad = pipetteTask.subTasks.every(st => st.markedBad)
+        pipetteTask.markedBad = pipetteTask.subTasks.some(st => st.markedBad)
 
         taskList.taskList.push(pipetteTask)
 

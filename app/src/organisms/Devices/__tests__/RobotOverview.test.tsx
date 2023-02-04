@@ -28,7 +28,12 @@ import {
   useRunStatuses,
 } from '../hooks'
 import {
-  expectedFailedTaskList,
+  expectedBadDeckTaskList,
+  expectedBadDeckAndPipetteOffsetTaskList,
+  expectedBadEverythingTaskList,
+  expectedBadPipetteOffsetTaskList,
+  expectedBadTipLengthTaskList,
+  expectedBadTipLengthAndOffsetTaskList,
   expectedIncompleteDeckCalTaskList,
   expectedTaskList,
 } from '../hooks/__fixtures__/taskListFixtures'
@@ -223,8 +228,77 @@ describe('RobotOverview', () => {
     )
   })
 
-  it('renders a recommended recalibration status label when the calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedFailedTaskList)
+  it('renders a recommended recalibration status label when the deck is bad and calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedBadDeckTaskList)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(props)
+    getByText('Recalibration recommended')
+    const calibrationDashboardLink = getByRole('link', {
+      name: 'Go to calibration',
+    })
+    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+      '/devices/opentrons-robot-name/robot-settings/calibration'
+    )
+  })
+
+  it('renders a recommended recalibration status label when both the deck and offset is bad and the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedBadDeckAndPipetteOffsetTaskList
+    )
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(props)
+    getByText('Recalibration recommended')
+    const calibrationDashboardLink = getByRole('link', {
+      name: 'Go to calibration',
+    })
+    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+      '/devices/opentrons-robot-name/robot-settings/calibration'
+    )
+  })
+
+  it('renders a recommended recalibration status label when everything is bad and the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedBadEverythingTaskList)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(props)
+    getByText('Recalibration recommended')
+    const calibrationDashboardLink = getByRole('link', {
+      name: 'Go to calibration',
+    })
+    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+      '/devices/opentrons-robot-name/robot-settings/calibration'
+    )
+  })
+
+  it('renders a recommended recalibration status label when the offset is bad and calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedBadPipetteOffsetTaskList)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(props)
+    getByText('Recalibration recommended')
+    const calibrationDashboardLink = getByRole('link', {
+      name: 'Go to calibration',
+    })
+    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+      '/devices/opentrons-robot-name/robot-settings/calibration'
+    )
+  })
+
+  it('renders a recommended recalibration status label when the tip length is bad and calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedBadTipLengthTaskList)
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(props)
+    getByText('Recalibration recommended')
+    const calibrationDashboardLink = getByRole('link', {
+      name: 'Go to calibration',
+    })
+    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+      '/devices/opentrons-robot-name/robot-settings/calibration'
+    )
+  })
+
+  it('renders a recommended recalibration status label when both the tip length and offset is bad and the calibration wizard feature flag is set', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedBadTipLengthAndOffsetTaskList
+    )
     mockUseFeatureFlag.mockReturnValue(true)
     const [{ getByRole, getByText }] = render(props)
     getByText('Recalibration recommended')
