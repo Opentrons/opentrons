@@ -177,6 +177,15 @@ settings = [
         restart_required=True,
     ),
     SettingDefinition(
+        _id="enableOT3FirmwareUpdates",
+        title="Enable experimental OT-3 firmware updates",
+        description=(
+            "Do not enable. This is an Opentrons-internal setting to test "
+            "new subsystem (head, gantry, etc) updates."
+        ),
+        restart_required=True,
+    ),
+    SettingDefinition(
         _id="enableProtocolEnginePAPICore",
         title="Enable experimental execution core for Python protocols",
         description=(

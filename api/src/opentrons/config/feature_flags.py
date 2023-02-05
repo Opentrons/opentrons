@@ -35,3 +35,9 @@ def enable_protocol_engine_papi_core() -> bool:
     """Whether to use the ProtocolEngine core to execute Protocol API v2 protocols."""
 
     return advs.get_setting_with_env_overload("enableProtocolEnginePAPICore")
+
+
+def enable_ot3_firmware_updates() -> bool:
+    """Whether to enable firmware updates for the OT-3 subsystems."""
+
+    return advs.get_setting_with_env_overload("enableOT3FirmwareUpdates")
