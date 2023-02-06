@@ -53,7 +53,7 @@ from opentrons.protocols.types import (
 # Note that even when simulation and execution are handled by the legacy machinery,
 # Protocol Engine still has some involvement for analyzing the simulation and
 # monitoring the execution.
-LEGACY_PYTHON_API_VERSION_CUTOFF = APIVersion(3, 0)
+LEGACY_PYTHON_API_VERSION_CUTOFF = APIVersion(2, 14)
 
 
 # The earliest JSON protocol schema version where the protocol is executed directly by
