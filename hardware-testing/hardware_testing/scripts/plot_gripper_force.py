@@ -35,7 +35,7 @@ class Plot:
         self.ranges = {
             "Input DC":[10,60],
             "Input Force":[5,30],
-            "Current":[100,450],
+            "Current":[50,450],
             "Force":[5,30],
         }
         self.dticks = {
