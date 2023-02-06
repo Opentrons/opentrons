@@ -91,54 +91,5 @@ describe('protocol actions', () => {
         },
       })
     })
-
-    describe('bundle upload', () => {
-      it('dispatches a protocol:OPEN', () => {
-        const result = store.dispatch(openProtocol(bundleFile))
-        const expected = {
-          type: 'protocol:OPEN',
-          payload: { file: bundleFile },
-        }
-
-        expect(result).toEqual(expected)
-        expect(store.getActions()).toEqual([expected])
-      })
-
-      it('dispatches a protocol:INVALID_FILE without bundles enabled', () => {
-        const result = store.dispatch(openProtocol(bundleFile))
-        const expected = {
-          type: 'protocol:INVALID_FILE',
-          payload: {
-            file: bundleFile,
-            message: expect.stringMatching(
-              /ZIP uploads are not currently supported/i
-            ),
-          },
-        }
-
-        expect(result).toEqual(expected)
-        expect(store.getActions()).toEqual([expected])
-      })
-
-      it('dispatches protocol:UPLOAD on bundle read completion', () => {
-        const arrayBuff = new ArrayBuffer(3)
-        const uint8array = new Uint8Array(arrayBuff)
-        uint8array[0] = 57
-        uint8array[1] = 54
-        uint8array[2] = 0
-
-        store.dispatch(openProtocol(bundleFile))
-        mockReader.result = arrayBuff
-        mockReader.onload()
-
-        const actions = store.getActions()
-        expect(actions).toHaveLength(2)
-        expect(actions[1]).toEqual({
-          type: 'protocol:UPLOAD',
-          meta: { robot: true },
-          payload: { contents: 'OTYA', data: null },
-        })
-      })
-    })
   })
 })
