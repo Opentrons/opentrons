@@ -5,7 +5,7 @@ from typing import List
 from opentrons.hardware_control import HardwareControlAPI
 
 from robot_server.hardware import get_hardware
-from robot_server.versioning import get_requested_version
+from server_utils.fastapi_utils.versioning import get_requested_version
 from robot_server.service.legacy.routers.modules import (
     get_modules as legacy_get_attached_modules,
 )

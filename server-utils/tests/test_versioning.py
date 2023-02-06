@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from typing import Dict
 
 from server_utils.fastapi_utils.errors import exception_handlers
-from robot_server.versioning import API_VERSION, check_version_header
+from server_utils.fastapi_utils.versioning import API_VERSION, check_version_header
 
 
 @pytest.fixture
