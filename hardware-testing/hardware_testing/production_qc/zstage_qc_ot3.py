@@ -266,7 +266,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 await _home(messenger)
 
 
-def _force_gauge_stepbystep(messenger: CanMessenger,write_cb: Callable):
+async def _force_gauge_stepbystep(messenger: CanMessenger,write_cb: Callable):
     global thread_sensor
     global cu_fg, sp_fg, distance_fg
     mark10 = _connect_to_mark10_fixture(False)
@@ -340,7 +340,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["----"])
     csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
     print("Force_Gauge_Test")
-    _force_gauge_stepbystep(messenger, csv_cb.write)
+    await _force_gauge_stepbystep(messenger, csv_cb.write)
 
     print('----Test mount right----')
     csv_cb.write(["----Test mount right----"])
@@ -359,7 +359,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["----"])
     csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
     print("Force_Gauge_Test")
-    _force_gauge_stepbystep(messenger, csv_cb.write)
+    await _force_gauge_stepbystep(messenger, csv_cb.write)
 
 async def _main(arguments: argparse.Namespace) -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
