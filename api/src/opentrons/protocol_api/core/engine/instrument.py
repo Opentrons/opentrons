@@ -81,15 +81,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate: The flow rate in µL/s to aspirate at.
         """
         if well_core is None:
-            self._engine_client.move_to_coordinates(
-                pipette_id=self._pipette_id,
-                coordinates=DeckPoint(
-                    x=location.point.x, y=location.point.y, z=location.point.z
-                ),
-                minimum_z_height=None,
-                force_direct=False,
-                speed=None,
-            )
+            if location != self._protocol_core.get_last_location():
+                self._engine_client.move_to_coordinates(
+                    pipette_id=self._pipette_id,
+                    coordinates=DeckPoint(
+                        x=location.point.x, y=location.point.y, z=location.point.z
+                    ),
+                    minimum_z_height=None,
+                    force_direct=False,
+                    speed=None,
+                )
 
             self._engine_client.aspirate_in_place(
                 pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
@@ -135,15 +136,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate: The flow rate in µL/s to dispense at.
         """
         if well_core is None:
-            self._engine_client.move_to_coordinates(
-                pipette_id=self._pipette_id,
-                coordinates=DeckPoint(
-                    x=location.point.x, y=location.point.y, z=location.point.z
-                ),
-                minimum_z_height=None,
-                force_direct=False,
-                speed=None,
-            )
+            if location != self._protocol_core.get_last_location():
+                self._engine_client.move_to_coordinates(
+                    pipette_id=self._pipette_id,
+                    coordinates=DeckPoint(
+                        x=location.point.x, y=location.point.y, z=location.point.z
+                    ),
+                    minimum_z_height=None,
+                    force_direct=False,
+                    speed=None,
+                )
 
             self._engine_client.dispense_in_place(
                 pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
@@ -180,15 +182,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """
         flow_rate = self.get_absolute_blow_out_flow_rate(1.0)
         if well_core is None:
-            self._engine_client.move_to_coordinates(
-                pipette_id=self._pipette_id,
-                coordinates=DeckPoint(
-                    x=location.point.x, y=location.point.y, z=location.point.z
-                ),
-                force_direct=False,
-                minimum_z_height=None,
-                speed=None,
-            )
+            if location != self._protocol_core.get_last_location():
+                self._engine_client.move_to_coordinates(
+                    pipette_id=self._pipette_id,
+                    coordinates=DeckPoint(
+                        x=location.point.x, y=location.point.y, z=location.point.z
+                    ),
+                    force_direct=False,
+                    minimum_z_height=None,
+                    speed=None,
+                )
 
             self._engine_client.blow_out_in_place(
                 pipette_id=self._pipette_id, flow_rate=flow_rate
