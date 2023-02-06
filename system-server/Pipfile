@@ -7,6 +7,7 @@ name = "pypi"
 typing-extensions = "==3.10.0.0"
 pyjwt = "==2.6.0"
 systemd-python = { version = "==234", sys_platform = "== 'linux'" }
+server-utils = {editable = true, path = "./../server-utils"}
 
 [dev-packages]
 system_server = {path = ".", editable = true}

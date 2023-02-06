@@ -31,6 +31,10 @@
             "markers": "sys_platform == 'linux'",
             "version": "==234"
         },
+        "server-utils": {
+            "editable": true,
+            "path": "./../server-utils"
+        },
         "typing-extensions": {
             "hashes": [
                 "sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497",
