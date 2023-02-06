@@ -14,7 +14,6 @@ from opentrons.protocols.advanced_control import transfers
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
-from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
@@ -42,7 +41,8 @@ _log = logging.getLogger(__name__)
 
 _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
 """The version after which the pick-up tip procedure should also prepare the plunger."""
-_PRESSES_INCREMENT_DEPRECATE_FROM = APIVersion(2, 14)
+
+_PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
 
 
@@ -533,37 +533,35 @@ class InstrumentContext(publisher.CommandPublisher):
             last_location = self._protocol_core.get_last_location()
             if not last_location:
                 raise RuntimeError("No valid current location cache present")
-            else:
-                well = last_location.labware
-                # type checked below
-        else:
-            well = LabwareLike(location)
-
-        if well.is_well:
-            if "touchTipDisabled" in well.quirks_from_any_parent():
-                _log.info(f"Ignoring touch tip on labware {well}")
-                return self
-            if well.parent.as_labware().is_tiprack:
-                _log.warning(
-                    "Touch_tip being performed on a tiprack. "
-                    "Please re-check your code"
+            parent_labware, well = last_location.labware.get_parent_labware_and_well()
+            if not well or not parent_labware:
+                raise RuntimeError(
+                    f"Last location {location} has no associated well or labware."
                 )
-
-            if self.api_version < APIVersion(2, 4):
-                to_loc = well.as_well().top()
-            else:
-                move_with_z_offset = well.as_well().top().point + types.Point(
-                    0, 0, v_offset
-                )
-                to_loc = types.Location(move_with_z_offset, well)
-            self.move_to(to_loc, publish=False)
+        elif isinstance(location, labware.Well):
+            well = location
+            parent_labware = well.parent
         else:
-            raise TypeError("location should be a Well, but it is {}".format(location))
+            raise TypeError(f"location should be a Well, but it is {location}")
+
+        if "touchTipDisabled" in parent_labware.quirks:
+            _log.info(f"Ignoring touch tip on labware {well}")
+            return self
+        if parent_labware.is_tiprack:
+            _log.warning(
+                "Touch_tip being performed on a tiprack. Please re-check your code"
+            )
+
+        if self.api_version < APIVersion(2, 4):
+            move_to_location = well.top()
+        else:
+            move_to_location = well.top(z=v_offset)
 
         self._core.touch_tip(
-            location=well.as_well()._core,
+            location=move_to_location,
+            well_core=well._core,
             radius=radius,
-            v_offset=v_offset,
+            z_offset=v_offset,
             speed=checked_speed,
         )
         return self
@@ -730,21 +728,15 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: This instance
         """
 
-        if (
-            presses is not None
-            and self._api_version >= _PRESSES_INCREMENT_DEPRECATE_FROM
-        ):
+        if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
             raise APIVersionError(
-                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_DEPRECATE_FROM},"
+                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
                 f" but you are using API {self._api_version}."
             )
 
-        if (
-            increment is not None
-            and self._api_version >= _PRESSES_INCREMENT_DEPRECATE_FROM
-        ):
+        if increment is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
             raise APIVersionError(
-                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_DEPRECATE_FROM},"
+                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
                 f" but you are using API {self._api_version}."
             )
 

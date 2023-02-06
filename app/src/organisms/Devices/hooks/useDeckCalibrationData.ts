@@ -5,6 +5,7 @@ import {
   fetchCalibrationStatus,
   getDeckCalibrationData,
   DECK_CAL_STATUS_OK,
+  DECK_CAL_STATUS_BAD_CALIBRATION,
 } from '../../../redux/calibration'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { useDeckCalibrationStatus } from './'
@@ -23,6 +24,7 @@ export function useDeckCalibrationData(
 ): {
   deckCalibrationData: DeckCalibrationData | null
   isDeckCalibrated: boolean
+  markedBad?: boolean
 } {
   const [dispatchRequest] = useDispatchApiRequest()
 
@@ -35,11 +37,15 @@ export function useDeckCalibrationData(
     deckCalibrationStatus != null &&
     deckCalibrationStatus === DECK_CAL_STATUS_OK
 
+  const markedBad =
+    deckCalibrationStatus != null &&
+    deckCalibrationStatus === DECK_CAL_STATUS_BAD_CALIBRATION
+
   React.useEffect(() => {
     if (robotName != null) {
       dispatchRequest(fetchCalibrationStatus(robotName))
     }
   }, [dispatchRequest, robotName])
 
-  return { deckCalibrationData, isDeckCalibrated }
+  return { deckCalibrationData, isDeckCalibrated, markedBad }
 }

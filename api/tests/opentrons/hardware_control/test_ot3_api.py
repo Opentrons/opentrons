@@ -834,7 +834,12 @@ async def test_drop_tip_full_tiprack(
         )
         await ot3_hardware.drop_tip(Mount.LEFT)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
-        tip_action.assert_called_once_with([OT3Axis.P_L], 1, 1, "clamp")
+        tip_action.assert_has_calls(
+            calls=[
+                call([OT3Axis.P_L], 1, 1, "clamp"),
+                call([OT3Axis.P_L], 1, 1, "home"),
+            ]
+        )
 
 
 @pytest.mark.parametrize(

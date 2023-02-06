@@ -562,3 +562,32 @@ def test_dispense_with_no_location(
         ),
         times=1,
     )
+
+
+def test_touch_tip(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should touch the pipette tip to the edges of the well with the core."""
+    mock_well = decoy.mock(cls=Well)
+
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+
+    decoy.when(mock_well.top(z=4.56)).then_return(
+        Location(point=Point(1, 2, 3), labware=mock_well)
+    )
+
+    decoy.when(mock_well.parent.quirks).then_return([])
+
+    subject.touch_tip(mock_well, radius=0.123, v_offset=4.56, speed=42.0)
+
+    decoy.verify(
+        mock_instrument_core.touch_tip(
+            location=Location(point=Point(1, 2, 3), labware=mock_well),
+            well_core=mock_well._core,
+            radius=0.123,
+            z_offset=4.56,
+            speed=42.0,
+        )
+    )

@@ -14,6 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  useCreateRunMutation,
   useDeleteProtocolMutation,
   useProtocolAnalysesQuery,
   useProtocolQuery,
@@ -37,14 +38,17 @@ const ProtocolHeader = (props: {
   title: string
   date: number | null
   protocolType: ProtocolType
+  handleRunProtocol: () => void
 }): JSX.Element => {
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
-  const { title, date, protocolType } = props
+  const { title, date, protocolType, handleRunProtocol } = props
   return (
     <Flex flexDirection="column" margin={SPACING.spacing5}>
       <Flex gridGap={SPACING.spacing5} marginBottom={SPACING.spacing3}>
         <StyledText as="h1">{title}</StyledText>
-        <TertiaryButton>{t('protocol_details:run_protocol')}</TertiaryButton>
+        <TertiaryButton onClick={handleRunProtocol}>
+          {t('protocol_details:run_protocol')}
+        </TertiaryButton>
       </Flex>
       <Flex flexDirection="row" gridGap={'1rem'}>
         <StyledText as="h2">{`${t('protocol_info:date_added')}: ${
@@ -173,6 +177,16 @@ export function ProtocolDetails(): JSX.Element | null {
     staleTime: Infinity,
   })
 
+  const { createRun } = useCreateRunMutation({
+    onSuccess: data => {
+      const runId: string = data.data.id
+      history.push(`/protocols/${runId}/setup`)
+    },
+  })
+  const handleRunProtocol = (): void => {
+    createRun({ protocolId })
+  }
+
   const { deleteProtocol } = useDeleteProtocolMutation(protocolId)
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
     staleTime: Infinity,
@@ -192,6 +206,7 @@ export function ProtocolDetails(): JSX.Element | null {
       <ProtocolHeader
         title={displayName}
         date={protocolRecord.data.metadata.created ?? null}
+        handleRunProtocol={handleRunProtocol}
         protocolType={protocolRecord.data.protocolType}
       />
       <ProtocolSectionTabs

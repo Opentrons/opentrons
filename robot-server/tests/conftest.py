@@ -16,7 +16,7 @@ from starlette.testclient import TestClient
 from typing import Any, Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
 from pathlib import Path
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -36,7 +36,7 @@ from robot_server import app
 from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
-from robot_server.persistence.database import create_sql_engine
+from robot_server.persistence import get_sql_engine, create_sql_engine
 
 test_router = routing.APIRouter()
 
@@ -91,9 +91,9 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
-def override_hardware(hardware: MagicMock) -> Iterator[None]:
+def _override_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
     async def get_hardware_override() -> HardwareControlAPI:
-        """Override for get_hardware dependency"""
+        """Override for the get_hardware() FastAPI dependency."""
         return hardware
 
     app.dependency_overrides[get_hardware] = get_hardware_override
@@ -102,14 +102,30 @@ def override_hardware(hardware: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
-def api_client(override_hardware: None) -> TestClient:
+def _override_sql_engine_with_mock() -> Iterator[None]:
+    async def get_sql_engine_override() -> SQLEngine:
+        """Override for the get_sql_engine() FastAPI dependency."""
+        return MagicMock(spec=SQLEngine)
+
+    app.dependency_overrides[get_sql_engine] = get_sql_engine_override
+    yield
+    del app.dependency_overrides[get_sql_engine]
+
+
+@pytest.fixture
+def api_client(
+    _override_hardware_with_mock: None,
+    _override_sql_engine_with_mock: None,
+) -> TestClient:
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return client
 
 
 @pytest.fixture
-def api_client_no_errors(override_hardware: None) -> TestClient:
+def api_client_no_errors(
+    _override_hardware_with_mock: None, _override_sql_engine_with_mock: None
+) -> TestClient:
     """An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests."""
     client = TestClient(app, raise_server_exceptions=False)
@@ -389,7 +405,7 @@ def clear_custom_tiprack_def_dir() -> Iterator[None]:
 
 
 @pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[Engine, None, None]:
+def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
     db_file_path = tmp_path / "test.db"
     sql_engine = create_sql_engine(db_file_path)

@@ -1,7 +1,7 @@
 {
   "$otSharedSchema": "gripper/schemas/1",
-  "model": 1,
-  "schema_version": 1,
+  "model": "gripperV1",
+  "schemaVersion": 1,
   "displayName": "Gripper V1",
   "zMotorConfigurations": {
     "idle": 0.2,
