@@ -93,30 +93,6 @@ exports[`icons alert-circle renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons arrow-back renders correctly 1`] = `
-.c0.spin {
-  -webkit-animation: GLFYz 0.8s steps(8) infinite;
-  animation: GLFYz 0.8s steps(8) infinite;
-  -webkit-transform-origin: center;
-  -ms-transform-origin: center;
-  transform-origin: center;
-}
-
-<svg
-  aria-hidden="true"
-  className=" c0 foo"
-  fill="currentColor"
-  version="1.1"
-  viewBox="0 0 31 31"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M12.9167 28.4166L0 15.5L12.9167 2.58331L14.725 4.42394L3.64896 15.5L14.725 26.576L12.9167 28.4166Z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
 exports[`icons arrow-left renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

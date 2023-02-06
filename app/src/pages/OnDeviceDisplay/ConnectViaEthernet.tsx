@@ -119,7 +119,7 @@ const TitleHeader = ({ title }: TitleHeaderProps): JSX.Element => {
           left="0%"
         >
           <Icon
-            name="arrow-back"
+            name="chevron-left"
             marginRight={SPACING.spacing2}
             size="1.875rem"
           />

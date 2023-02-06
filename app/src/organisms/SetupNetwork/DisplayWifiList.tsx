@@ -116,7 +116,7 @@ const HeaderWithIPs = ({ isSearching }: HeadWithIPsProps): JSX.Element => {
         <Btn onClick={() => history.push('/network-setup')}>
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
-              name="arrow-back"
+              name="chevron-left"
               marginRight={SPACING.spacing2}
               size="1.875rem"
             />
