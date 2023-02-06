@@ -5,7 +5,7 @@ import pytest
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
-from robot_server.errors import ApiError
+from server_utils.fastapi_utils.errors import ApiError
 from robot_server.service.legacy.routers import control
 
 

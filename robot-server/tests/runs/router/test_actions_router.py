@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from decoy import Decoy
 
-from robot_server.errors import ApiError
+from server_utils.fastapi_utils.errors import ApiError
 from server_utils.fastapi_utils.service.json_api import RequestModel
 from robot_server.runs.run_store import RunNotFoundError
 from robot_server.runs.run_controller import RunController, RunActionNotAllowedError

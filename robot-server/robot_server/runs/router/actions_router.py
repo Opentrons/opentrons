@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Union
 from typing_extensions import Literal
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from server_utils.fastapi_utils.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from server_utils.fastapi_utils.service.json_api import (
     RequestModel,

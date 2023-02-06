@@ -5,7 +5,7 @@ from typing import Optional
 from opentrons.calibration_storage import types as cal_types
 from opentrons.calibration_storage.ot2 import tip_length, models
 
-from robot_server.errors import ErrorBody
+from server_utils.fastapi_utils.errors import ErrorBody
 from robot_server.service.tip_length import models as tl_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model
