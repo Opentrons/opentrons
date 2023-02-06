@@ -42,7 +42,6 @@ export interface ConfigFormProps {
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
   groupLabels: string[]
   formId: string
-  __showHiddenFields: boolean
 }
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
@@ -83,15 +82,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   getVisibleFields: () => PipetteSettingsFieldsMap = () => {
-    if (this.props.__showHiddenFields) {
-      return omit(this.props.settings, [QUIRK_KEY])
-    }
-
-    return pick(this.props.settings, [
-      ...PLUNGER_KEYS,
-      ...POWER_KEYS,
-      ...TIP_KEYS,
-    ])
+    return omit(this.props.settings, [QUIRK_KEY])
   }
 
   getUnknownKeys: () => string[] = () => {
@@ -236,12 +227,10 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                     formFields={tipFields}
                   />
                   {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
-                  {this.props.__showHiddenFields && (
-                    <ConfigFormGroup
-                      groupLabel={this.props.groupLabels[2]}
-                      formFields={devFields}
-                    />
-                  )}
+                  <ConfigFormGroup
+                    groupLabel={this.props.groupLabels[2]}
+                    formFields={devFields}
+                  />
                 </FormColumn>
                 <FormColumn>
                   <ConfigFormGroup

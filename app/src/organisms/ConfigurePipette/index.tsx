@@ -50,9 +50,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
         updateRequest.error.message || t('an_error_occurred_while_updating')
       : null
 
-  // TODO(mc, 2019-12-09): remove this feature flag
-  const __showHiddenFields = useFeatureFlag('allPipetteConfig')
-
   // when an in-progress request completes, close modal if response was ok
   React.useEffect(() => {
     if (updateRequest?.status === SUCCESS) {
@@ -70,7 +67,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
           updateSettings={updateSettings}
           groupLabels={groupLabels}
           formId={formId}
-          __showHiddenFields={__showHiddenFields}
         />
       )}
     </Box>
