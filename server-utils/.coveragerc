@@ -1,0 +1,8 @@
+[paths]
+source =
+    server_utils
+
+[report]
+exclude_lines =
+    @overload
+    if TYPE_CHECKING:
