@@ -1,5 +1,5 @@
 """Tests for run module."""
-from typing import Iterator, TextIO, cast
+from typing import Iterator
 
 import mock
 import pytest
@@ -67,7 +67,7 @@ async def test_run_update(
     await run_update(
         messenger=mock_messenger,
         node_id=target.system_node,
-        hex_file=mock_hex_file,
+        filepath=mock_hex_file,
         retry_count=12,
         timeout_seconds=11,
         erase=should_erase,
@@ -102,10 +102,8 @@ async def test_run_updates(
 ) -> None:
     """It should call all the functions."""
     mock_messenger = AsyncMock()
-    mock_hex_file_1 = MagicMock()
-    mock_hex_file_2 = MagicMock()
-    hex_file_1 = cast(TextIO, mock_hex_file_1)
-    hex_file_2 = cast(TextIO, mock_hex_file_2)
+    hex_file_1 = str()
+    hex_file_2 = str()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
     target_1 = Target(system_node=NodeId.gantry_x)
@@ -114,13 +112,14 @@ async def test_run_updates(
         target_1.system_node: hex_file_1,
         target_2.system_node: hex_file_2,
     }
-    await run_updates(
-        messenger=mock_messenger,
-        update_details=update_details,
-        retry_count=12,
-        timeout_seconds=11,
-        erase=should_erase,
-    )
+    with mock.patch("os.path.exists"), mock.patch("builtins.open"):
+        await run_updates(
+            messenger=mock_messenger,
+            update_details=update_details,
+            retry_count=12,
+            timeout_seconds=11,
+            erase=should_erase,
+        )
 
     mock_initiator_run.assert_has_calls(
         [

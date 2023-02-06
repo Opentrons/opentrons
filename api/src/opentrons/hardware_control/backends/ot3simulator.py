@@ -476,8 +476,10 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    async def do_firmware_updates(
-        self, attached_pipettes: Dict[OT3Mount, PipetteDict]
+    async def update_firmware(
+        self,
+        attached_pipettes: Dict[OT3Mount, PipetteDict],
+        nodes: Optional[Set[NodeId]] = set(),
     ) -> None:
         """Updates the firmware on the OT3."""
         pass

@@ -201,8 +201,10 @@ class OT3Controller:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    async def do_firmware_updates(
-        self, attached_pipettes: Dict[OT3Mount, PipetteDict]
+    async def update_firmware(
+        self,
+        attached_pipettes: Dict[OT3Mount, PipetteDict],
+        nodes: Optional[Set[NodeId]] = set(),
     ) -> None:
         """Updates the firmware on the OT3."""
         # need the pipette channels to determine the update type
@@ -213,15 +215,29 @@ class OT3Controller:
             if node_id != NodeId.gripper:
                 pipettes[node_id] = pipette.get("channels", 0)
 
-        # start firmware updates if we have any
+        # Force Update specified nodes, otherwise update everything which requires an update.
+        force = False
+        device_info = self._network_info.device_info
+        if nodes:
+            force = True
+            device_info = {
+                node: cache_info
+                for node, cache_info in self._network_info.device_info.items()
+                if node in nodes
+            }
+
+        # Check if devices need an update, force = True will update the device regardless
         firmware_updates = firmware_update.check_firmware_updates(
-            self._network_info.device_info, pipettes, force=True
+            device_info, pipettes, force=force
         )
+
+        # Start firmware updates if we have any
         if firmware_updates:
             log.info(f"Firmware updates are available.")
             self.update_required = True
             update_details = {
-                node_id: update.filepath for node_id, update in firmware_updates.items()
+                node_id: str(update.filepath)
+                for node_id, update in firmware_updates.items()
             }
             await firmware_update.run_updates(
                 messenger=self._messenger,
@@ -230,6 +246,8 @@ class OT3Controller:
                 timeout_seconds=20,
                 erase=True,
             )
+            # refresh the device_info cache and reset the update_required flag
+            await self._network_info.probe()
             self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:

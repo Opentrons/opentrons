@@ -400,7 +400,7 @@ class OT3API(
         """Update all the firmware."""
         # get the attached instruments so we can get the type of pipettes attached
         attached_pipettes = self._pipette_handler.get_attached_instruments()
-        await self._backend.do_firmware_updates(attached_pipettes)
+        await self._backend.update_firmware(attached_pipettes)
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""

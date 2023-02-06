@@ -54,7 +54,7 @@ class NetworkInfo:
         return set(self._device_info_cache)
 
     async def probe(
-        self, expected: Optional[Set[NodeId]], timeout: float = 1.0
+        self, expected: Optional[Set[NodeId]] = set(), timeout: float = 1.0
     ) -> Dict[NodeId, DeviceInfoCache]:
         """Probe the bus and discover connected devices.
 

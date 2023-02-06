@@ -1,4 +1,5 @@
 from unittest.mock import mock_open
+import mock
 import pytest
 from typing import List, Optional, Set, Tuple, Any
 from itertools import chain
@@ -771,7 +772,7 @@ async def test_update_required_flag(
         "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
         fake_umpe,
     ), patch(
-        "opentrons.hardware_control.backends.ot3controller.firmware_update.run_update"
+        "opentrons.hardware_control.backends.ot3controller.firmware_update.run_updates"
     ), patch(
         "builtins.open", mock_open()
     ):
@@ -783,7 +784,7 @@ async def test_update_required_flag(
         # do not raise for update_firmware
         controller._update_required = True
         try:
-            await controller.update_firmware("/some/path", OT3SubSystem.head)
+            await controller.update_firmware(mock.Mock())
         except FirmwareUpdateRequired:
             assert False, "update_firmware raised an exception."
 

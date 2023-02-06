@@ -20,6 +20,8 @@ log = logging.getLogger(__name__)
 
 
 class FirmwareUpdateType(Enum):
+    """The type of firmware update."""
+
     head = 0
     gantry_x = 1
     gantry_y = 2
@@ -35,11 +37,13 @@ class FirmwareUpdateType(Enum):
 
     @classmethod
     def from_name(cls, name: str) -> "FirmwareUpdateType":
+        """Return FirmwareUpdateType with given name."""
         sanitized_name = name.replace("-", "_")
         return cls.__members__.get(sanitized_name, cls.unknown)
 
     @classmethod
     def from_channels(cls, channels: int) -> "FirmwareUpdateType":
+        """Return FirmwareUpdateType for pipettes with given channels."""
         pipette_channels = {
             1: cls.pipettes_single,
             8: cls.pipettes_multi,
@@ -51,16 +55,20 @@ class FirmwareUpdateType(Enum):
 
 @dataclass
 class UpdateInfo:
+    """Data for a firmware update."""
+
     def __init__(
         self,
         update_type: FirmwareUpdateType,
         version: int,
         shortsha: str,
-        filepath: str,
+        files_by_revision: Dict[str, str],
+        filepath: Optional[str] = str(),
     ) -> None:
         self.update_type = update_type
         self.version = version
         self.shortsha = shortsha
+        self.files_by_revision = files_by_revision
         self.filepath = filepath
 
     def __repr__(self) -> str:
@@ -104,16 +112,19 @@ def _generate_firmware_info(
 ) -> Union[UpdateInfo, None]:
     """Validate the version info and return an UpdateInfo object if valid."""
     try:
-        version = int(version_info.get("version", 0))
-        shortsha = str(version_info.get("shortsha", ""))
-        filepath = os.path.abspath(version_info.get("filepath", ""))
-        if not all([version, shortsha, filepath]):
-            log.info(f"Value error {update_type}")
+        version: int = int(version_info.get("version", 0))
+        shortsha: str = str(version_info.get("shortsha", ""))
+        files_by_revision: Dict[str, str] = version_info.get("files_by_revision", {})
+        if not all([version, shortsha, files_by_revision]):
+            log.error(f"Invalid update info {version_info}")
             raise ValueError
-        if not os.path.exists(filepath):
-            log.info(f"File not found {filepath}")
-            raise FileNotFoundError
-        return UpdateInfo(update_type, version, shortsha, filepath)
+
+        # make sure files exist on disk
+        for rev, filepath in files_by_revision.items():
+            if not os.path.exists(filepath):
+                log.error(f"{rev} File not found {filepath}")
+                raise FileNotFoundError
+        return UpdateInfo(update_type, version, shortsha, files_by_revision)
     except Exception as e:
         log.error(f"Issue serializing update info {update_type} {e}.")
         return None
@@ -152,5 +163,8 @@ def check_firmware_updates(
             log.info(
                 f"Subsystem {node.name} requires an update, device sha: {version_cache.shortsha} != update sha: {update_info.shortsha}"
             )
+            # TODO (BA, 02/03/2022): Get the filepath based on the revision once we add it to GetDeviceInfoResponse.
+            # For now just select the first value.
+            update_info.filepath = list(update_info.files_by_revision.values())[0]
             firmware_update_list[node] = update_info
     return firmware_update_list
