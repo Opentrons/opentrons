@@ -9,7 +9,11 @@ import asyncio
 from logging import getLogger
 from typing import Any, Awaitable, Callable, Set
 from fastapi import Depends
-from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 
 log = getLogger(__name__)
 

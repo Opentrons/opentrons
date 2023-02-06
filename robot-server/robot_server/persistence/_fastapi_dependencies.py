@@ -9,7 +9,11 @@ from anyio import to_thread
 from fastapi import Depends, status
 from typing_extensions import Final
 
-from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from robot_server.errors import ErrorDetails
 
 from ._database import create_sql_engine

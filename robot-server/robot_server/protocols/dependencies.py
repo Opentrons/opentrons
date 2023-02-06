@@ -15,7 +15,11 @@ from opentrons.protocol_runner import create_simulating_runner
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.hardware import get_robot_type
 from robot_server.persistence import get_sql_engine, get_persistence_directory
