@@ -214,5 +214,10 @@
   "display_sleep_settings": "Display Sleep Settings",
   "display_brightness": "Display Brightness",
   "display_text_size": "Display Text Size",
-  "device_reset": "Device Reset"
+  "device_reset": "Device Reset",
+  "sleep_settings": "Sleep Settings",
+  "sleep_settings_description": "Turn the display to sleep after:",
+  "never": "Never",
+  "minutes": "{{minute}} minutes",
+  "one_hour": "1 hour"
 }
