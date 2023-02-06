@@ -16,7 +16,7 @@ from robot_server.robot.calibration.pipette_offset.models import (
     PipetteOffsetCalibrationSessionStatus,
 )
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
-from server_utils.service.json_api import (
+from server_utils.fastapi_utils.service.json_api import (
     RequestModel,
     DeprecatedResponseModel,
     DeprecatedResponseDataModel,

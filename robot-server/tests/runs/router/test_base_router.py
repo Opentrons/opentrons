@@ -9,7 +9,7 @@ from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors import ApiError
-from server_utils.service.json_api import (
+from server_utils.fastapi_utils.service.json_api import (
     RequestModel,
     SimpleBody,
     SimpleEmptyBody,

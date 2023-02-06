@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from server_utils.service.json_api import DeprecatedResponseDataModel
-from server_utils.service.json_api.request import RequestModel
+from server_utils.fastapi_utils.service.json_api import DeprecatedResponseDataModel
+from server_utils.fastapi_utils.service.json_api.request import RequestModel
 
 
 class ItemModel(BaseModel):

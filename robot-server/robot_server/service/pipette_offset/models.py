@@ -5,7 +5,7 @@ from enum import Enum
 from pydantic import Field
 
 from opentrons.calibration_storage.types import SourceType
-from server_utils.service.json_api import (
+from server_utils.fastapi_utils.service.json_api import (
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
     DeprecatedResponseDataModel,

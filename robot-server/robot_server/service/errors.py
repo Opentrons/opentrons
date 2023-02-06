@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 from starlette import status as status_codes
 
 from robot_server.errors import ApiError, ErrorSource, ErrorDetails, ErrorBody
-from server_utils.service.json_api import ResourceLinks
+from server_utils.fastapi_utils.service.json_api import ResourceLinks
 
 
 @dataclass(frozen=True)

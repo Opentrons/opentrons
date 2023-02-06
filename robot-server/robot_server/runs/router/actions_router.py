@@ -8,7 +8,11 @@ from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from server_utils.service.json_api import RequestModel, SimpleBody, PydanticResponse
+from server_utils.fastapi_utils.service.json_api import (
+    RequestModel,
+    SimpleBody,
+    PydanticResponse,
+)
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
 from ..engine_store import EngineStore

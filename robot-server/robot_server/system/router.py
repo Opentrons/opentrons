@@ -7,7 +7,10 @@ Endpoints include:
 from datetime import datetime
 from fastapi import APIRouter
 
-from server_utils.service.json_api.resource_links import ResourceLinkKey, ResourceLink
+from server_utils.fastapi_utils.service.json_api.resource_links import (
+    ResourceLinkKey,
+    ResourceLink,
+)
 
 from .models import SystemTimeRequest, SystemTimeResponse, SystemTimeResponseAttributes
 from .time_utils import get_system_time, set_system_time

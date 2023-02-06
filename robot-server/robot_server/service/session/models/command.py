@@ -37,7 +37,7 @@ from robot_server.service.session.models.command_definitions import (
     CommandDefinitionType,
 )
 from robot_server.service.session.models.common import EmptyModel, JogPosition
-from server_utils.service.json_api import (
+from server_utils.fastapi_utils.service.json_api import (
     DeprecatedResponseModel,
     RequestModel,
     DeprecatedResponseDataModel,

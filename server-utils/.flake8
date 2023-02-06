@@ -28,9 +28,9 @@ per-file-ignores =
     server_utils/dependencies.py:ANN,D
     server_utils/util.py:ANN,D
     server_utils/settings.py:ANN,D
-    server_utils/service/*:ANN,D
+    server_utils/fastapi_utils/service/*:ANN,D
     tests/integration/*:ANN,D
     tests/robot/*:ANN,D
-    tests/service/*:ANN,D
+    tests/fastapi_utils/service/*:ANN,D
     tests/conftest.py:ANN,D
     tests/test_util.py:ANN,D

@@ -1,7 +1,7 @@
 from pytest import raises
 
 from pydantic import BaseModel, ValidationError
-from server_utils.service.json_api.resource_links import ResourceLinks
+from server_utils.fastapi_utils.service.json_api.resource_links import ResourceLinks
 
 
 class ThingWithLink(BaseModel):

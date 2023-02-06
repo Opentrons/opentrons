@@ -2,8 +2,8 @@ import pytest
 from pydantic import BaseModel
 from typing import Any, Dict, NamedTuple, Optional
 
-from server_utils.service.json_api.resource_links import ResourceLink
-from server_utils.service.json_api.response import (
+from server_utils.fastapi_utils.service.json_api.resource_links import ResourceLink
+from server_utils.fastapi_utils.service.json_api.response import (
     ResourceModel,
     SimpleBody,
     Body,

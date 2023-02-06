@@ -15,7 +15,7 @@ from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
-from server_utils.service.json_api import (
+from server_utils.fastapi_utils.service.json_api import (
     SimpleBody,
     SimpleMultiBody,
     SimpleEmptyBody,

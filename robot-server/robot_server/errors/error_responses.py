@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 from typing import Any, Dict, Generic, Optional, Sequence, Tuple, TypeVar
 
-from server_utils.service.json_api import BaseResponseBody, ResourceLinks
+from server_utils.fastapi_utils.service.json_api import BaseResponseBody, ResourceLinks
 
 
 class ApiError(Exception):
