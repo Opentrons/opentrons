@@ -20,7 +20,7 @@ const Table = styled('table')`
   text-align: left;
 `
 const TableHeader = styled('th')`
-  text-transform: ${TYPOGRAPHY.textTransformUppercase};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing2};
@@ -73,9 +73,9 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
     <Table>
       <thead>
         <tr>
-          <TableHeader>Location</TableHeader>
-          <TableHeader>Hardware</TableHeader>
-          <TableHeader>Connected Status</TableHeader>
+          <TableHeader>{t('location')}</TableHeader>
+          <TableHeader>{t('hardware')}</TableHeader>
+          <TableHeader>{t('connection_status')}</TableHeader>
         </tr>
       </thead>
       <tbody>
