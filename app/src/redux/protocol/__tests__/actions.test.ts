@@ -1,17 +1,10 @@
 // protocol actions tests
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import * as ConfigSelectors from '../../config/selectors'
 import { openProtocol } from '..'
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
-
-jest.mock('../../config/selectors')
-
-const getFeatureFlags = ConfigSelectors.getFeatureFlags as jest.MockedFunction<
-  typeof ConfigSelectors.getFeatureFlags
->
 
 describe('protocol actions', () => {
   let store: any
@@ -25,9 +18,6 @@ describe('protocol actions', () => {
     store = mockStore({})
     // @ts-expect-error(sa, 2021-6-28): not a valid FileReader interface
     global.FileReader = jest.fn(() => mockReader)
-    getFeatureFlags.mockReturnValue({
-      enableBundleUpload: false,
-    })
   })
 
   afterEach(() => {
@@ -104,9 +94,6 @@ describe('protocol actions', () => {
 
     describe('bundle upload', () => {
       it('dispatches a protocol:OPEN', () => {
-        getFeatureFlags.mockReturnValue({
-          enableBundleUpload: true,
-        })
         const result = store.dispatch(openProtocol(bundleFile))
         const expected = {
           type: 'protocol:OPEN',

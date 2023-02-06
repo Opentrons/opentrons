@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Box } from '@opentrons/components'
 import { SUCCESS, FAILURE, PENDING } from '../../redux/robot-api'
-import { useFeatureFlag } from '../../redux/config'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 import type {
