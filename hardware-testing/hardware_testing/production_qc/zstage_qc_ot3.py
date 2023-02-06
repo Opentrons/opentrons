@@ -25,13 +25,13 @@ from hardware_testing import data
 from hardware_testing.drivers import list_ports_and_select,find_port
 from hardware_testing.drivers.mark10.mark10_fg import Mark10,SimMark10
 
-default_move_speed = 60
+default_move_speed = 20
 default_run_current = 1.0
 currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
 speeds = (50, 100, 150, 200, 250, 300)
 force_gauge_currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
 force_gauge_speeds = (2, 5, 10, 20)
-ZSTAGE_TOLERANCES_MM = 0.1
+Z_STAGE_TOLERANCES_MM = 0.4
 
 data_format = "||{0:^12}|{1:^12}|{2:^12}||"
 
@@ -43,7 +43,7 @@ sp_fg = 0.0
 distance_fg = 0.0
 
 
-NODE = NodeId.head_r
+NODE = NodeId.head_l
 
 # save test results, to be saved and displayed at the end
 CURRENTS_SPEEDS_TEST_RESULTS = []
@@ -171,7 +171,7 @@ async def _move_to(
     encoder_pos = float(axis_dict[NODE][1])
     motor_str = str(round(motor_pos, 2))
     encoder_str = str(round(encoder_pos, 2))
-    if check and abs(motor_pos - encoder_pos) > ZSTAGE_TOLERANCES_MM:
+    if check and abs(motor_pos - encoder_pos) > Z_STAGE_TOLERANCES_MM:
         raise LoseStepError(
             f"ERROR: lost steps (motor={motor_str}, encoder={encoder_str}"
         )
@@ -297,69 +297,64 @@ async def _force_gauge_stepbystep(messenger: CanMessenger,write_cb: Callable):
 
 
 async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
-    await _home(messenger)
-    try:
-        mot, enc = await _move_to(
-            messenger, 100, default_move_speed, check=True
-        )
-        print(f"motor position: {mot}, encoder position: {enc}")
-    except Exception as e:
-        print(e)
     if "q" in input("\n\tEnter 'q' to exit"):
         raise KeyboardInterrupt()
     global NODE
-    await _homeMount(messenger)
-    # callback function for writing new data to CSV file
-    csv_props, csv_cb = _create_csv_and_get_callbacks(arguments.serial_number)
-    # cache the pressure-data header
-    # add metadata to CSV
-    # FIXME: create a set of CSV helpers, such that you can define a test-report
-    #        schema/format/line-length/etc., before having to fill its contents.
-    #        This would be very helpful, because changes to CVS length/contents
-    #        will break the analysis done in our Sheets
-    csv_cb.write(["--------"])
-    csv_cb.write(["METADATA"])
-    csv_cb.write(["test-name", csv_props.name])
-    csv_cb.write(["operator-name", arguments.operator_name])
-    csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
+    try:
+        await _homeMount(messenger)
+        # callback function for writing new data to CSV file
+        csv_props, csv_cb = _create_csv_and_get_callbacks(arguments.serial_number)
+        # cache the pressure-data header
+        # add metadata to CSV
+        # FIXME: create a set of CSV helpers, such that you can define a test-report
+        #        schema/format/line-length/etc., before having to fill its contents.
+        #        This would be very helpful, because changes to CVS length/contents
+        #        will break the analysis done in our Sheets
+        csv_cb.write(["--------"])
+        csv_cb.write(["METADATA"])
+        csv_cb.write(["test-name", csv_props.name])
+        csv_cb.write(["operator-name", arguments.operator_name])
+        csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
 
-    print('----Test mount left----')
-    csv_cb.write(["----Test mount left----"])
-    NODE = NodeId.head_l
-    await _home(messenger)
-    # run the test
-    csv_cb.write(["----"])
-    csv_cb.write(["Currents_Speeds_Test"])
-    csv_cb.write(["----"])
-    print("Currents_Speeds_Test")
-    csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
-    await _currents_speeds_test(messenger, csv_cb.write)
+        print('----Test mount left----')
+        csv_cb.write(["----Test mount left----"])
+        NODE = NodeId.head_l
+        await _home(messenger)
+        # run the test
+        csv_cb.write(["----"])
+        csv_cb.write(["Currents_Speeds_Test"])
+        csv_cb.write(["----"])
+        print("Currents_Speeds_Test")
+        csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
+        await _currents_speeds_test(messenger, csv_cb.write)
 
-    csv_cb.write(["----"])
-    csv_cb.write(["Force_Gauge_Test"])
-    csv_cb.write(["----"])
-    csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
-    print("Force_Gauge_Test")
-    await _force_gauge_stepbystep(messenger, csv_cb.write)
+        csv_cb.write(["----"])
+        csv_cb.write(["Force_Gauge_Test"])
+        csv_cb.write(["----"])
+        csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
+        print("Force_Gauge_Test")
+        await _force_gauge_stepbystep(messenger, csv_cb.write)
 
-    print('----Test mount right----')
-    csv_cb.write(["----Test mount right----"])
-    NODE = NodeId.head_r
-    await _home(messenger)
-    # run the test
-    csv_cb.write(["----"])
-    csv_cb.write(["Currents_Speeds_Test"])
-    csv_cb.write(["----"])
-    print("Currents_Speeds_Test")
-    csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
-    await _currents_speeds_test(messenger, csv_cb.write)
+        print('----Test mount right----')
+        csv_cb.write(["----Test mount right----"])
+        NODE = NodeId.head_r
+        await _home(messenger)
+        # run the test
+        csv_cb.write(["----"])
+        csv_cb.write(["Currents_Speeds_Test"])
+        csv_cb.write(["----"])
+        print("Currents_Speeds_Test")
+        csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
+        await _currents_speeds_test(messenger, csv_cb.write)
 
-    csv_cb.write(["----"])
-    csv_cb.write(["Force_Gauge_Test"])
-    csv_cb.write(["----"])
-    csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
-    print("Force_Gauge_Test")
-    await _force_gauge_stepbystep(messenger, csv_cb.write)
+        csv_cb.write(["----"])
+        csv_cb.write(["Force_Gauge_Test"])
+        csv_cb.write(["----"])
+        csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
+        print("Force_Gauge_Test")
+        await _force_gauge_stepbystep(messenger, csv_cb.write)
+    except Exception as e:
+        print(e)
 
 async def _main(arguments: argparse.Namespace) -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
