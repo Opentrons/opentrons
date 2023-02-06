@@ -3,6 +3,7 @@ config BR2_PACKAGE_PYTHON_OPENTRONS_SYSTEM_SERVER
   depends on BR2_PACKAGE_PYTHON3
   select BR2_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
   select BR2_PACKAGE_PYTHON_PYJWT # runtime
+  select BR2_PACKAGE_PYTHON_OPENTRONS_SERVER_UTILS # runtime
 
   help
     Opentrons system HTTP server. Provides access to an OT-2 robot.
