@@ -5,7 +5,7 @@ import pytest
 from mock import patch
 from typing import Any, Iterator
 
-from robot_server import util
+from server_utils import util
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ def mock_utc_now(mock_start_time: datetime) -> Iterator[datetime]:
             self._time += timedelta(days=1)
             return ret
 
-    with patch.object(util, "utc_now") as p:
+    with patch.object(util, "_utc_now") as p:
         p.side_effect = _TimeIncrementer(mock_start_time)
         yield p
 

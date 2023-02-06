@@ -1,3 +1,4 @@
+"""General utilities."""
 from __future__ import annotations
 import asyncio
 import hashlib
@@ -8,15 +9,19 @@ from pathlib import Path
 from types import TracebackType
 from typing import cast, Any, Awaitable, Callable, Optional, Type, TypeVar
 from typing_extensions import Final
+from datetime import datetime, timezone
 
-from opentrons.util.helpers import utc_now
+
+def _utc_now() -> datetime:
+    """Return the current time in the UTC timezone."""
+    return datetime.now(tz=timezone.utc)
 
 
 class duration:
     """Context manager to mark start and end times of a block"""
 
     def __enter__(self) -> duration:
-        self.start = utc_now()
+        self.start = _utc_now()
         return self
 
     def __exit__(
@@ -25,7 +30,7 @@ class duration:
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        self.end = utc_now()
+        self.end = _utc_now()
 
 
 @dataclass(frozen=True)
