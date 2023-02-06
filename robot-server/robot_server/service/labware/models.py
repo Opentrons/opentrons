@@ -4,7 +4,7 @@ from datetime import datetime
 from functools import partial
 from pydantic import BaseModel, Field
 
-from robot_server.service.json_api import (
+from server_utils.service.json_api import (
     DeprecatedResponseDataModel,
     DeprecatedMultiResponseModel,
 )

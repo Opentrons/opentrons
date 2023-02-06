@@ -2,7 +2,7 @@ from pytest import raises
 from pydantic import ValidationError
 from typing import Any, Dict
 
-from robot_server.service.json_api.request import RequestModel
+from server_utils.service.json_api.request import RequestModel
 from tests.service.helpers import ItemModel
 
 

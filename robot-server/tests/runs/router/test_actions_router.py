@@ -4,7 +4,7 @@ from datetime import datetime
 from decoy import Decoy
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel
+from server_utils.service.json_api import RequestModel
 from robot_server.runs.run_store import RunNotFoundError
 from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
 

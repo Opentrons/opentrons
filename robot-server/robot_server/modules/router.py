@@ -9,7 +9,7 @@ from robot_server.versioning import get_requested_version
 from robot_server.service.legacy.routers.modules import (
     get_modules as legacy_get_attached_modules,
 )
-from robot_server.service.json_api import (
+from server_utils.service.json_api import (
     SimpleMultiBody,
     MultiBodyMeta,
     PydanticResponse,
