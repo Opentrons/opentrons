@@ -1,0 +1,15 @@
+{
+  "title": "SystemServerSettings",
+  "description": "Robot server settings.\n\nTo override any of these create an environment variable with prefix\nOT_SYSTEM_SERVER_.",
+  "type": "object",
+  "properties": {
+    "persistence_directory": {
+      "title": "Persistence Directory",
+      "description": "A directory for the server to store things persistently across boots. If this directory doesn't already exist, the server will create it. If this is the string `automatically_make_temporary`, the server will use a fresh temporary directory (effectively not persisting anything).",
+      "default": "/var/lib/opentrons-system-server/",
+      "env_names": ["ot_system_server_persistence_directory"],
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
