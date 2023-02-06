@@ -31,7 +31,6 @@ from ..actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
     AddPipetteConfigAction,
-    SetWorkingPipetteVolumeAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -105,11 +104,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 max_volume=action.max_volume,
             )
             self._state.working_volume_by_id[action.pipette_id] = action.max_volume
-        elif isinstance(action, SetWorkingPipetteVolumeAction):
-            self._state.working_volume_by_id[action.pipette_id] = min(
-                action.tip_volume,
-                self._state.static_config_by_id[action.pipette_id].max_volume,
-            )
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -141,7 +135,16 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(command.result, PickUpTipResult):
             pipette_id = command.params.pipetteId
             tiprack_id = command.params.labwareId
+            tip_volume = command.result.tipVolume
             self._state.attached_tip_labware_by_id[pipette_id] = tiprack_id
+            static_config = self._state.static_config_by_id.get(pipette_id)
+            # If static config of the pipette does not exist for some reason, make working volume the tip volume
+            if static_config is None:
+                self._state.working_volume_by_id[pipette_id] = tip_volume
+            else:
+                self._state.working_volume_by_id[pipette_id] = min(
+                    tip_volume, static_config.max_volume
+                )
 
         elif isinstance(command.result, DropTipResult):
             pipette_id = command.params.pipetteId

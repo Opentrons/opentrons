@@ -94,7 +94,7 @@ async def test_runner_with_python(
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(tipVolume=300.0),
     )
 
     assert expected_command in commands_result
@@ -147,7 +147,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
             labwareId="labware-id",
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(tipVolume=300.0),
     )
 
     assert expected_command in commands_result
@@ -202,7 +202,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(tipVolume=300.0),
     )
 
     assert expected_command in commands_result
@@ -258,7 +258,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(tipVolume=300.0),
     )
 
     assert expected_command in commands_result

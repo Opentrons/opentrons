@@ -10,7 +10,6 @@ from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
-from opentrons.protocol_engine.actions import ActionDispatcher
 from opentrons.protocol_engine.state import (
     StateStore,
     TipGeometry,
@@ -41,12 +40,6 @@ def state_store(decoy: Decoy) -> StateStore:
 def movement_handler(decoy: Decoy) -> MovementHandler:
     """Get a mock in the shape of a MovementHandler."""
     return decoy.mock(cls=MovementHandler)
-
-
-@pytest.fixture
-def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
-    """Get a mocked out ActionDispatcher instance."""
-    return decoy.mock(cls=ActionDispatcher)
 
 
 @pytest.fixture
@@ -85,7 +78,6 @@ def subject(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
-    action_dispatcher: ActionDispatcher,
     labware_data_provider: LabwareDataProvider,
 ) -> PipettingHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
@@ -93,7 +85,6 @@ def subject(
         state_store=state_store,
         hardware_api=hardware_api,
         movement_handler=movement_handler,
-        action_dispatcher=action_dispatcher,
         labware_data_provider=labware_data_provider,
     )
 

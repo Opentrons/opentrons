@@ -181,14 +181,6 @@ class AddPipetteConfigAction:
     channels: int
 
 
-@dataclass(frozen=True)
-class SetWorkingPipetteVolumeAction:
-    """Set the working volume of a pipette after a tip pickup."""
-
-    pipette_id: str
-    tip_volume: float
-
-
 Action = Union[
     PlayAction,
     PauseAction,
@@ -206,5 +198,4 @@ Action = Union[
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     AddPipetteConfigAction,
-    SetWorkingPipetteVolumeAction,
 ]

@@ -25,15 +25,15 @@ async def test_pick_up_tip_implementation(
         wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
 
-    result = await subject.execute(data)
-
-    assert result == PickUpTipResult()
-
-    decoy.verify(
+    decoy.when(
         await pipetting.pick_up_tip(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
-    )
+    ).then_return(45.6)
+
+    result = await subject.execute(data)
+
+    assert result == PickUpTipResult(tipVolume=45.6)

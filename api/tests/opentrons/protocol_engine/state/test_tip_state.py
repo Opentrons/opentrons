@@ -63,7 +63,7 @@ def pick_up_tip_command() -> commands.PickUpTip:
             labwareId="cool-labware",
             wellName="A1",
         ),
-        result=commands.PickUpTipResult.construct(),
+        result=commands.PickUpTipResult.construct(),  # type: ignore[call-arg]
     )
 
 

@@ -1,6 +1,6 @@
 """Pick up tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
@@ -23,7 +23,11 @@ class PickUpTipParams(PipetteIdMixin, WellLocationMixin):
 class PickUpTipResult(BaseModel):
     """Result data from the execution of a PickUpTip."""
 
-    pass
+    tipVolume: float = Field(
+        ...,
+        description="Max volume of liquid in uL for picked up tip.",
+        gt=0,
+    )
 
 
 class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResult]):
@@ -34,14 +38,14 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
 
     async def execute(self, params: PickUpTipParams) -> PickUpTipResult:
         """Move to and pick up a tip using the requested pipette."""
-        await self._pipetting.pick_up_tip(
+        tip_volume = await self._pipetting.pick_up_tip(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
         )
 
-        return PickUpTipResult()
+        return PickUpTipResult(tipVolume=tip_volume)
 
 
 class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult]):

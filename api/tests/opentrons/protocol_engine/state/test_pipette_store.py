@@ -18,7 +18,6 @@ from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
     AddPipetteConfigAction,
-    SetWorkingPipetteVolumeAction,
 )
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
@@ -582,14 +581,18 @@ def test_set_working_pipette_volume(subject: PipetteStore) -> None:
 
     assert subject.state.working_volume_by_id["pipette-id"] == 42
 
-    subject.handle_action(
-        SetWorkingPipetteVolumeAction(pipette_id="pipette-id", tip_volume=21)
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id="pipette-id",
+        tip_volume=21,
     )
+    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
 
     assert subject.state.working_volume_by_id["pipette-id"] == 21
 
-    subject.handle_action(
-        SetWorkingPipetteVolumeAction(pipette_id="pipette-id", tip_volume=84)
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id="pipette-id",
+        tip_volume=84,
     )
+    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
 
     assert subject.state.working_volume_by_id["pipette-id"] == 42
