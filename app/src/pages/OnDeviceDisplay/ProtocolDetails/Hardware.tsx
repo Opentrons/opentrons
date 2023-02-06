@@ -93,7 +93,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
               <TableDatum>{getHardwareLocation(hardware, t)}</TableDatum>
               <TableDatum>{getHardwareName(hardware)}</TableDatum>
               <TableDatum>
-                {isConnected ? 'Connected' : 'Not Connected'}
+                {isConnected ? t('connected') : t('not_connected')}
               </TableDatum>
             </TableRow>
           )
