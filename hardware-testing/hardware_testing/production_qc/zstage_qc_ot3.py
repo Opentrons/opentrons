@@ -266,6 +266,34 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 await _home(messenger)
 
 
+def _force_gauge_stepbystep(messenger: CanMessenger,write_cb: Callable):
+    global thread_sensor
+    global cu_fg, sp_fg, distance_fg
+    mark10 = _connect_to_mark10_fixture(False)
+    for cu_fg in force_gauge_currents:
+        for sp_fg in force_gauge_speeds:
+            await _home(messenger)
+            await _set_pipette_current(messenger, default_run_current)
+            await _move_to(
+                messenger, 100, default_move_speed, check=True
+            )
+            print(f'current = {cu_fg},speed = {sp_fg}')
+            distance_fg = 100
+            for i in range(20):
+                try:
+                    print('Start record force...')
+                    distance_fg += 1
+                    await _set_pipette_current(messenger, cu_fg)
+                    await _move_to(
+                        messenger, distance_fg, sp_fg, check=True
+                    )
+                    print(f'Mark10 force is {mark10.read_force()}')
+                    write_cb([_convert_node_to_str(NODE), cu_fg, sp_fg, mark10.read_force()])
+                except LoseStepError as e:
+                    print(e)
+                    await _home(messenger)
+                    break
+
 
 
 async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
@@ -312,7 +340,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["----"])
     csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
     print("Force_Gauge_Test")
-    await _force_gauge(messenger, csv_cb.write)
+    _force_gauge_stepbystep(messenger, csv_cb.write)
 
     print('----Test mount right----')
     csv_cb.write(["----Test mount right----"])
@@ -331,7 +359,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["----"])
     csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
     print("Force_Gauge_Test")
-    await _force_gauge(messenger, csv_cb.write)
+    _force_gauge_stepbystep(messenger, csv_cb.write)
 
 async def _main(arguments: argparse.Namespace) -> None:
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
