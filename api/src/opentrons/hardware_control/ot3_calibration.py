@@ -174,17 +174,17 @@ async def _take_stride(
     edge_sense = hcapi.config.calibration.edge_sense
     traveled = 0.0
     stride_vector = search_axis.set_in_point(Point(0, 0, 0), stride_size)
-    target = probe_pos + stride_vector
+    target = probe_pos
 
     goal_reached = False
     while traveled < abs(max_stride_distance) or not repeat_if_failed:
+        target += stride_vector
         found_height = await _probe_deck_at(
             hcapi, mount, target, edge_sense.pass_settings
         )
         traveled += abs(stride_size)
         # Something is wrong when we found deck too soon, end it now
         if found_height > valid_z_range.max:
-            await hcapi.home_z()
             raise EarlyCapacitiveSenseTrigger(found_height, target.z)
         # check against reasonble minimum height of the deck to see if we have made contact
         touched_deck = found_height >= valid_z_range.min
@@ -210,10 +210,6 @@ async def _take_stride(
                 ),
                 goal_reached,
             )
-        else:
-            # continue taking strides in this same direction until we reach
-            # the goal or exceed max stride distance
-            target += stride_vector
     # did not reach out goal before we ran out of strides, we should continue
     # going the same direction in the next stride size
     LOG.info(f"Ran out of {stride_size} stride")
@@ -550,7 +546,6 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     nominal_center = _get_calibration_square_position_in_slot(slot)
-    await hcapi.reset_instrument_offset(mount)
     try:
         # First, find the estimated deck height. This will be used to baseline the edge detection points.
         z_height = await find_deck_height(hcapi, mount, nominal_center)
