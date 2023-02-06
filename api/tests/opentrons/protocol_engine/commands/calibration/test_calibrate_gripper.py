@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import pytest
 from datetime import datetime
 from decoy import Decoy
@@ -33,13 +34,11 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-@pytest.fixture
-def use_mock_hc_calibrate_gripper(
-    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Mock out ot3_calibration.calibrate_gripper() for the duration of the test."""
-    mock = decoy.mock(func=ot3_calibration.calibrate_gripper)
-    monkeypatch.setattr(ot3_calibration, "calibrate_gripper", mock)
+@pytest.mark.ot3_only
+@pytest.fixture(autouse=True)
+def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(ot3_calibration, inspect.isfunction):
+        monkeypatch.setattr(ot3_calibration, name, decoy.mock(func=func))
 
 
 @pytest.mark.ot3_only
@@ -53,7 +52,7 @@ def use_mock_hc_calibrate_gripper(
 async def test_calibrate_gripper(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    use_mock_hc_calibrate_gripper: None,
+    _mock_ot3_calibration: None,
     params_probe: CalibrateGripperParamsJaw,
     expected_hc_probe: GripperProbe,
 ) -> None:
@@ -63,8 +62,7 @@ async def test_calibrate_gripper(
     params = CalibrateGripperParams(jaw=params_probe)
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
-            ot3_hardware_api,
-            probe=expected_hc_probe,
+            ot3_hardware_api, probe=expected_hc_probe
         )
     ).then_return(Point(1.1, 2.2, 3.3))
 
@@ -76,7 +74,7 @@ async def test_calibrate_gripper(
 async def test_calibrate_gripper_saves_calibration(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    use_mock_hc_calibrate_gripper: None,
+    _mock_ot3_calibration: None,
 ) -> None:
     """It should delegate to hardware API to calibrate the gripper & save calibration."""
     subject = CalibrateGripperImplementation(hardware_api=ot3_hardware_api)

@@ -87,7 +87,10 @@ async def _main(
                         offset = await calibrate_gripper(api, front_offset, rear_offset)
                         await api.home_z()
                         input("Add probe to gripper FRONT, then press ENTER: ")
-            elif mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            else:
+                assert isinstance(mount, OT3Mount.RIGHT) or isinstance(
+                    mount, OT3Mount.LEFT
+                )
                 offset = await calibrate_pipette(api, mount, slot)
 
             with open(f"/var/{mount}_{id}_auto_cal.csv", "a") as cv:
