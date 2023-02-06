@@ -10,7 +10,6 @@ from pydantic.generics import GenericModel
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
-from opentrons.hardware_control.types import GripperJawState
 from opentrons.types import Mount
 
 from opentrons_shared_data.pipette.dev_types import (
@@ -18,10 +17,12 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
     ChannelCount,
 )
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
+from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
 
-InstrumentModelT = TypeVar("InstrumentModelT", bound=Union[GripperModel, PipetteModel])
+InstrumentModelT = TypeVar(
+    "InstrumentModelT", bound=Union[GripperModelStr, PipetteModel]
+)
 InstrumentDataT = TypeVar("InstrumentDataT", bound=BaseModel)
 
 InstrumentType = Literal["pipette", "gripper"]
@@ -62,7 +63,7 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
 class GripperData(BaseModel):
     """Data from attached gripper."""
 
-    jawState: GripperJawState = Field(..., description="Gripper Jaw state.")
+    jawState: str = Field(..., description="Gripper Jaw state.")
     # TODO (spp, 2023-01-03): update calibration field as decided after
     #  spike https://opentrons.atlassian.net/browse/RSS-167
     calibratedOffset: Optional[GripperCalibrationOffset] = Field(
@@ -89,11 +90,11 @@ class Pipette(_GenericInstrument[PipetteModel, PipetteData]):
     data: PipetteData
 
 
-class Gripper(_GenericInstrument[GripperModel, GripperData]):
+class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
     """Attached gripper info & configuration."""
 
     instrumentType: Literal["gripper"] = "gripper"
-    instrumentModel: GripperModel
+    instrumentModel: GripperModelStr
     data: GripperData
 
 

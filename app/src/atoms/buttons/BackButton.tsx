@@ -1,18 +1,24 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import { ALIGN_CENTER, Box, Btn, Flex, Icon } from '@opentrons/components'
 
-import { useTranslation } from 'react-i18next'
-
 // TODO(bh, 2022-12-7): finish styling when designs finalized
-export function BackButton(): JSX.Element {
+export function BackButton({
+  onClick,
+}: React.HTMLProps<HTMLButtonElement>): JSX.Element {
   const history = useHistory()
   const { t } = useTranslation('shared')
 
   return (
-    <Btn marginBottom="1rem">
-      <Flex alignItems={ALIGN_CENTER} onClick={() => history.goBack()}>
+    <Btn
+      marginBottom="1rem"
+      maxWidth="fit-content"
+      // go back in the history stack if no click handler specified
+      onClick={onClick != null ? onClick : () => history.goBack()}
+    >
+      <Flex alignItems={ALIGN_CENTER}>
         <Icon name="chevron-left" height="3rem" />
         <Box fontSize="2rem" fontWeight="700">
           {t('back')}

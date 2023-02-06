@@ -36,6 +36,8 @@ from opentrons.hardware_control.constants import (
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from .pipette import Pipette
+from .instrument_calibration import PipetteOffsetByPipetteMount
+
 
 MOD_LOG = logging.getLogger(__name__)
 
@@ -148,14 +150,16 @@ class PipetteHandlerProvider:
         pipette = self.get_pipette(mount)
         pipette.reset_pipette_offset(mount, to_default)
 
-    def save_instrument_offset(self, mount: OT3Mount, delta: top_types.Point) -> None:
+    def save_instrument_offset(
+        self, mount: OT3Mount, delta: top_types.Point
+    ) -> PipetteOffsetByPipetteMount:
         """
         Save a new instrument offset the pipette offset to a particular value.
         :param mount: Modify the given mount.
         :param delta: The offset to set for the pipette.
         """
         pipette = self.get_pipette(mount)
-        pipette.save_pipette_offset(mount, delta)
+        return pipette.save_pipette_offset(mount, delta)
 
     # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
     # instead of potentially returning an empty dict
@@ -659,7 +663,7 @@ class PipetteHandlerProvider:
                     retract_target=instrument.pick_up_configurations.distance,
                     pick_up_motor_actions=TipMotorPickUpTipSpec(
                         # Move onto the posts
-                        tiprack_down=top_types.Point(0, 0, -5),
+                        tiprack_down=top_types.Point(0, 0, -7),
                         tiprack_up=top_types.Point(0, 0, 2),
                         pick_up_distance=instrument.pick_up_configurations.distance,
                         speed=instrument.pick_up_configurations.speed,
@@ -759,8 +763,14 @@ class PipetteHandlerProvider:
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
 
+        is_96_chan = instrument.channels.value == 96
+
         bottom = instrument.plunger_positions.bottom
-        droptip = instrument.plunger_positions.drop_tip
+        droptip = (
+            instrument.drop_configurations.distance
+            if is_96_chan
+            else instrument.plunger_positions.drop_tip
+        )
         speed = instrument.drop_configurations.speed
         shakes: List[Tuple[top_types.Point, Optional[float]]] = []
 
@@ -769,7 +779,6 @@ class PipetteHandlerProvider:
             instrument.current_tiprack_diameter = 0.0
             instrument.remove_tip()
 
-        is_96_chan = instrument.channels.value == 96
         drop_tip_current_axis = (
             OT3Axis.Q if is_96_chan else OT3Axis.of_main_tool_actuator(mount)
         )

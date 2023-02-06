@@ -132,9 +132,14 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         )
 
     def touch_tip(
-        self, location: LegacyWellCore, radius: float, v_offset: float, speed: float
+        self,
+        location: types.Location,
+        well_core: LegacyWellCore,
+        radius: float,
+        z_offset: float,
+        speed: float,
     ) -> None:
-        pass
+        self.move_to(location)
 
     def pick_up_tip(
         self,

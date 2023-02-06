@@ -29,10 +29,9 @@ def test_analyze(
         [str(fixture_path.resolve()), "--json-output", str(analysis_output_path)],
     )
 
-    analysis_output_json = json.loads(analysis_output_path.read_bytes())
-
     assert result.exit_code == 0
 
+    analysis_output_json = json.loads(analysis_output_path.read_bytes())
     assert "robotType" in analysis_output_json
     assert "pipettes" in analysis_output_json
     assert "commands" in analysis_output_json

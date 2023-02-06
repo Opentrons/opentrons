@@ -17,7 +17,7 @@ import { StyledText } from '../../atoms/text'
 export function ConnectingNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (
-    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
         height="33rem"
         backgroundColor="#D6D6D6"
