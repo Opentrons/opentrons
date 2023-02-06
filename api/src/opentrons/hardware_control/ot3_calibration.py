@@ -61,8 +61,11 @@ class CalibrationMethod(Enum):
     NONCONTACT_PASS = "noncontact pass"
 
 
-class EdgeNotFoundException(Exception):
-    pass
+class DeckNotFoundError(RuntimeError):
+    def __init__(self, deck_height: float, lower_limit: float) -> None:
+        super().__init__(
+            f"Deck height at z={deck_height}mm beyond lower limit: {lower_limit}."
+        )
 
 
 class EarlyCapacitiveSenseTrigger(RuntimeError):
@@ -109,6 +112,9 @@ async def find_deck_height(
     z_pass_settings = hcapi.config.calibration.z_offset.pass_settings
     z_prep_point = nominal_center + Z_PREP_OFFSET
     deck_z = await _probe_deck_at(hcapi, mount, z_prep_point, z_pass_settings)
+    z_limit = nominal_center.z - z_pass_settings.max_overrun_distance_mm
+    if deck_z < z_limit:
+        raise DeckNotFoundError(deck_z, z_limit)
     LOG.info(f"autocalibration: found deck at {deck_z}")
     return deck_z
 

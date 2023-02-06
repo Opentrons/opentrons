@@ -25,6 +25,7 @@ from opentrons.hardware_control.ot3_calibration import (
     _get_calibration_square_position_in_slot,
     InaccurateNonContactSweepError,
     DeckHeightValidRange,
+    DeckNotFoundError,
     Z_PREP_OFFSET,
     EDGES,
 )
@@ -341,6 +342,21 @@ async def test_find_edge_early_trigger(
             Point(0.0, 0.0, 0.0),
             OT3Axis.Y,
             -1,
+        )
+
+
+async def test_deck_not_found(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_capacitive_probe: AsyncMock,
+    override_cal_config: None,
+) -> None:
+    await ot3_hardware.home()
+    mock_capacitive_probe.side_effect = (-3,)
+    with pytest.raises(DeckNotFoundError):
+        await find_deck_height(
+            ot3_hardware,
+            OT3Mount.RIGHT,
+            Point(0.0, 0.0, 0.0),
         )
 
 

@@ -182,7 +182,6 @@ ot3_dummy_settings = {
     "gripper_mount_offset": (1, 1, 1),
     "calibration": {
         "z_offset": {
-            "point": [1, 2, 3],
             "pass_settings": {
                 "prep_distance_mm": 1,
                 "max_overrun_distance_mm": 2,
@@ -191,11 +190,7 @@ ot3_dummy_settings = {
             },
         },
         "edge_sense": {
-            "plus_x_pos": [4, 5, 6],
-            "plus_y_pos": [7, 8, 9],
-            "minus_x_pos": [10, 11, 12],
-            "minus_y_pos": [13, 14, 15],
-            "overrun_tolerance_mm": 16,
+            "overrun_tolerance_mm": 2,
             "early_sense_tolerance_mm": 17,
             "pass_settings": {
                 "prep_distance_mm": 4,
@@ -205,7 +200,6 @@ ot3_dummy_settings = {
             },
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,
-            "nominal_center": [8, 8, 0],
         },
         "probe_length": 40,
     },
