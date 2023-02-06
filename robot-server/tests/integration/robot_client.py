@@ -228,6 +228,14 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_analyses(self, protocol_id: str) -> Response:
+        """GET /protocols/{protocol_id}/analyses."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/protocols/{protocol_id}/analyses"
+        )
+        response.raise_for_status()
+        return response
+
     async def get_analysis(self, protocol_id: str, analysis_id: str) -> Response:
         """GET /protocols/{protocol_id}/{analysis_id}."""
         response = await self.httpx_client.get(
