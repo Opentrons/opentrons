@@ -83,9 +83,7 @@ const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
     <Flex gridGap={SPACING.spacing3} margin={SPACING.spacing4}>
       {protocolSectionTabOptions.map(option => {
         const Button =
-          option === props.currentOption
-            ? TertiaryButton
-            : QuaternaryButton
+          option === props.currentOption ? TertiaryButton : QuaternaryButton
         return (
           <Button key={option} onClick={() => props.setCurrentOption(option)}>
             {option}
