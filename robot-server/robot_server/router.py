@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, status
 
 from server_utils.fastapi_utils.constants import V1_TAG
-from .errors import LegacyErrorResponse
+from server_utils.fastapi_utils.errors import LegacyErrorResponse
 from .health import health_router
 from .protocols import protocols_router
 from .runs import runs_router

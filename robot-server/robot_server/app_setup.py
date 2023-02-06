@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from opentrons import __version__
 
-from .errors import exception_handlers
+from server_utils.fastapi_utils.errors import exception_handlers
 from .hardware import start_initializing_hardware, clean_up_hardware
 from .persistence import start_initializing_persistence, clean_up_persistence
 from .router import router

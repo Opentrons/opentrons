@@ -5,7 +5,12 @@ from enum import Enum
 from typing import Any, Dict, Optional
 from starlette import status as status_codes
 
-from server_utils.fastapi_utils.errors import ApiError, ErrorSource, ErrorDetails, ErrorBody
+from server_utils.fastapi_utils.errors import (
+    ApiError,
+    ErrorSource,
+    ErrorDetails,
+    ErrorBody,
+)
 from server_utils.fastapi_utils.service.json_api import ResourceLinks
 
 

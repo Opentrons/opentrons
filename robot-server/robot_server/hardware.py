@@ -25,7 +25,7 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-from .errors import ErrorDetails
+from server_utils.fastapi_utils.errors import ErrorDetails
 from .settings import get_settings
 
 
