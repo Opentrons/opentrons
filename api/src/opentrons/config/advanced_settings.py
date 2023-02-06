@@ -188,8 +188,7 @@ settings = [
         _id="enableOT3FirmwareUpdates",
         title="Enable experimental OT-3 firmware updates",
         description=(
-            "Do not enable. This is an Opentrons-internal setting to test "
-            "new subsystem (head, gantry, etc) updates."
+            "This is an Opentrons-internal setting to test new firmware updates."
         ),
         restart_required=True,
     ),
