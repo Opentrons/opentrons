@@ -23,8 +23,9 @@ class PickUpTipParams(PipetteIdMixin, WellLocationMixin):
 class PickUpTipResult(BaseModel):
     """Result data from the execution of a PickUpTip."""
 
+    # Tip volume has a default ONLY for parsing data from earlier versions, which did not include this in the result
     tipVolume: float = Field(
-        ...,
+        0,
         description="Max volume of liquid in uL for picked up tip.",
         gt=0,
     )
