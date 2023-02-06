@@ -27,7 +27,6 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     MotorStatus,
-    OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,

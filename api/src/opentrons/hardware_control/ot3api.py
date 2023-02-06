@@ -65,7 +65,6 @@ from .types import (
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
-    OT3SubSystem,
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,

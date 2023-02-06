@@ -86,7 +86,6 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
-    OT3SubSystem,
     MotorStatus,
     InstrumentProbeType,
 )
@@ -233,7 +232,7 @@ class OT3Controller:
 
         # Start firmware updates if we have any
         if firmware_updates:
-            log.info(f"Firmware updates are available.")
+            log.info("Firmware updates are available.")
             self.update_required = True
             update_details = {
                 node_id: str(update.filepath)

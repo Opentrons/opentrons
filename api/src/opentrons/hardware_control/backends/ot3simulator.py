@@ -20,9 +20,6 @@ from typing import (
 
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
-from opentrons.types import Mount
-from opentrons_hardware.firmware_update.utils import UpdateInfo
-from opentrons_hardware.hardware_control.network import DeviceInfoCache
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -50,7 +47,6 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
-    OT3SubSystem,
     InstrumentProbeType,
     MotorStatus,
 )

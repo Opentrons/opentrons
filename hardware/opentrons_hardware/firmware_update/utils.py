@@ -33,6 +33,7 @@ class FirmwareUpdateType(Enum):
     unknown = -1
 
     def __str__(self) -> str:
+        """Name of enum."""
         return str(self.name)
 
     @classmethod
@@ -65,6 +66,7 @@ class UpdateInfo:
         files_by_revision: Dict[str, str],
         filepath: Optional[str] = str(),
     ) -> None:
+        """Constructor."""
         self.update_type = update_type
         self.version = version
         self.shortsha = shortsha
@@ -72,6 +74,7 @@ class UpdateInfo:
         self.filepath = filepath
 
     def __repr__(self) -> str:
+        """Readable representation of class."""
         return f"<{self.__class__.__name__}: type={self.update_type}, version={self.version}, sha={self.shortsha}>"
 
 
