@@ -1,31 +1,30 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
-import { last } from 'lodash'
 import { format } from 'date-fns'
-import styled from 'styled-components'
 import {
   COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
   SIZE_2,
   SPACING,
-  JUSTIFY_FLEX_START,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  useCreateRunMutation,
   useDeleteProtocolMutation,
-  useProtocolAnalysesQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import {
   BackButton,
   SecondaryTertiaryButton,
   TertiaryButton,
-} from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import type { OnDeviceRouteParams } from '../../App/types'
-import type { Protocol } from '@opentrons/api-client'
+} from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import type { OnDeviceRouteParams } from '../../../App/types'
+import { Hardware } from './Hardware'
+import { ProtocolMetadata } from '@opentrons/shared-data'
 
 type ProtocolType = 'json' | 'python'
 type CreationMethod = 'Protocol Designer' | 'Python'
@@ -37,14 +36,17 @@ const ProtocolHeader = (props: {
   title: string
   date: number | null
   protocolType: ProtocolType
+  handleRunProtocol: () => void
 }): JSX.Element => {
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
-  const { title, date, protocolType } = props
+  const { title, date, protocolType, handleRunProtocol } = props
   return (
-    <Flex flexDirection="column" margin={SPACING.spacing5}>
+    <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacing5}>
       <Flex gridGap={SPACING.spacing5} marginBottom={SPACING.spacing3}>
         <StyledText as="h1">{title}</StyledText>
-        <TertiaryButton>{t('protocol_details:run_protocol')}</TertiaryButton>
+        <TertiaryButton onClick={handleRunProtocol}>
+          {t('protocol_details:run_protocol')}
+        </TertiaryButton>
       </Flex>
       <Flex flexDirection="row" gridGap={'1rem'}>
         <StyledText as="h2">{`${t('protocol_info:date_added')}: ${
@@ -92,53 +94,28 @@ const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
   )
 }
 
-const Summary = (props: { protocolRecord: Protocol }): JSX.Element => {
+const Summary = (props: {
+  author: string | null
+  description: string | null
+}): JSX.Element => {
   const { t } = useTranslation('protocol_details')
   return (
-    <Flex flexDirection="column" gridGap={SPACING.spacing2}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
       <Flex gridGap={SPACING.spacing2}>
         <StyledText
           as="h2"
           textTransform={TYPOGRAPHY.textTransformCapitalize}
         >{`${t('author')}: `}</StyledText>
-        <StyledText>{props.protocolRecord.data.metadata.author}</StyledText>
+        <StyledText>{props.author}</StyledText>
       </Flex>
-      <StyledText>{props.protocolRecord.data.metadata.description}</StyledText>
+      <StyledText>{props.description}</StyledText>
     </Flex>
   )
 }
 
-const Table = styled('table')`
-  ${TYPOGRAPHY.labelRegular}
-  border-collapse: collapse;
-  table-layout: auto;
-  width: 100%;
-  border-spacing: 0 ${SPACING.spacing2};
-  margin: ${SPACING.spacing4} 0;
-  text-align: left;
-`
-const TableHeader = styled('th')`
-  text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.darkBlackEnabled};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSizeCaption};
-  padding: ${SPACING.spacing2};
-`
-
-const Hardware = (): JSX.Element => (
-  <Table>
-    <thead>
-      <tr>
-        <TableHeader>Location</TableHeader>
-        <TableHeader>Hardware</TableHeader>
-        <TableHeader>Connected Status</TableHeader>
-      </tr>
-    </thead>
-  </Table>
-)
-
 interface ProtocolSectionContentProps {
-  protocolRecord: Protocol
+  protocolId: string
+  metadata: ProtocolMetadata
   currentOption: TabOption
 }
 const ProtocolSectionContent = (
@@ -147,10 +124,15 @@ const ProtocolSectionContent = (
   let protocolSection
   switch (props.currentOption) {
     case 'Summary':
-      protocolSection = <Summary protocolRecord={props.protocolRecord} />
+      protocolSection = (
+        <Summary
+          author={props.metadata.author ?? null}
+          description={props.metadata.description ?? null}
+        />
+      )
       break
     case 'Hardware':
-      protocolSection = <Hardware />
+      protocolSection = <Hardware protocolId={props.protocolId} />
       break
     case 'Labware':
       break
@@ -173,25 +155,31 @@ export function ProtocolDetails(): JSX.Element | null {
     staleTime: Infinity,
   })
 
-  const { deleteProtocol } = useDeleteProtocolMutation(protocolId)
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
+  const { createRun } = useCreateRunMutation({
+    onSuccess: data => {
+      const runId: string = data.data.id
+      history.push(`/protocols/${runId}/setup`)
+    },
   })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const handleRunProtocol = (): void => {
+    createRun({ protocolId })
+  }
 
-  if (mostRecentAnalysis?.status !== 'completed' || protocolRecord == null)
-    return null
+  const { deleteProtocol } = useDeleteProtocolMutation(protocolId)
+
+  if (protocolRecord == null) return null
 
   const displayName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
 
   return (
-    <Flex flexDirection="column" alignItems={JUSTIFY_FLEX_START}>
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
       <BackButton />
       <ProtocolHeader
         title={displayName}
         date={protocolRecord.data.metadata.created ?? null}
+        handleRunProtocol={handleRunProtocol}
         protocolType={protocolRecord.data.protocolType}
       />
       <ProtocolSectionTabs
@@ -199,7 +187,8 @@ export function ProtocolDetails(): JSX.Element | null {
         setCurrentOption={setCurrentOption}
       />
       <ProtocolSectionContent
-        protocolRecord={protocolRecord}
+        protocolId={protocolId}
+        metadata={protocolRecord.data.metadata}
         currentOption={currentOption}
       />
       <Flex margin={SPACING.spacing4}>

@@ -254,20 +254,26 @@ describe('RobotOverviewOverflowMenu', () => {
 
     expect(mockRestartRobot).toBeCalled()
   })
-
-  it('should render disabled menu items when the robot is unreachable', () => {
-    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
-
-    const { getByRole, queryByRole } = render({ robot: mockUnreachableRobot })
+  it('render overflow menu buttons without the update robot software button', () => {
+    when(mockGetBuildrootUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+    const { getByRole, queryByRole } = render(props)
     const btn = getByRole('button')
     btn.click()
     expect(queryByRole('Update robot software')).toBeNull()
-    expect(queryByRole('button', { name: 'Run a protocol' })).toBeNull()
-    expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
-    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
-    expect(
-      queryByRole('button', { name: 'Disconnect from network' })
-    ).toBeNull()
+    getByRole('button', { name: 'Run a protocol' })
+    getByRole('button', { name: 'Restart robot' })
+    getByRole('button', { name: 'Home gantry' })
+    getByRole('button', { name: 'Disconnect from network' })
+    getByRole('button', { name: 'Robot settings' })
+  })
+  it('should disable settings link when the robot is unreachable', () => {
+    const { getByRole } = render({ robot: mockUnreachableRobot })
+    const btn = getByRole('button')
+    fireEvent.click(btn)
     expect(getByRole('button', { name: 'Robot settings' })).toBeDisabled()
   })
 })
