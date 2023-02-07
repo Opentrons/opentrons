@@ -3,11 +3,9 @@ from dataclasses import dataclass
 from typing import Optional, overload, Union
 from typing_extensions import Literal
 
-from opentrons_shared_data.pipette import dummy_model_for_name
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.config.pipette_config import load as load_pipette_config
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
@@ -30,7 +28,12 @@ from ..errors import (
     LabwareDefinitionDoesNotExistError,
     ModuleNotAttachedError,
 )
-from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
+from ..resources import (
+    LabwareDataProvider,
+    ModuleDataProvider,
+    ModelUtils,
+    pipette_data_provider,
+)
 from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
@@ -39,7 +42,6 @@ from ..types import (
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
-    FlowRates,
 )
 
 
@@ -174,6 +176,8 @@ class EquipmentHandler:
             else pipette_name
         )
 
+        pipette_id = pipette_id or self._model_utils.generate_id()
+
         if not use_virtual_pipettes:
             cache_request = {mount.to_hw_mount(): pipette_name_value}
 
@@ -201,26 +205,25 @@ class EquipmentHandler:
             pipette_model = self._hardware_api.get_attached_instrument(
                 mount.to_hw_mount()
             )["model"]
-        else:
-            pipette_model = dummy_model_for_name(pipette_name_value)
 
-        pipette_id = pipette_id or self._model_utils.generate_id()
-        config = load_pipette_config(
-            pipette_model, pipette_id=pipette_id if not use_virtual_pipettes else None
-        )
+            static_pipette_config = pipette_data_provider.get_pipette_static_config(
+                pipette_model, pipette_id
+            )
+        else:
+            static_pipette_config = (
+                pipette_data_provider.get_virtual_pipette_static_config(
+                    pipette_name_value
+                )
+            )
 
         self._action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id=pipette_id,
-                model=config.model,
-                min_volume=config.min_volume,
-                max_volume=config.max_volume,
-                channels=int(config.channels),
-                flow_rates=FlowRates(
-                    default_blow_out=config.default_blow_out_flow_rates,
-                    default_aspirate=config.default_aspirate_flow_rates,
-                    default_dispense=config.default_dispense_flow_rates,
-                ),
+                model=static_pipette_config.model,
+                min_volume=static_pipette_config.min_volume,
+                max_volume=static_pipette_config.max_volume,
+                channels=static_pipette_config.channels,
+                flow_rates=static_pipette_config.flow_rates,
             )
         )
 
