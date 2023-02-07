@@ -118,7 +118,8 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         location: types.Location,
         well_core: Optional[LegacyWellCore],
     ) -> None:
-        self.move_to(location=location, well_core=well_core)
+        if location != self._protocol_interface.get_last_location(mount=self._mount):
+            self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._update_volume(0)
         self._pipette_dict["ready_to_aspirate"] = False
