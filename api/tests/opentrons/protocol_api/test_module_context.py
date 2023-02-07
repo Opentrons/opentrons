@@ -168,7 +168,9 @@ def test_parent(decoy: Decoy, mock_core: ModuleCore, subject: ModuleContext) -> 
     """Should get the parent slot name."""
     decoy.when(mock_core.get_deck_slot()).then_return(DeckSlotName.SLOT_1)
 
-    assert subject.parent == DeckSlotName.SLOT_1
+    # TODO (tz, 1-17-23): make sure that the subject is not returning an Enum that subclasses str
+    assert type(subject.parent) == str
+    assert subject.parent == "1"
 
 
 def test_module_model(

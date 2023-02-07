@@ -49,7 +49,7 @@ describe('AttachProbe', () => {
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
     getByAltText('Attach probe')
-    const proceedBtn = getByRole('button', { name: 'Initiate calibration' })
+    const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
@@ -81,7 +81,7 @@ describe('AttachProbe', () => {
     const { getByText, getByAltText } = render(props)
     getByText('Stand Back, Pipette is Calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration divot in slot 2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot 2 to determine its exact position'
     )
     getByAltText('Pipette is calibrating')
   })

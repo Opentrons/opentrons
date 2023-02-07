@@ -17,6 +17,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteTipActionType,
     MotorPositionFlags,
     ErrorSeverity,
+    MoveStopCondition,
+    GearMotorId,
 )
 
 
@@ -225,6 +227,18 @@ class EepromDataField(utils.BinaryFieldBase[bytes]):
         return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
 
 
+class GearMotorIdField(utils.UInt8Field):
+    """Gear Motor id for 96 channel."""
+
+    def __repr__(self) -> str:
+        """Print gear motor id for 96 channel."""
+        try:
+            gear_id = GearMotorId(self.value).name
+        except ValueError:
+            gear_id = str(self.value)
+        return f"{self.__class__.__name__}(value={gear_id})"
+
+
 class PipetteTipActionTypeField(utils.UInt8Field):
     """pipette tip action type."""
 
@@ -246,3 +260,15 @@ class MotorPositionFlagsField(utils.UInt8Field):
             flag.name for flag in MotorPositionFlags if bool(self.value & flag.value)
         ]
         return f"{self.__class__.__name__}(value={','.join(flags_list)})"
+
+
+class MoveStopConditionField(utils.UInt8Field):
+    """Move stop condition."""
+
+    def __repr__(self) -> str:
+        """Print move stop condition."""
+        try:
+            condition = MoveStopCondition(self.value).name
+        except ValueError:
+            condition = str(self.value)
+        return f"{self.__class__.__name__}(value={condition})"

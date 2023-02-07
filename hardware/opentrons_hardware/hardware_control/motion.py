@@ -4,23 +4,16 @@ from dataclasses import dataclass
 import numpy as np
 from logging import getLogger
 from enum import Enum, unique
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipActionType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    PipetteTipActionType,
+    MoveStopCondition as MoveStopCondition,
+)
 
 LOG = getLogger(__name__)
 
 
 NodeIdMotionValues = Dict[NodeId, np.float64]
-
-
-@unique
-class MoveStopCondition(int, Enum):
-    """Move Stop Condition."""
-
-    none = 0x0
-    limit_switch = 0x1
-    cap_sensor = 0x2
-    encoder_position = 0x4
-    gripper_force = 0x5
 
 
 @unique
@@ -38,9 +31,10 @@ class MoveType(int, Enum):
         mapping = {
             MoveStopCondition.none: cls.linear,
             MoveStopCondition.limit_switch: cls.home,
-            MoveStopCondition.cap_sensor: cls.calibration,
+            MoveStopCondition.sync_line: cls.calibration,
             MoveStopCondition.encoder_position: cls.linear,
             MoveStopCondition.gripper_force: cls.grip,
+            MoveStopCondition.stall: cls.linear,
         }
         return mapping[condition]
 
@@ -167,7 +161,7 @@ def create_tip_action_step(
     step: MoveGroupStep = {}
     stop_condition = (
         MoveStopCondition.limit_switch
-        if action == PipetteTipActionType.drop
+        if action == PipetteTipActionType.home
         else MoveStopCondition.none
     )
     for axis_node in present_nodes:

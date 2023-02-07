@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.models import LabwareDefinition
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
@@ -120,4 +119,3 @@ class ProtocolSource:
     metadata: Metadata
     robot_type: RobotType
     config: ProtocolConfig
-    labware_definitions: List[LabwareDefinition]

@@ -184,6 +184,14 @@ settings = [
             " Do not enable."
         ),
     ),
+    SettingDefinition(
+        _id="enableOT3FirmwareUpdates",
+        title="Enable experimental OT-3 firmware updates",
+        description=(
+            "This is an Opentrons-internal setting to test new firmware updates."
+        ),
+        restart_required=True,
+    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -500,6 +508,16 @@ def _migrate18to19(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate19to20(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 20 of the feature flags file.
+
+    - Adds the enableOT3FirmwareUpdates config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableOT3FirmwareUpdates"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -520,6 +538,7 @@ _MIGRATIONS = [
     _migrate16to17,
     _migrate17to18,
     _migrate18to19,
+    _migrate19to20,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

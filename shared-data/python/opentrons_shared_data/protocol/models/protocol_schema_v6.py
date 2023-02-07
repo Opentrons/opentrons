@@ -70,6 +70,7 @@ class Params(BaseModel):
     # 'moveLabware' commands in the meantime
     newLocation: Optional[Union[Location, Literal["offDeck"]]]
     strategy: Optional[str]
+    radius: Optional[float]
 
 
 class Command(BaseModel):

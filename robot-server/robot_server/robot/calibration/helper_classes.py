@@ -131,7 +131,7 @@ class RequiredLabware(BaseModel):
         if not slot:
             # TODO(mc, 2021-09-08): lw.parent is not necessarily a slot
             slot = lw.parent  # type: ignore[assignment]
-        lw_def = lw._implementation.get_definition()
+        lw_def = lw._core.get_definition()
         return cls(
             # TODO(mc, 2020-09-17): DeckLocation does not match
             #  Union[int,str,None] expected by cls

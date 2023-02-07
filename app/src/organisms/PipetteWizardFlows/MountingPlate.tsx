@@ -23,7 +23,7 @@ export const MountingPlate = (
     <GenericWizardTile
       header={t(
         flowType === FLOWS.ATTACH
-          ? 'connect_mounting_plate'
+          ? 'attach_mounting_plate'
           : 'unscrew_and_detach'
       )}
       rightHandBody={
@@ -46,7 +46,7 @@ export const MountingPlate = (
         flowType === FLOWS.ATTACH ? (
           <Trans
             t={t}
-            i18nKey="attach_mounting_plate"
+            i18nKey="attach_mounting_plate_instructions"
             components={{
               block: <StyledText as="p" marginBottom={SPACING.spacing4} />,
             }}

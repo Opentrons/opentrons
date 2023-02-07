@@ -7,21 +7,23 @@ from typing import Optional, Dict, List, Union
 
 from typing_extensions import TypedDict, Literal
 
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+)
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
     PipetteName,
     ChannelCount,
 )
 from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations
-from opentrons_shared_data.gripper.dev_types import (
+from opentrons_shared_data.gripper import (
     GripperModel,
-    GripperName,
+    GripperDefinition,
 )
 
 from opentrons.drivers.types import MoveSplit
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
-from opentrons.config.gripper_config import GripperConfig
 from opentrons.hardware_control.types import GripperJawState
 
 
@@ -48,7 +50,7 @@ class OT3AttachedPipette(TypedDict):
 
 
 class AttachedGripper(TypedDict):
-    config: Optional[GripperConfig]
+    config: Optional[GripperDefinition]
     id: Optional[str]
 
 
@@ -95,10 +97,10 @@ class PipetteDict(InstrumentDict):
 
 
 class GripperDict(InstrumentDict):
-    name: GripperName
     model: GripperModel
     gripper_id: str
-    state: GripperJawState
+    state: GripperJawState  # Can we call this jaw_state?
+    calibration_offset: GripperCalibrationOffset
 
 
 class InstrumentHardwareConfigs(TypedDict):

@@ -2,12 +2,25 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Union, Tuple, cast
+from typing import (
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Union,
+    Tuple,
+    NamedTuple,
+    cast,
+)
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, Point, MountType
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -35,6 +48,7 @@ from ..actions import (
     AddLabwareDefinitionAction,
 )
 from .abstract_store import HasState, HandlesActions
+from .move_types import EdgePathType
 
 
 # URIs of labware whose definitions accidentally specify an engage height
@@ -46,6 +60,14 @@ _MAGDECK_HALF_MM_LABWARE = {
 }
 
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
+
+
+class LabwareLoadParams(NamedTuple):
+    """Parameters required to load a labware in Protocol Engine."""
+
+    load_name: str
+    namespace: str
+    version: int
 
 
 @dataclass
@@ -281,6 +303,18 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware definition for matching {uri} not found."
             ) from e
 
+    def find_custom_labware_load_params(self) -> List[LabwareLoadParams]:
+        """Find all load labware parameters for custom labware definitions in state."""
+        return [
+            LabwareLoadParams(
+                load_name=definition.parameters.loadName,
+                namespace=definition.namespace,
+                version=definition.version,
+            )
+            for definition in self._state.definitions_by_uri.values()
+            if definition.namespace != OPENTRONS_NAMESPACE
+        ]
+
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
         return self.get(labware_id).location
@@ -343,6 +377,42 @@ class LabwareView(HasState[LabwareState]):
             y_size = cast(float, well_definition.yDimension)
 
         return x_size, y_size, well_definition.depth
+
+    def get_well_radial_offsets(
+        self, labware_id: str, well_name: str, radius_percentage: float
+    ) -> Tuple[float, float]:
+        """Get x and y radius offsets modified by radius percentage."""
+        x_size, y_size, z_size = self.get_well_size(labware_id, well_name)
+        return (x_size / 2.0) * radius_percentage, (y_size / 2.0) * radius_percentage
+
+    def get_edge_path_type(
+        self,
+        labware_id: str,
+        well_name: str,
+        mount: MountType,
+        labware_slot: DeckSlotName,
+        next_to_module: bool,
+    ) -> EdgePathType:
+        """Get the recommended edge path type based on well column, labware position and any neighboring modules."""
+        labware_definition = self.get_definition(labware_id)
+        left_column = labware_definition.ordering[0]
+        right_column = labware_definition.ordering[-1]
+
+        left_path_criteria = mount is MountType.RIGHT and well_name in left_column
+        right_path_criteria = mount is MountType.LEFT and well_name in right_column
+        labware_right_side = labware_slot in [
+            DeckSlotName.SLOT_3,
+            DeckSlotName.SLOT_6,
+            DeckSlotName.SLOT_9,
+            DeckSlotName.FIXED_TRASH,
+        ]
+
+        if left_path_criteria and (next_to_module or labware_right_side):
+            return EdgePathType.LEFT
+        elif right_path_criteria and next_to_module:
+            return EdgePathType.RIGHT
+        else:
+            return EdgePathType.DEFAULT
 
     def validate_liquid_allowed_in_labware(
         self, labware_id: str, wells: Mapping[str, Any]

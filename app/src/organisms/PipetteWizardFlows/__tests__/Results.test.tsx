@@ -14,8 +14,15 @@ import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
+import { useCheckPipettes } from '../hooks'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
+
+jest.mock('../hooks')
+
+const mockUseCheckPipettes = useCheckPipettes as jest.MockedFunction<
+  typeof useCheckPipettes
+>
 
 const render = (props: React.ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {
@@ -28,6 +35,7 @@ const mockPipette: AttachedPipette = {
 }
 describe('Results', () => {
   let props: React.ComponentProps<typeof Results>
+  const mockCheckPipette = jest.fn()
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
@@ -46,10 +54,14 @@ describe('Results', () => {
       currentStepIndex: 2,
       totalStepCount: 6,
     }
+    mockUseCheckPipettes.mockReturnValue({
+      handleCheckPipette: mockCheckPipette,
+      isPending: false,
+    })
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Calibrated')
+    getByText('Pipette Successfully Attached and Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -84,8 +96,43 @@ describe('Results', () => {
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    const exit = getByRole('button', { name: 'Results_exit' })
-    fireEvent.click(exit)
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
+  })
+  it('renders the try again button when fail to attach and clicking on buton several times renders exit button', () => {
+    props = {
+      ...props,
+      attachedPipettes: { left: null, right: null },
+      flowType: FLOWS.ATTACH,
+    }
+    const { getByText, getByRole } = render(props)
+    getByText('Detach and retry')
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    //  critical error modal after tryAgain failing 2 times
+    getByText('Something Went Wrong')
+    getByRole('button', { name: 'Results_errorExit' }).click()
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+  })
+  it('renders the try again button when fail to detach and clicking on buton several times renders exit button', () => {
+    props = {
+      ...props,
+      attachedPipettes: { left: mockPipette, right: null },
+      flowType: FLOWS.DETACH,
+    }
+    const { getByText, getByRole } = render(props)
+    getByText('Attach and retry')
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    expect(mockCheckPipette).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' }).click()
+    //  critical error modal after tryAgain failing 2 times
+    getByText('Something Went Wrong')
+    getByRole('button', { name: 'Results_errorExit' }).click()
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a success for detach flow', () => {
@@ -110,13 +157,11 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette failed to detach')
+    getByText('Pipette Still Attached')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    const exit = getByRole('button', { name: 'Results_exit' })
-    fireEvent.click(exit)
-    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' })
   })
   it('renders the correct information when pipette wizard is a fail for 96 channel attach flow and gantry not empty', () => {
     props = {
@@ -125,13 +170,11 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette failed to detach')
+    getByText('Pipette Still Attached')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    const exit = getByRole('button', { name: 'Results_exit' })
-    fireEvent.click(exit)
-    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
+    getByRole('button', { name: 'Results_tryAgain' }).click()
   })
   it('renders the correct information when pipette wizard is a success for 96 channel attach flow and gantry not empty', () => {
     props = {
@@ -141,7 +184,7 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Detached')
+    getByText('All Pipettes Successfully Detached')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -155,7 +198,7 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Calibrated')
+    getByText('Pipette Successfully Attached and Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -170,7 +213,7 @@ describe('Results', () => {
       totalStepCount: 9,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Calibrated')
+    getByText('Pipette Successfully Attached and Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -185,7 +228,7 @@ describe('Results', () => {
       totalStepCount: 5,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Calibrated')
+    getByText('Pipette Successfully Attached and Calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )

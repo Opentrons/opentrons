@@ -27,7 +27,6 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import { useTrackEvent } from '../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
-import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
 
 import type { Run } from '@opentrons/api-client'
@@ -55,7 +54,7 @@ export function HistoricalProtocolRunOverflowMenu(
 
   const commands = useAllCommandsQuery(
     runId,
-    { cursor: 0, pageLength: RUN_LOG_WINDOW_SIZE },
+    { cursor: 0, pageLength: 0 },
     { staleTime: Infinity }
   )
   const runTotalCommandCount = commands?.data?.meta?.totalLength ?? 0

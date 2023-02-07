@@ -6,7 +6,7 @@ from contextlib import nullcontext as does_not_raise
 from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any
 
 from opentrons_shared_data import load_shared_data
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedModule,
@@ -15,6 +15,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleLocation,
     LabwareOffsetVector,
+    DeckType,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -279,7 +280,7 @@ def test_get_properties_by_id(
         ),
     ],
 )
-def test_get_module_offset(
+def test_get_module_offset_for_ot2_standard(
     module_def: ModuleDefinition,
     slot: DeckSlotName,
     expected_offset: LabwareOffsetVector,
@@ -294,7 +295,60 @@ def test_get_module_offset(
             )
         },
     )
-    assert subject.get_module_offset("module-id") == expected_offset
+    assert (
+        subject.get_module_offset("module-id", DeckType.OT2_STANDARD) == expected_offset
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["module_def", "slot", "expected_offset"],
+    argvalues=[
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=2.17, y=0, z=9),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=-2.17, y=0, z=9),
+        ),
+        (
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_7,
+            LabwareOffsetVector(x=-19.88, y=67.76, z=-0.04),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            DeckSlotName.SLOT_1,
+            LabwareOffsetVector(x=3, y=1, z=19),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            DeckSlotName.SLOT_3,
+            LabwareOffsetVector(x=-3, y=-1, z=19),
+        ),
+    ],
+)
+def test_get_module_offset_for_ot3_standard(
+    module_def: ModuleDefinition,
+    slot: DeckSlotName,
+    expected_offset: LabwareOffsetVector,
+) -> None:
+    """It should return the correct labware offset for module in specified slot."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": slot},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="module-serial",
+                definition=module_def,
+            )
+        },
+    )
+    result_offset = subject.get_module_offset("module-id", DeckType.OT3_STANDARD)
+    assert (result_offset.x, result_offset.y, result_offset.z) == pytest.approx(
+        (expected_offset.x, expected_offset.y, expected_offset.z)
+    )
 
 
 def test_get_magnetic_module_substate(
@@ -1567,3 +1621,27 @@ def test_get_by_slot_filter_ids() -> None:
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         serialNumber="serial-number-1",
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["mount", "target_slot", "expected_result"],
+    argvalues=[
+        (MountType.RIGHT, DeckSlotName.SLOT_1, False),
+        (MountType.RIGHT, DeckSlotName.SLOT_2, True),
+        (MountType.RIGHT, DeckSlotName.SLOT_5, False),
+        (MountType.LEFT, DeckSlotName.SLOT_3, False),
+        (MountType.RIGHT, DeckSlotName.SLOT_5, False),
+        (MountType.LEFT, DeckSlotName.SLOT_8, True),
+    ],
+)
+def test_is_edge_move_unsafe(
+    mount: MountType, target_slot: DeckSlotName, expected_result: bool
+) -> None:
+    """It should determine if an edge move would be unsafe."""
+    subject = make_module_view(
+        slot_by_module_id={"foo": DeckSlotName.SLOT_1, "bar": DeckSlotName.SLOT_9}
+    )
+
+    result = subject.is_edge_move_unsafe(mount=mount, target_slot=target_slot)
+
+    assert result is expected_result

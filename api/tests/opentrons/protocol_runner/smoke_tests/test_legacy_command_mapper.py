@@ -3,13 +3,15 @@
 Legacy ProtocolContext objects are prohibitively difficult to instansiate
 and mock in an isolated unit test environment.
 """
-import pytest
-import textwrap
 from datetime import datetime
-from decoy import matchers
 from pathlib import Path
+from typing import List
+
+import pytest
+from decoy import matchers
 
 from opentrons.protocol_engine import (
+    EngineStatus,
     commands,
     DeckSlotLocation,
     ModuleModel,
@@ -21,113 +23,125 @@ from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
-    """
-    # my protocol
 
-    from opentrons.types import Location, Point
+async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Command]:
+    """Simulate a protocol, make sure it succeeds, and return its commands."""
+    protocol_reader = ProtocolReader()
+    protocol_source = await protocol_reader.read_saved(
+        files=[protocol_file],
+        directory=None,
+    )
+    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    result = await subject.run(protocol_source)
+    assert result.state_summary.errors == []
+    assert result.state_summary.status == EngineStatus.SUCCEEDED
+    return result.commands
 
-    metadata = {
-        "apiLevel": "2.1",
-    }
 
-    def run(ctx):
-        tip_rack_1 = ctx.load_labware(
-            load_name="opentrons_96_tiprack_300ul",
-            location="1",
-        )
-        tip_rack_2 = ctx.load_labware(
-            load_name="opentrons_96_tiprack_300ul",
-            location="2",
-        )
-        module_1 = ctx.load_module("tempdeck", "4")
-        well_plate_1 = ctx.load_labware(
-            load_name="opentrons_96_aluminumblock_nest_wellplate_100ul",
-            location="3",
-        )
-        module_plate_1 = module_1.load_labware(
-            "opentrons_96_aluminumblock_nest_wellplate_100ul"
-        )
-        pipette_left = ctx.load_instrument(
-            instrument_name="p300_single",
-            mount="left",
-            tip_racks=[tip_rack_1],
-        )
-        pipette_right = ctx.load_instrument(
-            instrument_name="p300_multi",
-            mount="right",
-        )
-        pipette_left.pick_up_tip(
-            location=tip_rack_1.wells_by_name()["A1"],
-        )
-        pipette_right.pick_up_tip(
-            location=tip_rack_2.wells_by_name()["A1"].top(),
-        )
-        pipette_left.drop_tip()
-        pipette_left.pick_up_tip()
-        pipette_left.aspirate(
-            volume=40,
-            rate=1.0,
-            location=module_plate_1["A1"],
-        )
-        pipette_left.dispense(
-            volume=35,
-            rate=1.2,
-            location=well_plate_1["B1"],
-        )
-        pipette_left.aspirate(
-            volume=40,
-            location=well_plate_1.wells_by_name()["A1"],
-        )
-        pipette_left.dispense(
-            volume=35,
-            location=module_plate_1.wells_by_name()["B1"],
-        )
-        pipette_left.blow_out(
-            location=well_plate_1.wells_by_name()["B1"].top(),
-        )
-        pipette_left.aspirate(50)
-        pipette_left.dispense(50)
-        pipette_left.blow_out(
-            location=module_plate_1["B1"].top(),
-        )
-        pipette_left.aspirate()
-        pipette_left.dispense()
-        pipette_left.blow_out()
-        pipette_left.move_to(Location(point=Point(100, 100, 10),labware=None))
-        pipette_left.aspirate()
-        pipette_left.dispense()
-        pipette_left.blow_out()
-        pipette_left.aspirate(50, well_plate_1["D1"].bottom().move(point=Point(100, 10, 0)))
-        pipette_left.dispense(50, well_plate_1["F1"].top().move(point=Point(10, 10, 0)))
-        pipette_left.aspirate(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
-        pipette_left.dispense(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
-        pipette_left.drop_tip(
-            location=tip_rack_1.wells_by_name()["A1"]
-        )
-    """
-)
+# TODO(mm, 2023-01-09): Split this up into smaller, more focused tests.
+BIG_PROTOCOL = """\
+from opentrons.types import Location, Point
+
+metadata = {
+    "apiLevel": "2.1",
+}
+
+def run(ctx):
+    # Labware and module loads:
+    tip_rack_1 = ctx.load_labware(
+        load_name="opentrons_96_tiprack_300ul",
+        location="1",
+    )
+    tip_rack_2 = ctx.load_labware(
+        load_name="opentrons_96_tiprack_300ul",
+        location="2",
+    )
+    module_1 = ctx.load_module("tempdeck", "4")
+    well_plate_1 = ctx.load_labware(
+        load_name="opentrons_96_aluminumblock_nest_wellplate_100ul",
+        location="3",
+    )
+    module_plate_1 = module_1.load_labware(
+        "opentrons_96_aluminumblock_nest_wellplate_100ul"
+    )
+
+    # Pipette loads:
+    pipette_left = ctx.load_instrument(
+        instrument_name="p300_single",
+        mount="left",
+        tip_racks=[tip_rack_1],
+    )
+    pipette_right = ctx.load_instrument(
+        instrument_name="p300_multi",
+        mount="right",
+    )
+
+    # Tip pickups and drops with different kinds of locations:
+    pipette_left.pick_up_tip(
+        location=tip_rack_1.wells_by_name()["A1"],
+    )
+    pipette_right.pick_up_tip(
+        location=tip_rack_2.wells_by_name()["A1"].top(),
+    )
+    pipette_left.drop_tip()
+    pipette_left.pick_up_tip()
+
+    # Liquid handling commands:
+    pipette_left.aspirate(
+        volume=40,
+        rate=1.0,
+        location=module_plate_1["A1"],
+    )
+    pipette_left.dispense(
+        volume=35,
+        rate=1.2,
+        location=well_plate_1["B1"],
+    )
+    pipette_left.aspirate(
+        volume=40,
+        location=well_plate_1.wells_by_name()["A1"],
+    )
+    pipette_left.dispense(
+        volume=35,
+        location=module_plate_1.wells_by_name()["B1"],
+    )
+    pipette_left.blow_out(
+        location=well_plate_1.wells_by_name()["B1"].top(),
+    )
+    pipette_left.aspirate(50)
+    pipette_left.dispense(50)
+    pipette_left.blow_out(
+        location=module_plate_1["B1"].top(),
+    )
+    pipette_left.aspirate()
+    pipette_left.dispense()
+    pipette_left.blow_out()
+    pipette_left.move_to(Location(point=Point(100, 100, 10),labware=None))
+    pipette_left.aspirate()
+    pipette_left.dispense()
+    pipette_left.blow_out()
+    pipette_left.aspirate(50, well_plate_1["D1"].bottom().move(point=Point(100, 10, 0)))
+    pipette_left.dispense(50, well_plate_1["F1"].top().move(point=Point(10, 10, 0)))
+    pipette_left.aspirate(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
+    pipette_left.dispense(50, Location(point=Point(100, 100, 10), labware=well_plate_1))
+
+    pipette_left.drop_tip(
+        location=tip_rack_1.wells_by_name()["A1"]
+    )
+"""
 
 
 @pytest.fixture
-def legacy_commands_protocol_file(tmp_path: Path) -> Path:
-    """Put the pick up tip mapping test protocol on disk."""
+def big_protocol_file(tmp_path: Path) -> Path:
+    """Put the big test protocol on disk."""
     path = tmp_path / "protocol-name.py"
-    path.write_text(LEGACY_COMMANDS_PROTOCOL)
+    path.write_text(BIG_PROTOCOL)
     return path
 
 
-async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
-    """It should map legacy pick up tip commands."""
-    protocol_reader = ProtocolReader()
-    protocol_source = await protocol_reader.read_saved(
-        files=[legacy_commands_protocol_file],
-        directory=None,
-    )
-
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
-    result = await subject.run(protocol_source)
-    commands_result = result.commands
+async def test_big_protocol_commands(big_protocol_file: Path) -> None:
+    """It should map commands from the Python protocol."""
+    commands_result = await simulate_and_get_commands(big_protocol_file)
 
     tiprack_1_result_captor = matchers.Captor()
     tiprack_2_result_captor = matchers.Captor()
@@ -614,4 +628,74 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
             wellName="A1",
         ),
         result=commands.DropTipResult(),
+    )
+
+
+ZERO_VOLUME_ASPIRATE_DISPENSE_PROTOCOL = """\
+metadata = {"apiLevel": "2.0"}
+
+def run(ctx):
+    # Prep:
+    tip_rack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+    well_plate = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 2)
+    pipette = ctx.load_instrument("p300_single_gen2", mount="left", tip_racks=[tip_rack])
+    pipette.pick_up_tip()
+
+    # Test:
+
+    # Not providing a volume tells pipette.dispense() to use the pipette's current
+    # volume, which will be 0 because this is the first command.
+    pipette.dispense(location=well_plate["D6"])
+
+    # Aspirate the max available volume.
+    pipette.aspirate(location=well_plate["D7"])
+    # Aspirate the max available volume again, which should now be 0.
+    pipette.aspirate(location=well_plate["D7"])
+"""
+
+
+@pytest.fixture
+def zero_volume_aspirate_dispense_protocol_file(tmp_path: Path) -> Path:
+    """Return a file containing the zero-volume aspirate/dispense protocol."""
+    path = tmp_path / "protocol-name.py"
+    path.write_text(ZERO_VOLUME_ASPIRATE_DISPENSE_PROTOCOL)
+    return path
+
+
+async def test_zero_volume_dispense_commands(
+    zero_volume_aspirate_dispense_protocol_file: Path,
+) -> None:
+    """It should map zero-volume dispenses to moveToWell commands."""
+    result_commands = await simulate_and_get_commands(
+        zero_volume_aspirate_dispense_protocol_file
+    )
+
+    [
+        load_tip_rack,
+        load_well_plate,
+        load_pipette,
+        pick_up_tip,
+        dispense_as_move_to_well,
+        aspirate_1,
+        aspirate_2_as_move_to_well,
+    ] = result_commands
+    assert isinstance(load_tip_rack, commands.LoadLabware)
+    assert isinstance(load_well_plate, commands.LoadLabware)
+    assert isinstance(load_pipette, commands.LoadPipette)
+    assert isinstance(pick_up_tip, commands.PickUpTip)
+    assert isinstance(dispense_as_move_to_well, commands.MoveToWell)
+    assert isinstance(aspirate_1, commands.Aspirate)
+    assert isinstance(aspirate_2_as_move_to_well, commands.MoveToWell)
+
+    assert load_well_plate.result is not None
+    assert load_pipette.result is not None
+    assert dispense_as_move_to_well.params == commands.MoveToWellParams(
+        pipetteId=load_pipette.result.pipetteId,
+        labwareId=load_well_plate.result.labwareId,
+        wellName="D6",
+    )
+    assert aspirate_2_as_move_to_well.params == commands.MoveToWellParams(
+        pipetteId=load_pipette.result.pipetteId,
+        labwareId=load_well_plate.result.labwareId,
+        wellName="D7",
     )

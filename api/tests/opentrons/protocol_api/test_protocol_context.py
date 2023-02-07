@@ -22,6 +22,7 @@ from opentrons.protocol_api import (
     Labware,
     Deck,
     validation as mock_validation,
+    Liquid,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.labware import LabwareLoadParams
@@ -77,7 +78,7 @@ def subject(
     """Get a ProtocolContext test subject with its dependencies mocked out."""
     return ProtocolContext(
         api_version=MAX_SUPPORTED_VERSION,
-        implementation=mock_core,
+        core=mock_core,
         core_map=mock_core_map,
         deck=mock_deck,
     )
@@ -312,7 +313,7 @@ def test_move_labware_to_slot(
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     movable_labware = Labware(
-        implementation=mock_labware_core,
+        core=mock_labware_core,
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=mock_core,
         core_map=mock_core_map,
@@ -354,7 +355,7 @@ def test_move_labware_to_module(
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     movable_labware = Labware(
-        implementation=mock_labware_core,
+        core=mock_labware_core,
         api_version=MAX_SUPPORTED_VERSION,
         protocol_core=mock_core,
         core_map=mock_core_map,
@@ -480,13 +481,37 @@ def test_home(
     decoy.verify(mock_core.home(), times=1)
 
 
+def test_add_liquid(
+    decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
+) -> None:
+    """It should add a liquid to the state."""
+    expected_result = Liquid(
+        _id="water-id",
+        name="water",
+        description="water desc",
+        display_color="#1234",
+    )
+
+    decoy.when(
+        mock_core.define_liquid(
+            name="water", description="water desc", display_color="#1234"
+        )
+    ).then_return(expected_result)
+
+    result = subject.define_liquid(
+        name="water", description="water desc", display_color="#1234"
+    )
+
+    assert result == expected_result
+
+
 def test_bundled_data(
     decoy: Decoy, mock_core_map: LoadedCoreMap, mock_deck: Deck, mock_core: ProtocolCore
 ) -> None:
     """It should return bundled data."""
     subject = ProtocolContext(
         api_version=MAX_SUPPORTED_VERSION,
-        implementation=mock_core,
+        core=mock_core,
         core_map=mock_core_map,
         deck=mock_deck,
         bundled_data={"foo": b"ar"},

@@ -9,6 +9,7 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   FLEX_NONE,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -114,13 +115,19 @@ function ProgressTrackerItem({
           {taskConnector}
           {subTasks.map((subTask, subTaskIndex) => {
             const isPastSubTask =
-              activeTaskIndex != null &&
-              activeSubTaskIndex != null &&
-              subTaskIndex < activeSubTaskIndex &&
-              taskIndex <= activeTaskIndex
+              (activeTaskIndex != null &&
+                activeSubTaskIndex != null &&
+                subTaskIndex <= activeSubTaskIndex &&
+                taskIndex < activeTaskIndex) ||
+              (activeTaskIndex != null &&
+                subTask.isComplete === true &&
+                taskIndex <= activeTaskIndex)
             const isFutureSubTask =
-              activeSubTaskIndex != null &&
-              (subTaskIndex > activeSubTaskIndex || isFutureTask)
+              (activeSubTaskIndex != null &&
+                activeTaskIndex != null &&
+                subTaskIndex > activeSubTaskIndex &&
+                taskIndex >= activeTaskIndex) ||
+              isFutureTask
             // last subtask of the parent task
             const isLastSubTask = subTaskIndex === subTasks.length - 1
             // last subtask of the last task of the entire list
@@ -138,7 +145,7 @@ function ProgressTrackerItem({
                     // is in the past or list is complete
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blueEnabled
-                      : subTask.isComplete
+                      : subTask.isComplete === true
                       ? COLORS.medGreyHover
                       : 'initial'
                   }
@@ -191,6 +198,7 @@ function SubTask({
   description,
   cta,
   footer,
+  markedBad,
 }: SubTaskProps): JSX.Element {
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
 
@@ -220,12 +228,33 @@ function SubTask({
         gridGap={SPACING.spacing2}
       >
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {title}
+          <Flex
+            alignItems={ALIGN_CENTER}
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing3}
+          >
+            {title}
+          </Flex>
         </StyledText>
         <StyledText as="p">{description}</StyledText>
         {footer != null ? (
           <StyledText as="p" color={COLORS.darkGreyEnabled}>
-            {footer}
+            <Flex
+              alignItems={ALIGN_CENTER}
+              flexDirection={DIRECTION_ROW}
+              gridGap={SPACING.spacing3}
+            >
+              {markedBad === true && (
+                <Icon
+                  name="alert-circle"
+                  backgroundColor={COLORS.warningBackgroundLight}
+                  color={COLORS.warningEnabled}
+                  height="1rem"
+                  aria-label={`icon_warning`}
+                />
+              )}
+              {footer}
+            </Flex>
           </StyledText>
         ) : null}
       </Flex>
@@ -251,9 +280,8 @@ function Task({
   subTasks,
   taskListLength,
   isComplete,
+  markedBad,
 }: TaskProps): JSX.Element {
-  const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(false)
-
   const [activeTaskIndex] = activeIndex ?? []
 
   // TODO(bh, 2022-10-18): pass booleans to children as props
@@ -261,6 +289,14 @@ function Task({
   const isPastTask = activeTaskIndex != null && taskIndex < activeTaskIndex
   const isActiveTask = activeTaskIndex === taskIndex
   const hasSubTasks = subTasks.length > 0
+
+  const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(
+    hasSubTasks && isActiveTask
+  )
+
+  React.useEffect(() => {
+    setIsTaskOpen(hasSubTasks && isActiveTask)
+  }, [isActiveTask, hasSubTasks])
 
   return (
     <Flex key={title}>
@@ -299,12 +335,33 @@ function Task({
             gridGap={SPACING.spacing2}
           >
             <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {title}
+              <Flex
+                alignItems={ALIGN_CENTER}
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing3}
+              >
+                {markedBad === true && (
+                  <Icon
+                    name="alert-circle"
+                    backgroundColor={COLORS.warningBackgroundLight}
+                    color={COLORS.warningEnabled}
+                    height="1rem"
+                    aria-label={`icon_warning`}
+                  />
+                )}
+                {title}
+              </Flex>
             </StyledText>
             <StyledText as="p">{description}</StyledText>
             {footer != null ? (
               <StyledText as="p" color={COLORS.darkGreyEnabled}>
-                {footer}
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  flexDirection={DIRECTION_ROW}
+                  gridGap={SPACING.spacing3}
+                >
+                  {footer}
+                </Flex>
               </StyledText>
             ) : null}
           </Flex>
@@ -330,7 +387,10 @@ function Task({
             gridGap={SPACING.spacing3}
           >
             {subTasks.map(
-              ({ title, description, cta, footer }, subTaskIndex) => (
+              (
+                { title, description, cta, footer, markedBad },
+                subTaskIndex
+              ) => (
                 <SubTask
                   key={title}
                   title={title}
@@ -340,6 +400,7 @@ function Task({
                   activeIndex={activeIndex}
                   subTaskIndex={subTaskIndex}
                   taskIndex={taskIndex}
+                  markedBad={markedBad}
                 />
               )
             )}
@@ -358,7 +419,7 @@ export function TaskList({
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
       {taskList.map(
         (
-          { title, description, cta, footer, subTasks, isComplete },
+          { title, description, cta, footer, subTasks, isComplete, markedBad },
           taskIndex
         ) => (
           <Task
@@ -372,6 +433,7 @@ export function TaskList({
             taskIndex={taskIndex}
             taskListLength={taskList.length}
             isComplete={isComplete}
+            markedBad={markedBad}
           />
         )
       )}

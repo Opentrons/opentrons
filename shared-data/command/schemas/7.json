@@ -6,6 +6,9 @@
       "$ref": "#/definitions/AspirateCreate"
     },
     {
+      "$ref": "#/definitions/CommentCreate"
+    },
+    {
       "$ref": "#/definitions/CustomCreate"
     },
     {
@@ -142,7 +145,7 @@
     "WellOrigin": {
       "title": "WellOrigin",
       "description": "Origin of WellLocation offset.",
-      "enum": ["top", "bottom"],
+      "enum": ["top", "bottom", "center"],
       "type": "string"
     },
     "WellOffset": {
@@ -248,6 +251,49 @@
         },
         "params": {
           "$ref": "#/definitions/AspirateParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "CommentParams": {
+      "title": "CommentParams",
+      "description": "Payload required to annotate execution with a comment.",
+      "type": "object",
+      "properties": {
+        "message": {
+          "title": "Message",
+          "description": "A user-facing message",
+          "type": "string"
+        }
+      },
+      "required": ["message"]
+    },
+    "CommentCreate": {
+      "title": "CommentCreate",
+      "description": "Comment command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "comment",
+          "enum": ["comment"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/CommentParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -1564,6 +1610,17 @@
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "radius": {
+          "title": "Radius",
+          "description": "The proportion of the target well's radius the pipette tip will move towards.",
+          "default": 1.0,
+          "type": "number"
+        },
+        "speed": {
+          "title": "Speed",
+          "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+          "type": "number"
         }
       },
       "required": ["labwareId", "wellName", "pipetteId"]
@@ -2577,26 +2634,55 @@
       },
       "required": ["params"]
     },
-    "CalibrateGripperParamsProbe": {
-      "title": "CalibrateGripperParamsProbe",
+    "CalibrateGripperParamsJaw": {
+      "title": "CalibrateGripperParamsJaw",
       "description": "An enumeration.",
       "enum": ["front", "rear"]
+    },
+    "Vec3f": {
+      "title": "Vec3f",
+      "description": "A 3D vector of floats.",
+      "type": "object",
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "title": "Z",
+          "type": "number"
+        }
+      },
+      "required": ["x", "y", "z"]
     },
     "CalibrateGripperParams": {
       "title": "CalibrateGripperParams",
       "description": "Parameters for a `calibrateGripper` command.",
       "type": "object",
       "properties": {
-        "probe": {
-          "description": "Which of the gripper's probes to use to measure its offset. The robot will assume that a human operator has already attached this probe and removed the other probe, if there was one.",
+        "jaw": {
+          "description": "Which of the gripper's jaws to use to measure its offset. The robot will assume that a human operator has already attached the capacitive probe to the jaw and none is attached to the other jaw.",
           "allOf": [
             {
-              "$ref": "#/definitions/CalibrateGripperParamsProbe"
+              "$ref": "#/definitions/CalibrateGripperParamsJaw"
+            }
+          ]
+        },
+        "otherJawOffset": {
+          "title": "Otherjawoffset",
+          "description": "If an offset for the other probe is already found, then specifying it here will enable the CalibrateGripper command to complete the calibration process by calculating the total offset and saving it to disk. If this param is not specified then the command will only find and return the offset for the specified probe.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Vec3f"
             }
           ]
         }
       },
-      "required": ["probe"]
+      "required": ["jaw"]
     },
     "CalibrateGripperCreate": {
       "title": "CalibrateGripperCreate",

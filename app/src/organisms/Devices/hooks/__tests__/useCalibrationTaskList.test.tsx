@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
 import { useCalibrationTaskList } from '../useCalibrationTaskList'
@@ -12,6 +14,9 @@ import {
 import {
   TASK_COUNT,
   mockAttachedPipettesResponse,
+  mockBadDeckCalibration,
+  mockBadPipetteOffsetCalibrations,
+  mockBadTipLengthCalibrations,
   mockCompleteDeckCalibration,
   mockCompletePipetteOffsetCalibrations,
   mockCompleteTipLengthCalibrations,
@@ -22,6 +27,9 @@ import {
   expectedTaskList,
 } from '../__fixtures__/taskListFixtures'
 import { i18n } from '../../../../i18n'
+
+import type { Store } from 'redux'
+import type { State } from '../../../../redux/types'
 
 jest.mock('../')
 
@@ -38,11 +46,20 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
   typeof useDeckCalibrationData
 >
 
+const mockPipOffsetCalLauncher = jest.fn()
+const mockTipLengthCalLauncher = jest.fn()
+const mockDeckCalLauncher = jest.fn()
+
 describe('useCalibrationTaskList hook', () => {
   let wrapper: React.FunctionComponent<{}>
+  let store: Store<State>
   beforeEach(() => {
+    store = createStore(jest.fn(), {})
+    store.dispatch = jest.fn()
     wrapper = ({ children }) => (
-      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
     )
   })
   afterEach(() => {
@@ -65,9 +82,18 @@ describe('useCalibrationTaskList hook', () => {
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
 
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.taskList.length).toEqual(TASK_COUNT)
     result.current.taskList.forEach((task, i) => {
@@ -89,9 +115,18 @@ describe('useCalibrationTaskList hook', () => {
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
 
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual(null)
   })
@@ -109,9 +144,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.taskList[2].description).toEqual('Empty')
   })
@@ -129,9 +173,47 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    expect(result.current.activeIndex).toEqual([0, 0])
+  })
+
+  it('returns the the correct active when Deck Recalibration is needed', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockBadDeckCalibration) // markedBad === true
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompletePipetteOffsetCalibrations)
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual([0, 0])
   })
@@ -149,11 +231,49 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual([2, 1])
+  })
+
+  it('returns the the correct active index when both pipettes have bad Offset Calibrations', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockBadPipetteOffsetCalibrations)
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    expect(result.current.activeIndex).toEqual([1, 1])
   })
 
   it('returns the the correct active index when a pipette is missing Tip Length Calibrations', () => {
@@ -168,12 +288,137 @@ describe('useCalibrationTaskList hook', () => {
       .mockReturnValue(mockIncompleteTipLengthCalibrations)
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
-      .mockReturnValue(mockCompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+      .mockReturnValue(mockCompletePipetteOffsetCalibrations)
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual([1, 0])
+  })
+
+  it('returns the the correct active index when both pipettes have bad Tip Length Calibrations', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockBadTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompletePipetteOffsetCalibrations)
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    expect(result.current.activeIndex).toEqual([1, 0])
+  })
+
+  it('returns the the correct active index when both tlc and poc are bad', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockBadTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockBadPipetteOffsetCalibrations)
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    expect(result.current.activeIndex).toEqual([1, 0])
+  })
+
+  it('returns the the correct active index when both deck and poc are bad', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockBadDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockBadPipetteOffsetCalibrations)
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    expect(result.current.activeIndex).toEqual([0, 0])
+  })
+
+  it('returns the the correct active index when all calibrations are marked bad', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockBadDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockBadTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockBadPipetteOffsetCalibrations)
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    expect(result.current.activeIndex).toEqual([0, 0])
   })
 
   it('returns the earliest encountered task as the active index when multiple tasks require calibrations', () => {
@@ -189,9 +434,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.activeIndex).toEqual([0, 0])
   })
@@ -209,9 +463,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockIncompletePipetteOffsetCalibrations) // right mount marked as bad
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.taskList[0].description).toEqual(
       'Start with Deck Calibration, which is the basis for the rest of calibration.'
@@ -237,9 +500,18 @@ describe('useCalibrationTaskList hook', () => {
     when(mockUsePipetteOffsetCalibrations)
       .calledWith('otie')
       .mockReturnValue(mockCompletePipetteOffsetCalibrations)
-    const { result } = renderHook(() => useCalibrationTaskList('otie'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.taskList[0].footer).toEqual(
       expectedTaskList.taskList[0].footer
@@ -250,5 +522,83 @@ describe('useCalibrationTaskList hook', () => {
     expect(result.current.taskList[2].subTasks[1].footer).toEqual(
       expectedTaskList.taskList[2].subTasks[1].footer
     )
+  })
+
+  it('passes the launcher function to cta onclick handlers for recalibration', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockCompletePipetteOffsetCalibrations)
+
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    result.current.taskList[0].cta?.onClick()
+    expect(mockDeckCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[1].subTasks[0].cta?.onClick()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[1].subTasks[1].cta?.onClick()
+    expect(mockPipOffsetCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[2].subTasks[0].cta?.onClick()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalledTimes(2)
+    result.current.taskList[2].subTasks[1].cta?.onClick()
+    expect(mockPipOffsetCalLauncher).toHaveBeenCalledTimes(2)
+  })
+
+  it('passes the launcher function to cta onclick handlers for calibration', () => {
+    when(mockUseAttachedPipettes)
+      .calledWith()
+      .mockReturnValue(mockAttachedPipettesResponse)
+    when(mockUseDeckCalibrationData)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompleteDeckCalibration)
+    when(mockUseTipLengthCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompleteTipLengthCalibrations)
+    when(mockUsePipetteOffsetCalibrations)
+      .calledWith('otie')
+      .mockReturnValue(mockIncompletePipetteOffsetCalibrations)
+
+    const { result } = renderHook(
+      () =>
+        useCalibrationTaskList(
+          'otie',
+          mockPipOffsetCalLauncher,
+          mockTipLengthCalLauncher,
+          mockDeckCalLauncher
+        ),
+      {
+        wrapper,
+      }
+    )
+
+    result.current.taskList[0].cta?.onClick()
+    expect(mockDeckCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[1].subTasks[0].cta?.onClick()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[1].subTasks[1].cta?.onClick()
+    expect(mockPipOffsetCalLauncher).toHaveBeenCalledTimes(1)
+    result.current.taskList[2].subTasks[0].cta?.onClick()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalledTimes(2)
+    result.current.taskList[2].subTasks[1].cta?.onClick()
+    expect(mockPipOffsetCalLauncher).toHaveBeenCalledTimes(2)
   })
 })

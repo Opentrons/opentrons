@@ -17,7 +17,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     ThermocyclerModuleModel,
 )
-from opentrons.protocol_api.core.protocol_api.module_geometry import (
+from opentrons.protocol_api.core.legacy.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
     models_compatible,
 )
@@ -374,10 +374,7 @@ def test_module_load_labware(ctx_with_tempdeck):
         labware_def["cornerOffsetFromSlot"]["y"],
         labware_def["cornerOffsetFromSlot"]["z"],
     )
-    assert (
-        lw._implementation.get_geometry().offset
-        == lw_offset + mod.geometry.location.point
-    )
+    assert lw._core.get_geometry().offset == lw_offset + mod.geometry.location.point
     assert lw.name == labware_name
 
 

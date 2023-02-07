@@ -1,0 +1,21 @@
+[Unit]
+
+Description=Opentrons System HTTP Server
+
+Requires=nginx.service
+After=nginx.service
+
+After=opentrons-status-leds.service
+
+
+[Service]
+Type=notify
+ExecStart=python -m system_server
+Restart=on-failure
+TimeoutStartSec=3min
+
+Environment=OT_SYSTEM_SERVER_persistence_directory=/var/lib/opentrons-system-server
+
+
+[Install]
+WantedBy=opentrons.target

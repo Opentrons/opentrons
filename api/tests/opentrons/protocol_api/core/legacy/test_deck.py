@@ -6,9 +6,9 @@ from decoy import Decoy
 
 from opentrons.hardware_control.modules import ModuleType
 
-from opentrons.protocol_api.core.protocol_api.module_geometry import ModuleGeometry
-from opentrons.protocol_api.core.protocol_api import deck_conflict
-from opentrons.protocol_api.core.protocol_api.deck import Deck, DeckItem
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
+from opentrons.protocol_api.core.legacy import deck_conflict
+from opentrons.protocol_api.core.legacy.deck import Deck, DeckItem
 
 
 @pytest.fixture(autouse=True)

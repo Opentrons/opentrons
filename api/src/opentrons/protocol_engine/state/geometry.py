@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Set, Tuple, Union
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, MountType
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
@@ -17,11 +17,12 @@ from ..types import (
     ModuleLocation,
     LabwareLocation,
     LabwareOffsetVector,
+    DeckType,
 )
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import CurrentWell
-
+from . import move_types
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
@@ -125,7 +126,10 @@ class GeometryView:
         if module_id is None:
             return slot_pos
         else:
-            module_offset = self._modules.get_module_offset(module_id)
+            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
+            module_offset = self._modules.get_module_offset(
+                module_id=module_id, deck_type=deck_type
+            )
             return Point(
                 x=slot_pos.x + module_offset.x,
                 y=slot_pos.y + module_offset.y,
@@ -170,6 +174,8 @@ class GeometryView:
 
             if well_location.origin == WellOrigin.TOP:
                 offset = offset.copy(update={"z": offset.z + well_depth})
+            elif well_location.origin == WellOrigin.CENTER:
+                offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
 
         else:
             offset = WellOffset(x=0, y=0, z=well_depth)
@@ -201,38 +207,31 @@ class GeometryView:
         well_def = self._labware.get_well_definition(labware_id, well_name)
         return well_def.depth
 
-    def get_well_edges(
+    def get_touch_points(
         self,
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        mount: MountType,
+        radius: float = 1.0,
     ) -> List[Point]:
-        """Get list of absolute positions of four cardinal edges and center of well."""
-        well_def = self._labware.get_well_definition(labware_id, well_name)
-        if well_def.shape == "rectangular":
-            x_size = well_def.xDimension
-            y_size = well_def.yDimension
-            if x_size is None or y_size is None:
-                raise ValueError(
-                    f"Rectangular well {well_name} does not have x and y dimensions"
-                )
-        elif well_def.shape == "circular":
-            x_size = y_size = well_def.diameter
-            if x_size is None or y_size is None:
-                raise ValueError(f"Circular well {well_name} does not have diamater")
-        else:
-            raise ValueError(f'Shape "{well_def.shape}" is not a supported well shape')
+        """Get a list of touch points for a touch tip operation."""
+        labware_slot = self.get_ancestor_slot_name(labware_id)
+        next_to_module = self._modules.is_edge_move_unsafe(mount, labware_slot)
+        edge_path_type = self._labware.get_edge_path_type(
+            labware_id, well_name, mount, labware_slot, next_to_module
+        )
 
-        x_offset = x_size / 2.0
-        y_offset = y_size / 2.0
-        center = self.get_well_position(labware_id, well_name, well_location)
-        return [
-            center + Point(x=x_offset, y=0, z=0),  # right
-            center + Point(x=-x_offset, y=0, z=0),  # left
-            center,  # center
-            center + Point(x=0, y=y_offset, z=0),  # up
-            center + Point(x=0, y=-y_offset, z=0),  # down
-        ]
+        center_point = self.get_well_position(
+            labware_id, well_name, well_location=well_location
+        )
+
+        x_offset, y_offset = self._labware.get_well_radial_offsets(
+            labware_id, well_name, radius
+        )
+        return move_types.get_edge_point_list(
+            center_point, x_offset, y_offset, edge_path_type
+        )
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         labware_pos = self.get_labware_position(lw_data.id)
@@ -366,7 +365,10 @@ class GeometryView:
         module_offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName
         if isinstance(location, ModuleLocation):
-            module_offset = self._modules.get_module_offset(location.moduleId)
+            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
+            module_offset = self._modules.get_module_offset(
+                module_id=location.moduleId, deck_type=deck_type
+            )
             location_slot = self._modules.get_location(location.moduleId).slotName
         else:
             location_slot = location.slotName

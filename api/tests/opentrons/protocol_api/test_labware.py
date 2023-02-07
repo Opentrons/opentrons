@@ -16,7 +16,7 @@ from opentrons.protocol_api.core.common import (
     ModuleCore,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.module_contexts import TemperatureModuleContext
+from opentrons.protocol_api import TemperatureModuleContext
 
 from opentrons.types import DeckSlotName
 
@@ -66,10 +66,10 @@ def subject(
         well_grid.WellGrid(columns_by_name={}, rows_by_name={})
     )
     return Labware(
-        implementation=mock_labware_core,
+        core=mock_labware_core,
         api_version=api_version,
-        core_map=mock_map_core,
         protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
     )
 
 
@@ -123,7 +123,7 @@ def test_wells(
     decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
 
     subject = Labware(
-        implementation=mock_labware_core,
+        core=mock_labware_core,
         api_version=api_version,
         protocol_core=mock_protocol_core,
         core_map=mock_map_core,
