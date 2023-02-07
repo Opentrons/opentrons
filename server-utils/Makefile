@@ -112,4 +112,5 @@ push: wheel
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-server-utils","server_utils")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-system-server","server_utils")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","server_utils")
