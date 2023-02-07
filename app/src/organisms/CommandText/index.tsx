@@ -11,7 +11,7 @@ import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
 
-const SIMPLE_T_KEY_BY_COMMAND_TYPE: {
+const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
 } = {
   home: 'home_gantry',
@@ -150,7 +150,8 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'heaterShaker/closeLabwareLatch':
     case 'heaterShaker/deactivateShaker':
     case 'heaterShaker/waitForTemperature': {
-      const simpleTKey = SIMPLE_T_KEY_BY_COMMAND_TYPE[command.commandType]
+      const simpleTKey =
+        SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE[command.commandType]
       return (
         <StyledText as="p">
           {simpleTKey != null ? t(simpleTKey) : null}

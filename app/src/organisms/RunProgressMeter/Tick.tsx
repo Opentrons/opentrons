@@ -26,6 +26,18 @@ interface TickProps {
   total: number
 }
 
+const TRANSLATION_KEY_BY_COMMAND_TYPE: {
+  [commandType in RunTimeCommand['commandType']]?: string
+} = {
+  waitForResume: 'pause',
+  moveLabware: 'move_labware',
+}
+const ICON_NAME_BY_COMMAND_TYPE: {
+  [commandType in RunTimeCommand['commandType']]?: IconName
+} = {
+  waitForResume: 'pause-circle',
+  moveLabware: 'move-xy',
+}
 export function Tick(props: TickProps): JSX.Element {
   const {
     index,
@@ -37,32 +49,20 @@ export function Tick(props: TickProps): JSX.Element {
   } = props
   const { t } = useTranslation('run_details')
 
-  const tKeyByCommandType: {
-    [commandType in RunTimeCommand['commandType']]?: string
-  } = {
-    waitForResume: 'pause',
-    moveLabware: 'move_labware',
-  }
-  const iconByCommandType: {
-    [commandType in RunTimeCommand['commandType']]?: IconName
-  } = {
-    waitForResume: 'pause-circle',
-    moveLabware: 'move-xy',
-  }
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isAggregatedTick = count > 1
   const percent = (index / (total - 1)) * 100
   const stepNumber = index + 1
 
   const commandTKey =
-    firstCommandType in tKeyByCommandType &&
-    tKeyByCommandType[firstCommandType] != null
-      ? tKeyByCommandType[firstCommandType] ?? null
+    firstCommandType in TRANSLATION_KEY_BY_COMMAND_TYPE &&
+    TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] != null
+      ? TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] ?? null
       : null
   const iconName =
-    firstCommandType in iconByCommandType &&
-    iconByCommandType[firstCommandType] != null
-      ? iconByCommandType[firstCommandType] ?? null
+    firstCommandType in ICON_NAME_BY_COMMAND_TYPE &&
+    ICON_NAME_BY_COMMAND_TYPE[firstCommandType] != null
+      ? ICON_NAME_BY_COMMAND_TYPE[firstCommandType] ?? null
       : null
   return (
     <Flex
