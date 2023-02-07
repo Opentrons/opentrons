@@ -29,7 +29,17 @@ async def test_update(
 ) -> None:
     """It should complete the download."""
     with hex_file_path.open("r") as f:
-        await RunUpdate._run_update(
+        update_details = {
+            system_node_id: f,
+        }
+        updater = RunUpdate(
+            messenger=can_messenger,
+            update_details=update_details,
+            retry_count=3,
+            timeout_seconds=60,
+            erase=True,
+        )
+        await updater._run_update(
             messenger=can_messenger,
             node_id=system_node_id,
             hex_file=f,

@@ -59,11 +59,22 @@ async def test_run_update(
     mock_messenger = AsyncMock()
 
     mock_hex_file = MagicMock()
+    hex_file = cast(TextIO, mock_hex_file)
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
 
     target = Target(system_node=NodeId.head)
-    await RunUpdate._run_update(
+    update_details = {
+        target.system_node: hex_file,
+    }
+    updater = RunUpdate(
+        messenger=mock_messenger,
+        update_details=update_details,
+        retry_count=12,
+        timeout_seconds=11,
+        erase=should_erase,
+    )
+    await updater._run_update(
         messenger=mock_messenger,
         node_id=target.system_node,
         hex_file=mock_hex_file,
@@ -120,7 +131,8 @@ async def test_run_updates(
         timeout_seconds=11,
         erase=should_erase,
     )
-    await updater.run_updates()
+    async for progress in updater.run_updates():
+        pass
 
     mock_initiator_run.assert_has_calls(
         [

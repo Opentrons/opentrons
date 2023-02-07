@@ -65,7 +65,8 @@ async def run(args: argparse.Namespace) -> None:
             timeout_seconds=timeout_seconds,
             erase=erase,
         )
-        await updater.run_updates()
+        async for progress in updater.run_updates():
+            logger.info("%s is %s and %f done", "progress[0], progress[1], progress[2]")
 
     logger.info("Done")
 
