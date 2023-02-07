@@ -146,8 +146,8 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
             # This code path should only be reachable if a Python protocol does
             # `magnetic_module.engage(height=<...>)`.
             raise APIVersionError(
-                "The `height` parameter of MagneticModuleContext.engage() was removed in"
-                " apiLevel 2.14. Use `offset` or `height_from_base` instead."
+                "The height parameter of MagneticModuleContext.engage() was removed in"
+                " apiLevel 2.14. Use offset or height_from_base instead."
             )
 
         assert height_from_base is not None, "Expected engage height"
