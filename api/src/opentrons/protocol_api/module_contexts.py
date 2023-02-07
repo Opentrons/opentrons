@@ -34,9 +34,6 @@ from .labware import Labware
 from . import validation
 
 
-ENGAGE_HEIGHT_UNIT_CNV = 2
-
-
 _log = logging.getLogger(__name__)
 
 
