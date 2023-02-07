@@ -265,6 +265,9 @@ If you specify an API version of 2.13 or lower, your protocols will continue to 
 
   - ``MagneticModuleContext.calibrate`` was deprecated since it was never needed nor implemented.
 
+  - The ``height`` parameter of :py:meth:`MagneticModuleContext.engage` was deprecated.
+    Use ``offset`` or ``height_from_base`` instead.
+
   - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed,
     since they were holdovers from a calibration system that no longer exists.
  
