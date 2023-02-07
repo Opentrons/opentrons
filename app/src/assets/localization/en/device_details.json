@@ -109,7 +109,6 @@
   "download_run_log": "Download run log",
   "plunger_positions": "Plunger Positions",
   "tip_pickup_drop": "Tip Pickup / Drop",
-  "only_under_support_supervision": "Do not change these settings unless directed by Opentrons Support",
   "power_force": "Power / Force",
   "robot_is_busy": "Robot is busy",
   "this_robot_will_restart_with_update": "<block>This robot has to restart to update its software. Restarting will immediately stop the current run or calibration.</block><block>Do you want to update now anyway?</block>",

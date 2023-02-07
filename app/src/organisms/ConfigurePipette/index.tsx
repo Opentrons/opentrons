@@ -39,7 +39,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
   const groupLabels = [
     t('plunger_positions'),
     t('tip_pickup_drop'),
-    t('only_under_support_supervision'),
     t('power_force'),
   ]
 

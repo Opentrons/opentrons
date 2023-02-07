@@ -185,7 +185,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
     const quirkFields = this.getKnownQuirks()
     const quirksPresent = quirkFields.length > 0
-    const devFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
+    const unknownFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
     const initialValues = this.getInitialValues()
 
     return (
@@ -223,17 +223,13 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                   />
                   <ConfigFormGroup
                     groupLabel={this.props.groupLabels[1]}
-                    formFields={tipFields}
+                    formFields={[...tipFields, ...unknownFields]}
                   />
                   {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
-                  <ConfigFormGroup
-                    groupLabel={this.props.groupLabels[2]}
-                    formFields={devFields}
-                  />
                 </FormColumn>
                 <FormColumn>
                   <ConfigFormGroup
-                    groupLabel={this.props.groupLabels[3]}
+                    groupLabel={this.props.groupLabels[2]}
                     formFields={powerFields}
                   />
                 </FormColumn>
