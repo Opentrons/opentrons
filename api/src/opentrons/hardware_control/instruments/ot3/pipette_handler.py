@@ -36,6 +36,8 @@ from opentrons.hardware_control.constants import (
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from .pipette import Pipette
+from .instrument_calibration import PipetteOffsetByPipetteMount
+
 
 MOD_LOG = logging.getLogger(__name__)
 
@@ -148,14 +150,16 @@ class PipetteHandlerProvider:
         pipette = self.get_pipette(mount)
         pipette.reset_pipette_offset(mount, to_default)
 
-    def save_instrument_offset(self, mount: OT3Mount, delta: top_types.Point) -> None:
+    def save_instrument_offset(
+        self, mount: OT3Mount, delta: top_types.Point
+    ) -> PipetteOffsetByPipetteMount:
         """
         Save a new instrument offset the pipette offset to a particular value.
         :param mount: Modify the given mount.
         :param delta: The offset to set for the pipette.
         """
         pipette = self.get_pipette(mount)
-        pipette.save_pipette_offset(mount, delta)
+        return pipette.save_pipette_offset(mount, delta)
 
     # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
     # instead of potentially returning an empty dict

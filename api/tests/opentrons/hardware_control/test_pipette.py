@@ -350,7 +350,7 @@ def test_reset_instrument_offset(
     assert hw_pipette.pipette_offset.offset == Point(0, 0, 0)
 
 
-def test_save_instrument_offset_ot3(hardware_pipette_ot2: Callable) -> None:
+def test_save_instrument_offset_ot2(hardware_pipette_ot2: Callable) -> None:
     # TODO (lc 10-31-2022) These tests would be much cleaner/easier to mock with
     # an InstrumentCalibrationProvider class (like robot calibration provider)
     # which should be done in a follow-up refactor.
@@ -363,7 +363,7 @@ def test_save_instrument_offset_ot3(hardware_pipette_ot2: Callable) -> None:
         load_cal.assert_called_once_with("testID", Mount.LEFT)
 
 
-def test_save_instrument_offset_ot2(hardware_pipette_ot3: Callable) -> None:
+def test_save_instrument_offset_ot3(hardware_pipette_ot3: Callable) -> None:
     # TODO (lc 10-31-2022) These tests would be much cleaner/easier to mock with
     # an InstrumentCalibrationProvider class (like robot calibration provider)
     # which should be done in a follow-up refactor.
@@ -382,3 +382,24 @@ def test_save_instrument_offset_ot2(hardware_pipette_ot3: Callable) -> None:
             "testID", Mount.LEFT, Point(x=1.0, y=2.0, z=3.0)
         )
         load_cal.assert_called_once_with("testID", Mount.LEFT)
+
+
+def test_reload_instrument_cal_ot3(hardware_pipette_ot3: Callable) -> None:
+    old_pip = hardware_pipette_ot3(
+        ot3_pipette_config.convert_pipette_model("p1000_single_v1.0")
+    )
+    # if only calibration is changed
+    new_cal = ot3_calibration.PipetteOffsetByPipetteMount(
+        offset=Point(3, 4, 5),
+        source=cal_types.SourceType.user,
+        status=cal_types.CalibrationStatus(),
+    )
+    new_pip, skipped = ot3_pipette._reload_and_check_skip(
+        old_pip.config, old_pip, new_cal
+    )
+
+    assert skipped
+    # it's the same pipette
+    assert new_pip == old_pip
+    # only pipette offset has been updated
+    assert new_pip._pipette_offset == new_cal
