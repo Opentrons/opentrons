@@ -158,11 +158,13 @@ async def test_run_updates(
                 hex_processor=mock_hex_record_processor,
                 ack_wait_seconds=11,
             ),
+            mock.call().__aiter__(),
             mock.call(
                 node_id=target_2.bootloader_node,
                 hex_processor=mock_hex_record_processor,
                 ack_wait_seconds=11,
             ),
+            mock.call().__aiter__(),
         ]
     )
 

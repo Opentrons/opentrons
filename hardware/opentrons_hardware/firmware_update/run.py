@@ -142,7 +142,7 @@ class RunUpdate:
             for node_id, hex_file in self._update_details.items()
         ]
 
-        task = asyncio.create_task(asyncio.gather(*tasks))
+        task = asyncio.gather(*tasks)
         while True:
             try:
                 yield await asyncio.wait_for(self._status_queue.get(), 0.25)
