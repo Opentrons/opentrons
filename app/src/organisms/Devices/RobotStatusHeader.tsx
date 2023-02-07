@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SecondaryTertiaryButton } from '../../atoms/buttons'
+import { QuaternaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
@@ -66,11 +66,11 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
-            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-log'
+            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
           }`}
           id={`RobotStatusHeader_${String(name)}_goToRun`}
         >
-          <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
+          <QuaternaryButton>{t('go_to_run')}</QuaternaryButton>
         </Link>
       </Flex>
     ) : null
