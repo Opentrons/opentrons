@@ -150,7 +150,7 @@ class EdgeSenseSettings:
         search_initial_tolerance_mm: float,
         search_iteration_limit: int,
     ) -> None:
-        if not (overrun_tolerance_mm <= pass_settings.max_overrun_distance_mm):
+        if (overrun_tolerance_mm > pass_settings.max_overrun_distance_mm):
             raise ValueError("Overrun tolerance and pass setting distance do not match")
         object.__setattr__(self, "overrun_tolerance_mm", overrun_tolerance_mm)
         object.__setattr__(self, "early_sense_tolerance_mm", early_sense_tolerance_mm)
