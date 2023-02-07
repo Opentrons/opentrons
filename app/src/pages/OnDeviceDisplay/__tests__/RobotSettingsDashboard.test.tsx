@@ -59,49 +59,49 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Robot Name')
     fireEvent.click(button)
-    getByText('RobotName')
+    getByText('Robot Name')
   })
 
   it('should render component when tapping robot system version', () => {
     const [{ getByText }] = render()
     const button = getByText('Robot System Version')
     fireEvent.click(button)
-    getByText('RobotSystemVersion')
+    getByText('Robot System Version')
   })
 
   it('should render component when tapping network settings', () => {
     const [{ getByText }] = render()
     const button = getByText('Network Settings')
     fireEvent.click(button)
-    getByText('NetworkSettings')
+    getByText('Network Settings')
   })
 
   it('should render component when tapping display sleep settings', () => {
     const [{ getByText }] = render()
     const button = getByText('Display Sleep Settings')
     fireEvent.click(button)
-    getByText('DisplaySleepSettings')
+    getByText('Display Sleep Settings')
   })
 
   it('should render component when tapping display brightness', () => {
     const [{ getByText }] = render()
     const button = getByText('Display Brightness')
     fireEvent.click(button)
-    getByText('DisplayBrightness')
+    getByText('Display Brightness')
   })
 
   it('should render component when tapping display text size', () => {
     const [{ getByText }] = render()
     const button = getByText('Display Text Size')
     fireEvent.click(button)
-    getByText('DisplayTextSize')
+    getByText('Display Text Size')
   })
 
   it('should render component when tapping device rest', () => {
     const [{ getByText }] = render()
     const button = getByText('Device Reset')
     fireEvent.click(button)
-    getByText('DeviceReset')
+    getByText('Device Reset')
   })
 
   // The following cases will be activate when RobotSettings PRs are ready
