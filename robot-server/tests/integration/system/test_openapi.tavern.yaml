@@ -1,0 +1,13 @@
+---
+test_name: GET openapi.json
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Raw openapi.json endpoint is served and json is received # Stock, tavern can only validate json responses.
+    request:
+      url: "{host:s}:{port:d}/openapi.json"
+      method: GET
+    response:
+      status_code: 200
+# I think the status code is enough but we could do a lot more if we want.
