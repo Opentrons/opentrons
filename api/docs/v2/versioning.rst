@@ -243,7 +243,6 @@ Upcoming, not yet released.
 - :py:class:`.Labware` and :py:class:`.Well` objects will adhere to the protocol's API level setting. Prior to this version, they incorrectly ignore the setting.
 - :py:meth:`.ModuleContext.load_labware_object` will be deprecated.
 - :py:meth:`.MagneticModuleContext.calibrate` will be deprecated.
-- The ``height`` parameter of :py:meth:`.MagneticModuleContext.engage` will be deprecated. Use ``offset`` or ``height_from_base`` instead.
 - The ``presses`` and ``increment`` arguments of  :py:meth:`.InstrumentContext.pick_up_tip` will be deprecated. Configure your pipettes pick-up settings with the Opentrons App, instead.
 - Several internal properties of :py:class:`.Labware`, :py:class:`.Well`, and :py:class:`.ModuleContext` will be deprecated and/or removed:
     - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration``, which are holdovers from a calibration system that no longer exists.
@@ -252,3 +251,4 @@ Upcoming, not yet released.
     - The ``model`` and ``type`` properties of this interface will be replaced by :py:meth:`.ModuleContext.model` and :py:meth:`.ModuleContext.type`, respectively
 - :py:meth:`.ProtocolContext.load_labware` will favor loading custom labware over Opentrons defaults if a name shadows a default and no namespace is included.
  - :py:meth:`.InstrumentContext.touch_tip` will end with the pipette tip in the center of the well instead of on the edge closest to the front of the machine.
+ 
