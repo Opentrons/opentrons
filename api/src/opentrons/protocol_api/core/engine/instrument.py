@@ -180,7 +180,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_location=well_location,
             # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
             #   this also needs to be refactored along with other flow rate related issues
-            flow_rate=self.get_absolute_blow_out_flow_rate(1.0),
+            flow_rate=self.get_blow_out_flow_rate(),
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -413,29 +413,23 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
-    def get_aspirate_flow_rate(self) -> float:
-        return self._engine_client.state.pipettes.get_flow_rates(
-            self._pipette_id
-        ).aspirate
+    def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
+        return (
+            self._engine_client.state.pipettes.get_flow_rates(self._pipette_id).aspirate
+            * rate
+        )
 
-    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
-        return self.get_aspirate_flow_rate() * rate
+    def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
+        return (
+            self._engine_client.state.pipettes.get_flow_rates(self._pipette_id).dispense
+            * rate
+        )
 
-    def get_dispense_flow_rate(self) -> float:
-        return self._engine_client.state.pipettes.get_flow_rates(
-            self._pipette_id
-        ).dispense
-
-    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
-        return self.get_dispense_flow_rate() * rate
-
-    def get_blow_out_flow_rate(self) -> float:
-        return self._engine_client.state.pipettes.get_flow_rates(
-            self._pipette_id
-        ).blow_out
-
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
-        return self.get_blow_out_flow_rate() * rate
+    def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
+        return (
+            self._engine_client.state.pipettes.get_flow_rates(self._pipette_id).blow_out
+            * rate
+        )
 
     def set_flow_rate(
         self,

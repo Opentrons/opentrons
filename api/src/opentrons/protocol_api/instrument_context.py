@@ -203,7 +203,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         c_vol = self._core.get_available_volume() if not volume else volume
-        flow_rate = self._core.get_absolute_aspirate_flow_rate(rate)
+        flow_rate = self._core.get_aspirate_flow_rate(rate)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -313,7 +313,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         c_vol = self._core.get_current_volume() if not volume else volume
 
-        flow_rate = self._core.get_absolute_dispense_flow_rate(rate)
+        flow_rate = self._core.get_dispense_flow_rate(rate)
 
         with publisher.publish_context(
             broker=self.broker,

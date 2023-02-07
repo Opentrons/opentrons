@@ -422,23 +422,14 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
-    def get_aspirate_flow_rate(self) -> float:
-        return self.get_hardware_state()["aspirate_flow_rate"]
+    def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
+        return self.get_hardware_state()["aspirate_flow_rate"] * rate
 
-    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
-        return self.get_aspirate_flow_rate() * rate
+    def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
+        return self.get_hardware_state()["dispense_flow_rate"] * rate
 
-    def get_dispense_flow_rate(self) -> float:
-        return self.get_hardware_state()["dispense_flow_rate"]
-
-    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
-        return self.get_dispense_flow_rate() * rate
-
-    def get_blow_out_flow_rate(self) -> float:
-        return self.get_hardware_state()["blow_out_flow_rate"]
-
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
-        return self.get_blow_out_flow_rate() * rate
+    def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
+        return self.get_hardware_state()["blow_out_flow_rate"] * rate
 
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds
