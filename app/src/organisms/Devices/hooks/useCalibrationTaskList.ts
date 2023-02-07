@@ -59,6 +59,7 @@ export function useCalibrationTaskList(
   // get calibration data for mounted pipette subtasks
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
+  console.log({ attachedPipettes, tipLengthCalibrations, offsetCalibrations })
 
   useInterval(
     () => {
@@ -358,13 +359,22 @@ export function useCalibrationTaskList(
       taskList.taskList[1]?.subTasks[1]?.markedBad === true)
   ) {
     const invalidateHandler = (): void => {
-      const offsetCal = offsetCalibrations?.find(cal => cal.mount === 'left')
-      if (offsetCal != null) {
-        deleteCalibration({
-          calType: 'pipetteOffset',
-          mount: 'left',
-          pipette_id: offsetCal.pipette,
-        })
+      const tipLengthCal = tipLengthCalibrations?.find(
+        cal => cal.pipette === attachedPipettes?.left?.id
+      )
+      const offsetCals = offsetCalibrations?.filter(
+        cal =>
+          cal.pipette === tipLengthCal?.pipette &&
+          cal.tiprackUri === tipLengthCal.uri
+      )
+      if (offsetCals != null) {
+        for (const cal of offsetCals) {
+          deleteCalibration({
+            calType: 'pipetteOffset',
+            mount: cal.mount,
+            pipette_id: cal.pipette,
+          })
+        }
       }
     }
     if (taskList.taskList[1].subTasks[0].cta != null) {
@@ -384,13 +394,22 @@ export function useCalibrationTaskList(
       taskList.taskList[2]?.subTasks[1]?.markedBad === true)
   ) {
     const invalidateHandler = (): void => {
-      const offsetCal = offsetCalibrations?.find(cal => cal.mount === 'right')
-      if (offsetCal != null) {
-        deleteCalibration({
-          calType: 'pipetteOffset',
-          mount: 'right',
-          pipette_id: offsetCal.pipette,
-        })
+      const tipLengthCal = tipLengthCalibrations?.find(
+        cal => cal.pipette === attachedPipettes?.right?.id
+      )
+      const offsetCals = offsetCalibrations?.filter(
+        cal =>
+          cal.pipette === tipLengthCal?.pipette &&
+          cal.tiprackUri === tipLengthCal.uri
+      )
+      if (offsetCals != null) {
+        for (const cal of offsetCals) {
+          deleteCalibration({
+            calType: 'pipetteOffset',
+            mount: cal.mount,
+            pipette_id: cal.pipette,
+          })
+        }
       }
     }
     if (taskList.taskList[2].subTasks[0].cta != null) {
