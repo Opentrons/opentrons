@@ -26,7 +26,7 @@ class PickUpTipResult(BaseModel):
     # Tip volume has a default ONLY for parsing data from earlier versions, which did not include this in the result
     tipVolume: float = Field(
         0,
-        description="Max volume of liquid in uL for picked up tip.",
+        description="Maximum volume of liquid that the picked up tip can hold, in µL.",
         gt=0,
     )
 

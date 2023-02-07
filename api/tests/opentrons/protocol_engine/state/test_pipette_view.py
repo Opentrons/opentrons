@@ -23,7 +23,7 @@ from opentrons.protocol_engine.state.pipettes import (
 def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
     aspirated_volume_by_id: Optional[Dict[str, float]] = None,
-    working_volume_by_id: Optional[Dict[str, float]] = None,
+    tip_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
     attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
@@ -33,7 +33,7 @@ def get_pipette_view(
     state = PipetteState(
         pipettes_by_id=pipettes_by_id or {},
         aspirated_volume_by_id=aspirated_volume_by_id or {},
-        working_volume_by_id=working_volume_by_id or {},
+        tip_volume_by_id=tip_volume_by_id or {},
         current_well=current_well,
         attached_tip_labware_by_id=attached_tip_labware_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
@@ -206,11 +206,30 @@ def test_get_pipette_aspirated_volume() -> None:
     assert subject.get_aspirated_volume("pipette-id") == 42
 
 
+def test_get_pipette_working_volume() -> None:
+    """It should get the minimum value of tip volume and max volume."""
+    subject = get_pipette_view(
+        tip_volume_by_id={"pipette-id": 1337},
+        static_config_by_id={
+            "pipette-id": StaticPipetteConfig(
+                min_volume=1, max_volume=9001, model="blah"
+            )
+        },
+    )
+
+    assert subject.get_working_volume("pipette-id") == 1337
+
+
 def test_get_pipette_available_volume() -> None:
     """It should get the available volume for a pipette."""
     subject = get_pipette_view(
-        working_volume_by_id={"pipette-id": 100},
+        tip_volume_by_id={"pipette-id": 100},
         aspirated_volume_by_id={"pipette-id": 58},
+        static_config_by_id={
+            "pipette-id": StaticPipetteConfig(
+                min_volume=1, max_volume=123, model="blah"
+            )
+        },
     )
 
     assert subject.get_available_volume("pipette-id") == 42
