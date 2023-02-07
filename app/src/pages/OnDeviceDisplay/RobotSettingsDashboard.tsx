@@ -43,17 +43,14 @@ const SETTING_BUTTON_STYLE = css`
   border-radius: 16px;
 `
 
-const robotSettingOptions = [
-  'RobotName',
-  'RobotSystemVersion',
-  'NetworkSettings',
-  'DisplaySleepSettings',
-  'DisplayBrightness',
-  'DisplayTextSize',
-  'DeviceReset',
-] as const
-
-export type SettingOption = typeof robotSettingOptions[number]
+export type SettingOption =
+  | 'RobotName'
+  | 'RobotSystemVersion'
+  | 'NetworkSettings'
+  | 'DisplaySleepSettings'
+  | 'DisplayBrightness'
+  | 'DisplayTextSize'
+  | 'DeviceReset'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
