@@ -17,6 +17,7 @@ from opentrons.protocol_engine import (
     WellOrigin,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_api.core.engine import InstrumentCore, WellCore, ProtocolCore
 from opentrons.types import Location, Mount, MountType, Point
 
@@ -50,20 +51,18 @@ def subject(
     decoy.when(mock_engine_client.state.pipettes.get("abc123")).then_return(
         LoadedPipette.construct(mount=MountType.LEFT)  # type: ignore[call-arg]
     )
-    pipette_dict = cast(
-        PipetteDict,
-        {
-            "default_aspirate_flow_rates": {"1.1": 22},
-            "aspirate_flow_rate": 2.0,
-            "dispense_flow_rate": 2.0,
-            "default_dispense_flow_rates": {"3.3": 44},
-            "default_blow_out_flow_rates": {"5.5": 66},
-            "blow_out_flow_rate": 1.23,
-        },
+
+    decoy.when(mock_engine_client.state.pipettes.get_flow_rates("abc123")).then_return(
+        FlowRates(
+            aspirate=2.0,
+            dispense=2.0,
+            blow_out=1.23,
+            default_aspirate={"1.1": 22},
+            default_dispense={"3.3": 44},
+            default_blow_out={"5.5": 66},
+        ),
     )
-    decoy.when(mock_sync_hardware.get_attached_instrument(Mount.LEFT)).then_return(
-        pipette_dict
-    )
+
     return InstrumentCore(
         pipette_id="abc123",
         engine_client=mock_engine_client,

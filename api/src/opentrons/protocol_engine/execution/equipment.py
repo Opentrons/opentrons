@@ -39,6 +39,7 @@ from ..types import (
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
+    FlowRates,
 )
 
 
@@ -215,6 +216,14 @@ class EquipmentHandler:
                 min_volume=config.min_volume,
                 max_volume=config.max_volume,
                 channels=int(config.channels),
+                flow_rates=FlowRates(
+                    blow_out=config.blow_out_flow_rate,
+                    aspirate=config.aspirate_flow_rate,
+                    dispense=config.dispense_flow_rate,
+                    default_blow_out=config.default_blow_out_flow_rates,
+                    default_aspirate=config.default_aspirate_flow_rates,
+                    default_dispense=config.default_dispense_flow_rates,
+                ),
             )
         )
 

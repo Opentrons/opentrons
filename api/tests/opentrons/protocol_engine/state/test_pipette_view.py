@@ -10,6 +10,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedPipette,
     MotorAxis,
+    FlowRates,
 )
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
@@ -27,6 +28,7 @@ def get_pipette_view(
     attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
+    flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
@@ -36,6 +38,7 @@ def get_pipette_view(
         attached_tip_labware_by_id=attached_tip_labware_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
         static_config_by_id=static_config_by_id or {},
+        flow_rates_by_id=flow_rates_by_id or {},
     )
 
     return PipetteView(state=state)

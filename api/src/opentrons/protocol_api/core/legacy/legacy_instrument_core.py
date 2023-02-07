@@ -47,9 +47,16 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         self._mount = mount
         self._instrument_name = instrument_name
         self._default_speed = default_speed
-        self._flow_rates = FlowRates(self)
         self._speeds = PlungerSpeeds(self)
-        self._flow_rates.set_defaults(api_level=self._api_version)
+
+        pipette_state = self.get_hardware_state()
+        self._flow_rates = FlowRates(self)
+        self._flow_rates.set_defaults(
+            aspirate_defaults=pipette_state["default_aspirate_flow_rates"],
+            dispense_defaults=pipette_state["default_dispense_flow_rates"],
+            blow_out_defaults=pipette_state["default_blow_out_flow_rates"],
+            api_level=self._api_version,
+        )
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -415,14 +422,23 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
+    def get_aspirate_flow_rate(self) -> float:
+        return self.get_hardware_state()["aspirate_flow_rate"]
+
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.aspirate * rate
+        return self.get_aspirate_flow_rate() * rate
+
+    def get_dispense_flow_rate(self) -> float:
+        return self.get_hardware_state()["dispense_flow_rate"]
 
     def get_absolute_dispense_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.dispense * rate
+        return self.get_dispense_flow_rate() * rate
+
+    def get_blow_out_flow_rate(self) -> float:
+        return self.get_hardware_state()["blow_out_flow_rate"]
 
     def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.blow_out * rate
+        return self.get_blow_out_flow_rate() * rate
 
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds

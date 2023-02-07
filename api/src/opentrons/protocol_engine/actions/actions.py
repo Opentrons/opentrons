@@ -14,7 +14,7 @@ from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid, FlowRates
 
 
 @dataclass(frozen=True)
@@ -179,6 +179,17 @@ class AddPipetteConfigAction:
     min_volume: float
     max_volume: float
     channels: int
+    flow_rates: FlowRates
+
+
+@dataclass(frozen=True)
+class SetPipetteFlowRateAction:
+    """Set the flow rate for a pipette. Values of None will not change what has been set."""
+
+    pipette_id: str
+    aspirate: Optional[float]
+    dispense: Optional[float]
+    blow_out: Optional[float]
 
 
 Action = Union[
@@ -198,4 +209,5 @@ Action = Union[
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     AddPipetteConfigAction,
+    SetPipetteFlowRateAction,
 ]

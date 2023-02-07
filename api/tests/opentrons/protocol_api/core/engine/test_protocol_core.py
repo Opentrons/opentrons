@@ -37,7 +37,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor
+from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor, FlowRates
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.protocol_engine.state.labware import (
     LabwareLoadParams as EngineLabwareLoadParams,
@@ -168,19 +168,17 @@ def test_load_instrument(
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 
-    decoy.when(mock_engine_client.state.pipettes.get("cool-pipette")).then_return(
-        LoadedPipette.construct(mount=MountType.LEFT)  # type: ignore[call-arg]
-    )
-    pipette_dict = cast(
-        PipetteDict,
-        {
-            "default_aspirate_flow_rates": {"1.1": 22},
-            "default_dispense_flow_rates": {"3.3": 44},
-            "default_blow_out_flow_rates": {"5.5": 66},
-        },
-    )
-    decoy.when(mock_sync_hardware_api.get_attached_instrument(Mount.LEFT)).then_return(
-        pipette_dict
+    decoy.when(
+        mock_engine_client.state.pipettes.get_flow_rates("cool-pipette")
+    ).then_return(
+        FlowRates(
+            aspirate=1.23,
+            dispense=4.56,
+            blow_out=7.89,
+            default_aspirate={"1.1": 22},
+            default_dispense={"3.3": 44},
+            default_blow_out={"5.5": 66},
+        ),
     )
 
     result = subject.load_instrument(

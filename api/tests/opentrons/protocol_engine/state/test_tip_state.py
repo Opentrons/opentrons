@@ -10,6 +10,7 @@ from opentrons_shared_data.labware.labware_definition import (
 
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state.tips import TipStore, TipView
+from opentrons.protocol_engine.types import FlowRates
 
 
 _tip_rack_parameters = LabwareParameters.construct(isTiprack=True)  # type: ignore[call-arg]
@@ -167,6 +168,14 @@ def test_get_next_tip_skips_picked_up_tip(
             max_volume=15,
             min_volume=3,
             model="gen a",
+            flow_rates=FlowRates(
+                aspirate=1,
+                dispense=2,
+                blow_out=3,
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
@@ -210,6 +219,14 @@ def test_reset_tips(
             max_volume=15,
             min_volume=3,
             model="gen a",
+            flow_rates=FlowRates(
+                aspirate=1,
+                dispense=2,
+                blow_out=3,
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
@@ -233,6 +250,14 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
             max_volume=15,
             min_volume=3,
             model="gen a",
+            flow_rates=FlowRates(
+                aspirate=1,
+                dispense=2,
+                blow_out=3,
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
         )
     )
 

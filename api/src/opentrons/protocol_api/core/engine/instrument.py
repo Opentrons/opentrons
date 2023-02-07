@@ -43,7 +43,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         # TODO(jbl 2022-11-03) flow_rates should not live in the cores, and should be moved to the protocol context
         #   along with other rate related refactors (for the hardware API)
         self._flow_rates = FlowRates(self)
-        self._flow_rates.set_defaults(MAX_SUPPORTED_VERSION)
+
+        flow_rates = self._engine_client.state.pipettes.get_flow_rates(pipette_id)
+        self._flow_rates.set_defaults(
+            aspirate_defaults=flow_rates.default_aspirate,
+            dispense_defaults=flow_rates.default_dispense,
+            blow_out_defaults=flow_rates.default_blow_out,
+            api_level=MAX_SUPPORTED_VERSION,
+        )
 
         self.set_default_speed(speed=default_movement_speed)
 
@@ -406,14 +413,29 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
+    def get_aspirate_flow_rate(self) -> float:
+        return self._engine_client.state.pipettes.get_flow_rates(
+            self._pipette_id
+        ).aspirate
+
     def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.aspirate * rate
+        return self.get_aspirate_flow_rate() * rate
+
+    def get_dispense_flow_rate(self) -> float:
+        return self._engine_client.state.pipettes.get_flow_rates(
+            self._pipette_id
+        ).dispense
 
     def get_absolute_dispense_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.dispense * rate
+        return self.get_dispense_flow_rate() * rate
+
+    def get_blow_out_flow_rate(self) -> float:
+        return self._engine_client.state.pipettes.get_flow_rates(
+            self._pipette_id
+        ).blow_out
 
     def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.blow_out * rate
+        return self.get_blow_out_flow_rate() * rate
 
     def set_flow_rate(
         self,
@@ -421,11 +443,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
     ) -> None:
-        self._sync_hardware_api.set_flow_rate(
-            mount=self.get_mount(),
-            aspirate=aspirate,
-            dispense=dispense,
-            blow_out=blow_out,
+        self._engine_client.set_pipette_flow_rates(
+            self._pipette_id, aspirate, dispense, blow_out
         )
 
     def set_pipette_speed(

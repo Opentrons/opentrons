@@ -7,7 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette, MotorAxis
+from ..types import LoadedPipette, MotorAxis, FlowRates
 
 from ..commands import (
     Command,
@@ -31,6 +31,7 @@ from ..actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
     AddPipetteConfigAction,
+    SetPipetteFlowRateAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -71,6 +72,7 @@ class PipetteState:
     attached_tip_labware_by_id: Dict[str, str]
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
+    flow_rates_by_id: Dict[str, FlowRates]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -87,6 +89,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             attached_tip_labware_by_id={},
             movement_speed_by_id={},
             static_config_by_id={},
+            flow_rates_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -101,6 +104,20 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 min_volume=action.min_volume,
                 max_volume=action.max_volume,
             )
+            self._state.flow_rates_by_id[action.pipette_id] = action.flow_rates
+        elif isinstance(action, SetPipetteFlowRateAction):
+            try:
+                flow_rate = self._state.flow_rates_by_id[action.pipette_id]
+            except KeyError:
+                raise errors.PipetteNotLoadedError(
+                    f"Pipette {action.pipette_id} not found; unable to set flow rates."
+                )
+            if action.aspirate is not None:
+                flow_rate.aspirate = action.aspirate
+            if action.dispense is not None:
+                flow_rate.dispense = action.dispense
+            if action.blow_out is not None:
+                flow_rate.blow_out = action.blow_out
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -321,6 +338,14 @@ class PipetteView(HasState[PipetteState]):
     def get_maximum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's maximum volume."""
         return self._get_static_config(pipette_id).max_volume
+
+    def get_flow_rates(self, pipette_id: str) -> FlowRates:
+        try:
+            return self._state.flow_rates_by_id[pipette_id]
+        except KeyError:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to get pipette flow rates."
+            )
 
     def get_z_axis(self, pipette_id: str) -> MotorAxis:
         """Get the MotorAxis representing this pipette's Z stage."""

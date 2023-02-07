@@ -71,6 +71,22 @@ class SyncClient:
             speed=speed,
         )
 
+    def set_pipette_flow_rates(
+        self,
+        pipette_id: str,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
+    ) -> None:
+        """Set the flow rates of a pipette."""
+        self._transport.call_method(
+            "set_pipette_flow_rates",
+            pipette_id=pipette_id,
+            aspirate=aspirate,
+            dispense=dispense,
+            blow_out=blow_out,
+        )
+
     def load_labware(
         self,
         location: LabwareLocation,
