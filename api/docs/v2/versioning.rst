@@ -237,25 +237,39 @@ Version 2.13
 Version 2.14
 ++++++++++++
 
-Protocol API v2.14 introduces a new protocol runtime. Several older parts of the Protocol API were deprecated as part of this switchover. If you specify an API version of 2.13 or lower, your protocols will continue to execute on the old rumtime.
+This version a new protocol runtime. Several older parts of the Protocol API were deprecated as part of this switchover.
+If you specify an API version of 2.13 or lower, your protocols will continue to execute on the old runtime.
 
 - Feature additions
-  - :py:meth:`.ProtocolContext.define_liquid` and :py:meth:`.Well.load_liquid` added to define different liquid types and add them to wells, respectively.
-- Bug fixes
-  - :py:class:`.Labware` and :py:class:`.Well` now adhere to the protocol's API level setting. Prior to this version, they incorrectly ignored the setting.
-  - :py:meth:`.InstrumentContext.touch_tip` will end with the pipette tip in the center of the well instead of on the edge closest to the front of the machine.
-- Deprecations and removals
-  - :py:meth:`.ModuleContext.load_labware_object` was deprecated as an unnecessary internal method.
-  - :py:meth:`.MagneticModuleContext.calibrate` was deprecated since it was never needed nor implemented
-  - The ``presses`` and ``increment`` arguments of  :py:meth:`.InstrumentContext.pick_up_tip` were deprecated.
-    - Configure your pipettes pick-up settings with the Opentrons App, instead.
-  - Several internal properties of :py:class:`.Labware`, :py:class:`.Well`, and :py:class:`.ModuleContext` were deprecated:
-    - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed, since they were holdovers from a calibration system that no longer exists.
-    - The ``Well.has_tip`` setter was deprecated, since it is not compat The corresponding ``Well.has_tip`` getter will not be deprecated. Use :py:meth:`.Labware.reset` to reset your tip rack's state, instead.
-  - :py:meth:`.ModuleContext.geometry` was deprecated
-    - The ``model`` and ``type`` properties of were replaced by :py:meth:`.ModuleContext.model` and :py:meth:`.ModuleContext.type`, respectively
-    - Otherwise, this was an internal interface that didn't have much use for Protocol API authors
-  - :py:meth:`.ProtocolContext.load_labware` will now favor loading custom labware over Opentrons defaults if a load name shadows a default and no namespace is included.
-    - We continue to recommend, however, that you name your own labware definitions with load names that do not match any Opentrons standard definitions.
 
+  - :py:meth:`.ProtocolContext.define_liquid` and :py:meth:`.Well.load_liquid` added
+    to define different liquid types and add them to wells, respectively.
+
+- Bug fixes
+
+  - :py:class:`.Labware` and :py:class:`.Well` now adhere to the protocol's API level setting.
+    Prior to this version, they incorrectly ignored the setting.
  
+  - :py:meth:`.InstrumentContext.touch_tip` will end with the pipette tip in the center of the well
+    instead of on the edge closest to the front of the machine.
+
+  - :py:meth:`.ProtocolContext.load_labware` now prefers loading user-provided labware definitions
+    rather than built-in definitions if no explicit ``namespace`` is specified.
+
+- Deprecations and removals
+
+  - ``ModuleContext.load_labware_object`` was deprecated as an unnecessary internal method.
+
+  - ``ModuleContext.geometry`` was deprecated in favor of
+    :py:attr:`.ModuleContext.model` and :py:attr:`.ModuleContext.type`
+
+  - ``MagneticModuleContext.calibrate`` was deprecated since it was never needed nor implemented.
+
+  - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed,
+    since they were holdovers from a calibration system that no longer exists.
+ 
+  - The :py:attr:`.Well.has_tip` setter was deprecated. The getter is not deprecated.
+    Use :py:meth:`.Labware.reset` to reset your tip rack's state, instead.
+
+  - The ``presses`` and ``increment`` arguments of  :py:meth:`.InstrumentContext.pick_up_tip` were deprecated.
+    Configure your pipette pick-up settings with the Opentrons App, instead.
