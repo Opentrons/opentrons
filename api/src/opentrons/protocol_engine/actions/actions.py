@@ -182,16 +182,6 @@ class AddPipetteConfigAction:
     flow_rates: FlowRates
 
 
-@dataclass(frozen=True)
-class SetPipetteFlowRateAction:
-    """Set the flow rate for a pipette. Values of None will not change what has been set."""
-
-    pipette_id: str
-    aspirate: Optional[float]
-    dispense: Optional[float]
-    blow_out: Optional[float]
-
-
 Action = Union[
     PlayAction,
     PauseAction,
@@ -209,5 +199,4 @@ Action = Union[
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     AddPipetteConfigAction,
-    SetPipetteFlowRateAction,
 ]

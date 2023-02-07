@@ -560,12 +560,9 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
             max_volume=4.56,
             channels=7,
             flow_rates=FlowRates(
-                aspirate=1.2,
-                dispense=3.4,
-                blow_out=4.5,
-                default_aspirate={"a": 6},
-                default_dispense={"b": 7},
-                default_blow_out={"c": 8},
+                default_aspirate={"a": 1},
+                default_dispense={"b": 2},
+                default_blow_out={"c": 3},
             ),
         )
     )
@@ -574,10 +571,7 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
         model="pipette-model", min_volume=1.23, max_volume=4.56
     )
     assert subject.state.flow_rates_by_id["pipette-id"] == FlowRates(
-        aspirate=1.2,
-        dispense=3.4,
-        blow_out=4.5,
-        default_aspirate={"a": 6},
-        default_dispense={"b": 7},
-        default_blow_out={"c": 8},
+        default_aspirate={"a": 1},
+        default_dispense={"b": 2},
+        default_blow_out={"c": 3},
     )

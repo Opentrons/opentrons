@@ -31,7 +31,6 @@ from ..actions import (
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
     AddPipetteConfigAction,
-    SetPipetteFlowRateAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -105,19 +104,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 max_volume=action.max_volume,
             )
             self._state.flow_rates_by_id[action.pipette_id] = action.flow_rates
-        elif isinstance(action, SetPipetteFlowRateAction):
-            try:
-                flow_rate = self._state.flow_rates_by_id[action.pipette_id]
-            except KeyError:
-                raise errors.PipetteNotLoadedError(
-                    f"Pipette {action.pipette_id} not found; unable to set flow rates."
-                )
-            if action.aspirate is not None:
-                flow_rate.aspirate = action.aspirate
-            if action.dispense is not None:
-                flow_rate.dispense = action.dispense
-            if action.blow_out is not None:
-                flow_rate.blow_out = action.blow_out
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -340,6 +326,7 @@ class PipetteView(HasState[PipetteState]):
         return self._get_static_config(pipette_id).max_volume
 
     def get_flow_rates(self, pipette_id: str) -> FlowRates:
+        """Get the default flow rates for the pipette."""
         try:
             return self._state.flow_rates_by_id[pipette_id]
         except KeyError:

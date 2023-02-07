@@ -139,9 +139,6 @@ class LoadedPipette(BaseModel):
 class FlowRates:
     """Default and current flow rates for a pipette."""
 
-    blow_out: float
-    aspirate: float
-    dispense: float
     default_blow_out: Dict[str, float]
     default_aspirate: Dict[str, float]
     default_dispense: Dict[str, float]

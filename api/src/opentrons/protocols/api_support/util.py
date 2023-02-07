@@ -148,9 +148,9 @@ class FlowRates:
         blow_out_defaults: Dict[str, float],
         api_level: APIVersion,
     ) -> None:
-        self.aspirate = _find_value_for_api_version(api_level, aspirate_defaults)
-        self.dispense = _find_value_for_api_version(api_level, dispense_defaults)
-        self.blow_out = _find_value_for_api_version(api_level, blow_out_defaults)
+        self.aspirate = find_value_for_api_version(api_level, aspirate_defaults)
+        self.dispense = find_value_for_api_version(api_level, dispense_defaults)
+        self.blow_out = find_value_for_api_version(api_level, blow_out_defaults)
 
     @property
     def aspirate(self) -> float:
@@ -189,7 +189,7 @@ class FlowRates:
         )
 
 
-def _find_value_for_api_version(
+def find_value_for_api_version(
     for_version: APIVersion, values: Dict[str, float]
 ) -> float:
     """

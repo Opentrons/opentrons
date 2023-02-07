@@ -40,7 +40,6 @@ from .actions import (
     HardwareStoppedAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
-    SetPipetteFlowRateAction,
 )
 
 
@@ -334,23 +333,6 @@ class ProtocolEngine:
         """
         self._action_dispatcher.dispatch(
             SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=speed)
-        )
-
-    def set_pipette_flow_rates(
-        self,
-        pipette_id: str,
-        aspirate: Optional[float] = None,
-        dispense: Optional[float] = None,
-        blow_out: Optional[float] = None,
-    ) -> None:
-        """Set the flow rates of a pipette."""
-        self._action_dispatcher.dispatch(
-            SetPipetteFlowRateAction(
-                pipette_id=pipette_id,
-                aspirate=aspirate,
-                dispense=dispense,
-                blow_out=blow_out,
-            )
         )
 
     async def use_attached_modules(

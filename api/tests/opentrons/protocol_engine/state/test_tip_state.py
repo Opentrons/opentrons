@@ -169,9 +169,6 @@ def test_get_next_tip_skips_picked_up_tip(
             min_volume=3,
             model="gen a",
             flow_rates=FlowRates(
-                aspirate=1,
-                dispense=2,
-                blow_out=3,
                 default_aspirate={},
                 default_dispense={},
                 default_blow_out={},
@@ -220,9 +217,6 @@ def test_reset_tips(
             min_volume=3,
             model="gen a",
             flow_rates=FlowRates(
-                aspirate=1,
-                dispense=2,
-                blow_out=3,
                 default_aspirate={},
                 default_dispense={},
                 default_blow_out={},
@@ -251,9 +245,6 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
             min_volume=3,
             model="gen a",
             flow_rates=FlowRates(
-                aspirate=1,
-                dispense=2,
-                blow_out=3,
                 default_aspirate={},
                 default_dispense={},
                 default_blow_out={},

@@ -54,12 +54,9 @@ def subject(
 
     decoy.when(mock_engine_client.state.pipettes.get_flow_rates("abc123")).then_return(
         FlowRates(
-            aspirate=2.0,
-            dispense=2.0,
-            blow_out=1.23,
-            default_aspirate={"1.1": 22},
-            default_dispense={"3.3": 44},
-            default_blow_out={"5.5": 66},
+            default_aspirate={"1.2": 2.3},
+            default_dispense={"3.4": 4.5},
+            default_blow_out={"5.6": 6.7},
         ),
     )
 
@@ -335,7 +332,7 @@ def test_blow_out_to_well(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
-            flow_rate=1.23,
+            flow_rate=6.7,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
