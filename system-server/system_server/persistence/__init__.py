@@ -10,7 +10,11 @@ from .database import create_sql_engine
 from .tables import registration_table, migration_table
 from .persistent_directory import create_persistent_directory
 
-from system_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from system_server.settings import get_settings
 
 
