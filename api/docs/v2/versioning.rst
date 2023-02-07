@@ -237,7 +237,7 @@ Version 2.13
 Version 2.14
 ++++++++++++
 
-This version a new protocol runtime. Several older parts of the Protocol API were deprecated as part of this switchover.
+This version introduces a new protocol runtime. Several older parts of the Protocol API were deprecated as part of this switchover.
 If you specify an API version of 2.13 or lower, your protocols will continue to execute on the old runtime.
 
 - Feature additions
