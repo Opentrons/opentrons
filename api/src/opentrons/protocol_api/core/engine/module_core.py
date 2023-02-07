@@ -24,6 +24,7 @@ from opentrons.protocol_engine.errors.exceptions import (
 )
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 
 from ..module import (
     AbstractModuleCore,
@@ -142,8 +143,11 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
             height_from_home: Distance from motor home position to raise the magnets.
         """
         if height_from_home is not None:
-            raise NotImplementedError(
-                "MagneticModuleCore.engage with height_from_home not implemented"
+            # This code path should only be reachable if a Python protocol does
+            # `magnetic_module.engage(height=<...>)`.
+            raise APIVersionError(
+                "The `height` parameter of MagneticModuleContext.engage() was removed in"
+                " apiLevel 2.14. Use `offset` or `height_from_base` instead."
             )
 
         assert height_from_base is not None, "Expected engage height"
