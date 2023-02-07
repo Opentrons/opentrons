@@ -32,12 +32,6 @@ describe('protocol actions', () => {
       lastModified: 123,
     } as any
 
-    const bundleFile = {
-      name: 'foobar.zip',
-      type: 'zip',
-      lastModified: 111,
-    } as any
-
     const jsonFile = {
       name: 'foobar.json',
       type: 'json',
