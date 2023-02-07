@@ -1,0 +1,82 @@
+# This workflow runs tests and lint on non-release branches pushed that alter
+# the server-utils subpackage
+
+name: 'server-utils test/lint'
+
+on:
+  push:
+    paths:
+      - 'server-utils/**/*'
+      - 'Makefile'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/server-utils-lint-test.yaml'
+      - '.github/actions/python/**'
+    branches: # ignore any release-related thing (handled elsewhere)
+      - 'edge'
+    tags-ignore:
+      - '*'
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    paths:
+      - 'server-utils/**/*'
+      - 'Makefile'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/server-utils-lint-test.yaml'
+      - '.github/actions/python/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'server-utils linting'
+    timeout-minutes: 10
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - uses: 'actions/setup-python@v4'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'server-utils'
+      - name: Lint
+        run: make -C server-utils lint
+  test:
+    name: 'server-utils package tests'
+    timeout-minutes: 10
+    needs: [lint]
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - uses: 'actions/setup-python@v4'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'server-utils'
+      - name: Test
+        run: make -C server-utils test
+      - uses: 'codecov/codecov-action@v3'
+        with:
+          files: ./server-utils/coverage.xml
+          flags: server-utils
