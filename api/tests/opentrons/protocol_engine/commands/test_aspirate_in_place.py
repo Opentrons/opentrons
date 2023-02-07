@@ -24,7 +24,7 @@ async def test_aspirate_in_place_implementation(
     )
 
     decoy.when(
-        await pipetting.dispense_in_place(
+        await pipetting.aspirate_in_place(
             pipette_id="pipette-id-abc",
             volume=123,
             flow_rate=456,

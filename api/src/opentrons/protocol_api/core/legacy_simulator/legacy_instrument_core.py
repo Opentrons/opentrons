@@ -85,7 +85,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                         "When aspirate is called on something other than a "
                         "well relative position, we can't move to the top of"
                         " the well to prepare for aspiration. This might "
-                        "cause over aspiration if the previous command is a "
+                        "cause overz aspiration if the previous command is a "
                         "blow_out."
                     )
                 self.prepare_for_aspirate()
@@ -118,7 +118,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         location: types.Location,
         well_core: Optional[LegacyWellCore],
     ) -> None:
-        if location != self._protocol_interface.get_last_location(mount=self._mount):
+        if location != self._protocol_interface.get_last_location():
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._update_volume(0)
