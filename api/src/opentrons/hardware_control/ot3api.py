@@ -45,6 +45,10 @@ from .instruments.ot3.pipette import (
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+    PipetteOffsetByPipetteMount,
+)
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import get_system_constraints
@@ -467,6 +471,7 @@ class OT3API(
             OT3Mount.GRIPPER: self.attached_gripper,
         }
 
+    # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -489,14 +494,22 @@ class OT3API(
             # of simulation and it feels like a lot of work for this function
             # actually be doing.
             found = await self._backend.get_attached_instruments(checked_require)
-        for mount, instrument_data in found.items():
-            if mount == OT3Mount.GRIPPER:
-                await self.cache_gripper(cast(AttachedGripper, instrument_data))
-            else:
-                req_instr_name = checked_require.get(mount, None)
+
+        if OT3Mount.GRIPPER in found.keys():
+            await self.cache_gripper(cast(AttachedGripper, found.get(OT3Mount.GRIPPER)))
+        elif self._gripper_handler.gripper:
+            await self._gripper_handler.reset()
+
+        for pipette_mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            if pipette_mount in found.keys():
+                req_instr_name = checked_require.get(pipette_mount, None)
                 await self.cache_pipette(
-                    mount, cast(OT3AttachedPipette, instrument_data), req_instr_name
+                    pipette_mount,
+                    cast(OT3AttachedPipette, found.get(pipette_mount)),
+                    req_instr_name,
                 )
+            else:
+                self._pipette_handler.hardware_instruments[pipette_mount] = None
 
         await self._backend.probe_network()
         await self._backend.update_motor_status()
@@ -1551,13 +1564,13 @@ class OT3API(
 
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
-    ) -> None:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount]:
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:
-            self._gripper_handler.save_instrument_offset(delta)
+            return self._gripper_handler.save_instrument_offset(delta)
         else:
-            self._pipette_handler.save_instrument_offset(checked_mount, delta)
+            return self._pipette_handler.save_instrument_offset(checked_mount, delta)
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]

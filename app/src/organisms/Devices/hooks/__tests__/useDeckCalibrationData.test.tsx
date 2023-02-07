@@ -9,6 +9,7 @@ import {
   fetchCalibrationStatus,
   getDeckCalibrationData,
   DECK_CAL_STATUS_OK,
+  DECK_CAL_STATUS_BAD_CALIBRATION,
   DECK_CAL_STATUS_IDENTITY,
 } from '../../../../redux/calibration'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
@@ -73,6 +74,7 @@ describe('useDeckCalibrationData hook', () => {
     expect(result.current).toEqual({
       deckCalibrationData: null,
       isDeckCalibrated: false,
+      markedBad: false,
     })
     expect(dispatchApiRequest).not.toBeCalled()
   })
@@ -93,6 +95,30 @@ describe('useDeckCalibrationData hook', () => {
     expect(result.current).toEqual({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
+      markedBad: false,
+    })
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockFetchCalibrationStatus('otie')
+    )
+  })
+
+  it('returns markedBad deck calibration data when given a failed status', () => {
+    when(mockGetDeckCalibrationData)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue(mockDeckCalData)
+
+    when(mockUseDeckCalibrationStatus)
+      .calledWith('otie')
+      .mockReturnValue(DECK_CAL_STATUS_BAD_CALIBRATION)
+
+    const { result } = renderHook(() => useDeckCalibrationData('otie'), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual({
+      deckCalibrationData: mockDeckCalData,
+      isDeckCalibrated: false,
+      markedBad: true,
     })
     expect(dispatchApiRequest).toBeCalledWith(
       mockFetchCalibrationStatus('otie')

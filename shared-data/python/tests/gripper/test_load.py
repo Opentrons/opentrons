@@ -12,5 +12,5 @@ def test_load_schema() -> None:
 
 def test_load_definition() -> None:
     load_definition(GripperModel.v1, 1) == json.loads(
-        load_shared_data("gripper/definitions/1/v1.json")
+        load_shared_data("gripper/definitions/1/gripperV1.json")
     )
