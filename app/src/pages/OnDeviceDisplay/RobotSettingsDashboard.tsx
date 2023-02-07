@@ -76,6 +76,7 @@ export function RobotSettingsDashboard(): JSX.Element {
         <SettingsContent
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
+          robotName={robotName}
         />
       ) : (
         <>
@@ -155,6 +156,7 @@ interface RobotSettingButtonProps {
   settingInfo?: string
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption) => void
+  robotName?: string
 }
 
 function RobotSettingButton({
@@ -162,6 +164,7 @@ function RobotSettingButton({
   settingInfo,
   currentOption,
   setCurrentOption,
+  robotName,
 }: RobotSettingButtonProps): JSX.Element {
   return (
     <Btn
@@ -210,10 +213,12 @@ function RobotSettingButton({
 interface SettingsContentProps {
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption | null) => void
+  robotName: string
 }
 const SettingsContent = ({
   currentOption,
   setCurrentOption,
+  robotName,
 }: SettingsContentProps): JSX.Element => {
   let settingOption
   switch (currentOption) {
@@ -238,7 +243,12 @@ const SettingsContent = ({
       settingOption = <DisplayTextSize setCurrentOption={setCurrentOption} />
       break
     case 'DeviceReset':
-      settingOption = <DeviceReset setCurrentOption={setCurrentOption} />
+      settingOption = (
+        <DeviceReset
+          robotName={robotName}
+          setCurrentOption={setCurrentOption}
+        />
+      )
       break
   }
   return settingOption
