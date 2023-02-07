@@ -113,10 +113,10 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
                         )
                     ).json()
 
-                if len(all_command_summaries["data"]) == 0:
-                    assert run_id in snapshot.runs_with_no_commands
-                else:
-                    assert len(all_command_summaries["data"]) > 0
+                    if run_id in snapshot.runs_with_no_commands:
+                        assert len(all_command_summaries["data"]) == 0
+                    else:
+                        assert len(all_command_summaries["data"]) > 0
                 # Ideally, we would also fetch full commands via
                 # `GET /runs/{run_id}/commands/{command_id}`.
                 # We skip it for performance. Adds ~10+ seconds
