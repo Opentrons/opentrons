@@ -8,7 +8,12 @@ import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '..'
 import { useCalibrationTaskList } from '../../Devices/hooks'
 import {
-  expectedFailedTaskList,
+  expectedBadDeckTaskList,
+  expectedBadDeckAndPipetteOffsetTaskList,
+  expectedBadEverythingTaskList,
+  expectedBadPipetteOffsetTaskList,
+  expectedBadTipLengthTaskList,
+  expectedBadTipLengthAndOffsetTaskList,
   expectedIncompleteDeckCalTaskList,
   expectedTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
@@ -69,8 +74,42 @@ describe('CalibrationStatusCard', () => {
     getByText('Missing calibration data')
   })
 
-  it('renders a recommended status label', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedFailedTaskList)
+  it('renders a recommended status label when the deck is bad', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedBadDeckTaskList)
+    const [{ getByText }] = render(props)
+    getByText('Calibration recommended')
+  })
+
+  it('renders a recommended status label when both the deck and offset is bad', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedBadDeckAndPipetteOffsetTaskList
+    )
+    const [{ getByText }] = render(props)
+    getByText('Calibration recommended')
+  })
+
+  it('renders a recommended status label when everything is bad', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedBadEverythingTaskList)
+    const [{ getByText }] = render(props)
+    getByText('Calibration recommended')
+  })
+
+  it('renders a recommended status label when the offset is bad', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedBadPipetteOffsetTaskList)
+    const [{ getByText }] = render(props)
+    getByText('Calibration recommended')
+  })
+
+  it('renders a recommended status label when the tip length is bad', () => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedBadTipLengthTaskList)
+    const [{ getByText }] = render(props)
+    getByText('Calibration recommended')
+  })
+
+  it('renders a recommended status label when both the tip length and offset is bad', () => {
+    mockUseCalibrationTaskList.mockReturnValue(
+      expectedBadTipLengthAndOffsetTaskList
+    )
     const [{ getByText }] = render(props)
     getByText('Calibration recommended')
   })

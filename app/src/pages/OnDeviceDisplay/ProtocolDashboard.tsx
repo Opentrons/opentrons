@@ -54,7 +54,6 @@ export function ProtocolDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing6}
-      minHeight="25rem"
     >
       <BackButton />
       <Table>
@@ -65,7 +64,6 @@ export function ProtocolDashboard(): JSX.Element {
             <TableHeader>{t('date_added')}</TableHeader>
           </tr>
         </thead>
-
         <tbody>
           {protocols.data?.data.map((protocol, index) => {
             const lastRun = runs.data?.data.find(
