@@ -209,7 +209,9 @@ class OT3Controller:
                 timeout_seconds=20,
                 erase=True,
             )
-            await updater.run_updates()
+            async for progress in updater.run_updates():
+                pass
+                # TODO (peter, 2023-02-08): Pass this progress data up the stack for reporting
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
