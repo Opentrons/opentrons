@@ -2,8 +2,9 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { COLORS } from '@opentrons/components'
 import {
-  CreateCommand,
+  LEFT,
   NINETY_SIX_CHANNEL,
+  RIGHT,
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
@@ -24,6 +25,7 @@ import {
 } from './constants'
 import { getIsGantryEmpty } from './utils'
 import type { AxiosError } from 'axios'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 
@@ -129,17 +131,36 @@ export const BeforeBeginning = (
       })
   }
 
+  const SingleMountAttachCommand: CreateCommand = {
+    // @ts-expect-error calibration type not yet supported
+    commandType: 'calibration/moveToMaintenancePosition' as const,
+    params: {
+      mount: mount,
+    },
+  }
+
+  const NinetySixChannelAttachCommand: CreateCommand[] = [
+    {
+      // @ts-expect-error calibration type not yet supported
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: LEFT,
+      },
+    },
+    {
+      // @ts-expect-error calibration type not yet supported
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: RIGHT,
+      },
+    },
+  ]
+
   const handleOnClickAttach = (): void => {
     chainRunCommands(
-      [
-        {
-          // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: mount,
-          },
-        },
-      ],
+      selectedPipette === SINGLE_MOUNT_PIPETTES
+        ? [SingleMountAttachCommand]
+        : NinetySixChannelAttachCommand,
       false
     )
       .then(() => {
