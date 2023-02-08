@@ -48,12 +48,12 @@ const attachedPipetteCalPresent: (
   pipettes: AttachedPipettesByMount,
   pipetteCalibrations: PipetteCalibrationsByMount
 ) => boolean = (pipettes, pipetteCalibrations) =>
-    !Pipettes.PIPETTE_MOUNTS.some(
-      mount =>
-        pipettes?.[mount] != null &&
-        (pipetteCalibrations[mount]?.offset == null ||
-          pipetteCalibrations[mount]?.tipLength == null)
-    )
+  !Pipettes.PIPETTE_MOUNTS.some(
+    mount =>
+      pipettes?.[mount] != null &&
+      (pipetteCalibrations[mount]?.offset == null ||
+        pipetteCalibrations[mount]?.tipLength == null)
+  )
 
 export function CalibrationHealthCheck({
   buttonDisabledReason,
@@ -142,7 +142,9 @@ export function CalibrationHealthCheck({
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('calibration_health_check_title')}
         </StyledText>
-        <StyledText as="p">{t('calibration_health_check_description')}</StyledText>
+        <StyledText as="p">
+          {t('calibration_health_check_description')}
+        </StyledText>
       </Flex>
       <TertiaryButton
         {...targetProps}

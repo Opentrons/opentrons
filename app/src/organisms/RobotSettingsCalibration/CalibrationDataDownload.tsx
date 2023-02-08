@@ -77,20 +77,24 @@ export function CalibrationDataDownload({
       new Blob([
         isOT3
           ? JSON.stringify({
-            pipetteOffset: pipetteOffsetCalibrations,
-          })
+              pipetteOffset: pipetteOffsetCalibrations,
+            })
           : JSON.stringify({
-            deck: deckCalibrationData,
-            pipetteOffset: pipetteOffsetCalibrations,
-            tipLength: tipLengthCalibrations,
-          }),
+              deck: deckCalibrationData,
+              pipetteOffset: pipetteOffsetCalibrations,
+              tipLength: tipLengthCalibrations,
+            }),
       ]),
       `opentrons-${robotName}-calibration.json`
     )
   }
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} paddingTop={SPACING.spacing5}>
+    <Flex
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+      paddingTop={SPACING.spacing5}
+    >
       <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {isOT3
@@ -103,8 +107,9 @@ export function CalibrationDataDownload({
               t={t}
               i18nKey="about_calibration_description_ot3"
               components={{
-                block: <StyledText as="p" />
-              }} />
+                block: <StyledText as="p" />,
+              }}
+            />
             <Link
               external
               css={TYPOGRAPHY.linkPSemiBold}
@@ -120,7 +125,8 @@ export function CalibrationDataDownload({
                 ? 'robot_calibration:download_calibration_data_available'
                 : 'robot_calibration:download_calibration_data_unavailable'
             )}
-          </StyledText>)}
+          </StyledText>
+        )}
       </Flex>
       <TertiaryButton
         onClick={onClickSaveAs}

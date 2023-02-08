@@ -75,9 +75,7 @@ describe('SetupTipLengthCalibration', () => {
 
     expect(getAllByText('pipette 1')).toHaveLength(1)
     expect(getAllByText('Mock TipRack Definition')).toHaveLength(1)
-    expect(
-      getAllByText('Mock SetupTipLengthCalibrationButton')
-    ).toHaveLength(1)
+    expect(getAllByText('Mock SetupTipLengthCalibrationButton')).toHaveLength(1)
     expect(
       getAllByText('Attach pipette to see tip length calibration information')
     ).toHaveLength(1)
@@ -94,9 +92,7 @@ describe('SetupTipLengthCalibration', () => {
 
     expect(getAllByText('pipette 1')).toHaveLength(2)
     expect(getAllByText('Mock TipRack Definition')).toHaveLength(2)
-    expect(
-      getAllByText('Mock SetupTipLengthCalibrationButton')
-    ).toHaveLength(2)
+    expect(getAllByText('Mock SetupTipLengthCalibrationButton')).toHaveLength(2)
     expect(
       getAllByText('Attach pipette to see tip length calibration information')
     ).toHaveLength(2)

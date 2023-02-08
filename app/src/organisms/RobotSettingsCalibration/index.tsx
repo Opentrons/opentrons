@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { SpinnerModalPage, AlertModal, useInterval } from '@opentrons/components'
+import {
+  SpinnerModalPage,
+  AlertModal,
+  useInterval,
+} from '@opentrons/components'
 
 import { Portal } from '../../App/portal'
 import { Line } from '../../atoms/structure'
@@ -94,7 +98,7 @@ export function RobotSettingsCalibration({
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-        Sessions.sharedCalCommands.JOG
+          Sessions.sharedCalCommands.JOG
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta
@@ -286,10 +290,14 @@ export function RobotSettingsCalibration({
       ) : null}
       {isOT3 ? (
         <>
-          <CalibrationDataDownload {...{ robotName, setShowHowCalibrationWorksModal }} />
+          <CalibrationDataDownload
+            {...{ robotName, setShowHowCalibrationWorksModal }}
+          />
           <Line />
           <RobotSettingsPipetteOffsetCalibration
-            formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
+            formattedPipetteOffsetCalibrations={
+              formattedPipetteOffsetCalibrations
+            }
             robotName={robotName}
             updateRobotStatus={updateRobotStatus}
           />
@@ -298,7 +306,9 @@ export function RobotSettingsCalibration({
         </>
       ) : (
         <>
-          <CalibrationStatusCard {...{ robotName, setShowHowCalibrationWorksModal }} />
+          <CalibrationStatusCard
+            {...{ robotName, setShowHowCalibrationWorksModal }}
+          />
           <RobotSettingsDeckCalibration
             buttonDisabledReason={buttonDisabledReason}
             dispatchRequests={dispatchRequests}
@@ -307,7 +317,9 @@ export function RobotSettingsCalibration({
           />
           <Line />
           <RobotSettingsPipetteOffsetCalibration
-            formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
+            formattedPipetteOffsetCalibrations={
+              formattedPipetteOffsetCalibrations
+            }
             robotName={robotName}
             updateRobotStatus={updateRobotStatus}
           />

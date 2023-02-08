@@ -49,9 +49,9 @@ export function RobotSettingsPipetteOffsetCalibration({
           ? t('pipette_calibrations_title')
           : t('pipette_offset_calibrations_title')}
       </StyledText>
-      {isOT3
-        ? <StyledText as="p">{t('pipette_calibrations_description')}</StyledText>
-        : null}
+      {isOT3 ? (
+        <StyledText as="p">{t('pipette_calibrations_description')}</StyledText>
+      ) : null}
       {pipetteOffsetCalibrations != null ? (
         <PipetteOffsetCalibrationItems
           robotName={robotName}

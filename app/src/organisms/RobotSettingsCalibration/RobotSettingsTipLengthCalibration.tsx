@@ -48,19 +48,20 @@ export function RobotSettingsTipLengthCalibration({
   const formattedTipLengthCalibrations: FormattedTipLengthCalibration[] =
     tipLengthCalibrations != null
       ? tipLengthCalibrations?.map(tipLength => ({
-        tiprack: tipLength.tiprack,
-        pipette: tipLength.pipette,
-        lastCalibrated: tipLength.lastModified,
-        markedBad: tipLength.status.markedBad,
-        uri: tipLength.uri,
-      }))
+          tiprack: tipLength.tiprack,
+          pipette: tipLength.pipette,
+          lastCalibrated: tipLength.lastModified,
+          markedBad: tipLength.status.markedBad,
+          uri: tipLength.uri,
+        }))
       : []
 
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       paddingY={SPACING.spacing5}
-      gridGap={SPACING.spacing3}>
+      gridGap={SPACING.spacing3}
+    >
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('tip_length_calibrations_title')}
       </StyledText>

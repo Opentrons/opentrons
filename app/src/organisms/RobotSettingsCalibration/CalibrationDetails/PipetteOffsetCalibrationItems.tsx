@@ -106,7 +106,7 @@ export function PipetteOffsetCalibrationItems({
                 <StyledTableCell>
                   <Flex alignItems={ALIGN_CENTER}>
                     {calibration.lastCalibrated != null &&
-                      !(calibration.markedBad ?? false) ? (
+                    !(calibration.markedBad ?? false) ? (
                       <>
                         <StyledText as="p">
                           {formatLastCalibrated(calibration.lastCalibrated)}
@@ -115,11 +115,9 @@ export function PipetteOffsetCalibrationItems({
                     ) : (
                       <StyledText as="p">
                         {calibration.lastCalibrated != null &&
-                          calibration.markedBad === true ? (
+                        calibration.markedBad === true ? (
                           <>
-                            {formatLastCalibrated(
-                              calibration.lastCalibrated
-                            )}
+                            {formatLastCalibrated(calibration.lastCalibrated)}
                           </>
                         ) : (
                           <>{t('not_calibrated_short')}</>

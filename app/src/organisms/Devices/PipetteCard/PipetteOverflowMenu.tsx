@@ -79,7 +79,11 @@ export const PipetteOverflowMenu = (
                 onClick={() => handleCalibrate()}
                 data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
               >
-                {t(isPipetteCalibrated ? 'recalibrate_pipette' : 'calibrate_pipette')}
+                {t(
+                  isPipetteCalibrated
+                    ? 'recalibrate_pipette'
+                    : 'calibrate_pipette'
+                )}
               </MenuItem>
             )}
             <MenuItem
