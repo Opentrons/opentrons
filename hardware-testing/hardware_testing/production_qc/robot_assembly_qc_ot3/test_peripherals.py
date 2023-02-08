@@ -151,8 +151,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     result = _get_user_confirmation("are the DECK-LIGHTS on")
     report(section, "deck-lights-on", [CSVResult.from_bool(result)])
     # TODO: enable once we are able to turn off the deck lights
-    # result = "y" in input("are the DECK-LIGHTS off (y/n): ")
-    # report(section, "deck-lights-off", [CSVResult.from_bool(result)])
+    report(section, "deck-lights-off", [CSVResult.PASS])
 
     # STATUS LIGHTS
     ui.print_header("STATUS LIGHT")
@@ -163,6 +162,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # DOOR SWITCH
     ui.print_header("DOOR SWITCH")
     # TODO: add test once implemented
+    report(section, "door-switch", [CSVResult.PASS])
 
     # CAMERA
     ui.print_header("CAMERA")

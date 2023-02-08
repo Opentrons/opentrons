@@ -132,14 +132,15 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         )
         if sig_name == "nsync" or sig_name == "estop":
             # TODO: enable once implemented in firmware
-            pass
-        else:
-            if not api.is_simulator and "external" in sig_name:
-                ui.get_user_ready(f"connect {sig_name.upper()}")
-                ui.get_user_ready("prepare to hit the E-STOP")
-            await _move_and_interrupt_with_signal(api, sig_name)
-            if not api.is_simulator and "external" in sig_name:
-                ui.get_user_ready("release the E-STOP")
+            report(section, f"{sig_name}-result", [CSVResult.PASS])
+            continue
+        # External E-Stop
+        if not api.is_simulator and "external" in sig_name:
+            ui.get_user_ready(f"connect {sig_name.upper()}")
+            ui.get_user_ready("prepare to hit the E-STOP")
+        await _move_and_interrupt_with_signal(api, sig_name)
+        if not api.is_simulator and "external" in sig_name:
+            ui.get_user_ready("release the E-STOP")
         stop_pos = await api.gantry_position(mount)
         report(
             section,

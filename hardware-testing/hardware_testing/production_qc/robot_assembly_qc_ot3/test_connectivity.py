@@ -119,7 +119,8 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
         res = run_subprocess(["blkid"], capture_output=True, text=True)
         output = res.stdout
     else:
-        output = " ".join(USB_PORTS_TO_TEST)
+        _stored_names = [f"OT3-{p.upper()}" for p in USB_PORTS_TO_TEST]
+        output = " ".join(_stored_names)
 
     print(f"output from blkid:\n{output}\n")
     for tag in USB_PORTS_TO_TEST:
@@ -133,13 +134,14 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
     #       - can analyzer
     #       - door switch detection
     for test_name in AUX_PORT_TESTS:
-        result = CSVResult.FAIL
         if not api.is_simulator:
             ui.get_user_ready(f"testing {test_name.upper()}")
         if "can" in test_name:
             # send some arbitrary CAN data, to inspect externally
             await api.refresh_current_position_ot3()
-        if not api.is_simulator:
+        if api.is_simulator:
+            result = CSVResult.PASS
+        else:
             inp = ui.get_user_answer(f"does {test_name.upper()} signal look good")
             result = CSVResult.from_bool(inp)
         report(section, test_name, [result])

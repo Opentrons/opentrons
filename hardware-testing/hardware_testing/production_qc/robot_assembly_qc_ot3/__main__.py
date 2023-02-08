@@ -4,6 +4,7 @@ import asyncio
 from pathlib import Path
 
 from hardware_testing.data import ui
+from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
 
 from .config import TestSection, TestConfig, build_report, TESTS
@@ -46,7 +47,9 @@ async def _main(cfg: TestConfig) -> None:
     report_path = report.save_to_disk()
     complete_msg = "complete" if report.completed else "incomplete"
     print(f"done, {complete_msg} report -> {report_path}")
-    # print(report)
+    print("Overall Results:")
+    for line in report[RESULTS_OVERVIEW_TITLE].lines:
+        print(f" - {line.tag}: {line.result}")
 
 
 if __name__ == "__main__":

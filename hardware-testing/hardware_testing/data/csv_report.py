@@ -89,6 +89,14 @@ class CSVLine:
         self._start_time = start_time
 
     @property
+    def result(self) -> Optional[CSVResult]:
+        """Line result passed."""
+        for i, expected_type in enumerate(self._data_types):
+            if expected_type == CSVResult:
+                return self._data[i]
+        return None
+
+    @property
     def result_passed(self) -> bool:
         """Line result passed."""
         for i, expected_type in enumerate(self._data_types):
