@@ -70,12 +70,6 @@ export function RobotSettingsTipLengthCalibration({
           <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
             {t('tip_length_calibrations_title')}
           </Box>
-          <StyledText as="p" marginBottom={SPACING.spacing4}>
-            {/* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */}
-            {enableCalibrationWizards
-              ? t('tip_length_calibrations_description')
-              : t('tip_length_calibrations_description_legacy')}
-          </StyledText>
         </Box>
         {tipLengthCalibrations != null && tipLengthCalibrations.length !== 0 ? (
           <TipLengthCalibrationItems

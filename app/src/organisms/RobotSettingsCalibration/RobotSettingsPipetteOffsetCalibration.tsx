@@ -70,14 +70,9 @@ export function RobotSettingsPipetteOffsetCalibration({
                 ? t('pipette_calibrations_title')
                 : t('pipette_offset_calibrations_title')}
             </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {isOT3
-                ? t('pipette_calibrations_description')
-                : /* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */
-                enableCalibrationWizards
-                ? t('pipette_offset_calibrations_description')
-                : t('pipette_offset_calibrations_description_legacy')}
-            </StyledText>
+            {isOT3
+              ? <StyledText as="p" marginBottom={SPACING.spacing4}>t('pipette_calibrations_description')</StyledText>
+              : null}
           </Box>
           {pipetteOffsetCalibrations != null ? (
             <PipetteOffsetCalibrationItems
