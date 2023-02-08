@@ -39,6 +39,18 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         search_initial_tolerance_mm=5.0,
         search_iteration_limit=10,
     ),
+    edge_sense_binary=EdgeSenseSettings(
+        overrun_tolerance_mm=0.5,
+        early_sense_tolerance_mm=0.2,
+        pass_settings=CapacitivePassSettings(
+            prep_distance_mm=1,
+            max_overrun_distance_mm=1,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=1.0,
+        ),
+        search_initial_tolerance_mm=5.0,
+        search_iteration_limit=10,
+    ),
     probe_length=44.5,
 )
 
@@ -363,6 +375,9 @@ def _build_default_calibration(
         z_offset=_build_default_z_pass(from_conf.get("z_offset", {}), default.z_offset),
         edge_sense=_build_default_edge_sense(
             from_conf.get("edge_sense", {}), default.edge_sense
+        ),
+        edge_sense_binary=_build_default_edge_sense(
+            from_conf.get("edge_sense_binary", {}), default.edge_sense_binary
         ),
         probe_length=from_conf.get("probe_length", default.probe_length),
     )
