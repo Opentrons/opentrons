@@ -27,7 +27,7 @@ import type {
   Axis,
   Sign,
   StepSize,
-} from '../../molecules/DeprecatedJogControls/types'
+} from '../../molecules/JogControls/types'
 import type {
   CreateRunCommand,
   RegisterPositionAction,

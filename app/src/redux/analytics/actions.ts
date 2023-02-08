@@ -12,7 +12,6 @@ export const pipetteOffsetCalibrationStarted = (
 ): Types.PipetteOffsetStartedAnalyticsAction => ({
   type: Constants.ANALYTICS_PIPETTE_OFFSET_STARTED,
   payload: {
-    intent: 'pipette-offset',
     mount: mount,
     calBlock: calBlock,
     shouldPerformTipLength: shouldPerformTipLength,
@@ -27,7 +26,6 @@ export const tipLengthCalibrationStarted = (
 ): Types.TipLengthStartedAnalyticsAction => ({
   type: Constants.ANALYTICS_TIP_LENGTH_STARTED,
   payload: {
-    intent: 'tip-length-no-protocol',
     mount: mount,
     calBlock: calBlock,
     tipRackURI: tipRackURI,

@@ -11,10 +11,6 @@ import {
 } from '.'
 
 import { formatTimestamp } from '../utils'
-import {
-  INTENT_CALIBRATE_PIPETTE_OFFSET,
-  INTENT_RECALIBRATE_PIPETTE_OFFSET,
-} from '../../DeprecatedCalibrationPanels'
 import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
 import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
 import { fetchCalibrationStatus } from '../../../redux/calibration'
@@ -33,9 +29,9 @@ const CALIBRATION_DATA_POLL_MS = 5000
 
 export function useCalibrationTaskList(
   robotName: string,
-  pipOffsetCalLauncher: DashboardCalOffsetInvoker = () => {},
-  tipLengthCalLauncher: DashboardCalTipLengthInvoker = () => {},
-  deckCalLauncher: DashboardCalDeckInvoker = () => {}
+  pipOffsetCalLauncher: DashboardCalOffsetInvoker = () => { },
+  tipLengthCalLauncher: DashboardCalTipLengthInvoker = () => { },
+  deckCalLauncher: DashboardCalDeckInvoker = () => { }
 ): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
   const dispatch = useDispatch()
@@ -83,11 +79,11 @@ export function useCalibrationTaskList(
     deckTask.isComplete = true
     deckTask.footer =
       deckCalibrationData != null &&
-      'lastModified' in deckCalibrationData &&
-      deckCalibrationData.lastModified != null
+        'lastModified' in deckCalibrationData &&
+        deckCalibrationData.lastModified != null
         ? t('last_completed_on', {
-            timestamp: formatTimestamp(deckCalibrationData.lastModified),
-          })
+          timestamp: formatTimestamp(deckCalibrationData.lastModified),
+        })
         : ''
     deckTask.cta = { label: t('recalibrate'), onClick: deckCalLauncher }
   } else {
@@ -181,10 +177,7 @@ export function useCalibrationTaskList(
         offsetSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
           onClick: () =>
-            pipOffsetCalLauncher({
-              params: { mount },
-              withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
-            }),
+            pipOffsetCalLauncher({ params: { mount } }),
         }
         offsetSubTask.isComplete = true
 
@@ -264,10 +257,7 @@ export function useCalibrationTaskList(
           offsetSubTask.cta = {
             label: t('robot_calibration:calibrate'),
             onClick: () =>
-              pipOffsetCalLauncher({
-                params: { mount },
-                withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
-              }),
+              pipOffsetCalLauncher({ params: { mount } }),
           }
 
           if (offsetCalForPipette?.status.markedBad === true) {
@@ -282,10 +272,7 @@ export function useCalibrationTaskList(
           offsetSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
             onClick: () =>
-              pipOffsetCalLauncher({
-                params: { mount },
-                withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
-              }),
+              pipOffsetCalLauncher({ params: { mount } }),
           }
           offsetSubTask.isComplete = true
         }

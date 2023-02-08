@@ -22,10 +22,6 @@ import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Portal } from '../../../App/portal'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
-import {
-  INTENT_RECALIBRATE_PIPETTE_OFFSET,
-  INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-} from '../../DeprecatedCalibrationPanels'
 import * as Config from '../../../redux/config'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
@@ -129,10 +125,7 @@ export function OverflowMenu({
             configHasCalibrationBlock ?? hasBlockModalResponse
           ),
           shouldRecalibrateTipLength: !keepTipLength,
-        },
-        withIntent: keepTipLength
-          ? INTENT_RECALIBRATE_PIPETTE_OFFSET
-          : INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+        }
       })
       setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)
     }
@@ -163,9 +156,7 @@ export function OverflowMenu({
         } else {
           if (applicablePipetteOffsetCal != null) {
             // recalibrate pipette offset
-            startPipetteOffsetCalibration({
-              withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
-            })
+            startPipetteOffsetCalibration({})
           } else {
             // calibrate pipette offset with a wizard since not calibrated yet
             confirmStart()

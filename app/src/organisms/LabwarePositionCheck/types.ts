@@ -1,46 +1,6 @@
-import { DEPRECATED_SECTIONS, SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { MoveToWellCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
-import type {
-  HeaterShakerCloseLatchCreateCommand,
-  HeaterShakerDeactivateShakerCreateCommand,
-  TCOpenLidCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type {
-  DropTipCreateCommand,
-  PickUpTipCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { LabwareOffsetLocation, VectorOffset } from '@opentrons/api-client'
-
-/* START DEPRECATED TYPES */
-export type DeprecatedSection = keyof typeof DEPRECATED_SECTIONS
-export interface DeprecatedLabwarePositionCheckStep {
-  labwareId: string
-  section: DeprecatedSection
-  commands: LabwarePositionCheckCreateCommand[]
-}
-export type LabwarePositionCheckCreateCommand =
-  | MoveToWellCreateCommand
-  | PickUpTipCreateCommand
-  | DropTipCreateCommand
-  | TCOpenLidCreateCommand
-  | HeaterShakerDeactivateShakerCreateCommand
-  | HeaterShakerCloseLatchCreateCommand
-// LabwarePositionCheckMovementCommand is used to distinguish commands that have pipette + labware ids
-export type LabwarePositionCheckMovementCommand =
-  | MoveToWellCreateCommand
-  | PickUpTipCreateCommand
-  | DropTipCreateCommand
-export interface LabwareToOrder {
-  definition: LabwareDefinition2
-  labwareId: string
-  slot: string
-}
-export interface SavePositionCommandData {
-  [labwareId: string]: string[]
-}
-/* END DEPRECATED TYPES */
 
 export type LabwarePositionCheckStep =
   | BeforeBeginningStep
