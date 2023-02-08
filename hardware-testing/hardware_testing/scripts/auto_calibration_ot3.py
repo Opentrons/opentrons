@@ -1,4 +1,7 @@
 """OT-3 Auto Calibration."""
+from hardware_testing.opentrons_api.types import OT3Mount, GripperProbe, Point
+from hardware_testing.opentrons_api import helpers_ot3
+
 import os
 import sys
 import asyncio
@@ -12,11 +15,9 @@ from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper_jaw,
     calibrate_gripper,
 )
+from opentrons.hardware_control.ot3api import OT3API
 
 os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
-
-from hardware_testing.opentrons_api.types import OT3Mount, GripperProbe, Point
-from hardware_testing.opentrons_api import helpers_ot3
 
 LOG_CONFIG = {
     "version": 1,
@@ -50,7 +51,8 @@ LOG_CONFIG = {
 }
 
 
-async def fast_home_seq(api, mount, fast_home_pos):
+async def fast_home_seq(api: OT3API, mount: OT3Mount, fast_home_pos: Point) -> None:
+    """Fast home."""
     # home z first
     cur_pos = await api.gantry_position(mount, refresh=True)
     await api.move_to(mount, cur_pos._replace(z=fast_home_pos.z))
@@ -88,9 +90,7 @@ async def _main(
                         await api.home_z()
                         input("Add probe to gripper FRONT, then press ENTER: ")
             else:
-                assert isinstance(mount, OT3Mount.RIGHT) or isinstance(
-                    mount, OT3Mount.LEFT
-                )
+                assert mount is not OT3Mount.GRIPPER
                 offset = await calibrate_pipette(api, mount, slot)
 
             with open(f"/var/{mount}_{id}_auto_cal.csv", "a") as cv:
