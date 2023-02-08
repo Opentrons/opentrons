@@ -10,7 +10,7 @@ import {
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '.'
-
+import { getDefaultTiprackDefForPipetteName } from '../constants'
 import { formatTimestamp } from '../utils'
 import {
   INTENT_CALIBRATE_PIPETTE_OFFSET,
@@ -29,6 +29,7 @@ import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import { getLabwareDefURI, PipetteName } from '@opentrons/shared-data'
 
 const CALIBRATION_DATA_POLL_MS = 5000
 
@@ -350,7 +351,7 @@ export function useCalibrationTaskList(
     }
   }
 
-  // Recalibrating Tip Length for a mount clears that mount's pipette offset calibration
+  // Recalibrating Tip Length for a mount clears the pipette offset calibrations for that tip
   if (
     (taskList.taskList[1]?.subTasks[0]?.isComplete === true ||
       taskList.taskList[1]?.subTasks[0]?.markedBad === true) &&
@@ -358,21 +359,26 @@ export function useCalibrationTaskList(
       taskList.taskList[1]?.subTasks[1]?.markedBad === true)
   ) {
     const invalidateHandler = (): void => {
-      const tipLengthCal = tipLengthCalibrations?.find(
-        cal => cal.pipette === attachedPipettes?.left?.id
-      )
-      const offsetCals = offsetCalibrations?.filter(
-        cal =>
-          cal.pipette === tipLengthCal?.pipette &&
-          cal.tiprackUri === tipLengthCal.uri
-      )
-      if (offsetCals != null) {
-        for (const cal of offsetCals) {
-          deleteCalibration({
-            calType: 'pipetteOffset',
-            mount: cal.mount,
-            pipette_id: cal.pipette,
-          })
+      if (attachedPipettes.left != null) {
+        const tiprackDef = getDefaultTiprackDefForPipetteName(
+          attachedPipettes.left.name as PipetteName
+        )
+        if (tiprackDef != null) {
+          const tiprackUri = getLabwareDefURI(tiprackDef)
+          const offsetCals = offsetCalibrations?.filter(
+            cal =>
+              cal.pipette === attachedPipettes?.left?.id &&
+              cal.tiprackUri === tiprackUri
+          )
+          if (offsetCals != null) {
+            for (const cal of offsetCals) {
+              deleteCalibration({
+                calType: 'pipetteOffset',
+                mount: cal.mount,
+                pipette_id: cal.pipette,
+              })
+            }
+          }
         }
       }
     }
@@ -393,21 +399,26 @@ export function useCalibrationTaskList(
       taskList.taskList[2]?.subTasks[1]?.markedBad === true)
   ) {
     const invalidateHandler = (): void => {
-      const tipLengthCal = tipLengthCalibrations?.find(
-        cal => cal.pipette === attachedPipettes?.right?.id
-      )
-      const offsetCals = offsetCalibrations?.filter(
-        cal =>
-          cal.pipette === tipLengthCal?.pipette &&
-          cal.tiprackUri === tipLengthCal.uri
-      )
-      if (offsetCals != null) {
-        for (const cal of offsetCals) {
-          deleteCalibration({
-            calType: 'pipetteOffset',
-            mount: cal.mount,
-            pipette_id: cal.pipette,
-          })
+      if (attachedPipettes.right != null) {
+        const tiprackDef = getDefaultTiprackDefForPipetteName(
+          attachedPipettes.right.name as PipetteName
+        )
+        if (tiprackDef != null) {
+          const tiprackUri = getLabwareDefURI(tiprackDef)
+          const offsetCals = offsetCalibrations?.filter(
+            cal =>
+              cal.pipette === attachedPipettes?.right?.id &&
+              cal.tiprackUri === tiprackUri
+          )
+          if (offsetCals != null) {
+            for (const cal of offsetCals) {
+              deleteCalibration({
+                calType: 'pipetteOffset',
+                mount: cal.mount,
+                pipette_id: cal.pipette,
+              })
+            }
+          }
         }
       }
     }
