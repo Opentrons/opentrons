@@ -142,13 +142,6 @@ class LabwareCore(AbstractLabware[WellCore]):
     def get_geometry(self) -> LabwareGeometry:
         raise NotImplementedError("LabwareCore.get_geometry not implemented")
 
-    def get_default_magnet_engage_height(
-        self, preserve_half_mm: bool = False
-    ) -> Optional[float]:
-        raise NotImplementedError(
-            "LabwareCore.get_default_magnet_engage_height not implemented"
-        )
-
     def get_well_core(self, well_name: str) -> WellCore:
         """Create a well core interface to a well in this labware."""
         return WellCore(
