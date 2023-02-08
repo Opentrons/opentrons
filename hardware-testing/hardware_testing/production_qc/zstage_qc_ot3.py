@@ -29,8 +29,8 @@ default_move_speed = 20
 default_run_current = 1.0
 currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
 speeds = (50, 100, 150, 200, 250, 300)
-force_gauge_currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
-force_gauge_speeds = (10, 20)
+force_gauge_currents = (0.01, 0.02, 0.2, 0.5, 1.0, 1.5)
+force_gauge_speeds = (2, 5, 10, 20)
 Z_STAGE_TOLERANCES_MM = 0.4
 
 data_format = "||{0:^12}|{1:^12}|{2:^12}||"
@@ -204,6 +204,7 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
                     print(f"motor position: {mot}, encoder position: {enc}")
                     try:
                         write_cb([_convert_node_to_str(NODE), cu, sp, 'PASS'])
+                        CURRENTS_SPEEDS_TEST_RESULTS.append([_convert_node_to_str(NODE), cu, sp, 'PASS'])
                     except Exception as e:
                         print(e)
             except LoseStepError as e:
@@ -215,6 +216,7 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
                 )
                 print(f"motor position: {mot}, encoder position: {enc}")
                 write_cb([_convert_node_to_str(NODE), cu, sp, 'FAIL'])
+                CURRENTS_SPEEDS_TEST_RESULTS.append([_convert_node_to_str(NODE), cu, sp, 'FAIL'])
 
 
 def _record_force(mark10:Mark10,messenger: CanMessenger,write_cb: Callable):
@@ -226,6 +228,7 @@ def _record_force(mark10:Mark10,messenger: CanMessenger,write_cb: Callable):
             time.sleep(0.2)
             force = mark10.read_force()
             write_cb([_convert_node_to_str(NODE), cu_fg, sp_fg, force])
+            FORCE_GAUGE_TEST_RESULTS.append([_convert_node_to_str(NODE), cu_fg, sp_fg, force])
             print(_convert_node_to_str(NODE), cu_fg, sp_fg, force)
     except Exception as e:
         thread_sensor = False
@@ -250,17 +253,17 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 print('Start record force...')
                 thread_sensor = True
                 TH.start()
-                distance_fg = 120
+                distance_fg = 115
                 await _set_pipette_current(messenger, cu_fg)
                 await _move_to(
                     messenger, distance_fg, sp_fg, check=True
                 )
             except LoseStepError as e:
-                # time.sleep(1)
                 thread_sensor = False
                 TH.join()
+                print(e)
                 await _home(messenger)
-                break
+                # break
             finally:
                 thread_sensor = False
                 TH.join()
@@ -302,7 +305,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["----"])
     csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
     print("Force_Gauge_Test")
-    # await _force_gauge(messenger, csv_cb.write)
+    await _force_gauge(messenger, csv_cb.write)
 
     print('----Test mount right----')
     csv_cb.write(["----Test mount right----"])
@@ -321,7 +324,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["----"])
     csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
     print("Force_Gauge_Test")
-    # await _force_gauge(messenger, csv_cb.write)
+    await _force_gauge(messenger, csv_cb.write)
 
     print('Test Done...')
 
@@ -343,13 +346,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="OT3 Z_stage Test SCRIPT")
     add_can_args(parser)
     parser.add_argument(
-        "--operator_name",
+        "--operator",
         type=str,
         help="Operator name",
         default='xxx',
     )
     parser.add_argument(
-        "--serial_number",
+        "--sn",
         type=str,
         help="Z Stage Serial Number",
         default='Z_stage_001',
