@@ -45,7 +45,7 @@ async def run(args: argparse.Namespace) -> None:
     erase = not args.no_erase
 
     update_dict = json.load(args.dict)
-    update_details = {node_id: hex_file for node_id, hex_file in update_dict.items()}
+    update_details = {NodeId[node_id]: hex_file for node_id, hex_file in update_dict.items()}
 
     async with build.can_messenger(build_settings(args)) as messenger:
         updater = RunUpdate(
