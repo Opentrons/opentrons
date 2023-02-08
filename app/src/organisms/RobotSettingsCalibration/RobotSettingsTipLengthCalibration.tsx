@@ -45,9 +45,6 @@ export function RobotSettingsTipLengthCalibration({
   ])
 
   const robot = useRobot(robotName)
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   // wait for robot request to resolve instead of using name directly from params
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
