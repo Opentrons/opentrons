@@ -38,11 +38,7 @@ export function RobotSettingsTipLengthCalibration({
   robotName,
   updateRobotStatus,
 }: RobotSettingsTipLengthCalibrationProps): JSX.Element {
-  const { t } = useTranslation([
-    'device_settings',
-    'robot_calibration',
-    'shared',
-  ])
+  const { t } = useTranslation('device_settings')
 
   const robot = useRobot(robotName)
 
@@ -52,35 +48,34 @@ export function RobotSettingsTipLengthCalibration({
   const formattedTipLengthCalibrations: FormattedTipLengthCalibration[] =
     tipLengthCalibrations != null
       ? tipLengthCalibrations?.map(tipLength => ({
-          tiprack: tipLength.tiprack,
-          pipette: tipLength.pipette,
-          lastCalibrated: tipLength.lastModified,
-          markedBad: tipLength.status.markedBad,
-          uri: tipLength.uri,
-        }))
+        tiprack: tipLength.tiprack,
+        pipette: tipLength.pipette,
+        lastCalibrated: tipLength.lastModified,
+        markedBad: tipLength.status.markedBad,
+        uri: tipLength.uri,
+      }))
       : []
 
   return (
-    <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <Box marginRight={SPACING.spacing6}>
-          <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-            {t('tip_length_calibrations_title')}
-          </Box>
-        </Box>
-        {tipLengthCalibrations != null && tipLengthCalibrations.length !== 0 ? (
-          <TipLengthCalibrationItems
-            robotName={robotName}
-            formattedPipetteOffsetCalibrations={
-              formattedPipetteOffsetCalibrations
-            }
-            formattedTipLengthCalibrations={formattedTipLengthCalibrations}
-            updateRobotStatus={updateRobotStatus}
-          />
-        ) : (
-          <StyledText as="label">{t('not_calibrated')}</StyledText>
-        )}
-      </Flex>
-    </Box>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingY={SPACING.spacing5}
+      gridGap={SPACING.spacing3}>
+      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        {t('tip_length_calibrations_title')}
+      </StyledText>
+      {tipLengthCalibrations != null && tipLengthCalibrations.length !== 0 ? (
+        <TipLengthCalibrationItems
+          robotName={robotName}
+          formattedPipetteOffsetCalibrations={
+            formattedPipetteOffsetCalibrations
+          }
+          formattedTipLengthCalibrations={formattedTipLengthCalibrations}
+          updateRobotStatus={updateRobotStatus}
+        />
+      ) : (
+        <StyledText as="label">{t('not_calibrated')}</StyledText>
+      )}
+    </Flex>
   )
 }

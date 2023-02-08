@@ -34,7 +34,6 @@
   "connection_lost_description": "The Opentrons App is unable to communicate with this robot right now. Double check the USB or Wifi connection to the robot, then try to reconnect.",
   "connection_to_robot_lost": "Connection to robot lost",
   "deck_calibration_description": "Calibrating the deck is required for new robots or after you relocate your robot. Recalibrating the deck will require you to also recalibrate pipette offsets.",
-  "deck_calibration_description_legacy": "Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.",
   "deck_calibration_missing_no_pipette": "Deck calibration missing. Attach a pipette to perform deck calibration.",
   "deck_calibration_missing": "Deck calibration missing",
   "deck_calibration_modal_description": "Calibrating pipette offset before deck calibration when both are needed isn’t suggested. Calibrating the deck clears all other calibration data. ",

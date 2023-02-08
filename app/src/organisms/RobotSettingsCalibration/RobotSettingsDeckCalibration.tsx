@@ -10,6 +10,7 @@ import {
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -59,9 +60,6 @@ export function RobotSettingsDeckCalibration({
 
   const robot = useRobot(robotName)
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   // wait for robot request to resolve instead of using name directly from params
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
@@ -93,25 +91,25 @@ export function RobotSettingsDeckCalibration({
 
   const deckCalibrationButtonText =
     deckCalibrationStatus != null &&
-    deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
+      deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
       ? t('recalibrate_deck')
       : t('calibrate_deck')
 
   const disabledOrBusyReason = isPending
     ? t('robot_calibration:deck_calibration_spinner', {
-        ongoing_action:
-          createStatus === RobotApi.PENDING
-            ? t('shared:starting')
-            : t('shared:ending'),
-      })
+      ongoing_action:
+        createStatus === RobotApi.PENDING
+          ? t('shared:starting')
+          : t('shared:ending'),
+    })
     : buttonDisabledReason
 
   const deckCalData = deckCalibrationData.deckCalibrationData as DeckCalibrationInfo
   const calibratedDate = deckCalData?.lastModified ?? null
   const deckLastModified = Boolean(calibratedDate)
     ? t('last_calibrated', {
-        date: formatLastModified(calibratedDate),
-      })
+      date: formatLastModified(calibratedDate),
+    })
     : t('not_calibrated')
 
   const handleClickDeckCalibration = (): void => {
@@ -138,35 +136,35 @@ export function RobotSettingsDeckCalibration({
 
   const deckCalibrationBanner = !pipettePresent
     ? currentDeckStatus === 'error' && (
-        <Banner marginTop={SPACING.spacing5} type="error">
-          <StyledText>{t('deck_calibration_missing_no_pipette')}</StyledText>
-        </Banner>
-      )
+      <Banner marginTop={SPACING.spacing5} type="error">
+        <StyledText>{t('deck_calibration_missing_no_pipette')}</StyledText>
+      </Banner>
+    )
     : currentDeckStatus != null && (
-        <Banner
-          marginTop={SPACING.spacing5}
-          type={currentDeckStatus === 'error' ? 'error' : 'warning'}
-        >
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <StyledText as="p">
-              {currentDeckStatus === 'error'
-                ? t('deck_calibration_missing')
-                : t('deck_calibration_recommended')}
-            </StyledText>
-            <Link
-              role="button"
-              color={COLORS.darkBlackEnabled}
-              css={TYPOGRAPHY.pRegular}
-              textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              onClick={() => handleClickDeckCalibration()}
-            >
-              {currentDeckStatus === 'error'
-                ? t('calibrate_now')
-                : t('recalibrate_now')}
-            </Link>
-          </Flex>
-        </Banner>
-      )
+      <Banner
+        marginTop={SPACING.spacing5}
+        type={currentDeckStatus === 'error' ? 'error' : 'warning'}
+      >
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+          <StyledText as="p">
+            {currentDeckStatus === 'error'
+              ? t('deck_calibration_missing')
+              : t('deck_calibration_recommended')}
+          </StyledText>
+          <Link
+            role="button"
+            color={COLORS.darkBlackEnabled}
+            css={TYPOGRAPHY.pRegular}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            onClick={() => handleClickDeckCalibration()}
+          >
+            {currentDeckStatus === 'error'
+              ? t('calibrate_now')
+              : t('recalibrate_now')}
+          </Link>
+        </Flex>
+      </Banner>
+    )
 
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
@@ -175,34 +173,19 @@ export function RobotSettingsDeckCalibration({
   }, [createStatus])
 
   return (
-    <>
-      {!enableCalibrationWizards && deckCalibrationBanner}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('deck_calibration_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {/* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */}
-              {enableCalibrationWizards
-                ? t('deck_calibration_description')
-                : t('deck_calibration_description_legacy')}
-            </StyledText>
-            <StyledText as="label" color={COLORS.darkGreyEnabled}>
-              {deckLastModified}
-            </StyledText>
-          </Box>
-          {enableCalibrationWizards ? null : (
-            <TertiaryButton
-              onClick={handleClickDeckCalibration}
-              disabled={disabledOrBusyReason != null}
-            >
-              {deckCalibrationButtonText}
-            </TertiaryButton>
-          )}
-        </Flex>
-      </Box>
-    </>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingY={SPACING.spacing5}
+      gridGap={SPACING.spacing3}>
+      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        {t('deck_calibration_title')}
+      </StyledText>
+      <StyledText as="p">
+        {t('deck_calibration_description')}
+      </StyledText>
+      <StyledText as="label" color={COLORS.darkGreyEnabled}>
+        {deckLastModified}
+      </StyledText>
+    </Flex>
   )
 }
