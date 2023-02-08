@@ -284,28 +284,33 @@ export function RobotSettingsCalibration({
           onCloseClick={() => setShowHowCalibrationWorksModal(false)}
         />
       ) : null}
-      {!isOT3 ? (
-        <CalibrationStatusCard {...{ robotName, setShowHowCalibrationWorksModal }} />
-      ) : (
-        <CalibrationDataDownload {...{ robotName, setShowHowCalibrationWorksModal }} />
-      )}
-
-      {!isOT3 ? (
-        <RobotSettingsDeckCalibration
-          buttonDisabledReason={buttonDisabledReason}
-          dispatchRequests={dispatchRequests}
-          robotName={robotName}
-          updateRobotStatus={updateRobotStatus}
-        />
-      ) : null}
-      <Line />
-      <RobotSettingsPipetteOffsetCalibration
-        formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
-        robotName={robotName}
-        updateRobotStatus={updateRobotStatus}
-      />
-      {!isOT3 ? (
+      {isOT3 ? (
         <>
+          <CalibrationDataDownload {...{ robotName, setShowHowCalibrationWorksModal }} />
+          <Line />
+          <RobotSettingsPipetteOffsetCalibration
+            formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
+            robotName={robotName}
+            updateRobotStatus={updateRobotStatus}
+          />
+          <Line />
+          <RobotSettingsGripperCalibration />
+        </>
+      ) : (
+        <>
+          <CalibrationStatusCard {...{ robotName, setShowHowCalibrationWorksModal }} />
+          <RobotSettingsDeckCalibration
+            buttonDisabledReason={buttonDisabledReason}
+            dispatchRequests={dispatchRequests}
+            robotName={robotName}
+            updateRobotStatus={updateRobotStatus}
+          />
+          <Line />
+          <RobotSettingsPipetteOffsetCalibration
+            formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
+            robotName={robotName}
+            updateRobotStatus={updateRobotStatus}
+          />
           <Line />
           <RobotSettingsTipLengthCalibration
             formattedPipetteOffsetCalibrations={
@@ -320,24 +325,14 @@ export function RobotSettingsCalibration({
             dispatchRequests={dispatchRequests}
             isPending={isPending}
             robotName={robotName}
-            updateRobotStatus={updateRobotStatus}
           />
-        </>
-      ) : (
-        <>
-          <Line />
-          <RobotSettingsGripperCalibration />
-        </>
-      )}
-      {!isOT3 ? (
-        <>
           <Line />
           <CalibrationDataDownload
             robotName={robotName}
             setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
           />
         </>
-      ) : null}
+      )}
     </>
   )
 }

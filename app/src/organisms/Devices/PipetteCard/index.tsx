@@ -277,32 +277,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 </Banner>
               </Flex>
             ) : null}
-            {isDeckCalibrated &&
-            isMissingOffsetCalibration &&
-            pipetteInfo != null &&
-            showBanner &&
-            !isFetching &&
-            !isOT3Pipette(pipetteName as PipetteName) ? (
-              <Flex paddingBottom={SPACING.spacing2}>
-                <Banner
-                  type="error"
-                  flex="100%"
-                  onCloseClick={() => setShowBanner(false)}
-                >
-                  <Flex flexDirection={DIRECTION_COLUMN}>
-                    {t('pipette_offset_calibration_needed')}
-                    <Btn
-                      textAlign={ALIGN_START}
-                      fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                      onClick={handleCalibrate}
-                    >
-                      {t('calibrate_now')}
-                    </Btn>
-                  </Flex>
-                </Banner>
-              </Flex>
-            ) : null}
             {isDeckCalibrated && isBadOffsetCalibration && showBanner ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner
@@ -371,9 +345,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteSpecs={pipetteInfo}
               mount={mount}
               handleChangePipette={handleChangePipette}
-              handleCalibrate={handleCalibrate}
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
+              handleCalibrate={handleCalibrate}
               isPipetteCalibrated={pipetteOffsetCalibration != null}
             />
           </Box>

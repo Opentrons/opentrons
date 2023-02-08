@@ -1,7 +1,7 @@
 {
   "about_advanced": "About",
   "about_calibration_description": "For the robot to move accurately and precisely, you need to calibrate it. Positional calibration happens in three parts: deck calibration, pipette offset calibration and tip length calibration.",
-  "about_calibration_description_ot3": "For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin. \n\n After calibration is complete, you can save the calibration data to your computer as a JSON file.",
+  "about_calibration_description_ot3": "<block>For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.</block><block>After calibration is complete, you can save the calibration data to your computer as a JSON file.</block>",
   "about_calibration_title": "About Calibration",
   "advanced": "Advanced",
   "app_change_in": "App Changes in {{version}}",

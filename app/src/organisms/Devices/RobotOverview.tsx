@@ -83,10 +83,6 @@ export function RobotOverview({
 
   const [dispatchRequest] = useDispatchApiRequest()
 
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
-
   const robot = useRobot(robotName)
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robot?.name ?? '')
@@ -187,7 +183,7 @@ export function RobotOverview({
           </Box>
         </Flex>
       </Flex>
-      {enableCalibrationWizards && !isRobotBusy && showCalibrationStatusBanner && (
+      {!isRobotBusy && showCalibrationStatusBanner && (
         <Flex
           paddingBottom={SPACING.spacing4}
           flexDirection={DIRECTION_COLUMN}

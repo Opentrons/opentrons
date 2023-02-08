@@ -10,7 +10,6 @@ export type DiscoveryCandidates = string[]
 
 export type DevInternalFlag =
   | 'enableManualDeckStateModification'
-  | 'enableCalibrationWizards'
   | 'enableExtendedHardware'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>

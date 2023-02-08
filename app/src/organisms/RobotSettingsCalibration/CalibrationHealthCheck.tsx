@@ -11,6 +11,7 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   TOOLTIP_LEFT,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { Portal } from '../../App/portal'
@@ -41,26 +42,24 @@ interface CalibrationHealthCheckProps {
   dispatchRequests: DispatchRequestsType
   isPending: boolean
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 const attachedPipetteCalPresent: (
   pipettes: AttachedPipettesByMount,
   pipetteCalibrations: PipetteCalibrationsByMount
 ) => boolean = (pipettes, pipetteCalibrations) =>
-  !Pipettes.PIPETTE_MOUNTS.some(
-    mount =>
-      pipettes?.[mount] != null &&
-      (pipetteCalibrations[mount]?.offset == null ||
-        pipetteCalibrations[mount]?.tipLength == null)
-  )
+    !Pipettes.PIPETTE_MOUNTS.some(
+      mount =>
+        pipettes?.[mount] != null &&
+        (pipetteCalibrations[mount]?.offset == null ||
+          pipetteCalibrations[mount]?.tipLength == null)
+    )
 
 export function CalibrationHealthCheck({
   buttonDisabledReason,
   dispatchRequests,
   isPending,
   robotName,
-  updateRobotStatus,
 }: CalibrationHealthCheckProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -134,7 +133,29 @@ export function CalibrationHealthCheck({
   }
 
   return (
-    <>
+    <Flex
+      paddingY={SPACING.spacing5}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+    >
+      <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+        <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {t('calibration_health_check_title')}
+        </StyledText>
+        <StyledText as="p">{t('calibration_health_check_description')}</StyledText>
+      </Flex>
+      <TertiaryButton
+        {...targetProps}
+        onClick={handleHealthCheckClick}
+        disabled={calCheckButtonDisabled}
+      >
+        {t('health_check')}
+      </TertiaryButton>
+      {calCheckButtonDisabled && (
+        <Tooltip tooltipProps={tooltipProps}>
+          {t('fully_calibrate_before_checking_health')}
+        </Tooltip>
+      )}
       <Portal level="top">
         {showCalBlockModal ? (
           <AskForCalibrationBlockModal
@@ -144,30 +165,6 @@ export function CalibrationHealthCheck({
           />
         ) : null}
       </Portal>
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('calibration_health_check_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('calibration_health_check_description')}
-            </StyledText>
-          </Box>
-          <TertiaryButton
-            {...targetProps}
-            onClick={handleHealthCheckClick}
-            disabled={calCheckButtonDisabled}
-          >
-            {t('health_check')}
-          </TertiaryButton>
-          {calCheckButtonDisabled && (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('fully_calibrate_before_checking_health')}
-            </Tooltip>
-          )}
-        </Flex>
-      </Box>
-    </>
+    </Flex>
   )
 }

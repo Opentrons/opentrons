@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 
 import {
   Box,
@@ -27,6 +27,9 @@ import { useTrackEvent } from '../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../redux/calibration'
 import * as Config from '../../redux/config'
 
+// TODO(bc, 2022-02-08): replace with support article when available
+const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'
+
 interface CalibrationDataDownloadProps {
   robotName: string
   setShowHowCalibrationWorksModal: (
@@ -44,10 +47,6 @@ export function CalibrationDataDownload({
     'shared',
   ])
   const doTrackEvent = useTrackEvent()
-
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   const robot = useRobot(robotName)
   const isOT3 = useIsOT3(robotName)
@@ -91,85 +90,47 @@ export function CalibrationDataDownload({
   }
 
   return (
-    <>
-      {!isOT3 ? (
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} paddingTop={SPACING.spacing5}>
-          <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {isOT3
-                ? t('about_calibration_title')
-                : t('robot_calibration:download_calibration_title')}
-            </StyledText>
-            <StyledText as="p" marginBottom={SPACING.spacing3} whiteSpace="pre-line">
-              {isOT3
-                ? t('about_calibration_description_ot3')
-                : t('about_calibration_description')}
-            </StyledText>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t(
-                downloadIsPossible
-                  ? 'robot_calibration:download_calibration_data_available'
-                  : 'robot_calibration:download_calibration_data_unavailable'
-              )}
-            </StyledText>
-              <Link
-                role="button"
-                css={TYPOGRAPHY.linkPSemiBold}
-                onClick={() => setShowHowCalibrationWorksModal(true)}
-              >
-                {t('robot_calibration:see_how_robot_calibration_works')}
-              </Link>
-          </Flex>
-          <TertiaryButton
-            onClick={onClickSaveAs}
-            disabled={!downloadIsPossible}
-          >
-            <Flex alignItems={ALIGN_CENTER}>
-              <Icon name="download" size="0.75rem" marginRight={SPACING.spacing3} />
-              {t('download_calibration_data')}
-            </Flex>
-          </TertiaryButton>
-        </Flex>
-      ) : (
-        <Box paddingBottom={SPACING.spacing5} alignItems={ALIGN_CENTER}>
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Box marginRight={SPACING.spacing6}>
-              <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-                {t('about_calibration_title')}
-              </Box>
-              <StyledText
-                as="p"
-                marginBottom={SPACING.spacing3}
-                whiteSpace="pre-line"
-              >
-                {isOT3
-                  ? t('about_calibration_description_ot3')
-                  : t('about_calibration_description')}
-              </StyledText>
-              <Link
-                role="button"
-                css={TYPOGRAPHY.linkPSemiBold}
-                onClick={() => setShowHowCalibrationWorksModal(true)}
-              >
-                {t('robot_calibration:see_how_robot_calibration_works')}
-              </Link>
-            </Box>
-            <TertiaryButton
-              onClick={onClickSaveAs}
-              disabled={isOT3 && !ot3DownloadIsPossible}
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} paddingTop={SPACING.spacing5}>
+      <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+        <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {isOT3
+            ? t('about_calibration_title')
+            : t('robot_calibration:download_calibration_title')}
+        </StyledText>
+        {isOT3 ? (
+          <>
+            <Trans
+              t={t}
+              i18nKey="about_calibration_description_ot3"
+              components={{
+                block: <StyledText as="p" />
+              }} />
+            <Link
+              external
+              css={TYPOGRAPHY.linkPSemiBold}
+              href={FLEX_CALIBRATION_SUPPORT_URL}
             >
-              <Flex alignItems={ALIGN_CENTER}>
-                <Icon
-                  name="download"
-                  size="0.75rem"
-                  marginRight={SPACING.spacing3}
-                />
-                {t('download_calibration_data')}
-              </Flex>
-            </TertiaryButton>
-          </Flex>
-        </Box>
-      )}
-    </>
+              {t('robot_calibration:see_how_robot_calibration_works')}
+            </Link>
+          </>
+        ) : (
+          <StyledText as="p">
+            {t(
+              downloadIsPossible
+                ? 'robot_calibration:download_calibration_data_available'
+                : 'robot_calibration:download_calibration_data_unavailable'
+            )}
+          </StyledText>)}
+      </Flex>
+      <TertiaryButton
+        onClick={onClickSaveAs}
+        disabled={isOT3 ? !ot3DownloadIsPossible : !downloadIsPossible}
+      >
+        <Flex alignItems={ALIGN_CENTER}>
+          <Icon name="download" size="0.75rem" marginRight={SPACING.spacing3} />
+          {t('download_calibration_data')}
+        </Flex>
+      </TertiaryButton>
+    </Flex>
   )
 }

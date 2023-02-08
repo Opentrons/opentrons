@@ -9,7 +9,6 @@ import {
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
-import { useFeatureFlag } from '../../../redux/config'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useIsOT3,
@@ -23,12 +22,8 @@ import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffs
 import type { FormattedPipetteOffsetCalibration } from '..'
 
 jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../../../redux/config')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
@@ -51,9 +46,7 @@ const render = (
       formattedPipetteOffsetCalibrations={
         mockFormattedPipetteOffsetCalibrations
       }
-      pipetteOffsetCalBannerType="''"
       robotName="otie"
-      showPipetteOffsetCalibrationBanner={false}
       updateRobotStatus={mockUpdateRobotStatus}
       {...props}
     />,
@@ -75,9 +68,6 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     mockPipetteOffsetCalibrationItems.mockReturnValue(
       <div>PipetteOffsetCalibrationItems</div>
     )
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -108,47 +98,5 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     mockUsePipetteOffsetCalibrations.mockReturnValue(null)
     const [{ getByText }] = render()
     getByText('Not calibrated yet')
-  })
-
-  it('renders the error banner when error props provided', () => {
-    const [{ getByText }] = render({
-      showPipetteOffsetCalibrationBanner: true,
-      pipetteOffsetCalBannerType: 'error',
-    })
-    getByText('Pipette Offset calibration missing')
-  })
-
-  it('does not render the error banner when error props provided and when the calibration wizard feature flag is set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(true)
-    const [{ queryByText }] = render({
-      showPipetteOffsetCalibrationBanner: true,
-      pipetteOffsetCalBannerType: 'error',
-    })
-    expect(
-      queryByText('Pipette Offset calibration missing')
-    ).not.toBeInTheDocument()
-  })
-
-  it('renders the warning banner when warning props provided', () => {
-    const [{ getByText }] = render({
-      showPipetteOffsetCalibrationBanner: true,
-      pipetteOffsetCalBannerType: 'warning',
-    })
-    getByText('Pipette Offset calibration recommended')
-  })
-
-  it('does not render the warning banner when warning props provided and when the calibration wizard feature flag is set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(true)
-    const [{ queryByText }] = render({
-      showPipetteOffsetCalibrationBanner: true,
-      pipetteOffsetCalBannerType: 'warning',
-    })
-    expect(
-      queryByText('Pipette Offset calibration recommended')
-    ).not.toBeInTheDocument()
   })
 })
