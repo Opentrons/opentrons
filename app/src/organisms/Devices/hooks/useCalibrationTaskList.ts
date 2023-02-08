@@ -59,7 +59,6 @@ export function useCalibrationTaskList(
   // get calibration data for mounted pipette subtasks
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
-  console.log({ attachedPipettes, tipLengthCalibrations, offsetCalibrations })
 
   useInterval(
     () => {
