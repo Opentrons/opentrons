@@ -13,7 +13,10 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
 )
 from opentrons.hardware_control.types import GripperJawState
 from opentrons.types import Point, Mount
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
+from opentrons_shared_data.gripper.gripper_definition import (
+    GripperModelStr,
+    GripperModel,
+)
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
 from robot_server.instruments.instrument_models import (
@@ -146,10 +149,10 @@ async def test_get_all_attached_instruments(
         Gripper.construct(
             mount="extension",
             instrumentType="gripper",
-            instrumentModel=GripperModel.v1,
+            instrumentModel=GripperModelStr("gripperV1"),
             serialNumber="GripperID321",
             data=GripperData(
-                jawState=GripperJawState.UNHOMED,
+                jawState="unhomed",
                 calibratedOffset=GripperCalibrationOffset(
                     offset=Point(x=1, y=2, z=3),
                     source=SourceType.default,

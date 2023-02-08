@@ -475,6 +475,34 @@ def test_get_channels(
     assert subject.get_channels() == 42
 
 
+def test_get_current_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's current volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(123.4)
+    assert subject.get_current_volume() == 123.4
+
+
+def test_get_available_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's available volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_available_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(9001)
+    assert subject.get_available_volume() == 9001
+
+
 def test_home_z(
     decoy: Decoy,
     subject: InstrumentCore,
@@ -511,4 +539,40 @@ def test_home_plunger(
     decoy.verify(
         mock_engine_client.home(axes=[MotorAxis.LEFT_PLUNGER]),
         times=1,
+    )
+
+
+def test_touch_tip(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should touch the tip to the edges of the well."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+
+    subject.touch_tip(
+        location=location,
+        well_core=well_core,
+        radius=1.23,
+        z_offset=4.56,
+        speed=7.89,
+    )
+
+    decoy.verify(
+        mock_engine_client.touch_tip(
+            pipette_id="abc123",
+            labware_id="123abc",
+            well_name="my cool well",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=4.56)
+            ),
+            radius=1.23,
+            speed=7.89,
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )

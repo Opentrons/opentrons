@@ -80,6 +80,7 @@ class WellOrigin(str, Enum):
 
     TOP = "top"
     BOTTOM = "bottom"
+    CENTER = "center"
 
 
 # This is deliberately a separate type from Vec3f to let components default to 0.

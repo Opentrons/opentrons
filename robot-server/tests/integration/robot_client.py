@@ -41,7 +41,12 @@ class RobotClient:
     ) -> AsyncGenerator[RobotClient, None]:
         with concurrent.futures.ThreadPoolExecutor() as worker_executor:
             async with httpx.AsyncClient(
-                headers={"opentrons-version": version}
+                headers={"opentrons-version": version},
+                # Set the default timeout high enough for our heaviest requests
+                # (like fetching a large protocol analysis) to fit comfortably.
+                # If an individual test wants to shorten this timeout, it should wrap
+                # its request in anyio.fail_after().
+                timeout=30,
             ) as httpx_client:
                 yield RobotClient(
                     httpx_client=httpx_client,
@@ -120,12 +125,14 @@ class RobotClient:
 
     async def post_protocol(self, files: List[Path]) -> Response:
         """POST /protocols."""
-        file_payload = []
-        for file in files:
-            file_payload.append(("files", open(file, "rb")))
-        response = await self.httpx_client.post(
-            url=f"{self.base_url}/protocols", files=file_payload
-        )
+        with contextlib.ExitStack() as file_exit_stack:
+            file_payload = [
+                ("files", file_exit_stack.enter_context(path.open("rb")))
+                for path in files
+            ]
+            response = await self.httpx_client.post(
+                url=f"{self.base_url}/protocols", files=file_payload
+            )
         response.raise_for_status()
         return response
 
@@ -222,6 +229,14 @@ class RobotClient:
         response = await self.httpx_client.post(
             url=f"{self.base_url}/runs/{run_id}/actions",
             json=req_body,
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_analyses(self, protocol_id: str) -> Response:
+        """GET /protocols/{protocol_id}/analyses."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/protocols/{protocol_id}/analyses"
         )
         response.raise_for_status()
         return response

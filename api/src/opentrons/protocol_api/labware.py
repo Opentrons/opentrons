@@ -33,6 +33,7 @@ from opentrons.protocols.labware import (  # noqa: F401
 from . import validation
 from .core import well_grid
 from .core.labware import AbstractLabware
+from ._liquid import Liquid
 from .core.module import AbstractModuleCore
 from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
@@ -208,6 +209,21 @@ class Well:
                  location in absolute deck coordinates
         """
         return self._core.from_center_cartesian(x, y, z)
+
+    # TODO (tz, 12-19-22): Limit to API version 2.14
+    # https://opentrons.atlassian.net/browse/RCORE-537
+    @requires_version(2, 13)
+    def load_liquid(self, liquid: Liquid, volume: float) -> None:
+        """
+        Load a liquid into a well.
+
+        :param liquid: The type of liquid to load into the well.
+        :param volume: The volume of liquid to load, in µL.
+        """
+        self._core.load_liquid(
+            liquid=liquid,
+            volume=volume,
+        )
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """

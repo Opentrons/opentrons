@@ -1,6 +1,7 @@
 """Protocol file reading interfaces."""
 
-from .protocol_reader import ProtocolReader, ProtocolFilesInvalidError
+from .protocol_files_invalid_error import ProtocolFilesInvalidError
+from .protocol_reader import ProtocolReader
 from .input_file import AbstractInputFile
 from .protocol_source import (
     ProtocolSource,
@@ -10,10 +11,12 @@ from .protocol_source import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
+from .extract_labware_definitions import extract_labware_definitions
 
 __all__ = [
-    # main interface
+    # main interfaces
     "ProtocolReader",
+    "extract_labware_definitions",
     # input values
     "AbstractInputFile",
     # errors
