@@ -29,7 +29,7 @@ default_move_speed = 20
 default_run_current = 1.4
 currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
 speeds = (50, 100, 150, 200, 250, 300)
-force_gauge_currents = (0.01, 0.02, 0.2, 0.5, 1.0, 1.5)
+force_gauge_currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
 force_gauge_speeds = (2, 5, 10, 20)
 Z_STAGE_TOLERANCES_MM = 0.4
 
@@ -58,8 +58,8 @@ def _convert_node_to_str(Node: NodeId) -> str:
         return 'Mount_right'
 def _connect_to_mark10_fixture(simulate: bool) -> Mark10:
     if not simulate:
-        _port = list_ports_and_select('mark10')
-        fixture = Mark10.create(port=_port)
+        # _port = list_ports_and_select('mark10')
+        fixture = Mark10.create(port='/dev/ttyUSB0')
     else:
         fixture = SimMark10()  # type: ignore[assignment]
     fixture.connect()
@@ -273,7 +273,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     global NODE
     await _homeMount(messenger)
     # callback function for writing new data to CSV file
-    csv_props, csv_cb = _create_csv_and_get_callbacks(arguments.serial_number)
+    csv_props, csv_cb = _create_csv_and_get_callbacks(arguments.sn)
     # cache the pressure-data header
     # add metadata to CSV
     # FIXME: create a set of CSV helpers, such that you can define a test-report
@@ -283,7 +283,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["--------"])
     csv_cb.write(["METADATA"])
     csv_cb.write(["test-name", csv_props.name])
-    csv_cb.write(["operator-name", arguments.operator_name])
+    csv_cb.write(["operator-name", arguments.operator])
     csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
 
     print('----Test mount left----')
@@ -291,38 +291,42 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     NODE = NodeId.head_l
     await _home(messenger)
     # run the test
-    csv_cb.write(["----"])
-    csv_cb.write(["Currents_Speeds_Test"])
-    csv_cb.write(["----"])
-    print("Currents_Speeds_Test")
-    csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
-    await _currents_speeds_test(messenger, csv_cb.write)
+    if not arguments.skip_current_left:
+        csv_cb.write(["----"])
+        csv_cb.write(["Currents_Speeds_Test"])
+        csv_cb.write(["----"])
+        print("Currents_Speeds_Test")
+        csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
+        await _currents_speeds_test(messenger, csv_cb.write)
 
-    csv_cb.write(["----"])
-    csv_cb.write(["Force_Gauge_Test"])
-    csv_cb.write(["----"])
-    csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
-    print("Force_Gauge_Test")
-    await _force_gauge(messenger, csv_cb.write)
+    if not arguments.skip_force_left:
+        csv_cb.write(["----"])
+        csv_cb.write(["Force_Gauge_Test"])
+        csv_cb.write(["----"])
+        csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
+        print("Force_Gauge_Test")
+        await _force_gauge(messenger, csv_cb.write)
 
     print('----Test mount right----')
     csv_cb.write(["----Test mount right----"])
     NODE = NodeId.head_r
     await _home(messenger)
     # run the test
-    csv_cb.write(["----"])
-    csv_cb.write(["Currents_Speeds_Test"])
-    csv_cb.write(["----"])
-    print("Currents_Speeds_Test")
-    csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
-    await _currents_speeds_test(messenger, csv_cb.write)
+    if not arguments.skip_current_right:
+        csv_cb.write(["----"])
+        csv_cb.write(["Currents_Speeds_Test"])
+        csv_cb.write(["----"])
+        print("Currents_Speeds_Test")
+        csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
+        await _currents_speeds_test(messenger, csv_cb.write)
 
-    csv_cb.write(["----"])
-    csv_cb.write(["Force_Gauge_Test"])
-    csv_cb.write(["----"])
-    csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
-    print("Force_Gauge_Test")
-    await _force_gauge(messenger, csv_cb.write)
+    if not arguments.skip_force_right:
+        csv_cb.write(["----"])
+        csv_cb.write(["Force_Gauge_Test"])
+        csv_cb.write(["----"])
+        csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
+        print("Force_Gauge_Test")
+        await _force_gauge(messenger, csv_cb.write)
 
     print('Test Done...')
 
@@ -354,5 +358,29 @@ if __name__ == "__main__":
         type=str,
         help="Z Stage Serial Number",
         default='Z_stage_001',
+    )
+    parser.add_argument(
+        "--skip_current_left",
+        type=bool,
+        help="Skip current ",
+        default=False,
+    )
+    parser.add_argument(
+        "--skip_current_right",
+        type=bool,
+        help="Skip current ",
+        default=False,
+    )
+    parser.add_argument(
+        "--skip_force_left",
+        type=bool,
+        help="Skip force ",
+        default=False,
+    )
+    parser.add_argument(
+        "--skip_force_right",
+        type=bool,
+        help="Skip force ",
+        default=False,
     )
     asyncio.run(_main(parser.parse_args()))
