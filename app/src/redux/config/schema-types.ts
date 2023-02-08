@@ -9,10 +9,17 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 export type DiscoveryCandidates = string[]
 
 export type DevInternalFlag =
-  | 'enableManualDeckStateModification'
   | 'enableExtendedHardware'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
+
+export type ProtocolsOnDeviceSortKey =
+  | 'alphabetical'
+  | 'reverse'
+  | 'recentRun'
+  | 'oldRun'
+  | 'recentCreated'
+  | 'oldCreated'
 
 export interface ConfigV0 {
   version: 0
@@ -164,4 +171,11 @@ export interface ConfigV12 extends Omit<ConfigV11, 'version' | 'buildroot'> {
   }
 }
 
-export type Config = ConfigV12
+export interface ConfigV13 extends Omit<ConfigV12, 'version'> {
+  version: 13
+  protocols: ConfigV12['protocols'] & {
+    protocolsOnDeviceSortKey: ProtocolsOnDeviceSortKey | null
+  }
+}
+
+export type Config = ConfigV13

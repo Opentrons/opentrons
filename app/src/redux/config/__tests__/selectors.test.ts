@@ -140,21 +140,43 @@ describe('shell selectors', () => {
     })
   })
 
-  describe('getProtocolsStoredSortKey', () => {
+  describe('getProtocolsDesktopSortKey', () => {
     it('should return ProtocolSort if sortKey is selected', () => {
       const state: State = {
         config: {
           protocols: { protocolsStoredSortKey: 'alphabetical' },
         },
       } as any
-      expect(Selectors.getProtocolsStoredSortKey(state)).toEqual('alphabetical')
+      expect(Selectors.getProtocolsDesktopSortKey(state)).toEqual(
+        'alphabetical'
+      )
     })
 
     it('should return null if saved value in config is null', () => {
       const state: State = {
         config: { protocols: { protocolsStoredSortKey: null } },
       } as any
-      expect(Selectors.getProtocolsStoredSortKey(state)).toEqual(null)
+      expect(Selectors.getProtocolsDesktopSortKey(state)).toEqual(null)
+    })
+  })
+
+  describe('getProtocolsOnDeviceSortKey', () => {
+    it('should return ProtocolSort if sortKey is selected', () => {
+      const state: State = {
+        config: {
+          protocols: { protocolsOnDeviceSortKey: 'alphabetical' },
+        },
+      } as any
+      expect(Selectors.getProtocolsOnDeviceSortKey(state)).toEqual(
+        'alphabetical'
+      )
+    })
+
+    it('should return null if saved value in config is null', () => {
+      const state: State = {
+        config: { protocols: { protocolsOnDeviceSortKey: null } },
+      } as any
+      expect(Selectors.getProtocolsOnDeviceSortKey(state)).toEqual(null)
     })
   })
 })
