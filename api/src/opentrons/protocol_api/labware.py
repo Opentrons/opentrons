@@ -395,10 +395,28 @@ class Labware:
         """Quirks specific to this labware."""
         return self._core.get_quirks()
 
-    # TODO(mc, 2022-09-23): use `self._core.get_default_magnet_engage_height`
+    # TODO(mm, 2023-02-08):
+    # Specify units and origin after we resolve RSS-110.
+    # Remove warning once we resolve RSS-109 more broadly.
     @property  # type: ignore
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
+        """Return the default magnet engage height that
+        :py:meth:`MagneticModuleContext.engage` will use for this labware.
+
+        .. warning::
+            This currently returns confusing and unpredictable results that do not
+            necessarily match what :py:meth:`MagneticModuleContext.engage` will
+            actually choose for its default height.
+
+            The confusion is related to how this height's units and origin point are
+            defined, and differences between Magnetic Module generations.
+
+            For now, we recommend you avoid accessing this property directly.
+        """
+        # Return the raw value straight from the labware definition. For several
+        # reasons (see RSS-109), this may not match the actual default height chosen
+        # by MagneticModuleContext.engage().
         p = self._core.get_parameters()
         if not p["isMagneticModuleCompatible"]:
             return None
