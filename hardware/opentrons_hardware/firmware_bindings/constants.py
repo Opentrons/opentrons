@@ -235,7 +235,6 @@ class SensorOutputBinding(int, Enum):
     none = 0x0
     sync = 0x01
     report = 0x02
-    sync_and_report = 0x03
 
 
 @unique

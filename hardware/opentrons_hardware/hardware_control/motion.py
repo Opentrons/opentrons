@@ -24,7 +24,6 @@ class MoveType(int, Enum):
     home = 0x1
     calibration = 0x2
     grip = 0x3
-    liquid_sense = 0x4
 
     @classmethod
     def get_move_type(cls, condition: MoveStopCondition) -> "MoveType":
