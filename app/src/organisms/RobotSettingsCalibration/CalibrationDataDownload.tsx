@@ -11,6 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
@@ -77,13 +78,13 @@ export function CalibrationDataDownload({
       new Blob([
         isOT3
           ? JSON.stringify({
-              pipetteOffset: pipetteOffsetCalibrations,
-            })
+            pipetteOffset: pipetteOffsetCalibrations,
+          })
           : JSON.stringify({
-              deck: deckCalibrationData,
-              pipetteOffset: pipetteOffsetCalibrations,
-              tipLength: tipLengthCalibrations,
-            }),
+            deck: deckCalibrationData,
+            pipetteOffset: pipetteOffsetCalibrations,
+            tipLength: tipLengthCalibrations,
+          }),
       ]),
       `opentrons-${robotName}-calibration.json`
     )
@@ -91,45 +92,47 @@ export function CalibrationDataDownload({
 
   return (
     <>
-      {enableCalibrationWizards && !isOT3 ? (
-        <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
-            <Box marginRight={SPACING.spacing6}>
-              <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-                {t('robot_calibration:download_calibration_title')}
-              </Box>
-              <StyledText as="p" marginBottom={SPACING.spacing3}>
-                {t(
-                  downloadIsPossible
-                    ? 'robot_calibration:download_calibration_data_available'
-                    : 'robot_calibration:download_calibration_data_unavailable'
-                )}
-              </StyledText>
-            </Box>
-            <TertiaryButton
-              onClick={onClickSaveAs}
-              disabled={!downloadIsPossible}
-            >
-              <Flex alignItems={ALIGN_CENTER}>
-                <Icon
-                  name="download"
-                  size="0.75rem"
-                  marginRight={SPACING.spacing3}
-                />
-                {t('download_calibration_data')}
-              </Flex>
-            </TertiaryButton>
+      {!isOT3 ? (
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} paddingTop={SPACING.spacing5}>
+          <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {isOT3
+                ? t('about_calibration_title')
+                : t('robot_calibration:download_calibration_title')}
+            </StyledText>
+            <StyledText as="p" marginBottom={SPACING.spacing3} whiteSpace="pre-line">
+              {isOT3
+                ? t('about_calibration_description_ot3')
+                : t('about_calibration_description')}
+            </StyledText>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t(
+                downloadIsPossible
+                  ? 'robot_calibration:download_calibration_data_available'
+                  : 'robot_calibration:download_calibration_data_unavailable'
+              )}
+            </StyledText>
+              <Link
+                role="button"
+                css={TYPOGRAPHY.linkPSemiBold}
+                onClick={() => setShowHowCalibrationWorksModal(true)}
+              >
+                {t('robot_calibration:see_how_robot_calibration_works')}
+              </Link>
           </Flex>
-        </Box>
-      ) : (
-        <Box paddingBottom={SPACING.spacing5}>
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          <TertiaryButton
+            onClick={onClickSaveAs}
+            disabled={!downloadIsPossible}
           >
+            <Flex alignItems={ALIGN_CENTER}>
+              <Icon name="download" size="0.75rem" marginRight={SPACING.spacing3} />
+              {t('download_calibration_data')}
+            </Flex>
+          </TertiaryButton>
+        </Flex>
+      ) : (
+        <Box paddingBottom={SPACING.spacing5} alignItems={ALIGN_CENTER}>
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Box marginRight={SPACING.spacing6}>
               <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
                 {t('about_calibration_title')}
