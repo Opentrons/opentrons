@@ -964,7 +964,7 @@ def test_order_of_module_load():
     hw_temp2 = attached_modules[2]
 
     ctx1 = protocol_api.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=fake_hardware,
     )
 
@@ -981,7 +981,7 @@ def test_order_of_module_load():
     # hardware modules regardless of the slot it
     # was loaded into
     ctx2 = protocol_api.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=fake_hardware,
     )
 
@@ -1047,7 +1047,7 @@ def test_bundled_labware(get_labware_fixture, hardware):
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
 
     ctx = papi.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=hardware,
         bundled_labware=bundled_labware,
     )
@@ -1063,7 +1063,7 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
         RuntimeError, match="No labware found in bundle with load name fixture_96_plate"
     ):
         ctx = papi.create_protocol_context(
-            api_version=papi.MAX_SUPPORTED_VERSION,
+            api_version=APIVersion(2, 13),
             hardware_api=hardware,
             bundled_labware=bundled_labware,
         )
@@ -1075,7 +1075,7 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
         RuntimeError, match="No labware found in bundle with load name fixture_96_plate"
     ):
         ctx = papi.create_protocol_context(
-            api_version=papi.MAX_SUPPORTED_VERSION,
+            api_version=APIVersion(2, 13),
             hardware_api=hardware,
             bundled_labware={},
             extra_labware=bundled_labware,
@@ -1086,7 +1086,7 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
 def test_bundled_data(hardware):
     bundled_data = {"foo": b"1,2,3"}
     ctx = papi.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=hardware,
         bundled_data=bundled_data,
     )
@@ -1098,7 +1098,7 @@ def test_extra_labware(get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
     ctx = papi.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=hardware,
         extra_labware=bundled_labware,
     )
@@ -1113,14 +1113,14 @@ def test_api_version_checking(hardware):
         papi.MAX_SUPPORTED_VERSION.major,
         papi.MAX_SUPPORTED_VERSION.minor + 1,
     )
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         papi.create_protocol_context(api_version=minor_over, hardware_api=hardware)
 
     major_over = APIVersion(
         papi.MAX_SUPPORTED_VERSION.major + 1,
         papi.MAX_SUPPORTED_VERSION.minor,
     )
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         papi.create_protocol_context(api_version=major_over, hardware_api=hardware)
 
 
