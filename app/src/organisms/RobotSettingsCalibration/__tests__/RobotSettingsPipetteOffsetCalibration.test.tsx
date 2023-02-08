@@ -75,12 +75,9 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     resetAllWhenMocks()
   })
 
-  it('renders a title and description - Pipette Offset Calibrations', () => {
+  it('renders a title - Pipette Offset Calibrations', () => {
     const [{ getByText }] = render()
     getByText('Pipette Offset Calibrations')
-    getByText(
-      'Pipette offset calibration measures a pipette’s position relative to the pipette mount and the deck. You can recalibrate a pipette’s offset if its currently attached to this robot.'
-    )
     getByText('PipetteOffsetCalibrationItems')
   })
 

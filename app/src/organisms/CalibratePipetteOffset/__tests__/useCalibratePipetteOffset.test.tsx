@@ -82,7 +82,6 @@ describe('useCalibratePipetteOffset hook', () => {
     })
     expect(store.dispatch).toHaveBeenCalledWith(
       pipetteOffsetCalibrationStarted(
-        'pipette-offset',
         mountString,
         false,
         false,

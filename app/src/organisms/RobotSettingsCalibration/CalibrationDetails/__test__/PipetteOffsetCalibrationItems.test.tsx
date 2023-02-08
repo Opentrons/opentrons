@@ -116,23 +116,6 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('11/10/2022 18:15:02')
   })
 
-  it('should render icon and text when calibration missing', () => {
-    props = {
-      ...props,
-      formattedPipetteOffsetCalibrations: [
-        {
-          modelName: 'mockPipetteModelLeft',
-          serialNumber: '1234567',
-          mount: 'left' as Mount,
-          tiprack: 'mockTiprackLeft',
-          markedBad: false,
-        },
-      ],
-    }
-    const [{ getByText }] = render(props)
-    getByText('Missing calibration')
-  })
-
   it('should only render text when calibration missing', () => {
     props = {
       ...props,
@@ -147,7 +130,6 @@ describe('PipetteOffsetCalibrationItems', () => {
       ],
     }
     const [{ getByText, queryByText }] = render(props)
-    expect(queryByText('Missing calibration')).not.toBeInTheDocument()
     getByText('Not calibrated')
   })
 

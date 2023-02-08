@@ -108,12 +108,10 @@ describe('CalibrationDataDownload', () => {
     resetAllWhenMocks()
   })
 
-  it('renders a title and description - About Calibration', () => {
+  it('renders a title and description for OT2', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
     const [{ getByText }] = render()
-    getByText('About Calibration')
-    getByText(
-      'For the robot to move accurately and precisely, you need to calibrate it. Positional calibration happens in three parts: deck calibration, pipette offset calibration and tip length calibration.'
-    )
+    getByText('Download Calibration Data')
   })
 
   it('renders an OT-3 title and description - About Calibration', () => {
@@ -139,9 +137,10 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders a See how robot calibration works link', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ getByRole }] = render()
-    getByRole('button', { name: 'See how robot calibration works' }).click()
-    expect(mockSetShowHowCalibrationWorksModal).toHaveBeenCalled()
+    const SUPPORT_LINK = 'https://support.opentrons.com'
+    expect(getByRole('link', { name: 'See how robot calibration works' }).getAttribute('href')).toBe(SUPPORT_LINK)
   })
 
   it('renders correct title and description', () => {

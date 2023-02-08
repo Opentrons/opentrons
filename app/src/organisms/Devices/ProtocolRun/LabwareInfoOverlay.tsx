@@ -20,15 +20,12 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { OffsetVector } from '../../../molecules/OffsetVector'
-import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { getCurrentOffsetForLabwareInLocation } from '../../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
 import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
 interface LabwareInfoProps {
   displayName: string | null
   definitionDisplayName: string

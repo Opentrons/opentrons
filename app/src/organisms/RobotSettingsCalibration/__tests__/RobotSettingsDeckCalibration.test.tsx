@@ -94,36 +94,21 @@ describe('RobotSettingsDeckCalibration', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Deck Calibration')
     getByText(
-      'Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.'
+      'Calibrating the deck is required for new robots or after you relocate your robot. Recalibrating the deck will require you to also recalibrate pipette offsets.'
     )
-    getByRole('button', { name: 'Calibrate deck' })
     getByText('Last calibrated: September 15, 2021 00:00')
   })
 
-  it('renders calibrate deck button when deck is not calibrated', () => {
+  it('renders empty state if yet not calibrated', () => {
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: null,
       isDeckCalibrated: false,
     })
-    const [{ getByRole, getByText }] = render()
-    getByRole('button', { name: 'Calibrate deck' })
+    const [{ getByText }] = render()
     getByText('Not calibrated yet')
   })
 
-  it('renders the error banner when deck is not calibrated', () => {
-    mockUseDeckCalibrationStatus.mockReturnValue(
-      Calibration.DECK_CAL_STATUS_IDENTITY
-    )
-    mockUseDeckCalibrationData.mockReturnValue({
-      deckCalibrationData: null,
-      isDeckCalibrated: false,
-    })
-    const [{ getByRole, getByText }] = render()
-    getByText('Deck calibration missing')
-    getByRole('button', { name: 'Calibrate now' })
-  })
-
-  it('does not render the error banner when deck is not calibrated and when the calibration wizard feature flag is set', () => {
+  it('does not render the error banner when deck is not calibrated', () => {
     mockUseDeckCalibrationStatus.mockReturnValue(
       Calibration.DECK_CAL_STATUS_IDENTITY
     )
@@ -132,44 +117,17 @@ describe('RobotSettingsDeckCalibration', () => {
       isDeckCalibrated: false,
     })
     mockUseFeatureFlag.mockReturnValue(true)
-    const [{ queryByRole, queryByText }] = render()
+    const [{ queryByText }] = render()
     expect(queryByText('Deck calibration missing')).not.toBeInTheDocument()
-    expect(
-      queryByRole('button', { name: 'Calibrate now' })
-    ).not.toBeInTheDocument()
   })
 
-  it('deck cal button should be disabled if a button disabled reason is provided', () => {
-    const [{ getByRole }] = render({
-      buttonDisabledReason: 'otie is unreachable',
-    })
-    const button = getByRole('button', { name: 'Calibrate deck' })
-    expect(button).toBeDisabled()
-  })
-
-  it('renders the warning banner when deck calibration is not good', () => {
+  it('renders the last calibrated when deck calibration is not good', () => {
     mockUseDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: mockWarningDeckCalData,
       isDeckCalibrated: true,
     })
-    const [{ getByRole, getByText }] = render()
-    getByText('Deck calibration recommended')
-    getByRole('button', { name: 'Recalibrate now' })
-  })
-
-  it('renders the error banner when a user has no pipette', () => {
-    mockUseDeckCalibrationStatus.mockReturnValue(
-      Calibration.DECK_CAL_STATUS_IDENTITY
-    )
-    const mockEmptyAttachedPipettes: AttachedPipettesByMount = {
-      left: null,
-      right: null,
-    } as any
-    mockUseAttachedPipettes.mockReturnValue(mockEmptyAttachedPipettes)
     const [{ getByText }] = render()
-    getByText(
-      'Deck calibration missing. Attach a pipette to perform deck calibration.'
-    )
+    getByText('Last calibrated: September 15, 2021 00:00')
   })
 })

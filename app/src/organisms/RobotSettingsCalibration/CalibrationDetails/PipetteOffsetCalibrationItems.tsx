@@ -7,7 +7,6 @@ import {
   Flex,
   ALIGN_CENTER,
   SPACING,
-  Icon,
   COLORS,
   TYPOGRAPHY,
   BORDERS,
@@ -19,7 +18,6 @@ import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
 import { useAttachedPipettes, useIsOT3 } from '../../../organisms/Devices/hooks'
 
-import * as Config from '../../../redux/config'
 import type { State } from '../../../redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
