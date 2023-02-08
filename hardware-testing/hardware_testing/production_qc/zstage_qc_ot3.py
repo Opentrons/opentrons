@@ -26,7 +26,7 @@ from hardware_testing.drivers import list_ports_and_select,find_port
 from hardware_testing.drivers.mark10.mark10_fg import Mark10,SimMark10
 
 default_move_speed = 20
-default_run_current = 1.0
+default_run_current = 1.4
 currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
 speeds = (50, 100, 150, 200, 250, 300)
 force_gauge_currents = (0.01, 0.02, 0.2, 0.5, 1.0, 1.5)
@@ -116,12 +116,14 @@ def _create_csv_and_get_callbacks(sn:str) -> Tuple[CSVProperties, CSVCallbacks]:
 
 
 async def _home(messenger: CanMessenger) -> None:
+    await _set_pipette_current(messenger, default_run_current)
     home_runner = MoveGroupRunner(
         move_groups=[[create_home_step({NODE: float64(100.0)}, {NODE: float64(-5)})]]
     )
     await home_runner.run(can_messenger=messenger)
 
 async def _homeMount(messenger: CanMessenger) -> None:
+    await _set_pipette_current(messenger, default_run_current)
     # Home mount Left
     home_runner = MoveGroupRunner(
         move_groups=[[create_home_step({NodeId.head_l: float64(100.0)}, {NodeId.head_l: float64(-5)})]]
@@ -242,8 +244,8 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
     mark10 = _connect_to_mark10_fixture(False)
     for cu_fg in force_gauge_currents:
         for sp_fg in force_gauge_speeds:
-            await _home(messenger)
             await _set_pipette_current(messenger, default_run_current)
+            await _home(messenger)
             await _move_to(
                 messenger, 100, default_move_speed, check=True
             )
@@ -262,11 +264,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 thread_sensor = False
                 TH.join()
                 print(e)
-                await _home(messenger)
-                # break
-            finally:
-                thread_sensor = False
-                TH.join()
+                await _set_pipette_current(messenger, default_run_current)
                 await _home(messenger)
 
 async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
