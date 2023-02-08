@@ -234,30 +234,30 @@ async def _main() -> None:
         x_offset = 0
         y_offset = 0
         if args.test == 'precision_liquid_sense_test':
-            # # Move XY to Dial Indicator slot
-            # await hw_api.move_to(mount, Point(slot_loc[args.dial_slot][0] + dial_offset[0],
-            #                                     slot_loc[args.dial_slot][1] - dial_offset[1],
-            #                                     home_pos[OT3Axis.by_mount(mount)]))
-            # # Move Z to Dial Indicator slot
-            # await hw_api.move_to(mount, Point(slot_loc[args.dial_slot][0] + dial_offset[0],
-            #                                     slot_loc[args.dial_slot][1] - dial_offset[1],
-            #                                     slot_loc[args.dial_slot][2] + dial_offset[2]))
-            #
-            # current_position = await hw_api.current_position_ot3(mount, refresh=True)
-            # # Jog Nozzle to Dial Indicator
-            # nozzle_loc = await _jog_axis(hw_api, current_position)
-            # # Save Dial Indicator Nozzle Position
-            # await asyncio.sleep(2)
-            # nozzle_measurement = gauge.read_stable(timeout=20)
+            # Move XY to Dial Indicator slot
+            await hw_api.move_to(mount, Point(slot_loc[args.dial_slot][0] + dial_offset[0],
+                                                slot_loc[args.dial_slot][1] - dial_offset[1],
+                                                home_pos[OT3Axis.by_mount(mount)]))
+            # Move Z to Dial Indicator slot
+            await hw_api.move_to(mount, Point(slot_loc[args.dial_slot][0] + dial_offset[0],
+                                                slot_loc[args.dial_slot][1] - dial_offset[1],
+                                                slot_loc[args.dial_slot][2] + dial_offset[2]))
+
+            current_position = await hw_api.current_position_ot3(mount, refresh=True)
+            # Jog Nozzle to Dial Indicator
+            nozzle_loc = await _jog_axis(hw_api, current_position)
+            # Save Dial Indicator Nozzle Position
+            await asyncio.sleep(2)
+            nozzle_measurement = gauge.read_stable(timeout=20)
             start_time =  time.time()
-            # elasped_time = (time.time() - start_time)
-            # test_data["Time"] = round(elasped_time, 3)
-            # test_data["Tip Height(mm)"] = "No Tip"
-            # test_data["Nozzle Pos(mm)"] = nozzle_measurement
-            # test_data["Tip"] = "No Tip"
-            # print(test_data)
-            # d_str = f"{elasped_time}, {nozzle_measurement}, Nozzle \n"
-            # data.append_data_to_file(test_n, test_f, d_str)
+            elasped_time = (time.time() - start_time)
+            test_data["Time"] = round(elasped_time, 3)
+            test_data["Tip Height(mm)"] = "No Tip"
+            test_data["Nozzle Pos(mm)"] = nozzle_measurement
+            test_data["Tip"] = "No Tip"
+            print(test_data)
+            d_str = f"{elasped_time}, {nozzle_measurement}, Nozzle \n"
+            data.append_data_to_file(test_n, test_f, d_str)
             z_retract_distance = 130
             tip_length = 85.0
             for tip in range(1, tips_to_use+1):
@@ -348,74 +348,74 @@ async def _main() -> None:
                                                     speed = 5,
                                                     critical_point = CriticalPoint.TIP)
                 current_position = await hw_api.current_position_ot3(mount, refresh=True)
-                # # Jog to top of trough location
-                # if tip <= 1:
-                #     home_position = await hw_api.current_position_ot3(mount, refresh=True)
-                #     # Move XY to Tiprack slot
-                #     await hw_api.move_to(mount, Point(slot_loc[args.tiprack_slot][0],
-                #                                         slot_loc[args.tiprack_slot][1],
-                #                                         home_position[OT3Axis.by_mount(mount)]))
-                #     # Move to trought slot
-                #     await hw_api.move_to(mount, Point(slot_loc[args.trough_slot][0],
-                #                                         slot_loc[args.trough_slot][1],
-                #                                         slot_loc[args.trough_slot][2]))
-                #     print(" Calibrate to top of the trough")
-                #     trough_loc = await _jog_axis(hw_api, current_position)
-                # else:
-                #     # Move to trought slot
-                #     await hw_api.move_to(mount, Point(trough_loc[OT3Axis.X],
-                #                                         trough_loc[OT3Axis.Y],
-                #                                         position[OT3Axis.by_mount(mount)]))
-                #     # Move to trought slot
-                #     await hw_api.move_to(mount, Point(trough_loc[OT3Axis.X],
-                #                                         trough_loc[OT3Axis.Y],
-                #                                         trough_loc[OT3Axis.by_mount(mount)]))
+                # Jog to top of trough location
+                if tip <= 1:
+                    home_position = await hw_api.current_position_ot3(mount, refresh=True)
+                    # Move XY to Tiprack slot
+                    await hw_api.move_to(mount, Point(slot_loc[args.tiprack_slot][0],
+                                                        slot_loc[args.tiprack_slot][1],
+                                                        home_position[OT3Axis.by_mount(mount)]))
+                    # Move to trought slot
+                    await hw_api.move_to(mount, Point(slot_loc[args.trough_slot][0],
+                                                        slot_loc[args.trough_slot][1],
+                                                        slot_loc[args.trough_slot][2]))
+                    print(" Calibrate to top of the trough")
+                    trough_loc = await _jog_axis(hw_api, current_position)
+                else:
+                    # Move to trought slot
+                    await hw_api.move_to(mount, Point(trough_loc[OT3Axis.X],
+                                                        trough_loc[OT3Axis.Y],
+                                                        position[OT3Axis.by_mount(mount)]))
+                    # Move to trought slot
+                    await hw_api.move_to(mount, Point(trough_loc[OT3Axis.X],
+                                                        trough_loc[OT3Axis.Y],
+                                                        trough_loc[OT3Axis.by_mount(mount)]))
 
-                # initial_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
-                # initial_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
-                # # Probe Liquid
-                # init_probe_time = (time.time() - start_time)
-                # liquid_height_pos, ls_data = await hw_api.liquid_probe(mount, probe_settings = liquid_probe_settings)
-                # store_data(ls_data, tip)
-                # end_probe_time = (time.time() - start_time)
-                # end_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
-                # end_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
+                initial_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
+                initial_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
+                # Probe Liquid
+                init_probe_time = (time.time() - start_time)
+                liquid_height_pos, ls_data = await hw_api.liquid_probe(mount, probe_settings = liquid_probe_settings)
+                store_data(ls_data, tip)
+                end_probe_time = (time.time() - start_time)
+                end_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
+                end_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
                 test_data["Time_L"] = elasped_time
-                # test_data["Triggered_z_pos"] = liquid_height_pos[0]
-                # test_data["Triggered_zenc_pos"] = liquid_height_pos[1]
-                # test_data["init_Time_L"] = init_probe_time
-                # test_data["end_Time_L"] = end_probe_time
-                # test_data["init_z_pos(mm)"] = initial_motor_pos[OT3Axis.by_mount(mount)]
-                # test_data["init_zenc_pos(mm)"] = initial_enc_pos[OT3Axis.by_mount(mount)]
-                # test_data["init_pmotor_pos(mm)"] = initial_motor_pos[OT3Axis.of_main_tool_actuator(mount)]
-                # test_data["init_penc_pos(mm)"] = initial_enc_pos[OT3Axis.of_main_tool_actuator(mount)]
-                # test_data["end_z_pos(mm)"] = end_motor_pos[OT3Axis.by_mount(mount)]
-                # test_data["end_zenc_pos(mm)"] = end_enc_pos[OT3Axis.by_mount(mount)]
-                # test_data["end_pmotor_pos(mm)"] = end_motor_pos[OT3Axis.of_main_tool_actuator(mount)]
-                # test_data["end_penc_pos(mm)"] = end_enc_pos[OT3Axis.of_main_tool_actuator(mount)]
-                # print(test_data)
+                test_data["Triggered_z_pos"] = liquid_height_pos[0]
+                test_data["Triggered_zenc_pos"] = liquid_height_pos[1]
+                test_data["init_Time_L"] = init_probe_time
+                test_data["end_Time_L"] = end_probe_time
+                test_data["init_z_pos(mm)"] = initial_motor_pos[OT3Axis.by_mount(mount)]
+                test_data["init_zenc_pos(mm)"] = initial_enc_pos[OT3Axis.by_mount(mount)]
+                test_data["init_pmotor_pos(mm)"] = initial_motor_pos[OT3Axis.of_main_tool_actuator(mount)]
+                test_data["init_penc_pos(mm)"] = initial_enc_pos[OT3Axis.of_main_tool_actuator(mount)]
+                test_data["end_z_pos(mm)"] = end_motor_pos[OT3Axis.by_mount(mount)]
+                test_data["end_zenc_pos(mm)"] = end_enc_pos[OT3Axis.by_mount(mount)]
+                test_data["end_pmotor_pos(mm)"] = end_motor_pos[OT3Axis.of_main_tool_actuator(mount)]
+                test_data["end_penc_pos(mm)"] = end_enc_pos[OT3Axis.of_main_tool_actuator(mount)]
+                print(test_data)
                 d_str = f"{elasped_time}, \
                             {tip_measurement}, \
                             {None},\
-                            Tip \n"
-                            # {liquid_height_pos[0]}, \
-                            # {liquid_height_pos[1]}, \
-                            # {init_probe_time}, \
-                            # {end_probe_time}, \
-                            # {initial_motor_pos[OT3Axis.by_mount(mount)]}, \
-                            # {initial_enc_pos[OT3Axis.by_mount(mount)]}, \
-                            # {initial_motor_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
-                            # {initial_enc_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
-                            # {end_motor_pos[OT3Axis.by_mount(mount)]}, \
-                            # {end_enc_pos[OT3Axis.by_mount(mount)]}, \
-                            # {end_motor_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
-                            # {end_enc_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
-                            # {tip} \n"
+                            Tip, \
+                            {liquid_height_pos[0]}, \
+                            {liquid_height_pos[1]}, \
+                            {init_probe_time}, \
+                            {end_probe_time}, \
+                            {initial_motor_pos[OT3Axis.by_mount(mount)]}, \
+                            {initial_enc_pos[OT3Axis.by_mount(mount)]}, \
+                            {initial_motor_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
+                            {initial_enc_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
+                            {end_motor_pos[OT3Axis.by_mount(mount)]}, \
+                            {end_enc_pos[OT3Axis.by_mount(mount)]}, \
+                            {end_motor_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
+                            {end_enc_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
+                            {tip} \n"
                 print(d_str)
                 data.append_data_to_file(test_n, test_f, d_str)
                 # Blow out a bit
-                # await move_plunger_relative_ot3(hw_api, mount, 0.5, None, speed = 2)
-                # print(liquid_height_pos)
+                await move_plunger_relative_ot3(hw_api, mount, 0.5, None, speed = 2)
+                print(liquid_height_pos)
                 await hw_api.home([OT3Axis.by_mount(mount)])
                 # move plunger to bottom
                 await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[1])
@@ -488,19 +488,19 @@ if __name__ == "__main__":
                     "Tip Height(mm)": None,
                     "Nozzle Pos(mm)": None,
                     "Tip": None,
-                    # "Triggered_z_pos": None,
-                    # "Triggered_zenc_pos": None,
-                    # "init_Time_L": None,
-                    # "end_Time_L": None,
-                    # "init_z_pos(mm)": None,
-                    # "init_zenc_pos(mm)": None,
-                    # "init_pmotor_pos(mm)": None,
-                    # "init_penc_pos(mm)": None,
-                    # "end_z_pos(mm)": None,
-                    # "end_zenc_pos(mm)": None,
-                    # "end_pmotor_pos(mm)": None,
-                    # "end_penc_pos(mm)": None,
-                    # "tip": None
+                    "Triggered_z_pos": None,
+                    "Triggered_zenc_pos": None,
+                    "init_Time_L": None,
+                    "end_Time_L": None,
+                    "init_z_pos(mm)": None,
+                    "init_zenc_pos(mm)": None,
+                    "init_pmotor_pos(mm)": None,
+                    "init_penc_pos(mm)": None,
+                    "end_z_pos(mm)": None,
+                    "end_zenc_pos(mm)": None,
+                    "end_pmotor_pos(mm)": None,
+                    "end_penc_pos(mm)": None,
+                    "tip": None
                 }
         gauge = dial_indicator_setup()
         test_n , test_f  = file_setup(test_data)
