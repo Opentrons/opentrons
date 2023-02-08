@@ -67,6 +67,7 @@ class PipetteState:
 
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, float]
+    tip_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
     attached_tip_labware_by_id: Dict[str, str]
     movement_speed_by_id: Dict[str, Optional[float]]
@@ -84,6 +85,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self._state = PipetteState(
             pipettes_by_id={},
             aspirated_volume_by_id={},
+            tip_volume_by_id={},
             current_well=None,
             attached_tip_labware_by_id={},
             movement_speed_by_id={},
@@ -135,7 +137,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(command.result, PickUpTipResult):
             pipette_id = command.params.pipetteId
             tiprack_id = command.params.labwareId
+            tip_volume = command.result.tipVolume
+
             self._state.attached_tip_labware_by_id[pipette_id] = tiprack_id
+            self._state.tip_volume_by_id[pipette_id] = tip_volume
 
         elif isinstance(command.result, DropTipResult):
             pipette_id = command.params.pipetteId
@@ -282,6 +287,23 @@ class PipetteView(HasState[PipetteState]):
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get current volume."
             )
+
+    def get_working_volume(self, pipette_id: str) -> float:
+        """Get the working maximum volume of a pipette by ID."""
+        max_volume = self._get_static_config(pipette_id).max_volume
+        try:
+            tip_volume = self._state.tip_volume_by_id[pipette_id]
+        except KeyError:
+            raise errors.TipNotAttachedError(
+                f"Pipette {pipette_id} has no tip attached; unable to calculate working maximum volume."
+            )
+        return min(tip_volume, max_volume)
+
+    def get_available_volume(self, pipette_id: str) -> float:
+        """Get the available volume of a pipette by ID."""
+        working_volume = self.get_working_volume(pipette_id)
+        current_volume = self.get_aspirated_volume(pipette_id)
+        return max(0.0, working_volume - current_volume)
 
     def get_is_ready_to_aspirate(
         self,
