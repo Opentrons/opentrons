@@ -14,11 +14,9 @@ import type {
   PipetteOffsetCalibrationSessionParams,
 } from '../../redux/sessions/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import type { PipetteOffsetIntent } from '../../organisms/DeprecatedCalibrationPanels/types'
 
 import { Portal } from '../../App/portal'
 import { CalibratePipetteOffset } from '.'
-import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/DeprecatedCalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
 import { useTranslation } from 'react-i18next'
 
@@ -28,7 +26,6 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 ]
 export interface InvokerProps {
   overrideParams?: Partial<PipetteOffsetCalibrationSessionParams>
-  withIntent?: PipetteOffsetIntent
 }
 
 export type Invoker = (props: InvokerProps | undefined) => void
@@ -121,9 +118,6 @@ export function useCalibratePipetteOffset(
     }
   }, [shouldClose, onComplete])
 
-  const [intent, setIntent] = React.useState<PipetteOffsetIntent>(
-    INTENT_CALIBRATE_PIPETTE_OFFSET
-  )
 
   const {
     mount,
@@ -134,9 +128,7 @@ export function useCalibratePipetteOffset(
   const handleStartPipOffsetCalSession: Invoker = (props = {}) => {
     const {
       overrideParams = {},
-      withIntent = INTENT_CALIBRATE_PIPETTE_OFFSET,
     } = props
-    setIntent(withIntent)
     dispatchRequests(
       Sessions.ensureSession(
         robotName,
@@ -152,7 +144,6 @@ export function useCalibratePipetteOffset(
     )
     dispatch(
       pipetteOffsetCalibrationStarted(
-        withIntent,
         mount,
         hasCalibrationBlock,
         shouldRecalibrateTipLength,
