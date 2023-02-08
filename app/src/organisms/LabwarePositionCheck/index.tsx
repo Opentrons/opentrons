@@ -4,9 +4,7 @@ import { AlertModal, Box, SPACING_2, Text } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { Portal } from '../../App/portal'
 import { useLogger } from '../../logger'
-import { useFeatureFlag } from '../../redux/config'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
-import { DeprecatedLabwarePositionCheckComponent } from './DeprecatedComponents/DeprecatedLabwarePositionCheckComponent'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 
 interface LabwarePositionCheckModalProps {
@@ -23,9 +21,6 @@ export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element => {
   const logger = useLogger(__filename)
-  const manualDeckStateModificationEnabled = useFeatureFlag(
-    'enableManualDeckStateModification'
-  )
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(props.runId)
 
@@ -34,14 +29,10 @@ export const LabwarePositionCheck = (
 
   return (
     <ErrorBoundary logger={logger} ErrorComponent={CrashingErrorModal}>
-      {manualDeckStateModificationEnabled ? (
-        <LabwarePositionCheckComponent
-          {...props}
-          {...{ mostRecentAnalysis, existingOffsets }}
-        />
-      ) : (
-        <DeprecatedLabwarePositionCheckComponent {...props} />
-      )}
+      <LabwarePositionCheckComponent
+        {...props}
+        {...{ mostRecentAnalysis, existingOffsets }}
+      />
     </ErrorBoundary>
   )
 }
