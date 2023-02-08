@@ -178,7 +178,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self,
         location: Optional[types.Location],
         well_core: LegacyWellCore,
-        home_after: bool,
+        home_after: Optional[bool],
     ) -> None:
         labware_core = well_core.geometry.parent
 

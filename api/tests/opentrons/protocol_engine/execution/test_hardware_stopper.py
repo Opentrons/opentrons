@@ -100,6 +100,7 @@ async def test_hardware_stopping_sequence(
             labware_id="fixedTrash",
             well_name="A1",
             well_location=WellLocation(),
+            home_after=None,
         ),
         await hardware_api.stop(home_after=True),
     )
@@ -202,6 +203,7 @@ async def test_hardware_stopping_sequence_with_gripper(
             labware_id="fixedTrash",
             well_name="A1",
             well_location=WellLocation(),
+            home_after=None,
         ),
         await ot3_hardware_api.stop(home_after=True),
     )

@@ -206,7 +206,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         self,
         location: Optional[types.Location],
         well_core: LegacyWellCore,
-        home_after: bool,
+        home_after: Optional[bool],
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -243,7 +243,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
         hw = self._protocol_interface.get_hardware()
         self.move_to(location=location)
-        hw.drop_tip(self._mount, home_after=home_after)
+        hw.drop_tip(self._mount, home_after=True if home_after is None else home_after)
 
         if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
             # If this is a tiprack we can try and add the dirty tip back to the tracker
