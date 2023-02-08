@@ -125,7 +125,7 @@ export function OverflowMenu({
             configHasCalibrationBlock ?? hasBlockModalResponse
           ),
           shouldRecalibrateTipLength: !keepTipLength,
-        }
+        },
       })
       setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)
     }

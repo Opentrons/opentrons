@@ -118,7 +118,6 @@ export function useCalibratePipetteOffset(
     }
   }, [shouldClose, onComplete])
 
-
   const {
     mount,
     shouldRecalibrateTipLength = false,
@@ -126,9 +125,7 @@ export function useCalibratePipetteOffset(
     tipRackDefinition = null,
   } = sessionParams
   const handleStartPipOffsetCalSession: Invoker = (props = {}) => {
-    const {
-      overrideParams = {},
-    } = props
+    const { overrideParams = {} } = props
     dispatchRequests(
       Sessions.ensureSession(
         robotName,

@@ -85,12 +85,7 @@ describe('useDashboardCalibratePipOffset hook', () => {
       meta: { requestId: expect.any(String) },
     })
     expect(store.dispatch).toHaveBeenCalledWith(
-      pipetteOffsetCalibrationStarted(
-        mountString,
-        false,
-        false,
-        null
-      )
+      pipetteOffsetCalibrationStarted(mountString, false, false, null)
     )
   })
 
@@ -120,9 +115,7 @@ describe('useDashboardCalibratePipOffset hook', () => {
         status: 200,
       },
     })
-    act(() =>
-      startCalibration({ params: { mount: mountString } })
-    )
+    act(() => startCalibration({ params: { mount: mountString } }))
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
 
@@ -160,9 +153,7 @@ describe('useDashboardCalibratePipOffset hook', () => {
     mockGetRequestById.mockReturnValue({
       status: RobotApi.PENDING,
     })
-    act(() =>
-      startCalibration({ params: { mount: mountString } })
-    )
+    act(() => startCalibration({ params: { mount: mountString } }))
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
     expect(LoadingState).not.toBe(null)

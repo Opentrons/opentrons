@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { useRunQuery } from '@opentrons/react-api-client'
 import {
   Box,
   Flex,
@@ -19,9 +20,15 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { OffsetVector } from '../../../molecules/OffsetVector'
-import { useLabwareOffsetForLabware } from '../../LabwarePositionCheck/deprecatedHooks/useLabwareOffsetForLabware'
+import { useProtocolDetailsForRun } from '../../Devices/hooks'
+import { getCurrentOffsetForLabwareInLocation } from '../../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
+import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareOffset } from '@opentrons/api-client'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
 interface LabwareInfoProps {
   displayName: string | null
   definitionDisplayName: string
@@ -122,5 +129,35 @@ export const LabwareInfoOverlay = (
         labwareHasLiquid={props.labwareHasLiquid}
       />
     </RobotCoordsForeignDiv>
+  )
+}
+
+export function useLabwareOffsetForLabware(
+  runId: string,
+  labwareId: string
+): LabwareOffset | null {
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const { data: runRecord } = useRunQuery(runId)
+
+  if (mostRecentAnalysis == null) return null
+
+  const labwareDefinitionUri = mostRecentAnalysis.labware.find(
+    l => l.id === labwareId
+  )?.definitionUri
+
+  const labwareLocation = getLabwareOffsetLocation(
+    labwareId,
+    mostRecentAnalysis?.commands ?? [],
+    mostRecentAnalysis.modules.reduce((acc, m) => ({ ...acc, [m.id]: m }), {})
+  )
+  if (labwareLocation == null || labwareDefinitionUri == null) return null
+  const labwareOffsets = runRecord?.data?.labwareOffsets ?? []
+
+  return (
+    getCurrentOffsetForLabwareInLocation(
+      labwareOffsets,
+      labwareDefinitionUri,
+      labwareLocation
+    ) ?? null
   )
 }

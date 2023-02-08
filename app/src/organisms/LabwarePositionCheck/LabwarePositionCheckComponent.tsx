@@ -23,11 +23,7 @@ import {
   Coordinates,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
-import type {
-  Axis,
-  Sign,
-  StepSize,
-} from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type {
   CreateRunCommand,
   RegisterPositionAction,

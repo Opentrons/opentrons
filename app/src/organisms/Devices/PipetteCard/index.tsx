@@ -214,10 +214,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             paddingLeft={SPACING.spacing3}
           >
             {!isDeckCalibrated &&
-              isMissingOffsetCalibration &&
-              pipetteInfo != null &&
-              showBanner &&
-              !isFetching ? (
+            isMissingOffsetCalibration &&
+            pipetteInfo != null &&
+            showBanner &&
+            !isFetching ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner
                   type="error"
@@ -260,8 +260,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               {is96ChannelAttached
                 ? t('both_mounts')
                 : t('mount', {
-                  side: mount === LEFT ? t('left') : t('right'),
-                })}
+                    side: mount === LEFT ? t('left') : t('right'),
+                  })}
             </StyledText>
             <Flex
               paddingBottom={SPACING.spacing2}
