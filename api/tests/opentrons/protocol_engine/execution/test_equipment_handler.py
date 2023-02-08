@@ -5,7 +5,7 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from typing import Any, cast
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -533,7 +533,7 @@ async def test_load_pipette(
                     default_blow_out={"a": 1.23},
                     default_aspirate={"b": 4.56},
                     default_dispense={"c": 7.89},
-                )
+                ),
             )
         ),
     )
