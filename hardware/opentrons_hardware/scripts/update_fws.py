@@ -3,9 +3,7 @@ import argparse
 import asyncio
 import logging
 from logging.config import dictConfig
-from typing import Dict, Any
-
-from typing_extensions import Final
+from typing import Dict, Any, TextIO
 
 from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings import NodeId
@@ -36,14 +34,7 @@ LOG_CONFIG = {
     },
 }
 
-TARGETS: Final = {
-    "head": NodeId.head,
-    "gantry-x": NodeId.gantry_x,
-    "gantry-y": NodeId.gantry_y,
-    "pipette-left": NodeId.pipette_left,
-    "pipette-right": NodeId.pipette_right,
-    "gripper": NodeId.gripper,
-}
+UpdateDict = Dict[NodeId, TextIO]
 
 
 async def run(args: argparse.Namespace) -> None:
@@ -52,10 +43,7 @@ async def run(args: argparse.Namespace) -> None:
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
 
-    update_details = {
-        TARGETS[args.target1]: args.file1,
-        TARGETS[args.target2]: args.file2,
-    }
+    update_details = {node_id: hex_file for node_id, hex_file in args.dict.items()}
 
     async with build.can_messenger(build_settings(args)) as messenger:
         updater = RunUpdate(
@@ -77,28 +65,8 @@ def main() -> None:
     add_can_args(parser)
 
     parser.add_argument(
-        "--target1",
-        help="The first FW subsystem to be updated.",
-        type=str,
-        required=True,
-        choices=TARGETS.keys(),
-    )
-    parser.add_argument(
-        "--target2",
-        help="The second FW subsystem to be updated.",
-        type=str,
-        required=True,
-        choices=TARGETS.keys(),
-    )
-    parser.add_argument(
-        "--file1",
-        help="Path to hex file containing the first FW executable.",
-        type=argparse.FileType("r"),
-        required=True,
-    )
-    parser.add_argument(
-        "--file2",
-        help="Path to hex file containing the second FW executable.",
+        "--dict",
+        help="Path to json file containing the dictionary of node ids and hex files to be updated.",
         type=argparse.FileType("r"),
         required=True,
     )
