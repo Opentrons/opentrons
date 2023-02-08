@@ -89,10 +89,6 @@ export function OverflowMenu({
   } = useMenuHandleClickOutside()
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
-
   const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
@@ -281,18 +277,6 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {!enableCalibrationWizards && mount != null && (
-            <MenuItem
-              onClick={e => handleCalibration(e)}
-              disabled={disabledReason !== null}
-            >
-              {calType === 'pipetteOffset'
-                ? applicablePipetteOffsetCal != null
-                  ? t('recalibrate_pipette')
-                  : t('calibrate_pipette')
-                : t('recalibrate_tip_and_pipette')}
-            </MenuItem>
-          )}
           {!Boolean(isGen3Pipette) ? (
             <MenuItem onClick={e => handleDownload(e)}>
               {t('download_calibration_data')}

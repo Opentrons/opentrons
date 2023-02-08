@@ -8,7 +8,6 @@ import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { useFeatureFlag } from '../../../../redux/config'
 import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -40,7 +39,6 @@ const OT3_PIPETTE_NAME = OT3_PIPETTES[0]
 const startCalibration = jest.fn()
 jest.mock('file-saver')
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/robot-api/selectors')
@@ -65,9 +63,6 @@ const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.Mo
 >
 const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
   typeof useTipLengthCalibrations
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
@@ -108,9 +103,6 @@ describe('OverflowMenu', () => {
     mockUseDeleteCalibrationMutation.mockReturnValue({
       deleteCalibration: mockDeleteCalibration,
     } as any)
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -168,20 +160,18 @@ describe('OverflowMenu', () => {
     getByText('Delete calibration data')
   })
 
-  it('should not render Overflow tip length calibration button when the calibration wizard feature flag is set and no calibration exists', () => {
-    mockUseFeatureFlag.mockReturnValue(true)
+  it('should not render Overflow tip length calibration button when no calibration exists', () => {
     const [{ getByLabelText, queryByText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
     expect(queryByText('Calibrate Pipette Offset')).not.toBeInTheDocument()
   })
 
-  it('should not render Overflow tip length recalibration button when the calibration wizard feature flag is set', () => {
+  it('should not render Overflow tip length recalibration button', () => {
     props = {
       ...props,
       calType: 'tipLength',
     }
-    mockUseFeatureFlag.mockReturnValue(true)
     const [{ getByLabelText, queryByText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
