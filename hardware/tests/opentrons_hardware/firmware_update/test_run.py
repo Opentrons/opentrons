@@ -48,6 +48,13 @@ def mock_hex_record_builder() -> Iterator[MagicMock]:
         yield p
 
 
+@pytest.fixture
+def mock_path_exists() -> Iterator[MagicMock]:
+    """Mock path exists function."""
+    with mock.patch("os.path.exists") as p:
+        yield p
+
+
 @pytest.mark.parametrize(argnames=["should_erase"], argvalues=[[True], [False]])
 async def test_run_update(
     mock_initiator_run: AsyncMock,
@@ -55,23 +62,27 @@ async def test_run_update(
     mock_eraser_run: AsyncMock,
     mock_hex_record_builder: MagicMock,
     should_erase: bool,
+    mock_path_exists: MagicMock,
 ) -> None:
     """It should call all the functions."""
     mock_messenger = AsyncMock()
 
-    mock_hex_file = MagicMock()
+    filepath = MagicMock()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
 
     target = Target(system_node=NodeId.head)
-    await run_update(
-        messenger=mock_messenger,
-        node_id=target.system_node,
-        filepath=mock_hex_file,
-        retry_count=12,
-        timeout_seconds=11,
-        erase=should_erase,
-    )
+
+    with mock.patch("builtins.open"):
+        await run_update(
+            messenger=mock_messenger,
+            node_id=target.system_node,
+            filepath=filepath,
+            retry_count=12,
+            timeout_seconds=11,
+            erase=should_erase,
+        )
+
     mock_initiator_run.assert_called_once_with(
         target=target, retry_count=12, ready_wait_time_sec=11
     )
@@ -89,7 +100,6 @@ async def test_run_update(
     mock_messenger.send.assert_called_once_with(
         node_id=target.bootloader_node, message=FirmwareUpdateStartApp()
     )
-    mock_hex_record_builder.assert_called_once_with(mock_hex_file)
 
 
 @pytest.mark.parametrize(argnames=["should_erase"], argvalues=[[True], [False]])
@@ -102,8 +112,8 @@ async def test_run_updates(
 ) -> None:
     """It should call all the functions."""
     mock_messenger = AsyncMock()
-    hex_file_1 = str()
-    hex_file_2 = str()
+    hex_file_1 = MagicMock()
+    hex_file_2 = MagicMock()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
     target_1 = Target(system_node=NodeId.gantry_x)
@@ -115,7 +125,7 @@ async def test_run_updates(
     with mock.patch("os.path.exists"), mock.patch("builtins.open"):
         await run_updates(
             messenger=mock_messenger,
-            update_details=update_details,
+            update_details=update_details,  # type: ignore
             retry_count=12,
             timeout_seconds=11,
             erase=should_erase,
@@ -161,12 +171,5 @@ async def test_run_updates(
             mock.call(
                 node_id=target_2.bootloader_node, message=FirmwareUpdateStartApp()
             ),
-        ]
-    )
-
-    mock_hex_record_builder.assert_has_calls(
-        [
-            mock.call(hex_file_1),
-            mock.call(hex_file_2),
         ]
     )

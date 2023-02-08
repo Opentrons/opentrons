@@ -74,6 +74,7 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
+    PipetteType,
 )
 from opentrons_hardware import firmware_update
 
@@ -202,35 +203,14 @@ class OT3Controller:
 
     async def update_firmware(
         self,
-        attached_pipettes: Dict[OT3Mount, PipetteDict],
-        nodes: Optional[Set[NodeId]] = set(),
+        attached_pipettes: Dict[NodeId, PipetteType],
+        nodes: Set[NodeId] = set(),
     ) -> None:
         """Updates the firmware on the OT3."""
-        # need the pipette channels to determine the update type
-        pipettes: Dict[NodeId, int] = dict()
-        for mount, pipette in attached_pipettes.items():
-            # remove gripper from list of attached tools
-            node_id = sensor_node_for_mount(mount)
-            if node_id != NodeId.gripper:
-                pipettes[node_id] = pipette.get("channels", 0)
-
-        # Force Update specified nodes, otherwise update everything which requires an update.
-        force = False
-        device_info = self._network_info.device_info
-        if nodes:
-            force = True
-            device_info = {
-                node: cache_info
-                for node, cache_info in self._network_info.device_info.items()
-                if node in nodes
-            }
-
-        # Check if devices need an update, force = True will update the device regardless
+        # Check if devices need an update, force update if nodes are specified
         firmware_updates = firmware_update.check_firmware_updates(
-            device_info, pipettes, force=force
+            self._network_info.device_info, attached_pipettes, nodes=nodes
         )
-
-        # Start firmware updates if we have any
         if firmware_updates:
             log.info("Firmware updates are available.")
             self.update_required = True

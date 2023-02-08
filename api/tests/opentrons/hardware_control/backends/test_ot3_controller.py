@@ -36,11 +36,13 @@ from opentrons.hardware_control.errors import (
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_update.utils import FirmwareUpdateType, UpdateInfo
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
 )
 from opentrons_hardware.hardware_control import current_settings
+from opentrons_hardware.hardware_control.network import DeviceInfoCache
 from opentrons_hardware.hardware_control.tools.detector import OneshotToolDetector
 from opentrons_hardware.hardware_control.tools.types import (
     ToolSummary,
@@ -782,10 +784,13 @@ async def test_update_required_flag(
 
         # do not raise for update_firmware
         controller._update_required = True
-        try:
-            await controller.update_firmware(mock.Mock())
-        except FirmwareUpdateRequired:
-            assert False, "update_firmware raised an exception."
+        with mock.patch(
+            "opentrons.hardware_control.backends.ot3controller.firmware_update.utils.load_firmware_manifest"
+        ):
+            try:
+                await controller.update_firmware(mock.Mock())
+            except FirmwareUpdateRequired:
+                assert False, "update_firmware raised an exception."
 
         # do not raise if _update_required is False
         controller._update_required = False
@@ -797,3 +802,124 @@ async def test_update_required_flag(
             await controller.update_motor_estimation(axes)
         except FirmwareUpdateRequired:
             assert False, "update_motor_estimation raised an exception."
+
+
+async def test_update_firmware(controller: OT3Controller) -> None:
+    node_cache1 = DeviceInfoCache(NodeId.head, 1, "12345678", None)
+    node_cache2 = DeviceInfoCache(NodeId.gantry_x, 1, "12345678", None)
+    update_info1 = UpdateInfo(
+        FirmwareUpdateType.head,
+        2,
+        "abc12345",
+        {"rev1": "/some/path/head.hex"},
+        filepath="/some/path/head.hex",
+    )
+    update_info2 = UpdateInfo(
+        FirmwareUpdateType.gantry_x,
+        2,
+        "abc12345",
+        {"rev1": "/some/path/gantry.hex"},
+        filepath="/some/path/gantry.hex",
+    )
+
+    update_info = {
+        FirmwareUpdateType.head: update_info1,
+        FirmwareUpdateType.gantry_x: update_info2,
+    }
+
+    device_info_cache = {NodeId.head: node_cache1, NodeId.gantry_x: node_cache2}
+    controller._network_info._device_info_cache = device_info_cache
+
+    expected_update_details = {
+        NodeId.head: update_info1.filepath,
+        NodeId.gantry_x: update_info2.filepath,
+    }
+
+    # no updates have been started, but lets set this to true so we can assert later on
+    controller.update_required = True
+
+    # test that nodes in NetworkInfo._device_info_cache are updated if they are out of date
+    with mock.patch(
+        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        mock.Mock(return_value=update_info),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.run_updates"
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        await controller.update_firmware({})
+        run_updates.assert_called_with(
+            messenger=controller._messenger,
+            update_details=expected_update_details,
+            retry_count=mock.ANY,
+            timeout_seconds=mock.ANY,
+            erase=True,
+        )
+
+        assert controller.update_required == False
+        probe.assert_called_once()
+
+    # test that updates are not started if they are not out-of-date (shortsha's match)
+    node_cache1.shortsha = update_info1.shortsha
+    node_cache2.shortsha = update_info2.shortsha
+    with mock.patch(
+        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        mock.Mock(return_value=update_info),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.run_updates"
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        await controller.update_firmware({})
+        assert controller.update_required == False
+        run_updates.assert_not_called()
+        probe.assert_not_called()
+
+    # test that updates are started even if they are NOT out-of-date (shortsha's match) when nodes are specified
+    node_cache1.shortsha = "978abcde"
+    node_cache2.shortsha = "123abc98"
+    expected_update_details = {
+        NodeId.head: update_info1.filepath,
+        NodeId.gantry_x: update_info2.filepath,
+    }
+    with mock.patch(
+        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        mock.Mock(return_value=update_info),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.run_updates"
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        await controller.update_firmware({}, nodes={NodeId.head, NodeId.gantry_x})
+        run_updates.assert_called_with(
+            messenger=controller._messenger,
+            update_details=expected_update_details,
+            retry_count=mock.ANY,
+            timeout_seconds=mock.ANY,
+            erase=True,
+        )
+
+        assert controller.update_required == False
+        probe.assert_called_once()
+
+    # test that only nodes in device_info_cache are updated when nodes are specified
+    expected_update_details = {NodeId.head: update_info1.filepath}
+    with mock.patch(
+        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        mock.Mock(return_value=update_info),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.run_updates"
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        await controller.update_firmware({}, nodes={NodeId.head})
+        run_updates.assert_called_with(
+            messenger=controller._messenger,
+            update_details=expected_update_details,
+            retry_count=mock.ANY,
+            timeout_seconds=mock.ANY,
+            erase=True,
+        )
+
+        assert controller.update_required == False
+        probe.assert_called_once()

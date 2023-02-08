@@ -17,6 +17,8 @@ from typing import (
     TypeVar,
 )
 
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteType
+
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
@@ -51,7 +53,11 @@ from .instruments.ot3.instrument_calibration import (
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import (
+    channel_to_pipette_type,
+    get_system_constraints,
+    sensor_node_for_mount,
+)
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -402,8 +408,16 @@ class OT3API(
     async def do_firmware_updates(self) -> None:
         """Update all the firmware."""
         # get the attached instruments so we can get the type of pipettes attached
-        attached_pipettes = self._pipette_handler.get_attached_instruments()
-        await self._backend.update_firmware(attached_pipettes)
+        pipettes: Dict[NodeId, PipetteType] = dict()
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        for mount, pipette in attached_instruments.items():
+            # remove gripper from list of attached tools
+            if mount != OT3Mount.GRIPPER:
+                node_id = sensor_node_for_mount(mount)
+                channels = pipette.get("channels")
+                if channels:
+                    pipettes[node_id] = channel_to_pipette_type(channels)
+        await self._backend.update_firmware(pipettes)
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""

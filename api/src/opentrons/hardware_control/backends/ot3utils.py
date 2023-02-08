@@ -15,6 +15,7 @@ import numpy as np
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    PipetteType,
     SensorId,
     PipetteTipActionType,
 )
@@ -332,3 +333,15 @@ _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
 
 def sensor_id_for_instrument(probe: InstrumentProbeType) -> SensorId:
     return _instr_sensor_id_lookup[probe]
+
+
+_pipette_type_lookup: Dict[int, PipetteType] = {
+    1: PipetteType.pipette_single,
+    8: PipetteType.pipette_multi,
+    96: PipetteType.pipette_96,
+    384: PipetteType.pipette_384,
+}
+
+
+def channel_to_pipette_type(channels: int) -> PipetteType:
+    return _pipette_type_lookup[channels]

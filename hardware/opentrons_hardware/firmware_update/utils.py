@@ -7,8 +7,8 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from typing import Any, Dict, Optional, Set, Union
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteType
 
 from opentrons_hardware.firmware_update.errors import FirmwareManifestMissing
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
@@ -43,15 +43,15 @@ class FirmwareUpdateType(Enum):
         return cls.__members__.get(sanitized_name, cls.unknown)
 
     @classmethod
-    def from_channels(cls, channels: int) -> "FirmwareUpdateType":
-        """Return FirmwareUpdateType for pipettes with given channels."""
-        pipette_channels = {
-            1: cls.pipettes_single,
-            8: cls.pipettes_multi,
-            96: cls.pipettes_96,
-            384: cls.pipettes_384,
+    def from_pipette(cls, pipette: PipetteType) -> "FirmwareUpdateType":
+        """Return FirmwareUpdateType for pipettes with given pipette type."""
+        pipettes = {
+            pipette.pipette_single: cls.pipettes_single,
+            pipette.pipette_multi: cls.pipettes_multi,
+            pipette.pipette_96: cls.pipettes_96,
+            pipette.pipette_384: cls.pipettes_384,
         }
-        return pipette_channels.get(channels, cls.unknown)
+        return pipettes.get(pipette, cls.unknown)
 
 
 @dataclass
@@ -115,28 +115,27 @@ def _generate_firmware_info(
 ) -> Union[UpdateInfo, None]:
     """Validate the version info and return an UpdateInfo object if valid."""
     try:
-        version: int = int(version_info.get("version", 0))
-        shortsha: str = str(version_info.get("shortsha", ""))
+        version: int = version_info.get("version", 0)
+        shortsha: str = version_info.get("shortsha", "")
         files_by_revision: Dict[str, str] = version_info.get("files_by_revision", {})
-        if not all([version, shortsha, files_by_revision]):
-            log.error(f"Invalid update info {version_info}")
-            raise ValueError
+        version_keys = [version, shortsha, files_by_revision]
+        if not all(version_keys):
+            raise ValueError(f"Empty or invalid key {version_keys}")
 
         # make sure files exist on disk
         for rev, filepath in files_by_revision.items():
             if not os.path.exists(filepath):
-                log.error(f"{rev} File not found {filepath}")
-                raise FileNotFoundError
+                raise FileNotFoundError(f"Missing File {filepath}")
         return UpdateInfo(update_type, version, shortsha, files_by_revision)
     except Exception as e:
-        log.error(f"Issue serializing update info {update_type} {e}.")
+        log.error(f"Issue serializing update info {update_type}: {e}")
         return None
 
 
 def check_firmware_updates(
     device_info: Dict[NodeId, DeviceInfoCache],
-    attached_pipettes: Dict[NodeId, int],
-    force: Optional[bool] = False,
+    attached_pipettes: Dict[NodeId, PipetteType],
+    nodes: Set[NodeId] = set(),
 ) -> Dict[NodeId, UpdateInfo]:
     """Returns a dict of NodeIds that require a firmware update."""
     known_firmware = load_firmware_manifest()
@@ -146,11 +145,16 @@ def check_firmware_updates(
 
     firmware_update_list: Dict[NodeId, UpdateInfo] = dict()
     for node, version_cache in device_info.items():
+        # only check specified node if nodes are provided
+        if nodes and node not in nodes:
+            log.debug(f"Skipping unspecified node {node.name}")
+            continue
+
         log.debug(f"Checking firmware update for {node.name}")
-        # Get the update type based on the channels if pipette
+        # Get the update type based on the pipette type
         if attached_pipettes and node in [NodeId.pipette_left, NodeId.pipette_right]:
-            channels = attached_pipettes.get(node, 0)
-            update_type = FirmwareUpdateType.from_channels(channels)
+            pipette_type = attached_pipettes[node]
+            update_type = FirmwareUpdateType.from_pipette(pipette_type)
         else:
             update_type = FirmwareUpdateType.from_name(node.name)
         if update_type == FirmwareUpdateType.unknown:
@@ -162,6 +166,9 @@ def check_firmware_updates(
         if not update_info:
             log.warning(f"No firmware update found for {node.name}")
             continue
+
+        # force the update if this is node was specified
+        force = node in nodes
         if force or version_cache.shortsha != update_info.shortsha:
             log.info(
                 f"Subsystem {node.name} requires an update, device sha: {version_cache.shortsha} != update sha: {update_info.shortsha}"
