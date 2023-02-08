@@ -150,10 +150,8 @@ class OT3Controller:
     @classmethod
     async def build(cls, config: OT3Config) -> OT3Controller:
         """Create the OT3Controller instance.
-
         Args:
             config: Robot configuration
-
         Returns:
             Instance.
         """
@@ -162,7 +160,6 @@ class OT3Controller:
 
     def __init__(self, config: OT3Config, driver: AbstractCanDriver) -> None:
         """Construct.
-
         Args:
             config: Robot configuration
             driver: The Can Driver
@@ -332,12 +329,10 @@ class OT3Controller:
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         """Move to a position.
-
         Args:
             origin: The starting point of the move
             moves: List of moves.
             stop_condition: The stop condition.
-
         Returns:
             None
         """
@@ -427,10 +422,8 @@ class OT3Controller:
     @requires_update
     async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
-
         Args:
             axes: List[OT3Axis]
-
         Returns:
             A dictionary containing the new positions of each axis
         """
@@ -479,11 +472,9 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis], margin: float
     ) -> OT3AxisMap[float]:
         """Fast home axes.
-
         Args:
             axes: List of axes to home.
             margin: Margin
-
         Returns:
             New position.
         """
@@ -614,10 +605,8 @@ class OT3Controller:
         self, expected: Dict[OT3Mount, PipetteName]
     ) -> Dict[OT3Mount, OT3AttachedInstruments]:
         """Get attached instruments.
-
         Args:
             expected: Which mounts are expected.
-
         Returns:
             A map of mount to instrument name.
         """
@@ -662,10 +651,8 @@ class OT3Controller:
     @requires_update
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
-
         Args:
             axis_currents: Axes' currents
-
         Returns:
             None
         """
@@ -681,10 +668,8 @@ class OT3Controller:
     @requires_update
     async def set_hold_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the hold current for motor.
-
         Args:
             axis_currents: Axes' currents
-
         Returns:
             None
         """
@@ -831,7 +816,6 @@ class OT3Controller:
     @staticmethod
     def _replace_head_node(nodes: Set[NodeId]) -> Set[NodeId]:
         """Replace the head core node with its two sides.
-
         The node ID for the head central controller is what shows up in a network probe,
         but what we actually send commands to an overwhelming majority of the time is
         the head_l and head_r synthetic node IDs, and those are what we want in the
@@ -846,7 +830,6 @@ class OT3Controller:
     @staticmethod
     def _replace_gripper_node(nodes: Set[NodeId]) -> Set[NodeId]:
         """Replace the gripper core node with its two axes.
-
         The node ID for the gripper controller is what shows up in a network probe,
         but what we actually send most commands to is the gripper_z and gripper_g
         synthetic nodes, so we should have them in the network map instead.
@@ -874,7 +857,6 @@ class OT3Controller:
 
     async def _probe_core(self, timeout: float = 5.0) -> None:
         """Update the list of core nodes present on the network.
-
         Unlike probe_network, this always waits for the nodes that must be present for
         a working machine, and no more.
         """
@@ -886,7 +868,6 @@ class OT3Controller:
 
     async def probe_network(self, timeout: float = 5.0) -> None:
         """Update the list of nodes present on the network.
-
         The stored result is used to make sure that move commands include entries
         for all present axes, so none incorrectly move before the others are ready.
         """

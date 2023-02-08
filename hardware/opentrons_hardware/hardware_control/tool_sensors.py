@@ -193,4 +193,3 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
-Footer

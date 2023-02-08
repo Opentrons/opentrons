@@ -135,14 +135,12 @@ class OT3API(
     HardwareControlAPI,
 ):
     """This API is the primary interface to the hardware controller.
-
     Because the hardware manager controls access to the system's hardware
     as a whole, it is designed as a class of which only one should be
     instantiated at a time. This class's methods should be the only method
     of external access to the hardware. Each method may be minimal - it may
     only delegate the call to another submodule of the hardware manager -
     but its purpose is to be gathered here to provide a single interface.
-
     This implements the protocols in opentrons.hardware_control.protocols,
     and longer method docstrings may be found there. Docstrings for the
     methods in this class only note where their behavior is different or
@@ -158,7 +156,6 @@ class OT3API(
         config: OT3Config,
     ) -> None:
         """Initialize an API instance.
-
         This should rarely be explicitly invoked by an external user; instead,
         one of the factory methods build_hardware_controller or
         build_hardware_simulator should be used.
@@ -279,7 +276,6 @@ class OT3API(
         strict_attached_instruments: bool = True,
     ) -> "OT3API":
         """Build a simulating hardware controller.
-
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
         """
@@ -897,7 +893,6 @@ class OT3API(
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
         """Retract the 'other' mount if necessary
-
         If `mount` does not match the value in :py:attr:`_last_moved_mount`
         (and :py:attr:`_last_moved_mount` exists) then retract the mount
         in :py:attr:`_last_moved_mount`. Also unconditionally update
@@ -909,7 +904,6 @@ class OT3API(
 
     async def _move_gripper_to_idle_position(self, mount_in_use: OT3Mount) -> None:
         """Move gripper to its idle, gripped position.
-
         If the gripper is not currently in use, puts its jaws in a low-current,
         gripped position. Experimental behavior in order to prevent gripper jaws
         from colliding into thermocycler lid & lid latch clips.
@@ -1070,7 +1064,6 @@ class OT3API(
         self, mount: Union[top_types.Mount, OT3Mount], margin: float = 10
     ) -> None:
         """Pull the specified mount up to its home position.
-
         Works regardless of critical point or home status.
         """
         machine_ax = OT3Axis.by_mount(mount)
@@ -1087,7 +1080,6 @@ class OT3API(
     @property
     def config(self) -> OT3Config:
         """Get the robot's configuration object.
-
         :returns .RobotConfig: The object.
         """
         return self._config
@@ -1103,7 +1095,6 @@ class OT3API(
     def get_config(self) -> OT3Config:
         """
         Get the robot's configuration object.
-
         :returns .RobotConfig: The object.
         """
         return self.config
@@ -1679,17 +1670,14 @@ class OT3API(
         probe_settings: Optional[LiquidProbeSettings] = None,
     ) -> Tuple[float, float]:
         """Search for and return liquid level height.
-
         This function makes sure the plunger motor is homed before starting.
         After moving the mount the distance specified by starting_mount_height in the
         LiquidProbeSettings, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
-
         If the move is completed without the specified threshold being triggered, a
         MoveConditionNotMet error will be thrown.
         If the threshold is triggered before the minimum z distance has been traveled,
         a EarlyLiquidSenseTrigger error will be thrown.
-
         Otherwise, the function will stop moving once the threshold is triggered,
         home the plunger to prepare to aspirate, and return the position of the
         z axis in deck coordinates, as well as the encoder position, where
@@ -1771,21 +1759,16 @@ class OT3API(
         pass_settings: CapacitivePassSettings,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
-
         This function orchestrates detecting the position of a collision between the
         capacitive probe on the tool on the specified mount, and some fixed element
         of the robot.
-
         When calling this function, the mount's probe critical point should already
         be aligned in the probe axis with the item to be probed.
-
         It will move the mount's probe critical point to a small distance behind
         the expected position of the element (which is target_pos, in deck coordinates,
         in the axis to be probed) while running the tool's capacitive sensor. When the
         sensor senses contact, the mount stops.
-
         This function moves away and returns the sensed position.
-
         This sensed position can be used in several ways, including
         - To get an absolute position in deck coordinates of whatever was
         targeted, if something was guaranteed to be physically present.
