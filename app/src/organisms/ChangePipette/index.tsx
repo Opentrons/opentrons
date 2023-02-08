@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { getPipetteNameSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
+import { getPipetteNameSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
 import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+
 import {
   useDispatchApiRequests,
   getRequestById,
