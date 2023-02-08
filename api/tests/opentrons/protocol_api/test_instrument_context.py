@@ -9,6 +9,7 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     InstrumentContext,
@@ -169,6 +170,7 @@ def test_move_to_well(
     )
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
 def test_pick_up_from_well(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
@@ -190,6 +192,17 @@ def test_pick_up_from_well(
         ),
         times=1,
     )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_pick_up_from_well_deprecated_args(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should pick up a specific tip."""
+    mock_well = decoy.mock(cls=Well)
+
+    with pytest.raises(APIVersionError):
+        subject.pick_up_tip(mock_well, presses=1, increment=2.0, prep_after=False)
 
 
 def test_aspirate(
