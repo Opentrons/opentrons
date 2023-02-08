@@ -1,6 +1,6 @@
 """Capacitve Sensor Driver Class."""
 
-from typing import Optional, AsyncIterator
+from typing import Optional, AsyncIterator, Union, List
 from contextlib import asynccontextmanager
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
@@ -156,10 +156,17 @@ class SensorDriver(AbstractSensorDriver):
         self,
         can_messenger: CanMessenger,
         sensor: BaseSensorType,
-        binding: SensorOutputBinding = SensorOutputBinding.sync,
+        binding: Union[
+            SensorOutputBinding, List[SensorOutputBinding]
+        ] = SensorOutputBinding.sync,
     ) -> AsyncIterator[None]:
         """Send a BindSensorOutputRequest."""
         sensor_info = sensor.sensor
+        if type(binding) == list:
+            binding_field = SensorOutputBindingField.from_flags(binding)
+        elif type(binding) == SensorOutputBinding:
+            binding_field = SensorOutputBindingField(binding)
+
         try:
             await can_messenger.send(
                 node_id=sensor_info.node_id,
@@ -167,7 +174,7 @@ class SensorDriver(AbstractSensorDriver):
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(sensor_info.sensor_type),
                         sensor_id=SensorIdField(sensor_info.sensor_id),
-                        binding=SensorOutputBindingField(binding),
+                        binding=binding_field,
                     )
                 ),
             )

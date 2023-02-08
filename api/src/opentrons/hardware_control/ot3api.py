@@ -1748,7 +1748,6 @@ class OT3API(
                     "Liquid Sensing failed- threshold reached too early."
                 )
                 raise ThresholdReachedTooEarly
-            await self.home_plunger(mount)
 
             return position[mount_axis], encoder_position[mount_axis]
 

@@ -27,10 +27,6 @@ from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorOutputBindingField,
-)
-from contextlib import AsyncExitStack
 from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.scheduler import SensorScheduler
@@ -58,40 +54,18 @@ class SensorLog:
         threshold_pascals: float,
     ) -> None:  # add args here to set mount, threshold, stuff to log
         """Build the capturer."""
+        self.csv_writer = Any
+        self.data_file = Any
         self.response_queue: asyncio.Queue[float] = asyncio.Queue()
         self.mount = mount
         self.new_file_created = not os.path.isfile("/var/pressure_sensor_data.csv")
-        # self.data_file = open("/var/pressure_sensor_data.csv", "w")
-        # self.data_file = self.open_data_file()
         self.start_time = 0.0
         self.z_velocity = z_velocity
         self.plunger_velocity = plunger_velocity
         self.threshold_pascals = threshold_pascals
-        self.csv_writer = None
-        self.data_file = None
-
-    def _do_get_all(self) -> Iterator[float]:
-        """Worker to get messages."""
-        try:
-            yield self.response_queue.get_nowait()
-        except asyncio.QueueEmpty:
-            return
-
-    def get_all(self) -> List[float]:
-        """Get all captured messages."""
-        return list(self._do_get_all())
-
-    # @staticmethod
-    # def open_data_file(self) -> Any:
-    #     """Open the existing data file or create one if none exists."""
-    #     if self.new_file_created:
-    #         return open("/var/pressure_sensor_data.csv", "w")
-    #     else:
-    #         return open("/var/pressure_sensor_data.csv", "a")
 
     async def __aenter__(self) -> None:
         """Create a csv heading for logging pressure readings."""
-        print("in enter")
         heading = [
             "Pressure(pascals)",
             "time(s)",
@@ -115,22 +89,12 @@ class SensorLog:
             self.data_file = open("/var/pressure_sensor_data.csv", "a")
             self.csv_writer = csv.writer(self.data_file)
 
-        print("got past csv writer code")
-
-        # print(f"new file = {self.new_file_created}")
         self.start_time = time.time()
 
-    # async def __aexit__(self, *args: Any) -> Literal[False]:
     async def __aexit__(self, *args: Any) -> None:
         """Close csv file."""
-        print("in exit")
-        self.data_file.close()
+        self.data_file.close()  # type: ignore
 
-    # def start_timer(self) -> None:
-    #     """Records time when sensing move starts."""
-    #     self.start_time = time.time()
-
-    # callback method
     def __call__(
         self,
         message: MessageDefinition,
@@ -143,9 +107,7 @@ class SensorLog:
             ).to_float()
             self.response_queue.put_nowait(data)
             current_time = round((time.time() - self.start_time), 3)
-            self.csv_writer.writerow([data, current_time])
-        # elif isinstance(message, message_definitions.MoveCompleted):
-        #     self.data_file.close()
+            self.csv_writer.writerow([data, current_time])  # type: ignore
 
 
 def _build_pass_step(
@@ -168,7 +130,7 @@ def _build_pass_step(
     )
 
 
-async def liquid_probe(  # type: ignore
+async def liquid_probe(
     messenger: CanMessenger,
     tool: ProbeTarget,
     head_node: NodeId,
@@ -186,10 +148,6 @@ async def liquid_probe(  # type: ignore
     """Move the mount down to the starting height, then move the
     mount and pipette while reading from the pressure sensor.
     """
-    # sensor_capturer = SensorLog()
-    # sensor_capturer.set_mount(head_node)
-    # sensor_capturer.create_csv_header(mount_speed, plunger_speed, threshold_pascals)
-    # messenger.add_listener(sensor_capturer, None)
 
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
@@ -201,15 +159,11 @@ async def liquid_probe(  # type: ignore
 
     if read_only:
         stop_condition = MoveStopCondition.none
+        binding = [SensorOutputBinding.report]
     else:
         stop_condition = MoveStopCondition.sync_line
-
-    sensor_group = _build_pass_step(
-        movers=[head_node, tool],
-        distance={head_node: max_z_distance, tool: max_z_distance},
-        speed={head_node: mount_speed, tool: plunger_speed},
-        stop_condition=stop_condition,
-    )
+        binding = [SensorOutputBinding.sync]
+        await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
 
     prep_move = create_step(
         distance={head_node: float64(abs(starting_mount_height))},
@@ -220,57 +174,35 @@ async def liquid_probe(  # type: ignore
         stop_condition=MoveStopCondition.none,
     )
 
-    await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
+    sensor_group = _build_pass_step(
+        movers=[head_node, tool],
+        distance={head_node: max_z_distance, tool: max_z_distance},
+        speed={head_node: mount_speed, tool: plunger_speed},
+        stop_condition=stop_condition,
+    )
+
     prep_runner = MoveGroupRunner(move_groups=[[prep_move]])
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
     await prep_runner.run(can_messenger=messenger)
-
-    if read_only:
-        binding = SensorOutputBinding.report
-    else:
-        binding = SensorOutputBinding.sync
 
     if log_pressure:
         sensor_capturer = SensorLog(
             head_node, mount_speed, plunger_speed, threshold_pascals
         )
-        # messenger.add_listener(sensor_capturer, None)
-        # binding |= SensorOutputBinding.report
-        binding = SensorOutputBinding.sync_and_report
+        binding.append(SensorOutputBinding.report)
 
-    async with AsyncExitStack() as stack:
-        cms = [sensor_driver.bind_output(messenger, pressure_sensor, binding)]
-
+    async with sensor_driver.bind_output(messenger, pressure_sensor, binding):
         if log_pressure:
             messenger.add_listener(sensor_capturer, None)
-            sensor_capturer.get_all()
-            cms.append(sensor_capturer)
 
-        for context in cms:
-            await stack.enter_async_context(context)
+            async with sensor_capturer:
+                positions = await sensor_runner.run(can_messenger=messenger)
+            messenger.remove_listener(sensor_capturer)
 
-        return await sensor_runner.run(can_messenger=messenger)
+        else:
+            positions = await sensor_runner.run(can_messenger=messenger)
 
-        # positions = await sensor_runner.run(can_messenger=messenger)
-        # return positions
-
-    # if log_pressure:
-    #     sensor_capturer = SensorLog()
-    #     sensor_capturer.set_mount(head_node)
-    #     sensor_capturer.create_csv_header(mount_speed, plunger_speed, threshold_pascals)
-    #     messenger.add_listener(sensor_capturer, None)
-    #     binding = SensorOutputBinding.report | SensorOutputBinding.sync
-    # sensor_capturer.start_timer()
-
-    # async with sensor_driver.bind_output(
-    #     messenger,
-    #     pressure_sensor,
-    #     binding,
-    # ):
-    #     positions = await sensor_runner.run(can_messenger=messenger)
-    #     if log_pressure:
-    #         sensor_capturer.get_all()
-    #     return positions
+    return positions
 
 
 async def capacitive_probe(
