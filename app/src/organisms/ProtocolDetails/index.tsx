@@ -47,6 +47,7 @@ import { Modal } from '../../molecules/Modal'
 import { useTrackEvent } from '../../redux/analytics'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
+import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
@@ -246,7 +247,14 @@ export function ProtocolDetails(
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids'
   >('robot_config')
-  const [showSlideout, setShowSlideout] = React.useState(false)
+  const [
+    showChooseRobotToRunProtocolSlideout,
+    setShowChooseRobotToRunProtocolSlideout,
+  ] = React.useState<boolean>(false)
+  const [
+    showSendProtocolToOT3Slideout,
+    setShowSendProtocolToOT3Slideout,
+  ] = React.useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
@@ -374,7 +382,7 @@ export function ProtocolDetails(
       name: 'proceedToRun',
       properties: { sourceLocation: 'ProtocolsDetail' },
     })
-    setShowSlideout(true)
+    setShowChooseRobotToRunProtocolSlideout(true)
   }
 
   return (
@@ -395,8 +403,13 @@ export function ProtocolDetails(
         width="100%"
       >
         <ChooseRobotToRunProtocolSlideout
-          onCloseClick={() => setShowSlideout(false)}
-          showSlideout={showSlideout}
+          onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
+          showSlideout={showChooseRobotToRunProtocolSlideout}
+          storedProtocolData={props}
+        />
+        <SendProtocolToOT3Slideout
+          isExpanded={showSendProtocolToOT3Slideout}
+          onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
           storedProtocolData={props}
         />
         <Flex
@@ -528,9 +541,13 @@ export function ProtocolDetails(
             right={SPACING.spacing1}
           >
             <ProtocolOverflowMenu
-              handleRunProtocol={() => setShowSlideout(true)}
-              protocolDisplayName={protocolDisplayName}
-              protocolKey={protocolKey}
+              handleRunProtocol={() =>
+                setShowChooseRobotToRunProtocolSlideout(true)
+              }
+              handleSendProtocolToOT3={() =>
+                setShowSendProtocolToOT3Slideout(true)
+              }
+              storedProtocolData={props}
               data-testid="ProtocolDetails_overFlowMenu"
             />
           </Box>
