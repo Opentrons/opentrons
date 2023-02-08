@@ -31,9 +31,10 @@ from opentrons.protocols.labware import (  # noqa: F401
 )
 
 from . import validation
-from .core import well_grid
-from .core.labware import AbstractLabware
 from ._liquid import Liquid
+from .core import well_grid
+from .core.engine import ENGINE_CORE_API_VERSION
+from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
 from .core.core_map import LoadedCoreMap
 from .core.legacy.legacy_labware_core import LegacyLabwareCore
@@ -376,7 +377,7 @@ class Labware:
         .. deprecated: 2.14
             Set the name of labware in `load_labware` instead.
         """
-        if self._api_version >= APIVersion(2, 14):
+        if self._api_version >= ENGINE_CORE_API_VERSION:
             raise APIVersionError("Labware.name setter has been deprecated")
 
         # TODO(mc, 2023-02-06): this assert should be enough for mypy
@@ -677,7 +678,7 @@ class Labware:
             Ensure tip length is set properly in your tip rack's definition
             and/or use the Opentrons App's tip length calibration feature.
         """
-        if self._api_version >= APIVersion(2, 14):
+        if self._api_version >= ENGINE_CORE_API_VERSION:
             raise APIVersionError("Labware.tip_length setter has been deprecated")
 
         # TODO(mc, 2023-02-06): this assert should be enough for mypy

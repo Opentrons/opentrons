@@ -22,6 +22,7 @@ from .core.common import (
     HeaterShakerCore,
 )
 from .core.core_map import LoadedCoreMap
+from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_module_core import LegacyModuleCore
 from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
 from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
@@ -348,7 +349,7 @@ class MagneticModuleContext(ModuleContext):
             "`MagneticModuleContext.calibrate` doesn't do anything useful"
             " and will no-op in Protocol API version 2.14 and higher."
         )
-        if self._api_version < APIVersion(2, 14):
+        if self._api_version < ENGINE_CORE_API_VERSION:
             self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
 
     @publish(command=cmds.magdeck_engage)

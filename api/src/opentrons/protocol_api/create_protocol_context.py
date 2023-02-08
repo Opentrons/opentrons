@@ -28,7 +28,7 @@ from .core.legacy.labware_offset_provider import (
     NullLabwareOffsetProvider,
 )
 from .core.legacy_simulator.legacy_protocol_core import LegacyProtocolCoreSimulator
-from .core.engine import ProtocolCore
+from .core.engine import ENGINE_CORE_API_VERSION, ProtocolCore
 
 
 def create_protocol_context(
@@ -90,7 +90,7 @@ def create_protocol_context(
     else:
         labware_offset_provider = NullLabwareOffsetProvider()
 
-    if api_version >= APIVersion(2, 14):
+    if api_version >= ENGINE_CORE_API_VERSION:
         # TODO(mc, 2022-8-22): replace assertion with strict typing
         assert (
             protocol_engine is not None and protocol_engine_loop is not None
