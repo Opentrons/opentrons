@@ -4,7 +4,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { useFeatureFlag } from '../../../../redux/config'
 import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
 import {
   useAttachedPipettes,
@@ -45,7 +44,6 @@ const mockPipetteOffsetCalibrations = [
 ]
 
 jest.mock('../../../../redux/custom-labware/selectors')
-jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/discovery')
 jest.mock('../../../../assets/labware/findLabware')
@@ -60,9 +58,6 @@ const mockUpdateRobotStatus = jest.fn()
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
   typeof OverflowMenu
@@ -75,9 +70,6 @@ describe('PipetteOffsetCalibrationItems', () => {
     mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(false)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
@@ -141,10 +133,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Missing calibration')
   })
 
-  it('should only render text when calibration missing and when the calibration wizard feature flag is set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(true)
+  it('should only render text when calibration missing', () => {
     props = {
       ...props,
       formattedPipetteOffsetCalibrations: [
@@ -180,10 +169,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Recalibration recommended')
   })
 
-  it('should only render last calibrated date text when calibration recommended and when the calibration wizard feature flag is set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableCalibrationWizards')
-      .mockReturnValue(true)
+  it('should only render last calibrated date text when calibration recommended', () => {
     props = {
       ...props,
       formattedPipetteOffsetCalibrations: [

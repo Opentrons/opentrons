@@ -64,10 +64,6 @@ export function PipetteOffsetCalibrationItems({
   const attachedPipettes = useAttachedPipettes()
   const isOT3 = useIsOT3(robotName)
 
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
-
   return (
     <StyledTable>
       <thead>
@@ -110,69 +106,25 @@ export function PipetteOffsetCalibrationItems({
                 <StyledTableCell>
                   <Flex alignItems={ALIGN_CENTER}>
                     {calibration.lastCalibrated != null &&
-                    !(calibration.markedBad ?? false) ? (
+                      !(calibration.markedBad ?? false) ? (
                       <>
                         <StyledText as="p">
                           {formatLastCalibrated(calibration.lastCalibrated)}
                         </StyledText>
                       </>
                     ) : (
-                      <>
-                        {enableCalibrationWizards ? (
-                          <StyledText as="p">
-                            {calibration.lastCalibrated != null &&
-                            calibration.markedBad === true ? (
-                              <>
-                                {formatLastCalibrated(
-                                  calibration.lastCalibrated
-                                )}
-                              </>
-                            ) : (
-                              <>{t('not_calibrated_short')}</>
-                            )}
-                          </StyledText>
-                        ) : (
+                      <StyledText as="p">
+                        {calibration.lastCalibrated != null &&
+                          calibration.markedBad === true ? (
                           <>
-                            {calibration.markedBad ?? false ? (
-                              <>
-                                <Icon
-                                  name="alert-circle"
-                                  backgroundColor={
-                                    COLORS.warningBackgroundLight
-                                  }
-                                  color={COLORS.warningEnabled}
-                                  size={SPACING.spacing4}
-                                />
-                                <StyledText
-                                  as="p"
-                                  marginLeft={SPACING.spacing2}
-                                  width="100%"
-                                  color={COLORS.warningText}
-                                >
-                                  {t('recalibration_recommended')}
-                                </StyledText>
-                              </>
-                            ) : (
-                              <>
-                                <Icon
-                                  name="alert-circle"
-                                  backgroundColor={COLORS.errorBackgroundLight}
-                                  color={COLORS.errorEnabled}
-                                  size={SPACING.spacing4}
-                                />
-                                <StyledText
-                                  as="p"
-                                  marginLeft={SPACING.spacing2}
-                                  width="100%"
-                                  color={COLORS.errorText}
-                                >
-                                  {t('missing_calibration')}
-                                </StyledText>
-                              </>
+                            {formatLastCalibrated(
+                              calibration.lastCalibrated
                             )}
                           </>
+                        ) : (
+                          <>{t('not_calibrated_short')}</>
                         )}
-                      </>
+                      </StyledText>
                     )}
                   </Flex>
                 </StyledTableCell>
