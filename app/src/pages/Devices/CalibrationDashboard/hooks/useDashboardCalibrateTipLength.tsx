@@ -31,6 +31,7 @@ export interface DashboardTipLengthCalInvokerProps {
   params: Pick<TipLengthCalibrationSessionParams, 'mount'> &
     Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>
   hasBlockModalResponse: boolean | null
+  invalidateHandler?: () => void
 }
 
 export type DashboardCalTipLengthInvoker = (
@@ -48,6 +49,7 @@ export function useDashboardCalibrateTipLength(
         Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>)
     | null
   >(null)
+  const invalidateHandlerRef = React.useRef<(() => void) | undefined>()
   const dispatch = useDispatch()
   const { t } = useTranslation('robot_calibration')
 
@@ -98,7 +100,8 @@ export function useDashboardCalibrateTipLength(
   >(null)
 
   const handleStartDashboardTipLengthCalSession: DashboardCalTipLengthInvoker = props => {
-    const { params, hasBlockModalResponse } = props
+    const { params, hasBlockModalResponse, invalidateHandler } = props
+    invalidateHandlerRef.current = invalidateHandler
     sessionParams.current = params
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModal(true)
@@ -176,6 +179,7 @@ export function useDashboardCalibrateTipLength(
         showSpinner={showSpinner}
         dispatchRequests={dispatchRequests}
         isJogging={isJogging}
+        offsetInvalidationHandler={invalidateHandlerRef.current}
       />
     </Portal>
   )

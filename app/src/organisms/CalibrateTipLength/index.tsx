@@ -62,7 +62,14 @@ export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
+  const {
+    session,
+    robotName,
+    showSpinner,
+    dispatchRequests,
+    isJogging,
+    offsetInvalidationHandler,
+  } = props
   const { currentStep, instrument, labware } = session?.details ?? {}
 
   const isMulti = React.useMemo(() => {
@@ -154,6 +161,7 @@ export function CalibrateTipLength(
             calBlock={calBlock}
             currentStep={currentStep}
             sessionType={session.sessionType}
+            calInvalidationHandler={offsetInvalidationHandler}
           />
         )}
       </ModalShell>

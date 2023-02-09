@@ -19,7 +19,10 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { SearchNetwork } from './SearchNetwork'
-import { CONNECT } from '../Devices/RobotSettings/ConnectNetwork/constants'
+import {
+  CONNECT,
+  JOIN_OTHER,
+} from '../Devices/RobotSettings/ConnectNetwork/constants'
 
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
@@ -32,6 +35,12 @@ const NETWORK_ROW_STYLE = css`
   &:hover {
     background-color: ${COLORS.blueEnabled};
     color: ${COLORS.white};
+    svg {
+      color: ${COLORS.white};
+    }
+  }
+  svg {
+    color: ${COLORS.darkGreyEnabled};
   }
 `
 
@@ -52,6 +61,7 @@ export function DisplayWifiList({
   setChangeState,
   setSelectedSsid,
 }: DisplayWifiListProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const handleClick = (nw: WifiNetwork): void => {
     setShowSelectAuthenticationType(true)
     setSelectedSsid(nw.ssid)
@@ -78,7 +88,7 @@ export function DisplayWifiList({
               padding={SPACING.spacing4}
               alignItems={ALIGN_CENTER}
             >
-              <Icon name="wifi" size="2.25rem" color={COLORS.darkGreyEnabled} />
+              <Icon name="wifi" size="2.25rem" />
               <StyledText
                 marginLeft={SPACING.spacing4}
                 fontSize="1.5rem"
@@ -93,6 +103,31 @@ export function DisplayWifiList({
       ) : (
         <SearchNetwork />
       )}
+      <Btn
+        onClick={() => setChangeState({ type: JOIN_OTHER, ssid: null })}
+        marginTop={SPACING.spacing3}
+        height="4rem"
+        backgroundColor="#d6d6d6"
+        borderRadius="12px"
+        color={COLORS.black}
+        css={NETWORK_ROW_STYLE}
+      >
+        <Flex
+          padding={SPACING.spacing4}
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+        >
+          <Icon name="plus" size="2.25rem" color={COLORS.darkGreyEnabled} />
+          <StyledText
+            marginLeft={SPACING.spacingSM}
+            fontSize="1.5rem"
+            lineHeight="1.8125rem"
+            fontWeight="400"
+          >
+            {t('join_other_network')}
+          </StyledText>
+        </Flex>
+      </Btn>
     </>
   )
 }

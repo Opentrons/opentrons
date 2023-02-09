@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import { useInterval } from '@opentrons/components'
+import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
 
 import {
   useAttachedPipettes,
@@ -9,7 +10,7 @@ import {
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '.'
-
+import { getDefaultTiprackDefForPipetteName } from '../constants'
 import { formatTimestamp } from '../utils'
 import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
 import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
@@ -24,6 +25,7 @@ import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DashboardCalOffsetInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import type { DashboardCalDeckInvoker } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import { getLabwareDefURI, PipetteName } from '@opentrons/shared-data'
 
 const CALIBRATION_DATA_POLL_MS = 5000
 
@@ -34,6 +36,7 @@ export function useCalibrationTaskList(
   deckCalLauncher: DashboardCalDeckInvoker = () => {}
 ): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
+  const { deleteCalibration } = useDeleteCalibrationMutation()
   const dispatch = useDispatch()
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
@@ -307,6 +310,111 @@ export function useCalibrationTaskList(
     calibrationStatus = 'bad'
   }
   taskList.taskListStatus = calibrationStatus
+
+  // now that the task list is constructed we can check and see if tasks
+  // in 'recalibration' state need to invalidate calibration data of later tasks if performed
+
+  // Recalibrating the Deck will clear all pipette offset calibrations
+  if (
+    (taskList.taskList[0].isComplete === true ||
+      taskList.taskList[0].markedBad === true) &&
+    offsetCalibrations != null
+  ) {
+    const invalidateHandler = (): void => {
+      for (const cal of offsetCalibrations) {
+        deleteCalibration({
+          calType: 'pipetteOffset',
+          mount: cal.mount,
+          pipette_id: cal.pipette,
+        })
+      }
+    }
+    if (taskList.taskList[0].cta != null) {
+      taskList.taskList[0].cta.onClick = () =>
+        deckCalLauncher({ invalidateHandler })
+    }
+  }
+
+  // Recalibrating Tip Length for a mount clears the pipette offset calibrations for that tip
+  if (
+    (taskList.taskList[1]?.subTasks[0]?.isComplete === true ||
+      taskList.taskList[1]?.subTasks[0]?.markedBad === true) &&
+    (taskList.taskList[1]?.subTasks[1]?.isComplete === true ||
+      taskList.taskList[1]?.subTasks[1]?.markedBad === true)
+  ) {
+    const invalidateHandler = (): void => {
+      if (attachedPipettes.left != null) {
+        const tiprackDef = getDefaultTiprackDefForPipetteName(
+          attachedPipettes.left.name as PipetteName
+        )
+        if (tiprackDef != null) {
+          const tiprackUri = getLabwareDefURI(tiprackDef)
+          const offsetCals = offsetCalibrations?.filter(
+            cal =>
+              cal.pipette === attachedPipettes?.left?.id &&
+              cal.tiprackUri === tiprackUri
+          )
+          if (offsetCals != null) {
+            for (const cal of offsetCals) {
+              deleteCalibration({
+                calType: 'pipetteOffset',
+                mount: cal.mount,
+                pipette_id: cal.pipette,
+              })
+            }
+          }
+        }
+      }
+    }
+    if (taskList.taskList[1].subTasks[0].cta != null) {
+      taskList.taskList[1].subTasks[0].cta.onClick = () =>
+        tipLengthCalLauncher({
+          params: { mount: 'left' },
+          hasBlockModalResponse: null,
+          invalidateHandler,
+        })
+    }
+  }
+
+  if (
+    (taskList.taskList[2]?.subTasks[0]?.isComplete === true ||
+      taskList.taskList[2]?.subTasks[0]?.markedBad === true) &&
+    (taskList.taskList[2]?.subTasks[1]?.isComplete === true ||
+      taskList.taskList[2]?.subTasks[1]?.markedBad === true)
+  ) {
+    const invalidateHandler = (): void => {
+      if (attachedPipettes.right != null) {
+        const tiprackDef = getDefaultTiprackDefForPipetteName(
+          attachedPipettes.right.name as PipetteName
+        )
+        if (tiprackDef != null) {
+          const tiprackUri = getLabwareDefURI(tiprackDef)
+          const offsetCals = offsetCalibrations?.filter(
+            cal =>
+              cal.pipette === attachedPipettes?.right?.id &&
+              cal.tiprackUri === tiprackUri
+          )
+          if (offsetCals != null) {
+            for (const cal of offsetCals) {
+              deleteCalibration({
+                calType: 'pipetteOffset',
+                mount: cal.mount,
+                pipette_id: cal.pipette,
+              })
+            }
+          }
+        }
+      }
+    }
+    if (taskList.taskList[2].subTasks[0].cta != null) {
+      taskList.taskList[2].subTasks[0].cta.onClick = () =>
+        tipLengthCalLauncher({
+          params: { mount: 'right' },
+          hasBlockModalResponse: null,
+          invalidateHandler,
+        })
+    }
+  }
 
   return taskList
 }

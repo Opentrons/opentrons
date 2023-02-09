@@ -10,12 +10,16 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import {
+  useAttachedPipettes,
   useRobot,
   useTipLengthCalibrations,
 } from '../../organisms/Devices/hooks'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
 import type { FormattedPipetteOffsetCalibration } from '.'
+import { TipLengthCalibration } from '../../redux/calibration/api-types'
+import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
+import { getLabwareDefURI, PipetteName } from '@opentrons/shared-data'
 
 interface RobotSettingsTipLengthCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
@@ -24,9 +28,9 @@ interface RobotSettingsTipLengthCalibrationProps {
 }
 
 export interface FormattedTipLengthCalibration {
-  tiprack: string
+  tiprack?: string
   pipette: string
-  lastCalibrated: string
+  lastCalibrated?: string
   markedBad: boolean
   uri?: string | null
 }
@@ -40,16 +44,41 @@ export function RobotSettingsTipLengthCalibration({
 
   const robot = useRobot(robotName)
 
+  const attachedPipettes = useAttachedPipettes()
   // wait for robot request to resolve instead of using name directly from params
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
-
+  const tipLengthCalsForPipettesAndDefaultRacks: Array<
+    Partial<Omit<TipLengthCalibration, 'pipette' | 'uri'>> &
+      Pick<TipLengthCalibration, 'pipette' | 'uri'>
+  > = []
+  for (const pipette of Object.values(attachedPipettes)) {
+    if (pipette != null) {
+      const tiprackDef = getDefaultTiprackDefForPipetteName(
+        pipette.name as PipetteName
+      )
+      if (tiprackDef != null) {
+        const tiprackUri = getLabwareDefURI(tiprackDef)
+        const foundTipLengthCal = tipLengthCalibrations?.find(
+          cal => cal.pipette === pipette.id && cal.uri === tiprackUri
+        )
+        if (foundTipLengthCal != null) {
+          tipLengthCalsForPipettesAndDefaultRacks.push(foundTipLengthCal)
+        } else {
+          tipLengthCalsForPipettesAndDefaultRacks.push({
+            pipette: pipette.id,
+            uri: tiprackUri,
+          })
+        }
+      }
+    }
+  }
   const formattedTipLengthCalibrations: FormattedTipLengthCalibration[] =
-    tipLengthCalibrations != null
-      ? tipLengthCalibrations?.map(tipLength => ({
+    tipLengthCalsForPipettesAndDefaultRacks.length !== 0
+      ? tipLengthCalsForPipettesAndDefaultRacks?.map(tipLength => ({
           tiprack: tipLength.tiprack,
           pipette: tipLength.pipette,
           lastCalibrated: tipLength.lastModified,
-          markedBad: tipLength.status.markedBad,
+          markedBad: tipLength.status?.markedBad ?? false,
           uri: tipLength.uri,
         }))
       : []
@@ -63,18 +92,12 @@ export function RobotSettingsTipLengthCalibration({
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('tip_length_calibrations_title')}
       </StyledText>
-      {tipLengthCalibrations != null && tipLengthCalibrations.length !== 0 ? (
-        <TipLengthCalibrationItems
-          robotName={robotName}
-          formattedPipetteOffsetCalibrations={
-            formattedPipetteOffsetCalibrations
-          }
-          formattedTipLengthCalibrations={formattedTipLengthCalibrations}
-          updateRobotStatus={updateRobotStatus}
-        />
-      ) : (
-        <StyledText as="label">{t('not_calibrated')}</StyledText>
-      )}
+      <TipLengthCalibrationItems
+        robotName={robotName}
+        formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
+        formattedTipLengthCalibrations={formattedTipLengthCalibrations}
+        updateRobotStatus={updateRobotStatus}
+      />
     </Flex>
   )
 }
