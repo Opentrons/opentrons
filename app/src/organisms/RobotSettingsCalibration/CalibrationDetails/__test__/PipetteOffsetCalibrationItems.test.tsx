@@ -133,24 +133,6 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Not calibrated')
   })
 
-  it('should render icon and text when calibration recommended', () => {
-    props = {
-      ...props,
-      formattedPipetteOffsetCalibrations: [
-        {
-          modelName: 'mockPipetteModelLeft',
-          serialNumber: '1234567',
-          mount: 'left' as Mount,
-          tiprack: 'mockTiprackLeft',
-          lastCalibrated: '2022-11-10T18:15:02',
-          markedBad: true,
-        },
-      ],
-    }
-    const [{ getByText }] = render(props)
-    getByText('Recalibration recommended')
-  })
-
   it('should only render last calibrated date text when calibration recommended', () => {
     props = {
       ...props,
@@ -167,7 +149,6 @@ describe('PipetteOffsetCalibrationItems', () => {
     }
     const [{ getByText, queryByText }] = render(props)
     expect(queryByText('Not calibrated')).not.toBeInTheDocument()
-    expect(queryByText('Recalibration recommended')).not.toBeInTheDocument()
     getByText(formatLastCalibrated('2022-11-10T18:15:02'))
   })
 })

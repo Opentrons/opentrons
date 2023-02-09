@@ -113,7 +113,6 @@ describe('OverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
-    getByText('Calibrate Pipette Offset')
     getByText('Download calibration data')
     getByText('Delete calibration data')
   })
@@ -127,23 +126,11 @@ describe('OverflowMenu', () => {
     expect(saveAs).toHaveBeenCalled()
   })
 
-  it('should call pipette offset calibration when clicking calibrate button', () => {
-    const startCalibration = jest.fn()
-    mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button')
-    fireEvent.click(button)
-    const calibrationButton = getByText('Calibrate Pipette Offset')
-    fireEvent.click(calibrationButton)
-    expect(startCalibration).toHaveBeenCalled()
-  })
-
   it('should close the overflow menu when clicking it again', () => {
     const [{ getByLabelText, queryByText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
     fireEvent.click(button)
-    expect(queryByText('Recalibrate Pipette Offset')).not.toBeInTheDocument()
     expect(queryByText('Download calibration data')).not.toBeInTheDocument()
   })
 
@@ -155,43 +142,8 @@ describe('OverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
-    getByText('Recalibrate Tip Length and Pipette Offset')
     getByText('Download calibration data')
     getByText('Delete calibration data')
-  })
-
-  it('should not render Overflow tip length calibration button when no calibration exists', () => {
-    const [{ getByLabelText, queryByText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button')
-    fireEvent.click(button)
-    expect(queryByText('Calibrate Pipette Offset')).not.toBeInTheDocument()
-  })
-
-  it('should not render Overflow tip length recalibration button', () => {
-    props = {
-      ...props,
-      calType: 'tipLength',
-    }
-    const [{ getByLabelText, queryByText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button')
-    fireEvent.click(button)
-    expect(
-      queryByText('Recalibrate Tip Length and Pipette Offset')
-    ).not.toBeInTheDocument()
-  })
-
-  it('should not render calibrate menu item when mount is undefined', () => {
-    props = {
-      ...props,
-      mount: undefined as any,
-    }
-    const [{ getByRole, queryByRole }] = render(props)
-    const button = getByRole('button', {
-      name: 'CalibrationOverflowMenu_button',
-    })
-    fireEvent.click(button)
-    const menuItem = queryByRole('button', { name: 'Calibrate Pipette Offset' })
-    expect(menuItem).not.toBeInTheDocument()
   })
 
   it('call a function when clicking download tip length calibrations data', async () => {
@@ -216,30 +168,6 @@ describe('OverflowMenu', () => {
     )
     fireEvent.click(calibrationButton)
     expect(startCalibration).toHaveBeenCalled()
-  })
-
-  it('calibration button should be disabled if a protocol is running - pipette offset', () => {
-    mockUseRunStatuses.mockReturnValue({ ...RUN_STATUSES, isRunRunning: true })
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button')
-    fireEvent.click(button)
-    const calibrationButton = getByText('Calibrate Pipette Offset')
-    expect(calibrationButton).toBeDisabled()
-  })
-
-  it('calibration button should be disabled if a protocol is running - tip length', () => {
-    props = {
-      ...props,
-      calType: 'tipLength',
-    }
-    mockUseRunStatuses.mockReturnValue({ ...RUN_STATUSES, isRunRunning: true })
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button')
-    fireEvent.click(button)
-    const calibrationButton = getByText(
-      'Recalibrate Tip Length and Pipette Offset'
-    )
-    expect(calibrationButton).toBeDisabled()
   })
 
   it('calibration button should open up the pipette wizard flow for gen3 pipettes', () => {

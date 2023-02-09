@@ -149,7 +149,10 @@ describe('useCalibratePipetteOffset hook', () => {
     expect(CalWizardComponent).not.toBe(null)
 
     wrapper
-      .find('button[title="Return tip to tip rack and exit"]')
+      .find('button[title="exit"]')
+      .invoke('onClick')?.({} as React.MouseEvent)
+    wrapper
+      .find('button[title="exit"]')
       .invoke('onClick')?.({} as React.MouseEvent)
     wrapper.setProps({})
     expect(store.dispatch).toHaveBeenCalledWith({

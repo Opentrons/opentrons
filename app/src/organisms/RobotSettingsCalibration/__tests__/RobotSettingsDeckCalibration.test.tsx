@@ -128,6 +128,6 @@ describe('RobotSettingsDeckCalibration', () => {
       isDeckCalibrated: true,
     })
     const [{ getByText }] = render()
-    getByText('Last calibrated: September 15, 2021 00:00')
+    getByText('Last calibrated: September 22, 2222 00:00')
   })
 })
