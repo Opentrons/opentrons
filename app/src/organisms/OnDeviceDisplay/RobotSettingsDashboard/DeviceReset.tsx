@@ -61,7 +61,7 @@ export function DeviceReset({
   const options = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
   )
-  const [dispatchRequest] = useDispatchApiRequest()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
   // ToDo (kj:02/07/2023) gripperCalibration might be different since the option isn't implemented yet
   // Currently boot script will be added in the future
@@ -76,7 +76,6 @@ export function DeviceReset({
   const dispatch = useDispatch<Dispatch>()
 
   const handleClick = (): void => {
-    console.log(resetOptions)
     if (resetOptions != null) {
       dispatchRequest(resetConfig(robotName, resetOptions))
     }
@@ -168,12 +167,12 @@ export function DeviceReset({
           Object.keys(resetOptions).length === 0 ||
           availableOptions.every(option => resetOptions[option.id] === false)
         }
+        onClick={handleClick}
       >
         <StyledText
           fontSize="1.5rem"
           lineHeight="1.375rem"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          onClick={handleClick}
         >
           {t('clear_data_and_restart_robot')}
         </StyledText>

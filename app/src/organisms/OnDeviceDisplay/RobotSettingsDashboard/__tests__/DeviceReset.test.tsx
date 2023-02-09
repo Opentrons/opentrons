@@ -32,13 +32,17 @@ const mockResetConfigOptions = [
 const mockGetResetConfigOptions = getResetConfigOptions as jest.MockedFunction<
   typeof getResetConfigOptions
 >
-const mockResetConfig = resetConfig as jest.MockedFunction<typeof resetConfig>
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockResetConfig = resetConfig as jest.MockedFunction<typeof resetConfig>
 
 const render = (props: React.ComponentProps<typeof DeviceReset>) => {
-  return renderWithProviders(<DeviceReset {...props} />, { i18nInstance: i18n })
+  return renderWithProviders(
+    <DeviceReset {...props} />,
+
+    { i18nInstance: i18n }
+  )
 }
 
 describe('DeviceReset', () => {
@@ -70,27 +74,26 @@ describe('DeviceReset', () => {
 
   it('when tapping a option button, the clear button is enabled', () => {
     const [{ getByText, getByRole }] = render(props)
-    const button = getByText('Clear pipette calibration(s)')
-    fireEvent.click(button)
+    fireEvent.click(getByText('Clear pipette calibration(s)'))
     expect(
       getByRole('button', { name: 'Clear data and restart robot' })
     ).not.toBeDisabled()
   })
 
-  // it('when tapping a option button and tapping the clear button, a mock function is called', () => {
-  //   const clearMockResetOptions = {
-  //     pipetteOffsetCalibrations: true,
-  //     runsHistory: true,
-  //   }
-  //   const [{ getByText, getByRole }] = render(props)
-  //   const button = getByText('Clear pipette calibration(s)')
-  //   fireEvent.click(button)
-  //   fireEvent.click(getByText('Clear protocol run history'))
-  //   const clearButton = getByRole('button', {
-  //     name: 'Clear data and restart robot',
-  //   })
-  //   expect(dispatchApiRequest).toBeCalledWith(
-  //     mockResetConfig('mockRobot', clearMockResetOptions)
-  //   )
-  // })
+  it('when tapping a option button and tapping the clear button, a mock function is called', () => {
+    const clearMockResetOptions = {
+      pipetteOffsetCalibrations: true,
+      runsHistory: true,
+    }
+    const [{ getByText, getByRole }] = render(props)
+    fireEvent.click(getByText('Clear pipette calibration(s)'))
+    fireEvent.click(getByText('Clear protocol run history'))
+    const clearButton = getByRole('button', {
+      name: 'Clear data and restart robot',
+    })
+    fireEvent.click(clearButton)
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig('mockRobot', clearMockResetOptions)
+    )
+  })
 })
