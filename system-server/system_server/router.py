@@ -17,7 +17,7 @@ router = APIRouter()
 )
 async def refresh_system_db(
     sql: sqlalchemy.engine.Engine = Depends(get_sql_engine),
-    uuid: UUID = Depends(get_uuid)
+    uuid: UUID = Depends(get_uuid),
 ) -> responses.PlainTextResponse:
     """Silly fake endpoint to refresh our database."""
     return responses.PlainTextResponse(f"OK: {uuid}\n")
