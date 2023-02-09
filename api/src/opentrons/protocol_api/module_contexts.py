@@ -38,9 +38,6 @@ from . import validation
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 
 
-_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
-
-
 _log = logging.getLogger(__name__)
 
 
