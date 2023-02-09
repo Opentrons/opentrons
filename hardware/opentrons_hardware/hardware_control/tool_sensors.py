@@ -43,7 +43,7 @@ LOG = getLogger(__name__)
 ProbeTarget = Union[Literal[NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]]
 
 
-class SensorLog:
+class LogListener:
     """Capture incoming sensor messages."""
 
     def __init__(
