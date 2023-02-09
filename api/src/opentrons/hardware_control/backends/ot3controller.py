@@ -330,15 +330,6 @@ class OT3Controller:
             for status in get_stat(axes)
         )
 
-    def check_ready_for_park(self, axes: Sequence[OT3Axis]) -> bool:
-        get_stat: Callable[
-            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
-        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
-        return all(
-            isinstance(status, MotorStatus) and (status.encoder_ok or status.motor_ok)
-            for status in get_stat(axes)
-        )
-
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
@@ -352,18 +343,18 @@ class OT3Controller:
         response: NodeMap[Tuple[float, float, bool, bool]],
     ) -> None:
         for axis, pos in response.items():
-            motor_ok = pos[2]
-            encoder_ok = pos[3]
-            # Use encoder position to track current position if motor's status
-            # is not ok, e.g. a stall has been deteched
-            if encoder_ok and not motor_ok:
-                self._position.update({axis: pos[1]})
-            else:
-                self._position.update({axis: pos[0]})
-
+            self._position.update({axis: pos[0]})
             self._encoder_position.update({axis: pos[1]})
+            # if an axis has already been homed, we're not clearing the motor ok status flag
+            # TODO: (2023-01-10) This is just a temp fix so we're not blocking hardware testing,
+            # we should port the encoder position over to use as motor position if encoder status is ok
+            already_homed = (
+                self._motor_status[axis].motor_ok
+                if axis in self._motor_status.keys()
+                else False
+            )
             self._motor_status.update(
-                {axis: MotorStatus(motor_ok=motor_ok, encoder_ok=encoder_ok)}
+                {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3])}
             )
 
     @requires_update

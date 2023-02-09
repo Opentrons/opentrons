@@ -214,6 +214,11 @@ class OT3Simulator:
             for status in get_stat(axes)
         )
 
+    def is_parkable(self, ax: OT3Axis) -> bool:
+        """Check if present node is ready for park."""
+        status = self._motor_status.get(axis_to_node(ax))
+        return isinstance(status, MotorStatus) and status.encoder_ok
+
     @ensure_yield
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""

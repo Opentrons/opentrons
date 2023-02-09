@@ -715,6 +715,11 @@ class OT3API(
                 self._transforms.deck_calibration.attitude,
                 self._transforms.carriage_offset,
             )
+            self._encoder_current_position = deck_from_machine(
+                await self._backend.update_encoder_position(),
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
         return self._current_position
 
     async def encoder_current_position(
@@ -1052,40 +1057,49 @@ class OT3API(
                         pass
 
     async def park(
-        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
+        self,
+        axes: Optional[Union[List[Axis], List[OT3Axis]]] = None,
+        acquire_lock: bool = True,
     ) -> None:
-        """Move axes to home position with acceleration."""
+        """
+        Move gantry axes to home position with acceleration, if possible.
+
+        """
+
+        # make sure current position is up-to-date
+        await self.refresh_current_position_ot3()
+        if not (self._current_position and self._encoder_current_position):
+            raise MustHomeError("Cannot park because the current position is unknown.")
 
         self._reset_last_mount()
+        parkable = list(OT3Axis.gantry_axes())
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
+            assert all(
+                ax in parkable for ax in checked_axes
+            ), f"Only gantry axes are parkable: {parkable}"
         else:
-            checked_axes = [ax for ax in OT3Axis if ax != OT3Axis.Q]
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            checked_axes.append(OT3Axis.Q)
+            checked_axes = parkable
 
-        if not (
-            self._backend.check_ready_for_park(checked_axes)
-            and self._current_position
-            and self._encoder_current_position
-        ):
-            raise MustHomeError(f"Cannot park because the current position is unknown.")
         park_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
         self._log.info(f"Parking {park_seq}")
-        async with self._motion_lock:
+        async with contextlib.AsyncExitStack() as stack:
+            if acquire_lock:
+                await stack.enter_async_context(self._motion_lock)
             for axis in park_seq:
-                origin = await self._backend.update_position()
-                if self._backend.is_parkable(axis):
+                try:
+                    # update all motor position based on encoder position
+                    await self._update_position_estimation([axis])
+                    origin = await self._backend.update_position()
                     target_pos = {ax: pos for ax, pos in origin.items()}
-                    target_pos[axis] = 0
-                    target = deck_from_machine(
-                        target_pos,
-                        self._transforms.deck_calibration.attitude,
-                        self._transforms.carriage_offset,
+                    # home_position just returns 0 unless we decide to change
+                    # it in the future in ot3backends
+                    target_pos[axis] = self._backend.home_position()[axis]
+                    move_target = MoveTarget.build(position=target_pos, max_speed=400)
+                    _, moves = self._move_manager.plan_motion(
+                        origin=origin, target_list=[move_target]
                     )
-                    await self._move(target)
-                else:
-                    await self._backend.home(axis)
+                    await self._backend.move(origin, moves[0])
                     machine_pos = await self._backend.update_position()
                     encoder_machine_pos = await self._backend.update_encoder_position()
                     position = deck_from_machine(
@@ -1100,6 +1114,16 @@ class OT3API(
                         self._transforms.carriage_offset,
                     )
                     self._encoder_current_position.update(encoder_position)
+                except MustHomeError:
+                    # home instead of park if encoder position cannot be trusted
+                    await self._backend.home([axis])
+                except ZeroLengthMoveError:
+                    self._log.info(f"{axis} already at home position, skip parking")
+                    pass
+                except Exception:
+                    self._log.info("Park failed")
+                    self._current_position.clear()
+                    raise
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
