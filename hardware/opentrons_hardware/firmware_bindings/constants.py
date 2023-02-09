@@ -236,7 +236,6 @@ class PipetteType(int, Enum):
     pipette_multi = 2
     pipette_96 = 3
     pipette_384 = 4
-    unknown = -1
 
 
 @unique

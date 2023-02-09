@@ -161,13 +161,13 @@ async def initialize() -> ThreadManagedHardware:
 
     # check for and start firmware updates if OT3
     async def _do_updates() -> None:
-        if should_use_ot3():
+        if should_use_ot3() and ff.enable_ot3_firmware_updates():
             log.info("Checking firmware updates")
             await hardware.do_firmware_updates()
 
+    await asyncio.create_task(_do_updates())
+
     try:
-        if ff.enable_ot3_firmware_updates():
-            await asyncio.create_task(_do_updates())
 
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")

@@ -94,10 +94,9 @@ def test_load_firmware_manifest_success(mock_manifest: Dict[str, Any]) -> None:
 
 def test_load_firmware_manifest_failure(mock_manifest: Dict[str, Any]) -> None:
     """Test cases where we cant serialize the manifest file."""
-    # throw exception if the manifest file does not exist
-    with mock.patch("os.path.exists"), pytest.raises(FileNotFoundError):
-        updates = load_firmware_manifest("unknown-filename.json")
-        assert updates is None
+    # return empty if manifest file does not exist
+    updates = load_firmware_manifest("unknown-filename.json")
+    assert updates == {}
 
     # test invalid json file
     with open(manifest_filename, "w") as fp:

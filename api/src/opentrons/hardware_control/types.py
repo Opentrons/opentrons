@@ -268,6 +268,34 @@ class OT3SubSystem(enum.Enum):
         return self.name
 
 
+class PipetteSubType(enum.Enum):
+    """Something"""
+
+    pipette_single = 1
+    pipette_multi = 2
+    pipette_96 = 3
+    pipette_384 = 4
+
+    def __str__(self) -> str:
+        return self.name
+
+
+_subsystem_lookup = {
+    OT3Mount.LEFT: OT3SubSystem.pipette_left,
+    OT3Mount.RIGHT: OT3SubSystem.pipette_right,
+    OT3Mount.GRIPPER: OT3SubSystem.gripper,
+}
+
+
+def mount_to_subsystem(mount: OT3Mount) -> OT3SubSystem:
+    return _subsystem_lookup[mount]
+
+
+def subsystem_to_mount(subsystem: OT3SubSystem) -> OT3Mount:
+    mount_lookup = {subsystem: mount for mount, subsystem in _subsystem_lookup.items()}
+    return mount_lookup[subsystem]
+
+
 BCAxes = Union[Axis, OT3Axis]
 AxisMapValue = TypeVar("AxisMapValue")
 OT3AxisMap = Dict[OT3Axis, AxisMapValue]

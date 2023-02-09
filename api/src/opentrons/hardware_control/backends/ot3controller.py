@@ -25,7 +25,6 @@ from typing import (
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
-from opentrons.hardware_control.dev_types import PipetteDict
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -33,6 +32,7 @@ from .ot3utils import (
     get_current_settings,
     create_home_group,
     node_to_axis,
+    pipette_type_for_subtype,
     sensor_node_for_mount,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
@@ -40,6 +40,7 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_tip_action_group,
     PipetteAction,
+    sub_system_to_node_id,
 )
 
 try:
@@ -89,6 +90,8 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     MotorStatus,
     InstrumentProbeType,
+    PipetteSubType,
+    mount_to_subsystem,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -201,33 +204,51 @@ class OT3Controller:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
+    @staticmethod
+    def _attached_pipettes_to_nodes(
+        attached_pipettes: Dict[OT3Mount, PipetteSubType]
+    ) -> Dict[NodeId, PipetteType]:
+        pipette_nodes = {}
+        for mount, subtype in attached_pipettes.items():
+            subsystem = mount_to_subsystem(mount)
+            node_id = sub_system_to_node_id(subsystem)
+            pipette_type = pipette_type_for_subtype(subtype)
+            pipette_nodes[node_id] = pipette_type
+        return pipette_nodes
+
     async def update_firmware(
         self,
-        attached_pipettes: Dict[NodeId, PipetteType],
-        nodes: Set[NodeId] = set(),
+        attached_pipettes: Dict[OT3Mount, PipetteSubType],
+        nodes: Optional[Set[NodeId]] = None,
     ) -> None:
         """Updates the firmware on the OT3."""
+        nodes = nodes or set()
+        attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
         # Check if devices need an update, force update if nodes are specified
         firmware_updates = firmware_update.check_firmware_updates(
-            self._network_info.device_info, attached_pipettes, nodes=nodes
+            self._network_info.device_info, attached_pipette_nodes, nodes=nodes
         )
-        if firmware_updates:
-            log.info("Firmware updates are available.")
-            self.update_required = True
-            update_details = {
-                node_id: str(update.filepath)
-                for node_id, update in firmware_updates.items()
-            }
-            await firmware_update.run_updates(
-                messenger=self._messenger,
-                update_details=update_details,
-                retry_count=3,
-                timeout_seconds=20,
-                erase=True,
-            )
-            # refresh the device_info cache and reset the update_required flag
-            await self._network_info.probe()
+        if not firmware_updates:
+            log.info("No firmware updates required.")
             self.update_required = False
+            return
+
+        log.info("Firmware updates are available.")
+        self.update_required = True
+        update_details = {
+            node_id: str(update.filepath)
+            for node_id, update in firmware_updates.items()
+        }
+        await firmware_update.run_updates(
+            messenger=self._messenger,
+            update_details=update_details,
+            retry_count=3,
+            timeout_seconds=20,
+            erase=True,
+        )
+        # refresh the device_info cache and reset the update_required flag
+        await self._network_info.probe()
+        self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(

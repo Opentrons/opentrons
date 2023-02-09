@@ -34,9 +34,3 @@ class BootloaderNotReady(FirmwareUpdateException):
     """Bootloader is not ready."""
 
     pass
-
-
-class FirmwareManifestMissing(FirmwareUpdateException):
-    """The firmware manifest file was not found."""
-
-    pass

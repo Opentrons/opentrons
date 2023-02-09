@@ -788,7 +788,7 @@ async def test_update_required_flag(
             "opentrons.hardware_control.backends.ot3controller.firmware_update.utils.load_firmware_manifest"
         ):
             try:
-                await controller.update_firmware(mock.Mock())
+                await controller.update_firmware({})
             except FirmwareUpdateRequired:
                 assert False, "update_firmware raised an exception."
 
@@ -856,7 +856,7 @@ async def test_update_firmware(controller: OT3Controller) -> None:
             erase=True,
         )
 
-        assert controller.update_required == False
+        assert not controller.update_required
         probe.assert_called_once()
 
     # test that updates are not started if they are not out-of-date (shortsha's match)
@@ -871,7 +871,7 @@ async def test_update_firmware(controller: OT3Controller) -> None:
         controller._network_info, "probe"
     ) as probe:
         await controller.update_firmware({})
-        assert controller.update_required == False
+        assert not controller.update_required
         run_updates.assert_not_called()
         probe.assert_not_called()
 
@@ -899,7 +899,7 @@ async def test_update_firmware(controller: OT3Controller) -> None:
             erase=True,
         )
 
-        assert controller.update_required == False
+        assert not controller.update_required
         probe.assert_called_once()
 
     # test that only nodes in device_info_cache are updated when nodes are specified
@@ -921,5 +921,5 @@ async def test_update_firmware(controller: OT3Controller) -> None:
             erase=True,
         )
 
-        assert controller.update_required == False
+        assert not controller.update_required
         probe.assert_called_once()

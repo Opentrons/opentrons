@@ -33,7 +33,7 @@ from .ot3utils import (
     PipetteAction,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteType
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -49,6 +49,7 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     InstrumentProbeType,
     MotorStatus,
+    PipetteSubType,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -56,7 +57,6 @@ from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
-    PipetteDict,
     PipetteSpec,
     GripperSpec,
     OT3AttachedPipette,
@@ -474,11 +474,11 @@ class OT3Simulator:
 
     async def update_firmware(
         self,
-        attached_pipettes: Dict[NodeId, PipetteType],
-        nodes: Optional[Set[NodeId]] = set(),
+        attached_pipettes: Dict[OT3Mount, PipetteSubType],
+        nodes: Optional[Set[NodeId]] = None,
     ) -> None:
         """Updates the firmware on the OT3."""
-        pass
+        return None
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
