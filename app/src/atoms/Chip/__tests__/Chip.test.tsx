@@ -13,29 +13,53 @@ describe('Chip', () => {
 
   it('should render text, icon with success colors', () => {
     props = {
-      text: 'Connected',
-      textColor: COLORS.successText,
+      type: 'success',
+      text: 'mockSuccess',
       iconName: 'ot-check',
-      iconColor: COLORS.successEnabled,
     }
     const [{ getByText, getByLabelText }] = render(props)
-    const chip = getByText('Connected')
+    const chip = getByText('mockSuccess')
     expect(chip).toHaveStyle(`color: ${COLORS.successText}`)
-    const icon = getByLabelText('icon_Connected')
+    const icon = getByLabelText('icon_mockSuccess')
     expect(icon).toHaveStyle(`color: ${COLORS.successEnabled}`)
+  })
+
+  it('should render text, icon with error colors', () => {
+    props = {
+      type: 'error',
+      text: 'mockError',
+      iconName: 'ot-alert',
+    }
+    const [{ getByText, getByLabelText }] = render(props)
+    const chip = getByText('mockError')
+    expect(chip).toHaveStyle(`color: ${COLORS.errorText}`)
+    const icon = getByLabelText('icon_mockError')
+    expect(icon).toHaveStyle(`color: ${COLORS.errorEnabled}`)
   })
 
   it('should render text, icon with warning colors', () => {
     props = {
-      text: 'Missing 1 module',
-      textColor: COLORS.warningText,
+      type: 'warning',
+      text: 'mockWarning',
       iconName: 'ot-alert',
-      iconColor: COLORS.warningBackgroundMed,
     }
     const [{ getByText, getByLabelText }] = render(props)
-    const chip = getByText('Missing 1 module')
+    const chip = getByText('mockWarning')
     expect(chip).toHaveStyle(`color: ${COLORS.warningText}`)
-    const icon = getByLabelText('icon_Missing 1 module')
-    expect(icon).toHaveStyle(`color: ${COLORS.warningBackgroundMed}`)
+    const icon = getByLabelText('icon_mockWarning')
+    expect(icon).toHaveStyle(`color: ${COLORS.warningEnabled}`)
+  })
+
+  it('should render text, icon with informing colors', () => {
+    props = {
+      type: 'informing',
+      text: 'mockInforming',
+      iconName: 'ot-alert',
+    }
+    const [{ getByText, getByLabelText }] = render(props)
+    const chip = getByText('mockInforming')
+    expect(chip).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
+    const icon = getByLabelText('icon_mockInforming')
+    expect(icon).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
   })
 })

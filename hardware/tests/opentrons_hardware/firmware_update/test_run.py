@@ -13,9 +13,8 @@ from opentrons_hardware.firmware_update import (
     FirmwareUpdateInitiator,
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
-    run_update,
-    run_updates,
     HexRecordProcessor,
+    RunUpdate,
 )
 from opentrons_hardware.firmware_update.target import Target
 
@@ -60,11 +59,22 @@ async def test_run_update(
     mock_messenger = AsyncMock()
 
     mock_hex_file = MagicMock()
+    hex_file = cast(TextIO, mock_hex_file)
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
 
     target = Target(system_node=NodeId.head)
-    await run_update(
+    update_details = {
+        target.system_node: hex_file,
+    }
+    updater = RunUpdate(
+        messenger=mock_messenger,
+        update_details=update_details,
+        retry_count=12,
+        timeout_seconds=11,
+        erase=should_erase,
+    )
+    await updater._run_update(
         messenger=mock_messenger,
         node_id=target.system_node,
         hex_file=mock_hex_file,
@@ -114,13 +124,15 @@ async def test_run_updates(
         target_1.system_node: hex_file_1,
         target_2.system_node: hex_file_2,
     }
-    await run_updates(
+    updater = RunUpdate(
         messenger=mock_messenger,
         update_details=update_details,
         retry_count=12,
         timeout_seconds=11,
         erase=should_erase,
     )
+    async for progress in updater.run_updates():
+        pass
 
     mock_initiator_run.assert_has_calls(
         [
@@ -146,11 +158,13 @@ async def test_run_updates(
                 hex_processor=mock_hex_record_processor,
                 ack_wait_seconds=11,
             ),
+            mock.call().__aiter__(),
             mock.call(
                 node_id=target_2.bootloader_node,
                 hex_processor=mock_hex_record_processor,
                 ack_wait_seconds=11,
             ),
+            mock.call().__aiter__(),
         ]
     )
 

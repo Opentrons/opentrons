@@ -5,7 +5,7 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
-import { getProtocolsStoredSortKey } from '../../../redux/config'
+import { getProtocolsDesktopSortKey } from '../../../redux/config'
 import {
   storedProtocolData,
   storedProtocolDataTwo,
@@ -30,8 +30,8 @@ const mockEmptyStateLinks = EmptyStateLinks as jest.MockedFunction<
 const mockProtocolCard = ProtocolCard as jest.MockedFunction<
   typeof ProtocolCard
 >
-const mockGetProtocolsStoredSortKey = getProtocolsStoredSortKey as jest.MockedFunction<
-  typeof getProtocolsStoredSortKey
+const mockGetProtocolsDesktopSortKey = getProtocolsDesktopSortKey as jest.MockedFunction<
+  typeof getProtocolsDesktopSortKey
 >
 
 const render = (props: React.ComponentProps<typeof ProtocolList>) => {
@@ -57,7 +57,7 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('alphabetical', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolData, storedProtocolDataTwo])
-    when(mockGetProtocolsStoredSortKey).mockReturnValue('alphabetical')
+    when(mockGetProtocolsDesktopSortKey).mockReturnValue('alphabetical')
   })
 
   afterEach(() => {
@@ -101,7 +101,7 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('reverse', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolDataTwo, storedProtocolData])
-    when(mockGetProtocolsStoredSortKey).mockReturnValue('reverse')
+    when(mockGetProtocolsDesktopSortKey).mockReturnValue('reverse')
 
     const { getByRole, getByText, getByTestId } = render(props)
     fireEvent.click(getByTestId('ProtocolList_SortByMenu'))
@@ -117,7 +117,7 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('recent', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolData, storedProtocolDataTwo])
-    when(mockGetProtocolsStoredSortKey).mockReturnValue('recent')
+    when(mockGetProtocolsDesktopSortKey).mockReturnValue('recent')
 
     const { getByRole, getByText, getByTestId } = render(props)
     fireEvent.click(getByTestId('ProtocolList_SortByMenu'))
@@ -133,7 +133,7 @@ describe('ProtocolList', () => {
     when(mockUseSortedProtocols)
       .calledWith('oldest', [storedProtocolData, storedProtocolDataTwo])
       .mockReturnValue([storedProtocolDataTwo, storedProtocolData])
-    when(mockGetProtocolsStoredSortKey).mockReturnValue('oldest')
+    when(mockGetProtocolsDesktopSortKey).mockReturnValue('oldest')
 
     const { getByRole, getByText, getByTestId } = render(props)
     fireEvent.click(getByTestId('ProtocolList_SortByMenu'))
@@ -151,7 +151,7 @@ describe('ProtocolList', () => {
   })
 
   it('renders Oldest updates as the sort key when oldest was selected last time', () => {
-    when(mockGetProtocolsStoredSortKey).mockReturnValue('oldest')
+    when(mockGetProtocolsDesktopSortKey).mockReturnValue('oldest')
     const { getByText } = render(props)
     getByText('Oldest updates')
   })

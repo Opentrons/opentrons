@@ -109,7 +109,7 @@ describe('RobotStatusHeader', () => {
 
     const runLink = getByRole('link', { name: 'Go to Run' })
     expect(runLink.getAttribute('href')).toEqual(
-      '/devices/otie/protocol-runs/fakeRunId/run-log'
+      '/devices/otie/protocol-runs/fakeRunId/run-preview'
     )
   })
 })

@@ -9,9 +9,8 @@ import * as Networking from '../../../redux/networking'
 import { Portal } from '../../../App/portal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
-import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
-import { CONNECT, DISCONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
+import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type { WifiNetwork } from '../../../redux/networking/types'
@@ -40,9 +39,6 @@ export const SelectNetwork = ({
   const eapOptions = useSelector((state: State) =>
     Networking.getEapOptions(state, robotName)
   )
-  const canDisconnect = useSelector((state: State) =>
-    Networking.getCanDisconnect(state, robotName)
-  )
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
@@ -53,12 +49,6 @@ export const SelectNetwork = ({
     return lastId != null ? RobotApi.getRequestById(state, lastId) : null
   })
   const activeNetwork = list?.find(nw => nw.active)
-
-  const handleDisconnect = (): void => {
-    if (activeNetwork != null) {
-      dispatchApi(Networking.postWifiDisconnect(robotName, activeNetwork.ssid))
-    }
-  }
 
   const handleConnect = (options: WifiConfigureRequest): void => {
     dispatchApi(Networking.postWifiConfigure(robotName, options))
@@ -96,13 +86,6 @@ export const SelectNetwork = ({
     }
   }
 
-  const handleSelectDisconnect = (): void => {
-    if (!isRobotBusy) {
-      const ssid = activeNetwork?.ssid
-      ssid != null && setChangeState({ type: DISCONNECT, ssid })
-    }
-  }
-
   const handleSelectJoinOther = (): void => {
     if (!isRobotBusy) {
       setChangeState({ type: JOIN_OTHER, ssid: null })
@@ -122,10 +105,8 @@ export const SelectNetwork = ({
       <SelectSsid
         list={list}
         value={activeNetwork?.ssid ?? null}
-        showWifiDisconnect={canDisconnect}
         onConnect={handleSelectConnect}
         onJoinOther={handleSelectJoinOther}
-        onDisconnect={handleSelectDisconnect}
         isRobotBusy={isRobotBusy}
       />
       {changeState.type != null && (
@@ -144,12 +125,6 @@ export const SelectNetwork = ({
                   : null
               }
               onClose={handleDone}
-            />
-          ) : changeState.type === DISCONNECT ? (
-            <DisconnectModal
-              ssid={changeState.ssid}
-              onDisconnect={handleDisconnect}
-              onCancel={handleDone}
             />
           ) : (
             <ConnectModal

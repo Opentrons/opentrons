@@ -52,6 +52,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
     assert result == PipetteState(
         pipettes_by_id={},
         aspirated_volume_by_id={},
+        tip_volume_by_id={},
         current_well=None,
         attached_tip_labware_by_id={},
         movement_speed_by_id={},
@@ -563,3 +564,14 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
     assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
         model="pipette-model", min_volume=1.23, max_volume=4.56
     )
+
+
+def test_tip_volume_by_id(subject: PipetteStore) -> None:
+    """It should store the tip volume with the given pipette id."""
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id="pipette-id",
+        tip_volume=42,
+    )
+    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+
+    assert subject.state.tip_volume_by_id["pipette-id"] == 42
