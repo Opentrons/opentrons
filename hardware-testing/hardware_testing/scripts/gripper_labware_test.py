@@ -62,21 +62,6 @@ class Gripper_Labware_Test:
             "Deck Height":"None",
         }
         self.gauges = {}
-        self.gauge_ports = {
-            # "X":"/dev/ttyUSB0",
-            # "Y":"/dev/ttyUSB1",
-            # "Z":"/dev/ttyUSB2",
-        }
-        self.gauge_offsets_front = {
-            "X":Point(x=0, y=-5, z=6),
-            "Y":Point(x=-5, y=0, z=6),
-            "Z":Point(x=0, y=0, z=6),
-        }
-        self.gauge_offsets_rear = {
-            "X":Point(x=0, y=5, z=6),
-            "Y":Point(x=5, y=0, z=6),
-            "Z":Point(x=0, y=0, z=6),
-        }
         if self.probe == 'front':
             self.gripper_probe = GripperProbe.FRONT
         else:
@@ -84,7 +69,6 @@ class Gripper_Labware_Test:
 
     async def test_setup(self):
         self.file_setup()
-        self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.GRIPPER
         if self.simulate:
@@ -109,11 +93,6 @@ class Gripper_Labware_Test:
         print("FILE PATH = ", self.test_path)
         print("FILE NAME = ", self.test_file)
 
-    def gauge_setup(self):
-        for key, value in self.gauge_ports.items():
-            self.gauges[key] = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=value)
-            self.gauges[key].connect()
-
     def dict_keys_to_line(self, dict):
         return str.join(",", list(dict.keys()))+"\n"
 
@@ -129,84 +108,6 @@ class Gripper_Labware_Test:
     async def _get_encoder(self):
         encoder_position = await self.api.encoder_current_position(self.mount)
         return self._encoder_tolist(encoder_position)
-
-    async def _read_gauge(self, axis):
-        gauge_encoder = "{} Gauge Encoder".format(axis)
-        if self.probe == 'front':
-            gauge_position = self.slot_center + self.gauge_offsets_front[axis]
-        else:
-            gauge_position = self.slot_center + self.gauge_offsets_rear[axis]
-        if axis == "X":
-            if self.probe == 'front':
-                jog_position = gauge_position._replace(x=gauge_position.x + self.CUTOUT_HALF)
-            else:
-                jog_position = gauge_position._replace(x=gauge_position.x - self.CUTOUT_HALF)
-        elif axis == "Y":
-            if self.probe == 'front':
-                jog_position = gauge_position._replace(y=gauge_position.y - self.CUTOUT_HALF)
-            else:
-                jog_position = gauge_position._replace(y=gauge_position.y + self.CUTOUT_HALF)
-        elif axis == "Z":
-            jog_position = self.slot_center
-        # Move to gauge position
-        await self.api.move_to(self.mount, gauge_position, speed=100)
-        # Move to jog position
-        await self.api.move_to(self.mount, jog_position, speed=self.jog_speed)
-        # Read gauge
-        gauge = self.gauges[axis].read_stable(timeout=20)
-        # Return to gauge position
-        await self.api.move_to(self.mount, gauge_position, speed=100)
-        return gauge
-
-    def _zero_gauges(self):
-        print(f"\nPlace Gauge Block on Deck Slot #{self.slot}")
-        for axis in self.gauges:
-            gauge_zero = "{} Zero".format(axis)
-            input(f"\nPush block against {axis}-axis Gauge and Press ENTER\n")
-            _reading = True
-            while _reading:
-                zeros = []
-                for i in range(5):
-                    gauge = self.gauges[axis].read_stable(timeout=20)
-                    zeros.append(gauge)
-                _variance = abs(max(zeros) - min(zeros))
-                print(f"Variance = {_variance}")
-                if _variance < 0.1:
-                    _reading = False
-            zero = sum(zeros) / len(zeros)
-            self.test_data[gauge_zero] = str(zero)
-            print(f"{axis} Gauge Zero = {zero}mm")
-        input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
-
-    async def _measure_gauges(
-        self, api: OT3API, mount: OT3Mount
-    ) -> None:
-        # Add gripper probe
-        api.add_gripper_probe(self.gripper_probe)
-        # Move up
-        current_pos = await api.gantry_position(mount)
-        z_offset = current_pos + self.gauge_offsets_front["Z"]
-        await api.move_to(mount, z_offset, speed=20)
-        # Move above slot center
-        above_slot_center = self.slot_center + self.gauge_offsets_front["Z"]
-        await api.move_to(mount, above_slot_center, speed=20)
-        # Measure X-axis gauge
-        print("Measuring X Gauge...")
-        x_gauge = await self._read_gauge("X")
-        self.test_data["X Gauge"] = str(x_gauge)
-        print(f"X Gauge = ", self.test_data["X Gauge"])
-        # Measure Y-axis gauge
-        print("Measuring Y Gauge...")
-        y_gauge = await self._read_gauge("Y")
-        self.test_data["Y Gauge"] = str(y_gauge)
-        print(f"Y Gauge = ", self.test_data["Y Gauge"])
-        # Measure Z-axis gauge
-        print("Measuring Z Gauge...")
-        z_gauge = await self._read_gauge("Z")
-        self.test_data["Z Gauge"] = str(z_gauge)
-        print(f"Z Gauge = ", self.test_data["Z Gauge"])
-        # Remove gripper probe
-        api.remove_gripper_probe()
 
     async def _record_data(self, cycle):
         elapsed_time = (time.time() - self.start_time)/60
@@ -262,8 +163,6 @@ class Gripper_Labware_Test:
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     await self._home(self.api, self.mount)
                     await self._calibrate_slot(self.api, self.mount, self.slot)
-                    if len(self.gauges) > 0:
-                        await self._measure_gauges(self.api, self.mount)
                     await self._record_data(cycle)
                     await self._reset(self.api, self.mount)
         except Exception as e:
