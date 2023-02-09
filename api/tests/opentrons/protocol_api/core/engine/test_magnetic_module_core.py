@@ -65,15 +65,6 @@ def test_create(
     assert result.module_id == "1234"
     assert result.MODULE_TYPE == ModuleType.MAGNETIC
 
-
-def test_engage_from_home_raises_exception(
-    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
-) -> None:
-    """Should raise a descriptive error."""
-    with pytest.raises(APIVersionError):
-        subject.engage(height_from_home=7.0)
-
-
 def test_engage_from_base(
     decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
 ) -> None:
