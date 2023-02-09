@@ -9,12 +9,17 @@ import {
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
 } from '../../../redux/calibration/tip-length/__fixtures__'
-import { useTipLengthCalibrations } from '../../../organisms/Devices/hooks'
+import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
+import {
+  useAttachedPipettes,
+  useTipLengthCalibrations,
+} from '../../../organisms/Devices/hooks'
 
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 
 import type { FormattedPipetteOffsetCalibration } from '..'
+import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
 jest.mock('../../../redux/config')
 jest.mock('../../../organisms/Devices/hooks')
@@ -28,6 +33,9 @@ const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFu
 >
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
+>
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
 >
 
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
@@ -60,6 +68,10 @@ describe('RobotSettingsTipLengthCalibration', () => {
       <div>Mock TipLengthCalibrationItems</div>
     )
     mockUseFeatureFlag.mockReturnValue(false)
+    mockUseAttachedPipettes.mockReturnValue({
+      left: mockAttachedPipette,
+      right: null,
+    } as AttachedPipettesByMount)
   })
 
   afterEach(() => {
@@ -73,11 +85,5 @@ describe('RobotSettingsTipLengthCalibration', () => {
       'Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle. You can recalibrate a tip length if the pipette associated with it is currently attached to this robot. If you recalibrate a tip length, you will be prompted to recalibrate that pipette’s offset calibration.'
     )
     getByText('Mock TipLengthCalibrationItems')
-  })
-
-  it('renders Not calibrated yet when no tip length calibrations data', () => {
-    mockUseTipLengthCalibrations.mockReturnValue(null)
-    const [{ getByText }] = render()
-    getByText('Not calibrated yet')
   })
 })

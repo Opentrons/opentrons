@@ -4,6 +4,7 @@ import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
+import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
 import { useCalibrationTaskList } from '../useCalibrationTaskList'
 import {
   useAttachedPipettes,
@@ -32,6 +33,7 @@ import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
 jest.mock('../')
+jest.mock('@opentrons/react-api-client')
 
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
@@ -45,6 +47,9 @@ const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.Mo
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
+const mockUseDeleteCalibrationMutation = useDeleteCalibrationMutation as jest.MockedFunction<
+  typeof useDeleteCalibrationMutation
+>
 
 const mockPipOffsetCalLauncher = jest.fn()
 const mockTipLengthCalLauncher = jest.fn()
@@ -53,7 +58,12 @@ const mockDeckCalLauncher = jest.fn()
 describe('useCalibrationTaskList hook', () => {
   let wrapper: React.FunctionComponent<{}>
   let store: Store<State>
+  const mockDeleteCalibration = jest.fn()
+
   beforeEach(() => {
+    mockUseDeleteCalibrationMutation.mockReturnValue({
+      deleteCalibration: mockDeleteCalibration,
+    } as any)
     store = createStore(jest.fn(), {})
     store.dispatch = jest.fn()
     wrapper = ({ children }) => (
