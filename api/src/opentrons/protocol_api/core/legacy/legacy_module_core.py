@@ -61,7 +61,6 @@ class LegacyModuleCore(AbstractModuleCore):
         self._sync_module_hardware = sync_module_hardware
         self._requested_model = requested_model
         self._geometry = geometry
-        self._labware_core: Optional[LegacyLabwareCore] = None
         self._protocol_core = protocol_core
 
     @property
@@ -94,7 +93,6 @@ class LegacyModuleCore(AbstractModuleCore):
 
     def add_labware_core(self, labware_core: LegacyLabwareCore) -> Labware:
         """Add a labware to the module."""
-        self._labware_core = labware_core
         labware = self.geometry.add_labware(
             Labware(
                 core=labware_core,
@@ -182,20 +180,20 @@ class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
         Raises:
             ValueError: Labware is not loaded or has no default engage height.
         """
-        labware_core = self._labware_core
+        labware = self._geometry.labware
 
-        if labware_core is None:
+        if labware is None:
             raise ValueError(
                 "No labware loaded in Magnetic Module;"
                 " you must specify an engage height explicitly"
                 " using `height_from_base` or `height`"
             )
 
-        engage_height = labware_core.get_default_magnet_engage_height(preserve_half_mm)
+        engage_height = labware._core.get_default_magnet_engage_height(preserve_half_mm)
 
         if engage_height is None:
             raise ValueError(
-                f"Currently loaded labware {self._geometry.labware} does not have"
+                f"Currently loaded labware {labware} does not have"
                 " a default engage height; specify engage height explicitly"
                 " using `height_from_base` or `height`"
             )
