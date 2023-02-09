@@ -7,7 +7,8 @@ from opentrons.protocol_api import ProtocolContext
 from hardware_testing.gravimetric.execute import gravimetric
 from hardware_testing.gravimetric import helpers
 
-metadata = {"apiLevel": "2.12", "protocolName": "ot2-p300-single-channel-gravimetric"}
+
+metadata = {"apiLevel": "2.12", "protocolName": "ot3-p1000-single-channel-gravimetric"}
 
 TEST_VIAL_LIQUID = False
 
@@ -28,7 +29,7 @@ def _run(protocol: ProtocolContext) -> None:
         protocol,
         gravimetric.ExecuteGravConfig(
             name=metadata["protocolName"],
-            pipette_volume=300,
+            pipette_volume=1000,
             pipette_mount="left",
             labware_dir=Path(__file__).parent / "definitions",
         ),
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     TEST_VIAL_LIQUID = args.test_vial_liquid
     _ctx = helpers.get_api_context(
-        metadata["apiLevel"], is_simulating=args.simulate, machine="ot2"
+        metadata["apiLevel"], is_simulating=args.simulate, machine="ot3"
     )
     _ctx.home()
     _run(_ctx)

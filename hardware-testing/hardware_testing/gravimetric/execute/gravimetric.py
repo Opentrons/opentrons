@@ -78,7 +78,7 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
     # PIPETTE and LIQUID CLASS
     _liq_pip = PipetteLiquidClass(
         ctx=ctx,
-        model=f"p{cfg.pipette_volume}_single_gen2",
+        model=f"p{cfg.pipette_volume}_single",
         mount=cfg.pipette_mount,
         tip_racks=[_layout.tiprack],  # type: ignore[list-item]
         test_name=cfg.name,
