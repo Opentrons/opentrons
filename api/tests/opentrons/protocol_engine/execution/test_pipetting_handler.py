@@ -522,7 +522,7 @@ async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
     ).then_return(False)
 
     with pytest.raises(
-        ValueError,
+        RuntimeError,
         match="When aspirate is called on something other than a "
         "well relative position, we can't move to the top of"
         " the well to prepare for aspiration. This might "
