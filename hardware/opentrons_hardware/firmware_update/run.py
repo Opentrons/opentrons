@@ -2,8 +2,7 @@
 import logging
 import asyncio
 import os
-from pathlib import Path
-from typing import Optional, Dict, Tuple, Union, AsyncIterator
+from typing import Optional, Dict, Tuple, AsyncIterator
 from .types import FirmwareUpdateStatus, StatusElement
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
@@ -63,18 +62,18 @@ class RunUpdate:
         self,
         messenger: CanMessenger,
         node_id: NodeId,
-        filepath: Union[Path, str],
+        filepath: str,
         retry_count: int,
         timeout_seconds: float,
         erase: Optional[bool] = True,
     ) -> None:
         """Perform a firmware update on a node target."""
         if not os.path.exists(filepath):
-            logger.error(f"Subsystem update file not found {filepath}")
+            print("Subsystem update file not found {filepath}")
             raise FileNotFoundError
 
         with open(filepath) as f:
-            hex_processor = HexRecordProcessor.from_file(filepath)
+            hex_processor = HexRecordProcessor.from_file(f)
 
             initiator = FirmwareUpdateInitiator(messenger)
             downloader = FirmwareUpdateDownloader(messenger)
@@ -105,12 +104,19 @@ class RunUpdate:
                     )
                     download_start_progress = 0.2
                     await self._status_queue.put(
-                        (node_id, (FirmwareUpdateStatus.updating, download_start_progress))
+                        (
+                            node_id,
+                            (FirmwareUpdateStatus.updating, download_start_progress),
+                        )
                     )
                 except BootloaderNotReady as e:
                     logger.error(f"Firmware Update failed for {target} {e}.")
                     await self._status_queue.put(
-                        (node_id, (FirmwareUpdateStatus.updating, download_start_progress)))
+                        (
+                            node_id,
+                            (FirmwareUpdateStatus.updating, download_start_progress),
+                        )
+                    )
                     return
             else:
                 logger.info("Skipping erase step.")
@@ -147,12 +153,12 @@ class RunUpdate:
             self._run_update(
                 messenger=self._messenger,
                 node_id=node_id,
-                hex_file=hex_file,
+                filepath=filepath,
                 retry_count=self._retry_count,
                 timeout_seconds=self._timeout_seconds,
                 erase=self._erase,
             )
-            for node_id, hex_file in self._update_details.items()
+            for node_id, filepath in self._update_details.items()
         ]
 
         task = asyncio.gather(*tasks)

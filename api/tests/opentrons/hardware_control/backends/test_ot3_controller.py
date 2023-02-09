@@ -851,7 +851,7 @@ async def test_update_firmware(controller: OT3Controller) -> None:
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=update_info),
     ), mock.patch(
-        "opentrons_hardware.firmware_update.run_updates"
+        "opentrons_hardware.firmware_update.RunUpdate"
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
@@ -874,7 +874,7 @@ async def test_update_firmware(controller: OT3Controller) -> None:
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=update_info),
     ), mock.patch(
-        "opentrons_hardware.firmware_update.run_updates"
+        "opentrons_hardware.firmware_update.RunUpdate.run_updates"
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
@@ -894,7 +894,7 @@ async def test_update_firmware(controller: OT3Controller) -> None:
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=update_info),
     ), mock.patch(
-        "opentrons_hardware.firmware_update.run_updates"
+        "opentrons_hardware.firmware_update.RunUpdate"
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
@@ -916,7 +916,7 @@ async def test_update_firmware(controller: OT3Controller) -> None:
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=update_info),
     ), mock.patch(
-        "opentrons_hardware.firmware_update.run_updates"
+        "opentrons_hardware.firmware_update.RunUpdate"
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:

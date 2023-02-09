@@ -239,7 +239,7 @@ class OT3Controller:
             node_id: str(update.filepath)
             for node_id, update in firmware_updates.items()
         }
-        updater = await firmware_update.RunUpdate(
+        updater = firmware_update.RunUpdate(
             messenger=self._messenger,
             update_details=update_details,
             retry_count=3,

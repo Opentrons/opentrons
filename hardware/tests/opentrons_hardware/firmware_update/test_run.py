@@ -1,4 +1,6 @@
 """Tests for run module."""
+import os
+from pathlib import Path
 from typing import Iterator
 
 import mock
@@ -17,6 +19,14 @@ from opentrons_hardware.firmware_update import (
     RunUpdate,
 )
 from opentrons_hardware.firmware_update.target import Target
+
+
+@pytest.fixture
+def hex_file_path() -> str:
+    """Path of hex file for test."""
+    tt = os.path.dirname(__file__)
+    path = Path(os.path.abspath(tt))
+    return str(path / Path("bootloader-head.hex"))
 
 
 @pytest.fixture
@@ -62,17 +72,17 @@ async def test_run_update(
     mock_hex_record_builder: MagicMock,
     should_erase: bool,
     mock_path_exists: MagicMock,
+    hex_file_path: str,
 ) -> None:
     """It should call all the functions."""
     mock_messenger = AsyncMock()
 
-    filepath = MagicMock()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
 
     target = Target(system_node=NodeId.head)
     update_details = {
-        target.system_node: filepath,
+        target.system_node: hex_file_path,
     }
     updater = RunUpdate(
         messenger=mock_messenger,
@@ -81,12 +91,12 @@ async def test_run_update(
         timeout_seconds=11,
         erase=should_erase,
     )
-    
+
     with mock.patch("os.path.exists"), mock.patch("builtins.open"):
         await updater._run_update(
             messenger=mock_messenger,
             node_id=target.system_node,
-            filepath=filepath,
+            filepath=hex_file_path,
             retry_count=12,
             timeout_seconds=11,
             erase=should_erase,
@@ -120,8 +130,8 @@ async def test_run_updates(
 ) -> None:
     """It should call all the functions."""
     mock_messenger = AsyncMock()
-    hex_file_1 = MagicMock()
-    hex_file_2 = MagicMock()
+    hex_file_1 = str()
+    hex_file_2 = str()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
     target_1 = Target(system_node=NodeId.gantry_x)
@@ -133,13 +143,13 @@ async def test_run_updates(
     with mock.patch("os.path.exists"), mock.patch("builtins.open"):
         updater = RunUpdate(
             messenger=mock_messenger,
-            update_details=update_details,  # type: ignore
+            update_details=update_details,
             retry_count=12,
             timeout_seconds=11,
             erase=should_erase,
         )
-    async for progress in updater.run_updates():
-        pass
+        async for progress in updater.run_updates():
+            pass
 
     mock_initiator_run.assert_has_calls(
         [
