@@ -21,7 +21,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
-import { getLocalRobot } from '../../redux/discovery'
+import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 
@@ -38,6 +38,9 @@ export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const robotServerVersion =
+    localRobot?.status != null ? getRobotApiVersion(localRobot) : null
+
   return (
     <Flex
       padding={`${String(SPACING.spacing6)} ${String(
@@ -56,7 +59,11 @@ export function RobotSettingsDashboard(): JSX.Element {
       {/* Robot System Version */}
       <RobotSettingButton
         settingName={t('robot_system_version')}
-        settingInfo={'v7.0.0'}
+        settingInfo={
+          robotServerVersion != null
+            ? `v${robotServerVersion}`
+            : t('robot_settings_advanced_unknown')
+        }
       />
 
       {/* Network Settings */}

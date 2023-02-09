@@ -7,6 +7,12 @@ import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
 import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
 import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
 
+export * from './pipetting'
+export * from './gantry'
+export * from './module'
+export * from './setup'
+export * from './timing'
+
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime
@@ -16,7 +22,7 @@ export interface CommonCommandRunTimeInfo {
   key?: string
   id: string
   status: CommandStatus
-  error: string | null
+  error?: string | null
   createdAt: string
   startedAt: string | null
   completedAt: string | null

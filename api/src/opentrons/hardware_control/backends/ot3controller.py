@@ -201,16 +201,21 @@ class OT3Controller:
     async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
         """Update the firmware."""
         with open(filename, "r") as f:
-            await firmware_update.run_update(
+            update_details = {
+                sub_system_to_node_id(target): f,
+            }
+            updater = firmware_update.RunUpdate(
                 messenger=self._messenger,
-                node_id=sub_system_to_node_id(target),
-                hex_file=f,
+                update_details=update_details,
                 # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
                 #  config values.
                 retry_count=3,
                 timeout_seconds=20,
                 erase=True,
             )
+            async for progress in updater.run_updates():
+                pass
+                # TODO (peter, 2023-02-08): Pass this progress data up the stack for reporting
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
@@ -450,8 +455,7 @@ class OT3Controller:
             await self.tip_action(
                 [OT3Axis.Q],
                 self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
-                -1
-                * self._configuration.motion_settings.default_max_speed.high_throughput[
+                self._configuration.motion_settings.default_max_speed.high_throughput[
                     OT3Axis.to_kind(OT3Axis.Q)
                 ],
             )
@@ -491,8 +495,10 @@ class OT3Controller:
         axes: Sequence[OT3Axis],
         distance: float,
         speed: float,
-        tip_action: str = "drop",
+        tip_action: str = "home",
     ) -> None:
+        if tip_action == "home":
+            speed = speed * -1
         move_group = create_tip_action_group(
             axes, distance, speed, cast(PipetteAction, tip_action)
         )
@@ -582,7 +588,7 @@ class OT3Controller:
         serial = attached.serial
         return {
             "config": gripper_config.load(model),
-            "id": f"GRPV{attached.model}{serial}",
+            "id": f"GRPV{attached.model.replace('.', '')}{serial}",
         }
 
     @staticmethod

@@ -44,7 +44,7 @@ from opentrons_hardware.hardware_control.motion import (
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10
 
-PipetteAction = Literal["pick_up", "drop"]
+PipetteAction = Literal["clamp", "home"]
 
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed

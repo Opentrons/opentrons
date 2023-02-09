@@ -1,6 +1,11 @@
 import { createSelector } from 'reselect'
 import type { State } from '../types'
-import type { Config, FeatureFlags, UpdateChannel } from './types'
+import type {
+  Config,
+  FeatureFlags,
+  UpdateChannel,
+  ProtocolsOnDeviceSortKey,
+} from './types'
 import type { SelectOption } from '../../atoms/SelectField/Select'
 import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
@@ -70,9 +75,16 @@ export const getSendAllProtocolsToOT3: (
   config => config?.protocols.sendAllProtocolsToOT3 ?? false
 )
 
-export const getProtocolsStoredSortKey: (
+export const getProtocolsDesktopSortKey: (
   state: State
 ) => ProtocolSort | null = createSelector(
   getConfig,
   config => config?.protocols.protocolsStoredSortKey ?? null
+)
+
+export const getProtocolsOnDeviceSortKey: (
+  state: State
+) => ProtocolsOnDeviceSortKey | null = createSelector(
+  getConfig,
+  config => config?.protocols.protocolsOnDeviceSortKey ?? null
 )

@@ -127,18 +127,10 @@ def test_get_center(
 ) -> None:
     """It should get a well center."""
     decoy.when(
-        mock_engine_client.state.geometry.get_well_height(
-            labware_id="labware-id", well_name="well-name"
-        )
-    ).then_return(42.0)
-
-    decoy.when(
         mock_engine_client.state.geometry.get_well_position(
             labware_id="labware-id",
             well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=21)
-            ),
+            well_location=WellLocation(origin=WellOrigin.CENTER),
         )
     ).then_return(Point(1, 2, 3))
 
@@ -225,18 +217,10 @@ def test_from_center_cartesian(
 ) -> None:
     """It should get the relative point from the center of a well."""
     decoy.when(
-        mock_engine_client.state.geometry.get_well_height(
-            labware_id="labware-id", well_name="well-name"
-        )
-    ).then_return(42.0)
-
-    decoy.when(
         mock_engine_client.state.geometry.get_well_position(
             labware_id="labware-id",
             well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=21)
-            ),
+            well_location=WellLocation(origin=WellOrigin.CENTER),
         )
     ).then_return(Point(1, 2, 3))
 

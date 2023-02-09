@@ -12,7 +12,6 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteTipType,
     PlungerPositions,
     MotorConfigurations,
-    PickUpTipConfigurations,
     SupportedTipsDefinition,
     TipHandlingConfigurations,
     PipetteModelType,
@@ -165,11 +164,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._plunger_motor_current
 
     @property
-    def pick_up_configurations(self) -> PickUpTipConfigurations:
+    def pick_up_configurations(self) -> TipHandlingConfigurations:
         return self._pick_up_configurations
 
     @pick_up_configurations.setter
-    def pick_up_configurations(self, pick_up_configs: PickUpTipConfigurations) -> None:
+    def pick_up_configurations(
+        self, pick_up_configs: TipHandlingConfigurations
+    ) -> None:
         self._pick_up_configurations = pick_up_configs
 
     @property
@@ -225,10 +226,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         else:
             self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
-    def save_pipette_offset(self, mount: OT3Mount, offset: Point) -> None:
+    def save_pipette_offset(
+        self, mount: OT3Mount, offset: Point
+    ) -> PipetteOffsetByPipetteMount:
         """Update the pipette offset to a new value."""
         save_pipette_offset_calibration(self._pipette_id, mount, offset)
         self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
+        return self._pipette_offset
 
     @property
     def name(self) -> PipetteName:
@@ -527,8 +531,9 @@ def _reload_and_check_skip(
             p = Pipette(new_config, pipette_offset, attached_instr._pipette_id)
             p.act_as(attached_instr.acting_as)
             return p, False
-    # Good to skip
-    return attached_instr, True
+        # Good to skip, just need to update calibration offset
+        attached_instr._pipette_offset = pipette_offset
+        return attached_instr, True
 
 
 def load_from_config_and_check_skip(

@@ -276,7 +276,7 @@ def test_pick_up_tip(
             pipetteId="123", labwareId="456", wellName="A2", wellLocation=WellLocation()
         )
     )
-    response = commands.PickUpTipResult()
+    response = commands.PickUpTipResult(tipVolume=78.9)
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -400,6 +400,8 @@ def test_touch_tip(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
+            radius=7.89,
+            speed=65.4,
         )
     )
 
@@ -412,6 +414,8 @@ def test_touch_tip(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+        radius=7.89,
+        speed=65.4,
     )
 
     assert result == response

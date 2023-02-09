@@ -31,7 +31,7 @@ export type AppSettingsTab =
   | 'advanced'
   | 'feature-flags'
 
-export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
+export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-preview'
 
 /**
  * desktop app route params type definition
@@ -52,5 +52,4 @@ export interface DesktopRouteParams {
 export interface OnDeviceRouteParams {
   protocolId: string
   runId: string
-  ssid: string
 }

@@ -74,7 +74,7 @@ async def run(args: argparse.Namespace) -> None:
                         velocity_mm_sec=float64(5.5),
                         duration_sec=float64(2.5),
                         stop_condition=MoveStopCondition.none,
-                        action=PipetteTipActionType.pick_up,
+                        action=PipetteTipActionType.clamp,
                     )
                 }
             ]
@@ -88,7 +88,7 @@ async def run(args: argparse.Namespace) -> None:
                         velocity_mm_sec=float64(-5.5),
                         duration_sec=float64(6),
                         stop_condition=MoveStopCondition.limit_switch,
-                        action=PipetteTipActionType.drop,
+                        action=PipetteTipActionType.home,
                     )
                 }
             ]

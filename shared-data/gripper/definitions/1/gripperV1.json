@@ -1,0 +1,33 @@
+{
+  "$otSharedSchema": "gripper/schemas/1",
+  "model": "gripperV1",
+  "schemaVersion": 1,
+  "displayName": "Gripper V1",
+  "zMotorConfigurations": {
+    "idle": 0.2,
+    "run": 0.67
+  },
+  "jawMotorConfigurations": {
+    "vref": 2.0
+  },
+  "gripForceProfile": {
+    "polynomial": [
+      [0, -0.282],
+      [1, 2.09]
+    ],
+    "defaultGripForce": 15.0,
+    "defaultHomeForce": 12.0,
+    "min": 5.0,
+    "max": 20.0
+  },
+  "geometry": {
+    "baseOffsetFromMount": [19.5, -74.325, -94.825],
+    "jawCenterOffsetFromBase": [0.0, 0.0, -88.475],
+    "pinOneOffsetFromBase": [4.0, -57.0, -100.475],
+    "pinTwoOffsetFromBase": [4.0, 57.0, -100.475],
+    "jawWidth": {
+      "min": 58.0,
+      "max": 90.0
+    }
+  }
+}
