@@ -88,6 +88,33 @@ SuccessColors.args = {
   colors: successColors,
 }
 
+export const WarningColors = Template.bind({})
+const warningColors = [
+  {
+    name: 'successBackgroundLight',
+    value: COLORS.warningBackgroundLight,
+  },
+  {
+    name: 'successBackgroundMed',
+    value: COLORS.warningBackgroundMed,
+  },
+  {
+    name: 'successEnabled',
+    value: COLORS.warningEnabled,
+  },
+  {
+    name: 'successText',
+    value: COLORS.warningText,
+  },
+  {
+    name: 'successDisabled',
+    value: COLORS.warningDisabled,
+  },
+]
+WarningColors.args = {
+  colors: warningColors,
+}
+
 // export const Holding = Template.bind({})
 // Holding.args = {
 //   status: 'Holding at target',
