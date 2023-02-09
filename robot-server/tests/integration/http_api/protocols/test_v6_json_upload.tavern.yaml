@@ -280,7 +280,8 @@ stages:
                       x: 0
                       y: 0
                       z: 0
-                result: {}
+                result:
+                  tipVolume: 10.0
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr

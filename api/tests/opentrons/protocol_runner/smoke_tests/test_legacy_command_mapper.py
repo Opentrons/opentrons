@@ -275,7 +275,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_1_id,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(tipVolume=300.0),
     )
     assert commands_result[8] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
@@ -289,7 +289,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_2_id,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(tipVolume=300.0),
     )
 
     assert commands_result[9] == commands.DropTip.construct(
@@ -319,7 +319,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_1_id,
             wellName="B1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(tipVolume=300.0),
     )
     assert commands_result[11] == commands.Aspirate.construct(
         id=matchers.IsA(str),

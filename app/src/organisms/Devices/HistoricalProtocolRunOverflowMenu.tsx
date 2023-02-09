@@ -117,7 +117,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
-      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
+      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
   const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -163,7 +163,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       right={0}
       flexDirection={DIRECTION_COLUMN}
     >
-      <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}>
+      <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
           {t('view_run_record')}
         </MenuItem>

@@ -8,10 +8,7 @@ import { i18n } from '../../../../../i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
-import {
-  getIsLabwareOffsetCodeSnippetsOn,
-  useFeatureFlag,
-} from '../../../../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import {
   useLPCDisabledReason,
   useProtocolDetailsForRun,
@@ -32,9 +29,6 @@ jest.mock('../../../../../redux/config')
 jest.mock('../../../hooks')
 jest.mock('../../../hooks/useLPCSuccessToast')
 
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
   typeof getModuleTypesThatRequireExtraAttention
 >
@@ -166,9 +160,6 @@ describe('SetupLabware', () => {
         },
       } as any)
     when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
-    when(mockUseFeatureFlag)
-      .calledWith('enableManualDeckStateModification')
-      .mockReturnValue(false)
     when(mockSetupLabwareMap).mockReturnValue(<div>mock setup labware map</div>)
     when(mockSetupLabwareList).mockReturnValue(
       <div> mock setup labware list</div>

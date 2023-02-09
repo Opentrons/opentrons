@@ -475,6 +475,34 @@ def test_get_channels(
     assert subject.get_channels() == 42
 
 
+def test_get_current_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's current volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(123.4)
+    assert subject.get_current_volume() == 123.4
+
+
+def test_get_available_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's available volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_available_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(9001)
+    assert subject.get_available_volume() == 9001
+
+
 def test_home_z(
     decoy: Decoy,
     subject: InstrumentCore,
