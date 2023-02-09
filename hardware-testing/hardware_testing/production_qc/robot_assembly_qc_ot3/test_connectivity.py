@@ -44,38 +44,17 @@ AUX_PORT_TESTS = [
     "aux-right-id",
 ]
 AUX_CAN_TESTS = [
-    "aux-left-can",
-    "aux-right-can",
+    "aux-left-pcan",
+    "aux-right-pcan",
 ]
 COLORS_BY_SIGNAL = {
-    "none": {  # shared
-        "left": "BLUE",
-        "right": "BLUE"
-    },
-    "door": {  # shared
-        "left": "WHITE",
-        "right": "WHITE"
-    },
-    "estop-signal": {  # shared
-        "left": "RED",
-        "right": "RED"
-    },
-    "sync": {  # shared
-        "left": "Status is OFF",
-        "right": "Status is OFF"
-    },
-    "estop-detect": {
-        "left": "YELLOW",
-        "right": "CYAN"
-    },
-    "presence": {
-        "left": "PURPLE",
-        "right": "ORANGE"
-    },
-    "id": {
-        "left": "GREEN",
-        "right": "Deck-Lights OFF"
-    }
+    "none": {"left": "BLUE", "right": "BLUE"},  # shared
+    "door": {"left": "WHITE", "right": "WHITE"},  # shared
+    "estop-signal": {"left": "RED", "right": "RED"},  # shared
+    "sync": {"left": "Status is OFF", "right": "Status is OFF"},  # shared
+    "estop-detect": {"left": "YELLOW", "right": "CYAN"},
+    "presence": {"left": "PURPLE", "right": "ORANGE"},
+    "id": {"left": "GREEN", "right": "Deck-Lights OFF"},
 }
 
 ALLOWED_SECURITY_TYPES = {
@@ -178,7 +157,7 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
     def _get_color(t: str) -> str:
         side = "left" if "left" in t else "right"
         signal = [s for s in COLORS_BY_SIGNAL.keys() if s in t]
-        assert signal, f"no signals found matching test: \"{t}\""
+        assert signal, f'no signals found matching test: "{t}"'
         return COLORS_BY_SIGNAL[signal[0]][side]
 
     if not api.is_simulator:
@@ -198,10 +177,11 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
         if api.is_simulator:
             result = CSVResult.PASS
         else:
-            inp = ui.get_user_answer(f"does {test_name.upper()} count TRANSMIT = RECEIVE")
+            inp = ui.get_user_answer(
+                f"does {test_name.upper()} count TRANSMIT = RECEIVE"
+            )
             result = CSVResult.from_bool(inp)
         report(section, test_name, [result])
-
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
