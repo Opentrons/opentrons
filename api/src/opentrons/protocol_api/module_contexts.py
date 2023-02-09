@@ -34,6 +34,9 @@ from .labware import Labware
 from . import validation
 
 
+_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
+
+
 _log = logging.getLogger(__name__)
 
 
@@ -395,6 +398,12 @@ class MagneticModuleContext(ModuleContext):
         their order of precedence is ``height``, then ``height_from_base``, then ``offset``.
         """
         if height is not None:
+            if self._api_version >= _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN:
+                raise APIVersionError(
+                    "The height parameter of MagneticModuleContext.engage() was removed"
+                    " in {_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}."
+                    " Use offset or height_from_base instead."
+                )
             self._core.engage(height_from_home=height)
 
         # This version check has a bug:

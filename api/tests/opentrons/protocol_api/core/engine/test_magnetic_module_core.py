@@ -6,8 +6,6 @@ from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import MagDeck
 from opentrons.hardware_control.modules.types import MagneticStatus, ModuleType
 
-from opentrons.protocols.api_support.util import APIVersionError
-
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel
 
@@ -64,14 +62,6 @@ def test_create(
 
     assert result.module_id == "1234"
     assert result.MODULE_TYPE == ModuleType.MAGNETIC
-
-
-def test_engage_from_home_raises_exception(
-    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
-) -> None:
-    """Should raise a descriptive error."""
-    with pytest.raises(APIVersionError):
-        subject.engage(height_from_home=7.0)
 
 
 def test_engage_from_base(
