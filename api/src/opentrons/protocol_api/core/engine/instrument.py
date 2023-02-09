@@ -81,7 +81,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate: The flow rate in µL/s to aspirate at.
         """
         if well_core is None:
-            if location is not None:
+            if location:
                 self._engine_client.move_to_coordinates(
                     pipette_id=self._pipette_id,
                     coordinates=DeckPoint(
