@@ -28,7 +28,6 @@ class FirmwareUpdateType(Enum):
     pipettes_single = 4
     pipettes_multi = 5
     pipettes_96 = 6
-    pipettes_384 = 7
     unknown = -1
 
     def __str__(self) -> str:
@@ -59,7 +58,6 @@ class FirmwareUpdateType(Enum):
             pipette.pipette_single: cls.pipettes_single,
             pipette.pipette_multi: cls.pipettes_multi,
             pipette.pipette_96: cls.pipettes_96,
-            pipette.pipette_384: cls.pipettes_384,
         }
         return pipettes.get(pipette, cls.unknown)
 

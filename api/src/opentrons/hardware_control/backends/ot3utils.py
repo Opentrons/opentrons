@@ -340,7 +340,6 @@ _pipette_subtype_lookup = {
     PipetteSubType.pipette_single: PipetteType.pipette_single,
     PipetteSubType.pipette_multi: PipetteType.pipette_multi,
     PipetteSubType.pipette_96: PipetteType.pipette_96,
-    PipetteSubType.pipette_384: PipetteType.pipette_384,
 }
 
 

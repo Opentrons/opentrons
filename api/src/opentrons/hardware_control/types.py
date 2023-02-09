@@ -274,7 +274,6 @@ class PipetteSubType(enum.Enum):
     pipette_single = 1
     pipette_multi = 2
     pipette_96 = 3
-    pipette_384 = 4
 
     def __str__(self) -> str:
         return self.name

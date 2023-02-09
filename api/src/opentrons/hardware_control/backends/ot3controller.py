@@ -658,9 +658,9 @@ class OT3Controller:
             A map of mount to instrument name.
         """
         await self._probe_core()
-        attached_tools = await self._tool_detector.detect()
+        attached = await self._tool_detector.detect()
 
-        current_tools = dict(OT3Controller._generate_attached_instrs(attached_tools))
+        current_tools = dict(OT3Controller._generate_attached_instrs(attached))
         self._present_nodes -= set(
             axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )
