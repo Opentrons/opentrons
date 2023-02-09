@@ -7,7 +7,7 @@ from typing_extensions import Final
 from opentrons import protocol_api
 from opentrons.protocol_api.labware import Labware
 
-from hardware_testing.labware.definitions import load_radwag_vial_definition
+from .definitions import load_radwag_vial_definition
 from hardware_testing.opentrons_api.workarounds import is_running_in_app
 
 APP_TIPRACK_CALIBRATION_SLOT: Final = "8"  # where the App puts the tiprack

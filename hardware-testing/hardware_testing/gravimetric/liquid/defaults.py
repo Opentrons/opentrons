@@ -1,6 +1,6 @@
 """Defaults."""
 
-from hardware_testing.liquid.liquid_class import (
+from .liquid_class import (
     LiquidClassSettings,
     SampleConfig,
     AirConfig,

@@ -11,8 +11,8 @@ from hardware_testing.data import (
     dump_data_to_file,
     append_data_to_file,
 )
-from hardware_testing.liquid.height import LiquidTracker
-from hardware_testing.liquid.liquid_class import (
+from hardware_testing.gravimetric.liquid.height import LiquidTracker
+from hardware_testing.gravimetric.liquid.liquid_class import (
     LiquidClassSettings,
     LIQUID_CLASS_DEFAULT,
 )

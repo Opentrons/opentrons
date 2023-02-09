@@ -10,7 +10,7 @@ Abstracts away details of driver when possible.
 
 ```python
 from hardware_testing.opentrons_api import helpers
-from hardware_testing.measure.weight.scale import Scale
+from hardware_testing.gravimetric.measure.weight.scale import Scale
 
 scale = Scale.build(ctx=helpers.get_api_context("2.13"))
 scale.connect()
@@ -30,7 +30,7 @@ The idea is that a test should be able to "start" and "stop" a recording stream 
 ```python
 from time import time, sleep
 from hardware_testing import data
-from hardware_testing.measure.weight import record
+from hardware_testing.gravimetric.measure.weight import record
 from hardware_testing.opentrons_api import helpers
 
 cfg = record.GravimetricRecorderConfig(

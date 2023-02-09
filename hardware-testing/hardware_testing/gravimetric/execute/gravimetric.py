@@ -7,21 +7,21 @@ from typing_extensions import Final
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing import liquid
+from hardware_testing.gravimetric import liquid
 from hardware_testing.data import create_run_id_and_start_time
-from hardware_testing.labware.position import (
+from hardware_testing.gravimetric.labware.position import (
     VIAL_SAFE_Z_OFFSET,
     overwrite_default_labware_positions,
 )
-from hardware_testing.labware.layout import LayoutLabware, DEFAULT_SLOTS_GRAV
-from hardware_testing.liquid.height import LiquidTracker
-from hardware_testing.measure.weight import (
+from hardware_testing.gravimetric.labware.layout import LayoutLabware, DEFAULT_SLOTS_GRAV
+from hardware_testing.gravimetric.liquid.height import LiquidTracker
+from hardware_testing.gravimetric.measure.weight import (
     GravimetricRecording,
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from hardware_testing.pipette.liquid_class import PipetteLiquidClass
-from hardware_testing.pipette.timestamp import SampleTimestamps
+from hardware_testing.gravimetric.pipette.liquid_class import PipetteLiquidClass
+from hardware_testing.gravimetric.pipette.timestamp import SampleTimestamps
 
 
 LIQUID_CLASS_LOOKUP: Final = {300: liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE}
