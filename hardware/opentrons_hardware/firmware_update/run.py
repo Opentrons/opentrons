@@ -28,7 +28,7 @@ class RunUpdate:
     def __init__(
         self,
         messenger: CanMessenger,
-        update_details:  Dict[NodeId, str],
+        update_details: Dict[NodeId, str],
         retry_count: int,
         timeout_seconds: float,
         erase: Optional[bool] = True,
@@ -96,7 +96,7 @@ class RunUpdate:
             if erase:
                 eraser = FirmwareUpdateEraser(messenger)
                 logger.info(f"Erasing existing FW Update on {target}.")
-                
+
                 try:
                     await eraser.run(
                         node_id=target.bootloader_node,
