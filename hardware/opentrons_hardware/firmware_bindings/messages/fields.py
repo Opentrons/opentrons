@@ -149,7 +149,7 @@ class FirmwareShortSHADataField(utils.BinaryFieldBase[bytes]):
     increase this too.
     """
 
-    NUM_BYTES = 7
+    NUM_BYTES = 8
     FORMAT = f"{NUM_BYTES}s"
 
 
