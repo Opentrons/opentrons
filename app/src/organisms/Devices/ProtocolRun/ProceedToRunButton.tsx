@@ -58,7 +58,7 @@ export function ProceedToRunButton({
 
   return (
     <Link
-      to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}
+      to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
       onClick={() => {
         trackEvent({ name: 'proceedToRun', properties: { sourceLocation } })
         protocolRunHeaderRef?.current?.scrollIntoView({

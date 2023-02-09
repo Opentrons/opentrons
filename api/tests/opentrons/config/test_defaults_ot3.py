@@ -17,8 +17,8 @@ def test_load_calibration_cals() -> None:
 
     # some dicts not formatted right
     mostly_right = defaults_ot3.serialize(defaults_ot3.build_with_defaults({}))
-    del mostly_right["calibration"]["edge_sense"]["plus_y_pos"]
-    del mostly_right["calibration"]["z_offset"]["point"]
+    del mostly_right["calibration"]["edge_sense"]["early_sense_tolerance_mm"]
+    del mostly_right["calibration"]["z_offset"]["pass_settings"]["prep_distance_mm"]
     assert (
         defaults_ot3._build_default_calibration(
             mostly_right["calibration"], defaults_ot3.DEFAULT_CALIBRATION_SETTINGS
@@ -27,7 +27,7 @@ def test_load_calibration_cals() -> None:
     )
 
     # altered values are preserved
-    mostly_right["calibration"]["edge_sense"]["overrun_tolerance_mm"] += 2
+    mostly_right["calibration"]["edge_sense"]["overrun_tolerance_mm"] += 0.2
     mostly_right["calibration"]["z_offset"]["pass_settings"][
         "max_overrun_distance_mm"
     ] += 5

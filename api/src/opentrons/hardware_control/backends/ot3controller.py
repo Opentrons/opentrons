@@ -239,13 +239,15 @@ class OT3Controller:
             node_id: str(update.filepath)
             for node_id, update in firmware_updates.items()
         }
-        await firmware_update.run_updates(
+        updater = await firmware_update.RunUpdate(
             messenger=self._messenger,
             update_details=update_details,
             retry_count=3,
             timeout_seconds=20,
             erase=True,
         )
+        async for progress in updater.run_updates():
+            pass
         # refresh the device_info cache and reset the update_required flag
         await self._network_info.probe()
         self.update_required = False
@@ -621,7 +623,7 @@ class OT3Controller:
         serial = attached.serial
         return {
             "config": gripper_config.load(model),
-            "id": f"GRPV{attached.model}{serial}",
+            "id": f"GRPV{attached.model.replace('.', '')}{serial}",
         }
 
     @staticmethod

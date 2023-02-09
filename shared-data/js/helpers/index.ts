@@ -19,6 +19,7 @@ export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
 export * from './getLoadedLabwareDefinitionsByUri'
+export * from './getOccludedSlotCountForModule'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

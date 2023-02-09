@@ -2210,6 +2210,7 @@
     react-router-dom "5.1.1"
     react-select "5.4.0"
     react-simple-keyboard "^3.4.187"
+    react-viewport-list "6.3.0"
     redux "4.0.5"
     redux-observable "1.1.0"
     redux-thunk "2.3.0"
@@ -17657,6 +17658,11 @@ react-transition-group@^4.3.0:
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
+
+react-viewport-list@6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/react-viewport-list/-/react-viewport-list-6.3.0.tgz#dc73210d590c2a10f49be8902d86bb5e04a4b47e"
+  integrity sha512-IV7/yeqpurCa2FytCnUWyY664kbDxg5EgQQJHQhI6X2zUZXEq8BlQLfDoPRF2MA8YsVihsC7y3iEf2wGt+Lluw==
 
 react@17.0.1:
   version "17.0.1"

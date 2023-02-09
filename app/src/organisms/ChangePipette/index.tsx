@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { getPipetteNameSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
+import { getPipetteNameSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
 import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+
 import {
   useDispatchApiRequests,
   getRequestById,
@@ -42,6 +43,7 @@ import {
   EIGHT_CHANNEL_STEPS,
 } from './constants'
 
+import * as Config from '../../redux/config'
 import type { State, Dispatch } from '../../redux/types'
 import type { Mount } from '../../redux/pipettes/types'
 import type { WizardStep } from './types'
@@ -107,6 +109,10 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const homePipAndExit = React.useCallback(
     () => dispatchApiRequests(home(robotName, PIPETTE, mount)),
     [dispatchApiRequests, robotName, mount]
+  )
+
+  const enableCalibrationWizards = Config.useFeatureFlag(
+    'enableCalibrationWizards'
   )
 
   const baseProps = {
@@ -263,7 +269,11 @@ export function ChangePipette(props: Props): JSX.Element | null {
     const toCalDashboard = (): void => {
       dispatchApiRequests(home(robotName, ROBOT))
       closeModal()
-      history.push(`/devices/${robotName}/robot-settings/calibration`)
+      history.push(
+        `/devices/${robotName}/robot-settings/calibration${
+          enableCalibrationWizards ? '/dashboard' : ''
+        }`
+      )
     }
 
     let wizardCurrentStep: number = 0
