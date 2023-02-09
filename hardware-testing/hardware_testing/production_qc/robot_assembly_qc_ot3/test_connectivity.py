@@ -30,11 +30,53 @@ USB_PORTS_TO_TEST = [
 ]
 # TODO: work with EEs to get Aux-Port tests implemented
 AUX_PORT_TESTS = [
-    "aux-left-can",
     "aux-left-door-switch",
-    "aux-right-can",
+    "aux-left-sync",
+    "aux-left-estop-signal",
+    "aux-left-estop-detect",
+    "aux-left-presence",
+    "aux-left-id",
     "aux-right-door-switch",
+    "aux-right-sync",
+    "aux-right-estop-signal",
+    "aux-right-estop-detect",
+    "aux-right-presence",
+    "aux-right-id",
 ]
+AUX_CAN_TESTS = [
+    "aux-left-can",
+    "aux-right-can",
+]
+COLORS_BY_SIGNAL = {
+    "none": {  # shared
+        "left": "BLUE",
+        "right": "BLUE"
+    },
+    "door": {  # shared
+        "left": "WHITE",
+        "right": "WHITE"
+    },
+    "estop-signal": {  # shared
+        "left": "RED",
+        "right": "RED"
+    },
+    "sync": {  # shared
+        "left": "Status is OFF",
+        "right": "Status is OFF"
+    },
+    "estop-detect": {
+        "left": "YELLOW",
+        "right": "CYAN"
+    },
+    "presence": {
+        "left": "PURPLE",
+        "right": "ORANGE"
+    },
+    "id": {
+        "left": "GREEN",
+        "right": "Deck-Lights OFF"
+    }
+}
 
 ALLOWED_SECURITY_TYPES = {
     nmcli.SECURITY_TYPES.NONE.value: nmcli.SECURITY_TYPES.NONE,
@@ -133,30 +175,46 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
     # TODO: work with EEs to get Aux-Port tests implemented
     #       - can analyzer
     #       - door switch detection
+    def _get_color(t: str) -> str:
+        side = "left" if "left" in t else "right"
+        signal = [s for s in COLORS_BY_SIGNAL.keys() if s in t]
+        assert signal, f"no signals found matching test: \"{t}\""
+        return COLORS_BY_SIGNAL[signal[0]][side]
+
+    if not api.is_simulator:
+        ui.get_user_ready("connect buttons to both Aux ports (left/right)")
     for test_name in AUX_PORT_TESTS:
-        if not api.is_simulator:
-            ui.get_user_ready(f"testing {test_name.upper()}")
-        if "can" in test_name:
-            # send some arbitrary CAN data, to inspect externally
-            await api.refresh_current_position_ot3()
         if api.is_simulator:
             result = CSVResult.PASS
         else:
-            inp = ui.get_user_answer(f"does {test_name.upper()} signal look good")
+            color = _get_color(test_name)
+            inp = ui.get_user_answer(f"does {test_name.upper()} show {color}")
             result = CSVResult.from_bool(inp)
         report(section, test_name, [result])
+    if not api.is_simulator:
+        ui.get_user_ready("disconnect buttons")
+        ui.get_user_ready("prepare CAN analyzer and PCAN software")
+    for test_name in AUX_CAN_TESTS:
+        if api.is_simulator:
+            result = CSVResult.PASS
+        else:
+            inp = ui.get_user_answer(f"does {test_name.upper()} count TRANSMIT = RECEIVE")
+            result = CSVResult.from_bool(inp)
+        report(section, test_name, [result])
+
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     usb_a_tests = [CSVLine(t, [CSVResult]) for t in USB_PORTS_TO_TEST]
     aux_tests = [CSVLine(t, [CSVResult]) for t in AUX_PORT_TESTS]
+    can_tests = [CSVLine(t, [CSVResult]) for t in AUX_CAN_TESTS]
     other_tests = [
         CSVLine("ethernet", [str, CSVResult]),
         CSVLine("wifi", [str, str, str, CSVResult]),
         CSVLine("usb-b-rear", [CSVResult]),
     ]
-    return other_tests + usb_a_tests + aux_tests  # type: ignore[return-value]
+    return other_tests + usb_a_tests + aux_tests + can_tests  # type: ignore[return-value]
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
