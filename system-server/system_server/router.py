@@ -1,7 +1,8 @@
 """Application routes."""
 from fastapi import APIRouter, Depends, responses
-from system_server.persistence import get_sql_engine
+from system_server.persistence import get_sql_engine, get_uuid
 import sqlalchemy
+from uuid import UUID
 
 router = APIRouter()
 
@@ -16,6 +17,7 @@ router = APIRouter()
 )
 async def refresh_system_db(
     sql: sqlalchemy.engine.Engine = Depends(get_sql_engine),
+    uuid: UUID = Depends(get_uuid)
 ) -> responses.PlainTextResponse:
     """Silly fake endpoint to refresh our database."""
-    return responses.PlainTextResponse("OK")
+    return responses.PlainTextResponse(f"OK: {uuid}\n")
