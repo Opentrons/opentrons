@@ -189,6 +189,10 @@ ot3_dummy_settings = {
         "plunger_speed": 10,
         "sensor_threshold_pascals": 17,
         "expected_liquid_height": 90,
+        "log_pressure": True,
+        "home_plunger_at_start": False,
+        "aspirate_while_sensing": False,
+        "read_only": False,
     },
     "calibration": {
         "z_offset": {

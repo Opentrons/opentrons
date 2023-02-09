@@ -1712,10 +1712,8 @@ class OT3API(
             or probe_settings.aspirate_while_sensing
         ):
             await self.home_plunger(mount)
-        if probe_settings.aspirate_while_sensing:
-            direction = -1
-        else:
-            direction = 1
+
+        direction = -1 if probe_settings.aspirate_while_sensing else 1
 
         try:
             await self._backend.liquid_probe(
