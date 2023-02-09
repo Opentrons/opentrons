@@ -451,7 +451,7 @@ def test_drop_tip_to_trash(
 
     decoy.verify(
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._core, home_after=True
+            location=None, well_core=mock_well._core, home_after=None
         ),
         times=1,
     )
@@ -477,7 +477,7 @@ def test_return_tip(
             prep_after=True,
         ),
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._core, home_after=True
+            location=None, well_core=mock_well._core, home_after=None
         ),
     )
 
