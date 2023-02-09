@@ -17,7 +17,6 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.common import ModuleCore, ProtocolCore
 from ._liquid import Liquid
@@ -102,13 +101,6 @@ class ProtocolContext(CommandPublisher):
                              exposed as
                              :py:attr:`.ProtocolContext.bundled_data`
         """
-        if api_version > MAX_SUPPORTED_VERSION:
-            raise RuntimeError(
-                f"API version {api_version} is not supported by this robot software."
-                f" Please reduce your API version to {MAX_SUPPORTED_VERSION} or below"
-                f" or update your robot."
-            )
-
         super().__init__(broker)
         self._api_version = api_version
         self._core = core
@@ -752,9 +744,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._core.set_rail_lights(on=on)
 
-    # TODO (tz, 12-19-22): Limit to api version 2.14.
-    # https://opentrons.atlassian.net/browse/RCORE-537
-    @requires_version(2, 13)
+    @requires_version(2, 14)
     def define_liquid(
         self, name: str, description: Optional[str], display_color: Optional[str]
     ) -> Liquid:

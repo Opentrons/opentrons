@@ -1134,7 +1134,9 @@ class OT3API(
                 self._encoder_current_position[OT3Axis.G]
             )
         except Exception:
-            self._log.exception("Gripper grip failed")
+            self._log.exception(
+                f"Gripper grip failed, encoder pos: {self._encoder_current_position[OT3Axis.G]}"
+            )
             raise
 
     @ExecutionManagerProvider.wait_for_running
@@ -1568,6 +1570,7 @@ class OT3API(
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:
+            self._log.info(f"Saving instrument offset: {delta} for gripper")
             return self._gripper_handler.save_instrument_offset(delta)
         else:
             return self._pipette_handler.save_instrument_offset(checked_mount, delta)
