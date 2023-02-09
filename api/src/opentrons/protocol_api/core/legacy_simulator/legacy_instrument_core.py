@@ -64,13 +64,13 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def aspirate(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
     ) -> None:
-        if self.get_current_volume() == 0:
+        if location and self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
             if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
@@ -90,7 +90,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                     )
                 self.prepare_for_aspirate()
             self.move_to(location=location, well_core=well_core)
-        elif location != self._protocol_interface.get_last_location():
+        elif location:
             self.move_to(location=location, well_core=well_core)
 
         self._raise_if_no_tip(HardwareAction.ASPIRATE.name)
@@ -103,22 +103,23 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def dispense(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
     ) -> None:
-        self.move_to(location=location, well_core=well_core)
+        if location:
+            self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 
     def blow_out(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[LegacyWellCore],
     ) -> None:
-        if location != self._protocol_interface.get_last_location():
+        if location:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._update_volume(0)

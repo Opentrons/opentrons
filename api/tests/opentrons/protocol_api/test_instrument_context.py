@@ -276,7 +276,7 @@ def test_blow_out_in_place(
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=location,
+            location=None,
             well_core=mock_well._core,
         ),
         times=1,

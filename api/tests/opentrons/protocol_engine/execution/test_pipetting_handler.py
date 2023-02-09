@@ -467,6 +467,13 @@ async def test_handle_aspirate_in_place_request(
         )
     )
 
+    decoy.when(
+        state_store.pipettes.get_is_ready_to_aspirate(
+            pipette_id="pipette-id",
+            pipette_config=mock_hw_pipettes.right_config,
+        )
+    ).then_return(True)
+
     volume = await subject.aspirate_in_place(
         pipette_id="pipette-id",
         volume=25,
@@ -484,6 +491,49 @@ async def test_handle_aspirate_in_place_request(
             mount=Mount.RIGHT, aspirate=1.23, dispense=1.23, blow_out=1.23
         ),
     )
+
+
+async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
+    subject: PipettingHandler,
+) -> None:
+    """It raise an exception for not ready to aspirate."""
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=mock_hw_pipettes.right_config,
+        )
+    )
+
+    decoy.when(
+        state_store.pipettes.get_is_ready_to_aspirate(
+            pipette_id="pipette-id",
+            pipette_config=mock_hw_pipettes.right_config,
+        )
+    ).then_return(False)
+
+    with pytest.raises(
+        ValueError,
+        match="When aspirate is called on something other than a "
+        "well relative position, we can't move to the top of"
+        " the well to prepare for aspiration. This might "
+        "cause over aspiration if the previous command is a "
+        "blow_out.",
+    ):
+        await subject.aspirate_in_place(
+            pipette_id="pipette-id",
+            volume=25,
+            flow_rate=2.5,
+        )
 
 
 async def test_handle_add_tip(

@@ -174,7 +174,14 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         well: Optional[labware.Well]
-        last_location = self._protocol_core.get_last_location()
+        move_to_location: Optional[types.Location]
+
+        if self._api_version >= APIVersion(2, 14):
+            last_location = self._protocol_core.get_last_location(
+                mount=types.Mount.string_to_mount(self.mount)
+            )
+        else:
+            last_location = self._protocol_core.get_last_location()
 
         if isinstance(location, labware.Well):
             move_to_location = location.bottom(z=self._well_bottom_clearances.aspirate)
@@ -187,8 +194,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 "location should be a Well or Location, but it is {}".format(location)
             )
         elif last_location:
-            move_to_location = last_location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
+            move_to_location = None
+            _, well = last_location.labware.get_parent_labware_and_well()
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
@@ -198,7 +205,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
-                location=move_to_location,
+                location=move_to_location or last_location,  # type: ignore[arg-type]
                 reject_module=self.api_version >= APIVersion(2, 13),
             )
 
@@ -210,7 +217,7 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.aspirate(
                 instrument=self,
                 volume=c_vol,
-                location=move_to_location,
+                location=move_to_location or last_location,  # type: ignore[arg-type]
                 flow_rate=flow_rate,
                 rate=rate,
             ),
@@ -278,7 +285,12 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
         well: Optional[labware.Well]
-        last_location = self._protocol_core.get_last_location()
+        if self._api_version >= APIVersion(2, 14):
+            last_location = self._protocol_core.get_last_location(
+                mount=types.Mount.string_to_mount(self.mount)
+            )
+        else:
+            last_location = self._protocol_core.get_last_location()
 
         if isinstance(location, labware.Well):
             well = location
@@ -434,7 +446,13 @@ class InstrumentContext(publisher.CommandPublisher):
         """
 
         well: Optional[labware.Well]
-        last_location = self._protocol_core.get_last_location()
+        move_to_location: Optional[types.Location]
+        if self._api_version >= APIVersion(2, 14):
+            last_location = self._protocol_core.get_last_location(
+                mount=types.Mount.string_to_mount(self.mount)
+            )
+        else:
+            last_location = self._protocol_core.get_last_location()
 
         if isinstance(location, labware.Well):
             if location.parent.is_tiprack:
@@ -442,18 +460,18 @@ class InstrumentContext(publisher.CommandPublisher):
                     "Blow_out being performed on a tiprack. "
                     "Please re-check your code"
                 )
-            checked_loc = location.top()
+            move_to_location = location.top()
             well = location
         elif isinstance(location, types.Location):
-            checked_loc = location
+            move_to_location = location
             _, well = location.labware.get_parent_labware_and_well()
         elif location is not None:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
         elif last_location:
-            checked_loc = last_location
-            _, well = checked_loc.labware.get_parent_labware_and_well()
+            move_to_location = None
+            _, well = last_location.labware.get_parent_labware_and_well()
         else:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
@@ -464,10 +482,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.blow_out(instrument=self, location=checked_loc),
+            command=cmds.blow_out(
+                instrument=self, location=move_to_location or last_location  # type: ignore[arg-type]
+            ),
         ):
             self._core.blow_out(
-                location=checked_loc,
+                location=move_to_location,
                 well_core=well._core if well is not None else None,
             )
 

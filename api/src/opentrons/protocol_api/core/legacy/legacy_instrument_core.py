@@ -61,7 +61,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def aspirate(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
@@ -75,7 +75,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             rate: The rate in µL/s to aspirate at.
             flow_rate: Not used in this core.
         """
-        if self.get_current_volume() == 0:
+        if location and self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
             if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
@@ -93,14 +93,14 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                     )
                 self.prepare_for_aspirate()
             self.move_to(location=location)
-        elif location != self._protocol_interface.get_last_location():
+        elif location:
             self.move_to(location=location)
 
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
 
     def dispense(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
@@ -114,13 +114,14 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             rate: The rate in µL/s to dispense at.
             flow_rate: Not used in this core.
         """
-        self.move_to(location=location)
+        if location:
+            self.move_to(location=location)
 
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
     def blow_out(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[LegacyWellCore],
     ) -> None:
         """Blow liquid out of the tip.
@@ -129,7 +130,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             location: The location to blow out into.
             well_core: Unused by legacy core.
         """
-        if location != self._protocol_interface.get_last_location():
+        if location:
             self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
 

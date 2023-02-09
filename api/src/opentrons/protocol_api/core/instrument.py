@@ -24,7 +24,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def aspirate(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[WellCoreType],
         volume: float,
         rate: float,
@@ -43,7 +43,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def dispense(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[WellCoreType],
         volume: float,
         rate: float,
@@ -62,7 +62,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def blow_out(
         self,
-        location: types.Location,
+        location: Optional[types.Location],
         well_core: Optional[WellCoreType],
     ) -> None:
         """Blow liquid out of the tip.

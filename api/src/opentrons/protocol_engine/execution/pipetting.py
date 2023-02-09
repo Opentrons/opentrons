@@ -255,6 +255,20 @@ class PipettingHandler:
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
+        ready_to_aspirate = self._state_store.pipettes.get_is_ready_to_aspirate(
+            pipette_id=pipette_id,
+            pipette_config=hw_pipette.config,
+        )
+
+        if not ready_to_aspirate:
+            raise ValueError(
+                "When aspirate is called on something other than a "
+                "well relative position, we can't move to the top of"
+                " the well to prepare for aspiration. This might "
+                "cause over aspiration if the previous command is a "
+                "blow_out."
+            )
+
         with self.set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
             await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
