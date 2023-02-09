@@ -19,6 +19,7 @@ jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('../utils/getLabwareDefinitionUri')
+jest.mock('../useLabwareOffsetForLabware')
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -45,7 +46,7 @@ const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
 const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
   typeof useCurrentRun
 >
-const mockUseLabwareOffsetForLabware= useLabwareOffsetForLabware as jest.MockedFunction<
+const mockUseLabwareOffsetForLabware = useLabwareOffsetForLabware as jest.MockedFunction<
   typeof useLabwareOffsetForLabware
 >
 const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
@@ -87,12 +88,12 @@ describe('LabwareInfoOverlay', () => {
     when(mockUseLabwareOffsetForLabware)
       .calledWith(MOCK_RUN_ID, MOCK_LABWARE_ID)
       .mockReturnValue({
-        id: 'fake_offset_id' ,
+        id: 'fake_offset_id',
         createdAt: 'fake_timestamp',
-        definitionUri: 'fake_def_uri' ,
-        location: {slotName: MOCK_SLOT_NAME},
-        vector: MOCK_LABWARE_VECTOR
-      } )
+        definitionUri: 'fake_def_uri',
+        location: { slotName: MOCK_SLOT_NAME },
+        vector: MOCK_LABWARE_VECTOR,
+      })
 
     when(mockUseCurrentRun)
       .calledWith()

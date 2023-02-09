@@ -78,7 +78,7 @@ export interface WorkingOffset {
 }
 
 export interface LabwareToOrder {
-  definition: LabwareDefinition2 
+  definition: LabwareDefinition2
   labwareId: string
   slot: string
 }

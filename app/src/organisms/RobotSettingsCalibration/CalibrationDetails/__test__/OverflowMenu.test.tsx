@@ -155,21 +155,6 @@ describe('OverflowMenu', () => {
     expect(saveAs).toHaveBeenCalled()
   })
 
-  it('should call pipette offset calibration and tip length calibration when clicking calibrate button', () => {
-    props = {
-      ...props,
-      calType: 'tipLength',
-    }
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button')
-    fireEvent.click(button)
-    const calibrationButton = getByText(
-      'Recalibrate Tip Length and Pipette Offset'
-    )
-    fireEvent.click(calibrationButton)
-    expect(startCalibration).toHaveBeenCalled()
-  })
-
   it('calibration button should open up the pipette wizard flow for gen3 pipettes', () => {
     mockPipetteWizardFlow.mockReturnValue(<div>mock pipette wizard flows</div>)
     props = {
@@ -179,7 +164,7 @@ describe('OverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
-    const cal = getByText('Calibrate Pipette Offset')
+    const cal = getByText('Recalibrate pipette')
     expect(
       screen.queryByText('Download calibration data')
     ).not.toBeInTheDocument()

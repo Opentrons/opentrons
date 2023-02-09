@@ -264,9 +264,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     const toCalDashboard = (): void => {
       dispatchApiRequests(home(robotName, ROBOT))
       closeModal()
-      history.push(
-        `/devices/${robotName}/robot-settings/calibration/dashboard`
-      )
+      history.push(`/devices/${robotName}/robot-settings/calibration/dashboard`)
     }
 
     let wizardCurrentStep: number = 0

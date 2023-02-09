@@ -140,7 +140,11 @@ describe('CalibrationDataDownload', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ getByRole }] = render()
     const SUPPORT_LINK = 'https://support.opentrons.com'
-    expect(getByRole('link', { name: 'See how robot calibration works' }).getAttribute('href')).toBe(SUPPORT_LINK)
+    expect(
+      getByRole('link', {
+        name: 'See how robot calibration works',
+      }).getAttribute('href')
+    ).toBe(SUPPORT_LINK)
   })
 
   it('renders correct title and description', () => {
