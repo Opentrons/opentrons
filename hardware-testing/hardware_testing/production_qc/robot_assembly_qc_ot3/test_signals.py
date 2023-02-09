@@ -26,7 +26,8 @@ from hardware_testing.opentrons_api.types import OT3Axis, Point
 
 MOVING_Z_AXIS = OT3Axis.Z_L
 MOVING_DISTANCE = 100
-MOVE_SECONDS = 2
+MOVE_SECONDS = 5
+ROUND_ERR_MARGIN = 0.05
 MOVING_SPEED = MOVING_DISTANCE / MOVE_SECONDS
 
 SIGNAL_TEST_NAMES = ["nsync", "estop", "estop-external-left", "estop-external-right"]
@@ -115,12 +116,20 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    print("homing")
-    await api.home()
     mount = OT3Axis.to_mount(MOVING_Z_AXIS)
+
+    async def _home() -> None:
+        try:
+            print("homing")
+            await api.home()
+        except RuntimeError as e:
+            print(e)
+            ui.get_user_ready("release the E-STOP")
+            await _home()
 
     for sig_name in SIGNAL_TEST_NAMES:
         ui.print_header(sig_name.upper())
+        await _home()
         start_pos = await api.gantry_position(mount)
         target_pos = start_pos + Point(
             x=-MOVING_DISTANCE, y=-MOVING_DISTANCE, z=-MOVING_DISTANCE
@@ -147,9 +156,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             f"{sig_name}-stop-pos",
             [float(stop_pos.x), float(stop_pos.y), float(stop_pos.z)],
         )
-        result = CSVResult.from_bool(
-            1 < start_pos.magnitude_to(stop_pos) < MOVING_DISTANCE
-        )
+        diff = start_pos + (stop_pos * -1)
+        print(f"start: {start_pos}, stop: {stop_pos}, diff: {diff}")
+        x_passed = ROUND_ERR_MARGIN < diff.x < MOVING_DISTANCE - ROUND_ERR_MARGIN
+        y_passed = ROUND_ERR_MARGIN < diff.y < MOVING_DISTANCE - ROUND_ERR_MARGIN
+        z_passed = ROUND_ERR_MARGIN < diff.z < MOVING_DISTANCE - ROUND_ERR_MARGIN
+        result = CSVResult.from_bool(x_passed and y_passed and z_passed)
         report(section, f"{sig_name}-result", [result])
 
-    await api.home()
+    await _home()
