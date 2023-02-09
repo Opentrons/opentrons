@@ -78,12 +78,9 @@ describe('RobotSettingsTipLengthCalibration', () => {
     jest.resetAllMocks()
   })
 
-  it('renders a title and description', () => {
+  it('renders a title', () => {
     const [{ getByText }] = render()
     getByText('Tip Length Calibrations')
-    getByText(
-      'Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle. You can recalibrate a tip length if the pipette associated with it is currently attached to this robot. If you recalibrate a tip length, you will be prompted to recalibrate that pipette’s offset calibration.'
-    )
     getByText('Mock TipLengthCalibrationItems')
   })
 })

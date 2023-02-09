@@ -81,7 +81,6 @@ export function SetupTipLengthCalibrationButton({
   const dispatchAnalyticsEvent = (calBlock: boolean): void => {
     dispatch(
       tipLengthCalibrationStarted(
-        'tip-length-no-protocol', // TODO: remove intent param entirely once calibration wizards ff is removed
         mount,
         calBlock,
         getLabwareDefURI(tipRackDefinition)
