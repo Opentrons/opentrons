@@ -710,16 +710,20 @@ async def test_set_run_current(
     expected_call: List[Any],
 ):
     with patch(
-        "opentrons.hardware_control.backends.ot3controller.set_run_current",
-        spec=current_settings.set_run_current,
-    ) as mocked_currents:
-        await mock_present_nodes.update_to_default_current_settings(gantry_load)
-        await mock_present_nodes.set_active_current(active_current)
-        mocked_currents.assert_called_once_with(
-            mocked_currents.call_args_list[0][0][0],
-            expected_call[0],
-            use_tip_motor_message_for=expected_call[1],
-        )
+        "opentrons.hardware_control.backends.ot3controller.set_currents",
+        spec=current_settings.set_currents,
+    ):
+        with patch(
+            "opentrons.hardware_control.backends.ot3controller.set_run_current",
+            spec=current_settings.set_run_current,
+        ) as mocked_currents:
+            await mock_present_nodes.update_to_default_current_settings(gantry_load)
+            await mock_present_nodes.set_active_current(active_current)
+            mocked_currents.assert_called_once_with(
+                mocked_currents.call_args_list[0][0][0],
+                expected_call[0],
+                use_tip_motor_message_for=expected_call[1],
+            )
 
 
 @pytest.mark.parametrize(
@@ -744,16 +748,20 @@ async def test_set_hold_current(
     expected_call: List[Any],
 ):
     with patch(
-        "opentrons.hardware_control.backends.ot3controller.set_hold_current",
-        spec=current_settings.set_hold_current,
-    ) as mocked_currents:
-        await mock_present_nodes.update_to_default_current_settings(gantry_load)
-        await mock_present_nodes.set_hold_current(hold_current)
-        mocked_currents.assert_called_once_with(
-            mocked_currents.call_args_list[0][0][0],
-            expected_call[0],
-            use_tip_motor_message_for=expected_call[1],
-        )
+        "opentrons.hardware_control.backends.ot3controller.set_currents",
+        spec=current_settings.set_currents,
+    ):
+        with patch(
+            "opentrons.hardware_control.backends.ot3controller.set_hold_current",
+            spec=current_settings.set_hold_current,
+        ) as mocked_currents:
+            await mock_present_nodes.update_to_default_current_settings(gantry_load)
+            await mock_present_nodes.set_hold_current(hold_current)
+            mocked_currents.assert_called_once_with(
+                mocked_currents.call_args_list[0][0][0],
+                expected_call[0],
+                use_tip_motor_message_for=expected_call[1],
+            )
 
 
 async def test_update_required_flag(
@@ -771,7 +779,7 @@ async def test_update_required_flag(
         "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
         fake_umpe,
     ), patch(
-        "opentrons.hardware_control.backends.ot3controller.firmware_update.run_update"
+        "opentrons.hardware_control.backends.ot3controller.firmware_update.RunUpdate.run_updates"
     ), patch(
         "builtins.open", mock_open()
     ):

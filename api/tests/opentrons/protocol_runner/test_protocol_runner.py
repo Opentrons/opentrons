@@ -10,11 +10,9 @@ from opentrons_shared_data.protocol.dev_types import (
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.config import feature_flags
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
 from opentrons import protocol_reader
 from opentrons.protocol_reader import (
@@ -26,10 +24,7 @@ from opentrons.protocol_runner import ProtocolRunner
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_translator import JsonTranslator
-from opentrons.protocol_runner.python_file_reader import (
-    PythonFileReader,
-    PythonProtocol,
-)
+from opentrons.protocol_runner.python_file_reader import PythonFileReader
 from opentrons.protocol_runner.python_context_creator import PythonContextCreator
 from opentrons.protocol_runner.python_executor import PythonExecutor
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
@@ -362,52 +357,6 @@ async def test_load_json_liquids_ff_on(
     )
 
 
-async def test_load_python(
-    decoy: Decoy,
-    python_file_reader: PythonFileReader,
-    python_context_creator: PythonContextCreator,
-    python_executor: PythonExecutor,
-    protocol_engine: ProtocolEngine,
-    task_queue: TaskQueue,
-    subject: ProtocolRunner,
-) -> None:
-    """It should load a Python protocol file."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
-
-    python_protocol_source = ProtocolSource(
-        directory=Path("/dev/null"),
-        main_file=Path("/dev/null/abc.py"),
-        files=[],
-        metadata={},
-        robot_type="OT-2 Standard",
-        config=PythonProtocolConfig(api_version=APIVersion(3, 0)),
-    )
-
-    python_protocol = decoy.mock(cls=PythonProtocol)
-    protocol_context = decoy.mock(cls=ProtocolContext)
-
-    decoy.when(
-        await protocol_reader.extract_labware_definitions(python_protocol_source)
-    ).then_return([labware_definition])
-    decoy.when(python_file_reader.read(python_protocol_source)).then_return(
-        python_protocol
-    )
-    decoy.when(python_context_creator.create(protocol_engine)).then_return(
-        protocol_context
-    )
-
-    await subject.load(python_protocol_source)
-
-    decoy.verify(
-        protocol_engine.add_labware_definition(labware_definition),
-        task_queue.set_run_func(
-            func=python_executor.execute,
-            protocol=python_protocol,
-            context=protocol_context,
-        ),
-    )
-
-
 async def test_load_legacy_python(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
@@ -475,14 +424,11 @@ async def test_load_legacy_python(
     )
 
 
-# TODO(mc, 2022-08-30): remove enableProtocolEnginePAPICore FF
-# to promote feature to production
-async def test_load_legacy_python_with_pe_papi_core(
+async def test_load_python_with_pe_papi_core(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
     protocol_engine: ProtocolEngine,
-    mock_feature_flags: None,
     subject: ProtocolRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
@@ -492,14 +438,14 @@ async def test_load_legacy_python_with_pe_papi_core(
         files=[],
         metadata={},
         robot_type="OT-2 Standard",
-        config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
+        config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
     )
 
     legacy_protocol = LegacyPythonProtocol(
         text="",
         contents="",
         filename="protocol.py",
-        api_level=APIVersion(2, 11),
+        api_level=APIVersion(2, 14),
         metadata={"foo": "bar"},
         bundled_labware=None,
         bundled_data=None,
@@ -508,8 +454,6 @@ async def test_load_legacy_python_with_pe_papi_core(
     )
 
     legacy_context = decoy.mock(cls=LegacyProtocolContext)
-
-    decoy.when(feature_flags.enable_protocol_engine_papi_core()).then_return(True)
 
     decoy.when(
         await protocol_reader.extract_labware_definitions(legacy_protocol_source)
