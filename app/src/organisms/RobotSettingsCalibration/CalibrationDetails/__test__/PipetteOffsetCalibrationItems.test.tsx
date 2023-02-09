@@ -129,7 +129,7 @@ describe('PipetteOffsetCalibrationItems', () => {
         },
       ],
     }
-    const [{ getByText, queryByText }] = render(props)
+    const [{ getByText }] = render(props)
     getByText('Not calibrated')
   })
 

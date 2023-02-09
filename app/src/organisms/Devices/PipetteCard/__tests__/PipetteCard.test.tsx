@@ -2,7 +2,7 @@ import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { isOT3Pipette, LEFT, RIGHT } from '@opentrons/shared-data'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
@@ -19,16 +19,7 @@ import {
 } from '../../../../redux/pipettes/__fixtures__'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 
-import type { DeckCalibrationInfo } from '../../../../redux/calibration/api-types'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
-
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
-  return {
-    ...actualSharedData,
-    isOT3Pipette: jest.fn(),
-  }
-})
 
 jest.mock('../PipetteOverflowMenu')
 jest.mock('../../../../redux/config')
@@ -58,9 +49,6 @@ const mockAboutPipettesSlideout = AboutPipetteSlideout as jest.MockedFunction<
 >
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
->
-const mockIsOT3Pipette = isOT3Pipette as jest.MockedFunction<
-  typeof isOT3Pipette
 >
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {

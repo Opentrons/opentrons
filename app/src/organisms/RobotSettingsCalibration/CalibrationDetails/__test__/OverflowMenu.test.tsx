@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { when } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { saveAs } from 'file-saver'
 import { OT3_PIPETTES } from '@opentrons/shared-data'

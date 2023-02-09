@@ -3,7 +3,6 @@ import { saveAs } from 'file-saver'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
-  Box,
   Flex,
   Icon,
   Link,
@@ -25,7 +24,6 @@ import {
 } from '../../organisms/Devices/hooks'
 import { useTrackEvent } from '../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../redux/calibration'
-import * as Config from '../../redux/config'
 
 // TODO(bc, 2022-02-08): replace with support article when available
 const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'

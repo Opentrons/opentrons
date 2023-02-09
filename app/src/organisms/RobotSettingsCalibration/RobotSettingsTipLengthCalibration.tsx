@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Box,
   Flex,
   DIRECTION_COLUMN,
   SPACING,
@@ -14,7 +13,6 @@ import {
   useRobot,
   useTipLengthCalibrations,
 } from '../../organisms/Devices/hooks'
-import * as Config from '../../redux/config'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
 import type { FormattedPipetteOffsetCalibration } from '.'

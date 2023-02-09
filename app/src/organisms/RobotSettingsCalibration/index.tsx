@@ -309,12 +309,7 @@ export function RobotSettingsCalibration({
           <CalibrationStatusCard
             {...{ robotName, setShowHowCalibrationWorksModal }}
           />
-          <RobotSettingsDeckCalibration
-            buttonDisabledReason={buttonDisabledReason}
-            dispatchRequests={dispatchRequests}
-            robotName={robotName}
-            updateRobotStatus={updateRobotStatus}
-          />
+          <RobotSettingsDeckCalibration robotName={robotName} />
           <Line />
           <RobotSettingsPipetteOffsetCalibration
             formattedPipetteOffsetCalibrations={

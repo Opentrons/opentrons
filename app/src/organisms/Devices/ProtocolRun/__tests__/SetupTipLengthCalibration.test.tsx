@@ -4,7 +4,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { useFeatureFlag } from '../../../../redux/config'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
