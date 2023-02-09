@@ -76,11 +76,20 @@ class ExperimentalOffsetData(BaseModel):
 
 
 class WellOrigin(str, Enum):
-    """Origin of WellLocation offset."""
+    """Origin of WellLocation offset.
+
+    Props:
+        TOP: the top-center of the well
+        BOTTOM: the bottom-center of the well
+        CENTER: the middle-center of the well
+        DROP_TIP: the default drop-tip location of a well.
+            Only valid for tip-racks.
+    """
 
     TOP = "top"
     BOTTOM = "bottom"
     CENTER = "center"
+    DROP_TIP = "drop-tip"
 
 
 # This is deliberately a separate type from Vec3f to let components default to 0.

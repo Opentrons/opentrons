@@ -1,7 +1,7 @@
 """Test pick up tip commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.execution import PipettingHandler
 
 from opentrons.protocol_engine.commands.drop_tip import (
@@ -9,6 +9,15 @@ from opentrons.protocol_engine.commands.drop_tip import (
     DropTipResult,
     DropTipImplementation,
 )
+
+
+def test_drop_tip_params_defaults() -> None:
+    """A drop tip should drop a `WellOrigin.DROP_TIP` by default."""
+    default_params = DropTipParams(pipetteId="abc", labwareId="def", wellName="ghj")
+
+    assert default_params.wellLocation == WellLocation(
+        origin=WellOrigin.DROP_TIP, offset=WellOffset(x=0, y=0, z=0)
+    )
 
 
 async def test_drop_tip_implementation(
