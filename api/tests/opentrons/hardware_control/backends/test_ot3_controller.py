@@ -779,7 +779,7 @@ async def test_update_required_flag(
         "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
         fake_umpe,
     ), patch(
-        "opentrons.hardware_control.backends.ot3controller.firmware_update.run_update"
+        "opentrons.hardware_control.backends.ot3controller.firmware_update.RunUpdate.run_updates"
     ), patch(
         "builtins.open", mock_open()
     ):
