@@ -261,7 +261,7 @@ class PipettingHandler:
         )
 
         if not ready_to_aspirate:
-            raise ValueError(
+            raise RuntimeError(
                 "When aspirate is called on something other than a "
                 "well relative position, we can't move to the top of"
                 " the well to prepare for aspiration. This might "
