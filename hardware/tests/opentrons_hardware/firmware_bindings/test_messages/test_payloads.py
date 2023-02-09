@@ -46,7 +46,7 @@ def test_old_get_device_info() -> None:
     old = payloads._DeviceInfoResponsePayloadBase(
         version=utils.UInt32Field(0x11223344),
         flags=fields.VersionFlagsField(0x55667788),
-        shortsha=fields.FirmwareShortSHADataField(b"abcdef1"),
+        shortsha=fields.FirmwareShortSHADataField(b"abcdef12"),
     )
     old.message_index = utils.UInt32Field(0)
     ser = old.serialize()
@@ -64,7 +64,7 @@ def test_padded_old_get_device_info() -> None:
     old = payloads._DeviceInfoResponsePayloadBase(
         version=utils.UInt32Field(0x11223344),
         flags=fields.VersionFlagsField(0x55667788),
-        shortsha=fields.FirmwareShortSHADataField(b"abcdef1"),
+        shortsha=fields.FirmwareShortSHADataField(b"abcdef12"),
     )
     old.message_index = utils.UInt32Field(0)
     ser = old.serialize() + b"\x00\x00\x00\x00\x00\x00"
@@ -82,7 +82,7 @@ def test_new_get_device_info() -> None:
     new = payloads.DeviceInfoResponsePayload(
         version=utils.UInt32Field(0x11223344),
         flags=fields.VersionFlagsField(0x55667788),
-        shortsha=fields.FirmwareShortSHADataField(b"abcdef1"),
+        shortsha=fields.FirmwareShortSHADataField(b"abcdef12"),
         revision=fields.OptionalRevisionField.build(b"a1\x00\x00"),
     )
     new.message_index = utils.UInt32Field(0)
