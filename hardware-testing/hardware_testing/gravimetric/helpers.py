@@ -8,7 +8,8 @@ from opentrons.hardware_control.thread_manager import ThreadManagerException
 from opentrons.hardware_control.types import MachineType
 
 from .workarounds import is_running_in_app, store_robot_acceleration
-from .types import Axis, Point
+from opentrons.types import Point
+from opentrons.hardware_control.types import Axis
 
 
 def _add_fake_simulate(

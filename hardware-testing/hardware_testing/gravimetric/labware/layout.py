@@ -8,7 +8,7 @@ from opentrons import protocol_api
 from opentrons.protocol_api.labware import Labware
 
 from .definitions import load_radwag_vial_definition
-from hardware_testing.opentrons_api.workarounds import is_running_in_app
+from hardware_testing.gravimetric.workarounds import is_running_in_app
 
 APP_TIPRACK_CALIBRATION_SLOT: Final = "8"  # where the App puts the tiprack
 SCALE_SLOT_ON_OT2: Final = "6"  # could also be 9, it's sort of between the two

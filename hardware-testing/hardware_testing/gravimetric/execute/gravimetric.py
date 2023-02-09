@@ -13,7 +13,10 @@ from hardware_testing.gravimetric.labware.position import (
     VIAL_SAFE_Z_OFFSET,
     overwrite_default_labware_positions,
 )
-from hardware_testing.gravimetric.labware.layout import LayoutLabware, DEFAULT_SLOTS_GRAV
+from hardware_testing.gravimetric.labware.layout import (
+    LayoutLabware,
+    DEFAULT_SLOTS_GRAV,
+)
 from hardware_testing.gravimetric.liquid.height import LiquidTracker
 from hardware_testing.gravimetric.measure.weight import (
     GravimetricRecording,

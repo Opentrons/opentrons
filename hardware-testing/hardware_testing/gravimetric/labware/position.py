@@ -4,7 +4,7 @@ from opentrons.protocol_api.labware import Labware
 
 from .layout import LayoutLabware
 
-from hardware_testing.opentrons_api.workarounds import (
+from hardware_testing.gravimetric.workarounds import (
     apply_additional_offset_to_labware,
     is_running_in_app,
     http_get_all_labware_offsets,

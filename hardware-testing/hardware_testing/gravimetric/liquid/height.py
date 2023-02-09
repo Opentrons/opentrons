@@ -7,7 +7,7 @@ from typing import List, Optional, Tuple
 from opentrons.protocol_api.labware import Well
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 
-from hardware_testing.opentrons_api.helpers import (
+from hardware_testing.gravimetric.helpers import (
     well_is_reservoir,
     get_list_of_wells_affected,
 )

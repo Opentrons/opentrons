@@ -16,8 +16,8 @@ from hardware_testing.gravimetric.liquid.liquid_class import (
     LiquidClassSettings,
     LIQUID_CLASS_DEFAULT,
 )
-from hardware_testing.opentrons_api.workarounds import force_prepare_for_aspirate
-from hardware_testing.opentrons_api.helpers import get_pipette_unique_name
+from hardware_testing.gravimetric.workarounds import force_prepare_for_aspirate
+from hardware_testing.gravimetric.helpers import get_pipette_unique_name
 
 from .timestamp import Timestamp, SampleTimestamps, get_empty_sample_timestamp
 

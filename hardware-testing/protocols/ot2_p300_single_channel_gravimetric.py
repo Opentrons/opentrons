@@ -5,7 +5,7 @@ from pathlib import Path
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.gravimetric.execute import gravimetric
-from hardware_testing.opentrons_api import helpers
+from hardware_testing.gravimetric import helpers
 
 metadata = {"apiLevel": "2.12", "protocolName": "ot2-p300-single-channel-gravimetric"}
 
