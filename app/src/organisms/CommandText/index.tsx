@@ -198,6 +198,9 @@ export function CommandText(props: Props): JSX.Element | null {
         )
       }
     }
+    case 'comment': {
+      return <StyledText as="p"> { command.params.message } </StyledText>
+    }
     case 'custom': {
       const { legacyCommandText } = command.params ?? {}
       const sanitizedCommandText =

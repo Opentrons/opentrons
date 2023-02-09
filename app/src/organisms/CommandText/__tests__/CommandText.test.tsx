@@ -649,6 +649,28 @@ describe('CommandText', () => {
     )[0]
     getByText('Pausing protocol')
   })
+  it('renders correct text for comment', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'comment',
+          params: {message: 'THIS IS A MESSAGE'},
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText('THIS IS A MESSAGE')
+  })
   it('renders correct text for legacy delay with time', () => {
     const { getByText } = renderWithProviders(
       <CommandText
