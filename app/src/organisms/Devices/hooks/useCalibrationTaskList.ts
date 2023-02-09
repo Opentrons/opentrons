@@ -12,10 +12,6 @@ import {
 } from '.'
 import { getDefaultTiprackDefForPipetteName } from '../constants'
 import { formatTimestamp } from '../utils'
-import {
-  INTENT_CALIBRATE_PIPETTE_OFFSET,
-  INTENT_RECALIBRATE_PIPETTE_OFFSET,
-} from '../../DeprecatedCalibrationPanels'
 import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
 import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
 import { fetchCalibrationStatus } from '../../../redux/calibration'
@@ -183,11 +179,7 @@ export function useCalibrationTaskList(
         })
         offsetSubTask.cta = {
           label: t('robot_calibration:recalibrate'),
-          onClick: () =>
-            pipOffsetCalLauncher({
-              params: { mount },
-              withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
-            }),
+          onClick: () => pipOffsetCalLauncher({ params: { mount } }),
         }
         offsetSubTask.isComplete = true
 
@@ -266,11 +258,7 @@ export function useCalibrationTaskList(
           )
           offsetSubTask.cta = {
             label: t('robot_calibration:calibrate'),
-            onClick: () =>
-              pipOffsetCalLauncher({
-                params: { mount },
-                withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
-              }),
+            onClick: () => pipOffsetCalLauncher({ params: { mount } }),
           }
 
           if (offsetCalForPipette?.status.markedBad === true) {
@@ -284,11 +272,7 @@ export function useCalibrationTaskList(
           })
           offsetSubTask.cta = {
             label: t('robot_calibration:recalibrate'),
-            onClick: () =>
-              pipOffsetCalLauncher({
-                params: { mount },
-                withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
-              }),
+            onClick: () => pipOffsetCalLauncher({ params: { mount } }),
           }
           offsetSubTask.isComplete = true
         }

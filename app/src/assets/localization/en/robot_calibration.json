@@ -123,5 +123,6 @@
   "opentrons_tip_racks_recommended": "Opentrons tip racks are highly recommended. Accuracy cannot be guaranteed with other tip racks.",
   "opentrons": "opentrons",
   "custom": "custom",
-  "confirm_tip_rack": "Confirm tip rack"
+  "confirm_tip_rack": "Confirm tip rack",
+  "recalibrate_pipette": "Recalibrate pipette"
 }
