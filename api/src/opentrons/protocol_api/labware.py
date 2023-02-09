@@ -402,11 +402,11 @@ class Labware:
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
         """Return the default magnet engage height that
-        :py:meth:`MagneticModuleContext.engage` will use for this labware.
+        :py:meth:`.MagneticModuleContext.engage` will use for this labware.
 
         .. warning::
             This currently returns confusing and unpredictable results that do not
-            necessarily match what :py:meth:`MagneticModuleContext.engage` will
+            necessarily match what :py:meth:`.MagneticModuleContext.engage` will
             actually choose for its default height.
 
             The confusion is related to how this height's units and origin point are
