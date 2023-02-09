@@ -20,6 +20,7 @@ import { Chip } from '../../atoms/Chip'
 import type { IconName } from '@opentrons/components'
 import type { RenderContentType } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { NetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
+import type { ChipType } from '../../atoms/Chip'
 
 interface NetworkSettingsProps {
   networkConnection: NetworkConnection
@@ -38,17 +39,15 @@ export function NetworkSettings({
     activeSsid,
   } = networkConnection
 
+const handleChipType = (isConnected: boolean): ChipType => {
+  return isConnected ? 'success' : 'informing'
+}
+
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
     isConnected ? COLORS.successBackgroundMed : COLORS.medGreyEnabled
 
   const handleChipText = (isConnected: boolean): string =>
     isConnected ? t('connected') : t('not_connected')
-
-  const handleChipTextColor = (isConnected: boolean): string =>
-    isConnected ? COLORS.successText : COLORS.darkGreyEnabled
-
-  const handleChipIconColor = (isConnected: boolean): string =>
-    isConnected ? COLORS.successEnabled : COLORS.successDisabled
 
   return (
     <>
@@ -75,10 +74,9 @@ export function NetworkSettings({
           buttonTitle={t('wifi')}
           buttonBackgroundColor={handleButtonBackgroundColor(isWifiConnected)}
           iconName="wifi"
+          chipType={handleChipType(isWifiConnected)}
           chipText={handleChipText(isWifiConnected)}
-          chipTextColor={handleChipTextColor(isWifiConnected)}
           chipIconName="ot-check"
-          chipIconColor={handleChipIconColor(isWifiConnected)}
           networkName={activeSsid}
         />
         {/* ethernet */}
@@ -88,20 +86,18 @@ export function NetworkSettings({
             isEthernetConnected
           )}
           iconName="ethernet"
+          chipType={handleChipType(isEthernetConnected)}
           chipText={handleChipText(isEthernetConnected)}
-          chipTextColor={handleChipTextColor(isEthernetConnected)}
           chipIconName="ot-check"
-          chipIconColor={handleChipIconColor(isEthernetConnected)}
         />
         {/* usb hard-coded */}
         <NetworkSettingButton
           buttonTitle={t('usb')}
           buttonBackgroundColor={handleButtonBackgroundColor(isUsbConnected)}
           iconName="usb"
+          chipType={handleChipType(isUsbConnected)}
           chipText={handleChipText(isUsbConnected)}
-          chipTextColor={handleChipTextColor(isUsbConnected)}
           chipIconName="ot-check"
-          chipIconColor={handleChipIconColor(isUsbConnected)}
         />
       </Flex>
     </>
@@ -112,20 +108,18 @@ interface NetworkSettingButtonProps {
   buttonTitle: string
   buttonBackgroundColor: string
   iconName: IconName
+  chipType: ChipType
   chipText: string
-  chipTextColor: string
   chipIconName: IconName
-  chipIconColor: string
   networkName?: string
 }
 function NetworkSettingButton({
   buttonTitle,
   buttonBackgroundColor,
   iconName,
+  chipType,
   chipText,
-  chipTextColor,
   chipIconName,
-  chipIconColor,
   networkName,
 }: NetworkSettingButtonProps): JSX.Element {
   return (
@@ -159,10 +153,9 @@ function NetworkSettingButton({
         </Flex>
         <Flex alignItems={ALIGN_CENTER} width="15.1875rem">
           <Chip
+            type={chipType}
             text={chipText}
-            textColor={chipTextColor}
             iconName={chipIconName}
-            iconColor={chipIconColor}
           />
         </Flex>
         <Flex justifyContent="flex-end" alignSelf="stretch">
