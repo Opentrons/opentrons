@@ -23,29 +23,34 @@ const Template: Story<ChipStorybookProps> = ({ ...args }) => (
   </Flex>
 )
 
-export const Connected = Template.bind({})
-Connected.args = {
+export const Success = Template.bind({})
+Success.args = {
+  type: 'success',
   text: 'Connected',
-  textColor: COLORS.successText,
   iconName: 'ot-check',
-  iconColor: COLORS.successEnabled,
   backgroundColor: COLORS.successBackgroundMed,
 }
 
-export const NotConnected = Template.bind({})
-NotConnected.args = {
-  text: 'Not connected',
-  textColor: COLORS.darkGreyEnabled,
+export const Error = Template.bind({})
+Error.args = {
+  type: 'error',
+  text: 'Error',
   iconName: 'ot-check',
-  iconColor: COLORS.darkGreyEnabled,
-  backgroundColor: COLORS.medGreyEnabled,
+  backgroundColor: COLORS.errorBackgroundMed,
 }
 
-export const MissingModule = Template.bind({})
-MissingModule.args = {
+export const Warning = Template.bind({})
+Warning.args = {
+  type: 'warning',
   text: 'Missing 1 module',
-  textColor: COLORS.warningText,
   iconName: 'ot-alert',
-  iconColor: COLORS.warningEnabled,
   backgroundColor: COLORS.warningBackgroundMed,
+}
+
+export const Informing = Template.bind({})
+Informing.args = {
+  type: 'informing',
+  text: 'Not connected',
+  iconName: 'ot-check',
+  backgroundColor: COLORS.medGreyEnabled,
 }
