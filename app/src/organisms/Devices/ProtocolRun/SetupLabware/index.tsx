@@ -7,12 +7,9 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { useFeatureFlag } from '../../../../redux/config'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import { ReapplyOffsetsModal } from '../../../ReapplyOffsetsModal'
-import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
@@ -47,13 +44,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     t('map_view')
   )
   const isOt3 = useIsOT3(robotName)
-  /**
-   * This component's usage of the reapply offsets modal can be removed
-   * along with the enableManualDeckStateMod feature flag.
-   */
-  const enableManualDeckStateMod = useFeatureFlag(
-    'enableManualDeckStateModification'
-  )
+
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
@@ -65,17 +56,9 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
-  const currentRun = useCurrentRun()
-
-  const showReapplyOffsetsModal =
-    !enableManualDeckStateMod &&
-    currentRun?.data.id === runId &&
-    (currentRun?.data?.labwareOffsets == null ||
-      currentRun?.data?.labwareOffsets.length === 0)
 
   return (
     <>
-      {showReapplyOffsetsModal ? <ReapplyOffsetsModal runId={runId} /> : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}

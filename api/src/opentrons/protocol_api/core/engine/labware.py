@@ -10,7 +10,6 @@ from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnD
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
@@ -76,9 +75,6 @@ class LabwareCore(AbstractLabware[WellCore]):
         """Get the load name or the label of the labware specified by a user."""
         return self._user_display_name or self.load_name
 
-    def set_name(self, new_name: str) -> None:
-        raise APIVersionError("LabwareCore.set_name has been deprecated")
-
     def get_definition(self) -> LabwareDefinitionDict:
         """Get the labware's definition as a plain dictionary."""
         return cast(LabwareDefinitionDict, self._definition.dict(exclude_none=True))
@@ -111,9 +107,6 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     def get_tip_length(self) -> float:
         return self._engine_client.state.labware.get_tip_length(self._labware_id)
-
-    def set_tip_length(self, length: float) -> None:
-        raise APIVersionError("LabwareCore.set_tip_length has been deprecated")
 
     def reset_tips(self) -> None:
         self._engine_client.reset_tips(labware_id=self.labware_id)
