@@ -86,10 +86,4 @@ describe('RobotSettingsTipLengthCalibration', () => {
     )
     getByText('Mock TipLengthCalibrationItems')
   })
-
-  it('renders Not calibrated yet when no tip length calibrations data', () => {
-    mockUseTipLengthCalibrations.mockReturnValue(null)
-    const [{ getByText }] = render()
-    getByText('Not calibrated yet')
-  })
 })

@@ -30,9 +30,9 @@ interface RobotSettingsTipLengthCalibrationProps {
 }
 
 export interface FormattedTipLengthCalibration {
-  tiprack: string
+  tiprack?: string
   pipette: string
-  lastCalibrated: string
+  lastCalibrated?: string
   markedBad: boolean
   uri?: string | null
 }
@@ -56,7 +56,10 @@ export function RobotSettingsTipLengthCalibration({
   const attachedPipettes = useAttachedPipettes()
   // wait for robot request to resolve instead of using name directly from params
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
-  const tipLengthCalsForPipettesAndDefaultRacks: TipLengthCalibration[] = []
+  const tipLengthCalsForPipettesAndDefaultRacks: Array<
+    Partial<Omit<TipLengthCalibration, 'pipette' | 'uri'>> &
+      Pick<TipLengthCalibration, 'pipette' | 'uri'>
+  > = []
   for (const pipette of Object.values(attachedPipettes)) {
     if (pipette != null) {
       const tiprackDef = getDefaultTiprackDefForPipetteName(
@@ -69,6 +72,11 @@ export function RobotSettingsTipLengthCalibration({
         )
         if (foundTipLengthCal != null) {
           tipLengthCalsForPipettesAndDefaultRacks.push(foundTipLengthCal)
+        } else {
+          tipLengthCalsForPipettesAndDefaultRacks.push({
+            pipette: pipette.id,
+            uri: tiprackUri,
+          })
         }
       }
     }
@@ -79,7 +87,7 @@ export function RobotSettingsTipLengthCalibration({
           tiprack: tipLength.tiprack,
           pipette: tipLength.pipette,
           lastCalibrated: tipLength.lastModified,
-          markedBad: tipLength.status.markedBad,
+          markedBad: tipLength.status?.markedBad ?? false,
           uri: tipLength.uri,
         }))
       : []
@@ -98,18 +106,14 @@ export function RobotSettingsTipLengthCalibration({
               : t('tip_length_calibrations_description_legacy')}
           </StyledText>
         </Box>
-        {tipLengthCalibrations != null && tipLengthCalibrations.length !== 0 ? (
-          <TipLengthCalibrationItems
-            robotName={robotName}
-            formattedPipetteOffsetCalibrations={
-              formattedPipetteOffsetCalibrations
-            }
-            formattedTipLengthCalibrations={formattedTipLengthCalibrations}
-            updateRobotStatus={updateRobotStatus}
-          />
-        ) : (
-          <StyledText as="label">{t('not_calibrated')}</StyledText>
-        )}
+        <TipLengthCalibrationItems
+          robotName={robotName}
+          formattedPipetteOffsetCalibrations={
+            formattedPipetteOffsetCalibrations
+          }
+          formattedTipLengthCalibrations={formattedTipLengthCalibrations}
+          updateRobotStatus={updateRobotStatus}
+        />
       </Flex>
     </Box>
   )
