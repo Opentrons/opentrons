@@ -30,31 +30,31 @@ USB_PORTS_TO_TEST = [
 ]
 # TODO: work with EEs to get Aux-Port tests implemented
 AUX_PORT_TESTS = [
-    "aux-left-door-switch",
-    "aux-left-sync",
-    "aux-left-estop-signal",
-    "aux-left-estop-detect",
-    "aux-left-presence",
-    "aux-left-id",
-    "aux-right-door-switch",
-    "aux-right-sync",
-    "aux-right-estop-signal",
-    "aux-right-estop-detect",
-    "aux-right-presence",
-    "aux-right-id",
+    "aux-1-door-switch",
+    "aux-1-sync",
+    "aux-1-estop-signal",
+    "aux-1-estop-detect",
+    "aux-1-presence",
+    "aux-1-id",
+    "aux-2-door-switch",
+    "aux-2-sync",
+    "aux-2-estop-signal",
+    "aux-2-estop-detect",
+    "aux-2-presence",
+    "aux-2-id",
 ]
 AUX_CAN_TESTS = [
-    "aux-left-pcan",
-    "aux-right-pcan",
+    "aux-1-pcan",
+    "aux-2-pcan",
 ]
 COLORS_BY_SIGNAL = {
-    "none": {"left": "BLUE", "right": "BLUE"},  # shared
-    "door": {"left": "WHITE", "right": "WHITE"},  # shared
-    "estop-signal": {"left": "RED", "right": "RED"},  # shared
-    "sync": {"left": "Status is OFF", "right": "Status is OFF"},  # shared
-    "estop-detect": {"left": "YELLOW", "right": "CYAN"},
-    "presence": {"left": "PURPLE", "right": "ORANGE"},
-    "id": {"left": "GREEN", "right": "Deck-Lights OFF"},
+    "none": {"1": "BLUE", "2": "BLUE"},  # shared
+    "door": {"1": "WHITE", "2": "WHITE"},  # shared
+    "estop-signal": {"1": "RED", "2": "RED"},  # shared
+    "sync": {"1": "Status is OFF", "2": "Status is OFF"},  # shared
+    "estop-detect": {"1": "YELLOW", "2": "CYAN"},
+    "presence": {"1": "PURPLE", "2": "ORANGE"},
+    "id": {"1": "GREEN", "2": "Deck-Lights OFF"},
 }
 
 ALLOWED_SECURITY_TYPES = {
@@ -155,13 +155,13 @@ async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
     #       - can analyzer
     #       - door switch detection
     def _get_color(t: str) -> str:
-        side = "left" if "left" in t else "right"
+        side = "1" if "1" in t else "2"
         signal = [s for s in COLORS_BY_SIGNAL.keys() if s in t]
         assert signal, f'no signals found matching test: "{t}"'
         return COLORS_BY_SIGNAL[signal[0]][side]
 
     if not api.is_simulator:
-        ui.get_user_ready("connect buttons to both Aux ports (left/right)")
+        ui.get_user_ready("connect buttons to both Aux ports (1 and 2)")
     for test_name in AUX_PORT_TESTS:
         if api.is_simulator:
             result = CSVResult.PASS
