@@ -5,10 +5,12 @@ from fastapi import Depends
 from typing_extensions import Final
 import sqlalchemy
 from asyncio import Lock
+from uuid import UUID
 
 from .database import create_sql_engine
 from .tables import registration_table, migration_table
 from .persistent_directory import create_persistent_directory
+from .system_uuid import get_system_uuid
 
 from system_server.app_state import AppState, AppStateAccessor, get_app_state
 from system_server.settings import get_settings
@@ -16,14 +18,17 @@ from system_server.settings import get_settings
 
 _sql_engine_accessor = AppStateAccessor[sqlalchemy.engine.Engine]("sql_engine")
 _persistence_directory_accessor = AppStateAccessor[Path]("persistence_directory")
+_uuid_accessor = AppStateAccessor[UUID]("system_uuid")
 
 _DATABASE_FILE: Final = "system_server.db"
+_UUID_FILE: Final = "system_server_uuid"
 
 _log = logging.getLogger(__name__)
 
 
 _persistence_dir_lock = Lock()
 _sql_lock = Lock()
+_uuid_lock = Lock()
 
 
 async def get_persistence_directory(
@@ -70,9 +75,25 @@ async def get_sql_engine(
         # https://github.com/tiangolo/fastapi/issues/617
 
 
+async def get_uuid(
+    app_state: AppState = Depends(get_app_state),
+    persistence_directory: Path = Depends(get_persistence_directory),
+) -> UUID:
+    """Return a singleton UUID for signing purposes."""
+    async with _uuid_lock:
+        system_uuid = _uuid_accessor.get_from(app_state)
+
+        if system_uuid is None:
+            system_uuid = await get_system_uuid(persistence_directory / _UUID_FILE)
+            _uuid_accessor.set_on(app_state, system_uuid)
+
+        return system_uuid
+
+
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
+    "get_uuid",
     "registration_table",
     "migration_table",
 ]
