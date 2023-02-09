@@ -45,8 +45,8 @@ def get_virtual_pipette_static_config(
 
 
 def get_pipette_static_config(
-    pipette_model: PipetteModel, pipette_id: str
+    pipette_model: PipetteModel, pipette_serial: str
 ) -> LoadedStaticPipetteData:
     """Get the config for a pipette, given the actual model and pipette id."""
-    config = load_pipette_config(pipette_model, pipette_id)
+    config = load_pipette_config(pipette_model, pipette_serial)
     return _return_static_pipette_data(config)

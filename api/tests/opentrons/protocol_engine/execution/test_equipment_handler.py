@@ -488,11 +488,11 @@ async def test_load_pipette(
         LoadedPipette.construct(pipetteName=PipetteNameType.P300_MULTI)  # type: ignore[call-arg]
     )
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello world"})
+        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config("hello world", "unique-id")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
     ).then_return(
         LoadedStaticPipetteData(
             model="pipette_model",
@@ -552,11 +552,11 @@ async def test_load_pipette_96_channels(
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello world"})
+        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config("hello world", "unique-id")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
     ).then_return(
         LoadedStaticPipetteData(
             model="pipette_model",
@@ -608,11 +608,11 @@ async def test_load_pipette_uses_provided_id(
     """It should use the provided ID rather than generating an ID for the pipette."""
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello world"})
+        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config("hello world", "my-pipette-id")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
     ).then_return(
         LoadedStaticPipetteData(
             model="pipette_model",
@@ -639,6 +639,60 @@ async def test_load_pipette_uses_provided_id(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="my-pipette-id",
+                model="pipette_model",
+                min_volume=1.23,
+                max_volume=4.56,
+                channels=7,
+                flow_rates=FlowRates(
+                    default_blow_out={"a": 1.23},
+                    default_aspirate={"b": 4.56},
+                    default_dispense={"c": 7.89},
+                ),
+            )
+        )
+    )
+
+
+async def test_load_pipette_use_virtual(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    subject: EquipmentHandler,
+) -> None:
+    """It should use the provided ID rather than generating an ID for the pipette."""
+    decoy.when(state_store.config.use_virtual_pipettes).then_return(True)
+    decoy.when(model_utils.generate_id()).then_return("unique-id")
+
+    decoy.when(
+        pipette_data_provider.get_virtual_pipette_static_config(
+            PipetteNameType.P300_SINGLE.value
+        )
+    ).then_return(
+        LoadedStaticPipetteData(
+            model="pipette_model",
+            min_volume=1.23,
+            max_volume=4.56,
+            channels=7,
+            flow_rates=FlowRates(
+                default_blow_out={"a": 1.23},
+                default_aspirate={"b": 4.56},
+                default_dispense={"c": 7.89},
+            ),
+        )
+    )
+
+    result = await subject.load_pipette(
+        pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT, pipette_id=None
+    )
+
+    assert result == LoadedPipetteData(pipette_id="unique-id")
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddPipetteConfigAction(
+                pipette_id="unique-id",
                 model="pipette_model",
                 min_volume=1.23,
                 max_volume=4.56,

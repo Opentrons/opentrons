@@ -202,12 +202,15 @@ class EquipmentHandler:
             except RuntimeError as e:
                 raise FailedToLoadPipetteError(str(e)) from e
 
-            pipette_model = self._hardware_api.get_attached_instrument(
+            pipette_dict = self._hardware_api.get_attached_instrument(
                 mount.to_hw_mount()
-            )["model"]
+            )
+
+            pipette_model = pipette_dict["model"]
+            pipette_serial = pipette_dict["pipette_id"]
 
             static_pipette_config = pipette_data_provider.get_pipette_static_config(
-                pipette_model, pipette_id
+                pipette_model, pipette_serial
             )
         else:
             static_pipette_config = (
