@@ -91,7 +91,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     force_direct=False,
                     speed=None,
                 )
-                self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+                self._protocol_core.set_last_location(
+                    location=location, mount=self.get_mount()
+                )
 
             self._engine_client.aspirate_in_place(
                 pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
@@ -118,7 +120,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 flow_rate=flow_rate,
             )
 
-            self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+            self._protocol_core.set_last_location(
+                location=location, mount=self.get_mount()
+            )
 
     def dispense(
         self,
@@ -147,7 +151,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     force_direct=False,
                     speed=None,
                 )
-                self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+                self._protocol_core.set_last_location(
+                    location=location, mount=self.get_mount()
+                )
 
             self._engine_client.dispense_in_place(
                 pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
@@ -198,7 +204,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     minimum_z_height=None,
                     speed=None,
                 )
-                self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+                self._protocol_core.set_last_location(
+                    location=location, mount=self.get_mount()
+                )
 
             self._engine_client.blow_out_in_place(
                 pipette_id=self._pipette_id, flow_rate=flow_rate
