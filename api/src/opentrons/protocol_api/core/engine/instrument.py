@@ -97,7 +97,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
             )
 
-        elif location is not None:
+        elif location:
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
