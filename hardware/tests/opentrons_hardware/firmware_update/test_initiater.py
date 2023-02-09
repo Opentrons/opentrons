@@ -38,6 +38,7 @@ async def test_messaging(
                     version=UInt32Field(0),
                     flags=fields.VersionFlagsField(0),
                     shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
+                    revision=fields.OptionalRevisionField.build(b""),
                 )
             )
             can_message_notifier.notify(
@@ -86,6 +87,7 @@ async def test_retry(
                 version=UInt32Field(0),
                 flags=fields.VersionFlagsField(0),
                 shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
+                revision=fields.OptionalRevisionField.build(b""),
             )
         ),
         None,
