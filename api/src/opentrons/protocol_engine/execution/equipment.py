@@ -223,6 +223,7 @@ class EquipmentHandler:
             AddPipetteConfigAction(
                 pipette_id=pipette_id,
                 model=static_pipette_config.model,
+                display_name=static_pipette_config.display_name,
                 min_volume=static_pipette_config.min_volume,
                 max_volume=static_pipette_config.max_volume,
                 channels=static_pipette_config.channels,

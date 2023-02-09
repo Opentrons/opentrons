@@ -176,6 +176,7 @@ class AddPipetteConfigAction:
 
     pipette_id: str
     model: str
+    display_name: str
     min_volume: float
     max_volume: float
     channels: int

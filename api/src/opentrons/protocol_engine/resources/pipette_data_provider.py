@@ -14,6 +14,7 @@ class LoadedStaticPipetteData:
     """Static pipette config data for load pipette."""
 
     model: str
+    display_name: str
     min_volume: float
     max_volume: float
     channels: int
@@ -24,6 +25,7 @@ def _return_static_pipette_data(config: PipetteConfig) -> LoadedStaticPipetteDat
     """Get the needed info from PipetteConfig and return it as a LoadedStaticPipetteData object."""
     return LoadedStaticPipetteData(
         model=config.model,
+        display_name=config.display_name,
         min_volume=config.min_volume,
         max_volume=config.max_volume,
         channels=int(config.channels),

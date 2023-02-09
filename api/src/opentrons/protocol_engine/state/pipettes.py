@@ -57,6 +57,7 @@ class StaticPipetteConfig:
     """Static config for a pipette."""
 
     model: str
+    display_name: str
     min_volume: float
     max_volume: float
 
@@ -102,6 +103,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, AddPipetteConfigAction):
             self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
                 model=action.model,
+                display_name=action.display_name,
                 min_volume=action.min_volume,
                 max_volume=action.max_volume,
             )
@@ -338,6 +340,10 @@ class PipetteView(HasState[PipetteState]):
     def get_model_name(self, pipette_id: str) -> str:
         """Return the given pipette's model name."""
         return self._get_static_config(pipette_id).model
+
+    def get_display_name(self, pipette_id: str) -> str:
+        """Return the given pipette's display name."""
+        return self._get_static_config(pipette_id).display_name
 
     def get_minimum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's minimum volume."""

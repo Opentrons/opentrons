@@ -557,6 +557,7 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
         AddPipetteConfigAction(
             pipette_id="pipette-id",
             model="pipette-model",
+            display_name="pipette name",
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
@@ -569,7 +570,10 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
     )
 
     assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
-        model="pipette-model", min_volume=1.23, max_volume=4.56
+        model="pipette-model",
+        display_name="pipette name",
+        min_volume=1.23,
+        max_volume=4.56,
     )
     assert subject.state.flow_rates_by_id["pipette-id"] == FlowRates(
         default_aspirate={"a": 1},

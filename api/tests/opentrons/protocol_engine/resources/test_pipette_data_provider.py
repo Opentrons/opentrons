@@ -17,6 +17,7 @@ def test_get_virtual_pipette_static_config() -> None:
 
     assert result == LoadedStaticPipetteData(
         model="p20_single_v2.0",
+        display_name="P20 Single-Channel GEN2",
         min_volume=1,
         max_volume=20.0,
         channels=1,
@@ -34,6 +35,7 @@ def test_get_pipette_static_config() -> None:
 
     assert result == LoadedStaticPipetteData(
         model="p1000_multi_v3.1",
+        display_name="P1000 8-Channel GEN3",
         min_volume=1,
         max_volume=1000.0,
         channels=8,

@@ -496,6 +496,7 @@ async def test_load_pipette(
     ).then_return(
         LoadedStaticPipetteData(
             model="pipette_model",
+            display_name="pipette name",
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
@@ -526,6 +527,7 @@ async def test_load_pipette(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
                 model="pipette_model",
+                display_name="pipette name",
                 min_volume=1.23,
                 max_volume=4.56,
                 channels=7,
@@ -560,6 +562,7 @@ async def test_load_pipette_96_channels(
     ).then_return(
         LoadedStaticPipetteData(
             model="pipette_model",
+            display_name="pipette name",
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
@@ -585,6 +588,7 @@ async def test_load_pipette_96_channels(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
                 model="pipette_model",
+                display_name="pipette name",
                 min_volume=1.23,
                 max_volume=4.56,
                 channels=7,
@@ -616,6 +620,7 @@ async def test_load_pipette_uses_provided_id(
     ).then_return(
         LoadedStaticPipetteData(
             model="pipette_model",
+            display_name="pipette name",
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
@@ -640,6 +645,7 @@ async def test_load_pipette_uses_provided_id(
             AddPipetteConfigAction(
                 pipette_id="my-pipette-id",
                 model="pipette_model",
+                display_name="pipette name",
                 min_volume=1.23,
                 max_volume=4.56,
                 channels=7,
@@ -672,6 +678,7 @@ async def test_load_pipette_use_virtual(
     ).then_return(
         LoadedStaticPipetteData(
             model="pipette_model",
+            display_name="pipette name",
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
@@ -694,6 +701,7 @@ async def test_load_pipette_use_virtual(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
                 model="pipette_model",
+                display_name="pipette name",
                 min_volume=1.23,
                 max_volume=4.56,
                 channels=7,

@@ -380,6 +380,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_model(self) -> str:
         return self._engine_client.state.pipettes.get_model_name(self._pipette_id)
 
+    def get_display_name(self) -> str:
+        return self._engine_client.state.pipettes.get_display_name(self._pipette_id)
+
     def get_min_volume(self) -> float:
         return self._engine_client.state.pipettes.get_minimum_volume(self._pipette_id)
 

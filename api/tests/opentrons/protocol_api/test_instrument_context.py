@@ -1,12 +1,10 @@
 """Tests for the InstrumentContext public interface."""
 import inspect
-from typing import cast
 
 import pytest
 from decoy import Decoy
 
 from opentrons.broker import Broker
-from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import (
@@ -39,9 +37,6 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     """Get a mock instrument implementation core."""
     instrument_core = decoy.mock(cls=InstrumentCore)
     decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
-    decoy.when(instrument_core.get_hardware_state()).then_return(
-        cast(PipetteDict, {"display_name": "Cool Pipette"})
-    )
     return instrument_core
 
 

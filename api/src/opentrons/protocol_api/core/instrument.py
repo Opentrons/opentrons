@@ -155,6 +155,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_display_name(self) -> str:
+        ...
+
+    @abstractmethod
     def get_min_volume(self) -> float:
         ...
 

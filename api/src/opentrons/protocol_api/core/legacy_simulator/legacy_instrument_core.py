@@ -281,6 +281,9 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def get_model(self) -> str:
         return self._pipette_dict["model"]
 
+    def get_display_name(self) -> str:
+        return self._pipette_dict["display_name"]
+
     def get_min_volume(self) -> float:
         return self._pipette_dict["min_volume"]
 

@@ -373,6 +373,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """Get the model name."""
         return self.get_hardware_state()["model"]
 
+    def get_display_name(self) -> str:
+        """Get the display name"""
+        return self.get_hardware_state()["display_name"]
+
     def get_min_volume(self) -> float:
         """Get the min volume."""
         return self.get_hardware_state()["min_volume"]

@@ -429,6 +429,20 @@ def test_get_model(
     assert subject.get_model() == "pipette-model"
 
 
+def test_get_display_name(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's display name."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_display_name(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return("display-name")
+    assert subject.get_display_name() == "display-name"
+
+
 def test_get_min_volume(
     decoy: Decoy,
     subject: InstrumentCore,

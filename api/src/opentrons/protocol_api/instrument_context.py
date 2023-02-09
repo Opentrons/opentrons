@@ -1517,4 +1517,4 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
     def __str__(self) -> str:
-        return "{} on {} mount".format(self.hw_pipette["display_name"], self.mount)
+        return "{} on {} mount".format(self._core.get_display_name(), self.mount)
