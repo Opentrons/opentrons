@@ -155,6 +155,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_display_name(self) -> str:
+        ...
+
+    @abstractmethod
     def get_min_volume(self) -> float:
         ...
 
@@ -204,15 +208,15 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+    def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     @abstractmethod
-    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+    def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     @abstractmethod
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+    def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     def set_flow_rate(

@@ -1,12 +1,10 @@
 """Tests for the InstrumentContext public interface."""
 import inspect
-from typing import cast
 
 import pytest
 from decoy import Decoy
 
 from opentrons.broker import Broker
-from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
@@ -40,9 +38,6 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     """Get a mock instrument implementation core."""
     instrument_core = decoy.mock(cls=InstrumentCore)
     decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
-    decoy.when(instrument_core.get_hardware_state()).then_return(
-        cast(PipetteDict, {"display_name": "Cool Pipette"})
-    )
     return instrument_core
 
 
@@ -213,9 +208,7 @@ def test_aspirate(
     bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
-    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=mock_well, rate=1.23)
 
@@ -505,9 +498,7 @@ def test_dispense_with_location(
     mock_well = decoy.mock(cls=Well)
     location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
-        3.0
-    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.0)).then_return(3.0)
 
     subject.dispense(volume=42.0, location=location)
 
@@ -533,9 +524,7 @@ def test_dispense_with_well_location(
         Location(point=Point(1, 2, 3), labware=mock_well)
     )
 
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
-        3.0
-    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.0)).then_return(3.0)
 
     subject.dispense(volume=42.0, location=mock_well)
 
@@ -562,9 +551,7 @@ def test_dispense_with_no_location(
         Location(point=Point(1, 2, 3), labware=None)
     )
 
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
-        3.0
-    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.0)).then_return(3.0)
 
     subject.dispense(volume=42.0)
 
