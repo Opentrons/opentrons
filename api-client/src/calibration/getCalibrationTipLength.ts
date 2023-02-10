@@ -5,7 +5,12 @@ import type { HostConfig } from '../types'
 import type { AllTipLengthCalibrations } from './types'
 
 export function getCalibrationTipLength(
-  config: HostConfig,
+  config: HostConfig
 ): ResponsePromise<AllTipLengthCalibrations> {
-  return request<AllTipLengthCalibrations>(GET, '/calibration/tip_length', null, config)
+  return request<AllTipLengthCalibrations>(
+    GET,
+    '/calibration/tip_length',
+    null,
+    config
+  )
 }

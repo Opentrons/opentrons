@@ -27,7 +27,10 @@ export const Results = (props: ResultsProps): JSX.Element => {
     selectedPipette,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const {status: pipetteQueryStatus, refetch: refetchPipettes} = usePipettesQuery()
+  const {
+    status: pipetteQueryStatus,
+    refetch: refetchPipettes,
+  } = usePipettesQuery()
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   const isPending = pipetteQueryStatus === 'loading'
 
@@ -78,7 +81,10 @@ export const Results = (props: ResultsProps): JSX.Element => {
 
   const handleTryAgain = (): void => {
     refetchPipettes()
-    setNumberOfTryAgains(numberOfTryAgains + 1)
+      .then(() => {
+        setNumberOfTryAgains(numberOfTryAgains + 1)
+      })
+      .catch(() => {})
   }
 
   const handleProceed = (): void => {

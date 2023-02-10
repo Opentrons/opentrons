@@ -14,7 +14,10 @@ import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useRunPipetteInfoByMount } from '../hooks'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 
-import { useAllPipetteOffsetCalibrationsQuery, usePipettesQuery } from '@opentrons/react-api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  usePipettesQuery,
+} from '@opentrons/react-api-client'
 
 const PIPETTE_POLL_FETCH_MS = 5000
 interface SetupPipetteCalibrationProps {
@@ -29,8 +32,10 @@ export function SetupPipetteCalibration({
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
 
-  usePipettesQuery({refetchInterval: PIPETTE_POLL_FETCH_MS})
-  useAllPipetteOffsetCalibrationsQuery({refetchInterval: PIPETTE_POLL_FETCH_MS})
+  usePipettesQuery({ refetchInterval: PIPETTE_POLL_FETCH_MS })
+  useAllPipetteOffsetCalibrationsQuery({
+    refetchInterval: PIPETTE_POLL_FETCH_MS,
+  })
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>

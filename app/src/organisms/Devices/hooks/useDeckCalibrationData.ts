@@ -1,4 +1,7 @@
-import { DECK_CAL_STATUS_OK, DECK_CAL_STATUS_BAD_CALIBRATION } from '../../../redux/calibration'
+import {
+  DECK_CAL_STATUS_OK,
+  DECK_CAL_STATUS_BAD_CALIBRATION,
+} from '../../../redux/calibration'
 
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
 import { useRobot } from './useRobot'
@@ -20,10 +23,11 @@ export function useDeckCalibrationData(
 } {
   const robot = useRobot(robotName)
 
-  const { data: deckCalibrationData = null, status: deckCalibrationStatus } = useCalibrationStatusQuery(
-    {},
-    robot?.ip != null ? { hostname: robot.ip } : null
-  )?.data?.deckCalibration ?? {}
+  const { data: deckCalibrationData = null, status: deckCalibrationStatus } =
+    useCalibrationStatusQuery(
+      {},
+      robot?.ip != null ? { hostname: robot.ip } : null
+    )?.data?.deckCalibration ?? {}
 
   const isDeckCalibrated =
     deckCalibrationStatus != null &&

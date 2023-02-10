@@ -1,11 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import {
-  SpinnerModalPage,
-  AlertModal,
-  useInterval,
-} from '@opentrons/components'
+import { SpinnerModalPage, AlertModal } from '@opentrons/components'
 
 import { Portal } from '../../App/portal'
 import { Line } from '../../atoms/structure'
@@ -39,7 +35,11 @@ import type {
   DeckCalibrationSession,
 } from '../../redux/sessions/types'
 import type { State, Dispatch } from '../../redux/types'
-import { useAllPipetteOffsetCalibrationsQuery, useAllTipLengthCalibrationsQuery, useCalibrationStatusQuery } from '@opentrons/react-api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+  useCalibrationStatusQuery,
+} from '@opentrons/react-api-client'
 
 const CALS_FETCH_MS = 5000
 
@@ -86,7 +86,7 @@ export function RobotSettingsCalibration({
 
   React.useEffect(() => {
     dispatch(Sessions.fetchAllSessions(robotName))
-  }, [])
+  }, [dispatch, robotName])
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -169,7 +169,7 @@ export function RobotSettingsCalibration({
       Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
     )
     if (
-      session &&
+      session != null &&
       session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
     ) {
       // TODO: add this analytics event when we deprecate this event firing in redux/analytics makeEvent
@@ -219,9 +219,9 @@ export function RobotSettingsCalibration({
 
   // Note: following fetch need to reflect the latest state of calibrations
   // when a user does calibration or rename a robot.
-  useCalibrationStatusQuery({refetchInterval: CALS_FETCH_MS})
-  useAllPipetteOffsetCalibrationsQuery({refetchInterval: CALS_FETCH_MS})
-  useAllTipLengthCalibrationsQuery({refetchInterval: CALS_FETCH_MS})
+  useCalibrationStatusQuery({ refetchInterval: CALS_FETCH_MS })
+  useAllPipetteOffsetCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
+  useAllTipLengthCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
 
   return (
     <>
@@ -260,7 +260,7 @@ export function RobotSettingsCalibration({
               {
                 children: t('shared:ok'),
                 onClick: () => {
-                  createRequestId.current &&
+                  createRequestId.current != null &&
                     dispatch(RobotApi.dismissRequest(createRequestId.current))
                   createRequestId.current = null
                 },

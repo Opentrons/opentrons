@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
-import { useAllPipetteOffsetCalibrationsQuery, useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useModulesQuery,
+  usePipettesQuery,
+} from '@opentrons/react-api-client'
 
 import {
   Flex,
@@ -14,27 +17,19 @@ import {
   SIZE_3,
   SPACING,
   TYPOGRAPHY,
-  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import {
-  useIsOT3,
-  useIsRobotViewable,
-  usePipetteOffsetCalibrations,
-  useRunStatuses,
-} from './hooks'
+import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
 import {
   getIs96ChannelPipetteAttached,
   getOffsetCalibrationForMount,
 } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
-
-import type { Dispatch } from '../../redux/types'
 
 const EQUIPMENT_POLL_MS = 5000
 const FETCH_PIPETTE_LONG_POLL = 30000
@@ -54,7 +49,6 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
-  const dispatch = useDispatch<Dispatch>()
 
   // TODO(BC, 2022-12-05): replace with attachedGripper after RLAB-88 is done
   const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
@@ -81,7 +75,10 @@ export function InstrumentsAndModules({
   // to eliminate duplicated useInterval calls to `calibration/pipette_offset` coming from each card.
   // Instead we now capture all offset calibration data here, and pass the appropriate calibration
   // data to the associated card via props
-  const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery({refetchInterval: FETCH_PIPETTE_LONG_POLL})?.data?.data ?? []
+  const pipetteOffsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery({
+      refetchInterval: FETCH_PIPETTE_LONG_POLL,
+    })?.data?.data ?? []
   const leftMountOffsetCalibration = getOffsetCalibrationForMount(
     pipetteOffsetCalibrations,
     attachedPipettes,

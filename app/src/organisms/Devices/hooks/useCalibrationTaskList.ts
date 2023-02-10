@@ -1,5 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import { useAllPipetteOffsetCalibrationsQuery, useAllTipLengthCalibrationsQuery, useCalibrationStatusQuery, useDeleteCalibrationMutation } from '@opentrons/react-api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+  useCalibrationStatusQuery,
+  useDeleteCalibrationMutation,
+} from '@opentrons/react-api-client'
 
 import {
   useAttachedPipettes,
@@ -50,10 +55,13 @@ export function useCalibrationTaskList(
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
 
-
-  useCalibrationStatusQuery({refetchInterval: CALIBRATION_DATA_POLL_MS})
-  useAllPipetteOffsetCalibrationsQuery({refetchInterval: CALIBRATION_DATA_POLL_MS})
-  useAllTipLengthCalibrationsQuery({refetchInterval: CALIBRATION_DATA_POLL_MS})
+  useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
+  useAllPipetteOffsetCalibrationsQuery({
+    refetchInterval: CALIBRATION_DATA_POLL_MS,
+  })
+  useAllTipLengthCalibrationsQuery({
+    refetchInterval: CALIBRATION_DATA_POLL_MS,
+  })
 
   // first create the shape of the deck calibration task, then update values based on calibration status
   const deckTask: TaskProps = {

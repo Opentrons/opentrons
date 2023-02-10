@@ -19,29 +19,34 @@ export type FetchCalibrationStatusParams =
   | PipOffsetDeletionParams
   | TipLengthDeletionParams
 
-
-type CalibrationSourceType = "default" | "factory" | "user" | "calibration_check" | "legacy" | "unknown"
+type CalibrationSourceType =
+  | 'default'
+  | 'factory'
+  | 'user'
+  | 'calibration_check'
+  | 'legacy'
+  | 'unknown'
 interface IndividualCalibrationHealthStatus {
-  markedBad: boolean, // will be marked bad by a faile cal health check
-  source: CalibrationSourceType | null, // what actor marked it bad
-  markedAt: string | null, // what timestamp it was marked bad
+  markedBad: boolean // will be marked bad by a faile cal health check
+  source: CalibrationSourceType | null // what actor marked it bad
+  markedAt: string | null // what timestamp it was marked bad
 }
 
 export interface DeckCalibrationData {
-  type: "attitude" | "affine",
+  type: 'attitude' | 'affine'
   matrix: [
     [number, number, number],
     [number, number, number],
-    [number, number, number],
-  ],
-  lastModified: string | null,
-  pipetteCalibratedWith: string | null, // pipette serial number
-  tiprack: string | null, // tip rack hash
-  source: CalibrationSourceType,
+    [number, number, number]
+  ]
+  lastModified: string | null
+  pipetteCalibratedWith: string | null // pipette serial number
+  tiprack: string | null // tip rack hash
+  source: CalibrationSourceType
   status: IndividualCalibrationHealthStatus
 }
 export interface DeckCalibrationStatus {
-  status: "OK" | "IDENTITY" | "BAD_CALIBRATION" | "SINGULARITY",
+  status: 'OK' | 'IDENTITY' | 'BAD_CALIBRATION' | 'SINGULARITY'
   data: DeckCalibrationData
 }
 interface InstrumentOffset {

@@ -17,13 +17,7 @@ interface MountPipetteProps extends PipetteWizardStepProps {
 const BACKGROUND_SIZE = '47rem'
 
 export const MountPipette = (props: MountPipetteProps): JSX.Element => {
-  const {
-    proceed,
-    goBack,
-    selectedPipette,
-    isPending,
-    setPending,
-  } = props
+  const { proceed, goBack, selectedPipette, isPending, setPending } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
   const bodyTextSkeleton = (

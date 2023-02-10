@@ -1,20 +1,36 @@
 import head from 'lodash/head'
-import { useAllPipetteOffsetCalibrationsQuery, useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+} from '@opentrons/react-api-client'
 import { useAttachedPipettes } from './useAttachedPipettes'
 
 import type { PipetteCalibrationsByMount } from '../../../redux/pipettes/types'
-import type { PipetteOffsetCalibration, TipLengthCalibration } from '@opentrons/api-client'
+import type {
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+} from '@opentrons/api-client'
 
 export function useAttachedPipetteCalibrations(): PipetteCalibrationsByMount {
   const attachedPipettes = useAttachedPipettes()
-  const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery()?.data?.data ?? []
-  const tipLengthCalibrations = useAllTipLengthCalibrationsQuery()?.data?.data ?? []
+  const pipetteOffsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery()?.data?.data ?? []
+  const tipLengthCalibrations =
+    useAllTipLengthCalibrationsQuery()?.data?.data ?? []
   const offsets = {
     left: attachedPipettes.left
-      ? filterCalibrationForPipette(pipetteOffsetCalibrations, attachedPipettes.left.id, 'left')
+      ? filterCalibrationForPipette(
+          pipetteOffsetCalibrations,
+          attachedPipettes.left.id,
+          'left'
+        )
       : null,
     right: attachedPipettes.right
-      ? filterCalibrationForPipette(pipetteOffsetCalibrations, attachedPipettes.right.id, 'right')
+      ? filterCalibrationForPipette(
+          pipetteOffsetCalibrations,
+          attachedPipettes.right.id,
+          'right'
+        )
       : null,
   }
   return {
@@ -64,4 +80,3 @@ function filterCalibrationForPipette(
     ) || null
   )
 }
-
