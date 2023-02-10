@@ -128,7 +128,7 @@ def test_load_firmware_manifest_unknown_update_type(
 def test_load_firmware_manifest_invalid_update_info(
     mock_manifest: Dict[str, Any]
 ) -> None:
-    """Test invalid update info"""
+    """Test invalid update info."""
     with open(manifest_filename, "w") as fp:
         manifest = mock_manifest.copy()
         manifest["subsystems"]["gantry-x"] = {
