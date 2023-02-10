@@ -276,7 +276,7 @@ def test_pick_up_tip(
             pipetteId="123", labwareId="456", wellName="A2", wellLocation=WellLocation()
         )
     )
-    response = commands.PickUpTipResult()
+    response = commands.PickUpTipResult(tipVolume=78.9)
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 

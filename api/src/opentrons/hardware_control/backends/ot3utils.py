@@ -10,11 +10,13 @@ from opentrons.hardware_control.types import (
     OT3SubSystem,
     OT3Mount,
     InstrumentProbeType,
+    PipetteSubType,
 )
 import numpy as np
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    PipetteType,
     SensorId,
     PipetteTipActionType,
 )
@@ -52,6 +54,15 @@ PipetteAction = Literal["clamp", "home"]
 # to NodeId that are interpreted at import time because then the robot
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
+
+SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
+    OT3SubSystem.gantry_x: NodeId.gantry_x,
+    OT3SubSystem.gantry_y: NodeId.gantry_y,
+    OT3SubSystem.head: NodeId.head,
+    OT3SubSystem.pipette_left: NodeId.pipette_left,
+    OT3SubSystem.pipette_right: NodeId.pipette_right,
+    OT3SubSystem.gripper: NodeId.gripper,
+}
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -140,15 +151,15 @@ def axis_is_node(axis: OT3Axis) -> bool:
 
 def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
     """Convert a sub system to a NodeId."""
-    nam = {
-        OT3SubSystem.gantry_x: NodeId.gantry_x,
-        OT3SubSystem.gantry_y: NodeId.gantry_y,
-        OT3SubSystem.head: NodeId.head,
-        OT3SubSystem.pipette_left: NodeId.pipette_left,
-        OT3SubSystem.pipette_right: NodeId.pipette_right,
-        OT3SubSystem.gripper: NodeId.gripper,
+    return SUBSYSTEM_NODEID[sub_sys]
+
+
+def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
+    """Convert a NodeId to a Subsystem"""
+    node_to_subsystem = {
+        node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
     }
-    return nam[sub_sys]
+    return node_to_subsystem[node_id]
 
 
 def get_current_settings(
@@ -323,3 +334,14 @@ _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
 
 def sensor_id_for_instrument(probe: InstrumentProbeType) -> SensorId:
     return _instr_sensor_id_lookup[probe]
+
+
+_pipette_subtype_lookup = {
+    PipetteSubType.pipette_single: PipetteType.pipette_single,
+    PipetteSubType.pipette_multi: PipetteType.pipette_multi,
+    PipetteSubType.pipette_96: PipetteType.pipette_96,
+}
+
+
+def pipette_type_for_subtype(pipette_subtype: PipetteSubType) -> PipetteType:
+    return _pipette_subtype_lookup[pipette_subtype]

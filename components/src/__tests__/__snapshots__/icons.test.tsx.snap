@@ -1149,6 +1149,30 @@ exports[`icons minus-box renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons move-xy renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 20 20"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M9.45345 4.65104V8.07812H10.5472V4.65104L11.7139 5.72917L12.516 4.92708L10.0003 2.5L7.50293 4.92708L8.30501 5.72917L9.45345 4.65104Z M10.5651 15.3021L10.5651 11.875L9.47135 11.875L9.47135 15.3021L8.30469 14.224L7.5026 15.026L10.0182 17.4531L12.5156 15.026L11.7135 14.224L10.5651 15.3021Z M4.68376 10.5319L8.11084 10.5319L8.11084 9.43815L4.68376 9.43815L5.76188 8.27148L4.9598 7.4694L2.53271 9.98503L4.9598 12.4824L5.76188 11.6803L4.68376 10.5319Z M15.3348 9.42025L11.9077 9.42025L11.9077 10.514L15.3348 10.514L14.2567 11.6807L15.0588 12.4827L17.4858 9.96712L15.0588 7.46973L14.2567 8.27181L15.3348 9.42025Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons open-in-new renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

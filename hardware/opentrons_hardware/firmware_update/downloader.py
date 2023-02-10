@@ -18,6 +18,7 @@ from opentrons_hardware.firmware_bindings.messages import (
     payloads,
     fields,
 )
+from typing import AsyncIterator
 
 logger = logging.getLogger(__name__)
 
@@ -34,23 +35,23 @@ class FirmwareUpdateDownloader:
         node_id: NodeId,
         hex_processor: HexRecordProcessor,
         ack_wait_seconds: float,
-    ) -> None:
+    ) -> AsyncIterator[float]:
         """Download hex record chunks to node.
 
         Args:
             node_id: The target node id.
             hex_processor: The producer of hex chunks.
-            ack_wait_seconds: Number of seconds to wait for an ACK
+            ack_wait_seconds: Number of seconds to wait for an ACK.
 
         Returns:
             None
         """
+        chunks = list(hex_processor.process(fields.FirmwareUpdateDataField.NUM_BYTES))
+        total_chunks = len(chunks)
         with WaitableCallback(self._messenger) as reader:
             num_messages = 0
             crc32 = 0
-            for chunk in hex_processor.process(
-                fields.FirmwareUpdateDataField.NUM_BYTES
-            ):
+            for chunk in chunks:
                 logger.debug(
                     f"Sending chunk {num_messages} to address {chunk.address:x}."
                 )
@@ -72,6 +73,7 @@ class FirmwareUpdateDownloader:
 
                 crc32 = binascii.crc32(data, crc32)
                 num_messages += 1
+                yield num_messages / total_chunks
 
             # Create and send firmware update complete message.
             complete_message = message_definitions.FirmwareUpdateComplete(

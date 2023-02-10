@@ -32,7 +32,7 @@ from .ot3utils import (
     get_current_settings,
     create_home_group,
     node_to_axis,
-    sub_system_to_node_id,
+    pipette_type_for_subtype,
     sensor_node_for_mount,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
@@ -40,6 +40,7 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_tip_action_group,
     PipetteAction,
+    sub_system_to_node_id,
 )
 
 try:
@@ -74,8 +75,10 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
+    PipetteType,
 )
 from opentrons_hardware import firmware_update
+
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
@@ -85,9 +88,10 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
-    OT3SubSystem,
     MotorStatus,
     InstrumentProbeType,
+    PipetteSubType,
+    mount_to_subsystem,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -194,19 +198,59 @@ class OT3Controller:
     def update_required(self) -> bool:
         return self._update_required
 
-    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
-        """Update the firmware."""
-        with open(filename, "r") as f:
-            await firmware_update.run_update(
-                messenger=self._messenger,
-                node_id=sub_system_to_node_id(target),
-                hex_file=f,
-                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
-                #  config values.
-                retry_count=3,
-                timeout_seconds=20,
-                erase=True,
-            )
+    @update_required.setter
+    def update_required(self, value: bool) -> None:
+        if self._update_required != value:
+            log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
+            self._update_required = value
+
+    @staticmethod
+    def _attached_pipettes_to_nodes(
+        attached_pipettes: Dict[OT3Mount, PipetteSubType]
+    ) -> Dict[NodeId, PipetteType]:
+        pipette_nodes = {}
+        for mount, subtype in attached_pipettes.items():
+            subsystem = mount_to_subsystem(mount)
+            node_id = sub_system_to_node_id(subsystem)
+            pipette_type = pipette_type_for_subtype(subtype)
+            pipette_nodes[node_id] = pipette_type
+        return pipette_nodes
+
+    async def update_firmware(
+        self,
+        attached_pipettes: Dict[OT3Mount, PipetteSubType],
+        nodes: Optional[Set[NodeId]] = None,
+    ) -> None:
+        """Updates the firmware on the OT3."""
+        nodes = nodes or set()
+        attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
+        # Check if devices need an update, force update if nodes are specified
+        firmware_updates = firmware_update.check_firmware_updates(
+            self._network_info.device_info, attached_pipette_nodes, nodes=nodes
+        )
+        if not firmware_updates:
+            log.info("No firmware updates required.")
+            self.update_required = False
+            return
+
+        log.info("Firmware updates are available.")
+        self.update_required = True
+        update_details = {
+            node_id: str(update.filepath)
+            for node_id, update in firmware_updates.items()
+        }
+        updater = firmware_update.RunUpdate(
+            messenger=self._messenger,
+            update_details=update_details,
+            retry_count=3,
+            timeout_seconds=20,
+            erase=True,
+        )
+        async for progress in updater.run_updates():
+            pass
+        # refresh the device_info cache and reset the update_required flag
+        await self._network_info.probe()
+        self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
@@ -579,7 +623,7 @@ class OT3Controller:
         serial = attached.serial
         return {
             "config": gripper_config.load(model),
-            "id": f"GRPV{attached.model}{serial}",
+            "id": f"GRPV{attached.model.replace('.', '')}{serial}",
         }
 
     @staticmethod
