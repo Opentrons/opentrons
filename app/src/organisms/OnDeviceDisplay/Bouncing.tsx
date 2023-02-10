@@ -9,7 +9,7 @@ const Container = styled.div`
 export function Bouncing(): JSX.Element {
   const speed = 50
   const scale = 0.4
-  let canvas: HTMLElement
+  let canvas: HTMLCanvasElement
   let ctx: any
   let logoColor: string
 
@@ -68,6 +68,7 @@ export function Bouncing(): JSX.Element {
   }
 
   const main = (): void => {
+    // @ts-ignore:
     canvas = document.getElementById('odd-screen')
     ctx = canvas?.getContext('2d')
     dvd.img.src = logo
