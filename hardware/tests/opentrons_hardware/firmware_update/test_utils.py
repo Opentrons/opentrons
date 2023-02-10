@@ -74,7 +74,7 @@ def test_load_firmware_manifest_success(mock_manifest: Dict[str, Any]) -> None:
     with open(manifest_filename, "w") as fp:
         json.dump(mock_manifest, fp)
 
-    # test that the file written to disk can be serialized
+    # test that the file written to disk can be deserialized
     with mock.patch("os.path.exists"):
         updates = load_firmware_manifest(manifest_filename)
         assert updates
@@ -92,13 +92,15 @@ def test_load_firmware_manifest_success(mock_manifest: Dict[str, Any]) -> None:
         os.unlink(manifest_filename)
 
 
-def test_load_firmware_manifest_failure(mock_manifest: Dict[str, Any]) -> None:
+def test_load_firmware_manifest_file_not_found(mock_manifest: Dict[str, Any]) -> None:
     """Test cases where we cant serialize the manifest file."""
     # return empty if manifest file does not exist
     updates = load_firmware_manifest("unknown-filename.json")
     assert updates == {}
 
-    # test invalid json file
+
+def test_load_firmware_manifest_invalid_json() -> None:
+    """Test loading invalid firmware json file."""
     with open(manifest_filename, "w") as fp:
         fp.write("asdasd")
     with mock.patch("os.path.exists"):
@@ -106,7 +108,11 @@ def test_load_firmware_manifest_failure(mock_manifest: Dict[str, Any]) -> None:
         assert updates == {}
     os.unlink(manifest_filename)
 
-    # test unknown update_type
+
+def test_load_firmware_manifest_unknown_update_type(
+    mock_manifest: Dict[str, Any]
+) -> None:
+    """Test unknown update_type."""
     with open(manifest_filename, "w") as fp:
         manifest = mock_manifest.copy()
         manifest["subsystems"].update({"invalid_subsystem": {}})
@@ -118,7 +124,11 @@ def test_load_firmware_manifest_failure(mock_manifest: Dict[str, Any]) -> None:
         assert len(updates) == 1
         os.unlink(manifest_filename)
 
-    # test invalid update info
+
+def test_load_firmware_manifest_invalid_update_info(
+    mock_manifest: Dict[str, Any]
+) -> None:
+    """Test invalid update info"""
     with open(manifest_filename, "w") as fp:
         manifest = mock_manifest.copy()
         manifest["subsystems"]["gantry-x"] = {
@@ -144,7 +154,11 @@ def test_load_firmware_manifest_failure(mock_manifest: Dict[str, Any]) -> None:
         assert len(updates) == 1
         os.unlink(manifest_filename)
 
-    # test binary update file not found
+
+def test_load_firmware_manifest_binary_file_not_found(
+    mock_manifest: Dict[str, Any]
+) -> None:
+    """Test binary update file not found."""
     with open(manifest_filename, "w") as fp:
         manifest = mock_manifest.copy()
         json.dump(manifest, fp)
@@ -191,8 +205,13 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
         for node_id in firmware_updates:
             assert node_id in device_info_cache
 
-    # test updates when nodes are specified, which updates the device regardless of the shortsha
-    device_info_cache = generate_device_info(manifest)
+
+def test_check_firmware_updates_available_nodes_specified(
+    mock_manifest: Dict[str, Any]
+) -> None:
+    """Test updates when nodes are specified, which updates the device regardless of the shortsha."""
+    device_info_cache = generate_device_info(mock_manifest)
+    known_firmware_updates = generate_update_info(mock_manifest)
     with mock.patch(
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=known_firmware_updates),
@@ -205,7 +224,10 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
         for node_id in firmware_updates:
             assert node_id in device_info_cache
 
-    # dont do updates if load_firmware_manifest is empty
+
+def test_load_firmware_manifest_is_empty(mock_manifest: Dict[str, Any]) -> None:
+    """Don't do updates if load_firmware_manifest is empty."""
+    device_info_cache = generate_device_info(mock_manifest)
     with mock.patch(
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value={}),
@@ -215,8 +237,11 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
         )
         assert firmware_updates == {}
 
-    # no firmware updates if the FirmwareUpdateType is unknown
+
+def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
+    """Don't do updates if the FirmwareUpdateType is unknown."""
     device_info = {NodeId.head: DeviceInfoCache(NodeId.head, 2, "12345678", None)}
+    known_firmware_updates = generate_update_info(mock_manifest)
     known_firmware_updates.pop(FirmwareUpdateType.head)
     with mock.patch(
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
