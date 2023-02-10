@@ -178,7 +178,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if self._api_version >= APIVersion(2, 14):
             last_location = self._protocol_core.get_last_location(
-                mount=types.Mount.string_to_mount(self.mount)
+                mount=self._core.get_mount()
             )
         else:
             last_location = self._protocol_core.get_last_location()
