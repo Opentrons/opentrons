@@ -328,6 +328,9 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
         print("Force_Gauge_Test")
         await _force_gauge(messenger, csv_cb.write)
 
+    print(CURRENTS_SPEEDS_TEST_RESULTS)
+    print(FORCE_GAUGE_TEST_RESULTS)
+
     print('Test Done...')
 
 async def _main(arguments: argparse.Namespace) -> None:
