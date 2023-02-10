@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Dict, Tuple, List
+from typing import Iterator, AsyncIterator, Union, Dict, Tuple, List, cast
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -58,11 +58,11 @@ def fake_settings() -> CapacitivePassSettings:
 @pytest.fixture
 def mock_move_to(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
-        ot3_hardware.managed_obj,
+        cast(OT3API, ot3_hardware.managed_obj),
         "move_to",
         AsyncMock(
-            spec=ot3_hardware.managed_obj.move_to,
-            wraps=ot3_hardware.managed_obj.move_to,
+            spec=cast(OT3API, ot3_hardware.managed_obj).move_to,
+            wraps=cast(OT3API, ot3_hardware.managed_obj).move_to,
         ),
     ) as mock_move:
         yield mock_move
@@ -74,8 +74,8 @@ def mock_home(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
         ot3_hardware.managed_obj,
         "home",
         AsyncMock(
-            spec=ot3_hardware.managed_obj.home,
-            wraps=ot3_hardware.managed_obj.home,
+            spec=cast(OT3API, ot3_hardware.managed_obj).home,
+            wraps=cast(OT3API, ot3_hardware.managed_obj).home,
         ),
     ) as mock_move:
         yield mock_move
@@ -87,8 +87,8 @@ def mock_gantry_position(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncM
         ot3_hardware.managed_obj,
         "gantry_position",
         AsyncMock(
-            spec=ot3_hardware.managed_obj.gantry_position,
-            wraps=ot3_hardware.managed_obj.gantry_position,
+            spec=cast(OT3API, ot3_hardware.managed_obj).gantry_position,
+            wraps=cast(OT3API, ot3_hardware.managed_obj).gantry_position,
         ),
     ) as mock_gantry_pos:
         yield mock_gantry_pos
@@ -100,8 +100,8 @@ def mock_grip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
         ot3_hardware.managed_obj,
         "_grip",
         AsyncMock(
-            spec=ot3_hardware.managed_obj._grip,
-            wraps=ot3_hardware.managed_obj._grip,
+            spec=cast(OT3API, ot3_hardware.managed_obj)._grip,
+            wraps=cast(OT3API, ot3_hardware.managed_obj)._grip,
         ),
     ) as mock_move:
         yield mock_move
@@ -113,8 +113,8 @@ def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
         ot3_hardware.managed_obj,
         "_ungrip",
         AsyncMock(
-            spec=ot3_hardware.managed_obj._ungrip,
-            wraps=ot3_hardware.managed_obj._ungrip,
+            spec=cast(OT3API, ot3_hardware.managed_obj)._ungrip,
+            wraps=cast(OT3API, ot3_hardware.managed_obj)._ungrip,
         ),
     ) as mock_move:
         yield mock_move
@@ -126,27 +126,27 @@ def mock_hold_jaw_width(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMo
         ot3_hardware.managed_obj,
         "_hold_jaw_width",
         AsyncMock(
-            spec=ot3_hardware.managed_obj._hold_jaw_width,
-            wraps=ot3_hardware.managed_obj._hold_jaw_width,
+            spec=cast(OT3API, ot3_hardware.managed_obj)._hold_jaw_width,
+            wraps=cast(OT3API, ot3_hardware.managed_obj)._hold_jaw_width,
         ),
     ) as mock_move:
         yield mock_move
 
 
 @pytest.fixture
-async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
-        ot3_hardware.managed_obj._backend,
+        cast(OT3API, ot3_hardware.managed_obj)._backend,
         "move",
-        AsyncMock(spec=ot3_hardware.managed_obj._backend.move),
+        AsyncMock(spec=cast(OT3API, ot3_hardware.managed_obj)._backend.move),
     ) as mock_move:
         yield mock_move
 
 
 @pytest.fixture
-async def mock_instrument_handlers(
+def mock_instrument_handlers(
     ot3_hardware: ThreadManager[OT3API],
-) -> Iterator[Tuple[Mock]]:
+) -> Iterator[Tuple[Mock, Mock]]:
     with patch.object(
         ot3_hardware.managed_obj,
         "_gripper_handler",
@@ -209,13 +209,13 @@ async def mock_instrument_handlers(
 )
 async def test_gantry_load_transform(
     ot3_hardware: ThreadManager[OT3API],
-    load_configs: Dict[str, Union[int, str, Tuple[int, int]]],
+    load_configs: Dict[OT3Mount, Dict[str, Union[int, str, Tuple[int, int]]]],
     load: GantryLoad,
 ) -> None:
 
     for mount, configs in load_configs.items():
         if mount == OT3Mount.GRIPPER:
-            gripper_config = gc.load(configs["model"])
+            gripper_config = gc.load(cast(GripperModel, configs["model"]))
             instr_data = AttachedGripper(config=gripper_config, id="2345")
             await ot3_hardware.cache_gripper(instr_data)
         else:
@@ -223,11 +223,16 @@ async def test_gantry_load_transform(
                 ot3_pipette_config.PipetteModelVersionType(
                     PipetteModelType(configs["model"]),
                     PipetteChannelType(configs["channels"]),
-                    PipetteVersionType(*configs["version"]),
+                    PipetteVersionType(
+                        *cast(
+                            Tuple[Literal[1, 2, 3], Literal[0, 1, 2, 3]],
+                            configs["version"],
+                        )
+                    ),
                 )
             )
-            instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
-            await ot3_hardware.cache_pipette(mount, instr_data, None)
+            pip_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
+            await ot3_hardware.cache_pipette(mount, pip_data, None)
     assert ot3_hardware._gantry_load_from_instruments() == load
 
 
@@ -235,7 +240,7 @@ async def test_gantry_load_transform(
 def mock_backend_capacitive_probe(
     ot3_hardware: ThreadManager[OT3API],
 ) -> Iterator[AsyncMock]:
-    backend = ot3_hardware.managed_obj._backend
+    backend = cast(OT3API, ot3_hardware.managed_obj)._backend
     with patch.object(
         backend, "capacitive_probe", AsyncMock(spec=backend.capacitive_probe)
     ) as mock_probe:
@@ -259,7 +264,7 @@ def mock_backend_capacitive_probe(
 def mock_backend_capacitive_pass(
     ot3_hardware: ThreadManager[OT3API],
 ) -> Iterator[AsyncMock]:
-    backend = ot3_hardware.managed_obj._backend
+    backend = cast(OT3API, ot3_hardware.managed_obj)._backend
     with patch.object(
         backend, "capacitive_pass", AsyncMock(spec=backend.capacitive_pass)
     ) as mock_pass:
@@ -270,7 +275,7 @@ def mock_backend_capacitive_pass(
             distance_mm: float,
             speed_mm_per_s: float,
             probe: InstrumentProbeType,
-        ) -> None:
+        ) -> List[int]:
             ot3_hardware._backend._position[axis_to_node(moving)] += distance_mm / 2
             return [1, 2, 3, 4, 5, 6, 8]
 
@@ -351,9 +356,6 @@ async def test_capacitive_probe(
         assert this_point == original
 
 
-Direction = Union[Literal[0.0], Literal[1.0], Literal[-1.0]]
-
-
 @pytest.mark.parametrize(
     "target,origin,prep_direction,probe_direction",
     [
@@ -392,8 +394,8 @@ async def test_probe_direction(
     fake_settings: CapacitivePassSettings,
     target: float,
     origin: Point,
-    prep_direction: Direction,
-    probe_direction: Direction,
+    prep_direction: float,
+    probe_direction: float,
 ) -> None:
     mock_gantry_position.return_value = origin
     await ot3_hardware.capacitive_probe(
@@ -639,7 +641,7 @@ async def test_gripper_fails_for_pipette_cps(
 
 
 @pytest.mark.xfail
-async def test_gripper_position(ot3_hardware: ThreadManager[OT3API]):
+async def test_gripper_position(ot3_hardware: ThreadManager[OT3API]) -> None:
     gripper_config = gc.load(GripperModel.v1)
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
     await ot3_hardware.cache_gripper(instr_data)
@@ -655,7 +657,7 @@ async def test_gripper_position(ot3_hardware: ThreadManager[OT3API]):
 
 async def test_gripper_move_to(
     ot3_hardware: ThreadManager[OT3API], mock_backend_move: AsyncMock
-):
+) -> None:
     # Moving the gripper should, well, work
     gripper_config = gc.load(GripperModel.v1)
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
@@ -674,8 +676,12 @@ async def test_gripper_move_to(
         OT3Axis.Z_G: 0,
         OT3Axis.G: 0,
     }
+
+    def _key(elem: OT3Axis) -> int:
+        return elem.value
+
     for move in moves:
-        assert list(sorted(move.unit_vector.keys(), key=lambda elem: elem.value)) == [
+        assert list(sorted(move.unit_vector.keys(), key=_key)) == [
             OT3Axis.X,
             OT3Axis.Y,
             OT3Axis.Z_G,
@@ -718,7 +724,7 @@ async def test_move_stall_flag(
 async def test_reset_instrument_offset(
     ot3_hardware: ThreadManager[OT3API],
     mount: Union[OT3Mount, Mount],
-    mock_instrument_handlers: Tuple[Mock],
+    mock_instrument_handlers: Tuple[Mock, Mock],
 ) -> None:
     gripper_handler, pipette_handler = mock_instrument_handlers
     await ot3_hardware.reset_instrument_offset(mount)
@@ -744,7 +750,7 @@ async def test_reset_instrument_offset(
 async def test_save_instrument_offset(
     ot3_hardware: ThreadManager[OT3API],
     mount: Union[OT3Mount, Mount],
-    mock_instrument_handlers: Tuple[Mock],
+    mock_instrument_handlers: Tuple[Mock, Mock],
 ) -> None:
     gripper_handler, pipette_handler = mock_instrument_handlers
     await ot3_hardware.save_instrument_offset(mount, Point(1, 1, 1))
@@ -759,13 +765,13 @@ async def test_save_instrument_offset(
 
 async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
-    mock_instrument_handlers: Tuple[Mock],
+    mock_instrument_handlers: Tuple[Mock, Mock],
 ) -> None:
     await ot3_hardware.home()
     _, pipette_handler = mock_instrument_handlers
-    backend = ot3_hardware.managed_obj._backend
+    backend = cast(OT3API, ot3_hardware.managed_obj)._backend
 
-    def _fake_function():
+    def _fake_function() -> None:
         return None
 
     with patch.object(
@@ -806,12 +812,12 @@ async def test_pick_up_tip_full_tiprack(
 
 async def test_drop_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
-    mock_instrument_handlers: Tuple[Mock],
+    mock_instrument_handlers: Tuple[Mock, Mock],
 ) -> None:
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
 
-    def _fake_function():
+    def _fake_function() -> None:
         return None
 
     with patch.object(
@@ -850,7 +856,7 @@ async def test_update_position_estimation(
     ot3_hardware: ThreadManager[OT3API], axes: List[OT3Axis]
 ) -> None:
 
-    backend = ot3_hardware.managed_obj._backend
+    backend = cast(OT3API, ot3_hardware.managed_obj)._backend
     with patch.object(
         backend,
         "update_motor_estimation",
@@ -864,7 +870,7 @@ async def test_update_position_estimation(
 
 async def test_refresh_current_position(ot3_hardware: ThreadManager[OT3API]) -> None:
 
-    backend = ot3_hardware.managed_obj._backend
+    backend = cast(OT3API, ot3_hardware.managed_obj)._backend
 
     mock_update = AsyncMock(spec=backend.update_position)
     mock_update.return_value = {ax: 100 for ax in OT3Axis}

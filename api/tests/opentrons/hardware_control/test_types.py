@@ -2,7 +2,7 @@ import enum
 from opentrons.hardware_control import types
 
 
-def test_create_aionotify_event():
+def test_create_aionotify_event() -> None:
     class FakeEnum(enum.Enum):
         CREATE = enum.auto()
         DELETE = enum.auto()

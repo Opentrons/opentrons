@@ -4,19 +4,20 @@ from opentrons import types
 from opentrons.hardware_control import ot3api
 from opentrons.hardware_control.types import OT3Axis, OT3Mount
 from opentrons_shared_data.pipette import name_for_model
+from opentrons_shared_data.pipette.dev_types import PipetteModel
 
 
 @pytest.mark.parametrize(
     "pipette_model", ["p1000_single_v3.0", "p1000_single_v3.1", "p50_multi_v3.1"]
 )
-async def test_transforms_roundtrip(pipette_model):
+async def test_transforms_roundtrip(pipette_model: PipetteModel) -> None:
     attached = {
-        types.Mount.LEFT: {
+        OT3Mount.LEFT: {
             "model": pipette_model,
             "id": pipette_model + "_idididid_left",
             "name": name_for_model(pipette_model),
         },
-        types.Mount.RIGHT: {
+        OT3Mount.RIGHT: {
             "model": pipette_model,
             "id": pipette_model + "_idididid_right",
             "name": name_for_model(pipette_model),
@@ -32,14 +33,14 @@ async def test_transforms_roundtrip(pipette_model):
 @pytest.mark.parametrize(
     "pipette_model", ["p1000_single_v3.0", "p50_single_v3.1", "p1000_multi_v3.1"]
 )
-async def test_transform_values(pipette_model):
+async def test_transform_values(pipette_model: PipetteModel) -> None:
     attached = {
-        types.Mount.LEFT: {
+        OT3Mount.LEFT: {
             "model": pipette_model,
             "id": pipette_model + "_idididid_left",
             "name": name_for_model(pipette_model),
         },
-        types.Mount.RIGHT: {
+        OT3Mount.RIGHT: {
             "model": pipette_model,
             "id": pipette_model + "_idididid_right",
             "name": name_for_model(pipette_model),

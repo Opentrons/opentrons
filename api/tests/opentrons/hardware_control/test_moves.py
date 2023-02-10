@@ -1,4 +1,5 @@
 import asyncio
+from typing import Sequence, Any, Callable, cast, Dict
 
 import mock
 import pytest
@@ -6,6 +7,9 @@ from decoy import Decoy
 
 from opentrons import config, types
 from opentrons import hardware_control as hc
+from opentrons.hardware_control.backends import Simulator
+from opentrons.drivers.smoothie_drivers import SimulatingDriver
+
 from opentrons.calibration_storage.types import (
     SourceType,
     CalibrationStatus,
@@ -14,6 +18,7 @@ from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,
     MotionChecks,
+    OT3AxisMap,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -26,17 +31,19 @@ from opentrons.hardware_control.robot_calibration import (
 )
 from opentrons.hardware_control.types import OT3Axis
 
+from opentrons_shared_data.pipette.dev_types import PipetteModel
 
-async def test_controller_must_home(hardware_api):
+
+async def test_controller_must_home(hardware_api: hc.API) -> None:
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
     home = mock.AsyncMock()
-    hardware_api.home = home
+    hardware_api.home = home  # type: ignore[assignment]
     await hardware_api.move_to(mount, abs_position)
     home.assert_called_once()
 
 
-async def test_home_specific_sim(hardware_api):
+async def test_home_specific_sim(hardware_api: hc.API) -> None:
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     # Avoid the autoretract when moving two difference instruments
@@ -53,7 +60,7 @@ async def test_home_specific_sim(hardware_api):
     }
 
 
-async def test_retract(hardware_api):
+async def test_retract(hardware_api: hc.API) -> None:
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     await hardware_api.retract(types.Mount.RIGHT, 10)
@@ -67,8 +74,11 @@ async def test_retract(hardware_api):
     }
 
 
+HomeType = Callable[[Sequence[OT3Axis]], OT3AxisMap[float]]
+
+
 @pytest.fixture
-def mock_home(ot3_hardware):
+def mock_home(ot3_hardware: hc.ThreadManagedHardware) -> HomeType:
     with mock.patch.object(ot3_hardware._backend, "home") as mock_home:
         mock_home.return_value = {
             OT3Axis.X: 0,
@@ -83,7 +93,9 @@ def mock_home(ot3_hardware):
         yield mock_home
 
 
-async def test_home(ot3_hardware, mock_home):
+async def test_home(
+    ot3_hardware: hc.ThreadManagedHardware, mock_home: mock.Mock
+) -> None:
     with mock.patch("opentrons.hardware_control.ot3api.deck_from_machine") as dfm_mock:
         dfm_mock.return_value = {OT3Axis.X: 20}
         await ot3_hardware.home([OT3Axis.X])
@@ -97,7 +109,9 @@ async def test_home(ot3_hardware, mock_home):
     assert ot3_hardware._current_position[OT3Axis.X] == 20
 
 
-async def test_home_unmet(ot3_hardware, mock_home):
+async def test_home_unmet(
+    ot3_hardware: hc.ThreadManagedHardware, mock_home: mock.Mock
+) -> None:
     from opentrons_hardware.hardware_control.motion_planning.move_utils import (
         MoveConditionNotMet,
     )
@@ -109,7 +123,7 @@ async def test_home_unmet(ot3_hardware, mock_home):
     assert ot3_hardware._current_position == {}
 
 
-async def test_move(hardware_api):
+async def test_move(hardware_api: hc.API) -> None:
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
     target_position1 = {
@@ -141,7 +155,9 @@ async def test_move(hardware_api):
     assert hardware_api._current_position == target_position2
 
 
-async def test_move_extras_passed_through(hardware_api, monkeypatch):
+async def test_move_extras_passed_through(
+    hardware_api: hc.API, monkeypatch: Any
+) -> None:
     mock_be_move = mock.AsyncMock()
     monkeypatch.setattr(hardware_api._backend, "move", mock_be_move)
     await hardware_api.home()
@@ -162,7 +178,7 @@ async def test_move_extras_passed_through(hardware_api, monkeypatch):
     assert mock_be_move.call_args_list[0][1]["axis_max_speeds"] == {"Y": 20}
 
 
-async def test_mount_offset_applied(hardware_api, is_robot):
+async def test_mount_offset_applied(hardware_api: hc.API, is_robot: None) -> None:
     await hardware_api.home()
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.LEFT
@@ -187,12 +203,12 @@ async def test_mount_offset_applied(hardware_api, is_robot):
     ],
 )
 async def test_gripper_critical_points_fail_on_pipettes(
-    hardware_api, is_robot, critical_point
-):
+    hardware_api: hc.API, is_robot: None, critical_point: CriticalPoint
+) -> None:
     await hardware_api.home()
-    hardware_api._backend._attached_instruments = {
+    cast(Simulator, hardware_api._backend)._attached_instruments = {
         types.Mount.LEFT: {"model": None, "id": None},
-        types.Mount.RIGHT: {"model": "p10_single_v1", "id": "testyness"},
+        types.Mount.RIGHT: {"model": PipetteModel("p10_single_v1"), "id": "testyness"},
     }
     await hardware_api.cache_instruments()
     with pytest.raises(InvalidMoveError):
@@ -201,25 +217,30 @@ async def test_gripper_critical_points_fail_on_pipettes(
         )
 
 
-async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
+async def test_critical_point_applied(
+    hardware_api: hc.API, monkeypatch: Any, is_robot: None
+) -> None:
     await hardware_api.home()
-    hardware_api._backend._attached_instruments = {
+    cast(Simulator, hardware_api._backend)._attached_instruments = {
         types.Mount.LEFT: {"model": None, "id": None},
-        types.Mount.RIGHT: {"model": "p10_single_v1", "id": "testyness"},
+        types.Mount.RIGHT: {
+            "model": cast(PipetteModel, "p10_single_v1"),
+            "id": "testyness",
+        },
     }
     await hardware_api.cache_instruments()
     # Our critical point is now the tip of the nozzle
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     target_no_offset = {
-        Axis.X: 0,
-        Axis.Y: 0,
-        Axis.Z: 218,
-        Axis.A: -12,  # from pipette-config.json nozzle offset
-        Axis.B: 19,
-        Axis.C: 19,
+        Axis.X: 0.0,
+        Axis.Y: 0.0,
+        Axis.Z: 218.0,
+        Axis.A: -12.0,  # from pipette-config.json nozzle offset
+        Axis.B: 19.0,
+        Axis.C: 19.0,
     }
     assert hardware_api._current_position == target_no_offset
-    target = {Axis.X: 0, Axis.Y: 0, Axis.A: 0, Axis.C: 19}
+    target = {Axis.X: 0.0, Axis.Y: 0.0, Axis.A: 0.0, Axis.C: 19.0}
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
     p10_tip_length = 33
     # Specifiying critical point overrides as mount should not use nozzle
@@ -230,10 +251,10 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     assert hardware_api._current_position == {
         Axis.X: 0.0,
         Axis.Y: 0.0,
-        Axis.Z: 218,
-        Axis.A: -30,
-        Axis.B: 19,
-        Axis.C: 19,
+        Axis.Z: 218.0,
+        Axis.A: -30.0,
+        Axis.B: 19.0,
+        Axis.C: 19.0,
     }
     assert await hardware_api.current_position(
         types.Mount.RIGHT, critical_point=CriticalPoint.MOUNT
@@ -260,7 +281,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     await hardware_api.move_rel(types.Mount.RIGHT, types.Point(2.5, 0, 0))
     await hardware_api.drop_tip(types.Mount.RIGHT)
     await hardware_api.home_plunger(types.Mount.RIGHT)
-    target[Axis.A] = 33 + hc.DROP_TIP_RELEASE_DISTANCE
+    target[Axis.A] = 33.0 + hc.DROP_TIP_RELEASE_DISTANCE
     target_no_offset[Axis.X] = 2.5
     target[Axis.X] = 2.5
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
@@ -273,25 +294,28 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
 
 
-async def test_new_critical_point_applied(hardware_api):
+async def test_new_critical_point_applied(hardware_api: hc.API) -> None:
     await hardware_api.home()
-    hardware_api._backend._attached_instruments = {
+    cast(Simulator, hardware_api._backend)._attached_instruments = {
         types.Mount.LEFT: {"model": None, "id": None},
-        types.Mount.RIGHT: {"model": "p10_single_v1", "id": "testyness"},
+        types.Mount.RIGHT: {
+            "model": cast(PipetteModel, "p10_single_v1"),
+            "id": "testyness",
+        },
     }
     await hardware_api.cache_instruments()
     # Our critical point is now the tip of the nozzle
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     target_no_offset = {
-        Axis.X: 0,
-        Axis.Y: 0,
+        Axis.X: 0.0,
+        Axis.Y: 0.0,
         Axis.Z: 218,
         Axis.A: -12,  # from pipette-config.json model offset
         Axis.B: 19,
         Axis.C: 19,
     }
     assert hardware_api._current_position == target_no_offset
-    target = {Axis.X: 0, Axis.Y: 0, Axis.A: 0, Axis.C: 19}
+    target = {Axis.X: 0.0, Axis.Y: 0.0, Axis.A: 0.0, Axis.C: 19.0}
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
     p10_tip_length = 33
     # Specifiying critical point overrides as mount should not use model offset
@@ -336,21 +360,24 @@ async def test_new_critical_point_applied(hardware_api):
     target[Axis.X] = 2.5
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
-    target[Axis.X] = 0
-    target_no_offset[Axis.X] = 0
-    target_no_offset[Axis.A] = -12
-    target[Axis.A] = 0
+    target[Axis.X] = 0.0
+    target_no_offset[Axis.X] = 0.0
+    target_no_offset[Axis.A] = -12.0
+    target[Axis.A] = 0.0
     assert hardware_api._current_position == target_no_offset
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
 
 
-async def test_attitude_deck_cal_applied(monkeypatch):
+async def test_attitude_deck_cal_applied(monkeypatch: Any) -> None:
     new_gantry_cal = [[1.0047, -0.0046, 0.0], [0.0011, 1.0038, 0.0], [0.0, 0.0, 1.0]]
     called_with = None
 
     async def mock_move(
-        position, speed=None, home_flagged_axes=True, axis_max_speeds=None
-    ):
+        position: Dict[str, float],
+        speed=None,
+        home_flagged_axes=True,
+        axis_max_speeds=None,
+    ) -> None:
         nonlocal called_with
         called_with = position
 
@@ -366,6 +393,7 @@ async def test_attitude_deck_cal_applied(monkeypatch):
     hardware_api.set_robot_calibration(deck_cal)
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    assert called_with is not None
     assert called_with["X"] == 0.0
     assert called_with["Y"] == 0.0
     assert called_with["A"] == -30.0
@@ -376,7 +404,7 @@ async def test_attitude_deck_cal_applied(monkeypatch):
     assert round(called_with["Z"], 2) == -30.0
 
 
-async def test_other_mount_retracted(hardware_api, is_robot):
+async def test_other_mount_retracted(hardware_api: hc.API, is_robot: None) -> None:
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     assert await hardware_api.gantry_position(types.Mount.RIGHT) == types.Point(0, 0, 0)
@@ -386,11 +414,14 @@ async def test_other_mount_retracted(hardware_api, is_robot):
     )
 
 
-async def test_shake_during_pick_up(hardware_api, monkeypatch):
+async def test_shake_during_pick_up(hardware_api: hc.API, monkeypatch: Any) -> None:
     await hardware_api.home()
-    hardware_api._backend._attached_instruments = {
+    cast(Simulator, hardware_api._backend)._attached_instruments = {
         types.Mount.LEFT: {"model": None, "id": None},
-        types.Mount.RIGHT: {"model": "p1000_single_v2.0", "id": "testyness"},
+        types.Mount.RIGHT: {
+            "model": cast(PipetteModel, "p1000_single_v2.0"),
+            "id": "testyness",
+        },
     }
     await hardware_api.cache_instruments()
 
@@ -415,11 +446,14 @@ async def test_shake_during_pick_up(hardware_api, monkeypatch):
     move_rel.assert_has_calls(move_rel_calls)
 
 
-async def test_shake_during_drop(hardware_api, monkeypatch):
+async def test_shake_during_drop(hardware_api: hc.API, monkeypatch: Any) -> None:
     await hardware_api.home()
-    hardware_api._backend._attached_instruments = {
+    cast(Simulator, hardware_api._backend)._attached_instruments = {
         types.Mount.LEFT: {"model": None, "id": None},
-        types.Mount.RIGHT: {"model": "p1000_single_v1.5", "id": "testyness"},
+        types.Mount.RIGHT: {
+            "model": cast(PipetteModel, "p1000_single_v1.5"),
+            "id": "testyness",
+        },
     }
     await hardware_api.cache_instruments()
     await hardware_api.add_tip(types.Mount.RIGHT, 50.0)
@@ -475,16 +509,16 @@ async def test_shake_during_drop(hardware_api, monkeypatch):
     move_rel.assert_has_calls(move_rel_calls)
 
 
-async def test_move_rel_bounds(hardware_api):
+async def test_move_rel_bounds(hardware_api: hc.API) -> None:
     with pytest.raises(OutOfBoundsMove):
         await hardware_api.move_rel(
             types.Mount.RIGHT, types.Point(0, 0, 2000), check_bounds=MotionChecks.HIGH
         )
 
 
-async def test_move_rel_homing_failures(hardware_api):
+async def test_move_rel_homing_failures(hardware_api: hc.API) -> None:
     await hardware_api.home()
-    hardware_api._backend._smoothie_driver._homed_flags = {
+    cast(SimulatingDriver, hardware_api._backend._smoothie_driver)._homed_flags = {
         "X": True,
         "Y": True,
         "Z": False,
@@ -504,9 +538,11 @@ async def test_move_rel_homing_failures(hardware_api):
     )
 
 
-async def test_current_position_homing_failures(hardware_api):
+async def test_current_position_homing_failures(
+    hardware_api: hc.API,
+) -> None:
     await hardware_api.home()
-    hardware_api._backend._smoothie_driver._homed_flags = {
+    cast(SimulatingDriver, hardware_api._backend._smoothie_driver)._homed_flags = {
         "X": True,
         "Y": True,
         "Z": False,

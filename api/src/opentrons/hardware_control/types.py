@@ -1,7 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar
+from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Sequence
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -471,7 +471,7 @@ class AionotifyEvent:
     name: str
 
     @classmethod
-    def build(cls, name: str, flags: List[enum.Enum]) -> "AionotifyEvent":
+    def build(cls, name: str, flags: Sequence[enum.Enum]) -> "AionotifyEvent":
         # See https://github.com/python/mypy/issues/5317
         # as to why mypy cannot detect that list
         # comprehension or variables cannot be dynamically

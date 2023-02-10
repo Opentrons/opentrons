@@ -16,7 +16,7 @@ async def _raise_exception() -> Any:
     raise Exception("oh no")
 
 
-def test_build_fail_raises_exception():
+def test_build_fail_raises_exception() -> None:
     """
     Test that a builder that raises an exception raises
     a ThreadManagerException
@@ -25,7 +25,7 @@ def test_build_fail_raises_exception():
         ThreadManager(_raise_exception)
 
 
-def test_module_cache_add_entry():
+def test_module_cache_add_entry() -> None:
     """Test that _cached_modules updates correctly."""
 
     mod_names = ["tempdeck"]
@@ -47,7 +47,7 @@ def test_module_cache_add_entry():
     assert mods == mods2
 
 
-async def test_module_cache_remove_entry():
+async def test_module_cache_remove_entry() -> None:
     """Test that module entry gets removed from cache when module detaches."""
     mod_names = ["tempdeck", "magdeck"]
     thread_manager = ThreadManager(

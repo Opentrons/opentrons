@@ -28,7 +28,7 @@ def mock_pipette_ot3(decoy: Decoy) -> OT3Pipette:
 
 
 @pytest.fixture
-def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
+def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider[types.Mount]:
     inst_by_mount = {types.Mount.LEFT: mock_pipette, types.Mount.RIGHT: None}
     subject = PipetteHandlerProvider(attached_instruments=inst_by_mount)
     return subject
@@ -38,7 +38,7 @@ def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
 def subject_ot3(
     decoy: Decoy, mock_pipette_ot3: OT3Pipette
 ) -> OT3PipetteHandlerProvider:
-    inst_by_mount = {types.Mount.LEFT: mock_pipette_ot3, types.Mount.RIGHT: None}
+    inst_by_mount = {types.OT3Mount.LEFT: mock_pipette_ot3, types.OT3Mount.RIGHT: None}
     subject = OT3PipetteHandlerProvider(attached_instruments=inst_by_mount)
     return subject
 
@@ -48,7 +48,7 @@ def subject_ot3(
 )
 def test_plan_check_pick_up_tip_with_presses_argument(
     decoy: Decoy,
-    subject: PipetteHandlerProvider,
+    subject: PipetteHandlerProvider[types.Mount],
     mock_pipette: Pipette,
     presses_input: int,
     expected_array_length: int,
@@ -60,7 +60,6 @@ def test_plan_check_pick_up_tip_with_presses_argument(
     increment = None
 
     decoy.when(mock_pipette.has_tip).then_return(False)
-    decoy.when(mock_pipette.config.quirks).then_return([])
     decoy.when(mock_pipette.config.pick_up_distance).then_return(0)
     decoy.when(mock_pipette.config.pick_up_increment).then_return(0)
 
@@ -97,7 +96,7 @@ def test_plan_check_pick_up_tip_with_presses_argument(
 )
 def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy: Decoy,
-    subject_ot3: PipetteHandlerProvider,
+    subject_ot3: OT3PipetteHandlerProvider,
     mock_pipette_ot3: OT3Pipette,
     presses_input: int,
     expected_array_length: int,
@@ -106,7 +105,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
 ) -> None:
     """Should return an array with expected length."""
     tip_length = 25.0
-    mount = types.Mount.LEFT
+    mount = types.OT3Mount.LEFT
     presses = presses_input
     increment = 1
 
@@ -116,7 +115,6 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy.when(mock_pipette_ot3.pick_up_configurations.speed).then_return(10)
     decoy.when(mock_pipette_ot3.pick_up_configurations.distance).then_return(0)
     decoy.when(mock_pipette_ot3.pick_up_configurations.current).then_return(1)
-    decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels.value).then_return(channels)
 
     if presses_input is None:
@@ -132,6 +130,8 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     assert spec.pick_up_motor_actions == expected_pick_up_motor_actions
 
 
-def test_get_pipette_fails(decoy: Decoy, subject: PipetteHandlerProvider):
+def test_get_pipette_fails(
+    decoy: Decoy, subject: PipetteHandlerProvider[types.Mount]
+) -> None:
     with pytest.raises(types.PipetteNotAttachedError):
         subject.get_pipette(types.Mount.RIGHT)

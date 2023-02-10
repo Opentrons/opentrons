@@ -22,7 +22,10 @@ LEFT_PIPETTE_MODEL = "{}_v1".format(LEFT_PIPETTE_PREFIX)
 LEFT_PIPETTE_ID = "testy"
 
 
-def dummy_instruments_attached():
+InstrumentsAttached = Dict[types.Mount, Dict[str, Optional[str]]]
+
+
+def dummy_instruments_attached() -> InstrumentsAttached:
     return {
         types.Mount.LEFT: {
             "model": LEFT_PIPETTE_MODEL,
@@ -38,28 +41,31 @@ def dummy_instruments_attached():
 
 
 @pytest.fixture
-def dummy_instruments():
+def dummy_instruments() -> InstrumentsAttached:
     return dummy_instruments_attached()
 
 
-def dummy_instruments_attached_ot3():
+InstrumentsAttachedOT3 = Dict[OT3Mount, Optional[Dict[str, Optional[str]]]]
+
+
+def dummy_instruments_attached_ot3() -> InstrumentsAttachedOT3:
     return {
-        types.Mount.LEFT: {
+        OT3Mount.LEFT: {
             "model": "p1000_single_v3.0",
             "id": "testy",
             "name": "p1000_single_gen3",
         },
-        types.Mount.RIGHT: {"model": None, "id": None, "name": None},
+        OT3Mount.RIGHT: {"model": None, "id": None, "name": None},
         OT3Mount.GRIPPER: None,
     }
 
 
 @pytest.fixture
-def dummy_instruments_ot3():
+def dummy_instruments_ot3() -> InstrumentsAttachedOT3:
     return dummy_instruments_attached_ot3()
 
 
-def wrap_build_ot3_sim():
+def wrap_build_ot3_sim() -> "Callable[[...], OT3API]":
     from opentrons.hardware_control.ot3api import OT3API
 
     return OT3API.build_hardware_simulator
