@@ -18,11 +18,29 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 )
 from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
+LABWARE_SIZE_ARMADILLO = Point(x=127.8, y=-85.55, z=16)
+LABWARE_SIZE_EVT_TIPRACK = Point(x=127.6, y=-85.8, z=93)
+LABWARE_SIZE_RESERVOIR = Point(x=127.8, y=-85.55, z=30)
+
+LABWARE_SIZE = {
+    "plate": LABWARE_SIZE_ARMADILLO,
+    "tiprack": LABWARE_SIZE_EVT_TIPRACK,
+    "reservoir": LABWARE_SIZE_RESERVOIR,
+}
+LABWARE_GRIP_HEIGHT = {
+    "plate": LABWARE_SIZE_ARMADILLO.z * 0.5,
+    "tiprack": LABWARE_SIZE_EVT_TIPRACK.z * 0.4,
+    "reservoir": LABWARE_SIZE_RESERVOIR.z * 0.5,
+}
+LABWARE_KEYS = list(LABWARE_SIZE.keys())
+LABWARE_GRIP_FORCE = {k: 15 for k in LABWARE_KEYS}
+
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Labware Test')
     arg_parser.add_argument('-p', '--probe', choices=['front','rear'], required=False, help='The gripper probe position to be tested', default='front')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
+    arg_parser.add_argument('-l', '--labware', choices=LABWARE_KEYS, required=True)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
@@ -30,19 +48,24 @@ class Gripper_Labware_Test:
     def __init__(
         self, simulate: bool, probe: string, cycles: int, slot: int
     ) -> None:
+        self.simulate = simulate
+        self.probe = probe
+        self.cycles = cycles
+        self.slot = slot
         self.api = None
         self.mount = None
         self.home = None
         self.gripper_id = None
         self.deck_definition = None
-        self.slot_center = None
-        self.deck_encoder = None
-        self.deck_z = None
-        self.simulate = simulate
-        self.probe = probe
-        self.cycles = cycles
-        self.slot = slot
-        self.jog_speed = 10 # mm/s
+        self.probes = ["Front","Rear"]
+        self.slot_center = {
+            "Front":None,
+            "Rear":None,
+        }
+        self.offset = {
+            "Front":None,
+            "Rear":None,
+        }
         self.CUTOUT_SIZE = 20 # mm
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
@@ -51,17 +74,20 @@ class Gripper_Labware_Test:
             "Cycle":"None",
             "Slot":"None",
             "Gripper":"None",
-            "X Gauge":"None",
-            "Y Gauge":"None",
-            "Z Gauge":"None",
-            "X Zero":"None",
-            "Y Zero":"None",
-            "Z Zero":"None",
-            "X Center":"None",
-            "Y Center":"None",
-            "Deck Height":"None",
+            "X Center Front":"None",
+            "Y Center Front":"None",
+            "Deck Height Front":"None",
+            "X Center Rear":"None",
+            "Y Center Rear":"None",
+            "Deck Height Rear":"None",
+            "X Center Gripper":"None",
+            "Y Center Gripper":"None",
+            "Deck Height Gripper":"None",
         }
-        self.gauges = {}
+        self.gripper_probes = {
+            "Front":GripperProbe.FRONT,
+            "Rear":GripperProbe.REAR,
+        }
         if self.probe == 'front':
             self.gripper_probe = GripperProbe.FRONT
         else:
@@ -78,7 +104,7 @@ class Gripper_Labware_Test:
         self.test_data["Gripper"] = str(self.gripper_id)
         self.test_data["Slot"] = str(self.slot)
         self.deck_definition = load("ot3_standard", version=3)
-        print(f"\nStarting Gripper Labware Test on {self.probe.upper()} Probe!\n")
+        print(f"\nStarting Gripper Labware Test with both probes!\n")
         self.start_time = time.time()
 
     def file_setup(self):
@@ -99,16 +125,6 @@ class Gripper_Labware_Test:
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
 
-    def _encoder_tolist(self, encoder_position):
-        encoders = []
-        for key in encoder_position:
-            encoders.append(round(encoder_position[key], 3))
-        return encoders
-
-    async def _get_encoder(self):
-        encoder_position = await self.api.encoder_current_position(self.mount)
-        return self._encoder_tolist(encoder_position)
-
     async def _record_data(self, cycle):
         elapsed_time = (time.time() - self.start_time)/60
         self.test_data["Time"] = str(round(elapsed_time, 3))
@@ -119,16 +135,43 @@ class Gripper_Labware_Test:
     async def _calibrate_slot(
         self, api: OT3API, mount: OT3Mount, slot: int
     ) -> None:
-        # Calibrate gripper
-        await api.home_gripper_jaw()
-        self.offset, self.slot_center = await calibrate_gripper_jaw(api, self.gripper_probe, slot)
+        # Calibrate FRONT and REAR Probes
+        for probe in self.probes:
+            await api.home_gripper_jaw()
+            self.offset[probe], self.slot_center[probe] = await calibrate_gripper_jaw(api, self.gripper_probes[probe], slot)
+            self.test_data[f"X Center {probe}"] = str(self.slot_center[probe].x)
+            self.test_data[f"Y Center {probe}"] = str(self.slot_center[probe].y)
+            self.test_data[f"Deck Height {probe}"] = str(self.slot_center[probe].z)
+            print(f"{probe} Probe Slot Center: {self.slot_center[probe]}")
+            print(f"{probe} Probe Offset: {self.offset[probe]}")
+            await api.home_z()
 
-        print(f"New Slot Center: {self.slot_center}")
-        print(f"New Gripper Offset: {self.offset}")
+        # Calibrate Gripper Offset
+        self.gripper_offset = await calibrate_gripper(api, self.offset["Front"], self.offset["Rear"])
+        print(f"Gripper Offset: {self.gripper_offset}")
 
-        self.test_data["X Center"] = str(self.slot_center.x)
-        self.test_data["Y Center"] = str(self.slot_center.y)
-        self.test_data["Deck Height"] = str(self.slot_center.z)
+    async def _gripper_action(
+        self, api: OT3API, pos: Point, force: float, is_grip: bool
+    ) -> None:
+        mount = OT3Mount.GRIPPER
+        current_pos = await api.gantry_position(mount)
+        travel_height = max(current_pos.z, pos.z + TRAVEL_HEIGHT)
+        await api.move_to(mount, current_pos._replace(z=travel_height))
+        await api.move_to(mount, pos._replace(z=travel_height))
+        await api.move_to(mount, pos)
+        if is_grip:
+            await api.grip(force)
+        else:
+            await api.ungrip()
+        await api.move_rel(mount, types.Point(z=TRAVEL_HEIGHT))
+
+    async def _slot_to_slot(
+        self, api: OT3API, labware_key: str, force: Optional[float], src_slot: int, dst_slot: int,
+        src_deck_item: str,
+        dst_deck_item: str,
+        src_offset: Optional[types.Point] = None,
+        dst_offset: Optional[types.Point] = None,
+    ) -> None:
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
@@ -155,9 +198,7 @@ class Gripper_Labware_Test:
         try:
             await self.test_setup()
             if self.api and self.mount:
-                if len(self.gauges) > 0:
-                    self._zero_gauges()
-                input(f"Add probe to gripper {self.probe.upper()}, then press ENTER: ")
+                input(f"Add FRONT and REAR probes to gripper, then press ENTER: ")
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
