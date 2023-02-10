@@ -173,7 +173,7 @@ async def _move_to(
     encoder_pos = float(axis_dict[NODE][1])
     motor_str = str(round(motor_pos, 2))
     encoder_str = str(round(encoder_pos, 2))
-    if check and abs(motor_pos - encoder_pos) > Z_STAGE_TOLERANCES_MM:
+    if check and abs(motor_pos - abs(encoder_pos)) > Z_STAGE_TOLERANCES_MM:
         raise LoseStepError(
             f"ERROR: lost steps (motor={motor_str}, encoder={encoder_str}"
         )
@@ -185,7 +185,7 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
     print('-----------Home----------')
     await _home(messenger)
     mot, enc = await _move_to(
-        messenger, 10, default_move_speed, check=True
+        messenger, 5, default_move_speed, check=True
     )
     print(f"motor position: {mot}, encoder position: {enc}")
     for cu in currents:
@@ -196,12 +196,11 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
                 for c in range(CYCLES):
                     # print(f"cycle: {c + 1}/{CYCLES}")
                     mot, enc = await _move_to(
-                        messenger, 100, default_move_speed, check=True
+                        messenger, 80, default_move_speed, check=True
                     )
                     print(f"motor position: {mot}, encoder position: {enc}")
-                    time.sleep(0.5)
                     mot, enc = await _move_to(
-                        messenger, 100, -default_move_speed, check=True
+                        messenger, 80, -default_move_speed, check=True
                     )
                     print(f"motor position: {mot}, encoder position: {enc}")
                     try:
@@ -247,7 +246,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
             await _set_pipette_current(messenger, default_run_current)
             await _home(messenger)
             await _move_to(
-                messenger, 100, default_move_speed, check=True
+                messenger, 85, default_move_speed, check=True
             )
             print(f'current = {cu_fg},speed = {sp_fg}')
             TH = Thread(target=_record_force, args=(mark10,messenger,write_cb))
@@ -255,7 +254,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 print('Start record force...')
                 thread_sensor = True
                 TH.start()
-                distance_fg = 115
+                distance_fg = 95
                 await _set_pipette_current(messenger, cu_fg)
                 await _move_to(
                     messenger, distance_fg, sp_fg, check=True
@@ -283,6 +282,7 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["--------"])
     csv_cb.write(["METADATA"])
     csv_cb.write(["test-name", csv_props.name])
+    csv_cb.write(["serial-number",arguments.sn])
     csv_cb.write(["operator-name", arguments.operator])
     csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
 
@@ -340,8 +340,8 @@ async def _main(arguments: argparse.Namespace) -> None:
             await _run(messenger,arguments)
         except KeyboardInterrupt:
             break
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":
