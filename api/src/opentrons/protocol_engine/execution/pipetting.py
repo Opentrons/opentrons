@@ -262,11 +262,10 @@ class PipettingHandler:
 
         if not ready_to_aspirate:
             raise RuntimeError(
-                "When aspirate is called on something other than a "
-                "well relative position, we can't move to the top of"
-                " the well to prepare for aspiration. This might "
-                "cause over aspiration if the previous command is a "
-                "blow_out."
+                "Pipette cannot aspirate in place because of a previous blow out."
+                " The first aspirate following a blow-out must be from a specific well"
+                " so the plunger can be reset in a known safe position."
+               
             )
 
         with self.set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
