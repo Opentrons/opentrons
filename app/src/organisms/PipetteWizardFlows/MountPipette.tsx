@@ -20,7 +20,6 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   const {
     proceed,
     goBack,
-    robotName,
     selectedPipette,
     isPending,
     setPending,
@@ -105,7 +104,6 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
         <CheckPipetteButton
           isDisabled={isPending}
           proceed={proceed}
-          robotName={robotName}
           proceedButtonText={t('continue')}
           setPending={setPending}
         />

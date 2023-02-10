@@ -1,35 +1,67 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-
-import {
-  fetchPipetteOffsetCalibrations,
-  fetchTipLengthCalibrations,
-} from '../../../redux/calibration'
-import {
-  fetchPipettes,
-  getAttachedPipetteCalibrations,
-} from '../../../redux/pipettes'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
+import head from 'lodash/head'
+import { useAllPipetteOffsetCalibrationsQuery, useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
+import { useAttachedPipettes } from './useAttachedPipettes'
 
 import type { PipetteCalibrationsByMount } from '../../../redux/pipettes/types'
-import type { State } from '../../../redux/types'
+import type { PipetteOffsetCalibration, TipLengthCalibration } from '@opentrons/api-client'
 
-export function useAttachedPipetteCalibrations(
-  robotName: string | null
-): PipetteCalibrationsByMount {
-  const [dispatchRequest] = useDispatchApiRequest()
-
-  const attachedPipetteCalibrations = useSelector((state: State) =>
-    getAttachedPipetteCalibrations(state, robotName)
-  )
-
-  React.useEffect(() => {
-    if (robotName != null) {
-      dispatchRequest(fetchPipettes(robotName))
-      dispatchRequest(fetchPipetteOffsetCalibrations(robotName))
-      dispatchRequest(fetchTipLengthCalibrations(robotName))
-    }
-  }, [dispatchRequest, robotName])
-
-  return attachedPipetteCalibrations
+export function useAttachedPipetteCalibrations(): PipetteCalibrationsByMount {
+  const attachedPipettes = useAttachedPipettes()
+  const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery()?.data?.data ?? []
+  const tipLengthCalibrations = useAllTipLengthCalibrationsQuery()?.data?.data ?? []
+  const offsets = {
+    left: attachedPipettes.left
+      ? filterCalibrationForPipette(pipetteOffsetCalibrations, attachedPipettes.left.id, 'left')
+      : null,
+    right: attachedPipettes.right
+      ? filterCalibrationForPipette(pipetteOffsetCalibrations, attachedPipettes.right.id, 'right')
+      : null,
+  }
+  return {
+    left: {
+      offset: offsets.left,
+      tipLength: filterTipLengthForPipetteAndTiprack(
+        tipLengthCalibrations,
+        attachedPipettes.left?.id ?? null,
+        offsets.left?.tiprack ?? null
+      ),
+    },
+    right: {
+      offset: offsets.right,
+      tipLength: filterTipLengthForPipetteAndTiprack(
+        tipLengthCalibrations,
+        attachedPipettes.right?.id ?? null,
+        offsets.right?.tiprack ?? null
+      ),
+    },
+  }
 }
+
+function filterTipLengthForPipetteAndTiprack(
+  allCalibrations: TipLengthCalibration[],
+  pipetteSerial: string | null,
+  tiprackHash: string | null
+): TipLengthCalibration | null {
+  return (
+    head(
+      allCalibrations.filter(
+        cal => cal.pipette === pipetteSerial && cal.tiprack === tiprackHash
+      )
+    ) || null
+  )
+}
+
+function filterCalibrationForPipette(
+  calibrations: PipetteOffsetCalibration[],
+  pipetteSerial: string,
+  mount: string | null
+): PipetteOffsetCalibration | null {
+  return (
+    head(
+      calibrations.filter(
+        cal => cal.pipette === pipetteSerial && cal.mount === mount
+      )
+    ) || null
+  )
+}
+

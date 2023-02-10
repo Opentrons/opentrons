@@ -19,6 +19,7 @@ import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
 
 import type { Dispatch } from '../../../redux/types'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 
 const CALIBRATIONS_FETCH_MS = 5000
 interface SetupTipLengthCalibrationProps {
@@ -34,13 +35,7 @@ export function SetupTipLengthCalibration({
   const dispatch = useDispatch<Dispatch>()
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
 
-  useInterval(
-    () =>
-      robotName != null &&
-      dispatch(TipLength.fetchTipLengthCalibrations(robotName)),
-    CALIBRATIONS_FETCH_MS,
-    true
-  )
+  useAllTipLengthCalibrationsQuery({refetchInterval: CALIBRATIONS_FETCH_MS})
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>

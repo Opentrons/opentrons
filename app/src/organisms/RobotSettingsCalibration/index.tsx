@@ -21,7 +21,6 @@ import {
   useIsOT3,
 } from '../../organisms/Devices/hooks'
 import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
-import * as Calibration from '../../redux/calibration'
 import { CONNECTABLE } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
 import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
@@ -40,6 +39,7 @@ import type {
   DeckCalibrationSession,
 } from '../../redux/sessions/types'
 import type { State, Dispatch } from '../../redux/types'
+import { useAllPipetteOffsetCalibrationsQuery, useAllTipLengthCalibrationsQuery, useCalibrationStatusQuery } from '@opentrons/react-api-client'
 
 const CALS_FETCH_MS = 5000
 
@@ -219,15 +219,9 @@ export function RobotSettingsCalibration({
 
   // Note: following fetch need to reflect the latest state of calibrations
   // when a user does calibration or rename a robot.
-  useInterval(
-    () => {
-      dispatch(Calibration.fetchCalibrationStatus(robotName))
-      dispatch(Calibration.fetchPipetteOffsetCalibrations(robotName))
-      dispatch(Calibration.fetchTipLengthCalibrations(robotName))
-    },
-    CALS_FETCH_MS,
-    true
-  )
+  useCalibrationStatusQuery({refetchInterval: CALS_FETCH_MS})
+  useAllPipetteOffsetCalibrationsQuery({refetchInterval: CALS_FETCH_MS})
+  useAllTipLengthCalibrationsQuery({refetchInterval: CALS_FETCH_MS})
 
   return (
     <>

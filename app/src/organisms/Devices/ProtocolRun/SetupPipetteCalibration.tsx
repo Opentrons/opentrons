@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -8,19 +7,16 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
-import * as PipetteOffset from '../../../redux/calibration/pipette-offset'
-import * as Pipettes from '../../../redux/pipettes'
 import { useRunPipetteInfoByMount } from '../hooks'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 
-import type { Dispatch } from '../../../redux/types'
+import { useAllPipetteOffsetCalibrationsQuery, usePipettesQuery } from '@opentrons/react-api-client'
 
-const CALIBRATIONS_FETCH_MS = 5000
+const PIPETTE_POLL_FETCH_MS = 5000
 interface SetupPipetteCalibrationProps {
   robotName: string
   runId: string
@@ -31,19 +27,10 @@ export function SetupPipetteCalibration({
   runId,
 }: SetupPipetteCalibrationProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const dispatch = useDispatch<Dispatch>()
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
 
-  useInterval(
-    () => {
-      if (robotName != null) {
-        dispatch(Pipettes.fetchPipettes(robotName))
-        dispatch(PipetteOffset.fetchPipetteOffsetCalibrations(robotName))
-      }
-    },
-    CALIBRATIONS_FETCH_MS,
-    true
-  )
+  usePipettesQuery({refetchInterval: PIPETTE_POLL_FETCH_MS})
+  useAllPipetteOffsetCalibrationsQuery({refetchInterval: PIPETTE_POLL_FETCH_MS})
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>

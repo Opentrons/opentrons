@@ -1,8 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-
-import { useInterval } from '@opentrons/components'
-import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
+import { useAllPipetteOffsetCalibrationsQuery, useAllTipLengthCalibrationsQuery, useCalibrationStatusQuery, useDeleteCalibrationMutation } from '@opentrons/react-api-client'
 
 import {
   useAttachedPipettes,
@@ -12,9 +9,6 @@ import {
 } from '.'
 import { getDefaultTiprackDefForPipetteName } from '../constants'
 import { formatTimestamp } from '../utils'
-import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration/pipette-offset'
-import { fetchTipLengthCalibrations } from '../../../redux/calibration/tip-length'
-import { fetchCalibrationStatus } from '../../../redux/calibration'
 
 import type {
   SubTaskProps,
@@ -37,7 +31,6 @@ export function useCalibrationTaskList(
 ): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
   const { deleteCalibration } = useDeleteCalibrationMutation()
-  const dispatch = useDispatch()
   const TASK_LIST_LENGTH = 3
   let taskIndex = 0
   let activeTaskIndices: [number, number] | null = null
@@ -57,15 +50,10 @@ export function useCalibrationTaskList(
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
 
-  useInterval(
-    () => {
-      dispatch(fetchPipetteOffsetCalibrations(robotName))
-      dispatch(fetchTipLengthCalibrations(robotName))
-      dispatch(fetchCalibrationStatus(robotName))
-    },
-    CALIBRATION_DATA_POLL_MS,
-    true
-  )
+
+  useCalibrationStatusQuery({refetchInterval: CALIBRATION_DATA_POLL_MS})
+  useAllPipetteOffsetCalibrationsQuery({refetchInterval: CALIBRATION_DATA_POLL_MS})
+  useAllTipLengthCalibrationsQuery({refetchInterval: CALIBRATION_DATA_POLL_MS})
 
   // first create the shape of the deck calibration task, then update values based on calibration status
   const deckTask: TaskProps = {

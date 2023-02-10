@@ -4,12 +4,10 @@ import startCase from 'lodash/startCase'
 import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { PrimaryButton } from '../../atoms/buttons'
-import { useDispatchApiRequest } from '../../redux/robot-api'
-import { fetchPipettes } from '../../redux/pipettes'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
-import { useCheckPipettes } from './hooks'
 import type { PipetteWizardStepProps } from './types'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 
 interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void
@@ -27,19 +25,11 @@ export const Results = (props: ResultsProps): JSX.Element => {
     currentStepIndex,
     totalStepCount,
     selectedPipette,
-    robotName,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const { handleCheckPipette, isPending } = useCheckPipettes(robotName)
-  const [dispatchRequest] = useDispatchApiRequest()
+  const {status: pipetteQueryStatus, refetch: refetchPipettes} = usePipettesQuery()
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
-  //  when attachedPipettes updates with the try again button, if it is successful,
-  // the Results should automatically show the success screen
-  React.useEffect(() => {
-    if (robotName != null) {
-      dispatchRequest(fetchPipettes(robotName))
-    }
-  }, [dispatchRequest, robotName])
+  const isPending = pipetteQueryStatus === 'loading'
 
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
@@ -87,7 +77,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   }
 
   const handleTryAgain = (): void => {
-    handleCheckPipette()
+    refetchPipettes()
     setNumberOfTryAgains(numberOfTryAgains + 1)
   }
 
