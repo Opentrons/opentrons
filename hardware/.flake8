@@ -12,6 +12,15 @@ extend-ignore =
     # do not require type annotations for self nor cls
     ANN101,
     ANN102
+    # do not grammar pedant me any more
+    D400,
+    D401,
+    D403,
+    D404,
+    D415,
+    # there's no need to mandate docstrings in like __add__ (note that __init__
+    # is covered separately by D107)
+    D105,
 
 # configure flake8-docstrings
 # https://pypi.org/project/flake8-docstrings/
