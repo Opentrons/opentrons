@@ -19,6 +19,7 @@ import {
   SPACING,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
@@ -114,11 +115,17 @@ export function RobotOverview({
         >
           <img
             src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
-            style={{ paddingTop: SPACING.spacing3, width: '6.25rem' }}
+            style={{
+              paddingTop: SPACING.spacing3,
+              width: '6.25rem',
+              alignSelf: ALIGN_FLEX_START,
+            }}
             id="RobotOverview_robotImage"
           />
           <Box padding={SPACING.spacing3} width="100%">
-            <ReachableBanner robot={robot} />
+            <Box marginBottom={SPACING.spacing3}>
+              <ReachableBanner robot={robot} />
+            </Box>
             {robot != null ? (
               <UpdateRobotBanner
                 robot={robot}
