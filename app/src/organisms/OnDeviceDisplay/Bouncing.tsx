@@ -1,6 +1,10 @@
 import * as React from 'react'
-import { Flex, COLORS } from '@opentrons/components'
+import styled from 'styled-components'
 import logo from '../../assets/images/odd/opentrons_logo.png'
+
+const Container = styled.div`
+  pointer-events: none;
+`
 
 export function Bouncing(): JSX.Element {
   const speed = 50
@@ -81,8 +85,8 @@ export function Bouncing(): JSX.Element {
   }, [])
 
   return (
-    <div>
+    <Container>
       <canvas id="odd-screen"></canvas>
-    </div>
+    </Container>
   )
 }
