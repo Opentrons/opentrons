@@ -39,6 +39,8 @@ def create_queue_worker(
     labware_movement_handler = LabwareMovementHandler(
         hardware_api=hardware_api,
         state_store=state_store,
+        equipment=equipment_handler,
+        movement=movement_handler,
     )
 
     pipetting_handler = PipettingHandler(
