@@ -18,9 +18,9 @@ DEFAULT_SLOT_TIPRACK_MULTI: Final = "7"
 DEFAULT_SLOT_PLATE: Final = "2"
 DEFAULT_SLOT_TROUGH: Final = "5"
 
-# usually we would only use a p300 multi
+# usually we would only use a p1000 multi w/ t200
 # when doing photometric testing
-DEFAULT_MULTI_TIP_VOLUME: Final = 300
+DEFAULT_MULTI_TIP_VOLUME: Final = 200
 
 
 @dataclass
@@ -54,12 +54,12 @@ class LayoutLabware:
         """Load."""
         if self.slots.tiprack:
             self._ctx.load_labware(
-                f"opentrons_96_tiprack_{self._tip_volume}ul",
+                f"opentrons_ot3_96_tiprack_{self._tip_volume}ul",
                 location=self.slots.tiprack,
             )
         if self.slots.tiprack_multi:
             self._ctx.load_labware(
-                f"opentrons_96_tiprack_{self._multi_tip_volume}ul",
+                f"opentrons_ot3_96_tiprack_{self._multi_tip_volume}ul",
                 location=self.slots.tiprack_multi,
             )
         if self.slots.trough:

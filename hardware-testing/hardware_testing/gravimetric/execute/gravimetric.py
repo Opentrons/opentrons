@@ -42,6 +42,7 @@ class ExecuteGravConfig:
     labware_dir: Path
     pipette_volume: int
     pipette_mount: str
+    tip_volume: int
 
 
 @dataclass
@@ -61,7 +62,7 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
     # LABWARE
     # NOTE: labware must be fully initialized before the liquid tracker
     _layout = LayoutLabware(
-        ctx=ctx, slots=DEFAULT_SLOTS_GRAV, tip_volume=cfg.pipette_volume
+        ctx=ctx, slots=DEFAULT_SLOTS_GRAV, tip_volume=cfg.tip_volume
     )
     _layout.load(definitions_dir=cfg.labware_dir)
     overwrite_default_labware_positions(ctx, layout=_layout)

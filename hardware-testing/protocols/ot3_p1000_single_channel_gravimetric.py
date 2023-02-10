@@ -1,4 +1,4 @@
-"""OT2 P300 Single Channel Gravimetric Test."""
+"""OT3 P1000 Single Channel Gravimetric Test."""
 import argparse
 from pathlib import Path
 
@@ -31,6 +31,7 @@ def _run(protocol: ProtocolContext) -> None:
             name=metadata["protocolName"],
             pipette_volume=1000,
             pipette_mount="left",
+            tip_volume=1000,
             labware_dir=Path(__file__).parent / "definitions",
         ),
     )
