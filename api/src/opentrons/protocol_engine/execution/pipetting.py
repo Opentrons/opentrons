@@ -247,36 +247,6 @@ class PipettingHandler:
 
         return volume
 
-    async def aspirate_in_place(
-        self,
-        pipette_id: str,
-        volume: float,
-        flow_rate: float,
-    ) -> float:
-        """Aspirate liquid without moving the pipette."""
-        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
-
-        ready_to_aspirate = self._state_store.pipettes.get_is_ready_to_aspirate(
-            pipette_id=pipette_id,
-            pipette_config=hw_pipette.config,
-        )
-
-        if not ready_to_aspirate:
-            raise RuntimeError(
-                "Pipette cannot aspirate in place because of a previous blow out."
-                " The first aspirate following a blow-out must be from a specific well"
-                " so the plunger can be reset in a known safe position."
-               
-            )
-
-        with self.set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
-            await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
-
-        return volume
-
     async def touch_tip(
         self,
         pipette_id: str,

@@ -23,6 +23,7 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.common import InstrumentCore, ProtocolCore
+from .core.engine import ENGINE_CORE_API_VERSION
 from .config import Clearances
 from . import labware
 
@@ -176,12 +177,7 @@ class InstrumentContext(publisher.CommandPublisher):
         well: Optional[labware.Well]
         move_to_location: Optional[types.Location]
 
-        if self._api_version >= APIVersion(2, 14):
-            last_location = self._protocol_core.get_last_location(
-                mount=self._core.get_mount()
-            )
-        else:
-            last_location = self._protocol_core.get_last_location()
+        last_location = self._get_last_location_by_api_version()
 
         if isinstance(location, labware.Well):
             move_to_location = location.bottom(z=self._well_bottom_clearances.aspirate)
@@ -285,12 +281,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
         well: Optional[labware.Well]
-        if self._api_version >= APIVersion(2, 14):
-            last_location = self._protocol_core.get_last_location(
-                mount=types.Mount.string_to_mount(self.mount)
-            )
-        else:
-            last_location = self._protocol_core.get_last_location()
+        last_location = self._get_last_location_by_api_version()
 
         if isinstance(location, labware.Well):
             well = location
@@ -447,12 +438,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         well: Optional[labware.Well]
         move_to_location: Optional[types.Location]
-        if self._api_version >= APIVersion(2, 14):
-            last_location = self._protocol_core.get_last_location(
-                mount=types.Mount.string_to_mount(self.mount)
-            )
-        else:
-            last_location = self._protocol_core.get_last_location()
+        last_location = self._get_last_location_by_api_version()
 
         if isinstance(location, labware.Well):
             if location.parent.is_tiprack:
@@ -1521,6 +1507,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
         """
         return self._well_bottom_clearances
+
+    def _get_last_location_by_api_version(self) -> Optional[types.Location]:
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            return self._protocol_core.get_last_location(mount=self._core.get_mount())
+        else:
+            return self._protocol_core.get_last_location()
 
     def __repr__(self) -> str:
         return "<{}: {} in {}>".format(
