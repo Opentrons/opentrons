@@ -100,6 +100,9 @@ async def test_hardware_stopping_sequence(
             labware_id="fixedTrash",
             well_name="A1",
             well_location=WellLocation(),
+            # TODO(mm, 2023-02-10): Can we safely set this to False
+            # to avoid redundancy with the below call to
+            # hardware_api.stop(home_after=True)?
             home_after=None,
         ),
         await hardware_api.stop(home_after=True),
