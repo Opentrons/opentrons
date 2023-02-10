@@ -20,8 +20,11 @@ PipetteModelMinorVersionType = Literal[0, 1, 2, 3]
 
 
 class PipetteTipType(Enum):
+    t10 = 10
+    t20 = 20
     t50 = 50
     t200 = 200
+    t300 = 300
     t1000 = 1000
 
 
@@ -44,7 +47,10 @@ class PipetteChannelType(Enum):
 
 
 class PipetteModelType(Enum):
+    p10 = "p10"
+    p20 = "p20"
     p50 = "p50"
+    p300 = "p300"
     p1000 = "p1000"
 
 
@@ -118,6 +124,11 @@ class SupportedTipsDefinition(BaseModel):
     )
     dispense: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for dispensing."
+    )
+    tip_overlap_dictionary: Dict[str, float] = Field(
+        default={},
+        description="The default tip overlap associated with this tip type.",
+        alias="defaultTipOverlapDictionary",
     )
 
 
