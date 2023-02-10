@@ -882,3 +882,43 @@ async def test_refresh_positions(ot3_hardware: ThreadManager[OT3API]) -> None:
 
         assert (ax in ot3_hardware._current_position.keys() for ax in OT3Axis)
         assert (ax in ot3_hardware._encoder_position.keys() for ax in OT3Axis)
+
+
+@pytest.mark.parametrize(
+    "axes",
+    [[OT3Axis.X], [OT3Axis.X, OT3Axis.Y], [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L], None],
+)
+async def test_park(ot3_hardware: ThreadManager[OT3API], axes: List[OT3Axis]) -> None:
+
+    backend = ot3_hardware.managed_obj._backend
+    origin_pos = {axis_to_node(ax): 100 for ax in OT3Axis}
+    origin_encoder = {axis_to_node(ax): 99 for ax in OT3Axis}
+    backend._position = origin_pos
+    backend._encoder_position = origin_encoder
+
+    with patch.object(
+        backend,
+        "update_motor_estimation",
+        AsyncMock(
+            spec=backend.update_motor_estimation,
+            wraps=backend.update_motor_estimation,
+        ),
+    ) as mock_estimate:
+
+        await ot3_hardware.park(axes)
+
+        # if None, we park all of the gantry axes
+        parked = axes or OT3Axis.gantry_axes()
+        # must be in the correct home order
+        mock_calls = [call([ax]) for ax in OT3Axis.home_order() if ax in parked]
+
+        mock_estimate.assert_has_calls(mock_calls, any_order=False)
+
+        for ax in OT3Axis:
+            if ax in parked:
+                # axes are parkced back to 0.0
+                assert backend._position[axis_to_node(ax)] == 0
+                assert backend._encoder_position[axis_to_node(ax)] == 0
+            else:
+                assert backend._position[axis_to_node(ax)] != 0
+                assert backend._encoder_position[axis_to_node(ax)] != 0

@@ -1080,7 +1080,6 @@ class OT3API(
         await self.refresh_positions()
         if not (self._current_position and self._encoder_position):
             raise MustHomeError("Cannot park because the current position is unknown.")
-
         self._reset_last_mount()
         parkable = list(OT3Axis.gantry_axes())
         if axes:
