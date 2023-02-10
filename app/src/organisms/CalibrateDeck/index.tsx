@@ -59,7 +59,14 @@ export function CalibrateDeck(
   props: CalibrateDeckParentProps
 ): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
+  const {
+    session,
+    robotName,
+    dispatchRequests,
+    showSpinner,
+    isJogging,
+    offsetInvalidationHandler,
+  } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}
 
@@ -150,6 +157,7 @@ export function CalibrateDeck(
             sessionType={session.sessionType}
             supportedCommands={supportedCommands}
             defaultTipracks={instrument?.defaultTipracks}
+            calInvalidationHandler={offsetInvalidationHandler}
           />
         )}
       </ModalShell>

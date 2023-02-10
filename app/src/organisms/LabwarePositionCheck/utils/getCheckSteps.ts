@@ -82,7 +82,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     primaryPipetteId,
     commands,
     labware,
-    modules,
+    modules = [],
   } = args
 
   const labwareLocationCombos = getLabwareLocationCombos(

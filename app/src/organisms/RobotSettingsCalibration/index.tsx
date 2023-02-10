@@ -1,9 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-
 import {
-  SPACING,
   SpinnerModalPage,
   AlertModal,
   useInterval,
@@ -13,10 +11,8 @@ import { Portal } from '../../App/portal'
 import { Line } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { CalibrateDeck } from '../../organisms/CalibrateDeck'
-import { DeprecatedCalibrateDeck } from '../../organisms/DeprecatedCalibrateDeck'
 import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
 import { CheckCalibration } from '../../organisms/CheckCalibration'
-import { DeprecatedCheckCalibration } from '../../organisms/DeprecatedCheckCalibration'
 import {
   usePipetteOffsetCalibrations,
   useRobot,
@@ -26,7 +22,6 @@ import {
 } from '../../organisms/Devices/hooks'
 import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
 import * as Calibration from '../../redux/calibration'
-import * as Config from '../../redux/config'
 import { CONNECTABLE } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
 import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
@@ -83,22 +78,11 @@ export function RobotSettingsCalibration({
     showHowCalibrationWorksModal,
     setShowHowCalibrationWorksModal,
   ] = React.useState(false)
-  const [
-    showPipetteOffsetCalibrationBanner,
-    setShowPipetteOffsetCalibrationBanner,
-  ] = React.useState<boolean>(false)
-  const [
-    pipetteOffsetCalBannerType,
-    setPipetteOffsetCalBannerType,
-  ] = React.useState<string>('')
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
   const isOT3 = useIsOT3(robotName)
   const dispatch = useDispatch<Dispatch>()
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   React.useEffect(() => {
     dispatch(Sessions.fetchAllSessions(robotName))
@@ -227,40 +211,6 @@ export function RobotSettingsCalibration({
     })
   }
 
-  const checkPipetteCalibrationMissing = (): void => {
-    // checked the number of attached pipettes
-    const numberOfAttached =
-      attachedPipettes != null &&
-      Object.keys(attachedPipettes)
-        .map(mount => attachedPipettes[mount as Mount] != null)
-        .filter(x => x).length
-    const isPipettesNumberMatched =
-      numberOfAttached === formattedPipetteOffsetCalibrations.length
-    if (
-      pipetteOffsetCalibrations === null ||
-      (Object.values(pipetteOffsetCalibrations).length <= 1 &&
-        isPipettesNumberMatched)
-    ) {
-      setShowPipetteOffsetCalibrationBanner(true)
-      setPipetteOffsetCalBannerType('error')
-    } else {
-      const left = attachedPipettes?.left?.id
-      const right = attachedPipettes?.right?.id
-      const markedBads =
-        pipetteOffsetCalibrations?.filter(
-          p =>
-            (p.pipette === left && p.status.markedBad) ||
-            (p.pipette === right && p.status.markedBad)
-        ) ?? null
-      if (markedBads.length !== 0 && isPipettesNumberMatched) {
-        setShowPipetteOffsetCalibrationBanner(true)
-        setPipetteOffsetCalBannerType('warning')
-      } else {
-        setShowPipetteOffsetCalibrationBanner(false)
-      }
-    }
-  }
-
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
@@ -274,7 +224,6 @@ export function RobotSettingsCalibration({
       dispatch(Calibration.fetchCalibrationStatus(robotName))
       dispatch(Calibration.fetchPipetteOffsetCalibrations(robotName))
       dispatch(Calibration.fetchTipLengthCalibrations(robotName))
-      checkPipetteCalibrationMissing()
     },
     CALS_FETCH_MS,
     true
@@ -283,24 +232,13 @@ export function RobotSettingsCalibration({
   return (
     <>
       <Portal level="top">
-        {enableCalibrationWizards ? (
-          <CalibrateDeck
-            session={deckCalibrationSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-        ) : (
-          <DeprecatedCalibrateDeck
-            session={deckCalibrationSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-        )}
-
+        <CalibrateDeck
+          session={deckCalibrationSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={isPending}
+          isJogging={isJogging}
+        />
         {createStatus === RobotApi.PENDING ? (
           <SpinnerModalPage
             titleBar={{
@@ -313,23 +251,13 @@ export function RobotSettingsCalibration({
             }}
           />
         ) : null}
-        {enableCalibrationWizards ? (
-          <CheckCalibration
-            session={checkHealthSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-        ) : (
-          <DeprecatedCheckCalibration
-            session={checkHealthSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-        )}
+        <CheckCalibration
+          session={checkHealthSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={isPending}
+          isJogging={isJogging}
+        />
         {createStatus === RobotApi.FAILURE && (
           <AlertModal
             alertOverlay
@@ -360,43 +288,36 @@ export function RobotSettingsCalibration({
           onCloseClick={() => setShowHowCalibrationWorksModal(false)}
         />
       ) : null}
-      {enableCalibrationWizards && !isOT3 ? (
-        <CalibrationStatusCard
-          robotName={robotName}
-          setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
-        />
-      ) : (
-        <CalibrationDataDownload
-          robotName={robotName}
-          setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
-        />
-      )}
-
-      {!isOT3 ? (
+      {isOT3 ? (
         <>
-          {!enableCalibrationWizards ? <Line /> : null}
-          <RobotSettingsDeckCalibration
-            buttonDisabledReason={buttonDisabledReason}
-            dispatchRequests={dispatchRequests}
+          <CalibrationDataDownload
+            {...{ robotName, setShowHowCalibrationWorksModal }}
+          />
+          <Line />
+          <RobotSettingsPipetteOffsetCalibration
+            formattedPipetteOffsetCalibrations={
+              formattedPipetteOffsetCalibrations
+            }
             robotName={robotName}
             updateRobotStatus={updateRobotStatus}
           />
+          <Line />
+          <RobotSettingsGripperCalibration />
         </>
-      ) : null}
-      <Line
-        marginBottom={
-          showPipetteOffsetCalibrationBanner ? SPACING.spacing4 : null
-        }
-      />
-      <RobotSettingsPipetteOffsetCalibration
-        formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
-        pipetteOffsetCalBannerType={pipetteOffsetCalBannerType}
-        robotName={robotName}
-        showPipetteOffsetCalibrationBanner={showPipetteOffsetCalibrationBanner}
-        updateRobotStatus={updateRobotStatus}
-      />
-      {!isOT3 ? (
+      ) : (
         <>
+          <CalibrationStatusCard
+            {...{ robotName, setShowHowCalibrationWorksModal }}
+          />
+          <RobotSettingsDeckCalibration robotName={robotName} />
+          <Line />
+          <RobotSettingsPipetteOffsetCalibration
+            formattedPipetteOffsetCalibrations={
+              formattedPipetteOffsetCalibrations
+            }
+            robotName={robotName}
+            updateRobotStatus={updateRobotStatus}
+          />
           <Line />
           <RobotSettingsTipLengthCalibration
             formattedPipetteOffsetCalibrations={
@@ -411,24 +332,14 @@ export function RobotSettingsCalibration({
             dispatchRequests={dispatchRequests}
             isPending={isPending}
             robotName={robotName}
-            updateRobotStatus={updateRobotStatus}
           />
-        </>
-      ) : (
-        <>
-          <Line />
-          <RobotSettingsGripperCalibration />
-        </>
-      )}
-      {enableCalibrationWizards && !isOT3 ? (
-        <>
           <Line />
           <CalibrationDataDownload
             robotName={robotName}
             setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
           />
         </>
-      ) : null}
+      )}
     </>
   )
 }

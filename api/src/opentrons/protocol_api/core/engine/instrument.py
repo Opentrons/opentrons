@@ -433,12 +433,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.pipettes.get_maximum_volume(self._pipette_id)
 
     def get_current_volume(self) -> float:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-381
-        return self.get_hardware_state()["current_volume"]
+        return self._engine_client.state.pipettes.get_aspirated_volume(self._pipette_id)
 
     def get_available_volume(self) -> float:
-        # TODO(mc, 2022-11-11): https://opentrons.atlassian.net/browse/RCORE-381
-        return self.get_hardware_state()["available_volume"]
+        return self._engine_client.state.pipettes.get_available_volume(self._pipette_id)
 
     def get_hardware_state(self) -> PipetteDict:
         """Get the current state of the pipette hardware as a dictionary."""

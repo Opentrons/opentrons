@@ -20,7 +20,6 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
     HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
 
@@ -32,6 +31,7 @@ from opentrons.protocol_api import (
     Well as LegacyWell,
     create_protocol_context,
 )
+from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.core.legacy.load_info import (
     LoadInfo as LegacyLoadInfo,
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
@@ -53,7 +53,7 @@ from opentrons.protocols.types import (
 # Note that even when simulation and execution are handled by the legacy machinery,
 # Protocol Engine still has some involvement for analyzing the simulation and
 # monitoring the execution.
-LEGACY_PYTHON_API_VERSION_CUTOFF = APIVersion(3, 0)
+LEGACY_PYTHON_API_VERSION_CUTOFF = ENGINE_CORE_API_VERSION
 
 
 # The earliest JSON protocol schema version where the protocol is executed directly by

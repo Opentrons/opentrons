@@ -16,6 +16,7 @@ import type {
   ConfigV10,
   ConfigV11,
   ConfigV12,
+  ConfigV13,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -184,3 +185,12 @@ export const MOCK_CONFIG_V12: ConfigV12 = (() => {
     },
   }
 })()
+
+export const MOCK_CONFIG_V13: ConfigV13 = {
+  ...MOCK_CONFIG_V12,
+  version: 13,
+  protocols: {
+    ...MOCK_CONFIG_V12.protocols,
+    protocolsOnDeviceSortKey: null,
+  },
+}
