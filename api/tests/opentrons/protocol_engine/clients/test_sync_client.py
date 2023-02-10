@@ -311,7 +311,7 @@ def test_drop_tip(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
-        home_after=None,
+        home_after=True,
     )
 
     assert result == response
