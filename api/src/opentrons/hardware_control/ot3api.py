@@ -173,7 +173,7 @@ class OT3API(
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: OT3AxisMap[float] = {}
-        self._encoder_current_position: OT3AxisMap[float] = {}
+        self._encoder_position: OT3AxisMap[float] = {}
 
         self._last_moved_mount: Optional[OT3Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
@@ -241,6 +241,15 @@ class OT3API(
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
+
+    def _apply_deck_transform(
+        self, machine_pos: Dict[OT3Axis, float]
+    ) -> Dict[OT3Axis, float]:
+        return deck_from_machine(
+            machine_pos,
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+        )
 
     @classmethod
     async def build_hardware_controller(
@@ -529,7 +538,7 @@ class OT3API(
                 self._pipette_handler.hardware_instruments[pipette_mount] = None
 
         await self._backend.probe_network()
-        await self._backend.update_motor_status()
+        await self.refresh_positions()
         await self.set_gantry_load(self._gantry_load_from_instruments())
 
     @ExecutionManagerProvider.wait_for_running
@@ -701,26 +710,31 @@ class OT3API(
             raise MustHomeError("Current position is unknown; please home motors.")
 
         if refresh:
-            await self.refresh_current_position_ot3()
+            await self.refresh_positions()
         return self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), self._current_position, critical_point
         )
 
-    async def refresh_current_position_ot3(self) -> Dict[OT3Axis, float]:
-        """Requests the current position and updates _current_position."""
+    async def refresh_positions(self) -> None:
+        """Request and update both the motor and encoder positions from backend."""
         async with self._motion_lock:
             await self._backend.update_motor_status()
-            self._current_position = deck_from_machine(
-                await self._backend.update_position(),
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
-            self._encoder_current_position = deck_from_machine(
-                await self._backend.update_encoder_position(),
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+            await self._cache_current_position()
+            await self._cache_encoder_position()
+
+    async def _cache_current_position(self) -> Dict[OT3Axis, float]:
+        """Cache current position from backend and return in absolute deck coords."""
+        self._current_position = self._apply_deck_transform(
+            await self._backend.update_position()
+        )
         return self._current_position
+
+    async def _cache_encoder_position(self) -> Dict[OT3Axis, float]:
+        """Cache encoder position from backend and return in absolute deck coords."""
+        self._encoder_position = self._apply_deck_transform(
+            await self._backend.update_encoder_position()
+        )
+        return self._encoder_position
 
     async def encoder_current_position(
         self,
@@ -753,22 +767,19 @@ class OT3API(
 
         if fail_on_not_homed and (
             not self._backend.check_ready_for_movement(position_axes)
-            or not self._encoder_current_position
+            or not self._encoder_position
         ):
             raise MustHomeError(
                 f"Current position of {str(mount)} pipette is unknown, please home."
             )
-        elif not self._encoder_current_position and not refresh:
+        elif not self._encoder_position and not refresh:
             raise MustHomeError("Encoder position is unknown; please home motors.")
         async with self._motion_lock:
-            self._encoder_current_position = deck_from_machine(
-                await self._backend.update_encoder_position(),
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+            if refresh:
+                await self.refresh_positions()
             ot3pos = self._effector_pos_from_carriage_pos(
                 OT3Mount.from_mount(mount),
-                self._encoder_current_position,
+                self._encoder_position,
                 critical_point,
             )
             return ot3pos
@@ -833,7 +844,8 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
 
         # Refresh current position
-        await self.refresh_current_position_ot3()
+        await self._cache_current_position()
+        await self._cache_encoder_position()
 
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_ready_for_movement(axes_moving):
@@ -890,9 +902,13 @@ class OT3API(
                 raise mhe
             else:
                 await self.home(axes_moving)
+
         # Refresh current position
-        position = await self.refresh_current_position_ot3()
-        target_position = target_position_from_relative(realmount, delta, position)
+        await self.refresh_positions()
+
+        target_position = target_position_from_relative(
+            realmount, delta, self._current_position
+        )
         if fail_on_not_homed and not self._backend.check_ready_for_movement(
             [axis for axis in axes_moving if axis is not None]
         ):
@@ -974,7 +990,7 @@ class OT3API(
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 400
         move_target = MoveTarget.build(position=machine_pos, max_speed=checked_speed)
-        origin = await self._backend.update_position()
+        origin = await self._cache_current_position()
         try:
             blended, moves = self._move_manager.plan_motion(
                 origin=origin, target_list=[move_target]
@@ -995,19 +1011,13 @@ class OT3API(
                     moves[0],
                     MoveStopCondition.stall if check_stalls else MoveStopCondition.none,
                 )
-                encoder_machine_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
-                self._current_position.update(target_position)
-                encoder_position = deck_from_machine(
-                    encoder_machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-                self._encoder_current_position.update(encoder_position)
+                await self._cache_current_position()
+                await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -1034,25 +1044,15 @@ class OT3API(
                 self._current_position.clear()
                 raise
             else:
-                machine_pos = await self._backend.update_position()
-                encoder_machine_pos = await self._backend.update_encoder_position()
-                position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-                self._current_position.update(position)
-                encoder_position = deck_from_machine(
-                    encoder_machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-                self._encoder_current_position.update(encoder_position)
+                await self._cache_current_position()
+                await self._cache_encoder_position()
                 if OT3Axis.G in checked_axes:
                     try:
                         gripper = self._gripper_handler.get_gripper()
                         gripper.state = GripperJawState.HOMED_READY
-                        gripper.current_jaw_displacement = encoder_position[OT3Axis.G]
+                        gripper.current_jaw_displacement = self._encoder_position[
+                            OT3Axis.G
+                        ]
                     except GripperNotAttachedError:
                         pass
 
@@ -1067,8 +1067,8 @@ class OT3API(
         """
 
         # make sure current position is up-to-date
-        await self.refresh_current_position_ot3()
-        if not (self._current_position and self._encoder_current_position):
+        await self.refresh_positions()
+        if not (self._current_position and self._encoder_position):
             raise MustHomeError("Cannot park because the current position is unknown.")
 
         self._reset_last_mount()
@@ -1100,20 +1100,6 @@ class OT3API(
                         origin=origin, target_list=[move_target]
                     )
                     await self._backend.move(origin, moves[0])
-                    machine_pos = await self._backend.update_position()
-                    encoder_machine_pos = await self._backend.update_encoder_position()
-                    position = deck_from_machine(
-                        machine_pos,
-                        self._transforms.deck_calibration.attitude,
-                        self._transforms.carriage_offset,
-                    )
-                    self._current_position.update(position)
-                    encoder_position = deck_from_machine(
-                        encoder_machine_pos,
-                        self._transforms.deck_calibration.attitude,
-                        self._transforms.carriage_offset,
-                    )
-                    self._encoder_current_position.update(encoder_position)
                 except MustHomeError:
                     # home instead of park if encoder position cannot be trusted
                     await self._backend.home([axis])
@@ -1124,6 +1110,9 @@ class OT3API(
                     self._log.info("Park failed")
                     self._current_position.clear()
                     raise
+                else:
+                    await self._cache_current_position()
+                    await self._cache_encoder_position()
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
@@ -1161,12 +1150,9 @@ class OT3API(
         machine_ax = OT3Axis.by_mount(mount)
 
         async with self._motion_lock:
-            machine_pos = await self._fast_home((machine_ax,), margin)
-            self._current_position = deck_from_machine(
-                machine_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+            await self._fast_home((machine_ax,), margin)
+            await self._cache_current_position()
+            await self._cache_encoder_position()
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -1212,14 +1198,9 @@ class OT3API(
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+            await self.refresh_positions()
             self._gripper_handler.set_jaw_displacement(
-                self._encoder_current_position[OT3Axis.G]
+                self._encoder_position[OT3Axis.G]
             )
         except Exception:
             self._log.exception(
@@ -1232,14 +1213,10 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+            await self._cache_current_position()
+            await self._cache_encoder_position()
             self._gripper_handler.set_jaw_displacement(
-                self._encoder_current_position[OT3Axis.G]
+                self._encoder_position[OT3Axis.G]
             )
         except Exception:
             self._log.exception("Gripper home failed")
@@ -1263,14 +1240,10 @@ class OT3API(
                     / 2
                 )
             )
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+            await self._cache_current_position()
+            await self._cache_encoder_position()
             self._gripper_handler.set_jaw_displacement(
-                self._encoder_current_position[OT3Axis.G]
+                self._encoder_position[OT3Axis.G]
             )
         except Exception:
             self._log.exception("Gripper set width failed")
@@ -1565,15 +1538,11 @@ class OT3API(
                     home_flagged_axes=False,
                 )
             if move.home_after:
-                machine_pos = await self._backend.fast_home(
+                await self._fast_home(
                     [OT3Axis.from_axis(ax) for ax in move.home_axes],
                     move.home_after_safety_margin,
                 )
-                self._current_position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
+                await self.refresh_positions()
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
@@ -1733,11 +1702,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        carriage_pos = deck_from_machine(
-            self._backend.home_position(),
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
-        )
+        carriage_pos = self._apply_deck_transform(self._backend.home_position())
         pos_at_home = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
         )

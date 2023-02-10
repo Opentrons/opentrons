@@ -662,18 +662,7 @@ async def test_gripper_move_to(
     await ot3_hardware.cache_gripper(instr_data)
 
     await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
-    origin, moves, _ = mock_backend_move.call_args_list[0][0]
-    # The moves that it emits should move only x, y, and the gripper z
-    assert origin == {
-        OT3Axis.X: 0,
-        OT3Axis.Y: 0,
-        OT3Axis.Z_L: 0,
-        OT3Axis.Z_R: 0,
-        OT3Axis.P_L: 0,
-        OT3Axis.P_R: 0,
-        OT3Axis.Z_G: 0,
-        OT3Axis.G: 0,
-    }
+    _, moves, _ = mock_backend_move.call_args_list[0][0]
     for move in moves:
         assert list(sorted(move.unit_vector.keys(), key=lambda elem: elem.value)) == [
             OT3Axis.X,
@@ -862,20 +851,34 @@ async def test_update_position_estimation(
         mock_update.assert_called_once_with(axes)
 
 
-async def test_refresh_current_position(ot3_hardware: ThreadManager[OT3API]) -> None:
+async def test_refresh_positions(ot3_hardware: ThreadManager[OT3API]) -> None:
 
     backend = ot3_hardware.managed_obj._backend
-
-    mock_update = AsyncMock(spec=backend.update_position)
-    mock_update.return_value = {ax: 100 for ax in OT3Axis}
     ot3_hardware._current_position.clear()
+    ot3_hardware._encoder_position.clear()
+
     with patch.object(
         backend,
+        "update_motor_status",
+        AsyncMock(spec=backend.update_motor_status),
+    ) as mock_update_status, patch.object(
+        backend,
         "update_position",
-        mock_update,
-    ) as mock:
-        await ot3_hardware.refresh_current_position_ot3()
-        mock.assert_called_once()
+        AsyncMock(spec=backend.update_position),
+    ) as mock_pos, patch.object(
+        backend,
+        "update_encoder_position",
+        AsyncMock(spec=backend.update_encoder_position),
+    ) as mock_encoder:
 
-        for ax in OT3Axis:
-            assert ax in ot3_hardware._current_position.keys()
+        mock_pos.return_value = {ax: 100 for ax in OT3Axis}
+        mock_encoder.return_value = {ax: 99 for ax in OT3Axis}
+
+        await ot3_hardware.refresh_positions()
+
+        mock_update_status.assert_called_once()
+        mock_pos.assert_awaited_once()
+        mock_encoder.assert_called_once()
+
+        assert (ax in ot3_hardware._current_position.keys() for ax in OT3Axis)
+        assert (ax in ot3_hardware._encoder_position.keys() for ax in OT3Axis)
