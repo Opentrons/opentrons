@@ -294,7 +294,7 @@ def bundle_from_sim(
     )
 
 
-def simulate(
+def simulate(  # noqa: C901
     protocol_file: TextIO,
     file_name: Optional[str] = None,
     custom_labware_paths: Optional[List[str]] = None,
