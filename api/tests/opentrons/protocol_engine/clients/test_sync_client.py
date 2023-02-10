@@ -299,7 +299,7 @@ def test_drop_tip(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
-            homeAfter=None,
+            homeAfter=True,
         )
     )
     response = commands.DropTipResult()
