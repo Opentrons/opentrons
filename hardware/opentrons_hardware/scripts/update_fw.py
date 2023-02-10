@@ -84,7 +84,7 @@ def main() -> None:
     parser.add_argument(
         "--file",
         help="Path to hex file containing the FW executable.",
-        type=argparse.FileType("r"),
+        type=str,
         required=True,
     )
     parser.add_argument(

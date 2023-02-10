@@ -17,6 +17,7 @@ from typing import (
     TypeVar,
 )
 
+
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
@@ -38,10 +39,12 @@ from opentrons_hardware.hardware_control.motion_planning import (
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
 from .instruments.ot3.pipette import (
+    Pipette,
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
@@ -51,7 +54,9 @@ from .instruments.ot3.instrument_calibration import (
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import (
+    get_system_constraints,
+)
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -65,11 +70,11 @@ from .types import (
     HardwareEventHandler,
     HardwareAction,
     MotionChecks,
+    PipetteSubType,
     PauseType,
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
-    OT3SubSystem,
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
@@ -400,13 +405,25 @@ class OT3API(
             sim_model=model.value,
         )
 
-    async def update_firmware(
-        self,
-        firmware_file: str,
-        target: OT3SubSystem,
-    ) -> None:
-        """Update the firmware on the hardware."""
-        await self._backend.update_firmware(firmware_file, target)
+    @staticmethod
+    def _pipette_subtype_from_pipette(pipette: Pipette) -> PipetteSubType:
+        pipettes = {
+            PipetteChannelType.SINGLE_CHANNEL: PipetteSubType.pipette_single,
+            PipetteChannelType.EIGHT_CHANNEL: PipetteSubType.pipette_multi,
+            PipetteChannelType.NINETY_SIX_CHANNEL: PipetteSubType.pipette_96,
+        }
+        return pipettes[pipette.channels]
+
+    async def do_firmware_updates(self) -> None:
+        """Update all the firmware."""
+        # get the attached instruments so we can get the type of pipettes attached
+        pipettes: Dict[OT3Mount, PipetteSubType] = dict()
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        for mount, _ in attached_instruments.items():
+            if self._pipette_handler.has_pipette(mount):
+                pipette = self._pipette_handler.get_pipette(mount)
+                pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
+        await self._backend.update_firmware(pipettes)
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
