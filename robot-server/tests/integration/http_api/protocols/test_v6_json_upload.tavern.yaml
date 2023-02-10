@@ -111,16 +111,16 @@ stages:
                 displayName: Opentrons 96 Tip Rack 10 µL
                 location:
                   slotName: '8'
-            modules: 
-              - id: magneticModuleId 
+            modules:
+              - id: magneticModuleId
                 serialNumber: !anystr
-                model: magneticModuleV2 
-                location: 
+                model: magneticModuleV2
+                location:
                   slotName: '3'
-              - id: temperatureModuleId 
+              - id: temperatureModuleId
                 serialNumber: !anystr
-                model: temperatureModuleV2 
-                location: 
+                model: temperatureModuleV2
+                location:
                   slotName: '1'
             commands:
               - id: !anystr
@@ -425,7 +425,7 @@ stages:
                   labwareId: fixedTrash
                   wellName: A1
                   wellLocation:
-                    origin: top
+                    origin: dropTip
                     offset:
                       x: 0
                       y: 0

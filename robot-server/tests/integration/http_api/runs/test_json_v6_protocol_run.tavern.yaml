@@ -184,8 +184,8 @@ stages:
             key: !anystr
             status: queued
             params:
-              liquidId: "waterId"
-              labwareId: "sourcePlateId"
+              liquidId: 'waterId'
+              labwareId: 'sourcePlateId'
               volumeByWell:
                 A1: 100
                 B1: 100
@@ -282,7 +282,7 @@ stages:
               labwareId: fixedTrash
               wellName: A1
               wellLocation:
-                origin: top
+                origin: dropTip
                 offset:
                   x: 0
                   y: 0
@@ -552,7 +552,7 @@ stages:
               labwareId: fixedTrash
               wellName: A1
               wellLocation:
-                origin: top
+                origin: dropTip
                 offset:
                   x: 0
                   y: 0
