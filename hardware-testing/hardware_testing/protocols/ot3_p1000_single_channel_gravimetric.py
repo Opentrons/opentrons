@@ -1,8 +1,8 @@
 """OT3 P1000 Single Channel Gravimetric Test."""
 import argparse
-from pathlib import Path
 
 from opentrons.protocol_api import ProtocolContext
+from opentrons.config import infer_config_base_dir
 
 from hardware_testing.gravimetric.execute import gravimetric
 from hardware_testing.gravimetric import helpers
@@ -32,7 +32,7 @@ def _run(protocol: ProtocolContext) -> None:
             pipette_volume=1000,
             pipette_mount="left",
             tip_volume=1000,
-            labware_dir=Path(__file__).parent / "definitions",
+            labware_dir=infer_config_base_dir() / "testing_data" / "labware-definitions",
         ),
     )
     items.liquid_tracker.print_setup_instructions(protocol, user_confirm=True)

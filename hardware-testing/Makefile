@@ -73,7 +73,6 @@ test-cov:
 
 .PHONY: test-integration
 test-integration:
-	$(python) protocols/ot2_p300_single_channel_gravimetric.py --simulate
 	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
 	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
 	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
@@ -83,13 +82,13 @@ test-integration:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware_testing tests protocols
-	$(python) -m black --check hardware_testing tests protocols setup.py
-	$(python) -m flake8 hardware_testing tests protocols setup.py
+	$(python) -m mypy hardware_testing tests
+	$(python) -m black --check hardware_testing tests setup.py
+	$(python) -m flake8 hardware_testing tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests protocols setup.py
+	$(python) -m black hardware_testing tests setup.py
 
 define move-plot-webpage
 ssh -i $(2) $(3) root@$(1) \
@@ -132,19 +131,25 @@ push-no-restart-ot3: sdist Pipfile.lock
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3 restart-ot3
 
-.PHONY: push-protocols
-push-protocols:
-	scp -r protocols root@$(host):/data/user_storage/opentrons_data
+define move-directory-ot3
+ssh -i $(2) $(3) root@$(1) \
+"function cleanup () { mount -o remount,ro / ; } ;\
+mount -o remount,rw / &&\
+(rm -rf "$(6)/$(4)" || true) &&\
+mv "$(5)/$(4)" $(6) &&\
+ls "$(6)/$(4)" &&\
+cleanup"
+endef
 
-.PHONY: push-protocols-ot3
-push-protocols-ot3:
-	scp -r protocols root@$(host):/opt/opentrons-robot-server
+.PHONY: push-labware-definitions-ot3
+push-labware-definitions-ot3:
+	scp -r ./labware-definitions root@$(host):/home/root/.opentrons/testing_data
 
 .PHONY: push-all
-push-all: clean wheel push-no-restart push-plot-webpage push-protocols
+push-all: clean wheel push-no-restart push-plot-webpage
 
 .PHONY: push-all-ot3
-push-all: clean wheel push-no-restart-ot3 push-plot-webpage-ot3 push-protocols-ot3
+push-all-ot3: push-no-restart-ot3 push-labware-definitions-ot3
 
 .PHONY: term
 term:
