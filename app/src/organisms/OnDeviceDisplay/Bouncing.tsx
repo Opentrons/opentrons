@@ -8,7 +8,7 @@ const Container = styled.div`
 
 export function Bouncing(): JSX.Element {
   const speed = 50
-  const scale = 0.4 // Image scale (I work on 1080p monitor)
+  const scale = 0.4
   let canvas: HTMLElement
   let ctx: any
   let logoColor: string
@@ -21,7 +21,7 @@ export function Bouncing(): JSX.Element {
     img: new Image(),
   }
 
-  //Pick a random color in RGB format
+  // Pick a random color in RGB format
   const pickColor = (): void => {
     const r = Math.random() * (254 - 0) + 0
     const g = Math.random() * (254 - 0) + 0
@@ -30,7 +30,7 @@ export function Bouncing(): JSX.Element {
     logoColor = `rgb(${r}, ${g}, ${b})`
   }
 
-  //Check for border collision
+  // Check for border collision
   const checkHitBox = (): void => {
     if (dvd.x + dvd.img.width * scale >= canvas?.width || dvd.x <= 0) {
       dvd.xspeed *= -1
@@ -45,10 +45,10 @@ export function Bouncing(): JSX.Element {
 
   const update = (): void => {
     setTimeout(() => {
-      //Draw the canvas background
+      // Draw the canvas background
       ctx.fillStyle = '#000'
       ctx.fillRect(0, 0, canvas?.width, canvas?.height)
-      //Draw DVD Logo and his background
+      // Draw DVD Logo and his background
       ctx.fillStyle = logoColor
       ctx.fillRect(dvd.x, dvd.y, dvd.img.width * scale, dvd.img.height * scale)
       ctx.drawImage(
@@ -58,10 +58,10 @@ export function Bouncing(): JSX.Element {
         dvd.img.width * scale,
         dvd.img.height * scale
       )
-      //Move the logo
+      // Move the logo
       dvd.x += dvd.xspeed
       dvd.y += dvd.yspeed
-      //Check for collision
+      // Check for collision
       checkHitBox()
       update()
     }, speed)
@@ -72,7 +72,7 @@ export function Bouncing(): JSX.Element {
     ctx = canvas?.getContext('2d')
     dvd.img.src = logo
 
-    //Draw the "tv screen"
+    // Draw the "tv screen"
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
