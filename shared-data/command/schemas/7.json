@@ -144,8 +144,8 @@
   "definitions": {
     "WellOrigin": {
       "title": "WellOrigin",
-      "description": "Origin of WellLocation offset.",
-      "enum": ["top", "bottom", "center"],
+      "description": "Origin of WellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    DROP_TIP: the default drop-tip location of a well.\n        Only valid for tip-racks.",
+      "enum": ["top", "bottom", "center", "dropTip"],
       "type": "string"
     },
     "WellOffset": {
@@ -544,6 +544,24 @@
       },
       "required": ["params"]
     },
+    "DropTipWellLocation": {
+      "title": "DropTipWellLocation",
+      "description": "A relative location in reference to a tip rack's well's location.\n\nUnlike a typical WellLocation, the location for a drop tip\ndefaults to a drop-tip location based on the top length\nrather than the well's top.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "dropTip",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        }
+      }
+    },
     "DropTipParams": {
       "title": "DropTipParams",
       "description": "Payload required to drop a tip in a specific well.",
@@ -561,8 +579,11 @@
         },
         "wellLocation": {
           "title": "Welllocation",
-          "description": "Relative well location at which to perform the operation",
-          "allOf": [
+          "description": "Relative well location at which to drop the tip.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DropTipWellLocation"
+            },
             {
               "$ref": "#/definitions/WellLocation"
             }

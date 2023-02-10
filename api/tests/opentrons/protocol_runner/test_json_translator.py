@@ -111,7 +111,10 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=WellLocation(),
+                wellLocation=WellLocation(
+                    origin=WellOrigin.DROP_TIP,
+                    offset=WellOffset(x=0, y=0, z=0),
+                ),
             )
         ),
     ),

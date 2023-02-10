@@ -12,11 +12,29 @@ from opentrons.protocol_engine.commands.drop_tip import (
 
 
 def test_drop_tip_params_defaults() -> None:
-    """A drop tip should drop a `WellOrigin.DROP_TIP` by default."""
-    default_params = DropTipParams(pipetteId="abc", labwareId="def", wellName="ghj")
+    """A drop tip should use a `WellOrigin.DROP_TIP` by default."""
+    default_params = DropTipParams.parse_obj(
+        {"pipetteId": "abc", "labwareId": "def", "wellName": "ghj"}
+    )
 
     assert default_params.wellLocation == WellLocation(
         origin=WellOrigin.DROP_TIP, offset=WellOffset(x=0, y=0, z=0)
+    )
+
+
+def test_drop_tip_params_default_origin() -> None:
+    """A drop tip should drop a `WellOrigin.DROP_TIP` by default even if an offset is given."""
+    default_params = DropTipParams.parse_obj(
+        {
+            "pipetteId": "abc",
+            "labwareId": "def",
+            "wellName": "ghj",
+            "wellLocation": {"offset": {"x": 1, "y": 2, "z": 3}},
+        }
+    )
+
+    assert default_params.wellLocation == WellLocation(
+        origin=WellOrigin.DROP_TIP, offset=WellOffset(x=1, y=2, z=3)
     )
 
 

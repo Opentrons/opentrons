@@ -262,7 +262,42 @@ def test_drop_tip_no_location(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                origin=WellOrigin.DROP_TIP,
+                offset=WellOffset(x=0, y=0, z=0),
+            ),
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_with_location(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should drop a tip given a well core."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    well_core = WellCore(
+        name="well-name",
+        labware_id="labware-id",
+        engine_client=mock_engine_client,
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="labware-id",
+            well_name="well-name",
+            absolute_point=Point(1, 2, 3),
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.drop_tip(location=location, well_core=well_core, home_after=True)
+
+    decoy.verify(
+        mock_engine_client.drop_tip(
+            pipette_id="abc123",
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
         times=1,

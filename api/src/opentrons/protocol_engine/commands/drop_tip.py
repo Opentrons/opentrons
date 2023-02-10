@@ -1,7 +1,7 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
 from ..types import WellLocation, WellOrigin, WellOffset
@@ -16,7 +16,11 @@ DropTipCommandType = Literal["dropTip"]
 
 
 class DropTipWellLocation(WellLocation):
-    """A relative location in reference to a tip rack's well's location."""
+    """A relative location in reference to a tip rack's well's location.
+
+    Unlike a typical WellLocation, the location for a drop tip
+    defaults to location based on the tip length rather than the well's top.
+    """
 
     origin: WellOrigin = WellOrigin.DROP_TIP
     offset: WellOffset = Field(default_factory=WellOffset)
@@ -25,7 +29,7 @@ class DropTipWellLocation(WellLocation):
 class DropTipParams(PipetteIdMixin, WellLocationMixin):
     """Payload required to drop a tip in a specific well."""
 
-    wellLocation: DropTipWellLocation = Field(
+    wellLocation: Union[DropTipWellLocation, WellLocation] = Field(
         default_factory=DropTipWellLocation,
         description="Relative well location at which to drop the tip.",
     )

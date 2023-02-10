@@ -746,6 +746,47 @@ def test_get_well_position_with_center_offset(
     )
 
 
+def test_get_well_position_rejects_drop_tip_origin(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should reject a WellOrigin.DROP_TIP.
+
+    A drop tip command should resolve to a WellOrigin.TOP before hitting this method.
+    """
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
+        slot_pos
+    )
+    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+
+    with pytest.raises(errors.WellOriginNotAllowedError):
+        subject.get_well_position(
+            labware_id="labware-id",
+            well_name="B2",
+            well_location=WellLocation(origin=WellOrigin.DROP_TIP),
+        )
+
+
 def test_get_relative_well_location(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
@@ -897,15 +938,22 @@ def test_get_tip_drop_location(
     """It should get relative drop tip location for a pipette/labware combo."""
     pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 
-    decoy.when(labware_view.get_tip_length("tip-rack-id")).then_return(50)
+    decoy.when(
+        labware_view.get_tip_drop_z_offset(
+            labware_id="tip-rack-id", length_scale=0.5, additional_offset=3
+        )
+    ).then_return(1337)
 
     location = subject.get_tip_drop_location(
         pipette_config=pipette_config,
         labware_id="tip-rack-id",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=25)),
+        well_location=WellLocation(
+            origin=WellOrigin.DROP_TIP,
+            offset=WellOffset(x=1, y=2, z=3),
+        ),
     )
 
-    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=0))
+    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=1337))
 
 
 def test_get_tip_drop_location_with_trash(
@@ -922,23 +970,35 @@ def test_get_tip_drop_location_with_trash(
 
     location = subject.get_tip_drop_location(
         labware_id="labware-id",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        well_location=WellLocation(
+            origin=WellOrigin.DROP_TIP,
+            offset=WellOffset(x=1, y=2, z=3),
+        ),
         pipette_config=pipette_config,
     )
 
-    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=3))
+    assert location == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
 
 
-def test_get_tip_drop_invalid_origin(subject: GeometryView) -> None:
-    """It should raise if the given WellLocation is not WellOrigin.TOP."""
+def test_get_tip_drop_explicit_location(subject: GeometryView) -> None:
+    """It should pass the location through if origin is not WellOrigin.DROP_TIP."""
     pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 
-    with pytest.raises(errors.WellOriginNotAllowedError):
-        subject.get_tip_drop_location(
-            labware_id="labware-id",
-            well_location=WellLocation(origin=WellOrigin.BOTTOM),
-            pipette_config=pipette_config,
-        )
+    input_location = WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
+
+    result = subject.get_tip_drop_location(
+        labware_id="labware-id",
+        well_location=input_location,
+        pipette_config=pipette_config,
+    )
+
+    assert result == input_location
 
 
 def test_get_ancestor_slot_name(
