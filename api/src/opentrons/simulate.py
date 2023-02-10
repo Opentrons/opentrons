@@ -48,6 +48,25 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 
+# See Jira RCORE-535.
+_PYTHON_TOO_NEW_MESSAGE = (
+    "Python protocols with apiLevels higher than 2.13"
+    " cannot currently be simulated with"
+    " the opentrons_simulate command-line tool,"
+    " the opentrons.simulate.simulate() function,"
+    " or the opentrons.simulate.get_protocol_api() function."
+    " Use a lower apiLevel"
+    " or use the Opentrons App instead."
+)
+_JSON_TOO_NEW_MESSAGE = (
+    "Protocols created by recent versions of Protocol Designer"
+    " cannot currently be simulated with"
+    " the opentrons_simulate command-line tool"
+    " or the opentrons.simulate.simulate() function."
+    " Use the Opentrons App instead."
+)
+
+
 class AccumulatingHandler(logging.Handler):
     def __init__(
         self,
@@ -237,14 +256,17 @@ def _build_protocol_context(
     version specification for use with
     :py:meth:`.protocol_api.execute.run_protocol`
     """
-    context = protocol_api.create_protocol_context(
-        api_version=version,
-        hardware_api=hardware_simulator,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        extra_labware=extra_labware,
-        use_simulating_core=True,
-    )
+    try:
+        context = protocol_api.create_protocol_context(
+            api_version=version,
+            hardware_api=hardware_simulator,
+            bundled_labware=bundled_labware,
+            bundled_data=bundled_data,
+            extra_labware=extra_labware,
+            use_simulating_core=True,
+        )
+    except protocol_api.ProtocolEngineCoreRequiredError as e:
+        raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
     context.home()
     return context
 
@@ -375,22 +397,35 @@ def simulate(
             pathlib.Path(hardware_simulator_file_path),
         )
 
-    protocol = parse.parse(
-        contents, file_name, extra_labware=extra_labware, extra_data=extra_data
-    )
+    try:
+        protocol = parse.parse(
+            contents, file_name, extra_labware=extra_labware, extra_data=extra_data
+        )
+    except parse.JSONSchemaVersionTooNewError as e:
+        if e.attempted_schema_version == 6:
+            # See Jira RCORE-535.
+            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
+        else:
+            raise
+
     bundle_contents: Optional[BundleContents] = None
 
     # we want a None literal rather than empty dict so get_protocol_api
     # will look for custom labware if this is a robot
     gpa_extras = getattr(protocol, "extra_labware", None) or None
-    context = get_protocol_api(
-        getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
-        bundled_labware=getattr(protocol, "bundled_labware", None),
-        bundled_data=getattr(protocol, "bundled_data", None),
-        hardware_simulator=hardware_simulator,
-        extra_labware=gpa_extras,
-        machine=machine,
-    )
+
+    try:
+        context = get_protocol_api(
+            getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
+            bundled_labware=getattr(protocol, "bundled_labware", None),
+            bundled_data=getattr(protocol, "bundled_data", None),
+            hardware_simulator=hardware_simulator,
+            extra_labware=gpa_extras,
+            machine=machine,
+        )
+    except protocol_api.ProtocolEngineCoreRequiredError as e:
+        raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
+
     broker = context.broker
     scraper = CommandScraper(stack_logger, log_level, broker)
     if duration_estimator:
