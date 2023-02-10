@@ -31,6 +31,13 @@ from .core.legacy_simulator.legacy_protocol_core import LegacyProtocolCoreSimula
 from .core.engine import ENGINE_CORE_API_VERSION, ProtocolCore
 
 
+class ProtocolEngineCoreRequiredError(Exception):
+    """Raised when a Protocol Engine core was required, but not provided.
+
+    This can happen when creating a ProtocolContext with a high api_version.
+    """
+
+
 def create_protocol_context(
     api_version: APIVersion,
     *,
@@ -91,10 +98,10 @@ def create_protocol_context(
         labware_offset_provider = NullLabwareOffsetProvider()
 
     if api_version >= ENGINE_CORE_API_VERSION:
-        # TODO(mc, 2022-8-22): replace assertion with strict typing
-        assert (
-            protocol_engine is not None and protocol_engine_loop is not None
-        ), "ProtocolEngine PAPI core is enabled, but no ProtocolEngine given."
+        # TODO(mc, 2022-8-22): replace raise with strict typing
+        raise ProtocolEngineCoreRequiredError(
+            "ProtocolEngine PAPI core is enabled, but no ProtocolEngine given."
+        )
 
         engine_client_transport = ChildThreadTransport(
             engine=protocol_engine, loop=protocol_engine_loop
