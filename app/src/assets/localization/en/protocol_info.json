@@ -68,5 +68,7 @@
   "all_protocols": "All Protocols",
   "import_new_protocol": "Import a Protocol",
   "most_recent_updates": "Most recent updates",
-  "oldest_updates": "Oldest updates"
+  "oldest_updates": "Oldest updates",
+  "nothing_here_yet": "Nothing here yet!",
+  "send_a_protocol_to_store": "Send a protocol to store on your OT-3 or run a protocol from desktop app. "
 }

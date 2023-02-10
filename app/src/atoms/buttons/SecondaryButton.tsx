@@ -1,24 +1,37 @@
 import styled from 'styled-components'
 import {
-  NewSecondaryBtn,
   SPACING,
   COLORS,
   BORDERS,
   TYPOGRAPHY,
   styleProps,
+  isntStyleProp,
 } from '@opentrons/components'
 
-export const SecondaryButton = styled(NewSecondaryBtn)`
-  color: ${COLORS.blueEnabled};
+import type { StyleProps } from '@opentrons/components'
+
+interface SecondaryButtonProps extends StyleProps {
+  /** button action is dangerous and may have non-reversible side-effects for user */
+  isDangerous?: boolean
+}
+export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
+  shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
+})<SecondaryButtonProps>`
+  color: ${props =>
+    props.isDangerous ? COLORS.errorText : COLORS.blueEnabled};
+  border: ${BORDERS.lineBorder};
+  border-color: ${props =>
+    props.isDangerous ? COLORS.errorEnabled : 'initial'};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding-left: ${SPACING.spacing4};
-  padding-right: ${SPACING.spacing4};
+  padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   background-color: ${COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}
-  background-color: ${COLORS.transparent};
 
-  ${styleProps}
+  &:hover,
+  &:focus {
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
+  }
 
   &:hover {
     opacity: 70%;
@@ -29,7 +42,15 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
     box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 
-  &:disabled {
+  &:active {
+    box-shadow: none;
+  }
+
+  &:disabled,
+  &.disabled {
+    box-shadow: none;
     opacity: 50%;
   }
+
+  ${styleProps}
 `

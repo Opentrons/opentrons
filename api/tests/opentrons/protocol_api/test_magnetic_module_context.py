@@ -5,6 +5,7 @@ from decoy import Decoy, matchers
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules import MagneticStatus
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MagneticModuleContext
 from opentrons.protocol_api.core.common import ProtocolCore, MagneticModuleCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
@@ -88,13 +89,14 @@ def test_get_status(
     assert result == "disengaged"
 
 
-def test_engage_height_from_home(
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+def test_engage_height_from_home_succeeds_on_low_version(
     decoy: Decoy,
     mock_broker: Broker,
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
 ) -> None:
-    """It should engage if given a raw motor height."""
+    """It should engage if given a raw motor height and the apiLevel is low."""
     subject.engage(height=42.0)
 
     decoy.verify(
@@ -105,6 +107,20 @@ def test_engage_height_from_home(
         mock_core.engage(height_from_home=42.0),
         mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
     )
+
+
+# TODO(mm, 2023-02-09): Add MAX_SUPPORTED_VERSION when it's >=2.14.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_engage_height_from_home_raises_on_high_version(
+    decoy: Decoy,
+    mock_core: MagneticModuleCore,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should error if given a raw motor height and the apiLevel is high."""
+    with pytest.raises(APIVersionError):
+        subject.engage(height=42.0)
+    with pytest.raises(APIVersionError):
+        subject.engage(42.0)
 
 
 def test_engage_height_from_base(

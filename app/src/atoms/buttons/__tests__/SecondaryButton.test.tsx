@@ -29,9 +29,7 @@ describe('SecondaryButton', () => {
       `background-color: ${String(COLORS.transparent)}`
     )
     expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing3)} ${String(
-        SPACING.spacing4
-      )} ${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`
+      `padding: ${SPACING.spacing3} ${SPACING.spacing4}`
     )
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeP)}`)
     expect(button).toHaveStyle(
