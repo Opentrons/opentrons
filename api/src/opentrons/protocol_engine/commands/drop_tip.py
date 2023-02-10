@@ -19,7 +19,11 @@ class DropTipParams(PipetteIdMixin, WellLocationMixin):
 
     homeAfter: Optional[bool] = Field(
         None,
-        description="Whether to home this pipette's plunger after dropping the tip.",
+        description=(
+            "Whether to home this pipette's plunger after dropping the tip."
+            " You should normally leave this unspecified to let the robot choose"
+            " a safe default depending on its hardware."
+        ),
     )
 
 
