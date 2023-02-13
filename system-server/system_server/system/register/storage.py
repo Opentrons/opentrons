@@ -35,9 +35,9 @@ async def get_registration_token(
     """
     with sql_engine.begin() as conn:
         statement = sqlalchemy.select(registration_table).where(
-            registration_table.c.agent == registrant.agent
-            and registration_table.c.agent_id == registrant.agent_id
-            and registration_table.c.subject == registrant.subject
+            (registration_table.c.agent == registrant.agent)
+            & (registration_table.c.agent_id == registrant.agent_id)
+            & (registration_table.c.subject == registrant.subject)
         )
 
         # Database configuration means that we are assured to only get 1 or 0 hits.
@@ -52,9 +52,9 @@ async def delete_registration_token(
     """Clear out a registration token, if a match exists."""
     with sql_engine.begin() as conn:
         statement = sqlalchemy.delete(registration_table).where(
-            registration_table.c.agent == registrant.agent
-            and registration_table.c.agent_id == registrant.agent_id
-            and registration_table.c.subject == registrant.subject
+            (registration_table.c.agent == registrant.agent)
+            & (registration_table.c.agent_id == registrant.agent_id)
+            & (registration_table.c.subject == registrant.subject)
         )
         conn.execute(statement)
 
