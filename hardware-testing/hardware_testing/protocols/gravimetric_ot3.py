@@ -29,16 +29,16 @@ def _run(protocol: ProtocolContext) -> None:
         protocol,
         gravimetric.ExecuteGravConfig(
             name=metadata["protocolName"],
-            pipette_volume=1000,
+            pipette_volume=50,
             pipette_mount="left",
-            tip_volume=1000,
+            tip_volume=50,
             labware_dir=infer_config_base_dir() / "testing_data" / "labware-definitions",
         ),
     )
     items.liquid_tracker.print_setup_instructions(protocol, user_confirm=True)
     if TEST_VIAL_LIQUID:
         _move_to_vial_liquid_surface(protocol, items)
-    gravimetric.run(protocol, items, volumes=[200.0], samples=12)
+    gravimetric.run(protocol, items, volumes=[45.0], samples=12)
     gravimetric.analyze(protocol, items)
 
 

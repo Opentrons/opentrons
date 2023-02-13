@@ -51,11 +51,11 @@ class LiquidClassSettings:
 
 
 LIQUID_CLASS_DEFAULT = LiquidClassSettings(
-    aspirate=SampleConfig(flow_rate=10, delay=0, acceleration=None),
-    dispense=SampleConfig(flow_rate=10, delay=0, acceleration=None),
-    blow_out=AirConfig(flow_rate=20, volume=ACTUAL_OT2_BLOW_OUT_VOLUME_P300),
-    wet_air_gap=AirConfig(flow_rate=10, volume=0),
-    dry_air_gap=AirConfig(flow_rate=20, volume=0),
+    aspirate=SampleConfig(flow_rate=30, delay=0, acceleration=None),
+    dispense=SampleConfig(flow_rate=30, delay=0, acceleration=None),
+    blow_out=AirConfig(flow_rate=30, volume=10),  # FIXME: volume is ignore
+    wet_air_gap=AirConfig(flow_rate=50, volume=0),
+    dry_air_gap=AirConfig(flow_rate=50, volume=0),
     submerge=MovementConfig(distance=1.5, speed=5, delay=None, acceleration=None),
     tracking=MovementConfig(
         distance=0, speed=None, delay=None, acceleration=None
