@@ -194,3 +194,25 @@ def test_parent_module_context(
     )
 
     subject.parent == mock_temp_module_context
+
+
+@pytest.mark.parametrize("api_version", APIVersion(2, 13))
+def test_set_offset_succeeds_on_low_api_version(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should pass the offset to the core, on low API versions."""
+    subject.set_offset(1, 2, 3)
+    decoy.verify(mock_labware_core.set_calibration(1, 2, 3))
+
+
+@pytest.mark.parametrize("api_version", APIVersion(2, 14))
+def test_set_offset_raises_on_high_api_version(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should raise an error, on high API versions."""
+    with pytest.raises(APIVersionError):
+        subject.set_offset(1, 2, 3)

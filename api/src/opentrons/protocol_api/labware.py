@@ -449,15 +449,36 @@ class Labware:
         even if those labware are of the same type.
 
         .. caution::
-            This method is *only* for Jupyter and command-line applications
-            of the Python Protocol API. Do not use this method in a protocol
-            uploaded via the Opentrons App.
+            If you're uploading a protocol via the Opentrons App, don't use this method.
+            Instead, use the Opentrons App's Labware Position Check.
+
+            This method is *only* for when you're using mechanisms like
+            :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
+            to adjust labware offsets. (See :ref:`advanced-control`.)
 
             Using this method and the Opentrons App's Labware Position Check
             at the same time will produce undefined behavior. We may choose
             to define this behavior in a future release.
+
+            .. note::
+                Because protocols with a :ref:`version <v2-versioning>` of 2.14
+                can currently *only* be uploaded via the Opentrons App, it doesn't make
+                sense to use this method with them. Trying to do so will raise an exception.
         """
-        self._core.set_calibration(Point(x=x, y=y, z=z))
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            # TODO(mm, 2023-02-13): See Jira RCORE-535.
+            #
+            # Until that issue is resolved, the only way to simulate or run a
+            # >=ENGINE_CORE_API_VERSION protocol is through the Opentrons App.
+            # Therefore, in >=ENGINE_CORE_API_VERSION protocols,
+            # there's no legitimate way to use this method.
+            raise APIVersionError(
+                "Labware.set_offset() is not supported when apiLevel is 2.14."
+                " Use a lower apiLevel"
+                " or use the Opentrons App's Labware Position Check."
+            )
+        else:
+            self._core.set_calibration(Point(x=x, y=y, z=z))
 
     @property  # type: ignore
     @requires_version(2, 0)
