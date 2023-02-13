@@ -42,8 +42,10 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorId,
     SensorType,
     SensorThresholdMode,
+    SensorOutputBinding,
 )
 from opentrons_hardware.sensors.scheduler import SensorScheduler
+from opentrons_hardware.sensors.sensor_driver import LogListener, SensorDriver
 from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.sensor_types import SensorInformation
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
@@ -66,6 +68,19 @@ def mock_sensor_threshold() -> Iterator[AsyncMock]:
 
         mock_threshold.side_effect = echo_value
         yield mock_threshold
+
+@pytest.fixture
+def mock_bind_output() -> Iterator[AsyncMock]:
+    """Mock SensorDriver.bind_output."""
+    with patch.object(
+        SensorDriver,
+        "bind_output",
+        AsyncMock(
+            spec=SensorDriver.bind_output,
+            wraps=SensorDriver.bind_output,
+        ),
+    ) as mock_bind:
+        yield mock_bind
 
 
 @pytest.fixture
@@ -94,6 +109,7 @@ def mock_bind_sync() -> Iterator[AsyncMock]:
 )
 async def test_liquid_probe(
     mock_messenger: AsyncMock,
+    mock_bind_output: AsyncMock,
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
     target_node: ProbeTarget,
@@ -157,6 +173,25 @@ async def test_liquid_probe(
         data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
         mode=SensorThresholdMode.absolute,
     )
+    mock_bind_output.assert_called_with(
+        mock_messenger, sensor_info, [SensorOutputBinding.sync]
+    )
+
+    # with patch.object("LogListener") as mock_listener:
+    #     position = await liquid_probe(
+    #         messenger=mock_messenger,
+    #         tool=target_node,
+    #         head_node=motor_node,
+    #         max_z_distance=40,
+    #         mount_speed=10,
+    #         plunger_speed=8,
+    #         starting_mount_height=120,
+    #         prep_move_speed=40,
+    #         threshold_pascals=threshold_pascals,
+    #         log_pressure=False,
+    #         sensor_id=SensorId.S0,
+    #     )
+
 
 
 @pytest.mark.parametrize(
