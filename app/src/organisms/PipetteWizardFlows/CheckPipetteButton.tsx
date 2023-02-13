@@ -25,7 +25,14 @@ export const CheckPipetteButton = (
   }, [proceed, status, setPending])
 
   return (
-    <PrimaryButton disabled={isDisabled} onClick={refetch}>
+    <PrimaryButton
+      disabled={isDisabled}
+      onClick={() => {
+        refetch()
+          .then(() => {})
+          .catch(() => {})
+      }}
+    >
       {proceedButtonText}
     </PrimaryButton>
   )

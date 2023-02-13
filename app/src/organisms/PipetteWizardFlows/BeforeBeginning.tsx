@@ -67,15 +67,15 @@ export const BeforeBeginning = (
 
   let equipmentList = [CALIBRATION_PROBE]
   let proceedButtonText: string = t('get_started')
-  let bodyText: string = ''
+  let bodyTranslationKey: string = ''
 
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      bodyText = t('remove_labware_to_get_started')
+      bodyTranslationKey = 'remove_labware_to_get_started'
       break
     }
     case FLOWS.ATTACH: {
-      bodyText = t('remove_labware')
+      bodyTranslationKey = 'remove_labware'
       proceedButtonText = t('move_gantry_to_front')
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
@@ -90,7 +90,7 @@ export const BeforeBeginning = (
       break
     }
     case FLOWS.DETACH: {
-      bodyText = t('get_started_detach')
+      bodyTranslationKey = 'get_started_detach'
       equipmentList = [HEX_SCREWDRIVER]
       break
     }
@@ -169,7 +169,7 @@ export const BeforeBeginning = (
         <>
           <Trans
             t={t}
-            i18nKey={bodyText}
+            i18nKey={bodyTranslationKey}
             components={{ block: <StyledText as="p" /> }}
           />
           {selectedPipette === NINETY_SIX_CHANNEL &&

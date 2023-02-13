@@ -18,21 +18,24 @@ export function useAttachedPipetteCalibrations(): PipetteCalibrationsByMount {
   const tipLengthCalibrations =
     useAllTipLengthCalibrationsQuery()?.data?.data ?? []
   const offsets = {
-    left: attachedPipettes.left
-      ? filterCalibrationForPipette(
-          pipetteOffsetCalibrations,
-          attachedPipettes.left.id,
-          'left'
-        )
-      : null,
-    right: attachedPipettes.right
-      ? filterCalibrationForPipette(
-          pipetteOffsetCalibrations,
-          attachedPipettes.right.id,
-          'right'
-        )
-      : null,
+    left:
+      attachedPipettes.left != null
+        ? filterCalibrationForPipette(
+            pipetteOffsetCalibrations,
+            attachedPipettes.left.id,
+            'left'
+          )
+        : null,
+    right:
+      attachedPipettes.right != null
+        ? filterCalibrationForPipette(
+            pipetteOffsetCalibrations,
+            attachedPipettes.right.id,
+            'right'
+          )
+        : null,
   }
+
   return {
     left: {
       offset: offsets.left,
@@ -63,7 +66,7 @@ function filterTipLengthForPipetteAndTiprack(
       allCalibrations.filter(
         cal => cal.pipette === pipetteSerial && cal.tiprack === tiprackHash
       )
-    ) || null
+    ) ?? null
   )
 }
 
@@ -77,6 +80,6 @@ function filterCalibrationForPipette(
       calibrations.filter(
         cal => cal.pipette === pipetteSerial && cal.mount === mount
       )
-    ) || null
+    ) ?? null
   )
 }

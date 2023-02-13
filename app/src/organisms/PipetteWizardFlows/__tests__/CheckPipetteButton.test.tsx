@@ -1,16 +1,22 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { FAILURE, SUCCESS } from '../../../redux/robot-api'
+import { usePipettesQuery } from '@opentrons/react-api-client'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { CheckPipetteButton } from '../CheckPipetteButton'
-
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
   return renderWithProviders(<CheckPipetteButton {...props} />)[0]
 }
 
+jest.mock('@opentrons/react-api-client')
+
+const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
+  typeof usePipettesQuery
+>
+
 describe('CheckPipetteButton', () => {
   let props: React.ComponentProps<typeof CheckPipetteButton>
-  const mockCheckPipette = jest.fn()
+  const refetch = jest.fn(() => Promise.resolve())
   beforeEach(() => {
     props = {
       proceed: jest.fn(),
@@ -18,21 +24,23 @@ describe('CheckPipetteButton', () => {
       setPending: jest.fn(),
       isDisabled: false,
     }
+    when(mockUsePipettesQuery)
+      .calledWith()
+      .mockReturnValue({
+        status: 'idle',
+        refetch,
+      } as any)
   })
   afterEach(() => {
+    resetAllWhenMocks()
     jest.resetAllMocks()
   })
-  it('clicking on the button calls checkPipette success', () => {
+  it('clicking on the button calls refetch', () => {
     const { getByRole } = render(props)
     getByRole('button', { name: 'continue' }).click()
-    expect(mockCheckPipette).toHaveBeenCalled()
+    expect(refetch).toHaveBeenCalled()
   })
-  it('clicking on the button calls checkPipette failure', () => {
-    const { getByRole } = render(props)
-    getByRole('button', { name: 'continue' }).click()
-    expect(mockCheckPipette).toHaveBeenCalled()
-  })
-  it('renders button disbaled when isDisabled is true', () => {
+  it('renders button disabled when isDisabled is true', () => {
     props = {
       ...props,
       isDisabled: true,

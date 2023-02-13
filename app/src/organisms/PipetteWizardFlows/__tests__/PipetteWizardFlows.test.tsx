@@ -9,6 +9,7 @@ import {
 import {
   useCreateRunMutation,
   useStopRunMutation,
+  usePipettesQuery,
   // useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
@@ -19,7 +20,6 @@ import {
 } from '../../../redux/pipettes/__fixtures__'
 import * as RobotApi from '../../../redux/robot-api'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
-import { useAttachedPipettes } from '../../Devices/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
 import { FLOWS, SECTIONS } from '../constants'
@@ -34,12 +34,11 @@ jest.mock('../../../resources/runs/hooks')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../ExitModal')
 jest.mock('../../ProtocolUpload/hooks')
-jest.mock('../../Devices/hooks')
 jest.mock('../../../redux/robot-api')
 jest.mock('../UnskippableModal')
 
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
+const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
+  typeof usePipettesQuery
 >
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
@@ -95,7 +94,9 @@ describe('PipetteWizardFlows', () => {
       robotName: 'otie',
       closeFlow: jest.fn(),
     }
-    mockUseAttachedPipettes.mockReturnValue({ left: mockPipette, right: null })
+    mockUsePipettesQuery.mockReturnValue({
+      data: { left: mockPipette, right: null },
+    } as any)
     mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
     mockExitModal.mockReturnValue(<div>mock exit modal</div>)
     mockUseCreateRunMutation.mockReturnValue({
@@ -330,7 +331,9 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(continueBtn)
   })
   it('renders the correct information, calling the correct commands for the attach flow 96 channel', async () => {
-    mockUseAttachedPipettes.mockReturnValue({ left: mockPipette, right: null })
+    mockUsePipettesQuery.mockReturnValue({
+      data: { left: null, right: null },
+    } as any)
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -373,8 +376,8 @@ describe('PipetteWizardFlows', () => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
           {
-            commandType: 'home',
-            params: {},
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
           },
         ],
         false
@@ -386,22 +389,24 @@ describe('PipetteWizardFlows', () => {
     // TODO wait until commands are wired up to write out more of this test!
   })
   it('renders the correct information, calling the correct commands for the detach flow 96 channel', async () => {
-    mockUseAttachedPipettes.mockReturnValue({ 
-      left: {
-        id: 'abc',
-        name: 'p1000_96',
-        model: 'p1000_96_v1',
-        tip_length: 42,
-        mount_axis: 'c',
-        plunger_axis: 'd',
-        modelSpecs: {
-          ...mockGen3P1000PipetteSpecs,
-          maxVolume: 50,
-          displayName: 'mock display name',
+    mockUsePipettesQuery.mockReturnValue({
+      data: {
+        left: {
+          id: 'abc',
+          name: 'p1000_96',
+          model: 'p1000_96_v1',
+          tip_length: 42,
+          mount_axis: 'c',
+          plunger_axis: 'd',
+          modelSpecs: {
+            ...mockGen3P1000PipetteSpecs,
+            maxVolume: 50,
+            displayName: 'mock display name',
+          },
         },
+        right: null,
       },
-      right: null,
-    })
+    } as any)
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -466,7 +471,9 @@ describe('PipetteWizardFlows', () => {
     fireEvent.click(continueBtn)
   })
   it('renders the correct information, calling the correct commands for the attach flow 96 channel with gantry not empty', async () => {
-    mockUseAttachedPipettes.mockReturnValue({ left: null, right: mockPipette })
+    mockUsePipettesQuery.mockReturnValue({
+      data: { left: null, right: mockPipette },
+    } as any)
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -608,18 +615,20 @@ describe('PipetteWizardFlows', () => {
     })
   })
   it('renders the unskippable modal when you try to exit out of a 96 channel detach flow from a the detach pipette unskippable page', async () => {
-    mockUseAttachedPipettes.mockReturnValue({
-      left: {
-        id: 'abc',
-        name: 'p1000_96',
-        model: 'p1000_96_v1',
-        tip_length: 42,
-        mount_axis: 'c',
-        plunger_axis: 'd',
-        modelSpecs: mockGen3P1000PipetteSpecs,
+    mockUsePipettesQuery.mockReturnValue({
+      data: {
+        left: {
+          id: 'abc',
+          name: 'p1000_96',
+          model: 'p1000_96_v1',
+          tip_length: 42,
+          mount_axis: 'c',
+          plunger_axis: 'd',
+          modelSpecs: mockGen3P1000PipetteSpecs,
+        },
+        right: null,
       },
-      right: null,
-    })
+    } as any)
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -665,7 +674,9 @@ describe('PipetteWizardFlows', () => {
     getByText('mock unskippable modal')
   })
   it('renders the 96 channel attach flow carriage unskippable step page', async () => {
-    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    mockUsePipettesQuery.mockReturnValue({
+      data: { left: null, right: null },
+    } as any)
     props = {
       ...props,
       flowType: FLOWS.ATTACH,

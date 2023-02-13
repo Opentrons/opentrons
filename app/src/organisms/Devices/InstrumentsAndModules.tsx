@@ -32,7 +32,7 @@ import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
 
 const EQUIPMENT_POLL_MS = 5000
-const FETCH_PIPETTE_LONG_POLL = 30000
+const FETCH_PIPETTE_CAL_POLL = 30000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
@@ -77,7 +77,7 @@ export function InstrumentsAndModules({
   // data to the associated card via props
   const pipetteOffsetCalibrations =
     useAllPipetteOffsetCalibrationsQuery({
-      refetchInterval: FETCH_PIPETTE_LONG_POLL,
+      refetchInterval: FETCH_PIPETTE_CAL_POLL,
     })?.data?.data ?? []
   const leftMountOffsetCalibration = getOffsetCalibrationForMount(
     pipetteOffsetCalibrations,

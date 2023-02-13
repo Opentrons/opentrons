@@ -34,11 +34,18 @@ interface IndividualCalibrationHealthStatus {
 
 export interface DeckCalibrationData {
   type: 'attitude' | 'affine'
-  matrix: [
-    [number, number, number],
-    [number, number, number],
-    [number, number, number]
-  ]
+  matrix:
+    | [
+        [number, number, number],
+        [number, number, number],
+        [number, number, number]
+      ]
+    | [
+        [number, number, number, number],
+        [number, number, number, number],
+        [number, number, number, number],
+        [number, number, number, number]
+      ]
   lastModified: string | null
   pipetteCalibratedWith: string | null // pipette serial number
   tiprack: string | null // tip rack hash

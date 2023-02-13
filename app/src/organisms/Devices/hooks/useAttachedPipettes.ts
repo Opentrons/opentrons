@@ -12,8 +12,7 @@ export function useAttachedPipettes(
 ): AttachedPipettesByMount {
   const attachedPipettesResponse = usePipettesQuery(
     poll ? { refetchInterval: PIPETTE_POLL_MS } : {}
-  ).data
-
+  )?.data
   return Constants.PIPETTE_MOUNTS.reduce<AttachedPipettesByMount>(
     (result, mount) => {
       const attached = attachedPipettesResponse?.[mount] || null
