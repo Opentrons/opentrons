@@ -25,10 +25,10 @@ from hardware_testing import data
 from hardware_testing.drivers import list_ports_and_select,find_port
 from hardware_testing.drivers.mark10.mark10_fg import Mark10,SimMark10
 
-default_move_speed = 20
+default_move_speed = 15
 default_run_current = 1.4
 currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
-speeds = (50, 100, 150, 200, 250, 300)
+speeds = (10, 15, 20, 25, 30)
 force_gauge_currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
 force_gauge_speeds = (2, 5, 10, 20)
 Z_STAGE_TOLERANCES_MM = 0.4
@@ -137,7 +137,7 @@ async def _homeMount(messenger: CanMessenger) -> None:
 
 async def _set_pipette_current(messenger: CanMessenger, run_current: float) -> None:
     currents: Dict[NodeId, Tuple[float, float]] = dict()
-    currents[NODE] = (float(0), float(run_current))
+    currents[NODE] = (float(0.1), float(run_current))
     try:
         await set_currents(messenger, currents)
     except asyncio.CancelledError:
@@ -189,18 +189,18 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
     )
     print(f"motor position: {mot}, encoder position: {enc}")
     for cu in currents:
-        await _set_pipette_current(messenger, cu)
         for sp in speeds:
             print('Start Currents and Speeds testing, Current= {}, Speed= {}::::'.format(cu, sp))
             try:
+                await _set_pipette_current(messenger, cu)
                 for c in range(CYCLES):
                     # print(f"cycle: {c + 1}/{CYCLES}")
                     mot, enc = await _move_to(
-                        messenger, 80, default_move_speed, check=True
+                        messenger, 80, sp, check=True
                     )
                     print(f"motor position: {mot}, encoder position: {enc}")
                     mot, enc = await _move_to(
-                        messenger, 80, -default_move_speed, check=True
+                        messenger, 80, -sp, check=True
                     )
                     print(f"motor position: {mot}, encoder position: {enc}")
                     try:
