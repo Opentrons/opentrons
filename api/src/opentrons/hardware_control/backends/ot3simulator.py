@@ -16,6 +16,7 @@ from typing import (
     Set,
     Union,
     Mapping,
+    Iterator,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
@@ -205,13 +206,22 @@ class OT3Simulator:
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
 
+    def _get_motor_status(
+        self, ax: Sequence[OT3Axis]
+    ) -> Iterator[Optional[MotorStatus]]:
+        return (self._motor_status.get(axis_to_node(a)) for a in ax)
+
     def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        get_stat: Callable[
-            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
-        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
-            for status in get_stat(axes)
+            for status in self._get_motor_status(axes)
+        )
+
+    def check_ready_for_parking(self, axes: Sequence[OT3Axis]) -> bool:
+        """If any of the encoder statuses is ok, parking can proceed."""
+        return any(
+            isinstance(status, MotorStatus) and status.encoder_ok
+            for status in self._get_motor_status(axes)
         )
 
     @ensure_yield

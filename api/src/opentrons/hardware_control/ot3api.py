@@ -1079,6 +1079,7 @@ class OT3API(
         # make sure current position is up-to-date
         await self.refresh_positions()
 
+        parkable = list(OT3Axis.gantry_axes())
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
             assert all(
@@ -1091,7 +1092,6 @@ class OT3API(
                 "Cannot park because the encoder positions are unknown."
             )
         self._reset_last_mount()
-        parkable = list(OT3Axis.gantry_axes())
 
         park_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
         self._log.info(f"Parking {park_seq}")
