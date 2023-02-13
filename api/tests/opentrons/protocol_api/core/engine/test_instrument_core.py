@@ -260,6 +260,7 @@ def test_drop_tip_no_location(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
             ),
+            home_after=True,
         ),
         times=1,
     )

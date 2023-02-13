@@ -111,7 +111,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         self,
         location: Optional[types.Location],
         well_core: WellCoreType,
-        home_after: bool,
+        home_after: Optional[bool],
     ) -> None:
         """Move to and drop a tip into a given well.
 

@@ -623,7 +623,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @publisher.publish(command=cmds.return_tip)
     @requires_version(2, 0)
-    def return_tip(self, home_after: bool = True) -> InstrumentContext:
+    def return_tip(self, home_after: Optional[bool] = None) -> InstrumentContext:
         """
         If a tip is currently attached to the pipette, then the pipette will
         return the tip to its location in the tip rack.
@@ -832,7 +832,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def drop_tip(
         self,
         location: Optional[Union[types.Location, labware.Well]] = None,
-        home_after: bool = True,
+        home_after: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Drop the current tip.
@@ -864,7 +864,7 @@ class InstrumentContext(publisher.CommandPublisher):
             :py:class:`.types.Location` or :py:class:`.Well` or None
         :param home_after:
             Whether to home this pipette's plunger after dropping the tip.
-            Defaults to ``True``.
+            If not specified, defaults to ``True`` on an OT-2.
 
             Setting ``home_after=False`` saves waiting a couple of seconds
             after the pipette drops the tip, but risks causing other problems.
