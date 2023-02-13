@@ -1,6 +1,6 @@
 {
-  "displayName": "P50 8-Channel GEN1",
-  "model": "p50",
+  "displayName": "P300 8-Channel GEN1",
+  "model": "p300",
   "displayCategory": "GEN1",
   "pickUpTipConfigurations": {
     "current": 0.6,
@@ -19,8 +19,8 @@
   "plungerMotorConfigurations": { "idle": 0.5, "run": 0.5 },
   "plungerPositionsConfigurations": {
     "top": 19.5,
-    "bottom": 2.5,
-    "blowout": 2.0,
+    "bottom": 3.5,
+    "blowout": 1.5,
     "drop": -3.5
   },
   "availableSensors": { "sensors": [] },

@@ -3,10 +3,10 @@
   "model": "p50",
   "displayCategory": "GEN1",
   "pickUpTipConfigurations": {
-    "current": 0.6,
+    "current": 0.8,
     "speed": 30.0,
     "presses": 3,
-    "increment": 1.0,
+    "increment": 3.0,
     "distance": 10.0
   },
   "dropTipConfigurations": {
@@ -19,9 +19,9 @@
   "plungerMotorConfigurations": { "idle": 0.5, "run": 0.5 },
   "plungerPositionsConfigurations": {
     "top": 19.5,
-    "bottom": 2.5,
-    "blowout": 2.0,
-    "drop": -3.5
+    "bottom": 2.0,
+    "blowout": 0.5,
+    "drop": -4.0
   },
   "availableSensors": { "sensors": [] },
   "partialTipConfigurations": {

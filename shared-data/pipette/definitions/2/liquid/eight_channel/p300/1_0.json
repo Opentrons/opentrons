@@ -1,26 +1,28 @@
 {
   "supportedTips": {
     "t200": {
-      "defaultAspirateFlowRate": 25.0,
-      "defaultDispenseFlowRate": 50.0,
+      "defaultAspirateFlowRate": 150.0,
+      "defaultDispenseFlowRate": 300.0,
       "defaultBlowOutFlowRate": 1000.0,
       "defaultTipLength": 51.7,
       "defaultTipOverlap": 7.47,
       "defaultReturnTipHeight": null,
       "aspirate": {
         "opentrons/tipone_96_tiprack_200ul/1": [
-          [11.79687499, -0.0098, 3.064988953],
-          [50.0, -0.0004, 2.954068131]
+          [57.25698968, 0.017, 18.132],
+          [309.2612689, 0.001, 19.03]
         ],
         "opentrons/opentrons_96_filtertiprack_200ul/1": [
-          [11.79687499, -0.0098, 3.064988953],
-          [50.0, -0.0004, 2.954068131]
+          [57.25698968, 0.017, 18.132],
+          [309.2612689, 0.001, 19.03]
         ]
       },
       "dispense": {
-        "opentrons/tipone_96_tiprack_200ul/1": [[50.0, 0.0, 2.931601299]],
+        "opentrons/tipone_96_tiprack_200ul/1": [
+          [309.2612689, 0.0, 19.29389273]
+        ],
         "opentrons/opentrons_96_filtertiprack_200ul/1": [
-          [50.0, 0.0, 2.931601299]
+          [309.2612689, 0.0, 19.29389273]
         ]
       },
       "defaultTipOverlapDictionary": {
@@ -29,28 +31,30 @@
       }
     },
     "t300": {
-      "defaultAspirateFlowRate": 25.0,
-      "defaultDispenseFlowRate": 50.0,
+      "defaultAspirateFlowRate": 150.0,
+      "defaultDispenseFlowRate": 300.0,
       "defaultBlowOutFlowRate": 1000.0,
       "defaultTipLength": 51.7,
       "defaultTipOverlap": 7.47,
       "defaultReturnTipHeight": null,
       "aspirate": {
         "opentrons/opentrons_96_tiprack_300ul/1": [
-          [11.79687499, -0.0098, 3.064988953],
-          [50.0, -0.0004, 2.954068131]
+          [57.25698968, 0.017, 18.132],
+          [309.2612689, 0.001, 19.03]
         ]
       },
       "dispense": {
-        "opentrons/opentrons_96_tiprack_300ul/1": [[50.0, 0.0, 2.931601299]]
+        "opentrons/opentrons_96_tiprack_300ul/1": [
+          [309.2612689, 0.0, 19.29389273]
+        ]
       },
       "defaultTipOverlapDictionary": {
         "opentrons/opentrons_96_tiprack_300ul/1": 7.47
       }
     }
   },
-  "maxVolume": 50,
-  "minVolume": 5.0,
+  "maxVolume": 300,
+  "minVolume": 30.0,
   "defaultTipracks": [
     "opentrons/opentrons_96_tiprack_300ul/1",
     "opentrons/opentrons_96_filtertiprack_200ul/1"

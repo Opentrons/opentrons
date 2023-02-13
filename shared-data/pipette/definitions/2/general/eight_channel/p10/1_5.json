@@ -1,12 +1,12 @@
 {
-  "displayName": "P50 8-Channel GEN1",
-  "model": "p50",
+  "displayName": "P10 8-Channel GEN1",
+  "model": "p10",
   "displayCategory": "GEN1",
   "pickUpTipConfigurations": {
-    "current": 0.6,
+    "current": 0.55,
     "speed": 30.0,
     "presses": 3,
-    "increment": 1.0,
+    "increment": 3.0,
     "distance": 10.0
   },
   "dropTipConfigurations": {
@@ -19,9 +19,9 @@
   "plungerMotorConfigurations": { "idle": 0.5, "run": 0.5 },
   "plungerPositionsConfigurations": {
     "top": 19.5,
-    "bottom": 2.5,
-    "blowout": 2.0,
-    "drop": -3.5
+    "bottom": 2.0,
+    "blowout": -1.0,
+    "drop": -4.5
   },
   "availableSensors": { "sensors": [] },
   "partialTipConfigurations": {
