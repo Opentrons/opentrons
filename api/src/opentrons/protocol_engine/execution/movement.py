@@ -316,6 +316,17 @@ class MovementHandler:
                 speed=speed,
             )
 
-    async def fast_retract(self, mount: Mount) -> None:
+    async def fast_retract(self, axis: List[MotorAxis]) -> None:
         """Retract the desired mount."""
-        await self._hardware_api.retract(mount=mount)
+        for axis_item in axis:
+            if axis_item == MotorAxis.LEFT_Z:
+                await self._hardware_api.retract(mount=Mount.LEFT)
+            elif axis_item == MotorAxis.RIGHT_Z:
+                await self._hardware_api.retract(mount=Mount.RIGHT)
+            elif axis_item in [MotorAxis.X, MotorAxis.Y]:
+                pipettes = self._state_store.pipettes.get_all()
+                for pipette in pipettes:
+                    await self._hardware_api.retract(mount=pipette.mount.to_hw_mount())
+                    high_point = self._state_store.geometry.get_all_labware_highest_z()
+                    fixed_trash_id = self._state_store.labware.get_fixed_trash_id()
+                    trash_top = self._state_store.geometry.get_well_position(labware_id=fixed_trash_id, well_name="A1")

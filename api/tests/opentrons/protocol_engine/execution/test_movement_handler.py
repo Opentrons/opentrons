@@ -714,7 +714,8 @@ async def test_home_z(
 async def test_fast_retract(
     decoy: Decoy,
     hardware_api: HardwareAPI,
-    subject: MovementHandler,) -> None:
+    subject: MovementHandler,
+) -> None:
     """Should verify hardware retract."""
     await subject.fast_retract(Mount.RIGHT)
 
