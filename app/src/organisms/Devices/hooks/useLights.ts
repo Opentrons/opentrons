@@ -1,19 +1,21 @@
-import { useSelector } from 'react-redux'
+import {
+  useLightsQuery,
+  useSetLightsMutation,
+} from '@opentrons/react-api-client'
 
-import { useDispatchApiRequest } from '../../../redux/robot-api'
-import { updateLights, getLightsOn } from '../../../redux/robot-controls'
-
-import type { State } from '../../../redux/types'
-
-export function useLights(
-  robotName: string
-): { lightsOn: boolean | null; toggleLights: () => void } {
-  const [dispatchRequest] = useDispatchApiRequest()
-
-  const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
+const LIGHTS_POLL_MS = 5000
+export function useLights(): {
+  lightsOn: boolean | null
+  toggleLights: () => void
+} {
+  const { setLights } = useSetLightsMutation()
+  const { data: lightsData } = useLightsQuery({
+    refetchInterval: LIGHTS_POLL_MS,
+  })
+  const lightsOn = lightsData != null ? lightsData.on : false
 
   const toggleLights = (): void => {
-    dispatchRequest(updateLights(robotName, !lightsOn))
+    setLights({ on: !Boolean(lightsOn) })
   }
 
   return { lightsOn, toggleLights }
