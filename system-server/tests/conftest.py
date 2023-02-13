@@ -2,7 +2,12 @@ import pytest
 from pathlib import Path
 from typing import Generator
 from sqlalchemy.engine import Engine as SQLEngine
+import requests
+import time
+
 from system_server.persistence.database import create_sql_engine
+
+from .dev_server import DevServer
 
 
 @pytest.fixture(autouse=True)
@@ -30,3 +35,22 @@ def sql_engine(tmpdir: Path) -> Generator[SQLEngine, None, None]:
     sql_engine = create_sql_engine(db_file_path)
     yield sql_engine
     sql_engine.dispose()
+
+
+@pytest.fixture(scope="session")
+def run_server() -> Generator[DevServer, None, None]:
+    server = DevServer()
+    server.start()
+
+    with requests.Session() as session:
+        while True:
+            try:
+                session.get("http://localhost:32950")
+            except requests.exceptions.ConnectionError:
+                pass
+            else:
+                break
+            time.sleep(0.1)
+
+    yield server
+    server.stop()
