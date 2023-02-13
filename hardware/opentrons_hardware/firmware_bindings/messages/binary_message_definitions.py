@@ -11,50 +11,61 @@ from .fields import (
     VersionFlagsField,
 )
 
+
 @dataclass
 class EmptyBinMessage(utils.BinarySerializable):
     """An empty payload."""
-	length: utils.UInt16Field
+
+    length: utils.UInt16Field
+
 
 @dataclass
 class Echo(utils.BinarySerializable):
-	message_id: BinaryMessageId = BinaryMessageId.echo
-	length: utils.UInt16Field
-	message: utils.BinaryFieldBase[bytes]
+    message_id: BinaryMessageId = BinaryMessageId.echo
+    length: utils.UInt16Field
+    message: utils.BinaryFieldBase[bytes]
+
 
 @dataclass
 class Ack(utils.BinarySerializable):
-	message_id: BinaryMessageId = BinaryMessageId.ack
-	length: utils.UInt16Field
+    message_id: BinaryMessageId = BinaryMessageId.ack
+    length: utils.UInt16Field
+
 
 @dataclass
 class AckFailed(utils.BinarySerializable):
-	message_id: BinaryMessageId = BinaryMessageId.ack
-	length: utils.UInt16Field
+    message_id: BinaryMessageId = BinaryMessageId.ack
+    length: utils.UInt16Field
+
 
 @dataclass
 class DeviceInfoRequest(utils.BinarySerializable):
-	message_id: BinaryMessageId = BinaryMessageId.device_info_request
-	length: utils.UInt16Field
+    message_id: BinaryMessageId = BinaryMessageId.device_info_request
+    length: utils.UInt16Field
+
 
 @dataclass
 class DeviceInfoResponse(utils.BinarySerializable):
-	message_id: BinaryMessageId = BinaryMessageId.device_info_response
-	length: utils.UInt16Field
+    message_id: BinaryMessageId = BinaryMessageId.device_info_response
+    length: utils.UInt16Field
     version: utils.UInt32Field
     flags: VersionFlagsField
     shortsha: FirmwareShortSHADataField
 
+
 BinaryMessageDefinition = Union[
-	Echo,
-	Ack,
-	AckFailed,
-	DeviceInfoRequest,
-	DeviceInfoResponse,
+    Echo,
+    Ack,
+    AckFailed,
+    DeviceInfoRequest,
+    DeviceInfoResponse,
 ]
 
+
 @lru_cache(maxsize=None)
-def get_binary_definition(message_id: BinaryMessageId) -> Optional[Type[BinaryMessageDefinition]]:
+def get_binary_definition(
+    message_id: BinaryMessageId,
+) -> Optional[Type[BinaryMessageDefinition]]:
     """Get the message type for a message id.
 
     Args:
