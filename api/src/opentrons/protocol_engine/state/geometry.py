@@ -315,6 +315,7 @@ class GeometryView:
         else:
             z_offset = self._labware.get_tip_drop_z_offset(
                 labware_id=labware_id,
+                # TODO(mc, 2023-02-13): replace with PipetteView.get_return_tip_scale
                 length_scale=pipette_config["return_tip_height"],
                 additional_offset=well_location.offset.z,
             )

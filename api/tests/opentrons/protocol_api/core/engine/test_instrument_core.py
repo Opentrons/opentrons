@@ -240,15 +240,17 @@ def test_pick_up_tip(
     )
 
 
-# @pytest.mark.xfail(strict=True, reason="Blocked by ")
-# def test_get_return_height(
-#     decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
-# ) -> None:
-#     decoy.when(mock_engine_client.state.pip)
+def test_get_return_height(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should get the return tip scale from the engine state."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_return_tip_scale("abc123")
+    ).then_return(0.123)
 
-#     result = subject.get_return_height()
+    result = subject.get_return_height()
 
-#     assert result == 0.123
+    assert result == 0.123
 
 
 def test_drop_tip_no_location(
