@@ -129,11 +129,12 @@ export function SetupTipLengthCalibrationButton({
         ) : (
           <>
             <TertiaryButton
-              onClick={() => () =>
+              onClick={() =>
                 tipLengthCalLauncher({
                   params: { mount, tipRackDefinition },
                   hasBlockModalResponse: null,
-                })}
+                })
+              }
               id="TipRackCalibration_calibrateTipRackButton"
               disabled={disabled || !isDeckCalibrated}
               {...targetProps}
