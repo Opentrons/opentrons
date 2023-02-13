@@ -709,3 +709,13 @@ async def test_home_z(
         await hardware_api.home([HardwareAxis.A, HardwareAxis.B]),
         times=1,
     )
+
+
+async def test_fast_retract(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,) -> None:
+    """Should verify hardware retract."""
+    await subject.fast_retract(Mount.RIGHT)
+
+    decoy.verify(await hardware_api.retract(Mount.RIGHT))

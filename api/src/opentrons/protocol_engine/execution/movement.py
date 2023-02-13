@@ -315,3 +315,7 @@ class MovementHandler:
                 critical_point=waypoint.critical_point,
                 speed=speed,
             )
+
+    async def fast_retract(self, mount: Mount) -> None:
+        """Retract the desired mount."""
+        await self._hardware_api.retract(mount=mount)
