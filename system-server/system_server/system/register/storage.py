@@ -49,7 +49,16 @@ async def get_registration_token(
 async def delete_registration_token(
     sql_engine: sqlalchemy.engine.Engine, registrant: Registrant
 ) -> None:
-    """Clear out a registration token, if a match exists."""
+    """Clear out a registration token, if a match exists.
+
+    Args:
+        sql_engine: Connection to the backing database
+
+        registrant: Unique identification of the registration to delete
+
+    Returns:
+        None
+    """
     with sql_engine.begin() as conn:
         statement = sqlalchemy.delete(registration_table).where(
             (registration_table.c.agent == registrant.agent)

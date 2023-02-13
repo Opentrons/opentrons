@@ -39,6 +39,7 @@ def sql_engine(tmpdir: Path) -> Generator[SQLEngine, None, None]:
 
 @pytest.fixture(scope="session")
 def run_server() -> Generator[DevServer, None, None]:
+    """Run the system server as a subprocess."""
     server = DevServer()
     server.start()
 
