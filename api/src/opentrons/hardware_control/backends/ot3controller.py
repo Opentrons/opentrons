@@ -330,6 +330,16 @@ class OT3Controller:
             for status in get_stat(axes)
         )
 
+    def check_ready_for_parking(self, axes: Sequence[OT3Axis]) -> bool:
+        """If any of the encoder statuses is ok, parking can proceed."""
+        get_stat: Callable[
+            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
+        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+        return any(
+            isinstance(status, MotorStatus) and status.encoder_ok
+            for status in get_stat(axes)
+        )
+
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
         return axis_convert(self._position, 0.0)

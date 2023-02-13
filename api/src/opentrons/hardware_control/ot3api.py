@@ -242,7 +242,7 @@ class OT3API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    def _apply_deck_transform(
+    def _deck_from_machine(
         self, machine_pos: Dict[OT3Axis, float]
     ) -> Dict[OT3Axis, float]:
         return deck_from_machine(
@@ -724,14 +724,14 @@ class OT3API(
 
     async def _cache_current_position(self) -> Dict[OT3Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
-        self._current_position = self._apply_deck_transform(
+        self._current_position = self._deck_from_machine(
             await self._backend.update_position()
         )
         return self._current_position
 
     async def _cache_encoder_position(self) -> Dict[OT3Axis, float]:
         """Cache encoder position from backend and return in absolute deck coords."""
-        self._encoder_position = self._apply_deck_transform(
+        self._encoder_position = self._deck_from_machine(
             await self._backend.update_encoder_position()
         )
         return self._encoder_position
@@ -1078,10 +1078,7 @@ class OT3API(
 
         # make sure current position is up-to-date
         await self.refresh_positions()
-        if not (self._current_position and self._encoder_position):
-            raise MustHomeError("Cannot park because the current position is unknown.")
-        self._reset_last_mount()
-        parkable = list(OT3Axis.gantry_axes())
+
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
             assert all(
@@ -1089,6 +1086,12 @@ class OT3API(
             ), f"Only gantry axes are parkable: {parkable}"
         else:
             checked_axes = parkable
+        if not self._backend.check_ready_for_parking(checked_axes):
+            raise MustHomeError(
+                "Cannot park because the encoder positions are unknown."
+            )
+        self._reset_last_mount()
+        parkable = list(OT3Axis.gantry_axes())
 
         park_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
         self._log.info(f"Parking {park_seq}")
