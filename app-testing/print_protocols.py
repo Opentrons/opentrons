@@ -20,7 +20,7 @@ actual = set(props)
 out = possible - actual
 rich.print(Panel("Are all protocols mapped?"))
 if len(out) == 0:
-    rich.print("🥳everything is mapped.")
+    rich.print("🥳 everything is mapped.")
 else:
     rich.print("The below protocols need mapped:")
     rich.print(out)

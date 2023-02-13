@@ -20,7 +20,7 @@ Slices of the tests will be selected as candidates for automation and then perfo
 3. Install Chromedriver
    1. in the app-testing directory
       1. `sudo ./ci-tools/mac_get_chromedriver.sh 21.3.1` per the version of electron in the root package.json for electron
-         1. Windows `sudo .\windows_get_chromedriver.ps1 -version 21.3.1`
+         1. Windows `sudo .\ci-tools\windows_get_chromedriver.ps1 -version 21.3.1`
          1. if you experience `wget: command not found`
             1. brew install wget and try again
    2. when you run `chromedriver --version`
