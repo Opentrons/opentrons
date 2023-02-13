@@ -389,11 +389,11 @@ def test_blow_out_in_place(
             speed=None,
             force_direct=False,
         ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
         mock_engine_client.blow_out_in_place(
             pipette_id="abc123",
             flow_rate=1.23,
         ),
-        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 

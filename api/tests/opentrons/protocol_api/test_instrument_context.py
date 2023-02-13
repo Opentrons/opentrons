@@ -283,7 +283,7 @@ def test_blow_out_in_place(
     mock_well = decoy.mock(cls=Well)
     location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_protocol_core.get_last_location()).then_return(location)
+    decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(location)
 
     subject.blow_out()
 
@@ -302,7 +302,7 @@ def test_blow_out_no_location_cache_raises(
     subject: InstrumentContext,
 ) -> None:
     """It should raise if no location or well is provided and the location cache returns None."""
-    decoy.when(mock_protocol_core.get_last_location()).then_return(None)
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(None)
 
     with pytest.raises(RuntimeError):
         subject.blow_out()
@@ -555,7 +555,7 @@ def test_dispense_with_no_location(
     mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should dispense to a well."""
-    decoy.when(mock_protocol_core.get_last_location()).then_return(
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
         Location(point=Point(1, 2, 3), labware=None)
     )
 
