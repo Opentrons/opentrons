@@ -1483,7 +1483,12 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 2)
     def return_height(self) -> float:
-        """The height to return a tip to its tiprack."""
+        """The height to return a tip to its tiprack.
+
+        :returns: A scaling factor to apply to the tip length.
+                  During a drop tip, this factor will be multiplied by the tip length
+                  to get the distance from the top of the well where the tip is dropped.
+        """
         return self._core.get_return_height()
 
     @property  # type: ignore

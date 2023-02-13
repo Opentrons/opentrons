@@ -266,11 +266,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
         """
-        if location is not None:
-            raise NotImplementedError(
-                "InstrumentCore.drop_tip with non-default drop location not implemented"
-            )
-
         if home_after is False:
             raise NotImplementedError(
                 "InstrumentCore.drop_tip with home_after=False not implemented"
@@ -278,7 +273,17 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
-        well_location = WellLocation()
+
+        if location is not None:
+            well_location = (
+                self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=location.point,
+                )
+            )
+        else:
+            well_location = WellLocation(origin=WellOrigin.DROP_TIP)
 
         self._engine_client.drop_tip(
             pipette_id=self._pipette_id,

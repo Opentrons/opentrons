@@ -244,6 +244,17 @@ def test_pick_up_tip(
     )
 
 
+# @pytest.mark.xfail(strict=True, reason="Blocked by ")
+# def test_get_return_height(
+#     decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+# ) -> None:
+#     decoy.when(mock_engine_client.state.pip)
+
+#     result = subject.get_return_height()
+
+#     assert result == 0.123
+
+
 def test_drop_tip_no_location(
     decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
 ) -> None:
