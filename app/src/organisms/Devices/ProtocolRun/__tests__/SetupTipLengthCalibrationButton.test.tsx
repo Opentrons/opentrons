@@ -90,10 +90,17 @@ describe('SetupTipLengthCalibrationButton', () => {
     expect(getByText('Recalibrate')).toBeTruthy()
   })
 
-  it('button launches the tip length calibration wizard when clicked', () => {
+  it('button launches the tip length calibration wizard when clicked - no calibration', () => {
     const { getByText } = render()
     const calibrateBtn = getByText('Calibrate Now')
     calibrateBtn.click()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalled()
+  })
+
+  it('button launches the tip length calibration wizard when clicked - recalibration', () => {
+    const { getByText } = render({ hasCalibrated: true })
+    const recalibrateBtn = getByText('Recalibrate')
+    recalibrateBtn.click()
     expect(mockTipLengthCalLauncher).toHaveBeenCalled()
   })
 
