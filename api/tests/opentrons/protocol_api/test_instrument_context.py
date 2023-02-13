@@ -283,7 +283,9 @@ def test_blow_out_in_place(
     mock_well = decoy.mock(cls=Well)
     location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(location)
+    decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
+        location
+    )
 
     subject.blow_out()
 
