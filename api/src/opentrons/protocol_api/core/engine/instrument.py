@@ -6,7 +6,11 @@ from typing import Optional, TYPE_CHECKING
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates
+from opentrons.protocols.api_support.util import (
+    PlungerSpeeds,
+    FlowRates,
+    find_value_for_api_version,
+)
 from opentrons.protocol_engine import DeckPoint, WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -42,8 +46,17 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         # TODO(jbl 2022-11-03) flow_rates should not live in the cores, and should be moved to the protocol context
         #   along with other rate related refactors (for the hardware API)
+        flow_rates = self._engine_client.state.pipettes.get_flow_rates(pipette_id)
+        self._aspirate_flow_rate = find_value_for_api_version(
+            MAX_SUPPORTED_VERSION, flow_rates.default_aspirate
+        )
+        self._dispense_flow_rate = find_value_for_api_version(
+            MAX_SUPPORTED_VERSION, flow_rates.default_dispense
+        )
+        self._blow_out_flow_rate = find_value_for_api_version(
+            MAX_SUPPORTED_VERSION, flow_rates.default_blow_out
+        )
         self._flow_rates = FlowRates(self)
-        self._flow_rates.set_defaults(MAX_SUPPORTED_VERSION)
 
         self.set_default_speed(speed=default_movement_speed)
 
@@ -173,7 +186,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_location=well_location,
             # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
             #   this also needs to be refactored along with other flow rate related issues
-            flow_rate=self.get_absolute_blow_out_flow_rate(1.0),
+            flow_rate=self.get_blow_out_flow_rate(),
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -256,7 +269,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def drop_tip(
-        self, location: Optional[Location], well_core: WellCore, home_after: bool
+        self,
+        location: Optional[Location],
+        well_core: WellCore,
+        home_after: Optional[bool],
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -266,11 +282,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
         """
-        if home_after is False:
-            raise NotImplementedError(
-                "InstrumentCore.drop_tip with home_after=False not implemented"
-            )
-
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
@@ -290,6 +301,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            home_after=home_after,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -372,6 +384,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_model(self) -> str:
         return self._engine_client.state.pipettes.get_model_name(self._pipette_id)
 
+    def get_display_name(self) -> str:
+        return self._engine_client.state.pipettes.get_display_name(self._pipette_id)
+
     def get_min_volume(self) -> float:
         return self._engine_client.state.pipettes.get_minimum_volume(self._pipette_id)
 
@@ -409,14 +424,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
-    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.aspirate * rate
+    def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
+        return self._aspirate_flow_rate * rate
 
-    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.dispense * rate
+    def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
+        return self._dispense_flow_rate * rate
 
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.blow_out * rate
+    def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
+        return self._blow_out_flow_rate * rate
 
     def set_flow_rate(
         self,
@@ -424,12 +439,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
     ) -> None:
-        self._sync_hardware_api.set_flow_rate(
-            mount=self.get_mount(),
-            aspirate=aspirate,
-            dispense=dispense,
-            blow_out=blow_out,
-        )
+        if aspirate is not None:
+            assert aspirate > 0
+            self._aspirate_flow_rate = aspirate
+        if dispense is not None:
+            assert dispense > 0
+            self._dispense_flow_rate = dispense
+        if blow_out is not None:
+            assert blow_out > 0
+            self._blow_out_flow_rate = blow_out
 
     def set_pipette_speed(
         self,

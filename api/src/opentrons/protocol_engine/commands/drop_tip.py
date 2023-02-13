@@ -33,6 +33,14 @@ class DropTipParams(PipetteIdMixin, WellLocationMixin):
         default_factory=DropTipWellLocation,
         description="Relative well location at which to drop the tip.",
     )
+    homeAfter: Optional[bool] = Field(
+        None,
+        description=(
+            "Whether to home this pipette's plunger after dropping the tip."
+            " You should normally leave this unspecified to let the robot choose"
+            " a safe default depending on its hardware."
+        ),
+    )
 
 
 class DropTipResult(BaseModel):
@@ -54,6 +62,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+            home_after=params.homeAfter,
         )
 
         return DropTipResult()

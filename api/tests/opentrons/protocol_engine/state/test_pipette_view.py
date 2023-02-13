@@ -10,6 +10,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedPipette,
     MotorAxis,
+    FlowRates,
 )
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
@@ -28,6 +29,7 @@ def get_pipette_view(
     attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
+    flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
@@ -38,6 +40,7 @@ def get_pipette_view(
         attached_tip_labware_by_id=attached_tip_labware_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
         static_config_by_id=static_config_by_id or {},
+        flow_rates_by_id=flow_rates_by_id or {},
     )
 
     return PipetteView(state=state)
@@ -212,7 +215,10 @@ def test_get_pipette_working_volume() -> None:
         tip_volume_by_id={"pipette-id": 1337},
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                min_volume=1, max_volume=9001, model="blah"
+                min_volume=1,
+                max_volume=9001,
+                model="blah",
+                display_name="bleh",
             )
         },
     )
@@ -227,7 +233,10 @@ def test_get_pipette_available_volume() -> None:
         aspirated_volume_by_id={"pipette-id": 58},
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                min_volume=1, max_volume=123, model="blah"
+                min_volume=1,
+                max_volume=123,
+                model="blah",
+                display_name="bleh",
             )
         },
     )
@@ -325,12 +334,16 @@ def test_get_static_config() -> None:
     subject = get_pipette_view(
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                model="pipette-model", min_volume=1.23, max_volume=4.56
+                model="pipette-model",
+                display_name="display name",
+                min_volume=1.23,
+                max_volume=4.56,
             )
         }
     )
 
     assert subject.get_model_name("pipette-id") == "pipette-model"
+    assert subject.get_display_name("pipette-id") == "display name"
     assert subject.get_minimum_volume("pipette-id") == 1.23
     assert subject.get_maximum_volume("pipette-id") == 4.56
 

@@ -62,5 +62,6 @@ async def test_drop_tip_implementation(
             labware_id="123",
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            home_after=None,
         )
     )

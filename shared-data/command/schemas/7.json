@@ -648,6 +648,11 @@
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "homeAfter": {
+          "title": "Homeafter",
+          "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
+          "type": "boolean"
         }
       },
       "required": [
