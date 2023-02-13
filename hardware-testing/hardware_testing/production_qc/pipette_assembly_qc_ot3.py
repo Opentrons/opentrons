@@ -3,7 +3,7 @@ import argparse
 import asyncio
 from dataclasses import dataclass, fields
 import os
-from time import time
+import time
 from typing import Optional, Callable, List, Any, Tuple
 from typing_extensions import Final
 
@@ -325,12 +325,12 @@ async def _read_pressure_and_check_results(
     _samples = []
     for i in range(pressure_event_config.sample_count):
         _samples.append(fixture.read_all_pressure_channel())
-        next_sample_time = time() + pressure_event_config.sample_delay
+        next_sample_time = time.time() + pressure_event_config.sample_delay
         _sample_as_strings = [str(round(p, 2)) for p in _samples[-1]]
         csv_data_sample = [tag.value] + _sample_as_strings
         print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
         accumulate_raw_data_cb(csv_data_sample)
-        delay_time = next_sample_time - time()
+        delay_time = next_sample_time - time.time()
         if (
             not api.is_simulator
             and i < pressure_event_config.sample_count - 1
@@ -656,6 +656,31 @@ async def _test_diagnostics_capacitive(
     )
 
 
+async def _test_pipette_pressure(
+    api: OT3API, mount: OT3Mount, write_cb: Callable):
+    volume = [100,200,500,1000]
+    droplet_wait_seconds = 500
+    await api.add_tip(mount, 0.1)
+    await api.prepare_for_aspirate(mount)
+
+    async def _read_pressure() -> float:
+        return await _read_pipette_sensor_repeatedly_and_average(
+            api, mount, SensorType.pressure, 10
+        )
+    print('Test pressure before aspirate')
+    for i in range(droplet_wait_seconds):
+        pressure = await _read_pressure()
+        write_cb([''])
+        time.sleep(1)
+    await api.aspirate(mount, 100)
+
+    await _pick_up_tip_for_liquid(api, mount, tip)
+    await _move_to_liquid(api, mount)
+    test_passed = await _aspirate_and_look_for_droplets(
+            api, mount, droplet_wait_seconds
+        )
+    await _drop_tip_in_trash(api, mount)
+
 async def _test_diagnostics_pressure(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
@@ -821,7 +846,7 @@ def _create_csv_and_get_callbacks(
     file_name = data.create_file_name(test_name, run_id, pipette_sn)
     csv_display_name = os.path.join(folder_path, file_name)
     print(f"CSV: {csv_display_name}")
-    start_time = time()
+    start_time = time.time()
 
     def _append_csv_data(
         data_list: List[Any],
@@ -832,7 +857,7 @@ def _create_csv_and_get_callbacks(
         # every line in the CSV file begins with the elapsed seconds
         if not first_row_value_included:
             if first_row_value is None:
-                first_row_value = str(round(time() - start_time, 2))
+                first_row_value = str(round(time.time() - start_time, 2))
             data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
@@ -844,7 +869,7 @@ def _create_csv_and_get_callbacks(
         d: List[Any], first_row_value: Optional[str] = None
     ) -> None:
         if first_row_value is None:
-            first_row_value = str(round(time() - start_time, 2))
+            first_row_value = str(round(time.time() - start_time, 2))
         data_list = [first_row_value] + d
         PRESSURE_DATA_CACHE.append(data_list)
 
