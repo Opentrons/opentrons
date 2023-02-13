@@ -32,8 +32,8 @@ async def test_pick_up_tip_implementation(
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
-    ).then_return(45.6)
+    ).then_return((45.6, 78.9))
 
     result = await subject.execute(data)
 
-    assert result == PickUpTipResult(tipVolume=45.6)
+    assert result == PickUpTipResult(tipVolume=45.6, tipLength=78.9)

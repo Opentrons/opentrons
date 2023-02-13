@@ -219,6 +219,7 @@ def test_get_pipette_working_volume() -> None:
                 max_volume=9001,
                 model="blah",
                 display_name="bleh",
+                instrument_max_height=42,
             )
         },
     )
@@ -237,6 +238,7 @@ def test_get_pipette_available_volume() -> None:
                 max_volume=123,
                 model="blah",
                 display_name="bleh",
+                instrument_max_height=42,
             )
         },
     )
@@ -338,6 +340,7 @@ def test_get_static_config() -> None:
                 display_name="display name",
                 min_volume=1.23,
                 max_volume=4.56,
+                instrument_max_height=7.89,
             )
         }
     )
@@ -346,6 +349,7 @@ def test_get_static_config() -> None:
     assert subject.get_display_name("pipette-id") == "display name"
     assert subject.get_minimum_volume("pipette-id") == 1.23
     assert subject.get_maximum_volume("pipette-id") == 4.56
+    assert subject.get_instrument_max_height("pipette-id") == 7.89
 
 
 @pytest.mark.parametrize(

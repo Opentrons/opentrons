@@ -147,7 +147,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
             labwareId="labware-id",
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(tipVolume=300.0),
+        result=commands.PickUpTipResult(tipVolume=300.0, tipLength=51.83),
     )
 
     assert expected_command in commands_result

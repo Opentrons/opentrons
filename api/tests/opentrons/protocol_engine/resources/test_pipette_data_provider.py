@@ -21,6 +21,8 @@ def test_get_virtual_pipette_static_config() -> None:
         min_volume=1,
         max_volume=20.0,
         channels=1,
+        nozzle_offset_z=10.45,
+        home_position=172.15,
         flow_rates=FlowRates(
             default_aspirate={"2.0": 3.78, "2.6": 7.56},
             default_dispense={"2.0": 3.78, "2.6": 7.56},
@@ -39,6 +41,8 @@ def test_get_pipette_static_config() -> None:
         min_volume=1,
         max_volume=1000.0,
         channels=8,
+        nozzle_offset_z=-259.15,
+        home_position=230.15,
         flow_rates=FlowRates(
             default_aspirate={"2.0": 159.04, "2.6": 159.04},
             default_dispense={"2.0": 159.04},

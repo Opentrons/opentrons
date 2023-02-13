@@ -561,6 +561,7 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
+            instrument_max_height=89.1,
             flow_rates=FlowRates(
                 default_aspirate={"a": 1},
                 default_dispense={"b": 2},
@@ -574,6 +575,7 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
         display_name="pipette name",
         min_volume=1.23,
         max_volume=4.56,
+        instrument_max_height=89.1,
     )
     assert subject.state.flow_rates_by_id["pipette-id"] == FlowRates(
         default_aspirate={"a": 1},

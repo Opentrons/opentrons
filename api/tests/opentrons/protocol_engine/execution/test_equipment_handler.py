@@ -500,12 +500,18 @@ async def test_load_pipette(
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
+            home_position=8.9,
+            nozzle_offset_z=10.11,
             flow_rates=FlowRates(
                 default_blow_out={"a": 1.23},
                 default_aspirate={"b": 4.56},
                 default_dispense={"c": 7.89},
             ),
         )
+    )
+
+    decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
+        42.0
     )
 
     result = await subject.load_pipette(
@@ -531,6 +537,7 @@ async def test_load_pipette(
                 min_volume=1.23,
                 max_volume=4.56,
                 channels=7,
+                instrument_max_height=42.0,
                 flow_rates=FlowRates(
                     default_blow_out={"a": 1.23},
                     default_aspirate={"b": 4.56},
@@ -566,12 +573,18 @@ async def test_load_pipette_96_channels(
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
+            home_position=8.9,
+            nozzle_offset_z=10.11,
             flow_rates=FlowRates(
                 default_blow_out={"a": 1.23},
                 default_aspirate={"b": 4.56},
                 default_dispense={"c": 7.89},
             ),
         )
+    )
+
+    decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
+        42.0
     )
 
     result = await subject.load_pipette(
@@ -592,6 +605,7 @@ async def test_load_pipette_96_channels(
                 min_volume=1.23,
                 max_volume=4.56,
                 channels=7,
+                instrument_max_height=42.0,
                 flow_rates=FlowRates(
                     default_blow_out={"a": 1.23},
                     default_aspirate={"b": 4.56},
@@ -624,12 +638,18 @@ async def test_load_pipette_uses_provided_id(
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
+            home_position=8.9,
+            nozzle_offset_z=10.11,
             flow_rates=FlowRates(
                 default_blow_out={"a": 1.23},
                 default_aspirate={"b": 4.56},
                 default_dispense={"c": 7.89},
             ),
         )
+    )
+
+    decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
+        42.0
     )
 
     result = await subject.load_pipette(
@@ -649,6 +669,7 @@ async def test_load_pipette_uses_provided_id(
                 min_volume=1.23,
                 max_volume=4.56,
                 channels=7,
+                instrument_max_height=42.0,
                 flow_rates=FlowRates(
                     default_blow_out={"a": 1.23},
                     default_aspirate={"b": 4.56},
@@ -669,6 +690,7 @@ async def test_load_pipette_use_virtual(
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
     decoy.when(state_store.config.use_virtual_pipettes).then_return(True)
+    decoy.when(state_store.config.robot_type).then_return("OT-2 Standard")
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(
@@ -682,6 +704,8 @@ async def test_load_pipette_use_virtual(
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
+            home_position=8.9,
+            nozzle_offset_z=10.11,
             flow_rates=FlowRates(
                 default_blow_out={"a": 1.23},
                 default_aspirate={"b": 4.56},
@@ -689,6 +713,10 @@ async def test_load_pipette_use_virtual(
             ),
         )
     )
+
+    decoy.when(
+        pipette_data_provider.get_virtual_instrument_max_height_ot2(8.9, 10.11)
+    ).then_return(42.0)
 
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT, pipette_id=None
@@ -705,6 +733,7 @@ async def test_load_pipette_use_virtual(
                 min_volume=1.23,
                 max_volume=4.56,
                 channels=7,
+                instrument_max_height=42.0,
                 flow_rates=FlowRates(
                     default_blow_out={"a": 1.23},
                     default_aspirate={"b": 4.56},
