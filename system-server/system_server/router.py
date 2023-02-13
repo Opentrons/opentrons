@@ -1,10 +1,16 @@
 """Application routes."""
 from fastapi import APIRouter, Depends, responses
 from system_server.persistence import get_sql_engine, get_uuid
+from system_server.system.router import system_router
 import sqlalchemy
 from uuid import UUID
 
 router = APIRouter()
+
+router.include_router(
+    router=system_router,
+    tags=["System"],
+)
 
 
 # TODO(fs, 02-02-2022): This is a placeholder just to refresh the database for
