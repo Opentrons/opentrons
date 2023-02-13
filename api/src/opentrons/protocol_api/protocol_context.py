@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union, Mapping
+from typing import (
+    Callable,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Type,
+    Union,
+    Mapping,
+    cast,
+)
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -21,6 +31,7 @@ from opentrons.protocols.api_support.util import (
 from .core.common import ModuleCore, ProtocolCore
 from ._liquid import Liquid
 from .core.core_map import LoadedCoreMap
+from .core.engine import ENGINE_CORE_API_VERSION
 from .core.module import (
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
@@ -28,6 +39,7 @@ from .core.module import (
     AbstractHeaterShakerCore,
 )
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
+from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from .deck import Deck
@@ -381,11 +393,13 @@ class ProtocolContext(CommandPublisher):
                             If False, will pause protocol execution to allow the user
                             to perform a manual move and click resume to continue
                             protocol execution.
+
         Other experimental params:
+
         :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
-                            associated with its pick up location.
+                                                associated with its pick up location.
         :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
-                            associated with its drop off location.
+                                             associated with its drop off location.
         :param pick_up_offset: Offset to use when picking up labware.
         :param drop_offset: Offset to use when dropping off labware.
 
@@ -648,7 +662,17 @@ class ProtocolContext(CommandPublisher):
            If you're looking for a way for your protocol to resume automatically
            after a period of time, use :py:meth:`delay`.
         """
-        self._core.resume()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "A Python Protocol cannot safely resume itself after a pause."
+                " To wait automatically for a period of time, use ProtocolContext.delay()."
+                " Otherwise, implement your own wait loop rather than using pause/resume."
+            )
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyProtocolCore)
+        cast(LegacyProtocolCore, self._core).resume()
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)

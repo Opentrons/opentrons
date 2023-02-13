@@ -41,7 +41,7 @@ def test_same_pipette(
 def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     with pytest.raises(NoTipAttachedError, match="Cannot perform PREPARE_ASPIRATE"):
-        subject.prepare_for_aspirate()
+        subject.prepare_for_aspirate()  # type: ignore[attr-defined]
 
 
 def test_dispense_no_tip(subject: InstrumentCore) -> None:
@@ -166,7 +166,7 @@ def test_aspirate_too_much(
         increment=None,
         prep_after=False,
     )
-    subject.prepare_for_aspirate()
+    subject.prepare_for_aspirate()  # type: ignore[attr-defined]
     with pytest.raises(
         AssertionError, match="Cannot aspirate more than pipette max volume"
     ):
@@ -219,7 +219,7 @@ def test_pipette_dict(
 
 def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
-    i.prepare_for_aspirate()
+    i.prepare_for_aspirate()  # type: ignore[attr-defined]
     i.aspirate(
         location=Location(point=Point(1, 2, 3), labware=None),
         well_core=labware.get_well_core("A1"),
@@ -231,7 +231,7 @@ def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
 
 def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
-    i.prepare_for_aspirate()
+    i.prepare_for_aspirate()  # type: ignore[attr-defined]
     i.aspirate(
         location=Location(point=Point(1, 2, 3), labware=None),
         well_core=labware.get_well_core("A1"),
@@ -250,7 +250,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
 
 def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
-    i.prepare_for_aspirate()
+    i.prepare_for_aspirate()  # type: ignore[attr-defined]
     i.aspirate(
         location=Location(point=Point(1, 2, 3), labware=None),
         well_core=labware.get_well_core("A1"),

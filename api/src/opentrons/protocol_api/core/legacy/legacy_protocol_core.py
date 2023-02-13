@@ -398,23 +398,21 @@ class LegacyProtocolCore(
 
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
-        raise NotImplementedError(
-            "LegacyProtocolCore.get_deck_definition not implemented"
-        )
+        raise NotImplementedError("get_deck_definition only supported on engine core")
 
     def get_slot_item(
         self, slot_name: DeckSlotName
     ) -> Union[LegacyLabwareCore, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
-        raise NotImplementedError("LegacyProtocolCore.get_slot_item not implemented")
+        raise NotImplementedError("get_slot_item only supported on engine core")
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
-        raise NotImplementedError("LegacyProtocolCore.get_slot_center not implemented.")
+        raise NotImplementedError("get_slot_center only supported on engine core.")
 
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
-        raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
+        raise NotImplementedError("get_highest_z only supported on engine core")
 
     def define_liquid(
         self, name: str, description: Optional[str], display_color: Optional[str]
@@ -426,6 +424,4 @@ class LegacyProtocolCore(
         self, labware_core: LegacyLabwareCore
     ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
         """Get labware parent location."""
-        raise NotImplementedError(
-            "LegacyProtocolCore.get_labware_location not implemented"
-        )
+        raise NotImplementedError("get_labware_location only supported on engine core")
