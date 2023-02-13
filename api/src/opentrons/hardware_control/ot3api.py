@@ -990,7 +990,7 @@ class OT3API(
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 400
         move_target = MoveTarget.build(position=machine_pos, max_speed=checked_speed)
-        origin = await self._cache_current_position()
+        origin = await self._backend.update_position()
         try:
             blended, moves = self._move_manager.plan_motion(
                 origin=origin, target_list=[move_target]
@@ -1044,15 +1044,25 @@ class OT3API(
                 self._current_position.clear()
                 raise
             else:
-                await self._cache_current_position()
-                await self._cache_encoder_position()
+                machine_pos = await self._backend.update_position()
+                encoder_machine_pos = await self._backend.update_encoder_position()
+                position = deck_from_machine(
+                    machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
+                self._current_position.update(position)
+                encoder_position = deck_from_machine(
+                    encoder_machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
+                self._encoder_position.update(encoder_position)
                 if OT3Axis.G in checked_axes:
                     try:
                         gripper = self._gripper_handler.get_gripper()
                         gripper.state = GripperJawState.HOMED_READY
-                        gripper.current_jaw_displacement = self._encoder_position[
-                            OT3Axis.G
-                        ]
+                        gripper.current_jaw_displacement = encoder_position[OT3Axis.G]
                     except GripperNotAttachedError:
                         pass
 
@@ -1150,9 +1160,12 @@ class OT3API(
         machine_ax = OT3Axis.by_mount(mount)
 
         async with self._motion_lock:
-            await self._fast_home((machine_ax,), margin)
-            await self._cache_current_position()
-            await self._cache_encoder_position()
+            machine_pos = await self._fast_home((machine_ax,), margin)
+            self._current_position = deck_from_machine(
+                machine_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -1198,13 +1211,18 @@ class OT3API(
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
-            await self.refresh_positions()
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_position = deck_from_machine(
+                encoder_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
             self._gripper_handler.set_jaw_displacement(
                 self._encoder_position[OT3Axis.G]
             )
         except Exception:
             self._log.exception(
-                f"Gripper grip failed, encoder pos: {self._encoder_current_position[OT3Axis.G]}"
+                f"Gripper grip failed, encoder pos: {self._encoder_position[OT3Axis.G]}"
             )
             raise
 
@@ -1213,8 +1231,12 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
-            await self._cache_current_position()
-            await self._cache_encoder_position()
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_position = deck_from_machine(
+                encoder_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
             self._gripper_handler.set_jaw_displacement(
                 self._encoder_position[OT3Axis.G]
             )
@@ -1240,8 +1262,12 @@ class OT3API(
                     / 2
                 )
             )
-            await self._cache_current_position()
-            await self._cache_encoder_position()
+            encoder_pos = await self._backend.update_encoder_position()
+            self._encoder_position = deck_from_machine(
+                encoder_pos,
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
             self._gripper_handler.set_jaw_displacement(
                 self._encoder_position[OT3Axis.G]
             )
@@ -1538,11 +1564,15 @@ class OT3API(
                     home_flagged_axes=False,
                 )
             if move.home_after:
-                await self._fast_home(
+                machine_pos = await self._backend.fast_home(
                     [OT3Axis.from_axis(ax) for ax in move.home_axes],
                     move.home_after_safety_margin,
                 )
-                await self.refresh_positions()
+                self._current_position = deck_from_machine(
+                    machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                )
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
@@ -1702,7 +1732,11 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        carriage_pos = self._apply_deck_transform(self._backend.home_position())
+        carriage_pos = deck_from_machine(
+            self._backend.home_position(),
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+        )
         pos_at_home = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
         )
