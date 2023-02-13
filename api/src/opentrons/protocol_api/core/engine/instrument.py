@@ -269,7 +269,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def drop_tip(
-        self, location: Optional[Location], well_core: WellCore, home_after: bool
+        self,
+        location: Optional[Location],
+        well_core: WellCore,
+        home_after: Optional[bool],
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -284,11 +287,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 "InstrumentCore.drop_tip with non-default drop location not implemented"
             )
 
-        if home_after is False:
-            raise NotImplementedError(
-                "InstrumentCore.drop_tip with home_after=False not implemented"
-            )
-
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
         well_location = WellLocation()
@@ -298,6 +296,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            home_after=home_after,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
