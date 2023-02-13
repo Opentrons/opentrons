@@ -2,7 +2,6 @@
 from fastapi import APIRouter, Depends
 from datetime import timedelta
 import logging
-from typing import Dict
 from uuid import UUID
 
 from system_server.constants import REGISTRATION_AUDIENCE
@@ -14,6 +13,7 @@ from .storage import (
     add_registration_token,
     delete_registration_token,
 )
+from .models import PostRegisterResponse
 
 _log = logging.getLogger(__name__)
 
@@ -26,12 +26,13 @@ register_router = APIRouter()
 @register_router.post(
     "/system/register",
     summary="Register an agent with this robot.",
+    response_model=PostRegisterResponse,
 )
-async def post_register(
+async def register_endpoint(
     registrant: Registrant = Depends(Registrant),
     signing_uuid: UUID = Depends(get_uuid),
     engine: sqlalchemy.engine.Engine = Depends(get_sql_engine),
-) -> Dict[str, str]:
+) -> PostRegisterResponse:
     """Router for /system/register endpoint."""
     token = await get_registration_token(engine, registrant)
 
@@ -54,4 +55,6 @@ async def post_register(
         _log.info(f"Created new JWT: {token}")
         await add_registration_token(engine, registrant, token)
 
-    return {"token": token}
+    return PostRegisterResponse(
+        token=token,
+    )
