@@ -14,8 +14,9 @@ labware.
 
 
 import asyncio
+import textwrap
 from pathlib import Path
-from typing import Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Generator
 
 import anyio
 import pytest
@@ -25,30 +26,32 @@ from tests.integration.robot_client import RobotClient
 
 
 INTEGRATION_TEST_PROTOCOLS_DIR = Path(__file__).parent / "../../protocols"
-PROTOCOL_FILE = INTEGRATION_TEST_PROTOCOLS_DIR / "load_custom_labware.py"
-LABWARE_FILE = INTEGRATION_TEST_PROTOCOLS_DIR / "test_1_reservoir_5ul.json"
+LABWARE_PATH = INTEGRATION_TEST_PROTOCOLS_DIR / "test_1_reservoir_5ul.json"
 EXPECTED_LABWARE_LOAD_NAME = "test_1_reservoir_5ul"
 
+PORT = "15555"
 ANALYSIS_POLL_INTERVAL = 0.1
 ANALYSIS_POLL_TIMEOUT = 10
 
 
+@pytest.fixture(scope="module")
+def dev_server() -> Generator[DevServer, None, None]:
+    """Return a running dev server."""
+    with DevServer(port=PORT) as dev_server:
+        dev_server.start()
+        yield dev_server
+
+
 @pytest.fixture
-async def robot_client() -> AsyncGenerator[RobotClient, None]:
-    """Return a client for a running server."""
-    port = "15555"
+async def robot_client(dev_server: DevServer) -> AsyncGenerator[RobotClient, None]:
+    """Return a client for a running dev server."""
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        host="http://localhost", port=dev_server.port, version="*"
     ) as robot_client:
         assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
-        with DevServer(port=port) as server:
-            server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
-            yield robot_client
+            await robot_client.wait_until_alive()
+        ), "Dev Robot never became available."
+        yield robot_client
 
 
 async def poll_until_analysis_returns_ok(
@@ -72,15 +75,45 @@ async def poll_until_analysis_returns_ok(
             await asyncio.sleep(ANALYSIS_POLL_INTERVAL)
 
 
-async def test_python_custom_labware_upload(robot_client: RobotClient) -> None:
-    files_to_upload = [PROTOCOL_FILE, LABWARE_FILE]
-    response = (await robot_client.post_protocol(files=files_to_upload)).json()
+def make_test_protocol(api_level: str, labware_load_name: str) -> bytes:
+    """Return a Python protocol that loads a labware."""
+    return textwrap.dedent(
+        f"""
+        metadata = {{"apiLevel": "{api_level}"}}
+        def run(protocol) -> None:
+            protocol.load_labware(
+                load_name="{labware_load_name}",
+                location=1,
+            )
+        """
+    ).encode("utf-8")
+
+
+@pytest.mark.parametrize(
+    "api_level",
+    [
+        "2.0",  # Not executed by Protocol Engine.
+        "2.14",  # Executed by Protocol Engine.
+    ],
+)
+async def test_python_custom_labware_upload(
+    robot_client: RobotClient, api_level: str
+) -> None:
+    protocol = make_test_protocol(
+        api_level=api_level, labware_load_name=EXPECTED_LABWARE_LOAD_NAME
+    )
+
+    response = (
+        await robot_client.post_protocol(
+            files=[("protocol.py", protocol), LABWARE_PATH]
+        )
+    ).json()
 
     # Check that all files are present in the protocol resource.
     response_files = response["data"]["files"]
     assert len(response_files) == 2
-    assert {"name": PROTOCOL_FILE.name, "role": "main"} in response_files
-    assert {"name": LABWARE_FILE.name, "role": "labware"} in response_files
+    assert {"name": "protocol.py", "role": "main"} in response_files
+    assert {"name": LABWARE_PATH.name, "role": "labware"} in response_files
 
     protocol_id = response["data"]["id"]
     [analysis_summary] = response["data"]["analysisSummaries"]
