@@ -11,7 +11,6 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     InstrumentProbeType,
 )
-from opentrons.types import Mount
 import numpy as np
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -316,12 +315,6 @@ _head_node_lookup: Dict[OT3Mount, NodeId] = {
     OT3Mount.RIGHT: NodeId.head_r,
     OT3Mount.GRIPPER: NodeId.gripper_z,
 }
-
-
-def head_node_for_mount(mount: Union[OT3Mount, Mount]) -> NodeId:
-    if isinstance(mount, Mount):
-        mount = OT3Mount.from_mount(mount)
-    return _head_node_lookup[mount]
 
 
 def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:

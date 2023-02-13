@@ -145,9 +145,7 @@ class LiquidProbeSettings:
     sensor_threshold_pascals: float
     expected_liquid_height: float
     log_pressure: bool
-    home_plunger_at_start: bool
     aspirate_while_sensing: bool
-    read_only: bool
 
 
 @dataclass(frozen=True)
