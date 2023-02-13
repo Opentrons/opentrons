@@ -115,9 +115,7 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         sensor_threshold_pascals=15,
         expected_liquid_height=109,
         log_pressure=True,
-        home_plunger_at_start=False,
         aspirate_while_sensing=False,
-        read_only=False,
     )
 
 
@@ -628,13 +626,11 @@ async def test_liquid_probe(
         starting_mount_height=fake_liquid_settings.starting_mount_height,
         prep_move_speed=fake_liquid_settings.prep_move_speed,
     )
-    breakpoint()
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
             assert move_group  # don't pass in empty groups
             assert len(move_group) == 2
-        breakpoint()
         step = move_group[0][NodeId.pipette_left]
         assert step.stop_condition == MoveStopCondition.none
 

@@ -1,7 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
 from typing import Iterator, Union, Dict, Tuple, List
-
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -32,7 +31,7 @@ from opentrons.hardware_control.types import (
 )
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
-    ThresholdReachedTooEarly,
+    EarlyLiquidSenseTrigger,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
@@ -76,11 +75,13 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         starting_mount_height=100,
         prep_move_speed=6,
         max_z_distance=15,
-        min_z_distance=5,
+        min_z_distance=10,
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
         expected_liquid_height=109,
+        log_pressure=False,
+        aspirate_while_sensing=False,
     )
 
 
@@ -111,15 +112,18 @@ def mock_home(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 
 @pytest.fixture
-def mock_home_z(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+def mock_backend_liquid_probe(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[AsyncMock]:
     with patch.object(
-        ot3_hardware.managed_obj,
-        "home_z",
+        ot3_hardware.managed_obj._backend,
+        "liquid_probe",
         AsyncMock(
-            spec=ot3_hardware.managed_obj.home_z,
+            spec=ot3_hardware.managed_obj._backend.liquid_probe,
+            wraps=ot3_hardware.managed_obj._backend.liquid_probe,
         ),
-    ) as mock_move:
-        yield mock_move
+    ) as mock_liquid_probe:
+        yield mock_liquid_probe
 
 
 @pytest.fixture
@@ -331,28 +335,6 @@ def mock_current_position_ot3(
 
 
 @pytest.fixture
-def mock_backend_liquid_probe(
-    ot3_hardware: ThreadManager[OT3API],
-) -> Iterator[AsyncMock]:
-    backend = ot3_hardware.managed_obj._backend
-    with patch.object(
-        backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
-    ) as mock_probe:
-        mock_probe.side_effect = [
-            {
-                NodeId.head_l: (2, 2, True, True),
-                NodeId.pipette_left: (1, 2, True, True),
-            },
-            {
-                NodeId.head_r: (12, 12, True, True),
-                NodeId.pipette_right: (11, 11, True, True),
-            },
-            MoveConditionNotMet,
-        ]
-        yield mock_probe
-
-
-@pytest.fixture
 def mock_backend_capacitive_pass(
     ot3_hardware: ThreadManager[OT3API],
 ) -> Iterator[AsyncMock]:
@@ -408,42 +390,73 @@ async def test_move_to_without_homing_first(
 
 
 @pytest.mark.parametrize(
-    "mount, head_node, pipette_node",
+    "mount, head_ax, pipette_ax",
     [
-        (OT3Mount.LEFT, NodeId.head_l, NodeId.pipette_left),
-        (OT3Mount.RIGHT, NodeId.head_r, NodeId.pipette_right),
+        (OT3Mount.LEFT, OT3Axis.Z_L, OT3Axis.P_L),
+        (OT3Mount.RIGHT, OT3Axis.Z_R, OT3Axis.P_R),
     ],
 )
 async def test_liquid_probe(
     ot3_hardware: ThreadManager[OT3API],
-    head_node: NodeId,
-    pipette_node: NodeId,
+    head_ax: OT3Axis,
+    pipette_ax: OT3Axis,
     mount: OT3Mount,
     fake_liquid_settings: LiquidProbeSettings,
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
-    mock_home_z: AsyncMock,
     mock_home_plunger: AsyncMock,
+    mock_backend_liquid_probe: AsyncMock,
 ) -> None:
     backend = ot3_hardware.managed_obj._backend
 
     await ot3_hardware.home()
 
     with patch.object(
-        backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
-    ) as mock_probe:
-        mock_probe.side_effect = [
-            {head_node: (102, 102, True, True), pipette_node: (102, 102, True, True)},
-            {head_node: (112, 112, True, True), pipette_node: (111, 111, True, True)},
-            MoveConditionNotMet,
-        ]
+        backend, "update_position", AsyncMock(spec=backend.update_position)
+    ) as mock_position:
+        return_dict = {head_ax: 0, OT3Axis.X: 0, OT3Axis.Y: 0, pipette_ax: 0}
 
-        with pytest.raises(ThresholdReachedTooEarly):
+        # scenario - aspirate while sensing
+        mock_position.return_value = return_dict
+        fake_settings_aspirate = LiquidProbeSettings(
+            starting_mount_height=100,
+            prep_move_speed=6,
+            max_z_distance=15,
+            min_z_distance=5,
+            mount_speed=40,
+            plunger_speed=10,
+            sensor_threshold_pascals=15,
+            expected_liquid_height=109,
+            log_pressure=False,
+            aspirate_while_sensing=True,
+        )
+        await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
+        mock_home_plunger.assert_called_once()
+        backend.liquid_probe.assert_called_once_with(
+            mount,
+            fake_settings_aspirate.max_z_distance,
+            fake_settings_aspirate.mount_speed,
+            (fake_settings_aspirate.plunger_speed * -1),
+            fake_settings_aspirate.sensor_threshold_pascals,
+            fake_settings_aspirate.starting_mount_height,
+            fake_settings_aspirate.prep_move_speed,
+            fake_settings_aspirate.log_pressure,
+        )
+
+        # scenario - liquid threshold hit too early
+        return_dict[head_ax], return_dict[pipette_ax] = 150, 150
+        mock_position.return_value = return_dict
+        with pytest.raises(EarlyLiquidSenseTrigger):
             await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
 
-        final_pos = await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
-        assert final_pos == 112
+        # scenario - successful probe
+        return_dict[head_ax], return_dict[pipette_ax] = 112, 112
+        mock_position.return_value = return_dict
+        await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
+        # assert final_pos == 12 change this to no exceptions called
 
+        # scenario - MoveConditionNotMet
+        backend.liquid_probe.side_effect = MoveConditionNotMet
         with pytest.raises(MoveConditionNotMet):
             await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
 

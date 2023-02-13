@@ -119,7 +119,7 @@ from .dev_types import (
 )
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
-    ThresholdReachedTooEarly,
+    EarlyLiquidSenseTrigger,
 )
 
 mod_log = logging.getLogger(__name__)
@@ -633,6 +633,7 @@ class OT3API(
 
         checked_mount = OT3Mount.from_mount(mount)
         await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
+        print(f"pipette = self._pipette_handler.hardware_instruments")
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
             target_pos = target_position_from_plunger(
@@ -944,7 +945,7 @@ class OT3API(
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
-        bounds = self._backend.phony_bounds
+        bounds = self._backend.axis_bounds
         to_check = {
             ax: machine_pos[ax]
             for ax in target_position.keys()
@@ -1687,7 +1688,7 @@ class OT3API(
         If the move is completed without the specified threshold being triggered, a
         MoveConditionNotMet error will be thrown.
         If the threshold is triggered before the minimum z distance has been traveled,
-        a ThresholdReachedTooEarly error will be thrown.
+        a EarlyLiquidSenseTrigger error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
         home the plunger to prepare to aspirate, and return the position of the
@@ -1707,10 +1708,7 @@ class OT3API(
 
         if not self._current_position:
             await self.home()
-        if (
-            probe_settings.home_plunger_at_start
-            or probe_settings.aspirate_while_sensing
-        ):
+        if probe_settings.aspirate_while_sensing:
             await self.home_plunger(mount)
 
         direction = -1 if probe_settings.aspirate_while_sensing else 1
@@ -1725,13 +1723,13 @@ class OT3API(
                 probe_settings.starting_mount_height,
                 probe_settings.prep_move_speed,
                 probe_settings.log_pressure,
-                probe_settings.read_only,
             )
         except MoveConditionNotMet:
             self._log.exception("Liquid Sensing failed- threshold never reached.")
             raise
         else:
             machine_pos = await self._backend.update_position()
+            print(f"machine pos = {machine_pos}")
             position = deck_from_machine(
                 machine_pos,
                 self._transforms.deck_calibration.attitude,
@@ -1751,11 +1749,17 @@ class OT3API(
                 position[mount_axis] - probe_settings.starting_mount_height
             )
 
+            print(f"z distance = {z_distance_traveled}")
             if z_distance_traveled < probe_settings.min_z_distance:
-                self._log.exception(
-                    "Liquid Sensing failed- threshold reached too early."
+                print("should raise")
+                raise EarlyLiquidSenseTrigger(
+                    triggered_at=z_distance_traveled,
+                    min_z=probe_settings.min_z_distance,
                 )
-                raise ThresholdReachedTooEarly
+            else:
+                print(
+                    f"distance {z_distance_traveled} larger than min {probe_settings.min_z_distance}"
+                )
 
             return position[mount_axis], encoder_position[mount_axis]
 

@@ -29,8 +29,14 @@ class MoveConditionNotMet(ValueError):
     """Error raised if a move does not meet its stop condition before finishing."""
 
 
-class ThresholdReachedTooEarly(ValueError):
+class EarlyLiquidSenseTrigger(RuntimeError):
     """Error raised if sensor threshold reached before minimum probing distance."""
+
+    def __init__(self, triggered_at: float, min_z: float) -> None:
+        super().__init__(
+            f"Liquid threshold triggered early at z={triggered_at}mm, "
+            f"expected {min_z}"
+        )
 
 
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:

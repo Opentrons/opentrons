@@ -359,6 +359,7 @@ def deck_from_machine(
     axis_enum = type(next(iter(machine_pos.keys())))
     plunger_axes = {k: v for k, v in machine_pos.items() if k not in k.gantry_axes()}
     mount_axes = {k: v for k, v in machine_pos.items() if k in k.mount_axes()}
+    # print(f"mount axes = {mount_axes}")
     deck_positions_by_mount = {
         axis_enum.to_mount(axis): deck_point_from_machine_point(
             Point(machine_pos[axis_enum.X], machine_pos[axis_enum.Y], value),
