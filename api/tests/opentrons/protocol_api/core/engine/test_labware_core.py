@@ -66,8 +66,9 @@ def test_get_load_params(subject: LabwareCore) -> None:
 
 
 def test_set_calibration(subject: LabwareCore) -> None:
-    """It should no-op if calibration is set."""
-    subject.set_calibration(Point(1, 2, 3))
+    """It should raise if you attempt to set calibration."""
+    with pytest.raises(NotImplementedError):
+        subject.set_calibration(Point(1, 2, 3))
 
 
 @pytest.mark.parametrize(
