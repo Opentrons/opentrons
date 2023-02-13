@@ -54,7 +54,6 @@ class DevServer:
             # This environment is only for the subprocess so it should
             # not have any side effects.
             env={
-                "OTSYSTEM_SERVER_DOT_ENV_PATH": "dev.env",
                 "OT_SYSTEM_SERVER_persistence_directory": str(
                     self.persistence_directory
                 ),
