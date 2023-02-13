@@ -20,19 +20,26 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
     z_offset=ZSenseSettings(
-        point=(239, 160, 1),
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=3,
-            max_overrun_distance_mm=3,
-            speed_mm_per_s=1,
-            sensor_threshold_pf=1.0,
+            max_overrun_distance_mm=2,
+            speed_mm_per_s=1.0,
+            sensor_threshold_pf=0.5,
         ),
     ),
     edge_sense=EdgeSenseSettings(
-        plus_x_pos=(239, 150, 0),
-        minus_x_pos=(217, 150, 0),
-        plus_y_pos=(228, 161, 0),
-        minus_y_pos=(228, 139, 0),
+        overrun_tolerance_mm=0.1,
+        early_sense_tolerance_mm=0.1,
+        pass_settings=CapacitivePassSettings(
+            prep_distance_mm=0.2,
+            max_overrun_distance_mm=0.5,
+            speed_mm_per_s=0.5,
+            sensor_threshold_pf=0.5,
+        ),
+        search_initial_tolerance_mm=5.0,
+        search_iteration_limit=10,
+    ),
+    edge_sense_binary=EdgeSenseSettings(
         overrun_tolerance_mm=0.5,
         early_sense_tolerance_mm=0.2,
         pass_settings=CapacitivePassSettings(
@@ -43,9 +50,8 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         ),
         search_initial_tolerance_mm=5.0,
         search_iteration_limit=10,
-        nominal_center=(228, 150, 0),
     ),
-    probe_length=34.5,
+    probe_length=44.5,
 )
 
 ROBOT_CONFIG_VERSION: Final = 1
@@ -127,7 +133,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 10,
-        OT3AxisKind.Z_G: 15,
+        OT3AxisKind.Z_G: 10,
         OT3AxisKind.P: 5,
     },
     high_throughput={
@@ -220,7 +226,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
         OT3AxisKind.P: 1.0,
-        OT3AxisKind.Z_G: 0.7,
+        OT3AxisKind.Z_G: 0.67,
     },
     high_throughput={
         OT3AxisKind.X: 1.4,
@@ -334,7 +340,6 @@ def _build_default_cap_pass(
 
 def _build_default_z_pass(from_conf: Any, default: ZSenseSettings) -> ZSenseSettings:
     return ZSenseSettings(
-        point=from_conf.get("point", default.point),
         pass_settings=_build_default_cap_pass(
             from_conf.get("pass_settings", {}), default.pass_settings
         ),
@@ -345,10 +350,6 @@ def _build_default_edge_sense(
     from_conf: Any, default: EdgeSenseSettings
 ) -> EdgeSenseSettings:
     return EdgeSenseSettings(
-        plus_x_pos=from_conf.get("plus_x_pos", default.plus_x_pos),
-        minus_x_pos=from_conf.get("minus_x_pos", default.minus_x_pos),
-        plus_y_pos=from_conf.get("plus_y_pos", default.plus_y_pos),
-        minus_y_pos=from_conf.get("minus_y_pos", default.minus_y_pos),
         overrun_tolerance_mm=from_conf.get(
             "overrun_tolerance_mm", default.overrun_tolerance_mm
         ),
@@ -364,7 +365,6 @@ def _build_default_edge_sense(
         search_iteration_limit=from_conf.get(
             "search_iteration_limit", default.search_iteration_limit
         ),
-        nominal_center=from_conf.get("nominal_center", default.nominal_center),
     )
 
 
@@ -375,6 +375,9 @@ def _build_default_calibration(
         z_offset=_build_default_z_pass(from_conf.get("z_offset", {}), default.z_offset),
         edge_sense=_build_default_edge_sense(
             from_conf.get("edge_sense", {}), default.edge_sense
+        ),
+        edge_sense_binary=_build_default_edge_sense(
+            from_conf.get("edge_sense_binary", {}), default.edge_sense_binary
         ),
         probe_length=from_conf.get("probe_length", default.probe_length),
     )

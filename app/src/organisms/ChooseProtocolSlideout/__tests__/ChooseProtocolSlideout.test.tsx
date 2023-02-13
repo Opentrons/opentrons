@@ -1,12 +1,10 @@
 import * as React from 'react'
-import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { useFeatureFlag } from '../../../redux/config'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
@@ -19,9 +17,6 @@ jest.mock('../../../molecules/DeckThumbnail')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../redux/config')
 
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
   typeof getStoredProtocols
 >
@@ -62,9 +57,6 @@ describe('ChooseProtocolSlideout', () => {
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(mockUseFeatureFlag)
-      .calledWith('enableManualDeckStateModification')
-      .mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()

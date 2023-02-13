@@ -111,6 +111,7 @@ export function RobotSettings(): JSX.Element | null {
         borderRadius={BORDERS.radiusSoftCorners}
         flexDirection={DIRECTION_COLUMN}
         marginBottom={SPACING.spacing4}
+        minHeight="calc(100vh - 3.5rem)"
         width="100%"
       >
         <Box padding={`0 ${String(SPACING.spacing4)}`}>

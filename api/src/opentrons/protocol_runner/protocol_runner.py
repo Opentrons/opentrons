@@ -8,14 +8,9 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
-from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
-from opentrons.protocol_reader import (
-    ProtocolSource,
-    PythonProtocolConfig,
-    JsonProtocolConfig,
-)
+from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
 
 from .task_queue import TaskQueue
@@ -111,21 +106,13 @@ class ProtocolRunner:
             # definitions, so we don't need to yield here.
             self._protocol_engine.add_labware_definition(definition)
 
-        if isinstance(config, JsonProtocolConfig):
-            schema_version = config.schema_version
-
-            if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
-                await self._load_json(protocol_source)
-            else:
-                self._load_legacy(protocol_source, labware_definitions)
-
-        elif isinstance(config, PythonProtocolConfig):
-            api_version = config.api_version
-
-            if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
-                self._load_python(protocol_source)
-            else:
-                self._load_legacy(protocol_source, labware_definitions)
+        if (
+            isinstance(config, JsonProtocolConfig)
+            and config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
+        ):
+            await self._load_json(protocol_source)
+        else:
+            self._load_python_or_legacy_json(protocol_source, labware_definitions)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -201,18 +188,7 @@ class ProtocolRunner:
 
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
-    def _load_python(self, protocol_source: ProtocolSource) -> None:
-        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
-        # the event loop. Jira RSS-165.
-        protocol = self._python_file_reader.read(protocol_source)
-        context = self._python_context_creator.create(self._protocol_engine)
-        self._task_queue.set_run_func(
-            func=self._python_executor.execute,
-            protocol=protocol,
-            context=context,
-        )
-
-    def _load_legacy(
+    def _load_python_or_legacy_json(
         self,
         protocol_source: ProtocolSource,
         labware_definitions: Iterable[LabwareDefinition],
@@ -223,7 +199,7 @@ class ProtocolRunner:
         broker = None
         equipment_broker = None
 
-        if not feature_flags.enable_protocol_engine_papi_core():
+        if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
             broker = Broker()
             equipment_broker = EquipmentBroker[LegacyLoadInfo]()
 

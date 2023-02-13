@@ -84,7 +84,7 @@ class PipettingHandler:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
-    ) -> None:
+    ) -> float:
         """Pick up a tip at the specified "well"."""
         hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
             pipette_id=pipette_id,
@@ -119,10 +119,14 @@ class PipettingHandler:
             tip_volume=tip_volume,
         )
 
+        return tip_volume
+
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
         """Manually add a tip to a pipette in the hardware API.
 
         Used to enable a drop tip even if the HW API thinks no tip is attached.
+
+        This is used by hardware stopper, and will not affect the pipette state store working volume tracking
         """
         hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
             pipette_id=pipette_id,
@@ -142,6 +146,7 @@ class PipettingHandler:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        home_after: Optional[bool],
     ) -> None:
         """Drop a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
@@ -168,8 +173,7 @@ class PipettingHandler:
         # perform the tip drop routine
         await self._hardware_api.drop_tip(
             mount=hw_pipette.mount,
-            # TODO(mc, 2020-11-12): include this parameter in the request
-            home_after=True,
+            home_after=True if home_after is None else home_after,
         )
 
     async def aspirate(
