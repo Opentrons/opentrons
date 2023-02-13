@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from opentrons_shared_data.pipette import dummy_model_for_name
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.config.pipette_config import load as load_pipette_config, PipetteConfig
 
 from ..types import FlowRates
@@ -18,6 +19,8 @@ class LoadedStaticPipetteData:
     min_volume: float
     max_volume: float
     channels: int
+    home_position: float
+    nozzle_offset_z: float
     flow_rates: FlowRates
 
 
@@ -29,6 +32,8 @@ def _return_static_pipette_data(config: PipetteConfig) -> LoadedStaticPipetteDat
         min_volume=config.min_volume,
         max_volume=config.max_volume,
         channels=int(config.channels),
+        home_position=config.home_position,
+        nozzle_offset_z=config.nozzle_offset[2],
         flow_rates=FlowRates(
             default_blow_out=config.default_blow_out_flow_rates,
             default_aspirate=config.default_aspirate_flow_rates,
@@ -52,3 +57,10 @@ def get_pipette_static_config(
     """Get the config for a pipette, given the actual model and pipette id."""
     config = load_pipette_config(pipette_model, pipette_serial)
     return _return_static_pipette_data(config)
+
+
+def get_virtual_instrument_max_height_ot2(
+    home_position: float, nozzle_offset_z: float
+) -> float:
+    """Get calculated max instrument height (minus tip length), given pipette's home position and nozzle offset."""
+    return home_position - Z_RETRACT_DISTANCE + nozzle_offset_z

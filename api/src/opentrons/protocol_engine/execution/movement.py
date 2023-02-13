@@ -109,15 +109,12 @@ class MovementHandler:
         dest_slot_int = int(
             self._state_store.geometry.get_ancestor_slot_name(labware_id)
         )
-        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
 
         self._hs_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,
             destination_slot=dest_slot_int,
-            is_multi_channel=hw_pipette.config["channels"] > 1,
+            is_multi_channel=self._state_store.tips.get_pipette_channels(pipette_id)
+            > 1,
             destination_is_tip_rack=self._state_store.labware.is_tiprack(labware_id),
         )
 
@@ -134,7 +131,13 @@ class MovementHandler:
             mount=hw_mount,
             critical_point=origin_cp,
         )
-        max_travel_z = self._hardware_api.get_instrument_max_height(mount=hw_mount)
+
+        if self._state_store.config.use_virtual_pipettes:
+            max_travel_z = self._state_store.pipettes.get_instrument_max_height(
+                pipette_id
+            ) - self._state_store.tips.get_tip_length(pipette_id)
+        else:
+            max_travel_z = self._hardware_api.get_instrument_max_height(mount=hw_mount)
 
         # calculate the movement's waypoints
         waypoints = self._state_store.motion.get_movement_waypoints_to_well(
@@ -150,18 +153,19 @@ class MovementHandler:
             minimum_z_height=minimum_z_height,
         )
 
-        speed = self._state_store.pipettes.get_movement_speed(
-            pipette_id=pipette_id, requested_speed=speed
-        )
-
-        # move through the waypoints
-        for waypoint in waypoints:
-            await self._hardware_api.move_to(
-                mount=hw_mount,
-                abs_position=waypoint.position,
-                critical_point=waypoint.critical_point,
-                speed=speed,
+        if not self._state_store.config.use_virtual_pipettes:
+            speed = self._state_store.pipettes.get_movement_speed(
+                pipette_id=pipette_id, requested_speed=speed
             )
+
+            # move through the waypoints
+            for waypoint in waypoints:
+                await self._hardware_api.move_to(
+                    mount=hw_mount,
+                    abs_position=waypoint.position,
+                    critical_point=waypoint.critical_point,
+                    speed=speed,
+                )
 
     async def move_relative(
         self,

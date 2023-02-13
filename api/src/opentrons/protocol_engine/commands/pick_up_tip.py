@@ -27,7 +27,13 @@ class PickUpTipResult(BaseModel):
     tipVolume: float = Field(
         0,
         description="Maximum volume of liquid that the picked up tip can hold, in µL.",
-        gt=0,
+        ge=0,
+    )
+
+    tipLength: float = Field(
+        0,
+        description="The length of the tip in mm.",
+        ge=0,
     )
 
 
@@ -39,14 +45,14 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
 
     async def execute(self, params: PickUpTipParams) -> PickUpTipResult:
         """Move to and pick up a tip using the requested pipette."""
-        tip_volume = await self._pipetting.pick_up_tip(
+        tip_volume, tip_length = await self._pipetting.pick_up_tip(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
         )
 
-        return PickUpTipResult(tipVolume=tip_volume)
+        return PickUpTipResult(tipVolume=tip_volume, tipLength=tip_length)
 
 
 class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult]):

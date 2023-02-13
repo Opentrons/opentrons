@@ -219,6 +219,21 @@ class EquipmentHandler:
                 )
             )
 
+        if (
+            use_virtual_pipettes
+            and self._state_store.config.robot_type == "OT-2 Standard"
+        ):
+            instrument_max_height = (
+                pipette_data_provider.get_virtual_instrument_max_height_ot2(
+                    static_pipette_config.home_position,
+                    static_pipette_config.nozzle_offset_z,
+                )
+            )
+        else:
+            instrument_max_height = self._hardware_api.get_instrument_max_height(
+                mount.to_hw_mount()
+            )
+
         self._action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id=pipette_id,
@@ -227,6 +242,7 @@ class EquipmentHandler:
                 min_volume=static_pipette_config.min_volume,
                 max_volume=static_pipette_config.max_volume,
                 channels=static_pipette_config.channels,
+                instrument_max_height=instrument_max_height,
                 flow_rates=static_pipette_config.flow_rates,
             )
         )

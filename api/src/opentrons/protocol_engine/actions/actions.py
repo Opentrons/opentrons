@@ -180,6 +180,7 @@ class AddPipetteConfigAction:
     min_volume: float
     max_volume: float
     channels: int
+    instrument_max_height: float
     flow_rates: FlowRates
 
 

@@ -1,5 +1,5 @@
 """Pipetting command handling."""
-from typing import NamedTuple, Optional, Iterator
+from typing import Tuple, NamedTuple, Optional, Iterator
 from contextlib import contextmanager
 
 from opentrons.types import Mount as HardwareMount
@@ -84,7 +84,7 @@ class PipettingHandler:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
-    ) -> float:
+    ) -> Tuple[float, float]:
         """Pick up a tip at the specified "well"."""
         hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
             pipette_id=pipette_id,
@@ -119,7 +119,7 @@ class PipettingHandler:
             tip_volume=tip_volume,
         )
 
-        return tip_volume
+        return tip_volume, tip_length
 
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
         """Manually add a tip to a pipette in the hardware API.

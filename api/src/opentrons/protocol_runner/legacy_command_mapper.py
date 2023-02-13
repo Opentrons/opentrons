@@ -138,7 +138,8 @@ class LegacyCommandMapper:
                     completed_command = running_command.copy(
                         update={
                             "result": pe_commands.PickUpTipResult.construct(
-                                tipVolume=command["payload"]["location"].max_volume  # type: ignore[typeddict-item]
+                                tipVolume=command["payload"]["location"].max_volume,  # type: ignore[typeddict-item]
+                                tipLength=0,
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,

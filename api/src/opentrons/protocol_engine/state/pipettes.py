@@ -60,6 +60,7 @@ class StaticPipetteConfig:
     display_name: str
     min_volume: float
     max_volume: float
+    instrument_max_height: float
 
 
 @dataclass
@@ -106,6 +107,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 display_name=action.display_name,
                 min_volume=action.min_volume,
                 max_volume=action.max_volume,
+                instrument_max_height=action.instrument_max_height,
             )
             self._state.flow_rates_by_id[action.pipette_id] = action.flow_rates
 
@@ -352,6 +354,10 @@ class PipetteView(HasState[PipetteState]):
     def get_maximum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's maximum volume."""
         return self._get_static_config(pipette_id).max_volume
+
+    def get_instrument_max_height(self, pipette_id: str) -> float:
+        """Return the given pipette's max instrument height, not including tip length."""
+        return self._get_static_config(pipette_id).instrument_max_height
 
     def get_flow_rates(self, pipette_id: str) -> FlowRates:
         """Get the default flow rates for the pipette."""
