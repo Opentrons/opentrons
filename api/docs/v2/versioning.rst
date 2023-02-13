@@ -38,6 +38,10 @@ The version you specify determines the features and behaviors available to your 
 
 In general, consider what features you need in your protocol and keep the API level as low as possible. Using the lowest API version is good protocol design, as it helps the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software.
 
+.. note::
+
+    Python protocols with an ``apiLevel`` of 2.14 can't currently be simulated with the ``opentrons_simulate`` command-line tool, the :py:func:`opentrons.simulate.simulate` function, or the :py:func:`opentrons.simulate.get_protocol_api` function. If your protocol doesn't rely on new functionality added in version 2.14, use a lower ``apiLevel``. For protocols that require 2.14, analyze your protocol with the Opentrons App instead.
+
 
 Maximum Supported Versions
 --------------------------
