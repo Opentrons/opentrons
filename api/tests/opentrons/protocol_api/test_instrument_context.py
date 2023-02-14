@@ -272,7 +272,7 @@ def test_aspirate_from_coordinates(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(PointTarget(location=input_location, in_place=True))
+    ).then_return(PointTarget(location=input_location, in_place=False))
     decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
         5.67
     )
@@ -283,7 +283,7 @@ def test_aspirate_from_coordinates(
         mock_instrument_core.aspirate(
             location=input_location,
             well_core=None,
-            in_place=True,
+            in_place=False,
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
@@ -631,85 +631,148 @@ def test_return_tip(
 
 
 def test_dispense_with_location(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext, mock_protocol_core: ProtocolCore
 ) -> None:
     """It should dispense to a given location."""
-    mock_well = decoy.mock(cls=Well)
-    location = Location(point=Point(1, 2, 3), labware=mock_well)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
-        3.0
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.23)).then_return(
+        5.67
     )
 
-    subject.dispense(volume=42.0, location=location)
+    subject.dispense(volume=42.0, location=input_location, rate=1.23)
 
     decoy.verify(
         mock_instrument_core.dispense(
-            location=location,
-            well_core=mock_well._core,
+            location=input_location,
+            well_core=None,
+            in_place=False,
             volume=42.0,
-            rate=1.0,
-            flow_rate=3.0,
+            rate=1.23,
+            flow_rate=5.67,
         ),
         times=1,
     )
 
 
 def test_dispense_with_well_location(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext, mock_protocol_core: ProtocolCore
 ) -> None:
     """It should dispense to a well."""
     mock_well = decoy.mock(cls=Well)
+    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
-    decoy.when(mock_well.bottom(1.0)).then_return(
-        Location(point=Point(1, 2, 3), labware=mock_well)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=None))
+    decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
+    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.23)).then_return(
+        5.67
     )
 
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
-        3.0
-    )
-
-    subject.dispense(volume=42.0, location=mock_well)
+    subject.dispense(volume=42.0, location=input_location, rate=1.23)
 
     decoy.verify(
         mock_instrument_core.dispense(
-            location=Location(point=Point(1, 2, 3), labware=mock_well),
+            location=bottom_location,
             well_core=mock_well._core,
+            in_place=False,
             volume=42.0,
-            rate=1.0,
-            flow_rate=3.0,
+            rate=1.23,
+            flow_rate=5.67,
         ),
         times=1,
     )
 
 
-def test_dispense_with_no_location(
+def test_dispense_in_place(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-    """It should dispense to a well."""
-    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
-        Location(point=Point(1, 2, 3), labware=None)
+    """It should dispense in place."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(PointTarget(location=input_location, in_place=True))
+    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.23)).then_return(
+        5.67
     )
 
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.0)).then_return(
-        3.0
-    )
-
-    subject.dispense(volume=42.0)
+    subject.dispense(volume=42.0, location=input_location, rate=1.23)
 
     decoy.verify(
         mock_instrument_core.dispense(
-            location=Location(point=Point(1, 2, 3), labware=None),
+            location=input_location,
             well_core=None,
+            in_place=True,
             volume=42.0,
-            rate=1.0,
-            flow_rate=3.0,
+            rate=1.23,
+            flow_rate=5.67,
         ),
         times=1,
     )
+
+
+def test_dispense_raises_no_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
+
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=None)
+    ).then_raise(mock_validation.NoLocationError())
+    with pytest.raises(RuntimeError):
+        subject.dispense(location=None)
+
+
+def test_dispense_raises_wrong_location_value(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
+
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=None)
+    ).then_raise(mock_validation.LocationTypeError())
+    with pytest.raises(TypeError):
+        subject.dispense(location=None)
 
 
 def test_touch_tip(

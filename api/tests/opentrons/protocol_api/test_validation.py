@@ -278,7 +278,7 @@ def test_validate_in_place(decoy: Decoy) -> None:
     input_last_location = Location(point=Point(x=1, y=1, z=2), labware=None)
     expected_result = subject.PointTarget(location=input_last_location, in_place=True)
 
-    result = subject.validate_location(location=input_last_location, last_location=None)
+    result = subject.validate_location(location=None, last_location=input_last_location)
 
     assert result == expected_result
 

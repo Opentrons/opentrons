@@ -44,11 +44,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def dispense(
         self,
-        location: Optional[types.Location],
+        location: types.Location,
         well_core: Optional[WellCoreType],
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool = False,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:

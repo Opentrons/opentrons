@@ -102,11 +102,12 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def dispense(
         self,
-        location: Optional[types.Location],
+        location: types.Location,
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool = False,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -116,14 +117,13 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             rate: The rate in µL/s to dispense at.
             flow_rate: Not used in this core.
         """
-        if location:
-            self.move_to(location=location)
+        self.move_to(location=location)
 
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
     def blow_out(
         self,
-        location: Optional[types.Location],
+        location: types.Location,
         well_core: Optional[LegacyWellCore],
     ) -> None:
         """Blow liquid out of the tip.
@@ -132,7 +132,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             location: The location to blow out into.
             well_core: Unused by legacy core.
         """
-        if location:
+        if location != self._protocol_interface.get_last_location():
             self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
 

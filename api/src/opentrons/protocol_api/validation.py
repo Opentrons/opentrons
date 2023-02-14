@@ -234,11 +234,11 @@ def validate_location(
     if isinstance(location, Well):
         return WellTarget(well=location, location=None)
     elif isinstance(location, Location):
-        if location.labware is None:
+        if location.labware.as_well() is None:
             return PointTarget(location=location, in_place=False)
         return WellTarget(well=location.labware.as_well(), location=location)
     elif last_location and location is None:
-        if last_location.labware is None:
+        if last_location.labware.as_well() is None:
             return PointTarget(location=last_location, in_place=True)
         return WellTarget(well=last_location.labware.as_well(), location=last_location)
 

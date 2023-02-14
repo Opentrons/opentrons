@@ -104,23 +104,23 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def dispense(
         self,
-        location: Optional[types.Location],
+        location: types.Location,
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool = False,
     ) -> None:
-        if location:
-            self.move_to(location=location, well_core=well_core)
+        self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 
     def blow_out(
         self,
-        location: Optional[types.Location],
+        location: types.Location,
         well_core: Optional[LegacyWellCore],
     ) -> None:
-        if location:
+        if location != self._protocol_interface.get_last_location():
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._update_volume(0)

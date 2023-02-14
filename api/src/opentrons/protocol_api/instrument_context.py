@@ -289,32 +289,34 @@ class InstrumentContext(publisher.CommandPublisher):
         )
         well: Optional[labware.Well]
         last_location = self._get_last_location_by_api_version()
-
-        if isinstance(location, labware.Well):
-            well = location
-            if well.parent._core.is_fixed_trash():
-                move_to_location = location.top()
-            else:
-                move_to_location = location.bottom(
-                    z=self._well_bottom_clearances.dispense
-                )
-        elif isinstance(location, types.Location):
-            move_to_location = location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                f"location should be a Well or Location, but it is {location}"
-            )
-        elif last_location:
-            move_to_location = last_location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        else:
+        dispense_in_place: bool = False
+        try:
+            target = validation.validate_location(location=location, last_location=last_location)
+        except validation.NoLocationError:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is."
             )
+        except validation.LocationTypeError:
+            raise TypeError(
+                    f"location should be a Well or Location, but it is {location}"
+                )
+
+        if isinstance(target, validation.WellTarget):
+            well = target.well
+            if well.parent._core.is_fixed_trash():
+                move_to_location = target.well.top()
+            else:
+                move_to_location = target.location or target.well.bottom(
+                    z=self._well_bottom_clearances.dispense
+                )
+        if isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+            _, well = target.location.labware.get_parent_labware_and_well()
+            dispense_in_place = target.in_place
+
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -341,6 +343,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
+                in_place=dispense_in_place
             )
 
         return self
