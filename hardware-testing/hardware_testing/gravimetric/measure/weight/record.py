@@ -5,8 +5,6 @@ from threading import Thread, Event
 from time import sleep, time
 from typing import List, Optional, Callable
 
-from opentrons.protocol_api import ProtocolContext
-
 from hardware_testing.data import (
     dump_data_to_file,
     append_data_to_file,
@@ -255,11 +253,10 @@ def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -
 class GravimetricRecorder:
     """Gravimetric Recorder."""
 
-    def __init__(self, ctx: ProtocolContext, cfg: GravimetricRecorderConfig) -> None:
+    def __init__(self, cfg: GravimetricRecorderConfig, simulate: bool = False) -> None:
         """Gravimetric Recorder."""
-        self._ctx = ctx
         self._cfg = cfg
-        self._scale: Scale = Scale.build(ctx=ctx)
+        self._scale: Scale = Scale.build(simulate=simulate)
         self._recording = GravimetricRecording()
         self._is_recording = Event()
         self._reading_samples = Event()
