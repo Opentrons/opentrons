@@ -35,9 +35,6 @@ from .labware import Labware
 from . import validation
 
 
-ENGAGE_HEIGHT_UNIT_CNV = 2
-
-
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 
 

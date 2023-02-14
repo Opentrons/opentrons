@@ -10,19 +10,16 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
-import { useLabwareOffsetForLabware } from '../../../LabwarePositionCheck/deprecatedHooks/useLabwareOffsetForLabware'
-import { useProtocolDetailsForRun } from '../../hooks'
 import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
+import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
 
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock(
-  '../../../LabwarePositionCheck/deprecatedHooks/useLabwareOffsetForLabware'
-)
 jest.mock('../utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('../utils/getLabwareDefinitionUri')
+jest.mock('../useLabwareOffsetForLabware')
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -48,9 +45,6 @@ const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
 >
 const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
   typeof useCurrentRun
->
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
 >
 const mockUseLabwareOffsetForLabware = useLabwareOffsetForLabware as jest.MockedFunction<
   typeof useLabwareOffsetForLabware
@@ -91,20 +85,15 @@ describe('LabwareInfoOverlay', () => {
       .calledWith(props.definition)
       .mockReturnValue('mock definition display name')
 
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(MOCK_RUN_ID)
-      .mockReturnValue({
-        protocolData: {
-          commands: [],
-          labware,
-          labwareDefinitions,
-          modules: [],
-        },
-      } as any)
-
     when(mockUseLabwareOffsetForLabware)
       .calledWith(MOCK_RUN_ID, MOCK_LABWARE_ID)
-      .mockReturnValue({ vector: MOCK_LABWARE_VECTOR } as any)
+      .mockReturnValue({
+        id: 'fake_offset_id',
+        createdAt: 'fake_timestamp',
+        definitionUri: 'fake_def_uri',
+        location: { slotName: MOCK_SLOT_NAME },
+        vector: MOCK_LABWARE_VECTOR,
+      })
 
     when(mockUseCurrentRun)
       .calledWith()

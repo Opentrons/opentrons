@@ -4,7 +4,9 @@ import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
 import { HostConfig, getCommand, VectorOffset } from '@opentrons/api-client'
 import { useCurrentRunId } from './useCurrentRunId'
-import type { SavePositionCommandData } from '../../LabwarePositionCheck/types'
+interface SavePositionCommandData {
+  [labwareId: string]: string[]
+}
 interface LabwareOffsetData {
   [labwareId: string]: VectorOffset
 }

@@ -35,6 +35,8 @@ import {
   RobotSystemVersion,
 } from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
+import type { NetworkConnection } from './hooks'
+
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   height: 6.875rem;
@@ -74,6 +76,7 @@ export function RobotSettingsDashboard(): JSX.Element {
         <SettingsContent
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
+          networkConnection={networkConnection}
         />
       ) : (
         <>
@@ -208,10 +211,12 @@ function RobotSettingButton({
 interface SettingsContentProps {
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption | null) => void
+  networkConnection: NetworkConnection
 }
 const SettingsContent = ({
   currentOption,
   setCurrentOption,
+  networkConnection,
 }: SettingsContentProps): JSX.Element => {
   switch (currentOption) {
     case 'RobotName':
@@ -220,7 +225,12 @@ const SettingsContent = ({
       return <RobotSystemVersion setCurrentOption={setCurrentOption} />
 
     case 'NetworkSettings':
-      return <NetworkSettings setCurrentOption={setCurrentOption} />
+      return (
+        <NetworkSettings
+          networkConnection={networkConnection}
+          setCurrentOption={setCurrentOption}
+        />
+      )
 
     case 'DisplaySleepSettings':
       return <DisplaySleepSettings setCurrentOption={setCurrentOption} />

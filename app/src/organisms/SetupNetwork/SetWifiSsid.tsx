@@ -69,7 +69,7 @@ export function SetWifiSsid({
           <Btn onClick={() => setChangeState({ type: null })}>
             <Flex flexDirection={DIRECTION_ROW}>
               <Icon
-                name="arrow-back"
+                name="chevron-left"
                 marginRight={SPACING.spacing2}
                 size="1.875rem"
               />
