@@ -112,6 +112,9 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
   const pipetteName = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
   )?.pipetteName
+
+  if (pipetteName == null) return null
+
   let wellsToHighlight: string[] = []
 
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels

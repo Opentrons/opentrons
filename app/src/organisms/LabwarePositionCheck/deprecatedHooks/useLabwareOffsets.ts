@@ -31,7 +31,8 @@ const getDisplayLocation = (
     const module = protocolData.modules.find(
       module => module.id === labwareLocation.moduleId
     )
-    const moduleModel = module.model ?? ''
+    const moduleModel = module?.model
+    if (moduleModel == null) return ''
     if (getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE) {
       location = getModuleDisplayName(moduleModel)
     } else {
@@ -88,12 +89,13 @@ export const useLabwareOffsets = (
         protocolData.labware,
         labwareDefinitions
       )
-      const definitionUri = protocolData.labware.find(
+      const definitionUri = protocolData?.labware?.find(
         item => item.id === labwareId
-      ).definitionUri
-      const displayName = getLabwareDisplayName(
-        labwareDefinitions[definitionUri]
-      )
+      )?.definitionUri
+      const displayName =
+        definitionUri != null
+          ? getLabwareDisplayName(labwareDefinitions[definitionUri])
+          : ''
       const vectorPromise = offsetDataByLabwareId.then(result => ({
         ...result[labwareId],
       }))
