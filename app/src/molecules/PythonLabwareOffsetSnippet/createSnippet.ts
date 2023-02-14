@@ -1,8 +1,8 @@
 import isEqual from 'lodash/isEqual'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { getLabwareDefinitionUri } from '../../organisms/Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { LabwareOffset } from '@opentrons/api-client'
 import { getLabwareOffsetLocation } from '../../organisms/Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 
 const PYTHON_INDENT = '    '
@@ -12,7 +12,7 @@ const CLI_PREFIX = `from opentrons import protocol_api\n\nmetadata = {\n${PYTHON
 
 export function createSnippet(
   mode: 'jupyter' | 'cli',
-  protocol: LegacySchemaAdapterOutput,
+  protocol: ProtocolAnalysisOutput,
   labwareOffsets?: LabwareOffset[]
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}
@@ -90,7 +90,10 @@ export function createSnippet(
           ...moduleVariableById,
           [command.result.moduleId]: moduleVariable,
         }
-        const { model } = protocol.modules[command.params.moduleId]
+        const module = protocol.modules.find(
+          module => module.id === command.params.moduleId
+        )
+        const model = module?.model
         const { slotName } = command.params.location
         addendum = [
           `${moduleVariable} = protocol.load_module("${String(
