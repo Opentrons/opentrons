@@ -13,7 +13,7 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
 from opentrons.protocol_api.core.labware import AbstractLabware
 
 from opentrons.protocol_api.core.legacy.deck import DeckItem
-from opentrons.protocol_api.core.legacy.deck_conflict import (
+from opentrons.deck_conflict import (
     DeckConflictError,
     check,
 )

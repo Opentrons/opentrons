@@ -13,13 +13,18 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_south_slot,
     get_adjacent_slots,
 )
+
+# TODO: Decouple from these.
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.labware import AbstractLabware
-
-from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
+from opentrons.protocol_api.core.legacy.module_geometry import (
+    ModuleGeometry,
+    ThermocyclerGeometry,
+    HeaterShakerGeometry,
+)
 
 if TYPE_CHECKING:
-    from .deck import DeckItem
+    from opentrons.protocol_api.core.legacy.deck import DeckItem
 
 
 _FIXED_TRASH_SLOT: Final = 12

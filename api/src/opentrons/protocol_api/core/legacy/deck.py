@@ -21,7 +21,9 @@ from ...deck import CalibrationPosition
 from ...labware import load as load_lw, Labware
 from .legacy_labware_core import LegacyLabwareCore
 from .module_geometry import ModuleGeometry, ThermocyclerGeometry
-from . import deck_conflict
+
+# TODO: Find a proper place for this.
+from opentrons import deck_conflict
 
 _log = logging.getLogger(__name__)
 
