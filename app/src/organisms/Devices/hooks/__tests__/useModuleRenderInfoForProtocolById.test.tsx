@@ -3,6 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -19,6 +20,7 @@ import {
 } from '..'
 
 import type {
+  CompletedProtocolAnalysis,
   ModuleModel,
   ModuleType,
   ProtocolAnalysisOutput,
@@ -29,6 +31,7 @@ jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
 jest.mock('../useProtocolDetailsForRun')
 jest.mock('../useStoredProtocolAnalysis')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
@@ -41,6 +44,9 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
 >
 const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
   typeof useStoredProtocolAnalysis
+>
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 
 const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as ProtocolAnalysisOutput
@@ -123,10 +129,13 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       ])
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
-      .mockReturnValue(PROTOCOL_DETAILS)
+      .mockReturnValue(PROTOCOL_DETAILS as any)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
       .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith('1')
+      .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
     when(mockGetProtocolModulesInfo)
       .calledWith(heaterShakerCommandsWithResultsKey, standardDeckDef as any)
       .mockReturnValue([TEMPERATURE_MODULE_INFO, MAGNETIC_MODULE_INFO])
@@ -139,6 +148,9 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({} as ProtocolDetails)
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith('1')
+      .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
     const { result } = renderHook(() =>
       useModuleRenderInfoForProtocolById('otie', '1')

@@ -9,17 +9,18 @@ import { i18n } from '../../../../i18n'
 import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
 import {
-  useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
   useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '..'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { Store } from 'redux'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
 
 jest.mock('..')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
   return {
@@ -28,8 +29,8 @@ jest.mock('@opentrons/shared-data', () => {
   }
 })
 
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
   typeof useStoredProtocolAnalysis
@@ -57,9 +58,7 @@ describe('useLPCDisabledReason', () => {
   )
   beforeEach(() => {
     store.dispatch = jest.fn()
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: simpleV6Protocol,
-    } as any)
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(simpleV6Protocol as any)
     mockUseStoredProtocolAnalysis.mockReturnValue(
       (simpleV6Protocol as unknown) as ProtocolAnalysisOutput
     )
@@ -118,9 +117,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if robot protocol anaylsis is null', () => {
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: null,
-    } as any)
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(null as any)
     const { result } = renderHook(
       () => useLPCDisabledReason('otie', RUN_ID_1),
       { wrapper }
@@ -130,8 +127,9 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if no pipettes in protocol', () => {
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: { ...simpleV6Protocol, pipettes: {} },
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+      ...simpleV6Protocol,
+      pipettes: {},
     } as any)
     const { result } = renderHook(
       () => useLPCDisabledReason('otie', RUN_ID_1),
@@ -153,8 +151,9 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if no tips are being used in the protocols', () => {
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: { ...simpleV6Protocol, commands: {} },
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+      ...simpleV6Protocol,
+      commands: {},
     } as any)
     const { result } = renderHook(
       () => useLPCDisabledReason('otie', RUN_ID_1),

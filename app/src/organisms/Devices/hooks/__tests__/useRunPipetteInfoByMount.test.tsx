@@ -5,6 +5,7 @@ import {
   getPipetteNameSpecs,
   getLoadedLabwareDefinitionsByUri,
   RunTimeCommand,
+  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import _tiprack10ul from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_10ul/1.json'
 
@@ -20,6 +21,7 @@ import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
 } from '../../../../redux/pipettes/__fixtures__'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
@@ -45,6 +47,7 @@ jest.mock('@opentrons/shared-data', () => {
     getLoadedLabwareDefinitionsByUri: jest.fn(),
   }
 })
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../useAttachedPipetteCalibrations')
 jest.mock('../useAttachedPipettes')
 jest.mock('../useTipLengthCalibrations')
@@ -63,8 +66,8 @@ const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
 const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
   typeof useTipLengthCalibrations
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
   typeof useStoredProtocolAnalysis
@@ -149,9 +152,9 @@ describe('useRunPipetteInfoByMount hook', () => {
     when(mockUseTipLengthCalibrations)
       .calledWith('otie')
       .mockReturnValue(TIP_LENGTH_CALIBRATIONS)
-    when(mockUseProtocolDetailsForRun)
+    when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
-      .mockReturnValue(PROTOCOL_DETAILS)
+      .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
       .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
@@ -174,9 +177,9 @@ describe('useRunPipetteInfoByMount hook', () => {
   })
 
   it('should return empty mounts when protocol details not found', () => {
-    when(mockUseProtocolDetailsForRun)
+    when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
-      .mockReturnValue({} as ProtocolDetails)
+      .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
     const { result } = renderHook(() => useRunPipetteInfoByMount('otie', '1'))
     expect(result.current).toStrictEqual({
