@@ -263,6 +263,26 @@ def test_validate_well_no_location(decoy: Decoy) -> None:
     assert result == expected_result
 
 
+def test_validate_coordinates(decoy: Decoy) -> None:
+    """Should return a WellTarget with no location."""
+    input_location = Location(point=Point(x=1, y=1, z=2), labware=None)
+    expected_result = subject.PointTarget(location=input_location, in_place=False)
+
+    result = subject.validate_location(location=input_location, last_location=None)
+
+    assert result == expected_result
+
+
+def test_validate_in_place(decoy: Decoy) -> None:
+    """Should return a WellTarget with no location."""
+    input_last_location = Location(point=Point(x=1, y=1, z=2), labware=None)
+    expected_result = subject.PointTarget(location=input_last_location, in_place=True)
+
+    result = subject.validate_location(location=input_last_location, last_location=None)
+
+    assert result == expected_result
+
+
 def test_validate_location_with_well(decoy: Decoy) -> None:
     """Should return a WellTarget with location."""
     mock_well = decoy.mock(cls=Well)

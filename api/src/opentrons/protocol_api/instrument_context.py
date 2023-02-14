@@ -204,20 +204,7 @@ class InstrumentContext(publisher.CommandPublisher):
             move_to_location = target.location
             _, well = target.location.labware.get_parent_labware_and_well()
             aspirate_in_place = target.in_place
-        # elif location is not None:
-        #     raise TypeError(
-        #         "location should be a Well or Location, but it is {}".format(location)
-        #     )
-        # elif last_location:
-        #     move_to_location = last_location
-        #     _, well = last_location.labware.get_parent_labware_and_well()
-        # else:
-        #     raise RuntimeError(
-        #         "If aspirate is called without an explicit location, another"
-        #         " method that moves to a location (such as move_to or "
-        #         "dispense) must previously have been called so the robot "
-        #         "knows where it is."
-        #     )
+
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,

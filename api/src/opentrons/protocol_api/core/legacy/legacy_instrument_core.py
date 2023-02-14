@@ -75,12 +75,13 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: The well to aspirate from, if applicable.
             rate: The rate in µL/s to aspirate at.
             flow_rate: Not used in this core.
+            in_place: Used only for the engine core.
         """
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
             if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
-                if location and location.labware.is_well:
+                if location.labware.is_well:
                     self.move_to(location=location.labware.as_well().top())
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
@@ -93,9 +94,8 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                         "blow_out."
                     )
                 self.prepare_for_aspirate()
-            if location:
-                self.move_to(location=location)
-        elif location:
+            self.move_to(location=location)
+        elif location != self._protocol_interface.get_last_location():
             self.move_to(location=location)
 
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
