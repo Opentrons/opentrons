@@ -457,7 +457,7 @@ class Labware:
             because it will produce undefined behavior.
             Instead, use Labware Position Check in the app.
 
-            Because protocols using :ref:`version <v2-versioning>` 2.14 of the API
+            Because protocols using :ref:`API version <v2-versioning>` 2.14 or higher
             can currently *only* be uploaded via the Opentrons App, it doesn't make
             sense to use this method with them. Trying to do so will raise an exception.
         """
@@ -469,7 +469,7 @@ class Labware:
             # Therefore, in >=ENGINE_CORE_API_VERSION protocols,
             # there's no legitimate way to use this method.
             raise APIVersionError(
-                "Labware.set_offset() is not supported when apiLevel is 2.14."
+                "Labware.set_offset() is not supported when apiLevel is 2.14 or higher."
                 " Use a lower apiLevel"
                 " or use the Opentrons App's Labware Position Check."
             )
