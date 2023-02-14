@@ -61,7 +61,7 @@ export function DeviceReset({
   const options = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
   )
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const [dispatchRequest] = useDispatchApiRequest()
 
   // ToDo (kj:02/07/2023) gripperCalibration might be different since the option isn't implemented yet
   // Currently boot script will be added in the future
