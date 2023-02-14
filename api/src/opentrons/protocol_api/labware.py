@@ -453,7 +453,7 @@ class Labware:
             :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
             to adjust labware offsets. (See :ref:`advanced-control`.)
 
-            If you're uploading a protocol via the Opentrons App, don't use this method, 
+            If you're uploading a protocol via the Opentrons App, don't use this method,
             because it will produce undefined behavior.
             Instead, use Labware Position Check in the app.
 
