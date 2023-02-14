@@ -1,8 +1,9 @@
 """Test aspirate commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import PipettingHandler
+from opentrons.protocol_engine.execution.pipetting import VolumePointResult
 
 from opentrons.protocol_engine.commands.aspirate import (
     AspirateParams,
@@ -38,8 +39,8 @@ async def test_aspirate_implementation(
             volume=50,
             flow_rate=1.23,
         )
-    ).then_return(42)
+    ).then_return(VolumePointResult(volume=42, destination=DeckPoint(x=1, y=2, z=3)))
 
     result = await subject.execute(data)
 
-    assert result == AspirateResult(volume=42)
+    assert result == AspirateResult(volume=42, position=DeckPoint(x=1, y=2, z=3))
