@@ -2,7 +2,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import {
   useProtocolAnalysesQuery,
   useProtocolQuery,
@@ -12,7 +11,6 @@ import {
 import { useProtocolDetailsForRun } from '..'
 
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 import type { Protocol, Run, ProtocolAnalyses } from '@opentrons/api-client'
 
@@ -36,8 +34,6 @@ const PROTOCOL_RESPONSE = {
     key: 'fakeProtocolKey',
   },
 } as Protocol
-
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as CompletedProtocolAnalysis
 
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {

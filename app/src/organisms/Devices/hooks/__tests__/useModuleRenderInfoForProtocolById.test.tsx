@@ -20,7 +20,6 @@ import {
 } from '..'
 
 import type {
-  CompletedProtocolAnalysis,
   ModuleModel,
   ModuleType,
   ProtocolAnalysisOutput,

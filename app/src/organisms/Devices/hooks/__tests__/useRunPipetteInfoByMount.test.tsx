@@ -5,7 +5,6 @@ import {
   getPipetteNameSpecs,
   getLoadedLabwareDefinitionsByUri,
   RunTimeCommand,
-  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import _tiprack10ul from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_10ul/1.json'
 
@@ -26,7 +25,6 @@ import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
   useTipLengthCalibrations,
-  useProtocolDetailsForRun,
   useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
 } from '..'
@@ -37,7 +35,7 @@ import type {
   PipetteNameSpecs,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { PipetteInfo, ProtocolDetails } from '..'
+import type { PipetteInfo } from '..'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')

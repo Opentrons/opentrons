@@ -12,10 +12,7 @@ import {
   useStoredProtocolAnalysis,
 } from '..'
 
-import type {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
 
 jest.mock('../../ProtocolRun/utils/getLabwareRenderInfo')

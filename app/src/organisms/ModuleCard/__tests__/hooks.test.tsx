@@ -14,11 +14,7 @@ import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import {
-  useIsRobotBusy,
-  useProtocolDetailsForRun,
-  useRunStatuses,
-} from '../../Devices/hooks'
+import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
 import {
   useLatchControls,
   useModuleOverflowMenu,
