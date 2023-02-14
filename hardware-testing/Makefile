@@ -166,11 +166,11 @@ push-all-and-term: push-all term
 .PHONY: pull-data-ot3
 pull-data-ot3:
 	mkdir -p "./.pulled-data"
-	scp -r "root@$(host):/home/root/.opentrons/testing_data/$(test)" "./.pulled-data"
+	scp -r "root@$(host):/data/testing_data/$(test)" "./.pulled-data"
 
 define delete-test-data-cmd
 ssh -i $(2) $(3) root@$(1) \
-"rm -rf /home/root/.opentrons/testing_data/$(4)"
+"rm -rf /data/testing_data/$(4)"
 endef
 
 .PHONY: delete-data-ot3
