@@ -5,7 +5,6 @@ import asyncio
 from contextlib import asynccontextmanager
 from functools import wraps
 import logging
-import math
 from copy import deepcopy
 from typing import (
     Any,
@@ -937,7 +936,6 @@ class OT3Controller:
         starting_mount_height: float,
         prep_move_speed: float,
         log_pressure: bool = True,
-        read_only: bool = False,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
@@ -953,7 +951,6 @@ class OT3Controller:
             prep_move_speed,
             threshold_pascals,
             log_pressure,
-            read_only,
             sensor_id,
         )
         for node, point in positions.items():

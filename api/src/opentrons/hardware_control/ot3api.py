@@ -633,7 +633,6 @@ class OT3API(
 
         checked_mount = OT3Mount.from_mount(mount)
         await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
-        print(f"pipette = self._pipette_handler.hardware_instruments")
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
             target_pos = target_position_from_plunger(
@@ -1729,7 +1728,6 @@ class OT3API(
             raise
         else:
             machine_pos = await self._backend.update_position()
-            print(f"machine pos = {machine_pos}")
             position = deck_from_machine(
                 machine_pos,
                 self._transforms.deck_calibration.attitude,
@@ -1749,16 +1747,10 @@ class OT3API(
                 position[mount_axis] - probe_settings.starting_mount_height
             )
 
-            print(f"z distance = {z_distance_traveled}")
             if z_distance_traveled < probe_settings.min_z_distance:
-                print("should raise")
                 raise EarlyLiquidSenseTrigger(
                     triggered_at=z_distance_traveled,
                     min_z=probe_settings.min_z_distance,
-                )
-            else:
-                print(
-                    f"distance {z_distance_traveled} larger than min {probe_settings.min_z_distance}"
                 )
 
             return position[mount_axis], encoder_position[mount_axis]

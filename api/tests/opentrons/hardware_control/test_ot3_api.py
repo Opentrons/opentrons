@@ -54,10 +54,6 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteVersionType,
 )
 
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-)
-
 
 @pytest.fixture
 def fake_settings() -> CapacitivePassSettings:

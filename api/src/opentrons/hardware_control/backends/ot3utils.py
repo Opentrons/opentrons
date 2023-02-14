@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence, Union
+from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
