@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import {
   Flex,
@@ -23,9 +23,17 @@ import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import { NetworkSettings } from '../../organisms/RobotSettingsDashboard/NetworkSettings'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from './hooks'
+import {
+  DeviceReset,
+  DisplayBrightness,
+  DisplaySleepSettings,
+  DisplayTextSize,
+  NetworkSettings,
+  RobotName,
+  RobotSystemVersion,
+} from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -35,57 +43,47 @@ const SETTING_BUTTON_STYLE = css`
   padding: 1.5rem;
   border-radius: 16px;
 `
-
-export type RenderContentType =
-  | 'robotSystemVersion'
-  | 'networkSettings'
-  | 'displaySleepSettings'
-  | 'displayBrightness'
-  | 'displayTextSize'
-  | 'deviceReset'
-  | null
+export type SettingOption =
+  | 'RobotName'
+  | 'RobotSystemVersion'
+  | 'NetworkSettings'
+  | 'DisplaySleepSettings'
+  | 'DisplayBrightness'
+  | 'DisplayTextSize'
+  | 'DeviceReset'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
-  const [renderContent, setRenderContent] = React.useState<RenderContentType>(
-    null
-  )
-
-  const renderSetting = (): JSX.Element | null => {
-    switch (renderContent) {
-      case 'networkSettings':
-        return (
-          <NetworkSettings
-            networkConnection={networkConnection}
-            setRenderContent={setRenderContent}
-          />
-        )
-      default:
-        return null
-    }
-  }
+  const [
+    currentOption,
+    setCurrentOption,
+  ] = React.useState<SettingOption | null>(null)
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
   return (
-    <>
-      {renderSetting() != null ? (
-        renderSetting()
+    <Flex
+      padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+      flexDirection={DIRECTION_COLUMN}
+      columnGap={SPACING.spacing3}
+    >
+      {currentOption != null ? (
+        <SettingsContent
+          currentOption={currentOption}
+          setCurrentOption={setCurrentOption}
+        />
       ) : (
-        <Flex
-          padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
-          flexDirection={DIRECTION_COLUMN}
-          columnGap={SPACING.spacing3}
-        >
+        <>
           <Navigation routes={onDeviceDisplayRoutes} />
           {/* Robot Name */}
           <RobotSettingButton
             settingName={t('robot_name')}
             settingInfo={robotName}
-            forwardPath="/robot-settings/rename-robot"
+            currentOption="RobotName"
+            setCurrentOption={setCurrentOption}
           />
 
           {/* Robot System Version */}
@@ -96,88 +94,78 @@ export function RobotSettingsDashboard(): JSX.Element {
                 ? `v${robotServerVersion}`
                 : t('robot_settings_advanced_unknown')
             }
-            renderContent={'robotSystemVersion'}
-            setRenderContent={setRenderContent}
+            currentOption="RobotSystemVersion"
+            setCurrentOption={setCurrentOption}
           />
-
           {/* Network Settings */}
           <RobotSettingButton
             settingName={t('network_settings')}
-            settingInfo={networkConnection.connectionStatus}
-            renderContent={'networkSettings'}
-            setRenderContent={setRenderContent}
+            settingInfo={'Not connected'}
+            currentOption="NetworkSettings"
+            setCurrentOption={setCurrentOption}
           />
 
           {/* Display Sleep Settings */}
           <RobotSettingButton
             settingName={t('display_sleep_settings')}
-            renderContent={'displaySleepSettings'}
-            setRenderContent={setRenderContent}
+            currentOption="DisplaySleepSettings"
+            setCurrentOption={setCurrentOption}
           />
 
           {/* Display Brightness */}
           <RobotSettingButton
             settingName={t('display_brightness')}
-            renderContent={'displayBrightness'}
-            setRenderContent={setRenderContent}
+            currentOption="DisplayBrightness"
+            setCurrentOption={setCurrentOption}
           />
 
           {/* Display Text Size */}
           <RobotSettingButton
             settingName={t('display_text_size')}
-            renderContent={'displayTextSize'}
-            setRenderContent={setRenderContent}
+            currentOption="DisplayTextSize"
+            setCurrentOption={setCurrentOption}
           />
 
           {/* Device Reset */}
           <RobotSettingButton
             settingName={t('device_reset')}
-            renderContent={'deviceReset'}
-            setRenderContent={setRenderContent}
+            currentOption="DeviceReset"
+            setCurrentOption={setCurrentOption}
           />
-
-          <Flex
-            alignSelf={ALIGN_FLEX_END}
-            marginTop={SPACING.spacing5}
-            width="fit-content"
-          >
-            <Link to="menu">
-              <TertiaryButton>To ODD Menu</TertiaryButton>
-            </Link>
-          </Flex>
-        </Flex>
+        </>
       )}
-    </>
+
+      <Flex
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
+      >
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
+      </Flex>
+    </Flex>
   )
 }
 
 interface RobotSettingButtonProps {
   settingName: string
   settingInfo?: string
-  renderContent?: RenderContentType
-  setRenderContent?: (renderContentType: RenderContentType) => void
-  forwardPath?: string
+  currentOption: SettingOption
+  setCurrentOption: (currentOption: SettingOption) => void
 }
 
 function RobotSettingButton({
   settingName,
   settingInfo,
-  renderContent,
-  setRenderContent,
-  forwardPath,
+  currentOption,
+  setCurrentOption,
 }: RobotSettingButtonProps): JSX.Element {
-  const history = useHistory()
-  const handleClick = (): void => {
-    if (forwardPath != null) {
-      history.push(forwardPath)
-    } else {
-      renderContent != null &&
-        setRenderContent != null &&
-        setRenderContent(renderContent)
-    }
-  }
   return (
-    <Btn css={SETTING_BUTTON_STYLE} onClick={handleClick}>
+    <Btn
+      css={SETTING_BUTTON_STYLE}
+      onClick={() => setCurrentOption(currentOption)}
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing5}
@@ -215,4 +203,35 @@ function RobotSettingButton({
       </Flex>
     </Btn>
   )
+}
+
+interface SettingsContentProps {
+  currentOption: SettingOption
+  setCurrentOption: (currentOption: SettingOption | null) => void
+}
+const SettingsContent = ({
+  currentOption,
+  setCurrentOption,
+}: SettingsContentProps): JSX.Element => {
+  switch (currentOption) {
+    case 'RobotName':
+      return <RobotName setCurrentOption={setCurrentOption} />
+    case 'RobotSystemVersion':
+      return <RobotSystemVersion setCurrentOption={setCurrentOption} />
+
+    case 'NetworkSettings':
+      return <NetworkSettings setCurrentOption={setCurrentOption} />
+
+    case 'DisplaySleepSettings':
+      return <DisplaySleepSettings setCurrentOption={setCurrentOption} />
+
+    case 'DisplayBrightness':
+      return <DisplayBrightness setCurrentOption={setCurrentOption} />
+
+    case 'DisplayTextSize':
+      return <DisplayTextSize setCurrentOption={setCurrentOption} />
+
+    case 'DeviceReset':
+      return <DeviceReset setCurrentOption={setCurrentOption} />
+  }
 }

@@ -14,22 +14,22 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { Chip } from '../../atoms/Chip'
+import { StyledText } from '../../../atoms/text'
+import { Chip } from '../../../atoms/Chip'
 
 import type { IconName } from '@opentrons/components'
-import type { RenderContentType } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import type { NetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
-import type { ChipType } from '../../atoms/Chip'
+import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
+import type { ChipType } from '../../../atoms/Chip'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface NetworkSettingsProps {
   networkConnection: NetworkConnection
-  setRenderContent: (renderContentType: RenderContentType) => void
+  setCurrentOption: (currentOption: SettingOption | null) => void
 }
 
 export function NetworkSettings({
   networkConnection,
-  setRenderContent,
+  setCurrentOption,
 }: NetworkSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const {
@@ -39,9 +39,9 @@ export function NetworkSettings({
     activeSsid,
   } = networkConnection
 
-const handleChipType = (isConnected: boolean): ChipType => {
-  return isConnected ? 'success' : 'informing'
-}
+  const handleChipType = (isConnected: boolean): ChipType => {
+    return isConnected ? 'success' : 'informing'
+  }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
     isConnected ? COLORS.successBackgroundMed : COLORS.medGreyEnabled
@@ -56,7 +56,7 @@ const handleChipType = (isConnected: boolean): ChipType => {
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_START}
       >
-        <Btn onClick={() => setRenderContent(null)}>
+        <Btn onClick={() => setCurrentOption(null)}>
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
         <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
@@ -152,11 +152,7 @@ function NetworkSettingButton({
           </Flex>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} width="15.1875rem">
-          <Chip
-            type={chipType}
-            text={chipText}
-            iconName={chipIconName}
-          />
+          <Chip type={chipType} text={chipText} iconName={chipIconName} />
         </Flex>
         <Flex justifyContent="flex-end" alignSelf="stretch">
           <Btn onClick={() => console.log('setup')}>
