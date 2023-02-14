@@ -8,16 +8,23 @@ import { i18n } from '../../../i18n'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { DisplaySleepSettings } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
 import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DisplaySleepSettings'
+)
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
+const mockDisplaySleepSettings = DisplaySleepSettings as jest.MockedFunction<
+  typeof DisplaySleepSettings
+>
 
 const render = () => {
   return renderWithProviders(
@@ -35,6 +42,9 @@ describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
+    mockDisplaySleepSettings.mockReturnValue(
+      <div>Mock Display Sleep Settings</div>
+    )
   })
 
   it('should render Navigation', () => {
@@ -80,7 +90,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Display Sleep Settings')
     fireEvent.click(button)
-    getByText('Display Sleep Settings')
+    getByText('Mock Display Sleep Settings')
   })
 
   it('should render component when tapping display brightness', () => {

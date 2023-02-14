@@ -68,7 +68,7 @@ export function SleepScreen(): JSX.Element {
   }
 
   const main = (): void => {
-    // @ts-ignore:
+    // @ts-expect-error
     canvas = document.getElementById('odd-screen')
     ctx = canvas?.getContext('2d')
     dvd.img.src = logo
