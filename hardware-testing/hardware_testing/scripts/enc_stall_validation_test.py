@@ -84,10 +84,10 @@ async def _main(is_simulating: bool) -> None:
         await home_ot3(api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L])
         # MOVE_POS = Point(227.826, 362.808, 250.0) #Point(235.414, 385.308, 509.15)
         # FIXTURE_POS = Point(227.826, 362.808, 44.61) #Point(235.414, 385.308, 303.965)
-        await api.move_to(MOUNT, Point(236.218, 61.227, 250.0)) #, speed = 50) ### Y-Axis
-        await api.move_to(MOUNT, Point(236.218, 61.227, 371.859)) #, speed = 50) ### Y-Axis
-        await api.move_to(MOUNT, Point(236.218, 71.227, 371.859)) ### Y-Axis ### Point(x=236.21799999999996, y=66.227, z=371.85900000000004)
-
+        await api.move_to(MOUNT, Point(213.219, 153.517, 250.00)) #, speed = 50) ### Y-Axis Point(x=80.72599999999997, y=366.30600000000004, z=108.41000000000003)
+        await api.move_to(MOUNT, Point(213.219, 153.517, 109.00)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(203.219, 153.517, 109.00)) ### Y-Axis ### Point(x=236.21799999999996, y=66.227, z=371.85900000000004)
+        ### x=208.219, y=153.517, z=109.00900000000001)
         await asyncio.sleep(1)
         init_reading = gauge.read()
         init_robot_pos = await api.current_position_ot3(MOUNT, refresh=True)
@@ -96,29 +96,31 @@ async def _main(is_simulating: bool) -> None:
         # print(f"Initial robot position: {init_robot_pos[OT3Axis.Z_R]}\n")
         print(f"Initial robot position: {init_robot_pos[OT3Axis.X]}\n")
         # print(f"Initial encoder position: {init_encoder_pos[OT3Axis.Z_R]}\n")
-        print(f"Initial encoder position: {init_encoder_pos[OT3Axis.Y]}\n")
+        print(f"Initial encoder position: {init_encoder_pos[OT3Axis.X]}\n")
 
         # input("Press enter to continue test...\n")
         print("\n--STALLING--\n")
-        await api.move_to(MOUNT, Point(236.218, 61.227, 371.859)) #, speed = 50)
-        await api.move_to(MOUNT, Point(236.218, 31.231, 371.859)) #, speed = 50)
+        await api.move_to(MOUNT, Point(213.219, 153.517, 109.00)) #, speed = 50)
+        await api.move_to(MOUNT, Point(213.219, 153.517, 150.00)) #, speed = 50)
+        await api.move_to(MOUNT, Point(-70.726, 153.517, 150.00)) #, speed = 50)
         try:
-            await api.move_rel(MOUNT, delta=Point(x=-50), _check_stalls=True)
+            await api.move_rel(MOUNT, delta=Point(x=-20), _check_stalls=True)
         except RuntimeError as e:
             if "collision_detected" in str(e):
                 print("--COLLISION DETECTED--\n")
                 # collision_detected = True
                 print("--UPDATE POSITION--\n")
-                await api._update_position_estimation([OT3Axis.Y])
+                await api._update_position_estimation([OT3Axis.X])
 
         stall_robot_pos = await api.current_position_ot3(MOUNT, refresh=True)
         stall_encoder_pos = await api.encoder_current_position_ot3(MOUNT, refresh=True)
-        print(f"Stalled robot position: {stall_robot_pos[OT3Axis.Y]}\n")
-        print(f"Stalled encoder position: {stall_encoder_pos[OT3Axis.Y]}\n")
+        print(f"Stalled robot position: {stall_robot_pos[OT3Axis.X]}\n")
+        print(f"Stalled encoder position: {stall_encoder_pos[OT3Axis.X]}\n")
 
-        await api.move_to(MOUNT, Point(236.218, 31.231, 371.859)) #, speed = 50) ### Y-Axis
-        await api.move_to(MOUNT, Point(236.218, 61.227, 371.859)) #, speed = 50) ### Y-Axis
-        await api.move_to(MOUNT, Point(236.218, 71.227, 371.859)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(-70.726, 153.517, 150.00)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(213.219, 153.517, 150.00)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(213.219, 153.517, 109.00)) #, speed = 50) ### Y-Axis
+        await api.move_to(MOUNT, Point(203.219, 153.517, 109.00)) #, speed = 50) ### Y-Axis
 
         await asyncio.sleep(1)
         stall_reading = gauge.read()
@@ -144,9 +146,10 @@ async def _main(is_simulating: bool) -> None:
         # await api.move_to(MOUNT, Point(230.12, 150.619, 161.408)) ### Y-Axis
         # await api.move_to(MOUNT, Point(230.12, 150.619, 200.0)) ### Y-Axis
         # await api.move_to(MOUNT, Point(236.617, 172.525, 350.469)) ### New Z
-        await api.move_to(MOUNT, Point(223.725, 386.408, 368.365)) ### X-Axis
+        await api.move_to(MOUNT, Point(213.219, 153.517, 109.00))
+        await api.move_to(MOUNT, Point(213.219, 153.517, 150.00)) ### X-Axis
         # await api.move_to(MOUNT, Point(214.734, 366.706, 200.0)) ### X-Axis
-        await api.move_to(MOUNT, Point(435.0, 386.0, 400.0)) #200.0))
+        await api.move_to(MOUNT, Point(435.0, 386.0, 200.0)) #200.0))
         # await api.move_to(MOUNT, Point(485.0, 386.0, 225.0))
 
     await home_ot3(api)
