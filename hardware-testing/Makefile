@@ -90,19 +90,15 @@ lint:
 format:
 	$(python) -m black hardware_testing tests setup.py
 
-define move-plot-webpage
+define move-plot-webpage-ot3
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-mv /data/plot/index.html /usr/lib/python3.7/site-packages/hardware_testing/tools/plot &&\
-mv /data/plot/index.js /usr/lib/python3.7/site-packages/hardware_testing/tools/plot &&\
+mv /data/plot/index.html /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/index.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+rm -rf /data/plot &&\
 cleanup || cleanup"
 endef
-
-.PHONY: push-plot-webpage
-push-plot-webpage:
-	scp -r hardware_testing/tools/plot root@$(host):/data
-	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
 
 .PHONY: push-plot-webpage-ot3
 push-plot-webpage-ot3:
