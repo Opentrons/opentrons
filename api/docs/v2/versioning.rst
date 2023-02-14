@@ -278,5 +278,5 @@ If you specify an API version of 2.13 or lower, your protocols will continue to 
     Configure your pipette pick-up settings with the Opentrons App, instead.
 
   - The ``configuration`` argument of :py:meth:`.ProtocolContext.load_module` was deprecated
-    because it made unsafe modifications to the protocol's geometry system when used,
+    because it made unsafe modifications to the protocol's geometry system,
     and the Thermocycler's "semi" configuration is not officially supported.

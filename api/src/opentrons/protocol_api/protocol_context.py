@@ -477,9 +477,7 @@ class ProtocolContext(CommandPublisher):
                 )
             if self._api_version >= ENGINE_CORE_API_VERSION:
                 raise APIVersionError(
-                    "The configuration parameter of load_module has been deprecated."
-                    " It did not function correctly,"
-                    ' and "semi" configration is not officially supported.'
+                    "The configuration parameter of load_module has been removed."
                 )
 
         requested_model = validation.ensure_module_model(module_name)

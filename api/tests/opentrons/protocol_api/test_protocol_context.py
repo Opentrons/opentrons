@@ -462,7 +462,7 @@ def test_load_module_default_location(
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_load_module_with_configuration(subject: ProtocolContext) -> None:
     """It should raise an APIVersionError if the deprecated `configuration` argument is used."""
-    with pytest.raises(APIVersionError, match="deprecated"):
+    with pytest.raises(APIVersionError, match="removed"):
         subject.load_module(
             module_name="spline reticulator",
             location=42,
