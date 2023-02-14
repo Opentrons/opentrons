@@ -43,17 +43,14 @@ const SETTING_BUTTON_STYLE = css`
   border-radius: 16px;
 `
 
-const robotSettingOptions = [
-  'RobotName',
-  'RobotSystemVersion',
-  'NetworkSettings',
-  'DisplaySleepSettings',
-  'DisplayBrightness',
-  'DisplayTextSize',
-  'DeviceReset',
-] as const
-
-export type SettingOption = typeof robotSettingOptions[number]
+export type SettingOption =
+  | 'RobotName'
+  | 'RobotSystemVersion'
+  | 'NetworkSettings'
+  | 'DisplaySleepSettings'
+  | 'DisplayBrightness'
+  | 'DisplayTextSize'
+  | 'DeviceReset'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -215,31 +212,22 @@ const SettingsContent = ({
   currentOption,
   setCurrentOption,
 }: SettingsContentProps): JSX.Element => {
-  let settingOption
   switch (currentOption) {
     case 'RobotName':
-      settingOption = <RobotName setCurrentOption={setCurrentOption} />
-      break
+      return <RobotName setCurrentOption={setCurrentOption} />
     case 'RobotSystemVersion':
-      settingOption = <RobotSystemVersion setCurrentOption={setCurrentOption} />
-      break
+      return <RobotSystemVersion setCurrentOption={setCurrentOption} />
     case 'NetworkSettings':
-      settingOption = <NetworkSettings setCurrentOption={setCurrentOption} />
-      break
+      return <NetworkSettings setCurrentOption={setCurrentOption} />
     case 'DisplaySleepSettings':
-      settingOption = (
-        <DisplaySleepSettings setCurrentOption={setCurrentOption} />
-      )
-      break
+      return <DisplaySleepSettings setCurrentOption={setCurrentOption} />
+
     case 'DisplayBrightness':
-      settingOption = <DisplayBrightness setCurrentOption={setCurrentOption} />
-      break
+      return <DisplayBrightness setCurrentOption={setCurrentOption} />
+
     case 'DisplayTextSize':
-      settingOption = <DisplayTextSize setCurrentOption={setCurrentOption} />
-      break
+      return <DisplayTextSize setCurrentOption={setCurrentOption} />
     case 'DeviceReset':
-      settingOption = <DeviceReset setCurrentOption={setCurrentOption} />
-      break
+      return <DeviceReset setCurrentOption={setCurrentOption} />
   }
-  return settingOption
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-// import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -20,7 +20,7 @@ interface DeviceResetProps {
 export function DeviceReset({
   setCurrentOption,
 }: DeviceResetProps): JSX.Element {
-  // const { t } = useTranslation(['device_settings'])
+  const { t } = useTranslation(['device_settings'])
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_FLEX_START}>
@@ -29,7 +29,7 @@ export function DeviceReset({
         </Btn>
       </Flex>
       <StyledText fontSize="2rem" textAlign="center">
-        {'DeviceReset'}
+        {t('device_reset')}
       </StyledText>
     </Flex>
   )
