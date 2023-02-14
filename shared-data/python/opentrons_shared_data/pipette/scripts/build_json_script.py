@@ -6,9 +6,9 @@ from typing import Optional, Dict, Union, Any, cast
 from pathlib import Path
 from pydantic import BaseModel
 
-from .. import get_shared_data_root
-from . import name_config, model_config
-from .pipette_definition import (
+from ... import get_shared_data_root
+from .. import name_config, model_config
+from ..pipette_definition import (
     PipetteGeometryDefinition,
     PipetteLiquidPropertiesDefinition,
     PipettePhysicalPropertiesDefinition,
@@ -21,13 +21,13 @@ from .pipette_definition import (
     AvailableSensorDefinition,
 )
 
-from .dev_types import PipetteModelSpec, PipetteNameSpec, PipetteName
+from ..dev_types import PipetteModelSpec, PipetteNameSpec, PipetteName
 
 
-PIPETTE_DEFINITION_ROOT = get_shared_data_root() / "pipette" / "definitions" / "2"
-GEOMETRY_ROOT = PIPETTE_DEFINITION_ROOT / "geometry"
-GENERAL_ROOT = PIPETTE_DEFINITION_ROOT / "general"
-LIQUID_ROOT = PIPETTE_DEFINITION_ROOT / "liquid"
+PIPETTE_DEFINITION_ROOT = Path("pipette") / "definitions" / "2"
+GEOMETRY_ROOT = get_shared_data_root() / PIPETTE_DEFINITION_ROOT / "geometry"
+GENERAL_ROOT = get_shared_data_root() / PIPETTE_DEFINITION_ROOT / "general"
+LIQUID_ROOT = get_shared_data_root() / PIPETTE_DEFINITION_ROOT / "liquid"
 
 
 def _migrate_liquid_model_v1(
@@ -359,7 +359,7 @@ def migrate_v1_to_v2() -> None:
         )
         current_pipette_path = Path(physical_model.channels.name.lower()) / pipette_type
 
-        path_to_3d = GEOMETRY_ROOT / current_pipette_path / "placeholder.gltf"
+        path_to_3d = PIPETTE_DEFINITION_ROOT / current_pipette_path / "placeholder.gltf"
         geometry_model = _migrate_geometry_model_v1(
             str(path_to_3d), model_configurations
         )
