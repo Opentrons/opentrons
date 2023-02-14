@@ -26,7 +26,6 @@ interface DP {
 }
 
 class GateModalComponent extends React.Component<Props> {
-
   render(): JSX.Element | null {
     const { optIn, optOut } = this.props
 
