@@ -12,7 +12,7 @@ import {
 } from '..'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { ProtocolDetails, StoredProtocolAnalysis } from '..'
+import type { ProtocolDetails } from '..'
 
 jest.mock('../../ProtocolRun/utils/getLabwareRenderInfo')
 jest.mock('../useProtocolDetailsForRun')
@@ -118,7 +118,7 @@ describe('useLabwareRenderInfoForRunById hook', () => {
       .mockReturnValue(PROTOCOL_DETAILS)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
-      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
     when(mockGetLabwareRenderInfo)
       .calledWith(heaterShakerCommandsWithResultsKey, standardDeckDef as any)
       .mockReturnValue(LABWARE_RENDER_INFO)

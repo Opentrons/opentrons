@@ -35,7 +35,7 @@ import type {
   PipetteNameSpecs,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { PipetteInfo, ProtocolDetails, StoredProtocolAnalysis } from '..'
+import type { PipetteInfo, ProtocolDetails } from '..'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -154,7 +154,7 @@ describe('useRunPipetteInfoByMount hook', () => {
       .mockReturnValue(PROTOCOL_DETAILS)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
-      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
     when(mockGetPipetteNameSpecs)
       .calledWith('p10_single')
       .mockReturnValue({

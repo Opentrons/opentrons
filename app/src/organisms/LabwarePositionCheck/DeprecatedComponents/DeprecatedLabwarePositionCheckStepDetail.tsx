@@ -114,7 +114,6 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
   )?.pipetteName
   let wellsToHighlight: string[] = []
 
-  // @ts-expect-error pipetteName will not be undefined
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels
   if (pipetteChannels === 8) {
     wellsToHighlight = labwareDef.ordering[0]
@@ -183,7 +182,6 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
               />
               <PipetteRender
                 labwareDef={labwareDef}
-                // @ts-expect-error pipetteName will not be undefined
                 pipetteName={pipetteName}
               />
             </React.Fragment>

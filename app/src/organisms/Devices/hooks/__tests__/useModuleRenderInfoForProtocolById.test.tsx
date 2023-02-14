@@ -23,7 +23,7 @@ import type {
   ModuleType,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { ProtocolDetails, StoredProtocolAnalysis } from '..'
+import type { ProtocolDetails } from '..'
 
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
@@ -126,7 +126,7 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       .mockReturnValue(PROTOCOL_DETAILS)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
-      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
     when(mockGetProtocolModulesInfo)
       .calledWith(heaterShakerCommandsWithResultsKey, standardDeckDef as any)
       .mockReturnValue([TEMPERATURE_MODULE_INFO, MAGNETIC_MODULE_INFO])

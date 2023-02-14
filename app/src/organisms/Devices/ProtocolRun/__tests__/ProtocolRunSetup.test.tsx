@@ -31,7 +31,6 @@ import {
   ProtocolAnalysisOutput,
   protocolHasLiquids,
 } from '@opentrons/shared-data'
-import type { StoredProtocolAnalysis } from '../../hooks'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
@@ -115,7 +114,7 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue(({
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
-      } as unknown) as StoredProtocolAnalysis)
+      } as unknown) as ProtocolAnalysisOutput)
     when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)

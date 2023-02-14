@@ -18,7 +18,6 @@ import {
 import type { Store } from 'redux'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
-import type { StoredProtocolAnalysis } from '..'
 
 jest.mock('..')
 jest.mock('@opentrons/shared-data', () => {
@@ -62,7 +61,7 @@ describe('useLPCDisabledReason', () => {
       protocolData: simpleV6Protocol,
     } as any)
     mockUseStoredProtocolAnalysis.mockReturnValue(
-      (simpleV6Protocol as unknown) as StoredProtocolAnalysis
+      (simpleV6Protocol as unknown) as ProtocolAnalysisOutput
     )
     mockUseRunHasStarted.mockReturnValue(false)
     mockUseRunCalibrationStatus.mockReturnValue({ complete: true })

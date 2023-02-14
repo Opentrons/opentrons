@@ -1,12 +1,12 @@
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import {
+  getLoadedLabwareDefinitionsByUri,
+  LoadedModule,
+} from '@opentrons/shared-data'
 import { deprecatedGetPrimaryPipetteId } from './deprecatedGetPrimaryPipetteId'
 import { getPipetteWorkflow } from './getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from './getOnePipettePositionCheckSteps'
 import { getTwoPipettePositionCheckSteps } from './getTwoPipettePositionCheckSteps'
-import type {
-  RunTimeCommand,
-  ProtocolAnalysisFile,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   ProtocolAnalysisOutput,
   LoadedPipette,
@@ -40,7 +40,7 @@ export const deprecatedGetLabwarePositionCheckSteps = (
           ))
     )
 
-    const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
+    const modules: LoadedModule[] = protocolData.modules
     const commands: RunTimeCommand[] = protocolData.commands
     const primaryPipetteId = deprecatedGetPrimaryPipetteId(pipettes, commands)
     const pipetteWorkflow = getPipetteWorkflow({
