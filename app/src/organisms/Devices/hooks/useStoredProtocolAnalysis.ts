@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import {
-  parseAllRequiredModuleModelsById,
+  parseRequiredModulesEntity,
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
 } from '@opentrons/api-client'
@@ -8,24 +8,16 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 
-import type { ModuleModelsById } from '@opentrons/api-client'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
-// TODO(bc, 2022-09-26): StoredProtocolAnalysis can be wholesale replaced by ProtocolAnalysisOutput,
-// instead of just extending it, as soon as we remove the need for the schemaV6adapter
-export interface StoredProtocolAnalysis
-  extends Omit<ProtocolAnalysisOutput, 'modules'> {
-  modules: ModuleModelsById
-}
-
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null
-): StoredProtocolAnalysis | null => {
+): ProtocolAnalysisOutput | null => {
   const pipetteEntity = parsePipetteEntity(
     storedProtocolAnalysis?.commands ?? []
   )
-  const moduleModelsById = parseAllRequiredModuleModelsById(
+  const moduleEntity = parseRequiredModulesEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   const labwareEntity = parseInitialLoadedLabwareEntity(
@@ -36,14 +28,14 @@ export const parseProtocolAnalysisOutput = (
         ...storedProtocolAnalysis,
         pipettes: storedProtocolAnalysis.pipettes ?? pipetteEntity,
         labware: storedProtocolAnalysis.labware ?? labwareEntity,
-        modules: moduleModelsById,
+        modules: storedProtocolAnalysis.modules ?? moduleEntity,
       }
     : null
 }
 
 export function useStoredProtocolAnalysis(
   runId: string | null
-): StoredProtocolAnalysis | null {
+): ProtocolAnalysisOutput | null {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
 
