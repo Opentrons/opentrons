@@ -79,7 +79,6 @@ async def liquid_probe(
         stop_threshold=threshold_fixed_point,
     )
 
-    stop_condition = MoveStopCondition.sync_line
     binding = [SensorOutputBinding.sync]
     await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
 
@@ -96,7 +95,7 @@ async def liquid_probe(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
-        stop_condition=stop_condition,
+        stop_condition=MoveStopCondition.sync_line,
     )
 
     prep_runner = MoveGroupRunner(move_groups=[[prep_move]])
@@ -109,8 +108,7 @@ async def liquid_probe(
         )
         binding.append(SensorOutputBinding.report)
 
-    print(f"calling bind output w pressure sensor = {pressure_sensor}")
-    async with await sensor_driver.bind_output(messenger, pressure_sensor, binding):
+    async with sensor_driver.bind_output(messenger, pressure_sensor, binding):
         if log_pressure:
             messenger.add_listener(sensor_capturer, None)
 

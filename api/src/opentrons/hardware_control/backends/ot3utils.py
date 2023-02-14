@@ -310,12 +310,6 @@ _sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
     OT3Mount.GRIPPER: NodeId.gripper,
 }
 
-_head_node_lookup: Dict[OT3Mount, NodeId] = {
-    OT3Mount.LEFT: NodeId.head_l,
-    OT3Mount.RIGHT: NodeId.head_r,
-    OT3Mount.GRIPPER: NodeId.gripper_z,
-}
-
 
 def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
     return _sensor_node_lookup[mount]

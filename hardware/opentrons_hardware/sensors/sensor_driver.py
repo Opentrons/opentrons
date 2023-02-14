@@ -172,7 +172,6 @@ class SensorDriver(AbstractSensorDriver):
         ] = SensorOutputBinding.sync,
     ) -> AsyncIterator[None]:
         """Send a BindSensorOutputRequest."""
-        breakpoint()
         sensor_info = sensor.sensor
         if type(binding) == list:
             binding_field = SensorOutputBindingField.from_flags(binding)
@@ -229,13 +228,13 @@ class LogListener:
         z_velocity: float,
         plunger_velocity: float,
         threshold_pascals: float,
-    ) -> None:  # add args here to set mount, threshold, stuff to log
+    ) -> None:
         """Build the capturer."""
         self.csv_writer = Any
         self.data_file = Any
         self.response_queue: asyncio.Queue[float] = asyncio.Queue()
         self.mount = mount
-        self.new_file_created = not os.path.isfile("/var/pressure_sensor_data.csv")
+        self.new_file_created = bool
         self.start_time = 0.0
         self.z_velocity = z_velocity
         self.plunger_velocity = plunger_velocity
@@ -243,6 +242,7 @@ class LogListener:
 
     async def __aenter__(self) -> None:
         """Create a csv heading for logging pressure readings."""
+        self.data_file = os.path.isfile("/var/pressure_sensor_data.csv")
         heading = [
             "Pressure(pascals)",
             "time(s)",

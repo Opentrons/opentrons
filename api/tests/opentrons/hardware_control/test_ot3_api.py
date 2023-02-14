@@ -448,8 +448,9 @@ async def test_liquid_probe(
         # scenario - successful probe
         return_dict[head_ax], return_dict[pipette_ax] = 112, 112
         mock_position.return_value = return_dict
-        await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
-        # assert final_pos == 12 change this to no exceptions called
+        await ot3_hardware.liquid_probe(
+            mount, fake_liquid_settings
+        )  # should raise no exceptions
 
         # scenario - MoveConditionNotMet
         backend.liquid_probe.side_effect = MoveConditionNotMet

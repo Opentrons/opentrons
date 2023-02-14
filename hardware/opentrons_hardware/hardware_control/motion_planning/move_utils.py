@@ -33,6 +33,7 @@ class EarlyLiquidSenseTrigger(RuntimeError):
     """Error raised if sensor threshold reached before minimum probing distance."""
 
     def __init__(self, triggered_at: float, min_z: float) -> None:
+        """Initialize EarlyLiquidSenseTrigger error."""
         super().__init__(
             f"Liquid threshold triggered early at z={triggered_at}mm, "
             f"expected {min_z}"
