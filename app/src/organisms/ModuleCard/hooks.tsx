@@ -14,10 +14,11 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
+import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -37,12 +38,15 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
-  const { protocolData } = useProtocolDetailsForRun(currentRunId)
-  if (protocolData == null) return false
-  const robotType = getRobotTypeFromLoadedLabware(protocolData.labware)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(currentRunId)
+  if (robotProtocolAnalysis == null) return false
+  const robotType = getRobotTypeFromLoadedLabware(robotProtocolAnalysis.labware)
 
   const deckDef = getDeckDefFromRobotType(robotType)
-  const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
+  const protocolModulesInfo = getProtocolModulesInfo(
+    robotProtocolAnalysis,
+    deckDef
+  )
   return protocolModulesInfo.some(
     module => module.moduleDef.model === 'heaterShakerModuleV1'
   )

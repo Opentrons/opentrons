@@ -18,7 +18,8 @@ import {
 } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { useProtocolDetailsForRun, useDeckCalibrationData } from './hooks'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useDeckCalibrationData } from './hooks'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import type { RunData } from '@opentrons/api-client'
 
@@ -53,7 +54,7 @@ export function HistoricalProtocolRunOffsetDrawer(
     deckCalibrationData != null && 'lastModified' in deckCalibrationData
       ? deckCalibrationData.lastModified
       : null
-  const protocolDetails = useProtocolDetailsForRun(run.id)
+  const protocolDetails = useMostRecentCompletedAnalysis(run.id)
 
   if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
@@ -130,10 +131,8 @@ export function HistoricalProtocolRunOffsetDrawer(
       </Flex>
       {uniqueLabwareOffsets.map((offset, index) => {
         const labwareDefinitions =
-          protocolDetails.protocolData?.commands != null
-            ? getLoadedLabwareDefinitionsByUri(
-                protocolDetails.protocolData?.commands
-              )
+          protocolDetails?.commands != null
+            ? getLoadedLabwareDefinitionsByUri(protocolDetails?.commands)
             : {}
         const definition = Object.values(labwareDefinitions).find(
           def => getLabwareDefURI(def) === offset.definitionUri

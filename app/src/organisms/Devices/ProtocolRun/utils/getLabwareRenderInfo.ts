@@ -1,4 +1,5 @@
 import {
+  CompletedProtocolAnalysis,
   DeckDefinition,
   getSlotHasMatingSurfaceUnitVector,
   LabwareDefinition2,
@@ -44,7 +45,10 @@ export interface LabwareRenderInfoById {
 }
 
 export const getLabwareRenderInfo = (
-  protocolData: ProtocolAnalysisFile<{}> | ProtocolAnalysisOutput,
+  protocolData:
+    | ProtocolAnalysisFile<{}>
+    | CompletedProtocolAnalysis
+    | ProtocolAnalysisOutput,
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands

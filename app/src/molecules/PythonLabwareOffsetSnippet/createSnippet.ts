@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { getLabwareDefinitionUri } from '../../organisms/Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { LabwareOffset } from '@opentrons/api-client'
 import { getLabwareOffsetLocation } from '../../organisms/Devices/ProtocolRun/utils/getLabwareOffsetLocation'
 
@@ -12,7 +12,7 @@ const CLI_PREFIX = `from opentrons import protocol_api\n\nmetadata = {\n${PYTHON
 
 export function createSnippet(
   mode: 'jupyter' | 'cli',
-  protocol: ProtocolAnalysisOutput,
+  protocol: CompletedProtocolAnalysis,
   labwareOffsets?: LabwareOffset[]
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}

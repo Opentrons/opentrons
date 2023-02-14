@@ -15,14 +15,13 @@ import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
   useIsOT3,
-  useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../hooks'
-
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupModules } from './SetupModules'
@@ -51,9 +50,8 @@ export function ProtocolRunSetup({
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])

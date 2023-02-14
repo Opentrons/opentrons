@@ -28,6 +28,7 @@ import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
 import {
+  CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
   protocolHasLiquids,
 } from '@opentrons/shared-data'
@@ -101,7 +102,7 @@ describe('ProtocolRunSetup', () => {
         protocolData: ({
           ...noModulesProtocol,
           ...MOCK_ROTOCOL_LIQUID_KEY,
-        } as unknown) as ProtocolAnalysisOutput,
+        } as unknown) as CompletedProtocolAnalysis,
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
         robotType: 'OT-2 Standard',
@@ -244,7 +245,7 @@ describe('ProtocolRunSetup', () => {
           protocolData: ({
             ...noModulesProtocol,
             liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-          } as unknown) as ProtocolAnalysisOutput,
+          } as unknown) as CompletedProtocolAnalysis,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -271,7 +272,7 @@ describe('ProtocolRunSetup', () => {
           protocolData: ({
             ...withModulesProtocol,
             ...MOCK_ROTOCOL_LIQUID_KEY,
-          } as unknown) as ProtocolAnalysisOutput,
+          } as unknown) as CompletedProtocolAnalysis,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',
@@ -322,7 +323,7 @@ describe('ProtocolRunSetup', () => {
               withModulesProtocol.modules,
               Object.keys(withModulesProtocol.modules)[0]
             ),
-          } as unknown) as ProtocolAnalysisOutput,
+          } as unknown) as CompletedProtocolAnalysis,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
           robotType: 'OT-2 Standard',

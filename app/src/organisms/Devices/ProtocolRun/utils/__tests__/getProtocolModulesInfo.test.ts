@@ -6,6 +6,7 @@ import {
   getModuleDef2,
   ProtocolAnalysisOutput,
   LoadedLabware,
+  LoadedModule,
 } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = ({
@@ -88,7 +89,7 @@ const protocolWithMagTempTC = ({
         slotName: '7',
       },
     },
-  ],
+  ] as LoadedModule[],
 } as unknown) as ProtocolAnalysisOutput
 const protocolWithMultipleTemps = ({
   ..._protocolWithMultipleTemps,
@@ -170,7 +171,7 @@ const protocolWithMultipleTemps = ({
         slotName: '7',
       },
     },
-  ],
+  ] as LoadedModule[],
 } as unknown) as ProtocolAnalysisOutput
 const standardDeckDef = _standardDeckDef as any
 
@@ -359,7 +360,9 @@ describe('getProtocolModulesInfo', () => {
       getProtocolModulesInfo(
         {
           ...protocolWithMagTempTC,
-          modules: [{ id: MAG_MOD_ID, model: 'magneticModuleV2' }],
+          modules: [
+            { id: MAG_MOD_ID, model: 'magneticModuleV2' },
+          ] as LoadedModule[],
           labware: [
             {
               definitionUri:

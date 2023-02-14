@@ -19,9 +19,9 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
 import {
+  CompletedProtocolAnalysis,
   ModuleModel,
   ModuleType,
-  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 jest.mock('../../../ModuleCard')
@@ -35,7 +35,7 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
   typeof useProtocolDetailsForRun
 >
 
-const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolAnalysisOutput
+const _fixtureAnalysis = (fixtureAnalysis as unknown) as CompletedProtocolAnalysis
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = 'test123'

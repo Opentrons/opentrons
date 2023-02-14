@@ -9,10 +9,9 @@ import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
   useTipLengthCalibrations,
-  useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '.'
-
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
@@ -43,9 +42,8 @@ export function useRunPipetteInfoByMount(
 ): {
   [mount in Mount]: PipetteInfo | null
 } {
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedPipettes = useAttachedPipettes()
