@@ -16,12 +16,20 @@
         "opentrons/opentrons_96_filtertiprack_200ul/1": [
           [11.79687499, -0.0098, 3.064988953],
           [50.0, -0.0004, 2.954068131]
+        ],
+        "default": [
+          [11.79687499, -0.0098, 3.064988953],
+          [50.0, -0.0004, 2.954068131]
         ]
       },
       "dispense": {
         "opentrons/tipone_96_tiprack_200ul/1": [[50.0, 0.0, 2.931601299]],
         "opentrons/opentrons_96_filtertiprack_200ul/1": [
           [50.0, 0.0, 2.931601299]
+        ],
+        "default": [
+          [11.79687499, -0.0098, 3.064988953],
+          [50.0, -0.0004, 2.954068131]
         ]
       },
       "defaultTipOverlapDictionary": {
@@ -40,10 +48,15 @@
         "opentrons/opentrons_96_tiprack_300ul/1": [
           [11.79687499, -0.0098, 3.064988953],
           [50.0, -0.0004, 2.954068131]
+        ],
+        "default": [
+          [11.79687499, -0.0098, 3.064988953],
+          [50.0, -0.0004, 2.954068131]
         ]
       },
       "dispense": {
-        "opentrons/opentrons_96_tiprack_300ul/1": [[50.0, 0.0, 2.931601299]]
+        "opentrons/opentrons_96_tiprack_300ul/1": [[50.0, 0.0, 2.931601299]],
+        "default": [[50.0, 0.0, 2.931601299]]
       },
       "defaultTipOverlapDictionary": {
         "opentrons/opentrons_96_tiprack_300ul/1": 7.47
