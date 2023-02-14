@@ -69,10 +69,7 @@ export function HistoricalProtocolRunOverflowMenu(
             ref={protocolRunOverflowWrapperRef}
             data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
           >
-            <MenuDropdown
-              {...props}
-              closeOverflowMenu={handleOverflowClick}
-            />
+            <MenuDropdown {...props} closeOverflowMenu={handleOverflowClick} />
           </Box>
           {menuOverlay}
         </>
@@ -88,12 +85,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const history = useHistory()
 
-  const {
-    runId,
-    robotName,
-    robotIsBusy,
-    closeOverflowMenu,
-  } = props
+  const { runId, robotName, robotIsBusy, closeOverflowMenu } = props
 
   const commands = useAllCommandsQuery(
     runId,
@@ -185,18 +177,17 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         disabled={isRunLogLoading}
         onClick={onDownloadClick}
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
           {t('download_run_log')}
-          {isRunLogLoading ?
+          {isRunLogLoading ? (
             <Icon
               name="ot-spinner"
               size={SIZE_1}
               color={COLORS.darkGreyEnabled}
               aria-label="spinner"
               spin
-            /> : null}
+            />
+          ) : null}
         </Flex>
       </MenuItem>
       <Divider marginY="0" />

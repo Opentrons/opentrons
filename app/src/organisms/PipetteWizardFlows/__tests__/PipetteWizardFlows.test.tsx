@@ -83,6 +83,8 @@ describe('PipetteWizardFlows', () => {
   // const mockDeleteRun = jest.fn()
   const mockStopRun = jest.fn()
   const mockCloseCurrentRun = jest.fn()
+  const refetchPrommise = Promise
+  const mockRefetch = jest.fn(() => refetchPrommise.resolve())
   const mockChainRunCommands = jest
     .fn()
     .mockImplementation(() => Promise.resolve())
@@ -96,6 +98,7 @@ describe('PipetteWizardFlows', () => {
     }
     mockUsePipettesQuery.mockReturnValue({
       data: { left: mockPipette, right: null },
+      refetch: mockRefetch,
     } as any)
     mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
     mockExitModal.mockReturnValue(<div>mock exit modal</div>)
@@ -406,6 +409,7 @@ describe('PipetteWizardFlows', () => {
         },
         right: null,
       },
+      refetch: mockRefetch,
     } as any)
     props = {
       ...props,

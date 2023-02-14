@@ -81,6 +81,8 @@ export function RobotOverview({
   )
   const isRobotViewable = useIsRobotViewable(robot?.name ?? '')
   const { lightsOn, toggleLights } = useLights()
+  console.log('lightsOn', lightsOn)
+  console.log('robotstatus', robot?.status)
 
   return robot != null ? (
     <>

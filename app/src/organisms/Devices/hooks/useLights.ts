@@ -9,9 +9,8 @@ export function useLights(): {
   lightsOn: boolean | null
   toggleLights: () => void
 } {
-
   const [lightsOnCache, setLightsOnCache] = React.useState(false)
-  const { setLights, data: setLightsData} = useSetLightsMutation()
+  const { setLights, data: setLightsData } = useSetLightsMutation()
   const { data: lightsData } = useLightsQuery({
     refetchInterval: LIGHTS_POLL_MS,
   })
