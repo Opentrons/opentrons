@@ -275,7 +275,7 @@ class MovementHandler:
         direct: bool,
         additional_min_travel_z: Optional[float],
         speed: Optional[float] = None,
-    ) -> None:
+    ) -> DeckPoint:
         """Move pipette to a given deck coordinate."""
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
@@ -319,3 +319,7 @@ class MovementHandler:
                 critical_point=waypoint.critical_point,
                 speed=speed,
             )
+
+        final_point = waypoints[-1].position
+
+        return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
