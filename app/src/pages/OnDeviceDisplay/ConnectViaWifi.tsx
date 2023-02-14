@@ -17,13 +17,15 @@ import {
   CONNECT,
   JOIN_OTHER,
 } from '../../organisms/Devices/RobotSettings/ConnectNetwork/constants'
-import { DisplayWifiList } from '../../organisms/OnDeviceDisplay/SetupNetwork/DisplayWifiList'
-import { SetWifiSsid } from '../../organisms/OnDeviceDisplay/SetupNetwork/SetWifiSsid'
-import { SelectAuthenticationType } from '../../organisms/OnDeviceDisplay/SetupNetwork/SelectAuthenticationType'
-import { SetWifiCred } from '../../organisms/OnDeviceDisplay/SetupNetwork/SetWifiCred'
-import { ConnectingNetwork } from '../../organisms/OnDeviceDisplay/SetupNetwork/ConnectingNetwork'
-import { SucceededToConnect } from '../../organisms/OnDeviceDisplay/SetupNetwork/SucceededToConnect'
-import { FailedToConnect } from '../../organisms/OnDeviceDisplay/SetupNetwork/FailedToConnect'
+import {
+  ConnectingNetwork,
+  DisplayWifiList,
+  FailedToConnect,
+  SetWifiSsid,
+  SelectAuthenticationType,
+  SetWifiCred,
+  SucceededToConnect,
+} from '../../organisms/OnDeviceDisplay/SetupNetwork'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
