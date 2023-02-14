@@ -93,10 +93,10 @@ class BaseLiquidHandlingResult(BaseModel):
 
 
 class DestinationPositionResult(BaseModel):
-    """Mixin for command results that move a pipette"""
+    """Mixin for command results that move a pipette."""
 
-    position: DeckPoint = Field(  # TODO change this for the mix in
-        ...,
+    position: DeckPoint = Field(
+        DeckPoint(x=0, y=0, z=0),
         description=(
             "The (x,y,z) coordinates of the pipette's critical point in deck space"
             " after the move was completed."

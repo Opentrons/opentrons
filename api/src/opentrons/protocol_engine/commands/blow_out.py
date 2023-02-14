@@ -2,9 +2,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
-from pydantic import BaseModel
 
-from .pipetting_common import PipetteIdMixin, FlowRateMixin, WellLocationMixin, DestinationPositionResult
+from .pipetting_common import (
+    PipetteIdMixin,
+    FlowRateMixin,
+    WellLocationMixin,
+    DestinationPositionResult,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 from opentrons.hardware_control import HardwareControlAPI

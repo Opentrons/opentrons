@@ -1,10 +1,14 @@
 """Move to well command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin, WellLocationMixin, MovementMixin, DestinationPositionResult
+from .pipetting_common import (
+    PipetteIdMixin,
+    WellLocationMixin,
+    MovementMixin,
+    DestinationPositionResult,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:

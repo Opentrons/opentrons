@@ -1,10 +1,14 @@
 """Touch tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel, Field
+from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin, WellLocationMixin, DestinationPositionResult
+from .pipetting_common import (
+    PipetteIdMixin,
+    WellLocationMixin,
+    DestinationPositionResult,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..errors import TouchTipDisabledError, LabwareIsTipRackError
 

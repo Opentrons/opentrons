@@ -18,6 +18,7 @@ class _TipPickupData(NamedTuple):
     tip_diameter: float
     tip_volume: int
 
+
 @dataclass(frozen=True)
 class VolumePointResult:
     """The returned values of an aspirate or pick up tip operation."""
@@ -128,7 +129,6 @@ class PipettingHandler:
         )
 
         return VolumePointResult(volume=tip_volume, destination=destination)
-
 
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
         """Manually add a tip to a pipette in the hardware API.
