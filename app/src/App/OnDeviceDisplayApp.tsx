@@ -22,6 +22,7 @@ import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDa
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
+import { AttachInstrumentsDashboard } from '../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
@@ -107,7 +108,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     Component: () => (
       <>
         <BackButton />
-        <Box>attach instruments</Box>
+        <AttachInstrumentsDashboard />
       </>
     ),
     exact: true,
