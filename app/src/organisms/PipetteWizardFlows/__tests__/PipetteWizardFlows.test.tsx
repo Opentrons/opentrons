@@ -79,15 +79,13 @@ const mockPipette: AttachedPipette = {
 }
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
-  const mockCreateRun = jest.fn()
-  // const mockDeleteRun = jest.fn()
-  const mockStopRun = jest.fn()
-  const mockCloseCurrentRun = jest.fn()
-  const refetchPrommise = Promise
-  const mockRefetch = jest.fn(() => refetchPrommise.resolve())
-  const mockChainRunCommands = jest
-    .fn()
-    .mockImplementation(() => Promise.resolve())
+  let mockCreateRun: jest.Mock
+  // let mockDeleteRun = jest.fn()
+  let mockStopRun: jest.Mock
+  let mockCloseCurrentRun: jest.Mock
+  let refetchPromise: Promise<void>
+  let mockRefetch: jest.Mock
+  let mockChainRunCommands: jest.Mock
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
@@ -96,6 +94,13 @@ describe('PipetteWizardFlows', () => {
       robotName: 'otie',
       closeFlow: jest.fn(),
     }
+    mockCreateRun = jest.fn()
+    // mockDeleteRun = jest.fn()
+    mockStopRun = jest.fn()
+    mockCloseCurrentRun = jest.fn()
+    refetchPromise = Promise.resolve()
+    mockRefetch = jest.fn(() => refetchPromise)
+    mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
     mockUsePipettesQuery.mockReturnValue({
       data: { left: mockPipette, right: null },
       refetch: mockRefetch,
@@ -457,7 +462,7 @@ describe('PipetteWizardFlows', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_96',
             },
           },
           {

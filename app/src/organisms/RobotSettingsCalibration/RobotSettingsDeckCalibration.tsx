@@ -16,7 +16,6 @@ import { useDeckCalibrationData, useRobot } from '../../organisms/Devices/hooks'
 import * as RobotApi from '../../redux/robot-api'
 
 import type { State } from '../../redux/types'
-import type { DeckCalibrationData } from '@opentrons/api-client'
 
 interface RobotSettingsDeckCalibrationProps {
   robotName: string
@@ -39,7 +38,7 @@ export function RobotSettingsDeckCalibration({
 
   const createStatus = createRequest?.status
 
-  const deckCalData = deckCalibrationData.deckCalibrationData as DeckCalibrationData
+  const deckCalData = deckCalibrationData.deckCalibrationData
   const calibratedDate = deckCalData?.lastModified ?? null
   const deckLastModified = Boolean(calibratedDate)
     ? t('last_calibrated', {

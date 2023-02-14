@@ -6,12 +6,7 @@ import {
   useDeleteCalibrationMutation,
 } from '@opentrons/react-api-client'
 
-import {
-  useAttachedPipettes,
-  useDeckCalibrationData,
-  usePipetteOffsetCalibrations,
-  useTipLengthCalibrations,
-} from '.'
+import { useAttachedPipettes, useDeckCalibrationData } from '.'
 import { getDefaultTiprackDefForPipetteName } from '../constants'
 import { formatTimestamp } from '../utils'
 
@@ -52,16 +47,18 @@ export function useCalibrationTaskList(
   } = useDeckCalibrationData(robotName)
   const attachedPipettes = useAttachedPipettes()
   // get calibration data for mounted pipette subtasks
-  const tipLengthCalibrations = useTipLengthCalibrations(robotName)
-  const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
 
   useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
-  useAllPipetteOffsetCalibrationsQuery({
-    refetchInterval: CALIBRATION_DATA_POLL_MS,
-  })
-  useAllTipLengthCalibrationsQuery({
-    refetchInterval: CALIBRATION_DATA_POLL_MS,
-  })
+
+  const offsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery({
+      refetchInterval: CALIBRATION_DATA_POLL_MS,
+    })?.data?.data ?? []
+
+  const tipLengthCalibrations =
+    useAllTipLengthCalibrationsQuery({
+      refetchInterval: CALIBRATION_DATA_POLL_MS,
+    })?.data?.data ?? []
 
   // first create the shape of the deck calibration task, then update values based on calibration status
   const deckTask: TaskProps = {

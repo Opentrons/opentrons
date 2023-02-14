@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 import { PrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
-import { usePipettesQuery } from '@opentrons/react-api-client'
 
 interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void

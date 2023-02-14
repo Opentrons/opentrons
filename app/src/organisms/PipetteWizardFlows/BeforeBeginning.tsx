@@ -2,6 +2,7 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { COLORS } from '@opentrons/components'
 import {
+  CreateCommand,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
@@ -100,27 +101,26 @@ export const BeforeBeginning = (
   )
 
   const handleOnClickCalibrateOrDetach = (): void => {
-    chainRunCommands(
-      [
-        {
-          commandType: 'loadPipette' as const,
-          params: {
-            // @ts-expect-error pipetteName is required but missing in schema v6 type
-            pipetteName: attachedPipettes[mount]?.name,
-            pipetteId: pipetteId,
-            mount: mount,
-          },
+    let moveToFrontCommands: CreateCommand[] = [
+      {
+        commandType: 'loadPipette' as const,
+        params: {
+          // @ts-expect-error pipetteName is required but missing in schema v6 type
+          pipetteName: attachedPipettes[mount]?.name,
+          pipetteId: pipetteId,
+          mount: mount,
         },
-        {
-          // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: mount,
-          },
+      },
+      {
+        // @ts-expect-error calibration type not yet supported
+        commandType: 'calibration/moveToMaintenancePosition' as const,
+        params: {
+          mount: mount,
         },
-      ],
-      false
-    )
+      },
+    ]
+    if (pipetteId == null) moveToFrontCommands = moveToFrontCommands.slice(1)
+    chainRunCommands(moveToFrontCommands, false)
       .then(() => {
         proceed()
       })
