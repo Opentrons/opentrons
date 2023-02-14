@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     OFF_DECK_LOCATION,
     LabwareMovementStrategy,
+    FlowRates,
 )
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
@@ -57,6 +58,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         attached_tip_labware_by_id={},
         movement_speed_by_id={},
         static_config_by_id={},
+        flow_rates_by_id={},
     )
 
 
@@ -555,14 +557,28 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
         AddPipetteConfigAction(
             pipette_id="pipette-id",
             model="pipette-model",
+            display_name="pipette name",
             min_volume=1.23,
             max_volume=4.56,
             channels=7,
+            flow_rates=FlowRates(
+                default_aspirate={"a": 1},
+                default_dispense={"b": 2},
+                default_blow_out={"c": 3},
+            ),
         )
     )
 
     assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
-        model="pipette-model", min_volume=1.23, max_volume=4.56
+        model="pipette-model",
+        display_name="pipette name",
+        min_volume=1.23,
+        max_volume=4.56,
+    )
+    assert subject.state.flow_rates_by_id["pipette-id"] == FlowRates(
+        default_aspirate={"a": 1},
+        default_dispense={"b": 2},
+        default_blow_out={"c": 3},
     )
 
 

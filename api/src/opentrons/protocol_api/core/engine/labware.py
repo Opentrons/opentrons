@@ -138,6 +138,9 @@ class LabwareCore(AbstractLabware[WellCore]):
     def get_default_magnet_engage_height(
         self, preserve_half_mm: bool = False
     ) -> Optional[float]:
+        # The Protocol Engine core doesn't currently use this method.
+        # The Protocol Engine core for the Magnetic Module uses other means to get
+        # the default engage height for a labware.
         raise NotImplementedError(
             "LabwareCore.get_default_magnet_engage_height not implemented"
         )
