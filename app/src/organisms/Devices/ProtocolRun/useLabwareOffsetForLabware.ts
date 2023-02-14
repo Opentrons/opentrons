@@ -1,35 +1,36 @@
-import { LabwareOffset } from '@opentrons/api-client'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
-import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { getCurrentOffsetForLabwareInLocation } from '../../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
 import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
+
+import type { LabwareOffset } from '@opentrons/api-client'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 export function useLabwareOffsetForLabware(
   runId: string,
   labwareId: string
 ): LabwareOffset | null {
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { data: runRecord } = useRunQuery(runId)
+  if (mostRecentAnalysis == null) return null
 
-  if (protocolData == null) return null
   const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
-    protocolData.commands
+    mostRecentAnalysis.commands
   )
   const labwareDefinitionUri = getLabwareDefinitionUri(
     labwareId,
-    protocolData.labware,
+    mostRecentAnalysis.labware,
     labwareDefinitionsByUri
   )
 
   const labwareLocation = getLabwareOffsetLocation(
     labwareId,
-    protocolData?.commands ?? [],
-    protocolData.modules
+    mostRecentAnalysis?.commands ?? [],
+    mostRecentAnalysis?.modules ?? []
   )
-  if (labwareLocation == null) return null
+  if (labwareLocation == null || labwareDefinitionUri == null) return null
   const labwareOffsets = runRecord?.data?.labwareOffsets ?? []
 
   return (

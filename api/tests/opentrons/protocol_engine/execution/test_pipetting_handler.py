@@ -255,6 +255,7 @@ async def test_handle_drop_up_tip_request(
         labware_id="labware-id",
         well_name="A1",
         well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        home_after=None,
     )
 
     decoy.verify(

@@ -295,7 +295,11 @@ def test_drop_tip(
     """It should execute a drop up tip command."""
     request = commands.DropTipCreate(
         params=commands.DropTipParams(
-            pipetteId="123", labwareId="456", wellName="A2", wellLocation=WellLocation()
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(),
+            homeAfter=True,
         )
     )
     response = commands.DropTipResult()
@@ -303,7 +307,11 @@ def test_drop_tip(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.drop_tip(
-        pipette_id="123", labware_id="456", well_name="A2", well_location=WellLocation()
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(),
+        home_after=True,
     )
 
     assert result == response

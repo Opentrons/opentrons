@@ -1,7 +1,8 @@
 """Complete FW updater."""
 import logging
 import asyncio
-from typing import Optional, TextIO, Dict, Tuple, AsyncIterator
+import os
+from typing import Optional, Dict, Tuple, AsyncIterator
 from .types import FirmwareUpdateStatus, StatusElement
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
@@ -15,11 +16,10 @@ from opentrons_hardware.firmware_update import (
     FirmwareUpdateEraser,
     HexRecordProcessor,
 )
+from opentrons_hardware.firmware_update.errors import BootloaderNotReady
 from opentrons_hardware.firmware_update.target import Target
 
 logger = logging.getLogger(__name__)
-
-UpdateDict = Dict[NodeId, TextIO]
 
 
 class RunUpdate:
@@ -28,7 +28,7 @@ class RunUpdate:
     def __init__(
         self,
         messenger: CanMessenger,
-        update_details: UpdateDict,
+        update_details: Dict[NodeId, str],
         retry_count: int,
         timeout_seconds: float,
         erase: Optional[bool] = True,
@@ -62,13 +62,15 @@ class RunUpdate:
         self,
         messenger: CanMessenger,
         node_id: NodeId,
-        hex_file: TextIO,
+        filepath: str,
         retry_count: int,
         timeout_seconds: float,
         erase: Optional[bool] = True,
     ) -> None:
         """Perform a firmware update on a node target."""
-        hex_processor = HexRecordProcessor.from_file(hex_file)
+        if not os.path.exists(filepath):
+            logger.error(f"Subsystem update file not found {filepath}")
+            raise FileNotFoundError
 
         initiator = FirmwareUpdateInitiator(messenger)
         downloader = FirmwareUpdateDownloader(messenger)
@@ -91,33 +93,49 @@ class RunUpdate:
         if erase:
             eraser = FirmwareUpdateEraser(messenger)
             logger.info(f"Erasing existing FW Update on {target}.")
-            await eraser.run(
-                node_id=target.bootloader_node,
-                timeout_sec=timeout_seconds,
-            )
-            download_start_progress = 0.2
-            await self._status_queue.put(
-                (node_id, (FirmwareUpdateStatus.updating, download_start_progress))
-            )
+
+            try:
+                await eraser.run(
+                    node_id=target.bootloader_node,
+                    timeout_sec=timeout_seconds,
+                )
+                download_start_progress = 0.2
+                await self._status_queue.put(
+                    (
+                        node_id,
+                        (FirmwareUpdateStatus.updating, download_start_progress),
+                    )
+                )
+            except BootloaderNotReady as e:
+                logger.error(f"Firmware Update failed for {target} {e}.")
+                await self._status_queue.put(
+                    (
+                        node_id,
+                        (FirmwareUpdateStatus.updating, download_start_progress),
+                    )
+                )
+                return
         else:
             logger.info("Skipping erase step.")
 
         logger.info(f"Downloading FW to {target.bootloader_node}.")
-        async for download_progress in downloader.run(
-            node_id=target.bootloader_node,
-            hex_processor=hex_processor,
-            ack_wait_seconds=timeout_seconds,
-        ):
-            await self._status_queue.put(
-                (
-                    node_id,
+        with open(filepath) as f:
+            hex_processor = HexRecordProcessor.from_file(f)
+            async for download_progress in downloader.run(
+                node_id=target.bootloader_node,
+                hex_processor=hex_processor,
+                ack_wait_seconds=timeout_seconds,
+            ):
+                await self._status_queue.put(
                     (
-                        FirmwareUpdateStatus.updating,
-                        download_start_progress
-                        + (0.9 - download_start_progress) * download_progress,
-                    ),
+                        node_id,
+                        (
+                            FirmwareUpdateStatus.updating,
+                            download_start_progress
+                            + (0.9 - download_start_progress) * download_progress,
+                        ),
+                    )
                 )
-            )
 
         logger.info(f"Restarting FW on {target.system_node}.")
         await messenger.send(
@@ -134,12 +152,12 @@ class RunUpdate:
             self._run_update(
                 messenger=self._messenger,
                 node_id=node_id,
-                hex_file=hex_file,
+                filepath=filepath,
                 retry_count=self._retry_count,
                 timeout_seconds=self._timeout_seconds,
                 erase=self._erase,
             )
-            for node_id, hex_file in self._update_details.items()
+            for node_id, filepath in self._update_details.items()
         ]
 
         task = asyncio.gather(*tasks)
