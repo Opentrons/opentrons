@@ -8,6 +8,7 @@ import type {
   Liquid,
   LoadedPipette,
   LoadedLabware,
+  LoadedModule,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
@@ -80,23 +81,21 @@ export function parseAllRequiredModuleModels(
   )
 }
 
-export interface ModuleModelsById {
-  [moduleId: string]: { model: ModuleModel }
-}
-
-export function parseAllRequiredModuleModelsById(
+export function parseRequiredModulesEntity(
   commands: RunTimeCommand[]
-): ModuleModelsById {
-  return commands.reduce<ModuleModelsById>(
-    (acc, command) =>
+): LoadedModule[] {
+  const loadModuleCommands = commands.filter(
+    (command): command is LoadModuleRunTimeCommand =>
       command.commandType === 'loadModule'
-        ? {
-            ...acc,
-            [command.result?.moduleId]: { model: command.params.model },
-          }
-        : acc,
-    {}
   )
+  return loadModuleCommands.map(command => {
+    return {
+      id: command.result.moduleId,
+      model: command.params.model,
+      location: command.params.location,
+      serialNumber: '',
+    }
+  })
 }
 
 interface LoadedLabwareBySlot {
