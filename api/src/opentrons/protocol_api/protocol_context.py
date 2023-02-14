@@ -19,7 +19,7 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.common import ModuleCore, ProtocolCore
-from ._liquid import Liquid
+from .core.engine import ENGINE_CORE_API_VERSION
 from .core.core_map import LoadedCoreMap
 from .core.module import (
     AbstractTemperatureModuleCore,
@@ -30,6 +30,7 @@ from .core.module import (
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 
 from . import validation
+from ._liquid import Liquid
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
@@ -453,11 +454,13 @@ class ProtocolContext(CommandPublisher):
                          location. You do not have to specify a location
                          when loading a Thermocycler---it will always be
                          in Slot 7.
-        :param configuration: Only valid in Python API version 2.4 and later.
-                              Used to specify the slot configuration of the
-                              Thermocycler. If you wish to use the non-full-plate
-                              configuration, you must pass the keyword
-                              value ``semi``.
+        :param configuration: Configure a thermocycler to be in the ``semi`` position.
+                              This parameter does not work. Do not use it.
+
+            .. versionchanged:: 2.14
+                This parameter dangerously modified the protocol's geometry system,
+                and it didn't function properly, so it was removed.
+
         :type location: str or int or None
         :returns: The loaded and initialized module---a
                   :py:class:`TemperatureModuleContext`,
@@ -466,12 +469,18 @@ class ProtocolContext(CommandPublisher):
                   :py:class:`HeaterShakerContext`,
                   depending on what you requested with ``module_name``.
         """
-
-        if self._api_version < APIVersion(2, 4) and configuration:
-            raise APIVersionError(
-                f"You have specified API {self._api_version}, but you are"
-                "using Thermocycler parameters only available in 2.4"
-            )
+        if configuration:
+            if self._api_version < APIVersion(2, 4):
+                raise APIVersionError(
+                    f"You have specified API {self._api_version}, but you are"
+                    "using Thermocycler parameters only available in 2.4"
+                )
+            if self._api_version >= ENGINE_CORE_API_VERSION:
+                raise APIVersionError(
+                    "The configuration parameter of load_module has been deprecated."
+                    " It did not function correctly,"
+                    ' and "semi" configration is not officially supported.'
+                )
 
         requested_model = validation.ensure_module_model(module_name)
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
