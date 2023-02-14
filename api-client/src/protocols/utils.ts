@@ -81,6 +81,10 @@ export function parseAllRequiredModuleModels(
   )
 }
 
+// This function is only used to compile modules from commands in the case that the
+// app-side protocol analysis is being referenced and stale.
+// The only time this will happen is in the protocol list page, where the serialNumber
+// should NOT be referenced
 export function parseRequiredModulesEntity(
   commands: RunTimeCommand[]
 ): LoadedModule[] {
