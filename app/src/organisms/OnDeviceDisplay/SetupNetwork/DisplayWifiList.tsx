@@ -17,15 +17,15 @@ import {
   COLORS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
+import { StyledText } from '../../../atoms/text'
 import { SearchNetwork } from './SearchNetwork'
 import {
   CONNECT,
   JOIN_OTHER,
-} from '../Devices/RobotSettings/ConnectNetwork/constants'
+} from '../../Devices/RobotSettings/ConnectNetwork/constants'
 
-import type { WifiNetwork } from '../../redux/networking/types'
-import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
+import type { WifiNetwork } from '../../../redux/networking/types'
+import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 
 const NETWORK_ROW_STYLE = css`
   &:active {

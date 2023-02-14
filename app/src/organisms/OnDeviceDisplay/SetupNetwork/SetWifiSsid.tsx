@@ -17,13 +17,13 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { InputField } from '../../atoms/InputField'
-import { TertiaryButton } from '../../atoms/buttons'
-import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
-import { JOIN_OTHER } from '../Devices/RobotSettings/ConnectNetwork/constants'
+import { StyledText } from '../../../atoms/text'
+import { InputField } from '../../../atoms/InputField'
+import { TertiaryButton } from '../../../atoms/buttons'
+import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants'
 
-import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
+import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: ${SPACING.spacing5};

@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import { SearchNetwork } from '../SearchNetwork'
 
 const render = () => {
