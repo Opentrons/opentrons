@@ -88,10 +88,10 @@ export const DisconnectModal = ({
   })
 
   // if the disconnect request is sent when there is no wired connection, we will not receive a success response to the request once wi-fi has disconnected
-  // check for connectable robot health status and presume successful disconnection if request pending and robot connectable
+  // check for connectable robot health status and presume successful disconnection if request pending and robot not connectable
   const { status } = useRobot(robotName) ?? {}
   const isDisconnected =
-    isRequestSucceeded || (isRequestPending && status === CONNECTABLE)
+    isRequestSucceeded || (isRequestPending && status !== CONNECTABLE)
 
   if (isDisconnected) {
     disconnectModalBody = t('disconnect_from_wifi_network_success')

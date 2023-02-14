@@ -76,7 +76,7 @@ describe('DisconnectModal', () => {
       .mockReturnValue({} as RequestState)
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(mockReachableRobot)
+      .mockReturnValue(mockConnectableRobot)
   })
 
   afterEach(() => {
@@ -104,13 +104,13 @@ describe('DisconnectModal', () => {
     getByRole('button', { name: 'cancel' })
   })
 
-  it('renders success body when request is pending and robot is connectable', () => {
+  it('renders success body when request is pending and robot is not connectable', () => {
     when(mockGetRequestById)
       .calledWith({} as State, LAST_ID)
       .mockReturnValue({ status: PENDING } as RequestState)
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(mockConnectableRobot)
+      .mockReturnValue(mockReachableRobot)
     const { getByRole, getByText } = render()
 
     getByText('Disconnected from Wi-Fi')
