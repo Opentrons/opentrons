@@ -794,13 +794,12 @@ class Labware:
         :type num_tips: int
         :return: The :py:class:`.Well` meeting the target criteria, or ``None``
 
-        .. deprecated:: 2.14
-            Modification of tip tracking state outside :py:meth:`.reset` has been deprecated.
+        .. versionchanged:: 2.14
+            This method has been removed.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
             raise APIVersionError(
-                "Labware.previous_tip has been deprecated."
-                " To modify tip state, use Labware.reset"
+                "Labware.previous_tip is unsupported in this API version."
             )
 
         # This logic is the inverse of :py:meth:`next_tip`
@@ -837,13 +836,13 @@ class Labware:
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
 
-        .. deprecated:: 2.14
-            Modification of tip tracking state outside :py:meth:`.reset` has been deprecated.
+        .. versionchanged:: 2.14
+            This method has been removed. Use :py:meth:`.reset` instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
             raise APIVersionError(
-                "Labware.previous_tip has been deprecated."
-                " To modify tip state, use Labware.reset"
+                "Labware.return_tips() is unsupported in this API version."
+                " Use Labware.reset() instead."
             )
 
         # This logic is the inverse of :py:meth:`use_tips`
