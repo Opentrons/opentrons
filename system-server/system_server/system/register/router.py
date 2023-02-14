@@ -31,13 +31,13 @@ async def register_endpoint(
     engine: sqlalchemy.engine.Engine = Depends(get_sql_engine),
 ) -> PostRegisterResponse:
     """Router for /system/register endpoint."""
-    token = await get_registration_token(engine, registrant)
+    token = get_registration_token(engine, registrant)
 
     if token is not None:
         if not jwt_is_valid(
             signing_key=str(signing_uuid), token=token, audience=REGISTRATION_AUDIENCE
         ):
-            await delete_registration_token(engine, registrant)
+            delete_registration_token(engine, registrant)
             _log.info(f"Deleted token: {token}")
             token = None
 
@@ -50,7 +50,7 @@ async def register_endpoint(
             audience=REGISTRATION_AUDIENCE,
         )
         _log.info(f"Created new JWT: {token}")
-        await add_registration_token(engine, registrant, token)
+        add_registration_token(engine, registrant, token)
 
     return PostRegisterResponse(
         token=token,

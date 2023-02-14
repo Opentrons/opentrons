@@ -16,7 +16,7 @@ def _create_registration_row(registrant: Registrant, token: str) -> Dict[str, ob
     }
 
 
-async def get_registration_token(
+def get_registration_token(
     sql_engine: sqlalchemy.engine.Engine, registrant: Registrant
 ) -> Optional[str]:
     """Get the JWT for a registrant, if it exists.
@@ -46,7 +46,7 @@ async def get_registration_token(
         return None if matching_row is None else matching_row.token
 
 
-async def delete_registration_token(
+def delete_registration_token(
     sql_engine: sqlalchemy.engine.Engine, registrant: Registrant
 ) -> None:
     """Clear out a registration token, if a match exists.
@@ -68,7 +68,7 @@ async def delete_registration_token(
         conn.execute(statement)
 
 
-async def add_registration_token(
+def add_registration_token(
     sql_engine: sqlalchemy.engine.Engine, registrant: Registrant, token: str
 ) -> None:
     """Add a registration entry to the database.

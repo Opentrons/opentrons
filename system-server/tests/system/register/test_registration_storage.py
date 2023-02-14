@@ -14,18 +14,18 @@ async def test_registration_storage(sql_engine: sqlalchemy.engine.Engine) -> Non
     reg = Registrant("abc", "def", "ghi")
     token = "fake-token-to-store-in-my-database"
 
-    assert await get_registration_token(sql_engine, reg) is None
+    assert get_registration_token(sql_engine, reg) is None
 
-    await add_registration_token(sql_engine, reg, token)
+    add_registration_token(sql_engine, reg, token)
 
-    assert await get_registration_token(sql_engine, reg) == token
+    assert get_registration_token(sql_engine, reg) == token
 
     # Test duplicate insertions
     with pytest.raises(Exception):
-        await add_registration_token(sql_engine, reg, "a second, different token")
+        add_registration_token(sql_engine, reg, "a second, different token")
 
     # Make sure the other token didn't get inserted
-    assert await get_registration_token(sql_engine, reg) == token
+    assert get_registration_token(sql_engine, reg) == token
 
 
 async def test_multiple_registration_storage(
@@ -39,23 +39,21 @@ async def test_multiple_registration_storage(
 
     # Register 100 registrants
     for reg in registrants:
-        assert await get_registration_token(sql_engine, reg) is None
-        await add_registration_token(sql_engine, reg, token_from_registrant(reg))
+        assert get_registration_token(sql_engine, reg) is None
+        add_registration_token(sql_engine, reg, token_from_registrant(reg))
 
     # Now make sure EACH ONE can be looked up!
     for reg in registrants:
-        assert await get_registration_token(sql_engine, reg) == token_from_registrant(
-            reg
-        )
+        assert get_registration_token(sql_engine, reg) == token_from_registrant(reg)
 
     # Now delete one specific row and make sure everything else is ok
     while len(registrants) > 0:
         reg = registrants.pop(0)
-        await delete_registration_token(sql_engine, reg)
+        delete_registration_token(sql_engine, reg)
         # To verify that the deletion worked, we check that:
         #   1. The specified token is gone
         #   2. The number of rows in the table went down by one
-        assert await get_registration_token(sql_engine, reg) is None
+        assert get_registration_token(sql_engine, reg) is None
         with sql_engine.begin() as conn:
             statement = sqlalchemy.select(registration_table)
             assert len(conn.execute(statement).all()) == len(registrants)
