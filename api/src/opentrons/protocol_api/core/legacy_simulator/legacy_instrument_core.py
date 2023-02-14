@@ -64,11 +64,12 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def aspirate(
         self,
-        location: Optional[types.Location],
+        location: types.Location,
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool = False,
     ) -> None:
         if location and self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any

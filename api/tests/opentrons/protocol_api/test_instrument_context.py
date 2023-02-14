@@ -16,9 +16,17 @@ from opentrons.protocol_api import (
     Labware,
     Well,
     labware,
+    validation as mock_validation,
 )
+from opentrons.protocol_api.validation import WellTarget, PointTarget
 from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.types import Location, Mount, Point
+
+
+@pytest.fixture(autouse=True)
+def _mock_validation_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(mock_validation, inspect.isfunction):
+        monkeypatch.setattr(mock_validation, name, decoy.mock(func=func))
 
 
 @pytest.fixture(autouse=True)
@@ -206,29 +214,154 @@ def test_pick_up_from_well_deprecated_args(
 
 
 def test_aspirate(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should aspirate to a well."""
     mock_well = decoy.mock(cls=Well)
     bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=None))
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
         5.67
     )
 
-    subject.aspirate(volume=42.0, location=mock_well, rate=1.23)
+    subject.aspirate(volume=42.0, location=input_location, rate=1.23)
 
     decoy.verify(
         mock_instrument_core.aspirate(
             location=bottom_location,
             well_core=mock_well._core,
+            in_place=False,
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
         ),
         times=1,
     )
+
+
+def test_aspirate_from_coordinates(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate from given coordinates."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(PointTarget(location=input_location, in_place=True))
+    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
+        5.67
+    )
+
+    subject.aspirate(volume=42.0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=None,
+            in_place=True,
+            volume=42.0,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
+def test_aspirate_in_place(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate in place."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(PointTarget(location=input_location))
+    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
+        5.67
+    )
+
+    subject.aspirate(volume=42.0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=None,
+            in_place=False,
+            volume=42.0,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
+def test_aspirate_raises_no_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
+
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=None)
+    ).then_raise(mock_validation.NoLocationError())
+    with pytest.raises(RuntimeError):
+        subject.aspirate(location=None)
+
+
+def test_aspirate_raises_wrong_location_value(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
+
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=None)
+    ).then_raise(mock_validation.LocationTypeError())
+    with pytest.raises(TypeError):
+        subject.aspirate(location=None)
 
 
 def test_blow_out_to_well(

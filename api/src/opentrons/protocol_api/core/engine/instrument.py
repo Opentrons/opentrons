@@ -66,11 +66,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def aspirate(
         self,
-        location: Optional[Location],
+        location: Location,
         well_core: Optional[WellCore],
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool = False,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:

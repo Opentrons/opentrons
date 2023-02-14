@@ -1,10 +1,11 @@
 """Tests for Protocol API input validation."""
 from typing import List, Union, Optional, Dict
 
+from decoy import Decoy
 import pytest
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, DeckSlotName
+from opentrons.types import Mount, DeckSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -13,7 +14,7 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     ThermocyclerStep,
 )
-from opentrons.protocol_api import validation as subject
+from opentrons.protocol_api import validation as subject, Well
 
 
 @pytest.mark.parametrize(
@@ -250,3 +251,57 @@ def test_ensure_valid_labware_offset_vector(offset: Dict[str, float]) -> None:
     )
     with pytest.raises(TypeError):
         subject.ensure_valid_labware_offset_vector(offset)
+
+
+def test_validate_well_no_location(decoy: Decoy) -> None:
+    """Should return a WellTarget with no location."""
+    input_location = decoy.mock(cls=Well)
+    expected_result = subject.WellTarget(well=input_location, location=None)
+
+    result = subject.validate_location(location=input_location, last_location=None)
+
+    assert result == expected_result
+
+
+def test_validate_location_with_well(decoy: Decoy) -> None:
+    """Should return a WellTarget with location."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    expected_result = subject.WellTarget(well=mock_well, location=input_location)
+
+    result = subject.validate_location(location=input_location, last_location=None)
+
+    assert result == expected_result
+
+
+def test_validate_last_location(decoy: Decoy) -> None:
+    """Should return a WellTarget with location."""
+    mock_well = decoy.mock(cls=Well)
+    input_last_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    expected_result = subject.WellTarget(well=mock_well, location=input_last_location)
+
+    result = subject.validate_location(location=None, last_location=input_last_location)
+
+    assert result == expected_result
+
+
+def test_validate_with_wrong_location_with_last_location() -> None:
+
+    with pytest.raises(subject.LocationTypeError):
+        subject.validate_location(
+            location=42,  # type: ignore[arg-type]
+            last_location=Location(point=Point(x=1, y=1, z=1), labware=None),
+        )
+
+
+def test_validate_with_wrong_location() -> None:
+
+    with pytest.raises(subject.LocationTypeError):
+        subject.validate_location(
+            location=42, last_location=None  # type: ignore[arg-type]
+        )
+
+
+def test_validate_raises_no_location_error() -> None:
+    with pytest.raises(subject.NoLocationError):
+        subject.validate_location(location=None, last_location=None)

@@ -25,7 +25,7 @@ from opentrons.protocols.api_support.util import (
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .config import Clearances
-from . import labware
+from . import labware, validation
 
 
 AdvancedLiquidHandling = Union[
@@ -175,33 +175,52 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         well: Optional[labware.Well]
-        move_to_location: Optional[types.Location]
+        move_to_location: types.Location
+        aspirate_in_place: bool = False
 
         last_location = self._get_last_location_by_api_version()
-
-        if isinstance(location, labware.Well):
-            move_to_location = location.bottom(z=self._well_bottom_clearances.aspirate)
-            well = location
-        elif isinstance(location, types.Location):
-            move_to_location = location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
             )
-        elif last_location:
-            move_to_location = None
-            _, well = last_location.labware.get_parent_labware_and_well()
-        else:
+        except validation.NoLocationError:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
             )
+        except validation.LocationTypeError:
+            raise TypeError(
+                "location should be a Well or Location, but it is {}".format(location)
+            )
+
+        if isinstance(target, validation.WellTarget):
+            move_to_location = target.location or target.well.bottom(
+                z=self._well_bottom_clearances.aspirate
+            )
+            well = target.well
+        if isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+            _, well = target.location.labware.get_parent_labware_and_well()
+            aspirate_in_place = target.in_place
+        # elif location is not None:
+        #     raise TypeError(
+        #         "location should be a Well or Location, but it is {}".format(location)
+        #     )
+        # elif last_location:
+        #     move_to_location = last_location
+        #     _, well = last_location.labware.get_parent_labware_and_well()
+        # else:
+        #     raise RuntimeError(
+        #         "If aspirate is called without an explicit location, another"
+        #         " method that moves to a location (such as move_to or "
+        #         "dispense) must previously have been called so the robot "
+        #         "knows where it is."
+        #     )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
-                location=move_to_location or last_location,  # type: ignore[arg-type]
+                location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
             )
 
@@ -224,6 +243,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume=c_vol,
                 rate=rate,
                 flow_rate=flow_rate,
+                in_place=aspirate_in_place,
             )
 
         return self

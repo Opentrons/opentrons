@@ -1,9 +1,21 @@
-from typing import Any, Dict, List, Optional, Sequence, Union, Tuple, Mapping
+from __future__ import annotations
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Union,
+    Tuple,
+    Mapping,
+    NamedTuple,
+    TYPE_CHECKING,
+)
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, DeckSlotName
+from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -12,6 +24,9 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     ThermocyclerStep,
 )
+
+if TYPE_CHECKING:
+    from .labware import Well
 
 
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
@@ -180,3 +195,46 @@ def ensure_valid_labware_offset_vector(
     if not all(isinstance(v, (float, int)) for v in offsets):
         raise TypeError("Offset values should be a number (int or float).")
     return offsets
+
+
+class WellTarget(NamedTuple):
+    """A movement target that is a well."""
+
+    well: Well
+    location: Optional[Location]
+
+
+class PointTarget(NamedTuple):
+    """A movement to coordinates"""
+
+    location: Location
+    in_place: bool = False
+
+
+class NoLocationError(ValueError):
+    """"""
+
+
+class LocationTypeError(TypeError):
+    """"""
+
+
+def validate_location(
+    location: Union[Location, Well, None], last_location: Optional[Location]
+) -> Union[WellTarget, PointTarget]:
+    """
+    Raises: NoLocationError, LocationTypeError
+    """
+    from .labware import Well
+
+    if location is None and last_location is None:
+        raise NoLocationError()
+
+    if isinstance(location, Well):
+        return WellTarget(well=location, location=None)
+    elif isinstance(location, Location):
+        return WellTarget(well=location.labware.as_well(), location=location)
+    elif last_location and location is None:
+        return WellTarget(well=last_location.labware.as_well(), location=last_location)
+
+    raise LocationTypeError()
