@@ -1,22 +1,27 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
-import { usePipettesQuery } from '@opentrons/react-api-client'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { getIs96ChannelPipetteAttached } from '../../../organisms/Devices/utils'
+import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
+import {
+  mockAttachedGen3Pipette,
+  mockGen3P1000PipetteSpecs,
+} from '../../../redux/pipettes/__fixtures__'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { getLocalRobot } from '../../../redux/discovery'
 import { AttachInstrumentsDashboard } from '../AttachInstrumentsDashboard'
+import type { AttachedPipette } from '../../../redux/pipettes/types'
 
-jest.mock('@opentrons/react-api-client')
+jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../organisms/PipetteWizardFlows')
 jest.mock('../../../organisms/Devices/utils')
 jest.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
 
-const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
-  typeof usePipettesQuery
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
 >
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
@@ -37,17 +42,18 @@ const render = () => {
     </MemoryRouter>
   )
 }
+const mockPipette: AttachedPipette = {
+  ...mockAttachedGen3Pipette,
+  modelSpecs: {
+    ...mockGen3P1000PipetteSpecs,
+  },
+}
 describe('AttachInstrumentsDashboard', () => {
   beforeEach(() => {
     mockChoosePipette.mockReturnValue(<div>mock choose pipette</div>)
     mockGetIs96ChannelPipetteAttached.mockReturnValue(false)
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
-    mockUsePipettesQuery.mockReturnValue({
-      data: {
-        left: null,
-        right: null,
-      },
-    } as any)
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
     mockPipetteWizardFlows.mockReturnValue(<div>mock pipette wizard flows</div>)
   })
   afterEach(() => {
@@ -60,26 +66,10 @@ describe('AttachInstrumentsDashboard', () => {
     getByText('mock choose pipette')
   })
   it('shoud render detach pipette and calibrate pipette buttons, clicking on them renders wizard flow', () => {
-    mockUsePipettesQuery.mockReturnValue({
-      data: {
-        left: {
-          id: 'pipetteId',
-          name: `test-pipetteId`,
-          model: 'p1000_single_v3',
-          tip_length: 0,
-          mount_axis: 'z',
-          plunger_axis: 'b',
-        },
-        right: {
-          id: 'pipetteId',
-          name: `test-pipetteId`,
-          model: 'p1000_single_v3',
-          tip_length: 0,
-          mount_axis: 'y',
-          plunger_axis: 'a',
-        },
-      },
-    } as any)
+    mockUseAttachedPipettes.mockReturnValue({
+      left: mockPipette,
+      right: mockPipette,
+    })
     const [{ getByText }] = render()
     getByText('detach left pipette')
     getByText('calibrate left pipette')

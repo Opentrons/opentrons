@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { usePipettesQuery } from '@opentrons/react-api-client'
+import { useAttachedPipettes } from '../../organisms/Devices/hooks'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -33,9 +33,7 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
   const [showAttachPipette, setShowAttachPipette] = React.useState(false)
-  const attachedPipettes = usePipettesQuery({
-    refetchInterval: 5000,
-  })?.data ?? { left: undefined, right: undefined }
+  const attachedPipettes = useAttachedPipettes()
   const isNinetySixChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes.left ?? null
   )
@@ -72,7 +70,6 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
     <Flex flexDirection={DIRECTION_COLUMN}>
       {showAttachPipette ? (
         <ChoosePipette
-          robotName={robotName}
           proceed={handleAttachPipette}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
