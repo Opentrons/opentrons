@@ -1,4 +1,4 @@
 {
   "nozzleOffset": [0.0, 0.0, 12.0],
-  "pathTo3D": "/Users/lauracox/Desktop/Work/opentrons/shared-data/pipette/definitions/2/geometry/single_channel/p10/placeholder.gltf"
+  "pathTo3D": "pipette/definitions/2/geometry/single_channel/p10/placeholder.gltf"
 }
