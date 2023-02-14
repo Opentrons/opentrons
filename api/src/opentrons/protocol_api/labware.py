@@ -449,21 +449,17 @@ class Labware:
         even if those labware are of the same type.
 
         .. caution::
-            If you're uploading a protocol via the Opentrons App, don't use this method.
-            Instead, use the Opentrons App's Labware Position Check.
-
-            This method is *only* for when you're using mechanisms like
+            This method is *only* for use with mechanisms like
             :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
             to adjust labware offsets. (See :ref:`advanced-control`.)
 
-            Using this method and the Opentrons App's Labware Position Check
-            at the same time will produce undefined behavior. We may choose
-            to define this behavior in a future release.
+            If you're uploading a protocol via the Opentrons App, don't use this method, 
+            because it will produce undefined behavior.
+            Instead, use Labware Position Check in the app.
 
-            .. note::
-                Because protocols with a :ref:`version <v2-versioning>` of 2.14
-                can currently *only* be uploaded via the Opentrons App, it doesn't make
-                sense to use this method with them. Trying to do so will raise an exception.
+            Because protocols using :ref:`version <v2-versioning>` 2.14 of the API
+            can currently *only* be uploaded via the Opentrons App, it doesn't make
+            sense to use this method with them. Trying to do so will raise an exception.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
             # TODO(mm, 2023-02-13): See Jira RCORE-535.
