@@ -8,7 +8,7 @@ from enum import Enum, unique
 
 
 @unique
-class BinaryMessageId(int, enum):
+class BinaryMessageId(int, Enum):
     """USB Binary message ID."""
 
     echo = 0x00
