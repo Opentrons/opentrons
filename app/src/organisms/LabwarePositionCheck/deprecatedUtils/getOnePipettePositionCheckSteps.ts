@@ -7,7 +7,7 @@ import {
   getDropTipStep,
 } from './deprecatedStepCreators'
 import type {
-  ProtocolFile,
+  LoadedModule,
   LabwareDefinition2,
   LoadedLabware,
   RunTimeCommand,
@@ -18,7 +18,7 @@ export const getOnePipettePositionCheckSteps = (args: {
   primaryPipetteId: string
   labware: LoadedLabware[]
   labwareDefinitions: Record<string, LabwareDefinition2>
-  modules: ProtocolFile<{}>['modules']
+  modules: LoadedModule[]
   commands: RunTimeCommand[]
 }): DeprecatedLabwarePositionCheckStep[] => {
   const {

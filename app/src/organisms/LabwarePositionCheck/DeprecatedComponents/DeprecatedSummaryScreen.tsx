@@ -28,7 +28,7 @@ import {
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 
 import type { SavePositionCommandData } from './types'
-import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 /**
  *
@@ -47,7 +47,7 @@ export const DeprecatedSummaryScreen = (props: {
   const trackEvent = useTrackEvent()
   useLabwareOffsets(
     savePositionCommandData,
-    protocolData as LegacySchemaAdapterOutput
+    protocolData as ProtocolAnalysisOutput
   )
     .then(offsets => {
       labwareOffsets.length === 0 && setLabwareOffsets(offsets)

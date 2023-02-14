@@ -2,15 +2,15 @@ import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
 import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracks.json'
 import _uncastedProtocolOneTiprack from '@opentrons/shared-data/protocol/fixtures/6/oneTiprack.json'
 import type {
-  LegacySchemaAdapterOutput,
+  ProtocolAnalysisOutput,
   LoadedLabware,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 // TODO: update these fixtures to be v6 protocols
-const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as LegacySchemaAdapterOutput
+const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolAnalysisOutput
 const labwareDefinitionsMultipleTipracks = _uncastedProtocolMultipleTipracks.labwareDefinitions as {}
-const protocolOneTiprack = (_uncastedProtocolOneTiprack as unknown) as LegacySchemaAdapterOutput
+const protocolOneTiprack = (_uncastedProtocolOneTiprack as unknown) as ProtocolAnalysisOutput
 const labwareDefinitionsOneTiprack = _uncastedProtocolOneTiprack.labwareDefinitions as {}
 const labwareWithDefinitionUri = [
   {

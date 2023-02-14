@@ -16,7 +16,7 @@ import {
   useUnmatchedModulesForProtocol,
 } from '..'
 import type { Store } from 'redux'
-import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
 import type { StoredProtocolAnalysis } from '..'
 
@@ -47,7 +47,7 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
   typeof getLoadedLabwareDefinitionsByUri
 >
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as LegacySchemaAdapterOutput
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisOutput
 
 describe('useLPCDisabledReason', () => {
   const store: Store<State> = createStore(jest.fn(), {})

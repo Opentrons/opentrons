@@ -5,6 +5,7 @@ import {
   LabwareDefinition2,
   getSlotHasMatingSurfaceUnitVector,
   LoadedLabware,
+  LoadedModule,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
@@ -118,7 +119,7 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 export const getLabwareIdsInOrder = (
   labware: LoadedLabware[],
   labwareDefinitions: Record<string, LabwareDefinition2>,
-  modules: ProtocolFile<{}>['modules'],
+  modules: LoadedModule[],
   commands: RunTimeCommand[]
 ): string[] => {
   const unorderedLabware = labware.reduce<LabwareToOrder[]>(

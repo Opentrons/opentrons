@@ -10,9 +10,9 @@ import {
   getDropTipStep,
 } from './deprecatedStepCreators'
 import type {
-  ProtocolFile,
   LabwareDefinition2,
   LoadedLabware,
+  LoadedModule,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { DeprecatedLabwarePositionCheckStep } from '../types'
@@ -22,7 +22,7 @@ export const getTwoPipettePositionCheckSteps = (args: {
   secondaryPipetteId: string
   labware: LoadedLabware[]
   labwareDefinitions: Record<string, LabwareDefinition2>
-  modules: ProtocolFile<{}>['modules']
+  modules: LoadedModule[]
   commands: RunTimeCommand[]
 }): DeprecatedLabwarePositionCheckStep[] => {
   const {

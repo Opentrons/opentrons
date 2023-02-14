@@ -4,7 +4,7 @@ import _standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stan
 import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
 import {
   getModuleDef2,
-  LegacySchemaAdapterOutput,
+  ProtocolAnalysisOutput,
   LoadedLabware,
 } from '@opentrons/shared-data'
 
@@ -66,7 +66,30 @@ const protocolWithMagTempTC = ({
       definitionUri: 'opentrons/corning_24_wellplate_3.4ml_flat/1',
     },
   ],
-} as unknown) as LegacySchemaAdapterOutput
+  modules: [
+    {
+      id: '3e012450-3412-11eb-ad93-ed232a2337cf:magneticModuleType',
+      model: 'magneticModuleV2',
+      location: {
+        slotName: '1',
+      },
+    },
+    {
+      id: '3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType',
+      model: 'temperatureModuleV2',
+      location: {
+        slotName: '3',
+      },
+    },
+    {
+      id: '3e039550-3412-11eb-ad93-ed232a2337cf:thermocyclerModuleType',
+      model: 'thermocyclerModuleV1',
+      location: {
+        slotName: '7',
+      },
+    },
+  ],
+} as unknown) as ProtocolAnalysisOutput
 const protocolWithMultipleTemps = ({
   ..._protocolWithMultipleTemps,
   labware: [
@@ -125,7 +148,30 @@ const protocolWithMultipleTemps = ({
       definitionUri: 'opentrons/corning_24_wellplate_3.4ml_flat/1',
     },
   ],
-} as unknown) as LegacySchemaAdapterOutput
+  modules: [
+    {
+      id: '3e012450-3412-11eb-ad93-ed232a2337cf:magneticModuleType',
+      model: 'magneticModuleV2',
+      location: {
+        slotName: '1',
+      },
+    },
+    {
+      id: '3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType1',
+      model: 'temperatureModuleV2',
+      location: {
+        slotName: '3',
+      },
+    },
+    {
+      id: '3e039550-3412-11eb-ad93-ed232a2337cf:temperatureModuleType2',
+      model: 'temperatureModuleV2',
+      location: {
+        slotName: '7',
+      },
+    },
+  ],
+} as unknown) as ProtocolAnalysisOutput
 const standardDeckDef = _standardDeckDef as any
 
 describe('getProtocolModulesInfo', () => {
@@ -313,7 +359,7 @@ describe('getProtocolModulesInfo', () => {
       getProtocolModulesInfo(
         {
           ...protocolWithMagTempTC,
-          modules: { [MAG_MOD_ID]: protocolWithMagTempTC.modules[MAG_MOD_ID] },
+          modules: [{ id: MAG_MOD_ID, model: 'magneticModuleV2' }],
           labware: [
             {
               definitionUri:

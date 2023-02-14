@@ -4,7 +4,7 @@ import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
-import { schemaV6Adapter, TEMPERATURE_MODULE_V2 } from '@opentrons/shared-data'
+import { TEMPERATURE_MODULE_V2 } from '@opentrons/shared-data'
 import { renderHook } from '@testing-library/react-hooks'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
@@ -18,7 +18,7 @@ const mockAnalysis: CompletedProtocolAnalysis = {
   ...simpleAnalysisFileFixture,
   status: 'completed',
 } as any
-const mockProtocolDetails = schemaV6Adapter(mockAnalysis)
+const mockProtocolDetails = mockAnalysis
 const queryClient = new QueryClient()
 const store: Store<any> = createStore(jest.fn(), {})
 const wrapper: React.FunctionComponent<{}> = ({ children }) => (

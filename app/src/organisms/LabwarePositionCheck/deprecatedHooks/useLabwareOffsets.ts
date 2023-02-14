@@ -5,7 +5,7 @@ import {
   getLabwareDisplayName,
   getModuleType,
   getLoadedLabwareDefinitionsByUri,
-  LegacySchemaAdapterOutput,
+  ProtocolAnalysisOutput,
   THERMOCYCLER_MODULE_TYPE,
   getVectorSum,
 } from '@opentrons/shared-data'
@@ -21,25 +21,22 @@ import { useCurrentRun } from '../../ProtocolUpload/hooks'
 
 const getDisplayLocation = (
   labwareId: string,
-  protocolData: LegacySchemaAdapterOutput,
+  protocolData: ProtocolAnalysisOutput,
   t: TFunction<'labware_position_check'>
 ): string => {
   let location = ''
   const labwareLocation = getLabwareLocation(labwareId, protocolData.commands)
   if (labwareLocation === 'offDeck') return 'Off Deck'
   if ('moduleId' in labwareLocation) {
-    if (
-      getModuleType(protocolData.modules[labwareLocation.moduleId].model) ===
-      THERMOCYCLER_MODULE_TYPE
-    ) {
-      location = getModuleDisplayName(
-        protocolData.modules[labwareLocation.moduleId].model
-      )
+    const module = protocolData.modules.find(
+      module => module.id === labwareLocation.moduleId
+    )
+    const moduleModel = module.model ?? ''
+    if (getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE) {
+      location = getModuleDisplayName(moduleModel)
     } else {
       location = t('module_display_location_text', {
-        moduleName: getModuleDisplayName(
-          protocolData.modules[labwareLocation.moduleId].model
-        ),
+        moduleName: getModuleDisplayName(moduleModel),
         slot: getModuleInitialLoadInfo(
           labwareLocation.moduleId,
           protocolData.commands
@@ -65,7 +62,7 @@ export type LabwareOffsets = Array<{
 
 export const useLabwareOffsets = (
   savePositionCommandData: SavePositionCommandData,
-  protocolData: LegacySchemaAdapterOutput
+  protocolData: ProtocolAnalysisOutput
 ): Promise<LabwareOffsets> => {
   const { t } = useTranslation('labware_position_check')
   const offsetDataByLabwareId = useOffsetDataByLabwareId(
@@ -91,7 +88,6 @@ export const useLabwareOffsets = (
         protocolData.labware,
         labwareDefinitions
       )
-      //   @ts-expect-error: when we remove schemav6Adapter, this logic will be correct
       const definitionUri = protocolData.labware.find(
         item => item.id === labwareId
       ).definitionUri

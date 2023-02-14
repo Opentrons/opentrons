@@ -2,7 +2,7 @@ import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/f
 import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
 import { getTwoPipettePositionCheckSteps } from '../getTwoPipettePositionCheckSteps'
 import { DEPRECATED_SECTIONS } from '../../constants'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile, LoadedModule } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { DeprecatedLabwarePositionCheckStep } from '../../types'
 
@@ -42,7 +42,7 @@ describe('getTwoPipettePositionCheckSteps', () => {
       },
     ]
     const labwareDefinitions = protocolMultipleTipracks.labwareDefinitions
-    const modules = protocolMultipleTipracks.modules
+    const modules = [] as LoadedModule[]
     const commands = protocolMultipleTipracks.commands
 
     const tiprackInSlot1Id =
@@ -185,7 +185,12 @@ describe('getTwoPipettePositionCheckSteps', () => {
       },
     ]
     const labwareDefinitions = protocolWithTC.labwareDefinitions
-    const modules = protocolWithTC.modules
+    const modules = [
+      {
+        id: '18f0c1b0-0122-11ec-88a3-f1745cf9b36c:thermocyclerModuleType',
+        model: 'thermocyclerModuleV1',
+      },
+    ] as LoadedModule[]
     const commands = protocolWithTC.commands
 
     const TCId = '18f0c1b0-0122-11ec-88a3-f1745cf9b36c:thermocyclerModuleType'

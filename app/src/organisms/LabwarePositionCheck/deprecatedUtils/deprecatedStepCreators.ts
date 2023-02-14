@@ -1,10 +1,10 @@
 import {
   getModuleType,
-  ProtocolFile,
   RunTimeCommand,
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   LoadedLabware,
+  LoadedModule,
 } from '@opentrons/shared-data'
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import type {
@@ -20,30 +20,36 @@ import type {
 import type { MoveToWellCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 
 const getIsLabwareOnTopOfTC = (
-  modules: ProtocolFile<{}>['modules'],
+  modules: LoadedModule[],
   labwareId: string,
   commands: RunTimeCommand[]
 ): boolean => {
   const labwareLocation = getLabwareLocation(labwareId, commands)
+  let moduleModel = null
+  if (labwareLocation !== 'offDeck' && 'moduleId' in labwareLocation) {
+    moduleModel = modules.find(module => module.id === labwareLocation.moduleId)
+      ?.model
+  }
   return (
-    labwareLocation !== 'offDeck' &&
-    'moduleId' in labwareLocation &&
-    getModuleType(modules[labwareLocation.moduleId].model) ===
-      THERMOCYCLER_MODULE_TYPE
+    moduleModel != null &&
+    getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
   )
 }
 
 const getIsLabwareOnTopOfHS = (
-  modules: ProtocolFile<{}>['modules'],
+  modules: LoadedModule[],
   labwareId: string,
   commands: RunTimeCommand[]
 ): boolean => {
   const labwareLocation = getLabwareLocation(labwareId, commands)
+  let moduleModel = null
+  if (labwareLocation !== 'offDeck' && 'moduleId' in labwareLocation) {
+    moduleModel = modules.find(module => module.id === labwareLocation.moduleId)
+      ?.model
+  }
   return (
-    labwareLocation !== 'offDeck' &&
-    'moduleId' in labwareLocation &&
-    getModuleType(modules[labwareLocation.moduleId].model) ===
-      HEATERSHAKER_MODULE_TYPE
+    moduleModel != null &&
+    getModuleType(moduleModel) === HEATERSHAKER_MODULE_TYPE
   )
 }
 
@@ -70,7 +76,7 @@ export const getMoveToTiprackSteps = (
 
 export const getMoveToLabwareSteps = (
   labware: LoadedLabware[],
-  modules: ProtocolFile<{}>['modules'],
+  modules: LoadedModule[],
   labwareIds: string[],
   pipetteId: string,
   section: DeprecatedSection,

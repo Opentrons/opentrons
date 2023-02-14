@@ -8,13 +8,13 @@ import type {
   ProtocolAnalysisFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
-  LegacySchemaAdapterOutput,
+  ProtocolAnalysisOutput,
   LoadedPipette,
 } from '@opentrons/shared-data'
 import type { DeprecatedLabwarePositionCheckStep } from '../types'
 
 export const deprecatedGetLabwarePositionCheckSteps = (
-  protocolData: LegacySchemaAdapterOutput
+  protocolData: ProtocolAnalysisOutput
 ): DeprecatedLabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
     // filter out any pipettes that are not being used in the protocol
