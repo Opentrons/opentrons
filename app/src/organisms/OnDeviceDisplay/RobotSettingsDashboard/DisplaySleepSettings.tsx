@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -14,7 +15,12 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import {
+  getOnDeviceRobotSettings,
+  updateConfigValue,
+} from '../../../redux/config'
 
+import type { Dispatch } from '../../../redux/types'
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface LabelProps {
@@ -34,6 +40,8 @@ const SettingButtonLabel = styled.label<LabelProps>`
   color: ${({ isSelected }) => isSelected === true && COLORS.white};
 `
 
+const SLEEP_TIME_MS = 60 * 1000 // 1 min
+
 interface DisplaySleepSettingsProps {
   setCurrentOption: (currentOption: SettingOption | null) => void
 }
@@ -43,18 +51,28 @@ export function DisplaySleepSettings({
 }: DisplaySleepSettingsProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
   // ToDo (kj:02/06/2023) This will be replaced config value via redux
-  const [selected, setSelected] = React.useState<number>(0)
+  const { sleepMs } =
+    useSelector(getOnDeviceRobotSettings) ?? SLEEP_TIME_MS * 60 * 24 * 7
+  const dispatch = useDispatch<Dispatch>()
+
+  // Note (kj:02/10/2023) value's unit is ms
   const settingsButtons = [
-    { label: t('never'), value: 0 },
-    { label: t('minutes', { minute: 3 }), value: 3 },
-    { label: t('minutes', { minute: 15 }), value: 15 },
-    { label: t('minutes', { minute: 30 }), value: 30 },
-    { label: t('one_hour'), value: 60 },
+    { label: t('never'), value: SLEEP_TIME_MS * 60 * 24 * 7 },
+    { label: t('minutes', { minute: 3 }), value: SLEEP_TIME_MS * 3 },
+    { label: t('minutes', { minute: 15 }), value: SLEEP_TIME_MS * 15 },
+    { label: t('minutes', { minute: 30 }), value: SLEEP_TIME_MS * 30 },
+    { label: t('one_hour'), value: SLEEP_TIME_MS * 60 },
   ]
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     console.log('selected')
-    setSelected(Number(event.target.value))
+    // setSelected(Number(event.target.value))
+    dispatch(
+      updateConfigValue(
+        'onDeviceRobotSettings.sleep',
+        Number(event.target.value)
+      )
+    )
   }
 
   return (
@@ -81,12 +99,12 @@ export function DisplaySleepSettings({
               id={radio.label}
               type="radio"
               value={radio.value}
-              checked={radio.value === selected}
+              checked={radio.value === sleepMs}
               onChange={handleChange}
             />
             <SettingButtonLabel
               htmlFor={radio.label}
-              isSelected={radio.value === selected}
+              isSelected={radio.value === sleepMs}
             >
               <StyledText
                 fontSize="1.75rem"

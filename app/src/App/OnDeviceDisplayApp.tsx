@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
+import { useIdle } from 'react-use'
 
 import {
   Box,
@@ -24,6 +26,8 @@ import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
+import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
+import { getOnDeviceRobotSettings } from '../redux/config'
 
 import type { RouteProps } from './types'
 
@@ -162,30 +166,41 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
 ]
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const robotSettings = useSelector(getOnDeviceRobotSettings)
+  console.log('sleep', robotSettings.sleep)
+  console.log('brightness', robotSettings.brightness)
+  console.log('textSize', robotSettings.textSize)
+  const sleepTime =
+    robotSettings.sleep != null ? robotSettings.sleep : 24 * 60 * 60 * 1000
+  const isIdle = useIdle(sleepTime, false)
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%">
-        <Switch>
-          {onDeviceDisplayRoutes.map(
-            ({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.white}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            }
-          )}
-          <Redirect exact from="/" to="/dashboard" />
-        </Switch>
+        {isIdle ? (
+          <SleepScreen />
+        ) : (
+          <Switch>
+            {onDeviceDisplayRoutes.map(
+              ({ Component, exact, path }: RouteProps) => {
+                return (
+                  <Route key={path} exact={exact} path={path}>
+                    <Box
+                      position={POSITION_RELATIVE}
+                      width="100%"
+                      height="100%"
+                      backgroundColor={COLORS.white}
+                      overflow={OVERFLOW_SCROLL}
+                    >
+                      <ModalPortalRoot />
+                      <Component />
+                    </Box>
+                  </Route>
+                )
+              }
+            )}
+            <Redirect exact from="/" to="/dashboard" />
+          </Switch>
+        )}
       </Box>
     </ApiHostProvider>
   )

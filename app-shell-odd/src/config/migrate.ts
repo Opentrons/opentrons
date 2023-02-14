@@ -11,6 +11,7 @@ import type {
   Config,
   ConfigV12,
   ConfigV13,
+  ConfigV14,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
@@ -79,11 +80,30 @@ const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
   return nextConfig
 }
 
-const MIGRATIONS: [(prevConfig: ConfigV12) => ConfigV13] = [toVersion13]
+// config version 14 migration and defaults
+const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
+  // Note (kj:02/10/2023) default settings
+  // sleepMs: never(no sleep), brightness device default settings, textSize x1
+  const nextConfig = {
+    ...prevConfig,
+    version: 14 as const,
+    onDeviceRobotSettings: {
+      sleepMs: 60 * 1000 * 60 * 24 * 7,
+      brightness: 4,
+      textSize: 1,
+    },
+  }
+  return nextConfig
+}
+
+const MIGRATIONS: [
+  (prevConfig: ConfigV12) => ConfigV13,
+  (prevConfig: ConfigV13) => ConfigV14
+] = [toVersion13, toVersion14]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
 
-export function migrate(prevConfig: ConfigV12 | ConfigV13): Config {
+export function migrate(prevConfig: ConfigV12 | ConfigV13 | ConfigV14): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary
   // Note: the default version of app-shell-odd is version 12 (need to adjust the index range)
@@ -95,6 +115,7 @@ export function migrate(prevConfig: ConfigV12 | ConfigV13): Config {
     const migrateVersion = MIGRATIONS[i - BASE_CONFIG_VERSION]
     // @ts-expect-error (kj: 01/27/2023): migrateVersion function input typed to never
     result = migrateVersion(result)
+    console.log('result', result.version)
   }
 
   if (result.version < CONFIG_VERSION_LATEST) {

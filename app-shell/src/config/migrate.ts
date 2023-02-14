@@ -23,6 +23,7 @@ import type {
   ConfigV11,
   ConfigV12,
   ConfigV13,
+  ConfigV14,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
@@ -279,6 +280,22 @@ const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
   return nextConfig
 }
 
+// config version 14 migration and defaults
+const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
+  // Note (kj:02/10/2023) default settings
+  // sleepMs: never(24h x 7 days), brightness device default settings, textSize x1
+  const nextConfig = {
+    ...prevConfig,
+    version: 14 as const,
+    onDeviceRobotSettings: {
+      sleepMs: 60 * 1000 * 60 * 24 * 7,
+      brightness: 4,
+      textSize: 1,
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -292,7 +309,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV9) => ConfigV10,
   (prevConfig: ConfigV10) => ConfigV11,
   (prevConfig: ConfigV11) => ConfigV12,
-  (prevConfig: ConfigV12) => ConfigV13
+  (prevConfig: ConfigV12) => ConfigV13,
+  (prevConfig: ConfigV13) => ConfigV14
 ] = [
   toVersion1,
   toVersion2,
@@ -307,6 +325,7 @@ const MIGRATIONS: [
   toVersion11,
   toVersion12,
   toVersion13,
+  toVersion14,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -327,6 +346,7 @@ export function migrate(
     | ConfigV11
     | ConfigV12
     | ConfigV13
+    | ConfigV14
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig
