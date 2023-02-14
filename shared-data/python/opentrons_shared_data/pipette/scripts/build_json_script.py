@@ -29,6 +29,10 @@ GEOMETRY_ROOT = get_shared_data_root() / PIPETTE_DEFINITION_ROOT / "geometry"
 GENERAL_ROOT = get_shared_data_root() / PIPETTE_DEFINITION_ROOT / "general"
 LIQUID_ROOT = get_shared_data_root() / PIPETTE_DEFINITION_ROOT / "liquid"
 
+GENERAL_SCHEMA = "#/pipette/schemas/2/pipettePropertiesSchema.json"
+LIQUID_SCHEMA = "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json"
+GEOMETRY_SCHEMA = "#/pipette/schemas/2/pipetteGeometryPropertiesSchema.json"
+
 
 def _migrate_liquid_model_v1(
     model_configurations: PipetteModelSpec, name_configurations: PipetteNameSpec
@@ -313,6 +317,7 @@ def save_to_file(
     directorypath: Path,
     file_name: str,
     data: Union[BaseModel, Dict[str, Any]],
+    schema_path: str,
 ) -> None:
     """
     Function used to save data to a file
@@ -321,8 +326,11 @@ def save_to_file(
     directorypath.mkdir(parents=True, exist_ok=True)
     filepath = directorypath / f"{file_name}.json"
     if isinstance(data, BaseModel):
-        filepath.write_text(data.json(by_alias=True), encoding="utf-8")
+        dict_basemodel = data.dict(by_alias=True)
+        dict_basemodel["$otSharedSchema"] = schema_path
+        filepath.write_text(json.dumps(dict_basemodel), encoding="utf-8")
     else:
+        data["$otSharedSchema"] = schema_path
         filepath.write_text(json.dumps(data), encoding="utf-8")
 
 
@@ -370,9 +378,24 @@ def migrate_v1_to_v2() -> None:
             k.name: v for k, v in dict_liquid_model["supportedTips"].items()
         }
 
-        save_to_file(GEOMETRY_ROOT / current_pipette_path, file_name, geometry_model)
-        save_to_file(GENERAL_ROOT / current_pipette_path, file_name, physical_model)
-        save_to_file(LIQUID_ROOT / current_pipette_path, file_name, dict_liquid_model)
+        save_to_file(
+            GEOMETRY_ROOT / current_pipette_path,
+            file_name,
+            geometry_model,
+            GEOMETRY_SCHEMA,
+        )
+        save_to_file(
+            GENERAL_ROOT / current_pipette_path,
+            file_name,
+            physical_model,
+            GENERAL_SCHEMA,
+        )
+        save_to_file(
+            LIQUID_ROOT / current_pipette_path,
+            file_name,
+            dict_liquid_model,
+            LIQUID_SCHEMA,
+        )
 
     for key, items in quirks_list.items():
         print(f"Quirks list for {key}: {items}")
@@ -424,9 +447,15 @@ def build_new_pipette_model_v2(
     file_name = f"{major_version}_{minor_version}"
     current_pipette_path = Path(physical_model.channels.name.lower()) / pipette_type
 
-    save_to_file(GEOMETRY_ROOT / current_pipette_path, file_name, geometry_model)
-    save_to_file(GENERAL_ROOT / current_pipette_path, file_name, physical_model)
-    save_to_file(LIQUID_ROOT / current_pipette_path, file_name, liquid_model)
+    save_to_file(
+        GEOMETRY_ROOT / current_pipette_path, file_name, geometry_model, GEOMETRY_SCHEMA
+    )
+    save_to_file(
+        GENERAL_ROOT / current_pipette_path, file_name, physical_model, GENERAL_SCHEMA
+    )
+    save_to_file(
+        LIQUID_ROOT / current_pipette_path, file_name, liquid_model, LIQUID_SCHEMA
+    )
 
 
 def main() -> None:

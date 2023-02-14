@@ -1,4 +1,5 @@
 {
+  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "P20 Single-Channel GEN2",
   "model": "p20",
   "displayCategory": "GEN2",

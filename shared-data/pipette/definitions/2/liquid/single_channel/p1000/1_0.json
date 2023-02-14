@@ -1,4 +1,5 @@
 {
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t1000": {
       "defaultAspirateFlowRate": 500.0,

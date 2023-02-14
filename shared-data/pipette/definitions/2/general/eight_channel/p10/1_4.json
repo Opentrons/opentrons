@@ -1,4 +1,5 @@
 {
+  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "P10 8-Channel GEN1",
   "model": "p10",
   "displayCategory": "GEN1",
