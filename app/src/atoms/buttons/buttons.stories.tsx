@@ -10,7 +10,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   TertiaryButton,
-  SecondaryTertiaryButton,
+  QuaternaryButton,
   SubmitPrimaryButton,
   AlertPrimaryButton,
   ToggleButton,
@@ -70,20 +70,20 @@ Tertiary.args = {
   children: 'tertiary button',
 }
 
-const SecondaryTertiaryButtonTemplate: Story<
-  React.ComponentProps<typeof SecondaryTertiaryButton>
+const QuaternaryButtonTemplate: Story<
+  React.ComponentProps<typeof QuaternaryButton>
 > = args => {
   const { children } = args
   return (
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-      <SecondaryTertiaryButton>{children}</SecondaryTertiaryButton>
+      <QuaternaryButton>{children}</QuaternaryButton>
     </Flex>
   )
 }
 
-export const SecondaryTertiary = SecondaryTertiaryButtonTemplate.bind({})
-SecondaryTertiary.args = {
-  children: 'secondary tertiary button',
+export const Quaternary = QuaternaryButtonTemplate.bind({})
+Quaternary.args = {
+  children: 'quaternary button',
 }
 
 const SubmitPrimaryButtonTemplate: Story<

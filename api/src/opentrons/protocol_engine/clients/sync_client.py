@@ -222,6 +222,7 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        home_after: Optional[bool],
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""
         request = commands.DropTipCreate(
@@ -230,6 +231,7 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                homeAfter=home_after,
             )
         )
         result = self._transport.execute_command(request=request)

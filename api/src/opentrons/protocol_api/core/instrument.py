@@ -111,7 +111,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         self,
         location: Optional[types.Location],
         well_core: WellCoreType,
-        home_after: bool,
+        home_after: Optional[bool],
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -152,6 +152,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_model(self) -> str:
+        ...
+
+    @abstractmethod
+    def get_display_name(self) -> str:
         ...
 
     @abstractmethod
@@ -204,15 +208,15 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+    def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     @abstractmethod
-    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+    def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     @abstractmethod
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+    def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     def set_flow_rate(

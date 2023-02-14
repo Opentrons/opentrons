@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 
 import {
-  getProtocolsStoredSortKey,
+  getProtocolsDesktopSortKey,
   updateConfigValue,
 } from '../../redux/config'
 import { useSortedProtocols } from './hooks'
@@ -54,7 +54,7 @@ interface ProtocolListProps {
 }
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
-  const sortBy = useSelector(getProtocolsStoredSortKey) ?? 'alphabetical'
+  const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
   const { t } = useTranslation('protocol_info')

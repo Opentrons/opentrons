@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+import { Link } from 'react-router-dom'
 
 import {
   Flex,
@@ -16,9 +17,11 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
 import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
 import { UNREACHABLE } from '../../redux/discovery/constants'
@@ -45,17 +48,14 @@ const SETTING_BUTTON_STYLE = css`
   border-radius: 16px;
 `
 
-const robotSettingOptions = [
-  'RobotName',
-  'RobotSystemVersion',
-  'NetworkSettings',
-  'DisplaySleepSettings',
-  'DisplayBrightness',
-  'DisplayTextSize',
-  'DeviceReset',
-] as const
-
-export type SettingOption = typeof robotSettingOptions[number]
+export type SettingOption =
+  | 'RobotName'
+  | 'RobotSystemVersion'
+  | 'NetworkSettings'
+  | 'DisplaySleepSettings'
+  | 'DisplayBrightness'
+  | 'DisplayTextSize'
+  | 'DeviceReset'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -148,6 +148,16 @@ export function RobotSettingsDashboard(): JSX.Element {
           />
         </>
       )}
+
+      <Flex
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
+      >
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
+      </Flex>
     </Flex>
   )
 }

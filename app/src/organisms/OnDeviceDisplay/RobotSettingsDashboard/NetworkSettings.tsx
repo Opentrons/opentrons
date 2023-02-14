@@ -1,5 +1,5 @@
 import * as React from 'react'
-// import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -20,7 +20,7 @@ interface NetworkSettingsProps {
 export function NetworkSettings({
   setCurrentOption,
 }: NetworkSettingsProps): JSX.Element {
-  // const { t } = useTranslation(['device_settings'])
+  const { t } = useTranslation(['device_settings'])
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_FLEX_START}>
@@ -29,7 +29,7 @@ export function NetworkSettings({
         </Btn>
       </Flex>
       <StyledText fontSize="2rem" textAlign="center">
-        {'NetworkSettings'}
+        {t('network_settings')}
       </StyledText>
     </Flex>
   )
