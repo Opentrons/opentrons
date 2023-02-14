@@ -16,7 +16,6 @@ from hardware_testing.gravimetric.liquid.liquid_class import (
     LiquidClassSettings,
     LIQUID_CLASS_DEFAULT,
 )
-from hardware_testing.gravimetric.workarounds import force_prepare_for_aspirate
 from hardware_testing.gravimetric.helpers import get_pipette_unique_name
 
 from .timestamp import Timestamp, SampleTimestamps, get_empty_sample_timestamp
@@ -92,7 +91,7 @@ class LiquidSettingsRunner:
 
     def __init__(
         self,
-        ctx: ProtocolContext,
+        delay_method: Callable,
         cfg: LiquidSettingsRunnerConfig,
         timestamp: SampleTimestamps,
     ) -> None:
@@ -103,7 +102,7 @@ class LiquidSettingsRunner:
         assert (
             cfg.aspirate is None or cfg.dispense is None
         ), "cannot both aspirate and dispense"
-        self._ctx = ctx
+        self._delay_method = delay_method
         self._cfg = cfg
         self._timestamps = timestamp
 
@@ -158,11 +157,6 @@ class LiquidSettingsRunner:
 
     def _run_approach(self) -> None:
         self._cfg.pipette.move_to(self._cfg.well.top())
-        if (
-            self._cfg.aspirate
-            and self._ctx.api_version < API_VERSION_WITH_PREP_ASPIRATE_FIX
-        ):
-            force_prepare_for_aspirate(self._cfg.pipette)
 
     def _run_gather_air_gaps(self) -> None:
         if self._cfg.aspirate and self._cfg.settings.wet_air_gap.volume:
@@ -203,7 +197,7 @@ class LiquidSettingsRunner:
             delay_time = self._cfg.settings.dispense.delay
         else:
             delay_time = 0
-        self._ctx.delay(seconds=delay_time)
+        self._delay_method(delay_time)
 
     def _run_retract(self) -> None:
         self._cfg.pipette.move_to(
@@ -225,21 +219,21 @@ class PipetteLiquidClass:
 
     def __init__(
         self,
-        ctx: ProtocolContext,
-        model: str,
-        mount: str,
-        tip_racks: List[Labware],
+        pipette: InstrumentContext,
         test_name: str,
         run_id: str,
         start_time: float,
+        delay_method: Callable
     ) -> None:
         """Pipette Liquid Class."""
-        self._ctx = ctx
+        self._pipette = pipette
+        self._delay_method = delay_method
         self._test_name = test_name
         self._run_id = run_id
         self._start_time = start_time
-        self._pipette = ctx.load_instrument(model, mount, tip_racks=tip_racks)
+
         self._liq_cls: LiquidClassSettings = LIQUID_CLASS_DEFAULT
+
         self._on_pre_aspirate: Optional[Callable] = None
         self._on_post_aspirate: Optional[Callable] = None
         self._on_pre_dispense: Optional[Callable] = None
@@ -250,8 +244,6 @@ class PipetteLiquidClass:
     @property
     def unique_name(self) -> str:
         """Unique name."""
-        if self._ctx.is_simulating():
-            return "SIMULATE"
         return get_pipette_unique_name(self.pipette)
 
     @property
@@ -352,7 +344,7 @@ class PipetteLiquidClass:
         )
         timestamps = self._sample_timestamps_list[-1]
         pip_runner = LiquidSettingsRunner(
-            ctx=self._ctx, cfg=pipetting_cfg, timestamp=timestamps
+            delay_method=self._delay_method, cfg=pipetting_cfg, timestamp=timestamps
         )
         if aspirate:
             pip_runner.run(

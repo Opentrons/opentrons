@@ -14,6 +14,7 @@ from hardware_testing.gravimetric.labware.position import (
     overwrite_default_labware_positions,
 )
 from hardware_testing.gravimetric.labware.layout import (
+    load_radwag_vial_definition,
     LayoutLabware,
     DEFAULT_SLOTS_GRAV,
 )
@@ -57,34 +58,37 @@ class ExecuteGravItems:
 
 def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
     """Setup."""
-    # RUN ID (for labelling data)
     run_id, start_time = create_run_id_and_start_time()
-    # LABWARE
     # NOTE: labware must be fully initialized before the liquid tracker
-    _layout = LayoutLabware(
-        ctx=ctx, slots=DEFAULT_SLOTS_GRAV, tip_volume=cfg.tip_volume
+    tiprack = ctx.load_labware(
+        f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
+        location=6,
     )
-    _layout.load(definitions_dir=cfg.labware_dir)
-    overwrite_default_labware_positions(ctx, layout=_layout)
+    vial = ctx.load_labware_from_definition(
+        load_radwag_vial_definition(directory=cfg.labware_dir),
+        location=2
+    )
+    overwrite_default_labware_positions([tiprack, vial])
     # LIQUID-LEVEL TRACKING
     _liq_track = LiquidTracker()
     _liq_track.initialize_from_deck(ctx)
     # the vial is weird
-    # TODO: if using vial in production, figure out better calibration
-    #       that doesn't rely on calibrating to the liquid level
-    grav_well = _layout.vial["A1"]  # type: ignore[index]
+    # TODO: remove once we can use liquid-probe to find true vial liquid surface
     _liq_track.set_start_volume_from_liquid_height(
-        grav_well, grav_well.depth - VIAL_SAFE_Z_OFFSET, name="Water"
+        vial["A1"], vial["A1"].depth - VIAL_SAFE_Z_OFFSET, name="Water"
     )
     # PIPETTE and LIQUID CLASS
+    _pipette = ctx.load_instrument(
+        f"p{cfg.pipette_volume}_single",
+        cfg.pipette_mount,
+        tip_racks=[tiprack]
+    )
     _liq_pip = PipetteLiquidClass(
-        ctx=ctx,
-        model=f"p{cfg.pipette_volume}_single",
-        mount=cfg.pipette_mount,
-        tip_racks=[_layout.tiprack],  # type: ignore[list-item]
+        pipette=_pipette,
         test_name=cfg.name,
         run_id=run_id,
         start_time=start_time,
+        delay_method=ctx.delay
     )
     _liq_pip.set_liquid_class(liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE)
     # SCALE RECORDER
@@ -93,7 +97,6 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
     #   1) Set profile to USER
     #   2) Set screensaver to NONE
     _recorder = GravimetricRecorder(
-        ctx,
         GravimetricRecorderConfig(
             test_name=cfg.name,
             run_id=run_id,
@@ -103,6 +106,7 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
             frequency=10,
             stable=False,
         ),
+        simulate=ctx.is_simulating
     )
     return ExecuteGravItems(
         liquid_pipette=_liq_pip,

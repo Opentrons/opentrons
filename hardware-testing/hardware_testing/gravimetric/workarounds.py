@@ -61,11 +61,8 @@ def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
     pipette.dispense()
 
 
-def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
+def http_get_all_labware_offsets() -> List[dict]:
     """Request (HTTP GET) from the local robot-server all runs information."""
-    if ctx.is_simulating() or not is_running_on_robot():
-        return []
-
     # req = Request("http://localhost:31950/runs")
     # req.add_header("Opentrons-Version", "2")
     # runs_response = urlopen(req)
@@ -74,7 +71,6 @@ def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
     #
     # protocols_list = runs_json["data"]
     # return [offset for p in protocols_list for offset in p["labwareOffsets"]]
-
     return []
 
 
