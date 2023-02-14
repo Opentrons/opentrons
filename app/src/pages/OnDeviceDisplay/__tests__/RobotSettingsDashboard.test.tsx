@@ -8,17 +8,24 @@ import { i18n } from '../../../i18n'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { NetworkSettings } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
 import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../hooks/useNetworkConnection')
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
+)
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
-
+const mockNetworkSettings = NetworkSettings as jest.MockedFunction<
+  typeof NetworkSettings
+>
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -35,6 +42,7 @@ describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
+    mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
   })
 
   it('should render Navigation', () => {
@@ -73,7 +81,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Network Settings')
     fireEvent.click(button)
-    getByText('Network Settings')
+    getByText('Mock Network Settings')
   })
 
   it('should render component when tapping display sleep settings', () => {
