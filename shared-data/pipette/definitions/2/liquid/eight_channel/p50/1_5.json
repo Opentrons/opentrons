@@ -36,9 +36,7 @@
         "opentrons/opentrons_96_filtertiprack_200ul/1": [
           [50.0, 0.0, 3.06368702]
         ],
-        "default": [
-          [50.0, 0.0, 3.06368702]
-        ]
+        "default": [[50.0, 0.0, 3.06368702]]
       },
       "defaultTipOverlapDictionary": {
         "opentrons/tipone_96_tiprack_200ul/1": 6.1,

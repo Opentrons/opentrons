@@ -49,7 +49,9 @@
         "opentrons/opentrons_96_tiprack_10ul/1": [[12.5135, 0.0, 0.7945]],
         "opentrons/opentrons_96_filtertiprack_10ul/1": [[12.5135, 0.0, 0.7945]],
         "opentrons/geb_96_tiprack_10ul/1": [[12.5135, 0.0, 0.7945]],
-        "opentrons/eppendorf_96_tiprack_10ul_eptips/1": [[12.5135, 0.0, 0.7945]],
+        "opentrons/eppendorf_96_tiprack_10ul_eptips/1": [
+          [12.5135, 0.0, 0.7945]
+        ],
         "default": [[12.5135, 0.0, 0.7945]]
       },
       "defaultTipOverlapDictionary": {
