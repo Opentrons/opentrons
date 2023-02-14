@@ -4,8 +4,12 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
+import { useRobot } from '../../../../../organisms/Devices/hooks'
 import {
-  fetchWifiList,
+  mockConnectableRobot,
+  mockReachableRobot,
+} from '../../../../../redux/discovery/__fixtures__'
+import {
   getWifiList,
   postWifiDisconnect,
 } from '../../../../../redux/networking'
@@ -24,12 +28,10 @@ import type { DispatchApiRequestType } from '../../../../../redux/robot-api'
 import type { RequestState } from '../../../../../redux/robot-api/types'
 import type { State } from '../../../../../redux/types'
 
+jest.mock('../../../../../organisms/Devices/hooks')
 jest.mock('../../../../../redux/networking')
 jest.mock('../../../../../redux/robot-api')
 
-const mockFetchWifiList = fetchWifiList as jest.MockedFunction<
-  typeof fetchWifiList
->
 const mockGetWifiList = getWifiList as jest.MockedFunction<typeof getWifiList>
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
@@ -43,6 +45,7 @@ const mockPostWifiDisconnect = postWifiDisconnect as jest.MockedFunction<
 const mockDismissRequest = dismissRequest as jest.MockedFunction<
   typeof dismissRequest
 >
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const ROBOT_NAME = 'otie'
 const LAST_ID = 'a request id'
@@ -59,7 +62,6 @@ const render = () => {
 
 describe('DisconnectModal', () => {
   let dispatchApiRequest: DispatchApiRequestType
-  jest.useFakeTimers()
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
@@ -72,6 +74,9 @@ describe('DisconnectModal', () => {
     when(mockGetRequestById)
       .calledWith({} as State, LAST_ID)
       .mockReturnValue({} as RequestState)
+    when(mockUseRobot)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(mockReachableRobot)
   })
 
   afterEach(() => {
@@ -97,6 +102,22 @@ describe('DisconnectModal', () => {
     getByText('Disconnect from foo')
     getByText('Disconnecting from Wi-Fi network foo')
     getByRole('button', { name: 'cancel' })
+  })
+
+  it('renders success body when request is pending and robot is connectable', () => {
+    when(mockGetRequestById)
+      .calledWith({} as State, LAST_ID)
+      .mockReturnValue({ status: PENDING } as RequestState)
+    when(mockUseRobot)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(mockConnectableRobot)
+    const { getByRole, getByText } = render()
+
+    getByText('Disconnected from Wi-Fi')
+    getByText(
+      'Your robot has successfully disconnected from the Wi-Fi network.'
+    )
+    getByRole('button', { name: 'Done' })
   })
 
   it('renders success body when request is successful', () => {
@@ -129,16 +150,6 @@ describe('DisconnectModal', () => {
     )
     getByRole('button', { name: 'cancel' })
     getByRole('button', { name: 'Disconnect' })
-  })
-
-  it('dispatches fetchWifiList on mount and on an interval', () => {
-    render()
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(1, ROBOT_NAME)
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(1)
-    jest.advanceTimersByTime(20000)
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(2, ROBOT_NAME)
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(3, ROBOT_NAME)
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(3)
   })
 
   it('dispatches postWifiDisconnect on click Disconnect', () => {
