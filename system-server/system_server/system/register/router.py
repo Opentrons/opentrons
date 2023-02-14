@@ -4,7 +4,7 @@ from datetime import timedelta
 import logging
 from uuid import UUID
 
-from system_server.constants import REGISTRATION_AUDIENCE
+from system_server.constants import REGISTRATION_AUDIENCE, REGISTRATION_DURATION_DAYS
 from system_server.persistence import get_sql_engine, get_uuid
 from system_server.jwt import Registrant, create_jwt, jwt_is_valid
 import sqlalchemy
@@ -16,9 +16,6 @@ from .storage import (
 from .models import PostRegisterResponse
 
 _log = logging.getLogger(__name__)
-
-# JWT's for registratino should last two years.
-_REGISTRATION_DURATION_DAYS = 365 * 2
 
 register_router = APIRouter()
 
@@ -48,7 +45,7 @@ async def register_endpoint(
         _log.info(f"Creating new registration for {registrant}")
         token = create_jwt(
             signing_key=str(signing_uuid),
-            duration=timedelta(days=_REGISTRATION_DURATION_DAYS),
+            duration=timedelta(days=REGISTRATION_DURATION_DAYS),
             registrant=registrant,
             audience=REGISTRATION_AUDIENCE,
         )
