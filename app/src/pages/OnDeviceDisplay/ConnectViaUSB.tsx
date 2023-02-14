@@ -51,7 +51,7 @@ export function ConnectViaUSB(): JSX.Element {
             onClick={() => history.push('/network-setup')}
           >
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-              <Icon name="arrow-back" size="1.9375rem" />
+              <Icon name="chevron-left" size="1.9375rem" />
               <StyledText
                 fontSize="1.625rem"
                 lineHeight="2.1875rem"
