@@ -57,6 +57,7 @@ class TestConfig:
 
     operator_name: str
     skip_liquid: bool
+    skip_pipette_pressure: bool
     skip_fixture: bool
     skip_diagnostics: bool
     skip_plunger: bool
@@ -657,28 +658,37 @@ async def _test_diagnostics_capacitive(
 
 
 async def _test_pipette_pressure(
-    api: OT3API, mount: OT3Mount, write_cb: Callable):
-    volume = [100,200,500,1000]
+    api: OT3API, mount: OT3Mount, volume: float, tip: str, write_cb: Callable):
     droplet_wait_seconds = 500
-    await api.add_tip(mount, 0.1)
-    await api.prepare_for_aspirate(mount)
-
+    print("homing Z axis")
+    await api.home([OT3Axis.by_mount(mount)])
     async def _read_pressure() -> float:
         return await _read_pipette_sensor_repeatedly_and_average(
             api, mount, SensorType.pressure, 10
         )
     print('Test pressure before aspirate')
-    for i in range(droplet_wait_seconds):
+    for t in range(droplet_wait_seconds):
+        print(f"waiting for leaking tips ({t + 1}/{droplet_wait_seconds})")
         pressure = await _read_pressure()
-        write_cb([''])
-        time.sleep(1)
-    await api.aspirate(mount, 100)
+        write_cb(['pre-Aspirate',pressure])
+        print(f'pre-Aspirate: {pressure}')
+        await asyncio.sleep(1)
 
     await _pick_up_tip_for_liquid(api, mount, tip)
     await _move_to_liquid(api, mount)
-    test_passed = await _aspirate_and_look_for_droplets(
-            api, mount, droplet_wait_seconds
-        )
+    
+    await api.aspirate(mount, volume)
+    await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
+    for t in range(droplet_wait_seconds):
+        print(f"waiting for leaking tips ({t + 1}/{droplet_wait_seconds})")
+        pressure = await _read_pressure()
+        write_cb(['Aspirate',pressure])
+        print(f'Aspirate: {pressure}')
+        await asyncio.sleep(1)
+    print("dispensing back into reservoir")
+    await api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
+    await api.dispense(mount, volume)
+    await api.blow_out(mount)
     await _drop_tip_in_trash(api, mount)
 
 async def _test_diagnostics_pressure(
@@ -1006,6 +1016,16 @@ async def _main(test_config: TestConfig) -> None:
                 )
                 csv_cb.results("droplets", test_passed)
 
+        if not test_config.skip_pipette_pressure:
+            csv_cb.write(["-------------"])
+            csv_cb.write(["PIPETTE-PRESSURE-DATA"])
+            volumes = [100,200,500,1000]
+            for i, tip in enumerate(tips_used):
+                for volume in volumes:
+                    await _test_pipette_pressure(api,mount,volume,tip,csv_cb.write)
+            csv_cb.write(["-------------"])
+                
+
         if not test_config.skip_fixture:
             test_passed = await _test_for_leak(
                 api,
@@ -1053,6 +1073,7 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(description="OT-3 Pipette Assembly QC Test")
     arg_parser.add_argument("--operator", type=str, required=True)
     arg_parser.add_argument("--skip-liquid", action="store_true")
+    arg_parser.add_argument("--skip-pipette", action="store_true")
     arg_parser.add_argument("--skip-fixture", action="store_true")
     arg_parser.add_argument("--skip-diagnostics", action="store_true")
     arg_parser.add_argument("--skip-plunger", action="store_true")
@@ -1076,6 +1097,7 @@ if __name__ == "__main__":
     _cfg = TestConfig(
         operator_name=args.operator,
         skip_liquid=args.skip_liquid,
+        skip_pipette_pressure=args.skip_pipette,
         skip_fixture=args.skip_fixture,
         skip_diagnostics=args.skip_diagnostics,
         skip_plunger=args.skip_plunger,
