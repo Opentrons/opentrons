@@ -82,7 +82,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate: The flow rate in µL/s to aspirate at.
         """
         if well_core is None:
-            if location:
+            if not in_place:
                 self._engine_client.move_to_coordinates(
                     pipette_id=self._pipette_id,
                     coordinates=DeckPoint(
@@ -92,15 +92,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     force_direct=False,
                     speed=None,
                 )
-                self._protocol_core.set_last_location(
-                    location=location, mount=self.get_mount()
-                )
 
             self._engine_client.aspirate_in_place(
                 pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
             )
 
-        elif location:
+        else:
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
@@ -121,9 +118,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 flow_rate=flow_rate,
             )
 
-            self._protocol_core.set_last_location(
-                location=location, mount=self.get_mount()
-            )
+        self._protocol_core.set_last_location(
+            location=location, mount=self.get_mount()
+        )
 
     def dispense(
         self,

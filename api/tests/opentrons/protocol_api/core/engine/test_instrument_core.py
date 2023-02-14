@@ -306,17 +306,16 @@ def test_aspirate_from_well(
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
-
-def test_aspirate_in_place(
+def test_aspirate_from_location(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
-    """It should aspirate in place."""
+    """It should aspirate from coordinates."""
     location = Location(point=Point(1, 2, 3), labware=None)
     subject.aspirate(
-        volume=12.34, rate=5.6, flow_rate=7.8, well_core=None, location=location
+        volume=12.34, rate=5.6, flow_rate=7.8, well_core=None, location=location, in_place=False
     )
 
     decoy.verify(
@@ -327,6 +326,27 @@ def test_aspirate_in_place(
             force_direct=False,
             speed=None,
         ),
+        mock_engine_client.aspirate_in_place(
+            pipette_id="abc123",
+            volume=12.34,
+            flow_rate=7.8,
+        ),
+    )
+
+
+def test_aspirate_in_place(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should aspirate in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.aspirate(
+        volume=12.34, rate=5.6, flow_rate=7.8, well_core=None, location=location, in_place=True
+    )
+
+    decoy.verify(
         mock_engine_client.aspirate_in_place(
             pipette_id="abc123",
             volume=12.34,
