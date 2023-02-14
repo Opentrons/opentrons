@@ -1,13 +1,14 @@
 """Pipetting command handling."""
 from typing import NamedTuple, Optional, Iterator
 from contextlib import contextmanager
+from dataclasses import dataclass
 
 from opentrons.types import Mount as HardwareMount
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateStore, CurrentWell, HardwarePipette
 from ..resources import LabwareDataProvider
-from ..types import WellLocation, WellOrigin
+from ..types import WellLocation, WellOrigin, DeckPoint
 from .movement import MovementHandler
 
 
@@ -16,6 +17,13 @@ class _TipPickupData(NamedTuple):
     tip_length: float
     tip_diameter: float
     tip_volume: int
+
+@dataclass(frozen=True)
+class VolumePointResult:
+    """The returned values of an aspirate or pick up tip operation."""
+
+    volume: float
+    destination: DeckPoint
 
 
 class PipettingHandler:
@@ -84,7 +92,7 @@ class PipettingHandler:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
-    ) -> float:
+    ) -> VolumePointResult:
         """Pick up a tip at the specified "well"."""
         hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
             pipette_id=pipette_id,
@@ -93,7 +101,7 @@ class PipettingHandler:
         )
 
         # move the pipette to the top of the tip
-        await self._movement_handler.move_to_well(
+        destination = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
@@ -119,7 +127,8 @@ class PipettingHandler:
             tip_volume=tip_volume,
         )
 
-        return tip_volume
+        return VolumePointResult(volume=tip_volume, destination=destination)
+
 
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
         """Manually add a tip to a pipette in the hardware API.
@@ -147,7 +156,7 @@ class PipettingHandler:
         well_name: str,
         well_location: WellLocation,
         home_after: Optional[bool],
-    ) -> None:
+    ) -> DeckPoint:
         """Drop a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
@@ -163,7 +172,7 @@ class PipettingHandler:
         )
 
         # move the pipette to tip drop location
-        await self._movement_handler.move_to_well(
+        destination = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
@@ -175,6 +184,7 @@ class PipettingHandler:
             mount=hw_pipette.mount,
             home_after=True if home_after is None else home_after,
         )
+        return destination
 
     async def aspirate(
         self,
@@ -184,7 +194,7 @@ class PipettingHandler:
         well_location: WellLocation,
         volume: float,
         flow_rate: float,
-    ) -> float:
+    ) -> VolumePointResult:
         """Aspirate liquid from a well."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
@@ -217,7 +227,7 @@ class PipettingHandler:
                 well_name=well_name,
             )
 
-        await self._movement_handler.move_to_well(
+        destination = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
@@ -228,7 +238,7 @@ class PipettingHandler:
         with self.set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
-        return volume
+        return VolumePointResult(volume=volume, destination=destination)
 
     async def dispense_in_place(
         self,
@@ -255,7 +265,7 @@ class PipettingHandler:
         well_location: WellLocation,
         radius: float,
         speed: Optional[float],
-    ) -> None:
+    ) -> DeckPoint:
         """Touch the pipette tip to the sides of a well."""
         target_well = CurrentWell(
             pipette_id=pipette_id,
@@ -297,6 +307,9 @@ class PipettingHandler:
                 abs_position=position,
                 speed=speed,
             )
+        final_point = touch_points[-1]
+
+        return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
 
     @contextmanager
     def set_flow_rate(

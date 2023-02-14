@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin, WellLocationMixin
+from .pipetting_common import PipetteIdMixin, WellLocationMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ class PickUpTipParams(PipetteIdMixin, WellLocationMixin):
     pass
 
 
-class PickUpTipResult(BaseModel):
+class PickUpTipResult(DestinationPositionResult):
     """Result data from the execution of a PickUpTip."""
 
     # Tip volume has a default ONLY for parsing data from earlier versions, which did not include this in the result
@@ -39,14 +39,14 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
 
     async def execute(self, params: PickUpTipParams) -> PickUpTipResult:
         """Move to and pick up a tip using the requested pipette."""
-        tip_volume = await self._pipetting.pick_up_tip(
+        result = await self._pipetting.pick_up_tip(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
         )
 
-        return PickUpTipResult(tipVolume=tip_volume)
+        return PickUpTipResult(tipVolume=result.volume, position=result.destination)
 
 
 class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult]):

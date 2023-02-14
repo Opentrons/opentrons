@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin, WellLocationMixin, MovementMixin
+from .pipetting_common import PipetteIdMixin, WellLocationMixin, MovementMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -19,7 +19,7 @@ class MoveToWellParams(PipetteIdMixin, WellLocationMixin, MovementMixin):
     pass
 
 
-class MoveToWellResult(BaseModel):
+class MoveToWellResult(DestinationPositionResult):
     """Result data from the execution of a MoveToWell command."""
 
     pass
@@ -33,7 +33,7 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
 
     async def execute(self, params: MoveToWellParams) -> MoveToWellResult:
         """Move the requested pipette to the requested well."""
-        await self._movement.move_to_well(
+        destination = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -43,7 +43,7 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
             speed=params.speed,
         )
 
-        return MoveToWellResult()
+        return MoveToWellResult(position=destination)
 
 
 class MoveToWell(BaseCommand[MoveToWellParams, MoveToWellResult]):

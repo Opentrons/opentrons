@@ -9,6 +9,7 @@ from .pipetting_common import (
     FlowRateMixin,
     WellLocationMixin,
     BaseLiquidHandlingResult,
+    DestinationPositionResult,
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -25,7 +26,7 @@ class DispenseParams(PipetteIdMixin, VolumeMixin, FlowRateMixin, WellLocationMix
     pass
 
 
-class DispenseResult(BaseLiquidHandlingResult):
+class DispenseResult(BaseLiquidHandlingResult, DestinationPositionResult):
     """Result data from the execution of a Dispense command."""
 
     pass
@@ -42,7 +43,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]
 
     async def execute(self, params: DispenseParams) -> DispenseResult:
         """Move to and dispense to the requested well."""
-        await self._movement.move_to_well(
+        destination = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -54,7 +55,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]
             flow_rate=params.flowRate,
         )
 
-        return DispenseResult(volume=volume)
+        return DispenseResult(volume=volume, position=destination)
 
 
 class Dispense(BaseCommand[DispenseParams, DispenseResult]):

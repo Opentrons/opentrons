@@ -47,6 +47,7 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
         config=ProtocolEngineConfig(
             robot_type=robot_type,
             ignore_pause=True,
+            # use_virtual_pipettes=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
         ),

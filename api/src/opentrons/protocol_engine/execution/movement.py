@@ -90,7 +90,7 @@ class MovementHandler:
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
-    ) -> None:
+    ) -> DeckPoint:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
@@ -162,6 +162,10 @@ class MovementHandler:
                 critical_point=waypoint.critical_point,
                 speed=speed,
             )
+
+        final_point = waypoints[-1].position
+
+        return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
 
     async def move_relative(
         self,
