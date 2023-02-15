@@ -45,9 +45,7 @@ class LiquidNotFound(RuntimeError):
 
     def __init__(self, max_z: float) -> None:
         """Initialize LiquidNotFound error."""
-        super().__init__(
-            f"Liquid threshold not found, max travel allowed = {max_z}"
-        )
+        super().__init__(f"Liquid threshold not found, max travel allowed = {max_z}")
 
 
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
