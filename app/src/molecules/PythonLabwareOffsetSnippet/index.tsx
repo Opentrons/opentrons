@@ -1,16 +1,21 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { TYPOGRAPHY, SPACING } from '@opentrons/components'
+import { TYPOGRAPHY, SPACING, BORDERS } from '@opentrons/components'
 import { createSnippet } from './createSnippet'
 import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 const JsonTextArea = styled.textarea`
-  min-height: 30vh;
+  min-height: 12vh;
   width: 100%;
+  background-color: #F8F8F8;
+  border: ${BORDERS.lineBorder};
+  border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3};
+  margin: ${SPACING.spacing4} 0;
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   font-family: monospace;
+  resize: none;
 `
 interface PythonLabwareOffsetSnippetProps {
   mode: 'jupyter' | 'cli'
@@ -30,7 +35,5 @@ export function PythonLabwareOffsetSnippet(
     }
   }, [mode, JSON.stringify(labwareOffsets)])
 
-  if (protocol == null || labwareOffsets == null || snippet == null) return null
-
-  return <JsonTextArea readOnly value={snippet} spellCheck={false} />
+  return <JsonTextArea readOnly value={snippet ?? ''} spellCheck={false} />
 }
