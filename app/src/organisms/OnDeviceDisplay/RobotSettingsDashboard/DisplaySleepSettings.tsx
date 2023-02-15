@@ -16,7 +16,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import {
-  getOnDeviceRobotSettings,
+  getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '../../../redux/config'
 
@@ -52,7 +52,7 @@ export function DisplaySleepSettings({
   const { t } = useTranslation(['device_settings'])
   // ToDo (kj:02/06/2023) This will be replaced config value via redux
   const { sleepMs } =
-    useSelector(getOnDeviceRobotSettings) ?? SLEEP_TIME_MS * 60 * 24 * 7
+    useSelector(getOnDeviceDisplaySettings) ?? SLEEP_TIME_MS * 60 * 24 * 7
   const dispatch = useDispatch<Dispatch>()
 
   // Note (kj:02/10/2023) value's unit is ms
@@ -67,7 +67,7 @@ export function DisplaySleepSettings({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     dispatch(
       updateConfigValue(
-        'onDeviceRobotSettings.sleepMs',
+        'onDeviceDisplaySettings.sleepMs',
         Number(event.target.value)
       )
     )

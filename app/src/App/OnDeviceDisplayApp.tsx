@@ -27,7 +27,7 @@ import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
-import { getOnDeviceRobotSettings } from '../redux/config'
+import { getOnDeviceDisplaySettings } from '../redux/config'
 
 import type { RouteProps } from './types'
 
@@ -166,13 +166,27 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
 ]
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
-  const robotSettings = useSelector(getOnDeviceRobotSettings)
+  const onDeviceDisplaySettings = useSelector(getOnDeviceDisplaySettings)
   const sleepTime =
-    robotSettings.sleepMs != null
-      ? robotSettings.sleepMs
+    onDeviceDisplaySettings.sleepMs != null
+      ? onDeviceDisplaySettings.sleepMs
       : 60 * 1000 * 60 * 24 * 7
-  const testTime = 3 * 1000
-  const isIdle = useIdle(testTime, false)
+  const _isIdle = useIdle(sleepTime, false)
+  const [isIdle, setIsIdle] = React.useState(false)
+
+  React.useEffect(() => {
+    if (_isIdle)
+      setTimeout(() => {
+        setIsIdle(true)
+      }, 100)
+
+    if (!_isIdle) {
+      setTimeout(() => {
+        setIsIdle(false)
+      }, 100)
+    }
+  }, [_isIdle])
+
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%">

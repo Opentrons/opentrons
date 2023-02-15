@@ -287,7 +287,7 @@ const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
   const nextConfig = {
     ...prevConfig,
     version: 14 as const,
-    onDeviceRobotSettings: {
+    onDeviceDisplaySettings: {
       sleepMs: 60 * 1000 * 60 * 24 * 7,
       brightness: 4,
       textSize: 1,

@@ -5,7 +5,7 @@ import type {
   FeatureFlags,
   UpdateChannel,
   ProtocolsOnDeviceSortKey,
-  OnDeviceRobotSettings,
+  OnDeviceDisplaySettings,
 } from './types'
 import type { SelectOption } from '../../atoms/SelectField/Select'
 import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
@@ -90,14 +90,15 @@ export const getProtocolsOnDeviceSortKey: (
   config => config?.protocols.protocolsOnDeviceSortKey ?? null
 )
 
-export const getOnDeviceRobotSettings: (
+export const getOnDeviceDisplaySettings: (
   state: State
-) => OnDeviceRobotSettings = createSelector(
+) => OnDeviceDisplaySettings = createSelector(
   getConfig,
   config =>
-    config?.onDeviceRobotSettings ?? {
-      sleepMs: config?.onDeviceRobotSettings.sleepMs ?? 60 * 60 * 1000 * 24 * 7,
-      brightness: config?.onDeviceRobotSettings.brightness ?? 4,
-      textSize: config?.onDeviceRobotSettings.textSize ?? 1,
+    config?.onDeviceDisplaySettings ?? {
+      sleepMs:
+        config?.onDeviceDisplaySettings.sleepMs ?? 60 * 60 * 1000 * 24 * 7,
+      brightness: config?.onDeviceDisplaySettings.brightness ?? 4,
+      textSize: config?.onDeviceDisplaySettings.textSize ?? 1,
     }
 )

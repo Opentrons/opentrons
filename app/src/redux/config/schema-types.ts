@@ -20,7 +20,7 @@ export type ProtocolsOnDeviceSortKey =
   | 'recentCreated'
   | 'oldCreated'
 
-export interface OnDeviceRobotSettings {
+export interface OnDeviceDisplaySettings {
   sleepMs: number
   brightness: number
   textSize: number
@@ -185,7 +185,7 @@ export interface ConfigV13 extends Omit<ConfigV12, 'version'> {
 
 export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
   version: 14
-  onDeviceRobotSettings: {
+  onDeviceDisplaySettings: {
     sleepMs: number
     brightness: number
     textSize: number

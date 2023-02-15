@@ -1,13 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { Btn } from '@opentrons/components'
 import logo from '../../assets/images/odd/opentrons_logo.png'
-
-const Container = styled.div`
-  /* pointer-events: none; */
-  overscroll-behavior: none;
-  touch-action: none;
-`
 
 export function SleepScreen(): JSX.Element {
   const speed = 50
@@ -89,13 +81,8 @@ export function SleepScreen(): JSX.Element {
   }, [])
 
   return (
-    <Btn
-      onClick={e => {
-        console.log('tapped')
-        e.preventDefault()
-      }}
-    >
+    <div>
       <canvas id="odd-screen"></canvas>
-    </Btn>
+    </div>
   )
 }
