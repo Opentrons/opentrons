@@ -266,6 +266,45 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 await _set_pipette_current(messenger, default_run_current)
                 await _home(messenger)
 
+def _print_title(title: str) -> None:
+    PRINT_HEADER_NUM_SPACES = 4
+    PRINT_HEADER_DASHES = "-" * PRINT_HEADER_NUM_SPACES
+    PRINT_TITLE_POUNDS = "#" * PRINT_HEADER_NUM_SPACES
+    PRINT_HEADER_SPACES = " " * (PRINT_HEADER_NUM_SPACES - 1)
+    PRINT_HEADER_ASTERISK = "*"
+    """Print title."""
+    """
+    #####################
+    #   Example Title   #
+    #####################
+    """
+    length = len(title)
+    pounds = PRINT_TITLE_POUNDS + ("#" * length) + PRINT_TITLE_POUNDS
+    middle = f"#{PRINT_HEADER_SPACES}" f"{title}" f"{PRINT_HEADER_SPACES}#"
+    print(f"\n{pounds}\n{middle}\n{pounds}\n")
+
+def _results_check() -> None:
+    c_left_count = 0
+    c_right_count = 0
+    f_left_count = 0
+    f_right_count = 0
+    for re in CURRENTS_SPEEDS_TEST_RESULTS:
+        if 'Mount_left' == re[0] and 'PASS' == re[3]:
+            c_left_count += 1
+        elif 'Mount_right' == re[0] and 'PASS' == re[3]:
+            c_right_count += 1
+
+    for re in FORCE_GAUGE_TEST_RESULTS:
+        if 'Mount_left' == re[0] and re[3] > 300:
+            f_left_count += 1
+        elif 'Mount_right' == re[0] and re[3] > 300:
+            f_right_count += 1
+    _print_title('Test Results')
+    print(f'Mount_left Current and Speed Test: --PASS') if c_left_count >= 10 else print(f'Mount_left Current and Speed Test: --FAIL')
+    print(f'Mount_right Current and Speed Test: --PASS') if c_right_count >= 10 else print(f'Mount_right Current and Speed Test: --FAIL')
+    print(f'Mount_left Force Guage Test: --PASS') if f_left_count >= 10 else print(f'Mount_left Force Guage Test: --FAIL')
+    print(f'Mount_right Force Guage Test: --PASS') if f_right_count >= 10 else print(f'Mount_right Force Guage Test: --FAIL')
+
 async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     if "q" in input("\n\tEnter 'q' to exit"):
         raise KeyboardInterrupt()
@@ -286,50 +325,52 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     csv_cb.write(["operator-name", arguments.operator])
     csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
 
-    print('----Test mount left----')
-    csv_cb.write(["----Test mount left----"])
-    NODE = NodeId.head_l
-    await _home(messenger)
-    # run the test
-    if not arguments.skip_current_left:
-        csv_cb.write(["----"])
-        csv_cb.write(["Currents_Speeds_Test"])
-        csv_cb.write(["----"])
-        print("Currents_Speeds_Test")
-        csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
-        await _currents_speeds_test(messenger, csv_cb.write)
+    if not arguments.skip_left:
+        print('----Test mount left----')
+        csv_cb.write(["----Test mount left----"])
+        NODE = NodeId.head_l
+        await _home(messenger)
+        # run the test
+        if not arguments.skip_current_left:
+            csv_cb.write(["----"])
+            csv_cb.write(["Currents_Speeds_Test"])
+            csv_cb.write(["----"])
+            print("Currents_Speeds_Test")
+            csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
+            await _currents_speeds_test(messenger, csv_cb.write)
 
-    if not arguments.skip_force_left:
-        csv_cb.write(["----"])
-        csv_cb.write(["Force_Gauge_Test"])
-        csv_cb.write(["----"])
-        csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
-        print("Force_Gauge_Test")
-        await _force_gauge(messenger, csv_cb.write)
+        if not arguments.skip_force_left:
+            csv_cb.write(["----"])
+            csv_cb.write(["Force_Gauge_Test"])
+            csv_cb.write(["----"])
+            csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
+            print("Force_Gauge_Test")
+            await _force_gauge(messenger, csv_cb.write)
 
-    print('----Test mount right----')
-    csv_cb.write(["----Test mount right----"])
-    NODE = NodeId.head_r
-    await _home(messenger)
-    # run the test
-    if not arguments.skip_current_right:
-        csv_cb.write(["----"])
-        csv_cb.write(["Currents_Speeds_Test"])
-        csv_cb.write(["----"])
-        print("Currents_Speeds_Test")
-        csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
-        await _currents_speeds_test(messenger, csv_cb.write)
+    if not arguments.skip_right:
+        print('----Test mount right----')
+        csv_cb.write(["----Test mount right----"])
+        NODE = NodeId.head_r
+        await _home(messenger)
+        # run the test
+        if not arguments.skip_current_right:
+            csv_cb.write(["----"])
+            csv_cb.write(["Currents_Speeds_Test"])
+            csv_cb.write(["----"])
+            print("Currents_Speeds_Test")
+            csv_cb.write(['Mount', 'Current', 'Speed', 'Result'])
+            await _currents_speeds_test(messenger, csv_cb.write)
 
-    if not arguments.skip_force_right:
-        csv_cb.write(["----"])
-        csv_cb.write(["Force_Gauge_Test"])
-        csv_cb.write(["----"])
-        csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
-        print("Force_Gauge_Test")
-        await _force_gauge(messenger, csv_cb.write)
+        if not arguments.skip_force_right:
+            csv_cb.write(["----"])
+            csv_cb.write(["Force_Gauge_Test"])
+            csv_cb.write(["----"])
+            csv_cb.write(['Mount', 'Current', 'Speed', 'Force'])
+            print("Force_Gauge_Test")
+            await _force_gauge(messenger, csv_cb.write)
 
-    print(CURRENTS_SPEEDS_TEST_RESULTS)
-    print(FORCE_GAUGE_TEST_RESULTS)
+    if not arguments.skip_results_check:
+        _results_check()
 
     print('Test Done...')
 
@@ -348,42 +389,15 @@ async def _main(arguments: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="OT3 Z_stage Test SCRIPT")
-    add_can_args(parser)
-    parser.add_argument(
-        "--operator",
-        type=str,
-        help="Operator name",
-        default='xxx',
-    )
-    parser.add_argument(
-        "--sn",
-        type=str,
-        help="Z Stage Serial Number",
-        default='Z_stage_001',
-    )
-    parser.add_argument(
-        "--skip_current_left",
-        type=bool,
-        help="Skip current ",
-        default=False,
-    )
-    parser.add_argument(
-        "--skip_current_right",
-        type=bool,
-        help="Skip current ",
-        default=False,
-    )
-    parser.add_argument(
-        "--skip_force_left",
-        type=bool,
-        help="Skip force ",
-        default=False,
-    )
-    parser.add_argument(
-        "--skip_force_right",
-        type=bool,
-        help="Skip force ",
-        default=False,
-    )
-    asyncio.run(_main(parser.parse_args()))
+    arg_parser = argparse.ArgumentParser(description="OT3 Z_stage Test")
+    add_can_args(arg_parser)
+    arg_parser.add_argument("--operator", type=str, required=True)
+    arg_parser.add_argument("--sn", type=str, required=True)
+    arg_parser.add_argument("--skip_current_left", action="store_true")
+    arg_parser.add_argument("--skip_current_right", action="store_true")
+    arg_parser.add_argument("--skip_left", action="store_true")
+    arg_parser.add_argument("--skip_right", action="store_true")
+    arg_parser.add_argument("--skip_force_left", action="store_true")
+    arg_parser.add_argument("--skip_force_right", action="store_true")
+    arg_parser.add_argument("--skip_results_check", action="store_true")
+    asyncio.run(_main(arg_parser.parse_args()))
