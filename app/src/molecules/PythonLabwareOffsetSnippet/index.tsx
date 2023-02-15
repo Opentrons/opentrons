@@ -8,7 +8,7 @@ import type { LabwareOffset } from '@opentrons/api-client'
 const JsonTextArea = styled.textarea`
   min-height: 12vh;
   width: 100%;
-  background-color: #F8F8F8;
+  background-color: #f8f8f8;
   border: ${BORDERS.lineBorder};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3};

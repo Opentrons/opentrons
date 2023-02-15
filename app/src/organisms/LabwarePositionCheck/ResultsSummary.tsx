@@ -60,7 +60,9 @@ export const ResultsSummary = (
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
   )
-  const isLabwareOffsetCodeSnippetsOn = useSelector(getIsLabwareOffsetCodeSnippetsOn)
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    getIsLabwareOffsetCodeSnippetsOn
+  )
 
   const offsetsToApply = React.useMemo(() => {
     return workingOffsets.map<LabwareOffsetCreateData>(
