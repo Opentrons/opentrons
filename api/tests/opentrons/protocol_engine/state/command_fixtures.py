@@ -9,6 +9,7 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
     DeckPoint,
+    MovementAxis,
     WellLocation,
     LabwareLocation,
     LabwareMovementStrategy,
@@ -317,6 +318,49 @@ def create_move_to_well_command(
     )
 
 
+def create_move_to_coordinates_command(
+    pipette_id: str,
+    coordinates: DeckPoint = DeckPoint(x=0, y=0, z=0),
+) -> cmd.MoveToCoordinates:
+    """Get a completed MoveToWell command."""
+    params = cmd.MoveToCoordinatesParams(
+        pipetteId=pipette_id,
+        coordinates=coordinates,
+    )
+
+    result = cmd.MoveToCoordinatesResult(position=coordinates)
+
+    return cmd.MoveToCoordinates(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_move_relative_command(
+    pipette_id: str,
+    axis: MovementAxis = MovementAxis.X,
+    distance: float = 42,
+    destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
+) -> cmd.MoveRelative:
+    """Get a completed MoveToWell command."""
+    params = cmd.MoveRelativeParams(pipetteId=pipette_id, axis=axis, distance=distance)
+
+    result = cmd.MoveRelativeResult(position=destination)
+
+    return cmd.MoveRelative(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_blow_out_command(
     pipette_id: str,
     flow_rate: float,
@@ -336,6 +380,36 @@ def create_blow_out_command(
     result = cmd.BlowOutResult(position=destination)
 
     return cmd.BlowOut(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=1, day=1),
+        params=params,
+        result=result,
+    )
+
+
+def create_touch_tip_command(
+    pipette_id: str,
+    labware_id: str = "labware-id",
+    well_name: str = "A1",
+    well_location: Optional[WellLocation] = None,
+    radius: float = 1.0,
+    speed: Optional[float] = None,
+    destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
+) -> cmd.TouchTip:
+    """Get a completed BlowOut command."""
+    params = cmd.TouchTipParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location or WellLocation(),
+        radius=radius,
+        speed=speed,
+    )
+    result = cmd.TouchTipResult(position=destination)
+
+    return cmd.TouchTip(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
