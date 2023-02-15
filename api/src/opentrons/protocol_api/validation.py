@@ -217,7 +217,7 @@ class NoLocationError(ValueError):
 
 
 class LocationTypeError(TypeError):
-    """"""
+    """Error representing that the location supplied is of different expected type."""
 
 
 def validate_location(
