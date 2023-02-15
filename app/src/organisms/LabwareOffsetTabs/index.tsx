@@ -25,7 +25,7 @@ export function LabwareOffsetTabs({
   JupyterComponent,
   CommandLineComponent,
 }: LabwareOffsetTabsProps): JSX.Element {
-  const { t } = useTranslation()
+  const { t } = useTranslation('labware_position_check')
   const [currentTab, setCurrentTab] = React.useState<TabOptions>('table')
 
   const activeTabComponent = {
