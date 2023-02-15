@@ -12,6 +12,8 @@ export type DevInternalFlag = 'enableExtendedHardware'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
+export type PinnedProtocolIds = string[]
+
 export type ProtocolsOnDeviceSortKey =
   | 'alphabetical'
   | 'reverse'
@@ -177,4 +179,11 @@ export interface ConfigV13 extends Omit<ConfigV12, 'version'> {
   }
 }
 
-export type Config = ConfigV13
+export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
+  version: 14
+  protocols: ConfigV13['protocols'] & {
+    pinnedProtocolIds: PinnedProtocolIds | null
+  }
+}
+
+export type Config = ConfigV14

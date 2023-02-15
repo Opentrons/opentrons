@@ -179,4 +179,26 @@ describe('shell selectors', () => {
       expect(Selectors.getProtocolsOnDeviceSortKey(state)).toEqual(null)
     })
   })
+
+  describe('pinnedProtocolIds', () => {
+    it('should return id list if pinnedProtocolIds is selected', () => {
+      const state: State = {
+        config: {
+          protocols: {
+            pinnedProtocolIds: ['2b790468-5d72-45ba-b5da-2fd2e6d93a0e'],
+          },
+        },
+      } as any
+      expect(Selectors.getPinnedProtocolIds(state)).toEqual([
+        '2b790468-5d72-45ba-b5da-2fd2e6d93a0e',
+      ])
+    })
+
+    it('should return null if saved value in config is null', () => {
+      const state: State = {
+        config: { protocols: { pinnedProtocolIds: null } },
+      } as any
+      expect(Selectors.getPinnedProtocolIds(state)).toEqual(null)
+    })
+  })
 })
