@@ -40,7 +40,7 @@ export const useLongPress = (): UseLongPressResult => {
     if (interactiveRef?.current != null) {
       interact((interactiveRef.current as unknown) as HTMLElement)
         .pointerEvents({
-          holdDuration: 600,
+          holdDuration: 1000,
         })
         .on('hold', (event: PointerEvent) => {
           setIsLongPressed(isLongPressed => !isLongPressed)
