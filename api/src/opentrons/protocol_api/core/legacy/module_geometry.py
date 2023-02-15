@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Set, cast
+from typing import TYPE_CHECKING, Optional, Set
 
 import numpy as np
 
@@ -134,7 +134,10 @@ class ModuleGeometry:
 
     @property
     def load_name(self) -> str:
-        return cast(str, self.model.value)
+        # Mypy (at the time of writing, v0.910) incorrectly types self.model.value as
+        # Any. It seems to have trouble with it being a union of enums.
+        assert isinstance(self.model.value, str)
+        return self.model.value
 
     @property
     def module_type(self) -> ModuleType:
