@@ -1,0 +1,73 @@
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  Box,
+  COLORS,
+  BORDERS,
+} from '@opentrons/components'
+
+import { StyledText } from '../../atoms/text'
+import { RoundTab } from '../../molecules/RoundTab'
+
+type TabOptions = 'table' | 'jupyter' | 'cli'
+
+export interface LabwareOffsetTabsProps {
+  TableComponent: JSX.Element
+  JupyterComponent: JSX.Element
+  CommandLineComponent: JSX.Element
+}
+
+export function LabwareOffsetTabs({
+  TableComponent,
+  JupyterComponent,
+  CommandLineComponent,
+}: LabwareOffsetTabsProps): JSX.Element {
+  const { t } = useTranslation()
+  const [currentTab, setCurrentTab] = React.useState<TabOptions>('table')
+
+  const activeTabComponent = {
+    table: TableComponent,
+    jupyter: JupyterComponent,
+    cli: CommandLineComponent,
+  }
+  return (
+    <Flex width="100%" height="100%" flexDirection={DIRECTION_COLUMN}>
+      <Flex>
+        <RoundTab
+          isCurrent={currentTab === 'table'}
+          onClick={() => setCurrentTab('table')}
+        >
+          <StyledText>{t('table_view')}</StyledText>
+        </RoundTab>
+        <RoundTab
+          isCurrent={currentTab === 'jupyter'}
+          onClick={() => setCurrentTab('jupyter')}
+        >
+          <StyledText>{t('jupyter_notebook')}</StyledText>
+        </RoundTab>
+        <RoundTab
+          isCurrent={currentTab === 'cli'}
+          onClick={() => setCurrentTab('cli')}
+        >
+          <StyledText>{t('cli_ssh')}</StyledText>
+        </RoundTab>
+      </Flex>
+      <Box
+        backgroundColor={COLORS.white}
+        border={BORDERS.lineBorder}
+        // remove left upper corner border radius when first tab is active
+        borderRadius={`${
+          currentTab === 'table' ? '0' : BORDERS.radiusSoftCorners
+        } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
+          BORDERS.radiusSoftCorners
+        }`}
+        padding={`0 ${SPACING.spacing4}`}
+      >
+        {activeTabComponent[currentTab]}
+      </Box>
+    </Flex>
+  )
+}
