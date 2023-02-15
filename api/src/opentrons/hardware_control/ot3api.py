@@ -1707,6 +1707,17 @@ class OT3API(
 
         if not self._current_position:
             await self.home()
+        gantry_position = await self.gantry_position(mount, refresh=True)
+
+        await self.move_to(
+            mount,
+            top_types.Point(
+                x=gantry_position.x,
+                y=gantry_position.y,
+                z=probe_settings.starting_mount_height,
+            ),
+        )
+
         if probe_settings.aspirate_while_sensing:
             await self.home_plunger(mount)
 
@@ -1719,8 +1730,6 @@ class OT3API(
                 probe_settings.mount_speed,
                 (probe_settings.plunger_speed * direction),
                 probe_settings.sensor_threshold_pascals,
-                probe_settings.starting_mount_height,
-                probe_settings.prep_move_speed,
                 probe_settings.log_pressure,
             )
         except MoveConditionNotMet:

@@ -933,8 +933,6 @@ class OT3Controller:
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        starting_mount_height: float,
-        prep_move_speed: float,
         log_pressure: bool = True,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
@@ -947,8 +945,6 @@ class OT3Controller:
             max_z_distance,
             plunger_speed,
             mount_speed,
-            starting_mount_height,
-            prep_move_speed,
             threshold_pascals,
             log_pressure,
             sensor_id,
