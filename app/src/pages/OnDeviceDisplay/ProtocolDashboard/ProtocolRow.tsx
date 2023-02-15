@@ -22,7 +22,7 @@ import { ModalShell } from '../../../molecules/Modal'
 
 import {
   useCreateRunMutation,
-  useDeleteProtocolMutation,
+  // TODO useDeleteProtocolMutation,
 } from '@opentrons/react-api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -58,11 +58,12 @@ export function ProtocolRow(props: {
     },
   })
 
-  const { deleteProtocol } = useDeleteProtocolMutation(protocol.id)
+  // TODO const { deleteProtocol } = useDeleteProtocolMutation(protocol.id)
 
   const handleDeleteClick = (): void => {
     longpress.setIsLongPressed(false)
-    deleteProtocol()
+    // TODO: deleteProtocol()
+    console.log(`deleted protocol with id ${protocol.id}`)
     history.go(0)
   }
 
