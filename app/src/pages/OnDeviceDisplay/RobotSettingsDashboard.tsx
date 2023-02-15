@@ -66,8 +66,6 @@ export function RobotSettingsDashboard(): JSX.Element {
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
-  console.table(networkConnection)
-
   return (
     <Flex
       padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
@@ -105,7 +103,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           {/* Network Settings */}
           <RobotSettingButton
             settingName={t('network_settings')}
-            settingInfo={networkConnection.connectionStatus}
+            settingInfo={networkConnection?.connectionStatus}
             currentOption="NetworkSettings"
             setCurrentOption={setCurrentOption}
           />
