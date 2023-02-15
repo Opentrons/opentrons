@@ -19,6 +19,7 @@ import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '../../../redux/config'
+import { SLEEP_NEVER_MS } from '../../../App/constants'
 
 import type { Dispatch } from '../../../redux/types'
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
@@ -51,13 +52,12 @@ export function DisplaySleepSettings({
 }: DisplaySleepSettingsProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
   // ToDo (kj:02/06/2023) This will be replaced config value via redux
-  const { sleepMs } =
-    useSelector(getOnDeviceDisplaySettings) ?? SLEEP_TIME_MS * 60 * 24 * 7
+  const { sleepMs } = useSelector(getOnDeviceDisplaySettings) ?? SLEEP_NEVER_MS
   const dispatch = useDispatch<Dispatch>()
 
   // Note (kj:02/10/2023) value's unit is ms
   const settingsButtons = [
-    { label: t('never'), value: SLEEP_TIME_MS * 60 * 24 * 7 },
+    { label: t('never'), value: SLEEP_NEVER_MS },
     { label: t('minutes', { minute: 3 }), value: SLEEP_TIME_MS * 3 },
     { label: t('minutes', { minute: 15 }), value: SLEEP_TIME_MS * 15 },
     { label: t('minutes', { minute: 30 }), value: SLEEP_TIME_MS * 30 },

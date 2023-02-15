@@ -28,6 +28,7 @@ import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
 import { getOnDeviceDisplaySettings } from '../redux/config'
+import { SLEEP_NEVER_MS } from './constants'
 
 import type { RouteProps } from './types'
 
@@ -165,25 +166,20 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   },
 ]
 
+const SLEEP_SWITCH_MS = 100
+
 export const OnDeviceDisplayApp = (): JSX.Element => {
-  const onDeviceDisplaySettings = useSelector(getOnDeviceDisplaySettings)
-  const sleepTime =
-    onDeviceDisplaySettings.sleepMs != null
-      ? onDeviceDisplaySettings.sleepMs
-      : 60 * 1000 * 60 * 24 * 7
+  const { sleepMs } = useSelector(getOnDeviceDisplaySettings)
+  const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
+
+  console.log(sleepTime)
   const _isIdle = useIdle(sleepTime, false)
   const [isIdle, setIsIdle] = React.useState(false)
 
   React.useEffect(() => {
-    if (_isIdle)
-      setTimeout(() => {
-        setIsIdle(true)
-      }, 100)
-
-    if (!_isIdle) {
-      setTimeout(() => {
-        setIsIdle(false)
-      }, 100)
+    const timer = setTimeout(() => setIsIdle(_isIdle), SLEEP_SWITCH_MS)
+    return () => {
+      clearTimeout(timer)
     }
   }, [_isIdle])
 

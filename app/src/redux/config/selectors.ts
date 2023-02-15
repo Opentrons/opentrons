@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect'
+import { SLEEP_NEVER_MS } from '../../App/constants'
 import type { State } from '../types'
 import type {
   Config,
@@ -96,9 +97,8 @@ export const getOnDeviceDisplaySettings: (
   getConfig,
   config =>
     config?.onDeviceDisplaySettings ?? {
-      sleepMs:
-        config?.onDeviceDisplaySettings.sleepMs ?? 60 * 60 * 1000 * 24 * 7,
-      brightness: config?.onDeviceDisplaySettings.brightness ?? 4,
-      textSize: config?.onDeviceDisplaySettings.textSize ?? 1,
+      sleepMs: config?.onDeviceDisplaySettings?.sleepMs ?? SLEEP_NEVER_MS,
+      brightness: config?.onDeviceDisplaySettings?.brightness ?? 4,
+      textSize: config?.onDeviceDisplaySettings?.textSize ?? 1,
     }
 )
