@@ -155,7 +155,7 @@ export function CurrentOffsetsModal(
             CommandLineComponent={CommandLineSnippet}
           />
         ) : (
-          TableComponent 
+          TableComponent
         )}
         <Flex
           width="100%"
