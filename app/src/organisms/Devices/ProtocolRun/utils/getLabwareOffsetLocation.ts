@@ -1,7 +1,7 @@
-import { getLabwareLocation } from './getLabwareLocation'
-import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
 import { LoadedModule, ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { getLabwareLocation } from './getLabwareLocation'
+import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 
 // this logic to derive the LabwareOffsetLocation from the LabwareLocation
 // is required because the backend needs to know a module's model (not its ID)

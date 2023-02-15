@@ -5,6 +5,11 @@ import {
   componentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
+import {
+  CompletedProtocolAnalysis,
+  ModuleModel,
+  ModuleType,
+} from '@opentrons/shared-data'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import { ModuleCard } from '../../../ModuleCard'
 import {
@@ -18,11 +23,6 @@ import {
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
-import {
-  CompletedProtocolAnalysis,
-  ModuleModel,
-  ModuleType,
-} from '@opentrons/shared-data'
 
 jest.mock('../../../ModuleCard')
 jest.mock('../../hooks')
