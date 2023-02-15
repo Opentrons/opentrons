@@ -65,11 +65,9 @@ export function DisplaySleepSettings({
   ]
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    console.log('selected')
-    // setSelected(Number(event.target.value))
     dispatch(
       updateConfigValue(
-        'onDeviceRobotSettings.sleep',
+        'onDeviceRobotSettings.sleepMs',
         Number(event.target.value)
       )
     )

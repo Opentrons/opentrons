@@ -96,8 +96,8 @@ export const getOnDeviceRobotSettings: (
   getConfig,
   config =>
     config?.onDeviceRobotSettings ?? {
-      sleepMs: 60 * 1000 * 60 * 24 * 7,
-      brightness: 4,
-      textSize: 1,
+      sleepMs: config?.onDeviceRobotSettings.sleepMs ?? 60 * 60 * 1000 * 24 * 7,
+      brightness: config?.onDeviceRobotSettings.brightness ?? 4,
+      textSize: config?.onDeviceRobotSettings.textSize ?? 1,
     }
 )

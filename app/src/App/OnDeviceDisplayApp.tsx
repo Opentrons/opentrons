@@ -167,12 +167,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
   const robotSettings = useSelector(getOnDeviceRobotSettings)
-  console.log('sleep', robotSettings.sleepMs)
-  console.log('brightness', robotSettings.brightness)
-  console.log('textSize', robotSettings.textSize)
   const sleepTime =
-    robotSettings.sleepMs != null ? robotSettings.sleepMs : 24 * 60 * 60 * 1000
-  const isIdle = useIdle(sleepTime, false)
+    robotSettings.sleepMs != null
+      ? robotSettings.sleepMs
+      : 60 * 1000 * 60 * 24 * 7
+  const testTime = 3 * 1000
+  const isIdle = useIdle(testTime, false)
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%">
