@@ -224,5 +224,7 @@
   "device_reset": "Device Reset",
   "device_resets_cannot_be_undone": "Device resets cannot be undone.",
   "clear_all_stored_data": "Clear all stored data",
-  "returns_your_device_to_new_state": "This returns your device to a new state."
+  "returns_your_device_to_new_state": "This returns your device to a new state.",
+  "not_connected": "Not connected",
+  "connected_via": "Connected via {{networkInterface}}"
 }
