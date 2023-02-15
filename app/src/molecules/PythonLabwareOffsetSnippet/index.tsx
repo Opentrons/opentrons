@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { TYPOGRAPHY, SPACING } from '@opentrons/components'
 import { createSnippet } from './createSnippet'
-import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 const JsonTextArea = styled.textarea`
@@ -14,7 +14,7 @@ const JsonTextArea = styled.textarea`
 `
 interface PythonLabwareOffsetSnippetProps {
   mode: 'jupyter' | 'cli'
-  protocol: LegacySchemaAdapterOutput | null
+  protocol: CompletedProtocolAnalysis | null
   labwareOffsets: LabwareOffset[] | null
 }
 

@@ -26,8 +26,8 @@ import {
 import { useRunQuery } from '@opentrons/react-api-client'
 
 import { Portal } from '../../../../App/portal'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { useProtocolDetailsForRun } from '../../../../organisms/Devices/hooks'
 
 const MODES = ['jupyter', 'cli'] as const
 
@@ -45,7 +45,7 @@ export const DownloadOffsetDataModal = (
 ): JSX.Element => {
   const { onCloseClick, runId } = props
   const { t } = useTranslation(['protocol_info', 'shared'])
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const protocolData = useMostRecentCompletedAnalysis(runId)
   const labwareOffsets = useRunQuery(runId)?.data?.data.labwareOffsets ?? null
   const [mode, setMode] = React.useState<typeof MODES[number]>('jupyter')
 
