@@ -140,8 +140,6 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             location: The location to blow out into.
             well_core: Unused by legacy core.
         """
-        print(location)
-        print(self._protocol_interface.get_last_location())
         if location != self._protocol_interface.get_last_location():
             self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
