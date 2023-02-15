@@ -1,10 +1,13 @@
 """Command Line Interface for making use of G-Code Parsing Commands."""
 
+import asyncio
+import inspect
 import sys
 import re
 import argparse
 from dataclasses import dataclass
 from pathlib import PurePath
+from types import CoroutineType
 from typing import (
     Callable,
     Dict,
@@ -32,7 +35,7 @@ class RunnableConfiguration:
     """All the information necessary to perform an operation against a configuration."""
 
     configuration: Union[ProtocolGCodeConfirmConfig, HTTPGCodeConfirmConfig]
-    version: Optional[APIVersion]
+    version: Optional[Union[APIVersion,int]]
 
     def __hash__(self) -> int:
         """Make it hashable."""
@@ -232,12 +235,17 @@ class GCodeCLI:
                     )
                 )
             elif config_string.startswith(ProtocolGCodeConfirmConfig.results_dir):
+                version = None
+                try:
+                    version = APIVersion.from_string(
+                        config_string.rsplit("/", maxsplit=1)[-1]
+                    )
+                except ValueError:
+                    version = int(config_string.rsplit("/", maxsplit=1)[-1])
                 runnable_configurations.append(
                     RunnableConfiguration(
                         configuration=self.configurations[config_string],
-                        version=APIVersion.from_string(
-                            config_string.rsplit("/", maxsplit=1)[-1]
-                        ),
+                        version=version,
                     )
                 )
             else:
@@ -276,9 +284,15 @@ class GCodeCLI:
         ]
 
     @staticmethod
-    def run_commands(commands_to_run: List[Callable]) -> str:
+    async def run_commands(commands_to_run: List[Callable]) -> str:
         """Runs passed commands and returns their output."""
-        return "\n".join([command() for command in commands_to_run])
+        out = []
+        for command in commands_to_run:
+            try:
+                out.append(await command())
+            except TypeError:
+                out.append(command())
+        return "\n".join(out)
 
     @classmethod
     def parser(cls) -> argparse.ArgumentParser:
@@ -371,12 +385,16 @@ class GCodeCLI:
         return self._args
 
 
-if __name__ == "__main__":
+async def main():
     cli = GCodeCLI()
     funcs_to_run = cli.get_runnable_commands()
-    output = cli.run_commands(funcs_to_run)
+    output = await cli.run_commands(funcs_to_run)
 
     if cli.respond_with_error:
         sys.exit(output)
     else:
         print(output)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

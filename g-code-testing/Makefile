@@ -94,3 +94,7 @@ update-g-code-configuration-comparison:
 .PHONY: check-for-missing-comparison-files
 check-for-missing-comparison-files:
 	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
+
+.PHONY: format-readme
+format-readme:
+	yarn prettier --ignore-path .eslintignore --write g-code-testing/**/*.md

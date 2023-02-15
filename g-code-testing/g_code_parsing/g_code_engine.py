@@ -1,16 +1,27 @@
 import os
 import asyncio
+from pathlib import Path
 import time
 from multiprocessing import Process
-from typing import Generator, Callable, Iterator
+from typing import AsyncGenerator, Generator, Callable, Iterator, Union
 from collections import namedtuple
 
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.types import ModuleType
+from opentrons.protocol_api.protocol_context import ProtocolContext
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_reader.protocol_reader import ProtocolReader
+from opentrons.protocol_reader.protocol_source import (
+    JsonProtocolConfig,
+    ProtocolSource,
+    PythonProtocolConfig,
+)
+from opentrons.protocol_runner.protocol_runner import ProtocolRunner
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
-from contextlib import contextmanager
+from contextlib import asynccontextmanager, contextmanager
 from opentrons.protocol_api import create_protocol_context
 from opentrons.config.robot_configs import build_config
 from opentrons.hardware_control.emulation.module_server.helpers import (
@@ -24,6 +35,7 @@ from g_code_parsing.g_code_program.g_code_program import (
 )
 from g_code_parsing.g_code_watcher import GCodeWatcher
 from g_code_parsing.utils import get_configuration_dir
+from opentrons_shared_data.robot.dev_types import RobotType
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
@@ -108,8 +120,8 @@ class GCodeEngine:
 
         return Protocol(text=text, filename=file_path, filelike=file)
 
-    @contextmanager
-    def run_protocol(self, path: str, version: APIVersion) -> Generator:
+    @asynccontextmanager
+    async def run_protocol(self, path: str, version: Union[APIVersion,int]) -> AsyncGenerator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
@@ -117,16 +129,36 @@ class GCodeEngine:
         :param version: API version to use
         :return: GCodeProgram with all the parsed data
         """
-        file_path = os.path.join(get_configuration_dir(), path)
+        file_path = Path(get_configuration_dir(), path)
+        robot_type = "OT-2 Standard"
+        # handle python and json protocols
+        config = PythonProtocolConfig(api_version=version)
+        if file_path.suffix == ".json":
+            config = JsonProtocolConfig(schema_version=version)
+
         with self._emulate() as hardware:
-            protocol = self._get_protocol(file_path)
-            context = create_protocol_context(
-                api_version=version,
+            # use direct creation instead of
+            # ProtocolReader.read_and_save() to create
+            # since we override the config
+            protocol_source: ProtocolSource = ProtocolSource(
+                directory=file_path.parent,
+                main_file=file_path,
+                files=[],
+                metadata={},
+                robot_type=robot_type,
+                config=config,
+            )
+
+            protocol_runner: ProtocolRunner = ProtocolRunner(
+                protocol_engine=await create_protocol_engine(
+                    hardware_api=hardware,
+                    config=Config(robot_type=robot_type),
+                ),
                 hardware_api=hardware,
             )
-            parsed_protocol = parse(protocol.text, protocol.filename)
+
             with GCodeWatcher(emulator_settings=self._config) as watcher:
-                execute.run_protocol(parsed_protocol, context=context)
+                await protocol_runner.run(protocol_source=protocol_source)
             yield GCodeProgram.from_g_code_watcher(watcher)
 
     @contextmanager
