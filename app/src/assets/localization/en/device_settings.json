@@ -226,5 +226,7 @@
   "sleep_settings_description": "Turn the display to sleep after:",
   "never": "Never",
   "minutes": "{{minute}} minutes",
-  "one_hour": "1 hour"
+  "one_hour": "1 hour",
+  "not_connected": "Not connected",
+  "connected_via": "Connected via {{networkInterface}}"
 }
