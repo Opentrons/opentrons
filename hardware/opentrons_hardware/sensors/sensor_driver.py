@@ -234,7 +234,6 @@ class LogListener:
         self.data_file = Any
         self.response_queue: asyncio.Queue[float] = asyncio.Queue()
         self.mount = mount
-        self.new_file_created = bool
         self.start_time = 0.0
         self.z_velocity = z_velocity
         self.plunger_velocity = plunger_velocity
@@ -244,15 +243,15 @@ class LogListener:
         """Create a csv heading for logging pressure readings."""
         self.data_file = os.path.isfile("/var/pressure_sensor_data.csv")
         heading = [
-            "Pressure(pascals)",
             "time(s)",
+            "Pressure(pascals)",
             "z_velocity(mm/s)",
             "plunger_velocity(mm/s)",
             "threshold(pascals)",
         ]
         first_row = [
-            0,
             self.start_time,
+            0,
             self.z_velocity,
             self.plunger_velocity,
             self.threshold_pascals,
@@ -260,8 +259,7 @@ class LogListener:
 
         self.data_file = open("/var/pressure_sensor_data.csv", "a")
         self.csv_writer = csv.writer(self.data_file)
-        if self.new_file_created:
-            self.csv_writer.writerows([heading, first_row])
+        self.csv_writer.writerows([heading, first_row])
 
         self.start_time = time.time()
 

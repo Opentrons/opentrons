@@ -29,13 +29,13 @@ from opentrons.hardware_control.types import (
     GripperProbe,
     InstrumentProbeType,
 )
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-    EarlyLiquidSenseTrigger,
-)
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
     InvalidMoveError,
+)
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+    EarlyLiquidSenseTrigger,
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
@@ -69,7 +69,6 @@ def fake_settings() -> CapacitivePassSettings:
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         starting_mount_height=100,
-        prep_move_speed=6,
         max_z_distance=15,
         min_z_distance=10,
         mount_speed=40,
@@ -393,6 +392,7 @@ async def test_move_to_without_homing_first(
     ],
 )
 async def test_liquid_probe(
+    mock_move_to: AsyncMock,
     ot3_hardware: ThreadManager[OT3API],
     head_ax: OT3Axis,
     pipette_ax: OT3Axis,
@@ -406,17 +406,17 @@ async def test_liquid_probe(
     backend = ot3_hardware.managed_obj._backend
 
     await ot3_hardware.home()
+    mock_move_to.return_value = None
 
     with patch.object(
         backend, "update_position", AsyncMock(spec=backend.update_position)
     ) as mock_position:
-        return_dict = {head_ax: 0, OT3Axis.X: 0, OT3Axis.Y: 0, pipette_ax: 0}
+        return_dict = {head_ax: 140, OT3Axis.X: 0, OT3Axis.Y: 0, pipette_ax: 0}
 
         # scenario - aspirate while sensing
         mock_position.return_value = return_dict
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
-            prep_move_speed=6,
             max_z_distance=15,
             min_z_distance=5,
             mount_speed=40,
@@ -434,8 +434,6 @@ async def test_liquid_probe(
             fake_settings_aspirate.mount_speed,
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
-            fake_settings_aspirate.starting_mount_height,
-            fake_settings_aspirate.prep_move_speed,
             fake_settings_aspirate.log_pressure,
         )
 
@@ -446,7 +444,7 @@ async def test_liquid_probe(
             await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
 
         # scenario - successful probe
-        return_dict[head_ax], return_dict[pipette_ax] = 112, 112
+        return_dict[head_ax], return_dict[pipette_ax] = 142, 142
         mock_position.return_value = return_dict
         await ot3_hardware.liquid_probe(
             mount, fake_liquid_settings

@@ -7,6 +7,7 @@ from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
     axis_to_node,
+    sensor_node_for_mount,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
@@ -107,14 +108,13 @@ def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Con
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         starting_mount_height=100,
-        prep_move_speed=6,
         max_z_distance=15,
         min_z_distance=5,
         mount_speed=40,
         plunger_speed=10,
         sensor_threshold_pascals=15,
         expected_liquid_height=109,
-        log_pressure=True,
+        log_pressure=False,
         aspirate_while_sensing=False,
     )
 
@@ -616,6 +616,7 @@ async def test_liquid_probe(
     controller: OT3Controller,
     fake_liquid_settings: LiquidProbeSettings,
     mock_move_group_run,
+    mock_send_stop_threshold,
 ) -> None:
     await controller.liquid_probe(
         mount=mount,
@@ -623,16 +624,14 @@ async def test_liquid_probe(
         mount_speed=fake_liquid_settings.mount_speed,
         plunger_speed=fake_liquid_settings.plunger_speed,
         threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
-        starting_mount_height=fake_liquid_settings.starting_mount_height,
-        prep_move_speed=fake_liquid_settings.prep_move_speed,
+        log_pressure=fake_liquid_settings.log_pressure,
     )
-    for call in mock_move_group_run.call_args_list:
-        move_group_runner = call[0][0]
-        for move_group in move_group_runner._move_groups:
-            assert move_group  # don't pass in empty groups
-            assert len(move_group) == 2
-        step = move_group[0][NodeId.pipette_left]
-        assert step.stop_condition == MoveStopCondition.none
+    move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
+    head_node = axis_to_node(OT3Axis.by_mount(mount))
+    tool_node = sensor_node_for_mount(mount)
+    assert move_groups[head_node].stop_condition == MoveStopCondition.sync_line
+    assert len(move_groups) == 2
+    assert move_groups[head_node], move_groups[tool_node]
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:

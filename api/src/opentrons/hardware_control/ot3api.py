@@ -120,6 +120,7 @@ from .dev_types import (
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
     EarlyLiquidSenseTrigger,
+    LiquidNotFound,
 )
 
 mod_log = logging.getLogger(__name__)
@@ -1690,7 +1691,7 @@ class OT3API(
         a EarlyLiquidSenseTrigger error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
-        home the plunger to prepare to aspirate, and return the position of the
+        and return the position of the
         z axis in deck coordinates, as well as the encoder position, where
         the liquid was found.
         """
@@ -1755,12 +1756,13 @@ class OT3API(
             z_distance_traveled = (
                 position[mount_axis] - probe_settings.starting_mount_height
             )
-
             if z_distance_traveled < probe_settings.min_z_distance:
                 raise EarlyLiquidSenseTrigger(
                     triggered_at=z_distance_traveled,
                     min_z=probe_settings.min_z_distance,
                 )
+            elif z_distance_traveled > probe_settings.max_z_distance:
+                raise LiquidNotFound(max_z=probe_settings.max_z_distance)
 
             return position[mount_axis], encoder_position[mount_axis]
 

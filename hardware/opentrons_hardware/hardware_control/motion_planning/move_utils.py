@@ -40,6 +40,16 @@ class EarlyLiquidSenseTrigger(RuntimeError):
         )
 
 
+class LiquidNotFound(RuntimeError):
+    """Error raised if liquid sensing move completes without detecting liquid."""
+
+    def __init__(self, max_z: float) -> None:
+        """Initialize LiquidNotFound error."""
+        super().__init__(
+            f"Liquid threshold not found, max travel allowed = {max_z}"
+        )
+
+
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     """Keep the sign of the input but cap the numeric value at the constraint value."""
     return cast(np.float64, np.copysign(np.minimum(abs(constraint), abs(input)), input))

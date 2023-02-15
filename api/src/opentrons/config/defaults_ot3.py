@@ -21,7 +21,6 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     starting_mount_height=100,
-    prep_move_speed=10,
     max_z_distance=40,
     min_z_distance=5,
     mount_speed=10,
@@ -359,7 +358,6 @@ def _build_default_liquid_probe(
         starting_mount_height=from_conf.get(
             "starting_mount_height", default.starting_mount_height
         ),
-        prep_move_speed=from_conf.get("prep_move_speed", default.prep_move_speed),
         max_z_distance=from_conf.get("max_z_distance", default.max_z_distance),
         min_z_distance=from_conf.get("min_z_distance", default.min_z_distance),
         mount_speed=from_conf.get("mount_speed", default.mount_speed),

@@ -231,8 +231,6 @@ class OT3Simulator:
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        starting_mount_height: float,
-        prep_move_speed: float,
         log_pressure: bool = True,
         read_only: bool = False,
         sensor_id: SensorId = SensorId.S0,
