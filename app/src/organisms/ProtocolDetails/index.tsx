@@ -6,7 +6,7 @@ import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Box,
@@ -45,7 +45,10 @@ import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
 import { useTrackEvent } from '../../redux/analytics'
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import {
+  getIsProtocolAnalysisInProgress,
+  analyzeProtocol,
+} from '../../redux/protocol-storage'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
@@ -59,7 +62,7 @@ import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
+import type { State, Dispatch } from '../../redux/types'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -241,6 +244,7 @@ export function ProtocolDetails(
   props: ProtocolDetailsProps
 ): JSX.Element | null {
   const trackEvent = useTrackEvent()
+  const dispatch = useDispatch<Dispatch>()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
@@ -248,6 +252,13 @@ export function ProtocolDetails(
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
+
+  React.useEffect(() => {
+    if (mostRecentAnalysis != null && !('liquids' in mostRecentAnalysis)) {
+      dispatch(analyzeProtocol(protocolKey))
+    }
+  }, [])
+
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )

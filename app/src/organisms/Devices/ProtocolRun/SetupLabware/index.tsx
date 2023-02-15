@@ -10,10 +10,10 @@ import {
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '../../hooks'
 import { ProceedToRunButton } from '../ProceedToRunButton'
@@ -34,9 +34,7 @@ interface SetupLabwareProps {
 export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const { robotName, runId, nextStep, expandStep, protocolRunHeaderRef } = props
   const { t } = useTranslation('protocol_setup')
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [selectedValue, toggleGroup] = useToggleGroup(

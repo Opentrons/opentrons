@@ -286,3 +286,6 @@ If you specify an API version of 2.13 or lower, your protocols will continue to 
       - Internal methods ``Labware.use_tips``, ``Labware.previous_tip``, and ``Labware.return_tips``
         were deprecated.
 
+  - The ``configuration`` argument of :py:meth:`.ProtocolContext.load_module` was deprecated
+    because it made unsafe modifications to the protocol's geometry system,
+    and the Thermocycler's "semi" configuration is not officially supported.

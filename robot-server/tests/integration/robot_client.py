@@ -4,7 +4,7 @@ import asyncio
 import concurrent.futures
 import contextlib
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, List, Optional
+from typing import Any, AsyncGenerator, BinaryIO, Dict, List, Optional, Tuple, Union
 
 import httpx
 from httpx import Response
@@ -123,16 +123,35 @@ class RobotClient:
         )
         return response
 
-    async def post_protocol(self, files: List[Path]) -> Response:
-        """POST /protocols."""
+    async def post_protocol(
+        self, files: List[Union[Path, Tuple[str, bytes]]]
+    ) -> Response:
+        """POST /protocols.
+
+        Params:
+            files: The files to upload, representing the protocol, custom labware, etc.
+                Each file file can be provided as a Path, in which case it's read
+                from the filesystem, or as a (name, contents) tuple.
+        """
+        multipart_upload_name = "files"
+
         with contextlib.ExitStack() as file_exit_stack:
-            file_payload = [
-                ("files", file_exit_stack.enter_context(path.open("rb")))
-                for path in files
-            ]
+            opened_files: List[
+                Union[BinaryIO, Tuple[str, bytes]],
+            ] = []
+
+            for file in files:
+                if isinstance(file, Path):
+                    opened_file = file_exit_stack.enter_context(file.open("rb"))
+                    opened_files.append(opened_file)
+                else:
+                    opened_files.append(file)
+
             response = await self.httpx_client.post(
-                url=f"{self.base_url}/protocols", files=file_payload
+                url=f"{self.base_url}/protocols",
+                files=[(multipart_upload_name, f) for f in opened_files],
             )
+
         response.raise_for_status()
         return response
 

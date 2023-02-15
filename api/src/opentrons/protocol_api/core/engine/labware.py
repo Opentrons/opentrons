@@ -87,8 +87,10 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._definition.parameters.quirks or []
 
     def set_calibration(self, delta: Point) -> None:
-        # TODO(jbl 2022-09-01): implement set calibration through the engine
-        pass
+        raise NotImplementedError(
+            "Setting a labware's calibration after it's been loaded"
+            " is not supported by Protocol Engine."
+        )
 
     def get_calibrated_offset(self) -> Point:
         return self._engine_client.state.geometry.get_labware_position(self._labware_id)
