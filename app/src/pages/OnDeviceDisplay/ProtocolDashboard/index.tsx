@@ -22,6 +22,7 @@ import { StyledText } from '../../../atoms/text'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import {
+  getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '../../../redux/config'
@@ -56,7 +57,11 @@ export function ProtocolDashboard(): JSX.Element {
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
+  const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
+  const pinnedProtocols = protocolsData.filter(p =>
+    pinnedProtocolIds.includes(p.id)
+  )
   const runData = runs.data?.data != null ? runs.data?.data : []
   const sortedProtocols = sortProtocols(sortBy, protocolsData, runData)
 
@@ -98,6 +103,30 @@ export function ProtocolDashboard(): JSX.Element {
       minHeight="25rem"
     >
       <Navigation routes={onDeviceDisplayRoutes} />
+      {pinnedProtocols.length > 0 && (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          height="8rem"
+          backgroundColor={COLORS.medGreyEnabled}
+        >
+          <StyledText
+            fontSize="2rem"
+            lineHeight="2.75rem"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            Pinned Protocols
+          </StyledText>
+          <StyledText
+            fontSize="1rem"
+            lineHeight="1.125rem"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            {JSON.stringify(pinnedProtocolIds)}
+          </StyledText>
+        </Flex>
+      )}
       {sortedProtocols.length > 0 ? (
         <Table>
           <thead>

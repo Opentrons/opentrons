@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -19,6 +20,10 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
+import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
+
+import type { Dispatch } from '../../../redux/types'
+import type { PinnedProtocolIds } from '../../../redux/config/types'
 
 import {
   useCreateRunMutation,
@@ -46,7 +51,10 @@ export function ProtocolRow(props: {
   const { protocol, index, lastRun } = props
   const history = useHistory()
   const { t } = useTranslation('protocol_info')
+  const dispatch = useDispatch<Dispatch>()
+  let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
 
+  const pinned = pinnedProtocolIds.includes(protocol.id)
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
 
   const longpress = useLongPress()
@@ -57,6 +65,14 @@ export function ProtocolRow(props: {
       history.push(`/protocols/${runId}/setup`)
     },
   })
+
+  const handlePinnedProtocolIds = (
+    pinnedProtocolIds: PinnedProtocolIds
+  ): void => {
+    dispatch(
+      updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
+    )
+  }
 
   // TODO const { deleteProtocol } = useDeleteProtocolMutation(protocol.id)
 
@@ -69,6 +85,12 @@ export function ProtocolRow(props: {
 
   const handlePinClick = (): void => {
     longpress.setIsLongPressed(false)
+    if (pinned) {
+      pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocol.id)
+    } else {
+      pinnedProtocolIds.push(protocol.id)
+    }
+    handlePinnedProtocolIds(pinnedProtocolIds)
   }
 
   const handleProtocolClick = (): void => {
@@ -158,7 +180,7 @@ export function ProtocolRow(props: {
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
                 textAlign={TEXT_ALIGN_CENTER}
               >
-                {t('pin_protocol')}
+                {pinned ? t('unpin_protocol') : t('pin_protocol')}
               </StyledText>
             </Flex>
             <Flex

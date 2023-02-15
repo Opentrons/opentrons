@@ -40,6 +40,7 @@
   "required_cal_data_title": "Calibration Data",
   "run_protocol": "Run protocol",
   "simulation_in_progress": "Simulation in Progress",
+  "unpin_protocol": "Unpin protocol",
   "update_robot_for_custom_labware": "You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols",
   "upload_and_simulate": "Open a protocol to run on {{robot_name}}",
   "exit_modal_heading": "Confirm Close Protocol",
