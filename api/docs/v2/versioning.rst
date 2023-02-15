@@ -278,7 +278,7 @@ If you specify an API version of 2.13 or lower, your protocols will continue to 
  
   - Various methods and setters were deprecated that could modify tip state outside of
     calls to :py:meth:`.InstrumentContext.pick_up_tip` and :py:meth:`.InstrumentContext.drop_tip`.
-    This change allows us the robot to track tip usage more completely and reliably.
+    This change allows the robot to track tip usage more completely and reliably.
     You may still use :py:meth:`.Labware.reset` to reset your tip rack's state.
 
       - The :py:attr:`.Well.has_tip` **setter** was deprecated. **The getter is not deprecated.**
