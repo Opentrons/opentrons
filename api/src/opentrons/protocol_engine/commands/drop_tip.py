@@ -1,6 +1,6 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
@@ -17,7 +17,14 @@ DropTipCommandType = Literal["dropTip"]
 class DropTipParams(PipetteIdMixin, WellLocationMixin):
     """Payload required to drop a tip in a specific well."""
 
-    pass
+    homeAfter: Optional[bool] = Field(
+        None,
+        description=(
+            "Whether to home this pipette's plunger after dropping the tip."
+            " You should normally leave this unspecified to let the robot choose"
+            " a safe default depending on its hardware."
+        ),
+    )
 
 
 class DropTipResult(BaseModel):
@@ -39,6 +46,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+            home_after=params.homeAfter,
         )
 
         return DropTipResult()

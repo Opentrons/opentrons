@@ -133,7 +133,7 @@ const PROTOCOL_DETAILS = {
 describe('useRunPipetteInfoByMount hook', () => {
   beforeEach(() => {
     when(mockUseAttachedPipetteCalibrations)
-      .calledWith('otie')
+      .calledWith()
       .mockReturnValue(PIPETTE_CALIBRATIONS)
     when(mockUseAttachedPipettes)
       .calledWith()

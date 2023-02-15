@@ -162,8 +162,8 @@ async def mock_instrument_handlers(
     (
         (
             {
-                OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p50"},
-                OT3Mount.LEFT: {"channels": 1, "version": (1, 0), "model": "p1000"},
+                OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p50"},
+                OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"},
             },
             GantryLoad.TWO_LOW_THROUGHPUT,
         ),
@@ -173,34 +173,34 @@ async def mock_instrument_handlers(
             GantryLoad.GRIPPER,
         ),
         (
-            {OT3Mount.LEFT: {"channels": 8, "version": (1, 0), "model": "p1000"}},
+            {OT3Mount.LEFT: {"channels": 8, "version": (3, 3), "model": "p1000"}},
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
-            {OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p1000"}},
+            {OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p1000"}},
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
-            {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (1, 0)}},
+            {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (3, 3)}},
             GantryLoad.HIGH_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.LEFT: {"channels": 1, "version": (1, 0), "model": "p1000"},
+                OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"},
                 OT3Mount.GRIPPER: {"model": GripperModel.v1, "id": "g12345"},
             },
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p1000"},
+                OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p1000"},
                 OT3Mount.GRIPPER: {"model": GripperModel.v1, "id": "g12345"},
             },
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (1, 0)},
+                OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (3, 3)},
                 OT3Mount.GRIPPER: {"model": GripperModel.v1, "id": "g12345"},
             },
             GantryLoad.HIGH_THROUGHPUT,

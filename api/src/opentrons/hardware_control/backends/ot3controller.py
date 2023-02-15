@@ -235,13 +235,10 @@ class OT3Controller:
 
         log.info("Firmware updates are available.")
         self.update_required = True
-        update_details = {
-            node_id: str(update.filepath)
-            for node_id, update in firmware_updates.items()
-        }
+
         updater = firmware_update.RunUpdate(
             messenger=self._messenger,
-            update_details=update_details,
+            update_details=firmware_updates,
             retry_count=3,
             timeout_seconds=20,
             erase=True,

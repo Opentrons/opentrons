@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
 import {
@@ -20,11 +19,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 
-import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/buttons'
-import { useCalibratePipetteOffset } from '../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
-import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { getHasCalibrationBlock } from '../../../redux/config'
 import { Banner } from '../../../atoms/Banner'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useDeckCalibrationData, useIsOT3 } from '../hooks'
@@ -49,8 +44,6 @@ export function SetupPipetteCalibrationItem({
   runId,
 }: SetupPipetteCalibrationItemProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
-  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
-  const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
   const deviceDetailsUrl = `/devices/${robotName}`
 
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
@@ -59,28 +52,6 @@ export function SetupPipetteCalibrationItem({
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-
-  const [
-    startPipetteOffsetCalibration,
-    PipetteOffsetCalibrationWizard,
-  ] = useCalibratePipetteOffset(robotName, { mount })
-
-  const startPipetteOffsetCalibrationBlockModal = (
-    hasBlockModalResponse: boolean | null
-  ): void => {
-    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setShowCalBlockModal(true)
-    } else {
-      startPipetteOffsetCalibration({
-        overrideParams: {
-          hasCalibrationBlock: Boolean(
-            configHasCalibrationBlock ?? hasBlockModalResponse
-          ),
-        },
-      })
-      setShowCalBlockModal(false)
-    }
-  }
 
   let button: JSX.Element | undefined
   let subText
@@ -139,15 +110,17 @@ export function SetupPipetteCalibrationItem({
           gridGap={SPACING.spacing3}
         >
           <Flex>{pipetteMismatchInfo}</Flex>
-          <TertiaryButton
-            onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
-            disabled={!isDeckCalibrated}
-            id="PipetteCalibration_calibratePipetteButton"
-            {...targetProps}
+          <RRDLink
+            to={`/devices/${robotName}/robot-settings/calibration/dashboard`}
           >
-            {t('calibrate_now_cta')}
-          </TertiaryButton>
-
+            <TertiaryButton
+              disabled={!isDeckCalibrated}
+              id="PipetteCalibration_calibratePipetteButton"
+              {...targetProps}
+            >
+              {t('calibrate_now_cta')}
+            </TertiaryButton>
+          </RRDLink>
           {!isDeckCalibrated ? (
             <Tooltip {...tooltipProps}>
               <Box width={SIZE_4}>
@@ -176,18 +149,6 @@ export function SetupPipetteCalibrationItem({
         id={`PipetteCalibration_${mount}MountTitle`}
         runId={runId}
       />
-      {PipetteOffsetCalibrationWizard}
-      {showCalBlockModal && (
-        <Portal level="top">
-          <AskForCalibrationBlockModal
-            onResponse={hasBlockModalResponse => {
-              startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
-            }}
-            titleBarTitle={t('pipette_offset_cal')}
-            closePrompt={() => setShowCalBlockModal(false)}
-          />
-        </Portal>
-      )}
     </>
   )
 }

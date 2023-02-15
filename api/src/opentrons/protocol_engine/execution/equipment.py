@@ -3,9 +3,10 @@ from dataclasses import dataclass
 from typing import Optional, overload, Union
 from typing_extensions import Literal
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
@@ -27,7 +28,12 @@ from ..errors import (
     LabwareDefinitionDoesNotExistError,
     ModuleNotAttachedError,
 )
-from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
+from ..resources import (
+    LabwareDataProvider,
+    ModuleDataProvider,
+    ModelUtils,
+    pipette_data_provider,
+)
 from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
@@ -162,45 +168,66 @@ class EquipmentHandler:
         Returns:
             A LoadedPipetteData object.
         """
-        cache_request = {
-            mount.to_hw_mount(): (
-                pipette_name.value
-                if isinstance(pipette_name, PipetteNameType)
-                else pipette_name
-            )
-        }
+        use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
 
-        # TODO(mc, 2022-12-09): putting the other pipette in the cache request
-        # is only to support protocol analysis, since the hardware simulator
-        # does not cache requested virtual instruments. Remove per
-        # https://opentrons.atlassian.net/browse/RLIQ-258
-        other_mount = mount.other_mount()
-        other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
-        if other_pipette is not None:
-            cache_request[other_mount.to_hw_mount()] = (
-                other_pipette.pipetteName.value
-                if isinstance(other_pipette.pipetteName, PipetteNameType)
-                else other_pipette.pipetteName
-            )
+        pipette_name_value = (
+            pipette_name.value
+            if isinstance(pipette_name, PipetteNameType)
+            else pipette_name
+        )
 
-        # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
-        # behavior of protocol_context.load_instrument, and is used here as a
-        # pipette existence check
-        try:
-            await self._hardware_api.cache_instruments(cache_request)
-        except RuntimeError as e:
-            raise FailedToLoadPipetteError(str(e)) from e
-
-        pipette_dict = self._hardware_api.get_attached_instrument(mount.to_hw_mount())
         pipette_id = pipette_id or self._model_utils.generate_id()
+
+        if not use_virtual_pipettes:
+            cache_request = {mount.to_hw_mount(): pipette_name_value}
+
+            # TODO(mc, 2022-12-09): putting the other pipette in the cache request
+            # is only to support protocol analysis, since the hardware simulator
+            # does not cache requested virtual instruments. Remove per
+            # https://opentrons.atlassian.net/browse/RLIQ-258
+            other_mount = mount.other_mount()
+            other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
+            if other_pipette is not None:
+                cache_request[other_mount.to_hw_mount()] = (
+                    other_pipette.pipetteName.value
+                    if isinstance(other_pipette.pipetteName, PipetteNameType)
+                    else other_pipette.pipetteName
+                )
+
+            # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
+            # behavior of protocol_context.load_instrument, and is used here as a
+            # pipette existence check
+            try:
+                await self._hardware_api.cache_instruments(cache_request)
+            except RuntimeError as e:
+                raise FailedToLoadPipetteError(str(e)) from e
+
+            pipette_dict = self._hardware_api.get_attached_instrument(
+                mount.to_hw_mount()
+            )
+
+            pipette_model = pipette_dict["model"]
+            pipette_serial = pipette_dict["pipette_id"]
+
+            static_pipette_config = pipette_data_provider.get_pipette_static_config(
+                pipette_model, pipette_serial
+            )
+        else:
+            static_pipette_config = (
+                pipette_data_provider.get_virtual_pipette_static_config(
+                    pipette_name_value
+                )
+            )
 
         self._action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id=pipette_id,
-                model=pipette_dict["model"],
-                min_volume=pipette_dict["min_volume"],
-                max_volume=pipette_dict["max_volume"],
-                channels=pipette_dict["channels"],
+                model=static_pipette_config.model,
+                display_name=static_pipette_config.display_name,
+                min_volume=static_pipette_config.min_volume,
+                max_volume=static_pipette_config.max_volume,
+                channels=static_pipette_config.channels,
+                flow_rates=static_pipette_config.flow_rates,
             )
         )
 

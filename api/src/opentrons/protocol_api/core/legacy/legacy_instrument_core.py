@@ -47,9 +47,16 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         self._mount = mount
         self._instrument_name = instrument_name
         self._default_speed = default_speed
-        self._flow_rates = FlowRates(self)
         self._speeds = PlungerSpeeds(self)
-        self._flow_rates.set_defaults(api_level=self._api_version)
+
+        pipette_state = self.get_hardware_state()
+        self._flow_rates = FlowRates(self)
+        self._flow_rates.set_defaults(
+            aspirate_defaults=pipette_state["default_aspirate_flow_rates"],
+            dispense_defaults=pipette_state["default_dispense_flow_rates"],
+            blow_out_defaults=pipette_state["default_blow_out_flow_rates"],
+            api_level=self._api_version,
+        )
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -210,7 +217,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         self,
         location: Optional[types.Location],
         well_core: LegacyWellCore,
-        home_after: bool,
+        home_after: Optional[bool],
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -247,7 +254,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
         hw = self._protocol_interface.get_hardware()
         self.move_to(location=location)
-        hw.drop_tip(self._mount, home_after=home_after)
+        hw.drop_tip(self._mount, home_after=True if home_after is None else home_after)
 
         if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
             # If this is a tiprack we can try and add the dirty tip back to the tracker
@@ -370,6 +377,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """Get the model name."""
         return self.get_hardware_state()["model"]
 
+    def get_display_name(self) -> str:
+        """Get the display name"""
+        return self.get_hardware_state()["display_name"]
+
     def get_min_volume(self) -> float:
         """Get the min volume."""
         return self.get_hardware_state()["min_volume"]
@@ -419,14 +430,14 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
-    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.aspirate * rate
+    def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
+        return self.get_hardware_state()["aspirate_flow_rate"] * rate
 
-    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.dispense * rate
+    def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
+        return self.get_hardware_state()["dispense_flow_rate"] * rate
 
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
-        return self._flow_rates.blow_out * rate
+    def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
+        return self.get_hardware_state()["blow_out_flow_rate"] * rate
 
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds

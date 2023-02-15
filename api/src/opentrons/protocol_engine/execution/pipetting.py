@@ -146,6 +146,7 @@ class PipettingHandler:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        home_after: Optional[bool],
     ) -> None:
         """Drop a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
@@ -172,8 +173,7 @@ class PipettingHandler:
         # perform the tip drop routine
         await self._hardware_api.drop_tip(
             mount=hw_pipette.mount,
-            # TODO(mc, 2020-11-12): include this parameter in the request
-            home_after=True,
+            home_after=True if home_after is None else home_after,
         )
 
     async def aspirate(

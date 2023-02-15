@@ -1,12 +1,10 @@
 """Tests for the InstrumentContext public interface."""
 import inspect
-from typing import cast
 
 import pytest
 from decoy import Decoy
 
 from opentrons.broker import Broker
-from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
@@ -48,9 +46,6 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     """Get a mock instrument implementation core."""
     instrument_core = decoy.mock(cls=InstrumentCore)
     decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
-    decoy.when(instrument_core.get_hardware_state()).then_return(
-        cast(PipetteDict, {"display_name": "Cool Pipette"})
-    )
     return instrument_core
 
 
@@ -235,9 +230,7 @@ def test_aspirate(
         )
     ).then_return(WellTarget(well=mock_well, location=None))
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
-    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=input_location, rate=1.23)
 
@@ -274,9 +267,7 @@ def test_aspirate_well_location(
             location=input_location, last_location=last_location
         )
     ).then_return(WellTarget(well=mock_well, location=input_location))
-    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=input_location, rate=1.23)
 
@@ -312,9 +303,7 @@ def test_aspirate_from_coordinates(
             location=input_location, last_location=last_location
         )
     ).then_return(PointTarget(location=input_location, in_place=False))
-    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=input_location, rate=1.23)
 
@@ -350,9 +339,7 @@ def test_aspirate_in_place(
             location=input_location, last_location=last_location
         )
     ).then_return(PointTarget(location=input_location))
-    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=input_location, rate=1.23)
 
@@ -711,7 +698,7 @@ def test_drop_tip_to_trash(
 
     decoy.verify(
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._core, home_after=True
+            location=None, well_core=mock_well._core, home_after=None
         ),
         times=1,
     )
@@ -737,7 +724,7 @@ def test_return_tip(
             prep_after=True,
         ),
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._core, home_after=True
+            location=None, well_core=mock_well._core, home_after=None
         ),
     )
 
@@ -764,9 +751,7 @@ def test_dispense_with_location(
             location=input_location, last_location=last_location
         )
     ).then_return(PointTarget(location=input_location, in_place=False))
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
 
     subject.dispense(volume=42.0, location=input_location, rate=1.23)
 
@@ -803,9 +788,7 @@ def test_dispense_with_well_location(
             location=input_location, last_location=last_location
         )
     ).then_return(WellTarget(well=mock_well, location=input_location))
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(3.0)
 
     subject.dispense(volume=42.0, location=input_location, rate=1.23)
 
@@ -816,7 +799,7 @@ def test_dispense_with_well_location(
             in_place=False,
             volume=42.0,
             rate=1.23,
-            flow_rate=5.67,
+            flow_rate=3.0,
         ),
         times=1,
     )
@@ -844,9 +827,7 @@ def test_dispense_with_well(
         )
     ).then_return(WellTarget(well=mock_well, location=None))
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
 
     subject.dispense(volume=42.0, location=input_location, rate=1.23)
 
@@ -882,9 +863,7 @@ def test_dispense_in_place(
             location=input_location, last_location=last_location
         )
     ).then_return(PointTarget(location=input_location, in_place=True))
-    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.23)).then_return(
-        5.67
-    )
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
 
     subject.dispense(volume=42.0, location=input_location, rate=1.23)
 

@@ -99,9 +99,10 @@ def create_protocol_context(
 
     if api_version >= ENGINE_CORE_API_VERSION:
         # TODO(mc, 2022-8-22): replace raise with strict typing
-        raise ProtocolEngineCoreRequiredError(
-            "ProtocolEngine PAPI core is enabled, but no ProtocolEngine given."
-        )
+        if protocol_engine is None or protocol_engine_loop is None:
+            raise ProtocolEngineCoreRequiredError(
+                "ProtocolEngine PAPI core is enabled, but no ProtocolEngine given."
+            )
 
         engine_client_transport = ChildThreadTransport(
             engine=protocol_engine, loop=protocol_engine_loop

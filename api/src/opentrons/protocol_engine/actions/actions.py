@@ -14,7 +14,7 @@ from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid, FlowRates
 
 
 @dataclass(frozen=True)
@@ -176,9 +176,11 @@ class AddPipetteConfigAction:
 
     pipette_id: str
     model: str
+    display_name: str
     min_volume: float
     max_volume: float
     channels: int
+    flow_rates: FlowRates
 
 
 Action = Union[
