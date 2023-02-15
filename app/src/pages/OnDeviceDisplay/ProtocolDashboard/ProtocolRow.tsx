@@ -4,15 +4,26 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { format, formatDistance } from 'date-fns'
 import {
+  ALIGN_CENTER,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
   SPACING,
+  TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
   truncateString,
   useLongPress,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import { ModalShell } from '../../../molecules/Modal'
 
+import {
+  useCreateRunMutation,
+  useDeleteProtocolMutation,
+} from '@opentrons/react-api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 const TableRow = styled('tr')`
@@ -40,17 +51,40 @@ export function ProtocolRow(props: {
 
   const longpress = useLongPress()
 
-  const handleProtocolClick = (id: string): void => {
-    if (longpress.isLongPressed) {
-      alert(`Stop pressing me!`)
-      longpress.setIsLongPressed(false)
-    } else history.push(`/protocols/${id}`)
+  const { createRun } = useCreateRunMutation({
+    onSuccess: data => {
+      const runId: string = data.data.id
+      history.push(`/protocols/${runId}/setup`)
+    },
+  })
+
+  const { deleteProtocol } = useDeleteProtocolMutation(protocol.id)
+
+  const handleDeleteClick = (): void => {
+    longpress.setIsLongPressed(false)
+    deleteProtocol()
+    history.go(0)
+  }
+
+  const handlePinClick = (): void => {
+    longpress.setIsLongPressed(false)
+  }
+
+  const handleProtocolClick = (): void => {
+    if (!longpress.isLongPressed) {
+      history.push(`/protocols/${protocol.id}`)
+    }
+  }
+
+  const handleRunClick = (): void => {
+    longpress.setIsLongPressed(false)
+    createRun({ protocolId: protocol.id })
   }
 
   return (
     <TableRow
       key={protocol.key ?? index}
-      onClick={() => handleProtocolClick(protocol.id)}
+      onClick={() => handleProtocolClick()}
       ref={longpress.ref}
     >
       <TableDatum>
@@ -84,6 +118,71 @@ export function ProtocolRow(props: {
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
       </TableDatum>
+      {longpress.isLongPressed && (
+        <ModalShell width="15.625rem">
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
+            <Flex
+              alignItems={ALIGN_CENTER}
+              gridGap={SPACING.spacing3}
+              height="4.875rem"
+              justifyContent={JUSTIFY_CENTER}
+              padding={SPACING.spacing5}
+              onClick={() => handleRunClick()}
+            >
+              <Icon name="play-circle" size="1.5rem" color={COLORS.black} />
+              <StyledText
+                fontSize="1.375rem"
+                lineHeight="1.5rem"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                textAlign={TEXT_ALIGN_CENTER}
+              >
+                {t('run_protocol')}
+              </StyledText>
+            </Flex>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              gridGap={SPACING.spacing3}
+              height="4.875rem"
+              justifyContent={JUSTIFY_CENTER}
+              padding={SPACING.spacing5}
+              onClick={() => handlePinClick()}
+            >
+              <Icon name="push-pin" size="1.5rem" color={COLORS.black} />
+              <StyledText
+                fontSize="1.375rem"
+                lineHeight="1.5rem"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                textAlign={TEXT_ALIGN_CENTER}
+              >
+                {t('pin_protocol')}
+              </StyledText>
+            </Flex>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              backgroundColor={COLORS.errorEnabled}
+              gridGap={SPACING.spacing3}
+              height="4.875rem"
+              justifyContent={JUSTIFY_CENTER}
+              padding={SPACING.spacing5}
+              onClick={() => handleDeleteClick()}
+            >
+              <Icon name="trash" size="1.5rem" color={COLORS.white} />
+              <StyledText
+                color={COLORS.white}
+                fontSize="1.375rem"
+                lineHeight="1.5rem"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                textAlign={TEXT_ALIGN_CENTER}
+              >
+                {t('delete_protocol')}
+              </StyledText>
+            </Flex>
+          </Flex>
+        </ModalShell>
+      )}
     </TableRow>
   )
 }
