@@ -403,10 +403,28 @@ class Labware:
         """Quirks specific to this labware."""
         return self._core.get_quirks()
 
-    # TODO(mc, 2022-09-23): use `self._core.get_default_magnet_engage_height`
+    # TODO(mm, 2023-02-08):
+    # Specify units and origin after we resolve RSS-110.
+    # Remove warning once we resolve RSS-109 more broadly.
     @property  # type: ignore
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
+        """Return the default magnet engage height that
+        :py:meth:`.MagneticModuleContext.engage` will use for this labware.
+
+        .. warning::
+            This currently returns confusing and unpredictable results that do not
+            necessarily match what :py:meth:`.MagneticModuleContext.engage` will
+            actually choose for its default height.
+
+            The confusion is related to how this height's units and origin point are
+            defined, and differences between Magnetic Module generations.
+
+            For now, we recommend you avoid accessing this property directly.
+        """
+        # Return the raw value straight from the labware definition. For several
+        # reasons (see RSS-109), this may not match the actual default height chosen
+        # by MagneticModuleContext.engage().
         p = self._core.get_parameters()
         if not p["isMagneticModuleCompatible"]:
             return None
@@ -431,15 +449,32 @@ class Labware:
         even if those labware are of the same type.
 
         .. caution::
-            This method is *only* for Jupyter and command-line applications
-            of the Python Protocol API. Do not use this method in a protocol
-            uploaded via the Opentrons App.
+            This method is *only* for use with mechanisms like
+            :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
+            to adjust labware offsets. (See :ref:`advanced-control`.)
 
-            Using this method and the Opentrons App's Labware Position Check
-            at the same time will produce undefined behavior. We may choose
-            to define this behavior in a future release.
+            If you're uploading a protocol via the Opentrons App, don't use this method,
+            because it will produce undefined behavior.
+            Instead, use Labware Position Check in the app.
+
+            Because protocols using :ref:`API version <v2-versioning>` 2.14 or higher
+            can currently *only* be uploaded via the Opentrons App, it doesn't make
+            sense to use this method with them. Trying to do so will raise an exception.
         """
-        self._core.set_calibration(Point(x=x, y=y, z=z))
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            # TODO(mm, 2023-02-13): See Jira RCORE-535.
+            #
+            # Until that issue is resolved, the only way to simulate or run a
+            # >=ENGINE_CORE_API_VERSION protocol is through the Opentrons App.
+            # Therefore, in >=ENGINE_CORE_API_VERSION protocols,
+            # there's no legitimate way to use this method.
+            raise APIVersionError(
+                "Labware.set_offset() is not supported when apiLevel is 2.14 or higher."
+                " Use a lower apiLevel"
+                " or use the Opentrons App's Labware Position Check."
+            )
+        else:
+            self._core.set_calibration(Point(x=x, y=y, z=z))
 
     @property  # type: ignore
     @requires_version(2, 0)

@@ -7,13 +7,18 @@ import secrets
 from typing import Any, Dict, Optional
 import mock
 import pytest
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteType
+from opentrons_hardware.hardware_control.types import PCBARevision
 
 from opentrons_hardware.firmware_update.utils import (
     FirmwareUpdateType,
     UpdateInfo,
     load_firmware_manifest,
     check_firmware_updates,
+    _DEFAULT_PCBA_REVS,
+    _DEFAULT_PCBA_REVS_PIPETTE,
+    _update_type_for_device,
+    _update_files_from_types,
 )
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
 
@@ -30,14 +35,16 @@ def mock_manifest() -> Dict[str, Any]:
             "head": {
                 "version": 2,
                 "shortsha": "25755efd",
-                "files_by_revision": {"rev1": "head-rev1.hex"},
+                "files_by_revision": {"c1": "head-c1.hex"},
             }
         },
     }
 
 
 def generate_device_info(
-    manifest: Dict[str, Any], random_sha: Optional[bool] = False
+    manifest: Dict[str, Any],
+    random_sha: Optional[bool] = False,
+    revision: Optional[str] = "c1",
 ) -> Dict[NodeId, DeviceInfoCache]:
     """Helper function to generate device info."""
     device_info_cache: Dict[NodeId, DeviceInfoCache] = {}
@@ -46,7 +53,11 @@ def generate_device_info(
         version = info["version"]
         shortsha = secrets.token_hex(4) if random_sha else info["shortsha"]
         device_info_cache.update(
-            {node_id: DeviceInfoCache(node_id, version, shortsha, None)}
+            {
+                node_id: DeviceInfoCache(
+                    node_id, version, shortsha, None, PCBARevision(revision, None)
+                )
+            }
         )
     return device_info_cache
 
@@ -65,6 +76,85 @@ def generate_update_info(
             {update_type: UpdateInfo(update_type, version, shortsha, files_by_revision)}
         )
     return update_info
+
+
+@pytest.mark.parametrize("node", list(NodeId))
+def all_nodes_covered_by_defaults(node: NodeId) -> None:
+    """Every non-pipette node should have a default for its node id and bootloader."""
+    assert node in _DEFAULT_PCBA_REVS or "pipette" in node.name
+
+
+@pytest.mark.parametrize("pipette_type", list(PipetteType))
+def all_pipette_types_covered_by_defaults(pipette: PipetteType) -> None:
+    """Every pipette type should have a default for its pipette type."""
+    assert pipette in _DEFAULT_PCBA_REVS_PIPETTE
+
+
+@pytest.mark.parametrize(
+    "node,default_rev",
+    [(node, default_rev) for node, default_rev in _DEFAULT_PCBA_REVS.items()],
+)
+@pytest.mark.parametrize("reported_rev", ["a1", "b2", None])
+def test_revision_defaulting_for_core(
+    node: NodeId, default_rev: str, reported_rev: Optional[str]
+) -> None:
+    """We should pass through non-default revs and default ones that are not present."""
+    _, rev = _update_type_for_device(
+        {},
+        DeviceInfoCache(node, 2, "abcdef12", None, PCBARevision(main=reported_rev)),
+    )
+    if reported_rev:
+        assert rev == reported_rev
+    else:
+        assert rev == default_rev
+
+
+@pytest.mark.parametrize(
+    "node",
+    [
+        NodeId.pipette_left,
+        NodeId.pipette_left_bootloader,
+        NodeId.pipette_right,
+        NodeId.pipette_right_bootloader,
+    ],
+)
+@pytest.mark.parametrize(
+    "pipette_type,default_rev",
+    [
+        (pipette_type, default_rev)
+        for pipette_type, default_rev in _DEFAULT_PCBA_REVS_PIPETTE.items()
+    ],
+)
+@pytest.mark.parametrize("reported_rev", ["a1", "b2", None])
+def test_revision_defaulting_for_pipette(
+    node: NodeId,
+    pipette_type: PipetteType,
+    default_rev: str,
+    reported_rev: Optional[str],
+) -> None:
+    """We should pass through non-default revs and default ones that are not present."""
+    _, rev = _update_type_for_device(
+        {node: pipette_type},
+        DeviceInfoCache(node, 2, "abcdef12", None, PCBARevision(main=reported_rev)),
+    )
+    if reported_rev:
+        assert rev == reported_rev
+    else:
+        assert rev == default_rev
+
+
+def test_firmware_file_selected_for_revision() -> None:
+    """Given a device and revision, the right firmware file should be selected."""
+    stimulus = [
+        # a matching rev should be found
+        (NodeId.head, {"a1": "test-head.hex", "b1": "test-head-wrong.hex"}, "a1"),
+        # an empty revs dict should be ignored
+        (NodeId.gantry_x, {"": ""}, "a1"),
+        # a present but non matching revs dict should be ignored
+        (NodeId.gantry_y, {"b1": "test-gantry-y.hex"}, "c1"),
+    ]
+    response = list(_update_files_from_types(stimulus))
+    assert response == [(NodeId.head, "test-head.hex")]
 
 
 def test_load_firmware_manifest_success(mock_manifest: Dict[str, Any]) -> None:
@@ -128,7 +218,7 @@ def test_load_firmware_manifest_unknown_update_type(
 def test_load_firmware_manifest_invalid_update_info(
     mock_manifest: Dict[str, Any]
 ) -> None:
-    """Test invalid update info"""
+    """Test invalid update info."""
     with open(manifest_filename, "w") as fp:
         manifest = mock_manifest.copy()
         manifest["subsystems"]["gantry-x"] = {
@@ -175,17 +265,17 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
             "gantry-x": {
                 "version": 2,
                 "shortsha": "25755efd",
-                "files_by_revision": {"rev1": "gantry-x-rev1.hex"},
+                "files_by_revision": {"c1": "gantry-x-rev1.hex"},
             },
             "gantry-y": {
                 "version": 2,
                 "shortsha": "25755efd",
-                "files_by_revision": {"rev1": "gantry-y-rev1.hex"},
+                "files_by_revision": {"c1": "gantry-y-rev1.hex"},
             },
             "gripper": {
                 "version": 2,
                 "shortsha": "25755efd",
-                "files_by_revision": {"rev1": "gripper-rev1.hex"},
+                "files_by_revision": {"c1": "gripper-rev1.hex"},
             },
         }
     )
@@ -240,7 +330,11 @@ def test_load_firmware_manifest_is_empty(mock_manifest: Dict[str, Any]) -> None:
 
 def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
     """Don't do updates if the FirmwareUpdateType is unknown."""
-    device_info = {NodeId.head: DeviceInfoCache(NodeId.head, 2, "12345678", None)}
+    device_info = {
+        NodeId.head: DeviceInfoCache(
+            NodeId.head, 2, "12345678", None, PCBARevision(None)
+        )
+    }
     known_firmware_updates = generate_update_info(mock_manifest)
     known_firmware_updates.pop(FirmwareUpdateType.head)
     with mock.patch(

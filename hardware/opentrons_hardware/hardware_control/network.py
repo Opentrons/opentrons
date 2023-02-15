@@ -3,6 +3,7 @@ import asyncio
 from dataclasses import dataclass
 import logging
 from typing import Any, Dict, Set, Optional, Union
+from .types import PCBARevision
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
@@ -25,6 +26,7 @@ class DeviceInfoCache:
     version: int
     shortsha: str
     flags: Any
+    revision: PCBARevision
 
     def __repr__(self) -> str:
         """Readable representation of the device info."""
@@ -123,6 +125,9 @@ def _parse_device_info_response(
                 version=int(message.payload.version.value),
                 shortsha=message.payload.shortsha.value.decode(),
                 flags=message.payload.flags.value,
+                revision=PCBARevision(
+                    message.payload.revision.revision, message.payload.revision.tertiary
+                ),
             )
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")

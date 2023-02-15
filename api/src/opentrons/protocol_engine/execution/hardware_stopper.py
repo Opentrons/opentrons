@@ -75,6 +75,7 @@ class HardwareStopper:
                     labware_id=FIXED_TRASH_ID,
                     well_name="A1",
                     well_location=WellLocation(),
+                    home_after=None,
                 )
 
             except PipetteNotAttachedError:

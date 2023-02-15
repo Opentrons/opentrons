@@ -2,18 +2,46 @@
 
 
 from dataclasses import dataclass
+from typing_extensions import Final
 from enum import Enum
 import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Union
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Set,
+    Union,
+    Tuple,
+    Iterable,
+    Iterator,
+)
 from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteType
-
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
 
 
-_FIRMWARE_MANIFEST_PATH = os.path.abspath("/usr/lib/firmware/opentrons-firmware.json")
+_FIRMWARE_MANIFEST_PATH: Final = os.path.abspath(
+    "/usr/lib/firmware/opentrons-firmware.json"
+)
+
+_DEFAULT_PCBA_REVS: Final[Dict[NodeId, str]] = {
+    NodeId.head: "c2",
+    NodeId.head_bootloader: "c2",
+    NodeId.gantry_x: "c1",
+    NodeId.gantry_x_bootloader: "c1",
+    NodeId.gantry_y: "c1",
+    NodeId.gantry_y_bootloader: "c1",
+    NodeId.gripper: "c1",
+    NodeId.gripper_bootloader: "c1",
+}
+
+_DEFAULT_PCBA_REVS_PIPETTE: Final[Dict[PipetteType, str]] = {
+    PipetteType.pipette_single: "c2",
+    PipetteType.pipette_multi: "c2",
+    PipetteType.pipette_96: "c1",
+}
 
 log = logging.getLogger(__name__)
 
@@ -72,14 +100,12 @@ class UpdateInfo:
         version: int,
         shortsha: str,
         files_by_revision: Dict[str, str],
-        filepath: Optional[str] = None,
     ) -> None:
         """Constructor."""
         self.update_type = update_type
         self.version = version
         self.shortsha = shortsha
         self.files_by_revision = files_by_revision
-        self.filepath = filepath
 
     def __repr__(self) -> str:
         """Readable representation of class."""
@@ -136,50 +162,154 @@ def _generate_firmware_info(
         return None
 
 
+def _revision_for_core_or_gripper(device_info: DeviceInfoCache) -> str:
+    """Returns the appropriate defaulted revision for a non-pipette.
+
+    The default revision can be determined solely from the node id. This is needed
+    because PCBAs of the default revision were built before revision handling was
+    introduced, and cannot be updated because too many were made.
+    """
+    return device_info.revision.main or _DEFAULT_PCBA_REVS[device_info.node_id]
+
+
+def _revision_for_pipette(
+    pipette_type: PipetteType, device_info: DeviceInfoCache
+) -> str:
+    """Returns the appropriate defaulted revision for a pipette.
+
+    The default revision can be determined solely from the pipette type. This is
+    needed because PCBAs of the default revision were built before revision handling
+    was introduced, and cannot be updated because too many were made.
+    """
+    return device_info.revision.main or _DEFAULT_PCBA_REVS_PIPETTE[pipette_type]
+
+
+def _update_details_for_device(
+    attached_pipettes: Dict[NodeId, PipetteType],
+    version_cache: DeviceInfoCache,
+) -> Tuple[FirmwareUpdateType, str]:
+    if version_cache.node_id in attached_pipettes:
+        pipette_type = attached_pipettes[version_cache.node_id]
+        return FirmwareUpdateType.from_pipette(pipette_type), _revision_for_pipette(
+            pipette_type, version_cache
+        )
+    else:
+        return FirmwareUpdateType.from_node(
+            version_cache.node_id
+        ), _revision_for_core_or_gripper(version_cache)
+
+
+def _update_type_for_device(
+    attached_pipettes: Dict[NodeId, PipetteType],
+    version_cache: DeviceInfoCache,
+) -> Union[Tuple[FirmwareUpdateType, str], Tuple[None, None]]:
+    try:
+        update_type, revision = _update_details_for_device(
+            attached_pipettes, version_cache
+        )
+    except KeyError:
+        log.error(
+            f"Node {version_cache.node_id.name} (pipette {attached_pipettes.get(version_cache.node_id, None)}) "
+            "has no revision or default revision"
+        )
+        return None, None
+    return update_type, revision
+
+
+def _update_types_from_devices(
+    attached_pipettes: Dict[NodeId, PipetteType],
+    devices: Iterable[DeviceInfoCache],
+) -> Iterator[Tuple[DeviceInfoCache, FirmwareUpdateType, str]]:
+    for version_cache in devices:
+        log.debug(f"Checking firmware update for {version_cache.node_id.name}")
+        update_type, rev = _update_type_for_device(attached_pipettes, version_cache)
+        if not rev or not update_type:
+            continue
+        yield (version_cache, update_type, rev)
+
+
+def _devices_with_force(
+    device_info: Dict[NodeId, DeviceInfoCache], force: Set[NodeId]
+) -> Iterator[DeviceInfoCache]:
+    known_nodes = set(device_info.keys())
+    check_nodes = known_nodes.intersection(force) if force else known_nodes
+    return (device_info[node] for node in check_nodes)
+
+
+def _should_update(
+    version_cache: DeviceInfoCache,
+    update_info: UpdateInfo,
+    force: bool,
+) -> bool:
+    if force:
+        log.info(f"Update required for {version_cache.node_id} (forced)")
+        return True
+    if version_cache.shortsha != update_info.shortsha:
+        log.info(
+            f"Update required for {version_cache.node_id} (reported sha {version_cache.shortsha} != {update_info.shortsha})"
+        )
+        return True
+    log.info(
+        f"No update required for {version_cache.node_id}, sha {version_cache.shortsha} matches and not forced"
+    )
+    return False
+
+
+def _update_info_for_type(
+    known_firmware: Dict[FirmwareUpdateType, UpdateInfo],
+    update_type: Optional[FirmwareUpdateType],
+) -> Optional[UpdateInfo]:
+    # Given the update_type find the corresponding updateInfo, monadically on update_info
+    if not update_type:
+        return None
+    try:
+        update_info = known_firmware[update_type]
+    except KeyError:
+        log.error(f"No firmware update found with update type {update_type}")
+        return None
+    return update_info
+
+
+def _update_files_from_types(
+    info: Iterable[Tuple[NodeId, Dict[str, str], str]]
+) -> Iterator[Tuple[NodeId, str]]:
+    for node, files_by_revision, revision in info:
+        # if we have a force set, we always update (we're only checking nodes in the force set anyway)
+        try:
+            yield node, files_by_revision[revision]
+        except KeyError:
+            log.error(f"No available firmware for revision {revision}")
+
+
+def _info_for_required_updates(
+    force: bool,
+    known_firmware: Dict[FirmwareUpdateType, UpdateInfo],
+    details: Iterable[Tuple[DeviceInfoCache, FirmwareUpdateType, str]],
+) -> Iterator[Tuple[NodeId, Dict[str, str], str]]:
+    for version_cache, update_type, rev in details:
+        update_info = _update_info_for_type(known_firmware, update_type)
+        if not update_info:
+            continue
+        if _should_update(version_cache, update_info, force):
+            yield version_cache.node_id, update_info.files_by_revision, rev
+
+
 def check_firmware_updates(
     device_info: Dict[NodeId, DeviceInfoCache],
     attached_pipettes: Dict[NodeId, PipetteType],
     nodes: Optional[Set[NodeId]] = None,
-) -> Dict[NodeId, UpdateInfo]:
-    """Returns a dict of NodeIds that require a firmware update."""
-    nodes = nodes or set()
+) -> Dict[NodeId, str]:
+    """Returns a dict of NodeIds that require a firmware update and the path to the file to update them."""
+    forced_nodes = nodes or set()
+
     known_firmware = load_firmware_manifest()
     if known_firmware is None:
         log.error("Could not load the known firmware.")
         return
-
-    firmware_update_list: Dict[NodeId, UpdateInfo] = dict()
-    for node, version_cache in device_info.items():
-        # only check specified node if nodes are provided
-        if nodes and node not in nodes:
-            log.debug(f"Skipping unspecified node {node.name}")
-            continue
-
-        log.debug(f"Checking firmware update for {node.name}")
-        # Get the update type based on the pipette type
-        if node in attached_pipettes:
-            pipette_type = attached_pipettes[node]
-            update_type = FirmwareUpdateType.from_pipette(pipette_type)
-        else:
-            update_type = FirmwareUpdateType.from_node(node)
-        if update_type == FirmwareUpdateType.unknown:
-            log.error(f"Unknown firmware update type for {node.name}")
-            continue
-
-        # Given the update_type find the corresponding updateInfo
-        update_info = known_firmware.get(update_type)
-        if not update_info:
-            log.warning(f"No firmware update found for {node.name}")
-            continue
-
-        # force the update if this is node was specified
-        force = node in nodes
-        if force or version_cache.shortsha != update_info.shortsha:
-            log.info(
-                f"Subsystem {node.name} requires an update, device sha: {version_cache.shortsha} != update sha: {update_info.shortsha}"
-            )
-            # TODO (BA, 02/03/2022): Get the filepath based on the revision once we add it to GetDeviceInfoResponse.
-            # For now just select rev1.
-            update_info.filepath = update_info.files_by_revision["rev1"]
-            firmware_update_list[node] = update_info
-    return firmware_update_list
+    devices_to_check = _devices_with_force(device_info, forced_nodes)
+    update_types = _update_types_from_devices(attached_pipettes, devices_to_check)
+    update_info = _info_for_required_updates(
+        bool(forced_nodes), known_firmware, update_types
+    )
+    update_files = _update_files_from_types(update_info)
+    return {node: filepath for node, filepath in update_files}

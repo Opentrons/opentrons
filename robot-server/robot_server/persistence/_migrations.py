@@ -123,6 +123,11 @@ def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
     """
     add_summary_column = sqlalchemy.text("ALTER TABLE run ADD state_summary BLOB")
     add_commands_column = sqlalchemy.text("ALTER TABLE run ADD commands BLOB")
+    # NOTE: The column type of `STRING` here is mistaken. SQLite won't recognize it,
+    # so this column's type affinity will mistakenly default to `NUMERIC`.
+    # It should be `VARCHAR`, to match what SQLAlchemy uses when creating a new
+    # database from scratch. Fortunately, for this particular column, this inconsistency
+    # is harmless in practice because of SQLite's weak typing.
     add_status_column = sqlalchemy.text("ALTER TABLE run ADD engine_status STRING")
     add_updated_at_column = sqlalchemy.text("ALTER TABLE run ADD _updated_at DATETIME")
 
