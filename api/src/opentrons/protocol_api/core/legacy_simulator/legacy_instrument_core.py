@@ -119,6 +119,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self,
         location: types.Location,
         well_core: Optional[LegacyWellCore],
+        in_place: bool = False,
     ) -> None:
         if location != self._protocol_interface.get_last_location():
             self.move_to(location=location, well_core=well_core)

@@ -118,17 +118,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 flow_rate=flow_rate,
             )
 
-        self._protocol_core.set_last_location(
-            location=location, mount=self.get_mount()
-        )
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def dispense(
         self,
-        location: Optional[Location],
+        location: Location,
         well_core: Optional[WellCore],
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool = False,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -139,7 +138,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             flow_rate: The flow rate in µL/s to dispense at.
         """
         if well_core is None:
-            if location:
+            if not in_place:
                 self._engine_client.move_to_coordinates(
                     pipette_id=self._pipette_id,
                     coordinates=DeckPoint(
@@ -149,14 +148,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     force_direct=False,
                     speed=None,
                 )
-                self._protocol_core.set_last_location(
-                    location=location, mount=self.get_mount()
-                )
 
             self._engine_client.dispense_in_place(
                 pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
             )
-        elif location:
+        else:
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
@@ -177,12 +173,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 flow_rate=flow_rate,
             )
 
-            self._protocol_core.set_last_location(
-                location=location, mount=self.get_mount()
-            )
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def blow_out(
-        self, location: Optional[Location], well_core: Optional[WellCore]
+        self, location: Location, well_core: Optional[WellCore], in_place: bool = False
     ) -> None:
         """Blow liquid out of the tip.
 
@@ -192,7 +186,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """
         flow_rate = self.get_absolute_blow_out_flow_rate(1.0)
         if well_core is None:
-            if location:
+            if not in_place:
                 self._engine_client.move_to_coordinates(
                     pipette_id=self._pipette_id,
                     coordinates=DeckPoint(
@@ -202,14 +196,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     minimum_z_height=None,
                     speed=None,
                 )
-                self._protocol_core.set_last_location(
-                    location=location, mount=self.get_mount()
-                )
 
             self._engine_client.blow_out_in_place(
                 pipette_id=self._pipette_id, flow_rate=flow_rate
             )
-        elif location:
+        else:
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
@@ -231,9 +222,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 flow_rate=flow_rate,
             )
 
-            self._protocol_core.set_last_location(
-                location=location, mount=self.get_mount()
-            )
+        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def touch_tip(
         self,

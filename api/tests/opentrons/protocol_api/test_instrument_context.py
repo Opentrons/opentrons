@@ -365,42 +365,68 @@ def test_aspirate_raises_wrong_location_value(
 
 
 def test_blow_out_to_well(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should blow out to a well."""
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=None))
     decoy.when(mock_well.top()).then_return(top_location)
-
-    subject.blow_out(location=mock_well)
+    subject.blow_out(location=input_location)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=top_location,
-            well_core=mock_well._core,
+            location=top_location, well_core=mock_well._core, in_place=False
         ),
         times=1,
     )
 
 
 def test_blow_out_to_location(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should blow out to a location."""
-    mock_location = decoy.mock(cls=Location)
     mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    point_target = PointTarget(location=input_location, in_place=False)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
-    decoy.when(mock_location.labware.get_parent_labware_and_well()).then_return(
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(point_target)
+
+    decoy.when(point_target.location.labware.get_parent_labware_and_well()).then_return(
         (None, mock_well)
     )
 
-    subject.blow_out(location=mock_location)
+    subject.blow_out(location=input_location)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=mock_location,
-            well_core=mock_well._core,
+            location=input_location, well_core=mock_well._core, in_place=False
         ),
         times=1,
     )
@@ -413,34 +439,58 @@ def test_blow_out_in_place(
     subject: InstrumentContext,
 ) -> None:
     """It should blow out in place."""
-    mock_well = decoy.mock(cls=Well)
-    location = Location(point=Point(1, 2, 3), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
-    decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
-        location
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
     )
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=last_location)
+    ).then_return(PointTarget(location=last_location, in_place=True))
 
     subject.blow_out()
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=None,
-            well_core=mock_well._core,
+            location=last_location, well_core=None, in_place=True
         ),
         times=1,
     )
 
 
-def test_blow_out_no_location_cache_raises(
+def test_blow_out_raises_no_location(
     decoy: Decoy,
-    mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
-    """It should raise if no location or well is provided and the location cache returns None."""
-    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(None)
 
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
+
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=None)
+    ).then_raise(mock_validation.NoLocationError())
     with pytest.raises(RuntimeError):
-        subject.blow_out()
+        subject.blow_out(location=None)
+
+
+def test_blow_out_raises_wrong_location_value(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
+
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=None)
+    ).then_raise(mock_validation.LocationTypeError())
+    with pytest.raises(TypeError):
+        subject.blow_out(location=None)
 
 
 def test_pick_up_tip_from_labware(
@@ -631,7 +681,10 @@ def test_return_tip(
 
 
 def test_dispense_with_location(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext, mock_protocol_core: ProtocolCore
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should dispense to a given location."""
     input_location = Location(point=Point(2, 2, 2), labware=None)
@@ -666,7 +719,10 @@ def test_dispense_with_location(
 
 
 def test_dispense_with_well_location(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext, mock_protocol_core: ProtocolCore
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should dispense to a well."""
     mock_well = decoy.mock(cls=Well)

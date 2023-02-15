@@ -14,7 +14,7 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     ThermocyclerStep,
 )
-from opentrons.protocol_api import validation as subject, Well
+from opentrons.protocol_api import validation as subject, Well, Labware
 
 
 @pytest.mark.parametrize(
@@ -325,3 +325,21 @@ def test_validate_with_wrong_location() -> None:
 def test_validate_raises_no_location_error() -> None:
     with pytest.raises(subject.NoLocationError):
         subject.validate_location(location=None, last_location=None)
+
+
+def test_validate_with_labware(decoy: Decoy) -> None:
+    mock_labware = decoy.mock(cls=Labware)
+    input_location = Location(point=Point(1, 1, 1), labware=mock_labware)
+
+    result = subject.validate_location(location=input_location, last_location=None)
+
+    assert result == subject.PointTarget(location=input_location, in_place=False)
+
+
+def test_validate_last_location_with_labware(decoy: Decoy) -> None:
+    mock_labware = decoy.mock(cls=Labware)
+    input_last_location = Location(point=Point(1, 1, 1), labware=mock_labware)
+
+    result = subject.validate_location(location=None, last_location=input_last_location)
+
+    assert result == subject.PointTarget(location=input_last_location, in_place=True)

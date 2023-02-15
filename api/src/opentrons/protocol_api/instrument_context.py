@@ -202,7 +202,7 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
-            _, well = target.location.labware.get_parent_labware_and_well()
+            well = None
             aspirate_in_place = target.in_place
 
         if self.api_version >= APIVersion(2, 11):
@@ -287,11 +287,13 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume, location if location else "current position", rate
             )
         )
-        well: Optional[labware.Well]
+        well: Optional[labware.Well] = None
         last_location = self._get_last_location_by_api_version()
         dispense_in_place: bool = False
         try:
-            target = validation.validate_location(location=location, last_location=last_location)
+            target = validation.validate_location(
+                location=location, last_location=last_location
+            )
         except validation.NoLocationError:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
@@ -301,8 +303,8 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         except validation.LocationTypeError:
             raise TypeError(
-                    f"location should be a Well or Location, but it is {location}"
-                )
+                f"location should be a Well or Location, but it is {location}"
+            )
 
         if isinstance(target, validation.WellTarget):
             well = target.well
@@ -314,7 +316,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
-            _, well = target.location.labware.get_parent_labware_and_well()
+            well = None
             dispense_in_place = target.in_place
 
         if self.api_version >= APIVersion(2, 11):
@@ -343,7 +345,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
-                in_place=dispense_in_place
+                in_place=dispense_in_place,
             )
 
         return self
@@ -445,46 +447,48 @@ class InstrumentContext(publisher.CommandPublisher):
                               :py:meth:`dispense`)
         :returns: This instance
         """
-
         well: Optional[labware.Well]
-        move_to_location: Optional[types.Location]
-        last_location = self._get_last_location_by_api_version()
+        move_to_location: types.Location
+        blow_out_in_place: bool = False
 
-        if isinstance(location, labware.Well):
-            if location.parent.is_tiprack:
-                _log.warning(
-                    "Blow_out being performed on a tiprack. "
-                    "Please re-check your code"
-                )
-            move_to_location = location.top()
-            well = location
-        elif isinstance(location, types.Location):
-            move_to_location = location
-            _, well = location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
+        last_location = self._get_last_location_by_api_version()
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
             )
-        elif last_location:
-            move_to_location = None
-            _, well = last_location.labware.get_parent_labware_and_well()
-        else:
+        except validation.NoLocationError:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
             )
+        except validation.LocationTypeError:
+            raise TypeError(
+                "location should be a Well or Location, but it is {}".format(location)
+            )
+
+        if isinstance(target, validation.WellTarget):
+            if target.well.parent.is_tiprack:
+                _log.warning(
+                    "Blow_out being performed on a tiprack. "
+                    "Please re-check your code"
+                )
+            move_to_location = target.location or target.well.top()
+            well = target.well
+        elif isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+            well = None
+            blow_out_in_place = target.in_place
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.blow_out(
-                instrument=self, location=move_to_location or last_location  # type: ignore[arg-type]
-            ),
+            command=cmds.blow_out(instrument=self, location=move_to_location),
         ):
             self._core.blow_out(
                 location=move_to_location,
                 well_core=well._core if well is not None else None,
+                in_place=blow_out_in_place,
             )
 
         return self

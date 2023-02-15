@@ -64,8 +64,9 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def blow_out(
         self,
-        location: Optional[types.Location],
+        location: types.Location,
         well_core: Optional[WellCoreType],
+        in_place: bool = False,
     ) -> None:
         """Blow liquid out of the tip.
 
