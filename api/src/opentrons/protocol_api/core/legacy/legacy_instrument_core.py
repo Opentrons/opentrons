@@ -123,6 +123,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: The well to dispense to, if applicable.
             rate: The rate in µL/s to dispense at.
             flow_rate: Not used in this core.
+            in_place: Used only for the engine core.
         """
         self.move_to(location=location)
 
@@ -139,6 +140,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         Args:
             location: The location to blow out into.
             well_core: Unused by legacy core.
+            in_place: Used only for the engine core.
         """
         if location != self._protocol_interface.get_last_location():
             self.move_to(location=location)

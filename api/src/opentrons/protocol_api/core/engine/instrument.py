@@ -93,6 +93,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_core: The well to aspirate from, if applicable.
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to aspirate at.
+            in_place: whether this an in-place command.
         """
         if well_core is None:
             if not in_place:
@@ -149,6 +150,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_core: The well to dispense to, if applicable.
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to dispense at.
+            in_place: whether this an in-place command.
         """
         if well_core is None:
             if not in_place:
@@ -196,6 +198,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         Args:
             location: The location to blow out into.
             well_core: The well to blow out into.
+            in_place: whether this an in-place command.
         """
         flow_rate = self.get_blow_out_flow_rate(1.0)
         if well_core is None:

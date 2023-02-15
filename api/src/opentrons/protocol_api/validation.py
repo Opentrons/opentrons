@@ -223,8 +223,13 @@ class LocationTypeError(TypeError):
 def validate_location(
     location: Union[Location, Well, None], last_location: Optional[Location]
 ) -> Union[WellTarget, PointTarget]:
-    """
-    Raises: NoLocationError, LocationTypeError
+    """Validate and return if should use a WellTarget or a PointTarget.
+    Args:
+        location: The input location.
+        last_location: The cached last location.
+    Raises:
+        NoLocationError: The is no input location and no cached loaction.
+        LocationTypeError: The location supplied is of unexpected type.
     """
     from .labware import Well
 

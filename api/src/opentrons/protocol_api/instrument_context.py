@@ -219,7 +219,7 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.aspirate(
                 instrument=self,
                 volume=c_vol,
-                location=move_to_location
+                location=move_to_location,
                 flow_rate=flow_rate,
                 rate=rate,
             ),
