@@ -213,7 +213,7 @@ class PointTarget(NamedTuple):
 
 
 class NoLocationError(ValueError):
-    """"""
+    """Error representing that no location was supplied."""
 
 
 class LocationTypeError(TypeError):
