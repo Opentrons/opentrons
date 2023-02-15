@@ -656,10 +656,9 @@ async def _test_diagnostics_capacitive(
         and capacitive_probing_pass
     )
 
-
-async def _test_pipette_pressure(
-    api: OT3API, mount: OT3Mount, volume: float, tip: str, write_cb: Callable):
-    droplet_wait_seconds = 500
+async def _test_pipette_pre_ressure(
+    api: OT3API, mount: OT3Mount, write_cb: Callable):
+    droplet_wait_seconds = 10
     print("homing Z axis")
     await api.home([OT3Axis.by_mount(mount)])
     async def _read_pressure() -> float:
@@ -673,16 +672,26 @@ async def _test_pipette_pressure(
         write_cb(['pre-Aspirate',pressure])
         print(f'pre-Aspirate: {pressure}')
         await asyncio.sleep(1)
-
+    
+async def _test_pipette_pressure(
+    api: OT3API, mount: OT3Mount, volume: float, tip: str, write_cb: Callable):
+    droplet_wait_seconds = 200
+    print("homing Z axis")
+    await api.home([OT3Axis.by_mount(mount)])
+    async def _read_pressure() -> float:
+        return await _read_pipette_sensor_repeatedly_and_average(
+            api, mount, SensorType.pressure, 10
+        )
     await _pick_up_tip_for_liquid(api, mount, tip)
     await _move_to_liquid(api, mount)
     
     await api.aspirate(mount, volume)
     await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
+    print(f'---Start test volume: {volume}')
     for t in range(droplet_wait_seconds):
         print(f"waiting for leaking tips ({t + 1}/{droplet_wait_seconds})")
         pressure = await _read_pressure()
-        write_cb(['Aspirate',pressure])
+        write_cb(['Aspirate',volume,pressure])
         print(f'Aspirate: {pressure}')
         await asyncio.sleep(1)
     print("dispensing back into reservoir")
@@ -1017,12 +1026,17 @@ async def _main(test_config: TestConfig) -> None:
                 csv_cb.results("droplets", test_passed)
 
         if not test_config.skip_pipette_pressure:
+            input('Please layout tips from A1 to A4 then pressure Enter.')
             csv_cb.write(["-------------"])
             csv_cb.write(["PIPETTE-PRESSURE-DATA"])
             volumes = [100,200,500,1000]
-            for i, tip in enumerate(tips_used):
-                for volume in volumes:
-                    await _test_pipette_pressure(api,mount,volume,tip,csv_cb.write)
+            await _test_pipette_pre_ressure(api,mount,csv_cb.write)
+            count = 1
+            for volume in volumes:
+                tip = f'A{count}'
+                print(f'tip ----- {tip}')
+                await _test_pipette_pressure(api,mount,volume,tip,csv_cb.write)
+                count += 1
             csv_cb.write(["-------------"])
                 
 
