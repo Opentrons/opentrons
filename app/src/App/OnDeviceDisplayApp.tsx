@@ -105,14 +105,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:runId/run',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <AttachInstrumentsDashboard />
-      </>
-    ),
+    Component: AttachInstrumentsDashboard,
     exact: true,
-    // 'Attach Instruments Dashboard',
     name: 'Instruments',
     navLinkTo: '/attach-instruments',
     path: '/attach-instruments',

@@ -1,13 +1,15 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useAttachedPipettes } from '../../organisms/Devices/hooks'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { Btn, DIRECTION_COLUMN, Flex } from '@opentrons/components'
+import { Btn, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
+import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import { useAttachedPipettes } from '../../organisms/Devices/hooks'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { ChoosePipette } from '../../organisms/PipetteWizardFlows/ChoosePipette'
@@ -67,7 +69,14 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
     setPipetteWizardFlow(FLOWS.ATTACH)
   }
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      padding={`${String(SPACING.spacing6)} ${String(
+        SPACING.spacingXXL
+      )} ${String(SPACING.spacingXXL)}`}
+      flexDirection={DIRECTION_COLUMN}
+    >
+      <Navigation routes={onDeviceDisplayRoutes} />
+
       {showAttachPipette ? (
         <ChoosePipette
           proceed={handleAttachPipette}
