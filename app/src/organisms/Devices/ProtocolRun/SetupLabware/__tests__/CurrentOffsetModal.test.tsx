@@ -124,12 +124,13 @@ describe('CurrentOffsetsModal', () => {
     getByText('opentrons/opentrons_96_tiprack_10ul/1')
     getByText('Slot 2')
   })
-  //    TODO(jr, 12/20/22): finish this test when we add the jupyter snippet info
-  it('renders the Get labware offset data button, clicking on it renders the juypter snippet', () => {
+
+  it('renders tabbed offset data with snippets when config option is selected', () => {
     mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
     const { getByText } = render(props)
-    getByText('Get Labware Offset Data').click()
-    getByText('TODO ADD JUPYTER/CLI SNIPPET SUPPORT')
+    expect(getByText('Table View')).toBeTruthy()
+    expect(getByText('Jupyter Notebook')).toBeTruthy()
+    expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
   })
   it('renders the LPC button as disabled when there is a disabled reason', () => {
     mockUseLPCDisabledReason.mockReturnValue('mockDisabledReason')
