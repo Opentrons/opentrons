@@ -672,7 +672,6 @@ class ProtocolContext(CommandPublisher):
             raise APIVersionError(
                 "A Python Protocol cannot safely resume itself after a pause."
                 " To wait automatically for a period of time, use ProtocolContext.delay()."
-                " Otherwise, implement your own wait loop rather than using pause/resume."
             )
 
         # TODO(mc, 2023-02-13): this assert should be enough for mypy
