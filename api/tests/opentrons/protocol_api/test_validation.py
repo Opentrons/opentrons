@@ -306,7 +306,7 @@ def test_validate_last_location(decoy: Decoy) -> None:
 
 
 def test_validate_with_wrong_location_with_last_location() -> None:
-
+    """Should raise a LocationTypeError."""
     with pytest.raises(subject.LocationTypeError):
         subject.validate_location(
             location=42,  # type: ignore[arg-type]
@@ -315,7 +315,7 @@ def test_validate_with_wrong_location_with_last_location() -> None:
 
 
 def test_validate_with_wrong_location() -> None:
-
+    """Should raise a LocationTypeError."""
     with pytest.raises(subject.LocationTypeError):
         subject.validate_location(
             location=42, last_location=None  # type: ignore[arg-type]
@@ -323,11 +323,13 @@ def test_validate_with_wrong_location() -> None:
 
 
 def test_validate_raises_no_location_error() -> None:
+    """Should raise a NoLocationError."""
     with pytest.raises(subject.NoLocationError):
         subject.validate_location(location=None, last_location=None)
 
 
 def test_validate_with_labware(decoy: Decoy) -> None:
+    """Should return a PointTarget for none in_place commands."""
     mock_labware = decoy.mock(cls=Labware)
     input_location = Location(point=Point(1, 1, 1), labware=mock_labware)
 
@@ -337,6 +339,7 @@ def test_validate_with_labware(decoy: Decoy) -> None:
 
 
 def test_validate_last_location_with_labware(decoy: Decoy) -> None:
+    """Should return a PointTarget for in_place commands."""
     mock_labware = decoy.mock(cls=Labware)
     input_last_location = Location(point=Point(1, 1, 1), labware=mock_labware)
 

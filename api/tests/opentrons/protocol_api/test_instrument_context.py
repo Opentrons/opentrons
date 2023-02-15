@@ -254,6 +254,45 @@ def test_aspirate(
     )
 
 
+def test_aspirate_well_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location))
+    decoy.when(mock_instrument_core.get_absolute_aspirate_flow_rate(1.23)).then_return(
+        5.67
+    )
+
+    subject.aspirate(volume=42.0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=42.0,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
 def test_aspirate_from_coordinates(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -336,7 +375,7 @@ def test_aspirate_raises_no_location(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-
+    """Shound raise a RuntimeError error."""
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
 
@@ -353,7 +392,7 @@ def test_aspirate_raises_wrong_location_value(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-
+    """Should raise a TypeError."""
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
 
@@ -396,6 +435,36 @@ def test_blow_out_to_well(
     )
 
 
+def test_blow_out_to_well_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should blow out to a well location."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location))
+    subject.blow_out(location=input_location)
+
+    decoy.verify(
+        mock_instrument_core.blow_out(
+            location=input_location, well_core=mock_well._core, in_place=False
+        ),
+        times=1,
+    )
+
+
 def test_blow_out_to_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -418,15 +487,11 @@ def test_blow_out_to_location(
         )
     ).then_return(point_target)
 
-    decoy.when(point_target.location.labware.get_parent_labware_and_well()).then_return(
-        (None, mock_well)
-    )
-
     subject.blow_out(location=input_location)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=input_location, well_core=mock_well._core, in_place=False
+            location=input_location, well_core=None, in_place=False
         ),
         times=1,
     )
@@ -465,7 +530,7 @@ def test_blow_out_raises_no_location(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-
+    """Should raise a RuntimeError."""
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
 
@@ -482,7 +547,7 @@ def test_blow_out_raises_wrong_location_value(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-
+    """Should raise a TypeError."""
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
 
@@ -724,6 +789,45 @@ def test_dispense_with_well_location(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
+    """It should dispense to a well location."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location))
+    decoy.when(mock_instrument_core.get_absolute_dispense_flow_rate(1.23)).then_return(
+        5.67
+    )
+
+    subject.dispense(volume=42.0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=42.0,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
+def test_dispense_with_well(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
     """It should dispense to a well."""
     mock_well = decoy.mock(cls=Well)
     bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
@@ -803,7 +907,7 @@ def test_dispense_raises_no_location(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-
+    """Should raise a RuntimeError."""
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
 
@@ -820,7 +924,7 @@ def test_dispense_raises_wrong_location_value(
     subject: InstrumentContext,
     mock_protocol_core: ProtocolCore,
 ) -> None:
-
+    """Should raise a TypeError."""
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
 
