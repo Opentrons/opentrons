@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Generator
 from sqlalchemy.engine import Engine as SQLEngine
 import requests
-import time
 
 from system_server.persistence.database import create_sql_engine
 
@@ -51,7 +50,6 @@ def run_server() -> Generator[DevServer, None, None]:
                 pass
             else:
                 break
-            time.sleep(0.1)
 
     yield server
     server.stop()
