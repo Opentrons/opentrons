@@ -262,13 +262,6 @@ class ThermocyclerGeometry(ModuleGeometry):
     def is_semi_configuration(self) -> bool:
         return bool(self._configuration == ThermocyclerConfiguration.SEMI)
 
-    @property
-    def covered_slots(self) -> Set[int]:
-        if self.is_semi_configuration:
-            return {7, 10}
-        else:
-            return {7, 8, 10, 11}
-
     # TODO(mc, 2022-11-16): this method causes bugs and should not be used;
     # Thermocycler `configuration="semi"` does not work properly and should be removed
     # https://opentrons.atlassian.net/browse/RSS-106
@@ -319,32 +312,6 @@ class ThermocyclerGeometry(ModuleGeometry):
 
 class HeaterShakerGeometry(ModuleGeometry):
     """Class holding the state of a Heater-Shaker's physical geometry."""
-
-    # TODO(mc, 2022-06-16): move these constants to the module definition
-    MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
-    """Maximum height of an adjacent item in the x-direction.
-
-    This value selected to avoid interference
-    with the Heater-Shaker's labware latch.
-
-    For background, see: https://github.com/Opentrons/opentrons/issues/10316
-    """
-
-    ALLOWED_ADJACENT_TALL_LABWARE = [
-        LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
-        LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
-        LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
-        LabwareUri("opentrons/opentrons_96_tiprack_10ul/1"),
-        LabwareUri("opentrons/opentrons_96_tiprack_20ul/1"),
-        LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
-    ]
-    """URI's of labware that are allowed to exceed the height limit above.
-
-    These labware do not take up the full with of the slot
-    in the area that would interfere with the labware latch.
-
-    For background, see: https://github.com/Opentrons/opentrons/issues/10316
-    """
 
     def flag_unsafe_move(
         self,

@@ -1,9 +1,8 @@
 """Check a deck layout for conflicts."""
-# TODO(mc, 2022-06-15): decouple this interface from DeckItem
-# (and subclasses) so it can be used in ProtocolEngine
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Mapping, NamedTuple, Optional, Union
+from dataclasses import dataclass
+from typing import List, Mapping, NamedTuple, Optional, Set, Union
 from typing_extensions import Final
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -14,20 +13,78 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_slots,
 )
 
-# TODO: Decouple from these.
-from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocol_api.core.legacy.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-    HeaterShakerGeometry,
-)
-
-if TYPE_CHECKING:
-    from opentrons.protocol_api.core.legacy.deck import DeckItem
-
 
 _FIXED_TRASH_SLOT: Final = 12
+
+
+# The maximum height allowed for items adjacent to a Heater-Shaker in the x-direction.
+# This value selected to avoid interference with the Heater-Shaker's labware latch.
+# For background, see: https://github.com/Opentrons/opentrons/issues/10316
+#
+# TODO(mc, 2022-06-16): move this constant to the module definition
+_HS_MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
+
+
+# URIs of labware that are allowed to exceed _HS_MAX_X_ADJACENT_ITEM_HEIGHT.
+# These labware do not take up the full with of the slot
+# in the area that would interfere with the labware latch.
+# For background, see: https://github.com/Opentrons/opentrons/issues/10316
+#
+# TODO(mc, 2022-06-16): move this constant to the module definition
+_HS_ALLOWED_ADJACENT_TALL_LABWARE = [
+    LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
+    LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
+    LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
+    LabwareUri("opentrons/opentrons_96_tiprack_10ul/1"),
+    LabwareUri("opentrons/opentrons_96_tiprack_20ul/1"),
+    LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
+]
+
+
+@dataclass
+class Labware:
+    """A normal labware that occupies a single slot."""
+    uri: str
+    highest_z: float
+    is_fixed_trash: bool
+    name_for_errors: str
+
+
+@dataclass
+class _Module:
+    highest_z: float
+    name_for_errors: str
+
+
+@dataclass
+class HeaterShakerModule(_Module):
+    """A Heater-Shaker module."""
+    pass
+
+
+@dataclass
+class ThermocyclerModule(_Module):
+    """A Thermocycler module."""
+
+    is_semi_configuration: bool
+    """Whether this Thermocycler is loaded in its "semi" configuration.
+
+    In this configuration, it's offset to the left, so it takes up fewer deck slots.
+    """
+
+
+# TODO: Spell out the rest of the modules.
+@dataclass
+class OtherModule(_Module):
+    pass
+
+
+DeckItem = Union[
+    Labware,
+    HeaterShakerModule,
+    ThermocyclerModule,
+    OtherModule,
+]
 
 
 class _NothingAllowed(NamedTuple):
@@ -51,7 +108,9 @@ class _MaxHeight(NamedTuple):
     allowed_labware: List[LabwareUri]
 
     def is_allowed(self, item: DeckItem) -> bool:
-        if isinstance(item, AbstractLabware) and item.get_uri() in self.allowed_labware:
+        # FIX BEFORE MERGE: Confirm whether this is intended to apply to modules
+        # as well as labware. If it is, we need to add highest_z support to modules.
+        if isinstance(item, Labware) and item.uri in self.allowed_labware:
             return True
 
         return item.highest_z < self.max_height
@@ -65,7 +124,7 @@ class _NoModule(NamedTuple):
     source_location: int
 
     def is_allowed(self, item: DeckItem) -> bool:
-        return not isinstance(item, ModuleGeometry)
+        return not isinstance(item, _Module)
 
 
 class _NoHeaterShakerModule(NamedTuple):
@@ -76,7 +135,7 @@ class _NoHeaterShakerModule(NamedTuple):
     source_location: int
 
     def is_allowed(self, item: DeckItem) -> bool:
-        return not isinstance(item, HeaterShakerGeometry)
+        return not isinstance(item, HeaterShakerModule)
 
 
 class _FixedTrashOnly(NamedTuple):
@@ -172,8 +231,8 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                 )
             )
 
-    if isinstance(item, ThermocyclerGeometry):
-        for covered_location in item.covered_slots:
+    if isinstance(item, ThermocyclerModule):
+        for covered_location in _slots_covered_by_thermocycler(item):
             restrictions.append(
                 _NothingAllowed(
                     location=covered_location,
@@ -182,7 +241,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                 )
             )
 
-    if isinstance(item, HeaterShakerGeometry):
+    if isinstance(item, HeaterShakerModule):
         for covered_location in get_adjacent_slots(location):
             restrictions.append(
                 _NoModule(
@@ -198,8 +257,8 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                     location=covered_location,
                     source_item=item,
                     source_location=location,
-                    max_height=item.MAX_X_ADJACENT_ITEM_HEIGHT,
-                    allowed_labware=item.ALLOWED_ADJACENT_TALL_LABWARE,
+                    max_height=_HS_MAX_X_ADJACENT_ITEM_HEIGHT,
+                    allowed_labware=_HS_ALLOWED_ADJACENT_TALL_LABWARE,
                 )
             )
 
@@ -220,28 +279,28 @@ def _create_deck_conflict_error_message(
 
     elif new_item is not None:
         message = (
-            f"{restriction.source_item.load_name}"
+            f"{restriction.source_item.name_for_errors}"
             f" in slot {restriction.source_location}"
-            f" prevents {new_item.load_name}"
+            f" prevents {new_item.name_for_errors}"
             f" from using slot {restriction.location}."
         )
 
     elif existing_item is not None:
         message = (
-            f"{existing_item.load_name} in slot {restriction.location}"
-            f" prevents {restriction.source_item.load_name}"
+            f"{existing_item.name_for_errors} in slot {restriction.location}"
+            f" prevents {restriction.source_item.name_for_errors}"
             f" from using slot {restriction.source_location}."
         )
 
     return message
 
 
+def _slots_covered_by_thermocycler(thermocycler: ThermocyclerModule) -> Set[int]:
+    if thermocycler.is_semi_configuration:
+        return {7, 10}
+    else:
+        return {7, 8, 10, 11}
+
+
 def _is_fixed_trash(item: DeckItem) -> bool:
-    # `item` is inconsistently provided to us as an AbstractLabware or Labware.
-    # See TODO comments in opentrons.protocols.geometry.deck,
-    # the module that calls into this module.
-    if isinstance(item, AbstractLabware):
-        return "fixedTrash" in item.get_quirks()
-    if isinstance(item, Labware):
-        return "fixedTrash" in item.quirks
-    return False
+    return isinstance(item, Labware) and item.is_fixed_trash
