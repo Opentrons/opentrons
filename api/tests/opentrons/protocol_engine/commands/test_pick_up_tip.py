@@ -33,7 +33,7 @@ async def test_pick_up_tip_implementation(
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
-    ).then_return(VolumePointResult(volume=45.6, destination=DeckPoint(x=7, y=8, z=9)))
+    ).then_return(VolumePointResult(volume=45.6, position=DeckPoint(x=7, y=8, z=9)))
 
     result = await subject.execute(data)
 

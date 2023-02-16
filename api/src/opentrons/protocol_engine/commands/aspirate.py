@@ -49,7 +49,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
             flow_rate=params.flowRate,
         )
 
-        return AspirateResult(volume=result.volume, position=result.destination)
+        return AspirateResult(volume=result.volume, position=result.position)
 
 
 class Aspirate(BaseCommand[AspirateParams, AspirateResult]):

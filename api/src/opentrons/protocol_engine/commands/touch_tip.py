@@ -66,7 +66,7 @@ class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]
         if self._state_view.labware.is_tiprack(labware_id=params.labwareId):
             raise LabwareIsTipRackError("Cannot touch tip on tiprack")
 
-        destination = await self._pipetting.touch_tip(
+        position = await self._pipetting.touch_tip(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -75,7 +75,7 @@ class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]
             speed=params.speed,
         )
 
-        return TouchTipResult(position=destination)
+        return TouchTipResult(position=position)
 
 
 class TouchTip(BaseCommand[TouchTipParams, TouchTipResult]):

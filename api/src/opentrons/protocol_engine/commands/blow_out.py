@@ -56,7 +56,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
-        destination = await self._movement.move_to_well(
+        position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -68,7 +68,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
         ):
             await self._hardware_api.blow_out(mount=hw_pipette.mount)
 
-        return BlowOutResult(position=destination)
+        return BlowOutResult(position=position)
 
 
 class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):

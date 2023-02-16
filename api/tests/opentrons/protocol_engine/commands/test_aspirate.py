@@ -39,7 +39,7 @@ async def test_aspirate_implementation(
             volume=50,
             flow_rate=1.23,
         )
-    ).then_return(VolumePointResult(volume=42, destination=DeckPoint(x=1, y=2, z=3)))
+    ).then_return(VolumePointResult(volume=42, position=DeckPoint(x=1, y=2, z=3)))
 
     result = await subject.execute(data)
 

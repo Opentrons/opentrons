@@ -24,7 +24,7 @@ class VolumePointResult:
     """The returned values of an aspirate or pick up tip operation."""
 
     volume: float
-    destination: DeckPoint
+    position: DeckPoint
 
 
 class PipettingHandler:
@@ -102,7 +102,7 @@ class PipettingHandler:
         )
 
         # move the pipette to the top of the tip
-        destination = await self._movement_handler.move_to_well(
+        position = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
@@ -128,7 +128,7 @@ class PipettingHandler:
             tip_volume=tip_volume,
         )
 
-        return VolumePointResult(volume=tip_volume, destination=destination)
+        return VolumePointResult(volume=tip_volume, position=position)
 
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
         """Manually add a tip to a pipette in the hardware API.
@@ -172,7 +172,7 @@ class PipettingHandler:
         )
 
         # move the pipette to tip drop location
-        destination = await self._movement_handler.move_to_well(
+        position = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
@@ -184,7 +184,7 @@ class PipettingHandler:
             mount=hw_pipette.mount,
             home_after=True if home_after is None else home_after,
         )
-        return destination
+        return position
 
     async def aspirate(
         self,
@@ -227,7 +227,7 @@ class PipettingHandler:
                 well_name=well_name,
             )
 
-        destination = await self._movement_handler.move_to_well(
+        position = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
@@ -238,7 +238,7 @@ class PipettingHandler:
         with self.set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
-        return VolumePointResult(volume=volume, destination=destination)
+        return VolumePointResult(volume=volume, position=position)
 
     async def dispense_in_place(
         self,
@@ -300,11 +300,11 @@ class PipettingHandler:
             well_location=well_location,
         )
 
-        for position in touch_points:
+        for touch_point in touch_points:
             await self._hardware_api.move_to(
                 mount=pipette_location.mount.to_hw_mount(),
                 critical_point=pipette_location.critical_point,
-                abs_position=position,
+                abs_position=touch_point,
                 speed=speed,
             )
         final_point = touch_points[-1]

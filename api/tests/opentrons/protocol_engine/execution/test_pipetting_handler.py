@@ -322,7 +322,7 @@ async def test_handle_aspirate_request_without_prep(
     )
 
     assert result.volume == 25
-    assert result.destination == DeckPoint(x=1, y=2, z=3)
+    assert result.position == DeckPoint(x=1, y=2, z=3)
 
     decoy.verify(
         hardware_api.set_flow_rate(
@@ -395,7 +395,7 @@ async def test_handle_aspirate_request_with_prep(
     )
 
     assert result.volume == 25
-    assert result.destination == DeckPoint(x=1, y=2, z=3)
+    assert result.position == DeckPoint(x=1, y=2, z=3)
 
     decoy.verify(
         await movement_handler.move_to_well(

@@ -43,7 +43,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]
 
     async def execute(self, params: DispenseParams) -> DispenseResult:
         """Move to and dispense to the requested well."""
-        destination = await self._movement.move_to_well(
+        position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -55,7 +55,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]
             flow_rate=params.flowRate,
         )
 
-        return DispenseResult(volume=volume, position=destination)
+        return DispenseResult(volume=volume, position=position)
 
 
 class Dispense(BaseCommand[DispenseParams, DispenseResult]):

@@ -37,7 +37,7 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
 
     async def execute(self, params: MoveToWellParams) -> MoveToWellResult:
         """Move the requested pipette to the requested well."""
-        destination = await self._movement.move_to_well(
+        position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -47,7 +47,7 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
             speed=params.speed,
         )
 
-        return MoveToWellResult(position=destination)
+        return MoveToWellResult(position=position)
 
 
 class MoveToWell(BaseCommand[MoveToWellParams, MoveToWellResult]):

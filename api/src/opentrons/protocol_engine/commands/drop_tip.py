@@ -45,7 +45,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
 
     async def execute(self, params: DropTipParams) -> DropTipResult:
         """Move to and drop a tip using the requested pipette."""
-        destination = await self._pipetting.drop_tip(
+        position = await self._pipetting.drop_tip(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -53,7 +53,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
             home_after=params.homeAfter,
         )
 
-        return DropTipResult(position=destination)
+        return DropTipResult(position=position)
 
 
 class DropTip(BaseCommand[DropTipParams, DropTipResult]):

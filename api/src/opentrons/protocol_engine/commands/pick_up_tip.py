@@ -50,7 +50,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
             well_location=params.wellLocation,
         )
 
-        return PickUpTipResult(tipVolume=result.volume, position=result.destination)
+        return PickUpTipResult(tipVolume=result.volume, position=result.position)
 
 
 class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult]):
