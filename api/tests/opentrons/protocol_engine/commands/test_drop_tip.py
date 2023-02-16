@@ -1,7 +1,7 @@
 """Test pick up tip commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import PipettingHandler
 
 from opentrons.protocol_engine.commands.drop_tip import (
@@ -25,11 +25,7 @@ async def test_drop_tip_implementation(
         wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
 
-    result = await subject.execute(data)
-
-    assert result == DropTipResult()
-
-    decoy.verify(
+    decoy.when(
         await pipetting.drop_tip(
             pipette_id="abc",
             labware_id="123",
@@ -37,4 +33,8 @@ async def test_drop_tip_implementation(
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
             home_after=None,
         )
-    )
+    ).then_return(DeckPoint(x=4, y=5, z=6))
+
+    result = await subject.execute(data)
+
+    assert result == DropTipResult(position=DeckPoint(x=4, y=5, z=6))
