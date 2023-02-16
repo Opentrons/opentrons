@@ -82,7 +82,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: The well to aspirate from, if applicable.
             rate: The rate in µL/s to aspirate at.
             flow_rate: Not used in this core.
-            in_place: Used only for the engine core.
+            in_place: Whether we should move_to location.
         """
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -102,7 +102,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                     )
                 self.prepare_for_aspirate()
             self.move_to(location=location)
-        elif location != self._protocol_interface.get_last_location():
+        elif not in_place:
             self.move_to(location=location)
 
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
@@ -123,9 +123,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: The well to dispense to, if applicable.
             rate: The rate in µL/s to dispense at.
             flow_rate: Not used in this core.
-            in_place: Used only for the engine core.
+            in_place: Whether we should move_to location.
         """
-        self.move_to(location=location)
+        if not in_place:
+            self.move_to(location=location)
 
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
@@ -140,9 +141,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         Args:
             location: The location to blow out into.
             well_core: Unused by legacy core.
-            in_place: Used only for the engine core.
+            in_place: Whether we should move_to location.
         """
-        if location != self._protocol_interface.get_last_location():
+        if not in_place:
             self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
 

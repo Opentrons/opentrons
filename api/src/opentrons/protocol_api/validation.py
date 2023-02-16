@@ -247,7 +247,7 @@ def validate_location(
         return WellTarget(well=target_location, location=None)
 
     _, well = target_location.labware.get_parent_labware_and_well()
-    in_place = target_location is last_location
+    in_place = target_location == last_location
 
     return (
         WellTarget(well=well, location=target_location)
