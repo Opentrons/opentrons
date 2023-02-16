@@ -15,7 +15,6 @@ import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
 import { useDeckCalibrationData, useRobot } from '../../organisms/Devices/hooks'
 import * as RobotApi from '../../redux/robot-api'
 
-import type { DeckCalibrationInfo } from '../../redux/calibration/types'
 import type { State } from '../../redux/types'
 
 interface RobotSettingsDeckCalibrationProps {
@@ -39,7 +38,7 @@ export function RobotSettingsDeckCalibration({
 
   const createStatus = createRequest?.status
 
-  const deckCalData = deckCalibrationData.deckCalibrationData as DeckCalibrationInfo
+  const deckCalData = deckCalibrationData.deckCalibrationData
   const calibratedDate = deckCalData?.lastModified ?? null
   const deckLastModified = Boolean(calibratedDate)
     ? t('last_calibrated', {

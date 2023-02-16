@@ -10,11 +10,11 @@ import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
 import type { StoredProtocolData } from '../../../redux/protocol-storage/types'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
-import type { StoredProtocolAnalysis } from './'
 
 export const parseProtocolRunAnalyticsData = (
-  protocolAnalysis: StoredProtocolAnalysis | null,
+  protocolAnalysis: ProtocolAnalysisOutput | null,
   storedProtocol: StoredProtocolData | null,
   startedAt: string | null
 ) => () => {
@@ -90,7 +90,7 @@ export function useProtocolRunAnalyticsData(
   const { startedAt } = useRunTimestamps(runId)
 
   const getProtocolRunAnalyticsData = parseProtocolRunAnalyticsData(
-    protocolAnalysis as StoredProtocolAnalysis | null,
+    protocolAnalysis as ProtocolAnalysisOutput | null,
     storedProtocol,
     startedAt
   )
