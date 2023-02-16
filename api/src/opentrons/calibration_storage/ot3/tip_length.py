@@ -118,7 +118,12 @@ def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
         del tip_lengths[tiprack]
         tip_length_directory = config.get_tip_length_cal_path()
         if tip_lengths:
-            io.save_to_file(tip_length_directory, pipette_id, tip_lengths)
+            # This is a workaround since pydantic doesn't have a nice way to
+            # add encoders when converting to a dict.
+            dict_of_tip_lengths = {}
+            for key, item in tip_lengths.items():
+                dict_of_tip_lengths[key] = json.loads(item.json())
+            io.save_to_file(tip_length_directory, pipette_id, dict_of_tip_lengths)
         else:
             io.delete_file(tip_length_directory / f"{pipette_id}.json")
     else:
