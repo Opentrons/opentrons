@@ -1,13 +1,16 @@
+import asyncio
 from unittest.mock import mock_open
 import mock
 import pytest
-from typing import Dict, List, Optional, Set, Tuple, Any
+from typing import AsyncIterator, Dict, List, Optional, Set, Tuple, Any
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
+    node_id_to_subsystem,
     node_to_axis,
     axis_to_node,
+    sub_system_to_node_id,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
@@ -27,6 +30,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     MotorStatus,
+    UpdateStatus,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
@@ -36,6 +40,7 @@ from opentrons.hardware_control.errors import (
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.firmware_update.utils import FirmwareUpdateType, UpdateInfo
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
@@ -818,7 +823,8 @@ async def test_update_required_bypass_firmware_update(controller: OT3Controller)
         "opentrons.hardware_control.backends.ot3controller.firmware_update.utils.load_firmware_manifest"
     ):
         try:
-            await controller.update_firmware({})
+            async for node_id, status_element in controller.update_firmware({}):
+                pass
         except FirmwareUpdateRequired:
             assert False, "update_firmware raised an exception."
 
@@ -845,7 +851,8 @@ async def test_update_required_flag_false(controller: OT3Controller):
         fake_umpe,
     ):
         try:
-            await controller.update_motor_estimation(axes)
+            async for node_id, status_element in controller.update_firmware({}):
+                pass
         except FirmwareUpdateRequired:
             assert False, "update_motor_estimation raised an exception."
 
@@ -866,7 +873,8 @@ async def test_update_firmware_update_required(
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        await controller.update_firmware({})
+        async for node_id, status_element in controller.update_firmware({}):
+            pass
         run_updates.assert_called_with(
             messenger=controller._messenger,
             update_details=fw_update_info,
@@ -891,7 +899,8 @@ async def test_update_firmware_up_to_date(
         "opentrons_hardware.firmware_update.check_firmware_updates",
         mock.Mock(return_value={}),
     ):
-        await controller.update_firmware({})
+        async for node_id, status_element in controller.update_firmware({}):
+            pass
         assert not controller.update_required
         run_updates.assert_not_called()
         probe.assert_not_called()
@@ -915,7 +924,10 @@ async def test_update_firmware_specified_nodes(
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        await controller.update_firmware({}, nodes={NodeId.head, NodeId.gantry_x})
+        async for node_id, status_element in controller.update_firmware(
+            {}, nodes={NodeId.head, NodeId.gantry_x}
+        ):
+            pass
         check_updates.assert_called_with(
             fw_node_info, {}, nodes={NodeId.head, NodeId.gantry_x}
         )
@@ -946,7 +958,10 @@ async def test_update_firmware_invalid_specified_node(
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        await controller.update_firmware({}, nodes={NodeId.head})
+        async for node_id, status_element in controller.update_firmware(
+            {}, nodes={NodeId.head}
+        ):
+            pass
         run_updates.assert_called_with(
             messenger=controller._messenger,
             update_details=fw_update_info,
@@ -956,4 +971,49 @@ async def test_update_firmware_invalid_specified_node(
         )
 
         assert not controller.update_required
+        probe.assert_called_once()
+
+
+async def test_update_firmware_progress(
+    controller: OT3Controller,
+    fw_node_info: Dict[NodeId, DeviceInfoCache],
+    fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
+):
+    """Test that the progress is reported for nodes updating."""
+    controller._network_info._device_info_cache = fw_node_info
+
+    async def _fake_update_progress(
+        fw_node_info: Dict[NodeId, DeviceInfoCache]
+    ) -> AsyncIterator[Tuple[NodeId, StatusElement]]:
+        for node_id in fw_node_info:
+            await asyncio.sleep(0)
+            progress_bar = [0, 0.2, 0.6, 0.8, 0.9, 1]
+            for progress in progress_bar:
+                if progress == 0:
+                    status = FirmwareUpdateStatus.queued
+                elif progress == 1:
+                    status = FirmwareUpdateStatus.done
+                else:
+                    status = FirmwareUpdateStatus.updating
+                yield (node_id, (status, progress))
+
+    with mock.patch(
+        "opentrons_hardware.firmware_update.check_firmware_updates",
+        mock.Mock(return_value=fw_update_info),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.RunUpdate.run_updates",
+        mock.Mock(return_value=_fake_update_progress(fw_node_info)),
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        async for updates, progress in controller.update_firmware({}):
+            for update in updates:
+                node_id = sub_system_to_node_id(update.subsystem)
+                assert node_id in fw_node_info
+            assert progress in [0, 10, 30, 40, 45, 50, 60, 80, 90, 95, 100]
+        run_updates.assert_called_once()
+
+        assert not controller.update_required
+        assert controller._update_status == {}
+        assert controller._update_progress == 0
         probe.assert_called_once()

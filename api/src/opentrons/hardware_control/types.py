@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar
 from typing_extensions import Literal
 from opentrons import types as top_types
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -277,6 +278,37 @@ class PipetteSubType(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+class UpdateState(enum.Enum):
+    """Higher level node update state."""
+
+    queued = enum.auto()
+    updating = enum.auto()
+    done = enum.auto()
+
+    @classmethod
+    def from_status(cls, state: FirmwareUpdateStatus) -> "UpdateState":
+        _state_lookup = {
+            FirmwareUpdateStatus.queued: cls.queued,
+            FirmwareUpdateStatus.updating: cls.updating,
+            FirmwareUpdateStatus.done: cls.done,
+        }
+        return _state_lookup[state]
+
+
+class UpdateStatus:
+    def __init__(self, subsystem: OT3SubSystem, state: UpdateState, progress: int):
+        self.subsystem = subsystem
+        self.state = state
+        self.progress = progress
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: {self.subsystem} state: {self.state} progress: {self.progress}>"
+
+    def update(self, state: UpdateState, progress: int) -> None:
+        self.state = state
+        self.progress = progress
 
 
 _subsystem_lookup = {
