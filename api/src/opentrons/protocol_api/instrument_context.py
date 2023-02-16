@@ -190,10 +190,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
             )
-        except validation.LocationTypeError:
+        except validation.LocationTypeError as e:
             raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
-            )
+                f"location should be a Well or Location, but it is {location}"
+            ) from e
 
         if isinstance(target, validation.WellTarget):
             move_to_location = target.location or target.well.bottom(
