@@ -46,6 +46,8 @@ const render = () => {
 }
 
 describe('Protocol Row', () => {
+  jest.useFakeTimers()
+
   it('should redirect to protocol details after short click', () => {
     const [{ getByText }] = render()
     const name = getByText('yay mock protocol')
@@ -57,7 +59,7 @@ describe('Protocol Row', () => {
     const [{ getByText }] = render()
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
-    await new Promise(resolve => setTimeout(resolve, 1005))
+    jest.advanceTimersByTime(1005)
     getByText('Run protocol')
     getByText('Pin protocol')
     getByText('Delete protocol')
