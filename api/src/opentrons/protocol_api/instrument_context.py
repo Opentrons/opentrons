@@ -308,10 +308,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if isinstance(target, validation.WellTarget):
             well = target.well
-            if well.parent._core.is_fixed_trash():
+            if target.location:
+                move_to_location = target.location
+            elif well.parent._core.is_fixed_trash():
                 move_to_location = target.well.top()
             else:
-                move_to_location = target.location or target.well.bottom(
+                move_to_location = target.well.bottom(
                     z=self._well_bottom_clearances.dispense
                 )
         if isinstance(target, validation.PointTarget):
