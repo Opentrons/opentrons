@@ -9,11 +9,11 @@ stages:
       url: "{host:s}:{port:d}/system/register"
       method: POST
       params:
-        agent: 'agent-1'
+        agent: 'agent-system-authorize-test'
         agent_id: 'agent_id-1'
         subject: 'subject-1'
     response:
-      status_code: 200
+      status_code: 201
       json:
         token: !anystr
       save:

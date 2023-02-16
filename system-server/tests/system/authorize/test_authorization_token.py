@@ -25,7 +25,9 @@ async def test_authorize_token() -> None:
     assert jwt_is_valid(TEST_KEY, auth, AUTHORIZATION_AUDIENCE)
 
     # Decode and make sure there's an ID, and the registrant matches
-    decoded = jwt.decode(auth, TEST_KEY, algorithms=["HS512"], audience=AUTHORIZATION_AUDIENCE)
+    decoded = jwt.decode(
+        auth, TEST_KEY, algorithms=["HS512"], audience=AUTHORIZATION_AUDIENCE
+    )
 
     assert decoded["sub"] == registrant.subject
     assert decoded["ot_agent"] == registrant.agent
