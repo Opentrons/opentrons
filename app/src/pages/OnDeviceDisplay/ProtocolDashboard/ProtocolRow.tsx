@@ -140,72 +140,72 @@ export function ProtocolRow(props: {
         >
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
+        {longpress.isLongPressed && (
+          <ModalShell width="15.625rem">
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              justifyContent={JUSTIFY_CENTER}
+            >
+              <Flex
+                alignItems={ALIGN_CENTER}
+                gridGap={SPACING.spacing3}
+                height="4.875rem"
+                justifyContent={JUSTIFY_CENTER}
+                padding={SPACING.spacing5}
+                onClick={() => handleRunClick()}
+              >
+                <Icon name="play-circle" size="1.5rem" color={COLORS.black} />
+                <StyledText
+                  fontSize="1.375rem"
+                  lineHeight="1.5rem"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  textAlign={TEXT_ALIGN_CENTER}
+                >
+                  {t('run_protocol')}
+                </StyledText>
+              </Flex>
+              <Flex
+                alignItems={ALIGN_CENTER}
+                gridGap={SPACING.spacing3}
+                height="4.875rem"
+                justifyContent={JUSTIFY_CENTER}
+                padding={SPACING.spacing5}
+                onClick={() => handlePinClick()}
+              >
+                <Icon name="push-pin" size="1.5rem" color={COLORS.black} />
+                <StyledText
+                  fontSize="1.375rem"
+                  lineHeight="1.5rem"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  textAlign={TEXT_ALIGN_CENTER}
+                >
+                  {pinned ? t('unpin_protocol') : t('pin_protocol')}
+                </StyledText>
+              </Flex>
+              <Flex
+                alignItems={ALIGN_CENTER}
+                backgroundColor={COLORS.errorEnabled}
+                gridGap={SPACING.spacing3}
+                height="4.875rem"
+                justifyContent={JUSTIFY_CENTER}
+                padding={SPACING.spacing5}
+                onClick={() => handleDeleteClick()}
+              >
+                <Icon name="trash" size="1.5rem" color={COLORS.white} />
+                <StyledText
+                  color={COLORS.white}
+                  fontSize="1.375rem"
+                  lineHeight="1.5rem"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  textAlign={TEXT_ALIGN_CENTER}
+                >
+                  {t('delete_protocol')}
+                </StyledText>
+              </Flex>
+            </Flex>
+          </ModalShell>
+        )}
       </TableDatum>
-      {longpress.isLongPressed && (
-        <ModalShell width="15.625rem">
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-          >
-            <Flex
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing3}
-              height="4.875rem"
-              justifyContent={JUSTIFY_CENTER}
-              padding={SPACING.spacing5}
-              onClick={() => handleRunClick()}
-            >
-              <Icon name="play-circle" size="1.5rem" color={COLORS.black} />
-              <StyledText
-                fontSize="1.375rem"
-                lineHeight="1.5rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                textAlign={TEXT_ALIGN_CENTER}
-              >
-                {t('run_protocol')}
-              </StyledText>
-            </Flex>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing3}
-              height="4.875rem"
-              justifyContent={JUSTIFY_CENTER}
-              padding={SPACING.spacing5}
-              onClick={() => handlePinClick()}
-            >
-              <Icon name="push-pin" size="1.5rem" color={COLORS.black} />
-              <StyledText
-                fontSize="1.375rem"
-                lineHeight="1.5rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                textAlign={TEXT_ALIGN_CENTER}
-              >
-                {pinned ? t('unpin_protocol') : t('pin_protocol')}
-              </StyledText>
-            </Flex>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.errorEnabled}
-              gridGap={SPACING.spacing3}
-              height="4.875rem"
-              justifyContent={JUSTIFY_CENTER}
-              padding={SPACING.spacing5}
-              onClick={() => handleDeleteClick()}
-            >
-              <Icon name="trash" size="1.5rem" color={COLORS.white} />
-              <StyledText
-                color={COLORS.white}
-                fontSize="1.375rem"
-                lineHeight="1.5rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                textAlign={TEXT_ALIGN_CENTER}
-              >
-                {t('delete_protocol')}
-              </StyledText>
-            </Flex>
-          </Flex>
-        </ModalShell>
-      )}
     </TableRow>
   )
 }
