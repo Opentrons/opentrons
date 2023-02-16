@@ -53,14 +53,14 @@ export function parsePipetteEntity(
   )
   if (rightPipetteCommand != null) {
     pipetteEntity.push({
-      id: rightPipetteCommand.result.pipetteId,
+      id: rightPipetteCommand.result?.pipetteId,
       pipetteName: rightPipetteCommand.params.pipetteName,
       mount: rightPipetteCommand.params.mount,
     })
   }
   if (leftPipetteCommand != null) {
     pipetteEntity.push({
-      id: leftPipetteCommand.result.pipetteId,
+      id: leftPipetteCommand.result?.pipetteId,
       pipetteName: leftPipetteCommand.params.pipetteName,
       mount: leftPipetteCommand.params.mount,
     })
@@ -94,7 +94,7 @@ export function parseRequiredModulesEntity(
   )
   return loadModuleCommands.map(command => {
     return {
-      id: command.result.moduleId,
+      id: command.result?.moduleId,
       model: command.params.model,
       location: command.params.location,
       serialNumber: '',
@@ -156,15 +156,15 @@ export function parseInitialLoadedLabwareEntity(
       command.commandType === 'loadLabware'
   )
   const filterOutTrashCommands = loadLabwareCommands.filter(
-    command => command.result.definition.metadata.displayCategory !== 'trash'
+    command => command.result?.definition?.metadata?.displayCategory !== 'trash'
   )
   return filterOutTrashCommands.map(command => {
-    const labwareId = command.result.labwareId ?? ''
+    const labwareId = command.result?.labwareId ?? ''
     const {
       namespace,
       version,
       parameters: { loadName },
-    } = command.result.definition
+    } = command.result?.definition
     const definitionUri = `${namespace}/${loadName}/${version}`
     return {
       id: labwareId,

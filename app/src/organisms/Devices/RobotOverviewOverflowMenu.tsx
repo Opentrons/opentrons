@@ -14,6 +14,7 @@ import {
   useMountEffect,
 } from '@opentrons/components'
 
+import * as Config from '../../redux/config'
 import { Portal } from '../../App/portal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -34,6 +35,7 @@ import { useIsRobotBusy } from './hooks'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
+import { JogGantry } from '../JogGantry'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
@@ -54,7 +56,7 @@ export const RobotOverviewOverflowMenu = (
   const isRobotBusy = useIsRobotBusy()
   const runId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
-
+  const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const dispatch = useDispatch<Dispatch>()
 
   const handleClickRestart: React.MouseEventHandler<HTMLButtonElement> = () => {
@@ -103,6 +105,7 @@ export const RobotOverviewOverflowMenu = (
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
   const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
+  const [showJogGantry, setShowJogGantry] = React.useState(false)
 
   return (
     <Flex
@@ -116,8 +119,8 @@ export const RobotOverviewOverflowMenu = (
     >
       <Portal level="top">
         {showSoftwareUpdateModal &&
-        robot != null &&
-        robot.status !== UNREACHABLE ? (
+          robot != null &&
+          robot.status !== UNREACHABLE ? (
           <UpdateBuildroot
             robot={robot}
             close={() => setShowSoftwareUpdateModal(false)}
@@ -128,6 +131,9 @@ export const RobotOverviewOverflowMenu = (
             onCancel={() => setShowDisconnectModal(false)}
             robotName={robot.name}
           />
+        ) : null}
+        {showJogGantry ? (
+          <JogGantry handleClose={() => setShowJogGantry(false)}/>
         ) : null}
       </Portal>
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
@@ -179,6 +185,14 @@ export const RobotOverviewOverflowMenu = (
           >
             {t('home_gantry')}
           </MenuItem>
+          {devToolsOn ? (
+            <MenuItem
+              disabled={isRobotUnavailable}
+              onClick={() => {setShowJogGantry(true)}}
+            >
+              {t('Jog Gantry')}
+            </MenuItem>
+          ) : null}
           {robot.status === CONNECTABLE ? (
             <MenuItem
               disabled={isRobotBusy || !canDisconnect}
