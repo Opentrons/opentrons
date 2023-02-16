@@ -88,6 +88,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
           networkConnection={networkConnection}
+          robotName={robotName}
           robotServerVersion={robotServerVersion ?? 'Unknown'}
           isUpdateAvailable={isUpdateAvailable}
         />
@@ -170,6 +171,7 @@ interface RobotSettingButtonProps {
   settingInfo?: string
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption) => void
+  robotName?: string
   isUpdateAvailable?: boolean
 }
 
@@ -178,6 +180,7 @@ const RobotSettingButton = ({
   settingInfo,
   currentOption,
   setCurrentOption,
+  robotName,
   isUpdateAvailable,
 }: RobotSettingButtonProps): JSX.Element => {
   const { t } = useTranslation('app_settings')
@@ -252,6 +255,7 @@ interface SettingsContentProps {
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption | null) => void
   networkConnection: NetworkConnection
+  robotName: string
   robotServerVersion: string
   isUpdateAvailable: boolean
 }
@@ -259,10 +263,10 @@ const SettingsContent = ({
   currentOption,
   setCurrentOption,
   networkConnection,
+  robotName,
   robotServerVersion,
   isUpdateAvailable,
 }: SettingsContentProps): JSX.Element => {
-  let settingOption
   switch (currentOption) {
     case 'RobotName':
       return <RobotName setCurrentOption={setCurrentOption} />
@@ -275,7 +279,6 @@ const SettingsContent = ({
           setCurrentOption={setCurrentOption}
         />
       )
-
     case 'NetworkSettings':
       return (
         <NetworkSettings
@@ -290,7 +293,11 @@ const SettingsContent = ({
     case 'DisplayTextSize':
       return <DisplayTextSize setCurrentOption={setCurrentOption} />
     case 'DeviceReset':
-      return <DeviceReset setCurrentOption={setCurrentOption} />
+      return (
+        <DeviceReset
+          robotName={robotName}
+          setCurrentOption={setCurrentOption}
+        />
+      )
   }
-  return settingOption
 }

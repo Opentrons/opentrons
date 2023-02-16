@@ -10,6 +10,7 @@ import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import {
   NetworkSettings,
+  DeviceReset,
   RobotSystemVersion,
 } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
@@ -23,6 +24,9 @@ jest.mock(
   '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
 )
 jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DeviceReset'
+)
+jest.mock(
   '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/RobotSystemVersion'
 )
 
@@ -33,6 +37,7 @@ const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 const mockNetworkSettings = NetworkSettings as jest.MockedFunction<
   typeof NetworkSettings
 >
+const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
 const mockRobotSystemVersion = RobotSystemVersion as jest.MockedFunction<
   typeof RobotSystemVersion
 >
@@ -54,6 +59,7 @@ describe('RobotSettingsDashboard', () => {
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
+    mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
   })
 
@@ -121,7 +127,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Device Reset')
     fireEvent.click(button)
-    getByText('Device Reset')
+    getByText('Mock Device Reset')
   })
 
   // The following cases will be activate when RobotSettings PRs are ready
