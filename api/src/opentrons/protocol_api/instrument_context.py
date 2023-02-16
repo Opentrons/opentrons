@@ -464,7 +464,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
-            )
+            ) from e
         except validation.LocationTypeError:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
