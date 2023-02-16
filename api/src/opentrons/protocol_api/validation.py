@@ -203,13 +203,14 @@ class WellTarget(NamedTuple):
 
     well: Well
     location: Optional[Location]
+    in_place: bool
 
 
 class PointTarget(NamedTuple):
     """A movement to coordinates"""
 
     location: Location
-    in_place: bool = False
+    in_place: bool
 
 
 class NoLocationError(ValueError):
@@ -243,14 +244,15 @@ def validate_location(
             "location should be a Well or Location, but it is {}".format(location)
         )
 
-    if isinstance(target_location, Well):
-        return WellTarget(well=target_location, location=None)
-
-    _, well = target_location.labware.get_parent_labware_and_well()
     in_place = target_location == last_location
 
+    if isinstance(target_location, Well):
+        return WellTarget(well=target_location, location=None, in_place=in_place)
+
+    _, well = target_location.labware.get_parent_labware_and_well()
+
     return (
-        WellTarget(well=well, location=target_location)
+        WellTarget(well=well, location=target_location, in_place=in_place)
         if well is not None
         else PointTarget(location=target_location, in_place=in_place)
     )

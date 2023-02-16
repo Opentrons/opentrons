@@ -176,7 +176,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         well: Optional[labware.Well]
         move_to_location: types.Location
-        aspirate_in_place: bool = False
 
         last_location = self._get_last_location_by_api_version()
         try:
@@ -191,6 +190,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
+        aspirate_in_place = target.in_place
         if isinstance(target, validation.WellTarget):
             move_to_location = target.location or target.well.bottom(
                 z=self._well_bottom_clearances.aspirate
@@ -199,7 +199,6 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
             well = None
-            aspirate_in_place = target.in_place
 
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
@@ -285,7 +284,7 @@ class InstrumentContext(publisher.CommandPublisher):
         )
         well: Optional[labware.Well] = None
         last_location = self._get_last_location_by_api_version()
-        dispense_in_place: bool = False
+
         try:
             target = validation.validate_location(
                 location=location, last_location=last_location
@@ -298,6 +297,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
+        dispense_in_place = target.in_place
         if isinstance(target, validation.WellTarget):
             well = target.well
             if target.location:
@@ -311,7 +311,6 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
             well = None
-            dispense_in_place = target.in_place
 
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
@@ -443,7 +442,6 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         well: Optional[labware.Well]
         move_to_location: types.Location
-        blow_out_in_place: bool = False
 
         last_location = self._get_last_location_by_api_version()
         try:
@@ -458,6 +456,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
+        blow_out_in_place = target.in_place
         if isinstance(target, validation.WellTarget):
             if target.well.parent.is_tiprack:
                 _log.warning(
@@ -469,7 +468,6 @@ class InstrumentContext(publisher.CommandPublisher):
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
             well = None
-            blow_out_in_place = target.in_place
 
         with publisher.publish_context(
             broker=self.broker,

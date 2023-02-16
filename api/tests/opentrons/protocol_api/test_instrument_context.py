@@ -228,7 +228,7 @@ def test_aspirate(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(WellTarget(well=mock_well, location=None))
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
@@ -266,7 +266,7 @@ def test_aspirate_well_location(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(WellTarget(well=mock_well, location=input_location))
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=input_location, rate=1.23)
@@ -338,7 +338,7 @@ def test_aspirate_in_place(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(PointTarget(location=input_location))
+    ).then_return(PointTarget(location=input_location, in_place=False))
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=input_location, rate=1.23)
@@ -410,7 +410,7 @@ def test_blow_out_to_well(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(WellTarget(well=mock_well, location=None))
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
     decoy.when(mock_well.top()).then_return(top_location)
     subject.blow_out(location=input_location)
 
@@ -441,7 +441,7 @@ def test_blow_out_to_well_location(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(WellTarget(well=mock_well, location=input_location))
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
     subject.blow_out(location=input_location)
 
     decoy.verify(
@@ -787,7 +787,7 @@ def test_dispense_with_well_location(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(WellTarget(well=mock_well, location=input_location))
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(3.0)
 
     subject.dispense(volume=42.0, location=input_location, rate=1.23)
@@ -825,7 +825,7 @@ def test_dispense_with_well(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(WellTarget(well=mock_well, location=None))
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
     decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
 
