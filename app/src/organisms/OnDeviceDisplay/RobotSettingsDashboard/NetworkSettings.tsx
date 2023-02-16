@@ -123,43 +123,45 @@ function NetworkSettingButton({
   networkName,
 }: NetworkSettingButtonProps): JSX.Element {
   return (
-    <Btn
-      width="100%"
-      padding={SPACING.spacing5}
-      backgroundColor={buttonBackgroundColor}
-      borderRadius="0.75rem"
-    >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
-        <Flex gridGap={SPACING.spacing3} width="34.8125rem">
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-            <Icon name={iconName} size="3rem" />
-            <StyledText
-              fontSize="1.5rem"
-              lineHeight="2.0625rem"
-              fontWeight="700"
-            >
-              {buttonTitle}
-            </StyledText>
-            {networkName != null ? (
+    <>
+      <Btn
+        width="100%"
+        padding={SPACING.spacing5}
+        backgroundColor={buttonBackgroundColor}
+        borderRadius="0.75rem"
+      >
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
+          <Flex gridGap={SPACING.spacing3} width="34.8125rem">
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+              <Icon name={iconName} size="3rem" />
               <StyledText
                 fontSize="1.5rem"
                 lineHeight="2.0625rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                fontWeight="700"
               >
-                {networkName}
+                {buttonTitle}
               </StyledText>
-            ) : null}
+              {networkName != null ? (
+                <StyledText
+                  fontSize="1.5rem"
+                  lineHeight="2.0625rem"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                >
+                  {networkName}
+                </StyledText>
+              ) : null}
+            </Flex>
+          </Flex>
+          <Flex alignItems={ALIGN_CENTER} width="15.1875rem">
+            <Chip type={chipType} text={chipText} iconName={chipIconName} />
+          </Flex>
+          <Flex justifyContent="flex-end" alignSelf="stretch">
+            <Btn onClick={() => console.log('setup')}>
+              <Icon name="chevron-right" size="3rem" />
+            </Btn>
           </Flex>
         </Flex>
-        <Flex alignItems={ALIGN_CENTER} width="15.1875rem">
-          <Chip type={chipType} text={chipText} iconName={chipIconName} />
-        </Flex>
-        <Flex justifyContent="flex-end" alignSelf="stretch">
-          <Btn onClick={() => console.log('setup')}>
-            <Icon name="chevron-right" size="3rem" />
-          </Btn>
-        </Flex>
-      </Flex>
-    </Btn>
+      </Btn>
+    </>
   )
 }
