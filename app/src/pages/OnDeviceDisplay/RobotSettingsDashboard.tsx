@@ -27,6 +27,7 @@ import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import { useNetworkConnection } from './hooks'
 import {
   DeviceReset,
   DisplayBrightness,
@@ -37,6 +38,7 @@ import {
   RobotSystemVersion,
 } from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
+import type { NetworkConnection } from './hooks'
 import type { State } from '../../redux/types'
 
 const SETTING_BUTTON_STYLE = css`
@@ -47,7 +49,6 @@ const SETTING_BUTTON_STYLE = css`
   padding: 1.5rem;
   border-radius: 16px;
 `
-
 export type SettingOption =
   | 'RobotName'
   | 'RobotSystemVersion'
@@ -61,6 +62,7 @@ export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const networkConnection = useNetworkConnection(robotName)
   const [
     currentOption,
     setCurrentOption,
@@ -85,6 +87,7 @@ export function RobotSettingsDashboard(): JSX.Element {
         <SettingsContent
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
+          networkConnection={networkConnection}
           robotName={robotName}
           robotServerVersion={robotServerVersion ?? 'Unknown'}
           isUpdateAvailable={isUpdateAvailable}
@@ -115,7 +118,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           {/* Network Settings */}
           <RobotSettingButton
             settingName={t('network_settings')}
-            settingInfo={'Not connected'}
+            settingInfo={networkConnection?.connectionStatus}
             currentOption="NetworkSettings"
             setCurrentOption={setCurrentOption}
           />
@@ -251,6 +254,7 @@ const RobotSettingButton = ({
 interface SettingsContentProps {
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption | null) => void
+  networkConnection: NetworkConnection
   robotName: string
   robotServerVersion: string
   isUpdateAvailable: boolean
@@ -258,6 +262,7 @@ interface SettingsContentProps {
 const SettingsContent = ({
   currentOption,
   setCurrentOption,
+  networkConnection,
   robotName,
   robotServerVersion,
   isUpdateAvailable,
@@ -265,6 +270,7 @@ const SettingsContent = ({
   switch (currentOption) {
     case 'RobotName':
       return <RobotName setCurrentOption={setCurrentOption} />
+
     case 'RobotSystemVersion':
       return (
         <RobotSystemVersion
@@ -274,7 +280,12 @@ const SettingsContent = ({
         />
       )
     case 'NetworkSettings':
-      return <NetworkSettings setCurrentOption={setCurrentOption} />
+      return (
+        <NetworkSettings
+          networkConnection={networkConnection}
+          setCurrentOption={setCurrentOption}
+        />
+      )
     case 'DisplaySleepSettings':
       return <DisplaySleepSettings setCurrentOption={setCurrentOption} />
     case 'DisplayBrightness':
