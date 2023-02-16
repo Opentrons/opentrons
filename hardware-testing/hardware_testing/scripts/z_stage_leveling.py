@@ -3,6 +3,7 @@ import curses
 import asyncio
 import argparse
 
+from typing import Any
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api.types import OT3Mount, Point
@@ -17,15 +18,13 @@ MAX_STEP_INDEX = len(STEP_LIST) - 1
 STARTING_MOUNT = OT3Mount.RIGHT
 
 
-async def begin_z_leveling(
-    stdscr: curses._CursesWindow, api: OT3API, mount: OT3Mount
-) -> None:
+async def begin_z_leveling(stdscr: Any, api: OT3API, mount: OT3Mount) -> None:
     """Begin Z Leveling.
 
     Main application that runs continuously until CTRL-C is pressed.
     """
     step_index = DEFAULT_STEP_INDEX
-    stdscr.erase()
+    stdscr.clear()
     while True:
         c = stdscr.getkey()
         stdscr.addstr(f"Received {c} character")
@@ -57,14 +56,13 @@ async def begin_z_leveling(
             calibration_square_pos = (
                 helpers_ot3.get_slot_calibration_square_position_ot3(int(next_slot))
             )
-            calibration_square_pos._replace(z=50)
+            calibration_square_pos = calibration_square_pos._replace(z=50)
             stdscr.addstr(f"Calibration square pos {calibration_square_pos}")
             await api.move_to(mount, calibration_square_pos)
+        stdscr.clear()
 
 
-async def jog_axis(
-    stdscr: curses._CursesWindow, api: OT3API, mount: OT3Mount, step_index: int
-) -> None:
+async def jog_axis(stdscr: Any, api: OT3API, mount: OT3Mount, step_index: int) -> None:
     """Jog Axis Tool.
 
     Internal axis jog controls using move_rel
@@ -72,35 +70,37 @@ async def jog_axis(
     CONTINUE_JOG = True
     z = False
     while CONTINUE_JOG:
+        stdscr.refresh()
         c = stdscr.getkey()
         stdscr.addstr(f"In jog, received {c} character")
         amount = STEP_LIST[step_index]
         if c == "z":
             z = not z
-        elif c == curses.KEY_LEFT:
+        elif c == "a":
             stdscr.addstr("Jogging left")
             await api.move_rel(mount, Point(x=amount * -1, y=0, z=0))
-        elif c == curses.KEY_RIGHT:
+        elif c == "d":
             stdscr.addstr("Jogging right")
             await api.move_rel(mount, Point(x=amount, y=0, z=0))
-        elif c == curses.KEY_UP and z:
+        elif c == "w" and z:
             stdscr.addstr("Jogging up")
             await api.move_rel(mount, Point(x=0, y=0, z=amount))
-        elif c == curses.KEY_DOWN and z:
+        elif c == "s" and z:
             stdscr.addstr("Jogging down")
             await api.move_rel(mount, Point(x=0, y=0, z=amount * -1))
-        elif c == curses.KEY_UP:
+        elif c == "w":
             stdscr.addstr("Jogging backwards")
             await api.move_rel(mount, Point(x=0, y=amount, z=0))
-        elif c == curses.KEY_DOWN:
+        elif c == "s":
             stdscr.addstr("Jogging forwards")
             await api.move_rel(mount, Point(x=0, y=amount * -1, z=0))
         elif c == "n":
             stdscr.addstr("Exiting jog.")
             CONTINUE_JOG = False
+        stdscr.clear()
 
 
-async def _main(stdscr: curses._CursesWindow, simulating: bool) -> None:
+async def _main(stdscr: Any, simulating: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulating, use_defaults=True
     )
@@ -111,7 +111,7 @@ async def _main(stdscr: curses._CursesWindow, simulating: bool) -> None:
     await begin_z_leveling(stdscr, api, STARTING_MOUNT)
 
 
-def main(stdscr: curses._CursesWindow, simulating: bool) -> None:
+def main(stdscr: Any, simulating: bool) -> None:
     """Entrypoint."""
     asyncio.run(_main(stdscr, simulating))
 
