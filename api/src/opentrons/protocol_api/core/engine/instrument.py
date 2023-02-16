@@ -93,7 +93,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_core: The well to aspirate from, if applicable.
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to aspirate at.
-            in_place: whether this an in-place command.
+            in_place: whether this is a in-place command.
         """
         if well_core is None:
             if not in_place:
