@@ -84,17 +84,20 @@ def mock_home(ot3_hardware):
 
 
 async def test_home(ot3_hardware, mock_home):
+    # this is only valid for Axis G, for other axes, check out test_ot3_api.py
     with mock.patch("opentrons.hardware_control.ot3api.deck_from_machine") as dfm_mock:
-        dfm_mock.return_value = {OT3Axis.X: 20}
-        await ot3_hardware.home([OT3Axis.X])
-        mock_home.assert_called_once_with([OT3Axis.X])
+        dfm_mock.return_value = {OT3Axis.G: 20}
+        await ot3_hardware._home([OT3Axis.G])
+
+        mock_home.assert_called_once_with([OT3Axis.G])
         assert dfm_mock.call_count == 2
         dfm_mock.assert_called_with(
             mock_home.return_value,
             ot3_hardware._transforms.deck_calibration.attitude,
             ot3_hardware._transforms.carriage_offset,
         )
-    assert ot3_hardware._current_position[OT3Axis.X] == 20
+    assert ot3_hardware._current_position[OT3Axis.G] == 20
+    assert ot3_hardware._encoder_position[OT3Axis.G] == 20
 
 
 async def test_home_unmet(ot3_hardware, mock_home):

@@ -33,6 +33,7 @@ from opentrons.config.types import (
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons_hardware.hardware_control.motion_planning import (
+    Move,
     MoveManager,
     MoveTarget,
     ZeroLengthMoveError,
@@ -73,6 +74,7 @@ from .types import (
     PipetteSubType,
     PauseType,
     OT3Axis,
+    OT3AxisKind,
     OT3Mount,
     OT3AxisMap,
     GripperJawState,
@@ -699,7 +701,7 @@ class OT3API(
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
 
         if fail_on_not_homed and (
-            not self._backend.check_ready_for_movement(position_axes)
+            not self._backend.check_motor_status(position_axes)
             or not self._current_position
         ):
             raise MustHomeError(
@@ -719,20 +721,20 @@ class OT3API(
         """Request and update both the motor and encoder positions from backend."""
         async with self._motion_lock:
             await self._backend.update_motor_status()
-            await self._cache_current_position()
-            await self._cache_encoder_position()
+            self._cache_current_position()
+            self._cache_encoder_position()
 
-    async def _cache_current_position(self) -> Dict[OT3Axis, float]:
+    def _cache_current_position(self) -> Dict[OT3Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
         self._current_position = self._deck_from_machine(
-            await self._backend.update_position()
+            self._backend.update_position()
         )
         return self._current_position
 
-    async def _cache_encoder_position(self) -> Dict[OT3Axis, float]:
+    def _cache_encoder_position(self) -> Dict[OT3Axis, float]:
         """Cache encoder position from backend and return in absolute deck coords."""
         self._encoder_position = self._deck_from_machine(
-            await self._backend.update_encoder_position()
+            self._backend.update_encoder_position()
         )
         return self._encoder_position
 
@@ -766,7 +768,7 @@ class OT3API(
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
 
         if fail_on_not_homed and (
-            not self._backend.check_ready_for_movement(position_axes)
+            not self._backend.check_motor_status(position_axes)
             or not self._encoder_position
         ):
             raise MustHomeError(
@@ -844,11 +846,11 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
 
         # Refresh current position
-        await self._cache_current_position()
-        await self._cache_encoder_position()
+        self._cache_current_position()
+        self._cache_encoder_position()
 
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if not self._backend.check_ready_for_movement(axes_moving):
+        if not self._backend.check_motor_status(axes_moving):
             await self.home(axes_moving)
 
         target_position = target_position_from_absolute(
@@ -897,7 +899,7 @@ class OT3API(
 
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if not self._backend.check_ready_for_movement([axis for axis in axes_moving]):
+        if not self._backend.check_motor_status([axis for axis in axes_moving]):
             if fail_on_not_homed:
                 raise mhe
             else:
@@ -909,7 +911,7 @@ class OT3API(
         target_position = target_position_from_relative(
             realmount, delta, self._current_position
         )
-        if fail_on_not_homed and not self._backend.check_ready_for_movement(
+        if fail_on_not_homed and not self._backend.check_motor_status(
             [axis for axis in axes_moving if axis is not None]
         ):
             raise mhe
@@ -962,6 +964,21 @@ class OT3API(
                 # allows for safer gantry movement at minimum force
                 await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
+    def _build_moves(
+        self,
+        origin: Dict[OT3Axis, float],
+        target: Dict[OT3Axis, float],
+        speed: Optional[float] = None,
+    ) -> List[List[Move[OT3Axis]]]:
+        """Build move with Move Manager with machine positions."""
+        # TODO: (2022-02-10) Use actual max speed for MoveTarget
+        checked_speed = speed or 400
+        move_target = MoveTarget.build(position=target, max_speed=checked_speed)
+        _, moves = self._move_manager.plan_motion(
+            origin=origin, target_list=[move_target]
+        )
+        return moves
+
     @ExecutionManagerProvider.wait_for_running
     async def _move(
         self,
@@ -987,14 +1004,9 @@ class OT3API(
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
 
-        # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        checked_speed = speed or 400
-        move_target = MoveTarget.build(position=machine_pos, max_speed=checked_speed)
-        origin = await self._backend.update_position()
+        origin = self._backend.update_position()
         try:
-            blended, moves = self._move_manager.plan_motion(
-                origin=origin, target_list=[move_target]
-            )
+            moves = self._build_moves(origin, machine_pos, speed)
         except ZeroLengthMoveError as zero_length_error:
             self._log.info(f"{str(zero_length_error)}, ignoring")
             return
@@ -1016,8 +1028,98 @@ class OT3API(
                 self._current_position.clear()
                 raise
             else:
-                await self._cache_current_position()
-                await self._cache_encoder_position()
+                self._cache_current_position()
+                self._cache_encoder_position()
+
+    async def _home_axis(self, axis: OT3Axis) -> None:
+        """
+        Perform home; base on axis motor/encoder statuses, shorten homing time
+        if possible.
+
+        1. If stepper position status is valid, move directly to the home position.
+        2. If encoder position status is valid, update position estimation.
+           If axis encoder is accurate (Zs & Ps ONLY), move directly to home position.
+           Or, if axis encoder is not accurate, move to 20mm away from home position,
+           then home.
+        3. If both stepper and encoder statuses are invalid, home full axis.
+
+        Note that when an axis is move directly to the home position, the axis limit
+        switch will not be triggered.
+        """
+        # G, Q should be handled in the backend through `self._home()`
+        assert axis not in [OT3Axis.G, OT3Axis.Q]
+
+        # retrieve home position
+        origin = self._backend.update_position()
+        target_pos = {ax: pos for ax, pos in origin.items()}
+        target_pos.update({axis: self._backend.home_position()[axis]})
+        if self._backend.check_motor_status([axis]):
+            # move directly the home position if the stepper position is valid
+            moves = self._build_moves(origin, target_pos)
+            await self._backend.move(
+                origin,
+                moves[0],
+                MoveStopCondition.none,
+            )
+        elif self._backend.check_encoder_status([axis]):
+            # update stepper position using the valid encoder position
+            await self._update_position_estimation([axis])
+            if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
+                # we can move directly to the home position for accuracy axes
+                # move directly the home position if the stepper position is valid
+                moves = self._build_moves(origin, target_pos)
+                await self._backend.move(
+                    origin,
+                    moves[0],
+                    MoveStopCondition.none,
+                )
+            else:
+                # FIXME: (AA 2/15/23) This is a temporary workaround because of
+                # XY encoder inaccuracy. We should remove this and move axes directly
+                # to the home position when we fix the encoder issues.
+                # Move to 20 mm away from the home position and then home
+                target_pos[axis] += 20.00
+                moves = self._build_moves(origin, target_pos)
+                await self._backend.move(
+                    origin,
+                    moves[0],
+                    MoveStopCondition.none,
+                )
+                await self._backend.home([axis])
+        else:
+            # both stepper and encoder positions are invalid, must home
+            await self._backend.home([axis])
+
+    async def _home(self, axes: Sequence[OT3Axis]) -> None:
+        """Home one axis at a time."""
+        async with self._motion_lock:
+            for axis in axes:
+                try:
+                    # let backend handle homing gripper jaw and pipette plunger
+                    if axis in [OT3Axis.G, OT3Axis.Q]:
+                        await self._backend.home([axis])
+                    else:
+                        await self._home_axis(axis)
+                except ZeroLengthMoveError:
+                    self._log.info(f"{axis} already at home position, skip homing")
+                    pass
+                except (MoveConditionNotMet, Exception):
+                    self._log.exception("Homing failed")
+                    self._current_position.clear()
+                    raise
+                else:
+                    self._cache_current_position()
+                    self._cache_encoder_position()
+                    if axis == OT3Axis.G:
+                        try:
+                            self._gripper_handler.set_jaw_state(
+                                GripperJawState.HOMED_READY
+                            )
+                            self._gripper_handler.set_jaw_displacement(
+                                self._encoder_position[OT3Axis.G]
+                            )
+                        except GripperNotAttachedError:
+                            pass
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -1027,8 +1129,9 @@ class OT3API(
         Worker function to home the robot by axis or list of
         desired axes.
         """
+        # make sure current position is up-to-date
+        await self.refresh_positions()
 
-        self._reset_last_mount()
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
@@ -1036,95 +1139,9 @@ class OT3API(
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(OT3Axis.Q)
         self._log.info(f"Homing {axes}")
-        async with self._motion_lock:
-            try:
-                await self._backend.home(checked_axes)
-            except MoveConditionNotMet:
-                self._log.exception("Homing failed")
-                self._current_position.clear()
-                raise
-            else:
-                machine_pos = await self._backend.update_position()
-                encoder_machine_pos = await self._backend.update_encoder_position()
-                position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-                self._current_position.update(position)
-                encoder_position = deck_from_machine(
-                    encoder_machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-                self._encoder_position.update(encoder_position)
-                if OT3Axis.G in checked_axes:
-                    try:
-                        gripper = self._gripper_handler.get_gripper()
-                        gripper.state = GripperJawState.HOMED_READY
-                        gripper.current_jaw_displacement = encoder_position[OT3Axis.G]
-                    except GripperNotAttachedError:
-                        pass
 
-    async def park(
-        self,
-        axes: Optional[Union[List[Axis], List[OT3Axis]]] = None,
-        acquire_lock: bool = True,
-    ) -> None:
-        """
-        Move gantry axes to home position with acceleration, if possible.
-
-        """
-
-        # make sure current position is up-to-date
-        await self.refresh_positions()
-
-        parkable = list(OT3Axis.gantry_axes())
-        if axes:
-            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
-            assert all(
-                ax in parkable for ax in checked_axes
-            ), f"Only gantry axes are parkable: {parkable}"
-        else:
-            checked_axes = parkable
-        if not self._backend.check_ready_for_parking(checked_axes):
-            raise MustHomeError(
-                "Cannot park because the encoder positions are unknown."
-            )
-        self._reset_last_mount()
-
-        park_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
-        self._log.info(f"Parking {park_seq}")
-        async with contextlib.AsyncExitStack() as stack:
-            if acquire_lock:
-                await stack.enter_async_context(self._motion_lock)
-            for axis in park_seq:
-                try:
-                    # update all motor position based on encoder position
-                    await self._update_position_estimation([axis])
-                    origin = await self._backend.update_position()
-                    target_pos = {ax: pos for ax, pos in origin.items()}
-                    # home_position just returns 0 unless we decide to change
-                    # it in the future in ot3backends
-                    target_pos[axis] = self._backend.home_position()[axis]
-                    move_target = MoveTarget.build(position=target_pos, max_speed=400)
-                    _, moves = self._move_manager.plan_motion(
-                        origin=origin, target_list=[move_target]
-                    )
-                    await self._backend.move(origin, moves[0])
-                except MustHomeError:
-                    # home instead of park if encoder position cannot be trusted
-                    await self._backend.home([axis])
-                except ZeroLengthMoveError:
-                    self._log.info(f"{axis} already at home position, skip parking")
-                    pass
-                except Exception:
-                    self._log.info("Park failed")
-                    self._current_position.clear()
-                    raise
-                else:
-                    await self._cache_current_position()
-                    await self._cache_encoder_position()
+        home_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
+        await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
@@ -1213,7 +1230,7 @@ class OT3API(
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
-            encoder_pos = await self._backend.update_encoder_position()
+            encoder_pos = self._backend.update_encoder_position()
             self._encoder_position = deck_from_machine(
                 encoder_pos,
                 self._transforms.deck_calibration.attitude,
@@ -1233,7 +1250,7 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
-            encoder_pos = await self._backend.update_encoder_position()
+            encoder_pos = self._backend.update_encoder_position()
             self._encoder_position = deck_from_machine(
                 encoder_pos,
                 self._transforms.deck_calibration.attitude,
@@ -1264,7 +1281,7 @@ class OT3API(
                     / 2
                 )
             )
-            encoder_pos = await self._backend.update_encoder_position()
+            encoder_pos = self._backend.update_encoder_position()
             self._encoder_position = deck_from_machine(
                 encoder_pos,
                 self._transforms.deck_calibration.attitude,

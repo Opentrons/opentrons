@@ -223,7 +223,7 @@ async def test_home_execute(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
@@ -249,7 +249,7 @@ async def test_home_prioritize_mount(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
@@ -279,7 +279,7 @@ async def test_home_build_runners(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
@@ -603,7 +603,7 @@ async def test_ready_for_movement(
     controller._motor_status = motor_status
 
     axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
-    assert controller.check_ready_for_movement(axes) == ready
+    assert controller.check_motor_status(axes) == ready
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:

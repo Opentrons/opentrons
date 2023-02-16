@@ -144,6 +144,39 @@ async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[Asy
 
 
 @pytest.fixture
+def mock_check_motor(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj._backend,
+        "check_motor_status",
+        Mock(spec=ot3_hardware.managed_obj._backend.check_motor_status),
+    ) as mock_check:
+        yield mock_check
+
+
+@pytest.fixture
+def mock_check_encoder(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj._backend,
+        "check_encoder_status",
+        Mock(spec=ot3_hardware.managed_obj._backend.check_encoder_status),
+    ) as mock_check:
+        yield mock_check
+
+
+@pytest.fixture
+async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "refresh_positions",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.refresh_positions,
+            wraps=ot3_hardware.managed_obj.refresh_positions,
+        ),
+    ) as mock_refresh:
+        yield mock_refresh
+
+
+@pytest.fixture
 async def mock_instrument_handlers(
     ot3_hardware: ThreadManager[OT3API],
 ) -> Iterator[Tuple[Mock]]:
@@ -300,14 +333,14 @@ async def test_move_to_without_homing_first(
         await ot3_hardware.cache_gripper(instr_data)
 
     ot3_hardware._backend._motor_status = {}
-    assert not ot3_hardware._backend.check_ready_for_movement(homed_axis)
+    assert not ot3_hardware._backend.check_motor_status(homed_axis)
 
     await ot3_hardware.move_to(
         mount,
         Point(0.001, 0.001, 0.001),
     )
     mock_home.assert_called_once_with(homed_axis)
-    assert ot3_hardware._backend.check_ready_for_movement(homed_axis)
+    assert ot3_hardware._backend.check_motor_status(homed_axis)
 
 
 @pytest.mark.parametrize(
@@ -864,11 +897,11 @@ async def test_refresh_positions(ot3_hardware: ThreadManager[OT3API]) -> None:
     ) as mock_update_status, patch.object(
         backend,
         "update_position",
-        AsyncMock(spec=backend.update_position),
+        Mock(spec=backend.update_position),
     ) as mock_pos, patch.object(
         backend,
         "update_encoder_position",
-        AsyncMock(spec=backend.update_encoder_position),
+        Mock(spec=backend.update_encoder_position),
     ) as mock_encoder:
 
         mock_pos.return_value = {ax: 100 for ax in OT3Axis}
@@ -877,26 +910,57 @@ async def test_refresh_positions(ot3_hardware: ThreadManager[OT3API]) -> None:
         await ot3_hardware.refresh_positions()
 
         mock_update_status.assert_called_once()
-        mock_pos.assert_awaited_once()
+        mock_pos.assert_called_once()
         mock_encoder.assert_called_once()
 
         assert (ax in ot3_hardware._current_position.keys() for ax in OT3Axis)
         assert (ax in ot3_hardware._encoder_position.keys() for ax in OT3Axis)
 
 
+@pytest.mark.parametrize("axis", [OT3Axis.X, OT3Axis.Z_L, OT3Axis.P_L, OT3Axis.Y])
 @pytest.mark.parametrize(
-    "axes",
-    [[OT3Axis.X], [OT3Axis.X, OT3Axis.Y], [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L], None],
+    "stepper_ok,encoder_ok",
+    [
+        (True, True),
+        (False, True),
+        (False, False),
+    ],
 )
-async def test_park(ot3_hardware: ThreadManager[OT3API], axes: List[OT3Axis]) -> None:
+async def test_home_axis(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_check_motor: Mock,
+    mock_check_encoder: Mock,
+    axis: OT3Axis,
+    stepper_ok: bool,
+    encoder_ok: bool,
+) -> None:
 
     backend = ot3_hardware.managed_obj._backend
-    origin_pos = {axis_to_node(ax): 100 for ax in OT3Axis}
-    origin_encoder = {axis_to_node(ax): 99 for ax in OT3Axis}
-    backend._position = origin_pos
-    backend._encoder_position = origin_encoder
+    origin_pos = {ax: 100 for ax in OT3Axis}
+    origin_encoder = {ax: 99 for ax in OT3Axis}
+    backend._position = {axis_to_node(ax): v for ax, v in origin_pos.items()}
+    backend._encoder_position = {
+        axis_to_node(ax): v for ax, v in origin_encoder.items()
+    }
+
+    mock_check_motor.return_value = stepper_ok
+    mock_check_encoder.return_value = encoder_ok
 
     with patch.object(
+        backend,
+        "move",
+        AsyncMock(
+            spec=backend.move,
+            wraps=backend.move,
+        ),
+    ) as mock_backend_move, patch.object(
+        backend,
+        "home",
+        AsyncMock(
+            spec=backend.home,
+            wraps=backend.home,
+        ),
+    ) as mock_backend_home, patch.object(
         backend,
         "update_motor_estimation",
         AsyncMock(
@@ -905,20 +969,38 @@ async def test_park(ot3_hardware: ThreadManager[OT3API], axes: List[OT3Axis]) ->
         ),
     ) as mock_estimate:
 
-        await ot3_hardware.park(axes)
+        await ot3_hardware._home_axis(axis)
 
-        # if None, we park all of the gantry axes
-        parked = axes or OT3Axis.gantry_axes()
-        # must be in the correct home order
-        mock_calls = [call([ax]) for ax in OT3Axis.home_order() if ax in parked]
-
-        mock_estimate.assert_has_calls(mock_calls, any_order=False)
-
-        for ax in OT3Axis:
-            if ax in parked:
-                # axes are parkced back to 0.0
-                assert backend._position[axis_to_node(ax)] == 0
-                assert backend._encoder_position[axis_to_node(ax)] == 0
+        if stepper_ok:
+            """Move to home position"""
+            # move is called
+            mock_backend_move.assert_awaited_once()
+            move = mock_backend_move.call_args_list[0][0][1][0]
+            assert move.distance == 100.0
+            # home is NOT called
+            mock_backend_home.assert_not_awaited()
+        elif encoder_ok:
+            """Copy encoder position to stepper pos"""
+            mock_estimate.assert_awaited_once()
+            # for accurate axis, we just move to home pos:
+            if axis in [OT3Axis.Z_L, OT3Axis.P_L]:
+                # move is called
+                mock_backend_move.assert_awaited_once()
+                mock_backend_home.assert_not_awaited()
             else:
-                assert backend._position[axis_to_node(ax)] != 0
-                assert backend._encoder_position[axis_to_node(ax)] != 0
+                # we move to 20 mm away from home
+                mock_backend_move.assert_awaited_once()
+                move = mock_backend_move.call_args_list[0][0][1][0]
+                assert move.distance == 80.0
+                # then home is called
+                mock_backend_home.assert_awaited_once()
+        else:
+            # home axis
+            mock_backend_home.assert_awaited_once()
+            # move not called
+            mock_backend_move.assert_not_awaited()
+
+    # axis is at the home position
+    expected_pos = {axis_to_node(ax): v for ax, v in origin_pos.items()}
+    expected_pos.update({axis_to_node(axis): 0})
+    assert backend._position == expected_pos

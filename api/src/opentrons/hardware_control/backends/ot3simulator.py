@@ -5,7 +5,6 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from typing import (
-    Callable,
     Dict,
     List,
     Optional,
@@ -211,26 +210,24 @@ class OT3Simulator:
     ) -> Iterator[Optional[MotorStatus]]:
         return (self._motor_status.get(axis_to_node(a)) for a in ax)
 
-    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_motor_status(self, axes: Sequence[OT3Axis]) -> bool:
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
             for status in self._get_motor_status(axes)
         )
 
-    def check_ready_for_parking(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
         """If any of the encoder statuses is ok, parking can proceed."""
         return any(
             isinstance(status, MotorStatus) and status.encoder_ok
             for status in self._get_motor_status(axes)
         )
 
-    @ensure_yield
-    async def update_position(self) -> OT3AxisMap[float]:
+    def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
 
-    @ensure_yield
-    async def update_encoder_position(self) -> OT3AxisMap[float]:
+    def update_encoder_position(self) -> OT3AxisMap[float]:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
 
@@ -271,6 +268,7 @@ class OT3Simulator:
         else:
             homed = list(self._position.keys())
         for h in homed:
+            self._position[h] = self._get_home_position()[h]
             self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
