@@ -233,20 +233,22 @@ def validate_location(
     """
     from .labware import Well
 
-    if location is None and last_location is None:
+    target_location = location or last_location
+
+    if target_location is None:
         raise NoLocationError()
 
-    if isinstance(location, Well):
-        return WellTarget(well=location, location=None)
-    elif isinstance(location, Location):
-        _, well = location.labware.get_parent_labware_and_well()
-        if well is None:
-            return PointTarget(location=location, in_place=False)
-        return WellTarget(well=well, location=location)
-    elif last_location and location is None:
-        _, well = last_location.labware.get_parent_labware_and_well()
-        if well is None:
-            return PointTarget(location=last_location, in_place=True)
-        return WellTarget(well=well, location=last_location)
+    if not isinstance(target_location, (Location, Well)):
+        raise LocationTypeError()
 
-    raise LocationTypeError()
+    if isinstance(target_location, Well):
+        return WellTarget(well=target_location, location=None)
+
+    _, well = target_location.labware.get_parent_labware_and_well()
+    in_place = target_location is last_location
+
+    return (
+        WellTarget(well=well, location=target_location)
+        if well is not None
+        else PointTarget(location=target_location, in_place=in_place)
+    )
