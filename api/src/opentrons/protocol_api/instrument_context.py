@@ -458,7 +458,7 @@ class InstrumentContext(publisher.CommandPublisher):
             target = validation.validate_location(
                 location=location, last_location=last_location
             )
-        except validation.NoLocationError:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
