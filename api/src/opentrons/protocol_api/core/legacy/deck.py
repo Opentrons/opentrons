@@ -13,10 +13,11 @@ from opentrons_shared_data.deck import (
 from opentrons_shared_data.deck.dev_types import SlotDefV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
-from opentrons.types import DeckLocation, Location, Mount, Point
 from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.motion_planning import deck_conflict
 from opentrons.protocols.api_support.constants import deck_type
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.types import DeckLocation, Location, Mount, Point
 
 from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.deck import CalibrationPosition
@@ -25,8 +26,6 @@ from opentrons.protocol_api.labware import load as load_lw, Labware
 from .legacy_labware_core import LegacyLabwareCore
 from .module_geometry import ModuleGeometry, HeaterShakerGeometry, ThermocyclerGeometry
 
-# TODO: Find a proper place for this.
-from opentrons import deck_conflict
 
 _log = logging.getLogger(__name__)
 

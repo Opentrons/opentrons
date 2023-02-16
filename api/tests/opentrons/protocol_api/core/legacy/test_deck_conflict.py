@@ -3,7 +3,7 @@ import pytest
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
-from opentrons import deck_conflict
+from opentrons.motion_planning import deck_conflict
 
 
 def test_empty_no_conflict() -> None:

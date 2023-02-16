@@ -6,6 +6,7 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
+from opentrons.motion_planning import deck_conflict
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.module_geometry import (
@@ -13,7 +14,6 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
     ThermocyclerGeometry,
     HeaterShakerGeometry,
 )
-from opentrons import deck_conflict
 from opentrons.protocol_api.core.legacy.deck import Deck
 
 
