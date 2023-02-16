@@ -80,7 +80,7 @@ const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
   return nextConfig
 }
 
-// config version 13 migration and defaults
+// config version 14 migration and defaults
 const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
   const nextConfig = {
     ...prevConfig,
