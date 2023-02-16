@@ -16,7 +16,8 @@
       "step-generation",
       "webpack-config",
       "api-client",
-      "react-api-client"
+      "react-api-client",
+      "usb-bridge/node-client"
     ]
   },
   "config": {
