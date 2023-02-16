@@ -1,5 +1,5 @@
 """Router for all /system/ endpoints."""
-from fastapi import APIRouter, Depends, Header, status
+from fastapi import APIRouter, Depends, status
 from uuid import UUID
 
 from system_server.persistence import get_uuid

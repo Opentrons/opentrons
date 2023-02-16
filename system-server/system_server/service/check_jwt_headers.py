@@ -18,6 +18,7 @@ async def check_registration_token_header(
     ),
     signing_key: UUID = Depends(get_uuid),
 ) -> None:
+    """A header requirement that requests a registration token from /system/register."""
     _log.info(f"Verifying registration token: {authentication_bearer}")
     if not jwt_is_valid(
         signing_key=str(signing_key),
@@ -32,6 +33,7 @@ async def check_registration_token_header(
 
 
 async def get_registration_token_header(request: Request) -> str:
+    """Gets the registration token from a request."""
     assert isinstance(
         request.state.authentication_bearer, str
     ), "No authentication_bearer in request state; is endpoint properly configured?"
