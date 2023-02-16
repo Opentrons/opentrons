@@ -12,7 +12,6 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
   truncateString,
   useLongPress,
@@ -45,7 +44,7 @@ const TableDatum = styled('td')`
 
 export function ProtocolRow(props: {
   protocol: ProtocolResource
-  lastRun: string | undefined
+  lastRun?: string
 }): JSX.Element {
   const { protocol, lastRun } = props
   const history = useHistory()
@@ -140,7 +139,7 @@ export function ProtocolRow(props: {
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
         {longpress.isLongPressed && (
-          <ModalShell width="15.625rem">
+          <ModalShell borderRadius="0.75rem" width="15.625rem">
             <Flex
               flexDirection={DIRECTION_COLUMN}
               justifyContent={JUSTIFY_CENTER}
@@ -158,7 +157,7 @@ export function ProtocolRow(props: {
                   fontSize="1.375rem"
                   lineHeight="1.5rem"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  textAlign={TEXT_ALIGN_CENTER}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('run_protocol')}
                 </StyledText>
@@ -176,7 +175,7 @@ export function ProtocolRow(props: {
                   fontSize="1.375rem"
                   lineHeight="1.5rem"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  textAlign={TEXT_ALIGN_CENTER}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {pinned ? t('unpin_protocol') : t('pin_protocol')}
                 </StyledText>
@@ -188,7 +187,7 @@ export function ProtocolRow(props: {
                 height="4.875rem"
                 justifyContent={JUSTIFY_CENTER}
                 padding={SPACING.spacing5}
-                onClick={() => handleDeleteClick()}
+                onClick={handleDeleteClick}
               >
                 <Icon name="trash" size="1.5rem" color={COLORS.white} />
                 <StyledText
@@ -196,7 +195,7 @@ export function ProtocolRow(props: {
                   fontSize="1.375rem"
                   lineHeight="1.5rem"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  textAlign={TEXT_ALIGN_CENTER}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('delete_protocol')}
                 </StyledText>

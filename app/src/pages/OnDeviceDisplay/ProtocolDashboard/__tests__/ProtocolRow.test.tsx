@@ -37,7 +37,7 @@ const mockProtocol: ProtocolResource = {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolRow protocol={mockProtocol} lastRun={undefined} />
+      <ProtocolRow protocol={mockProtocol} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
