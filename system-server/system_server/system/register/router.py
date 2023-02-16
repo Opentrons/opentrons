@@ -1,4 +1,4 @@
-"""Router for all /system/ endpoints."""
+"""Router for /system/register endpoint."""
 from fastapi import APIRouter, Depends, status, Response
 from uuid import UUID
 
