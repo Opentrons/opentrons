@@ -2,6 +2,7 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { COLORS } from '@opentrons/components'
 import {
+  CreateCommand,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
@@ -67,15 +68,15 @@ export const BeforeBeginning = (
 
   let equipmentList = [CALIBRATION_PROBE]
   let proceedButtonText: string = t('get_started')
-  let bodyText: string = ''
+  let bodyTranslationKey: string = ''
 
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      bodyText = t('remove_labware_to_get_started')
+      bodyTranslationKey = 'remove_labware_to_get_started'
       break
     }
     case FLOWS.ATTACH: {
-      bodyText = t('remove_labware')
+      bodyTranslationKey = 'remove_labware'
       proceedButtonText = t('move_gantry_to_front')
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
@@ -90,7 +91,7 @@ export const BeforeBeginning = (
       break
     }
     case FLOWS.DETACH: {
-      bodyText = t('get_started_detach')
+      bodyTranslationKey = 'get_started_detach'
       equipmentList = [HEX_SCREWDRIVER]
       break
     }
@@ -100,27 +101,26 @@ export const BeforeBeginning = (
   )
 
   const handleOnClickCalibrateOrDetach = (): void => {
-    chainRunCommands(
-      [
-        {
-          commandType: 'loadPipette' as const,
-          params: {
-            // @ts-expect-error pipetteName is required but missing in schema v6 type
-            pipetteName: attachedPipettes[mount]?.name,
-            pipetteId: pipetteId,
-            mount: mount,
-          },
+    let moveToFrontCommands: CreateCommand[] = [
+      {
+        commandType: 'loadPipette' as const,
+        params: {
+          // @ts-expect-error pipetteName is required but missing in schema v6 type
+          pipetteName: attachedPipettes[mount]?.name,
+          pipetteId: pipetteId,
+          mount: mount,
         },
-        {
-          // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: mount,
-          },
+      },
+      {
+        // @ts-expect-error calibration type not yet supported
+        commandType: 'calibration/moveToMaintenancePosition' as const,
+        params: {
+          mount: mount,
         },
-      ],
-      false
-    )
+      },
+    ]
+    if (pipetteId == null) moveToFrontCommands = moveToFrontCommands.slice(1)
+    chainRunCommands(moveToFrontCommands, false)
       .then(() => {
         proceed()
       })
@@ -169,7 +169,7 @@ export const BeforeBeginning = (
         <>
           <Trans
             t={t}
-            i18nKey={bodyText}
+            i18nKey={bodyTranslationKey}
             components={{ block: <StyledText as="p" /> }}
           />
           {selectedPipette === NINETY_SIX_CHANNEL &&

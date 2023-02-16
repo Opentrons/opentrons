@@ -1,4 +1,4 @@
-import { useProtocolDetailsForRun } from '../hooks'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 export interface ModuleIdsFromRun {
   moduleIdsFromRun: string[]
@@ -7,7 +7,7 @@ export interface ModuleIdsFromRun {
 export function useHeaterShakerModuleIdsFromRun(
   runId: string | null
 ): ModuleIdsFromRun {
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const protocolData = useMostRecentCompletedAnalysis(runId)
 
   const loadModuleCommands = protocolData?.commands.filter(
     command =>
