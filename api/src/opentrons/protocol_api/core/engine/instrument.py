@@ -198,7 +198,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         Args:
             location: The location to blow out into.
             well_core: The well to blow out into.
-            in_place: whether this an in-place command.
+            in_place: whether this is a in-place command.
         """
         flow_rate = self.get_blow_out_flow_rate(1.0)
         if well_core is None:
