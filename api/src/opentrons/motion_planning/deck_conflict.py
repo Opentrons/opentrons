@@ -107,8 +107,6 @@ class _MaxHeight(NamedTuple):
     allowed_labware: List[LabwareUri]
 
     def is_allowed(self, item: DeckItem) -> bool:
-        # FIX BEFORE MERGE: Confirm whether this is intended to apply to modules
-        # as well as labware. If it is, we need to add highest_z support to modules.
         if isinstance(item, Labware) and item.uri in self.allowed_labware:
             return True
 
