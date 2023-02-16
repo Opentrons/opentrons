@@ -79,7 +79,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         flow_rate: float,
         in_place: bool = False,
     ) -> None:
-        if location and self.get_current_volume() == 0:
+        if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
             if self._api_version < APIVersion(2, 3) or not self.is_ready_to_aspirate():
