@@ -7,16 +7,13 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { useFeatureFlag } from '../../../../redux/config'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import { ReapplyOffsetsModal } from '../../../ReapplyOffsetsModal'
-import { useCurrentRun } from '../../../ProtocolUpload/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '../../hooks'
 import { ProceedToRunButton } from '../ProceedToRunButton'
@@ -37,9 +34,7 @@ interface SetupLabwareProps {
 export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const { robotName, runId, nextStep, expandStep, protocolRunHeaderRef } = props
   const { t } = useTranslation('protocol_setup')
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [selectedValue, toggleGroup] = useToggleGroup(
@@ -47,13 +42,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     t('map_view')
   )
   const isOt3 = useIsOT3(robotName)
-  /**
-   * This component's usage of the reapply offsets modal can be removed
-   * along with the enableManualDeckStateMod feature flag.
-   */
-  const enableManualDeckStateMod = useFeatureFlag(
-    'enableManualDeckStateModification'
-  )
+
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
@@ -65,17 +54,9 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
-  const currentRun = useCurrentRun()
-
-  const showReapplyOffsetsModal =
-    !enableManualDeckStateMod &&
-    currentRun?.data.id === runId &&
-    (currentRun?.data?.labwareOffsets == null ||
-      currentRun?.data?.labwareOffsets.length === 0)
 
   return (
     <>
-      {showReapplyOffsetsModal ? <ReapplyOffsetsModal runId={runId} /> : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}

@@ -15,27 +15,27 @@ import { StyledText } from '../../atoms/text'
 export function SearchNetwork(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   return (
-    <>
+    <Flex
+      height="22rem"
+      backgroundColor="#D6D6D6"
+      justifyContent={JUSTIFY_CENTER}
+      borderRadius="12px"
+      width="100%"
+    >
       <Flex
-        height="26.5625rem"
-        backgroundColor="#D6D6D6"
         justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+        flexDirection={DIRECTION_COLUMN}
       >
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          flexDirection={DIRECTION_COLUMN}
+        <StyledText
+          fontSize="2rem"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          lineHeight="2.72375rem"
+          marginTop={SPACING.spacingXXL}
         >
-          <StyledText
-            fontSize="2rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            lineHeight="2.72375rem"
-            marginTop={SPACING.spacingXXL}
-          >
-            {t('searching_for_networks')}
-          </StyledText>
-        </Flex>
+          {t('searching_for_networks')}
+        </StyledText>
       </Flex>
-    </>
+    </Flex>
   )
 }

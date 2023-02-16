@@ -9,6 +9,7 @@ import { ConnectViaEthernet } from '../../pages/OnDeviceDisplay/ConnectViaEthern
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
+import { AttachInstrumentsDashboard } from '../../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
@@ -23,6 +24,7 @@ jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
+jest.mock('../../pages/OnDeviceDisplay/AttachInstrumentsDashboard')
 
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
   typeof NetworkSetupMenu
@@ -48,6 +50,9 @@ const mockProtocolSetup = ProtocolSetup as jest.MockedFunction<
 const mockRobotSettingsDashboard = RobotSettingsDashboard as jest.MockedFunction<
   typeof RobotSettingsDashboard
 >
+const mockAttachInstrumentsDashboard = AttachInstrumentsDashboard as jest.MockedFunction<
+  typeof AttachInstrumentsDashboard
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -60,6 +65,9 @@ const render = (path = '/') => {
 
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
+    mockAttachInstrumentsDashboard.mockReturnValue(
+      <div>Mock AttachInstrumentsDashboard</div>
+    )
     mockNetworkSetupMenu.mockReturnValue(<div>Mock NetworkSetupMenu</div>)
     mockConnectViaEthernet.mockReturnValue(<div>Mock ConnectViaEthernet</div>)
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
@@ -110,5 +118,9 @@ describe('OnDeviceDisplayApp', () => {
   it('renders a RobotSettingsDashboard component from /robot-settings', () => {
     const [{ getByText }] = render('/robot-settings')
     getByText('Mock RobotSettingsDashboard')
+  })
+  it('renders a AttachInstrumentsDashboard component from /attach-instruments', () => {
+    const [{ getByText }] = render('/attach-instruments')
+    getByText('Mock AttachInstrumentsDashboard')
   })
 })

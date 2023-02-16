@@ -572,6 +572,11 @@
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "homeAfter": {
+          "title": "Homeafter",
+          "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
+          "type": "boolean"
         }
       },
       "required": ["labwareId", "wellName", "pipetteId"]
@@ -2634,26 +2639,55 @@
       },
       "required": ["params"]
     },
-    "CalibrateGripperParamsProbe": {
-      "title": "CalibrateGripperParamsProbe",
+    "CalibrateGripperParamsJaw": {
+      "title": "CalibrateGripperParamsJaw",
       "description": "An enumeration.",
       "enum": ["front", "rear"]
+    },
+    "Vec3f": {
+      "title": "Vec3f",
+      "description": "A 3D vector of floats.",
+      "type": "object",
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "title": "Z",
+          "type": "number"
+        }
+      },
+      "required": ["x", "y", "z"]
     },
     "CalibrateGripperParams": {
       "title": "CalibrateGripperParams",
       "description": "Parameters for a `calibrateGripper` command.",
       "type": "object",
       "properties": {
-        "probe": {
-          "description": "Which of the gripper's probes to use to measure its offset. The robot will assume that a human operator has already attached this probe and removed the other probe, if there was one.",
+        "jaw": {
+          "description": "Which of the gripper's jaws to use to measure its offset. The robot will assume that a human operator has already attached the capacitive probe to the jaw and none is attached to the other jaw.",
           "allOf": [
             {
-              "$ref": "#/definitions/CalibrateGripperParamsProbe"
+              "$ref": "#/definitions/CalibrateGripperParamsJaw"
+            }
+          ]
+        },
+        "otherJawOffset": {
+          "title": "Otherjawoffset",
+          "description": "If an offset for the other probe is already found, then specifying it here will enable the CalibrateGripper command to complete the calibration process by calculating the total offset and saving it to disk. If this param is not specified then the command will only find and return the offset for the specified probe.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Vec3f"
             }
           ]
         }
       },
-      "required": ["probe"]
+      "required": ["jaw"]
     },
     "CalibrateGripperCreate": {
       "title": "CalibrateGripperCreate",

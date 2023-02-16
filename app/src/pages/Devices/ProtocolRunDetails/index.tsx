@@ -14,7 +14,6 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   OVERFLOW_SCROLL,
-  SIZE_1,
   SIZE_6,
   BORDERS,
   COLORS,
@@ -26,13 +25,12 @@ import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
   useRobot,
   useRunStatuses,
   useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
+import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
@@ -43,6 +41,8 @@ import type {
   ProtocolRunDetailsTab,
 } from '../../../App/types'
 import type { Dispatch } from '../../../redux/types'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ViewportListRef } from 'react-viewport-list'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -79,16 +79,15 @@ const RoundNavLink = styled(NavLink)`
       display: ${DISPLAY_BLOCK};
       content: '';
       background-color: ${COLORS.white};
-      top: 100;
+      bottom: -1px;
       left: 0;
-      height: ${SIZE_1};
+      height: 1px;
       width: 100%;
     }
   }
 `
 
 interface RoundTabProps {
-  id: string
   disabled: boolean
   tabDisabledReason?: string
   to: string
@@ -130,34 +129,8 @@ export function ProtocolRunDetails(): JSX.Element | null {
   } = useParams<DesktopRouteParams>()
   const dispatch = useDispatch<Dispatch>()
 
-  const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
-
   const robot = useRobot(robotName)
   useSyncRobotClock(robotName)
-
-  const protocolRunDetailsContentByTab: {
-    [K in ProtocolRunDetailsTab]: JSX.Element | null
-  } = {
-    setup: (
-      <ProtocolRunSetup
-        protocolRunHeaderRef={protocolRunHeaderRef}
-        robotName={robotName}
-        runId={runId}
-      />
-    ),
-    'module-controls': (
-      <ProtocolRunModuleControls robotName={robotName} runId={runId} />
-    ),
-    'run-log': <RunLog robotName={robotName} runId={runId} />,
-  }
-
-  const protocolRunDetailsContent = protocolRunDetailsContentByTab[
-    protocolRunDetailsTab
-  ] ?? (
-    // default to the setup tab if no tab or nonexistent tab is passed as a param
-    <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
-  )
-
   React.useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
@@ -179,36 +152,99 @@ export function ProtocolRunDetails(): JSX.Element | null {
           marginBottom={SPACING.spacing4}
           width="100%"
         >
-          <ProtocolRunHeader
-            protocolRunHeaderRef={protocolRunHeaderRef}
-            robotName={robot.name}
+          <PageContents
             runId={runId}
+            robotName={robotName}
+            protocolRunDetailsTab={protocolRunDetailsTab}
           />
-          <Flex>
-            <SetupTab robotName={robotName} runId={runId} />
-            <ModuleControlsTab robotName={robotName} runId={runId} />
-            <RunLogTab robotName={robotName} runId={runId} />
-          </Flex>
-          <Box
-            backgroundColor={COLORS.white}
-            border={`${String(SPACING.spacingXXS)} ${String(
-              BORDERS.styleSolid
-            )} ${String(COLORS.medGreyEnabled)}`}
-            // remove left upper corner border radius when first tab is active
-            borderRadius={`${
-              protocolRunDetailsTab === 'setup'
-                ? '0'
-                : String(BORDERS.radiusSoftCorners)
-            } ${String(BORDERS.radiusSoftCorners)} ${String(
-              BORDERS.radiusSoftCorners
-            )} ${String(BORDERS.radiusSoftCorners)}`}
-          >
-            {protocolRunDetailsContent}
-          </Box>
         </Flex>
       </Box>
     </ApiHostProvider>
   ) : null
+}
+
+const JUMPED_STEP_HIGHLIGHT_DELAY_MS = 500
+interface PageContentsProps {
+  runId: string
+  robotName: string
+  protocolRunDetailsTab: ProtocolRunDetailsTab
+}
+function PageContents(props: PageContentsProps): JSX.Element {
+  const { runId, robotName, protocolRunDetailsTab } = props
+  const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
+  const listRef = React.useRef<ViewportListRef | null>(null)
+  const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
+  React.useEffect(() => {
+    if (jumpedIndex != null) {
+      setTimeout(() => setJumpedIndex(null), JUMPED_STEP_HIGHLIGHT_DELAY_MS)
+    }
+  }, [jumpedIndex])
+
+  const makeHandleJumpToStep = (i: number) => () => {
+    listRef.current?.scrollToIndex(i)
+    setJumpedIndex(i)
+  }
+  const protocolRunDetailsContentByTab: {
+    [K in ProtocolRunDetailsTab]: JSX.Element | null
+  } = {
+    setup: (
+      <ProtocolRunSetup
+        protocolRunHeaderRef={protocolRunHeaderRef}
+        robotName={robotName}
+        runId={runId}
+      />
+    ),
+    'module-controls': (
+      <ProtocolRunModuleControls robotName={robotName} runId={runId} />
+    ),
+    'run-preview': (
+      <RunPreview
+        runId={runId}
+        ref={listRef}
+        jumpedIndex={jumpedIndex}
+        makeHandleJumpToStep={makeHandleJumpToStep}
+      />
+    ),
+  }
+
+  const protocolRunDetailsContent = protocolRunDetailsContentByTab[
+    protocolRunDetailsTab
+  ] ?? (
+    // default to the setup tab if no tab or nonexistent tab is passed as a param
+    <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
+  )
+
+  return (
+    <>
+      <ProtocolRunHeader
+        protocolRunHeaderRef={protocolRunHeaderRef}
+        robotName={robotName}
+        runId={runId}
+        makeHandleJumpToStep={makeHandleJumpToStep}
+      />
+      <Flex>
+        <SetupTab robotName={robotName} runId={runId} />
+        <ModuleControlsTab robotName={robotName} runId={runId} />
+        <RunPreviewTab robotName={robotName} runId={runId} />
+      </Flex>
+      <Box
+        backgroundColor={COLORS.white}
+        border={`${String(SPACING.spacingXXS)} ${String(
+          BORDERS.styleSolid
+        )} ${String(COLORS.medGreyEnabled)}`}
+        // remove left upper corner border radius when first tab is active
+        borderRadius={`${
+          protocolRunDetailsTab === 'setup'
+            ? '0'
+            : String(BORDERS.radiusSoftCorners)
+        } ${String(BORDERS.radiusSoftCorners)} ${String(
+          BORDERS.radiusSoftCorners
+        )} ${String(BORDERS.radiusSoftCorners)}`}
+      >
+        {protocolRunDetailsContent}
+      </Box>
+    </>
+  )
 }
 
 interface SetupTabProps {
@@ -229,15 +265,16 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
   return (
     <>
       <RoundTab
-        id="ProtocolRunDetails_setupTab"
         disabled={disabled}
         tabDisabledReason={tabDisabledReason}
         to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
         tabName={t('setup')}
       />
       {currentRunId !== runId ? (
-        // redirect to run log if not current run
-        <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-log`} />
+        // redirect to run preview if not current run
+        <Redirect
+          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
+        />
       ) : null}
     </>
   )
@@ -270,33 +307,32 @@ const ModuleControlsTab = (
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (
     <>
       <RoundTab
-        id="ProtocolRunDetails_moduleControlsTab"
         disabled={disabled}
         tabDisabledReason={tabDisabledReason}
         to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
         tabName={t('module_controls')}
       />
       {disabled ? (
-        // redirect to run log if not current run
-        <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-log`} />
+        // redirect to run preview if not current run
+        <Redirect
+          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
+        />
       ) : null}
     </>
   )
 }
 
-const RunLogTab = (props: SetupTabProps): JSX.Element | null => {
+const RunPreviewTab = (props: SetupTabProps): JSX.Element | null => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
-  const { protocolData } = useProtocolDetailsForRun(runId)
 
-  const disabled = protocolData == null
+  const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
 
   return (
     <RoundTab
-      id="ProtocolRunDetails_runLogTab"
-      disabled={disabled}
-      to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}
-      tabName={t('run_log')}
+      disabled={robotSideAnalysis == null}
+      to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
+      tabName={t('run_preview')}
     />
   )
 }

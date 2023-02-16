@@ -84,7 +84,7 @@ export function SelectAuthenticationType({
         <Btn onClick={handleClickBack}>
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
-              name="arrow-back"
+              name="chevron-left"
               marginRight={SPACING.spacing2}
               size="1.875rem"
             />

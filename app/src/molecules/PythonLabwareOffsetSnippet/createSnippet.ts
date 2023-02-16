@@ -1,8 +1,9 @@
 import isEqual from 'lodash/isEqual'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { getLabwareDefinitionUri } from '../../organisms/Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
+import { LabwareOffset } from '@opentrons/api-client'
 import { getLabwareOffsetLocation } from '../../organisms/Devices/ProtocolRun/utils/getLabwareOffsetLocation'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const PYTHON_INDENT = '    '
 const JUPYTER_PREFIX =
@@ -11,7 +12,7 @@ const CLI_PREFIX = `from opentrons import protocol_api\n\nmetadata = {\n${PYTHON
 
 export function createSnippet(
   mode: 'jupyter' | 'cli',
-  protocol: LegacySchemaAdapterOutput,
+  protocol: CompletedProtocolAnalysis,
   labwareOffsets?: LabwareOffset[]
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}
@@ -26,7 +27,10 @@ export function createSnippet(
           item => item.id === command.result.labwareId
         )
         if (loadedLabware == null) return acc
-        const { loadName } = protocol.labwareDefinitions[
+        const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
+          protocol.commands
+        )
+        const { loadName } = labwareDefinitions[
           loadedLabware.definitionUri
         ].parameters
         if (command.params.location === 'offDeck') {
@@ -50,7 +54,7 @@ export function createSnippet(
         const labwareDefUri = getLabwareDefinitionUri(
           command.result.labwareId,
           protocol.labware,
-          protocol.labwareDefinitions
+          labwareDefinitions
         )
 
         const offsetLocation = getLabwareOffsetLocation(
@@ -86,7 +90,10 @@ export function createSnippet(
           ...moduleVariableById,
           [command.result.moduleId]: moduleVariable,
         }
-        const { model } = protocol.modules[command.params.moduleId]
+        const module = protocol.modules.find(
+          module => module.id === command.params.moduleId
+        )
+        const model = module?.model
         const { slotName } = command.params.location
         addendum = [
           `${moduleVariable} = protocol.load_module("${String(

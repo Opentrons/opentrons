@@ -34,7 +34,9 @@
   "deck_calibration_missing": "You haven't calibrated the deck yet",
   "deck_calibration_redo": "recalibrate deck",
   "deck_calibration_spinner": "Deck calibration is {{ongoing_action}}",
+  "deck_invalidates_pipette_offset": "Recalibrating the deck clears pipette offset data",
   "definition": "Your OT-2 moves pipettes around in 3D space based on its calibration. <a>Learn more</a> about how calibration works on the OT-2.",
+  "delete_calibration_data": "Delete calibration data",
   "did_pipette_pick_up_tip": "Did pipette pick up tip successfully?",
   "direction_controls": "direction controls",
   "download_calibration": "Download your calibration data",
@@ -76,6 +78,7 @@
   "pipette_offset_calibration_intro_body": "Calibrating pipette offset measures a pipette’s position relative to the pipette mount and the deck.",
   "pipette_offset_requires_tip_length": "You don’t have a tip length saved with this pipette yet. You will need to calibrate tip length before calibrating your pipette offset.",
   "pipette_offset_title": "pipette offset calibration",
+  "pipette_offset_recalibrate_both_mounts": "Pipette offsets for both mounts will have to be recalibrated.",
   "place_full_tip_rack": "Place a full {{tip_rack}} into slot 8",
   "place_cal_block": "Place the Calibration Block into it's designated slot",
   "position_pipette_over_tip": "Position pipette over A1",
@@ -96,7 +99,7 @@
   "tip_length_and_pipette_offset_calibration": "Tip Length and Pipette Offset Calibration",
   "tip_length_calibration": "Tip Length Calibration",
   "tip_length_calibration_intro_body": "Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle.",
-  "tip_length_invalidates_pipette_offset": "This tip was used to calibrate this pipette’s offset. Recalibrating this tip’s length will invalidate this pipette’s offset. If you recalibrate this tip length, you will need to recalibrate this pipette offset afterwards.",
+  "tip_length_invalidates_pipette_offset": "Recalibrating tip length will clear pipette offset data.",
   "tip_pick_up_instructions": "<block>Using the controls below or your keyboard, jog the pipette until the nozzle closest to you is centered above the A1 position and level with the top of the tip.</block><br/><block>When the pipette is aligned, you’re ready to test picking up the tip.</block>",
   "title": "robot calibration",
   "this_is_the_tip_used_in_pipette_offset_cal": "Please note: You must use the same tips you used in Pipette Offset Calibration, which are listed above.",
@@ -120,5 +123,6 @@
   "opentrons_tip_racks_recommended": "Opentrons tip racks are highly recommended. Accuracy cannot be guaranteed with other tip racks.",
   "opentrons": "opentrons",
   "custom": "custom",
-  "confirm_tip_rack": "Confirm tip rack"
+  "confirm_tip_rack": "Confirm tip rack",
+  "recalibrate_pipette": "Recalibrate pipette"
 }

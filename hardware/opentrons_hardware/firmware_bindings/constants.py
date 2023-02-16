@@ -217,7 +217,7 @@ class SensorId(int, Enum):
 
 @unique
 class PipetteName(int, Enum):
-    """High-level type of pipette."""
+    """High-level name of pipette."""
 
     p1000_single = 0x00
     p1000_multi = 0x01
@@ -226,6 +226,15 @@ class PipetteName(int, Enum):
     p1000_96 = 0x04
     p50_96 = 0x05
     unknown = 0xFFFF
+
+
+@unique
+class PipetteType(int, Enum):
+    """High-level type of pipette."""
+
+    pipette_single = 1
+    pipette_multi = 2
+    pipette_96 = 3
 
 
 @unique

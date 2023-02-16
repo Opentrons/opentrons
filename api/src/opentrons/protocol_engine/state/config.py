@@ -23,6 +23,7 @@ class Config:
 
     robot_type: RobotType
     ignore_pause: bool = False
+    use_virtual_pipettes: bool = False
     use_virtual_modules: bool = False
     use_virtual_gripper: bool = False
     block_on_door_open: bool = False
