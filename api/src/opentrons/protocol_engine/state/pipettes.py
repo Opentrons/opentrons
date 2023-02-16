@@ -54,6 +54,14 @@ class CurrentWell:
 
 
 @dataclass(frozen=True)
+class CurrentDeckPoint:
+    """The latest deck point and mount the robot has accessed."""
+
+    mount: Optional[MountType]
+    deck_point: Optional[DeckPoint]
+
+
+@dataclass(frozen=True)
 class StaticPipetteConfig:
     """Static config for a pipette."""
 
@@ -71,11 +79,11 @@ class PipetteState:
     aspirated_volume_by_id: Dict[str, float]
     tip_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
+    current_deck_point: CurrentDeckPoint
     attached_tip_labware_by_id: Dict[str, str]
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
-    deck_point_by_id: Dict[str, Optional[DeckPoint]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -90,11 +98,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             aspirated_volume_by_id={},
             tip_volume_by_id={},
             current_well=None,
+            current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
             attached_tip_labware_by_id={},
             movement_speed_by_id={},
             static_config_by_id={},
             flow_rates_by_id={},
-            deck_point_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -242,7 +250,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         ):
             pipette_id = command.params.pipetteId
             deck_point = command.result.position
-            self._state.deck_point_by_id[pipette_id] = deck_point
+
+            try:
+                loaded_pipette = self._state.pipettes_by_id[pipette_id]
+            except KeyError:
+                self._clear_deck_point()
+            else:
+                self._state.current_deck_point = CurrentDeckPoint(
+                    mount=loaded_pipette.mount, deck_point=deck_point
+                )
 
         elif isinstance(
             command.result,
@@ -252,7 +268,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 thermocycler.CloseLidResult,
             ),
         ):
-            self._clear_deck_points()
+            self._clear_deck_point()
 
         elif isinstance(
             command.result,
@@ -262,16 +278,16 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ),
         ):
             if command.result.pipetteRetracted:
-                self._clear_deck_points()
+                self._clear_deck_point()
 
         elif isinstance(command.result, MoveLabwareResult):
             if command.params.strategy == "usingGripper":
                 # All mounts will have been retracted.
-                self._clear_deck_points()
+                self._clear_deck_point()
 
-    def _clear_deck_points(self) -> None:
-        """Sets all pipette id keys to a value of None, after a home/retract."""
-        self._state.deck_point_by_id = dict.fromkeys(self._state.deck_point_by_id, None)
+    def _clear_deck_point(self) -> None:
+        """Reset last deck point to default None value for mount and point."""
+        self._state.current_deck_point = CurrentDeckPoint(mount=None, deck_point=None)
 
 
 class PipetteView(HasState[PipetteState]):
@@ -335,13 +351,12 @@ class PipetteView(HasState[PipetteState]):
         return self._state.current_well
 
     def get_deck_point(self, pipette_id: str) -> Optional[DeckPoint]:
-        """Get the deck point of a pipette by ID."""
-        try:
-            return self._state.deck_point_by_id[pipette_id]
-        except KeyError:
-            raise errors.PipetteNotLoadedError(
-                f"Pipette {pipette_id} not found; unable to get current volume."
-            )
+        """Get the deck point of a pipette by ID, or None if it was not associated with the last move operation."""
+        loaded_pipette = self.get(pipette_id)
+        current_deck_point = self._state.current_deck_point
+        if loaded_pipette.mount == current_deck_point.mount:
+            return current_deck_point.deck_point
+        return None
 
     def get_aspirated_volume(self, pipette_id: str) -> float:
         """Get the currently aspirated volume of a pipette by ID."""

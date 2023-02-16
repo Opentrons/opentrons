@@ -24,6 +24,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
     CurrentWell,
+    CurrentDeckPoint,
     StaticPipetteConfig,
 )
 
@@ -58,11 +59,11 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         aspirated_volume_by_id={},
         tip_volume_by_id={},
         current_well=None,
+        current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
         attached_tip_labware_by_id={},
         movement_speed_by_id={},
         static_config_by_id={},
         flow_rates_by_id={},
-        deck_point_by_id={},
     )
 
 
@@ -408,7 +409,9 @@ def test_heater_shaker_command_without_movement(
         well_name="well-name",
     )
 
-    assert subject.state.deck_point_by_id["pipette-id"] == DeckPoint(x=1, y=2, z=3)
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
+    )
 
 
 @pytest.mark.parametrize(
@@ -674,7 +677,9 @@ def test_movement_commands_update_deck_point(
     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
     subject.handle_action(UpdateCommandAction(command=command))
 
-    assert subject.state.deck_point_by_id["pipette-id"] == DeckPoint(x=11, y=22, z=33)
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.LEFT, deck_point=DeckPoint(x=11, y=22, z=33)
+    )
 
 
 @pytest.mark.parametrize(
@@ -736,40 +741,27 @@ def test_homing_commands_clear_deck_point(
     subject: PipetteStore,
 ) -> None:
     """It should save the last used pipette, labware, and well for movement commands."""
-    load_left_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id-left",
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    load_right_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id-right",
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.RIGHT,
-    )
-    move_command_left_pipette = create_move_to_well_command(
-        pipette_id="pipette-id-left",
+    move_command = create_move_to_well_command(
+        pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="well-name",
         destination=DeckPoint(x=1, y=2, z=3),
     )
-    move_command_right_pipette = create_move_to_well_command(
-        pipette_id="pipette-id-right",
-        labware_id="labware-id",
-        well_name="well-name",
-        destination=DeckPoint(x=4, y=5, z=6),
-    )
 
-    subject.handle_action(UpdateCommandAction(command=load_left_pipette_command))
-    subject.handle_action(UpdateCommandAction(command=load_right_pipette_command))
-    subject.handle_action(UpdateCommandAction(command=move_command_left_pipette))
-    subject.handle_action(UpdateCommandAction(command=move_command_right_pipette))
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=move_command))
 
-    assert subject.state.deck_point_by_id["pipette-id-left"] == DeckPoint(x=1, y=2, z=3)
-    assert subject.state.deck_point_by_id["pipette-id-right"] == DeckPoint(
-        x=4, y=5, z=6
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
     )
 
     subject.handle_action(UpdateCommandAction(command=command))
 
-    assert subject.state.deck_point_by_id["pipette-id-left"] is None
-    assert subject.state.deck_point_by_id["pipette-id-right"] is None
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=None, deck_point=None
+    )

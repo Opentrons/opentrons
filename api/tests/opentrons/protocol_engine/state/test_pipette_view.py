@@ -17,6 +17,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,
     CurrentWell,
+    CurrentDeckPoint,
     HardwarePipette,
     StaticPipetteConfig,
 )
@@ -27,11 +28,13 @@ def get_pipette_view(
     aspirated_volume_by_id: Optional[Dict[str, float]] = None,
     tip_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
+    current_deck_point: CurrentDeckPoint = CurrentDeckPoint(
+        mount=None, deck_point=None
+    ),
     attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
     flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
-    deck_point_by_id: Optional[Dict[str, Optional[DeckPoint]]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
@@ -39,11 +42,11 @@ def get_pipette_view(
         aspirated_volume_by_id=aspirated_volume_by_id or {},
         tip_volume_by_id=tip_volume_by_id or {},
         current_well=current_well,
+        current_deck_point=current_deck_point,
         attached_tip_labware_by_id=attached_tip_labware_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
         static_config_by_id=static_config_by_id or {},
         flow_rates_by_id=flow_rates_by_id or {},
-        deck_point_by_id=deck_point_by_id or {},
     )
 
     return PipetteView(state=state)
@@ -332,12 +335,33 @@ def test_get_movement_speed() -> None:
     )
 
 
-def test_get_deck_point() -> None:
+@pytest.mark.parametrize(
+    ("mount", "deck_point", "expected_deck_point"),
+    [
+        (MountType.LEFT, DeckPoint(x=1, y=2, z=3), DeckPoint(x=1, y=2, z=3)),
+        (MountType.LEFT, None, None),
+        (MountType.RIGHT, DeckPoint(x=1, y=2, z=3), None),
+        (None, DeckPoint(x=1, y=2, z=3), None),
+        (None, None, None),
+    ],
+)
+def test_get_deck_point(
+    mount: Optional[MountType],
+    deck_point: Optional[DeckPoint],
+    expected_deck_point: Optional[DeckPoint],
+) -> None:
     """It should return the deck point for the given pipette."""
+    pipette_data = LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
     subject = get_pipette_view(
-        deck_point_by_id={
-            "pipette-id": DeckPoint(x=1, y=2, z=3),
-        }
+        pipettes_by_id={"pipette-id": pipette_data},
+        current_deck_point=CurrentDeckPoint(
+            mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
+        ),
     )
 
     assert subject.get_deck_point(pipette_id="pipette-id") == DeckPoint(x=1, y=2, z=3)
