@@ -126,7 +126,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         >
           <Flex gridGap={SPACING.spacing2}>
             <Icon name="download" size={SIZE_1} />
-            <StyledText>Download Run Log</StyledText>
+            <StyledText>{t('download_run_log_title_case')}</StyledText>
           </Flex>
         </SecondaryButton>
       </Flex>

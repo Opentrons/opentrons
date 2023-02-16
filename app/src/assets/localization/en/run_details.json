@@ -84,6 +84,7 @@
   "clear_protocol": "Clear protocol",
   "clear_protocol_to_make_available": "Clear protocol from robot to make it available.",
   "download_run_log": "Download run log",
+  "download_run_log_title_case": "Download Run Log",
   "downloading_run_log": "Downloading run log",
   "jump_to_current_step": "Jump to current step",
   "run_has_diverged_from_predicted": "Run has diverged from predicted state. Cannot anticipate new steps.",
