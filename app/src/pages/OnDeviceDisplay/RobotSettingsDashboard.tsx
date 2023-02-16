@@ -85,6 +85,7 @@ export function RobotSettingsDashboard(): JSX.Element {
         <SettingsContent
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
+          robotName={robotName}
           robotServerVersion={robotServerVersion ?? 'Unknown'}
           isUpdateAvailable={isUpdateAvailable}
         />
@@ -167,6 +168,7 @@ interface RobotSettingButtonProps {
   settingInfo?: string
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption) => void
+  robotName?: string
   isUpdateAvailable?: boolean
 }
 
@@ -175,6 +177,7 @@ const RobotSettingButton = ({
   settingInfo,
   currentOption,
   setCurrentOption,
+  robotName,
   isUpdateAvailable,
 }: RobotSettingButtonProps): JSX.Element => {
   const { t } = useTranslation('app_settings')
@@ -248,46 +251,42 @@ const RobotSettingButton = ({
 interface SettingsContentProps {
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption | null) => void
+  robotName: string
   robotServerVersion: string
   isUpdateAvailable: boolean
 }
 const SettingsContent = ({
   currentOption,
   setCurrentOption,
+  robotName,
   robotServerVersion,
   isUpdateAvailable,
 }: SettingsContentProps): JSX.Element => {
-  let settingOption
   switch (currentOption) {
     case 'RobotName':
-      settingOption = <RobotName setCurrentOption={setCurrentOption} />
-      break
+      return <RobotName setCurrentOption={setCurrentOption} />
     case 'RobotSystemVersion':
-      settingOption = (
+      return (
         <RobotSystemVersion
           currentVersion={robotServerVersion}
           isUpdateAvailable={isUpdateAvailable}
           setCurrentOption={setCurrentOption}
         />
       )
-      break
     case 'NetworkSettings':
-      settingOption = <NetworkSettings setCurrentOption={setCurrentOption} />
-      break
+      return <NetworkSettings setCurrentOption={setCurrentOption} />
     case 'DisplaySleepSettings':
-      settingOption = (
-        <DisplaySleepSettings setCurrentOption={setCurrentOption} />
-      )
-      break
+      return <DisplaySleepSettings setCurrentOption={setCurrentOption} />
     case 'DisplayBrightness':
-      settingOption = <DisplayBrightness setCurrentOption={setCurrentOption} />
-      break
+      return <DisplayBrightness setCurrentOption={setCurrentOption} />
     case 'DisplayTextSize':
-      settingOption = <DisplayTextSize setCurrentOption={setCurrentOption} />
-      break
+      return <DisplayTextSize setCurrentOption={setCurrentOption} />
     case 'DeviceReset':
-      settingOption = <DeviceReset setCurrentOption={setCurrentOption} />
-      break
+      return (
+        <DeviceReset
+          robotName={robotName}
+          setCurrentOption={setCurrentOption}
+        />
+      )
   }
-  return settingOption
 }
