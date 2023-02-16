@@ -1,5 +1,5 @@
 """Router for all /system/ endpoints."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status, Response
 from uuid import UUID
 
 from system_server.persistence import get_sql_engine, get_uuid
@@ -16,13 +16,20 @@ register_router = APIRouter()
     "/system/register",
     summary="Register an agent with this robot.",
     response_model=PostRegisterResponse,
+    status_code=status.HTTP_201_CREATED,
 )
 async def register_endpoint(
+    response: Response,
     registrant: Registrant = Depends(Registrant),
     signing_uuid: UUID = Depends(get_uuid),
     engine: sqlalchemy.engine.Engine = Depends(get_sql_engine),
 ) -> PostRegisterResponse:
     """Router for /system/register endpoint."""
+    token, new_token = get_or_create_registration_token(
+        engine, registrant, str(signing_uuid)
+    )
+
+    response.status_code = status.HTTP_201_CREATED if new_token else status.HTTP_200_OK
     return PostRegisterResponse(
-        token=get_or_create_registration_token(engine, registrant, str(signing_uuid)),
+        token=token,
     )
