@@ -70,11 +70,14 @@ async def test_get_or_create_token(sql_engine: sqlalchemy.engine.Engine) -> None
     reg = Registrant("abc", "def", "ghi")
     key = "lime pie"
 
-    first_token = get_or_create_registration_token(sql_engine, reg, key)
+    first_token, first_is_new = get_or_create_registration_token(sql_engine, reg, key)
+    assert first_is_new
     assert jwt_is_valid(key, first_token, constants.REGISTRATION_AUDIENCE)
 
     # Now test that, if the token is valid, we get the same one back
-    assert first_token == get_or_create_registration_token(sql_engine, reg, key)
+    assert (first_token, False) == get_or_create_registration_token(
+        sql_engine, reg, key
+    )
 
     reg.agent = "new agent"
 
@@ -82,5 +85,6 @@ async def test_get_or_create_token(sql_engine: sqlalchemy.engine.Engine) -> None
     bad_token = "this is not a valid token and it should clearly fail validation!"
     _add_registration_token(sql_engine, reg, bad_token)
 
-    second_token = get_or_create_registration_token(sql_engine, reg, key)
+    second_token, second_is_new = get_or_create_registration_token(sql_engine, reg, key)
+    assert second_is_new
     assert second_token != bad_token

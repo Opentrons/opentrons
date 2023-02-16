@@ -1,6 +1,6 @@
 """Functionality to interface with the registration table."""
 import sqlalchemy
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 from datetime import timedelta
 import logging
 
@@ -97,7 +97,7 @@ def _add_registration_token(
 
 def get_or_create_registration_token(
     sql_engine: sqlalchemy.engine.Engine, registrant: Registrant, signing_key: str
-) -> str:
+) -> Tuple[str, bool]:
     """Get the token for a registrant, or create a new one if necessary.
 
     If a token is found in the database, this function performns validation on it. If
@@ -114,9 +114,11 @@ def get_or_create_registration_token(
         signing_key: A string key (generally a UUID) to encode & decode the JWT
 
     Returns:
-        The JWT, either a refreshed value from the database or a new token.
+        The JWT, and a boolean that is True if the JWT is newly created or False if
+        it is a cached value.
     """
     token = _get_registration_token(sql_engine, registrant)
+    token_is_new = False
 
     if token is not None:
         if not jwt_is_valid(
@@ -135,5 +137,6 @@ def get_or_create_registration_token(
         )
         _log.info(f"Created new JWT: {token}")
         _add_registration_token(sql_engine, registrant, token)
+        token_is_new = True
 
-    return token
+    return (token, token_is_new)

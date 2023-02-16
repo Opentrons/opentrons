@@ -13,7 +13,7 @@ stages:
         agent_id: 'agent_id-1'
         subject: 'subject-1'
     response: &good_response
-      status_code: 200
+      status_code: 201
       json:
         token: !anystr
       save:
@@ -21,7 +21,10 @@ stages:
           issued_token: "token"
   - name: Second POST request returns same JWT
     request: *system_register_first
-    response: *good_response
+    response:
+      status_code: 200
+      json:
+        token: '{issued_token}'
   - name: POST request with different info returns a new JWT
     request: &system_register_second
       url: "{host:s}:{port:d}/system/register"
@@ -31,7 +34,7 @@ stages:
         agent_id: 'agent_id-1'
         subject: 'subject-1'
     response:
-      status_code: 200
+      status_code: 201
       verify_response_with:
         function: tests.integration.testing_utils:token_does_not_match
         extra_kwargs:
