@@ -9,6 +9,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
   SPACING,
+  Icon,
+  SIZE_1,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -22,6 +24,8 @@ import { StyledText } from '../../atoms/text'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ProgressBar } from '../../atoms/ProgressBar'
+import { SecondaryButton } from '../../atoms/buttons'
+import { useDownloadRunLog } from '../Devices/hooks'
 import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { InterventionTicks } from './InterventionTicks'
 
@@ -36,14 +40,22 @@ const TERMINAL_RUN_STATUSES: RunStatus[] = [
 
 interface RunProgressMeterProps {
   runId: string
+  robotName: string
   makeHandleJumpToStep: (index: number) => () => void
 }
 export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
-  const { runId, makeHandleJumpToStep } = props
+  const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
   const analysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = analysis?.commands ?? []
+
+  // todo (jb 2-16-23) This should be switched out soon for something more performant, see https://opentrons.atlassian.net/browse/RLAB-298
+  const { downloadRunLog } = useDownloadRunLog(
+    robotName,
+    runId,
+    analysisCommands.length
+  )
 
   /**
    * find the analysis command within the analysis
@@ -85,6 +97,15 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     )
   }
 
+  const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    downloadRunLog()
+  }
+
+  const downloadIsDisabled =
+    runStatus != null && !TERMINAL_RUN_STATUSES.includes(runStatus)
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -96,6 +117,18 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           }`}</StyledText>
           {currentStepContents}
         </Flex>
+        <SecondaryButton
+          disabled={downloadIsDisabled}
+          color={COLORS.darkBlackEnabled}
+          border={BORDERS.transparentLineBorder}
+          cursor={downloadIsDisabled ? '' : 'pointer'}
+          onClick={onDownloadClick}
+        >
+          <Flex gridGap={SPACING.spacing2}>
+            <Icon name="download" size={SIZE_1} />
+            <StyledText>Download Run Log</StyledText>
+          </Flex>
+        </SecondaryButton>
       </Flex>
       {analysis != null ? (
         <ProgressBar
