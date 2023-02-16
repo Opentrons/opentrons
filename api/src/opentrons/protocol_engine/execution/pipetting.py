@@ -293,7 +293,7 @@ class PipettingHandler:
 
         # this will handle raising if the thermocycler lid is in a bad state
         # so we don't need to put that logic elsewhere
-        await self._movement_handler.move_to_well(
+        well_position = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
@@ -307,9 +307,13 @@ class PipettingHandler:
                 abs_position=touch_point,
                 speed=speed,
             )
-        final_point = touch_points[-1]
+        try:
+            final_point = touch_points[-1]
+            position = DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
+        except IndexError:
+            position = well_position
 
-        return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
+        return position
 
     @contextmanager
     def set_flow_rate(

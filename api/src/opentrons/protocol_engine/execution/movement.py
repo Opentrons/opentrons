@@ -163,7 +163,10 @@ class MovementHandler:
                 speed=speed,
             )
 
-        final_point = waypoints[-1].position
+        try:
+            final_point = waypoints[-1].position
+        except IndexError:
+            final_point = origin
 
         return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
 
@@ -320,6 +323,9 @@ class MovementHandler:
                 speed=speed,
             )
 
-        final_point = waypoints[-1].position
+        try:
+            final_point = waypoints[-1].position
+        except IndexError:
+            final_point = origin
 
         return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
