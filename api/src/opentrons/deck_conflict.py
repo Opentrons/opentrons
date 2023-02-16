@@ -44,22 +44,22 @@ HS_ALLOWED_ADJACENT_TALL_LABWARE = [
 @dataclass
 class Labware:
     """A normal labware that occupies a single slot."""
-    uri: LabwareUri
-    highest_z: float
-    is_fixed_trash: bool
+
     name_for_errors: str
+    highest_z: float
+    uri: LabwareUri
+    is_fixed_trash: bool
 
 
 @dataclass
 class _Module:
-    highest_z: float
     name_for_errors: str
+    highest_z: float
 
 
 @dataclass
 class HeaterShakerModule(_Module):
     """A Heater-Shaker module."""
-    pass
 
 
 @dataclass
@@ -73,10 +73,9 @@ class ThermocyclerModule(_Module):
     """
 
 
-# TODO: Spell out the rest of the modules.
 @dataclass
 class OtherModule(_Module):
-    pass
+    """A module that's not a Heater-Shaker or Thermocycler."""
 
 
 DeckItem = Union[

@@ -10,12 +10,11 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Set
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 
 from opentrons_shared_data import module
-from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons.types import Location, Point, LocationLabware
