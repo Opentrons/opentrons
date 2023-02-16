@@ -117,18 +117,22 @@ def save_pipette_offset_calibration(
         )
 
 
+# TODO(mc, 2023-02-16): this function is not covered by unit tests
 # TODO (lc 09-26-2022) We should ensure that only LabwareDefinition models are passed
 # into this function instead of a mixture of TypeDicts and BaseModels
 def load_tip_length_for_pipette(
     pipette_id: str, tiprack: typing.Union["TypeDictLabwareDef", LabwareDefinition]
 ) -> TipLengthCalibration:
     if isinstance(tiprack, LabwareDefinition):
-        tiprack = typing.cast("TypeDictLabwareDef", tiprack.dict())
+        tiprack = typing.cast("TypeDictLabwareDef", tiprack.dict(exclude_none=True))
+
     tip_length_data = load_tip_length_calibration(pipette_id, tiprack)
+
     # TODO (lc 09-26-2022) We shouldn't have to do a hash twice. We should figure out what
     # information we actually need from the labware definition and pass it into
     # the `load_tip_length_calibration` function.
     tiprack_hash = helpers.hash_labware_def(tiprack)
+
     return TipLengthCalibration(
         tip_length=tip_length_data.tipLength,
         source=tip_length_data.source,
