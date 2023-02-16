@@ -23,7 +23,7 @@ describe('config migration', () => {
     expect(result).toEqual(MOCK_CONFIG_V14)
   })
 
-  it('should keep version 13', () => {
+  it('4', () => {
     const v14Config = MOCK_CONFIG_V14
     const result = migrate(v14Config)
 
