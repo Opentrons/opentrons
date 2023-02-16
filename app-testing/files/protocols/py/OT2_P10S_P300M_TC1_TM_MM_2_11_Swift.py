@@ -8,9 +8,9 @@ def run(protocol_context):
     # Labware Setup
     rt_reagents = protocol_context.load_labware("nest_12_reservoir_15ml", "2")
 
-    p20rack = protocol_context.load_labware("opentrons_96_tiprack_300ul", "3")
+    p300rack = protocol_context.load_labware("opentrons_96_tiprack_300ul", "3")
 
-    p300racks = [
+    p20racks = [
         protocol_context.load_labware("opentrons_96_tiprack_20ul", slot)
         for slot in [
             "5",
@@ -18,8 +18,8 @@ def run(protocol_context):
         ]
     ]
     # Pipette Setup
-    p20 = protocol_context.load_instrument("p10_single", "left", tip_racks=p300racks)
-    p300 = protocol_context.load_instrument("p300_multi_gen2", "right", tip_racks=[p20rack])
+    p20 = protocol_context.load_instrument("p10_single", "left", tip_racks=p20racks)
+    p300 = protocol_context.load_instrument("p300_multi_gen2", "right", tip_racks=[p300rack])
 
     # Module Setup
     magdeck = protocol_context.load_module("magneticModuleV2", "1")
