@@ -119,7 +119,8 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         flow_rate: float,
         in_place: bool,
     ) -> None:
-        self.move_to(location=location, well_core=well_core)
+        if not in_place:
+            self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 
