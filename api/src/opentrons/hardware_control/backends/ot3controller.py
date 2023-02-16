@@ -30,6 +30,7 @@ from .ot3utils import (
     axis_convert,
     create_move_group,
     axis_to_node,
+    fw_update_state_from_status,
     get_current_settings,
     create_home_group,
     node_id_to_subsystem,
@@ -86,7 +87,6 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
     OT3SubSystem,
-    UpdateState,
     OT3Axis,
     AionotifyEvent,
     OT3Mount,
@@ -217,7 +217,7 @@ class OT3Controller:
         """Update internal states/progress of firmware updates."""
         fw_update_status, progress = status_element
         subsystem = node_id_to_subsystem(node_id)
-        state = UpdateState.from_status(fw_update_status)
+        state = fw_update_state_from_status(fw_update_status)
         progress = int(progress * 100)
 
         # Find the UpdateStatus if it exists, otherwise create it, then update its internal state

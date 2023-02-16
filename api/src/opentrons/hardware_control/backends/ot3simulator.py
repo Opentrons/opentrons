@@ -480,9 +480,9 @@ class OT3Simulator:
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> Tuple[Set[UpdateStatus], int]:
+    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
         """Updates the firmware on the OT3."""
-        return set(), 0
+        yield (set(), 0)
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""

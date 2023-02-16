@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     InstrumentProbeType,
     PipetteSubType,
+    UpdateState,
 )
 import numpy as np
 
@@ -20,6 +21,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorId,
     PipetteTipActionType,
 )
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -345,3 +347,14 @@ _pipette_subtype_lookup = {
 
 def pipette_type_for_subtype(pipette_subtype: PipetteSubType) -> PipetteType:
     return _pipette_subtype_lookup[pipette_subtype]
+
+
+_update_state_lookup = {
+    FirmwareUpdateStatus.queued: UpdateState.queued,
+    FirmwareUpdateStatus.updating: UpdateState.updating,
+    FirmwareUpdateStatus.done: UpdateState.done,
+}
+
+
+def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
+    return _update_state_lookup[state]

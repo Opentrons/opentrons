@@ -429,7 +429,8 @@ class OT3API(
             if self._pipette_handler.has_pipette(mount):
                 pipette = self._pipette_handler.get_pipette(mount)
                 pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
-        self._backend.update_firmware(pipettes)
+        async for update_status, progress in self._backend.update_firmware(pipettes):
+            mod_log.debug(f"Firmware update progress {progress}%.")
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
