@@ -99,7 +99,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                     )
                 self.prepare_for_aspirate()
             self.move_to(location=location, well_core=well_core)
-        elif location:
+        elif location != self._protocol_interface.get_last_location():
             self.move_to(location=location, well_core=well_core)
 
         self._raise_if_no_tip(HardwareAction.ASPIRATE.name)
