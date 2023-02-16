@@ -201,9 +201,12 @@ export function getLabwareDefinitionsFromCommands(
       command.commandType === 'loadLabware' &&
       !acc.some(
         def =>
-          getLabwareDefURI(def) === getLabwareDefURI(command.result.definition)
+          command.result?.definition != null &&
+          getLabwareDefURI(def) === getLabwareDefURI(command.result?.definition)
       )
-    return isLoadingNewDef ? [...acc, command.result.definition] : acc
+    return isLoadingNewDef && command.result?.definition != null
+      ? [...acc, command.result?.definition]
+      : acc
   }, [])
 }
 

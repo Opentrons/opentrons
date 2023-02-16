@@ -130,7 +130,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
           {
             onSuccess: response => {
-              setInitialPosition(response.data.result.position)
+              setInitialPosition(response.data.result?.position)
             },
           }
         )
