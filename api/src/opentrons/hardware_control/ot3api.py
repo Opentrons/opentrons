@@ -1680,13 +1680,12 @@ class OT3API(
     ) -> Tuple[float, float]:
         """Search for and return liquid level height.
 
-        This function makes sure the plunger motor is homed before starting.
-        After moving the mount the distance specified by starting_mount_height in the
-        LiquidProbeSettings, the mount and plunger motors will move simultaneously while
+        This function begins by moving the mount the distance specified by starting_mount_height in the
+        LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a
-        MoveConditionNotMet error will be thrown.
+        LiquidNotFound error will be thrown.
         If the threshold is triggered before the minimum z distance has been traveled,
         a EarlyLiquidSenseTrigger error will be thrown.
 
