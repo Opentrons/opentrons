@@ -1,133 +1,154 @@
 """Tests for opentrons.protocols.geometry.deck_conflict."""
 import pytest
-from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
-from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.legacy.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-    HeaterShakerGeometry,
-)
-from opentrons.protocol_api.core.labware import AbstractLabware
-
-from opentrons.protocol_api.core.legacy.deck import DeckItem
-from opentrons.deck_conflict import (
-    DeckConflictError,
-    check,
-)
+from opentrons import deck_conflict
 
 
-def test_empty_no_conflict(decoy: Decoy) -> None:
+def test_empty_no_conflict() -> None:
     """It should not raise on empty input."""
-    item = decoy.mock(cls=DeckItem)
-    check(existing_items={}, new_item=item, new_location=1)
+    deck_conflict.check(
+        existing_items={},
+        new_item=deck_conflict.OtherModule(highest_z=123, name_for_errors="foo"),
+        new_location=1,
+    )
 
 
-def test_no_multiple_locations(decoy: Decoy) -> None:
+def test_no_multiple_locations() -> None:
     """It should not allow two items in the same slot."""
-    item_1 = decoy.mock(cls=DeckItem)
-    item_2 = decoy.mock(cls=DeckItem)
-
-    decoy.when(item_1.load_name).then_return("some_item_1")
-    decoy.when(item_2.load_name).then_return("some_item_2")
+    item_1 = deck_conflict.OtherModule(highest_z=123, name_for_errors="some_item_1")
+    item_2 = deck_conflict.OtherModule(highest_z=123, name_for_errors="some_item_2")
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match="some_item_1 in slot 1 prevents some_item_2 from using slot 1",
     ):
-        check(existing_items={1: item_1}, new_item=item_2, new_location=1)
+        deck_conflict.check(existing_items={1: item_1}, new_item=item_2, new_location=1)
 
 
-def test_only_trash_in_12(decoy: Decoy) -> None:
+def test_only_trash_in_12() -> None:
     """It should only allow trash labware in slot 12."""
-    trash_labware = decoy.mock(cls=Labware)
-    trash_labware_impl = decoy.mock(cls=AbstractLabware)
-    not_trash = decoy.mock(cls=Labware)
-    not_trash_impl = decoy.mock(cls=AbstractLabware)
+    trash_labware = deck_conflict.Labware(
+        uri=LabwareUri("trash_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=True,
+        name_for_errors="trash_labware",
+    )
+    not_trash_labware = deck_conflict.Labware(
+        uri=LabwareUri("not_trash_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="not_trash_labware",
+    )
+    not_trash_module = deck_conflict.OtherModule(
+        highest_z=123, name_for_errors="not_trash_module"
+    )
 
-    decoy.when(trash_labware.quirks).then_return(["fixedTrash"])
-    decoy.when(trash_labware_impl.get_quirks()).then_return(["fixedTrash"])
-    decoy.when(not_trash.quirks).then_return(["notTrash"])
-    decoy.when(not_trash_impl.get_quirks()).then_return(["notTrash"])
-
-    check(existing_items={}, new_item=trash_labware, new_location=12)
-    check(existing_items={}, new_item=trash_labware_impl, new_location=12)
+    deck_conflict.check(existing_items={}, new_item=trash_labware, new_location=12)
 
     with pytest.raises(
-        DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
-        check(existing_items={}, new_item=not_trash, new_location=12)
+        deck_conflict.check(
+            existing_items={}, new_item=not_trash_labware, new_location=12
+        )
 
     with pytest.raises(
-        DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
-        check(existing_items={}, new_item=not_trash_impl, new_location=12)
+        deck_conflict.check(
+            existing_items={}, new_item=not_trash_module, new_location=12
+        )
 
 
-def test_trash_override(decoy: Decoy) -> None:
+def test_trash_override() -> None:
     """It should allow the trash labware to be replaced with another trash labware."""
-    trash_labware = decoy.mock(cls=Labware)
-    trash_labware_impl = decoy.mock(cls=AbstractLabware)
-    not_trash = decoy.mock(cls=Labware)
-    not_trash_impl = decoy.mock(cls=AbstractLabware)
+    trash_labware_1 = deck_conflict.Labware(
+        uri=LabwareUri("trash_labware_1_uri"),
+        highest_z=123,
+        is_fixed_trash=True,
+        name_for_errors="trash_labware_1",
+    )
+    trash_labware_2 = deck_conflict.Labware(
+        uri=LabwareUri("trash_labware_2_uri"),
+        highest_z=123,
+        is_fixed_trash=True,
+        name_for_errors="trash_labware_2",
+    )
+    not_trash_labware = deck_conflict.Labware(
+        uri=LabwareUri("not_trash_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="not_trash_labware",
+    )
+    not_trash_module = deck_conflict.OtherModule(
+        highest_z=123, name_for_errors="not_trash_module"
+    )
 
-    decoy.when(trash_labware.quirks).then_return(["fixedTrash"])
-    decoy.when(trash_labware_impl.get_quirks()).then_return(["fixedTrash"])
-    decoy.when(not_trash.quirks).then_return(["notTrash"])
-    decoy.when(not_trash_impl.get_quirks()).then_return(["notTrash"])
-
-    check(
-        existing_items={12: trash_labware},
-        new_item=trash_labware_impl,
+    deck_conflict.check(
+        existing_items={12: trash_labware_1},
+        new_item=trash_labware_2,
         new_location=12,
     )
 
     with pytest.raises(
-        DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
-        check(existing_items={12: trash_labware}, new_item=not_trash, new_location=12)
+        deck_conflict.check(
+            existing_items={12: trash_labware_1},
+            new_item=not_trash_labware,
+            new_location=12,
+        )
 
     with pytest.raises(
-        DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+        deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
-        check(
-            existing_items={12: trash_labware}, new_item=not_trash_impl, new_location=12
+        deck_conflict.check(
+            existing_items={12: trash_labware_1},
+            new_item=not_trash_module,
+            new_location=12,
         )
 
 
+# TODO(mm, 2023-02-16): Test Thermocycler semi configuration.
 @pytest.mark.parametrize("labware_location", [8, 10, 11])
-def test_no_labware_when_thermocycler(decoy: Decoy, labware_location: int) -> None:
+def test_no_labware_when_thermocycler(labware_location: int) -> None:
     """It should reject labware if a thermocycler is placed."""
-    thermocycler = decoy.mock(cls=ThermocyclerGeometry)
-    labware = decoy.mock(cls=DeckItem)
+    thermocycler = deck_conflict.ThermocyclerModule(
+        name_for_errors="some_thermocycler",
+        highest_z=123,
+        is_semi_configuration=False,
+    )
 
-    decoy.when(thermocycler.load_name).then_return("some_thermocycler")
-    decoy.when(thermocycler.covered_slots).then_return({7, 8, 10, 11})
-    decoy.when(labware.load_name).then_return("some_labware")
+    labware = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_labware",
+    )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             "some_thermocycler in slot 7 prevents"
             f" some_labware from using slot {labware_location}"
         ),
     ):
-        check(
+        deck_conflict.check(
             existing_items={7: thermocycler},
             new_location=labware_location,
             new_item=labware,
         )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             f"some_labware in slot {labware_location}"
             " prevents some_thermocycler from using slot 7"
         ),
     ):
-        check(
+        deck_conflict.check(
             existing_items={labware_location: labware},
             new_location=7,
             new_item=thermocycler,
@@ -154,54 +175,58 @@ def test_no_labware_when_thermocycler(decoy: Decoy, labware_location: int) -> No
     ],
 )
 def test_labware_when_heater_shaker(
-    decoy: Decoy,
     heater_shaker_location: int,
     labware_location: int,
 ) -> None:
     """It should allow short labware east and west if a heater-shaker is placed."""
-    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    cool_labware = decoy.mock(cls=DeckItem)
-    lame_labware = decoy.mock(cls=DeckItem)
+    heater_shaker = deck_conflict.HeaterShakerModule(
+        highest_z=123, name_for_errors="some_heater_shaker"
+    )
+    cool_labware = deck_conflict.Labware(
+        uri=LabwareUri("cool_labware_uri"),
+        highest_z=1,
+        is_fixed_trash=False,
+        name_for_errors="cool_labware",
+    )
+    lame_labware = deck_conflict.Labware(
+        uri=LabwareUri("lame_labware_uri"),
+        highest_z=999,
+        is_fixed_trash=False,
+        name_for_errors="lame_labware",
+    )
 
-    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
-    decoy.when(heater_shaker.MAX_X_ADJACENT_ITEM_HEIGHT).then_return(10)
-    decoy.when(cool_labware.load_name).then_return("cool_labware")
-    decoy.when(cool_labware.highest_z).then_return(9.9)
-    decoy.when(lame_labware.load_name).then_return("lame_labware")
-    decoy.when(lame_labware.highest_z).then_return(10.1)
-
-    check(
+    deck_conflict.check(
         existing_items={heater_shaker_location: heater_shaker},
         new_location=labware_location,
         new_item=cool_labware,
     )
-    check(
+    deck_conflict.check(
         existing_items={labware_location: cool_labware},
         new_location=heater_shaker_location,
         new_item=heater_shaker,
     )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             f"some_heater_shaker in slot {heater_shaker_location}"
             f" prevents lame_labware from using slot {labware_location}"
         ),
     ):
-        check(
+        deck_conflict.check(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=labware_location,
             new_item=lame_labware,
         )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             f"lame_labware in slot {labware_location}"
             f" prevents some_heater_shaker from using slot {heater_shaker_location}"
         ),
     ):
-        check(
+        deck_conflict.check(
             existing_items={labware_location: lame_labware},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
@@ -244,7 +269,6 @@ def test_labware_when_heater_shaker(
     ],
 )
 def test_no_modules_when_heater_shaker(
-    decoy: Decoy,
     heater_shaker_location: int,
     other_module_location: int,
 ) -> None:
@@ -253,39 +277,44 @@ def test_no_modules_when_heater_shaker(
     All modules are taller than the H/S height restriction,
     so this test only checks modules specifically in N/S.
     """
-    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    other_module = decoy.mock(cls=ModuleGeometry)
-
-    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
-    decoy.when(other_module.load_name).then_return("some_other_module")
+    heater_shaker = deck_conflict.HeaterShakerModule(
+        highest_z=123, name_for_errors="some_heater_shaker"
+    )
+    other_module = deck_conflict.OtherModule(
+        highest_z=0, name_for_errors="some_other_module"
+    )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             f"some_heater_shaker in slot {heater_shaker_location}"
             f" prevents some_other_module from using slot {other_module_location}"
         ),
     ):
-        check(
+        deck_conflict.check(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=other_module_location,
             new_item=other_module,
         )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             f"some_other_module in slot {other_module_location}"
             f" prevents some_heater_shaker from using slot {heater_shaker_location}"
         ),
     ):
-        check(
+        deck_conflict.check(
             existing_items={other_module_location: other_module},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
         )
 
 
+@pytest.mark.parametrize(
+    "allowed_tip_rack_uri",
+    deck_conflict.HS_ALLOWED_ADJACENT_TALL_LABWARE,
+)
 @pytest.mark.parametrize(
     ("heater_shaker_location", "tip_rack_location"),
     [
@@ -306,104 +335,99 @@ def test_no_modules_when_heater_shaker(
     ],
 )
 def test_tip_rack_when_heater_shaker(
-    decoy: Decoy,
+    allowed_tip_rack_uri: LabwareUri,
     heater_shaker_location: int,
     tip_rack_location: int,
 ) -> None:
     """It should allow short tip racks east and west if a heater-shaker is placed."""
-    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    cool_tip_rack = decoy.mock(cls=AbstractLabware)
-    lame_tip_rack = decoy.mock(cls=AbstractLabware)
-
-    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
-    decoy.when(heater_shaker.MAX_X_ADJACENT_ITEM_HEIGHT).then_return(10)
-    decoy.when(heater_shaker.ALLOWED_ADJACENT_TALL_LABWARE).then_return(
-        [LabwareUri("test/cool_tip_rack/1")]
+    heater_shaker = deck_conflict.HeaterShakerModule(
+        highest_z=123,
+        name_for_errors="some_heater_shaker",
     )
-    decoy.when(cool_tip_rack.load_name).then_return("cool_tip_rack")
-    decoy.when(cool_tip_rack.highest_z).then_return(11)
-    decoy.when(cool_tip_rack.get_uri()).then_return("test/cool_tip_rack/1")
-    decoy.when(cool_tip_rack.get_quirks()).then_return([])
-    decoy.when(lame_tip_rack.load_name).then_return("lame_tip_rack")
-    decoy.when(lame_tip_rack.highest_z).then_return(11)
-    decoy.when(lame_tip_rack.get_uri()).then_return("test/lame_tip_rack/1")
-    decoy.when(lame_tip_rack.get_quirks()).then_return([])
 
-    check(
+    too_high = deck_conflict.HS_MAX_X_ADJACENT_ITEM_HEIGHT + 0.1
+
+    cool_tip_rack = deck_conflict.Labware(
+        uri=allowed_tip_rack_uri,
+        highest_z=too_high,
+        is_fixed_trash=False,
+        name_for_errors="cool_tip_rack",
+    )
+
+    lame_tip_rack = deck_conflict.Labware(
+        uri=LabwareUri("test/lame_tip_rack/1"),
+        highest_z=too_high,
+        is_fixed_trash=False,
+        name_for_errors="lame_tip_rack",
+    )
+
+    deck_conflict.check(
         existing_items={heater_shaker_location: heater_shaker},
         new_location=tip_rack_location,
         new_item=cool_tip_rack,
     )
-    check(
+    deck_conflict.check(
         existing_items={tip_rack_location: cool_tip_rack},
         new_location=heater_shaker_location,
         new_item=heater_shaker,
     )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             f"some_heater_shaker in slot {heater_shaker_location}"
             f" prevents lame_tip_rack from using slot {tip_rack_location}"
         ),
     ):
-        check(
+        deck_conflict.check(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=tip_rack_location,
             new_item=lame_tip_rack,
         )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             f"lame_tip_rack in slot {tip_rack_location}"
             f" prevents some_heater_shaker from using slot {heater_shaker_location}"
         ),
     ):
-        check(
+        deck_conflict.check(
             existing_items={tip_rack_location: lame_tip_rack},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
         )
 
 
-def test_no_heater_shaker_west_of_trash(decoy: Decoy) -> None:
-    """It should check that fixed trash does not conflict with heater-shaker."""
-    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    trash = decoy.mock(cls=Labware)
+def test_no_heater_shaker_south_of_trash() -> None:
+    """It should prevent loading a Heater-Shaker south of a fixed trash.
 
-    decoy.when(trash.load_name).then_return("some_fixed_trash")
-    decoy.when(trash.quirks).then_return(["fixedTrash"])
-    decoy.when(trash.highest_z).then_return(11)
+    This is because the trash prevents accessing the Heater-Shaker's anchor screw.
 
-    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
-    decoy.when(heater_shaker.MAX_X_ADJACENT_ITEM_HEIGHT).then_return(10)
-
-    with pytest.raises(
-        DeckConflictError,
-        match=(
-            "some_fixed_trash in slot 12"
-            " prevents some_heater_shaker from using slot 11"
-        ),
-    ):
-        check(existing_items={12: trash}, new_item=heater_shaker, new_location=11)
-
-
-def test_no_heater_shaker_south_of_trash_(decoy: Decoy) -> None:
-    """It should check that fixed trash does not conflict with heater-shaker."""
-    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    trash = decoy.mock(cls=Labware)
-
-    decoy.when(trash.load_name).then_return("some_fixed_trash")
-    decoy.when(trash.quirks).then_return(["fixedTrash"])
-
-    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
+    Unrelated restrictions on height may prevent putting a Heater-Shaker in other places
+    around the fixed trash. Those restrictions should be covered by HS<->labware tests.
+    """
+    heater_shaker = deck_conflict.HeaterShakerModule(
+        highest_z=123, name_for_errors="some_heater_shaker"
+    )
+    trash = deck_conflict.Labware(
+        # We want to test that the subject rejects the HS placement on account of this
+        # labware being a fixed trash, not on account of this labware being too tall.
+        highest_z=0,
+        name_for_errors="some_fixed_trash",
+        uri=LabwareUri("test/some_fixed_trash/1"),
+        is_fixed_trash=True,
+    )
 
     with pytest.raises(
-        DeckConflictError,
+        deck_conflict.DeckConflictError,
         match=(
             "some_fixed_trash in slot 12"
             " prevents some_heater_shaker from using slot 9"
         ),
     ):
-        check(existing_items={12: trash}, new_item=heater_shaker, new_location=9)
+        deck_conflict.check(
+            existing_items={12: trash},
+            new_item=heater_shaker,
+            new_location=9,
+        )

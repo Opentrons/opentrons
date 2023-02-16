@@ -22,16 +22,16 @@ _FIXED_TRASH_SLOT: Final = 12
 # For background, see: https://github.com/Opentrons/opentrons/issues/10316
 #
 # TODO(mc, 2022-06-16): move this constant to the module definition
-_HS_MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
+HS_MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
 
 
-# URIs of labware that are allowed to exceed _HS_MAX_X_ADJACENT_ITEM_HEIGHT.
+# URIs of labware that are allowed to exceed HS_MAX_X_ADJACENT_ITEM_HEIGHT.
 # These labware do not take up the full with of the slot
 # in the area that would interfere with the labware latch.
 # For background, see: https://github.com/Opentrons/opentrons/issues/10316
 #
 # TODO(mc, 2022-06-16): move this constant to the module definition
-_HS_ALLOWED_ADJACENT_TALL_LABWARE = [
+HS_ALLOWED_ADJACENT_TALL_LABWARE = [
     LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
     LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
     LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
@@ -161,6 +161,9 @@ class DeckConflictError(ValueError):
     """Adding an item to the deck would cause a conflict."""
 
 
+# TODO(mm, 2023-02-16): Taking a single int as the deck location doesn't make sense for
+# things that don't fit into a single deck slot, like the Thermocycler.
+# Refactor this interface to take a more symbolic locaion.
 def check(
     existing_items: Mapping[int, DeckItem],
     new_item: DeckItem,
@@ -257,8 +260,8 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                     location=covered_location,
                     source_item=item,
                     source_location=location,
-                    max_height=_HS_MAX_X_ADJACENT_ITEM_HEIGHT,
-                    allowed_labware=_HS_ALLOWED_ADJACENT_TALL_LABWARE,
+                    max_height=HS_MAX_X_ADJACENT_ITEM_HEIGHT,
+                    allowed_labware=HS_ALLOWED_ADJACENT_TALL_LABWARE,
                 )
             )
 
