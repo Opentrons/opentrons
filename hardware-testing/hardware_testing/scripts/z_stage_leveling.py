@@ -50,9 +50,9 @@ async def begin_z_leveling(
         elif c == "s":
             stdscr.addstr("Select next slot to move to by inputing numbers 1-11")
             await api.home_z()
-            next_slot = None
-            while not next_slot:
-                next_slot = stdscr.getkey()
+            next_slot = ""
+            while len(next_slot) < 2:
+                next_slot += stdscr.getkey()
             stdscr.addstr(f"Got slot {next_slot}")
             calibration_square_pos = (
                 helpers_ot3.get_slot_calibration_square_position_ot3(int(next_slot))
