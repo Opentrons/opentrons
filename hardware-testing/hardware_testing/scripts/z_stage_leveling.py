@@ -57,7 +57,7 @@ async def begin_z_leveling(
             calibration_square_pos = (
                 helpers_ot3.get_slot_calibration_square_position_ot3(int(next_slot))
             )
-            calibration_square_pos._replace(50)
+            calibration_square_pos._replace(z=50)
             stdscr.addstr(f"Calibration square pos {calibration_square_pos}")
             await api.move_to(mount, calibration_square_pos)
 
