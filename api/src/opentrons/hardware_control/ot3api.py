@@ -5,6 +5,7 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
+    Tuple,
     cast,
     Callable,
     Dict,
@@ -78,6 +79,7 @@ from .types import (
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
+    UpdateStatus,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -414,6 +416,10 @@ class OT3API(
         }
         return pipettes[pipette.channels]
 
+    def get_fw_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Get the progress of updates currently running."""
+        return self._backend.get_update_progress()
+
     async def do_firmware_updates(self) -> None:
         """Update all the firmware."""
         # get the attached instruments so we can get the type of pipettes attached
@@ -423,7 +429,7 @@ class OT3API(
             if self._pipette_handler.has_pipette(mount):
                 pipette = self._pipette_handler.get_pipette(mount)
                 pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
-        await self._backend.update_firmware(pipettes)
+        self._backend.update_firmware(pipettes)
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""

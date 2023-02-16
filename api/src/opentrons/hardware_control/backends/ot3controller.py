@@ -25,12 +25,14 @@ from typing import (
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
+from opentrons_hardware.firmware_update.types import StatusElement
 from .ot3utils import (
     axis_convert,
     create_move_group,
     axis_to_node,
     get_current_settings,
     create_home_group,
+    node_id_to_subsystem,
     node_to_axis,
     pipette_type_for_subtype,
     sensor_node_for_mount,
@@ -83,6 +85,8 @@ from opentrons_hardware import firmware_update
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
+    OT3SubSystem,
+    UpdateState,
     OT3Axis,
     AionotifyEvent,
     OT3Mount,
@@ -91,6 +95,7 @@ from opentrons.hardware_control.types import (
     MotorStatus,
     InstrumentProbeType,
     PipetteSubType,
+    UpdateStatus,
     mount_to_subsystem,
 )
 from opentrons.hardware_control.errors import (
@@ -179,6 +184,8 @@ class OT3Controller:
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._update_required = False
+        self._update_status: Dict[OT3SubSystem, UpdateStatus] = {}
+        self._update_progress: int = 0
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -204,6 +211,37 @@ class OT3Controller:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
+    def _received_update_progress(
+        self, total_updating: int, node_id: NodeId, status_element: StatusElement
+    ) -> Tuple[Set[UpdateStatus], int]:
+        """Update internal states/progress of firmware updates."""
+        fw_update_status, progress = status_element
+        subsystem = node_id_to_subsystem(node_id)
+        state = UpdateState.from_status(fw_update_status)
+        progress = int(progress * 100)
+
+        # Find the UpdateStatus if it exists, otherwise create it, then update its internal state
+        update_status = self._update_status.get(subsystem)
+        if not update_status:
+            update_status = UpdateStatus(subsystem, state, progress)
+            self._update_status[subsystem] = update_status
+        update_status.update(state, progress)
+
+        # calculate the progress of all updates
+        current_progress = 0
+        update_status_set = set(self._update_status.values())
+        for status in update_status_set:
+            current_progress += status.progress
+        self._update_progress = update_progress = int(
+            (current_progress) / total_updating
+        )
+        log.debug(f"Received: {update_status} total: {update_progress}%")
+        return update_status_set, update_progress
+
+    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Returns a tuple of UpdateStatus and total progress of the updates."""
+        return set(self._update_status.values()), self._update_progress
+
     @staticmethod
     def _attached_pipettes_to_nodes(
         attached_pipettes: Dict[OT3Mount, PipetteSubType]
@@ -220,7 +258,7 @@ class OT3Controller:
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> None:
+    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
         """Updates the firmware on the OT3."""
         nodes = nodes or set()
         attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
@@ -243,10 +281,17 @@ class OT3Controller:
             timeout_seconds=20,
             erase=True,
         )
-        async for progress in updater.run_updates():
-            pass
-        # refresh the device_info cache and reset the update_required flag
+
+        number_of_updates = len(firmware_updates)
+        async for node_id, status_element in updater.run_updates():
+            yield self._received_update_progress(
+                number_of_updates, node_id, status_element
+            )
+
+        # refresh the device_info cache and reset internal states
         await self._network_info.probe()
+        self._update_status = {}
+        self._update_progress = 0
         self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
