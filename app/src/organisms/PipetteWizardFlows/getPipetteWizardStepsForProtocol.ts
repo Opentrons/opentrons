@@ -1,29 +1,63 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { getRequiredPipetteForProtocol } from './getRequiredPipetteForProtocol'
+import * as PipetteConstants from '../../redux/pipettes/constants'
 import { FLOWS, SECTIONS } from './constants'
-import type { PipetteInfo, StoredProtocolAnalysis } from '../Devices/hooks'
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type { Mount } from '../../redux/pipettes/types'
+import type { PipetteInfo } from '../Devices/hooks'
 import type { PipetteWizardStep } from './types'
 
 export const getPipetteWizardStepsForProtocol = (
-  protocolData: StoredProtocolAnalysis,
-  //    pipetteInfoByMount type comes from useRunPipetteInfoByMount
+  attachedPipettesByMount: AttachedPipettesByMount,
   pipetteInfoByMount: { [mount in Mount]: PipetteInfo | null },
   mount: Mount
 ): PipetteWizardStep[] => {
-  const pipetteName = getRequiredPipetteForProtocol(
-    protocolData,
-    pipetteInfoByMount,
-    mount
-  )
+  const noPipetteRequiredInProtocol = pipetteInfoByMount[mount] == null
+  const requiredPipetteName =
+    pipetteInfoByMount[mount]?.requestedPipetteMatch !== PipetteConstants.MATCH
+      ? pipetteInfoByMount[mount]?.pipetteSpecs.name
+      : null
   const nintySixChannelAttached =
-    pipetteInfoByMount[LEFT]?.pipetteSpecs.name === 'p1000_96'
+    attachedPipettesByMount[LEFT]?.name === 'p1000_96'
 
-  //    return no steps if correct pipette is attached or protocol doesn't require pipette on mount
-  if (pipetteName === null) {
+  //    return calibration flow only if correct pipette is attached and pipette cal null
+  if (
+    requiredPipetteName == null &&
+    !noPipetteRequiredInProtocol &&
+    pipetteInfoByMount[mount]?.pipetteCalDate == null
+  ) {
+    return [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: mount,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: mount,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: mount,
+        flowType: FLOWS.CALIBRATE,
+      },
+      { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.CALIBRATE },
+    ]
+  }
+  //  return empty array when correct pipette is attached && pipette cal not needed or
+  //  no pipette is required in the protocol
+  else if (
+    (requiredPipetteName == null &&
+      !noPipetteRequiredInProtocol &&
+      pipetteInfoByMount[mount]?.pipetteCalDate != null) ||
+    noPipetteRequiredInProtocol
+  ) {
     return []
     //  if required pipette is not the 96-channel and a pipette attached to gantry
-  } else if (pipetteName !== 'p1000_96' && pipetteInfoByMount[mount] != null) {
+  } else if (
+    requiredPipetteName !== 'p1000_96' &&
+    attachedPipettesByMount[mount] != null
+  ) {
     //    96-channel pipette attached and need to attach single mount pipette
     if (nintySixChannelAttached) {
       return [
@@ -119,9 +153,9 @@ export const getPipetteWizardStepsForProtocol = (
     }
     //  Single mount pipette attached to both mounts and need to attach 96-channel pipette
   } else if (
-    pipetteName === 'p1000_96' &&
-    pipetteInfoByMount[LEFT] != null &&
-    pipetteInfoByMount[RIGHT] != null
+    requiredPipetteName === 'p1000_96' &&
+    attachedPipettesByMount[LEFT] != null &&
+    attachedPipettesByMount[RIGHT] != null
   ) {
     return [
       {
@@ -185,9 +219,9 @@ export const getPipetteWizardStepsForProtocol = (
     ]
     //  Single mount pipette attached to left mount and need to attach 96-channel pipette
   } else if (
-    pipetteName === 'p1000_96' &&
-    pipetteInfoByMount[LEFT] != null &&
-    pipetteInfoByMount[RIGHT] == null
+    requiredPipetteName === 'p1000_96' &&
+    attachedPipettesByMount[LEFT] != null &&
+    attachedPipettesByMount[RIGHT] == null
   ) {
     return [
       {
@@ -240,9 +274,9 @@ export const getPipetteWizardStepsForProtocol = (
     ]
     //  Single mount pipette attached to right mount and need to attach 96-channel pipette
   } else if (
-    pipetteName === 'p1000_96' &&
-    pipetteInfoByMount[LEFT] == null &&
-    pipetteInfoByMount[RIGHT] != null
+    requiredPipetteName === 'p1000_96' &&
+    attachedPipettesByMount[LEFT] == null &&
+    attachedPipettesByMount[RIGHT] != null
   ) {
     return [
       {
@@ -296,7 +330,7 @@ export const getPipetteWizardStepsForProtocol = (
     //  if no pipette is attached to gantry
   } else {
     //  Gantry empty and need to attach 96-channel pipette
-    if (pipetteName === 'p1000_96') {
+    if (requiredPipetteName === 'p1000_96') {
       return [
         {
           section: SECTIONS.BEFORE_BEGINNING,

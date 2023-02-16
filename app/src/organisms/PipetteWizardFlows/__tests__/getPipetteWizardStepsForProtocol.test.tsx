@@ -1,32 +1,14 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import protocolData from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import {
+  mockAttachedGen3Pipette,
+  mockGen3P1000PipetteSpecs,
+} from '../../../redux/pipettes/__fixtures__'
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardStepsForProtocol } from '../getPipetteWizardStepsForProtocol'
-import { getRequiredPipetteForProtocol } from '../getRequiredPipetteForProtocol'
 
-import type { PipetteInfo, StoredProtocolAnalysis } from '../../Devices/hooks'
+import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type { PipetteInfo } from '../../Devices/hooks'
 import type { PipetteWizardStep } from '../types'
-
-jest.mock('../getRequiredPipetteForProtocol')
-
-const mockGetRequiredPipetteForProtocol = getRequiredPipetteForProtocol as jest.MockedFunction<
-  typeof getRequiredPipetteForProtocol
->
-
-const mockProtocolData = ({
-  ...protocolData,
-  commands: [
-    {
-      commandType: 'loadPipette',
-      id: '0abc123',
-      params: {
-        pipetteId: 'pipetteId',
-        mount: 'left',
-        pipetteName: 'p1000_single_gen3',
-      },
-    },
-  ],
-} as unknown) as StoredProtocolAnalysis
 
 const mockPipetteInfo = {
   requestedPipetteMatch: 'incompatible',
@@ -37,37 +19,93 @@ const mockPipetteInfo = {
   },
 } as PipetteInfo
 
-const mockAttachedPipettesEmpty = {
-  left: null,
-  right: null,
-}
-const mockAttachedPipettesNotEmpty = {
+const mockPipettesInProtocolNotEmpty = {
   left: { ...mockPipetteInfo, pipetteSpecs: { name: 'p1000_single_gen3' } },
   right: null,
 }
-const mockAttachedPipettesMulti = {
+const mockPipettesInProtocolMulti = {
   left: { ...mockPipetteInfo, pipetteSpecs: { name: 'p1000_multi_gen3' } },
   right: null,
 }
-const mockAttachedPipette96Channel = {
+const mockPipettesInProtocol96Channel = {
   left: mockPipetteInfo,
   right: null,
 }
+const mockPipette: AttachedPipette = {
+  ...mockAttachedGen3Pipette,
+  modelSpecs: {
+    ...mockGen3P1000PipetteSpecs,
+    displayName: 'mock pipette display name',
+  },
+}
+const mockSingleMountPipetteAttached = { left: mockPipette, right: null }
 
 describe('getPipetteWizardStepsForProtocol', () => {
-  mockGetRequiredPipetteForProtocol.mockReturnValue(null)
   it('returns an empty array of info when the attached pipette matches required pipette', () => {
     const mockFlowSteps = [] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        mockProtocolData,
-        mockAttachedPipettesNotEmpty as any,
+        mockSingleMountPipetteAttached,
+        {
+          left: {
+            pipetteCalDate: 'cal date',
+            requestedPipetteMatch: 'match',
+            pipetteSpecs: { name: 'p1000_single_gen3' },
+          },
+          right: null,
+        } as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
+  it('returns an empty array when there is no pipette attached and no pipette is needed', () => {
+    const mockFlowSteps = [] as PipetteWizardStep[]
+    expect(
+      getPipetteWizardStepsForProtocol(
+        { left: null, right: null },
+        {
+          left: null,
+          right: null,
+        } as any,
+        LEFT
+      )
+    ).toStrictEqual(mockFlowSteps)
+  })
+  it('returns the calibration flow only when correct pipette is attached but there is no pip cal data', () => {
+    const mockFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: RIGHT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: RIGHT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: RIGHT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.CALIBRATE },
+    ] as PipetteWizardStep[]
+    expect(
+      getPipetteWizardStepsForProtocol(
+        { left: null, right: mockPipette },
+        {
+          left: null,
+          right: {
+            pipetteCalDate: null,
+            requestedPipetteMatch: 'match',
+            pipetteSpecs: { name: 'p1000_single_gen3' },
+          },
+        } as any,
+        RIGHT
+      )
+    ).toStrictEqual(mockFlowSteps)
+  })
   it('returns the correct array of info when the attached pipette needs to be switched out for single mount', () => {
-    mockGetRequiredPipetteForProtocol.mockReturnValue('p1000_single_gen3')
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -109,14 +147,13 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        mockProtocolData,
-        mockAttachedPipettesMulti as any,
+        mockSingleMountPipetteAttached,
+        mockPipettesInProtocolMulti as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when the attached 96-channel pipette needs to be switched out for single mount', () => {
-    mockGetRequiredPipetteForProtocol.mockReturnValue('p1000_single_gen3')
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -168,14 +205,13 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        mockProtocolData,
-        mockAttachedPipette96Channel as any,
+        { left: { ...mockPipette, name: 'p1000_96' }, right: null },
+        mockPipettesInProtocolNotEmpty as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when the attached pipette on left mount needs to be switched out for 96-channel', () => {
-    mockGetRequiredPipetteForProtocol.mockReturnValue('p1000_96')
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -227,14 +263,13 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        mockProtocolData,
-        mockAttachedPipettesNotEmpty as any,
+        { left: mockPipette, right: null },
+        mockPipettesInProtocol96Channel as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when the attached pipette on right mount needs to be switched out for 96-channel', () => {
-    mockGetRequiredPipetteForProtocol.mockReturnValue('p1000_96')
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -286,20 +321,13 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        mockProtocolData,
-        {
-          left: null,
-          right: {
-            ...mockPipetteInfo,
-            pipetteSpecs: { name: 'p1000_single_gen3' },
-          },
-        } as any,
+        { left: null, right: mockPipette },
+        mockPipettesInProtocol96Channel as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when the attached pipette on both mounts need to be switched out for 96-channel', () => {
-    mockGetRequiredPipetteForProtocol.mockReturnValue('p1000_96')
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -362,23 +390,13 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        mockProtocolData,
-        {
-          left: {
-            ...mockPipetteInfo,
-            pipetteSpecs: { name: 'p1000_single_gen3' },
-          },
-          right: {
-            ...mockPipetteInfo,
-            pipetteSpecs: { name: 'p1000_single_gen3' },
-          },
-        } as any,
+        { left: mockPipette, right: mockPipette },
+        mockPipettesInProtocol96Channel as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when gantry is empty and a single mount needs to be attached', () => {
-    mockGetRequiredPipetteForProtocol.mockReturnValue('p1000_single_gen3')
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -409,14 +427,13 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        mockProtocolData,
-        mockAttachedPipettesEmpty as any,
+        { left: null, right: null },
+        mockPipettesInProtocolNotEmpty as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when gantry is empty and 96-channel needs to be attached', () => {
-    mockGetRequiredPipetteForProtocol.mockReturnValue('p1000_96')
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -457,8 +474,8 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        mockProtocolData,
-        mockAttachedPipettesEmpty as any,
+        { left: null, right: null },
+        mockPipettesInProtocol96Channel as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
