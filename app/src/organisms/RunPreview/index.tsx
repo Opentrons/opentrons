@@ -133,23 +133,25 @@ export const RunPreviewComponent = (
           </Flex>
         )}
       </ViewportList>
-      <PrimaryButton
-        position={POSITION_FIXED}
-        bottom={SPACING.spacingXXL}
-        left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
-        transform="translate(-50%)"
-        borderRadius={SPACING.spacing6}
-        display={currentCommandDirection !== 0 ? DISPLAY_FLEX : DISPLAY_NONE}
-        onClick={makeHandleJumpToStep(currentRunCommandIndex)}
-        id="RunLog_jumpToCurrentStep"
-      >
-        <Icon
-          name={currentCommandDirection > 0 ? 'ot-arrow-down' : 'ot-arrow-up'}
-          size={SIZE_1}
-          marginRight={SPACING.spacing3}
-        />
-        {t('jump_to_current_step')}
-      </PrimaryButton>
+      {currentRunCommandIndex >= 0 ? (
+        <PrimaryButton
+          position={POSITION_FIXED}
+          bottom={SPACING.spacingXXL}
+          left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
+          transform="translate(-50%)"
+          borderRadius={SPACING.spacing6}
+          display={currentCommandDirection !== 0 ? DISPLAY_FLEX : DISPLAY_NONE}
+          onClick={makeHandleJumpToStep(currentRunCommandIndex)}
+          id="RunLog_jumpToCurrentStep"
+        >
+          <Icon
+            name={currentCommandDirection > 0 ? 'ot-arrow-down' : 'ot-arrow-up'}
+            size={SIZE_1}
+            marginRight={SPACING.spacing3}
+          />
+          {t('jump_to_current_step')}
+        </PrimaryButton>
+      ) : null}
     </Flex>
   )
 }
