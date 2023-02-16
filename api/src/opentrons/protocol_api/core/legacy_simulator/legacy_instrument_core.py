@@ -129,7 +129,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         well_core: Optional[LegacyWellCore],
         in_place: bool,
     ) -> None:
-        if location != self._protocol_interface.get_last_location():
+        if not in_place:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._update_volume(0)
