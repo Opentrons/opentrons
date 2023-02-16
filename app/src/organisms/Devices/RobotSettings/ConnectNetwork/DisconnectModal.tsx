@@ -7,7 +7,6 @@ import {
   Flex,
   Link,
   Icon,
-  useInterval,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
@@ -19,11 +18,9 @@ import {
 import { AlertPrimaryButton, PrimaryButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
-import {
-  fetchWifiList,
-  getWifiList,
-  postWifiDisconnect,
-} from '../../../../redux/networking'
+import { useRobot } from '../../../../organisms/Devices/hooks'
+import { CONNECTABLE } from '../../../../redux/discovery'
+import { getWifiList, postWifiDisconnect } from '../../../../redux/networking'
 import {
   dismissRequest,
   getRequestById,
@@ -39,8 +36,6 @@ export interface DisconnectModalProps {
   onCancel: () => unknown
   robotName: string
 }
-
-const LIST_REFRESH_MS = 10000
 
 export const DisconnectModal = ({
   onCancel,
@@ -88,25 +83,29 @@ export const DisconnectModal = ({
 
   const dispatch = useDispatch<Dispatch>()
 
-  useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
-
   let disconnectModalBody: string = t('are_you_sure_you_want_to_disconnect', {
     ssid,
   })
 
-  if (isRequestPending) {
+  // if the disconnect request is sent when there is no wired connection, we will not receive a success response to the request once wi-fi has disconnected
+  // check for connectable robot health status and presume successful disconnection if request pending and robot not connectable
+  const { status } = useRobot(robotName) ?? {}
+  const isDisconnected =
+    isRequestSucceeded || (isRequestPending && status !== CONNECTABLE)
+
+  if (isDisconnected) {
+    disconnectModalBody = t('disconnect_from_wifi_network_success')
+  } else if (isRequestPending) {
     disconnectModalBody = t('disconnecting_from_wifi_network', { ssid })
   } else if (isRequestFailed) {
     disconnectModalBody = t('disconnect_from_wifi_network_failure', { ssid })
-  } else if (isRequestSucceeded) {
-    disconnectModalBody = t('disconnect_from_wifi_network_success')
   }
 
   return (
     <Modal
       type="warning"
       title={
-        isRequestSucceeded
+        isDisconnected
           ? t('disconnected_from_wifi')
           : t('disconnect_from_ssid', { ssid })
       }
@@ -131,7 +130,7 @@ export const DisconnectModal = ({
           </StyledText>
         ) : null}
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
-          {isRequestSucceeded ? (
+          {isDisconnected ? (
             <PrimaryButton onClick={handleCancel}>{t('done')}</PrimaryButton>
           ) : (
             <>
