@@ -77,7 +77,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
-        in_place: bool = False,
+        in_place: bool,
     ) -> None:
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -117,7 +117,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
-        in_place: bool = False,
+        in_place: bool,
     ) -> None:
         self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
@@ -127,7 +127,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self,
         location: types.Location,
         well_core: Optional[LegacyWellCore],
-        in_place: bool = False,
+        in_place: bool,
     ) -> None:
         if location != self._protocol_interface.get_last_location():
             self.move_to(location=location, well_core=well_core)

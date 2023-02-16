@@ -183,16 +183,12 @@ class InstrumentContext(publisher.CommandPublisher):
             target = validation.validate_location(
                 location=location, last_location=last_location
             )
-        except validation.NoLocationError:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
-            )
-        except validation.LocationTypeError as e:
-            raise TypeError(
-                f"location should be a Well or Location, but it is {location}"
             ) from e
 
         if isinstance(target, validation.WellTarget):
@@ -294,17 +290,13 @@ class InstrumentContext(publisher.CommandPublisher):
             target = validation.validate_location(
                 location=location, last_location=last_location
             )
-        except validation.NoLocationError:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is."
-            )
-        except validation.LocationTypeError:
-            raise TypeError(
-                f"location should be a Well or Location, but it is {location}"
-            )
+            ) from e
 
         if isinstance(target, validation.WellTarget):
             well = target.well
@@ -465,10 +457,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
             ) from e
-        except validation.LocationTypeError:
-            raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
-            )
 
         if isinstance(target, validation.WellTarget):
             if target.well.parent.is_tiprack:

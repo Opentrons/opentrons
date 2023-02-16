@@ -84,7 +84,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
-        in_place: bool = False,
+        in_place: bool,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -141,7 +141,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
-        in_place: bool = False,
+        in_place: bool,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -191,7 +191,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def blow_out(
-        self, location: Location, well_core: Optional[WellCore], in_place: bool = False
+        self, location: Location, well_core: Optional[WellCore], in_place: bool
     ) -> None:
         """Blow liquid out of the tip.
 

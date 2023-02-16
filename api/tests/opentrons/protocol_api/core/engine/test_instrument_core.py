@@ -286,7 +286,12 @@ def test_aspirate_from_well(
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
     subject.aspirate(
-        location=location, well_core=well_core, volume=12.34, rate=5.6, flow_rate=7.8
+        location=location,
+        well_core=well_core,
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        in_place=False,
     )
 
     decoy.verify(
@@ -382,7 +387,7 @@ def test_blow_out_to_well(
         )
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
-    subject.blow_out(location=location, well_core=well_core)
+    subject.blow_out(location=location, well_core=well_core, in_place=False)
 
     decoy.verify(
         mock_engine_client.blow_out(
@@ -407,7 +412,7 @@ def test_blow_out_in_place(
     """It should blow out in place."""
     location = Location(point=Point(1, 2, 3), labware=None)
 
-    subject.blow_out(location=location, well_core=None)
+    subject.blow_out(location=location, well_core=None, in_place=False)
 
     decoy.verify(
         mock_engine_client.move_to_coordinates(
@@ -445,7 +450,12 @@ def test_dispense_to_well(
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
     subject.dispense(
-        location=location, well_core=well_core, volume=12.34, rate=5.6, flow_rate=6.0
+        location=location,
+        well_core=well_core,
+        volume=12.34,
+        rate=5.6,
+        flow_rate=6.0,
+        in_place=False,
     )
 
     decoy.verify(
@@ -498,7 +508,12 @@ def test_dispense_in_coordinates(
     """It should dispense in place."""
     location = Location(point=Point(1, 2, 3), labware=None)
     subject.dispense(
-        volume=12.34, rate=5.6, flow_rate=7.8, well_core=None, location=location
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        well_core=None,
+        location=location,
+        in_place=False,
     )
 
     decoy.verify(

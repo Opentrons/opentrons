@@ -239,7 +239,9 @@ def validate_location(
         raise NoLocationError()
 
     if not isinstance(target_location, (Location, Well)):
-        raise LocationTypeError()
+        raise LocationTypeError(
+            "location should be a Well or Location, but it is {}".format(location)
+        )
 
     if isinstance(target_location, Well):
         return WellTarget(well=target_location, location=None)
