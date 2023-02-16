@@ -4,6 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
+  RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import {
@@ -386,6 +387,10 @@ describe('PipetteWizardFlows', () => {
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: { mount: RIGHT },
           },
         ],
         false

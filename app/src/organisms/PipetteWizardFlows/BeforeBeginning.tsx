@@ -131,13 +131,15 @@ export const BeforeBeginning = (
       })
   }
 
-  const SingleMountAttachCommand: CreateCommand = {
-    // @ts-expect-error calibration type not yet supported
-    commandType: 'calibration/moveToMaintenancePosition' as const,
-    params: {
-      mount: mount,
+  const SingleMountAttachCommand: CreateCommand[] = [
+    {
+      // @ts-expect-error calibration type not yet supported
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: mount,
+      },
     },
-  }
+  ]
 
   const NinetySixChannelAttachCommand: CreateCommand[] = [
     {
@@ -159,7 +161,7 @@ export const BeforeBeginning = (
   const handleOnClickAttach = (): void => {
     chainRunCommands(
       selectedPipette === SINGLE_MOUNT_PIPETTES
-        ? [SingleMountAttachCommand]
+        ? SingleMountAttachCommand
         : NinetySixChannelAttachCommand,
       false
     )
