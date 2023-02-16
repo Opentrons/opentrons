@@ -44,7 +44,7 @@ HS_ALLOWED_ADJACENT_TALL_LABWARE = [
 @dataclass
 class Labware:
     """A normal labware that occupies a single slot."""
-    uri: str
+    uri: LabwareUri
     highest_z: float
     is_fixed_trash: bool
     name_for_errors: str

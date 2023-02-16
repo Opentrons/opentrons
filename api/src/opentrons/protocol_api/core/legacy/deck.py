@@ -11,6 +11,7 @@ from opentrons_shared_data.deck import (
     load as load_deck,
 )
 from opentrons_shared_data.deck.dev_types import SlotDefV3
+from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.types import DeckLocation, Location, Mount, Point
 from opentrons.hardware_control.modules.types import ModuleType
@@ -116,7 +117,8 @@ class Deck(UserDict):  # type: ignore[type-arg]
             return deck_conflict.Labware(
                 highest_z=item.highest_z,
                 name_for_errors=item.load_name,
-                uri=item.uri,
+                # TODO(mm, 2023-02-16): Refactor item.uri to return LabwareUri.
+                uri=LabwareUri(item.uri),
                 is_fixed_trash=is_fixed_trash,
             )
 
@@ -125,7 +127,8 @@ class Deck(UserDict):  # type: ignore[type-arg]
             return deck_conflict.Labware(
                 highest_z=highest_z,
                 name_for_errors=name_for_errors,
-                uri=item.get_uri(),
+                # TODO(mm, 2023-02-16): Refactor item.uri to return LabwareUri.
+                uri=LabwareUri(item.get_uri()),
                 is_fixed_trash=is_fixed_trash,
             )
 
