@@ -1,0 +1,38 @@
+---
+test_name: POST System Authorize
+marks:
+  - usefixtures:
+    - run_server
+stages:
+  - name: POST /system/register
+    request:
+      url: "{host:s}:{port:d}/system/register"
+      method: POST
+      params:
+        agent: 'agent-1'
+        agent_id: 'agent_id-1'
+        subject: 'subject-1'
+    response:
+      status_code: 200
+      json:
+        token: !anystr
+      save:
+        json:
+          issued_token: "token"
+  - name: POST /system/authorize with invalid token
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authentication-bearer: 'not-a-valid-token'
+    response:
+      status_code: 401
+  - name: POST /system/authorize with valid token
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authentication-bearer: "{issued_token:s}"
+    response:
+      status_code: 201
+    
