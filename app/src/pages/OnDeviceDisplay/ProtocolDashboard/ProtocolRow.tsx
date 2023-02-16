@@ -45,10 +45,9 @@ const TableDatum = styled('td')`
 
 export function ProtocolRow(props: {
   protocol: ProtocolResource
-  index: number
   lastRun: string | undefined
 }): JSX.Element {
-  const { protocol, index, lastRun } = props
+  const { protocol, lastRun } = props
   const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
@@ -106,7 +105,7 @@ export function ProtocolRow(props: {
 
   return (
     <TableRow
-      key={protocol.key ?? index}
+      key={protocol.key}
       onClick={() => handleProtocolClick()}
       ref={longpress.ref}
     >

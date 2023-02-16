@@ -202,15 +202,14 @@ export function ProtocolDashboard(): JSX.Element {
           </thead>
 
           <tbody>
-            {sortedProtocols.map((protocol, index) => {
+            {sortedProtocols.map(protocol => {
               const lastRun = runs.data?.data.find(
                 run => run.protocolId === protocol.id
               )?.createdAt
 
               return (
                 <ProtocolRow
-                  index={index}
-                  key={index}
+                  key={protocol.key}
                   lastRun={lastRun}
                   protocol={protocol}
                 />
