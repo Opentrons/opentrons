@@ -16,12 +16,15 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
+  TYPOGRAPHY,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
+import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
+import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
@@ -33,6 +36,8 @@ import {
   RobotName,
   RobotSystemVersion,
 } from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
+
+import type { State } from '../../redux/types'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -63,6 +68,13 @@ export function RobotSettingsDashboard(): JSX.Element {
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
+  const robotUpdateType = useSelector((state: State) => {
+    return localRobot != null && localRobot.status !== UNREACHABLE
+      ? getBuildrootUpdateAvailable(state, localRobot)
+      : null
+  })
+  const isUpdateAvailable = robotUpdateType === 'upgrade'
+
   return (
     <Flex
       padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
@@ -73,6 +85,8 @@ export function RobotSettingsDashboard(): JSX.Element {
         <SettingsContent
           currentOption={currentOption}
           setCurrentOption={setCurrentOption}
+          robotServerVersion={robotServerVersion ?? 'Unknown'}
+          isUpdateAvailable={isUpdateAvailable}
         />
       ) : (
         <>
@@ -95,6 +109,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             }
             currentOption="RobotSystemVersion"
             setCurrentOption={setCurrentOption}
+            isUpdateAvailable={isUpdateAvailable}
           />
           {/* Network Settings */}
           <RobotSettingButton
@@ -152,14 +167,17 @@ interface RobotSettingButtonProps {
   settingInfo?: string
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption) => void
+  isUpdateAvailable?: boolean
 }
 
-function RobotSettingButton({
+const RobotSettingButton = ({
   settingName,
   settingInfo,
   currentOption,
   setCurrentOption,
-}: RobotSettingButtonProps): JSX.Element {
+  isUpdateAvailable,
+}: RobotSettingButtonProps): JSX.Element => {
+  const { t } = useTranslation('app_settings')
   return (
     <Btn
       css={SETTING_BUTTON_STYLE}
@@ -198,6 +216,29 @@ function RobotSettingButton({
             ) : null}
           </Flex>
         </Flex>
+        {isUpdateAvailable ?? false ? (
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap="0.75rem"
+            alignItems={ALIGN_CENTER}
+            backgroundColor={COLORS.warningBackgroundMed}
+            padding={`0.75rem ${SPACING.spacing4}`}
+            borderRadius="16px"
+          >
+            <Icon
+              name="ot-alert"
+              size="1.75rem"
+              color={COLORS.warningEnabled}
+            />
+            <StyledText
+              fontSize="1.375rem"
+              lineHeight="1.625rem"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {t('update_available')}
+            </StyledText>
+          </Flex>
+        ) : null}
         <Icon name="chevron-right" size="3rem" />
       </Flex>
     </Btn>
@@ -207,30 +248,46 @@ function RobotSettingButton({
 interface SettingsContentProps {
   currentOption: SettingOption
   setCurrentOption: (currentOption: SettingOption | null) => void
+  robotServerVersion: string
+  isUpdateAvailable: boolean
 }
 const SettingsContent = ({
   currentOption,
   setCurrentOption,
+  robotServerVersion,
+  isUpdateAvailable,
 }: SettingsContentProps): JSX.Element => {
+  let settingOption
   switch (currentOption) {
     case 'RobotName':
-      return <RobotName setCurrentOption={setCurrentOption} />
+      settingOption = <RobotName setCurrentOption={setCurrentOption} />
+      break
     case 'RobotSystemVersion':
-      return <RobotSystemVersion setCurrentOption={setCurrentOption} />
-
+      settingOption = (
+        <RobotSystemVersion
+          currentVersion={robotServerVersion}
+          isUpdateAvailable={isUpdateAvailable}
+          setCurrentOption={setCurrentOption}
+        />
+      )
+      break
     case 'NetworkSettings':
-      return <NetworkSettings setCurrentOption={setCurrentOption} />
-
+      settingOption = <NetworkSettings setCurrentOption={setCurrentOption} />
+      break
     case 'DisplaySleepSettings':
-      return <DisplaySleepSettings setCurrentOption={setCurrentOption} />
-
+      settingOption = (
+        <DisplaySleepSettings setCurrentOption={setCurrentOption} />
+      )
+      break
     case 'DisplayBrightness':
-      return <DisplayBrightness setCurrentOption={setCurrentOption} />
-
+      settingOption = <DisplayBrightness setCurrentOption={setCurrentOption} />
+      break
     case 'DisplayTextSize':
-      return <DisplayTextSize setCurrentOption={setCurrentOption} />
-
+      settingOption = <DisplayTextSize setCurrentOption={setCurrentOption} />
+      break
     case 'DeviceReset':
-      return <DeviceReset setCurrentOption={setCurrentOption} />
+      settingOption = <DeviceReset setCurrentOption={setCurrentOption} />
+      break
   }
+  return settingOption
 }
