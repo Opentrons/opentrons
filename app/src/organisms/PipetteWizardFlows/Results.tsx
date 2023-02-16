@@ -1,10 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
-import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
+import {
+  COLORS,
+  TEXT_TRANSFORM_CAPITALIZE,
+  SPACING,
+} from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { usePipettesQuery } from '@opentrons/react-api-client'
-import { PrimaryButton } from '../../atoms/buttons'
+import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
@@ -104,35 +107,29 @@ export const Results = (props: ResultsProps): JSX.Element => {
     </PrimaryButton>
   )
 
-  if (
-    !isSuccess &&
-    (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) &&
-    numberOfTryAgains < 3
-  ) {
+  if (!isSuccess && (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)) {
+    subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
     button = (
-      <PrimaryButton
-        onClick={handleTryAgain}
-        disabled={isPending}
-        aria-label="Results_tryAgain"
-      >
-        {t(flowType === FLOWS.ATTACH ? 'detach_and_retry' : 'attach_and_retry')}
-      </PrimaryButton>
-    )
-  } else if (
-    !isSuccess &&
-    (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) &&
-    numberOfTryAgains <= 3
-  ) {
-    header = startCase(t('shared:something_went_wrong'))
-    button = (
-      <PrimaryButton
-        onClick={handleCleanUpAndClose}
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        disabled={isPending}
-        aria-label="Results_errorExit"
-      >
-        {t('shared:exit')}
-      </PrimaryButton>
+      <>
+        <SecondaryButton
+          onClick={handleCleanUpAndClose}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          disabled={isPending}
+          aria-label="Results_errorExit"
+          marginRight={SPACING.spacing2}
+        >
+          {t('shared:exit')}
+        </SecondaryButton>
+        <PrimaryButton
+          onClick={handleTryAgain}
+          disabled={isPending}
+          aria-label="Results_tryAgain"
+        >
+          {t(
+            flowType === FLOWS.ATTACH ? 'detach_and_retry' : 'attach_and_retry'
+          )}
+        </PrimaryButton>
+      </>
     )
   }
 

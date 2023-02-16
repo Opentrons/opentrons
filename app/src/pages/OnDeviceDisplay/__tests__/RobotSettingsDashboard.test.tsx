@@ -8,16 +8,31 @@ import { i18n } from '../../../i18n'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import {
+  DeviceReset,
+  RobotSystemVersion,
+} from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
 import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
 
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/buildroot')
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DeviceReset'
+)
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/RobotSystemVersion'
+)
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
+const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
+const mockRobotSystemVersion = RobotSystemVersion as jest.MockedFunction<
+  typeof RobotSystemVersion
+>
 
 const render = () => {
   return renderWithProviders(
@@ -35,6 +50,8 @@ describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
+    mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
+    mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
   })
 
   it('should render Navigation', () => {
@@ -66,7 +83,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Robot System Version')
     fireEvent.click(button)
-    getByText('Robot System Version')
+    getByText('Mock Robot System Version')
   })
 
   it('should render component when tapping network settings', () => {
@@ -101,7 +118,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Device Reset')
     fireEvent.click(button)
-    getByText('Device Reset')
+    getByText('Mock Device Reset')
   })
 
   // The following cases will be activate when RobotSettings PRs are ready
