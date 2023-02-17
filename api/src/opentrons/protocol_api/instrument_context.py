@@ -224,7 +224,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume=c_vol,
                 rate=rate,
                 flow_rate=flow_rate,
-                in_place=aspirate_in_place,
+                in_place=target.in_place,
             )
 
         return self
