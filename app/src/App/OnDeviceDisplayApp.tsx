@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
-// import { useIdle } from 'react-use'
 
 import {
   Box,
@@ -168,23 +167,20 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
 ]
 
 // const SLEEP_SWITCH_MS = 100
+const ODD_EVENTS: Array<keyof DocumentEventMap> = [
+  'mousedown',
+  'click',
+  'scroll',
+]
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
   const { sleepMs } = useSelector(getOnDeviceDisplaySettings)
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
-
-  const isIdle = useIdle(3000)
-
-  // const _isIdle = useIdle(sleepTime, false)
-  // const [isIdle, setIsIdle] = React.useState(false)
-
-  // React.useEffect(() => {
-  //   const timer = setTimeout(() => setIsIdle(_isIdle), SLEEP_SWITCH_MS)
-  //   return () => {
-  //     clearTimeout(timer)
-  //   }
-  // }, [_isIdle])
-
+  const options = {
+    events: ODD_EVENTS,
+    initialState: false,
+  }
+  const isIdle = useIdle(sleepTime, options)
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%">

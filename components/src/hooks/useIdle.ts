@@ -2,25 +2,24 @@ import { useState, useEffect, useRef } from 'react'
 
 const USER_EVENTS: Array<keyof DocumentEventMap> = [
   'click',
-  // 'dblclick',
-  // 'keypress',
-  // 'mousemove',
-  // 'pointerover',
-  // 'pointerenter',
-  // 'pointerdown',
-  // 'pointermove',
-  // 'pointerout',
-  // 'pointerleave',
-  // 'scroll',
-  // 'touchmove',
-  // 'touchstart',
-  'touchend',
+  'dblclick',
+  'keypress',
+  'mousemove',
+  'pointerover',
+  'pointerenter',
+  'pointerdown',
+  'pointermove',
+  'pointerout',
+  'pointerleave',
+  'scroll',
+  'touchmove',
+  'touchstart',
   'mousedown',
 ]
 
 const DEFAULT_OPTIONS = {
   events: USER_EVENTS,
-  initialState: false,
+  initialState: true,
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
