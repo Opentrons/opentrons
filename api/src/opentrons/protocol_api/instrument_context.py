@@ -190,7 +190,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
-        aspirate_in_place = target.in_place
         if isinstance(target, validation.WellTarget):
             move_to_location = target.location or target.well.bottom(
                 z=self._well_bottom_clearances.aspirate
