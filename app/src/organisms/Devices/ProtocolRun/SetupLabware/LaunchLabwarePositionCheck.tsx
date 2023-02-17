@@ -148,6 +148,8 @@ export function LaunchLabwarePositionCheck(
         <CurrentOffsetsModal
           currentOffsets={currentOffsets}
           commands={protocolData?.commands ?? []}
+          labware={protocolData?.labware ?? []}
+          modules={protocolData?.modules ?? []}
           onCloseClick={() => setShowCurrentOffsetsModal(false)}
           handleRelaunchLPC={() => {
             setShowCurrentOffsetsModal(false)

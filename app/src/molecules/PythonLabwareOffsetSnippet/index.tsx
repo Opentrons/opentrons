@@ -2,8 +2,12 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { TYPOGRAPHY, SPACING, BORDERS } from '@opentrons/components'
 import { createSnippet } from './createSnippet'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  LoadedLabware,
+  LoadedModule,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 const JsonTextArea = styled.textarea`
   min-height: 12vh;
@@ -19,19 +23,21 @@ const JsonTextArea = styled.textarea`
 `
 interface PythonLabwareOffsetSnippetProps {
   mode: 'jupyter' | 'cli'
-  protocol: CompletedProtocolAnalysis | null
+  commands: RunTimeCommand[],
+  labware: LoadedLabware[],
+  modules: LoadedModule[],
   labwareOffsets: LabwareOffset[] | null
 }
 
 export function PythonLabwareOffsetSnippet(
   props: PythonLabwareOffsetSnippetProps
 ): JSX.Element | null {
-  const { protocol, labwareOffsets, mode } = props
+  const { commands, labware, modules, labwareOffsets, mode } = props
   const [snippet, setSnippet] = React.useState<string | null>(null)
-
+console.table(props)
   React.useEffect(() => {
-    if (protocol != null && labwareOffsets != null) {
-      setSnippet(createSnippet(mode, protocol, labwareOffsets))
+    if (labware.length > 0 && labwareOffsets != null) {
+      setSnippet(createSnippet(mode, commands, labware, modules, labwareOffsets))
     }
   }, [mode, JSON.stringify(labwareOffsets)])
 

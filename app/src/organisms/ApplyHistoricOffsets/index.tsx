@@ -21,6 +21,7 @@ import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { CheckboxField } from '../../atoms/CheckboxField'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
+import type { LoadedLabware, LoadedModule, RunTimeCommand } from '@opentrons/shared-data'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -33,28 +34,32 @@ interface ApplyHistoricOffsetsProps {
   offsetCandidates: OffsetCandidate[]
   shouldApplyOffsets: boolean
   setShouldApplyOffsets: (shouldApplyOffsets: boolean) => void
+  commands: RunTimeCommand[],
+  labware: LoadedLabware[],
+  modules: LoadedModule[],
 }
 export function ApplyHistoricOffsets(
   props: ApplyHistoricOffsetsProps
 ): JSX.Element {
-  const { offsetCandidates, shouldApplyOffsets, setShouldApplyOffsets } = props
+  const { offsetCandidates, shouldApplyOffsets, setShouldApplyOffsets, labware, modules, commands  } = props
   const [showOffsetDataModal, setShowOffsetDataModal] = React.useState(false)
   const { t } = useTranslation('labware_position_check')
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
+  console.table({labware, modules, commands})
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
-      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      labwareOffsets={offsetCandidates}
+      {...{labware, modules, commands}}
     />
   )
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
-      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      labwareOffsets={offsetCandidates}
+      {...{labware, modules, commands}}
     />
   )
   return (
@@ -97,6 +102,7 @@ export function ApplyHistoricOffsets(
                   : t('robot_has_no_offsets_from_previous_runs')}
               </StyledText>
               <Link
+                external
                 css={TYPOGRAPHY.linkPSemiBold}
                 marginTop={SPACING.spacing3}
                 href={HOW_OFFSETS_WORK_SUPPORT_URL}

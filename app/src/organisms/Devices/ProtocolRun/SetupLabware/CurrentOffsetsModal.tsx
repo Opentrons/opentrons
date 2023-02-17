@@ -7,7 +7,6 @@ import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 import {
   Flex,
@@ -34,6 +33,11 @@ import { useLPCDisabledReason } from '../../hooks'
 import { getLatestCurrentOffsets } from './utils'
 
 import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  RunTimeCommand,
+  LoadedLabware,
+  LoadedModule,
+} from '@opentrons/shared-data'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -61,6 +65,8 @@ const OffsetTableDatum = styled('td')`
 interface CurrentOffsetsModalProps {
   currentOffsets: LabwareOffset[]
   commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  modules: LoadedModule[]
   runId: string
   robotName: string
   onCloseClick: () => void
@@ -72,6 +78,8 @@ export function CurrentOffsetsModal(
   const {
     currentOffsets,
     commands,
+    labware,
+    modules,
     runId,
     robotName,
     onCloseClick,
@@ -125,15 +133,19 @@ export function CurrentOffsetsModal(
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
-      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      labwareOffsets={latestCurrentOffsets}
+      commands={commands ?? []}
+      labware={labware ?? []}
+      modules={modules ?? []}
     />
   )
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
-      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      labwareOffsets={latestCurrentOffsets}
+      commands={commands ?? []}
+      labware={labware ?? []}
+      modules={modules ?? []}
     />
   )
   return (
