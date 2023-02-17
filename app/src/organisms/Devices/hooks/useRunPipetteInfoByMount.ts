@@ -71,7 +71,6 @@ export function useRunPipetteInfoByMount(
     )
     if (loadCommand != null) {
       const { mount } = loadCommand.params
-      const { pipetteId } = loadCommand.result
       const pipetteName = pipette.pipetteName
       const requestedPipetteName = pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
@@ -79,7 +78,7 @@ export function useRunPipetteInfoByMount(
         const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
           LabwareDefinition2[]
         >((acc, command) => {
-          if (pipetteId === command.params?.pipetteId) {
+          if (loadCommand.result?.pipetteId === command.params?.pipetteId) {
             const tipRack = labware.find(
               item => item.id === command.params?.labwareId
             )
@@ -128,7 +127,7 @@ export function useRunPipetteInfoByMount(
           ...acc,
           [mount]: {
             pipetteName: requestedPipetteName,
-            id: pipetteId,
+            id: loadCommand.result?.pipetteId ?? '',
             pipetteSpecs,
             tipRacksForPipette,
             requestedPipetteMatch,

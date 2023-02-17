@@ -56,7 +56,7 @@ export interface MagneticModuleEngageMagnetCreateCommand
 export interface MagneticModuleEngageMagnetRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MagneticModuleEngageMagnetCreateCommand {
-  result: any
+  result?: any
 }
 export interface MagneticModuleDisengageCreateCommand
   extends CommonCommandCreateInfo {
@@ -66,7 +66,7 @@ export interface MagneticModuleDisengageCreateCommand
 export interface MagneticModuleDisengageRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MagneticModuleDisengageCreateCommand {
-  result: any
+  result?: any
 }
 export interface TemperatureModuleSetTargetTemperatureCreateCommand
   extends CommonCommandCreateInfo {
@@ -76,7 +76,7 @@ export interface TemperatureModuleSetTargetTemperatureCreateCommand
 export interface TemperatureModuleSetTargetTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TemperatureModuleSetTargetTemperatureCreateCommand {
-  result: any
+  result?: any
 }
 export interface TemperatureModuleDeactivateCreateCommand
   extends CommonCommandCreateInfo {
@@ -86,7 +86,7 @@ export interface TemperatureModuleDeactivateCreateCommand
 export interface TemperatureModuleDeactivateRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TemperatureModuleDeactivateCreateCommand {
-  result: any
+  result?: any
 }
 export interface TemperatureModuleAwaitTemperatureCreateCommand
   extends CommonCommandCreateInfo {
@@ -96,7 +96,7 @@ export interface TemperatureModuleAwaitTemperatureCreateCommand
 export interface TemperatureModuleAwaitTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TemperatureModuleAwaitTemperatureCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCSetTargetBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
@@ -106,7 +106,7 @@ export interface TCSetTargetBlockTemperatureCreateCommand
 export interface TCSetTargetBlockTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCSetTargetBlockTemperatureCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCSetTargetLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
@@ -116,7 +116,7 @@ export interface TCSetTargetLidTemperatureCreateCommand
 export interface TCSetTargetLidTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCSetTargetLidTemperatureCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCWaitForBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
@@ -126,7 +126,7 @@ export interface TCWaitForBlockTemperatureCreateCommand
 export interface TCWaitForBlockTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCWaitForBlockTemperatureCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCWaitForLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
@@ -136,7 +136,7 @@ export interface TCWaitForLidTemperatureCreateCommand
 export interface TCWaitForLidTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCWaitForLidTemperatureCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCOpenLidCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/openLid'
@@ -145,7 +145,7 @@ export interface TCOpenLidCreateCommand extends CommonCommandCreateInfo {
 export interface TCOpenLidRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCOpenLidCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCCloseLidCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/closeLid'
@@ -154,7 +154,7 @@ export interface TCCloseLidCreateCommand extends CommonCommandCreateInfo {
 export interface TCCloseLidRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCCloseLidCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCDeactivateBlockCreateCommand
   extends CommonCommandCreateInfo {
@@ -164,7 +164,7 @@ export interface TCDeactivateBlockCreateCommand
 export interface TCDeactivateBlockRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCDeactivateBlockCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCDeactivateLidCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/deactivateLid'
@@ -173,7 +173,7 @@ export interface TCDeactivateLidCreateCommand extends CommonCommandCreateInfo {
 export interface TCDeactivateLidRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCDeactivateLidCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCRunProfileCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/runProfile'
@@ -182,7 +182,7 @@ export interface TCRunProfileCreateCommand extends CommonCommandCreateInfo {
 export interface TCRunProfileRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCRunProfileCreateCommand {
-  result: any
+  result?: any
 }
 export interface TCAwaitProfileCompleteCreateCommand
   extends CommonCommandCreateInfo {
@@ -192,7 +192,7 @@ export interface TCAwaitProfileCompleteCreateCommand
 export interface TCAwaitProfileCompleteRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCAwaitProfileCompleteCreateCommand {
-  result: any
+  result?: any
 }
 export interface HeaterShakerSetTargetTemperatureCreateCommand
   extends CommonCommandCreateInfo {
@@ -202,7 +202,7 @@ export interface HeaterShakerSetTargetTemperatureCreateCommand
 export interface HeaterShakerSetTargetTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerSetTargetTemperatureCreateCommand {
-  result: any
+  result?: any
 }
 export interface HeaterShakerWaitForTemperatureCreateCommand
   extends CommonCommandCreateInfo {
@@ -212,7 +212,7 @@ export interface HeaterShakerWaitForTemperatureCreateCommand
 export interface HeaterShakerWaitForTemperatureRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerWaitForTemperatureCreateCommand {
-  result: any
+  result?: any
 }
 export interface HeaterShakerSetAndWaitForShakeSpeedCreateCommand
   extends CommonCommandCreateInfo {
@@ -222,7 +222,7 @@ export interface HeaterShakerSetAndWaitForShakeSpeedCreateCommand
 export interface HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerSetAndWaitForShakeSpeedCreateCommand {
-  result: any
+  result?: any
 }
 export interface HeaterShakerDeactivateHeaterCreateCommand
   extends CommonCommandCreateInfo {
@@ -232,7 +232,7 @@ export interface HeaterShakerDeactivateHeaterCreateCommand
 export interface HeaterShakerDeactivateHeaterRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerDeactivateHeaterCreateCommand {
-  result: any
+  result?: any
 }
 export interface HeaterShakerOpenLatchCreateCommand
   extends CommonCommandCreateInfo {
@@ -242,7 +242,7 @@ export interface HeaterShakerOpenLatchCreateCommand
 export interface HeaterShakerOpenLatchRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerOpenLatchCreateCommand {
-  result: any
+  result?: any
 }
 export interface HeaterShakerCloseLatchCreateCommand
   extends CommonCommandCreateInfo {
@@ -252,7 +252,7 @@ export interface HeaterShakerCloseLatchCreateCommand
 export interface HeaterShakerCloseLatchRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerCloseLatchCreateCommand {
-  result: any
+  result?: any
 }
 export interface HeaterShakerDeactivateShakerCreateCommand
   extends CommonCommandCreateInfo {
@@ -262,7 +262,7 @@ export interface HeaterShakerDeactivateShakerCreateCommand
 export interface HeaterShakerDeactivateShakerRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerDeactivateShakerCreateCommand {
-  result: any
+  result?: any
 }
 
 export interface EngageMagnetParams {
