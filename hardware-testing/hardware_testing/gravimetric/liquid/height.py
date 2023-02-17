@@ -5,7 +5,7 @@ import math
 from typing import List, Optional, Tuple
 
 from opentrons.protocol_api.labware import Well
-from opentrons.protocol_api import InstrumentContext, ProtocolContext
+from opentrons.protocol_api import InstrumentContext
 
 from hardware_testing.gravimetric.helpers import (
     well_is_reservoir,
@@ -206,28 +206,12 @@ class LiquidTracker:
         """Liquid Tracker."""
         self._items: dict = dict({})
 
-    def initialize_from_deck(self, protocol: ProtocolContext) -> None:
-        """Initialize from deck."""
-        # NOTE: For Corning 3631, assuming a perfect cylinder creates
-        #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
-        #       This means the software will think the liquid is
-        #       0.78mm lower than it is in reality. To make it more
-        #       accurate, give .init_liquid_height() a lookup table
-        self.reset()
-        for lw in protocol.loaded_labwares.values():
-            if lw.is_tiprack or "trash" in lw.name.lower():
-                continue
-            for w in lw.wells():
-                self.init_well_liquid_height(w)
-
     def reset(self) -> None:
         """Reset."""
         for key in list(self._items.keys()):
             del self._items[key]
 
-    def print_setup_instructions(
-        self, ctx: ProtocolContext, user_confirm: bool = False
-    ) -> None:
+    def get_setup_instructions_string(self) -> str:
         """Print setup instructions."""
         found = [
             (well, tracker)
@@ -235,17 +219,13 @@ class LiquidTracker:
             if tracker.get_volume() > 0
         ]
         if not len(found):
-            return
-        ctx.comment("Add the following volumes (uL) to the specified wells:")
+            return ""
+        ret_str = ["Add the following volumes (uL) to the specified wells:"]
         for well, tracker in found:
-            ctx.comment(
+            ret_str.append(
                 f"\t{tracker.name}   -> {int(tracker.get_volume())} uL -> {well.display_name}"
             )
-        if user_confirm:
-            if ctx.is_simulating():
-                ctx.comment("press ENTER when ready...")
-            else:
-                ctx.pause("press ENTER when ready...")
+        return "\n".join(ret_str)
 
     def init_well_liquid_height(
         self, well: Well, lookup_table: Optional[list] = None

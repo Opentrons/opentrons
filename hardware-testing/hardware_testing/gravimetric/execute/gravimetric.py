@@ -2,10 +2,10 @@
 from dataclasses import dataclass
 from statistics import stdev
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 from typing_extensions import Final
 
-from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api import ProtocolContext, Well
 
 from hardware_testing.gravimetric import liquid
 from hardware_testing.data import create_run_id_and_start_time
@@ -15,8 +15,6 @@ from hardware_testing.gravimetric.labware.position import (
 )
 from hardware_testing.gravimetric.labware.layout import (
     load_radwag_vial_definition,
-    LayoutLabware,
-    DEFAULT_SLOTS_GRAV,
 )
 from hardware_testing.gravimetric.liquid.height import LiquidTracker
 from hardware_testing.gravimetric.measure.weight import (
@@ -28,7 +26,6 @@ from hardware_testing.gravimetric.pipette.liquid_class import PipetteLiquidClass
 from hardware_testing.gravimetric.pipette.timestamp import SampleTimestamps
 
 
-LIQUID_CLASS_LOOKUP: Final = {300: liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE}
 SCALE_SECONDS_TO_SETTLE: Final = 15
 GRAV_STABLE_DURATION: Final = 10
 GRAV_STABLE_TIMEOUT: Final = GRAV_STABLE_DURATION + 5
@@ -40,49 +37,58 @@ class ExecuteGravConfig:
     """Execute Gravimetric Setup Config."""
 
     name: str
+    vial_slot: int
+    tiprack_slot: int
     labware_dir: Path
     pipette_volume: int
     pipette_mount: str
     tip_volume: int
 
 
-@dataclass
-class ExecuteGravItems:
-    """Execute Gravimetric Items."""
+def _initialize_liquid_from_deck(ctx: ProtocolContext, lt: LiquidTracker) -> None:
+    # NOTE: For Corning 3631, assuming a perfect cylinder creates
+    #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
+    #       This means the software will think the liquid is
+    #       0.78mm lower than it is in reality. To make it more
+    #       accurate, give .init_liquid_height() a lookup table
+    lt.reset()
+    for lw in ctx.loaded_labwares.values():
+        if lw.is_tiprack or "trash" in lw.name.lower():
+            continue
+        for w in lw.wells():
+            lt.init_well_liquid_height(w)
 
-    liquid_pipette: PipetteLiquidClass
-    liquid_tracker: LiquidTracker
-    layout: LayoutLabware
-    recorder: GravimetricRecorder
 
-
-def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
+def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> Tuple[PipetteLiquidClass, LiquidTracker, GravimetricRecorder]:
     """Setup."""
     run_id, start_time = create_run_id_and_start_time()
-    # NOTE: labware must be fully initialized before the liquid tracker
+
+    # LOAD LABWARE
     tiprack = ctx.load_labware(
         f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
-        location=6,
+        location=cfg.tiprack_slot,
     )
     vial = ctx.load_labware_from_definition(
         load_radwag_vial_definition(directory=cfg.labware_dir),
-        location=2
+        location=cfg.vial_slot
     )
     overwrite_default_labware_positions([tiprack, vial])
-    # LIQUID-LEVEL TRACKING
+
+    # LIQUID TRACKING
     _liq_track = LiquidTracker()
-    _liq_track.initialize_from_deck(ctx)
-    # the vial is weird
-    # TODO: remove once we can use liquid-probe to find true vial liquid surface
+    _initialize_liquid_from_deck(ctx, _liq_track)
     _liq_track.set_start_volume_from_liquid_height(
         vial["A1"], vial["A1"].depth - VIAL_SAFE_Z_OFFSET, name="Water"
     )
-    # PIPETTE and LIQUID CLASS
+
+    # PIPETTE
     _pipette = ctx.load_instrument(
         f"p{cfg.pipette_volume}_single",
         cfg.pipette_mount,
         tip_racks=[tiprack]
     )
+
+    # LIQUID CLASS
     _liq_pip = PipetteLiquidClass(
         pipette=_pipette,
         test_name=cfg.name,
@@ -91,7 +97,8 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
         delay_method=ctx.delay
     )
     _liq_pip.set_liquid_class(liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE)
-    # SCALE RECORDER
+
+    # SCALE
     # Some Radwag settings cannot be controlled remotely.
     # Listed below are the things the must be done using the touchscreen:
     #   1) Set profile to USER
@@ -108,45 +115,52 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
         ),
         simulate=ctx.is_simulating
     )
-    return ExecuteGravItems(
-        liquid_pipette=_liq_pip,
-        liquid_tracker=_liq_track,
-        layout=_layout,
-        recorder=_recorder,
-    )
+
+    # USER SETUP LIQUIDS
+    setup_str = _liq_track.get_setup_instructions_string()
+    ctx.comment(setup_str)
+    if ctx.is_simulating():
+        ctx.comment("press ENTER when ready...")
+    else:
+        ctx.pause("press ENTER when ready...")
+
+    # DONE
+    return _liq_pip, _liq_track, _recorder
 
 
 def run(
     ctx: ProtocolContext,
-    items: ExecuteGravItems,
+    liquid_pipette: PipetteLiquidClass,
+    liquid_tracker: LiquidTracker,
+    recorder: GravimetricRecorder,
+    grav_well: Well,
     volumes: List[float],
     samples: int,
 ) -> None:
     """Run."""
     try:
-        items.recorder.record(in_thread=True)
-        items.liquid_pipette.record_timestamp_enable()
+        recorder.record(in_thread=True)
+        liquid_pipette.record_timestamp_enable()
         sample_volumes = [v for v in volumes for _ in range(samples)]
-        if items.liquid_pipette.pipette.has_tip:
-            items.liquid_pipette.pipette.drop_tip()
-        grav_well = items.layout.vial["A1"]  # type: ignore[index]
+        if liquid_pipette.pipette.has_tip:
+            liquid_pipette.pipette.drop_tip()
         for i, sample_volume in enumerate(sample_volumes):
             ctx.comment(f"{i + 1}/{len(sample_volumes)}: {sample_volume} uL")
-            items.liquid_pipette.create_empty_timestamp(tag=str(sample_volume))
-            items.liquid_pipette.pipette.pick_up_tip()
-            items.liquid_pipette.aspirate(
-                sample_volume, grav_well, liquid_level=items.liquid_tracker
+            liquid_pipette.create_empty_timestamp(tag=str(sample_volume))
+            liquid_pipette.pipette.pick_up_tip()
+            liquid_pipette.aspirate(
+                sample_volume, grav_well, liquid_level=liquid_tracker
             )
             ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
-            items.liquid_pipette.dispense(
-                sample_volume, grav_well, liquid_level=items.liquid_tracker
+            liquid_pipette.dispense(
+                sample_volume, grav_well, liquid_level=liquid_tracker
             )
-            items.liquid_pipette.pipette.drop_tip()
-            items.liquid_pipette.save_latest_timestamp()
+            liquid_pipette.pipette.drop_tip()
+            liquid_pipette.save_latest_timestamp()
         ctx.comment("One final pause to wait for final reading to settle")
         ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
     finally:
-        items.recorder.stop()
+        recorder.stop()
 
 
 @dataclass
@@ -259,12 +273,12 @@ def _analyze_recording_and_timestamps(
         ctx.comment(f"\t\t{i + 1})\t{round(v * 1000.0, 2)} mg")
 
 
-def analyze(ctx: ProtocolContext, items: ExecuteGravItems) -> None:
+def analyze(ctx: ProtocolContext, liquid_pipette: PipetteLiquidClass, recorder: GravimetricRecorder) -> None:
     """Analyze."""
     # FIXME: this totally breaks when simulating
     if ctx.is_simulating():
         ctx.comment("FIXME: skipping analysis during simulation")
         return
     _analyze_recording_and_timestamps(
-        ctx, items.recorder.recording, items.liquid_pipette.get_timestamps()
+        ctx, recorder.recording, liquid_pipette.get_timestamps()
     )

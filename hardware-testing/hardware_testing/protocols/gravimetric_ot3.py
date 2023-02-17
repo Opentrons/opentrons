@@ -1,45 +1,56 @@
 """OT3 P1000 Single Channel Gravimetric Test."""
 import argparse
+from pathlib import Path
 
-from opentrons.protocol_api import ProtocolContext
-from opentrons.config import infer_config_base_dir
+from opentrons.protocol_api import ProtocolContext, InstrumentContext
+from opentrons.config import infer_config_base_dir, IS_ROBOT
+from opentrons.protocol_api.labware import Well
 
+from hardware_testing.gravimetric.liquid.height import LiquidTracker
 from hardware_testing.gravimetric.execute import gravimetric
 from hardware_testing.gravimetric import helpers
 
 
-metadata = {"apiLevel": "2.12", "protocolName": "ot3-p1000-single-channel-gravimetric"}
+metadata = {"apiLevel": "2.13", "protocolName": "ot3-p1000-single-channel-gravimetric"}
+
+PIPETTE_VOLUME = 50
+TIP_VOLUME = 50
 
 TEST_VIAL_LIQUID = False
 
 
 def _move_to_vial_liquid_surface(
-    ctx: ProtocolContext, items: gravimetric.ExecuteGravItems
+   ctx: ProtocolContext, liquid_tracker: LiquidTracker, well: Well, pipette: InstrumentContext,
 ) -> None:
-    vial_well = items.layout.vial["A1"]  # type: ignore[index]
-    expected_height = items.liquid_tracker.get_liquid_height(vial_well)
-    items.liquid_pipette.pipette.pick_up_tip()
-    items.liquid_pipette.pipette.move_to(vial_well.bottom(expected_height))
+    expected_height = liquid_tracker.get_liquid_height(well)
+    pipette.pick_up_tip()
+    pipette.move_to(well.bottom(expected_height))
     ctx.pause("Check that tip is touching liquid surface (+/-) 0.1 mm")
-    items.liquid_pipette.pipette.drop_tip()
+    pipette.drop_tip()
 
 
 def _run(protocol: ProtocolContext) -> None:
-    items = gravimetric.setup(
+    if IS_ROBOT:
+        labware_dir = infer_config_base_dir() / "testing_data" / "labware-definitions"
+    else:
+        labware_dir = Path(__file__).parent.parent.parent / "labware-definitions"
+    p, l, r = gravimetric.setup(
         protocol,
         gravimetric.ExecuteGravConfig(
             name=metadata["protocolName"],
-            pipette_volume=50,
+            vial_slot=2,
+            tiprack_slot=6,
+            pipette_volume=PIPETTE_VOLUME,
             pipette_mount="left",
-            tip_volume=50,
-            labware_dir=infer_config_base_dir() / "testing_data" / "labware-definitions",
+            tip_volume=TIP_VOLUME,
+            labware_dir=labware_dir,
         ),
     )
-    items.liquid_tracker.print_setup_instructions(protocol, user_confirm=True)
+    vial_well = protocol.loaded_labwares[2]["A1"]
     if TEST_VIAL_LIQUID:
-        _move_to_vial_liquid_surface(protocol, items)
-    gravimetric.run(protocol, items, volumes=[45.0], samples=12)
-    gravimetric.analyze(protocol, items)
+        _move_to_vial_liquid_surface(protocol, l, vial_well, p.pipette)
+    gravimetric.run(protocol, p, l, r, vial_well, volumes=[45.0], samples=12)
+    gravimetric.analyze(protocol, p, r)
 
 
 if __name__ == "__main__":
@@ -57,7 +68,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     TEST_VIAL_LIQUID = args.test_vial_liquid
     _ctx = helpers.get_api_context(
-        metadata["apiLevel"], is_simulating=args.simulate, machine="ot3"
+        metadata["apiLevel"],
+        is_simulating=args.simulate,
+        pipette_left="p50_single_v3.3"
     )
     _ctx.home()
     _run(_ctx)

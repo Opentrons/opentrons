@@ -1,15 +1,19 @@
 """Opentrons helper methods."""
 from types import MethodType
-from typing import Any, List, Dict, cast, Optional
+from typing import Any, List, Dict, Optional
 
-from opentrons import protocol_api, execute, simulate
+from opentrons import protocol_api
 from opentrons.protocol_api.labware import Well
-from opentrons.hardware_control.thread_manager import ThreadManagerException
-from opentrons.hardware_control.types import MachineType
-
-from .workarounds import is_running_in_app, store_robot_acceleration
-from opentrons.types import Point
+from opentrons.protocols.types import APIVersion
+from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.ot3api import OT3API
+
+from opentrons.types import Point
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+from hardware_testing.opentrons_api import helpers_ot3
 
 
 def _add_fake_simulate(
@@ -39,33 +43,25 @@ def _add_fake_comment_pause(
 def get_api_context(
     api_level: str,
     is_simulating: bool = False,
-    connect_to_hardware: bool = True,
-    machine: Optional[str] = None,
+    pipette_left: Optional[str] = None,
+    pipette_right: Optional[str] = None,
+    gripper: Optional[str] = None,
+    extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
 ) -> protocol_api.ProtocolContext:
-    """Create an Opentrons API ProtocolContext instance."""
-    checked_machine = cast(MachineType, machine if machine else "ot3")
-    able_to_execute = False
-    ctx = None
-    if not is_simulating and connect_to_hardware:
-        try:
-            ctx = execute.get_protocol_api(api_level, machine=checked_machine)
-            able_to_execute = True
-        except ThreadManagerException:
-            # Unable to build non-simulated Protocol Context
-            # Probably be running on a non-Linux machine
-            # Creating simulated Protocol Context, with .is_simulated() overridden
-            pass
-    if not able_to_execute or is_simulating or not connect_to_hardware:
-        ctx = simulate.get_protocol_api(api_level, machine=checked_machine)
-    assert ctx
-    if not able_to_execute or not connect_to_hardware:
-        _add_fake_simulate(ctx, is_simulating)
-    if not is_running_in_app():
-        _add_fake_comment_pause(ctx)
-    if checked_machine == "ot2":
-        # NOTE: goshdarnit, all OT2s should have slower acceleration
-        store_robot_acceleration()
-    return ctx
+
+    async def _build_hw_api(*args: Any, **kwargs: Any) -> OT3API:
+        return await helpers_ot3.build_async_ot3_hardware_api(
+            is_simulating=is_simulating,
+            pipette_left=pipette_left,
+            pipette_right=pipette_right,
+            gripper=gripper
+        )
+
+    return protocol_api.create_protocol_context(
+        api_version=APIVersion.from_string(api_level),
+        hardware_api=ThreadManager(_build_hw_api),  # type: ignore[arg-type]
+        extra_labware=extra_labware,
+    )
 
 
 def well_is_reservoir(well: protocol_api.labware.Well) -> bool:

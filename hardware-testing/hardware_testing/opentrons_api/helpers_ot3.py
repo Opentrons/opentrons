@@ -72,30 +72,14 @@ def stop_on_device_display_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-app"])
 
 
-def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[str]:
-    if model is None:
-        return None
-    items = model.split("_")
-    assert len(items) == 3
-    size = "P1K" if items[0] == "p1000" else "P50"
-    channels = "S" if items[1] == "single" else "M"
-    version = items[2].upper().replace(".", "")
-    date = datetime.now().strftime("%y%m%d")
-    unique_number = 1 if mount == OT3Mount.LEFT else 2
-    return f"{size}{channels}{version}{date}A0{unique_number}"
-
-
 def _create_attached_instruments_dict(
     pipette_left: Optional[str] = None,
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
 ) -> Dict[OT3Mount, Dict[str, Optional[str]]]:
-    fake_id_left = _create_fake_pipette_id(OT3Mount.LEFT, pipette_left)
-    fake_id_right = _create_fake_pipette_id(OT3Mount.RIGHT, pipette_right)
-    fake_id_gripper = "GRPV1020221101A02" if gripper else None
-    sim_pip_left = {"model": pipette_left, "id": fake_id_left}
-    sim_pip_right = {"model": pipette_right, "id": fake_id_right}
-    sim_gripper = {"model": gripper, "id": fake_id_gripper}
+    sim_pip_left = {"model": pipette_left, "id": None}
+    sim_pip_right = {"model": pipette_right, "id": None}
+    sim_gripper = {"model": gripper, "id": None}
     return {
         OT3Mount.LEFT: sim_pip_left,
         OT3Mount.RIGHT: sim_pip_right,
