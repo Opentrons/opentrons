@@ -106,14 +106,16 @@ async def test_do_not_lift_plate_if_not_in_tc_gen2(
         labware_location=ModuleLocation(moduleId="thermocycler-id")
     )
     decoy.verify(
-        await movement.home(axes=matchers.Anything()), times=0,
+        await movement.home(axes=matchers.Anything()),
+        times=0,
     )
 
     await subject.lift_plate_for_labware_movement(
         labware_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
     )
     decoy.verify(
-        await movement.home(axes=matchers.Anything()), times=0,
+        await movement.home(axes=matchers.Anything()),
+        times=0,
     )
 
 

@@ -41,15 +41,18 @@ class ThermocyclerPlateLifter:
                 self._state_store.modules.get_model(module_id)
                 == ModuleModel.THERMOCYCLER_MODULE_V2
             ):
+                # We already verify that TC lid is open before moving labware. So,
+                # only assert that that is still true.
+                assert self._state_store.modules.get_thermocycler_module_substate(
+                    module_id
+                ).is_lid_open, (
+                    "Thermocycler lid needs to be open before performing a plate lift"
+                )
+
                 # TODO (spp, 2023-02-09): replace with a park/fast-home action
                 await self._movement.home(axes=None)
                 thermocycler_hardware = self._equipment.get_module_hardware_api(
                     ThermocyclerModuleId(labware_location.moduleId)
                 )
                 if thermocycler_hardware is not None:
-                    # We already verify that TC lid is open before moving labware. So,
-                    # only assert that that is still true.
-                    assert self._state_store.modules.get_thermocycler_module_substate(
-                        module_id
-                    ).is_lid_open, "Thermocycler lid needs to be open before performing a plate lift"
                     await thermocycler_hardware.lift_plate()
