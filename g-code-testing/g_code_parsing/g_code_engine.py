@@ -3,18 +3,20 @@ import asyncio
 from pathlib import Path
 import time
 from multiprocessing import Process
-from typing import AsyncGenerator, Generator, Callable, Iterator, Union
+from typing import AsyncGenerator, Callable, Iterator, Union
 from collections import namedtuple
 
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.types import ModuleType
+from opentrons.hardware_control.protocols import HardwareControlAPI
 from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_reader.protocol_reader import ProtocolReader
 from opentrons.protocol_reader.protocol_source import (
     JsonProtocolConfig,
+    ProtocolConfig,
     ProtocolSource,
     PythonProtocolConfig,
 )
@@ -121,7 +123,9 @@ class GCodeEngine:
         return Protocol(text=text, filename=file_path, filelike=file)
 
     @asynccontextmanager
-    async def run_protocol(self, path: str, version: Union[APIVersion,int]) -> AsyncGenerator:
+    async def run_protocol(
+        self, path: str, version: Union[APIVersion, int]
+    ) -> AsyncGenerator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
@@ -131,35 +135,52 @@ class GCodeEngine:
         """
         file_path = Path(get_configuration_dir(), path)
         robot_type = "OT-2 Standard"
-        # handle python and json protocols
-        config = PythonProtocolConfig(api_version=version)
-        if file_path.suffix == ".json":
-            config = JsonProtocolConfig(schema_version=version)
 
         with self._emulate() as hardware:
-            # use direct creation instead of
-            # ProtocolReader.read_and_save() to create
-            # since we override the config
-            protocol_source: ProtocolSource = ProtocolSource(
-                directory=file_path.parent,
-                main_file=file_path,
-                files=[],
-                metadata={},
-                robot_type=robot_type,
-                config=config,
-            )
+            if (isinstance(version, APIVersion) and version >= APIVersion(2, 14)) or (
+                isinstance(version, int)
+            ):
+                # use direct creation instead of
+                # ProtocolReader.read_and_save() to create
+                # since we override the config
+                config: ProtocolConfig
+                if isinstance(version, int):
+                    config = JsonProtocolConfig(schema_version=version)
+                elif isinstance(version, APIVersion):
+                    config = PythonProtocolConfig(api_version=version)
+                protocol_source: ProtocolSource = ProtocolSource(
+                    directory=file_path.parent,
+                    main_file=file_path,
+                    files=[],
+                    metadata={},
+                    robot_type=robot_type,
+                    config=config,
+                )
 
-            protocol_runner: ProtocolRunner = ProtocolRunner(
-                protocol_engine=await create_protocol_engine(
+                protocol_runner: ProtocolRunner = ProtocolRunner(
+                    protocol_engine=await create_protocol_engine(
+                        hardware_api=hardware,
+                        config=Config(robot_type=robot_type),
+                    ),
                     hardware_api=hardware,
-                    config=Config(robot_type=robot_type),
-                ),
-                hardware_api=hardware,
-            )
-
-            with GCodeWatcher(emulator_settings=self._config) as watcher:
-                await protocol_runner.run(protocol_source=protocol_source)
-            yield GCodeProgram.from_g_code_watcher(watcher)
+                )
+                with GCodeWatcher(emulator_settings=self._config) as watcher:
+                    await protocol_runner.run(protocol_source=protocol_source)
+                    yield GCodeProgram.from_g_code_watcher(watcher)
+            elif isinstance(version, APIVersion) and version < APIVersion(2, 14):
+                file_path = os.path.join(get_configuration_dir(), path)
+                with self._emulate() as hardware:
+                    protocol = self._get_protocol(file_path)
+                    context = create_protocol_context(
+                        api_version=version,
+                        hardware_api=hardware,
+                    )
+                    parsed_protocol = parse(protocol.text, protocol.filename)
+                    with GCodeWatcher(emulator_settings=self._config) as watcher:
+                        execute.run_protocol(parsed_protocol, context=context)
+                    yield GCodeProgram.from_g_code_watcher(watcher)
+            else:
+                raise ValueError(f"APIVersion is {version}")
 
     @contextmanager
     def run_http(self, executable: Callable):

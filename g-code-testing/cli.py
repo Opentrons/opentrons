@@ -35,7 +35,7 @@ class RunnableConfiguration:
     """All the information necessary to perform an operation against a configuration."""
 
     configuration: Union[ProtocolGCodeConfirmConfig, HTTPGCodeConfirmConfig]
-    version: Optional[Union[APIVersion,int]]
+    version: Optional[Union[APIVersion, int]]
 
     def __hash__(self) -> int:
         """Make it hashable."""
