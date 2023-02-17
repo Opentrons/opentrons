@@ -656,7 +656,7 @@
     },
     "DropTipWellOrigin": {
       "title": "DropTipWellOrigin",
-      "description": "The origin of a TipRackWellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    DEFAULT: the default drop-tip location of the well,\n        based on pipette configuration and length of the tip.",
+      "description": "The origin of a DropTipWellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    DEFAULT: the default drop-tip location of the well,\n        based on pipette configuration and length of the tip.",
       "enum": ["top", "bottom", "center", "default"],
       "type": "string"
     },

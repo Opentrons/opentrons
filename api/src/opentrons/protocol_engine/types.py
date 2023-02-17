@@ -90,7 +90,7 @@ class WellOrigin(str, Enum):
 
 
 class DropTipWellOrigin(str, Enum):
-    """The origin of a TipRackWellLocation offset.
+    """The origin of a DropTipWellLocation offset.
 
     Props:
         TOP: the top-center of the well
