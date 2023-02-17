@@ -224,10 +224,16 @@ class LocationTypeError(TypeError):
 def validate_location(
     location: Union[Location, Well, None], last_location: Optional[Location]
 ) -> Union[WellTarget, PointTarget]:
-    """Validate and return if should use a WellTarget or a PointTarget.
+    """Validate a given location for a liquid handling command.
+    
     Args:
         location: The input location.
-        last_location: The cached last location.
+        last_location: The last location accessed by the pipette.
+    
+    Returns:
+        A `WellTarget` if the input location represents a well.
+        A `PointTarget` if the input location is an x, y, z coordinate.
+    
     Raises:
         NoLocationError: The is no input location and no cached loaction.
         LocationTypeError: The location supplied is of unexpected type.
