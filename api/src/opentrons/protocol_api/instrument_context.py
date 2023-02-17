@@ -1508,6 +1508,11 @@ class InstrumentContext(publisher.CommandPublisher):
         return self._well_bottom_clearances
 
     def _get_last_location_by_api_version(self) -> Optional[types.Location]:
+        """Get the last location accessed by this pipette, if any.
+        
+        In pre-engine Protocol API versions, this call omits the pipette mount.
+        This is to preserve pre-existing, potentially buggy behavior.
+        """
         if self._api_version >= ENGINE_CORE_API_VERSION:
             return self._protocol_core.get_last_location(mount=self._core.get_mount())
         else:
