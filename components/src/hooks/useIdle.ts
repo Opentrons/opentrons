@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 
 const USER_EVENTS: Array<keyof DocumentEventMap> = [
-  // 'click',
+  'click',
   // 'dblclick',
   // 'keypress',
   // 'mousemove',
@@ -14,7 +14,7 @@ const USER_EVENTS: Array<keyof DocumentEventMap> = [
   // 'scroll',
   // 'touchmove',
   // 'touchstart',
-  // 'touchend',
+  'touchend',
   'mousedown',
 ]
 
