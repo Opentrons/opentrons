@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
@@ -12,6 +12,7 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     PipetteSubType,
     UpdateState,
+    UpdateStatus,
 )
 import numpy as np
 
@@ -21,7 +22,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorId,
     PipetteTipActionType,
 )
-from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -358,3 +359,34 @@ _update_state_lookup = {
 
 def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
     return _update_state_lookup[state]
+
+
+class UpdateProgress:
+    """Class to keep track of Update progress."""
+
+    def __init__(self, nodes: Set[NodeId]):
+        self._tracker: Dict[OT3SubSystem, UpdateStatus] = {}
+        self._total_progress = 0
+        for node in nodes:
+            subsystem = node_id_to_subsystem(node)
+            self._tracker[subsystem] = UpdateStatus(subsystem, UpdateState.queued, 0)
+
+    def get_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Gets the update status and total progress"""
+        return set(self._tracker.values()), self._total_progress
+
+    def update(
+        self, node_id: NodeId, status_element: StatusElement
+    ) -> Tuple[Set[UpdateStatus], int]:
+        """Update internal states/progress of firmware updates."""
+        fw_update_status, progress = status_element
+        subsystem = node_id_to_subsystem(node_id)
+        state = fw_update_state_from_status(fw_update_status)
+        progress = int(progress * 100)
+        self._tracker[subsystem] = UpdateStatus(subsystem, state, progress)
+        # calculate the total progress of all updates
+        progress_sum = 0
+        for update_status in self._tracker.values():
+            progress_sum += update_status.progress
+        self._total_progress = int(progress_sum / len(self._tracker))
+        return set(self._tracker.values()), self._total_progress

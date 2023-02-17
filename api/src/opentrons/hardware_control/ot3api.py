@@ -5,6 +5,7 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
+    AsyncIterator,
     Tuple,
     cast,
     Callable,
@@ -420,7 +421,12 @@ class OT3API(
         """Get the progress of updates currently running."""
         return self._backend.get_update_progress()
 
-    async def do_firmware_updates(self) -> None:
+    async def start_firmware_updates(self) -> None:
+        """Helper to start firmware updates without needing to consume iterator."""
+        async for updates, progress in self.do_firmware_updates():
+            mod_log.debug(f"{updates} {progress}")
+
+    async def do_firmware_updates(self) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
         """Update all the firmware."""
         # get the attached instruments so we can get the type of pipettes attached
         pipettes: Dict[OT3Mount, PipetteSubType] = dict()
@@ -429,8 +435,8 @@ class OT3API(
             if self._pipette_handler.has_pipette(mount):
                 pipette = self._pipette_handler.get_pipette(mount)
                 pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
-        async for update_status, progress in self._backend.update_firmware(pipettes):
-            mod_log.debug(f"Firmware update progress {progress}%.")
+        async for updates, progress in self._backend.update_firmware(pipettes):
+            yield updates, progress
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""

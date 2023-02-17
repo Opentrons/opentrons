@@ -1,7 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar
+from typing import NamedTuple, cast, Tuple, Union, List, Callable, Dict, TypeVar
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -290,20 +290,10 @@ class UpdateState(enum.Enum):
         return self.name
 
 
-class UpdateStatus:
-    """Class to keep track of Update status."""
-
-    def __init__(self, subsystem: OT3SubSystem, state: UpdateState, progress: int):
-        self.subsystem = subsystem
-        self.state = state
-        self.progress = progress
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: {self.subsystem} state: {self.state} progress: {self.progress}>"
-
-    def update(self, state: UpdateState, progress: int) -> None:
-        self.state = state
-        self.progress = progress
+class UpdateStatus(NamedTuple):
+    subsystem: OT3SubSystem
+    state: UpdateState
+    progress: int
 
 
 _subsystem_lookup = {

@@ -1011,6 +1011,5 @@ async def test_update_firmware_progress(
         run_updates.assert_called_once()
 
         assert not controller.update_required
-        assert controller._update_status == {}
-        assert controller._update_progress == 0
+        assert controller._update_tracker is None
         probe.assert_called_once()
