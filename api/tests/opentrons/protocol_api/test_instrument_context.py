@@ -302,7 +302,7 @@ def test_aspirate_from_coordinates(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(PointTarget(location=input_location, in_place=False))
+    ).then_return(PointTarget(location=input_location, in_place=True))
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=42.0, location=input_location, rate=1.23)
@@ -311,7 +311,7 @@ def test_aspirate_from_coordinates(
         mock_instrument_core.aspirate(
             location=input_location,
             well_core=None,
-            in_place=False,
+            in_place=True,
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
