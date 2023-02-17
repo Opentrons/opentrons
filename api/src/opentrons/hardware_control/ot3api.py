@@ -52,7 +52,7 @@ from .instruments.ot3.instrument_calibration import (
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import get_system_constraints, axis_convert
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -1720,7 +1720,7 @@ class OT3API(
 
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
 
-        machine_pos = await self._backend.liquid_probe(
+        machine_pos_node_id = await self._backend.liquid_probe(
             mount,
             probe_settings.max_z_distance,
             probe_settings.mount_speed,
@@ -1728,12 +1728,12 @@ class OT3API(
             probe_settings.sensor_threshold_pascals,
             probe_settings.log_pressure,
         )
+        machine_pos = axis_convert(machine_pos_node_id, 0.0)
         position = deck_from_machine(
             machine_pos,
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
-
         z_distance_traveled = (
             position[mount_axis] - probe_settings.starting_mount_height
         )
