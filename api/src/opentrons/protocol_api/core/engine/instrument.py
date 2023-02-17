@@ -294,10 +294,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             increment: Customize the movement "distance" of the pipette to press harder.
             prep_after: Not used by this core, pipette preparation will always happen.
         """
-        if presses is not None or increment is not None:
-            raise NotImplementedError(
-                "InstrumentCore.pick_up_tip with custom presses or increment not implemented"
-            )
+        assert (
+            presses is None and increment is None
+        ), "Tip pick-up with custom presses or increment deprecated"
 
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
@@ -452,12 +451,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def has_tip(self) -> bool:
         return self.get_hardware_state()["has_tip"]
-
-    def is_ready_to_aspirate(self) -> bool:
-        raise NotImplementedError("InstrumentCore.is_ready_to_aspirate not implemented")
-
-    def prepare_for_aspirate(self) -> None:
-        raise NotImplementedError("InstrumentCore.prepare_for_aspirate not implemented")
 
     def get_return_height(self) -> float:
         raise NotImplementedError("InstrumentCore.get_return_height not implemented")

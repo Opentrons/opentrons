@@ -1243,7 +1243,7 @@ class InstrumentContext(publisher.CommandPublisher):
             # would get a TypeError if they tried to call it like delay(minutes=10).
             # Without changing the ultimate behavior that such a call fails the
             # protocol, we can provide a more descriptive message as a courtesy.
-            raise NotImplementedError(
+            raise APIVersionError(
                 "InstrumentContext.delay() is not supported in Python Protocol API v2."
                 " Use ProtocolContext.delay() instead."
             )
