@@ -167,7 +167,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
 ]
 
 // const SLEEP_SWITCH_MS = 100
-const ODD_EVENTS: Array<keyof DocumentEventMap> = [
+const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
   'mousedown',
   'click',
   'scroll',
@@ -177,7 +177,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const { sleepMs } = useSelector(getOnDeviceDisplaySettings)
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
   const options = {
-    events: ODD_EVENTS,
+    events: onDeviceDisplayEvents,
     initialState: false,
   }
   const isIdle = useIdle(sleepTime, options)
