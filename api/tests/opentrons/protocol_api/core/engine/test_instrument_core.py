@@ -15,6 +15,8 @@ from opentrons.protocol_engine import (
     WellLocation,
     WellOffset,
     WellOrigin,
+    DropTipWellLocation,
+    DropTipWellOrigin,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import FlowRates
@@ -240,6 +242,7 @@ def test_pick_up_tip(
     )
 
 
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_get_return_height(
     decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
 ) -> None:
@@ -270,8 +273,8 @@ def test_drop_tip_no_location(
             pipette_id="abc123",
             labware_id="labware-id",
             well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.DROP_TIP,
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.DEFAULT,
                 offset=WellOffset(x=0, y=0, z=0),
             ),
             home_after=True,
@@ -306,8 +309,8 @@ def test_drop_tip_with_location(
             pipette_id="abc123",
             labware_id="labware-id",
             well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             home_after=True,
         ),

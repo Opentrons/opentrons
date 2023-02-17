@@ -23,7 +23,7 @@ def test_drop_tip_params_defaults() -> None:
     )
 
     assert default_params.wellLocation == DropTipWellLocation(
-        origin=DropTipWellOrigin.DROP_TIP, offset=WellOffset(x=0, y=0, z=0)
+        origin=DropTipWellOrigin.DEFAULT, offset=WellOffset(x=0, y=0, z=0)
     )
 
 
@@ -39,7 +39,7 @@ def test_drop_tip_params_default_origin() -> None:
     )
 
     assert default_params.wellLocation == DropTipWellLocation(
-        origin=DropTipWellOrigin.DROP_TIP, offset=WellOffset(x=1, y=2, z=3)
+        origin=DropTipWellOrigin.DEFAULT, offset=WellOffset(x=1, y=2, z=3)
     )
 
 

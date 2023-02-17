@@ -13,6 +13,7 @@ from opentrons.types import Point, DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
     LabwareOffsetVector,
     DeckSlotLocation,
     ModuleLocation,
@@ -20,8 +21,9 @@ from opentrons.protocol_engine.types import (
     LoadedModule,
     WellLocation,
     WellOrigin,
+    DropTipWellLocation,
+    DropTipWellOrigin,
     WellOffset,
-    OFF_DECK_LOCATION,
     Dimensions,
     DeckType,
 )
@@ -746,47 +748,6 @@ def test_get_well_position_with_center_offset(
     )
 
 
-def test_get_well_position_rejects_drop_tip_origin(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    labware_view: LabwareView,
-    subject: GeometryView,
-) -> None:
-    """It should reject a WellOrigin.DROP_TIP.
-
-    A drop tip command should resolve to a WellOrigin.TOP before hitting this method.
-    """
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
-    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    with pytest.raises(errors.WellOriginNotAllowedError):
-        subject.get_well_position(
-            labware_id="labware-id",
-            well_name="B2",
-            well_location=WellLocation(origin=WellOrigin.DROP_TIP),
-        )
-
-
 def test_get_relative_well_location(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
@@ -947,8 +908,8 @@ def test_get_tip_drop_location(
     location = subject.get_tip_drop_location(
         pipette_config=pipette_config,
         labware_id="tip-rack-id",
-        well_location=WellLocation(
-            origin=WellOrigin.DROP_TIP,
+        well_location=DropTipWellLocation(
+            origin=DropTipWellOrigin.DEFAULT,
             offset=WellOffset(x=1, y=2, z=3),
         ),
     )
@@ -970,8 +931,8 @@ def test_get_tip_drop_location_with_trash(
 
     location = subject.get_tip_drop_location(
         labware_id="labware-id",
-        well_location=WellLocation(
-            origin=WellOrigin.DROP_TIP,
+        well_location=DropTipWellLocation(
+            origin=DropTipWellOrigin.DEFAULT,
             offset=WellOffset(x=1, y=2, z=3),
         ),
         pipette_config=pipette_config,
@@ -987,8 +948,8 @@ def test_get_tip_drop_explicit_location(subject: GeometryView) -> None:
     """It should pass the location through if origin is not WellOrigin.DROP_TIP."""
     pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 
-    input_location = WellLocation(
-        origin=WellOrigin.TOP,
+    input_location = DropTipWellLocation(
+        origin=DropTipWellOrigin.TOP,
         offset=WellOffset(x=1, y=2, z=3),
     )
 
@@ -998,7 +959,10 @@ def test_get_tip_drop_explicit_location(subject: GeometryView) -> None:
         pipette_config=pipette_config,
     )
 
-    assert result == input_location
+    assert result == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
 
 
 def test_get_ancestor_slot_name(

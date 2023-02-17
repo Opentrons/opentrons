@@ -115,7 +115,7 @@ stages:
               labwareId: tipRackId
               wellName: A1
               wellLocation:
-                origin: dropTip
+                origin: default
                 offset:
                   x: 0
                   y: 0

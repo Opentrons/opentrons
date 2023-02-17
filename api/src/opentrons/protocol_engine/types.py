@@ -82,14 +82,28 @@ class WellOrigin(str, Enum):
         TOP: the top-center of the well
         BOTTOM: the bottom-center of the well
         CENTER: the middle-center of the well
-        DROP_TIP: the default drop-tip location of a well.
-            Only valid for tip-racks.
     """
 
     TOP = "top"
     BOTTOM = "bottom"
     CENTER = "center"
-    DROP_TIP = "dropTip"
+
+
+class DropTipWellOrigin(str, Enum):
+    """The origin of a TipRackWellLocation offset.
+
+    Props:
+        TOP: the top-center of the well
+        BOTTOM: the bottom-center of the well
+        CENTER: the middle-center of the well
+        DEFAULT: the default drop-tip location of the well,
+            based on pipette configuration and length of the tip.
+    """
+
+    TOP = "top"
+    BOTTOM = "bottom"
+    CENTER = "center"
+    DEFAULT = "default"
 
 
 # This is deliberately a separate type from Vec3f to let components default to 0.
@@ -105,6 +119,17 @@ class WellLocation(BaseModel):
     """A relative location in reference to a well's location."""
 
     origin: WellOrigin = WellOrigin.TOP
+    offset: WellOffset = Field(default_factory=WellOffset)
+
+
+class DropTipWellLocation(BaseModel):
+    """Like WellLocation, but for dropping tips.
+
+    Unlike a typical WellLocation, the location for a drop tip
+    defaults to location based on the tip length rather than the well's top.
+    """
+
+    origin: DropTipWellOrigin = DropTipWellOrigin.DEFAULT
     offset: WellOffset = Field(default_factory=WellOffset)
 
 

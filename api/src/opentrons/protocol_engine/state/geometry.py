@@ -11,7 +11,9 @@ from ..types import (
     LoadedLabware,
     LoadedModule,
     WellLocation,
+    DropTipWellLocation,
     WellOrigin,
+    DropTipWellOrigin,
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
@@ -176,10 +178,7 @@ class GeometryView:
                 offset = offset.copy(update={"z": offset.z + well_depth})
             elif well_location.origin == WellOrigin.CENTER:
                 offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
-            elif well_location.origin == WellOrigin.DROP_TIP:
-                raise errors.WellOriginNotAllowedError(
-                    f"Well origin '{WellOrigin.DROP_TIP.value}' is only allowed with drop-tip commands"
-                )
+
         else:
             offset = WellOffset(x=0, y=0, z=well_depth)
 
@@ -303,11 +302,14 @@ class GeometryView:
         self,
         pipette_config: PipetteDict,
         labware_id: str,
-        well_location: WellLocation,
+        well_location: DropTipWellLocation,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
-        if well_location.origin != WellOrigin.DROP_TIP:
-            return well_location
+        if well_location.origin != DropTipWellOrigin.DEFAULT:
+            return WellLocation(
+                origin=WellOrigin(well_location.origin.value),
+                offset=well_location.offset,
+            )
 
         # return to top if labware is fixed trash
         if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):

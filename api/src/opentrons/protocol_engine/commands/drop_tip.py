@@ -5,11 +5,7 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from ..types import DropTipWellLocation
-from .pipetting_common import (
-    PipetteIdMixin,
-    WellLocationMixin,
-    DestinationPositionResult,
-)
+from .pipetting_common import PipetteIdMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -19,9 +15,11 @@ if TYPE_CHECKING:
 DropTipCommandType = Literal["dropTip"]
 
 
-class DropTipParams(PipetteIdMixin, WellLocationMixin):
+class DropTipParams(PipetteIdMixin):
     """Payload required to drop a tip in a specific well."""
 
+    labwareId: str = Field(..., description="Identifier of labware to use.")
+    wellName: str = Field(..., description="Name of well to use in labware.")
     wellLocation: DropTipWellLocation = Field(
         default_factory=DropTipWellLocation,
         description="Relative well location at which to drop the tip.",

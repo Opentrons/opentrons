@@ -282,7 +282,7 @@ stages:
               labwareId: fixedTrash
               wellName: A1
               wellLocation:
-                origin: dropTip
+                origin: default
                 offset:
                   x: 0
                   y: 0
@@ -552,7 +552,7 @@ stages:
               labwareId: fixedTrash
               wellName: A1
               wellLocation:
-                origin: dropTip
+                origin: default
                 offset:
                   x: 0
                   y: 0

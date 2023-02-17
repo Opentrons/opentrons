@@ -11,7 +11,14 @@ from opentrons.protocols.api_support.util import (
     FlowRates,
     find_value_for_api_version,
 )
-from opentrons.protocol_engine import DeckPoint, WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import (
+    DeckPoint,
+    DropTipWellLocation,
+    DropTipWellOrigin,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+)
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -286,15 +293,20 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         labware_id = well_core.labware_id
 
         if location is not None:
-            well_location = (
+            relative_well_location = (
                 self._engine_client.state.geometry.get_relative_well_location(
                     labware_id=labware_id,
                     well_name=well_name,
                     absolute_point=location.point,
                 )
             )
+
+            well_location = DropTipWellLocation(
+                origin=DropTipWellOrigin(relative_well_location.origin.value),
+                offset=relative_well_location.offset,
+            )
         else:
-            well_location = WellLocation(origin=WellOrigin.DROP_TIP)
+            well_location = DropTipWellLocation()
 
         self._engine_client.drop_tip(
             pipette_id=self._pipette_id,
