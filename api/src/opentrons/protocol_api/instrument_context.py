@@ -1506,7 +1506,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def _get_last_location_by_api_version(self) -> Optional[types.Location]:
         """Get the last location accessed by this pipette, if any.
-        
+
         In pre-engine Protocol API versions, this call omits the pipette mount.
         This is to preserve pre-existing, potentially buggy behavior.
         """

@@ -311,6 +311,22 @@ def test_validate_last_location(decoy: Decoy) -> None:
     assert result == expected_result
 
 
+def test_validate_location_matches_last_location(decoy: Decoy) -> None:
+    """Should return an in_place WellTarget."""
+    mock_well = decoy.mock(cls=Well)
+    input_last_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    input_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    expected_result = subject.WellTarget(
+        well=mock_well, location=input_last_location, in_place=True
+    )
+
+    result = subject.validate_location(
+        location=input_location, last_location=input_last_location
+    )
+
+    assert result == expected_result
+
+
 def test_validate_with_wrong_location_with_last_location() -> None:
     """Should raise a LocationTypeError."""
     with pytest.raises(subject.LocationTypeError):

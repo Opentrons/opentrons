@@ -409,7 +409,7 @@ def test_blow_out_to_location(
     mock_well = decoy.mock(cls=Well)
     input_location = Location(point=Point(2, 2, 2), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=None)
-    point_target = PointTarget(location=input_location, in_place=False)
+    point_target = PointTarget(location=input_location, in_place=True)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(

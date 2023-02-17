@@ -411,7 +411,7 @@ def test_blow_to_coordinates(
     mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
-    """It should blow out in place."""
+    """It should move to coordinate and blow out in place."""
     location = Location(point=Point(1, 2, 3), labware=None)
 
     subject.blow_out(location=location, well_core=None, in_place=False)
@@ -429,6 +429,28 @@ def test_blow_to_coordinates(
             flow_rate=6.7,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_blow_out_in_place(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """Should blow-out in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.blow_out(
+        location=location,
+        well_core=None,
+        in_place=True,
+    )
+
+    decoy.verify(
+        mock_engine_client.blow_out_in_place(
+            pipette_id="abc123",
+            flow_rate=6.7,
+        ),
     )
 
 
