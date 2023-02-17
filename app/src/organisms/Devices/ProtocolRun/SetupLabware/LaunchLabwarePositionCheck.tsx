@@ -151,12 +151,6 @@ export function LaunchLabwarePositionCheck(
           labware={protocolData?.labware ?? []}
           modules={protocolData?.modules ?? []}
           onCloseClick={() => setShowCurrentOffsetsModal(false)}
-          handleRelaunchLPC={() => {
-            setShowCurrentOffsetsModal(false)
-            setShowLabwarePositionCheckModal(true)
-          }}
-          runId={runId}
-          robotName={robotName}
         />
       )}
     </Flex>

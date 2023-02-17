@@ -47,7 +47,6 @@ export function ApplyHistoricOffsets(
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
-  console.table({labware, modules, commands})
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"

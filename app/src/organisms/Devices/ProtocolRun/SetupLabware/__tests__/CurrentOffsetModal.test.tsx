@@ -84,10 +84,9 @@ describe('CurrentOffsetsModal', () => {
     props = {
       currentOffsets: mockCurrentOffsets,
       commands: protocolWithTC.commands,
+      labware: protocolWithTC.labware,
+      modules: protocolWithTC.modules,
       onCloseClick: jest.fn(),
-      runId: RUN_ID_1,
-      handleRelaunchLPC: jest.fn(),
-      robotName: 'otie',
     }
     mockUseLPCDisabledReason.mockReturnValue(null)
     mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
@@ -107,16 +106,12 @@ describe('CurrentOffsetsModal', () => {
       },
     ])
   })
-  it('renders the correct text and buttons CTA work', () => {
+  it('renders the correct text', () => {
     const { getByText } = render(props)
     getByText('Applied Labware Offset data')
     getByText('location')
     getByText('labware')
     getByText('labware offset data')
-    getByText('cancel').click()
-    expect(props.onCloseClick).toHaveBeenCalled()
-    getByText('run labware position check').click()
-    expect(props.handleRelaunchLPC).toHaveBeenCalled()
   })
 
   it('renders 1 offset with the correct information', () => {
@@ -131,10 +126,5 @@ describe('CurrentOffsetsModal', () => {
     expect(getByText('Table View')).toBeTruthy()
     expect(getByText('Jupyter Notebook')).toBeTruthy()
     expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
-  })
-  it('renders the LPC button as disabled when there is a disabled reason', () => {
-    mockUseLPCDisabledReason.mockReturnValue('mockDisabledReason')
-    const { getByText } = render(props)
-    expect(getByText('run labware position check')).toBeDisabled()
   })
 })

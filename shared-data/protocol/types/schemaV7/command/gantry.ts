@@ -8,7 +8,7 @@ export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
 export interface MoveToSlotRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveToSlotCreateCommand {
-  result: {}
+  result?: {}
 }
 export interface MoveToWellCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToWell'
@@ -17,7 +17,7 @@ export interface MoveToWellCreateCommand extends CommonCommandCreateInfo {
 export interface MoveToWellRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveToWellCreateCommand {
-  result: {}
+  result?: {}
 }
 export interface MoveToCoordinatesCreateCommand
   extends CommonCommandCreateInfo {
@@ -27,7 +27,7 @@ export interface MoveToCoordinatesCreateCommand
 export interface MoveToCoordinatesRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveToCoordinatesCreateCommand {
-  result: {}
+  result?: {}
 }
 export interface MoveRelativeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveRelative'
@@ -36,7 +36,7 @@ export interface MoveRelativeCreateCommand extends CommonCommandCreateInfo {
 export interface MoveRelativeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveRelativeCreateCommand {
-  result: {
+  result?: {
     position: Coordinates
   }
 }
@@ -47,7 +47,7 @@ export interface SavePositionCreateCommand extends CommonCommandCreateInfo {
 export interface SavePositionRunTimeCommand
   extends CommonCommandRunTimeInfo,
     SavePositionCreateCommand {
-  result: {
+  result?: {
     positionId: string
     position: Coordinates
   }
@@ -59,7 +59,7 @@ export interface HomeCreateCommand extends CommonCommandCreateInfo {
 export interface HomeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HomeCreateCommand {
-  result: {}
+  result?: {}
 }
 export type GantryRunTimeCommand =
   | MoveToSlotRunTimeCommand

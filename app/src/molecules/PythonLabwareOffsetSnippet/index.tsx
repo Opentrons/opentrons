@@ -10,7 +10,7 @@ import type {
 } from '@opentrons/shared-data'
 
 const JsonTextArea = styled.textarea`
-  min-height: 12vh;
+  min-height: 28vh;
   width: 100%;
   background-color: #f8f8f8;
   border: ${BORDERS.lineBorder};
@@ -34,7 +34,6 @@ export function PythonLabwareOffsetSnippet(
 ): JSX.Element | null {
   const { commands, labware, modules, labwareOffsets, mode } = props
   const [snippet, setSnippet] = React.useState<string | null>(null)
-console.table(props)
   React.useEffect(() => {
     if (labware.length > 0 && labwareOffsets != null) {
       setSnippet(createSnippet(mode, commands, labware, modules, labwareOffsets))

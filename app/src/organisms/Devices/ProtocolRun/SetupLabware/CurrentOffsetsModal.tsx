@@ -67,10 +67,7 @@ interface CurrentOffsetsModalProps {
   commands: RunTimeCommand[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
-  runId: string
-  robotName: string
   onCloseClick: () => void
-  handleRelaunchLPC: () => void
 }
 export function CurrentOffsetsModal(
   props: CurrentOffsetsModalProps
@@ -80,20 +77,13 @@ export function CurrentOffsetsModal(
     commands,
     labware,
     modules,
-    runId,
-    robotName,
     onCloseClick,
-    handleRelaunchLPC,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_LEFT,
-  })
-  const lpcDisabledReason = useLPCDisabledReason(robotName, runId)
   const latestCurrentOffsets = getLatestCurrentOffsets(currentOffsets)
 
   const TableComponent = (
@@ -169,33 +159,6 @@ export function CurrentOffsetsModal(
         ) : (
           TableComponent
         )}
-        <Flex
-          width="100%"
-          marginTop={SPACING.spacing6}
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing3}
-        >
-          <Link
-            css={TYPOGRAPHY.linkPSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={onCloseClick}
-            role="button"
-          >
-            {t('shared:cancel')}
-          </Link>
-          <PrimaryButton
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={handleRelaunchLPC}
-            disabled={lpcDisabledReason !== null}
-            {...targetProps}
-          >
-            {t('run_labware_position_check')}
-          </PrimaryButton>
-          {lpcDisabledReason !== null ? (
-            <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
-          ) : null}
-        </Flex>
       </Flex>
     </ModalShell>
   )

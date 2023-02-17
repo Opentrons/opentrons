@@ -84,6 +84,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -92,29 +93,44 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_core: The well to aspirate from, if applicable.
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to aspirate at.
+            in_place: whether this is a in-place command.
         """
         if well_core is None:
-            raise NotImplementedError(
-                "InstrumentCore.aspirate with well_core value of None not implemented"
+            if not in_place:
+                self._engine_client.move_to_coordinates(
+                    pipette_id=self._pipette_id,
+                    coordinates=DeckPoint(
+                        x=location.point.x, y=location.point.y, z=location.point.z
+                    ),
+                    minimum_z_height=None,
+                    force_direct=False,
+                    speed=None,
+                )
+
+            self._engine_client.aspirate_in_place(
+                pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
             )
 
-        well_name = well_core.get_name()
-        labware_id = well_core.labware_id
+        else:
+            well_name = well_core.get_name()
+            labware_id = well_core.labware_id
 
-        well_location = self._engine_client.state.geometry.get_relative_well_location(
-            labware_id=labware_id,
-            well_name=well_name,
-            absolute_point=location.point,
-        )
+            well_location = (
+                self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=location.point,
+                )
+            )
 
-        self._engine_client.aspirate(
-            pipette_id=self._pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            volume=volume,
-            flow_rate=flow_rate,
-        )
+            self._engine_client.aspirate(
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=well_location,
+                volume=volume,
+                flow_rate=flow_rate,
+            )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
@@ -125,6 +141,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -133,61 +150,93 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_core: The well to dispense to, if applicable.
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to dispense at.
+            in_place: whether this is a in-place command.
         """
         if well_core is None:
-            raise NotImplementedError(
-                "InstrumentCore.dispense with well_core value of None not implemented"
+            if not in_place:
+                self._engine_client.move_to_coordinates(
+                    pipette_id=self._pipette_id,
+                    coordinates=DeckPoint(
+                        x=location.point.x, y=location.point.y, z=location.point.z
+                    ),
+                    minimum_z_height=None,
+                    force_direct=False,
+                    speed=None,
+                )
+
+            self._engine_client.dispense_in_place(
+                pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
+            )
+        else:
+            well_name = well_core.get_name()
+            labware_id = well_core.labware_id
+
+            well_location = (
+                self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=location.point,
+                )
             )
 
-        well_name = well_core.get_name()
-        labware_id = well_core.labware_id
-
-        well_location = self._engine_client.state.geometry.get_relative_well_location(
-            labware_id=labware_id, well_name=well_name, absolute_point=location.point
-        )
-
-        self._engine_client.dispense(
-            pipette_id=self._pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            volume=volume,
-            flow_rate=flow_rate,
-        )
+            self._engine_client.dispense(
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=well_location,
+                volume=volume,
+                flow_rate=flow_rate,
+            )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def blow_out(
-        self, location: Location, well_core: Optional[WellCore], move_to_well: bool
+        self, location: Location, well_core: Optional[WellCore], in_place: bool
     ) -> None:
         """Blow liquid out of the tip.
 
         Args:
             location: The location to blow out into.
             well_core: The well to blow out into.
-            move_to_well: Unused by engine core.
+            in_place: whether this is a in-place command.
         """
+        flow_rate = self.get_blow_out_flow_rate(1.0)
         if well_core is None:
-            raise NotImplementedError("In-place blow-out is not implemented")
+            if not in_place:
+                self._engine_client.move_to_coordinates(
+                    pipette_id=self._pipette_id,
+                    coordinates=DeckPoint(
+                        x=location.point.x, y=location.point.y, z=location.point.z
+                    ),
+                    force_direct=False,
+                    minimum_z_height=None,
+                    speed=None,
+                )
 
-        well_name = well_core.get_name()
-        labware_id = well_core.labware_id
+            self._engine_client.blow_out_in_place(
+                pipette_id=self._pipette_id, flow_rate=flow_rate
+            )
+        else:
+            well_name = well_core.get_name()
+            labware_id = well_core.labware_id
 
-        well_location = self._engine_client.state.geometry.get_relative_well_location(
-            labware_id=labware_id,
-            well_name=well_name,
-            absolute_point=location.point,
-        )
+            well_location = (
+                self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=location.point,
+                )
+            )
 
-        self._engine_client.blow_out(
-            pipette_id=self._pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
-            #   this also needs to be refactored along with other flow rate related issues
-            flow_rate=self.get_blow_out_flow_rate(),
-        )
+            self._engine_client.blow_out(
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=well_location,
+                # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
+                #   this also needs to be refactored along with other flow rate related issues
+                flow_rate=flow_rate,
+            )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
@@ -245,10 +294,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             increment: Customize the movement "distance" of the pipette to press harder.
             prep_after: Not used by this core, pipette preparation will always happen.
         """
-        if presses is not None or increment is not None:
-            raise NotImplementedError(
-                "InstrumentCore.pick_up_tip with custom presses or increment not implemented"
-            )
+        assert (
+            presses is None and increment is None
+        ), "Tip pick-up with custom presses or increment deprecated"
 
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
@@ -403,12 +451,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def has_tip(self) -> bool:
         return self.get_hardware_state()["has_tip"]
-
-    def is_ready_to_aspirate(self) -> bool:
-        raise NotImplementedError("InstrumentCore.is_ready_to_aspirate not implemented")
-
-    def prepare_for_aspirate(self) -> None:
-        raise NotImplementedError("InstrumentCore.prepare_for_aspirate not implemented")
 
     def get_return_height(self) -> float:
         raise NotImplementedError("InstrumentCore.get_return_height not implemented")
