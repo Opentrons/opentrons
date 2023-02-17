@@ -19,20 +19,19 @@ class SerialUsbDriver:
     ) -> None:
         """Initialize a serial connection to a usb device that uses the binary messaging protocol."""
         self._port_name = self._find_serial_port(vid, pid)
-        if self._port_name == "":
+        if self._port_name is None:
             raise IOError("unable to find serial device")
 
         self._port = serial.Serial(self._port_name, baudrate, timeout=timeout)
 
-    def _find_serial_port(self, vid: int, pid: int) -> str:
+    def _find_serial_port(self, vid: int, pid: int) -> Optional[str]:
         ports = serial.tools.list_ports.comports()
 
         for check_port in ports:
-            if hasattr(serial.tools, "list_ports_common"):
-                if (check_port.vid, check_port.pid) == (vid, pid):
-                    return str(check_port.device)
-                continue
-        return ""
+            if (check_port.vid, check_port.pid) == (vid, pid):
+                return str(check_port.device)
+            continue
+        return None
 
     def write(self, message: BinaryMessageDefinition) -> int:
         """Send a binary message to the connected serial device."""
