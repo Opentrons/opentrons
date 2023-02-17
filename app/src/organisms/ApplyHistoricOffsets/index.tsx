@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import pick from 'lodash/pick'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -50,14 +51,14 @@ export function ApplyHistoricOffsets(
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={offsetCandidates}
+      labwareOffsets={offsetCandidates.map(o => pick(o, ['definitionUri', 'vector', 'location']))}
       {...{labware, modules, commands}}
     />
   )
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={offsetCandidates}
+      labwareOffsets={offsetCandidates.map(o => pick(o, ['definitionUri', 'vector', 'location']))}
       {...{labware, modules, commands}}
     />
   )

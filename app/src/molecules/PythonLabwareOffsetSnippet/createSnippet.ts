@@ -19,7 +19,7 @@ export function createSnippet(
   commands: RunTimeCommand[],
   labware: LoadedLabware[],
   modules: LoadedModule[],
-  labwareOffsets?: LabwareOffset[]
+  labwareOffsets?: Array<Omit<LabwareOffset, 'createdAt' | 'id'>>
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}
   let labwareCount = 0
@@ -29,7 +29,7 @@ export function createSnippet(
     if (command.commandType === 'loadLabware') {
       labwareCount = labwareCount + 1
       const loadedLabware = labware.find(
-        item => item.id === command.result.labwareId
+        item => item.id === command.result?.labwareId
       )
       if (loadedLabware == null) return acc
       const labwareDefinitions = getLoadedLabwareDefinitionsByUri(commands)
@@ -55,12 +55,12 @@ export function createSnippet(
         )}")`
       }
       const labwareDefUri = getLabwareDefinitionUri(
-        command.result.labwareId,
+        command.result?.labwareId ?? '',
         labware,
         labwareDefinitions
       )
       const offsetLocation = getLabwareOffsetLocation(
-        command.result.labwareId,
+        command.result?.labwareId ?? '',
         commands,
         modules
       )
@@ -84,6 +84,7 @@ export function createSnippet(
         ]
       }
     } else if (command.commandType === 'loadModule') {
+      if (command.result == null) return acc
       // load module on deck
       const moduleVariable = `module_${
         Object.keys(moduleVariableById).length + 1

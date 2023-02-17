@@ -127,9 +127,9 @@ const labwareOffsets = [
 ]
 
 const juptyerPrefix =
-  'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.12")\n\n'
+  'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.13")\n\n'
 const cliPrefix =
-  'from opentrons import protocol_api\n\nmetadata = {\n    "apiLevel": "2.12"\n}\n\ndef run(protocol: protocol_api.ProtocolContext):'
+  'from opentrons import protocol_api\n\nmetadata = {\n    "apiLevel": "2.13"\n}\n\ndef run(protocol: protocol_api.ProtocolContext):'
 
 describe('createSnippet', () => {
   it('should generate expected python snippet for jupyter rounding vector values to 2 fixed decimal values', () => {
@@ -142,7 +142,9 @@ describe('createSnippet', () => {
 
     const resultingSnippet = createSnippet(
       'jupyter',
-      protocolWithMagTempTC,
+      protocolWithMagTempTC.commands,
+      protocolWithMagTempTC.labware,
+      protocolWithMagTempTC.modules,
       labwareOffsets
     )
 
@@ -191,7 +193,9 @@ describe('createSnippet', () => {
       'labware_9 = protocol.load_labware("corning_24_wellplate_3.4ml_flat", location="6")\n    labware_9.set_offset(x=0.00, y=0.00, z=3.00)'
     const resultingSnippet = createSnippet(
       'cli',
-      protocolWithMagTempTC,
+      protocolWithMagTempTC.commands,
+      protocolWithMagTempTC.labware,
+      protocolWithMagTempTC.modules,
       labwareOffsets
     )
 

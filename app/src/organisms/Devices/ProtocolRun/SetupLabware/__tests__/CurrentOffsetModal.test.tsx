@@ -84,8 +84,19 @@ describe('CurrentOffsetsModal', () => {
     props = {
       currentOffsets: mockCurrentOffsets,
       commands: protocolWithTC.commands,
-      labware: protocolWithTC.labware,
-      modules: protocolWithTC.modules,
+      labware: Object.entries(protocolWithTC.labware).map(([id, labware]) => ({
+        id,
+        ...labware,
+        loadName: 'fakeLoadName',
+        definitionUri: labware.definitionId,
+        location: 'offDeck',
+      })),
+      modules: Object.entries(protocolWithTC.modules).map(([id, module]) => ({
+        id,
+        ...module,
+        location: { slotName: '1' },
+        serialNumber: 'fakeserial',
+      })),
       onCloseClick: jest.fn(),
     }
     mockUseLPCDisabledReason.mockReturnValue(null)

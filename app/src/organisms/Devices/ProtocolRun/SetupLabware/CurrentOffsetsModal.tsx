@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import pick from 'lodash/pick'
 
 import {
   getLabwareDisplayName,
@@ -15,21 +16,13 @@ import {
   TYPOGRAPHY,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_FLEX_END,
-  ALIGN_CENTER,
-  Link,
-  useHoverTooltip,
-  TOOLTIP_LEFT,
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
-import { PrimaryButton } from '../../../../atoms/buttons'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { useLPCDisabledReason } from '../../hooks'
 import { getLatestCurrentOffsets } from './utils'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -123,7 +116,7 @@ export function CurrentOffsetsModal(
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={latestCurrentOffsets}
+      labwareOffsets={latestCurrentOffsets.map(o => pick(o, ['definitionUri', 'location', 'vector']))}
       commands={commands ?? []}
       labware={labware ?? []}
       modules={modules ?? []}
@@ -132,7 +125,7 @@ export function CurrentOffsetsModal(
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={latestCurrentOffsets}
+      labwareOffsets={latestCurrentOffsets.map(o => pick(o, ['definitionUri', 'location', 'vector']))}
       commands={commands ?? []}
       labware={labware ?? []}
       modules={modules ?? []}
