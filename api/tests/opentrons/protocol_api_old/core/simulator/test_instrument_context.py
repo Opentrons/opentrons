@@ -276,7 +276,7 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
     i.blow_out(
         location=Location(point=Point(1, 2, 3), labware=None),
         well_core=labware.get_well_core("A1"),
-        in_place=False,
+        in_place=True,
     )
 
 
