@@ -71,7 +71,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
           const labwareInModule =
             moduleInSlot?.result?.moduleId != null &&
             moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
-              ? initialLoadedLabwareByModuleId[moduleInSlot.result?.moduleId]
+              ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
               : null
           let labwareId =
             labwareInSlot != null ? labwareInSlot.result?.labwareId : null

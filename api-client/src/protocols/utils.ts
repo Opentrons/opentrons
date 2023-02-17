@@ -2,14 +2,14 @@
 import reduce from 'lodash/reduce'
 
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
-import {
+import { getLabwareDefURI } from '@opentrons/shared-data'
+import type {
   ModuleModel,
   PipetteName,
   Liquid,
   LoadedPipette,
   LoadedLabware,
   LoadedModule,
-  getLabwareDefURI,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
