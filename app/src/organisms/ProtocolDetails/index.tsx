@@ -6,7 +6,7 @@ import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Box,
@@ -19,11 +19,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  DISPLAY_BLOCK,
   DISPLAY_FLEX,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SIZE_1,
   SIZE_5,
@@ -44,8 +42,12 @@ import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
+import { RoundTab } from '../../molecules/RoundTab'
 import { useTrackEvent } from '../../redux/analytics'
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import {
+  getIsProtocolAnalysisInProgress,
+  analyzeProtocol,
+} from '../../redux/protocol-storage'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
@@ -59,47 +61,7 @@ import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
-
-const defaultTabStyle = css`
-  ${TYPOGRAPHY.pSemiBold}
-  border-radius: ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0 0;
-  border-top: ${BORDERS.transparentLineBorder};
-  border-left: ${BORDERS.transparentLineBorder};
-  border-right: ${BORDERS.transparentLineBorder};
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
-  position: ${POSITION_RELATIVE};
-`
-
-const inactiveTabStyle = css`
-  color: ${COLORS.darkGreyEnabled};
-
-  &:hover {
-    color: ${COLORS.darkGreyEnabled};
-    background-color: ${COLORS.fundamentalsBackgroundShade};
-  }
-`
-
-const currentTabStyle = css`
-  ${TYPOGRAPHY.pSemiBold}
-  background-color: ${COLORS.white};
-  border-top: ${BORDERS.lineBorder};
-  border-left: ${BORDERS.lineBorder};
-  border-right: ${BORDERS.lineBorder};
-  color: ${COLORS.blueEnabled};
-
-  /* extend below the tab when active to flow into the content */
-  &:after {
-    position: ${POSITION_ABSOLUTE};
-    display: ${DISPLAY_BLOCK};
-    content: '';
-    background-color: ${COLORS.white};
-    top: 100;
-    left: 0;
-    height: ${SIZE_1};
-    width: 100%;
-  }
-`
+import type { State, Dispatch } from '../../redux/types'
 
 const GRID_STYLE = css`
   display: grid;
@@ -122,34 +84,6 @@ const ZOOM_ICON_STYLE = css`
     box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 `
-
-interface RoundTabProps extends React.ComponentProps<typeof Btn> {
-  isCurrent: boolean
-}
-function RoundTab({
-  isCurrent,
-  children,
-  ...restProps
-}: RoundTabProps): JSX.Element {
-  return (
-    <Btn
-      {...restProps}
-      css={
-        isCurrent
-          ? css`
-              ${defaultTabStyle}
-              ${currentTabStyle}
-            `
-          : css`
-              ${defaultTabStyle}
-              ${inactiveTabStyle}
-            `
-      }
-    >
-      {children}
-    </Btn>
-  )
-}
 
 interface Metadata {
   [key: string]: any
@@ -241,6 +175,7 @@ export function ProtocolDetails(
   props: ProtocolDetailsProps
 ): JSX.Element | null {
   const trackEvent = useTrackEvent()
+  const dispatch = useDispatch<Dispatch>()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
@@ -248,6 +183,13 @@ export function ProtocolDetails(
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
+
+  React.useEffect(() => {
+    if (mostRecentAnalysis != null && !('liquids' in mostRecentAnalysis)) {
+      dispatch(analyzeProtocol(protocolKey))
+    }
+  }, [])
+
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )

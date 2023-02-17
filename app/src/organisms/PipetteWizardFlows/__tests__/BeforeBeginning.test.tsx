@@ -250,6 +250,10 @@ describe('BeforeBeginning', () => {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
           },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: RIGHT },
+          },
         ],
         false
       )

@@ -2,7 +2,14 @@
 import reduce from 'lodash/reduce'
 
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
-import type { ModuleModel, PipetteName, Liquid } from '@opentrons/shared-data'
+import type {
+  ModuleModel,
+  PipetteName,
+  Liquid,
+  LoadedPipette,
+  LoadedLabware,
+  LoadedModule,
+} from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   LoadLabwareRunTimeCommand,
@@ -32,47 +39,34 @@ export function parseInitialPipetteNamesByMount(
   }
 }
 
-export interface PipetteNamesById {
-  id: string
-  pipetteName: PipetteName
-}
-
 export function parsePipetteEntity(
   commands: RunTimeCommand[]
-): PipetteNamesById[] {
-  const rightPipette = commands.find(
+): LoadedPipette[] {
+  const pipetteEntity = []
+  const rightPipetteCommand = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
   )
-  const leftPipette = commands.find(
+  const leftPipetteCommand = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'left'
   )
-
-  const rightPipetteEntity =
-    rightPipette != null
-      ? {
-          id: rightPipette.result.pipetteId,
-          pipetteName: rightPipette.params.pipetteName,
-        }
-      : {}
-  const leftPipetteEntity =
-    leftPipette != null
-      ? {
-          id: leftPipette.result.pipetteId,
-          pipetteName: leftPipette.params.pipetteName,
-        }
-      : {}
-
-  if (leftPipetteEntity.id == null && rightPipetteEntity.id != null) {
-    return [rightPipetteEntity]
-  } else if (rightPipetteEntity.id == null && leftPipetteEntity.id != null) {
-    return [leftPipetteEntity]
-  } else if (rightPipetteEntity.id != null && leftPipetteEntity.id != null) {
-    return [rightPipetteEntity, leftPipetteEntity]
-  } else {
-    return []
+  if (rightPipetteCommand != null) {
+    pipetteEntity.push({
+      id: rightPipetteCommand.result.pipetteId,
+      pipetteName: rightPipetteCommand.params.pipetteName,
+      mount: rightPipetteCommand.params.mount,
+    })
   }
+  if (leftPipetteCommand != null) {
+    pipetteEntity.push({
+      id: leftPipetteCommand.result.pipetteId,
+      pipetteName: leftPipetteCommand.params.pipetteName,
+      mount: leftPipetteCommand.params.mount,
+    })
+  }
+
+  return pipetteEntity
 }
 
 export function parseAllRequiredModuleModels(
@@ -87,23 +81,25 @@ export function parseAllRequiredModuleModels(
   )
 }
 
-export interface ModuleModelsById {
-  [moduleId: string]: { model: ModuleModel }
-}
-
-export function parseAllRequiredModuleModelsById(
+// This function is only used to compile modules from commands in the case that the
+// app-side protocol analysis is being referenced and stale.
+// The only time this will happen is in the protocol list page, where the serialNumber
+// should NOT be referenced
+export function parseRequiredModulesEntity(
   commands: RunTimeCommand[]
-): ModuleModelsById {
-  return commands.reduce<ModuleModelsById>(
-    (acc, command) =>
+): LoadedModule[] {
+  const loadModuleCommands = commands.filter(
+    (command): command is LoadModuleRunTimeCommand =>
       command.commandType === 'loadModule'
-        ? {
-            ...acc,
-            [command.result?.moduleId]: { model: command.params.model },
-          }
-        : acc,
-    {}
   )
+  return loadModuleCommands.map(command => {
+    return {
+      id: command.result.moduleId,
+      model: command.params.model,
+      location: command.params.location,
+      serialNumber: '',
+    }
+  })
 }
 
 interface LoadedLabwareBySlot {
@@ -152,16 +148,9 @@ export function parseInitialLoadedLabwareByModuleId(
   )
 }
 
-export interface LoadedLabwareEntity {
-  id: string
-  loadName: string
-  definitionUri: string
-  displayName?: string
-}
-
 export function parseInitialLoadedLabwareEntity(
   commands: RunTimeCommand[]
-): LoadedLabwareEntity[] {
+): LoadedLabware[] {
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareRunTimeCommand =>
       command.commandType === 'loadLabware'
@@ -181,6 +170,7 @@ export function parseInitialLoadedLabwareEntity(
       id: labwareId,
       loadName,
       definitionUri,
+      location: command.params.location,
       displayName: command.params.displayName,
     }
   })

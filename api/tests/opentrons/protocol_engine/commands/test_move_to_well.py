@@ -1,7 +1,7 @@
 """Test move to well commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import MovementHandler
 
 from opentrons.protocol_engine.commands.move_to_well import (
@@ -28,10 +28,7 @@ async def test_move_to_well_implementation(
         speed=7.89,
     )
 
-    result = await subject.execute(data)
-
-    assert result == MoveToWellResult()
-    decoy.verify(
+    decoy.when(
         await movement.move_to_well(
             pipette_id="abc",
             labware_id="123",
@@ -41,4 +38,8 @@ async def test_move_to_well_implementation(
             minimum_z_height=4.56,
             speed=7.89,
         )
-    )
+    ).then_return(DeckPoint(x=9, y=8, z=7))
+
+    result = await subject.execute(data)
+
+    assert result == MoveToWellResult(position=DeckPoint(x=9, y=8, z=7))

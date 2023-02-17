@@ -74,7 +74,7 @@ export function CalibrationHealthCheck({
 
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const attachedPipettes = useAttachedPipettes()
-  const attachedPipetteCalibrations = useAttachedPipetteCalibrations(robotName)
+  const attachedPipetteCalibrations = useAttachedPipetteCalibrations()
 
   const { isRunRunning: isRunning } = useRunStatuses()
 

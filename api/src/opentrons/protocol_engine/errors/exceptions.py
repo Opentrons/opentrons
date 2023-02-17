@@ -207,3 +207,7 @@ class LocationIsOccupiedError(ProtocolEngineError):
 
 class FirmwareUpdateRequired(ProtocolEngineError):
     """An error raised when the firmware needs to be updated."""
+
+
+class PipetteNotReadyToAspirateError(ProtocolEngineError):
+    """An error raised when the pipette is not ready to aspirate."""
