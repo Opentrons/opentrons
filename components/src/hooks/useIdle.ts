@@ -1,20 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
 
 const USER_EVENTS: Array<keyof DocumentEventMap> = [
-  'click',
-  'dblclick',
-  'keypress',
-  'mousemove',
-  'pointerover',
-  'pointerenter',
-  'pointerdown',
-  'pointermove',
-  'pointerout',
-  'pointerleave',
-  'scroll',
-  'touchmove',
-  'touchstart',
-  'touchend',
+  // 'click',
+  // 'dblclick',
+  // 'keypress',
+  // 'mousemove',
+  // 'pointerover',
+  // 'pointerenter',
+  // 'pointerdown',
+  // 'pointermove',
+  // 'pointerout',
+  // 'pointerleave',
+  // 'scroll',
+  // 'touchmove',
+  // 'touchstart',
+  // 'touchend',
+  'mousedown',
 ]
 
 const DEFAULT_OPTIONS = {
