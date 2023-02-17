@@ -35,7 +35,7 @@ export function useIdle(
     events: Array<keyof DocumentEventMap>
     initialState: boolean
   }>
-) {
+): boolean {
   const { events, initialState } = { ...DEFAULT_OPTIONS, ...options }
   const [idle, setIdle] = useState<boolean>(initialState)
   const idleTimer = useRef<number>()
