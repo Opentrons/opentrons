@@ -307,7 +307,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
-            well = None
 
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
