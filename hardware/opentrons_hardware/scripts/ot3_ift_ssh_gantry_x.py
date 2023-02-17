@@ -65,7 +65,7 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
     pos = 0
     speed = 10
     res = {node: (0,0,0)}
-    current = 0.8
+    current = 1
     await set_pipette_current(current, args)
     try:
         if xy == "downward":
@@ -181,7 +181,7 @@ def calc_time(distance, speed):
 async def set_pipette_current(run_current,args) -> None:
 
     currents: Dict[NodeId, Tuple[float, float]] = {}
-    currents[NodeId.pipette_left] = (float(0), float(run_current))
+    currents[NodeId.gantry_x] = (float(0), float(run_current))
 
     async with build.can_messenger(build_settings(args)) as messenger:
         try:
@@ -199,7 +199,7 @@ async def home(messenger, node, args):
             ]
         ]
     )
-    current = 0.8
+    current = 0.6
     try:
         await set_pipette_current(current, args)
         await home_runner.run(can_messenger = messenger)
@@ -263,7 +263,7 @@ async def  run(args: argparse.Namespace) -> None:
     # gpio.deactivate_estop()
     subprocess.run(["systemctl", "stop", "opentrons-robot-server"])
     position = {'pipette': 0}
-    node = NodeId.pipette_left
+    node = NodeId.gantry_x
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
