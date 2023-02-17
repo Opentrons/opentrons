@@ -339,7 +339,7 @@ def test_validate_with_labware(decoy: Decoy) -> None:
 
 
 def test_validate_last_location_with_labware(decoy: Decoy) -> None:
-    """Should return a PointTarget for in_place commands."""
+    """Should return a PointTarget for non-Well previous Location."""
     mock_labware = decoy.mock(cls=Labware)
     input_last_location = Location(point=Point(1, 1, 1), labware=mock_labware)
 
