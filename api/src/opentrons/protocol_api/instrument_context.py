@@ -462,7 +462,6 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
-            well = None
 
         with publisher.publish_context(
             broker=self.broker,
