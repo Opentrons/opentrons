@@ -501,7 +501,7 @@ def test_dispense_in_place(
     )
 
 
-def test_dispense_in_coordinates(
+def test_dispense_to_coordinates(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
