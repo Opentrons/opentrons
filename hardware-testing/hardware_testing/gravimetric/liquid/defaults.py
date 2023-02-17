@@ -8,7 +8,9 @@ from .liquid_class import (
     ACTUAL_OT2_BLOW_OUT_VOLUME_P300,
 )
 
-DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE = LiquidClassSettings(
+# TODO: set defaults from spreadsheet charts
+
+P50_SINGLE_T50_50_UL = LiquidClassSettings(
     aspirate=SampleConfig(flow_rate=47, delay=1, acceleration=None),
     dispense=SampleConfig(flow_rate=47, delay=0, acceleration=None),
     blow_out=AirConfig(flow_rate=200, volume=ACTUAL_OT2_BLOW_OUT_VOLUME_P300),

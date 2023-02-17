@@ -96,7 +96,7 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> Tuple[PipetteLiquidCl
         start_time=start_time,
         delay_method=ctx.delay
     )
-    _liq_pip.set_liquid_class(liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE)
+    _liq_pip.set_liquid_class(liquid.defaults.P50_SINGLE_T50_50_UL)
 
     # SCALE
     # Some Radwag settings cannot be controlled remotely.
