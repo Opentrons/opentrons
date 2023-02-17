@@ -329,7 +329,7 @@ def test_validate_raises_no_location_error() -> None:
 
 
 def test_validate_with_labware(decoy: Decoy) -> None:
-    """Should return a PointTarget for none in_place commands."""
+    """Should return a PointTarget for a non-Well Location."""
     mock_labware = decoy.mock(cls=Labware)
     input_location = Location(point=Point(1, 1, 1), labware=mock_labware)
 
