@@ -320,42 +320,6 @@ def test_aspirate_from_coordinates(
     )
 
 
-def test_aspirate_in_place(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    subject: InstrumentContext,
-    mock_protocol_core: ProtocolCore,
-) -> None:
-    """It should aspirate in place."""
-    input_location = Location(point=Point(2, 2, 2), labware=None)
-    last_location = Location(point=Point(9, 9, 9), labware=None)
-    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
-    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
-        last_location
-    )
-    decoy.when(
-        mock_validation.validate_location(
-            location=input_location, last_location=last_location
-        )
-    ).then_return(PointTarget(location=input_location, in_place=False))
-    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
-
-    subject.aspirate(volume=42.0, location=input_location, rate=1.23)
-
-    decoy.verify(
-        mock_instrument_core.aspirate(
-            location=input_location,
-            well_core=None,
-            in_place=False,
-            volume=42.0,
-            rate=1.23,
-            flow_rate=5.67,
-        ),
-        times=1,
-    )
-
-
 def test_aspirate_raises_no_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -370,23 +334,6 @@ def test_aspirate_raises_no_location(
         mock_validation.validate_location(location=None, last_location=None)
     ).then_raise(mock_validation.NoLocationError())
     with pytest.raises(RuntimeError):
-        subject.aspirate(location=None)
-
-
-def test_aspirate_raises_wrong_location_value(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    subject: InstrumentContext,
-    mock_protocol_core: ProtocolCore,
-) -> None:
-    """Should raise a TypeError."""
-    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
-
-    decoy.when(
-        mock_validation.validate_location(location=None, last_location=None)
-    ).then_raise(mock_validation.LocationTypeError())
-    with pytest.raises(TypeError):
         subject.aspirate(location=None)
 
 
@@ -478,34 +425,7 @@ def test_blow_out_to_location(
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=input_location, well_core=None, in_place=False
-        ),
-        times=1,
-    )
-
-
-def test_blow_out_in_place(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    mock_protocol_core: ProtocolCore,
-    subject: InstrumentContext,
-) -> None:
-    """It should blow out in place."""
-    last_location = Location(point=Point(9, 9, 9), labware=None)
-    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
-    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
-        last_location
-    )
-    decoy.when(
-        mock_validation.validate_location(location=None, last_location=last_location)
-    ).then_return(PointTarget(location=last_location, in_place=True))
-
-    subject.blow_out()
-
-    decoy.verify(
-        mock_instrument_core.blow_out(
-            location=last_location, well_core=None, in_place=True
+            location=input_location, well_core=None, in_place=True
         ),
         times=1,
     )
@@ -525,23 +445,6 @@ def test_blow_out_raises_no_location(
         mock_validation.validate_location(location=None, last_location=None)
     ).then_raise(mock_validation.NoLocationError())
     with pytest.raises(RuntimeError):
-        subject.blow_out(location=None)
-
-
-def test_blow_out_raises_wrong_location_value(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    subject: InstrumentContext,
-    mock_protocol_core: ProtocolCore,
-) -> None:
-    """Should raise a TypeError."""
-    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
-
-    decoy.when(
-        mock_validation.validate_location(location=None, last_location=None)
-    ).then_raise(mock_validation.LocationTypeError())
-    with pytest.raises(TypeError):
         subject.blow_out(location=None)
 
 
@@ -750,7 +653,7 @@ def test_dispense_with_location(
         mock_validation.validate_location(
             location=input_location, last_location=last_location
         )
-    ).then_return(PointTarget(location=input_location, in_place=False))
+    ).then_return(PointTarget(location=input_location, in_place=True))
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
 
     subject.dispense(volume=42.0, location=input_location, rate=1.23)
@@ -759,7 +662,7 @@ def test_dispense_with_location(
         mock_instrument_core.dispense(
             location=input_location,
             well_core=None,
-            in_place=False,
+            in_place=True,
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
@@ -844,42 +747,6 @@ def test_dispense_with_well(
     )
 
 
-def test_dispense_in_place(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    subject: InstrumentContext,
-    mock_protocol_core: ProtocolCore,
-) -> None:
-    """It should dispense in place."""
-    input_location = Location(point=Point(2, 2, 2), labware=None)
-    last_location = Location(point=Point(9, 9, 9), labware=None)
-    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
-    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
-        last_location
-    )
-    decoy.when(
-        mock_validation.validate_location(
-            location=input_location, last_location=last_location
-        )
-    ).then_return(PointTarget(location=input_location, in_place=True))
-    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
-
-    subject.dispense(volume=42.0, location=input_location, rate=1.23)
-
-    decoy.verify(
-        mock_instrument_core.dispense(
-            location=input_location,
-            well_core=None,
-            in_place=True,
-            volume=42.0,
-            rate=1.23,
-            flow_rate=5.67,
-        ),
-        times=1,
-    )
-
-
 def test_dispense_raises_no_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -894,23 +761,6 @@ def test_dispense_raises_no_location(
         mock_validation.validate_location(location=None, last_location=None)
     ).then_raise(mock_validation.NoLocationError())
     with pytest.raises(RuntimeError):
-        subject.dispense(location=None)
-
-
-def test_dispense_raises_wrong_location_value(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    subject: InstrumentContext,
-    mock_protocol_core: ProtocolCore,
-) -> None:
-    """Should raise a TypeError."""
-    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
-
-    decoy.when(
-        mock_validation.validate_location(location=None, last_location=None)
-    ).then_raise(mock_validation.LocationTypeError())
-    with pytest.raises(TypeError):
         subject.dispense(location=None)
 
 

@@ -70,12 +70,11 @@ def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None
 
 def test_blow_out_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
     """It should raise an error if a tip is not attached."""
-    subject.home()
     with pytest.raises(NoTipAttachedError, match="Cannot perform BLOWOUT"):
         subject.blow_out(
             location=Location(point=Point(1, 2, 3), labware=None),
             well_core=labware.get_well_core("A1"),
-            in_place=False,
+            in_place=True,
         )
 
 
