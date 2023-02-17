@@ -50,7 +50,12 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
     location = Location(point=Point(1, 2, 3), labware=None)
     with pytest.raises(NoTipAttachedError, match="Cannot perform DISPENSE"):
         subject.dispense(
-            volume=1, rate=1, flow_rate=1, location=location, well_core=None
+            volume=1,
+            rate=1,
+            flow_rate=1,
+            location=location,
+            well_core=None,
+            in_place=False,
         )
 
 
@@ -69,7 +74,7 @@ def test_blow_out_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
         subject.blow_out(
             location=Location(point=Point(1, 2, 3), labware=None),
             well_core=labware.get_well_core("A1"),
-            move_to_well=False,
+            in_place=True,
         )
 
 
@@ -115,6 +120,7 @@ def test_pick_up_tip_prep_after(
         volume=1,
         rate=1,
         flow_rate=1,
+        in_place=False,
     )
     subject.dispense(
         volume=1,
@@ -122,6 +128,7 @@ def test_pick_up_tip_prep_after(
         flow_rate=1,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
+        in_place=False,
     )
 
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
@@ -140,6 +147,7 @@ def test_pick_up_tip_prep_after(
         volume=1,
         rate=1,
         flow_rate=1,
+        in_place=False,
     )
     subject.dispense(
         volume=1,
@@ -147,6 +155,7 @@ def test_pick_up_tip_prep_after(
         flow_rate=1,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
+        in_place=False,
     )
 
     subject.drop_tip(location=None, well_core=tip_core, home_after=True)
@@ -176,6 +185,7 @@ def test_aspirate_too_much(
             volume=subject.get_max_volume() + 1,
             rate=1,
             flow_rate=1,
+            in_place=False,
         )
 
 
@@ -226,6 +236,7 @@ def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
         volume=12,
         rate=10,
         flow_rate=10,
+        in_place=False,
     )
 
 
@@ -238,6 +249,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         volume=12,
         rate=10,
         flow_rate=10,
+        in_place=False,
     )
     i.dispense(
         volume=2,
@@ -245,6 +257,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         flow_rate=2,
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
+        in_place=False,
     )
 
 
@@ -257,11 +270,12 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
         volume=11,
         rate=13,
         flow_rate=13,
+        in_place=False,
     )
     i.blow_out(
         location=Location(point=Point(1, 2, 3), labware=None),
         well_core=labware.get_well_core("A1"),
-        move_to_well=False,
+        in_place=True,
     )
 
 

@@ -29,6 +29,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -37,6 +38,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
             well_core: The well to aspirate from, if applicable.
             rate: The rate for how quickly to aspirate.
             flow_rate: The flow rate in µL/s to aspirate at.
+            in_place: Whether this is in-place.
         """
         ...
 
@@ -48,6 +50,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -56,6 +59,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
             well_core: The well to dispense to, if applicable.
             rate: The rate for how quickly to dispense.
             flow_rate: The flow rate in µL/s to dispense at.
+            in_place: Whether this is in-place.
         """
         ...
 
@@ -64,14 +68,14 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         self,
         location: types.Location,
         well_core: Optional[WellCoreType],
-        move_to_well: bool,
+        in_place: bool,
     ) -> None:
         """Blow liquid out of the tip.
 
         Args:
             location: The location to blow out into.
             well_core: The well to blow out into.
-            move_to_well: If pipette should be moved before blow-out.
+            in_place: Whether this is in-place.
         """
         ...
 
