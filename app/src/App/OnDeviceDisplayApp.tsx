@@ -172,7 +172,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const { sleepMs } = useSelector(getOnDeviceDisplaySettings)
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
 
-  console.log(sleepTime)
   const _isIdle = useIdle(sleepTime, false)
   const [isIdle, setIsIdle] = React.useState(false)
 
