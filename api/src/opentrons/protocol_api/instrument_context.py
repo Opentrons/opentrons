@@ -436,7 +436,7 @@ class InstrumentContext(publisher.CommandPublisher):
                               :py:meth:`dispense`)
         :returns: This instance
         """
-        well: Optional[labware.Well]
+        well: Optional[labware.Well] = None
         move_to_location: types.Location
 
         last_location = self._get_last_location_by_api_version()
