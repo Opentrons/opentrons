@@ -2,6 +2,7 @@ import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
 import { ResultsSummary } from '../ResultsSummary'
 import { SECTIONS } from '../constants'
 import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
@@ -10,6 +11,12 @@ import {
   mockExistingOffsets,
   mockWorkingOffsets,
 } from '../__fixtures__'
+
+jest.mock('../../../redux/config')
+
+const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
+  typeof getIsLabwareOffsetCodeSnippetsOn
+>
 
 const render = (props: React.ComponentProps<typeof ResultsSummary>) => {
   return renderWithProviders(<ResultsSummary {...props} />, {
@@ -58,5 +65,13 @@ describe('ResultsSummary', () => {
     getByRole('cell', { name: 'slot 3' })
     getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })
     getByRole('cell', { name: 'X 3.0 Y 3.0 Z 3.0' })
+  })
+
+  it('renders tabbed offset data with snippets when config option is selected', () => {
+    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
+    const { getByText } = render(props)
+    expect(getByText('Table View')).toBeTruthy()
+    expect(getByText('Jupyter Notebook')).toBeTruthy()
+    expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
   })
 })

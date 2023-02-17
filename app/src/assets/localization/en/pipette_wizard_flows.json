@@ -70,5 +70,6 @@
   "detach_and_retry": "Detach and retry",
   "attach_and_retry": "Attach and retry",
   "critical_unskippable_step": "This is a critical step that cannot be skipped",
-  "must_detach_mounting_plate": "You must detach the mounting plate before using other pipettes."
+  "must_detach_mounting_plate": "You must detach the mounting plate before using other pipettes.",
+  "something_seems_wrong": "There may be a problem with your pipette. Exit setup and contact Opentrons Support for assistance."
 }

@@ -2,9 +2,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
-from pydantic import BaseModel
 
-from .pipetting_common import PipetteIdMixin, FlowRateMixin, WellLocationMixin
+from .pipetting_common import (
+    PipetteIdMixin,
+    FlowRateMixin,
+    WellLocationMixin,
+    DestinationPositionResult,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -23,7 +27,7 @@ class BlowOutParams(PipetteIdMixin, FlowRateMixin, WellLocationMixin):
     pass
 
 
-class BlowOutResult(BaseModel):
+class BlowOutResult(DestinationPositionResult):
     """Result data from the execution of a blow-out command."""
 
     pass
@@ -52,7 +56,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
-        await self._movement.move_to_well(
+        position = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -64,7 +68,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
         ):
             await self._hardware_api.blow_out(mount=hw_pipette.mount)
 
-        return BlowOutResult()
+        return BlowOutResult(position=position)
 
 
 class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):

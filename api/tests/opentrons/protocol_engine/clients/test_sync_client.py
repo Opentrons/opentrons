@@ -216,7 +216,7 @@ def test_move_to_well(
             speed=7.89,
         )
     )
-    response = commands.MoveToWellResult()
+    response = commands.MoveToWellResult(position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -276,7 +276,9 @@ def test_pick_up_tip(
             pipetteId="123", labwareId="456", wellName="A2", wellLocation=WellLocation()
         )
     )
-    response = commands.PickUpTipResult(tipVolume=78.9)
+    response = commands.PickUpTipResult(
+        tipVolume=78.9, position=DeckPoint(x=4, y=5, z=6)
+    )
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -302,7 +304,7 @@ def test_drop_tip(
             homeAfter=True,
         )
     )
-    response = commands.DropTipResult()
+    response = commands.DropTipResult(position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -337,7 +339,9 @@ def test_aspirate(
         )
     )
 
-    result_from_transport = commands.AspirateResult(volume=67.89)
+    result_from_transport = commands.AspirateResult(
+        volume=67.89, position=DeckPoint(x=4, y=5, z=6)
+    )
 
     decoy.when(transport.execute_command(request=request)).then_return(
         result_from_transport
@@ -378,7 +382,7 @@ def test_dispense(
         )
     )
 
-    response = commands.DispenseResult(volume=1)
+    response = commands.DispenseResult(volume=1, position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -413,7 +417,7 @@ def test_touch_tip(
         )
     )
 
-    response = commands.TouchTipResult()
+    response = commands.TouchTipResult(position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -730,7 +734,7 @@ def test_blow_out(
         )
     )
 
-    response = commands.BlowOutResult()
+    response = commands.BlowOutResult(position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
