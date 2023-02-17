@@ -242,7 +242,6 @@ def test_pick_up_tip(
     )
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_get_return_height(
     decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
 ) -> None:

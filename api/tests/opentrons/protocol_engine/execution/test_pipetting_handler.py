@@ -101,29 +101,25 @@ async def test_handle_pick_up_tip_request(
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
     labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
     tip_rack_def: LabwareDefinition,
     subject: PipettingHandler,
 ) -> None:
     """It should handle a PickUpTipCreate properly."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
     decoy.when(state_store.labware.get_definition("labware-id")).then_return(
         tip_rack_def
     )
 
+    decoy.when(state_store.pipettes.get_serial_number("pipette-id")).then_return(
+        "pipette-serial"
+    )
+
+    decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
+
     decoy.when(
         state_store.geometry.get_nominal_tip_geometry(
+            pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="B2",
-            pipette_config=mock_hw_pipettes.left_config,
         )
     ).then_return(
         TipGeometry(
@@ -135,7 +131,7 @@ async def test_handle_pick_up_tip_request(
 
     decoy.when(
         await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
+            pipette_serial="pipette-serial",
             labware_definition=tip_rack_def,
         )
     ).then_return(42)
@@ -169,20 +165,15 @@ async def test_handle_pick_up_tip_request_tip_length_fallback(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
     labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
     tip_rack_def: LabwareDefinition,
     subject: PipettingHandler,
 ) -> None:
     """It should pick up a tip even if there's no calibrated tip length available."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
+
+    decoy.when(state_store.pipettes.get_serial_number("pipette-id")).then_return(
+        "pipette-serial"
     )
 
     decoy.when(state_store.labware.get_definition("labware-id")).then_return(
@@ -191,9 +182,9 @@ async def test_handle_pick_up_tip_request_tip_length_fallback(
 
     decoy.when(
         state_store.geometry.get_nominal_tip_geometry(
+            pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="B2",
-            pipette_config=mock_hw_pipettes.left_config,
         )
     ).then_return(
         TipGeometry(
@@ -205,7 +196,7 @@ async def test_handle_pick_up_tip_request_tip_length_fallback(
 
     decoy.when(
         await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
+            pipette_serial="pipette-serial",
             labware_definition=tip_rack_def,
         )
     ).then_return(None)
@@ -227,30 +218,25 @@ async def test_handle_pick_up_tip_request_tip_length_fallback(
     )
 
 
-async def test_handle_drop_up_tip_request(
+async def test_handle_drop_tip_request(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
     subject: PipettingHandler,
 ) -> None:
     """It should handle a DropTipCreate properly."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(
-            mount=Mount.RIGHT,
-            config=mock_hw_pipettes.right_config,
-        )
+    decoy.when(state_store.pipettes.get_serial_number("pipette-id")).then_return(
+        "pipette-serial"
+    )
+
+    decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(
+        MountType.RIGHT
     )
 
     decoy.when(
         state_store.geometry.get_tip_drop_location(
-            pipette_config=mock_hw_pipettes.right_config,
+            pipette_id="pipette-id",
             labware_id="labware-id",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
@@ -469,19 +455,15 @@ async def test_handle_add_tip(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
     tip_rack_def: LabwareDefinition,
     subject: PipettingHandler,
 ) -> None:
     """It should add a tip manually to the hardware API."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    decoy.when(state_store.pipettes.get_serial_number("pipette-id")).then_return(
+        "pipette-serial"
     )
+
+    decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
 
     decoy.when(state_store.labware.get_definition("labware-id")).then_return(
         tip_rack_def
@@ -490,7 +472,7 @@ async def test_handle_add_tip(
     decoy.when(
         state_store.geometry.get_nominal_tip_geometry(
             labware_id="labware-id",
-            pipette_config=mock_hw_pipettes.left_config,
+            pipette_id="pipette-id",
             well_name=None,
         )
     ).then_return(
@@ -503,7 +485,7 @@ async def test_handle_add_tip(
 
     decoy.when(
         await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
+            pipette_serial="pipette-serial",
             labware_definition=tip_rack_def,
         )
     ).then_return(42)
@@ -522,19 +504,15 @@ async def test_handle_add_tip_length_fallback(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
     tip_rack_def: LabwareDefinition,
     subject: PipettingHandler,
 ) -> None:
     """It should add a tip to the HW API even if there's no calibrated length."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    decoy.when(state_store.pipettes.get_serial_number("pipette-id")).then_return(
+        "pipette-serial"
     )
+
+    decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
 
     decoy.when(state_store.labware.get_definition("labware-id")).then_return(
         tip_rack_def
@@ -543,7 +521,7 @@ async def test_handle_add_tip_length_fallback(
     decoy.when(
         state_store.geometry.get_nominal_tip_geometry(
             labware_id="labware-id",
-            pipette_config=mock_hw_pipettes.left_config,
+            pipette_id="pipette-id",
             well_name=None,
         )
     ).then_return(
@@ -556,7 +534,7 @@ async def test_handle_add_tip_length_fallback(
 
     decoy.when(
         await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
+            pipette_serial="pipette-serial",
             labware_definition=tip_rack_def,
         )
     ).then_return(None)

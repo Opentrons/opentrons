@@ -470,7 +470,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self.get_hardware_state()["has_tip"]
 
     def get_return_height(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_return_height not implemented")
+        return self._engine_client.state.pipettes.get_return_tip_scale(self._pipette_id)
 
     def get_speed(self) -> PlungerSpeeds:
         raise NotImplementedError("InstrumentCore.get_speed not implemented")

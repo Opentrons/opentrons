@@ -66,9 +66,12 @@ class StaticPipetteConfig:
     """Static config for a pipette."""
 
     model: str
+    serial_number: str
     display_name: str
     min_volume: float
     max_volume: float
+    return_tip_scale: float
+    nominal_tip_overlap: Dict[str, float]
 
 
 @dataclass
@@ -112,13 +115,17 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
         elif isinstance(action, AddPipetteConfigAction):
+            config = action.config
             self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
-                model=action.model,
-                display_name=action.display_name,
-                min_volume=action.min_volume,
-                max_volume=action.max_volume,
+                serial_number=action.serial_number,
+                model=config.model,
+                display_name=config.display_name,
+                min_volume=config.min_volume,
+                max_volume=config.max_volume,
+                return_tip_scale=config.return_tip_scale,
+                nominal_tip_overlap=config.nominal_tip_overlap,
             )
-            self._state.flow_rates_by_id[action.pipette_id] = action.flow_rates
+            self._state.flow_rates_by_id[action.pipette_id] = config.flow_rates
 
     def _handle_command(self, command: Command) -> None:
         self._update_current_well(command)
@@ -303,8 +310,14 @@ class PipetteView(HasState[PipetteState]):
         """Get pipette data by the pipette's unique identifier."""
         try:
             return self._state.pipettes_by_id[pipette_id]
-        except KeyError:
-            raise errors.PipetteNotLoadedError(f"Pipette {pipette_id} not found.")
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found."
+            ) from e
+
+    def get_mount(self, pipette_id: str) -> MountType:
+        """Get the pipette's mount."""
+        return self.get(pipette_id).mount
 
     def get_all(self) -> List[LoadedPipette]:
         """Get a list of all pipette entries in state."""
@@ -362,20 +375,21 @@ class PipetteView(HasState[PipetteState]):
         """Get the currently aspirated volume of a pipette by ID."""
         try:
             return self._state.aspirated_volume_by_id[pipette_id]
-        except KeyError:
+        except KeyError as e:
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get current volume."
-            )
+            ) from e
 
     def get_working_volume(self, pipette_id: str) -> float:
         """Get the working maximum volume of a pipette by ID."""
-        max_volume = self._get_static_config(pipette_id).max_volume
+        max_volume = self.get_maximum_volume(pipette_id)
         try:
             tip_volume = self._state.tip_volume_by_id[pipette_id]
-        except KeyError:
+        except KeyError as e:
             raise errors.TipNotAttachedError(
                 f"Pipette {pipette_id} has no tip attached; unable to calculate working maximum volume."
-            )
+            ) from e
+
         return min(tip_volume, max_volume)
 
     def get_available_volume(self, pipette_id: str) -> float:
@@ -405,43 +419,56 @@ class PipetteView(HasState[PipetteState]):
         """Return the given pipette's requested or current movement speed."""
         return requested_speed or self._state.movement_speed_by_id[pipette_id]
 
-    def _get_static_config(self, pipette_id: str) -> StaticPipetteConfig:
+    def get_config(self, pipette_id: str) -> StaticPipetteConfig:
         """Get the static pipette configuration by pipette id."""
         try:
             return self._state.static_config_by_id[pipette_id]
-        except KeyError:
+        except KeyError as e:
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get pipette configuration."
-            )
+            ) from e
 
     def get_model_name(self, pipette_id: str) -> str:
         """Return the given pipette's model name."""
-        return self._get_static_config(pipette_id).model
+        return self.get_config(pipette_id).model
 
     def get_display_name(self, pipette_id: str) -> str:
         """Return the given pipette's display name."""
-        return self._get_static_config(pipette_id).display_name
+        return self.get_config(pipette_id).display_name
+
+    def get_serial_number(self, pipette_id: str) -> str:
+        """Get the serial number of the pipette."""
+        return self.get_config(pipette_id).serial_number
 
     def get_minimum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's minimum volume."""
-        return self._get_static_config(pipette_id).min_volume
+        return self.get_config(pipette_id).min_volume
 
     def get_maximum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's maximum volume."""
-        return self._get_static_config(pipette_id).max_volume
+        return self.get_config(pipette_id).max_volume
 
     def get_return_tip_scale(self, pipette_id: str) -> float:
         """Return the given pipette's return tip height scale."""
-        raise NotImplementedError("get_return_tip_scale not yet implemented.")
+        return self.get_config(pipette_id).return_tip_scale
 
     def get_flow_rates(self, pipette_id: str) -> FlowRates:
         """Get the default flow rates for the pipette."""
         try:
             return self._state.flow_rates_by_id[pipette_id]
-        except KeyError:
+        except KeyError as e:
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get pipette flow rates."
-            )
+            ) from e
+
+    def get_nominal_tip_overlap(self, pipette_id: str, labware_uri: str) -> float:
+        """Get the nominal tip overlap for a given labware from config."""
+        tip_overlaps_by_uri = self.get_config(pipette_id).nominal_tip_overlap
+
+        try:
+            return tip_overlaps_by_uri[labware_uri]
+        except KeyError:
+            return tip_overlaps_by_uri.get("default", 0)
 
     def get_z_axis(self, pipette_id: str) -> MotorAxis:
         """Get the MotorAxis representing this pipette's Z stage."""

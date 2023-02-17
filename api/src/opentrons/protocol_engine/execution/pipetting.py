@@ -54,34 +54,27 @@ class PipettingHandler:
         well_name: Optional[str] = None,
     ) -> _TipPickupData:
         """Retrieve data needed by the HardwareAPI for a tip pickup."""
-        # get mount and config data from state and hardware controller
-        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
+        hw_mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        # get the requested tip rack's definition for pulling calibrated tip length
-        tip_rack_def = self._state_store.labware.get_definition(labware_id)
-
-        # use config data to get tip geometry (length, diameter, volume)
         nominal_tip_geometry = self._state_store.geometry.get_nominal_tip_geometry(
+            pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            pipette_config=hw_pipette.config,
         )
 
         # TODO(mc, 2022-01-12): this call hits the filesystem, which has performance
         # implications over the course of a protocol since most calls will be redundant
+        # FIXME: not needed when `use_virtual_pipettes is True`
         tip_length = await self._labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=hw_pipette.config["pipette_id"],
-            labware_definition=tip_rack_def,
+            pipette_serial=self._state_store.pipettes.get_serial_number(pipette_id),
+            labware_definition=self._state_store.labware.get_definition(labware_id),
         )
 
         if tip_length is None:
             tip_length = nominal_tip_geometry.effective_length
 
         return _TipPickupData(
-            hw_mount=hw_pipette.mount,
+            hw_mount=hw_mount,
             tip_length=tip_length,
             tip_diameter=nominal_tip_geometry.diameter,
             tip_volume=nominal_tip_geometry.volume,
@@ -110,15 +103,16 @@ class PipettingHandler:
         )
 
         # perform the tip pickup routine
+        # FIXME: skip if use_virtual_pipette
         await self._hardware_api.pick_up_tip(
             mount=hw_mount,
             tip_length=tip_length,
-            # TODO(mc, 2020-11-12): include these parameters in the request
             presses=None,
             increment=None,
         )
 
         # after a successful pickup, update the hardware controller state
+        # FIXME: skip if use_virtual_pipette
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
             tiprack_diameter=tip_diameter,
@@ -143,10 +137,12 @@ class PipettingHandler:
         )
 
         await self._hardware_api.add_tip(mount=hw_mount, tip_length=tip_length)
+
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
             tiprack_diameter=tip_diameter,
         )
+
         self._hardware_api.set_working_volume(mount=hw_mount, tip_volume=tip_volume)
 
     async def drop_tip(
@@ -159,14 +155,11 @@ class PipettingHandler:
     ) -> DeckPoint:
         """Drop a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
-        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
+        hw_mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
 
         # get the adjusted tip drop location
         tip_drop_location = self._state_store.geometry.get_tip_drop_location(
-            pipette_config=hw_pipette.config,
+            pipette_id=pipette_id,
             labware_id=labware_id,
             well_location=well_location,
         )
@@ -181,7 +174,7 @@ class PipettingHandler:
 
         # perform the tip drop routine
         await self._hardware_api.drop_tip(
-            mount=hw_pipette.mount,
+            mount=hw_mount,
             home_after=True if home_after is None else home_after,
         )
         return position
