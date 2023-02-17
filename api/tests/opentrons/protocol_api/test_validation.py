@@ -274,7 +274,7 @@ def test_validate_coordinates(decoy: Decoy) -> None:
 
 
 def test_validate_in_place(decoy: Decoy) -> None:
-    """Should return a WellTarget with no location."""
+    """Should return an `in_place` PointTarget."""
     input_last_location = Location(point=Point(x=1, y=1, z=2), labware=None)
     expected_result = subject.PointTarget(location=input_last_location, in_place=True)
 
