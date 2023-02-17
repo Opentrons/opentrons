@@ -11,6 +11,8 @@ import {
   SPACING,
   Icon,
   SIZE_1,
+  Link,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -18,13 +20,13 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { StyledText } from '../../atoms/text'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ProgressBar } from '../../atoms/ProgressBar'
-import { SecondaryButton } from '../../atoms/buttons'
 import { useDownloadRunLog } from '../Devices/hooks'
 import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { InterventionTicks } from './InterventionTicks'
@@ -97,14 +99,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     )
   }
 
-  const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
+  const onDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
+    if (downloadIsDisabled) return false
     e.preventDefault()
     e.stopPropagation()
     downloadRunLog()
   }
 
-  const downloadIsDisabled =
-    runStatus != null && !TERMINAL_RUN_STATUSES.includes(runStatus)
+  const downloadIsDisabled = runStatus === RUN_STATUS_RUNNING
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -117,18 +119,28 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           }`}</StyledText>
           {currentStepContents}
         </Flex>
-        <SecondaryButton
-          disabled={downloadIsDisabled}
-          color={COLORS.darkBlackEnabled}
-          border={BORDERS.transparentLineBorder}
-          cursor={downloadIsDisabled ? '' : 'pointer'}
+        <Link
+          role="button"
+          css={css`
+            ${TYPOGRAPHY.darkLinkH4SemiBold}
+            &:hover {
+              color: ${
+                downloadIsDisabled
+                  ? COLORS.darkGreyEnabled
+                  : COLORS.darkBlackEnabled
+              };
+            }
+            cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
+          }
+          `}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={onDownloadClick}
         >
-          <Flex gridGap={SPACING.spacing2}>
+          <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
             <Icon name="download" size={SIZE_1} />
-            <StyledText>{t('download_run_log_title_case')}</StyledText>
+            {t('download_run_log')}
           </Flex>
-        </SecondaryButton>
+        </Link>
       </Flex>
       {analysis != null ? (
         <ProgressBar
