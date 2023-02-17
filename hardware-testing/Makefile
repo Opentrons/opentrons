@@ -139,7 +139,7 @@ endef
 
 .PHONY: push-labware-definitions-ot3
 push-labware-definitions-ot3:
-	scp -r ./labware-definitions root@$(host):/home/root/.opentrons/testing_data
+	scp -r ./labware-definitions root@$(host):/data/testing_data
 
 .PHONY: push-all
 push-all: clean wheel push-no-restart push-plot-webpage
@@ -165,7 +165,7 @@ push-all-and-term: push-all term
 .PHONY: pull-data-ot3
 pull-data-ot3:
 	mkdir -p ./.pulled-data
-	scp -r root@$(host):/home/root/.opentrons/testing_data/$(test) ./.pulled-data
+	scp -r root@$(host):/data/testing_data/$(test) ./.pulled-data
 
 define push-and-update-fw
 scp -i $(2) $(3) ot3-firmware.tar.gz root@$(1):/data/$(notdir ot3-firmware.tar.gz)
