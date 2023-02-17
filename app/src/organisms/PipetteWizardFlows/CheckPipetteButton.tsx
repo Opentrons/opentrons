@@ -19,6 +19,9 @@ export const CheckPipetteButton = (
       onSuccess: () => {
         proceed()
       },
+      onSettled: () => {
+        setPending(false)
+      },
     }
   )
 

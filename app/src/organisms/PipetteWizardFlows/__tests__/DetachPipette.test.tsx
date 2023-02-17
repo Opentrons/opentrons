@@ -40,7 +40,6 @@ describe('DetachPipette', () => {
   let props: React.ComponentProps<typeof DetachPipette>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
       goBack: jest.fn(),

@@ -18,6 +18,7 @@ import {
   useCreateRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
+
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -37,21 +38,28 @@ import { DetachPipette } from './DetachPipette'
 import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
+
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
-  robotName: string
   selectedPipette: SelectablePipettes
   closeFlow: () => void
+  setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow, robotName, selectedPipette } = props
+  const {
+    flowType,
+    mount,
+    closeFlow,
+    selectedPipette,
+    setSelectedPipette,
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettes = useAttachedPipettes()
@@ -115,6 +123,7 @@ export const PipetteWizardFlows = (
     }
   }
   const handleCleanUpAndClose = (): void => {
+    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
     setIsExiting(true)
     chainRunCommands(
       [
@@ -154,12 +163,15 @@ export const PipetteWizardFlows = (
     attachedPipettes,
     setShowErrorMessage,
     errorMessage,
-    robotName,
     selectedPipette,
     isOnDevice,
   }
   const exitModal = (
-    <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
+    <ExitModal
+      goBack={cancelExit}
+      proceed={handleCleanUpAndClose}
+      flowType={flowType}
+    />
   )
   const [
     showUnskippableStepModal,
