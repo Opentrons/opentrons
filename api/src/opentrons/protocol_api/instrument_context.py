@@ -473,7 +473,7 @@ class InstrumentContext(publisher.CommandPublisher):
             self._core.blow_out(
                 location=move_to_location,
                 well_core=well._core if well is not None else None,
-                in_place=blow_out_in_place,
+                in_place=target.in_place,
             )
 
         return self
