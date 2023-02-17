@@ -339,6 +339,7 @@ def test_aspirate_from_location(
             volume=12.34,
             flow_rate=7.8,
         ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
 
 
