@@ -38,14 +38,16 @@ export const ProtocolLabwareDetails = (
     requiredLabwareDetails != null
       ? [
           ...requiredLabwareDetails
-            .reduce((obj, labware) => {
-              if (!obj.has(getLabwareDefURI(labware.result.definition)))
-                obj.set(getLabwareDefURI(labware.result.definition), {
+            .reduce((acc, labware) => {
+              if (labware.result?.definition == null) return acc
+              else if (!acc.has(getLabwareDefURI(labware.result.definition))) {
+                acc.set(getLabwareDefURI(labware.result.definition), {
                   ...labware,
                   quantity: 0,
                 })
-              obj.get(getLabwareDefURI(labware.result.definition)).quantity++
-              return obj
+              }
+              acc.get(getLabwareDefURI(labware.result?.definition)).quantity++
+              return acc
             }, new Map())
             .values(),
         ]
@@ -75,19 +77,16 @@ export const ProtocolLabwareDetails = (
           {t('quantity')}
         </StyledText>
       </Flex>
-      {labwareDetails?.map((labware, index) => {
-        return (
-          <React.Fragment key={index}>
-            <ProtocolLabwareDetailItem
-              namespace={labware.params.namespace}
-              displayName={labware.result.definition.metadata.displayName}
-              quantity={labware.quantity}
-              labware={{ definition: labware.result.definition }}
-              data-testid={`ProtocolLabwareDetails_item_${index}`}
-            />
-          </React.Fragment>
-        )
-      })}
+      {labwareDetails?.map((labware, index) => (
+        <ProtocolLabwareDetailItem
+          key={index}
+          namespace={labware.params.namespace}
+          displayName={labware.result?.definition?.metadata?.displayName}
+          quantity={labware.quantity}
+          labware={{ definition: labware.result?.definition }}
+          data-testid={`ProtocolLabwareDetails_item_${index}`}
+        />
+      ))}
     </Flex>
   )
 }

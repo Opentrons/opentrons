@@ -486,6 +486,7 @@ async def test_bind_to_sync(
     )
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     argnames=["sensor_type", "timeout"],
     argvalues=[
@@ -586,6 +587,7 @@ async def test_get_baseline(
         )
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     argnames=["sensor_type", "timeout", "data_points"],
     argvalues=[
@@ -646,6 +648,7 @@ async def test_debug_poll(
     )
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     argnames=["sensor_type", "timeout"],
     argvalues=[

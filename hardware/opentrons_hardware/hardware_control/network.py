@@ -3,6 +3,7 @@ import asyncio
 from dataclasses import dataclass
 import logging
 from typing import Any, Dict, Set, Optional, Union
+from .types import PCBARevision
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
@@ -25,9 +26,10 @@ class DeviceInfoCache:
     version: int
     shortsha: str
     flags: Any
+    revision: PCBARevision
 
     def __repr__(self) -> str:
-        """Readable representation of this class."""
+        """Readable representation of the device info."""
         return f"<{self.__class__.__name__}: node={self.node_id}, version={self.version}, sha={self.shortsha}>"
 
 
@@ -54,7 +56,7 @@ class NetworkInfo:
         return set(self._device_info_cache)
 
     async def probe(
-        self, expected: Optional[Set[NodeId]], timeout: float = 1.0
+        self, expected: Optional[Set[NodeId]] = None, timeout: float = 1.0
     ) -> Dict[NodeId, DeviceInfoCache]:
         """Probe the bus and discover connected devices.
 
@@ -71,6 +73,7 @@ class NetworkInfo:
             expected: Set of NodeIds to expect
             timeout: time in seconds to wait for can message responses
         """
+        expected_nodes = expected or set()
         event = asyncio.Event()
         nodes: Dict[NodeId, DeviceInfoCache] = dict()
 
@@ -79,7 +82,7 @@ class NetworkInfo:
                 device_info_cache = _parse_device_info_response(message, arbitration_id)
                 if device_info_cache:
                     nodes[device_info_cache.node_id] = device_info_cache
-            if expected and expected.issubset(nodes):
+            if expected_nodes and expected_nodes.issubset(nodes):
                 event.set()
 
         self._can_messenger.add_listener(listener)
@@ -90,10 +93,10 @@ class NetworkInfo:
         try:
             await asyncio.wait_for(event.wait(), timeout)
         except asyncio.TimeoutError:
-            if expected:
+            if expected_nodes:
                 log.warning(
                     "probe timed out before expected nodes found, missing "
-                    f"{expected.difference(nodes)}"
+                    f"{expected_nodes.difference(nodes)}"
                 )
             else:
                 log.debug("probe terminated (no expected set)")
@@ -122,6 +125,9 @@ def _parse_device_info_response(
                 version=int(message.payload.version.value),
                 shortsha=message.payload.shortsha.value.decode(),
                 flags=message.payload.flags.value,
+                revision=PCBARevision(
+                    message.payload.revision.revision, message.payload.revision.tertiary
+                ),
             )
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")

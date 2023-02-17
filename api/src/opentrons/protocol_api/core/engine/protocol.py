@@ -90,20 +90,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             engine_client=self._engine_client,
         )
 
-    def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
-        """Get a map of labware names to definition dicts.
-
-        Deprecated method used for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_labware not implemented")
-
-    def get_extra_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
-        """Get a map of extra labware names to definition dicts.
-
-        Used to assist load custom labware definitions.
-        """
-        raise NotImplementedError("ProtocolCore.get_extra_labware not implemented")
-
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
         raise NotImplementedError("ProtocolCore.get_max_speeds not implemented")
@@ -229,6 +215,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         configuration: Optional[str],
     ) -> ModuleCore:
         """Load a module into the protocol."""
+        assert configuration is None, "Module `configuration` is deprecated"
+
         # TODO(mc, 2022-10-20): move to public ProtocolContext
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
@@ -296,12 +284,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
         self._engine_client.wait_for_resume(message=msg)
-
-    def resume(self) -> None:
-        """Resume the protocol."""
-        # TODO(mm, 2022-11-08): This method is not usable in practice. Consider removing
-        # it from both cores. https://github.com/Opentrons/opentrons/issues/8209
-        raise NotImplementedError("ProtocolCore.resume not implemented")
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""

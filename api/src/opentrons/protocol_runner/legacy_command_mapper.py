@@ -138,7 +138,8 @@ class LegacyCommandMapper:
                     completed_command = running_command.copy(
                         update={
                             "result": pe_commands.PickUpTipResult.construct(
-                                tipVolume=command["payload"]["location"].max_volume  # type: ignore[typeddict-item]
+                                tipVolume=command["payload"]["location"].max_volume,  # type: ignore[typeddict-item]
+                                position=pe_types.DeckPoint(x=0, y=0, z=0),
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
@@ -147,7 +148,9 @@ class LegacyCommandMapper:
                 elif isinstance(running_command, pe_commands.DropTip):
                     completed_command = running_command.copy(
                         update={
-                            "result": pe_commands.DropTipResult.construct(),
+                            "result": pe_commands.DropTipResult.construct(
+                                position=pe_types.DeckPoint(x=0, y=0, z=0)
+                            ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
                         }
@@ -158,7 +161,8 @@ class LegacyCommandMapper:
                             # Don't .construct() result, because we want to validate
                             # volume.
                             "result": pe_commands.AspirateResult(
-                                volume=running_command.params.volume
+                                volume=running_command.params.volume,
+                                position=pe_types.DeckPoint(x=0, y=0, z=0),
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
@@ -170,7 +174,8 @@ class LegacyCommandMapper:
                             # Don't .construct() result, because we want to validate
                             # volume.
                             "result": pe_commands.DispenseResult(
-                                volume=running_command.params.volume
+                                volume=running_command.params.volume,
+                                position=pe_types.DeckPoint(x=0, y=0, z=0),
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
@@ -179,7 +184,9 @@ class LegacyCommandMapper:
                 elif isinstance(running_command, pe_commands.BlowOut):
                     completed_command = running_command.copy(
                         update={
-                            "result": pe_commands.BlowOutResult.construct(),
+                            "result": pe_commands.BlowOutResult.construct(
+                                position=pe_types.DeckPoint(x=0, y=0, z=0)
+                            ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
                         }

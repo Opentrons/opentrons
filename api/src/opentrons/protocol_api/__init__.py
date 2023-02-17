@@ -22,7 +22,10 @@ from .module_contexts import (
 )
 from ._liquid import Liquid
 
-from .create_protocol_context import create_protocol_context
+from .create_protocol_context import (
+    create_protocol_context,
+    ProtocolEngineCoreRequiredError,
+)
 
 __all__ = [
     "MAX_SUPPORTED_VERSION",
@@ -38,5 +41,7 @@ __all__ = [
     "Labware",
     "Well",
     "Liquid",
+    # For internal Opentrons use only:
     "create_protocol_context",
+    "ProtocolEngineCoreRequiredError",
 ]

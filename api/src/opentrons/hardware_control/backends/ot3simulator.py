@@ -47,9 +47,9 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
-    OT3SubSystem,
     InstrumentProbeType,
     MotorStatus,
+    PipetteSubType,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -118,6 +118,7 @@ class OT3Simulator:
         self._loop = loop
         self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
+        self._update_required = False
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -475,10 +476,23 @@ class OT3Simulator:
         """Get the firmware version."""
         return None
 
-    @ensure_yield
-    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
-        """Update the firmware."""
-        pass
+    @property
+    def update_required(self) -> bool:
+        return self._update_required
+
+    @update_required.setter
+    def update_required(self, value: bool) -> None:
+        if value != self._update_required:
+            log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
+            self._update_required = value
+
+    async def update_firmware(
+        self,
+        attached_pipettes: Dict[OT3Mount, PipetteSubType],
+        nodes: Optional[Set[NodeId]] = None,
+    ) -> None:
+        """Updates the firmware on the OT3."""
+        return None
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
