@@ -395,7 +395,12 @@ async def test_liquid_probe(
     with patch.object(
         backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
     ) as mock_position:
-        return_dict = {head_node: 140, NodeId.gantry_x: 0, NodeId.gantry_y: 0, pipette_node: 0}
+        return_dict = {
+            head_node: 140,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+            pipette_node: 0,
+        }
 
         # make sure aspirate while sensing reverses direction
         mock_position.return_value = return_dict
@@ -455,7 +460,12 @@ async def test_liquid_sensing_errors(
     with patch.object(
         backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
     ) as mock_position:
-        return_dict = {head_node: 103, NodeId.gantry_x: 0, NodeId.gantry_y: 0, pipette_node: 200}
+        return_dict = {
+            head_node: 103,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+            pipette_node: 200,
+        }
         # should raise LiquidNotFound
         mock_position.return_value = return_dict
         with pytest.raises(LiquidNotFound):

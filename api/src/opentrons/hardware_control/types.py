@@ -491,7 +491,7 @@ class EarlyLiquidSenseTrigger(RuntimeError):
     """Error raised if sensor threshold reached before minimum probing distance."""
 
     def __init__(
-        self, triggered_at: Dict[OT3Axis, float], min_z_pos: Dict[Axis, float]
+        self, triggered_at: Dict[OT3Axis, float], min_z_pos: Dict[OT3Axis, float]
     ) -> None:
         """Initialize EarlyLiquidSenseTrigger error."""
         super().__init__(
@@ -504,7 +504,7 @@ class LiquidNotFound(RuntimeError):
     """Error raised if liquid sensing move completes without detecting liquid."""
 
     def __init__(
-        self, position: Dict[Axis, float], max_z_pos: Dict[Axis, float]
+        self, position: Dict[OT3Axis, float], max_z_pos: Dict[OT3Axis, float]
     ) -> None:
         """Initialize LiquidNotFound error."""
         super().__init__(
