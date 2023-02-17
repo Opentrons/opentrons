@@ -261,6 +261,24 @@ class SyncClient:
 
         return cast(commands.AspirateResult, result)
 
+    def aspirate_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> commands.AspirateInPlaceResult:
+        """Execute an ``AspirateInPlace`` command and return the result."""
+        request = commands.AspirateInPlaceCreate(
+            params=commands.AspirateInPlaceParams(
+                pipetteId=pipette_id,
+                volume=volume,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.AspirateInPlaceResult, result)
+
     def dispense(
         self,
         pipette_id: str,
@@ -284,6 +302,23 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.DispenseResult, result)
 
+    def dispense_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> commands.DispenseInPlaceResult:
+        """Execute a ``DispenseInPlace`` command and return the result."""
+        request = commands.DispenseInPlaceCreate(
+            params=commands.DispenseInPlaceParams(
+                pipetteId=pipette_id,
+                volume=volume,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.DispenseInPlaceResult, result)
+
     def blow_out(
         self,
         pipette_id: str,
@@ -304,6 +339,21 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.BlowOutResult, result)
+
+    def blow_out_in_place(
+        self,
+        pipette_id: str,
+        flow_rate: float,
+    ) -> commands.BlowOutInPlaceResult:
+        """Execute a ``BlowOutInPlace`` command and return the result."""
+        request = commands.BlowOutInPlaceCreate(
+            params=commands.BlowOutInPlaceParams(
+                pipetteId=pipette_id,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.BlowOutInPlaceResult, result)
 
     def touch_tip(
         self,

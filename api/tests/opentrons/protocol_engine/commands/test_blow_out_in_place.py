@@ -1,14 +1,14 @@
-"""Test blow-out command."""
+"""Test blow-out-in-place commands."""
 from decoy import Decoy
 from typing import cast
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 from opentrons.protocol_engine.state import StateView, HardwarePipette
-from opentrons.protocol_engine.commands import (
-    BlowOutResult,
-    BlowOutImplementation,
-    BlowOutParams,
+from opentrons.protocol_engine.commands.blow_out_in_place import (
+    BlowOutInPlaceParams,
+    BlowOutInPlaceResult,
+    BlowOutInPlaceImplementation,
 )
+
 from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
@@ -18,7 +18,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control import HardwareControlAPI
 
 
-async def test_blow_out_implementation(
+async def test_blow_out_in_place_implementation(
     decoy: Decoy,
     state_view: StateView,
     hardware_api: HardwareControlAPI,
@@ -26,9 +26,8 @@ async def test_blow_out_implementation(
     pipetting: PipettingHandler,
 ) -> None:
     """Test BlowOut command execution."""
-    subject = BlowOutImplementation(
+    subject = BlowOutInPlaceImplementation(
         state_view=state_view,
-        movement=movement,
         hardware_api=hardware_api,
         pipetting=pipetting,
     )
@@ -40,8 +39,6 @@ async def test_blow_out_implementation(
 
     left_pipette = HardwarePipette(mount=Mount.LEFT, config=left_config)
 
-    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
-
     decoy.when(hardware_api.attached_instruments).then_return(pipette_dict_by_mount)
     decoy.when(
         state_view.pipettes.get_hardware_pipette(
@@ -50,11 +47,8 @@ async def test_blow_out_implementation(
         )
     ).then_return(HardwarePipette(mount=Mount.LEFT, config=left_config))
 
-    data = BlowOutParams(
+    data = BlowOutInPlaceParams(
         pipetteId="pipette-id",
-        labwareId="labware-id",
-        wellName="C6",
-        wellLocation=location,
         flowRate=1.234,
     )
 
@@ -66,18 +60,9 @@ async def test_blow_out_implementation(
         )
     ).then_return(mock_flow_rate_context)
 
-    decoy.when(
-        await movement.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=location,
-        )
-    ).then_return(DeckPoint(x=1, y=2, z=3))
-
     result = await subject.execute(data)
 
-    assert result == BlowOutResult(position=DeckPoint(x=1, y=2, z=3))
+    assert result == BlowOutInPlaceResult()
 
     decoy.verify(
         mock_flow_rate_context.__enter__(),

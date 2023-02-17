@@ -216,7 +216,7 @@ def test_move_to_well(
             speed=7.89,
         )
     )
-    response = commands.MoveToWellResult()
+    response = commands.MoveToWellResult(position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -276,7 +276,9 @@ def test_pick_up_tip(
             pipetteId="123", labwareId="456", wellName="A2", wellLocation=WellLocation()
         )
     )
-    response = commands.PickUpTipResult(tipVolume=78.9)
+    response = commands.PickUpTipResult(
+        tipVolume=78.9, position=DeckPoint(x=4, y=5, z=6)
+    )
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -302,7 +304,7 @@ def test_drop_tip(
             homeAfter=True,
         )
     )
-    response = commands.DropTipResult()
+    response = commands.DropTipResult(position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -337,7 +339,9 @@ def test_aspirate(
         )
     )
 
-    result_from_transport = commands.AspirateResult(volume=67.89)
+    result_from_transport = commands.AspirateResult(
+        volume=67.89, position=DeckPoint(x=4, y=5, z=6)
+    )
 
     decoy.when(transport.execute_command(request=request)).then_return(
         result_from_transport
@@ -351,6 +355,35 @@ def test_aspirate(
             origin=WellOrigin.BOTTOM,
             offset=WellOffset(x=0, y=0, z=1),
         ),
+        volume=123.45,
+        flow_rate=6.7,
+    )
+
+    assert result == result_from_transport
+
+
+def test_aspirate_in_place(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should send an AspirateInPlaceCommand through the transport."""
+    request = commands.AspirateInPlaceCreate(
+        params=commands.AspirateInPlaceParams(
+            pipetteId="123",
+            volume=123.45,
+            flowRate=6.7,
+        )
+    )
+
+    result_from_transport = commands.AspirateInPlaceResult(volume=67.89)
+
+    decoy.when(transport.execute_command(request=request)).then_return(
+        result_from_transport
+    )
+
+    result = subject.aspirate_in_place(
+        pipette_id="123",
         volume=123.45,
         flow_rate=6.7,
     )
@@ -378,7 +411,7 @@ def test_dispense(
         )
     )
 
-    response = commands.DispenseResult(volume=1)
+    response = commands.DispenseResult(volume=1, position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -389,6 +422,33 @@ def test_dispense(
         well_location=WellLocation(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
         ),
+        volume=10,
+        flow_rate=2.0,
+    )
+
+    assert result == response
+
+
+def test_dispense_in_place(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a DispenceInPlace command."""
+    request = commands.DispenseInPlaceCreate(
+        params=commands.DispenseInPlaceParams(
+            pipetteId="123",
+            volume=10,
+            flowRate=2.0,
+        )
+    )
+
+    response = commands.DispenseInPlaceResult(volume=1)
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.dispense_in_place(
+        pipette_id="123",
         volume=10,
         flow_rate=2.0,
     )
@@ -413,7 +473,7 @@ def test_touch_tip(
         )
     )
 
-    response = commands.TouchTipResult()
+    response = commands.TouchTipResult(position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -730,7 +790,7 @@ def test_blow_out(
         )
     )
 
-    response = commands.BlowOutResult()
+    response = commands.BlowOutResult(position=DeckPoint(x=4, y=5, z=6))
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -739,6 +799,31 @@ def test_blow_out(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+        flow_rate=7.8,
+    )
+
+    assert result == response
+
+
+def test_blow_out_in_place(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a blow_out command."""
+    request = commands.BlowOutInPlaceCreate(
+        params=commands.BlowOutInPlaceParams(
+            pipetteId="123",
+            flowRate=7.8,
+        )
+    )
+
+    response = commands.BlowOutInPlaceResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.blow_out_in_place(
+        pipette_id="123",
         flow_rate=7.8,
     )
 
