@@ -462,7 +462,7 @@ async def test_bind_to_sync(
     async with sensor_driver.bind_output(
         mock_messenger,
         sensor_type,
-        SensorOutputBinding.sync,
+        [SensorOutputBinding.sync],
     ):
         mock_messenger.send.assert_called_with(
             node_id=sensor_type.sensor.node_id,
@@ -618,7 +618,7 @@ async def test_debug_poll(
 ) -> None:
     """Test for debug poll."""
     async with sensor_driver.bind_output(
-        mock_messenger, sensor_type, SensorOutputBinding.report
+        mock_messenger, sensor_type, [SensorOutputBinding.report]
     ):
         with patch.object(
             sensor_driver._scheduler,

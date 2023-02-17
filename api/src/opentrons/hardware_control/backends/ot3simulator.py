@@ -232,10 +232,14 @@ class OT3Simulator:
         plunger_speed: float,
         threshold_pascals: float,
         log_pressure: bool = True,
-        read_only: bool = False,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
-        return
+
+        head_node = axis_to_node(OT3Axis.by_mount(mount))
+        pos = self._position
+        pos[head_node] = max_z_distance - 2
+        self._position.update(pos)
+        self._encoder_position.update(pos)
 
     @ensure_yield
     async def move(

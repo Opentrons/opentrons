@@ -39,14 +39,14 @@ def _build_pass_step(
     speed: Dict[NodeId, float],
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
-    # use any node present to calculate duration of the move, assuming the durations
-    #   will be the same
     return create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
             ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
         },
         acceleration={},
+        # use any node present to calculate duration of the move, assuming the durations
+        #   will be the same
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
         stop_condition=stop_condition,
@@ -64,10 +64,7 @@ async def liquid_probe(
     log_pressure: bool = True,
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
-    """Create and run liquid probing moves."""
-    # move the mount and pipette simultaneously
-    #  while reading from the pressure sensor
-
+    """Move the mount and pipette simultaneously while reading from the pressure sensor."""
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     pressure_sensor = PressureSensor.build(
@@ -89,8 +86,19 @@ async def liquid_probe(
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
 
     if log_pressure:
+        file_heading = [
+            "time(s)",
+            "Pressure(pascals)",
+            "z_velocity(mm/s)",
+            "plunger_velocity(mm/s)",
+            "threshold(pascals)",
+        ]
+        sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
         sensor_capturer = LogListener(
-            head_node, mount_speed, plunger_speed, threshold_pascals
+            mount=head_node,
+            data_file="/var/pressure_sensor_data.csv",
+            file_heading=file_heading,
+            sensor_metadata=sensor_metadata,
         )
         binding.append(SensorOutputBinding.report)
 

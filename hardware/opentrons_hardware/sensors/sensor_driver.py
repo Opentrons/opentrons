@@ -2,9 +2,8 @@
 import time
 import asyncio
 import csv
-import os
 
-from typing import Optional, AsyncIterator, Union, List, Any
+from typing import Optional, AsyncIterator, Any, Sequence
 from contextlib import asynccontextmanager
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
@@ -167,16 +166,15 @@ class SensorDriver(AbstractSensorDriver):
         self,
         can_messenger: CanMessenger,
         sensor: BaseSensorType,
-        binding: Union[
-            SensorOutputBinding, List[SensorOutputBinding]
-        ] = SensorOutputBinding.sync,
+        binding: Optional[Sequence[SensorOutputBinding]] = None,
     ) -> AsyncIterator[None]:
         """Send a BindSensorOutputRequest."""
         sensor_info = sensor.sensor
-        if type(binding) == list:
+
+        if binding is not None:
             binding_field = SensorOutputBindingField.from_flags(binding)
-        elif type(binding) == SensorOutputBinding:
-            binding_field = SensorOutputBindingField(binding)
+        else:
+            binding_field = SensorOutputBindingField(SensorOutputBinding.none)
 
         try:
             await can_messenger.send(
@@ -225,47 +223,30 @@ class LogListener:
     def __init__(
         self,
         mount: NodeId,
-        z_velocity: float,
-        plunger_velocity: float,
-        threshold_pascals: float,
+        data_file: Any,
+        file_heading: Sequence[str],
+        sensor_metadata: Sequence[Any],
     ) -> None:
         """Build the capturer."""
         self.csv_writer = Any
-        self.data_file = Any
+        self.data_file = data_file
+        self.file_heading = file_heading
+        self.sensor_metadata = sensor_metadata
         self.response_queue: asyncio.Queue[float] = asyncio.Queue()
         self.mount = mount
         self.start_time = 0.0
-        self.z_velocity = z_velocity
-        self.plunger_velocity = plunger_velocity
-        self.threshold_pascals = threshold_pascals
 
     async def __aenter__(self) -> None:
         """Create a csv heading for logging pressure readings."""
-        self.data_file = os.path.isfile("/var/pressure_sensor_data.csv")
-        heading = [
-            "time(s)",
-            "Pressure(pascals)",
-            "z_velocity(mm/s)",
-            "plunger_velocity(mm/s)",
-            "threshold(pascals)",
-        ]
-        first_row = [
-            self.start_time,
-            0,
-            self.z_velocity,
-            self.plunger_velocity,
-            self.threshold_pascals,
-        ]
-
-        self.data_file = open("/var/pressure_sensor_data.csv", "a")
+        self.data_file = open(self.data_file, "a")
         self.csv_writer = csv.writer(self.data_file)
-        self.csv_writer.writerows([heading, first_row])
+        self.csv_writer.writerows([self.file_heading, self.sensor_metadata])
 
         self.start_time = time.time()
 
     async def __aexit__(self, *args: Any) -> None:
         """Close csv file."""
-        self.data_file.close()  # type: ignore
+        self.data_file.close()
 
     def __call__(
         self,

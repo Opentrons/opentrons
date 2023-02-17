@@ -29,25 +29,6 @@ class MoveConditionNotMet(ValueError):
     """Error raised if a move does not meet its stop condition before finishing."""
 
 
-class EarlyLiquidSenseTrigger(RuntimeError):
-    """Error raised if sensor threshold reached before minimum probing distance."""
-
-    def __init__(self, triggered_at: float, min_z: float) -> None:
-        """Initialize EarlyLiquidSenseTrigger error."""
-        super().__init__(
-            f"Liquid threshold triggered early at z={triggered_at}mm, "
-            f"expected {min_z}"
-        )
-
-
-class LiquidNotFound(RuntimeError):
-    """Error raised if liquid sensing move completes without detecting liquid."""
-
-    def __init__(self, max_z: float) -> None:
-        """Initialize LiquidNotFound error."""
-        super().__init__(f"Liquid threshold not found, max travel allowed = {max_z}")
-
-
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     """Keep the sign of the input but cap the numeric value at the constraint value."""
     return cast(np.float64, np.copysign(np.minimum(abs(constraint), abs(input)), input))

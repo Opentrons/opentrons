@@ -28,14 +28,12 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperProbe,
     InstrumentProbeType,
+    LiquidNotFound,
+    EarlyLiquidSenseTrigger,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
     InvalidMoveError,
-)
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-    EarlyLiquidSenseTrigger,
 )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
@@ -413,7 +411,7 @@ async def test_liquid_probe(
     ) as mock_position:
         return_dict = {head_ax: 140, OT3Axis.X: 0, OT3Axis.Y: 0, pipette_ax: 0}
 
-        # scenario - aspirate while sensing
+        # make sure aspirate while sensing reverses direction
         mock_position.return_value = return_dict
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
@@ -437,22 +435,43 @@ async def test_liquid_probe(
             fake_settings_aspirate.log_pressure,
         )
 
-        # scenario - liquid threshold hit too early
-        return_dict[head_ax], return_dict[pipette_ax] = 150, 150
-        mock_position.return_value = return_dict
-        with pytest.raises(EarlyLiquidSenseTrigger):
-            await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
-
-        # scenario - successful probe
         return_dict[head_ax], return_dict[pipette_ax] = 142, 142
         mock_position.return_value = return_dict
         await ot3_hardware.liquid_probe(
             mount, fake_liquid_settings
         )  # should raise no exceptions
 
-        # scenario - MoveConditionNotMet
-        backend.liquid_probe.side_effect = MoveConditionNotMet
-        with pytest.raises(MoveConditionNotMet):
+
+async def test_liquid_sensing_errors(
+    mock_move_to: AsyncMock,
+    ot3_hardware: ThreadManager[OT3API],
+    head_ax: OT3Axis,
+    pipette_ax: OT3Axis,
+    mount: OT3Mount,
+    fake_liquid_settings: LiquidProbeSettings,
+    mock_instrument_handlers: Tuple[Mock],
+    mock_current_position_ot3: AsyncMock,
+    mock_home_plunger: AsyncMock,
+    mock_backend_liquid_probe: AsyncMock,
+) -> None:
+    backend = ot3_hardware.managed_obj._backend
+
+    await ot3_hardware.home()
+    mock_move_to.return_value = None
+
+    with patch.object(
+        backend, "update_position", AsyncMock(spec=backend.update_position)
+    ) as mock_position:
+        return_dict = {head_ax: 200, OT3Axis.X: 0, OT3Axis.Y: 0, pipette_ax: 200}
+        # should raise LiquidNotFound
+        mock_position.return_value = return_dict
+        with pytest.raises(LiquidNotFound):
+            await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
+
+        # should raise EarlyLiquidSenseTrigger
+        return_dict[head_ax], return_dict[pipette_ax] = 150, 150
+        mock_position.return_value = return_dict
+        with pytest.raises(EarlyLiquidSenseTrigger):
             await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
 
 
