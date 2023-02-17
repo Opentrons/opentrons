@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.protocol_engine.types import (
     ModuleLocation,
@@ -105,12 +105,16 @@ async def test_do_not_lift_plate_if_not_in_tc_gen2(
     await subject.lift_plate_for_labware_movement(
         labware_location=ModuleLocation(moduleId="thermocycler-id")
     )
-    decoy.verify(await movement.home(axes=None), times=0)
+    decoy.verify(
+        await movement.home(axes=matchers.Anything()), times=0,
+    )
 
     await subject.lift_plate_for_labware_movement(
         labware_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
     )
-    decoy.verify(await movement.home(axes=None), times=0)
+    decoy.verify(
+        await movement.home(axes=matchers.Anything()), times=0,
+    )
 
 
 async def test_do_not_lift_plate_with_lid_closed(
