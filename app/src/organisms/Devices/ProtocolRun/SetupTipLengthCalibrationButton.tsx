@@ -1,14 +1,11 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
   Box,
   Flex,
   Link,
-  SpinnerModalPage,
   Tooltip,
-  useConditionalConfirm,
   useHoverTooltip,
   ALIGN_CENTER,
   SIZE_4,
@@ -17,30 +14,20 @@ import {
   COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/buttons'
 import {
-  CalibrateTipLength,
-  ConfirmRecalibrationModal,
-} from '../../CalibrateTipLength'
-import { AskForCalibrationBlockModal } from '../../CalibrateTipLength/AskForCalibrationBlockModal'
-import { tipLengthCalibrationStarted } from '../../../redux/analytics'
-import { getHasCalibrationBlock } from '../../../redux/config'
-import * as RobotApi from '../../../redux/robot-api'
-import * as Sessions from '../../../redux/sessions'
-import { getTipLengthCalibrationSession } from '../../../redux/sessions/tip-length-calibration/selectors'
-import { useDeckCalibrationData, useRunHasStarted } from '../hooks'
+  useAttachedPipettes,
+  useDeckCalibrationData,
+  usePipetteOffsetCalibrations,
+  useRunHasStarted,
+} from '../hooks'
+import { useDashboardCalibrateTipLength } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 
 import type { Mount } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { RequestState } from '../../../redux/robot-api/types'
-import type {
-  SessionCommandString,
-  TipLengthCalibrationSession,
-} from '../../../redux/sessions/types'
-import type { State } from '../../../redux/types'
 
 export interface SetupTipLengthCalibrationButtonProps {
   robotName: string
@@ -52,11 +39,6 @@ export interface SetupTipLengthCalibrationButtonProps {
   disabled: boolean
 }
 
-// tip length calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: SessionCommandString[] = [
-  Sessions.sharedCalCommands.JOG,
-]
-
 export function SetupTipLengthCalibrationButton({
   robotName,
   runId,
@@ -66,109 +48,34 @@ export function SetupTipLengthCalibrationButton({
   isExtendedPipOffset,
   disabled,
 }: SetupTipLengthCalibrationButtonProps): JSX.Element {
-  const createRequestId = React.useRef<string | null>(null)
-  const trackedRequestId = React.useRef<string | null>(null)
-  const jogRequestId = React.useRef<string | null>(null)
-  const dispatch = useDispatch()
   const { t } = useTranslation(['protocol_setup', 'shared'])
 
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+  const [
+    tipLengthCalLauncher,
+    TipLengthCalWizard,
+  ] = useDashboardCalibrateTipLength(robotName)
+  const { deleteCalibration } = useDeleteCalibrationMutation()
+  const attachedPipettes = useAttachedPipettes()
+  const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
 
-  const sessionType = isExtendedPipOffset
-    ? Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-    : Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+  const offsetCalsToDelete = offsetCalibrations?.filter(
+    cal =>
+      cal.pipette === attachedPipettes[mount]?.id &&
+      cal.tiprackUri === getLabwareDefURI(tipRackDefinition)
+  )
 
-  const dispatchAnalyticsEvent = (calBlock: boolean): void => {
-    dispatch(
-      tipLengthCalibrationStarted(
-        mount,
-        calBlock,
-        getLabwareDefURI(tipRackDefinition)
-      )
-    )
-  }
-
-  const [dispatchRequests] = RobotApi.useDispatchApiRequests(
-    dispatchedAction => {
-      if (
-        dispatchedAction.type === Sessions.ENSURE_SESSION &&
-        dispatchedAction.payload.sessionType === sessionType
-      ) {
-        // @ts-expect-error TODO: account for possible absence of requestId on meta
-        createRequestId.current = dispatchedAction.meta.requestId
-      } else if (
-        dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
-        dispatchedAction.payload.command.command ===
-          Sessions.sharedCalCommands.JOG
-      ) {
-        // @ts-expect-error TODO: account for possible absence of requestId on meta
-        jogRequestId.current = dispatchedAction.meta.requestId
-      } else if (
-        dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
-        !spinnerCommandBlockList.includes(
-          dispatchedAction.payload.command.command
-        )
-      ) {
-        // @ts-expect-error TODO: account for possible absence of meta on action, requestId on meta
-        trackedRequestId.current = dispatchedAction.meta.requestId
+  const invalidateHandler = (): void => {
+    if (offsetCalsToDelete !== undefined) {
+      for (const cal of offsetCalsToDelete) {
+        deleteCalibration({
+          calType: 'pipetteOffset',
+          mount: cal.mount,
+          pipette_id: cal.pipette,
+        })
       }
     }
-  )
-
-  const tipLengthCalibrationSession: TipLengthCalibrationSession | null = useSelector(
-    (state: State) => {
-      return getTipLengthCalibrationSession(state, robotName)
-    }
-  )
-
-  const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
-  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
-
-  const handleStart = (hasBlockModalResponse: boolean | null = null): void => {
-    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setShowCalBlockModal(true)
-    } else {
-      setShowCalBlockModal(false)
-      const sharedOptions = {
-        mount,
-        hasCalibrationBlock: Boolean(
-          configHasCalibrationBlock ?? hasBlockModalResponse
-        ),
-        tipRackDefinition,
-      }
-      const options = isExtendedPipOffset
-        ? { ...sharedOptions, shouldRecalibrateTipLength: true }
-        : sharedOptions
-      dispatchRequests(Sessions.ensureSession(robotName, sessionType, options))
-      dispatchAnalyticsEvent(sharedOptions.hasCalibrationBlock)
-    }
   }
-
-  const startingSession =
-    useSelector<State, RequestState | null>(state =>
-      createRequestId.current
-        ? RobotApi.getRequestById(state, createRequestId.current)
-        : null
-    )?.status === RobotApi.PENDING
-
-  const showSpinner =
-    useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current
-        ? RobotApi.getRequestById(state, trackedRequestId.current)
-        : null
-    )?.status === RobotApi.PENDING
-
-  const isJogging =
-    useSelector((state: State) =>
-      jogRequestId.current
-        ? RobotApi.getRequestById(state, jogRequestId.current)
-        : null
-    )?.status === RobotApi.PENDING
-
-  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    handleStart,
-    hasCalibrated
-  )
 
   const runHasStarted = useRunHasStarted(runId)
   const disableRecalibrate = runHasStarted || !isDeckCalibrated
@@ -199,7 +106,14 @@ export function SetupTipLengthCalibrationButton({
   ) : (
     <Link
       role="link"
-      onClick={() => confirm(null)}
+      onClick={() =>
+        tipLengthCalLauncher({
+          params: { mount, tipRackDefinition },
+          hasBlockModalResponse: null,
+          invalidateHandler:
+            offsetCalsToDelete !== undefined ? invalidateHandler : undefined,
+        })
+      }
       css={TYPOGRAPHY.labelSemiBold}
       id="TipRackCalibration_recalibrateTipRackLink"
     >
@@ -215,7 +129,12 @@ export function SetupTipLengthCalibrationButton({
         ) : (
           <>
             <TertiaryButton
-              onClick={() => handleStart(null)}
+              onClick={() =>
+                tipLengthCalLauncher({
+                  params: { mount, tipRackDefinition },
+                  hasBlockModalResponse: null,
+                })
+              }
               id="TipRackCalibration_calibrateTipRackButton"
               disabled={disabled || !isDeckCalibrated}
               {...targetProps}
@@ -234,43 +153,7 @@ export function SetupTipLengthCalibrationButton({
           </>
         )}
       </Flex>
-      {showConfirmation && (
-        <Portal>
-          <ConfirmRecalibrationModal
-            confirm={confirm}
-            cancel={cancel}
-            tiprackDisplayName={tipRackDefinition.metadata.displayName}
-          />
-        </Portal>
-      )}
-      <Portal level="top">
-        {showCalBlockModal ? (
-          <AskForCalibrationBlockModal
-            onResponse={handleStart}
-            titleBarTitle={t('tip_length_calibration')}
-            closePrompt={() => setShowCalBlockModal(false)}
-          />
-        ) : null}
-        {startingSession ? (
-          <SpinnerModalPage
-            titleBar={{
-              title: t('tip_length_calibration'),
-              back: {
-                disabled: true,
-                title: t('shared:exit'),
-                children: t('shared:exit'),
-              },
-            }}
-          />
-        ) : null}
-        <CalibrateTipLength
-          session={tipLengthCalibrationSession}
-          robotName={robotName}
-          showSpinner={showSpinner}
-          dispatchRequests={dispatchRequests}
-          isJogging={isJogging}
-        />
-      </Portal>
+      {TipLengthCalWizard}
     </>
   )
 }

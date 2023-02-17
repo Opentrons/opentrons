@@ -1,22 +1,17 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-
 import {
-  fetchCalibrationStatus,
-  getDeckCalibrationData,
   DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_BAD_CALIBRATION,
 } from '../../../redux/calibration'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
-import { useDeckCalibrationStatus } from './'
 
-import type { DeckCalibrationData } from '../../../redux/calibration/types'
-import type { State } from '../../../redux/types'
+import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
+import { useRobot } from './useRobot'
+import type { DeckCalibrationData } from '@opentrons/api-client'
 
 /**
- * Returns deck calibration data and whether deck calibration is done or not
+ * Returns deck calibration data, whether deck calibration is done or not,
+ * and whether it was marked bad by calibration health check
  * @param   {string | null} robotName
- * @returns {DeckCalibrationData | null, boolean}
+ * @returns {DeckCalibrationData | null, boolean, boolean}
  *
  */
 export function useDeckCalibrationData(
@@ -26,12 +21,13 @@ export function useDeckCalibrationData(
   isDeckCalibrated: boolean
   markedBad?: boolean
 } {
-  const [dispatchRequest] = useDispatchApiRequest()
+  const robot = useRobot(robotName)
 
-  const deckCalibrationData = useSelector((state: State) =>
-    getDeckCalibrationData(state, robotName)
-  )
-  const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
+  const { data: deckCalibrationData = null, status: deckCalibrationStatus } =
+    useCalibrationStatusQuery(
+      {},
+      robot?.ip != null ? { hostname: robot.ip } : null
+    )?.data?.deckCalibration ?? {}
 
   const isDeckCalibrated =
     deckCalibrationStatus != null &&
@@ -40,12 +36,6 @@ export function useDeckCalibrationData(
   const markedBad =
     deckCalibrationStatus != null &&
     deckCalibrationStatus === DECK_CAL_STATUS_BAD_CALIBRATION
-
-  React.useEffect(() => {
-    if (robotName != null) {
-      dispatchRequest(fetchCalibrationStatus(robotName))
-    }
-  }, [dispatchRequest, robotName])
 
   return { deckCalibrationData, isDeckCalibrated, markedBad }
 }

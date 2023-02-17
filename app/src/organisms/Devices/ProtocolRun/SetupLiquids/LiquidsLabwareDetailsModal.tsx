@@ -15,7 +15,7 @@ import {
   TYPOGRAPHY,
   LabwareRender,
 } from '@opentrons/components'
-import { useProtocolDetailsForRun } from '../../../Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
@@ -41,7 +41,7 @@ export const LiquidsLabwareDetailsModal = (
   const { liquidId, labwareId, runId, closeModal } = props
   const { t } = useTranslation('protocol_setup')
   const currentLiquidRef = React.useRef<HTMLDivElement>(null)
-  const protocolData = useProtocolDetailsForRun(runId).protocolData
+  const protocolData = useMostRecentCompletedAnalysis(runId)
   const commands = protocolData?.commands ?? []
   const liquids = parseLiquidsInLoadOrder(
     protocolData?.liquids != null ? protocolData?.liquids : [],

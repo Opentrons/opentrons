@@ -475,7 +475,7 @@ def test_load_module(
     result = subject.load_module(
         model=requested_model,
         deck_slot=DeckSlotName.SLOT_1,
-        configuration="",
+        configuration=None,
     )
 
     assert isinstance(result, expected_core_cls)
@@ -544,7 +544,7 @@ def test_load_module_thermocycler_with_no_location(
     result = subject.load_module(
         model=requested_model,
         deck_slot=None,
-        configuration="",
+        configuration=None,
     )
 
     assert isinstance(result, ThermocyclerModuleCore)
@@ -566,7 +566,7 @@ def test_load_module_no_location(
 ) -> None:
     """Should raise an InvalidModuleLocationError exception."""
     with pytest.raises(InvalidModuleLocationError):
-        subject.load_module(model=requested_model, deck_slot=None, configuration="")
+        subject.load_module(model=requested_model, deck_slot=None, configuration=None)
 
 
 @pytest.mark.parametrize("message", [None, "Hello, world!", ""])

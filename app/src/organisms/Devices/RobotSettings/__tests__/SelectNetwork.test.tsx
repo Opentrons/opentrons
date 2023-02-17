@@ -117,18 +117,6 @@ describe('<TemporarySelectNetwork />', () => {
     jest.useRealTimers()
   })
 
-  it('dispatches fetchWifiList on mount and on an interval', () => {
-    const expectedFetchList = Networking.fetchWifiList(mockRobotName)
-
-    render()
-    expect(dispatch).toHaveBeenNthCalledWith(1, expectedFetchList)
-    expect(dispatch).toHaveBeenCalledTimes(1)
-    jest.advanceTimersByTime(20000)
-    expect(dispatch).toHaveBeenNthCalledWith(2, expectedFetchList)
-    expect(dispatch).toHaveBeenNthCalledWith(3, expectedFetchList)
-    expect(dispatch).toHaveBeenCalledTimes(3)
-  })
-
   it('renders an <SelectSsid /> child with props from state', () => {
     const wrapper = render()
     const selectSsid = wrapper.find(SelectSsid)

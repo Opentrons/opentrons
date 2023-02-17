@@ -42,7 +42,12 @@ def test_labware_landing(
         style="white on blue",
     )
     drag_and_drop_file(labware_landing.get_drag_drop_file_button(), test_labwares["validlabware"])
-    assert labware_landing.get_success_toast_message().is_displayed()
+    toast = labware_landing.get_success_toast_message()
+    if toast:
+        assert toast.is_displayed()
+    else:
+        labware_landing.base.take_screenshot("Labware upload success toast?")
+        raise AssertionError("No labware upload success toast.")
 
     # uploading an invalid labware and verifying the error toast
 
@@ -66,4 +71,9 @@ def test_labware_landing(
         style="white on blue",
     )
     drag_and_drop_file(labware_landing.get_drag_drop_file_button(), test_labwares["validlabware"])
-    assert labware_landing.get_duplicate_error_toast_message().is_displayed()
+    toast = labware_landing.get_duplicate_error_toast_message()
+    if toast:
+        assert toast.is_displayed()
+    else:
+        labware_landing.base.take_screenshot("Labware upload duplicate toast?")
+        raise AssertionError("No labware upload duplicate toast.")
