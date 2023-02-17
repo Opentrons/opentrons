@@ -7,7 +7,7 @@ from opentrons.config import infer_config_base_dir, IS_ROBOT
 from opentrons.protocol_api.labware import Well
 
 from hardware_testing.gravimetric.liquid.height import LiquidTracker
-from hardware_testing.gravimetric.execute import gravimetric
+from hardware_testing.gravimetric import execute
 from hardware_testing.gravimetric import helpers
 
 
@@ -34,9 +34,9 @@ def _run(protocol: ProtocolContext) -> None:
         labware_dir = infer_config_base_dir() / "testing_data" / "labware-definitions"
     else:
         labware_dir = Path(__file__).parent.parent.parent / "labware-definitions"
-    p, l, r = gravimetric.setup(
+    p, l, r = execute.setup(
         protocol,
-        gravimetric.ExecuteGravConfig(
+        execute.ExecuteGravConfig(
             name=metadata["protocolName"],
             vial_slot=2,
             tiprack_slot=6,
@@ -49,8 +49,8 @@ def _run(protocol: ProtocolContext) -> None:
     vial_well = protocol.loaded_labwares[2]["A1"]
     if TEST_VIAL_LIQUID:
         _move_to_vial_liquid_surface(protocol, l, vial_well, p.pipette)
-    gravimetric.run(protocol, p, l, r, vial_well, volumes=[45.0], samples=12)
-    gravimetric.analyze(protocol, p, r)
+    execute.run(protocol, p, l, r, vial_well, volumes=[45.0], samples=12)
+    execute.analyze(protocol, p, r)
 
 
 if __name__ == "__main__":

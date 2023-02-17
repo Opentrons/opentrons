@@ -118,11 +118,11 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> Tuple[PipetteLiquidCl
 
     # USER SETUP LIQUIDS
     setup_str = _liq_track.get_setup_instructions_string()
-    ctx.comment(setup_str)
+    print(setup_str)
     if ctx.is_simulating():
-        ctx.comment("press ENTER when ready...")
+        print("press ENTER when ready...")
     else:
-        ctx.pause("press ENTER when ready...")
+        input("press ENTER when ready...")
 
     # DONE
     return _liq_pip, _liq_track, _recorder
@@ -145,7 +145,7 @@ def run(
         if liquid_pipette.pipette.has_tip:
             liquid_pipette.pipette.drop_tip()
         for i, sample_volume in enumerate(sample_volumes):
-            ctx.comment(f"{i + 1}/{len(sample_volumes)}: {sample_volume} uL")
+            print(f"{i + 1}/{len(sample_volumes)}: {sample_volume} uL")
             liquid_pipette.create_empty_timestamp(tag=str(sample_volume))
             liquid_pipette.pipette.pick_up_tip()
             liquid_pipette.aspirate(
@@ -157,7 +157,7 @@ def run(
             )
             liquid_pipette.pipette.drop_tip()
             liquid_pipette.save_latest_timestamp()
-        ctx.comment("One final pause to wait for final reading to settle")
+        print("One final pause to wait for final reading to settle")
         ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
     finally:
         recorder.stop()
@@ -265,19 +265,19 @@ def _analyze_recording_and_timestamps(
     assert len(dispense_volumes)
     dispense_avg = sum(dispense_volumes) / len(dispense_volumes)
     dispense_cv = stdev(dispense_volumes) / max(dispense_avg, 0.00000001)
-    ctx.comment("Summary:")
-    ctx.comment(f"\tAverage: {round(dispense_avg * 1000, 2)} mg")
-    ctx.comment(f"\tCV: {round(dispense_cv * 100, 3)}%")
-    ctx.comment("\tVolumes:")
+    print("Summary:")
+    print(f"\tAverage: {round(dispense_avg * 1000, 2)} mg")
+    print(f"\tCV: {round(dispense_cv * 100, 3)}%")
+    print("\tVolumes:")
     for i, v in enumerate(dispense_volumes):
-        ctx.comment(f"\t\t{i + 1})\t{round(v * 1000.0, 2)} mg")
+        print(f"\t\t{i + 1})\t{round(v * 1000.0, 2)} mg")
 
 
 def analyze(ctx: ProtocolContext, liquid_pipette: PipetteLiquidClass, recorder: GravimetricRecorder) -> None:
     """Analyze."""
     # FIXME: this totally breaks when simulating
     if ctx.is_simulating():
-        ctx.comment("FIXME: skipping analysis during simulation")
+        print("FIXME: skipping analysis during simulation")
         return
     _analyze_recording_and_timestamps(
         ctx, recorder.recording, liquid_pipette.get_timestamps()
