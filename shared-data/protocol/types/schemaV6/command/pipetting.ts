@@ -97,7 +97,8 @@ interface VolumeParams {
 interface WellLocationParam {
   wellLocation?: {
     // default value is 'top'
-    origin?: 'top' | 'bottom'
+    // value of 'default' is only valid for drop tip commands
+    origin?: 'top' | 'bottom' | 'center' | 'default'
     offset?: {
       // mm
       // all values default to 0

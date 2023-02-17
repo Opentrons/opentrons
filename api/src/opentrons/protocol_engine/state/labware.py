@@ -438,7 +438,15 @@ class LabwareView(HasState[LabwareState]):
             raise errors.LabwareIsNotTipRackError(
                 f"Labware {labware_id} has no tip length defined."
             )
+
         return definition.parameters.tipLength
+
+    def get_tip_drop_z_offset(
+        self, labware_id: str, length_scale: float, additional_offset: float
+    ) -> float:
+        """Get the tip drop offset from the top of the well."""
+        tip_length = self.get_tip_length(labware_id)
+        return -tip_length * length_scale + additional_offset
 
     def get_definition_uri(self, labware_id: str) -> str:
         """Get a labware's definition URI."""

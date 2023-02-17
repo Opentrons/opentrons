@@ -15,6 +15,8 @@ from opentrons.protocol_engine import (
     WellLocation,
     WellOffset,
     WellOrigin,
+    DropTipWellLocation,
+    DropTipWellOrigin,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import FlowRates
@@ -240,6 +242,20 @@ def test_pick_up_tip(
     )
 
 
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_get_return_height(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should get the return tip scale from the engine state."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_return_tip_scale("abc123")
+    ).then_return(0.123)
+
+    result = subject.get_return_height()
+
+    assert result == 0.123
+
+
 def test_drop_tip_no_location(
     decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
 ) -> None:
@@ -257,8 +273,44 @@ def test_drop_tip_no_location(
             pipette_id="abc123",
             labware_id="labware-id",
             well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.DEFAULT,
+                offset=WellOffset(x=0, y=0, z=0),
+            ),
+            home_after=True,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_with_location(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should drop a tip given a well core."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    well_core = WellCore(
+        name="well-name",
+        labware_id="labware-id",
+        engine_client=mock_engine_client,
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="labware-id",
+            well_name="well-name",
+            absolute_point=Point(1, 2, 3),
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.drop_tip(location=location, well_core=well_core, home_after=True)
+
+    decoy.verify(
+        mock_engine_client.drop_tip(
+            pipette_id="abc123",
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             home_after=True,
         ),

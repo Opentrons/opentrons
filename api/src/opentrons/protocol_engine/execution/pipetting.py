@@ -8,7 +8,7 @@ from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateStore, CurrentWell, HardwarePipette
 from ..resources import LabwareDataProvider
-from ..types import WellLocation, WellOrigin, DeckPoint
+from ..types import WellLocation, DropTipWellLocation, WellOrigin, DeckPoint
 from .movement import MovementHandler
 
 
@@ -154,7 +154,7 @@ class PipettingHandler:
         pipette_id: str,
         labware_id: str,
         well_name: str,
-        well_location: WellLocation,
+        well_location: DropTipWellLocation,
         home_after: Optional[bool],
     ) -> DeckPoint:
         """Drop a tip at the specified "well"."""
