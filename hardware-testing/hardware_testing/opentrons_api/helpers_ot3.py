@@ -1,4 +1,5 @@
 """Opentrons helper methods."""
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
 from subprocess import run
@@ -93,6 +94,7 @@ async def build_async_ot3_hardware_api(
     pipette_left: Optional[str] = None,
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
+    loop: Optional[asyncio.AbstractEventLoop] = None
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
@@ -111,7 +113,7 @@ async def build_async_ot3_hardware_api(
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
         restart_canbus_ot3()
-    return await builder(**kwargs)  # type: ignore[arg-type]
+    return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
 
 
 def set_gantry_per_axis_setting_ot3(

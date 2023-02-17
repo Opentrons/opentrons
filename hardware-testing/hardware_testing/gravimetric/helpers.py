@@ -1,10 +1,12 @@
 """Opentrons helper methods."""
+import asyncio
 from types import MethodType
 from typing import Any, List, Dict, Optional
 
 from opentrons import protocol_api
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.types import APIVersion
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.ot3api import OT3API
@@ -49,17 +51,19 @@ def get_api_context(
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
 ) -> protocol_api.ProtocolContext:
 
-    async def _build_hw_api(*args: Any, **kwargs: Any) -> OT3API:
+    async def _thread_manager_build_hw_api(
+            *args: Any, loop: asyncio.AbstractEventLoop, **kwargs: Any) -> OT3API:
         return await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=is_simulating,
             pipette_left=pipette_left,
             pipette_right=pipette_right,
-            gripper=gripper
+            gripper=gripper,
+            loop=loop
         )
 
     return protocol_api.create_protocol_context(
         api_version=APIVersion.from_string(api_level),
-        hardware_api=ThreadManager(_build_hw_api),  # type: ignore[arg-type]
+        hardware_api=ThreadManager(_thread_manager_build_hw_api),  # type: ignore[arg-type]
         extra_labware=extra_labware,
     )
 
