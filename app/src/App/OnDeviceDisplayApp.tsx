@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import { useIdle } from 'react-use'
 
 import {
   Box,
   POSITION_RELATIVE,
   COLORS,
   OVERFLOW_SCROLL,
+  useIdle,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -161,26 +161,25 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   },
 ]
 
-const SLEEP_SWITCH_MS = 100
+const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
+  'mousedown',
+  'click',
+  'scroll',
+]
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
   const { sleepMs } = useSelector(getOnDeviceDisplaySettings)
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
-
-  const _isIdle = useIdle(sleepTime, false)
-  const [isIdle, setIsIdle] = React.useState(false)
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setIsIdle(_isIdle), SLEEP_SWITCH_MS)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [_isIdle])
+  const options = {
+    events: onDeviceDisplayEvents,
+    initialState: false,
+  }
+  const isIdle = useIdle(sleepTime, options)
 
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%">
-        {isIdle ? (
+        {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (
           <Switch>
