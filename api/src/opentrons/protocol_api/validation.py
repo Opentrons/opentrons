@@ -241,7 +241,7 @@ def validate_location(
 
     if not isinstance(target_location, (Location, Well)):
         raise LocationTypeError(
-            "location should be a Well or Location, but it is {}".format(location)
+            f"location should be a Well or Location, but it is {location}"```
         )
 
     in_place = target_location == last_location
