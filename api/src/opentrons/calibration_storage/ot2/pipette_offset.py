@@ -1,9 +1,13 @@
 import json
 import typing
 import logging
+import importlib
 from pydantic import ValidationError
 from dataclasses import asdict
 
+import pytest
+
+import opentrons
 from opentrons import config, types
 
 from .. import file_operators as io, types as local_types
@@ -14,6 +18,12 @@ from opentrons.types import Mount, Point
 from opentrons.util.helpers import utc_now
 
 log = logging.getLogger(__name__)
+
+
+@pytest.fixture(autouse=True, scope="module")
+def reload_module() -> None:
+    importlib.reload(opentrons.calibration_storage)
+
 
 # Delete Pipette Offset Calibrations
 
