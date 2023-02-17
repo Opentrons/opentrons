@@ -4,16 +4,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from opentrons.config.robot_configs import default_pipette_offset
 
+from opentrons import calibration_storage
+from opentrons.calibration_storage import types, helpers
 from opentrons.types import Mount, Point
-from opentrons.calibration_storage import (
-    types,
-    helpers,
-    load_tip_length_calibration,
-    get_pipette_offset,
-    save_pipette_calibration,
-)
 from opentrons.hardware_control.types import OT3Mount
-
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -81,7 +75,7 @@ def load_pipette_offset(
     else:
         checked_mount = mount
     if pip_id:
-        pip_offset_data = get_pipette_offset(pip_id, checked_mount)
+        pip_offset_data = calibration_storage.get_pipette_offset(pip_id, checked_mount)
         if pip_offset_data:
             return PipetteOffsetByPipetteMount(
                 offset=pip_offset_data.offset,
@@ -112,12 +106,11 @@ def save_pipette_offset_calibration(
     else:
         checked_mount = mount
     if pip_id:
-        save_pipette_calibration(
+        calibration_storage.save_pipette_calibration(
             offset, pip_id, checked_mount, tiprack_hash, tiprack_uri
         )
 
 
-# TODO(mc, 2023-02-16): this function is not covered by unit tests
 # TODO (lc 09-26-2022) We should ensure that only LabwareDefinition models are passed
 # into this function instead of a mixture of TypeDicts and BaseModels
 def load_tip_length_for_pipette(
@@ -126,7 +119,9 @@ def load_tip_length_for_pipette(
     if isinstance(tiprack, LabwareDefinition):
         tiprack = typing.cast("TypeDictLabwareDef", tiprack.dict(exclude_none=True))
 
-    tip_length_data = load_tip_length_calibration(pipette_id, tiprack)
+    tip_length_data = calibration_storage.load_tip_length_calibration(
+        pipette_id, tiprack
+    )
 
     # TODO (lc 09-26-2022) We shouldn't have to do a hash twice. We should figure out what
     # information we actually need from the labware definition and pass it into
