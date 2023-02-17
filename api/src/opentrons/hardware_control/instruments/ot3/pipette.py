@@ -272,7 +272,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             NUM_ROWS = 12
             NUM_COLS = 8
             X_DIRECTION_VALUE = -1
-            Y_DIVISION = 3
         elif self.channels.value == 8:
             NUM_ROWS = 1
             NUM_COLS = 8
@@ -293,7 +292,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             raise InvalidMoveError(
                 f"Critical point {cp_override.name} is not valid for a pipette"
             )
-
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0
