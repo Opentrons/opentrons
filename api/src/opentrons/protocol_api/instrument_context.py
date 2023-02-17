@@ -336,7 +336,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
-                in_place=dispense_in_place,
+                in_place=target.in_place,
             )
 
         return self
