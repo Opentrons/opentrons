@@ -296,7 +296,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
-        dispense_in_place = target.in_place
         if isinstance(target, validation.WellTarget):
             well = target.well
             if target.location:
