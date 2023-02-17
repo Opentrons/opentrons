@@ -405,7 +405,7 @@ def test_blow_out_to_well(
     )
 
 
-def test_blow_out_in_place(
+def test_blow_to_coordinates(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
