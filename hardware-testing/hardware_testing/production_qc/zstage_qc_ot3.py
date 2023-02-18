@@ -116,14 +116,14 @@ def _create_csv_and_get_callbacks(sn:str) -> Tuple[CSVProperties, CSVCallbacks]:
 
 
 async def _home(messenger: CanMessenger) -> None:
-    await _set_pipette_current(messenger, default_run_current)
+    await _set_current(messenger, default_run_current)
     home_runner = MoveGroupRunner(
         move_groups=[[create_home_step({NODE: float64(100.0)}, {NODE: float64(-5)})]]
     )
     await home_runner.run(can_messenger=messenger)
 
 async def _homeMount(messenger: CanMessenger) -> None:
-    await _set_pipette_current(messenger, default_run_current)
+    await _set_current(messenger, default_run_current)
     # Home mount Left
     home_runner = MoveGroupRunner(
         move_groups=[[create_home_step({NodeId.head_l: float64(100.0)}, {NodeId.head_l: float64(-5)})]]
@@ -135,7 +135,25 @@ async def _homeMount(messenger: CanMessenger) -> None:
     )
     await home_runner.run(can_messenger=messenger)
 
-async def _set_pipette_current(messenger: CanMessenger, run_current: float) -> None:
+async def _home_check(messenger: CanMessenger) -> None:
+    check = True
+    count = 0
+    while check:
+        count += 1
+        mot, enc = await _move_to(
+                    messenger, 1, default_move_speed, check=True
+                )
+        if abs(enc) <= 1.1:
+            check = False
+        elif count > 5:
+            raise OverHomeCountError
+        else:
+            await _home(messenger)
+
+
+
+
+async def _set_current(messenger: CanMessenger, run_current: float) -> None:
     currents: Dict[NodeId, Tuple[float, float]] = dict()
     currents[NODE] = (float(0.1), float(run_current))
     try:
@@ -148,6 +166,9 @@ class LoseStepError(Exception):
     """Lost Step Error."""
 
     pass
+
+class OverHomeCountError(Exception):
+    print('Homed over the max count, please check the z-stage')
 
 async def _move_to(
     messenger: CanMessenger,
@@ -192,7 +213,7 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
         for sp in speeds:
             print('Start Currents and Speeds testing, Current= {}, Speed= {}::::'.format(cu, sp))
             try:
-                await _set_pipette_current(messenger, cu)
+                await _set_current(messenger, cu)
                 for c in range(CYCLES):
                     # print(f"cycle: {c + 1}/{CYCLES}")
                     mot, enc = await _move_to(
@@ -210,8 +231,8 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
                         print(e)
             except LoseStepError as e:
                 print(str(e))
-                await _set_pipette_current(messenger, default_run_current)
-                await _home(messenger)
+                await _set_current(messenger, default_run_current)
+                await _home_check(messenger)
                 mot, enc = await _move_to(
                     messenger, 10, default_move_speed, check=True
                 )
@@ -243,7 +264,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
     mark10 = _connect_to_mark10_fixture(False)
     for cu_fg in force_gauge_currents:
         for sp_fg in force_gauge_speeds:
-            await _set_pipette_current(messenger, default_run_current)
+            await _set_current(messenger, default_run_current)
             await _home(messenger)
             await _move_to(
                 messenger, 85, default_move_speed, check=True
@@ -255,7 +276,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 thread_sensor = True
                 TH.start()
                 distance_fg = 95
-                await _set_pipette_current(messenger, cu_fg)
+                await _set_current(messenger, cu_fg)
                 await _move_to(
                     messenger, distance_fg, sp_fg, check=True
                 )
@@ -263,8 +284,8 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 thread_sensor = False
                 TH.join()
                 print(e)
-                await _set_pipette_current(messenger, default_run_current)
-                await _home(messenger)
+                await _set_current(messenger, default_run_current)
+                await _home_check(messenger)
 
 def _print_title(title: str) -> None:
     PRINT_HEADER_NUM_SPACES = 4
