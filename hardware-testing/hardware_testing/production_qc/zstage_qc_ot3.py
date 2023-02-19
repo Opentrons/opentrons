@@ -143,10 +143,12 @@ async def _home_check(messenger: CanMessenger) -> None:
         mot, enc = await _move_to(
                     messenger, 1, default_move_speed, check=True
                 )
+        print("enc",enc)
         if abs(enc) <= 1.1:
             check = False
         elif count > 5:
-            raise OverHomeCountError
+            #raise OverHomeCountError
+            print(233333)
         else:
             await _home(messenger)
 
@@ -230,12 +232,17 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
                     except Exception as e:
                         print(e)
             except LoseStepError as e:
+                print(44444444)
                 print(str(e))
                 await _set_current(messenger, default_run_current)
-                await _home_check(messenger)
+                print(5555555)
+                await _home(messenger)
+                #await _home_check(messenger)
+                print(6666666)
                 mot, enc = await _move_to(
-                    messenger, 10, default_move_speed, check=True
+                    messenger, 10, default_move_speed, check=False
                 )
+                print(7777777)
                 print(f"motor position: {mot}, encoder position: {enc}")
                 write_cb([_convert_node_to_str(NODE), cu, sp, 'FAIL'])
                 CURRENTS_SPEEDS_TEST_RESULTS.append([_convert_node_to_str(NODE), cu, sp, 'FAIL'])
@@ -267,7 +274,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
             await _set_current(messenger, default_run_current)
             await _home(messenger)
             await _move_to(
-                messenger, 85, default_move_speed, check=True
+                messenger, 90, default_move_speed, check=True
             )
             print(f'current = {cu_fg},speed = {sp_fg}')
             TH = Thread(target=_record_force, args=(mark10,messenger,write_cb))
@@ -275,7 +282,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 print('Start record force...')
                 thread_sensor = True
                 TH.start()
-                distance_fg = 95
+                distance_fg = 100
                 await _set_current(messenger, cu_fg)
                 await _move_to(
                     messenger, distance_fg, sp_fg, check=True
@@ -285,7 +292,9 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 TH.join()
                 print(e)
                 await _set_current(messenger, default_run_current)
-                await _home_check(messenger)
+                print(88888888888888)
+                await _home(messenger)
+                #await _home_check(messenger)
 
 def _print_title(title: str) -> None:
     PRINT_HEADER_NUM_SPACES = 4
@@ -330,9 +339,12 @@ async def _run(messenger: CanMessenger,arguments: argparse.Namespace) -> None:
     if "q" in input("\n\tEnter 'q' to exit"):
         raise KeyboardInterrupt()
     global NODE
+    print(11111111)
     await _homeMount(messenger)
+    print(22222222)
     # callback function for writing new data to CSV file
     csv_props, csv_cb = _create_csv_and_get_callbacks(arguments.sn)
+    print(333333)
     # cache the pressure-data header
     # add metadata to CSV
     # FIXME: create a set of CSV helpers, such that you can define a test-report
