@@ -240,7 +240,7 @@ async def _currents_speeds_test(messenger: CanMessenger,write_cb: Callable):
                 #await _home_check(messenger)
                 print(6666666)
                 mot, enc = await _move_to(
-                    messenger, 10, default_move_speed, check=False
+                    messenger, 15, default_move_speed, check=False
                 )
                 print(7777777)
                 print(f"motor position: {mot}, encoder position: {enc}")
@@ -274,7 +274,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
             await _set_current(messenger, default_run_current)
             await _home(messenger)
             await _move_to(
-                messenger, 90, default_move_speed, check=True
+                messenger, 85, default_move_speed, check=True
             )
             print(f'current = {cu_fg},speed = {sp_fg}')
             TH = Thread(target=_record_force, args=(mark10,messenger,write_cb))
@@ -282,7 +282,7 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 print('Start record force...')
                 thread_sensor = True
                 TH.start()
-                distance_fg = 100
+                distance_fg = 95
                 await _set_current(messenger, cu_fg)
                 await _move_to(
                     messenger, distance_fg, sp_fg, check=True
@@ -292,6 +292,9 @@ async def _force_gauge(messenger: CanMessenger,write_cb: Callable):
                 TH.join()
                 print(e)
                 await _set_current(messenger, default_run_current)
+                mot, enc = await _move_to(
+                    messenger, 75, -default_move_speed, check=False
+                )
                 print(88888888888888)
                 await _home(messenger)
                 #await _home_check(messenger)
