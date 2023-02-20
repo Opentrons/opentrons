@@ -203,7 +203,7 @@ async def home(messenger, node, args):
             ]
         ]
     )
-    current = 1.0
+    current = 0.8
     try:
         await set_pipette_current(current, args)
         await home_runner.run(can_messenger = messenger)
