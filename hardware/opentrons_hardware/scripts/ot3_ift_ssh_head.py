@@ -184,6 +184,8 @@ async def set_pipette_current(run_current,args) -> None:
         node = NodeId.head_l
     elif args.node == "head_r":
         node = NodeId.head_r
+    elif args.node == "gantry_x":
+        node = NodeId.gantry_x
     currents: Dict[NodeId, Tuple[float, float]] = {}
     currents[node] = (float(0.1), float(run_current))
 
@@ -271,6 +273,8 @@ async def  run(args: argparse.Namespace) -> None:
         node = NodeId.head_l
     elif args.node == "head_r":
         node = NodeId.head_r
+    elif args.node == "gantry_x":
+        node = NodeId.gantry_x
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
