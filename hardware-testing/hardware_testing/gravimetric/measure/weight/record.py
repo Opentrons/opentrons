@@ -1,4 +1,5 @@
 """Record weight measurements."""
+from contextlib import contextmanager
 from dataclasses import dataclass
 from statistics import stdev
 from threading import Thread, Event
@@ -23,20 +24,22 @@ class GravimetricSample:
     time: float
     grams: float
     stable: bool
+    tag: Optional[str]
 
     @classmethod
     def csv_header(cls) -> str:
         """Get CSV header line."""
-        return "time,relative-time,grams,unstable-grams,stable-grams,stable"
+        return "time,relative-time,grams,unstable-grams,stable-grams,stable,tag"
 
     def as_csv(self, start_time: float) -> str:
         """Get data as a single CSV line."""
         rel_time = self.relative_time(start_time)
         unstable_grams = str(self.grams) if not self.stable else ""
         stable_grams = str(self.grams) if self.stable else ""
+        tag = self.tag if self.tag else ""
         return (
             f"{self.time},{rel_time},{self.grams},"
-            f"{unstable_grams},{stable_grams},{int(self.stable)}"
+            f"{unstable_grams},{stable_grams},{int(self.stable)},{tag}"
         )
 
     def relative_time(self, start_time: float) -> float:
@@ -74,13 +77,21 @@ class GravimetricRecording(List):
         time_idx = header_list.index("time")
         grams_idx = header_list.index("grams")
         stable_idx = header_list.index("stable")
+        tag_idx = header_list.index("tag")
         split_lines = [line.strip().split(",") for line in lines[1:] if line]
+
+        def _parse_tag(tag_from_csv: str) -> Optional[str]:
+            if not tag_from_csv:
+                return None
+            return tag_from_csv
+
         return GravimetricRecording(
             [
                 GravimetricSample(
                     time=float(split_line[time_idx]),
                     grams=float(split_line[grams_idx]),
                     stable=bool(int(split_line[stable_idx])),
+                    tag=_parse_tag(split_line[tag_idx]),
                 )
                 for split_line in split_lines
                 if len(split_line) > 1
@@ -261,6 +272,7 @@ class GravimetricRecorder:
         self._is_recording = Event()
         self._reading_samples = Event()
         self._thread: Optional[Thread] = None
+        self._sample_tag: Optional[str] = None
         super().__init__()
         self.activate()
 
@@ -303,6 +315,15 @@ class GravimetricRecorder:
     def set_duration(self, duration: float) -> None:
         """Set stable."""
         self._cfg.duration = duration
+
+    @contextmanager
+    def set_sample_tag(self, tag: Optional[str]) -> None:
+        """Set the sample tag."""
+        self._sample_tag = tag
+        try:
+            yield
+        finally:
+            self._sample_tag = None
 
     def calibrate_scale(self) -> None:
         """Calibrate scale."""
@@ -388,7 +409,7 @@ class GravimetricRecorder:
                 if self._cfg.stable and not mass.stable:
                     _recording.clear()  # delete all previously recorded samples
                     continue
-                _s = GravimetricSample(grams=mass.grams, stable=mass.stable, time=mass.time)
+                _s = GravimetricSample(grams=mass.grams, stable=mass.stable, time=mass.time, tag=self._sample_tag)
                 _recording.append(_s)
                 self._reading_samples.set()
                 if callable(on_new_sample):

@@ -1,16 +1,11 @@
 """Pipette motions."""
 from dataclasses import dataclass
-from typing import Optional, Callable, List
+from typing import Optional, Callable
 
-from opentrons.protocol_api import ProtocolContext, InstrumentContext
-from opentrons.protocol_api.labware import Well, Labware
+from opentrons.protocol_api import InstrumentContext
+from opentrons.protocol_api.labware import Well
 from opentrons.protocols.api_support.types import APIVersion
 
-from hardware_testing.data import (
-    create_file_name,
-    dump_data_to_file,
-    append_data_to_file,
-)
 from hardware_testing.gravimetric.liquid.height import LiquidTracker
 from hardware_testing.gravimetric.liquid.liquid_class import (
     LiquidClassSettings,
@@ -18,7 +13,6 @@ from hardware_testing.gravimetric.liquid.liquid_class import (
 )
 from hardware_testing.gravimetric.helpers import get_pipette_unique_name
 
-from .timestamp import Timestamp, SampleTimestamps, get_empty_sample_timestamp
 
 LABWARE_BOTTOM_CLEARANCE = 1.5  # FIXME: not sure who should own this
 
@@ -93,7 +87,6 @@ class LiquidSettingsRunner:
         self,
         delay_method: Callable,
         cfg: LiquidSettingsRunnerConfig,
-        timestamp: SampleTimestamps,
     ) -> None:
         """Pipetting Liquid Settings."""
         assert (
@@ -104,7 +97,6 @@ class LiquidSettingsRunner:
         ), "cannot both aspirate and dispense"
         self._delay_method = delay_method
         self._cfg = cfg
-        self._timestamps = timestamp
 
     def run(
         self,
@@ -113,7 +105,6 @@ class LiquidSettingsRunner:
     ) -> None:
         """Run."""
         self._run_approach()
-        self._timestamp_pre_submerge()
         if callable(on_pre_submerge):
             on_pre_submerge(self._cfg)
         self._run_gather_air_gaps()
@@ -122,38 +113,12 @@ class LiquidSettingsRunner:
             self._run_aspirate()
         else:
             self._run_dispense()
-        self._timestamp_sample()
         self._run_delay()
         self._run_retract()
         self._run_blow_out()
         self._run_finish()
-        self._timestamp_post_emerge()
         if callable(on_post_emerge):
             on_post_emerge(self._cfg)
-
-    def _timestamp_pre_submerge(self) -> None:
-        if self._cfg.aspirate:
-            t = Timestamp(f"{self._cfg.aspirate}-pre-aspirate")
-            self._timestamps.pre_aspirate = t
-        else:
-            t = Timestamp(f"{self._cfg.dispense}-pre-dispense")
-            self._timestamps.pre_dispense = t
-
-    def _timestamp_sample(self) -> None:
-        if self._cfg.aspirate:
-            t = Timestamp(f"{self._cfg.aspirate}-aspirate")
-            self._timestamps.aspirate = t
-        else:
-            t = Timestamp(f"{self._cfg.dispense}-dispense")
-            self._timestamps.dispense = t
-
-    def _timestamp_post_emerge(self) -> None:
-        if self._cfg.aspirate:
-            t = Timestamp(f"{self._cfg.aspirate}-post-aspirate")
-            self._timestamps.post_aspirate = t
-        else:
-            t = Timestamp(f"{self._cfg.dispense}-post-dispense")
-            self._timestamps.post_dispense = t
 
     def _run_approach(self) -> None:
         self._cfg.pipette.move_to(self._cfg.well.top())
@@ -238,7 +203,6 @@ class PipetteLiquidClass:
         self._on_post_aspirate: Optional[Callable] = None
         self._on_pre_dispense: Optional[Callable] = None
         self._on_post_dispense: Optional[Callable] = None
-        self._sample_timestamps_list: List = list()
         self._file_name: Optional[str] = None
 
     @property
@@ -255,33 +219,6 @@ class PipetteLiquidClass:
     def pipette(self) -> InstrumentContext:
         """Pipette."""
         return self._pipette
-
-    def clear_timestamps(self) -> None:
-        """Clear timestamps."""
-        self._sample_timestamps_list = list()
-
-    def get_timestamps(self) -> List[SampleTimestamps]:
-        """Get timestamps."""
-        return self._sample_timestamps_list
-
-    def create_empty_timestamp(self, tag: str = "") -> None:
-        """Create empty timestamp."""
-        self._sample_timestamps_list.append(get_empty_sample_timestamp(tag=tag))
-
-    def save_latest_timestamp(self) -> None:
-        """Save latest timestamp."""
-        assert self._file_name, "No file to save to, please activate recording first"
-        _latest = self._sample_timestamps_list[-1]
-        csv_line = _latest.as_csv(self._start_time)
-        append_data_to_file(self._test_name, self._file_name, csv_line + "\n")
-
-    def record_timestamp_enable(self) -> None:
-        """Enable recording timestamps."""
-        self._file_name = create_file_name(self._test_name, self._run_id, self.tag)
-        # add the header to the CSV file
-        dump_data_to_file(
-            self._test_name, self._file_name, SampleTimestamps.csv_header() + "\n"
-        )
 
     def record_timestamp_disable(self) -> None:
         """Disable recording timestamps."""
@@ -342,9 +279,8 @@ class PipetteLiquidClass:
             aspirate=aspirate,
             dispense=dispense,
         )
-        timestamps = self._sample_timestamps_list[-1]
         pip_runner = LiquidSettingsRunner(
-            delay_method=self._delay_method, cfg=pipetting_cfg, timestamp=timestamps
+            delay_method=self._delay_method, cfg=pipetting_cfg
         )
         if aspirate:
             pip_runner.run(
