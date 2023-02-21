@@ -1,8 +1,11 @@
+import { Flex, TYPOGRAPHY, COLOR_ERROR, JUSTIFY_SPACE_BETWEEN, Link } from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import type { GripperWizardStepProps } from './types'
 
 export const MountGripper = (
@@ -13,18 +16,13 @@ export const MountGripper = (
     attachedGripper,
     isRobotMoving,
     goBack,
-    chainRunCommands,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
-  if (attachedGripper == null) return null
-  // TODO: if clicked and attachedGripper not detected, show "Unable to Detect Gripper" tile
+  const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
   const handleOnClick = (): void => {
-    chainRunCommands([
-     // TODO: move gantry to mount/unmount location here
-    ]).then(() => {
-      proceed()
-    })
-    proceed()
+    attachedGripper == null
+      ? setShowUnableToDetect(true)
+      : proceed()
   }
 
   if (isRobotMoving)
@@ -33,7 +31,23 @@ export const MountGripper = (
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
-  return (
+  return showUnableToDetect ? (
+    <SimpleWizardBody
+      header={t('unable_to_detect_gripper')}
+      iconColor={COLOR_ERROR}
+      isSuccess={false}
+    >
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Link
+            role="button"
+            css={TYPOGRAPHY.darkLinkH4SemiBold}
+            onClick={goBack}>
+            {t('shared:go_back')}
+          </Link>
+        <PrimaryButton onClick={() => setShowUnableToDetect(false)}>{t('shared:try_again')}</PrimaryButton>
+      </Flex> 
+    </SimpleWizardBody>
+  ) : (
     <GenericWizardTile
       header={t('connect_and_screw_in_gripper')}
       rightHandBody={

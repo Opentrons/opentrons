@@ -14,8 +14,7 @@ import {
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-import { CreateCommand, LEFT, RunTimeCommand } from '@opentrons/shared-data'
-import { flow } from 'lodash'
+import { CreateCommand, LEFT } from '@opentrons/shared-data'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -83,7 +82,7 @@ export const BeforeBeginning = (
   const handleOnClick = (): void => {
     chainRunCommands(commandsOnProceed, true).then(() => {
       proceed()
-    })
+    }).catch(() => {})
   }
 
   const equipmentInfoByLoadName: {
