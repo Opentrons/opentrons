@@ -25,3 +25,9 @@ export interface Instruments {
   data: InstrumentsData
   meta: InstrumentsMeta
 }
+
+export interface GetInstrumentsRequestParams {
+  refresh?: boolean
+}
+
+

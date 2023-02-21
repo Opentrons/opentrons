@@ -53,7 +53,7 @@ export function InstrumentsAndModules({
 
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
-  })
+  }, true)
   const extensionInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const is96ChannelAttached = getIs96ChannelPipetteAttached(

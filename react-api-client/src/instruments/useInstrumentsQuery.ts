@@ -5,12 +5,13 @@ import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type { HostConfig, Instruments } from '@opentrons/api-client'
 
 export function useInstrumentsQuery(
-  options: UseQueryOptions<Instruments> = {}
+  options: UseQueryOptions<Instruments> = {},
+  refresh: boolean = false
 ): UseQueryResult<Instruments> {
   const host = useHost()
   const query = useQuery<Instruments>(
     [host, 'instruments'],
-    () => getInstruments(host as HostConfig).then(response => response.data),
+    () => getInstruments(host as HostConfig, { refresh }).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

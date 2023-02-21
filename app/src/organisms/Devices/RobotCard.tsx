@@ -138,7 +138,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { data: attachedInstruments } = useInstrumentsQuery({}, true)
   const extensionInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const leftPipetteDisplayName = attachedPipettes?.left?.modelSpecs.displayName
