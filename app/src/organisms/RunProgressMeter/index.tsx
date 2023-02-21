@@ -57,6 +57,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId)
   const analysisCommands = analysis?.commands ?? []
   const runCommands = allCommandsQueryData?.data ?? []
+  const runCommandsLength = allCommandsQueryData?.meta.totalLength
 
   // todo (jb 2-16-23) This should be switched out soon for something more performant, see https://opentrons.atlassian.net/browse/RLAB-298
   const { downloadRunLog } = useDownloadRunLog(
@@ -68,17 +69,20 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   /**
    * find the analysis command within the analysis
    * that has the same commandKey as the most recent
-   * command from the run record. NOTE: the most recent
+   * command from the run record.
+   * Or in the case of a non-deterministic protocol
+   * source from the run rather than the analysis
+   * NOTE: the most recent
    * command may not always be "current", for instance if
    * the run has completed/failed */
   const lastRunCommandKey = useLastRunCommandKey(runId)
   const lastRunCommandIndex =
     analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
-  const lastRunCommandIndexFromAllCommands =
+  const lastRunCommandIndexFromRunCommands =
     runCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
-  const { data: commandDetails } = useCommandQuery(
+  const { data: runCommandDetails } = useCommandQuery(
     runId,
-    runCommands[lastRunCommandIndexFromAllCommands]?.id
+    runCommands[lastRunCommandIndexFromRunCommands]?.id
   )
   let countOfTotalText = ''
   if (
@@ -86,8 +90,12 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     lastRunCommandIndex <= analysisCommands.length - 1
   ) {
     countOfTotalText = ` ${lastRunCommandIndex + 1}/${analysisCommands.length}`
-  } else if (lastRunCommandIndex === -1 && lastRunCommandKey != null) {
-    countOfTotalText = `${lastRunCommandIndexFromAllCommands + 1}/?`
+  } else if (
+    lastRunCommandIndex === -1 &&
+    lastRunCommandKey != null &&
+    runCommandsLength != null
+  ) {
+    countOfTotalText = `${runCommandsLength}/?`
   } else if (analysis == null) {
     countOfTotalText = '?/?'
   }
@@ -103,10 +111,13 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   } else if (
     analysis != null &&
     lastRunCommandIndex === -1 &&
-    commandDetails != null
+    runCommandDetails != null
   ) {
     currentStepContents = (
-      <CommandText robotSideAnalysis={analysis} command={commandDetails.data} />
+      <CommandText
+        robotSideAnalysis={analysis}
+        command={runCommandDetails.data}
+      />
     )
   } else if (
     runStatus === RUN_STATUS_IDLE &&
