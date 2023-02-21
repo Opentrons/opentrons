@@ -142,3 +142,56 @@ def test_lzma(testing_partition, tmpdir):
         assert cb.call_count == calls
         assert success
         assert msg == ""
+
+
+def test_decomp_and_write_raises_runtime_error(
+    tmpdir, mock_partition_manager_valid_switch: MagicMock
+):
+    """Test that decomp_and_write function raises RunTime Error when it fails."""
+    updater = OT3UpdateActions(
+        root_FS_intf=RootFSInterface(),
+        part_mngr=mock_partition_manager_valid_switch,
+    )
+
+    rfs_path = os.path.join(tmpdir, "rootfs.xz")
+    with lzma.open(rfs_path, "w") as f:
+        f.write(os.urandom(400000))
+
+    with mock.patch(
+        "otupdate.openembedded.update_actions.PartitionManager.get_partition_size",
+        mock.Mock(return_value=1),
+    ):
+        # make sure we catch RunTime Exception if the update size is larger than the partition size
+        try:
+            updater.decomp_and_write(rfs_path, lambda x: x(2))
+            assert (
+                False
+            ), "Did not raise RunTime error when update file is larger than partition."
+        except RuntimeError:
+            assert True, ""
+
+
+def test_write_update_fails(testing_partition, tmpdir):
+    """Test that we dont write update if update size is larger than partition size."""
+    rfs_path = os.path.join(tmpdir, "rootfs.xz")
+    with lzma.open(rfs_path, "w") as f:
+        f.write(os.urandom(400000))
+    cb = mock.Mock()
+    root_FS_intf = RootFSInterface()
+    p = Partition(2, testing_partition, "/media/mmcblk0p2")
+    total_size = 0
+    chunk_size = 1024 * 32
+    with lzma.open(rfs_path, "rb") as fsrc:
+        while True:
+            chunk = fsrc.read(chunk_size)
+            total_size += len(chunk)
+            if len(chunk) != chunk_size:
+                break
+    with mock.patch(
+        "otupdate.openembedded.update_actions.PartitionManager.get_partition_size",
+        mock.Mock(return_value=1),
+    ):
+        success, msg = root_FS_intf.write_update(rfs_path, p, cb, chunk_size)
+        cb.assert_not_called()
+        assert not success
+        assert msg != ""
