@@ -138,15 +138,12 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
-  const {data: attachedInstruments} = useInstrumentsQuery()
+  const { data: attachedInstruments } = useInstrumentsQuery()
   const extensionInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
-  
 
   const leftPipetteDisplayName = attachedPipettes?.left?.modelSpecs.displayName
-  const rightPipetteDisplayName =
-    attachedPipettes?.right?.modelSpecs.displayName
-
-  const extensionMountDisplayName = extensionInstrument != null ? getGripperDisplayName(extensionInstrument?.instrumentModel) : null
+  const rightPipetteDisplayName = attachedPipettes?.right?.modelSpecs.displayName
+  const extensionMountDisplayName = extensionInstrument != null && extensionInstrument.instrumentModel === 'gripperV1' ? getGripperDisplayName(extensionInstrument.instrumentModel) : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data
   // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
