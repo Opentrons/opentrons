@@ -7,7 +7,9 @@ from typing import TYPE_CHECKING
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.protocol_engine import DropTipWellLocation, errors
+from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
+
+from opentrons.protocol_engine import DropTipWellLocation
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.execution import (
     MovementHandler,
@@ -160,7 +162,7 @@ async def test_hardware_stopping_sequence_no_pipette(
             pipette_id="pipette-id",
             labware_id="tiprack-id",
         ),
-    ).then_raise(errors.PipetteNotAttachedError("oh no"))
+    ).then_raise(HwPipetteNotAttachedError("oh no"))
 
     await subject.do_stop_and_recover(drop_tips_and_home=True)
 

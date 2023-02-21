@@ -64,7 +64,8 @@ class PipettingHandler:
 
         # TODO(mc, 2022-01-12): this call hits the filesystem, which has performance
         # implications over the course of a protocol since most calls will be redundant
-        # FIXME: not needed when `use_virtual_pipettes is True`
+        # TODO(mc, 2023-02-21): skip if use_virtual_pipette
+        # https://opentrons.atlassian.net/browse/RCORE-625
         tip_length = await self._labware_data_provider.get_calibrated_tip_length(
             pipette_serial=self._state_store.pipettes.get_serial_number(pipette_id),
             labware_definition=self._state_store.labware.get_definition(labware_id),
@@ -103,7 +104,8 @@ class PipettingHandler:
         )
 
         # perform the tip pickup routine
-        # FIXME: skip if use_virtual_pipette
+        # TODO(mc, 2023-02-21): skip if use_virtual_pipette
+        # https://opentrons.atlassian.net/browse/RCORE-625
         await self._hardware_api.pick_up_tip(
             mount=hw_mount,
             tip_length=tip_length,
@@ -112,7 +114,8 @@ class PipettingHandler:
         )
 
         # after a successful pickup, update the hardware controller state
-        # FIXME: skip if use_virtual_pipette
+        # TODO(mc, 2023-02-21): skip if use_virtual_pipette
+        # https://opentrons.atlassian.net/browse/RCORE-625
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
             tiprack_diameter=tip_diameter,
@@ -172,7 +175,8 @@ class PipettingHandler:
             well_location=tip_drop_location,
         )
 
-        # perform the tip drop routine
+        # TODO(mc, 2023-02-21): skip if use_virtual_pipette
+        # https://opentrons.atlassian.net/browse/RCORE-625
         await self._hardware_api.drop_tip(
             mount=hw_mount,
             home_after=True if home_after is None else home_after,
