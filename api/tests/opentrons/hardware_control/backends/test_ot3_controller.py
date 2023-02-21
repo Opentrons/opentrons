@@ -8,13 +8,14 @@ from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
     axis_to_node,
+    sensor_node_for_mount,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
     MessageListenerCallbackFilter,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, LiquidProbeSettings
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -105,6 +106,31 @@ def mock_driver(mock_messenger: AsyncMock) -> AbstractCanDriver:
 def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Controller:
     with mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"):
         yield OT3Controller(mock_config, mock_driver)
+
+
+@pytest.fixture
+def fake_liquid_settings() -> LiquidProbeSettings:
+    return LiquidProbeSettings(
+        starting_mount_height=100,
+        max_z_distance=15,
+        min_z_distance=5,
+        mount_speed=40,
+        plunger_speed=10,
+        sensor_threshold_pascals=15,
+        expected_liquid_height=109,
+        log_pressure=False,
+        aspirate_while_sensing=False,
+        data_file="fake_data_file",
+    )
+
+
+@pytest.fixture
+def mock_send_stop_threshold() -> None:
+    with patch(
+        "opentrons_hardware.sensors.sensor_driver.SensorDriver.send_stop_threshold",
+        autospec=True,
+    ) as mock_stop_threshold:
+        yield mock_stop_threshold
 
 
 @pytest.fixture
@@ -604,6 +630,30 @@ async def test_ready_for_movement(
 
     axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
     assert controller.check_motor_status(axes) == ready
+
+
+@pytest.mark.parametrize("mount", [OT3Mount.LEFT, OT3Mount.RIGHT])
+async def test_liquid_probe(
+    mount: OT3Mount,
+    controller: OT3Controller,
+    fake_liquid_settings: LiquidProbeSettings,
+    mock_move_group_run,
+    mock_send_stop_threshold,
+) -> None:
+    await controller.liquid_probe(
+        mount=mount,
+        max_z_distance=fake_liquid_settings.max_z_distance,
+        mount_speed=fake_liquid_settings.mount_speed,
+        plunger_speed=fake_liquid_settings.plunger_speed,
+        threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
+        log_pressure=fake_liquid_settings.log_pressure,
+    )
+    move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
+    head_node = axis_to_node(OT3Axis.by_mount(mount))
+    tool_node = sensor_node_for_mount(mount)
+    assert move_groups[head_node].stop_condition == MoveStopCondition.sync_line
+    assert len(move_groups) == 2
+    assert move_groups[head_node], move_groups[tool_node]
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:

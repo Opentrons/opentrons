@@ -471,6 +471,7 @@ class HardwareAction(enum.Enum):
     DISPENSE = enum.auto()
     BLOWOUT = enum.auto()
     PREPARE_ASPIRATE = enum.auto()
+    LIQUID_PROBE = enum.auto()
 
     def __str__(self) -> str:
         return self.name
@@ -527,3 +528,29 @@ class GripperProbe(enum.Enum):
             return InstrumentProbeType.PRIMARY
         else:
             return InstrumentProbeType.SECONDARY
+
+
+class EarlyLiquidSenseTrigger(RuntimeError):
+    """Error raised if sensor threshold reached before minimum probing distance."""
+
+    def __init__(
+        self, triggered_at: Dict[OT3Axis, float], min_z_pos: Dict[OT3Axis, float]
+    ) -> None:
+        """Initialize EarlyLiquidSenseTrigger error."""
+        super().__init__(
+            f"Liquid threshold triggered early at z={triggered_at}mm, "
+            f"minimum z position = {min_z_pos}"
+        )
+
+
+class LiquidNotFound(RuntimeError):
+    """Error raised if liquid sensing move completes without detecting liquid."""
+
+    def __init__(
+        self, position: Dict[OT3Axis, float], max_z_pos: Dict[OT3Axis, float]
+    ) -> None:
+        """Initialize LiquidNotFound error."""
+        super().__init__(
+            f"Liquid threshold not found, current_position = {position}"
+            f"position at max travel allowed = {max_z_pos}"
+        )

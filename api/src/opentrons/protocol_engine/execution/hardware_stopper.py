@@ -5,7 +5,7 @@ from typing import Optional
 from opentrons.hardware_control import HardwareControlAPI
 from ..resources.ot3_validation import ensure_ot3_hardware
 from ..state import StateStore
-from ..types import MotorAxis, WellLocation
+from ..types import MotorAxis, DropTipWellLocation
 from ..errors import PipetteNotAttachedError, HardwareNotSupportedError
 
 from .movement import MovementHandler
@@ -74,7 +74,7 @@ class HardwareStopper:
                     pipette_id=pipette_id,
                     labware_id=FIXED_TRASH_ID,
                     well_name="A1",
-                    well_location=WellLocation(),
+                    well_location=DropTipWellLocation(),
                     home_after=None,
                 )
 

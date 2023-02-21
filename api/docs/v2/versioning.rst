@@ -258,21 +258,34 @@ If you specify an API version of 2.13 or lower, your protocols will continue to 
 
 - Deprecations and removals
 
+  - The ``presses`` and ``increment`` arguments of  :py:meth:`.InstrumentContext.pick_up_tip` were deprecated.
+    Configure your pipette pick-up settings with the Opentrons App, instead.
+
   - ``ModuleContext.load_labware_object`` was deprecated as an unnecessary internal method.
 
   - ``ModuleContext.geometry`` was deprecated in favor of
     :py:attr:`.ModuleContext.model` and :py:attr:`.ModuleContext.type`
 
+  - ``Well.geometry`` was deprecated as unnecessary.
+
   - ``MagneticModuleContext.calibrate`` was deprecated since it was never needed nor implemented.
 
-  - The ``height`` parameter of :py:meth:`MagneticModuleContext.engage` was deprecated.
+  - The ``height`` parameter of :py:meth:`.MagneticModuleContext.engage` was deprecated.
     Use ``offset`` or ``height_from_base`` instead.
 
   - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed,
     since they were holdovers from a calibration system that no longer exists.
  
-  - The :py:attr:`.Well.has_tip` setter was deprecated. The getter is not deprecated.
-    Use :py:meth:`.Labware.reset` to reset your tip rack's state, instead.
+  - Various methods and setters were deprecated that could modify tip state outside of
+    calls to :py:meth:`.InstrumentContext.pick_up_tip` and :py:meth:`.InstrumentContext.drop_tip`.
+    This change allows the robot to track tip usage more completely and reliably.
+    You may still use :py:meth:`.Labware.reset` to reset your tip rack's state.
 
-  - The ``presses`` and ``increment`` arguments of  :py:meth:`.InstrumentContext.pick_up_tip` were deprecated.
-    Configure your pipette pick-up settings with the Opentrons App, instead.
+      - The :py:attr:`.Well.has_tip` **setter** was deprecated. **The getter is not deprecated.**
+
+      - Internal methods ``Labware.use_tips``, ``Labware.previous_tip``, and ``Labware.return_tips``
+        were deprecated.
+
+  - The ``configuration`` argument of :py:meth:`.ProtocolContext.load_module` was deprecated
+    because it made unsafe modifications to the protocol's geometry system,
+    and the Thermocycler's "semi" configuration is not officially supported.

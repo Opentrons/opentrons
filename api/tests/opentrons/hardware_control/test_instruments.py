@@ -45,7 +45,7 @@ def dummy_instruments():
 def dummy_instruments_attached_ot3():
     return {
         types.Mount.LEFT: {
-            "model": "p1000_single_v3.0",
+            "model": "p1000_single_v3.3",
             "id": "testy",
             "name": "p1000_single_gen3",
         },
@@ -673,12 +673,12 @@ async def test_blowout_flow_rate(sim_and_instr):
 async def test_reset_instruments(monkeypatch, sim_and_instr):
     instruments = {
         types.Mount.LEFT: {
-            "model": "p1000_single_v3.0",
+            "model": "p1000_single_v3.3",
             "id": "testy",
             "name": "p1000_single_gen3",
         },
         types.Mount.RIGHT: {
-            "model": "p1000_single_v3.0",
+            "model": "p1000_single_v3.3",
             "id": "testy",
             "name": "p1000_single_gen3",
         },

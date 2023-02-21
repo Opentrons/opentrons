@@ -46,6 +46,14 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceParams,
+    AspirateInPlaceCreate,
+    AspirateInPlaceResult,
+    AspirateInPlaceCommandType,
+)
+
 from .comment import (
     Comment,
     CommentParams,
@@ -215,6 +223,14 @@ from .blow_out import (
     BlowOut,
 )
 
+from .blow_out_in_place import (
+    BlowOutInPlaceParams,
+    BlowOutInPlaceResult,
+    BlowOutInPlaceCreate,
+    BlowOutInPlaceImplementation,
+    BlowOutInPlace,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -238,6 +254,12 @@ __all__ = [
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # aspirate in place command models
+    "AspirateInPlace",
+    "AspirateInPlaceCreate",
+    "AspirateInPlaceParams",
+    "AspirateInPlaceResult",
+    "AspirateInPlaceCommandType",
     # comment command models
     "Comment",
     "CommentParams",
@@ -358,6 +380,12 @@ __all__ = [
     "BlowOutImplementation",
     "BlowOutParams",
     "BlowOut",
+    # blow out in place command models
+    "BlowOutInPlaceParams",
+    "BlowOutInPlaceResult",
+    "BlowOutInPlaceCreate",
+    "BlowOutInPlaceImplementation",
+    "BlowOutInPlace",
     # load liquid command models
     "LoadLiquid",
     "LoadLiquidCreate",

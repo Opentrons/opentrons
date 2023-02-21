@@ -134,6 +134,20 @@ class ZSenseSettings:
     pass_settings: CapacitivePassSettings
 
 
+@dataclass
+class LiquidProbeSettings:
+    starting_mount_height: float
+    max_z_distance: float
+    min_z_distance: float
+    mount_speed: float
+    plunger_speed: float
+    sensor_threshold_pascals: float
+    expected_liquid_height: float
+    log_pressure: bool
+    aspirate_while_sensing: bool
+    data_file: str
+
+
 @dataclass(frozen=True)
 class EdgeSenseSettings:
     overrun_tolerance_mm: float
@@ -185,3 +199,4 @@ class OT3Config:
     right_mount_offset: Offset
     gripper_mount_offset: Offset
     calibration: OT3CalibrationSettings
+    liquid_sense: LiquidProbeSettings
