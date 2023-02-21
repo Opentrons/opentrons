@@ -29,5 +29,3 @@ export interface Instruments {
 export interface GetInstrumentsRequestParams {
   refresh?: boolean
 }
-
-
