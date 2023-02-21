@@ -26,6 +26,7 @@ from typing import (
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
+    UpdateProgress,
     axis_convert,
     create_move_group,
     axis_to_node,
@@ -92,6 +93,7 @@ from opentrons.hardware_control.types import (
     MotorStatus,
     InstrumentProbeType,
     PipetteSubType,
+    UpdateStatus,
     mount_to_subsystem,
 )
 from opentrons.hardware_control.errors import (
@@ -181,6 +183,7 @@ class OT3Controller:
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._update_required = False
+        self._update_tracker: Optional[UpdateProgress] = None
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -206,6 +209,14 @@ class OT3Controller:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
+    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Returns a tuple of UpdateStatus and total progress of the updates."""
+        updates: Set[UpdateStatus] = set()
+        total_progress: int = 0
+        if self._update_tracker:
+            updates, total_progress = self._update_tracker.get_progress()
+        return updates, total_progress
+
     @staticmethod
     def _attached_pipettes_to_nodes(
         attached_pipettes: Dict[OT3Mount, PipetteSubType]
@@ -222,7 +233,7 @@ class OT3Controller:
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> None:
+    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
         """Updates the firmware on the OT3."""
         nodes = nodes or set()
         attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
@@ -236,6 +247,7 @@ class OT3Controller:
             return
 
         log.info("Firmware updates are available.")
+        self._update_tracker = UpdateProgress(set(firmware_updates))
         self.update_required = True
 
         updater = firmware_update.RunUpdate(
@@ -245,10 +257,17 @@ class OT3Controller:
             timeout_seconds=20,
             erase=True,
         )
-        async for progress in updater.run_updates():
-            pass
-        # refresh the device_info cache and reset the update_required flag
+
+        # start the updates and yield progress to caller
+        async for node_id, status_element in updater.run_updates():
+            updates, total_progress = self._update_tracker.update(
+                node_id, status_element
+            )
+            yield updates, total_progress
+
+        # refresh the device_info cache and reset internal states
         await self._network_info.probe()
+        self._update_tracker = None
         self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:

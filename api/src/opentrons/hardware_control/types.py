@@ -1,7 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar
+from typing import NamedTuple, cast, Tuple, Union, List, Callable, Dict, TypeVar
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -269,7 +269,7 @@ class OT3SubSystem(enum.Enum):
 
 
 class PipetteSubType(enum.Enum):
-    """Something"""
+    """Pipette type to map from lower level PipetteType."""
 
     pipette_single = 1
     pipette_multi = 2
@@ -277,6 +277,23 @@ class PipetteSubType(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+class UpdateState(enum.Enum):
+    """Update state to map from lower level FirmwareUpdateStatus"""
+
+    queued = enum.auto()
+    updating = enum.auto()
+    done = enum.auto()
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class UpdateStatus(NamedTuple):
+    subsystem: OT3SubSystem
+    state: UpdateState
+    progress: int
 
 
 _subsystem_lookup = {
