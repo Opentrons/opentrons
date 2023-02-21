@@ -20,6 +20,12 @@ from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 
+from .gantry_movement import (
+    AbstractGantryMovementHandler,
+    GantryMovementHandler,
+    VirtualGantryMovementHandler,
+)
+
 
 MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.X: HardwareAxis.X,
@@ -62,6 +68,7 @@ class MovementHandler:
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
         heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
+        gantry_mover: Optional[AbstractGantryMovementHandler] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
@@ -76,6 +83,14 @@ class MovementHandler:
         self._hs_movement_flagger = (
             heater_shaker_movement_flagger
             or HeaterShakerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
+
+        self._gantry_mover = (
+            gantry_mover or VirtualGantryMovementHandler(state_store=self._state_store)
+            if self._state_store.config.use_virtual_pipettes
+            else GantryMovementHandler(
                 state_store=self._state_store, hardware_api=self._hardware_api
             )
         )
@@ -126,18 +141,9 @@ class MovementHandler:
         hw_mount = pipette_location.mount.to_hw_mount()
         origin_cp = pipette_location.critical_point
 
-        # get the origin of the movement from the hardware controller
-        origin = await self._hardware_api.gantry_position(
-            mount=hw_mount,
-            critical_point=origin_cp,
-        )
+        origin = await self._gantry_mover.get_origin_point(pipette_id, current_well)
 
-        if self._state_store.config.use_virtual_pipettes:
-            max_travel_z = self._state_store.pipettes.get_instrument_max_height(
-                pipette_id
-            ) - self._state_store.tips.get_tip_length(pipette_id)
-        else:
-            max_travel_z = self._hardware_api.get_instrument_max_height(mount=hw_mount)
+        max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id)
 
         # calculate the movement's waypoints
         waypoints = self._state_store.motion.get_movement_waypoints_to_well(
@@ -153,19 +159,15 @@ class MovementHandler:
             minimum_z_height=minimum_z_height,
         )
 
-        if not self._state_store.config.use_virtual_pipettes:
-            speed = self._state_store.pipettes.get_movement_speed(
-                pipette_id=pipette_id, requested_speed=speed
-            )
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
-            # move through the waypoints
-            for waypoint in waypoints:
-                await self._hardware_api.move_to(
-                    mount=hw_mount,
-                    abs_position=waypoint.position,
-                    critical_point=waypoint.critical_point,
-                    speed=speed,
-                )
+        # move through the waypoints
+        for waypoint in waypoints:
+            await self._gantry_mover.move_to(
+                mount=hw_mount, waypoint=waypoint, speed=speed
+            )
 
         try:
             final_point = waypoints[-1].position
@@ -181,11 +183,6 @@ class MovementHandler:
         distance: float,
     ) -> MoveRelativeData:
         """Move a given pipette a relative amount in millimeters."""
-        pipette_location = self._state_store.motion.get_pipette_location(
-            pipette_id=pipette_id,
-        )
-        pip_cp = pipette_location.critical_point
-        hw_mount = pipette_location.mount.to_hw_mount()
         delta = Point(
             x=distance if axis == MovementAxis.X else 0,
             y=distance if axis == MovementAxis.Y else 0,
@@ -194,21 +191,7 @@ class MovementHandler:
 
         speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
 
-        try:
-            await self._hardware_api.move_rel(
-                mount=hw_mount,
-                delta=delta,
-                fail_on_not_homed=True,
-                speed=speed,
-            )
-            point = await self._hardware_api.gantry_position(
-                mount=hw_mount,
-                critical_point=pip_cp,
-                fail_on_not_homed=True,
-            )
-
-        except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
+        point = await self._gantry_mover.move_relative(pipette_id, delta, speed)
 
         return MoveRelativeData(
             position=DeckPoint(x=point.x, y=point.y, z=point.z),
@@ -220,30 +203,7 @@ class MovementHandler:
         position_id: Optional[str],
     ) -> SavedPositionData:
         """Get the pipette position and save to state."""
-        pipette_location = self._state_store.motion.get_pipette_location(
-            pipette_id=pipette_id,
-        )
-
-        hw_mount = pipette_location.mount.to_hw_mount()
-        pip_cp = pipette_location.critical_point
-        if pip_cp is None:
-            hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-                pipette_id=pipette_id,
-                attached_pipettes=self._hardware_api.attached_instruments,
-            )
-            if hw_pipette.config.get("tip_length"):
-                pip_cp = CriticalPoint.TIP
-            else:
-                pip_cp = CriticalPoint.NOZZLE
-
-        try:
-            point = await self._hardware_api.gantry_position(
-                mount=hw_mount,
-                critical_point=pip_cp,
-                fail_on_not_homed=True,
-            )
-        except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
+        point = await self._gantry_mover.save_position(pipette_id)
 
         position_id = position_id or self._model_utils.generate_id()
 
@@ -257,23 +217,7 @@ class MovementHandler:
 
         If axes is `None`, will home all motors.
         """
-        # TODO(mc, 2022-12-01): this is overly complicated
-        # https://opentrons.atlassian.net/browse/RET-1287
-        if axes is None:
-            await self._hardware_api.home()
-        elif axes == [MotorAxis.LEFT_PLUNGER]:
-            await self._hardware_api.home_plunger(Mount.LEFT)
-        elif axes == [MotorAxis.RIGHT_PLUNGER]:
-            await self._hardware_api.home_plunger(Mount.RIGHT)
-        elif axes == [MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER]:
-            await self._hardware_api.home_z(Mount.LEFT)
-            await self._hardware_api.home_plunger(Mount.LEFT)
-        elif axes == [MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER]:
-            await self._hardware_api.home_z(Mount.RIGHT)
-            await self._hardware_api.home_plunger(Mount.RIGHT)
-        else:
-            hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
-            await self._hardware_api.home(axes=hardware_axes)
+        await self._gantry_mover.home(axes)
 
     async def move_to_coordinates(
         self,
@@ -289,19 +233,9 @@ class MovementHandler:
         )
         hw_mount = pipette_location.mount.to_hw_mount()
 
-        origin = await self._hardware_api.gantry_position(
-            mount=hw_mount,
-            # critical_point=None to get the current position of whatever tip is
-            # currently attached (if any).
-            critical_point=None,
-        )
+        origin = await self._gantry_mover.get_origin_point(pipette_id)
 
-        max_travel_z = self._hardware_api.get_instrument_max_height(
-            mount=hw_mount,
-            # critical_point=None to get the maximum z-coordinate
-            # given whatever tip is currently attached (if any).
-            critical_point=None,
-        )
+        max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id)
 
         # calculate the movement's waypoints
         waypoints = self._state_store.motion.get_movement_waypoints_to_coords(
@@ -320,10 +254,9 @@ class MovementHandler:
 
         # move through the waypoints
         for waypoint in waypoints:
-            await self._hardware_api.move_to(
+            await self._gantry_mover.move_to(
                 mount=hw_mount,
-                abs_position=waypoint.position,
-                critical_point=waypoint.critical_point,
+                waypoint=waypoint,
                 speed=speed,
             )
 
