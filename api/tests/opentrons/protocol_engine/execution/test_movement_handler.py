@@ -335,15 +335,7 @@ async def test_move_to_well_no_waypoints(
         DeckSlotName.SLOT_1
     )
 
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
+    decoy.when(state_store.tips.get_pipette_channels("pipette-id")).then_return(1)
     decoy.when(state_store.labware.is_tiprack("labware-id")).then_return(False)
 
     decoy.when(
@@ -365,6 +357,7 @@ async def test_move_to_well_no_waypoints(
         )
     ).then_return(Point(11, 22, 33))
 
+    decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(hardware_api.get_instrument_max_height(mount=Mount.LEFT)).then_return(
         42.0
     )

@@ -151,7 +151,9 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=14.38, y=74.24, z=64.69)
+            tipVolume=300.0,
+            tipLength=51.83,
+            position=DeckPoint(x=14.38, y=74.24, z=64.69),
         ),
     )
 
