@@ -1,5 +1,5 @@
 """Pipetting command handling."""
-from typing import Tuple, NamedTuple, Optional, Iterator
+from typing import NamedTuple, Optional, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 

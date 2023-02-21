@@ -1,3 +1,4 @@
+"""Test virtual gantry movement handler with state store."""
 import pytest
 from decoy import Decoy
 

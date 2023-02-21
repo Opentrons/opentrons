@@ -1,3 +1,4 @@
+"""Test gantry movement handler with hardware API."""
 import pytest
 from decoy import Decoy
 
@@ -80,7 +81,7 @@ async def test_get_position_fail_not_homed_raises(
     hardware_api: HardwareAPI,
     subject: GantryMovementHandler,
 ) -> None:
-    """It should raise a HardwareMustHomeError."""
+    """It should raise a MustHomeError."""
     decoy.when(
         await hardware_api.gantry_position(
             mount=Mount.LEFT,
@@ -172,7 +173,7 @@ async def test_move_relative_must_home(
     hardware_api: HardwareAPI,
     subject: GantryMovementHandler,
 ) -> None:
-
+    """It should raise a MustHomeError."""
     decoy.when(
         await hardware_api.move_rel(
             mount=Mount.LEFT,

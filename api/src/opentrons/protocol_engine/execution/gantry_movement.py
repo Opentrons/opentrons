@@ -1,3 +1,4 @@
+"""Gantry movement wrapper for hardware and simulation based movement."""
 from abc import ABC, abstractmethod
 from typing import Optional, List, Dict
 
@@ -28,6 +29,8 @@ MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
 
 
 class AbstractGantryMovementHandler(ABC):
+    """Abstract class for gantry movement handler."""
+
     @abstractmethod
     async def get_position(
         self,
@@ -77,7 +80,9 @@ class AbstractGantryMovementHandler(ABC):
 
 
 class GantryMovementHandler(AbstractGantryMovementHandler):
-    def __init__(self, hardware_api: HardwareControlAPI):
+    """Hardware API based gantry movement handler."""
+
+    def __init__(self, hardware_api: HardwareControlAPI) -> None:
         self._hardware_api = hardware_api
 
     async def get_position(
@@ -194,7 +199,9 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
 
 
 class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
-    def __init__(self, state_store: StateStore):
+    """State store based gantry movement handler for simulation/analysis."""
+
+    def __init__(self, state_store: StateStore) -> None:
         self._state_store = state_store
 
     async def get_position(

@@ -1,22 +1,15 @@
-"""Pipetting command subject."""
+"""MovementHandler command subject."""
 import pytest
 from decoy import Decoy
 from typing import NamedTuple
 
 from opentrons.types import MountType, Mount, Point, DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    Axis as HardwareAxis,
-)
-from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
-
-from opentrons.protocol_engine.errors import MustHomeError
 
 from opentrons.protocol_engine.types import (
     DeckPoint,
-    MotorAxis,
     MovementAxis,
     WellLocation,
     WellOrigin,
@@ -27,7 +20,6 @@ from opentrons.protocol_engine.state import (
     StateStore,
     PipetteLocationData,
     CurrentWell,
-    HardwarePipette,
 )
 from opentrons.protocol_engine.execution.movement import (
     MovementHandler,
@@ -79,6 +71,7 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
 
 @pytest.fixture
 def gantry_movement_handler(decoy: Decoy) -> GantryMovementHandler:
+    """Get a mock in the shape of a GantryMovementHandler."""
     return decoy.mock(cls=GantryMovementHandler)
 
 

@@ -5,17 +5,12 @@ import logging
 from typing import Dict, Optional, List
 from dataclasses import dataclass
 
-from opentrons.types import Point, Mount
+from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    Axis as HardwareAxis,
-)
-from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
+from opentrons.hardware_control.types import Axis as HardwareAxis
 
 from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis
 from ..state import StateStore, CurrentWell
-from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
