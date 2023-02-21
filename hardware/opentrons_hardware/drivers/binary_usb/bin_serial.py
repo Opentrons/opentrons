@@ -10,7 +10,7 @@ import asyncio
 import logging
 import concurrent.futures
 
-from typing import Optional
+from typing import Optional, Type
 from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 
@@ -26,15 +26,20 @@ class SerialUsbDriver:
         self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
         self._connected = False
 
-    def connect(
+    def find_and_connect(
         self, vid: int, pid: int, baudrate: int = 115200, timeout: int = 1
     ) -> None:
         """Initialize a serial connection to a usb device that uses the binary messaging protocol."""
-        self._port_name = self._find_serial_port(vid, pid)
-        if self._port_name is None:
+        _port_name = self._find_serial_port(vid, pid)
+        if _port_name is None:
             raise IOError("unable to find serial device")
+        _port = serial.Serial(_port_name, baudrate, timeout=timeout)
+        self.connect(_port_name, _port)
 
-        self._port = serial.Serial(self._port_name, baudrate, timeout=timeout)
+    def connect(self, port_name: str, serial_port: Type[serial.Serial]) -> None:
+        """Initialize a serial connection to a usb device that uses the binary messaging protocol."""
+        self._port_name = port_name
+        self._port = serial_port
         self._connected = self._port.is_open
 
     def connected(self) -> bool:
