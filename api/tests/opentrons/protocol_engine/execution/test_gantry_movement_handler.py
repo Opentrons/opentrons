@@ -154,6 +154,8 @@ async def test_move_relative(
 
     assert result == Point(4, 5, 6)
 
+    # TODO(mc, 2022-05-13): the order of these calls is difficult to manage
+    # and test for. Ideally, `hardware.move_rel` would return the resulting position
     decoy.verify(
         await hardware_api.move_rel(
             mount=Mount.RIGHT,
@@ -163,6 +165,31 @@ async def test_move_relative(
         ),
         times=1,
     )
+
+
+async def test_move_relative_must_home(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    subject: GantryMovementHandler,
+) -> None:
+
+    decoy.when(
+        await hardware_api.move_rel(
+            mount=Mount.LEFT,
+            delta=Point(x=1, y=2, z=3),
+            fail_on_not_homed=True,
+            speed=456.7,
+        )
+    ).then_raise(HardwareMustHomeError("oh no"))
+
+    with pytest.raises(MustHomeError, match="oh no"):
+        await subject.move_relative(
+            pipette_id="pipette-id",
+            mount=Mount.LEFT,
+            critical_point=None,
+            delta=Point(x=1, y=2, z=3),
+            speed=456.7,
+        )
 
 
 async def test_home(

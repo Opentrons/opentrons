@@ -7,7 +7,9 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.types import DeckPoint
 
-from opentrons.protocol_engine.execution.gantry_movement import VirtualGantryMovementHandler
+from opentrons.protocol_engine.execution.gantry_movement import (
+    VirtualGantryMovementHandler,
+)
 
 
 @pytest.fixture
@@ -32,7 +34,9 @@ async def test_get_position(
     subject: VirtualGantryMovementHandler,
 ) -> None:
     """It should get the position of the pipette with the state store."""
-    decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(DeckPoint(x=1, y=2, z=3))
+    decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(
+        DeckPoint(x=1, y=2, z=3)
+    )
 
     result = await subject.get_position("pipette-id", mount=Mount.LEFT)
 
@@ -58,7 +62,9 @@ def test_get_max_travel_z(
     subject: VirtualGantryMovementHandler,
 ) -> None:
     """It should get the max travel z height with the state store."""
-    decoy.when(state_store.pipettes.get_instrument_max_height("pipette-id")).then_return(42)
+    decoy.when(
+        state_store.pipettes.get_instrument_max_height("pipette-id")
+    ).then_return(42)
     decoy.when(state_store.tips.get_tip_length("pipette-id")).then_return(20)
 
     result = subject.get_max_travel_z("pipette-id", mount=Mount.RIGHT)
@@ -72,8 +78,16 @@ async def test_move_relative(
     subject: VirtualGantryMovementHandler,
 ) -> None:
     """It should simulate moving the gantry by the delta with the state store."""
-    decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(DeckPoint(x=1, y=2, z=3))
+    decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(
+        DeckPoint(x=1, y=2, z=3)
+    )
 
-    result = await subject.move_relative("pipette-id", mount=Mount.LEFT, critical_point=CriticalPoint.TIP, delta=Point(3, 2, 1), speed=123)
+    result = await subject.move_relative(
+        "pipette-id",
+        mount=Mount.LEFT,
+        critical_point=CriticalPoint.TIP,
+        delta=Point(3, 2, 1),
+        speed=123,
+    )
 
     assert result == Point(x=4, y=4, z=4)
