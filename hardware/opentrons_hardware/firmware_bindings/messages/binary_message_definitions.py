@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 class Echo(utils.BinarySerializable):
     """Send a message to the device and have it echoed back."""
 
-    message_id: BinaryMessageId = BinaryMessageId.echo
+    message_id: utils.UInt16Field  = utils.UInt16Field(BinaryMessageId.echo)
     length: utils.UInt16Field = utils.UInt16Field(0)
     message: utils.BinaryFieldBase[bytes] = utils.BinaryFieldBase(bytes())
 
@@ -29,7 +29,7 @@ class Echo(utils.BinarySerializable):
 class Ack(utils.BinarySerializable):
     """Sent as a reply from the device to signal message received."""
 
-    message_id: BinaryMessageId = BinaryMessageId.ack
+    message_id: utils.UInt16Field  = utils.UInt16Field(BinaryMessageId.ack)
     length: utils.UInt16Field = utils.UInt16Field(0)
 
 
@@ -37,7 +37,7 @@ class Ack(utils.BinarySerializable):
 class AckFailed(utils.BinarySerializable):
     """Sent as a reply from the device to signal message could not be interpreted."""
 
-    message_id: BinaryMessageId = BinaryMessageId.ack_failed
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.ack_failed)
     length: utils.UInt16Field = utils.UInt16Field(0)
 
 
@@ -45,7 +45,7 @@ class AckFailed(utils.BinarySerializable):
 class DeviceInfoRequest(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: BinaryMessageId = BinaryMessageId.device_info_request
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.device_info_request)
     length: utils.UInt16Field = utils.UInt16Field(0)
 
 
@@ -53,7 +53,7 @@ class DeviceInfoRequest(utils.BinarySerializable):
 class DeviceInfoResponse(utils.BinarySerializable):
     """Version information sent from the device."""
 
-    message_id: BinaryMessageId = BinaryMessageId.device_info_response
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.device_info_response)
     length: utils.UInt16Field = utils.UInt16Field(0)
     version: utils.UInt32Field = utils.UInt32Field(0)
     flags: VersionFlagsField = VersionFlagsField(0)
@@ -84,7 +84,7 @@ def get_binary_definition(
     """
     # Dumb linear search, but the result is memoized.
     for i in get_args(BinaryMessageDefinition):
-        if i.message_id == message_id:
+        if i.message_id.value == message_id:
             # get args returns Tuple[Any...]
             return i  # type: ignore[no-any-return]
     log.error("No binary message definition found.")

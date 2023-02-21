@@ -85,11 +85,11 @@ class SerialUsbDriver:
                 self._executor, partial(self._port.read, size=4)
             )  # read the message id and length
             message_type = BinaryMessageId(
-                utils.UInt16Field.build(header_data[0, 2]).value
+                int.from_bytes(utils.UInt16Field.build(header_data[0:2]).value,'big')
             )
             message_def = get_binary_definition(message_type)
             if message_def is not None:
-                message_length = utils.UInt16Field.build(header_data[2, 4]).value
+                message_length = int.from_bytes(utils.UInt16Field.build(header_data[2: 4]).value,'big')
                 message_data = await self._loop.run_in_executor(
                     self._executor,
                     partial(
@@ -98,7 +98,7 @@ class SerialUsbDriver:
                     ),
                 )
                 data = b"".join([header_data, message_data])
-                return message_def(message_def.build(data))  # type: ignore[arg-type]
+                return message_def.build(data)  # type: ignore[arg-type]
             else:
                 return None
         except serial.SerialException as e:
