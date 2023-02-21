@@ -9,6 +9,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
   SPACING,
+  Icon,
+  SIZE_1,
+  Link,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -16,6 +20,7 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
 import {
   useAllCommandsQuery,
@@ -26,6 +31,7 @@ import { StyledText } from '../../atoms/text'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ProgressBar } from '../../atoms/ProgressBar'
+import { useDownloadRunLog } from '../Devices/hooks'
 import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { InterventionTicks } from './InterventionTicks'
 
@@ -40,16 +46,24 @@ const TERMINAL_RUN_STATUSES: RunStatus[] = [
 
 interface RunProgressMeterProps {
   runId: string
+  robotName: string
   makeHandleJumpToStep: (index: number) => () => void
 }
 export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
-  const { runId, makeHandleJumpToStep } = props
+  const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
   const analysis = useMostRecentCompletedAnalysis(runId)
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId)
   const analysisCommands = analysis?.commands ?? []
   const runCommands = allCommandsQueryData?.data ?? []
+
+  // todo (jb 2-16-23) This should be switched out soon for something more performant, see https://opentrons.atlassian.net/browse/RLAB-298
+  const { downloadRunLog } = useDownloadRunLog(
+    robotName,
+    runId,
+    analysisCommands.length
+  )
 
   /**
    * find the analysis command within the analysis
@@ -107,6 +121,15 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     )
   }
 
+  const onDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
+    if (downloadIsDisabled) return false
+    e.preventDefault()
+    e.stopPropagation()
+    downloadRunLog()
+  }
+
+  const downloadIsDisabled = runStatus === RUN_STATUS_RUNNING
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -118,6 +141,28 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           }`}</StyledText>
           {currentStepContents}
         </Flex>
+        <Link
+          role="button"
+          css={css`
+            ${TYPOGRAPHY.darkLinkH4SemiBold}
+            &:hover {
+              color: ${
+                downloadIsDisabled
+                  ? COLORS.darkGreyEnabled
+                  : COLORS.darkBlackEnabled
+              };
+            }
+            cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
+          }
+          `}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          onClick={onDownloadClick}
+        >
+          <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+            <Icon name="download" size={SIZE_1} />
+            {t('download_run_log')}
+          </Flex>
+        </Link>
       </Flex>
       {analysis != null && lastRunCommandIndex >= 0 ? (
         <ProgressBar

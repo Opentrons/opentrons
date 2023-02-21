@@ -226,7 +226,7 @@ export function ProtocolDetails(
               : []
           ),
         }).filter(
-          labware => labware.result.definition.parameters.format !== 'trash'
+          labware => labware.result?.definition?.parameters?.format !== 'trash'
         )
       : []
 
