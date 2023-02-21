@@ -194,11 +194,11 @@ describe('shell selectors', () => {
       ])
     })
 
-    it('should return null if saved value in config is null', () => {
+    it('should return empty array if saved value in config is empty array', () => {
       const state: State = {
-        config: { protocols: { pinnedProtocolIds: null } },
+        config: { protocols: { pinnedProtocolIds: [] } },
       } as any
-      expect(Selectors.getPinnedProtocolIds(state)).toEqual(null)
+      expect(Selectors.getPinnedProtocolIds(state)).toEqual([])
     })
   })
 })

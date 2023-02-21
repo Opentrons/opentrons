@@ -287,7 +287,7 @@ const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
     version: 14 as const,
     protocols: {
       ...prevConfig.protocols,
-      pinnedProtocolIds: null,
+      pinnedProtocolIds: [],
     },
   }
   return nextConfig

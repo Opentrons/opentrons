@@ -22,7 +22,6 @@ import { ModalShell } from '../../../molecules/Modal'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
-import type { PinnedProtocolIds } from '../../../redux/config/types'
 
 import {
   useCreateRunMutation,
@@ -64,9 +63,7 @@ export function ProtocolRow(props: {
     },
   })
 
-  const handlePinnedProtocolIds = (
-    pinnedProtocolIds: PinnedProtocolIds
-  ): void => {
+  const handlePinnedProtocolIds = (pinnedProtocolIds: string[]): void => {
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )

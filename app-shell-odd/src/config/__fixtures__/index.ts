@@ -69,6 +69,6 @@ export const MOCK_CONFIG_V14: ConfigV14 = {
   version: 14,
   protocols: {
     ...MOCK_CONFIG_V13.protocols,
-    pinnedProtocolIds: null,
+    pinnedProtocolIds: [],
   },
 }

@@ -5,7 +5,6 @@ import type {
   FeatureFlags,
   UpdateChannel,
   ProtocolsOnDeviceSortKey,
-  PinnedProtocolIds,
 } from './types'
 import type { SelectOption } from '../../atoms/SelectField/Select'
 import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
@@ -92,7 +91,7 @@ export const getProtocolsOnDeviceSortKey: (
 
 export const getPinnedProtocolIds: (
   state: State
-) => PinnedProtocolIds | null = createSelector(
+) => string[] | undefined = createSelector(
   getConfig,
-  config => config?.protocols.pinnedProtocolIds ?? null
+  config => config?.protocols.pinnedProtocolIds
 )
