@@ -31,6 +31,7 @@ async def test_get_position(
     state_store: StateStore,
     subject: VirtualGantryMovementHandler,
 ) -> None:
+    """It should get the position of the pipette with the state store."""
     decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(DeckPoint(x=1, y=2, z=3))
 
     result = await subject.get_position("pipette-id", mount=Mount.LEFT)
@@ -43,6 +44,7 @@ async def test_get_position_default(
     state_store: StateStore,
     subject: VirtualGantryMovementHandler,
 ) -> None:
+    """It should get a default Point if no stored deck point can be found in the state store."""
     decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(None)
 
     result = await subject.get_position("pipette-id", mount=Mount.LEFT)
@@ -55,6 +57,7 @@ def test_get_max_travel_z(
     state_store: StateStore,
     subject: VirtualGantryMovementHandler,
 ) -> None:
+    """It should get the max travel z height with the state store."""
     decoy.when(state_store.pipettes.get_instrument_max_height("pipette-id")).then_return(42)
     decoy.when(state_store.tips.get_tip_length("pipette-id")).then_return(20)
 
@@ -68,6 +71,7 @@ async def test_move_relative(
     state_store: StateStore,
     subject: VirtualGantryMovementHandler,
 ) -> None:
+    """It should simulate moving the gantry by the delta with the state store."""
     decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(DeckPoint(x=1, y=2, z=3))
 
     result = await subject.move_relative("pipette-id", mount=Mount.LEFT, critical_point=CriticalPoint.TIP, delta=Point(3, 2, 1), speed=123)

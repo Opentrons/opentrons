@@ -36,22 +36,26 @@ class AbstractGantryMovementHandler(ABC):
         critical_point: Optional[CriticalPoint] = None,
         fail_on_not_homed: bool = False,
     ) -> Point:
+        """Get the current position of the gantry."""
         ...
 
     @abstractmethod
     async def get_position_fail_not_homed(
         self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
     ) -> Point:
+        """Get the current position of the gantry, raise error if not homed."""
         ...
 
     @abstractmethod
     def get_max_travel_z(self, pipette_id: str, mount: Mount) -> float:
+        """Get the maximum allowed z-height for pipette movement."""
         ...
 
     @abstractmethod
     async def move_to(
         self, mount: Mount, waypoint: Waypoint, speed: Optional[float]
     ) -> None:
+        """Move the hardware gantry to a waypoint."""
         ...
 
     @abstractmethod
@@ -63,16 +67,17 @@ class AbstractGantryMovementHandler(ABC):
         delta: Point,
         speed: Optional[float],
     ) -> Point:
+        """Move the hardware gantry in a relative direction by delta."""
         ...
 
     @abstractmethod
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
+        """Home the gantry."""
         ...
 
 
 class GantryMovementHandler(AbstractGantryMovementHandler):
-    def __init__(self, state_store: StateStore, hardware_api: HardwareControlAPI):
-        self._state_store = state_store
+    def __init__(self, hardware_api: HardwareControlAPI):
         self._hardware_api = hardware_api
 
     async def get_position(
@@ -82,6 +87,14 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
         critical_point: Optional[CriticalPoint] = None,
         fail_on_not_homed: bool = False,
     ) -> Point:
+        """Get the current position of the gantry.
+
+        Args:
+            pipette_id: Not used in hardware implementation.
+            mount: Hardware mount to get position for.
+            critical_point: Critical point to use.
+            fail_on_not_homed: Raise HardwareMustHomeError if gantry position is not known.
+        """
         return await self._hardware_api.gantry_position(
             mount=mount,
             critical_point=critical_point,
@@ -91,6 +104,7 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
     async def get_position_fail_not_homed(
         self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
     ) -> Point:
+        """Get the current position of the gantry, raise error if not homed."""
         try:
             point = await self.get_position(
                 pipette_id=pipette_id,
@@ -104,11 +118,18 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
         return point
 
     def get_max_travel_z(self, pipette_id: str, mount: Mount) -> float:
+        """Get the maximum allowed z-height for pipette movement.
+
+        Args:
+            pipette_id: Not used in hardware implementation.
+            mount: Hardware mount to get position for.
+        """
         return self._hardware_api.get_instrument_max_height(mount=mount)
 
     async def move_to(
         self, mount: Mount, waypoint: Waypoint, speed: Optional[float]
     ) -> None:
+        """Move the hardware gantry to a waypoint."""
         await self._hardware_api.move_to(
             mount=mount,
             abs_position=waypoint.position,
@@ -124,6 +145,15 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
         delta: Point,
         speed: Optional[float],
     ) -> Point:
+        """Move the hardware gantry in a relative direction by delta.
+
+        Args:
+            pipette_id: Not used in hardware implementation.
+            mount: Hardware mount to get position for.
+            critical_point: Critical point to use.
+            delta: Relative X/Y/Z distance to move gantry.
+            speed: Optional speed parameter for the move.
+        """
         try:
             await self._hardware_api.move_rel(
                 mount=mount,
@@ -143,6 +173,7 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
         return point
 
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
+        """Home the gantry."""
         # TODO(mc, 2022-12-01): this is overly complicated
         # https://opentrons.atlassian.net/browse/RET-1287
         if axes is None:
@@ -173,6 +204,14 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
         critical_point: Optional[CriticalPoint] = None,
         fail_on_not_homed: bool = False,
     ) -> Point:
+        """Get the current position of the gantry.
+
+        Args:
+            pipette_id: Pipette ID to get position of.
+            mount: Not used in virtual implementation.
+            critical_point: Not used in virtual implementation.
+            fail_on_not_homed: Not used in virtual implementation.
+        """
         origin_deck_point = self._state_store.pipettes.get_deck_point(pipette_id)
         if origin_deck_point is not None:
             origin = Point(
@@ -185,9 +224,16 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
     async def get_position_fail_not_homed(
         self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
     ) -> Point:
+        """Get the current position of the gantry. This will not raise in the virtual implementation."""
         return await self.get_position(pipette_id, mount)
 
     def get_max_travel_z(self, pipette_id: str, mount: Mount) -> float:
+        """Get the maximum allowed z-height for pipette movement.
+
+        Args:
+            pipette_id: Pipette ID to get instrument height and tip length for.
+            mount: Not used in virtual implementation.
+        """
         instrument_height = self._state_store.pipettes.get_instrument_max_height(
             pipette_id
         )
@@ -197,6 +243,7 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
     async def move_to(
         self, mount: Mount, waypoint: Waypoint, speed: Optional[float]
     ) -> None:
+        """Move the hardware gantry to a waypoint. No-op in virtual implementation."""
         pass
 
     async def move_relative(
@@ -207,8 +254,18 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
         delta: Point,
         speed: Optional[float],
     ) -> Point:
+        """Move the hardware gantry in a relative direction by delta.
+
+        Args:
+            pipette_id: Pipette ID to get position of for virtual move.
+            mount: Hardware mount to get position for.
+            critical_point: Not used in virtual implementation.
+            delta: Relative X/Y/Z distance to move gantry.
+            speed: Not used in virtual implementation.
+        """
         origin = await self.get_position(pipette_id, mount)
         return origin + delta
 
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
+        """Home the gantry. No-op in virtual implementation."""
         pass

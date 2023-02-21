@@ -90,9 +90,7 @@ class MovementHandler:
         self._gantry_mover = (
             gantry_mover or VirtualGantryMovementHandler(state_store=self._state_store)
             if self._state_store.config.use_virtual_pipettes
-            else GantryMovementHandler(
-                state_store=self._state_store, hardware_api=self._hardware_api
-            )
+            else GantryMovementHandler(hardware_api=self._hardware_api)
         )
 
     async def move_to_well(

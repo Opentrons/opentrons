@@ -38,6 +38,7 @@ async def test_get_position(
     hardware_api: HardwareAPI,
     subject: GantryMovementHandler,
 ) -> None:
+    """It should get the position of the pipette with the hardware API."""
     decoy.when(
         await hardware_api.gantry_position(
             mount=Mount.RIGHT,
@@ -58,6 +59,7 @@ async def test_get_position_fail_not_homed(
     hardware_api: HardwareAPI,
     subject: GantryMovementHandler,
 ) -> None:
+    """It should get the position of the pipette and set fail_on_not_homed to True."""
     decoy.when(
         await hardware_api.gantry_position(
             mount=Mount.LEFT,
@@ -78,6 +80,7 @@ async def test_get_position_fail_not_homed_raises(
     hardware_api: HardwareAPI,
     subject: GantryMovementHandler,
 ) -> None:
+    """It should raise a HardwareMustHomeError."""
     decoy.when(
         await hardware_api.gantry_position(
             mount=Mount.LEFT,
@@ -97,6 +100,7 @@ def test_get_max_travel_z(
     hardware_api: HardwareAPI,
     subject: GantryMovementHandler,
 ) -> None:
+    """It should get the max travel z height with the hardware API."""
     decoy.when(hardware_api.get_instrument_max_height(mount=Mount.RIGHT)).then_return(
         42.1
     )
@@ -109,6 +113,7 @@ async def test_move_to(
     hardware_api: HardwareAPI,
     subject: GantryMovementHandler,
 ) -> None:
+    """It should move the gantry with the hardware API."""
     await subject.move_to(
         mount=Mount.RIGHT,
         waypoint=Waypoint(position=Point(1, 2, 3), critical_point=CriticalPoint.TIP),
@@ -130,6 +135,7 @@ async def test_move_relative(
     hardware_api: HardwareAPI,
     subject: GantryMovementHandler,
 ) -> None:
+    """It should move the gantry by the delta with the hardware API."""
     decoy.when(
         await hardware_api.gantry_position(
             mount=Mount.RIGHT,
