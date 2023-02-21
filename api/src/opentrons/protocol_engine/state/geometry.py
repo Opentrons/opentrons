@@ -279,8 +279,6 @@ class GeometryView:
 
         This geometry data is based solely on labware and pipette definitions and
         does not take calibrated tip lengths into account.
-
-        For calibrated data, use `PipettingHandler.get_calibrated_tip_geometry`.
         """
         effective_length = self.get_nominal_effective_tip_length(
             pipette_id=pipette_id,
