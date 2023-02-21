@@ -2,7 +2,7 @@
 from decoy import Decoy
 from typing import cast
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 from opentrons.protocol_engine.state import StateView, HardwarePipette
 from opentrons.protocol_engine.commands import (
     BlowOutResult,
@@ -66,17 +66,20 @@ async def test_blow_out_implementation(
         )
     ).then_return(mock_flow_rate_context)
 
-    result = await subject.execute(data)
-
-    assert result == BlowOutResult()
-
-    decoy.verify(
+    decoy.when(
         await movement.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="C6",
             well_location=location,
-        ),
+        )
+    ).then_return(DeckPoint(x=1, y=2, z=3))
+
+    result = await subject.execute(data)
+
+    assert result == BlowOutResult(position=DeckPoint(x=1, y=2, z=3))
+
+    decoy.verify(
         mock_flow_rate_context.__enter__(),
         await hardware_api.blow_out(mount=left_pipette.mount),
         mock_flow_rate_context.__exit__(None, None, None),

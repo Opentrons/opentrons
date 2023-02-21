@@ -9,6 +9,7 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import {
+  NetworkSettings,
   DeviceReset,
   RobotSystemVersion,
 } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
@@ -18,6 +19,10 @@ import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../hooks/useNetworkConnection')
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
+)
 jest.mock(
   '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DeviceReset'
 )
@@ -29,6 +34,9 @@ const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
+const mockNetworkSettings = NetworkSettings as jest.MockedFunction<
+  typeof NetworkSettings
+>
 const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
 const mockRobotSystemVersion = RobotSystemVersion as jest.MockedFunction<
   typeof RobotSystemVersion
@@ -50,6 +58,7 @@ describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
+    mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
   })
@@ -90,7 +99,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Network Settings')
     fireEvent.click(button)
-    getByText('Network Settings')
+    getByText('Mock Network Settings')
   })
 
   it('should render component when tapping display sleep settings', () => {

@@ -2,7 +2,7 @@ def get_values(*names):
     import json
 
     _all_values = json.loads(
-        """{"num_samples":96,"deepwell_type":"nest_96_wellplate_2ml_deep","res_type":"nest_12_reservoir_15ml","starting_vol":400,"binding_buffer_vol":430,"wash1_vol":500,"wash2_vol":500,"wash3_vol":500,"elution_vol":50,"mix_reps":15,"settling_time":7,"park_tips":false,"tip_track":false,"flash":false}"""
+        """{"num_samples":1,"deepwell_type":"nest_96_wellplate_2ml_deep","res_type":"nest_12_reservoir_15ml","starting_vol":400,"binding_buffer_vol":430,"wash1_vol":500,"wash2_vol":500,"wash3_vol":500,"elution_vol":50,"mix_reps":15,"settling_time":7,"park_tips":false,"tip_track":false,"flash":false}"""
     )
     return [_all_values[n] for n in names]
 
@@ -99,7 +99,7 @@ def run(ctx):
     Here is where you can change the locations of your labware and modules
     (note that this is the recommended configuration)
     """
-    magdeck = ctx.load_module("magdeck", "6")
+    magdeck = ctx.load_module("magnetic module gen2", "6")
     magdeck.disengage()
     magplate = magdeck.load_labware(deepwell_type, "deepwell plate")
     tempdeck = ctx.load_module("Temperature Module Gen2", "1")

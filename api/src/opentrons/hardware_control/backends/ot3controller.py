@@ -76,6 +76,7 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
+    SensorId,
     PipetteType,
 )
 from opentrons_hardware import firmware_update
@@ -111,6 +112,7 @@ from opentrons_hardware.hardware_control.tools import detector, types as ohc_too
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
+    liquid_probe,
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -806,9 +808,6 @@ class OT3Controller:
             OT3Axis.Q: phony_bounds,
         }
 
-    def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
-        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
-
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
         return {}
@@ -981,6 +980,34 @@ class OT3Controller:
     ) -> NodeMap[MapPayload]:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._present_nodes}
+
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        max_z_distance: float,
+        mount_speed: float,
+        plunger_speed: float,
+        threshold_pascals: float,
+        log_pressure: bool = True,
+        sensor_id: SensorId = SensorId.S0,
+    ) -> Dict[NodeId, float]:
+        head_node = axis_to_node(OT3Axis.by_mount(mount))
+        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        positions = await liquid_probe(
+            self._messenger,
+            tool,
+            head_node,
+            max_z_distance,
+            plunger_speed,
+            mount_speed,
+            threshold_pascals,
+            log_pressure,
+            sensor_id,
+        )
+        for node, point in positions.items():
+            self._position.update({node: point[0]})
+            self._encoder_position.update({node: point[1]})
+        return self._position
 
     async def capacitive_probe(
         self,

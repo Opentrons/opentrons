@@ -32,6 +32,7 @@ from opentrons.config.types import (
     OT3Config,
     GantryLoad,
     CapacitivePassSettings,
+    LiquidProbeSettings,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons_hardware.hardware_control.motion_planning import (
@@ -56,9 +57,7 @@ from .instruments.ot3.instrument_calibration import (
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import (
-    get_system_constraints,
-)
+from .backends.ot3utils import get_system_constraints, axis_convert
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -80,6 +79,8 @@ from .types import (
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
+    EarlyLiquidSenseTrigger,
+    LiquidNotFound,
     UpdateStatus,
 )
 from .errors import MustHomeError, GripperNotAttachedError
@@ -978,7 +979,6 @@ class OT3API(
             if ax in OT3Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 400
         self._move_manager.update_constraints(
@@ -1699,6 +1699,88 @@ class OT3API(
 
     def remove_gripper_probe(self) -> None:
         self._gripper_handler.remove_probe()
+
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        probe_settings: Optional[LiquidProbeSettings] = None,
+    ) -> float:
+        """Search for and return liquid level height.
+
+        This function begins by moving the mount the distance specified by starting_mount_height in the
+        LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
+        reading from the pressure sensor.
+
+        If the move is completed without the specified threshold being triggered, a
+        LiquidNotFound error will be thrown.
+        If the threshold is triggered before the minimum z distance has been traveled,
+        a EarlyLiquidSenseTrigger error will be thrown.
+
+        Otherwise, the function will stop moving once the threshold is triggered,
+        and return the position of the
+        z axis in deck coordinates, as well as the encoder position, where
+        the liquid was found.
+        """
+
+        checked_mount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(checked_mount)
+        self._pipette_handler.ready_for_tip_action(
+            instrument, HardwareAction.LIQUID_PROBE
+        )
+
+        if not probe_settings:
+            probe_settings = self.config.liquid_sense
+        mount_axis = OT3Axis.by_mount(mount)
+
+        gantry_position = await self.gantry_position(mount, refresh=True)
+
+        await self.move_to(
+            mount,
+            top_types.Point(
+                x=gantry_position.x,
+                y=gantry_position.y,
+                z=probe_settings.starting_mount_height,
+            ),
+        )
+
+        if probe_settings.aspirate_while_sensing:
+            await self.home_plunger(mount)
+
+        plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
+
+        machine_pos_node_id = await self._backend.liquid_probe(
+            mount,
+            probe_settings.max_z_distance,
+            probe_settings.mount_speed,
+            (probe_settings.plunger_speed * plunger_direction),
+            probe_settings.sensor_threshold_pascals,
+            probe_settings.log_pressure,
+        )
+        machine_pos = axis_convert(machine_pos_node_id, 0.0)
+        position = deck_from_machine(
+            machine_pos,
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+        )
+        z_distance_traveled = (
+            position[mount_axis] - probe_settings.starting_mount_height
+        )
+        if z_distance_traveled < probe_settings.min_z_distance:
+            min_z_travel_pos = position
+            min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
+            raise EarlyLiquidSenseTrigger(
+                triggered_at=position,
+                min_z_pos=min_z_travel_pos,
+            )
+        elif z_distance_traveled > probe_settings.max_z_distance:
+            max_z_travel_pos = position
+            max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
+            raise LiquidNotFound(
+                position=position,
+                max_z_pos=max_z_travel_pos,
+            )
+
+        return position[mount_axis]
 
     async def capacitive_probe(
         self,

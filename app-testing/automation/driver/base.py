@@ -33,7 +33,7 @@ Func = Callable[..., WebElement]
 
 
 class Base:
-    """Object to hold commom functionality for WebDriver actions and error handling."""
+    """Object to hold common functionality for WebDriver actions and error handling."""
 
     def __init__(self, driver: WebDriver, console: Console, execution_id: str) -> None:
         """Instantiate the Base.
