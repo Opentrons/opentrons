@@ -576,7 +576,7 @@ class ModuleView(HasState[ModuleState]):
         )
 
     def get_overall_height(self, module_id: str) -> float:
-        """Get the height of the module."""
+        """Get the height of the module, excluding any labware loaded atop it."""
         return self.get_dimensions(module_id).bareOverallHeight
 
     # TODO(mc, 2022-01-19): this method is missing unit test coverage
