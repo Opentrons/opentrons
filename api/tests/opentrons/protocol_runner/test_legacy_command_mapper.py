@@ -27,7 +27,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
 from opentrons.types import DeckSlotName, Mount, MountType
 
 
@@ -276,6 +276,8 @@ def test_map_instrument_load() -> None:
     input = LegacyInstrumentLoadInfo(
         instrument_load_name="p1000_single_gen2",
         mount=Mount.LEFT,
+        model=PipetteModel("foobar"),
+        serial_number="fizzbuzz",
     )
     expected_output = pe_commands.LoadPipette.construct(
         id=matchers.IsA(str),

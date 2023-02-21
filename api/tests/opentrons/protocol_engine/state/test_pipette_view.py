@@ -325,6 +325,29 @@ def test_pipette_not_ready_to_aspirate() -> None:
     assert result is False
 
 
+def test_get_attached_tip_labware_by_id() -> None:
+    """It should get the tip-rack ID map of a pipette's attached tip."""
+    subject = get_pipette_view(attached_tip_labware_by_id={"foo": "bar"})
+    result = subject.get_attached_tip_labware_by_id()
+    assert result == {"foo": "bar"}
+
+
+def test_validate_tip_state() -> None:
+    """It should validate a pipette's tip attached state."""
+    subject = get_pipette_view(
+        attached_tip_labware_by_id={"has-tip": "some-tip-rack-id"}
+    )
+
+    subject.validate_tip_state(pipette_id="has-tip", expected_has_tip=True)
+    subject.validate_tip_state(pipette_id="no-tip", expected_has_tip=False)
+
+    with pytest.raises(errors.TipAttachedError):
+        subject.validate_tip_state(pipette_id="has-tip", expected_has_tip=False)
+
+    with pytest.raises(errors.TipNotAttachedError):
+        subject.validate_tip_state(pipette_id="no-tip", expected_has_tip=True)
+
+
 def test_get_movement_speed() -> None:
     """It should return the movement speed that was set for the given pipette."""
     subject = get_pipette_view(

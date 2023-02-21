@@ -413,6 +413,19 @@ class PipetteView(HasState[PipetteState]):
         """Get the tiprack ids of attached tip by pipette ids."""
         return self._state.attached_tip_labware_by_id
 
+    def validate_tip_state(self, pipette_id: str, expected_has_tip: bool) -> None:
+        """Validate that a pipette's tip state matches expectations."""
+        tip_rack_id = self._state.attached_tip_labware_by_id.get(pipette_id)
+
+        if expected_has_tip is True and tip_rack_id is None:
+            raise errors.TipNotAttachedError(
+                "Pipette should have a tip attached, but does not."
+            )
+        if expected_has_tip is False and tip_rack_id is not None:
+            raise errors.TipAttachedError(
+                "Pipette should not have a tip attached, but does."
+            )
+
     def get_movement_speed(
         self, pipette_id: str, requested_speed: Optional[float] = None
     ) -> Optional[float]:
