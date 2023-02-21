@@ -29,11 +29,18 @@ MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
 
 class AbstractGantryMovementHandler(ABC):
     @abstractmethod
-    async def get_origin_point(
+    async def get_position(
         self,
         pipette_id: str,
         mount: Mount,
         critical_point: Optional[CriticalPoint] = None,
+        fail_on_not_homed: bool = False,
+    ) -> Point:
+        ...
+
+    @abstractmethod
+    async def get_position_fail_not_homed(
+        self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
     ) -> Point:
         ...
 
@@ -59,12 +66,6 @@ class AbstractGantryMovementHandler(ABC):
         ...
 
     @abstractmethod
-    async def save_position(
-        self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
-    ) -> Point:
-        ...
-
-    @abstractmethod
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         ...
 
@@ -74,16 +75,33 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
         self._state_store = state_store
         self._hardware_api = hardware_api
 
-    async def get_origin_point(
+    async def get_position(
         self,
         pipette_id: str,
         mount: Mount,
         critical_point: Optional[CriticalPoint] = None,
+        fail_on_not_homed: bool = False,
     ) -> Point:
         return await self._hardware_api.gantry_position(
             mount=mount,
             critical_point=critical_point,
+            fail_on_not_homed=fail_on_not_homed,
         )
+
+    async def get_position_fail_not_homed(
+        self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
+    ) -> Point:
+        try:
+            point = await self.get_position(
+                pipette_id=pipette_id,
+                mount=mount,
+                critical_point=critical_point,
+                fail_on_not_homed=True,
+            )
+        except HardwareMustHomeError as e:
+            raise MustHomeError(str(e)) from e
+
+        return point
 
     def get_max_travel_z(self, pipette_id: str, mount: Mount) -> float:
         return self._hardware_api.get_instrument_max_height(mount=mount)
@@ -113,21 +131,8 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
                 fail_on_not_homed=True,
                 speed=speed,
             )
-            point = await self._hardware_api.gantry_position(
-                mount=mount,
-                critical_point=critical_point,
-                fail_on_not_homed=True,
-            )
-        except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
-
-        return point
-
-    async def save_position(
-        self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
-    ) -> Point:
-        try:
-            point = await self._hardware_api.gantry_position(
+            point = await self.get_position(
+                pipette_id=pipette_id,
                 mount=mount,
                 critical_point=critical_point,
                 fail_on_not_homed=True,
@@ -161,11 +166,12 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
     def __init__(self, state_store: StateStore):
         self._state_store = state_store
 
-    async def get_origin_point(
+    async def get_position(
         self,
         pipette_id: str,
         mount: Mount,
         critical_point: Optional[CriticalPoint] = None,
+        fail_on_not_homed: bool = False,
     ) -> Point:
         origin_deck_point = self._state_store.pipettes.get_deck_point(pipette_id)
         if origin_deck_point is not None:
@@ -175,6 +181,11 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
         else:
             origin = Point(x=0, y=0, z=0)
         return origin
+
+    async def get_position_fail_not_homed(
+        self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
+    ) -> Point:
+        return await self.get_position(pipette_id, mount)
 
     def get_max_travel_z(self, pipette_id: str, mount: Mount) -> float:
         instrument_height = self._state_store.pipettes.get_instrument_max_height(
@@ -196,13 +207,8 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
         delta: Point,
         speed: Optional[float],
     ) -> Point:
-        origin = await self.get_origin_point(pipette_id, mount)
+        origin = await self.get_position(pipette_id, mount)
         return origin + delta
-
-    async def save_position(
-        self, pipette_id: str, mount: Mount, critical_point: Optional[CriticalPoint]
-    ) -> Point:
-        return await self.get_origin_point(pipette_id, mount)
 
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         pass
