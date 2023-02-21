@@ -378,19 +378,19 @@ class GravimetricRecorder:
                 break
             if _record_did_exceed_time(_start_time, timeout):
                 break
-            self._reading_samples.set()
-            mass = self._scale.read()
-            _s = GravimetricSample(grams=mass.grams, stable=mass.stable, time=mass.time)
-            if self._cfg.stable and not _s.stable:
-                _recording.clear()  # delete all previously recorded samples
-                continue
             interval_w_overlap = interval - _record_get_interval_overlap(
                 _recording, interval
             )
             if not len(_recording) or _record_did_exceed_time(
                 _recording.end_time, interval_w_overlap
             ):
+                mass = self._scale.read()
+                if self._cfg.stable and not mass.stable:
+                    _recording.clear()  # delete all previously recorded samples
+                    continue
+                _s = GravimetricSample(grams=mass.grams, stable=mass.stable, time=mass.time)
                 _recording.append(_s)
+                self._reading_samples.set()
                 if callable(on_new_sample):
                     on_new_sample(_recording)
             if self.is_in_thread:

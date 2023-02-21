@@ -139,15 +139,24 @@ def run(
 ) -> None:
     """Run."""
     try:
+        # RECORD SCALE + PIPETTING TIMESTAMPS
         recorder.record(in_thread=True)
         liquid_pipette.record_timestamp_enable()
+
+        # LOOP THROUGH SAMPLES
         sample_volumes = [v for v in volumes for _ in range(samples)]
-        if liquid_pipette.pipette.has_tip:
-            liquid_pipette.pipette.drop_tip()
         for i, sample_volume in enumerate(sample_volumes):
+
+            # TODO: delete timestamp stuff
             print(f"{i + 1}/{len(sample_volumes)}: {sample_volume} uL")
             liquid_pipette.create_empty_timestamp(tag=str(sample_volume))
+
+            # PICK-UP TIP
+            if liquid_pipette.pipette.has_tip:
+                liquid_pipette.pipette.drop_tip()
             liquid_pipette.pipette.pick_up_tip()
+
+            # TRANSFER w/ LIQUID-CLASS
             liquid_pipette.aspirate(
                 sample_volume, grav_well, liquid_level=liquid_tracker
             )
@@ -155,8 +164,13 @@ def run(
             liquid_pipette.dispense(
                 sample_volume, grav_well, liquid_level=liquid_tracker
             )
+
+            # DROP TIP
             liquid_pipette.pipette.drop_tip()
+
+            # TODO: delete timestamp stuff
             liquid_pipette.save_latest_timestamp()
+
         print("One final pause to wait for final reading to settle")
         ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
     finally:
