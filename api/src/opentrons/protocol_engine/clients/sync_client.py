@@ -1,5 +1,5 @@
 """Synchronous ProtocolEngine client module."""
-from typing import cast, List, Optional, Union
+from typing import cast, List, Optional, Union, Dict
 from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -19,8 +19,10 @@ from ..types import (
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
+    DropTipWellLocation,
     LabwareOffsetVector,
     MotorAxis,
+    Liquid,
 )
 from .transports import AbstractSyncTransport
 
@@ -43,6 +45,12 @@ class SyncClient:
             "add_labware_definition",
             definition=definition,
         )
+
+    def add_liquid(
+        self, name: str, color: Optional[str], description: Optional[str]
+    ) -> Liquid:
+        """Add a liquid to the engine."""
+        return self._transport.call_method("add_liquid", name=name, color=color, description=description)  # type: ignore[no-any-return]
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset a labware's tip tracking state.."""
@@ -214,7 +222,8 @@ class SyncClient:
         pipette_id: str,
         labware_id: str,
         well_name: str,
-        well_location: WellLocation,
+        well_location: DropTipWellLocation,
+        home_after: Optional[bool],
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""
         request = commands.DropTipCreate(
@@ -223,6 +232,7 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                homeAfter=home_after,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -252,6 +262,24 @@ class SyncClient:
 
         return cast(commands.AspirateResult, result)
 
+    def aspirate_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> commands.AspirateInPlaceResult:
+        """Execute an ``AspirateInPlace`` command and return the result."""
+        request = commands.AspirateInPlaceCreate(
+            params=commands.AspirateInPlaceParams(
+                pipetteId=pipette_id,
+                volume=volume,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.AspirateInPlaceResult, result)
+
     def dispense(
         self,
         pipette_id: str,
@@ -275,6 +303,23 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.DispenseResult, result)
 
+    def dispense_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> commands.DispenseInPlaceResult:
+        """Execute a ``DispenseInPlace`` command and return the result."""
+        request = commands.DispenseInPlaceCreate(
+            params=commands.DispenseInPlaceParams(
+                pipetteId=pipette_id,
+                volume=volume,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.DispenseInPlaceResult, result)
+
     def blow_out(
         self,
         pipette_id: str,
@@ -296,12 +341,29 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.BlowOutResult, result)
 
+    def blow_out_in_place(
+        self,
+        pipette_id: str,
+        flow_rate: float,
+    ) -> commands.BlowOutInPlaceResult:
+        """Execute a ``BlowOutInPlace`` command and return the result."""
+        request = commands.BlowOutInPlaceCreate(
+            params=commands.BlowOutInPlaceParams(
+                pipetteId=pipette_id,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.BlowOutInPlaceResult, result)
+
     def touch_tip(
         self,
         pipette_id: str,
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        radius: float,
+        speed: float,
     ) -> commands.TouchTipResult:
         """Execute a ``Touch Tip`` command and return the result."""
         request = commands.TouchTipCreate(
@@ -310,6 +372,8 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                radius=radius,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -615,3 +679,15 @@ class SyncClient:
         request = commands.HomeCreate(params=commands.HomeParams(axes=axes))
         result = self._transport.execute_command(request=request)
         return cast(commands.HomeResult, result)
+
+    def load_liquid(
+        self, labware_id: str, liquid_id: str, volume_by_well: Dict[str, float]
+    ) -> commands.LoadLiquidResult:
+        """Execute a load_liquid command and return the result."""
+        request = commands.LoadLiquidCreate(
+            params=commands.LoadLiquidParams(
+                labwareId=labware_id, liquidId=liquid_id, volumeByWell=volume_by_well
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.LoadLiquidResult, result)

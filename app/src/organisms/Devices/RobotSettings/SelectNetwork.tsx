@@ -2,16 +2,13 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { useInterval } from '@opentrons/components'
-
 import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
 import { Portal } from '../../../App/portal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
-import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
-import { CONNECT, DISCONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
+import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type { WifiNetwork } from '../../../redux/networking/types'
@@ -24,8 +21,6 @@ interface TempSelectNetworkProps {
   robotName: string
   isRobotBusy: boolean
 }
-
-const LIST_REFRESH_MS = 10000
 
 export const SelectNetwork = ({
   robotName,
@@ -40,9 +35,6 @@ export const SelectNetwork = ({
   const eapOptions = useSelector((state: State) =>
     Networking.getEapOptions(state, robotName)
   )
-  const canDisconnect = useSelector((state: State) =>
-    Networking.getCanDisconnect(state, robotName)
-  )
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
@@ -54,24 +46,12 @@ export const SelectNetwork = ({
   })
   const activeNetwork = list?.find(nw => nw.active)
 
-  const handleDisconnect = (): void => {
-    if (activeNetwork != null) {
-      dispatchApi(Networking.postWifiDisconnect(robotName, activeNetwork.ssid))
-    }
-  }
-
   const handleConnect = (options: WifiConfigureRequest): void => {
     dispatchApi(Networking.postWifiConfigure(robotName, options))
     if (changeState.type === JOIN_OTHER) {
       setChangeState({ ...changeState, ssid: options.ssid })
     }
   }
-
-  useInterval(
-    () => dispatch(Networking.fetchWifiList(robotName)),
-    LIST_REFRESH_MS,
-    true
-  )
 
   React.useEffect(() => {
     // if we're connecting to a network, ensure we get the info needed to
@@ -96,13 +76,6 @@ export const SelectNetwork = ({
     }
   }
 
-  const handleSelectDisconnect = (): void => {
-    if (!isRobotBusy) {
-      const ssid = activeNetwork?.ssid
-      ssid != null && setChangeState({ type: DISCONNECT, ssid })
-    }
-  }
-
   const handleSelectJoinOther = (): void => {
     if (!isRobotBusy) {
       setChangeState({ type: JOIN_OTHER, ssid: null })
@@ -122,10 +95,8 @@ export const SelectNetwork = ({
       <SelectSsid
         list={list}
         value={activeNetwork?.ssid ?? null}
-        showWifiDisconnect={canDisconnect}
         onConnect={handleSelectConnect}
         onJoinOther={handleSelectJoinOther}
-        onDisconnect={handleSelectDisconnect}
         isRobotBusy={isRobotBusy}
       />
       {changeState.type != null && (
@@ -144,12 +115,6 @@ export const SelectNetwork = ({
                   : null
               }
               onClose={handleDone}
-            />
-          ) : changeState.type === DISCONNECT ? (
-            <DisconnectModal
-              ssid={changeState.ssid}
-              onDisconnect={handleDisconnect}
-              onCancel={handleDone}
             />
           ) : (
             <ConnectModal

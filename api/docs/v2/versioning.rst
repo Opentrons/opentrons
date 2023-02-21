@@ -3,23 +3,21 @@
 Versioning
 ==========
 
-The OT-2 Python Protocol API has its own versioning system, which is separated from the version of the OT-2 software or of the Opentrons App. This separation allows you to specify the Protocol Api version your protocol requires without being concerned with what OT-2 software versions it will work with, and allows Opentrons to version the Python Protocol API based only on changes that affect protocols.
+The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows you to specify the API version that your protocol requires without worrying about what robot software versions it will work with. 
 
-The API is versioned with a major and minor version, expressed like this: ``major.minor``. For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers. Major version 2 and minor version 10 is written as ``2.10``, while ``2.1`` means major version 2 and minor version 1.
+Major and Minor Versions
+------------------------
 
-Major and Minor Version
------------------------
+The API uses a major and minor version number and does not use patch version numbers. For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers, so ``2.10`` indicates major version 2 and minor version 10, which is 9 minor versions newer than ``2.1``. The Python Protocol API version will only increase based on changes that affect protocol behavior.
 
-The major version of the API is increased whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because protocols must now have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. A similar level of structural change would require a major version 3. Another major version bump would be if all of the default units switched to nanoliters instead of microliters (we won't do this, it's just an example). This major behavioral change would also require a major version 3.
+The major version of the API increases whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because it required protocols to have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. Protocols written with major version 1 of the API will not run without modification in major version 2. A similar level of structural change would require a major version 3. This documentation only deals with features found in major version 2 of the API; see the `archived version 1 documentation <https://docs.opentrons.com/v1/index.html>`_ for information on older protocols.
 
-The minor version of the API is increased whenever we add new functionality that might change the way a protocol is written, or when we want to make a behavior change to an aspect of the API but not the whole thing. For instance, if we added support for a new module, added an option for specifying volume units in the ``aspirate`` and ``dispense`` functions, or added a way to queue up actions from multiple different modules and execute them at the same time, we would increase the minor version of the API. Another minor version bump would be if we added automatic liquid level tracking, and the position at which the OT-2 aspirated from wells was now dynamic - some people might not want that change appearing suddenly in their well-tested protocol, so we would increase the minor version.
+The minor version of the API increases whenever there is new functionality that might change the way a protocol is written, or when a behavior changes in one aspect of the API but does not affect all protocols. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API. 
 
-
-
-Expressing Versions
+Specifying Versions
 -------------------
 
-You must specify the API version you are targeting at the top of your Python protocol. This is done in the ``metadata`` block, using the key ``'apiLevel'``:
+You must specify the API version you are targeting in the ``metadata`` block at the top of your Python protocol. Use the ``'apiLevel'`` key, alongside any other metadata elements:
 
 .. code-block:: python
   :substitutions:
@@ -31,97 +29,74 @@ You must specify the API version you are targeting at the top of your Python pro
        'author': 'A. Biologist'}
 
    def run(protocol: protocol_api.ProtocolContext):
-       pass
+       protocol.comment('Hello, world!')
 
 
-This key exists alongside the other elements of the metadata.
+Version specification is required by the system. If you do not specify a target API version, you will not be able to simulate or run your protocol.
 
-Version specification is required by the system. If you do not specify your target API version, you will not be able to simulate or run your protocol.
+The version you specify determines the features and behaviors available to your protocol. For example, support for the Heater-Shaker Module was added in version 2.13, so you can't specify a lower version and then call ``HeaterShakerContext`` methods without causing an error. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
 
-The version you specify determines the features and behaviors available to your protocol. For instance, if Opentrons adds the ability to set the volume units in a call to ``aspirate`` in version 2.1, then you must specify version 2.1 in your metadata. A protocol like this:
-
-
-.. code-block:: python
+In general, consider what features you need in your protocol and keep the API level as low as possible. Using the lowest API version is good protocol design, as it helps the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software.
 
 
-   from opentrons import protocol_api
+Maximum Supported Versions
+--------------------------
 
-   metadata = {
-       'apiLevel': '2.0',
-       'author': 'A. Biologist'}
+From version 3.15.0 to 5.0.2 of the OT-2 software and Opentrons App, the maximum supported API level was listed in the robot's **Information** card in the app. Since version 6.0.0, the same information is listed under **Robot Settings > Advanced**.
 
-   def run(protocol: protocol_api.ProtocolContext):
-       tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-       plate = protocol.load_labware('corning_96_wellplate_380ul', '2')
-       left = protocol.load_instrument('p300_single', 'left', tip_racks=[tiprack])
-
-       left.pick_up_tip()
-       left.aspirate(volume=50000, location=plate['A1'], units='nanoliters')
+If you upload a protocol that specifies a higher API level than the maximum supported by your OT-2, it won't be able to analyze or run your protocol. You may be able to increase the maximum supported version by updating your OT-2 to the latest robot software and Opentrons App. All OT-2 hardware is capable of running protocols specifying any minor version of the API v2, as long as its software is up to date.
 
 
-would cause an error, because the ``units`` argument is not present in API version 2.0. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
+Added Features
+--------------
 
-In general, you should closely consider what features you need in your protocol, and keep your specified API level as low as possible. This makes your protocol work on a wider range of OT-2 software versions.
-
-
-Determining What Version Is Available
--------------------------------------
-
-Since version 3.15.0 of the OT-2 software and Opentrons App, the maximum supported API level of your OT-2 is visible in the Information card in the Opentrons App for your OT-2.
-
-This maximum supported API level is the highest API level you can specify in a protocol. If you upload a protocol that specifies a higher API level than the OT-2 software supports, the OT-2 cannot simulate or run your protocol.
-
-
-Determining What Features Are In What Version
----------------------------------------------
-
-As you read the documentation on this site, you will notice that all documentation on features, function calls, available properties, and everything else about the Python Protocol API notes which API version it was introduced in. Keep this information in mind when specifying your protocol's API version. The version statement will look like this:
+Throughout the Python Protocol API documentation, there are version statements indicating when elements (features, function calls, available properties, etc.) were introduced. Keep these in mind when specifying your protocol's API version. Version statements look like this:
 
 .. versionadded:: 2.0
 
 
 .. _version-table:
 
-API and OT-2 Software Versions
+API and Robot Software Versions
 -------------------------------
 
 This table lists the correspondence between Protocol API versions and robot software versions.
 
-+-------------+-----------------------------+
-| API Version | Introduced In OT-2 Software |
-+=============+=============================+
-|     1.0     |           3.0.0             |
-+-------------+-----------------------------+
-|     2.0     |          3.14.0             |
-+-------------+-----------------------------+
-|     2.1     |          3.15.2             |
-+-------------+-----------------------------+
-|     2.2     |          3.16.0             |
-+-------------+-----------------------------+
-|     2.3     |          3.17.0             |
-+-------------+-----------------------------+
-|     2.4     |          3.17.1             |
-+-------------+-----------------------------+
-|     2.5     |          3.19.0             |
-+-------------+-----------------------------+
-|     2.6     |          3.20.0             |
-+-------------+-----------------------------+
-|     2.7     |          3.21.0             |
-+-------------+-----------------------------+
-|     2.8     |          4.0.0              |
-+-------------+-----------------------------+
-|     2.9     |          4.1.0              |
-+-------------+-----------------------------+
-|     2.10    |          4.3.0              |
-+-------------+-----------------------------+
-|     2.11    |          4.4.0              |
-+-------------+-----------------------------+
-|     2.12    |          5.0.0              |
-+-------------+-----------------------------+
-|     2.13    |          6.1.0              |
-+-------------+-----------------------------+
-|     2.14    |        unreleased           |
-+-------------+-----------------------------+
++-------------+------------------------------+
+| API Version | Introduced in Robot Software |
++=============+==============================+
+|     1.0     |           3.0.0              |
++-------------+------------------------------+
+|     2.0     |          3.14.0              |
++-------------+------------------------------+
+|     2.1     |          3.15.2              |
++-------------+------------------------------+
+|     2.2     |          3.16.0              |
++-------------+------------------------------+
+|     2.3     |          3.17.0              |
++-------------+------------------------------+
+|     2.4     |          3.17.1              |
++-------------+------------------------------+
+|     2.5     |          3.19.0              |
++-------------+------------------------------+
+|     2.6     |          3.20.0              |
++-------------+------------------------------+
+|     2.7     |          3.21.0              |
++-------------+------------------------------+
+|     2.8     |          4.0.0               |
++-------------+------------------------------+
+|     2.9     |          4.1.0               |
++-------------+------------------------------+
+|     2.10    |          4.3.0               |
++-------------+------------------------------+
+|     2.11    |          4.4.0               |
++-------------+------------------------------+
+|     2.12    |          5.0.0               |
++-------------+------------------------------+
+|     2.13    |          6.1.0               |
++-------------+------------------------------+
+|     2.14    |          6.3.0               |
++-------------+------------------------------+
 
 Changes in API Versions
 -----------------------
@@ -129,7 +104,7 @@ Changes in API Versions
 Version 2.0
 +++++++++++
 
-Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow `this migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_.
+Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow this `migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_.
 
 We've also published a `more in-depth discussion <http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2>`_ of why we developed version 2 of the API and how it differs from version 1.
 
@@ -139,7 +114,7 @@ Version 2.1
 
 - When loading labware onto a module, you can now specify a label with the ``label`` parameter of
   :py:meth:`.MagneticModuleContext.load_labware`,
-  :py:meth:`.TemperatureModuleContext.load_labware`,
+  :py:meth:`.TemperatureModuleContext.load_labware`, or
   :py:meth:`.ThermocyclerContext.load_labware`,
   just like you can when loading labware onto the deck with :py:meth:`.ProtocolContext.load_labware`.
 
@@ -147,7 +122,7 @@ Version 2.1
 Version 2.2
 +++++++++++
 
-- You should now specify magnetic module engage height using the
+- You should now specify Magnetic Module engage height using the
   ``height_from_base`` parameter, which specifies the height of the top of the
   magnet from the base of the labware. For more, see :ref:`magnetic-module-engage`.
 - Return tip will now use pre-defined heights from hardware testing. For more information, see :ref:`pipette-return-tip`.
@@ -157,19 +132,19 @@ Version 2.2
 Version 2.3
 +++++++++++
 
-- Magnetic Modules GEN2 and Temperature Modules GEN2 are now supported; you can load them with the names ``"magnetic
-  module gen2"`` and ``"temperature module gen2"``, respectively
-- All pipettes will return tips to tipracks from a higher position to avoid
-  possible collisions
+- Magnetic Module GEN2 and Temperature Module GEN2 are now supported; you can load them with the names ``"magnetic
+  module gen2"`` and ``"temperature module gen2"``, respectively.
+- All pipettes will return tips to tip racks from a higher position to avoid
+  possible collisions.
 - During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
-  between every dispense and following aspirate
-- You can now access the temperature module's status via :py:obj:`.TemperatureModuleContext.status`.
+  between every dispense and following aspirate.
+- You can now access the Temperature Module's status via :py:obj:`.TemperatureModuleContext.status`.
 
 
 Version 2.4
 +++++++++++
 
-- The following improvements were made to the `touch_tip` command:
+- The following improvements were made to the ``touch_tip`` command:
 
   - The speed for ``touch_tip`` can now be lowered down to 1 mm/s
   - ``touch_tip`` no longer moves diagonally from the X direction -> Y direction
@@ -200,12 +175,11 @@ Version 2.6
 Version 2.7
 +++++++++++
 
-- You can now move both pipettes simultaneously on the robot! See :py:meth:`.InstrumentContext.pair_with` for
-  further information on how to use this new feature.
+- Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously. 
 
   .. note::
 
-      This feature is still under development.
+      This feature has been removed from the Python Protocol API.
 
 - Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
   has a tip attached or not.
@@ -220,7 +194,7 @@ Version 2.8
 
 - :py:meth:`.Well.from_center_cartesian` can be used to find a point within a well using normalized distance from the center in each axis.
 
-  - **Note** that you will need to create a location object to use this function in a protocol. See :ref:`protocol-api-labware` for more information.
+  - Note that you will need to create a location object to use this function in a protocol. See :ref:`protocol-api-labware` for more information.
 
 - You can now pass in a blowout location to transfer, distribute, and consolidate
   with the ``blowout_location`` parameter. See :py:meth:`.InstrumentContext.transfer` for more detail!
@@ -235,20 +209,20 @@ Version 2.9
 Version 2.10
 ++++++++++++
 
-- In Python protocols requesting API version 2.10, moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.
+- Moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.
 
 
 Version 2.11
 ++++++++++++
 
-- In Python protocols requesting API version 2.11, attempting to aspirate from or dispense to tip racks will raise an error.
+- Attempting to aspirate from or dispense to tip racks will raise an error.
 
 
 Version 2.12
 ++++++++++++
 
 - :py:meth:`.ProtocolContext.resume` has been deprecated.
-- :py:meth:`.Labware.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons app (Jupyter Notebook and SSH).
+- :py:meth:`.Labware.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons App (Jupyter Notebook and SSH).
 
 
 Version 2.13
@@ -263,13 +237,55 @@ Version 2.13
 Version 2.14
 ++++++++++++
 
-Upcoming, not yet released.
+This version introduces a new protocol runtime. Several older parts of the Protocol API were deprecated as part of this switchover.
+If you specify an API version of 2.13 or lower, your protocols will continue to execute on the old runtime.
 
-- :py:class:`.Labware` and :py:class:`.Well` objects will adhere to the protocol's API level setting. Prior to this version, they incorrectly ignore the setting.
-- :py:meth:`.ModuleContext.load_labware_object` will be deprecated.
-- :py:meth:`.MagneticModuleContext.calibrate` will be deprecated.
-- Several internal properties of :py:class:`.Labware`, :py:class:`.Well`, and :py:class:`.ModuleContext` will be deprecated and/or removed:
-    - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration``, which are holdovers from a calibration system that no longer exists.
-    - The ``Well.has_tip`` setter, which will cease to function in a future upgrade to the Python protocol execution system. The corresponding `Well.has_tip` getter will not be deprecated.
-- :py:meth:`.ModuleContext.geometry` will be deprecated
-    - The `model` and `type` properties of this interface will be replaced by :py:meth:`.ModuleContext.model` and :py:meth:`.ModuleContext.type`, respectively
+- Feature additions
+
+  - :py:meth:`.ProtocolContext.define_liquid` and :py:meth:`.Well.load_liquid` added
+    to define different liquid types and add them to wells, respectively.
+
+- Bug fixes
+
+  - :py:class:`.Labware` and :py:class:`.Well` now adhere to the protocol's API level setting.
+    Prior to this version, they incorrectly ignored the setting.
+ 
+  - :py:meth:`.InstrumentContext.touch_tip` will end with the pipette tip in the center of the well
+    instead of on the edge closest to the front of the machine.
+
+  - :py:meth:`.ProtocolContext.load_labware` now prefers loading user-provided labware definitions
+    rather than built-in definitions if no explicit ``namespace`` is specified.
+
+- Deprecations and removals
+
+  - The ``presses`` and ``increment`` arguments of  :py:meth:`.InstrumentContext.pick_up_tip` were deprecated.
+    Configure your pipette pick-up settings with the Opentrons App, instead.
+
+  - ``ModuleContext.load_labware_object`` was deprecated as an unnecessary internal method.
+
+  - ``ModuleContext.geometry`` was deprecated in favor of
+    :py:attr:`.ModuleContext.model` and :py:attr:`.ModuleContext.type`
+
+  - ``Well.geometry`` was deprecated as unnecessary.
+
+  - ``MagneticModuleContext.calibrate`` was deprecated since it was never needed nor implemented.
+
+  - The ``height`` parameter of :py:meth:`.MagneticModuleContext.engage` was deprecated.
+    Use ``offset`` or ``height_from_base`` instead.
+
+  - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed,
+    since they were holdovers from a calibration system that no longer exists.
+ 
+  - Various methods and setters were deprecated that could modify tip state outside of
+    calls to :py:meth:`.InstrumentContext.pick_up_tip` and :py:meth:`.InstrumentContext.drop_tip`.
+    This change allows the robot to track tip usage more completely and reliably.
+    You may still use :py:meth:`.Labware.reset` to reset your tip rack's state.
+
+      - The :py:attr:`.Well.has_tip` **setter** was deprecated. **The getter is not deprecated.**
+
+      - Internal methods ``Labware.use_tips``, ``Labware.previous_tip``, and ``Labware.return_tips``
+        were deprecated.
+
+  - The ``configuration`` argument of :py:meth:`.ProtocolContext.load_module` was deprecated
+    because it made unsafe modifications to the protocol's geometry system,
+    and the Thermocycler's "semi" configuration is not officially supported.

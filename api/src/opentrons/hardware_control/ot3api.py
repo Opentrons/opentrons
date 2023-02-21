@@ -17,6 +17,7 @@ from typing import (
     TypeVar,
 )
 
+
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
@@ -38,16 +39,24 @@ from opentrons_hardware.hardware_control.motion_planning import (
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
 from .instruments.ot3.pipette import (
+    Pipette,
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+    PipetteOffsetByPipetteMount,
+)
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import (
+    get_system_constraints,
+)
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -55,23 +64,22 @@ from .util import DeckTransformState
 from .types import (
     Axis,
     CriticalPoint,
-    MustHomeError,
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
     HardwareEventHandler,
     HardwareAction,
     MotionChecks,
+    PipetteSubType,
     PauseType,
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
-    OT3SubSystem,
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
-    GripperNotAttachedError,
 )
+from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
 from .robot_calibration import (
     OT3Transforms,
@@ -397,13 +405,25 @@ class OT3API(
             sim_model=model.value,
         )
 
-    async def update_firmware(
-        self,
-        firmware_file: str,
-        target: OT3SubSystem,
-    ) -> None:
-        """Update the firmware on the hardware."""
-        await self._backend.update_firmware(firmware_file, target)
+    @staticmethod
+    def _pipette_subtype_from_pipette(pipette: Pipette) -> PipetteSubType:
+        pipettes = {
+            PipetteChannelType.SINGLE_CHANNEL: PipetteSubType.pipette_single,
+            PipetteChannelType.EIGHT_CHANNEL: PipetteSubType.pipette_multi,
+            PipetteChannelType.NINETY_SIX_CHANNEL: PipetteSubType.pipette_96,
+        }
+        return pipettes[pipette.channels]
+
+    async def do_firmware_updates(self) -> None:
+        """Update all the firmware."""
+        # get the attached instruments so we can get the type of pipettes attached
+        pipettes: Dict[OT3Mount, PipetteSubType] = dict()
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        for mount, _ in attached_instruments.items():
+            if self._pipette_handler.has_pipette(mount):
+                pipette = self._pipette_handler.get_pipette(mount)
+                pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
+        await self._backend.update_firmware(pipettes)
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
@@ -468,6 +488,7 @@ class OT3API(
             OT3Mount.GRIPPER: self.attached_gripper,
         }
 
+    # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -490,14 +511,22 @@ class OT3API(
             # of simulation and it feels like a lot of work for this function
             # actually be doing.
             found = await self._backend.get_attached_instruments(checked_require)
-        for mount, instrument_data in found.items():
-            if mount == OT3Mount.GRIPPER:
-                await self.cache_gripper(cast(AttachedGripper, instrument_data))
-            else:
-                req_instr_name = checked_require.get(mount, None)
+
+        if OT3Mount.GRIPPER in found.keys():
+            await self.cache_gripper(cast(AttachedGripper, found.get(OT3Mount.GRIPPER)))
+        elif self._gripper_handler.gripper:
+            await self._gripper_handler.reset()
+
+        for pipette_mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            if pipette_mount in found.keys():
+                req_instr_name = checked_require.get(pipette_mount, None)
                 await self.cache_pipette(
-                    mount, cast(OT3AttachedPipette, instrument_data), req_instr_name
+                    pipette_mount,
+                    cast(OT3AttachedPipette, found.get(pipette_mount)),
+                    req_instr_name,
                 )
+            else:
+                self._pipette_handler.hardware_instruments[pipette_mount] = None
 
         await self._backend.probe_network()
         await self._backend.update_motor_status()
@@ -1122,7 +1151,9 @@ class OT3API(
                 self._encoder_current_position[OT3Axis.G]
             )
         except Exception:
-            self._log.exception("Gripper grip failed")
+            self._log.exception(
+                f"Gripper grip failed, encoder pos: {self._encoder_current_position[OT3Axis.G]}"
+            )
             raise
 
     @ExecutionManagerProvider.wait_for_running
@@ -1361,15 +1392,15 @@ class OT3API(
                 [OT3Axis.of_main_tool_actuator(mount)],
                 pipette_spec.pick_up_distance,
                 pipette_spec.speed,
-                "pick_up",
+                "clamp",
             )
-            # Move to pick up position
-            target_up = target_position_from_relative(
-                mount,
-                pipette_spec.tiprack_up,
-                self._current_position,
+            # back clamps off the adapter posts
+            await self._backend.tip_action(
+                [OT3Axis.of_main_tool_actuator(mount)],
+                pipette_spec.pick_up_distance,
+                pipette_spec.speed,
+                "home",
             )
-            await self._move(target_up)
 
     async def pick_up_tip(
         self,
@@ -1384,18 +1415,6 @@ class OT3API(
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
-
-        target_absolute = target_position_from_plunger(
-            realmount, spec.plunger_prep_pos, self._current_position
-        )
-        async with self._backend.restore_current():
-            await self._backend.set_active_current(
-                {axis: current for axis, current in spec.plunger_currents.items()}
-            )
-            await self._move(
-                target_absolute,
-                home_flagged_axes=False,
-            )
 
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
@@ -1457,7 +1476,13 @@ class OT3API(
                     [OT3Axis.of_main_tool_actuator(mount)],
                     move.target_position,
                     move.speed,
-                    "drop",
+                    "clamp",
+                )
+                await self._backend.tip_action(
+                    [OT3Axis.of_main_tool_actuator(mount)],
+                    move.target_position,
+                    move.speed,
+                    "home",
                 )
             else:
                 target_pos = target_position_from_plunger(
@@ -1558,13 +1583,14 @@ class OT3API(
 
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
-    ) -> None:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount]:
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:
-            self._gripper_handler.save_instrument_offset(delta)
+            self._log.info(f"Saving instrument offset: {delta} for gripper")
+            return self._gripper_handler.save_instrument_offset(delta)
         else:
-            self._pipette_handler.save_instrument_offset(checked_mount, delta)
+            return self._pipette_handler.save_instrument_offset(checked_mount, delta)
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]

@@ -217,7 +217,7 @@ class SensorId(int, Enum):
 
 @unique
 class PipetteName(int, Enum):
-    """High-level type of pipette."""
+    """High-level name of pipette."""
 
     p1000_single = 0x00
     p1000_multi = 0x01
@@ -226,6 +226,15 @@ class PipetteName(int, Enum):
     p1000_96 = 0x04
     p50_96 = 0x05
     unknown = 0xFFFF
+
+
+@unique
+class PipetteType(int, Enum):
+    """High-level type of pipette."""
+
+    pipette_single = 1
+    pipette_multi = 2
+    pipette_96 = 3
 
 
 @unique
@@ -257,8 +266,8 @@ class GearMotorId(int, Enum):
 class PipetteTipActionType(int, Enum):
     """Tip action types."""
 
-    pick_up = 0x0
-    drop = 0x01
+    clamp = 0x0
+    home = 0x01
 
 
 @unique
@@ -279,7 +288,7 @@ class MoveStopCondition(int, Enum):
 
     none = 0x0
     limit_switch = 0x1
-    cap_sensor = 0x2
+    sync_line = 0x2
     encoder_position = 0x4
     gripper_force = 0x8
     stall = 0x10

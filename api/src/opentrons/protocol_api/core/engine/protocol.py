@@ -29,6 +29,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
+from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
@@ -88,20 +89,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_id=trash_id,
             engine_client=self._engine_client,
         )
-
-    def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
-        """Get a map of labware names to definition dicts.
-
-        Deprecated method used for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_labware not implemented")
-
-    def get_extra_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
-        """Get a map of extra labware names to definition dicts.
-
-        Used to assist load custom labware definitions.
-        """
-        raise NotImplementedError("ProtocolCore.get_extra_labware not implemented")
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
@@ -228,6 +215,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         configuration: Optional[str],
     ) -> ModuleCore:
         """Load a module into the protocol."""
+        assert configuration is None, "Module `configuration` is deprecated"
+
         # TODO(mc, 2022-10-20): move to public ProtocolContext
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
@@ -295,12 +284,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
         self._engine_client.wait_for_resume(message=msg)
-
-    def resume(self) -> None:
-        """Resume the protocol."""
-        # TODO(mm, 2022-11-08): This method is not usable in practice. Consider removing
-        # it from both cores. https://github.com/Opentrons/opentrons/issues/8209
-        raise NotImplementedError("ProtocolCore.resume not implemented")
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
@@ -392,6 +375,26 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def get_module_cores(self) -> List[ModuleCore]:
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
+
+    def define_liquid(
+        self,
+        name: str,
+        description: Optional[str],
+        display_color: Optional[str],
+    ) -> Liquid:
+        """Define a liquid to load into a well."""
+        liquid = self._engine_client.add_liquid(
+            name=name, description=description, color=display_color
+        )
+
+        return Liquid(
+            _id=liquid.id,
+            name=liquid.displayName,
+            description=liquid.description,
+            display_color=(
+                liquid.displayColor.__root__ if liquid.displayColor else None
+            ),
+        )
 
     def get_labware_location(
         self, labware_core: LabwareCore

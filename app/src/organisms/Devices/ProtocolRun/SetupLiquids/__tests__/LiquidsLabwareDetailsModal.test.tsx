@@ -11,15 +11,13 @@ import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
 import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
 import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
-import {
-  useLabwareRenderInfoForRunById,
-  useProtocolDetailsForRun,
-} from '../../../../Devices/hooks'
+import { useLabwareRenderInfoForRunById } from '../../../../Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -31,6 +29,7 @@ jest.mock('@opentrons/components', () => {
 jest.mock('@opentrons/api-client')
 jest.mock('../../utils/getSlotLabwareName')
 jest.mock('../../utils/getSlotLabwareDefinition')
+jest.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../utils')
 jest.mock('../LiquidDetailCard')
 jest.mock('../../../../Devices/hooks')
@@ -59,8 +58,8 @@ const mockGetWellFillFromLabwareId = getWellFillFromLabwareId as jest.MockedFunc
 const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
   typeof useLabwareRenderInfoForRunById
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 const render = (
   props: React.ComponentProps<typeof LiquidsLabwareDetailsModal>
@@ -117,11 +116,9 @@ describe('LiquidsLabwareDetailsModal', () => {
         labwareDef: {},
       },
     } as any)
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      displayName: null,
-      protocolData: {} as ProtocolAnalysisFile<{}>,
-      protocolKey: null,
-    } as any)
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(
+      {} as CompletedProtocolAnalysis
+    )
 
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected props

@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
-import { useModulesQuery, usePipettesQuery, useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useModulesQuery,
+  usePipettesQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 
 import {
   Flex,
@@ -14,32 +18,22 @@ import {
   SIZE_3,
   SPACING,
   TYPOGRAPHY,
-  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import {
-  useIsOT3,
-  useIsRobotViewable,
-  usePipetteOffsetCalibrations,
-  useRunStatuses,
-} from './hooks'
+import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
 import {
   getIs96ChannelPipetteAttached,
   getOffsetCalibrationForMount,
 } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
-import { fetchPipetteOffsetCalibrations } from '../../redux/calibration'
-
-import type { Dispatch } from '../../redux/types'
 
 const EQUIPMENT_POLL_MS = 5000
-const FETCH_PIPETTE_LONG_POLL = 30000
-const FETCH_PIPETTE_SHORT_POLL = 1000
+const FETCH_PIPETTE_CAL_POLL = 30000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
@@ -56,7 +50,6 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
-  const dispatch = useDispatch<Dispatch>()
 
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
@@ -82,7 +75,10 @@ export function InstrumentsAndModules({
   // to eliminate duplicated useInterval calls to `calibration/pipette_offset` coming from each card.
   // Instead we now capture all offset calibration data here, and pass the appropriate calibration
   // data to the associated card via props
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
+  const pipetteOffsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery({
+      refetchInterval: FETCH_PIPETTE_CAL_POLL,
+    })?.data?.data ?? []
   const leftMountOffsetCalibration = getOffsetCalibrationForMount(
     pipetteOffsetCalibrations,
     attachedPipettes,
@@ -92,20 +88,6 @@ export function InstrumentsAndModules({
     pipetteOffsetCalibrations,
     attachedPipettes,
     RIGHT
-  )
-
-  const allAttachedPipettesHaveOffsetCals =
-    (attachedPipettes.left == null || leftMountOffsetCalibration != null) &&
-    (attachedPipettes.right == null || rightMountOffsetCalibration != null)
-
-  useInterval(
-    () => {
-      dispatch(fetchPipetteOffsetCalibrations(robotName))
-    },
-    allAttachedPipettesHaveOffsetCals
-      ? FETCH_PIPETTE_LONG_POLL
-      : EQUIPMENT_POLL_MS,
-    true
   )
 
   return (

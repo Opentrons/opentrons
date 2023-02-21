@@ -11,6 +11,7 @@ import {
 } from '../../../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
+import { formatLastCalibrated } from '../utils'
 
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
@@ -43,7 +44,6 @@ const mockPipetteOffsetCalibrations = [
 ]
 
 jest.mock('../../../../redux/custom-labware/selectors')
-jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/discovery')
 jest.mock('../../../../assets/labware/findLabware')
@@ -116,7 +116,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('11/10/2022 18:15:02')
   })
 
-  it('should render icon and text when calibration missing', () => {
+  it('should only render text when calibration missing', () => {
     props = {
       ...props,
       formattedPipetteOffsetCalibrations: [
@@ -130,10 +130,10 @@ describe('PipetteOffsetCalibrationItems', () => {
       ],
     }
     const [{ getByText }] = render(props)
-    getByText('Missing calibration')
+    getByText('Not calibrated')
   })
 
-  it('should render icon and test when calibration recommended', () => {
+  it('should only render last calibrated date text when calibration recommended', () => {
     props = {
       ...props,
       formattedPipetteOffsetCalibrations: [
@@ -147,7 +147,8 @@ describe('PipetteOffsetCalibrationItems', () => {
         },
       ],
     }
-    const [{ getByText }] = render(props)
-    getByText('Recalibration recommended')
+    const [{ getByText, queryByText }] = render(props)
+    expect(queryByText('Not calibrated')).not.toBeInTheDocument()
+    getByText(formatLastCalibrated('2022-11-10T18:15:02'))
   })
 })

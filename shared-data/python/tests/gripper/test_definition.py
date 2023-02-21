@@ -7,7 +7,7 @@ from opentrons_shared_data.gripper import (
     GripperModel,
 )
 
-GRIPPER_DEF = json.loads(load_shared_data("gripper/definitions/1/v1.json"))
+GRIPPER_DEF = json.loads(load_shared_data("gripper/definitions/1/gripperV1.json"))
 
 
 def test_gripper_definition() -> None:

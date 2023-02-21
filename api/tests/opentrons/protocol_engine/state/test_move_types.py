@@ -1,7 +1,8 @@
 """Test Protocol Engine motion planning utility methods."""
 import pytest
-from typing import Optional
+from typing import List, Optional
 
+from opentrons.types import Point
 from opentrons.motion_planning.types import MoveType
 from opentrons.protocol_engine.state import move_types as subject
 from opentrons.protocol_engine.state.pipettes import CurrentWell
@@ -44,3 +45,51 @@ def test_get_move_type_to_well(
     )
 
     assert move_type == expected_move_type
+
+
+@pytest.mark.parametrize(
+    ["edge_path_type", "expected_result"],
+    [
+        (
+            subject.EdgePathType.LEFT,
+            [
+                Point(5, 20, 30),
+                Point(10, 20, 30),
+                Point(10, 30, 30),
+                Point(10, 10, 30),
+                Point(10, 20, 30),
+            ],
+        ),
+        (
+            subject.EdgePathType.RIGHT,
+            [
+                Point(15, 20, 30),
+                Point(10, 20, 30),
+                Point(10, 30, 30),
+                Point(10, 10, 30),
+                Point(10, 20, 30),
+            ],
+        ),
+        (
+            subject.EdgePathType.DEFAULT,
+            [
+                Point(15, 20, 30),
+                Point(5, 20, 30),
+                Point(10, 20, 30),
+                Point(10, 30, 30),
+                Point(10, 10, 30),
+                Point(10, 20, 30),
+            ],
+        ),
+    ],
+)
+def get_edge_point_list(
+    edge_path_type: subject.EdgePathType,
+    expected_result: List[Point],
+) -> None:
+    """It should get a list of well edge points."""
+    result = subject.get_edge_point_list(
+        Point(x=10, y=20, z=30), x_radius=5, y_radius=10, edge_path_type=edge_path_type
+    )
+
+    assert result == expected_result

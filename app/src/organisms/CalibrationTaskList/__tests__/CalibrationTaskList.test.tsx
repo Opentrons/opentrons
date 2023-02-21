@@ -1,30 +1,25 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { StaticRouter } from 'react-router-dom'
 import { i18n } from '../../../i18n'
 import { CalibrationTaskList } from '..'
 import {
   mockDeckCalLauncher,
   mockTipLengthCalLauncher,
   mockPipOffsetCalLauncher,
-  mockCompleteDeckCalibration,
-  mockAttachedPipettesResponse,
-  mockCompleteTipLengthCalibrations,
-  mockCompletePipetteOffsetCalibrations,
+  expectedBadDeckAndPipetteOffsetTaskList,
+  expectedBadEverythingTaskList,
+  expectedBadTipLengthAndOffsetTaskList,
+  expectedTaskList,
+  expectedIncompleteDeckCalTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
-import { StaticRouter } from 'react-router-dom'
+import { useCalibrationTaskList } from '../../Devices/hooks'
 
-jest.mock('../../Devices/hooks', () => {
-  const actualHooks = jest.requireActual('../../Devices/hooks')
-  return {
-    ...actualHooks,
-    useAttachedPipettes: jest.fn(() => mockAttachedPipettesResponse),
-    useDeckCalibrationData: jest.fn(() => mockCompleteDeckCalibration),
-    usePipetteOffsetCalibrations: jest.fn(
-      () => mockCompletePipetteOffsetCalibrations
-    ),
-    useTipLengthCalibrations: jest.fn(() => mockCompleteTipLengthCalibrations),
-  }
-})
+jest.mock('../../Devices/hooks')
+
+const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
+  typeof useCalibrationTaskList
+>
 
 const render = (robotName: string = 'otie') => {
   return renderWithProviders(
@@ -43,6 +38,13 @@ const render = (robotName: string = 'otie') => {
 }
 
 describe('CalibrationTaskList', () => {
+  beforeEach(() => {
+    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   it('renders the Calibration Task List', () => {
     const [{ getByText }] = render()
     getByText('Deck Calibration')
@@ -50,22 +52,99 @@ describe('CalibrationTaskList', () => {
     getByText('Right Mount')
   })
 
-  it('clicking the recalibrate CTAs triggers the calibration launchers', () => {
-    const [{ getByText, getAllByText }] = render()
-    getByText('Left Mount').click()
-    getByText('Right Mount').click()
-    const recalibrateButtons = getAllByText('Recalibrate') // [deck, left-tip-length, left-offset, right-tip-length, left-offset]
-    expect(recalibrateButtons).toHaveLength(5)
+  it('does not show the Calibrations complete screen when viewing a completed task list', () => {
+    const [{ queryByText }] = render()
+    expect(queryByText('Calibrations complete!')).toBeFalsy()
+  })
 
-    recalibrateButtons[0].click()
-    expect(mockDeckCalLauncher).toHaveBeenCalled()
-    recalibrateButtons[1].click()
-    expect(mockTipLengthCalLauncher).toHaveBeenCalled()
-    recalibrateButtons[2].click()
-    expect(mockPipOffsetCalLauncher).toHaveBeenCalled()
-    recalibrateButtons[3].click()
-    expect(mockTipLengthCalLauncher).toHaveBeenCalled()
-    recalibrateButtons[4].click()
-    expect(mockPipOffsetCalLauncher).toHaveBeenCalled()
+  it('shows the Calibrations complete screen after the calibrations are completed', () => {
+    // initial render has incomplete calibrations, the rerender will use the completed calibrations mock response
+    // this triggers the useEffect that causes the Calibrations complete screen to render
+    mockUseCalibrationTaskList.mockReturnValueOnce(
+      expectedIncompleteDeckCalTaskList
+    )
+    const [{ getByText, rerender }] = render()
+    expect(getByText('Calibrate')).toBeTruthy()
+    rerender(
+      <StaticRouter>
+        <CalibrationTaskList
+          robotName={'otie'}
+          pipOffsetCalLauncher={mockPipOffsetCalLauncher}
+          tipLengthCalLauncher={mockTipLengthCalLauncher}
+          deckCalLauncher={mockDeckCalLauncher}
+        />
+      </StaticRouter>
+    )
+    expect(getByText('Calibrations complete!')).toBeTruthy()
+  })
+
+  it('renders the Calibration Task List properly when both tip length and offset are bad', () => {
+    mockUseCalibrationTaskList.mockReturnValueOnce(
+      expectedBadTipLengthAndOffsetTaskList
+    )
+    const [{ getAllByText, getByRole, getByText, rerender }] = render()
+    getByText('Deck Calibration')
+    expect(getByText('Recalibrate')).toBeTruthy()
+    getByText('Left Mount')
+    expect(getAllByText('Calibration recommended')).toHaveLength(3)
+    expect(getByRole('button', { name: 'Calibrate' })).toBeTruthy()
+    getByText('Right Mount')
+    rerender(
+      <StaticRouter>
+        <CalibrationTaskList
+          robotName={'otie'}
+          pipOffsetCalLauncher={mockPipOffsetCalLauncher}
+          tipLengthCalLauncher={mockTipLengthCalLauncher}
+          deckCalLauncher={mockDeckCalLauncher}
+        />
+      </StaticRouter>
+    )
+    expect(getByText('Calibrations complete!')).toBeTruthy()
+  })
+
+  it('renders the Calibration Task List properly when both deck and offset are bad', () => {
+    mockUseCalibrationTaskList.mockReturnValueOnce(
+      expectedBadDeckAndPipetteOffsetTaskList
+    )
+    const [{ getAllByText, getByRole, getByText, rerender }] = render()
+    getByText('Deck Calibration')
+    expect(getAllByText('Calibration recommended')).toHaveLength(2)
+    expect(getByRole('button', { name: 'Calibrate' })).toBeTruthy()
+    getByText('Left Mount')
+    getByText('Right Mount')
+    rerender(
+      <StaticRouter>
+        <CalibrationTaskList
+          robotName={'otie'}
+          pipOffsetCalLauncher={mockPipOffsetCalLauncher}
+          tipLengthCalLauncher={mockTipLengthCalLauncher}
+          deckCalLauncher={mockDeckCalLauncher}
+        />
+      </StaticRouter>
+    )
+    expect(getByText('Calibrations complete!')).toBeTruthy()
+  })
+
+  it('renders the Calibration Task List properly when everything is bad', () => {
+    mockUseCalibrationTaskList.mockReturnValueOnce(
+      expectedBadEverythingTaskList
+    )
+    const [{ getAllByText, getByRole, getByText, rerender }] = render()
+    getByText('Deck Calibration')
+    expect(getAllByText('Calibration recommended')).toHaveLength(2)
+    expect(getByRole('button', { name: 'Calibrate' })).toBeTruthy()
+    getByText('Left Mount')
+    getByText('Right Mount')
+    rerender(
+      <StaticRouter>
+        <CalibrationTaskList
+          robotName={'otie'}
+          pipOffsetCalLauncher={mockPipOffsetCalLauncher}
+          tipLengthCalLauncher={mockTipLengthCalLauncher}
+          deckCalLauncher={mockDeckCalLauncher}
+        />
+      </StaticRouter>
+    )
+    expect(getByText('Calibrations complete!')).toBeTruthy()
   })
 })

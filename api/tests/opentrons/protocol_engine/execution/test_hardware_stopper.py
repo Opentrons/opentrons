@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.protocol_engine import WellLocation, errors
+from opentrons.protocol_engine import DropTipWellLocation, errors
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.execution import (
     MovementHandler,
@@ -99,7 +99,11 @@ async def test_hardware_stopping_sequence(
             pipette_id="pipette-id",
             labware_id="fixedTrash",
             well_name="A1",
-            well_location=WellLocation(),
+            well_location=DropTipWellLocation(),
+            # TODO(mm, 2023-02-10): Can we safely set this to False
+            # to avoid redundancy with the below call to
+            # hardware_api.stop(home_after=True)?
+            home_after=None,
         ),
         await hardware_api.stop(home_after=True),
     )
@@ -201,7 +205,8 @@ async def test_hardware_stopping_sequence_with_gripper(
             pipette_id="pipette-id",
             labware_id="fixedTrash",
             well_name="A1",
-            well_location=WellLocation(),
+            well_location=DropTipWellLocation(),
+            home_after=None,
         ),
         await ot3_hardware_api.stop(home_after=True),
     )

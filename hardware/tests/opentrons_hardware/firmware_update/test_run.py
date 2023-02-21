@@ -1,5 +1,7 @@
 """Tests for run module."""
-from typing import Iterator, TextIO, cast
+import os
+from pathlib import Path
+from typing import Iterator
 
 import mock
 import pytest
@@ -13,11 +15,18 @@ from opentrons_hardware.firmware_update import (
     FirmwareUpdateInitiator,
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
-    run_update,
-    run_updates,
     HexRecordProcessor,
+    RunUpdate,
 )
 from opentrons_hardware.firmware_update.target import Target
+
+
+@pytest.fixture
+def hex_file_path() -> str:
+    """Path of hex file for test."""
+    tt = os.path.dirname(__file__)
+    path = Path(os.path.abspath(tt))
+    return str(path / Path("bootloader-head.hex"))
 
 
 @pytest.fixture
@@ -48,6 +57,13 @@ def mock_hex_record_builder() -> Iterator[MagicMock]:
         yield p
 
 
+@pytest.fixture
+def mock_path_exists() -> Iterator[MagicMock]:
+    """Mock path exists function."""
+    with mock.patch("os.path.exists") as p:
+        yield p
+
+
 @pytest.mark.parametrize(argnames=["should_erase"], argvalues=[[True], [False]])
 async def test_run_update(
     mock_initiator_run: AsyncMock,
@@ -55,23 +71,36 @@ async def test_run_update(
     mock_eraser_run: AsyncMock,
     mock_hex_record_builder: MagicMock,
     should_erase: bool,
+    mock_path_exists: MagicMock,
+    hex_file_path: str,
 ) -> None:
     """It should call all the functions."""
     mock_messenger = AsyncMock()
 
-    mock_hex_file = MagicMock()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
 
     target = Target(system_node=NodeId.head)
-    await run_update(
+    update_details = {
+        target.system_node: hex_file_path,
+    }
+    updater = RunUpdate(
         messenger=mock_messenger,
-        node_id=target.system_node,
-        hex_file=mock_hex_file,
+        update_details=update_details,
         retry_count=12,
         timeout_seconds=11,
         erase=should_erase,
     )
+
+    with mock.patch("os.path.exists"), mock.patch("builtins.open"):
+        await updater._run_update(
+            messenger=mock_messenger,
+            node_id=target.system_node,
+            filepath=hex_file_path,
+            retry_count=12,
+            timeout_seconds=11,
+            erase=should_erase,
+        )
     mock_initiator_run.assert_called_once_with(
         target=target, retry_count=12, ready_wait_time_sec=11
     )
@@ -89,7 +118,6 @@ async def test_run_update(
     mock_messenger.send.assert_called_once_with(
         node_id=target.bootloader_node, message=FirmwareUpdateStartApp()
     )
-    mock_hex_record_builder.assert_called_once_with(mock_hex_file)
 
 
 @pytest.mark.parametrize(argnames=["should_erase"], argvalues=[[True], [False]])
@@ -102,10 +130,8 @@ async def test_run_updates(
 ) -> None:
     """It should call all the functions."""
     mock_messenger = AsyncMock()
-    mock_hex_file_1 = MagicMock()
-    mock_hex_file_2 = MagicMock()
-    hex_file_1 = cast(TextIO, mock_hex_file_1)
-    hex_file_2 = cast(TextIO, mock_hex_file_2)
+    hex_file_1 = str()
+    hex_file_2 = str()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
     target_1 = Target(system_node=NodeId.gantry_x)
@@ -114,13 +140,16 @@ async def test_run_updates(
         target_1.system_node: hex_file_1,
         target_2.system_node: hex_file_2,
     }
-    await run_updates(
-        messenger=mock_messenger,
-        update_details=update_details,
-        retry_count=12,
-        timeout_seconds=11,
-        erase=should_erase,
-    )
+    with mock.patch("os.path.exists"), mock.patch("builtins.open"):
+        updater = RunUpdate(
+            messenger=mock_messenger,
+            update_details=update_details,
+            retry_count=12,
+            timeout_seconds=11,
+            erase=should_erase,
+        )
+        async for progress in updater.run_updates():
+            pass
 
     mock_initiator_run.assert_has_calls(
         [
@@ -146,11 +175,13 @@ async def test_run_updates(
                 hex_processor=mock_hex_record_processor,
                 ack_wait_seconds=11,
             ),
+            mock.call().__aiter__(),
             mock.call(
                 node_id=target_2.bootloader_node,
                 hex_processor=mock_hex_record_processor,
                 ack_wait_seconds=11,
             ),
+            mock.call().__aiter__(),
         ]
     )
 
@@ -162,12 +193,5 @@ async def test_run_updates(
             mock.call(
                 node_id=target_2.bootloader_node, message=FirmwareUpdateStartApp()
             ),
-        ]
-    )
-
-    mock_hex_record_builder.assert_has_calls(
-        [
-            mock.call(hex_file_1),
-            mock.call(hex_file_2),
         ]
     )

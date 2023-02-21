@@ -1,5 +1,6 @@
 import { getModuleDef2 } from '@opentrons/shared-data'
-import { useAttachedModules, useProtocolDetailsForRun } from '../Devices/hooks'
+import { useAttachedModules } from '../Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { AttachedModule } from '../../redux/modules/types'
 
 export interface ModuleIdFromRun {
@@ -10,7 +11,7 @@ export function useModuleIdFromRun(
   module: AttachedModule,
   runId: string | null
 ): ModuleIdFromRun {
-  const { protocolData } = useProtocolDetailsForRun(runId)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const attachedModules = useAttachedModules()
 
   const { compatibleWith } = getModuleDef2(module.moduleModel)
@@ -21,7 +22,7 @@ export function useModuleIdFromRun(
       compatibleWith.includes(item.moduleModel)
   )
 
-  const loadModuleCommands = protocolData?.commands.filter(
+  const loadModuleCommands = robotProtocolAnalysis?.commands.filter(
     command =>
       command.commandType === 'loadModule' &&
       (command.params.model === module.moduleModel ||
@@ -34,7 +35,7 @@ export function useModuleIdFromRun(
 
   const moduleIdFromRun =
     loadModuleCommands?.[moduleIndex] != null
-      ? loadModuleCommands?.[moduleIndex].result.moduleId
+      ? loadModuleCommands?.[moduleIndex].result?.moduleId
       : ''
 
   return { moduleIdFromRun }
