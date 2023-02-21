@@ -376,6 +376,26 @@ def test_get_tip_length_gets_length_from_definition(
     assert length == tip_rack_def.parameters.tipLength
 
 
+def test_get_tip_drop_z_offset() -> None:
+    """It should get a tip drop z offset by scaling the tip length."""
+    tip_rack_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+        parameters=Parameters.construct(  # type: ignore[call-arg]
+            tipLength=100,
+        )
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"tip-rack-id": tip_rack},
+        definitions_by_uri={"some-tip-rack-uri": tip_rack_def},
+    )
+
+    result = subject.get_tip_drop_z_offset(
+        labware_id="tip-rack-id", length_scale=0.5, additional_offset=-0.123
+    )
+
+    assert result == -50.123
+
+
 def test_get_labware_uri_from_definition(tip_rack_def: LabwareDefinition) -> None:
     """It should return the labware's definition URI."""
     tip_rack = LoadedLabware(

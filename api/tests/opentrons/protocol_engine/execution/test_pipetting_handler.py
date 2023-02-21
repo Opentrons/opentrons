@@ -9,7 +9,13 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine import (
+    DropTipWellLocation,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckPoint,
+)
 from opentrons.protocol_engine.state import (
     StateStore,
     TipGeometry,
@@ -246,7 +252,7 @@ async def test_handle_drop_up_tip_request(
         state_store.geometry.get_tip_drop_location(
             pipette_config=mock_hw_pipettes.right_config,
             labware_id="labware-id",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
@@ -254,7 +260,7 @@ async def test_handle_drop_up_tip_request(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="A1",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
         home_after=None,
     )
 

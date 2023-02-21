@@ -11,7 +11,9 @@ from ..types import (
     LoadedLabware,
     LoadedModule,
     WellLocation,
+    DropTipWellLocation,
     WellOrigin,
+    DropTipWellOrigin,
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
@@ -296,34 +298,37 @@ class GeometryView:
             volume=int(well_def.totalLiquidVolume),
         )
 
-    # TODO(mc, 2020-11-12): support pre-PAPIv2.2/2.3 behavior of dropping the tip
-    # 10mm above well bottom
     def get_tip_drop_location(
         self,
         pipette_config: PipetteDict,
         labware_id: str,
-        well_location: WellLocation,
+        well_location: DropTipWellLocation,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
-        if well_location.origin != WellOrigin.TOP:
-            raise errors.WellOriginNotAllowedError(
-                'Drop tip location must be relative to "top"'
+        if well_location.origin != DropTipWellOrigin.DEFAULT:
+            return WellLocation(
+                origin=WellOrigin(well_location.origin.value),
+                offset=well_location.offset,
             )
 
         # return to top if labware is fixed trash
         if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):
-            return well_location
-
-        nominal_length = self._labware.get_tip_length(labware_id)
-        offset_factor = pipette_config["return_tip_height"]
-        tip_z_offset = nominal_length * offset_factor
+            z_offset = well_location.offset.z
+        else:
+            z_offset = self._labware.get_tip_drop_z_offset(
+                labware_id=labware_id,
+                # TODO(mc, 2023-02-13): replace with PipetteView.get_return_tip_scale
+                length_scale=pipette_config["return_tip_height"],
+                additional_offset=well_location.offset.z,
+            )
 
         return WellLocation(
+            origin=WellOrigin.TOP,
             offset=WellOffset(
                 x=well_location.offset.x,
                 y=well_location.offset.y,
-                z=well_location.offset.z - tip_z_offset,
-            )
+                z=z_offset,
+            ),
         )
 
     def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:

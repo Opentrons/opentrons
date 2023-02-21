@@ -25,17 +25,18 @@ export function getLabwareSetupItemGroups(
     commands.reduce<LabwareSetupItem[]>((acc, c) => {
       if (
         c.commandType === 'loadLabware' &&
-        c.result.definition.metadata.displayCategory !== 'trash'
+        c.result?.definition?.metadata?.displayCategory !== 'trash'
       ) {
         const { location, displayName } = c.params
-        const { definition } = c.result
+        const { definition } = c.result ?? {}
+        if (definition == null) return acc
         let moduleModel = null
         let moduleLocation = null
         if (location !== 'offDeck' && 'moduleId' in location) {
           const loadModuleCommand = commands.find(
             (c): c is LoadModuleRunTimeCommand =>
               c.commandType === 'loadModule' &&
-              c.result.moduleId === location.moduleId
+              c.result?.moduleId === location.moduleId
           )
           if (loadModuleCommand == null) {
             console.error(

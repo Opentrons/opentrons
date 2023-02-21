@@ -436,6 +436,10 @@ class PipetteView(HasState[PipetteState]):
         """Return the given pipette's max instrument height, not including tip length."""
         return self._get_static_config(pipette_id).instrument_max_height
 
+    def get_return_tip_scale(self, pipette_id: str) -> float:
+        """Return the given pipette's return tip height scale."""
+        raise NotImplementedError("get_return_tip_scale not yet implemented.")
+
     def get_flow_rates(self, pipette_id: str) -> FlowRates:
         """Get the default flow rates for the pipette."""
         try:
