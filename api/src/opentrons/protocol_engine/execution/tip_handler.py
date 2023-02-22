@@ -30,7 +30,7 @@ class TipHandler(TypingProtocol):
     async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
         """Drop the attached tip into the named location.
 
-        Pipette should be in place over the desitnation prior to calling this method.
+        Pipette should be in place over the destination prior to calling this method.
         """
 
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
