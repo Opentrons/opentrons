@@ -83,7 +83,9 @@ class MovementHandler:
         self._gantry_mover = (
             gantry_mover or VirtualGantryMovementHandler(state_store=self._state_store)
             if self._state_store.config.use_virtual_pipettes
-            else GantryMovementHandler(hardware_api=hardware_api)
+            else GantryMovementHandler(
+                hardware_api=hardware_api, state_store=self._state_store
+            )
         )
 
     async def move_to_well(
@@ -132,12 +134,8 @@ class MovementHandler:
         hw_mount = pipette_location.mount.to_hw_mount()
         origin_cp = pipette_location.critical_point
 
-        origin = await self._gantry_mover.get_position(
-            pipette_id=pipette_id, mount=hw_mount, critical_point=origin_cp
-        )
-        max_travel_z = self._gantry_mover.get_max_travel_z(
-            pipette_id=pipette_id, mount=hw_mount
-        )
+        origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
+        max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
         # calculate the movement's waypoints
         waypoints = self._state_store.motion.get_movement_waypoints_to_well(
@@ -177,12 +175,6 @@ class MovementHandler:
         distance: float,
     ) -> MoveRelativeData:
         """Move a given pipette a relative amount in millimeters."""
-        pipette_location = self._state_store.motion.get_pipette_location(
-            pipette_id=pipette_id,
-        )
-        pip_cp = pipette_location.critical_point
-        hw_mount = pipette_location.mount.to_hw_mount()
-
         delta = Point(
             x=distance if axis == MovementAxis.X else 0,
             y=distance if axis == MovementAxis.Y else 0,
@@ -193,8 +185,6 @@ class MovementHandler:
 
         point = await self._gantry_mover.move_relative(
             pipette_id=pipette_id,
-            mount=hw_mount,
-            critical_point=pip_cp,
             delta=delta,
             speed=speed,
         )
@@ -209,17 +199,9 @@ class MovementHandler:
         position_id: Optional[str],
     ) -> SavedPositionData:
         """Get the pipette position and save to state."""
-        pipette_location = self._state_store.motion.get_pipette_location(
+        point = await self._gantry_mover.get_position(
             pipette_id=pipette_id,
-        )
-
-        hw_mount = pipette_location.mount.to_hw_mount()
-        pip_cp = pipette_location.critical_point
-
-        point = await self._gantry_mover.get_position_fail_not_homed(
-            pipette_id=pipette_id,
-            mount=hw_mount,
-            critical_point=pip_cp,
+            fail_on_not_homed=True,
         )
 
         position_id = position_id or self._model_utils.generate_id()
@@ -250,12 +232,8 @@ class MovementHandler:
         )
         hw_mount = pipette_location.mount.to_hw_mount()
 
-        origin = await self._gantry_mover.get_position(
-            pipette_id=pipette_id, mount=hw_mount, critical_point=None
-        )
-        max_travel_z = self._gantry_mover.get_max_travel_z(
-            pipette_id=pipette_id, mount=hw_mount
-        )
+        origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
+        max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
         # calculate the movement's waypoints
         waypoints = self._state_store.motion.get_movement_waypoints_to_coords(

@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.types import Mount, Point
+from opentrons.types import Mount, MountType, Point
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
@@ -12,6 +12,7 @@ from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeE
 
 from opentrons.motion_planning import Waypoint
 
+from opentrons.protocol_engine.state import StateStore, CurrentWell, PipetteLocationData
 from opentrons.protocol_engine.types import MotorAxis
 from opentrons.protocol_engine.errors import MustHomeError
 
@@ -25,21 +26,43 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 
 
 @pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mock in the shape of a StateStore."""
+    return decoy.mock(cls=StateStore)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareAPI,
+    state_store: StateStore,
 ) -> GantryMovementHandler:
     """Create a GantryMovementHandler with its dependencies mocked out."""
     return GantryMovementHandler(
         hardware_api=hardware_api,
+        state_store=state_store,
     )
 
 
 async def test_get_position(
     decoy: Decoy,
     hardware_api: HardwareAPI,
+    state_store: StateStore,
     subject: GantryMovementHandler,
 ) -> None:
     """It should get the position of the pipette with the hardware API."""
+    current_well = CurrentWell(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2",
+    )
+    decoy.when(
+        state_store.motion.get_pipette_location("pipette-id", current_well)
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.RIGHT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
     decoy.when(
         await hardware_api.gantry_position(
             mount=Mount.RIGHT,
@@ -49,64 +72,52 @@ async def test_get_position(
     ).then_return(Point(1, 2, 3))
 
     result = await subject.get_position(
-        "pipette-id", Mount.RIGHT, CriticalPoint.XY_CENTER, fail_on_not_homed=True
+        "pipette-id", current_well=current_well, fail_on_not_homed=True
     )
 
     assert result == Point(1, 2, 3)
 
 
-async def test_get_position_fail_not_homed(
+async def test_get_position_raises(
     decoy: Decoy,
     hardware_api: HardwareAPI,
-    subject: GantryMovementHandler,
-) -> None:
-    """It should get the position of the pipette and set fail_on_not_homed to True."""
-    decoy.when(
-        await hardware_api.gantry_position(
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.NOZZLE,
-            fail_on_not_homed=True,
-        )
-    ).then_return(Point(1, 2, 3))
-
-    result = await subject.get_position_fail_not_homed(
-        "pipette-id", Mount.LEFT, CriticalPoint.NOZZLE
-    )
-
-    assert result == Point(1, 2, 3)
-
-
-async def test_get_position_fail_not_homed_raises(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
+    state_store: StateStore,
     subject: GantryMovementHandler,
 ) -> None:
     """It should raise a MustHomeError."""
+    decoy.when(state_store.motion.get_pipette_location("pipette-id", None)).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.NOZZLE,
+        )
+    )
     decoy.when(
         await hardware_api.gantry_position(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.NOZZLE,
-            fail_on_not_homed=True,
+            fail_on_not_homed=False,
         )
     ).then_raise(HardwareMustHomeError("oh no"))
 
     with pytest.raises(MustHomeError, match="oh no"):
-        await subject.get_position_fail_not_homed(
-            "pipette-id", Mount.LEFT, CriticalPoint.NOZZLE
-        )
+        await subject.get_position("pipette-id")
 
 
 def test_get_max_travel_z(
     decoy: Decoy,
     hardware_api: HardwareAPI,
+    state_store: StateStore,
     subject: GantryMovementHandler,
 ) -> None:
     """It should get the max travel z height with the hardware API."""
+    decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(
+        MountType.RIGHT
+    )
     decoy.when(hardware_api.get_instrument_max_height(mount=Mount.RIGHT)).then_return(
         42.1
     )
 
-    assert subject.get_max_travel_z("pipette-id", Mount.RIGHT) == 42.1
+    assert subject.get_max_travel_z("pipette-id") == 42.1
 
 
 async def test_move_to(
@@ -134,9 +145,16 @@ async def test_move_to(
 async def test_move_relative(
     decoy: Decoy,
     hardware_api: HardwareAPI,
+    state_store: StateStore,
     subject: GantryMovementHandler,
 ) -> None:
     """It should move the gantry by the delta with the hardware API."""
+    decoy.when(state_store.motion.get_pipette_location("pipette-id")).then_return(
+        PipetteLocationData(
+            mount=MountType.RIGHT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
     decoy.when(
         await hardware_api.gantry_position(
             mount=Mount.RIGHT,
@@ -147,8 +165,6 @@ async def test_move_relative(
 
     result = await subject.move_relative(
         pipette_id="pipette-id",
-        mount=Mount.RIGHT,
-        critical_point=CriticalPoint.XY_CENTER,
         delta=Point(1, 2, 3),
         speed=9001,
     )
@@ -171,9 +187,16 @@ async def test_move_relative(
 async def test_move_relative_must_home(
     decoy: Decoy,
     hardware_api: HardwareAPI,
+    state_store: StateStore,
     subject: GantryMovementHandler,
 ) -> None:
     """It should raise a MustHomeError."""
+    decoy.when(state_store.motion.get_pipette_location("pipette-id")).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
     decoy.when(
         await hardware_api.move_rel(
             mount=Mount.LEFT,
@@ -186,8 +209,6 @@ async def test_move_relative_must_home(
     with pytest.raises(MustHomeError, match="oh no"):
         await subject.move_relative(
             pipette_id="pipette-id",
-            mount=Mount.LEFT,
-            critical_point=None,
             delta=Point(x=1, y=2, z=3),
             speed=456.7,
         )

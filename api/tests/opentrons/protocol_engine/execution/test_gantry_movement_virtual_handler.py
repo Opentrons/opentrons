@@ -2,8 +2,7 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.types import Mount, Point
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.types import Point
 
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.types import DeckPoint
@@ -39,7 +38,7 @@ async def test_get_position(
         DeckPoint(x=1, y=2, z=3)
     )
 
-    result = await subject.get_position("pipette-id", mount=Mount.LEFT)
+    result = await subject.get_position("pipette-id")
 
     assert result == Point(x=1, y=2, z=3)
 
@@ -52,7 +51,7 @@ async def test_get_position_default(
     """It should get a default Point if no stored deck point can be found in the state store."""
     decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(None)
 
-    result = await subject.get_position("pipette-id", mount=Mount.LEFT)
+    result = await subject.get_position("pipette-id")
 
     assert result == Point(x=0, y=0, z=0)
 
@@ -68,7 +67,7 @@ def test_get_max_travel_z(
     ).then_return(42)
     decoy.when(state_store.tips.get_tip_length("pipette-id")).then_return(20)
 
-    result = subject.get_max_travel_z("pipette-id", mount=Mount.RIGHT)
+    result = subject.get_max_travel_z("pipette-id")
 
     assert result == 22.0
 
@@ -85,8 +84,6 @@ async def test_move_relative(
 
     result = await subject.move_relative(
         "pipette-id",
-        mount=Mount.LEFT,
-        critical_point=CriticalPoint.TIP,
         delta=Point(3, 2, 1),
         speed=123,
     )

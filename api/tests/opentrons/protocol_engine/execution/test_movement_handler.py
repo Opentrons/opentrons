@@ -125,15 +125,11 @@ async def test_move_to_well(
     decoy.when(
         await gantry_movement_handler.get_position(
             pipette_id="pipette-id",
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.FRONT_NOZZLE,
         )
     ).then_return(Point(1, 1, 1))
 
     decoy.when(
-        gantry_movement_handler.get_max_travel_z(
-            pipette_id="pipette-id", mount=Mount.LEFT
-        )
+        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
     ).then_return(42.0)
 
     decoy.when(
@@ -242,15 +238,11 @@ async def test_move_to_well_from_starting_location(
     decoy.when(
         await gantry_movement_handler.get_position(
             pipette_id="pipette-id",
-            mount=Mount.RIGHT,
-            critical_point=CriticalPoint.XY_CENTER,
         )
     ).then_return(Point(1, 2, 5))
 
     decoy.when(
-        gantry_movement_handler.get_max_travel_z(
-            pipette_id="pipette-id", mount=Mount.RIGHT
-        )
+        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
     ).then_return(42.0)
 
     decoy.when(
@@ -342,15 +334,11 @@ async def test_move_to_well_no_waypoints(
     decoy.when(
         await gantry_movement_handler.get_position(
             pipette_id="pipette-id",
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.FRONT_NOZZLE,
         )
     ).then_return(Point(11, 22, 33))
 
     decoy.when(
-        gantry_movement_handler.get_max_travel_z(
-            pipette_id="pipette-id", mount=Mount.LEFT
-        )
+        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
     ).then_return(42.0)
 
     decoy.when(
@@ -423,19 +411,8 @@ async def test_move_relative(
 ) -> None:
     """Test that move_relative triggers a relative move with the HardwareAPI."""
     decoy.when(
-        state_store.motion.get_pipette_location(pipette_id="pipette-id")
-    ).then_return(
-        PipetteLocationData(
-            mount=MountType.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
-        )
-    )
-
-    decoy.when(
         await gantry_movement_handler.move_relative(
             pipette_id="pipette-id",
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
             delta=expected_delta,
             speed=39339.5,
         )
@@ -462,21 +439,9 @@ async def test_save_position(
 ) -> None:
     """Test that `save_position` fetches gantry position from hardwareAPI."""
     decoy.when(
-        state_store.motion.get_pipette_location(
+        await gantry_movement_handler.get_position(
             pipette_id="pipette-id",
-        )
-    ).then_return(
-        PipetteLocationData(
-            mount=MountType.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
-        )
-    )
-
-    decoy.when(
-        await gantry_movement_handler.get_position_fail_not_homed(
-            pipette_id="pipette-id",
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
+            fail_on_not_homed=True,
         )
     ).then_return(Point(1, 1, 1))
 
@@ -517,13 +482,11 @@ async def test_move_to_coordinates(
     )
 
     decoy.when(
-        await gantry_movement_handler.get_position(
-            pipette_id="pipette-id", mount=mount, critical_point=None
-        )
+        await gantry_movement_handler.get_position(pipette_id="pipette-id")
     ).then_return(current_position)
 
     decoy.when(
-        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id", mount=mount)
+        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
     ).then_return(5678)
 
     decoy.when(
@@ -585,15 +548,11 @@ async def test_move_to_coordinates_no_waypoints(
     )
 
     decoy.when(
-        await gantry_movement_handler.get_position(
-            pipette_id="pipette-id", mount=Mount.RIGHT, critical_point=None
-        )
+        await gantry_movement_handler.get_position(pipette_id="pipette-id")
     ).then_return(Point(11, 22, 33))
 
     decoy.when(
-        gantry_movement_handler.get_max_travel_z(
-            pipette_id="pipette-id", mount=Mount.RIGHT
-        )
+        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
     ).then_return(5678)
 
     decoy.when(

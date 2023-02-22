@@ -308,6 +308,10 @@ class PipetteView(HasState[PipetteState]):
         except KeyError:
             raise errors.PipetteNotLoadedError(f"Pipette {pipette_id} not found.")
 
+    def get_mount(self, pipette_id: str) -> MountType:
+        """Get the pipette's mount."""
+        return self.get(pipette_id).mount
+
     def get_all(self) -> List[LoadedPipette]:
         """Get a list of all pipette entries in state."""
         return list(self._state.pipettes_by_id.values())
