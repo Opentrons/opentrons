@@ -8,8 +8,6 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
-from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
@@ -89,8 +87,10 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._definition.parameters.quirks or []
 
     def set_calibration(self, delta: Point) -> None:
-        # TODO(jbl 2022-09-01): implement set calibration through the engine
-        pass
+        raise NotImplementedError(
+            "Setting a labware's calibration after it's been loaded"
+            " is not supported by Protocol Engine."
+        )
 
     def get_calibrated_offset(self) -> Point:
         return self._engine_client.state.geometry.get_labware_position(self._labware_id)
@@ -124,23 +124,9 @@ class LabwareCore(AbstractLabware[WellCore]):
             ),
         )
 
-    # TODO(mc, 2022-11-09): remove from engine core
-    def get_tip_tracker(self) -> TipTracker:
-        raise NotImplementedError("LabwareCore.get_tip_tracker not implemented")
-
     def get_well_columns(self) -> List[List[str]]:
         """Get the all well names, organized by column, from the labware's definition."""
         return self._definition.ordering
-
-    def get_geometry(self) -> LabwareGeometry:
-        raise NotImplementedError("LabwareCore.get_geometry not implemented")
-
-    def get_default_magnet_engage_height(
-        self, preserve_half_mm: bool = False
-    ) -> Optional[float]:
-        raise NotImplementedError(
-            "LabwareCore.get_default_magnet_engage_height not implemented"
-        )
 
     def get_well_core(self, well_name: str) -> WellCore:
         """Create a well core interface to a well in this labware."""

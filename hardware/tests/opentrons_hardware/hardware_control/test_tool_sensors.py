@@ -1,6 +1,6 @@
 """Test the tool-sensor coordination code."""
 import logging
-from mock import patch, AsyncMock, ANY
+from mock import patch, ANY, AsyncMock
 import pytest
 from contextlib import asynccontextmanager
 from typing import Iterator, List, Tuple, AsyncIterator, Any
@@ -69,17 +69,21 @@ def mock_sensor_threshold() -> Iterator[AsyncMock]:
         mock_threshold.side_effect = echo_value
         yield mock_threshold
 
+
 @pytest.fixture
 def mock_bind_output() -> Iterator[AsyncMock]:
-    """Mock SensorDriver.bind_output."""
-    with patch.object(
-        SensorDriver,
-        "bind_output",
-        AsyncMock(
-            spec=SensorDriver.bind_output,
-            wraps=SensorDriver.bind_output,
-        ),
-    ) as mock_bind:
+    """Mock sensor output binding."""
+    mock_bind = AsyncMock(spec=SensorDriver.bind_output)
+
+    @asynccontextmanager
+    async def _fake_bind(*args: Any, **kwargs: Any) -> AsyncIterator[None]:
+        await mock_bind(*args, **kwargs)
+        yield
+
+    with patch(
+        "opentrons_hardware.sensors.sensor_driver.SensorDriver.bind_output",
+        _fake_bind,
+    ):
         yield mock_bind
 
 
@@ -161,8 +165,6 @@ async def test_liquid_probe(
         max_z_distance=40,
         mount_speed=10,
         plunger_speed=8,
-        starting_mount_height=120,
-        prep_move_speed=40,
         threshold_pascals=threshold_pascals,
         log_pressure=False,
         sensor_id=SensorId.S0,
@@ -173,25 +175,32 @@ async def test_liquid_probe(
         data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
         mode=SensorThresholdMode.absolute,
     )
-    mock_bind_output.assert_called_with(
-        mock_messenger, sensor_info, [SensorOutputBinding.sync]
-    )
+    mock_bind_output.assert_called_once()
+    assert mock_bind_output.call_args_list[0][0][3] == [SensorOutputBinding.sync]
 
-    # with patch.object("LogListener") as mock_listener:
-    #     position = await liquid_probe(
-    #         messenger=mock_messenger,
-    #         tool=target_node,
-    #         head_node=motor_node,
-    #         max_z_distance=40,
-    #         mount_speed=10,
-    #         plunger_speed=8,
-    #         starting_mount_height=120,
-    #         prep_move_speed=40,
-    #         threshold_pascals=threshold_pascals,
-    #         log_pressure=False,
-    #         sensor_id=SensorId.S0,
-    #     )
+    with patch(
+        "opentrons_hardware.hardware_control.tool_sensors", LogListener
+    ) as mock_log:
 
+        mock_log.__aenter__ = AsyncMock(return_value=mock_log)  # type: ignore
+        mock_log.__aexit__ = AsyncMock(return_value=None)  # type: ignore
+
+        await liquid_probe(
+            messenger=mock_messenger,
+            tool=target_node,
+            head_node=motor_node,
+            max_z_distance=40,
+            mount_speed=10,
+            plunger_speed=8,
+            threshold_pascals=threshold_pascals,
+            log_pressure=True,
+            sensor_id=SensorId.S0,
+        )
+        mock_bind_output.assert_called()
+        assert mock_bind_output.call_args_list[1][0][3] == [
+            SensorOutputBinding.sync,
+            SensorOutputBinding.report,
+        ]
 
 
 @pytest.mark.parametrize(

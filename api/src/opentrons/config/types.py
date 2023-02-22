@@ -137,7 +137,6 @@ class ZSenseSettings:
 @dataclass
 class LiquidProbeSettings:
     starting_mount_height: float
-    prep_move_speed: float
     max_z_distance: float
     min_z_distance: float
     mount_speed: float
@@ -146,6 +145,7 @@ class LiquidProbeSettings:
     expected_liquid_height: float
     log_pressure: bool
     aspirate_while_sensing: bool
+    data_file: str
 
 
 @dataclass(frozen=True)

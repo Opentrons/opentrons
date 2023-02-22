@@ -23,11 +23,7 @@ import {
   Coordinates,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
-import type {
-  Axis,
-  Sign,
-  StepSize,
-} from '../../molecules/DeprecatedJogControls/types'
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type {
   CreateRunCommand,
   RegisterPositionAction,
@@ -153,7 +149,7 @@ export const LabwarePositionCheckInner = (
         pipetteId: pip.id,
         labwareId: FIXED_TRASH_ID,
         wellName: 'A1',
-        wellLocation: { origin: 'top' as const },
+        wellLocation: { origin: 'default' as const },
       },
     }))
     chainRunCommands(

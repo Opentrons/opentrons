@@ -1,593 +1,392 @@
-"""OT3 Hardware Controller Backend."""
-
-from __future__ import annotations
-import asyncio
-import math
-from contextlib import asynccontextmanager
-import logging
-from typing import (
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Sequence,
-    AsyncIterator,
-    cast,
-    Set,
-    Union,
-    Mapping,
-)
-
-from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config
-from .ot3utils import (
-    axis_convert,
-    create_move_group,
-    get_current_settings,
-    node_to_axis,
-    axis_to_node,
-    create_gripper_jaw_hold_group,
-    create_gripper_jaw_grip_group,
-    create_gripper_jaw_home_group,
-    create_tip_action_group,
-    PipetteAction,
-)
-
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
-from opentrons_hardware.hardware_control.motion_planning import (
-    Move,
-    Coordinates,
-)
-
-from opentrons.hardware_control.module_control import AttachedModulesControl
-from opentrons.hardware_control import modules
+"""Shared utilities for ot3 hardware control."""
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
+from typing_extensions import Literal
+from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
-    BoardRevision,
     OT3Axis,
-    OT3Mount,
+    OT3AxisKind,
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
+    OT3Mount,
     InstrumentProbeType,
-    MotorStatus,
+    PipetteSubType,
+    UpdateState,
+    UpdateStatus,
 )
-from opentrons_hardware.hardware_control.motion import MoveStopCondition
+import numpy as np
 
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
-from opentrons.hardware_control.dev_types import (
-    InstrumentHardwareConfigs,
-    PipetteSpec,
-    GripperSpec,
-    OT3AttachedPipette,
-    AttachedGripper,
-    OT3AttachedInstruments,
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    PipetteType,
+    SensorId,
+    PipetteTipActionType,
 )
-from opentrons.util.async_helpers import ensure_yield
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
+from opentrons_hardware.hardware_control.motion_planning import (
+    AxisConstraints,
+    SystemConstraints,
+    Coordinates,
+    Move,
+    CoordinateValue,
+)
+from opentrons_hardware.hardware_control.tool_sensors import ProbeTarget
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    unit_vector_multiplication,
+)
+from opentrons_hardware.hardware_control.motion import (
+    create_step,
+    NodeIdMotionValues,
+    create_home_step,
+    MoveGroup,
+    MoveType,
+    MoveStopCondition,
+    create_gripper_jaw_step,
+    create_tip_action_step,
+)
 
-log = logging.getLogger(__name__)
+GRIPPER_JAW_HOME_TIME: float = 10
+GRIPPER_JAW_GRIP_TIME: float = 10
+
+PipetteAction = Literal["clamp", "home"]
+
+# TODO: These methods exist to defer uses of NodeId to inside
+# method bodies, which won't be evaluated until called. This is needed
+# because the robot server doesn't have opentrons_ot3_firmware as a dep
+# which is where they're defined, and therefore you can't have references
+# to NodeId that are interpreted at import time because then the robot
+# server tests fail when importing hardware controller. This is obviously
+# terrible and needs to be fixed.
+
+SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
+    OT3SubSystem.gantry_x: NodeId.gantry_x,
+    OT3SubSystem.gantry_y: NodeId.gantry_y,
+    OT3SubSystem.head: NodeId.head,
+    OT3SubSystem.pipette_left: NodeId.pipette_left,
+    OT3SubSystem.pipette_right: NodeId.pipette_right,
+    OT3SubSystem.gripper: NodeId.gripper,
+}
 
 
-class OT3Simulator:
-    """OT3 Hardware Controller Backend."""
+def axis_nodes() -> List["NodeId"]:
+    return [
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        NodeId.head_l,
+        NodeId.head_r,
+        NodeId.pipette_left,
+        NodeId.pipette_right,
+        NodeId.gripper_z,
+        NodeId.gripper_g,
+    ]
 
-    _position: Dict[NodeId, float]
-    _encoder_position: Dict[NodeId, float]
-    _motor_status: Dict[NodeId, MotorStatus]
 
-    @classmethod
-    async def build(
-        cls,
-        attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
-        config: OT3Config,
-        loop: asyncio.AbstractEventLoop,
-        strict_attached_instruments: bool = True,
-    ) -> OT3Simulator:
-        """Create the OT3Simulator instance.
+def node_axes() -> List[OT3Axis]:
+    return [
+        OT3Axis.X,
+        OT3Axis.Y,
+        OT3Axis.Z_L,
+        OT3Axis.Z_R,
+        OT3Axis.P_L,
+        OT3Axis.P_R,
+        OT3Axis.Z_G,
+        OT3Axis.G,
+    ]
 
-        Args:
-            config: Robot configuration
 
-        Returns:
-            Instance.
-        """
-        return cls(
-            attached_instruments,
-            attached_modules,
-            config,
-            loop,
-            strict_attached_instruments,
-        )
+def home_axes() -> List[OT3Axis]:
+    return [
+        OT3Axis.P_L,
+        OT3Axis.P_R,
+        OT3Axis.G,
+        OT3Axis.Z_L,
+        OT3Axis.Z_R,
+        OT3Axis.Z_G,
+        OT3Axis.X,
+        OT3Axis.Y,
+    ]
 
-    def __init__(
-        self,
-        attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
-        config: OT3Config,
-        loop: asyncio.AbstractEventLoop,
-        strict_attached_instruments: bool = True,
-    ) -> None:
-        """Construct.
 
-        Args:
-            config: Robot configuration
-            driver: The Can Driver
-        """
-        self._configuration = config
-        self._loop = loop
-        self._strict_attached = bool(strict_attached_instruments)
-        self._stubbed_attached_modules = attached_modules
+def axis_to_node(axis: OT3Axis) -> "NodeId":
+    anm = {
+        OT3Axis.X: NodeId.gantry_x,
+        OT3Axis.Y: NodeId.gantry_y,
+        OT3Axis.Z_L: NodeId.head_l,
+        OT3Axis.Z_R: NodeId.head_r,
+        OT3Axis.P_L: NodeId.pipette_left,
+        OT3Axis.P_R: NodeId.pipette_right,
+        OT3Axis.Z_G: NodeId.gripper_z,
+        OT3Axis.G: NodeId.gripper_g,
+        OT3Axis.Q: NodeId.pipette_left,
+    }
+    return anm[axis]
 
-        def _sanitize_attached_instrument(
-            mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
-        ) -> Union[PipetteSpec, GripperSpec]:
-            if mount is OT3Mount.GRIPPER:
-                gripper_spec: GripperSpec = {"model": None, "id": None}
-                if passed_ai and passed_ai.get("model"):
-                    gripper_spec["model"] = GripperModel.v1
-                    gripper_spec["id"] = passed_ai.get("id")
-                return gripper_spec
 
-            # TODO (lc 12-5-2022) need to not always pass in defaults here
-            # but doing it to satisfy linter errors for now.
-            pipette_spec: PipetteSpec = {"model": None, "id": None}
-            if not passed_ai or not passed_ai.get("model"):
-                return pipette_spec
+def node_to_axis(node: "NodeId") -> OT3Axis:
+    nam = {
+        NodeId.gantry_x: OT3Axis.X,
+        NodeId.gantry_y: OT3Axis.Y,
+        NodeId.head_l: OT3Axis.Z_L,
+        NodeId.head_r: OT3Axis.Z_R,
+        NodeId.pipette_left: OT3Axis.P_L,
+        NodeId.pipette_right: OT3Axis.P_R,
+        NodeId.gripper_z: OT3Axis.Z_G,
+        NodeId.gripper_g: OT3Axis.G,
+    }
+    return nam[node]
 
-            if ot3_pipette_config.supported_pipette(
-                cast(PipetteModel, passed_ai["model"])
-            ):
-                pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
-                pipette_spec["id"] = passed_ai.get("id")
-                return pipette_spec
-            # TODO (lc 12-05-2022) When the time comes we should properly
-            # support backwards compatibility
-            raise KeyError(
-                "If you specify attached_instruments, the model "
-                "should be pipette names or pipette models, but "
-                f'{passed_ai["model"]} is not'
+
+def node_is_axis(node: "NodeId") -> bool:
+    try:
+        node_to_axis(node)
+        return True
+    except KeyError:
+        return False
+
+
+def axis_is_node(axis: OT3Axis) -> bool:
+    try:
+        axis_to_node(axis)
+        return True
+    except KeyError:
+        return False
+
+
+def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
+    """Convert a sub system to a NodeId."""
+    return SUBSYSTEM_NODEID[sub_sys]
+
+
+def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
+    """Convert a NodeId to a Subsystem"""
+    node_to_subsystem = {
+        node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
+    }
+    return node_to_subsystem[node_id]
+
+
+def get_current_settings(
+    config: OT3CurrentSettings,
+    gantry_load: GantryLoad,
+) -> OT3AxisMap[CurrentConfig]:
+    conf_by_pip = config.by_gantry_load(gantry_load)
+    currents = {}
+    for axis_kind in conf_by_pip["hold_current"].keys():
+        for axis in OT3Axis.of_kind(axis_kind):
+            currents[axis] = CurrentConfig(
+                conf_by_pip["hold_current"][axis_kind],
+                conf_by_pip["run_current"][axis_kind],
             )
+    return currents
 
-        self._attached_instruments = {
-            m: _sanitize_attached_instrument(m, attached_instruments.get(m))
-            for m in OT3Mount
-        }
-        self._module_controls: Optional[AttachedModulesControl] = None
-        self._position = self._get_home_position()
-        self._encoder_position = self._get_home_position()
-        self._motor_status = {}
-        self._present_nodes: Set[NodeId] = set()
-        self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
-    @property
-    def board_revision(self) -> BoardRevision:
-        """Get the board revision"""
-        return BoardRevision.UNKNOWN
-
-    @property
-    def module_controls(self) -> AttachedModulesControl:
-        """Get the module controls."""
-        if self._module_controls is None:
-            raise AttributeError("Module controls not found.")
-        return self._module_controls
-
-    @module_controls.setter
-    def module_controls(self, module_controls: AttachedModulesControl) -> None:
-        """Set the module controls"""
-        self._module_controls = module_controls
-
-    @ensure_yield
-    async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
-        self._current_settings = get_current_settings(
-            self._configuration.current_settings, gantry_load
-        )
-
-    def _handle_motor_status_update(self, response: Dict[NodeId, float]) -> None:
-        self._position.update(response)
-        self._encoder_position.update(response)
-        self._motor_status.update(
-            (node, MotorStatus(True, True)) for node in response.keys()
-        )
-
-    @ensure_yield
-    async def update_motor_status(self) -> None:
-        """Retreieve motor and encoder status and position from all present nodes"""
-        # Simulate condition at boot, status would not be ok
-        self._motor_status.update(
-            (node, MotorStatus(False, False)) for node in self._present_nodes
-        )
-
-    @ensure_yield
-    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
-        """Update motor position estimation for commanded nodes, and update cache of data."""
-        # Simulate conditions as if there are no stalls, aka do nothing
-        return None
-
-    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        get_stat: Callable[
-            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
-        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
-        return all(
-            isinstance(status, MotorStatus) and status.motor_ok
-            for status in get_stat(axes)
-        )
-
-    @ensure_yield
-    async def update_position(self) -> OT3AxisMap[float]:
-        """Get the current position."""
-        return axis_convert(self._position, 0.0)
-
-    @ensure_yield
-    async def update_encoder_position(self) -> OT3AxisMap[float]:
-        """Get the encoder current position."""
-        return axis_convert(self._encoder_position, 0.0)
-
-    @ensure_yield
-    async def liquid_probe(
-        self,
-        mount: OT3Mount,
-        max_z_distance: float,
-        mount_speed: float,
-        plunger_speed: float,
-        threshold_pascals: float,
-        starting_mount_height: float,
-        prep_move_speed: float,
-        log_pressure: bool = True,
-        read_only: bool = False,
-        sensor_id: SensorId = SensorId.S0,
-    ) -> None:
-        return
-
-    @ensure_yield
-    async def move(
-        self,
-        origin: Coordinates[OT3Axis, float],
-        moves: List[Move[OT3Axis]],
-        stop_condition: MoveStopCondition = MoveStopCondition.none,
-    ) -> None:
-        """Move to a position.
-
-        Args:
-            target_position: Map of axis to position.
-            home_flagged_axes: Whether to home afterwords.
-            speed: Optional speed
-            axis_max_speeds: Optional map of axis to speed.
-
-        Returns:
-            None
-        """
-        _, final_positions = create_move_group(origin, moves, self._present_nodes)
-        self._position.update(final_positions)
-        self._encoder_position.update(final_positions)
-
-    @ensure_yield
-    async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
-        """Home axes.
-
-        Args:
-            axes: Optional list of axes.
-
-        Returns:
-            Homed position.
-        """
-        if axes:
-            homed = [axis_to_node(a) for a in axes]
-        else:
-            homed = list(self._position.keys())
-        for h in homed:
-            self._motor_status[h] = MotorStatus(True, True)
-        return axis_convert(self._position, 0.0)
-
-    @ensure_yield
-    async def fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        """Fast home axes.
-
-        Args:
-            axes: List of axes to home.
-            margin: Margin
-
-        Returns:
-            New position.
-        """
-        homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
-        for h in homed:
-            self._motor_status[h] = MotorStatus(True, True)
-        return axis_convert(self._position, 0.0)
-
-    @ensure_yield
-    async def gripper_grip_jaw(
-        self,
-        duty_cycle: float,
-        stop_condition: MoveStopCondition = MoveStopCondition.none,
-    ) -> None:
-        """Move gripper inward."""
-        _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
-
-    @ensure_yield
-    async def gripper_home_jaw(self, duty_cycle: float) -> None:
-        """Move gripper outward."""
-        _ = create_gripper_jaw_home_group(duty_cycle)
-        self._motor_status[NodeId.gripper_g] = MotorStatus(True, True)
-
-    @ensure_yield
-    async def gripper_hold_jaw(
-        self,
-        encoder_position_um: int,
-    ) -> None:
-        _ = create_gripper_jaw_hold_group(encoder_position_um)
-
-    @ensure_yield
-    async def tip_action(
-        self,
-        axes: Sequence[OT3Axis],
-        distance: float = 33,
-        speed: float = -5.5,
-        tip_action: str = "drop",
-    ) -> None:
-        _ = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
-        )
-
-    def _attached_to_mount(
-        self, mount: OT3Mount, expected_instr: Optional[PipetteName]
-    ) -> OT3AttachedInstruments:
-        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})  # type: ignore
-        if mount is OT3Mount.GRIPPER:
-            return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
-        return self._attached_pipette_to_mount(
-            mount, cast(PipetteSpec, init_instr), expected_instr
-        )
-
-    def _attached_gripper_to_mount(self, init_instr: GripperSpec) -> AttachedGripper:
-        found_model = init_instr["model"]
-        if found_model:
-            return {
-                "config": gripper_config.load(GripperModel.v1),
-                "id": init_instr["id"],
-            }
-        else:
-            return {"config": None, "id": None}
-
-    def _attached_pipette_to_mount(
-        self,
-        mount: OT3Mount,
-        init_instr: PipetteSpec,
-        expected_instr: Optional[PipetteName],
-    ) -> OT3AttachedPipette:
-        found_model = init_instr["model"]
-
-        # TODO (lc 12-05-2022) When the time comes, we should think about supporting
-        # backwards compatability -- hopefully not relying on config keys only,
-        # but TBD.
-        if expected_instr and not ot3_pipette_config.supported_pipette(
-            cast(PipetteModel, expected_instr)
-        ):
-            raise RuntimeError(
-                f"mount {mount.name} requested a {expected_instr} which is not supported on the OT3"
+def get_system_constraints(
+    config: OT3MotionSettings,
+    gantry_load: GantryLoad,
+) -> "SystemConstraints[OT3Axis]":
+    conf_by_pip = config.by_gantry_load(gantry_load)
+    constraints = {}
+    for axis_kind in [
+        OT3AxisKind.P,
+        OT3AxisKind.X,
+        OT3AxisKind.Y,
+        OT3AxisKind.Z,
+        OT3AxisKind.Z_G,
+    ]:
+        for axis in OT3Axis.of_kind(axis_kind):
+            constraints[axis] = AxisConstraints.build(
+                conf_by_pip["acceleration"][axis_kind],
+                conf_by_pip["max_speed_discontinuity"][axis_kind],
+                conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
+                conf_by_pip["default_max_speed"][axis_kind],
             )
-        if found_model and expected_instr and (expected_instr != found_model):
-            if self._strict_attached:
-                raise RuntimeError(
-                    "mount {}: expected instrument {} but got {}".format(
-                        mount.name, expected_instr, found_model
-                    )
-                )
-            else:
-                return {
-                    "config": ot3_pipette_config.load_ot3_pipette(
-                        ot3_pipette_config.convert_pipette_name(expected_instr)
-                    ),
-                    "id": None,
-                }
-        if found_model and expected_instr or found_model:
-            # Instrument detected matches instrument expected (note:
-            # "instrument detected" means passed as an argument to the
-            # constructor of this class)
+    return constraints
 
-            # OR Instrument detected and no expected instrument specified
-            return {
-                "config": ot3_pipette_config.load_ot3_pipette(
-                    ot3_pipette_config.convert_pipette_model(found_model)
-                ),
-                "id": init_instr["id"],
-            }
-        elif expected_instr:
-            # Expected instrument specified and no instrument detected
-            return {
-                "config": ot3_pipette_config.load_ot3_pipette(
-                    ot3_pipette_config.convert_pipette_name(expected_instr)
-                ),
-                "id": None,
-            }
-        else:
-            # No instrument detected or expected
-            return {"config": None, "id": None}
 
-    @ensure_yield
-    async def get_attached_instruments(
-        self, expected: Mapping[OT3Mount, Optional[PipetteName]]
-    ) -> Mapping[OT3Mount, OT3AttachedInstruments]:
-        """Get attached instruments.
+def _convert_to_node_id_dict(
+    axis_pos: Coordinates[OT3Axis, CoordinateValue],
+) -> NodeIdMotionValues:
+    target: NodeIdMotionValues = {}
+    for axis, pos in axis_pos.items():
+        if axis_is_node(axis):
+            target[axis_to_node(axis)] = np.float64(pos)
+    return target
 
-        Args:
-            expected: Which mounts are expected.
 
-        Returns:
-            A map of mount to pipette name.
-        """
-        return {
-            mount: self._attached_to_mount(mount, expected.get(mount))
-            for mount in OT3Mount
-        }
+def create_move_group(
+    origin: Coordinates[OT3Axis, CoordinateValue],
+    moves: List[Move[OT3Axis]],
+    present_nodes: Iterable[NodeId],
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
+) -> Tuple[MoveGroup, Dict[NodeId, float]]:
+    pos = _convert_to_node_id_dict(origin)
+    move_group: MoveGroup = []
+    for move in moves:
+        unit_vector = move.unit_vector
+        for block in move.blocks:
+            distances = unit_vector_multiplication(unit_vector, block.distance)
+            node_id_distances = _convert_to_node_id_dict(distances)
+            velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
+            accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
+            step = create_step(
+                distance=node_id_distances,
+                velocity=_convert_to_node_id_dict(velocities),
+                acceleration=_convert_to_node_id_dict(accelerations),
+                duration=block.time,
+                present_nodes=present_nodes,
+                stop_condition=stop_condition,
+            )
+            for ax in pos.keys():
+                pos[ax] += node_id_distances.get(ax, 0)
+            move_group.append(step)
+    return move_group, {k: float(v) for k, v in pos.items()}
 
-    @ensure_yield
-    async def get_limit_switches(self) -> OT3AxisMap[bool]:
-        """Get the state of the gantry's limit switches on each axis."""
-        return {}
 
-    @ensure_yield
-    async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
-        """Set the active current.
+def create_home_group(
+    distance: Dict[OT3Axis, float], velocity: Dict[OT3Axis, float]
+) -> MoveGroup:
+    node_id_distances = _convert_to_node_id_dict(distance)
+    node_id_velocities = _convert_to_node_id_dict(velocity)
+    step = create_home_step(
+        distance=node_id_distances,
+        velocity=node_id_velocities,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
 
-        Args:
-            axis_currents: Axes' currents
 
-        Returns:
-            None
-        """
-        return None
+def create_tip_action_group(
+    axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction
+) -> MoveGroup:
+    current_nodes = [axis_to_node(ax) for ax in axes]
+    step = create_tip_action_step(
+        velocity={node_id: np.float64(velocity) for node_id in current_nodes},
+        distance={node_id: np.float64(distance) for node_id in current_nodes},
+        present_nodes=current_nodes,
+        action=PipetteTipActionType[action],
+    )
+    return [step]
 
-    @asynccontextmanager
-    async def restore_current(self) -> AsyncIterator[None]:
-        """Save the current."""
-        yield
 
-    @ensure_yield
-    async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
-        new_mods_at_ports = [
-            modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
-            for idx, mod in enumerate(self._stubbed_attached_modules)
-        ]
-        await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
+def create_gripper_jaw_grip_group(
+    duty_cycle: float,
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
+) -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_GRIP_TIME),
+        duty_cycle=np.float32(duty_cycle),
+        stop_condition=stop_condition,
+        move_type=MoveType.grip,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
 
-    @property
-    def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
-        """Get the axis bounds."""
-        # TODO (AL, 2021-11-18): The bounds need to be defined
-        phony_bounds = (0, 10000)
-        return {
-            OT3Axis.Z_R: phony_bounds,
-            OT3Axis.Z_L: phony_bounds,
-            OT3Axis.P_L: phony_bounds,
-            OT3Axis.P_R: phony_bounds,
-            OT3Axis.Y: phony_bounds,
-            OT3Axis.X: phony_bounds,
-            OT3Axis.Z_G: phony_bounds,
-        }
 
-    @property
-    def fw_version(self) -> Optional[str]:
-        """Get the firmware version."""
-        return None
+def create_gripper_jaw_home_group(dc: float) -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_HOME_TIME),
+        duty_cycle=np.float32(dc),
+        stop_condition=MoveStopCondition.limit_switch,
+        move_type=MoveType.home,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
 
-    @ensure_yield
-    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
-        """Update the firmware."""
-        pass
 
-    def engaged_axes(self) -> OT3AxisMap[bool]:
-        """Get engaged axes."""
-        return {}
+def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_GRIP_TIME),
+        duty_cycle=np.float32(0),
+        encoder_position_um=np.int32(encoder_position_um),
+        stop_condition=MoveStopCondition.encoder_position,
+        move_type=MoveType.linear,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
 
-    @ensure_yield
-    async def disengage_axes(self, axes: List[OT3Axis]) -> None:
-        """Disengage axes."""
-        return None
 
-    @ensure_yield
-    async def engage_axes(self, axes: List[OT3Axis]) -> None:
-        """Engage axes."""
-        return None
+AxisMapPayload = TypeVar("AxisMapPayload")
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
-        """Set the light states."""
-        return None
 
-    def get_lights(self) -> Dict[str, bool]:
-        """Get the light state."""
-        return {}
+def axis_convert(
+    axis_map: Dict["NodeId", AxisMapPayload], default_value: AxisMapPayload
+) -> OT3AxisMap[AxisMapPayload]:
+    ret: OT3AxisMap[AxisMapPayload] = {k: default_value for k in node_axes()}
+    for node, value in axis_map.items():
+        if node_is_axis(node):
+            ret[node_to_axis(node)] = value
+    return ret
 
-    def pause(self) -> None:
-        """Pause the controller activity."""
-        return None
 
-    def resume(self) -> None:
-        """Resume the controller activity."""
-        return None
+_sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
+    OT3Mount.LEFT: NodeId.pipette_left,
+    OT3Mount.RIGHT: NodeId.pipette_right,
+    OT3Mount.GRIPPER: NodeId.gripper,
+}
 
-    @ensure_yield
-    async def halt(self) -> None:
-        """Halt the motors."""
-        return None
 
-    @ensure_yield
-    async def hard_halt(self) -> None:
-        """Halt the motors."""
-        return None
+def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
+    return _sensor_node_lookup[mount]
 
-    @ensure_yield
-    async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
-        """Probe."""
-        return {}
 
-    @ensure_yield
-    async def clean_up(self) -> None:
-        """Clean up."""
-        pass
+_instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
+    InstrumentProbeType.PRIMARY: SensorId.S0,
+    InstrumentProbeType.SECONDARY: SensorId.S1,
+}
 
-    @ensure_yield
-    async def configure_mount(
-        self, mount: OT3Mount, config: InstrumentHardwareConfigs
-    ) -> None:
-        """Configure a mount."""
-        return None
 
-    @staticmethod
-    def _get_home_position() -> Dict[NodeId, float]:
-        return {
-            NodeId.head_l: 0,
-            NodeId.head_r: 0,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-            NodeId.pipette_left: 0,
-            NodeId.pipette_right: 0,
-            NodeId.gripper_z: 0,
-            NodeId.gripper_g: 0,
-        }
+def sensor_id_for_instrument(probe: InstrumentProbeType) -> SensorId:
+    return _instr_sensor_id_lookup[probe]
 
-    @staticmethod
-    def home_position() -> OT3AxisMap[float]:
-        return {
-            node_to_axis(k): v for k, v in OT3Simulator._get_home_position().items()
-        }
 
-    @ensure_yield
-    async def probe_network(self) -> None:
-        nodes = set((NodeId.head_l, NodeId.head_r, NodeId.gantry_x, NodeId.gantry_y))
-        if self._attached_instruments[OT3Mount.LEFT].get("model", None):
-            nodes.add(NodeId.pipette_left)
-        if self._attached_instruments[OT3Mount.RIGHT].get("model", None):
-            nodes.add(NodeId.pipette_right)
-        if self._attached_instruments.get(
-            OT3Mount.GRIPPER
-        ) and self._attached_instruments[OT3Mount.GRIPPER].get("model", None):
-            nodes.add(NodeId.gripper)
-        self._present_nodes = nodes
+_pipette_subtype_lookup = {
+    PipetteSubType.pipette_single: PipetteType.pipette_single,
+    PipetteSubType.pipette_multi: PipetteType.pipette_multi,
+    PipetteSubType.pipette_96: PipetteType.pipette_96,
+}
 
-    @ensure_yield
-    async def capacitive_probe(
-        self,
-        mount: OT3Mount,
-        moving: OT3Axis,
-        distance_mm: float,
-        speed_mm_per_s: float,
-        sensor_threshold_pf: float,
-        probe: InstrumentProbeType,
-    ) -> None:
-        self._position[axis_to_node(moving)] += distance_mm
 
-    @ensure_yield
-    async def capacitive_pass(
-        self,
-        mount: OT3Mount,
-        moving: OT3Axis,
-        distance_mm: float,
-        speed_mm_per_s: float,
-        probe: InstrumentProbeType,
-    ) -> List[float]:
-        self._position[axis_to_node(moving)] += distance_mm
-        return []
+def pipette_type_for_subtype(pipette_subtype: PipetteSubType) -> PipetteType:
+    return _pipette_subtype_lookup[pipette_subtype]
+
+
+_update_state_lookup = {
+    FirmwareUpdateStatus.queued: UpdateState.queued,
+    FirmwareUpdateStatus.updating: UpdateState.updating,
+    FirmwareUpdateStatus.done: UpdateState.done,
+}
+
+
+def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
+    return _update_state_lookup[state]
+
+
+class UpdateProgress:
+    """Class to keep track of Update progress."""
+
+    def __init__(self, nodes: Set[NodeId]):
+        self._tracker: Dict[OT3SubSystem, UpdateStatus] = {}
+        self._total_progress = 0
+        for node in nodes:
+            subsystem = node_id_to_subsystem(node)
+            self._tracker[subsystem] = UpdateStatus(subsystem, UpdateState.queued, 0)
+
+    def get_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Gets the update status and total progress"""
+        return set(self._tracker.values()), self._total_progress
+
+    def update(
+        self, node_id: NodeId, status_element: StatusElement
+    ) -> Tuple[Set[UpdateStatus], int]:
+        """Update internal states/progress of firmware updates."""
+        fw_update_status, progress = status_element
+        subsystem = node_id_to_subsystem(node_id)
+        state = fw_update_state_from_status(fw_update_status)
+        progress = int(progress * 100)
+        self._tracker[subsystem] = UpdateStatus(subsystem, state, progress)
+        # calculate the total progress of all updates
+        progress_sum = 0
+        for update_status in self._tracker.values():
+            progress_sum += update_status.progress
+        self._total_progress = int(progress_sum / len(self._tracker))
+        return set(self._tracker.values()), self._total_progress

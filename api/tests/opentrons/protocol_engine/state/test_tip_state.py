@@ -10,6 +10,7 @@ from opentrons_shared_data.labware.labware_definition import (
 
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state.tips import TipStore, TipView
+from opentrons.protocol_engine.types import FlowRates, DeckPoint
 
 
 _tip_rack_parameters = LabwareParameters.construct(isTiprack=True)  # type: ignore[call-arg]
@@ -63,7 +64,7 @@ def pick_up_tip_command() -> commands.PickUpTip:
             labwareId="cool-labware",
             wellName="A1",
         ),
-        result=commands.PickUpTipResult.construct(),
+        result=commands.PickUpTipResult.construct(position=DeckPoint(x=0, y=0, z=0)),
     )
 
 
@@ -75,7 +76,7 @@ def drop_tip_command() -> commands.DropTip:
             labwareId="cool-labware",
             wellName="A1",
         ),
-        result=commands.DropTipResult.construct(),
+        result=commands.DropTipResult.construct(position=DeckPoint(x=0, y=0, z=0)),
     )
 
 
@@ -167,6 +168,12 @@ def test_get_next_tip_skips_picked_up_tip(
             max_volume=15,
             min_volume=3,
             model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
@@ -210,6 +217,12 @@ def test_reset_tips(
             max_volume=15,
             min_volume=3,
             model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
         )
     )
     subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
@@ -233,6 +246,12 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
             max_volume=15,
             min_volume=3,
             model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
         )
     )
 

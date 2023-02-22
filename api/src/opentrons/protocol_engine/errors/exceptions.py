@@ -125,10 +125,6 @@ class RunStoppedError(ProtocolEngineError):
     """An error raised when attempting to interact with a stopped engine."""
 
 
-class WellOriginNotAllowedError(ProtocolEngineError):
-    """An error raised when using a disallowed origin in a relative well location."""
-
-
 class ModuleNotAttachedError(ProtocolEngineError):
     """An error raised when a requested module is not attached."""
 
@@ -207,3 +203,7 @@ class LocationIsOccupiedError(ProtocolEngineError):
 
 class FirmwareUpdateRequired(ProtocolEngineError):
     """An error raised when the firmware needs to be updated."""
+
+
+class PipetteNotReadyToAspirateError(ProtocolEngineError):
+    """An error raised when the pipette is not ready to aspirate."""

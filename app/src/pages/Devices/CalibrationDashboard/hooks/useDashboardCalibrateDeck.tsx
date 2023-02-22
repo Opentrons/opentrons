@@ -20,8 +20,12 @@ import type { RequestState } from '../../../../redux/robot-api/types'
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
-
-export type DashboardCalDeckInvoker = () => void
+export interface DashboardCalDeckInvokerProps {
+  invalidateHandler?: () => void
+}
+export type DashboardCalDeckInvoker = (
+  props?: DashboardCalDeckInvokerProps
+) => void
 
 export function useDashboardCalibrateDeck(
   robotName: string
@@ -29,6 +33,7 @@ export function useDashboardCalibrateDeck(
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
+  const invalidateHandlerRef = React.useRef<(() => void) | undefined>()
   const { t } = useTranslation('robot_calibration')
 
   const deckCalSession: DeckCalibrationSession | null = useSelector(
@@ -88,7 +93,10 @@ export function useDashboardCalibrateDeck(
         : null
     )?.status === RobotApi.PENDING
 
-  const handleStartDashboardDeckCalSession: DashboardCalDeckInvoker = () => {
+  const handleStartDashboardDeckCalSession: DashboardCalDeckInvoker = (
+    props = {}
+  ) => {
+    invalidateHandlerRef.current = props.invalidateHandler
     dispatchRequests(
       Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_DECK_CALIBRATION)
     )
@@ -110,6 +118,7 @@ export function useDashboardCalibrateDeck(
           showSpinner={showSpinner}
           dispatchRequests={dispatchRequests}
           isJogging={isJogging}
+          offsetInvalidationHandler={invalidateHandlerRef.current}
         />
       )}
     </Portal>

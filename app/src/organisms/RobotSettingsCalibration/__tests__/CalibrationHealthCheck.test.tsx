@@ -67,7 +67,6 @@ const RUN_STATUSES = {
 }
 
 let mockTrackEvent: jest.Mock
-const mockUpdateRobotStatus = jest.fn()
 const mockDispatchRequests = jest.fn()
 
 const render = (
@@ -79,7 +78,6 @@ const render = (
       dispatchRequests={mockDispatchRequests}
       isPending={false}
       robotName="otie"
-      updateRobotStatus={mockUpdateRobotStatus}
       {...props}
     />,
     {

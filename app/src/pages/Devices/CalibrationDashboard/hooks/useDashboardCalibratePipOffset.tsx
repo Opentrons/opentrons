@@ -11,10 +11,6 @@ import * as RobotApi from '../../../../redux/robot-api'
 import * as Sessions from '../../../../redux/sessions'
 import { getPipetteOffsetCalibrationSession } from '../../../../redux/sessions/pipette-offset-calibration/selectors'
 import { pipetteOffsetCalibrationStarted } from '../../../../redux/analytics'
-import {
-  INTENT_CALIBRATE_PIPETTE_OFFSET,
-  INTENT_RECALIBRATE_PIPETTE_OFFSET,
-} from '../../../../organisms/DeprecatedCalibrationPanels'
 
 import type { State } from '../../../../redux/types'
 import type {
@@ -32,9 +28,6 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 export interface DashboardOffsetCalInvokerProps {
   params: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
     Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
-  withIntent:
-    | typeof INTENT_CALIBRATE_PIPETTE_OFFSET
-    | typeof INTENT_RECALIBRATE_PIPETTE_OFFSET
 }
 
 export type DashboardCalOffsetInvoker = (
@@ -136,7 +129,7 @@ export function useDashboardCalibratePipOffset(
   }, [shouldClose, onComplete])
 
   const handleStartDashboardPipOffsetCalSession: DashboardCalOffsetInvoker = props => {
-    const { params, withIntent } = props
+    const { params } = props
     const {
       mount,
       shouldRecalibrateTipLength = false,
@@ -157,7 +150,6 @@ export function useDashboardCalibratePipOffset(
     )
     dispatch(
       pipetteOffsetCalibrationStarted(
-        withIntent,
         mount,
         hasCalibrationBlock,
         shouldRecalibrateTipLength,

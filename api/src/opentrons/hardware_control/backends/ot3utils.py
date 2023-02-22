@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Tuple, TypeVar, Sequence, Union
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
@@ -10,14 +10,19 @@ from opentrons.hardware_control.types import (
     OT3SubSystem,
     OT3Mount,
     InstrumentProbeType,
+    PipetteSubType,
+    UpdateState,
+    UpdateStatus,
 )
 import numpy as np
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    PipetteType,
     SensorId,
     PipetteTipActionType,
 )
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -52,6 +57,15 @@ PipetteAction = Literal["clamp", "home"]
 # to NodeId that are interpreted at import time because then the robot
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
+
+SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
+    OT3SubSystem.gantry_x: NodeId.gantry_x,
+    OT3SubSystem.gantry_y: NodeId.gantry_y,
+    OT3SubSystem.head: NodeId.head,
+    OT3SubSystem.pipette_left: NodeId.pipette_left,
+    OT3SubSystem.pipette_right: NodeId.pipette_right,
+    OT3SubSystem.gripper: NodeId.gripper,
+}
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -140,15 +154,15 @@ def axis_is_node(axis: OT3Axis) -> bool:
 
 def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
     """Convert a sub system to a NodeId."""
-    nam = {
-        OT3SubSystem.gantry_x: NodeId.gantry_x,
-        OT3SubSystem.gantry_y: NodeId.gantry_y,
-        OT3SubSystem.head: NodeId.head,
-        OT3SubSystem.pipette_left: NodeId.pipette_left,
-        OT3SubSystem.pipette_right: NodeId.pipette_right,
-        OT3SubSystem.gripper: NodeId.gripper,
+    return SUBSYSTEM_NODEID[sub_sys]
+
+
+def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
+    """Convert a NodeId to a Subsystem"""
+    node_to_subsystem = {
+        node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
     }
-    return nam[sub_sys]
+    return node_to_subsystem[node_id]
 
 
 def get_current_settings(
@@ -310,12 +324,6 @@ _sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
     OT3Mount.GRIPPER: NodeId.gripper,
 }
 
-_head_node_lookup: Dict[OT3Mount, NodeId] = {
-    OT3Mount.LEFT: NodeId.head_l,
-    OT3Mount.RIGHT: NodeId.head_r,
-    OT3Mount.GRIPPER: NodeId.gripper_z,
-}
-
 
 def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
     return _sensor_node_lookup[mount]
@@ -329,3 +337,56 @@ _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
 
 def sensor_id_for_instrument(probe: InstrumentProbeType) -> SensorId:
     return _instr_sensor_id_lookup[probe]
+
+
+_pipette_subtype_lookup = {
+    PipetteSubType.pipette_single: PipetteType.pipette_single,
+    PipetteSubType.pipette_multi: PipetteType.pipette_multi,
+    PipetteSubType.pipette_96: PipetteType.pipette_96,
+}
+
+
+def pipette_type_for_subtype(pipette_subtype: PipetteSubType) -> PipetteType:
+    return _pipette_subtype_lookup[pipette_subtype]
+
+
+_update_state_lookup = {
+    FirmwareUpdateStatus.queued: UpdateState.queued,
+    FirmwareUpdateStatus.updating: UpdateState.updating,
+    FirmwareUpdateStatus.done: UpdateState.done,
+}
+
+
+def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
+    return _update_state_lookup[state]
+
+
+class UpdateProgress:
+    """Class to keep track of Update progress."""
+
+    def __init__(self, nodes: Set[NodeId]):
+        self._tracker: Dict[OT3SubSystem, UpdateStatus] = {}
+        self._total_progress = 0
+        for node in nodes:
+            subsystem = node_id_to_subsystem(node)
+            self._tracker[subsystem] = UpdateStatus(subsystem, UpdateState.queued, 0)
+
+    def get_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Gets the update status and total progress"""
+        return set(self._tracker.values()), self._total_progress
+
+    def update(
+        self, node_id: NodeId, status_element: StatusElement
+    ) -> Tuple[Set[UpdateStatus], int]:
+        """Update internal states/progress of firmware updates."""
+        fw_update_status, progress = status_element
+        subsystem = node_id_to_subsystem(node_id)
+        state = fw_update_state_from_status(fw_update_status)
+        progress = int(progress * 100)
+        self._tracker[subsystem] = UpdateStatus(subsystem, state, progress)
+        # calculate the total progress of all updates
+        progress_sum = 0
+        for update_status in self._tracker.values():
+            progress_sum += update_status.progress
+        self._total_progress = int(progress_sum / len(self._tracker))
+        return set(self._tracker.values()), self._total_progress

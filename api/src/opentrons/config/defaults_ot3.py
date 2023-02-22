@@ -21,7 +21,6 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     starting_mount_height=100,
-    prep_move_speed=10,
     max_z_distance=40,
     min_z_distance=5,
     mount_speed=10,
@@ -30,6 +29,7 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     expected_liquid_height=110,
     log_pressure=True,
     aspirate_while_sensing=False,
+    data_file="/var/pressure_sensor_data.csv",
 )
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
@@ -359,7 +359,6 @@ def _build_default_liquid_probe(
         starting_mount_height=from_conf.get(
             "starting_mount_height", default.starting_mount_height
         ),
-        prep_move_speed=from_conf.get("prep_move_speed", default.prep_move_speed),
         max_z_distance=from_conf.get("max_z_distance", default.max_z_distance),
         min_z_distance=from_conf.get("min_z_distance", default.min_z_distance),
         mount_speed=from_conf.get("mount_speed", default.mount_speed),
@@ -374,6 +373,7 @@ def _build_default_liquid_probe(
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
         ),
+        data_file=from_conf.get("data_file", default.data_file),
     )
 
 

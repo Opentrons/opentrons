@@ -13,12 +13,12 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorThresholdMode,
     SensorOutputBinding,
 )
+from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
 from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
-from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -39,14 +39,14 @@ def _build_pass_step(
     speed: Dict[NodeId, float],
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
-    # use any node present to calculate duration of the move, assuming the durations
-    #   will be the same
     return create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
         velocity={
             ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
         },
         acceleration={},
+        # use any node present to calculate duration of the move, assuming the durations
+        #   will be the same
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
         stop_condition=stop_condition,
@@ -60,17 +60,11 @@ async def liquid_probe(
     max_z_distance: float,
     plunger_speed: float,
     mount_speed: float,
-    starting_mount_height: float,
-    prep_move_speed: float,
     threshold_pascals: float,
     log_pressure: bool = True,
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
-    """Create and run liquid probing moves."""
-    """Move the mount down to the starting height, then move the
-    mount and pipette while reading from the pressure sensor.
-    """
-
+    """Move the mount and pipette simultaneously while reading from the pressure sensor."""
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     pressure_sensor = PressureSensor.build(
@@ -79,38 +73,36 @@ async def liquid_probe(
         stop_threshold=threshold_fixed_point,
     )
 
-    stop_condition = MoveStopCondition.sync_line
     binding = [SensorOutputBinding.sync]
     await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
-
-    prep_move = create_step(
-        distance={head_node: float64(abs(starting_mount_height))},
-        velocity={head_node: float64(prep_move_speed)},
-        acceleration={},
-        duration=float64(abs(starting_mount_height / prep_move_speed)),
-        present_nodes=[head_node],
-        stop_condition=MoveStopCondition.none,
-    )
 
     sensor_group = _build_pass_step(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
-        stop_condition=stop_condition,
+        stop_condition=MoveStopCondition.sync_line,
     )
 
-    prep_runner = MoveGroupRunner(move_groups=[[prep_move]])
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
-    await prep_runner.run(can_messenger=messenger)
 
     if log_pressure:
+        file_heading = [
+            "time(s)",
+            "Pressure(pascals)",
+            "z_velocity(mm/s)",
+            "plunger_velocity(mm/s)",
+            "threshold(pascals)",
+        ]
+        sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
         sensor_capturer = LogListener(
-            head_node, mount_speed, plunger_speed, threshold_pascals
+            mount=head_node,
+            data_file="/var/pressure_sensor_data.csv",
+            file_heading=file_heading,
+            sensor_metadata=sensor_metadata,
         )
         binding.append(SensorOutputBinding.report)
 
-    print(f"calling bind output w pressure sensor = {pressure_sensor}")
-    async with await sensor_driver.bind_output(messenger, pressure_sensor, binding):
+    async with sensor_driver.bind_output(messenger, pressure_sensor, binding):
         if log_pressure:
             messenger.add_listener(sensor_capturer, None)
 

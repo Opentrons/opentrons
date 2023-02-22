@@ -1,10 +1,11 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin, WellLocationMixin
+from ..types import DropTipWellLocation
+from .pipetting_common import PipetteIdMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -14,13 +15,26 @@ if TYPE_CHECKING:
 DropTipCommandType = Literal["dropTip"]
 
 
-class DropTipParams(PipetteIdMixin, WellLocationMixin):
+class DropTipParams(PipetteIdMixin):
     """Payload required to drop a tip in a specific well."""
 
-    pass
+    labwareId: str = Field(..., description="Identifier of labware to use.")
+    wellName: str = Field(..., description="Name of well to use in labware.")
+    wellLocation: DropTipWellLocation = Field(
+        default_factory=DropTipWellLocation,
+        description="Relative well location at which to drop the tip.",
+    )
+    homeAfter: Optional[bool] = Field(
+        None,
+        description=(
+            "Whether to home this pipette's plunger after dropping the tip."
+            " You should normally leave this unspecified to let the robot choose"
+            " a safe default depending on its hardware."
+        ),
+    )
 
 
-class DropTipResult(BaseModel):
+class DropTipResult(DestinationPositionResult):
     """Result data from the execution of a DropTip command."""
 
     pass
@@ -34,14 +48,15 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
 
     async def execute(self, params: DropTipParams) -> DropTipResult:
         """Move to and drop a tip using the requested pipette."""
-        await self._pipetting.drop_tip(
+        position = await self._pipetting.drop_tip(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+            home_after=params.homeAfter,
         )
 
-        return DropTipResult()
+        return DropTipResult(position=position)
 
 
 class DropTip(BaseCommand[DropTipParams, DropTipResult]):

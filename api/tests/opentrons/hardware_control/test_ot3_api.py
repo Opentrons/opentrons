@@ -28,9 +28,7 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperProbe,
     InstrumentProbeType,
-)
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
+    LiquidNotFound,
     EarlyLiquidSenseTrigger,
 )
 from opentrons.hardware_control.errors import (
@@ -42,6 +40,7 @@ from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import (
     axis_to_node,
 )
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.types import Point, Mount
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
@@ -52,10 +51,6 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteModelType,
     PipetteChannelType,
     PipetteVersionType,
-)
-
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
 )
 
 
@@ -73,7 +68,6 @@ def fake_settings() -> CapacitivePassSettings:
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
         starting_mount_height=100,
-        prep_move_speed=6,
         max_z_distance=15,
         min_z_distance=10,
         mount_speed=40,
@@ -82,6 +76,7 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         expected_liquid_height=109,
         log_pressure=False,
         aspirate_while_sensing=False,
+        data_file="fake_file_name",
     )
 
 
@@ -109,21 +104,6 @@ def mock_home(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
         ),
     ) as mock_move:
         yield mock_move
-
-
-@pytest.fixture
-def mock_backend_liquid_probe(
-    ot3_hardware: ThreadManager[OT3API],
-) -> Iterator[AsyncMock]:
-    with patch.object(
-        ot3_hardware.managed_obj._backend,
-        "liquid_probe",
-        AsyncMock(
-            spec=ot3_hardware.managed_obj._backend.liquid_probe,
-            wraps=ot3_hardware.managed_obj._backend.liquid_probe,
-        ),
-    ) as mock_liquid_probe:
-        yield mock_liquid_probe
 
 
 @pytest.fixture
@@ -219,8 +199,8 @@ async def mock_instrument_handlers(
     (
         (
             {
-                OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p50"},
-                OT3Mount.LEFT: {"channels": 1, "version": (1, 0), "model": "p1000"},
+                OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p50"},
+                OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"},
             },
             GantryLoad.TWO_LOW_THROUGHPUT,
         ),
@@ -230,34 +210,34 @@ async def mock_instrument_handlers(
             GantryLoad.GRIPPER,
         ),
         (
-            {OT3Mount.LEFT: {"channels": 8, "version": (1, 0), "model": "p1000"}},
+            {OT3Mount.LEFT: {"channels": 8, "version": (3, 3), "model": "p1000"}},
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
-            {OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p1000"}},
+            {OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p1000"}},
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
-            {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (1, 0)}},
+            {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (3, 3)}},
             GantryLoad.HIGH_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.LEFT: {"channels": 1, "version": (1, 0), "model": "p1000"},
+                OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"},
                 OT3Mount.GRIPPER: {"model": GripperModel.v1, "id": "g12345"},
             },
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.RIGHT: {"channels": 8, "version": (1, 0), "model": "p1000"},
+                OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p1000"},
                 OT3Mount.GRIPPER: {"model": GripperModel.v1, "id": "g12345"},
             },
             GantryLoad.LOW_THROUGHPUT,
         ),
         (
             {
-                OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (1, 0)},
+                OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (3, 3)},
                 OT3Mount.GRIPPER: {"model": GripperModel.v1, "id": "g12345"},
             },
             GantryLoad.HIGH_THROUGHPUT,
@@ -390,37 +370,42 @@ async def test_move_to_without_homing_first(
 
 
 @pytest.mark.parametrize(
-    "mount, head_ax, pipette_ax",
+    "mount, head_node, pipette_node",
     [
-        (OT3Mount.LEFT, OT3Axis.Z_L, OT3Axis.P_L),
-        (OT3Mount.RIGHT, OT3Axis.Z_R, OT3Axis.P_R),
+        (OT3Mount.LEFT, NodeId.head_l, NodeId.pipette_left),
+        (OT3Mount.RIGHT, NodeId.head_r, NodeId.pipette_right),
     ],
 )
 async def test_liquid_probe(
+    mock_move_to: AsyncMock,
     ot3_hardware: ThreadManager[OT3API],
-    head_ax: OT3Axis,
-    pipette_ax: OT3Axis,
+    head_node: NodeId,
+    pipette_node: OT3Axis,
     mount: OT3Mount,
     fake_liquid_settings: LiquidProbeSettings,
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
     mock_home_plunger: AsyncMock,
-    mock_backend_liquid_probe: AsyncMock,
 ) -> None:
     backend = ot3_hardware.managed_obj._backend
 
     await ot3_hardware.home()
+    mock_move_to.return_value = None
 
     with patch.object(
-        backend, "update_position", AsyncMock(spec=backend.update_position)
+        backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
     ) as mock_position:
-        return_dict = {head_ax: 0, OT3Axis.X: 0, OT3Axis.Y: 0, pipette_ax: 0}
+        return_dict = {
+            head_node: 140,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+            pipette_node: 0,
+        }
 
-        # scenario - aspirate while sensing
+        # make sure aspirate while sensing reverses direction
         mock_position.return_value = return_dict
         fake_settings_aspirate = LiquidProbeSettings(
             starting_mount_height=100,
-            prep_move_speed=6,
             max_z_distance=15,
             min_z_distance=5,
             mount_speed=40,
@@ -429,6 +414,7 @@ async def test_liquid_probe(
             expected_liquid_height=109,
             log_pressure=False,
             aspirate_while_sensing=True,
+            data_file="fake_file_name",
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
         mock_home_plunger.assert_called_once()
@@ -438,26 +424,57 @@ async def test_liquid_probe(
             fake_settings_aspirate.mount_speed,
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
-            fake_settings_aspirate.starting_mount_height,
-            fake_settings_aspirate.prep_move_speed,
             fake_settings_aspirate.log_pressure,
         )
 
-        # scenario - liquid threshold hit too early
-        return_dict[head_ax], return_dict[pipette_ax] = 150, 150
+        return_dict[head_node], return_dict[pipette_node] = 142, 142
         mock_position.return_value = return_dict
-        with pytest.raises(EarlyLiquidSenseTrigger):
+        await ot3_hardware.liquid_probe(
+            mount, fake_liquid_settings
+        )  # should raise no exceptions
+
+
+@pytest.mark.parametrize(
+    "mount, head_node, pipette_node",
+    [
+        (OT3Mount.LEFT, NodeId.head_l, NodeId.pipette_left),
+        (OT3Mount.RIGHT, NodeId.head_r, NodeId.pipette_right),
+    ],
+)
+async def test_liquid_sensing_errors(
+    mock_move_to: AsyncMock,
+    ot3_hardware: ThreadManager[OT3API],
+    head_node: NodeId,
+    pipette_node: NodeId,
+    mount: OT3Mount,
+    fake_liquid_settings: LiquidProbeSettings,
+    mock_instrument_handlers: Tuple[Mock],
+    mock_current_position_ot3: AsyncMock,
+    mock_home_plunger: AsyncMock,
+) -> None:
+    backend = ot3_hardware.managed_obj._backend
+
+    await ot3_hardware.home()
+    mock_move_to.return_value = None
+
+    with patch.object(
+        backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
+    ) as mock_position:
+        return_dict = {
+            head_node: 103,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+            pipette_node: 200,
+        }
+        # should raise LiquidNotFound
+        mock_position.return_value = return_dict
+        with pytest.raises(LiquidNotFound):
             await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
 
-        # scenario - successful probe
-        return_dict[head_ax], return_dict[pipette_ax] = 112, 112
+        # should raise EarlyLiquidSenseTrigger
+        return_dict[head_node], return_dict[pipette_node] = 150, 150
         mock_position.return_value = return_dict
-        await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
-        # assert final_pos == 12 change this to no exceptions called
-
-        # scenario - MoveConditionNotMet
-        backend.liquid_probe.side_effect = MoveConditionNotMet
-        with pytest.raises(MoveConditionNotMet):
+        with pytest.raises(EarlyLiquidSenseTrigger):
             await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
 
 
