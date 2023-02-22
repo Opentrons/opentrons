@@ -6,6 +6,9 @@
       "$ref": "#/definitions/AspirateCreate"
     },
     {
+      "$ref": "#/definitions/AspirateInPlaceCreate"
+    },
+    {
       "$ref": "#/definitions/CommentCreate"
     },
     {
@@ -19,6 +22,9 @@
     },
     {
       "$ref": "#/definitions/BlowOutCreate"
+    },
+    {
+      "$ref": "#/definitions/BlowOutInPlaceCreate"
     },
     {
       "$ref": "#/definitions/DropTipCreate"
@@ -144,7 +150,7 @@
   "definitions": {
     "WellOrigin": {
       "title": "WellOrigin",
-      "description": "Origin of WellLocation offset.",
+      "description": "Origin of WellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well",
       "enum": ["top", "bottom", "center"],
       "type": "string"
     },
@@ -251,6 +257,61 @@
         },
         "params": {
           "$ref": "#/definitions/AspirateParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "AspirateInPlaceParams": {
+      "title": "AspirateInPlaceParams",
+      "description": "Payload required to aspirate in place.",
+      "type": "object",
+      "properties": {
+        "flowRate": {
+          "title": "Flowrate",
+          "description": "Speed in \u00b5L/s configured for the pipette",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "volume": {
+          "title": "Volume",
+          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["flowRate", "volume", "pipetteId"]
+    },
+    "AspirateInPlaceCreate": {
+      "title": "AspirateInPlaceCreate",
+      "description": "AspirateInPlace command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "aspirateInPlace",
+          "enum": ["aspirateInPlace"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/AspirateInPlaceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -544,11 +605,89 @@
       },
       "required": ["params"]
     },
+    "BlowOutInPlaceParams": {
+      "title": "BlowOutInPlaceParams",
+      "description": "Payload required to blow-out in place.",
+      "type": "object",
+      "properties": {
+        "flowRate": {
+          "title": "Flowrate",
+          "description": "Speed in \u00b5L/s configured for the pipette",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["flowRate", "pipetteId"]
+    },
+    "BlowOutInPlaceCreate": {
+      "title": "BlowOutInPlaceCreate",
+      "description": "BlowOutInPlace command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "blowOutInPlace",
+          "enum": ["blowOutInPlace"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/BlowOutInPlaceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "DropTipWellOrigin": {
+      "title": "DropTipWellOrigin",
+      "description": "The origin of a DropTipWellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    DEFAULT: the default drop-tip location of the well,\n        based on pipette configuration and length of the tip.",
+      "enum": ["top", "bottom", "center", "default"],
+      "type": "string"
+    },
+    "DropTipWellLocation": {
+      "title": "DropTipWellLocation",
+      "description": "Like WellLocation, but for dropping tips.\n\nUnlike a typical WellLocation, the location for a drop tip\ndefaults to location based on the tip length rather than the well's top.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "default",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DropTipWellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        }
+      }
+    },
     "DropTipParams": {
       "title": "DropTipParams",
       "description": "Payload required to drop a tip in a specific well.",
       "type": "object",
       "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
         "labwareId": {
           "title": "Labwareid",
           "description": "Identifier of labware to use.",
@@ -561,20 +700,20 @@
         },
         "wellLocation": {
           "title": "Welllocation",
-          "description": "Relative well location at which to perform the operation",
+          "description": "Relative well location at which to drop the tip.",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/DropTipWellLocation"
             }
           ]
         },
-        "pipetteId": {
-          "title": "Pipetteid",
-          "description": "Identifier of pipette to use for liquid handling.",
-          "type": "string"
+        "homeAfter": {
+          "title": "Homeafter",
+          "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
+          "type": "boolean"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"]
+      "required": ["pipetteId", "labwareId", "wellName"]
     },
     "DropTipCreate": {
       "title": "DropTipCreate",

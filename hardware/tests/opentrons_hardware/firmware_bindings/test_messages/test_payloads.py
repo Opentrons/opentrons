@@ -39,3 +39,58 @@ def test_create_firmware_updata_data(
 def test_eeprom_field_from_string(value_str: str, expected: bytes) -> None:
     """It should convert to bytes from a string."""
     assert fields.EepromDataField.from_string(value_str).value == expected
+
+
+def test_old_get_device_info() -> None:
+    """A device info response without revision should parse."""
+    old = payloads._DeviceInfoResponsePayloadBase(
+        version=utils.UInt32Field(0x11223344),
+        flags=fields.VersionFlagsField(0x55667788),
+        shortsha=fields.FirmwareShortSHADataField(b"abcdef12"),
+    )
+    old.message_index = utils.UInt32Field(0)
+    ser = old.serialize()
+    reparsed_old = payloads.DeviceInfoResponsePayload.build(ser)
+    assert reparsed_old.version == old.version
+    assert reparsed_old.flags == old.flags
+    assert reparsed_old.shortsha == old.shortsha
+    assert reparsed_old.revision.primary is None
+    assert reparsed_old.revision.secondary is None
+    assert reparsed_old.revision.tertiary is None
+
+
+def test_padded_old_get_device_info() -> None:
+    """A device info with contentless bytes in revision place should parse."""
+    old = payloads._DeviceInfoResponsePayloadBase(
+        version=utils.UInt32Field(0x11223344),
+        flags=fields.VersionFlagsField(0x55667788),
+        shortsha=fields.FirmwareShortSHADataField(b"abcdef12"),
+    )
+    old.message_index = utils.UInt32Field(0)
+    ser = old.serialize() + b"\x00\x00\x00\x00\x00\x00"
+    reparsed_old = payloads.DeviceInfoResponsePayload.build(ser)
+    assert reparsed_old.version == old.version
+    assert reparsed_old.flags == old.flags
+    assert reparsed_old.shortsha == old.shortsha
+    assert reparsed_old.revision.primary is None
+    assert reparsed_old.revision.secondary is None
+    assert reparsed_old.revision.tertiary is None
+
+
+def test_new_get_device_info() -> None:
+    """A device info with a filled-out revision field should parse."""
+    new = payloads.DeviceInfoResponsePayload(
+        version=utils.UInt32Field(0x11223344),
+        flags=fields.VersionFlagsField(0x55667788),
+        shortsha=fields.FirmwareShortSHADataField(b"abcdef12"),
+        revision=fields.OptionalRevisionField.build(b"a1\x00\x00"),
+    )
+    new.message_index = utils.UInt32Field(0)
+    ser = new.serialize()
+    reparsed_new = payloads.DeviceInfoResponsePayload.build(ser)
+    assert reparsed_new.version == new.version
+    assert reparsed_new.flags == new.flags
+    assert reparsed_new.shortsha == new.shortsha
+    assert reparsed_new.revision.primary == new.revision.primary
+    assert reparsed_new.revision.secondary == new.revision.secondary
+    assert reparsed_new.revision.tertiary == new.revision.tertiary

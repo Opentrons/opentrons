@@ -1,12 +1,12 @@
 """Move to coordinates command request, result, and implementation models."""
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 from typing import Optional, Type, TYPE_CHECKING
 from typing_extensions import Literal
 
 from ..types import DeckPoint
-from .pipetting_common import PipetteIdMixin, MovementMixin
+from .pipetting_common import PipetteIdMixin, MovementMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -25,7 +25,7 @@ class MoveToCoordinatesParams(PipetteIdMixin, MovementMixin):
     )
 
 
-class MoveToCoordinatesResult(BaseModel):
+class MoveToCoordinatesResult(DestinationPositionResult):
     """Result data from the execution of a MoveToCoordinates command."""
 
     pass
@@ -45,14 +45,14 @@ class MoveToCoordinatesImplementation(
 
     async def execute(self, params: MoveToCoordinatesParams) -> MoveToCoordinatesResult:
         """Move the requested pipette to the requested coordinates."""
-        await self._movement.move_to_coordinates(
+        position = await self._movement.move_to_coordinates(
             pipette_id=params.pipetteId,
             deck_coordinates=params.coordinates,
             direct=params.forceDirect,
             additional_min_travel_z=params.minimumZHeight,
             speed=params.speed,
         )
-        return MoveToCoordinatesResult()
+        return MoveToCoordinatesResult(position=position)
 
 
 class MoveToCoordinates(BaseCommand[MoveToCoordinatesParams, MoveToCoordinatesResult]):

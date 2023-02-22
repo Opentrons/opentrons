@@ -14,7 +14,7 @@ export interface CommentCreateCommand extends CommonCommandCreateInfo {
 export interface CommentRunTimeCommand
   extends CommonCommandRunTimeInfo,
     CommentCreateCommand {
-  result: any
+  result?: any
 }
 
 interface CommentParams {
@@ -29,7 +29,7 @@ export interface CustomCreateCommand extends CommonCommandCreateInfo {
 export interface CustomRunTimeCommand
   extends CommonCommandRunTimeInfo,
     CustomCreateCommand {
-  result: any
+  result?: any
 }
 
 interface CustomParams {

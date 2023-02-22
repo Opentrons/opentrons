@@ -6,7 +6,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
@@ -132,6 +132,8 @@ def test_load_instrument(
     pipette_dict = cast(
         PipetteDict,
         {
+            "model": "cool-model",
+            "pipette_id": "cool-serial-number",
             "default_aspirate_flow_rates": {"1.1": 22},
             "default_dispense_flow_rates": {"3.3": 44},
             "default_blow_out_flow_rates": {"5.5": 66},
@@ -152,7 +154,12 @@ def test_load_instrument(
     decoy.verify(
         mock_sync_hardware_api.cache_instruments({Mount.RIGHT: "p300_single"}),
         mock_equipment_broker.publish(
-            InstrumentLoadInfo(instrument_load_name="p300_single", mount=Mount.RIGHT)
+            InstrumentLoadInfo(
+                instrument_load_name="p300_single",
+                mount=Mount.RIGHT,
+                model=PipetteModel("cool-model"),
+                serial_number="cool-serial-number",
+            )
         ),
     )
 

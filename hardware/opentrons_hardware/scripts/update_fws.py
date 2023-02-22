@@ -46,8 +46,7 @@ async def run(args: argparse.Namespace) -> None:
 
     update_dict = json.load(args.dict)
     update_details = {
-        NodeId[node_id]: open(hex_file, "r")
-        for node_id, hex_file in update_dict.items()
+        NodeId[node_id]: filepath for node_id, filepath in update_dict.items()
     }
 
     async with build.can_messenger(build_settings(args)) as messenger:
@@ -72,7 +71,7 @@ def main() -> None:
     parser.add_argument(
         "--dict",
         help="Path to json file containing the dictionary of node ids and hex files to be updated.",
-        type=argparse.FileType("r"),
+        type=str,
         required=True,
     )
     parser.add_argument(

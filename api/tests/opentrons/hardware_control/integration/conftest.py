@@ -50,7 +50,7 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
         c = await ModuleStatusClient.connect(
             host="localhost",
             port=emulator_settings.module_server.port,
-            interval_seconds=1,
+            interval_seconds=0.1,
         )
         await wait_emulators(client=c, modules=modules, timeout=5)
         c.close()
