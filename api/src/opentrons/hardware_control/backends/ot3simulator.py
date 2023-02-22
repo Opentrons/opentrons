@@ -33,7 +33,7 @@ from .ot3utils import (
     PipetteAction,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -50,6 +50,7 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     MotorStatus,
     PipetteSubType,
+    UpdateStatus,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -223,6 +224,24 @@ class OT3Simulator:
     async def update_encoder_position(self) -> OT3AxisMap[float]:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
+
+    @ensure_yield
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        max_z_distance: float,
+        mount_speed: float,
+        plunger_speed: float,
+        threshold_pascals: float,
+        log_pressure: bool = True,
+        sensor_id: SensorId = SensorId.S0,
+    ) -> None:
+
+        head_node = axis_to_node(OT3Axis.by_mount(mount))
+        pos = self._position
+        pos[head_node] = max_z_distance - 2
+        self._position.update(pos)
+        self._encoder_position.update(pos)
 
     @ensure_yield
     async def move(
@@ -451,11 +470,7 @@ class OT3Simulator:
             OT3Axis.Y: phony_bounds,
             OT3Axis.X: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
-            OT3Axis.G: phony_bounds,
         }
-
-    def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
-        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -472,13 +487,16 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
+    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        return set(), 0
+
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> None:
+    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
         """Updates the firmware on the OT3."""
-        return None
+        yield (set(), 0)
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""

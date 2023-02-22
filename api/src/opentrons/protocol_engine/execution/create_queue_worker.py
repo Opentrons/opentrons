@@ -8,6 +8,7 @@ from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .labware_movement import LabwareMovementHandler
 from .pipetting import PipettingHandler
+from .tip_handler import create_tip_handler
 from .run_control import RunControlHandler
 from .command_executor import CommandExecutor
 from .queue_worker import QueueWorker
@@ -39,12 +40,19 @@ def create_queue_worker(
     labware_movement_handler = LabwareMovementHandler(
         hardware_api=hardware_api,
         state_store=state_store,
+        equipment=equipment_handler,
+        movement=movement_handler,
     )
 
     pipetting_handler = PipettingHandler(
         hardware_api=hardware_api,
         state_store=state_store,
         movement_handler=movement_handler,
+    )
+
+    tip_handler = create_tip_handler(
+        hardware_api=hardware_api,
+        state_view=state_store,
     )
 
     run_control_handler = RunControlHandler(
@@ -63,6 +71,7 @@ def create_queue_worker(
         movement=movement_handler,
         labware_movement=labware_movement_handler,
         pipetting=pipetting_handler,
+        tip_handler=tip_handler,
         run_control=run_control_handler,
         rail_lights=rail_lights_handler,
     )

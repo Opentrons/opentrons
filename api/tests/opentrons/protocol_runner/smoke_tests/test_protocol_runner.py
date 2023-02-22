@@ -113,6 +113,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
 
     subject = await create_simulating_runner(robot_type="OT-2 Standard")
     result = await subject.run(protocol_source)
+
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
     labware_result = result.state_summary.labware
@@ -151,7 +152,9 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=14.38, y=74.24, z=64.69)
+            tipVolume=300.0,
+            tipLength=59.3,
+            position=DeckPoint(x=14.38, y=74.24, z=64.69),
         ),
     )
 

@@ -127,6 +127,25 @@ async def temp_module_v2(decoy: Decoy) -> TempDeck:
 
 
 @pytest.fixture
+def loaded_static_pipette_data() -> LoadedStaticPipetteData:
+    """Get a pipette config data value object."""
+    return LoadedStaticPipetteData(
+        model="pipette_model",
+        display_name="pipette name",
+        min_volume=1.23,
+        max_volume=4.56,
+        channels=7,
+        flow_rates=FlowRates(
+            default_blow_out={"a": 1.23},
+            default_aspirate={"b": 4.56},
+            default_dispense={"c": 7.89},
+        ),
+        return_tip_scale=0.5,
+        nominal_tip_overlap={"default": 9.87},
+    )
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
@@ -203,7 +222,6 @@ async def test_load_labware_off_deck(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
-    labware_data_provider: LabwareDataProvider,
     minimal_labware_def: LabwareDefinition,
     subject: EquipmentHandler,
 ) -> None:
@@ -233,7 +251,6 @@ async def test_load_labware_off_deck(
 
 async def test_load_labware_uses_provided_id(
     decoy: Decoy,
-    model_utils: ModelUtils,
     state_store: StateStore,
     labware_data_provider: LabwareDataProvider,
     minimal_labware_def: LabwareDefinition,
@@ -328,9 +345,7 @@ async def test_load_labware_on_module(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
-    labware_data_provider: LabwareDataProvider,
     minimal_labware_def: LabwareDefinition,
-    tempdeck_v1_def: ModuleDefinition,
     subject: EquipmentHandler,
 ) -> None:
     """It should load labware definition and offset data and generate an ID."""
@@ -460,11 +475,7 @@ def test_find_offset_id_of_labware_on_module(
     assert result == "labware-offset-id"
 
 
-def test_find_offset_id_of_labware_off_deck(
-    decoy: Decoy,
-    state_store: StateStore,
-    subject: EquipmentHandler,
-) -> None:
+def test_find_offset_id_of_labware_off_deck(subject: EquipmentHandler) -> None:
     """It should return None for offset_id of labware off-deck."""
     result = subject.find_applicable_labware_offset_id(
         labware_definition_uri="opentrons-test/load-name/1",
@@ -479,6 +490,7 @@ async def test_load_pipette(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
+    loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
@@ -492,21 +504,8 @@ async def test_load_pipette(
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
-    ).then_return(
-        LoadedStaticPipetteData(
-            model="pipette_model",
-            display_name="pipette name",
-            min_volume=1.23,
-            max_volume=4.56,
-            channels=7,
-            flow_rates=FlowRates(
-                default_blow_out={"a": 1.23},
-                default_aspirate={"b": 4.56},
-                default_dispense={"c": 7.89},
-            ),
-        )
-    )
+        pipette_data_provider.get_pipette_static_config(model="hello", serial_number="world")  # type: ignore[arg-type]
+    ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
@@ -526,16 +525,8 @@ async def test_load_pipette(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
-                model="pipette_model",
-                display_name="pipette name",
-                min_volume=1.23,
-                max_volume=4.56,
-                channels=7,
-                flow_rates=FlowRates(
-                    default_blow_out={"a": 1.23},
-                    default_aspirate={"b": 4.56},
-                    default_dispense={"c": 7.89},
-                ),
+                serial_number="world",
+                config=loaded_static_pipette_data,
             )
         ),
     )
@@ -547,6 +538,7 @@ async def test_load_pipette_96_channels(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
+    loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
@@ -559,20 +551,7 @@ async def test_load_pipette_96_channels(
 
     decoy.when(
         pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
-    ).then_return(
-        LoadedStaticPipetteData(
-            model="pipette_model",
-            display_name="pipette name",
-            min_volume=1.23,
-            max_volume=4.56,
-            channels=7,
-            flow_rates=FlowRates(
-                default_blow_out={"a": 1.23},
-                default_aspirate={"b": 4.56},
-                default_dispense={"c": 7.89},
-            ),
-        )
-    )
+    ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
         pipette_name="p1000_96",
@@ -587,16 +566,8 @@ async def test_load_pipette_96_channels(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
-                model="pipette_model",
-                display_name="pipette name",
-                min_volume=1.23,
-                max_volume=4.56,
-                channels=7,
-                flow_rates=FlowRates(
-                    default_blow_out={"a": 1.23},
-                    default_aspirate={"b": 4.56},
-                    default_dispense={"c": 7.89},
-                ),
+                serial_number="world",
+                config=loaded_static_pipette_data,
             )
         ),
     )
@@ -607,6 +578,7 @@ async def test_load_pipette_uses_provided_id(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
+    loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
@@ -617,20 +589,7 @@ async def test_load_pipette_uses_provided_id(
 
     decoy.when(
         pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
-    ).then_return(
-        LoadedStaticPipetteData(
-            model="pipette_model",
-            display_name="pipette name",
-            min_volume=1.23,
-            max_volume=4.56,
-            channels=7,
-            flow_rates=FlowRates(
-                default_blow_out={"a": 1.23},
-                default_aspirate={"b": 4.56},
-                default_dispense={"c": 7.89},
-            ),
-        )
-    )
+    ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
@@ -644,16 +603,8 @@ async def test_load_pipette_uses_provided_id(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="my-pipette-id",
-                model="pipette_model",
-                display_name="pipette name",
-                min_volume=1.23,
-                max_volume=4.56,
-                channels=7,
-                flow_rates=FlowRates(
-                    default_blow_out={"a": 1.23},
-                    default_aspirate={"b": 4.56},
-                    default_dispense={"c": 7.89},
-                ),
+                serial_number="world",
+                config=loaded_static_pipette_data,
             )
         )
     )
@@ -662,33 +613,23 @@ async def test_load_pipette_uses_provided_id(
 async def test_load_pipette_use_virtual(
     decoy: Decoy,
     model_utils: ModelUtils,
-    hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
+    loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
     decoy.when(state_store.config.use_virtual_pipettes).then_return(True)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
+    decoy.when(model_utils.generate_id(prefix="fake-serial-number-")).then_return(
+        "fake-serial"
+    )
 
     decoy.when(
         pipette_data_provider.get_virtual_pipette_static_config(
             PipetteNameType.P300_SINGLE.value
         )
-    ).then_return(
-        LoadedStaticPipetteData(
-            model="pipette_model",
-            display_name="pipette name",
-            min_volume=1.23,
-            max_volume=4.56,
-            channels=7,
-            flow_rates=FlowRates(
-                default_blow_out={"a": 1.23},
-                default_aspirate={"b": 4.56},
-                default_dispense={"c": 7.89},
-            ),
-        )
-    )
+    ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT, pipette_id=None
@@ -700,16 +641,8 @@ async def test_load_pipette_use_virtual(
         action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id="unique-id",
-                model="pipette_model",
-                display_name="pipette name",
-                min_volume=1.23,
-                max_volume=4.56,
-                channels=7,
-                flow_rates=FlowRates(
-                    default_blow_out={"a": 1.23},
-                    default_aspirate={"b": 4.56},
-                    default_dispense={"c": 7.89},
-                ),
+                serial_number="fake-serial",
+                config=loaded_static_pipette_data,
             )
         )
     )

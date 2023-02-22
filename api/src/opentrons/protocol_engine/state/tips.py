@@ -82,7 +82,8 @@ class TipStore(HasState[TipState], HandlesActions):
                 ] = TipRackWellState.CLEAN
 
         elif isinstance(action, AddPipetteConfigAction):
-            self._state.channels_by_pipette_id[action.pipette_id] = action.channels
+            config = action.config
+            self._state.channels_by_pipette_id[action.pipette_id] = config.channels
 
     def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
         pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)

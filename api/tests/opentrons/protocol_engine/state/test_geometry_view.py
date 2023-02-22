@@ -8,11 +8,11 @@ from typing import cast, List, Tuple, Union, Optional
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import Point, DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
     LabwareOffsetVector,
     DeckSlotLocation,
     ModuleLocation,
@@ -20,8 +20,9 @@ from opentrons.protocol_engine.types import (
     LoadedModule,
     WellLocation,
     WellOrigin,
+    DropTipWellLocation,
+    DropTipWellOrigin,
     WellOffset,
-    OFF_DECK_LOCATION,
     Dimensions,
     DeckType,
     CurrentWell,
@@ -29,6 +30,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
+from opentrons.protocol_engine.state.pipettes import PipetteView, CurrentWell
 from opentrons.protocol_engine.state.geometry import GeometryView
 
 
@@ -44,6 +46,12 @@ def module_view(decoy: Decoy) -> ModuleView:
     return decoy.mock(cls=ModuleView)
 
 
+@pytest.fixture
+def mock_pipette_view(decoy: Decoy) -> PipetteView:
+    """Get a mock in the shape of a PipetteView."""
+    return decoy.mock(cls=PipetteView)
+
+
 @pytest.fixture(autouse=True)
 def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     """Mock out move_types.py functions."""
@@ -52,9 +60,15 @@ def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 
 @pytest.fixture
-def subject(labware_view: LabwareView, module_view: ModuleView) -> GeometryView:
+def subject(
+    labware_view: LabwareView, module_view: ModuleView, mock_pipette_view: PipetteView
+) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
-    return GeometryView(labware_view=labware_view, module_view=module_view)
+    return GeometryView(
+        labware_view=labware_view,
+        module_view=module_view,
+        pipette_view=mock_pipette_view,
+    )
 
 
 def test_get_labware_parent_position(
@@ -799,71 +813,71 @@ def test_get_relative_well_location(
 def test_get_nominal_effective_tip_length(
     decoy: Decoy,
     labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
     subject: GeometryView,
 ) -> None:
     """It should get the effective tip length from a labware ID and pipette config."""
-    pipette_config: PipetteDict = cast(
-        PipetteDict,
-        {
-            "tip_overlap": {
-                "default": 10,
-                "opentrons/opentrons_96_tiprack_300ul/1": 20,
-            }
-        },
-    )
-
-    decoy.when(labware_view.get_tip_length("tip-rack-id")).then_return(50)
-
     decoy.when(labware_view.get_definition_uri("tip-rack-id")).then_return(
         "opentrons/opentrons_96_tiprack_300ul/1"
     )
 
-    length_eff = subject.get_nominal_effective_tip_length(
+    decoy.when(
+        mock_pipette_view.get_nominal_tip_overlap(
+            pipette_id="pipette-id",
+            labware_uri="opentrons/opentrons_96_tiprack_300ul/1",
+        )
+    ).then_return(10)
+
+    decoy.when(
+        labware_view.get_tip_length(labware_id="tip-rack-id", overlap=10)
+    ).then_return(100)
+
+    result = subject.get_nominal_effective_tip_length(
         labware_id="tip-rack-id",
-        pipette_config=pipette_config,
+        pipette_id="pipette-id",
     )
 
-    assert length_eff == 30
-
-    decoy.when(labware_view.get_definition_uri("tip-rack-id")).then_return(
-        "opentrons/something_else/1"
-    )
-
-    default_length_eff = subject.get_nominal_effective_tip_length(
-        labware_id="tip-rack-id",
-        pipette_config=pipette_config,
-    )
-
-    assert default_length_eff == 40
+    assert result == 100
 
 
 def test_get_nominal_tip_geometry(
     decoy: Decoy,
     tip_rack_def: LabwareDefinition,
     labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
     subject: GeometryView,
 ) -> None:
     """It should get a "well's" tip geometry."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"tip_overlap": {"default": 10}})
     well_def = tip_rack_def.wells["B2"]
 
-    decoy.when(labware_view.get_tip_length("tip-rack-id")).then_return(50)
-
-    decoy.when(labware_view.get_definition_uri("tip-rack-id")).then_return("")
+    decoy.when(labware_view.get_definition_uri("tip-rack-id")).then_return(
+        "opentrons/opentrons_96_tiprack_300ul/1"
+    )
 
     decoy.when(labware_view.get_well_definition("tip-rack-id", "B2")).then_return(
         well_def
     )
 
-    tip_geometry = subject.get_nominal_tip_geometry(
+    decoy.when(
+        mock_pipette_view.get_nominal_tip_overlap(
+            pipette_id="pipette-id",
+            labware_uri="opentrons/opentrons_96_tiprack_300ul/1",
+        )
+    ).then_return(10)
+
+    decoy.when(
+        labware_view.get_tip_length(labware_id="tip-rack-id", overlap=10)
+    ).then_return(100)
+
+    result = subject.get_nominal_tip_geometry(
+        pipette_id="pipette-id",
         labware_id="tip-rack-id",
         well_name="B2",
-        pipette_config=pipette_config,
     )
 
-    assert tip_geometry.effective_length == 40
-    assert tip_geometry.diameter == well_def.diameter
-    assert tip_geometry.volume == well_def.totalLiquidVolume
+    assert result.effective_length == 100
+    assert result.diameter == well_def.diameter
+    assert result.volume == well_def.totalLiquidVolume
 
 
 def test_get_nominal_tip_geometry_raises(
@@ -873,39 +887,44 @@ def test_get_nominal_tip_geometry_raises(
     subject: GeometryView,
 ) -> None:
     """It should raise LabwareIsNotTipRackError if well is not circular."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"tip_overlap": {"default": 10}})
     well_def = tip_rack_def.wells["B2"]
     well_def.shape = "rectangular"
 
+    decoy.when(labware_view.get_well_definition("tip-rack-id", "B2")).then_return(
+        well_def
+    )
+
     with pytest.raises(errors.LabwareIsNotTipRackError):
-        decoy.when(labware_view.get_tip_length("tip-rack-id")).then_return(0)
-
-        decoy.when(labware_view.get_well_definition("tip-rack-id", "B2")).then_return(
-            well_def
-        )
-
         subject.get_nominal_tip_geometry(
-            labware_id="tip-rack-id", well_name="B2", pipette_config=pipette_config
+            labware_id="tip-rack-id", well_name="B2", pipette_id="pipette-id"
         )
 
 
 def test_get_tip_drop_location(
     decoy: Decoy,
     labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
     subject: GeometryView,
 ) -> None:
     """It should get relative drop tip location for a pipette/labware combo."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
+    decoy.when(mock_pipette_view.get_return_tip_scale("pipette-id")).then_return(0.5)
 
-    decoy.when(labware_view.get_tip_length("tip-rack-id")).then_return(50)
+    decoy.when(
+        labware_view.get_tip_drop_z_offset(
+            labware_id="tip-rack-id", length_scale=0.5, additional_offset=3
+        )
+    ).then_return(1337)
 
     location = subject.get_tip_drop_location(
-        pipette_config=pipette_config,
+        pipette_id="pipette-id",
         labware_id="tip-rack-id",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=25)),
+        well_location=DropTipWellLocation(
+            origin=DropTipWellOrigin.DEFAULT,
+            offset=WellOffset(x=1, y=2, z=3),
+        ),
     )
 
-    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=0))
+    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=1337))
 
 
 def test_get_tip_drop_location_with_trash(
@@ -914,31 +933,42 @@ def test_get_tip_drop_location_with_trash(
     subject: GeometryView,
 ) -> None:
     """It should get relative drop tip location for a the fixed trash."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
-
     decoy.when(
         labware_view.get_has_quirk(labware_id="labware-id", quirk="fixedTrash")
     ).then_return(True)
 
     location = subject.get_tip_drop_location(
+        pipette_id="pipette-id",
         labware_id="labware-id",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-        pipette_config=pipette_config,
+        well_location=DropTipWellLocation(
+            origin=DropTipWellOrigin.DEFAULT,
+            offset=WellOffset(x=1, y=2, z=3),
+        ),
     )
 
-    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=3))
+    assert location == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
 
 
-def test_get_tip_drop_invalid_origin(subject: GeometryView) -> None:
-    """It should raise if the given WellLocation is not WellOrigin.TOP."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
+def test_get_tip_drop_explicit_location(subject: GeometryView) -> None:
+    """It should pass the location through if origin is not WellOrigin.DROP_TIP."""
+    input_location = DropTipWellLocation(
+        origin=DropTipWellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
 
-    with pytest.raises(errors.WellOriginNotAllowedError):
-        subject.get_tip_drop_location(
-            labware_id="labware-id",
-            well_location=WellLocation(origin=WellOrigin.BOTTOM),
-            pipette_config=pipette_config,
-        )
+    result = subject.get_tip_drop_location(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_location=input_location,
+    )
+
+    assert result == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
 
 
 def test_get_ancestor_slot_name(
