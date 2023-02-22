@@ -114,7 +114,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
             is_fixed_trash = "fixedTrash" in item.quirks
             return deck_conflict.Labware(
                 highest_z=item.highest_z,
-                name_for_errors=item.load_name,
+                name_for_errors=name_for_errors,
                 # TODO(mm, 2023-02-16): Refactor item.uri to return LabwareUri.
                 uri=LabwareUri(item.uri),
                 is_fixed_trash=is_fixed_trash,
