@@ -160,7 +160,7 @@ class DeckConflictError(ValueError):
 
 # TODO(mm, 2023-02-16): Taking a single int as the deck location doesn't make sense for
 # things that don't fit into a single deck slot, like the Thermocycler.
-# Refactor this interface to take a more symbolic locaion.
+# Refactor this interface to take a more symbolic location.
 def check(
     existing_items: Mapping[int, DeckItem],
     new_item: DeckItem,
