@@ -15,8 +15,10 @@ register_router = APIRouter()
 @register_router.post(
     "/system/register",
     summary="Register an agent with this robot.",
-    response_model=PostRegisterResponse,
-    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_200_OK: {"model": PostRegisterResponse},
+        status.HTTP_201_CREATED: {"model": PostRegisterResponse},
+    },
 )
 async def register_endpoint(
     response: Response,
