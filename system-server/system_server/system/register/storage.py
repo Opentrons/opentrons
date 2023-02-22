@@ -27,7 +27,7 @@ def _get_registration_token(
     """Get the JWT for a registrant, if it exists.
 
     This function searches the database to check if a token exists for
-    the requested agent. If it exists, return the encoded token without
+    the requested registrant. If it exists, return the encoded token without
     verifying anything.
 
     Args:
