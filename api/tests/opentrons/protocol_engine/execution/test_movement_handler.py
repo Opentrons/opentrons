@@ -22,11 +22,11 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     DeckSlotLocation,
+    CurrentWell,
 )
 from opentrons.protocol_engine.state import (
     StateStore,
     PipetteLocationData,
-    CurrentWell,
     HardwarePipette,
 )
 from opentrons.protocol_engine.execution.movement import (

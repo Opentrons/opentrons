@@ -14,10 +14,11 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     LoadedPipette,
     DeckSlotLocation,
+    CurrentWell,
 )
 from opentrons.protocol_engine.state import PipetteLocationData, move_types
 from opentrons.protocol_engine.state.labware import LabwareView
-from opentrons.protocol_engine.state.pipettes import PipetteView, CurrentWell
+from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
 from opentrons.protocol_engine.state.modules import ModuleView

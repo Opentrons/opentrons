@@ -6,9 +6,9 @@ from dataclasses import dataclass
 from opentrons.types import Mount as HardwareMount
 from opentrons.hardware_control import HardwareControlAPI
 
-from ..state import StateStore, CurrentWell, HardwarePipette
+from ..state import StateStore, HardwarePipette
 from ..resources import LabwareDataProvider
-from ..types import WellLocation, WellOrigin, DeckPoint
+from ..types import WellLocation, WellOrigin, DeckPoint, CurrentWell
 from .movement import MovementHandler
 
 
@@ -239,6 +239,21 @@ class PipettingHandler:
             await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
         return VolumePointResult(volume=volume, position=position)
+
+    def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
+        """Get whether a pipette is ready to aspirate."""
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+        return (
+            self._state_store.pipettes.get_aspirated_volume(pipette_id) > 0
+            or hw_pipette.config["ready_to_aspirate"]
+        )
+
+    async def prepare_for_aspirate(self, mount: HardwareMount) -> None:
+        """Prepare for pipette aspiration."""
+        await self._hardware_api.prepare_for_aspirate(mount=mount)
 
     async def dispense_in_place(
         self,

@@ -14,6 +14,7 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     LabwareMovementStrategy,
     FlowRates,
+    CurrentWell,
 )
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
@@ -23,7 +24,6 @@ from opentrons.protocol_engine.actions import (
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
-    CurrentWell,
     CurrentDeckPoint,
     StaticPipetteConfig,
 )

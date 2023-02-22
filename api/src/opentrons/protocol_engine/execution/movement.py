@@ -13,8 +13,8 @@ from opentrons.hardware_control.types import (
 )
 from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
 
-from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis
-from ..state import StateStore, CurrentWell
+from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis, CurrentWell
+from ..state import StateStore
 from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger

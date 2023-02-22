@@ -144,6 +144,15 @@ class FlowRates:
     default_dispense: Dict[str, float]
 
 
+@dataclass(frozen=True)
+class CurrentWell:
+    """The latest well that the robot has accessed."""
+
+    pipette_id: str
+    labware_id: str
+    well_name: str
+
+
 class MovementAxis(str, Enum):
     """Axis on which to issue a relative movement."""
 

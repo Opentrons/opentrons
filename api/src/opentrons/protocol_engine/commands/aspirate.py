@@ -13,8 +13,13 @@ from .pipetting_common import (
 )
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
+from opentrons.hardware_control import HardwareControlAPI
+
+from ..types import WellLocation, WellOrigin, CurrentWell
+
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler
+    from ..execution import MovementHandler, PipettingHandler
+    from ..state import StateView
 
 
 AspirateCommandType = Literal["aspirate"]
@@ -35,12 +40,57 @@ class AspirateResult(BaseLiquidHandlingResult, DestinationPositionResult):
 class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]):
     """Aspirate command implementation."""
 
-    def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
+    def __init__(
+        self,
+        pipetting: PipettingHandler,
+        state_view: StateView,
+        hardware_api: HardwareControlAPI,
+        movement: MovementHandler,
+        **kwargs: object,
+    ) -> None:
         self._pipetting = pipetting
+        self._state_view = state_view
+        self._hardware_api = hardware_api
+        self._movement = movement
 
     async def execute(self, params: AspirateParams) -> AspirateResult:
         """Move to and aspirate from the requested well."""
-        result = await self._pipetting.aspirate(
+        ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
+            pipette_id=params.pipetteId
+        )
+
+        current_well = None
+
+        if not ready_to_aspirate:
+            await self._movement.move_to_well(
+                pipette_id=params.pipetteId,
+                labware_id=params.labwareId,
+                well_name=params.wellName,
+                well_location=WellLocation(origin=WellOrigin.TOP),
+            )
+
+            hw_mount = self._state_view.pipettes.get(
+                pipette_id=params.pipetteId
+            ).mount.to_hw_mount()
+            await self._pipetting.prepare_for_aspirate(mount=hw_mount)
+
+            # set our current deck location to the well now that we've made
+            # an intermediate move for the "prepare for aspirate" step
+            current_well = CurrentWell(
+                pipette_id=params.pipetteId,
+                labware_id=params.labwareId,
+                well_name=params.wellName,
+            )
+
+        position = await self._movement.move_to_well(
+            pipette_id=params.pipetteId,
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=params.wellLocation,
+            current_well=current_well,
+        )
+
+        await self._pipetting.aspirate(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -49,7 +99,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
             flow_rate=params.flowRate,
         )
 
-        return AspirateResult(volume=result.volume, position=result.position)
+        return AspirateResult(volume=params.volume, position=position)
 
 
 class Aspirate(BaseCommand[AspirateParams, AspirateResult]):

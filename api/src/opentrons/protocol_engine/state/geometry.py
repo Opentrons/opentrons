@@ -21,7 +21,7 @@ from ..types import (
 )
 from .labware import LabwareView
 from .modules import ModuleView
-from .pipettes import CurrentWell
+from ..types import CurrentWell
 from . import move_types
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5

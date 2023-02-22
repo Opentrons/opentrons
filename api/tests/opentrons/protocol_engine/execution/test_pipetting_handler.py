@@ -10,11 +10,11 @@ from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine.types import CurrentWell
 from opentrons.protocol_engine.state import (
     StateStore,
     TipGeometry,
     HardwarePipette,
-    CurrentWell,
     PipetteLocationData,
 )
 from opentrons.protocol_engine.execution.movement import MovementHandler
@@ -266,155 +266,6 @@ async def test_handle_drop_up_tip_request(
             well_location=WellLocation(offset=WellOffset(x=4, y=5, z=6)),
         ),
         await hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
-    )
-
-
-async def test_handle_aspirate_request_without_prep(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
-) -> None:
-    """It should aspirate from a well if pipette is ready to aspirate."""
-    well_location = WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=WellOffset(x=0, y=0, z=1),
-    )
-
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(
-            mount=Mount.LEFT,
-            config=mock_hw_pipettes.left_config,
-        )
-    )
-
-    decoy.when(
-        state_store.pipettes.get_is_ready_to_aspirate(
-            pipette_id="pipette-id",
-            pipette_config=mock_hw_pipettes.left_config,
-        )
-    ).then_return(True)
-
-    decoy.when(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=well_location,
-            current_well=None,
-        ),
-    ).then_return(DeckPoint(x=1, y=2, z=3))
-
-    result = await subject.aspirate(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="C6",
-        well_location=well_location,
-        volume=25,
-        flow_rate=2.5,
-    )
-
-    assert result.volume == 25
-    assert result.position == DeckPoint(x=1, y=2, z=3)
-
-    decoy.verify(
-        hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
-        ),
-        await hardware_api.aspirate(
-            mount=Mount.LEFT,
-            volume=25,
-        ),
-        hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
-        ),
-    )
-
-
-async def test_handle_aspirate_request_with_prep(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
-) -> None:
-    """It should aspirate from a well if pipette isn't ready to aspirate."""
-    well_location = WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=WellOffset(x=0, y=0, z=1),
-    )
-
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(
-            mount=Mount.LEFT,
-            config=mock_hw_pipettes.left_config,
-        )
-    )
-
-    decoy.when(
-        state_store.pipettes.get_is_ready_to_aspirate(
-            pipette_id="pipette-id",
-            pipette_config=mock_hw_pipettes.left_config,
-        )
-    ).then_return(False)
-
-    decoy.when(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=well_location,
-            current_well=CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="C6",
-            ),
-        ),
-    ).then_return(DeckPoint(x=1, y=2, z=3))
-
-    result = await subject.aspirate(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="C6",
-        well_location=well_location,
-        volume=25,
-        flow_rate=2.5,
-    )
-
-    assert result.volume == 25
-    assert result.position == DeckPoint(x=1, y=2, z=3)
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=WellLocation(origin=WellOrigin.TOP),
-        )
-    )
-
-    decoy.verify(
-        await hardware_api.prepare_for_aspirate(mount=Mount.LEFT),
-        hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
-        ),
-        await hardware_api.aspirate(mount=Mount.LEFT, volume=25),
-        hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
-        ),
     )
 
 

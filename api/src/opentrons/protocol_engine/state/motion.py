@@ -12,9 +12,9 @@ from opentrons import motion_planning
 
 from . import move_types
 from .. import errors
-from ..types import WellLocation
+from ..types import WellLocation, CurrentWell
 from .labware import LabwareView
-from .pipettes import PipetteView, CurrentWell
+from .pipettes import PipetteView
 from .geometry import GeometryView
 from .modules import ModuleView
 from .module_substates import HeaterShakerModuleId

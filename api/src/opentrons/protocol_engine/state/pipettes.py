@@ -7,7 +7,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette, MotorAxis, FlowRates, DeckPoint
+from ..types import LoadedPipette, MotorAxis, FlowRates, DeckPoint, CurrentWell
 
 from ..commands import (
     Command,
@@ -42,15 +42,6 @@ class HardwarePipette:
 
     mount: HwMount
     config: PipetteDict
-
-
-@dataclass(frozen=True)
-class CurrentWell:
-    """The latest well that the robot has accessed."""
-
-    pipette_id: str
-    labware_id: str
-    well_name: str
 
 
 @dataclass(frozen=True)

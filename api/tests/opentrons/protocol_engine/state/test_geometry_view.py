@@ -24,12 +24,12 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     Dimensions,
     DeckType,
+    CurrentWell,
 )
 from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.pipettes import CurrentWell
 
 
 @pytest.fixture

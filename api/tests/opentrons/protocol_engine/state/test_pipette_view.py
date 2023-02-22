@@ -12,11 +12,11 @@ from opentrons.protocol_engine.types import (
     MotorAxis,
     FlowRates,
     DeckPoint,
+    CurrentWell,
 )
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,
-    CurrentWell,
     CurrentDeckPoint,
     HardwarePipette,
     StaticPipetteConfig,

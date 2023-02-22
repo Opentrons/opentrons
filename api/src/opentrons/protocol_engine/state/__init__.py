@@ -5,7 +5,7 @@ from .state_summary import StateSummary
 from .config import Config
 from .commands import CommandState, CommandView, CommandSlice, CurrentCommand
 from .labware import LabwareState, LabwareView
-from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
+from .pipettes import PipetteState, PipetteView, HardwarePipette
 from .modules import ModuleState, ModuleView, HardwareModule
 from .module_substates import (
     MagneticModuleId,
@@ -41,7 +41,6 @@ __all__ = [
     "PipetteState",
     "PipetteView",
     "HardwarePipette",
-    "CurrentWell",
     # module state and values
     "ModuleState",
     "ModuleView",
