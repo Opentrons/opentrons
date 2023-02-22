@@ -10,15 +10,21 @@ def test_empty_no_conflict() -> None:
     """It should not raise on empty input."""
     deck_conflict.check(
         existing_items={},
-        new_item=deck_conflict.OtherModule(highest_z=123, name_for_errors="foo"),
+        new_item=deck_conflict.OtherModule(
+            highest_z_including_labware=123, name_for_errors="foo"
+        ),
         new_location=1,
     )
 
 
 def test_no_multiple_locations() -> None:
     """It should not allow two items in the same slot."""
-    item_1 = deck_conflict.OtherModule(highest_z=123, name_for_errors="some_item_1")
-    item_2 = deck_conflict.OtherModule(highest_z=123, name_for_errors="some_item_2")
+    item_1 = deck_conflict.OtherModule(
+        highest_z_including_labware=123, name_for_errors="some_item_1"
+    )
+    item_2 = deck_conflict.OtherModule(
+        highest_z_including_labware=123, name_for_errors="some_item_2"
+    )
 
     with pytest.raises(
         deck_conflict.DeckConflictError,
@@ -42,7 +48,7 @@ def test_only_trash_in_12() -> None:
         name_for_errors="not_trash_labware",
     )
     not_trash_module = deck_conflict.OtherModule(
-        highest_z=123, name_for_errors="not_trash_module"
+        highest_z_including_labware=123, name_for_errors="not_trash_module"
     )
 
     deck_conflict.check(existing_items={}, new_item=trash_labware, new_location=12)
@@ -83,7 +89,7 @@ def test_trash_override() -> None:
         name_for_errors="not_trash_labware",
     )
     not_trash_module = deck_conflict.OtherModule(
-        highest_z=123, name_for_errors="not_trash_module"
+        highest_z_including_labware=123, name_for_errors="not_trash_module"
     )
 
     deck_conflict.check(
@@ -117,7 +123,7 @@ def test_no_labware_when_thermocycler(labware_location: int) -> None:
     """It should reject labware if a thermocycler is placed."""
     thermocycler = deck_conflict.ThermocyclerModule(
         name_for_errors="some_thermocycler",
-        highest_z=123,
+        highest_z_including_labware=123,
         is_semi_configuration=False,
     )
 
@@ -180,7 +186,7 @@ def test_labware_when_heater_shaker(
 ) -> None:
     """It should allow short labware east and west if a heater-shaker is placed."""
     heater_shaker = deck_conflict.HeaterShakerModule(
-        highest_z=123, name_for_errors="some_heater_shaker"
+        highest_z_including_labware=123, name_for_errors="some_heater_shaker"
     )
     cool_labware = deck_conflict.Labware(
         uri=LabwareUri("cool_labware_uri"),
@@ -278,10 +284,10 @@ def test_no_modules_when_heater_shaker(
     so this test only checks modules specifically in N/S.
     """
     heater_shaker = deck_conflict.HeaterShakerModule(
-        highest_z=123, name_for_errors="some_heater_shaker"
+        highest_z_including_labware=123, name_for_errors="some_heater_shaker"
     )
     other_module = deck_conflict.OtherModule(
-        highest_z=0, name_for_errors="some_other_module"
+        highest_z_including_labware=0, name_for_errors="some_other_module"
     )
 
     with pytest.raises(
@@ -341,7 +347,7 @@ def test_tip_rack_when_heater_shaker(
 ) -> None:
     """It should allow short tip racks east and west if a heater-shaker is placed."""
     heater_shaker = deck_conflict.HeaterShakerModule(
-        highest_z=123,
+        highest_z_including_labware=123,
         name_for_errors="some_heater_shaker",
     )
 
@@ -408,7 +414,7 @@ def test_no_heater_shaker_south_of_trash() -> None:
     around the fixed trash. Those restrictions should be covered by HS<->labware tests.
     """
     heater_shaker = deck_conflict.HeaterShakerModule(
-        highest_z=123, name_for_errors="some_heater_shaker"
+        highest_z_including_labware=123, name_for_errors="some_heater_shaker"
     )
     trash = deck_conflict.Labware(
         # We want to test that the subject rejects the HS placement on account of this

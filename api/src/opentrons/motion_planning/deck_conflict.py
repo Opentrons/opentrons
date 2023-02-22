@@ -54,7 +54,7 @@ class Labware:
 @dataclass
 class _Module:
     name_for_errors: str
-    highest_z: float
+    highest_z_including_labware: float
 
 
 @dataclass
@@ -107,10 +107,13 @@ class _MaxHeight(NamedTuple):
     allowed_labware: List[LabwareUri]
 
     def is_allowed(self, item: DeckItem) -> bool:
-        if isinstance(item, Labware) and item.uri in self.allowed_labware:
-            return True
-
-        return item.highest_z < self.max_height
+        if isinstance(item, Labware):
+            if item.uri in self.allowed_labware:
+                return True
+            else:
+                return item.highest_z < self.max_height
+        elif isinstance(item, _Module):
+            return item.highest_z_including_labware < self.max_height
 
 
 class _NoModule(NamedTuple):

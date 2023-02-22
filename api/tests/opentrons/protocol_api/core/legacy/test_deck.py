@@ -227,7 +227,7 @@ def test_thermocycler_module_conflict_checking(
             },
             new_location=4,
             new_item=deck_conflict.ThermocyclerModule(
-                highest_z=42,
+                highest_z_including_labware=42,
                 name_for_errors="thermocycler_load_name",
                 is_semi_configuration=is_semi_configuration,
             ),
@@ -254,7 +254,7 @@ def test_heater_shaker_module_conflict_checking(
             },
             new_location=4,
             new_item=deck_conflict.HeaterShakerModule(
-                highest_z=42,
+                highest_z_including_labware=42,
                 name_for_errors="heater_shaker_load_name",
             ),
         ),
@@ -280,7 +280,7 @@ def test_other_module_conflict_checking(
             },
             new_location=4,
             new_item=deck_conflict.OtherModule(
-                highest_z=42,
+                highest_z_including_labware=42,
                 name_for_errors="module_load_name",
             ),
         ),

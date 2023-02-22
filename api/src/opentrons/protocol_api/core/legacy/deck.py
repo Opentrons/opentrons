@@ -105,7 +105,6 @@ class Deck(UserDict):  # type: ignore[type-arg]
 
     @staticmethod
     def _map_to_conflict_checker_item(item: DeckItem) -> deck_conflict.DeckItem:
-        highest_z = item.highest_z
         name_for_errors = item.load_name
 
         # We have to account for both Labware and AbstractLabware because this class
@@ -124,7 +123,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
         elif isinstance(item, AbstractLabware):
             is_fixed_trash = "fixedTrash" in item.get_quirks()
             return deck_conflict.Labware(
-                highest_z=highest_z,
+                highest_z=item.highest_z,
                 name_for_errors=name_for_errors,
                 # TODO(mm, 2023-02-16): Refactor item.uri to return LabwareUri.
                 uri=LabwareUri(item.get_uri()),
@@ -133,20 +132,20 @@ class Deck(UserDict):  # type: ignore[type-arg]
 
         elif isinstance(item, HeaterShakerGeometry):
             return deck_conflict.HeaterShakerModule(
-                highest_z=highest_z,
+                highest_z_including_labware=item.highest_z,
                 name_for_errors=name_for_errors,
             )
 
         elif isinstance(item, ThermocyclerGeometry):
             return deck_conflict.ThermocyclerModule(
-                highest_z=highest_z,
+                highest_z_including_labware=item.highest_z,
                 name_for_errors=name_for_errors,
                 is_semi_configuration=item.is_semi_configuration,
             )
 
         elif isinstance(item, ModuleGeometry):
             return deck_conflict.OtherModule(
-                highest_z=highest_z,
+                highest_z_including_labware=item.highest_z,
                 name_for_errors=name_for_errors,
             )
 
