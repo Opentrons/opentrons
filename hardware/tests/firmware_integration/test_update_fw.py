@@ -16,34 +16,33 @@ def system_node_id() -> NodeId:
 
 
 @pytest.fixture
-def hex_file_path() -> Path:
+def hex_file_path() -> str:
     """Path of hex file for test."""
     tt = os.path.dirname(__file__)
     path = Path(os.path.abspath(tt))
-    return path / Path("bootloader-head.hex")
+    return str(path / Path("bootloader-head.hex"))
 
 
 @pytest.mark.requires_emulator
 async def test_update(
-    can_messenger: CanMessenger, system_node_id: NodeId, hex_file_path: Path
+    can_messenger: CanMessenger, system_node_id: NodeId, hex_file_path: str
 ) -> None:
     """It should complete the download."""
-    with hex_file_path.open("r") as f:
-        update_details = {
-            system_node_id: f,
-        }
-        updater = RunUpdate(
-            messenger=can_messenger,
-            update_details=update_details,
-            retry_count=3,
-            timeout_seconds=60,
-            erase=True,
-        )
-        await updater._run_update(
-            messenger=can_messenger,
-            node_id=system_node_id,
-            hex_file=f,
-            retry_count=3,
-            timeout_seconds=60,
-            erase=True,
-        )
+    update_details = {
+        system_node_id: hex_file_path,
+    }
+    updater = RunUpdate(
+        messenger=can_messenger,
+        update_details=update_details,
+        retry_count=3,
+        timeout_seconds=60,
+        erase=True,
+    )
+    await updater._run_update(
+        messenger=can_messenger,
+        node_id=system_node_id,
+        filepath=hex_file_path,
+        retry_count=3,
+        timeout_seconds=60,
+        erase=True,
+    )

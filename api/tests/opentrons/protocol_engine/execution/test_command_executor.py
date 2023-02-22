@@ -31,6 +31,7 @@ from opentrons.protocol_engine.execution import (
     MovementHandler,
     LabwareMovementHandler,
     PipettingHandler,
+    TipHandler,
     RunControlHandler,
     RailLightsHandler,
 )
@@ -79,6 +80,12 @@ def pipetting(decoy: Decoy) -> PipettingHandler:
 
 
 @pytest.fixture
+def mock_tip_handler(decoy: Decoy) -> TipHandler:
+    """Get a mocked out TipHandler."""
+    return decoy.mock(cls=TipHandler)
+
+
+@pytest.fixture
 def run_control(decoy: Decoy) -> RunControlHandler:
     """Get a mocked out RunControlHandler."""
     return decoy.mock(cls=RunControlHandler)
@@ -105,6 +112,7 @@ def subject(
     movement: MovementHandler,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
@@ -118,6 +126,7 @@ def subject(
         movement=movement,
         labware_movement=labware_movement,
         pipetting=pipetting,
+        tip_handler=mock_tip_handler,
         run_control=run_control,
         model_utils=model_utils,
         rail_lights=rail_lights,
@@ -146,6 +155,7 @@ async def test_execute(
     movement: MovementHandler,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
@@ -216,6 +226,7 @@ async def test_execute(
             movement=movement,
             labware_movement=labware_movement,
             pipetting=pipetting,
+            tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
         )
@@ -264,6 +275,7 @@ async def test_execute_raises_protocol_engine_error(
     movement: MovementHandler,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
@@ -321,6 +333,7 @@ async def test_execute_raises_protocol_engine_error(
             movement=movement,
             labware_movement=labware_movement,
             pipetting=pipetting,
+            tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
         )

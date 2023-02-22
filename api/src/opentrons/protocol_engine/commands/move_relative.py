@@ -4,8 +4,9 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import MovementAxis, DeckPoint
+from ..types import MovementAxis
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .pipetting_common import DestinationPositionResult
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
@@ -28,16 +29,10 @@ class MoveRelativeParams(BaseModel):
     )
 
 
-class MoveRelativeResult(BaseModel):
+class MoveRelativeResult(DestinationPositionResult):
     """Result data from the execution of a MoveRelative command."""
 
-    position: DeckPoint = Field(
-        ...,
-        description=(
-            "The (x,y,z) coordinates of the pipette's critical point in deck space"
-            " after the move was completed."
-        ),
-    )
+    pass
 
 
 class MoveRelativeImplementation(

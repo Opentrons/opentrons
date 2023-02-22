@@ -46,7 +46,24 @@ def create_jwt(
     now: Optional[datetime] = None,
     id: Optional[str] = None,
 ) -> str:
-    """Generate a signed JWT with the specified parameters."""
+    """Generate a signed JWT with the specified parameters.
+
+    Args:
+        signing_key: A string key to encode the JWT, which must be used to decode the key.
+
+        duration: The amount of time to mark this JWT as valid for
+
+        registrant: Unique identification of the registrant that this JWT is for
+
+        audience: The audience (or resources) that this JWT provides access to
+
+        now: The time to use as the `iat` (issued at) claim. If `None`, the current time is used.
+
+        id: If provided, this should be a unique-ish ID for this token instance
+
+    Returns:
+        An encoded JWT
+    """
     if now is None:
         now = datetime.now(tz=timezone.utc)
     claims = {
@@ -59,15 +76,34 @@ def create_jwt(
     }
     if id is not None:
         claims["jti"] = id
-    try:
-        return jwt.encode(payload=claims, key=signing_key, algorithm=_JWT_ALGORITHM)
-    except Exception as e:
-        _log.error(f"Error during JWT creation: {type(e)}:{e}")
-        raise e
+    return jwt.encode(payload=claims, key=signing_key, algorithm=_JWT_ALGORITHM)
 
 
 def jwt_is_valid(signing_key: str, token: str, audience: str) -> bool:
-    """Check the validity of a JWT."""
+    """Check the validity of a JWT.
+
+    Validity refers to a few components of a JWT:
+
+    - The token must be signed with the expected `signing_key`
+
+    - The token must not be expired
+
+    - The token must have the expected audience claim
+
+    If any of the above conditions are not met, the token is not valid for accessing
+    the resource that maps to `audience`.
+
+    Args:
+        signing_key: The string key that was used to sign this token
+
+        token: The token, as an encoded string
+
+        audience: The intended audience of this token, which refers to the group
+        of resources the token is intended to give access to
+
+    Returns:
+        True if the token is valid, False if it is not.
+    """
     try:
         jwt.decode(
             jwt=token, key=signing_key, algorithms=[_JWT_ALGORITHM], audience=audience

@@ -165,6 +165,7 @@ class AbstractCommandImpl(
         movement: execution.MovementHandler,
         labware_movement: execution.LabwareMovementHandler,
         pipetting: execution.PipettingHandler,
+        tip_handler: execution.TipHandler,
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
     ) -> None:

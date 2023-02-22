@@ -10,7 +10,7 @@ stages:
       method: POST
       params:
         agent: 'agent-1'
-        agent_id: 'agent_id-1'
+        agentId: 'agent_id-1'
         subject: 'subject-1'
     response: &good_response
       status_code: 201
@@ -31,7 +31,7 @@ stages:
       method: POST
       params:
         agent: 'agent-2'
-        agent_id: 'agent_id-1'
+        agentId: 'agent_id-1'
         subject: 'subject-1'
     response:
       status_code: 201

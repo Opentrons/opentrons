@@ -11,6 +11,7 @@ from .equipment import (
 from .movement import MovementHandler, MoveRelativeData, SavedPositionData
 from .labware_movement import LabwareMovementHandler
 from .pipetting import PipettingHandler
+from .tip_handler import TipHandler
 from .queue_worker import QueueWorker
 from .rail_lights import RailLightsHandler
 from .run_control import RunControlHandler
@@ -31,6 +32,7 @@ __all__ = [
     "MoveRelativeData",
     "SavedPositionData",
     "PipettingHandler",
+    "TipHandler",
     "LabwareMovementHandler",
     "QueueWorker",
     "RunControlHandler",

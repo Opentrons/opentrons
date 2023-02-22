@@ -18,7 +18,7 @@ from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution import execute as execute_apiv2
 
 from opentrons.commands import types as command_types
-from opentrons.protocols.parse import parse, version_from_string
+from opentrons.protocols import parse
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API as OT2API, ThreadManager, HardwareControlAPI
@@ -32,6 +32,25 @@ if TYPE_CHECKING:
 _THREAD_MANAGED_HW: Optional[ThreadManager[HardwareControlAPI]] = None
 #: The background global cache that all protocol contexts created by
 #: :py:meth:`get_protocol_api` will share
+
+
+# See Jira RCORE-535.
+_PYTHON_TOO_NEW_MESSAGE = (
+    "Python protocols with apiLevels higher than 2.13"
+    " cannot currently be executed with"
+    " the opentrons_execute command-line tool,"
+    " the opentrons.execute.execute() function,"
+    " or the opentrons.execute.get_protocol_api() function."
+    " Use a lower apiLevel"
+    " or use the Opentrons App instead."
+)
+_JSON_TOO_NEW_MESSAGE = (
+    "Protocols created by recent versions of Protocol Designer"
+    " cannot currently be executed with"
+    " the opentrons_execute command-line tool"
+    " or the opentrons.execute.execute() function."
+    " Use the Opentrons App instead."
+)
 
 
 def get_protocol_api(
@@ -88,7 +107,7 @@ def get_protocol_api(
     """
     _create_hardware_controller(machine)
     if isinstance(version, str):
-        checked_version = version_from_string(version)
+        checked_version = parse.version_from_string(version)
     elif not isinstance(version, APIVersion):
         raise TypeError("version must be either a string or an APIVersion")
     else:
@@ -101,13 +120,16 @@ def get_protocol_api(
     ):
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    context = protocol_api.create_protocol_context(
-        api_version=checked_version,
-        hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        extra_labware=extra_labware,
-    )
+    try:
+        context = protocol_api.create_protocol_context(
+            api_version=checked_version,
+            hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
+            bundled_labware=bundled_labware,
+            bundled_data=bundled_data,
+            extra_labware=extra_labware,
+        )
+    except protocol_api.ProtocolEngineCoreRequiredError as e:
+        raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
 
     _THREAD_MANAGED_HW.sync.cache_instruments()  # type: ignore[union-attr]
     return context
@@ -284,9 +306,18 @@ def execute(
         extra_data = datafiles_from_paths(custom_data_paths)
     else:
         extra_data = {}
-    protocol = parse(
-        contents, protocol_name, extra_labware=extra_labware, extra_data=extra_data
-    )
+
+    try:
+        protocol = parse.parse(
+            contents, protocol_name, extra_labware=extra_labware, extra_data=extra_data
+        )
+    except parse.JSONSchemaVersionTooNewError as e:
+        if e.attempted_schema_version == 6:
+            # See Jira RCORE-535.
+            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
+        else:
+            raise
+
     if getattr(protocol, "api_level", APIVersion(2, 0)) < APIVersion(2, 0):
         raise ApiDeprecationError(getattr(protocol, "api_level"))
     else:

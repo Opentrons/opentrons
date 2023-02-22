@@ -1,14 +1,17 @@
 import last from 'lodash/last'
-import { getPipetteNameSpecs, getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  getLabwareDefURI,
+  getLoadedLabwareDefinitionsByUri,
+} from '@opentrons/shared-data'
 import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '../../../redux/pipettes'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
   useTipLengthCalibrations,
-  useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '.'
-
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
@@ -39,20 +42,20 @@ export function useRunPipetteInfoByMount(
 ): {
   [mount in Mount]: PipetteInfo | null
 } {
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations =
-    useAttachedPipetteCalibrations(robotName) ?? EMPTY_MOUNTS
+    useAttachedPipetteCalibrations() ?? EMPTY_MOUNTS
   const tipLengthCalibrations = useTipLengthCalibrations(robotName) ?? []
 
   if (protocolData == null) {
     return EMPTY_MOUNTS
   }
-  const { pipettes, labware, labwareDefinitions, commands } = protocolData
+  const { pipettes, labware, commands } = protocolData
+  const labwareDefinitions = getLoadedLabwareDefinitionsByUri(commands)
   const loadPipetteCommands = commands.filter(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette'
@@ -68,7 +71,6 @@ export function useRunPipetteInfoByMount(
     )
     if (loadCommand != null) {
       const { mount } = loadCommand.params
-      const { pipetteId } = loadCommand.result
       const pipetteName = pipette.pipetteName
       const requestedPipetteName = pipetteName
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
@@ -76,7 +78,7 @@ export function useRunPipetteInfoByMount(
         const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
           LabwareDefinition2[]
         >((acc, command) => {
-          if (pipetteId === command.params?.pipetteId) {
+          if (loadCommand.result?.pipetteId === command.params?.pipetteId) {
             const tipRack = labware.find(
               item => item.id === command.params?.labwareId
             )
@@ -125,7 +127,7 @@ export function useRunPipetteInfoByMount(
           ...acc,
           [mount]: {
             pipetteName: requestedPipetteName,
-            id: pipetteId,
+            id: loadCommand.result?.pipetteId ?? '',
             pipetteSpecs,
             tipRacksForPipette,
             requestedPipetteMatch,

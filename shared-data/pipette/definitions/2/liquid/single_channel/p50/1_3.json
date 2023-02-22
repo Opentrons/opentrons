@@ -1,0 +1,64 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
+  "supportedTips": {
+    "t200": {
+      "defaultAspirateFlowRate": 25.0,
+      "defaultDispenseFlowRate": 50.0,
+      "defaultBlowOutFlowRate": 1000.0,
+      "defaultTipLength": 51.7,
+      "defaultTipOverlap": 7.47,
+      "defaultReturnTipHeight": null,
+      "aspirate": {
+        "opentrons/tipone_96_tiprack_200ul/1": [
+          [11.79687499, -0.0098, 3.064988953],
+          [50.0, -0.0004, 2.954068131]
+        ],
+        "opentrons/opentrons_96_filtertiprack_200ul/1": [
+          [11.79687499, -0.0098, 3.064988953],
+          [50.0, -0.0004, 2.954068131]
+        ],
+        "default": [
+          [11.79687499, -0.0098, 3.064988953],
+          [50.0, -0.0004, 2.954068131]
+        ]
+      },
+      "dispense": {
+        "opentrons/tipone_96_tiprack_200ul/1": [[50.0, 0.0, 2.931601299]],
+        "opentrons/opentrons_96_filtertiprack_200ul/1": [
+          [50.0, 0.0, 2.931601299]
+        ],
+        "default": [[50.0, 0.0, 2.931601299]]
+      },
+      "defaultTipOverlapDictionary": {
+        "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+        "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47
+      }
+    },
+    "t300": {
+      "defaultAspirateFlowRate": 25.0,
+      "defaultDispenseFlowRate": 50.0,
+      "defaultBlowOutFlowRate": 1000.0,
+      "defaultTipLength": 51.7,
+      "defaultTipOverlap": 7.47,
+      "defaultReturnTipHeight": null,
+      "aspirate": {
+        "opentrons/opentrons_96_tiprack_300ul/1": [
+          [11.79687499, -0.0098, 3.064988953],
+          [50.0, -0.0004, 2.954068131]
+        ]
+      },
+      "dispense": {
+        "opentrons/opentrons_96_tiprack_300ul/1": [[50.0, 0.0, 2.931601299]]
+      },
+      "defaultTipOverlapDictionary": {
+        "opentrons/opentrons_96_tiprack_300ul/1": 7.47
+      }
+    }
+  },
+  "maxVolume": 50,
+  "minVolume": 5.0,
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1"
+  ]
+}

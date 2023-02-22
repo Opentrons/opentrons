@@ -22,64 +22,62 @@ def _create_registration_row(registrant: Registrant, token: str) -> Dict[str, ob
 
 
 def _get_registration_token(
-    sql_engine: sqlalchemy.engine.Engine, registrant: Registrant
+    sql_connection: sqlalchemy.engine.Connection, registrant: Registrant
 ) -> Optional[str]:
     """Get the JWT for a registrant, if it exists.
 
     This function searches the database to check if a token exists for
-    the requested agent. If it exists, return the encoded token without
+    the requested registrant. If it exists, return the encoded token without
     verifying anything.
 
     Args:
-        sql_engine: Connection to the backing database
+        sql_connection: An active transaction connection to the database
 
         registrant: Unique identification of the registration to look up
 
     Returns:
          None or an encoded JWT for this row
     """
-    with sql_engine.begin() as conn:
-        statement = sqlalchemy.select(registration_table).where(
-            (registration_table.c.agent == registrant.agent)
-            & (registration_table.c.agent_id == registrant.agent_id)
-            & (registration_table.c.subject == registrant.subject)
-        )
+    statement = sqlalchemy.select(registration_table).where(
+        (registration_table.c.agent == registrant.agent)
+        & (registration_table.c.agent_id == registrant.agent_id)
+        & (registration_table.c.subject == registrant.subject)
+    )
 
-        # Database configuration means that we are assured to only get 1 or 0 hits.
-        matching_row = conn.execute(statement).one_or_none()
+    # Database configuration means that we are assured to only get 1 or 0 hits.
+    matching_row = sql_connection.execute(statement).one_or_none()
 
-        return None if matching_row is None else matching_row.token
+    return None if matching_row is None else matching_row.token
 
 
 def _delete_registration_token(
-    sql_engine: sqlalchemy.engine.Engine, registrant: Registrant
+    sql_connection: sqlalchemy.engine.Connection, registrant: Registrant
 ) -> None:
     """Clear out a registration token, if a match exists.
 
     Args:
-        sql_engine: Connection to the backing database
+        sql_connection: An active transaction connection to the database
 
         registrant: Unique identification of the registration to delete
 
     Returns:
         None
     """
-    with sql_engine.begin() as conn:
-        statement = sqlalchemy.delete(registration_table).where(
-            (registration_table.c.agent == registrant.agent)
-            & (registration_table.c.agent_id == registrant.agent_id)
-            & (registration_table.c.subject == registrant.subject)
-        )
-        conn.execute(statement)
+    statement = sqlalchemy.delete(registration_table).where(
+        (registration_table.c.agent == registrant.agent)
+        & (registration_table.c.agent_id == registrant.agent_id)
+        & (registration_table.c.subject == registrant.subject)
+    )
+    sql_connection.execute(statement)
 
 
 def _add_registration_token(
-    sql_engine: sqlalchemy.engine.Engine, registrant: Registrant, token: str
+    sql_connection: sqlalchemy.engine.Connection, registrant: Registrant, token: str
 ) -> None:
     """Add a registration entry to the database.
 
     Args:
-        sql_engine: Connection to the backing database
+        sql_connection: An active transaction connection to the database
 
         registrant: Unique identification of the registration to store
 
@@ -88,11 +86,10 @@ def _add_registration_token(
     Returns:
         None
     """
-    with sql_engine.begin() as conn:
-        statement = sqlalchemy.insert(registration_table).values(
-            _create_registration_row(registrant, token)
-        )
-        conn.execute(statement)
+    statement = sqlalchemy.insert(registration_table).values(
+        _create_registration_row(registrant, token)
+    )
+    sql_connection.execute(statement)
 
 
 def get_or_create_registration_token(
@@ -100,7 +97,7 @@ def get_or_create_registration_token(
 ) -> Tuple[str, bool]:
     """Get the token for a registrant, or create a new one if necessary.
 
-    If a token is found in the database, this function performns validation on it. If
+    If a token is found in the database, this function performs validation on it. If
     the token is not valid, it is discarded and replaced with a fresh JWT for this
     registrant. If no token is found, a new one is created as well.
 
@@ -117,26 +114,27 @@ def get_or_create_registration_token(
         The JWT, and a boolean that is True if the JWT is newly created or False if
         it is a cached value.
     """
-    token = _get_registration_token(sql_engine, registrant)
-    token_is_new = False
+    with sql_engine.connect() as conn:
+        token = _get_registration_token(conn, registrant)
+        token_is_new = False
 
-    if token is not None:
-        if not jwt_is_valid(
-            signing_key=signing_key, token=token, audience=REGISTRATION_AUDIENCE
-        ):
-            _delete_registration_token(sql_engine, registrant)
-            token = None
+        if token is not None:
+            if not jwt_is_valid(
+                signing_key=signing_key, token=token, audience=REGISTRATION_AUDIENCE
+            ):
+                _delete_registration_token(conn, registrant)
+                token = None
 
-    if token is None:
-        _log.info(f"Creating new registration for {registrant}")
-        token = create_jwt(
-            signing_key=signing_key,
-            duration=timedelta(days=REGISTRATION_DURATION_DAYS),
-            registrant=registrant,
-            audience=REGISTRATION_AUDIENCE,
-        )
-        _log.info(f"Created new JWT: {token}")
-        _add_registration_token(sql_engine, registrant, token)
-        token_is_new = True
+        if token is None:
+            _log.debug(f"Creating new registration for {registrant}")
+            token = create_jwt(
+                signing_key=signing_key,
+                duration=timedelta(days=REGISTRATION_DURATION_DAYS),
+                registrant=registrant,
+                audience=REGISTRATION_AUDIENCE,
+            )
+            _log.debug(f"Created new JWT: {token}")
+            _add_registration_token(conn, registrant, token)
+            token_is_new = True
 
     return (token, token_is_new)
