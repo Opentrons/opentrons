@@ -1,4 +1,7 @@
 """Tests for opentrons.protocols.geometry.deck_conflict."""
+from typing import ContextManager
+from contextlib import nullcontext
+
 import pytest
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -117,14 +120,33 @@ def test_trash_override() -> None:
         )
 
 
-# TODO(mm, 2023-02-16): Test Thermocycler semi configuration.
-@pytest.mark.parametrize("labware_location", [8, 10, 11])
-def test_no_labware_when_thermocycler(labware_location: int) -> None:
-    """It should reject labware if a thermocycler is placed."""
+@pytest.mark.parametrize(
+    ("thermocycler_is_semi", "labware_location", "labware_should_be_allowed"),
+    [
+        # Non-semi config:
+        (False, 1, True),
+        (False, 7, False),
+        (False, 8, False),
+        (False, 10, False),
+        (False, 11, False),
+        # Semi config:
+        (True, 1, True),
+        (True, 7, False),
+        (True, 8, True),
+        (True, 10, False),
+        (True, 11, True),
+    ],
+)
+def test_labware_when_thermocycler(
+    thermocycler_is_semi: bool,
+    labware_location: int,
+    labware_should_be_allowed: bool,
+) -> None:
+    """It should reject labware if a Thermocycler covers the same slot."""
     thermocycler = deck_conflict.ThermocyclerModule(
         name_for_errors="some_thermocycler",
         highest_z_including_labware=123,
-        is_semi_configuration=False,
+        is_semi_configuration=thermocycler_is_semi,
     )
 
     labware = deck_conflict.Labware(
@@ -134,26 +156,35 @@ def test_no_labware_when_thermocycler(labware_location: int) -> None:
         name_for_errors="some_labware",
     )
 
-    with pytest.raises(
-        deck_conflict.DeckConflictError,
-        match=(
-            "some_thermocycler in slot 7 prevents"
-            f" some_labware from using slot {labware_location}"
-        ),
-    ):
+    maybe_raises: ContextManager[object]
+    if labware_should_be_allowed:
+        maybe_raises = nullcontext()  # Expecct no exception.
+    else:
+        maybe_raises = pytest.raises(  # Expect an exception..
+            deck_conflict.DeckConflictError,
+            match=(
+                "some_thermocycler in slot 7 prevents"
+                f" some_labware from using slot {labware_location}"
+            ),
+        )
+    with maybe_raises:
         deck_conflict.check(
             existing_items={7: thermocycler},
             new_location=labware_location,
             new_item=labware,
         )
 
-    with pytest.raises(
-        deck_conflict.DeckConflictError,
-        match=(
-            f"some_labware in slot {labware_location}"
-            " prevents some_thermocycler from using slot 7"
-        ),
-    ):
+    if labware_should_be_allowed:
+        maybe_raises = nullcontext()  # Expecct no exception.
+    else:
+        maybe_raises = pytest.raises(  # Expect an exception..
+            deck_conflict.DeckConflictError,
+            match=(
+                f"some_labware in slot {labware_location}"
+                " prevents some_thermocycler from using slot 7"
+            ),
+        )
+    with maybe_raises:
         deck_conflict.check(
             existing_items={labware_location: labware},
             new_location=7,
