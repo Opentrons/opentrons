@@ -41,11 +41,7 @@ def create_jwt(
         "ot_aid": registrant.agent_id,
         "aud": audience,
     }
-    try:
-        return jwt.encode(payload=claims, key=signing_key, algorithm=_JWT_ALGORITHM)
-    except Exception as e:
-        _log.error(f"Error during JWT creation: {type(e)}:{e}")
-        raise e
+    return jwt.encode(payload=claims, key=signing_key, algorithm=_JWT_ALGORITHM)
 
 
 def jwt_is_valid(signing_key: str, token: str, audience: str) -> bool:
