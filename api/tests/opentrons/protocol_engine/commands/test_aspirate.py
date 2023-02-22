@@ -1,5 +1,4 @@
 """Test aspirate commands."""
-import pytest
 from decoy import Decoy
 
 from opentrons.types import Mount as HardwareMount, MountType

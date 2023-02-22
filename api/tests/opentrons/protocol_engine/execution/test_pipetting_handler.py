@@ -9,7 +9,7 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine import WellLocation, WellOffset
 from opentrons.protocol_engine.types import CurrentWell
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -514,6 +514,7 @@ async def test_aspirate(
             mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
         ),
     )
+
 
 async def test_blow_out(
     decoy: Decoy,

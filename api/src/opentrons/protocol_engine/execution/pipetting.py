@@ -8,7 +8,7 @@ from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateStore, HardwarePipette
 from ..resources import LabwareDataProvider
-from ..types import WellLocation, WellOrigin, DeckPoint, CurrentWell
+from ..types import WellLocation, DeckPoint, CurrentWell
 from .movement import MovementHandler
 
 

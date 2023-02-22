@@ -58,7 +58,9 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             well_location=params.wellLocation,
         )
 
-        await self._pipetting.blow_out_in_place(pipette_id=params.pipetteId, flow_rate=params.flowRate)
+        await self._pipetting.blow_out_in_place(
+            pipette_id=params.pipetteId, flow_rate=params.flowRate
+        )
 
         return BlowOutResult(position=position)
 

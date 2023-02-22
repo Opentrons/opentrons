@@ -1,9 +1,8 @@
 """Test blow-out command."""
 from decoy import Decoy
-from typing import cast
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
-from opentrons.protocol_engine.state import StateView, HardwarePipette
+from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands import (
     BlowOutResult,
     BlowOutImplementation,
@@ -13,8 +12,6 @@ from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
 )
-from opentrons.types import Mount
-from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control import HardwareControlAPI
 
 
@@ -58,5 +55,5 @@ async def test_blow_out_implementation(
 
     decoy.verify(
         await pipetting.blow_out_in_place(pipette_id="pipette-id", flow_rate=1.234),
-        times=1
+        times=1,
     )

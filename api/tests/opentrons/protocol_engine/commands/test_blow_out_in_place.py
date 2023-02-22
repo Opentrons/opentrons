@@ -1,8 +1,7 @@
 """Test blow-out-in-place commands."""
 from decoy import Decoy
-from typing import cast
 
-from opentrons.protocol_engine.state import StateView, HardwarePipette
+from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands.blow_out_in_place import (
     BlowOutInPlaceParams,
     BlowOutInPlaceResult,
@@ -13,8 +12,6 @@ from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
 )
-from opentrons.types import Mount
-from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control import HardwareControlAPI
 
 

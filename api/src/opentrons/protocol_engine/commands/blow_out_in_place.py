@@ -52,7 +52,9 @@ class BlowOutInPlaceImplementation(
 
     async def execute(self, params: BlowOutInPlaceParams) -> BlowOutInPlaceResult:
         """Blow-out without moving the pipette."""
-        await self._pipetting.blow_out_in_place(pipette_id=params.pipetteId, flow_rate=params.flowRate)
+        await self._pipetting.blow_out_in_place(
+            pipette_id=params.pipetteId, flow_rate=params.flowRate
+        )
 
         return BlowOutInPlaceResult()
 
