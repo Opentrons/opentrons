@@ -26,6 +26,16 @@ def test_get_virtual_pipette_static_config() -> None:
             default_dispense={"2.0": 3.78, "2.6": 7.56},
             default_blow_out={"2.0": 3.78, "2.6": 7.56},
         ),
+        return_tip_scale=0.5,
+        nominal_tip_overlap={
+            "default": 8.25,
+            "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 8.4,
+            "opentrons/geb_96_tiprack_10ul/1": 8.3,
+            "opentrons/opentrons_96_filtertiprack_10ul/1": 8.25,
+            "opentrons/opentrons_96_filtertiprack_20ul/1": 8.25,
+            "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
+            "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
+        },
     )
 
 
@@ -44,4 +54,10 @@ def test_get_pipette_static_config() -> None:
             default_dispense={"2.0": 159.04},
             default_blow_out={"2.0": 78.52},
         ),
+        return_tip_scale=0.83,
+        nominal_tip_overlap={
+            "default": 10.5,
+            "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
+            "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5,
+        },
     )

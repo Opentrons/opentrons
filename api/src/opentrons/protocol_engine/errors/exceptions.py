@@ -39,6 +39,10 @@ class TipNotAttachedError(ProtocolEngineError):
     """An error raised when an operation's required pipette tip is not attached."""
 
 
+class TipAttachedError(ProtocolEngineError):
+    """An error raised when a tip shouldn't be attached, but is."""
+
+
 class CommandDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a command that does not exist."""
 
