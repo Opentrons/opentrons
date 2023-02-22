@@ -26,7 +26,7 @@ HS_MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
 
 
 # URIs of labware that are allowed to exceed HS_MAX_X_ADJACENT_ITEM_HEIGHT.
-# These labware do not take up the full with of the slot
+# These labware do not take up the full width of the slot
 # in the area that would interfere with the labware latch.
 # For background, see: https://github.com/Opentrons/opentrons/issues/10316
 #
