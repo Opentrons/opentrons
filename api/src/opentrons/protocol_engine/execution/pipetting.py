@@ -186,59 +186,22 @@ class PipettingHandler:
         )
         return position
 
-    async def aspirate(
+    async def aspirate_in_place(
         self,
         pipette_id: str,
-        labware_id: str,
-        well_name: str,
-        well_location: WellLocation,
         volume: float,
         flow_rate: float,
-    ) -> VolumePointResult:
+    ) -> float:
         """Aspirate liquid from a well."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,
         )
-
-        ready_to_aspirate = self._state_store.pipettes.get_is_ready_to_aspirate(
-            pipette_id=pipette_id,
-            pipette_config=hw_pipette.config,
-        )
-
-        current_well = None
-
-        if not ready_to_aspirate:
-            await self._movement_handler.move_to_well(
-                pipette_id=pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                well_location=WellLocation(origin=WellOrigin.TOP),
-            )
-
-            await self._hardware_api.prepare_for_aspirate(mount=hw_pipette.mount)
-
-            # set our current deck location to the well now that we've made
-            # an intermediate move for the "prepare for aspirate" step
-            current_well = CurrentWell(
-                pipette_id=pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-            )
-
-        position = await self._movement_handler.move_to_well(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            current_well=current_well,
-        )
-
         with self.set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
-        return VolumePointResult(volume=volume, position=position)
+        return volume
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
@@ -271,6 +234,20 @@ class PipettingHandler:
             await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
 
         return volume
+
+    async def blow_out_in_place(
+        self,
+        pipette_id: str,
+        flow_rate: float,
+    ) -> None:
+        """Set flow rate and blow-out."""
+        # get mount and config data from state and hardware controller
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+        with self.set_flow_rate(pipette=hw_pipette, blow_out_flow_rate=flow_rate):
+            await self._hardware_api.blow_out(mount=hw_pipette.mount)
 
     async def touch_tip(
         self,

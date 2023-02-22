@@ -70,14 +70,7 @@ async def test_aspirate_implementation_no_prep(
     assert result == AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3))
 
     decoy.verify(
-        await pipetting.aspirate(
-            pipette_id="abc",
-            labware_id="123",
-            well_name="A3",
-            well_location=location,
-            volume=50,
-            flow_rate=1.23,
-        ),
+        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
         times=1,
     )
 
@@ -134,14 +127,7 @@ async def test_aspirate_implementation_with_prep(
     assert result == AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3))
 
     decoy.verify(
-        await pipetting.aspirate(
-            pipette_id="abc",
-            labware_id="123",
-            well_name="A3",
-            well_location=location,
-            volume=50,
-            flow_rate=1.23,
-        ),
+        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
         times=1,
     )
     decoy.verify(

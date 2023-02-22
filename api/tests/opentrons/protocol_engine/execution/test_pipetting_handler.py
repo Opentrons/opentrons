@@ -484,3 +484,62 @@ async def test_touch_tip(
             speed=9001,
         ),
     )
+
+
+async def test_aspirate(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: PipettingHandler,
+    mock_hw_pipettes: MockPipettes,
+) -> None:
+    """Should set flow_rate and call hardware_api aspirate."""
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    )
+
+    await subject.aspirate_in_place(pipette_id="pipette-id", volume=25, flow_rate=2.5)
+
+    decoy.verify(
+        hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
+        ),
+        await hardware_api.aspirate(mount=Mount.LEFT, volume=25),
+        hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
+        ),
+    )
+
+async def test_blow_out(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: PipettingHandler,
+    mock_hw_pipettes: MockPipettes,
+) -> None:
+    """Should set flow_rate and call hardware_api blow-out."""
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    )
+
+    await subject.blow_out_in_place(pipette_id="pipette-id", flow_rate=2.5)
+
+    decoy.verify(
+        hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=None, dispense=None, blow_out=2.5
+        ),
+        await hardware_api.blow_out(mount=Mount.LEFT),
+        hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
+        ),
+    )
