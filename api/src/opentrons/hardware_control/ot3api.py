@@ -1704,7 +1704,7 @@ class OT3API(
         self,
         mount: OT3Mount,
         probe_settings: Optional[LiquidProbeSettings] = None,
-    ) -> float:
+    ) -> Tuple[Dict[OT3Axis, float], Dict[OT3Axis, float]]:
         """Search for and return liquid level height.
 
         This function begins by moving the mount the distance specified by starting_mount_height in the
@@ -1772,15 +1772,17 @@ class OT3API(
                 triggered_at=position,
                 min_z_pos=min_z_travel_pos,
             )
-        elif z_distance_traveled > probe_settings.max_z_distance:
-            max_z_travel_pos = position
-            max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
-            raise LiquidNotFound(
-                position=position,
-                max_z_pos=max_z_travel_pos,
-            )
+        # elif z_distance_traveled > probe_settings.max_z_distance:
+        #     max_z_travel_pos = position
+        #     max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
+        #     raise LiquidNotFound(
+        #         position=position,
+        #         max_z_pos=max_z_travel_pos,
+        #     )
 
-        return position[mount_axis]
+        encoder_pos = await self._backend.update_encoder_position()
+
+        return position, encoder_pos
 
     async def capacitive_probe(
         self,
