@@ -217,9 +217,7 @@ async def _main() -> None:
                                                 sensor_threshold_pascals = args.sensor_threshold,
                                                 expected_liquid_height = args.expected_liquid_height,
                                                 log_pressure = args.log_pressure,
-                                                home_plunger_at_start = False,
-                                                aspirate_while_sensing = False,
-                                                read_only = False
+                                                aspirate_while_sensing = False
                                                 )
     try:
         # Home
@@ -229,7 +227,7 @@ async def _main() -> None:
         await hw_api.home_plunger(mount)
         plunger_pos = get_plunger_positions_ot3(hw_api, mount)
         dial_offset = (50, 25, 50)
-        tips_to_use = 96
+        tips_to_use = args.tips
         tip_count = 0
         x_offset = 0
         y_offset = 0
@@ -330,7 +328,7 @@ async def _main() -> None:
                     await hw_api.move_to(mount, Point(tip_loc[OT3Axis.X],
                                                         tip_loc[OT3Axis.Y],
                                                         tip_loc[OT3Axis.by_mount(mount)]),
-                                                        speed = 5,
+                                                        speed = 10,
                                                         critical_point = CriticalPoint.TIP)
                 # Save Dial Indicator Nozzle Position
                 await asyncio.sleep(2)
@@ -375,8 +373,8 @@ async def _main() -> None:
                 initial_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
                 # Probe Liquid
                 init_probe_time = (time.time() - start_time)
-                liquid_height_pos, ls_data = await hw_api.liquid_probe(mount, probe_settings = liquid_probe_settings)
-                store_data(ls_data, tip)
+                liquid_height_pos = await hw_api.liquid_probe(mount, probe_settings = liquid_probe_settings)
+                # store_data(ls_data, tip)
                 end_probe_time = (time.time() - start_time)
                 end_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
                 end_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
@@ -459,14 +457,14 @@ if __name__ == "__main__":
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C2")
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
-    parser.add_argument("--tips", type=int, default = 30)
+    parser.add_argument("--tips", type=int, default = 40)
     parser.add_argument("--start_mount_height", type=float, default = 0)
     parser.add_argument("--prep_move_speed", type=float, default = 5)
     parser.add_argument("--max_z_distance", type=float, default = 40)
     parser.add_argument("--min_z_distance", type=float, default = 5)
-    parser.add_argument("--mount_speed", type=float, default = 1)
-    parser.add_argument("--plunger_speed", type=float, default = 1)
-    parser.add_argument("--sensor_threshold", type=float, default = 100, help = "Threshold in Pascals")
+    parser.add_argument("--mount_speed", type=float, default = 21.3)
+    parser.add_argument("--plunger_speed", type=float, default = 11.3)
+    parser.add_argument("--sensor_threshold", type=float, default = 110, help = "Threshold in Pascals")
     parser.add_argument("--expected_liquid_height", type=int, default = 0)
     parser.add_argument("--log_pressure", action="store_true")
     parser.add_argument("--home_plunger_at_start", action="store_true")
