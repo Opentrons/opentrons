@@ -65,8 +65,8 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
     pos = 0
     speed = 10
     res = {node: (0,0,0)}
-    current = 0.8
-    await set_pipette_current(current, args)
+    current = args.current
+    await set_pipette_current(messenger,current,node)
     try:
         if xy == "downward":
             pos = pos + step
@@ -106,7 +106,7 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
 
 
 
-async def _jog_axis(messenger: CanMessenger, node, position) -> None:
+async def _jog_axis(messenger: CanMessenger, node, position,current = 0.1) -> None:
     step_size = [0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
@@ -123,6 +123,7 @@ async def _jog_axis(messenger: CanMessenger, node, position) -> None:
         Click  >> q << to quit the test script
                     """
     print(information_str)
+    await set_pipette_current(messenger,current,node)
     while True:
         input = getch()
         if input == 'w':
@@ -178,23 +179,25 @@ async def _jog_axis(messenger: CanMessenger, node, position) -> None:
 def calc_time(distance, speed):
     time = abs(distance/speed)
     return time
-async def set_pipette_current(run_current,args) -> None:
-    print(args.node)
-    if args.node == "head_l":
-        node = NodeId.head_l
-    elif args.node == "head_r":
-        node = NodeId.head_r
-    elif args.node == "gantry_x":
-        node = NodeId.gantry_x
+async def set_pipette_current(messenger: CanMessenger, run_current: float,node) -> None:
+    # print(args.node)
+    # if args.node == "head_l":
+    #     node = NodeId.head_l
+    # elif args.node == "head_r":
+    #     node = NodeId.head_r
+    # elif args.node == "gantry_x":
+    #     node = NodeId.gantry_x
+    # elif args.node == "gantry_y":
+    #     node = NodeId.gantry_y
     currents: Dict[NodeId, Tuple[float, float]] = {}
     currents[node] = (float(0.1), float(run_current))
 
-    async with build.can_messenger(build_settings(args)) as messenger:
-        try:
-            await set_currents(messenger, currents)
-        except asyncio.CancelledError:
-            pass
-async def home(messenger, node, args):
+    # async with build.can_messenger(build_settings(args)) as messenger:
+    try:
+        await set_currents(messenger, currents)
+    except asyncio.CancelledError:
+        print("set_pipette_current err")
+async def home(messenger, node,args):
     home_runner = MoveGroupRunner(
         move_groups=[
             [
@@ -205,9 +208,9 @@ async def home(messenger, node, args):
             ]
         ]
     )
-    current = 0.8
+    current = args.current#0.8
     try:
-        await set_pipette_current(current, args)
+        await set_pipette_current(messenger,current,node)
         await home_runner.run(can_messenger = messenger)
         print("MOVEHOME=Pass")
     except asyncio.TimeoutError:
@@ -275,6 +278,9 @@ async def  run(args: argparse.Namespace) -> None:
         node = NodeId.head_r
     elif args.node == "gantry_x":
         node = NodeId.gantry_x
+    elif args.node == "gantry_y":
+        node = NodeId.gantry_y
+
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
     messenger.start()
@@ -287,7 +293,8 @@ async def  run(args: argparse.Namespace) -> None:
     if args.jog:
         print('\n')
         print('----------Read Motor Position and Encoder--------------')
-        await _jog_axis(messenger, node, position)
+        current = args.current
+        await _jog_axis(messenger, node, position,current)
 
     if args.limit_switch:
         print('\n')
@@ -379,7 +386,10 @@ def main() -> None:
     parser.add_argument(
         "--node", type=str, help="Node id to operate.", default="head_l"
     )
-
+    parser.add_argument(
+        "--current", type=str, help="set current.", default=0.8
+    )
+    
     args = parser.parse_args()
 
     asyncio.run(run(args))
