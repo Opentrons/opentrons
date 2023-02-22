@@ -34,21 +34,11 @@ from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
 )
 from opentrons.protocol_engine.execution.gantry_movement import GantryMovementHandler
 
-from .mock_defs import MockPipettes
-
 
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareAPI:
     """Get a mock in the shape of a HardwareAPI."""
     return decoy.mock(cls=HardwareAPI)
-
-
-@pytest.fixture
-def mock_hw_pipettes(hardware_api: HardwareAPI) -> MockPipettes:
-    """Get mock pipette configs and attach them to the mock HW controller."""
-    mock_hw_pipettes = MockPipettes()
-    hardware_api.attached_instruments = mock_hw_pipettes.by_mount  # type: ignore[misc]
-    return mock_hw_pipettes
 
 
 @pytest.fixture
@@ -96,11 +86,9 @@ def subject(
 async def test_move_to_well(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     gantry_movement_handler: GantryMovementHandler,
-    mock_hw_pipettes: MockPipettes,
     subject: MovementHandler,
 ) -> None:
     """Move requests should call hardware controller with movement data."""
@@ -209,11 +197,9 @@ async def test_move_to_well(
 async def test_move_to_well_from_starting_location(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     gantry_movement_handler: GantryMovementHandler,
-    mock_hw_pipettes: MockPipettes,
     subject: MovementHandler,
 ) -> None:
     """It should be able to move to a well from a start location."""
@@ -317,11 +303,9 @@ async def test_move_to_well_from_starting_location(
 async def test_move_to_well_no_waypoints(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     gantry_movement_handler: GantryMovementHandler,
-    mock_hw_pipettes: MockPipettes,
     subject: MovementHandler,
 ) -> None:
     """Move requests should return origin if no waypoints are returned from MotionView."""
@@ -431,7 +415,6 @@ class MoveRelativeSpec(NamedTuple):
 async def test_move_relative(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     gantry_movement_handler: GantryMovementHandler,
     subject: MovementHandler,
     axis: MovementAxis,
@@ -474,7 +457,6 @@ async def test_move_relative(
 async def test_save_position(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     gantry_movement_handler: GantryMovementHandler,
     subject: MovementHandler,
 ) -> None:
@@ -508,7 +490,6 @@ async def test_save_position(
 async def test_move_to_coordinates(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     gantry_movement_handler: GantryMovementHandler,
     subject: MovementHandler,
 ) -> None:
@@ -588,7 +569,6 @@ async def test_move_to_coordinates(
 async def test_move_to_coordinates_no_waypoints(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     gantry_movement_handler: GantryMovementHandler,
     subject: MovementHandler,
 ) -> None:

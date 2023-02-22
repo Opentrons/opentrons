@@ -53,7 +53,6 @@ class MovementHandler:
     """Implementation logic for gantry movement."""
 
     _state_store: StateStore
-    _hardware_api: HardwareControlAPI
     _model_utils: ModelUtils
 
     def __init__(
@@ -67,25 +66,24 @@ class MovementHandler:
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
-        self._hardware_api = hardware_api
         self._model_utils = model_utils or ModelUtils()
         self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
-                state_store=self._state_store, hardware_api=self._hardware_api
+                state_store=self._state_store, hardware_api=hardware_api
             )
         )
         self._hs_movement_flagger = (
             heater_shaker_movement_flagger
             or HeaterShakerMovementFlagger(
-                state_store=self._state_store, hardware_api=self._hardware_api
+                state_store=self._state_store, hardware_api=hardware_api
             )
         )
 
         self._gantry_mover = (
             gantry_mover or VirtualGantryMovementHandler(state_store=self._state_store)
             if self._state_store.config.use_virtual_pipettes
-            else GantryMovementHandler(hardware_api=self._hardware_api)
+            else GantryMovementHandler(hardware_api=hardware_api)
         )
 
     async def move_to_well(
