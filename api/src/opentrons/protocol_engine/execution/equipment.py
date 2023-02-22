@@ -219,6 +219,10 @@ class EquipmentHandler:
                 )
             )
 
+        # TODO(mc, 2023-02-22): rather than dispatch from inside the load command
+        # see if additional config data like this can be returned from the command impl
+        # alongside, but outside of, the command result.
+        # this pattern could potentially improve `loadLabware` and `loadModule`, too
         self._action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id=pipette_id,

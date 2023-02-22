@@ -327,9 +327,12 @@ def test_pipette_not_ready_to_aspirate() -> None:
 
 def test_get_attached_tip_labware_by_id() -> None:
     """It should get the tip-rack ID map of a pipette's attached tip."""
-    subject = get_pipette_view(attached_tip_labware_by_id={"foo": "bar"})
+    attached_tip_labware_by_id = {"foo": "bar"}
+    subject = get_pipette_view(attached_tip_labware_by_id=attached_tip_labware_by_id)
     result = subject.get_attached_tip_labware_by_id()
+
     assert result == {"foo": "bar"}
+    assert result is not attached_tip_labware_by_id
 
 
 def test_validate_tip_state() -> None:

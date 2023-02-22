@@ -11,7 +11,7 @@ from ..types import MotorAxis
 from ..errors import HardwareNotSupportedError
 
 from .movement import MovementHandler
-from .tip_handler import TipHandler, create_tip_handler
+from .tip_handler import TipHandler, HardwareTipHandler
 from ...hardware_control.types import OT3Mount
 
 log = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class HardwareStopper:
             hardware_api=hardware_api,
             state_store=state_store,
         )
-        self._tip_handler = tip_handler or create_tip_handler(
+        self._tip_handler = tip_handler or HardwareTipHandler(
             hardware_api=hardware_api,
             state_view=state_store,
         )

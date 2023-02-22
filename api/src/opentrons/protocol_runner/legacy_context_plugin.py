@@ -8,14 +8,9 @@ from typing import Optional
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.commands.types import CommandMessage as LegacyCommand
-from opentrons.protocol_engine import (
-    AbstractPlugin,
-    actions as pe_actions,
-    commands as pe_commands,
-)
-from opentrons.protocol_engine.resources import pipette_data_provider
+from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
-from .legacy_wrappers import LegacyLoadInfo, LegacyInstrumentLoadInfo
+from .legacy_wrappers import LegacyLoadInfo
 from .legacy_command_mapper import LegacyCommandMapper
 from .thread_async_queue import ThreadAsyncQueue
 
@@ -127,28 +122,17 @@ class LegacyContextPlugin(AbstractPlugin):
             self._actions_to_dispatch.put(pe_action)
 
     def _handle_equipment_loaded(self, load_info: LegacyLoadInfo) -> None:
-        pe_command = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
-        pe_action = pe_actions.UpdateCommandAction(command=pe_command)
-        self._actions_to_dispatch.put(pe_action)
+        (
+            pe_command,
+            pipette_config_action,
+        ) = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
 
-        if (
-            isinstance(pe_command, pe_commands.LoadPipette)
-            and isinstance(load_info, LegacyInstrumentLoadInfo)
-            and pe_command.result is not None
-        ):
-            model = load_info.model
-            serial_number = load_info.serial_number
-            static_pipette_config = pipette_data_provider.get_pipette_static_config(
-                model, serial_number
-            )
+        if pipette_config_action:
+            self._actions_to_dispatch.put(pipette_config_action)
 
-            self._actions_to_dispatch.put(
-                pe_actions.AddPipetteConfigAction(
-                    pipette_id=pe_command.result.pipetteId,
-                    serial_number=serial_number,
-                    config=static_pipette_config,
-                )
-            )
+        self._actions_to_dispatch.put(
+            pe_actions.UpdateCommandAction(command=pe_command)
+        )
 
     async def _dispatch_all_actions(self) -> None:
         """Dispatch all actions to the `ProtocolEngine`.

@@ -411,7 +411,7 @@ class PipetteView(HasState[PipetteState]):
 
     def get_attached_tip_labware_by_id(self) -> Dict[str, str]:
         """Get the tiprack ids of attached tip by pipette ids."""
-        return self._state.attached_tip_labware_by_id
+        return dict(self._state.attached_tip_labware_by_id)
 
     def validate_tip_state(self, pipette_id: str, expected_has_tip: bool) -> None:
         """Validate that a pipette's tip state matches expectations."""

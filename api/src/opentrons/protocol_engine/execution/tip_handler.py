@@ -188,8 +188,9 @@ class VirtualTipHandler(TipHandler):
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
         """Add a tip using a virtual pipette.
 
-        No-op
+        This should not be called when using virtual pipettes.
         """
+        assert False, "TipHandler.add_tip should not be used with virtual pipettes"
 
 
 def create_tip_handler(

@@ -275,7 +275,8 @@ async def test_virtual_drop_tip(decoy: Decoy, mock_state_view: StateView) -> Non
 
 
 async def test_virtual_add_tip(decoy: Decoy, mock_state_view: StateView) -> None:
-    """It should no-op to add a tip to a virtual pipette."""
+    """It should disallow `add_tip` when using virtual pipettes."""
     subject = VirtualTipHandler(state_view=mock_state_view)
 
-    await subject.add_tip(pipette_id="pipette-id", labware_id="labware-id")
+    with pytest.raises(AssertionError):
+        await subject.add_tip(pipette_id="pipette-id", labware_id="labware-id")
