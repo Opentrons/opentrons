@@ -49,6 +49,7 @@ describe('MountPipette', () => {
       isRobotMoving: false,
       isPending: false,
       setPending: jest.fn(),
+      isOnDevice: false,
     }
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })

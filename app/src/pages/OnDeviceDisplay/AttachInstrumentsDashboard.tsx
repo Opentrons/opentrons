@@ -6,9 +6,7 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { Btn, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import { Btn, DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { useAttachedPipettes } from '../../organisms/Devices/hooks'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
@@ -69,14 +67,7 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
     setPipetteWizardFlow(FLOWS.ATTACH)
   }
   return (
-    <Flex
-      padding={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
-      flexDirection={DIRECTION_COLUMN}
-    >
-      <Navigation routes={onDeviceDisplayRoutes} />
-
+    <Flex flexDirection={DIRECTION_COLUMN}>
       {showAttachPipette ? (
         <ChoosePipette
           proceed={handleAttachPipette}

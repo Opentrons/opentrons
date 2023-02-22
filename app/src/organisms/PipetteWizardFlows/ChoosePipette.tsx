@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -11,14 +12,20 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
+  POSITION_ABSOLUTE,
+  JUSTIFY_FLEX_END,
+  TEXT_TRANSFORM_CAPITALIZE,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Portal } from '../../App/portal'
+import { OnDevicePrimaryButton } from '../../atoms/buttons'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -59,9 +66,21 @@ const selectedOptionStyles = css`
     background-color: ${COLORS.lightBlue};
   }
 `
-
+const onDeviceUnselectedOptionStyles = css`
+  background-color: ${COLORS.light1};
+  border-radius: 1rem;
+  padding: ${SPACING.spacing5};
+  margin-bottom: ${SPACING.spacing3};
+  height: 5.25rem;
+  width: 57.8125rem;
+`
+const onDeviceSelectedOptionStyles = css`
+  ${onDeviceUnselectedOptionStyles}
+  background-color: ${COLORS.flex1};
+`
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const { selectedPipette, setSelectedPipette, proceed, exit } = props
+  const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettesByMount = useAttachedPipettes()
   const isGantryEmpty = getIsGantryEmpty(attachedPipettesByMount)
@@ -75,6 +94,14 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
     selectedPipette === SINGLE_MOUNT_PIPETTES
       ? selectedOptionStyles
       : unselectedOptionStyles
+  const onDevice96Wrapper =
+    selectedPipette === NINETY_SIX_CHANNEL
+      ? onDeviceSelectedOptionStyles
+      : onDeviceUnselectedOptionStyles
+  const onDeviceSingleMountWrapper =
+    selectedPipette === SINGLE_MOUNT_PIPETTES
+      ? onDeviceSelectedOptionStyles
+      : onDeviceUnselectedOptionStyles
 
   let ninetySix: string = t('ninety_six_channel', {
     ninetySix: NINETY_SIX_CHANNEL,
@@ -91,7 +118,87 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
     eight: EIGHT_CHANNEL,
   })
 
-  return (
+  return isOnDevice ? (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      width="100%"
+      position={POSITION_ABSOLUTE}
+    >
+      <WizardHeader
+        title={t('attach_pipette')}
+        currentStep={0}
+        totalSteps={3}
+        onExit={setShowExit ? exit : () => showExit(true)}
+      />
+      {setShowExit ? (
+        <ExitModal
+          goBack={() => showExit(false)}
+          proceed={exit}
+          flowType={FLOWS.ATTACH}
+        />
+      ) : (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          paddingX={SPACING.spacing6}
+          paddingY="1.75rem"
+        >
+          <StyledText
+            fontSize="1.75rem"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginBottom={SPACING.spacing4}
+          >
+            {t('choose_pipette')}
+          </StyledText>
+          <Flex
+            onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
+            css={onDeviceSingleMountWrapper}
+            data-testid="ChoosePipette_SingleAndEight_OnDevice"
+          >
+            <StyledText
+              fontSize="1.75rem"
+              fontWeight={700}
+              alignSelf={ALIGN_CENTER}
+            >
+              {singleMount}
+            </StyledText>
+          </Flex>
+          <Flex
+            onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
+            css={onDevice96Wrapper}
+            data-testid="ChoosePipette_NinetySix_OnDevice"
+          >
+            <StyledText
+              fontSize="1.75rem"
+              fontWeight={700}
+              alignSelf={ALIGN_CENTER}
+            >
+              {ninetySix}
+            </StyledText>
+          </Flex>
+        </Flex>
+      )}
+      <Flex
+        alignItems={ALIGN_FLEX_END}
+        paddingX={SPACING.spacing6}
+        paddingBottom="1.75rem"
+        justifyContent={JUSTIFY_FLEX_END}
+        marginTop="7.5rem"
+      >
+        <OnDevicePrimaryButton
+          onClick={proceed}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        >
+          <StyledText
+            fontSize="1.375rem"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            padding={SPACING.spacing4}
+          >
+            {t('continue')}
+          </StyledText>
+        </OnDevicePrimaryButton>
+      </Flex>
+    </Flex>
+  ) : (
     <Portal level="top">
       <ModalShell
         width="47rem"
