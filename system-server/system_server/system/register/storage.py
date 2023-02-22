@@ -100,7 +100,7 @@ def get_or_create_registration_token(
 ) -> Tuple[str, bool]:
     """Get the token for a registrant, or create a new one if necessary.
 
-    If a token is found in the database, this function performns validation on it. If
+    If a token is found in the database, this function performs validation on it. If
     the token is not valid, it is discarded and replaced with a fresh JWT for this
     registrant. If no token is found, a new one is created as well.
 
