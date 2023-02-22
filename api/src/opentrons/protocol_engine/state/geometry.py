@@ -19,7 +19,7 @@ from ..types import (
     LabwareLocation,
     LabwareOffsetVector,
     DeckType,
-    CurrentWell
+    CurrentWell,
 )
 from .labware import LabwareView
 from .modules import ModuleView

@@ -10,9 +10,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocol_engine import (
     WellLocation,
-    WellOrigin,
     WellOffset,
-    DeckPoint,
 )
 from opentrons.protocol_engine.types import CurrentWell
 from opentrons.protocol_engine.state import (

@@ -30,7 +30,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.pipettes import PipetteView, CurrentWell
+from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.geometry import GeometryView
 
 
