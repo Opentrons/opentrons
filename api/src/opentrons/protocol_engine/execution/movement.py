@@ -15,12 +15,7 @@ from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 
-from .gantry_movement import (
-    AbstractGantryMovementHandler,
-    GantryMovementHandler,
-    VirtualGantryMovementHandler,
-)
-
+from .gantry_movement import GantryMovementHandler, create_gantry_movement_handler
 
 MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.X: HardwareAxis.X,
@@ -62,7 +57,7 @@ class MovementHandler:
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
         heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
-        gantry_mover: Optional[AbstractGantryMovementHandler] = None,
+        gantry_mover: Optional[GantryMovementHandler] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
@@ -80,12 +75,8 @@ class MovementHandler:
             )
         )
 
-        self._gantry_mover = (
-            gantry_mover or VirtualGantryMovementHandler(state_store=self._state_store)
-            if self._state_store.config.use_virtual_pipettes
-            else GantryMovementHandler(
-                hardware_api=hardware_api, state_store=self._state_store
-            )
+        self._gantry_mover = gantry_mover or create_gantry_movement_handler(
+            hardware_api=hardware_api, state_view=self._state_store
         )
 
     async def move_to_well(

@@ -1,6 +1,6 @@
 """Gantry movement wrapper for hardware and simulation based movement."""
-from abc import ABC, abstractmethod
 from typing import Optional, List, Dict
+from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.types import Point, Mount
 
@@ -10,7 +10,7 @@ from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeE
 
 from opentrons.motion_planning import Waypoint
 
-from ..state import StateStore, CurrentWell
+from ..state import StateView, CurrentWell
 from ..types import MotorAxis
 from ..errors import MustHomeError
 
@@ -25,10 +25,9 @@ MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
 }
 
 
-class AbstractGantryMovementHandler(ABC):
+class GantryMovementHandler(TypingProtocol):
     """Abstract class for gantry movement handler."""
 
-    @abstractmethod
     async def get_position(
         self,
         pipette_id: str,
@@ -38,19 +37,16 @@ class AbstractGantryMovementHandler(ABC):
         """Get the current position of the gantry."""
         ...
 
-    @abstractmethod
     def get_max_travel_z(self, pipette_id: str) -> float:
         """Get the maximum allowed z-height for pipette movement."""
         ...
 
-    @abstractmethod
     async def move_to(
         self, mount: Mount, waypoint: Waypoint, speed: Optional[float]
     ) -> None:
         """Move the hardware gantry to a waypoint."""
         ...
 
-    @abstractmethod
     async def move_relative(
         self,
         pipette_id: str,
@@ -60,20 +56,17 @@ class AbstractGantryMovementHandler(ABC):
         """Move the hardware gantry in a relative direction by delta."""
         ...
 
-    @abstractmethod
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         """Home the gantry."""
         ...
 
 
-class GantryMovementHandler(AbstractGantryMovementHandler):
+class HardwareGantryMovementHandler(GantryMovementHandler):
     """Hardware API based gantry movement handler."""
 
-    def __init__(
-        self, hardware_api: HardwareControlAPI, state_store: StateStore
-    ) -> None:
+    def __init__(self, hardware_api: HardwareControlAPI, state_view: StateView) -> None:
         self._hardware_api = hardware_api
-        self._state_store = state_store
+        self._state_view = state_view
 
     async def get_position(
         self,
@@ -88,7 +81,7 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
             current_well: Optional parameter for getting pipette location data, effects critical point.
             fail_on_not_homed: Raise HardwareMustHomeError if gantry position is not known.
         """
-        pipette_location = self._state_store.motion.get_pipette_location(
+        pipette_location = self._state_view.motion.get_pipette_location(
             pipette_id=pipette_id,
             current_well=current_well,
         )
@@ -107,7 +100,7 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
         Args:
             pipette_id: Pipette ID to get max travel z-height for.
         """
-        hw_mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
+        hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
         return self._hardware_api.get_instrument_max_height(mount=hw_mount)
 
     async def move_to(
@@ -134,7 +127,7 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
             delta: Relative X/Y/Z distance to move gantry.
             speed: Optional speed parameter for the move.
         """
-        pipette_location = self._state_store.motion.get_pipette_location(
+        pipette_location = self._state_view.motion.get_pipette_location(
             pipette_id=pipette_id,
         )
         critical_point = pipette_location.critical_point
@@ -177,11 +170,11 @@ class GantryMovementHandler(AbstractGantryMovementHandler):
             await self._hardware_api.home(axes=hardware_axes)
 
 
-class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
+class VirtualGantryMovementHandler(GantryMovementHandler):
     """State store based gantry movement handler for simulation/analysis."""
 
-    def __init__(self, state_store: StateStore) -> None:
-        self._state_store = state_store
+    def __init__(self, state_view: StateView) -> None:
+        self._state_view = state_view
 
     async def get_position(
         self,
@@ -196,7 +189,7 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
             current_well: Not used in virtual implementation.
             fail_on_not_homed: Not used in virtual implementation.
         """
-        origin_deck_point = self._state_store.pipettes.get_deck_point(pipette_id)
+        origin_deck_point = self._state_view.pipettes.get_deck_point(pipette_id)
         if origin_deck_point is not None:
             origin = Point(
                 x=origin_deck_point.x, y=origin_deck_point.y, z=origin_deck_point.z
@@ -211,10 +204,10 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
         Args:
             pipette_id: Pipette ID to get instrument height and tip length for.
         """
-        instrument_height = self._state_store.pipettes.get_instrument_max_height(
+        instrument_height = self._state_view.pipettes.get_instrument_max_height(
             pipette_id
         )
-        tip_length = self._state_store.tips.get_tip_length(pipette_id)
+        tip_length = self._state_view.tips.get_tip_length(pipette_id)
         return instrument_height - tip_length
 
     async def move_to(
@@ -242,3 +235,14 @@ class VirtualGantryMovementHandler(AbstractGantryMovementHandler):
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         """Home the gantry. No-op in virtual implementation."""
         pass
+
+
+def create_gantry_movement_handler(
+    state_view: StateView, hardware_api: HardwareControlAPI
+) -> GantryMovementHandler:
+    """Create a tip handler."""
+    return (
+        HardwareGantryMovementHandler(hardware_api=hardware_api, state_view=state_view)
+        if state_view.config.use_virtual_pipettes is False
+        else VirtualGantryMovementHandler(state_view=state_view)
+    )

@@ -24,7 +24,7 @@ def subject(
 ) -> VirtualGantryMovementHandler:
     """Create a GantryMovementHandler with its dependencies mocked out."""
     return VirtualGantryMovementHandler(
-        state_store=state_store,
+        state_view=state_store,
     )
 
 
