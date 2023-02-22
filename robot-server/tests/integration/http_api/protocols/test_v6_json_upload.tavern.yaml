@@ -283,6 +283,7 @@ stages:
                 result:
                   position: { 'x': 146.88, 'y': 246.24, 'z': 64.69 }
                   tipVolume: 10.0
+                  tipLength: 39.2
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr

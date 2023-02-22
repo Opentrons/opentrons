@@ -12,7 +12,8 @@ from .pipetting_common import (
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler
+    from ..state import StateView
+    from ..execution import MovementHandler, TipHandler
 
 
 PickUpTipCommandType = Literal["pickUpTip"]
@@ -31,26 +32,55 @@ class PickUpTipResult(DestinationPositionResult):
     tipVolume: float = Field(
         0,
         description="Maximum volume of liquid that the picked up tip can hold, in µL.",
-        gt=0,
+        ge=0,
+    )
+
+    tipLength: float = Field(
+        0,
+        description="The length of the tip in mm.",
+        ge=0,
     )
 
 
 class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResult]):
     """Pick up tip command implementation."""
 
-    def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
-        self._pipetting = pipetting
+    def __init__(
+        self,
+        state_view: StateView,
+        tip_handler: TipHandler,
+        movement: MovementHandler,
+        **kwargs: object,
+    ) -> None:
+        self._state_view = state_view
+        self._tip_handler = tip_handler
+        self._movement = movement
 
     async def execute(self, params: PickUpTipParams) -> PickUpTipResult:
         """Move to and pick up a tip using the requested pipette."""
-        result = await self._pipetting.pick_up_tip(
-            pipette_id=params.pipetteId,
-            labware_id=params.labwareId,
-            well_name=params.wellName,
-            well_location=params.wellLocation,
+        pipette_id = params.pipetteId
+        labware_id = params.labwareId
+        well_name = params.wellName
+        well_location = params.wellLocation
+
+        position = await self._movement.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
         )
 
-        return PickUpTipResult(tipVolume=result.volume, position=result.position)
+        tip_geometry = await self._tip_handler.pick_up_tip(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+        )
+
+        return PickUpTipResult(
+            tipVolume=tip_geometry.volume,
+            tipLength=tip_geometry.effective_length,
+            position=position,
+        )
 
 
 class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult]):

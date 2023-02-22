@@ -30,14 +30,10 @@ DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
 @dataclass(frozen=True)
 class TipGeometry:
-    """Nominal tip geometry data.
-
-    This data is loaded from definitions and configurations, and does
-    not take calibration values into account.
+    """Tip geometry data.
 
     Props:
-        effective_length: The nominal working length (total length minus overlap)
-            of a tip, according to a tip rack and pipette's definitions.
+        effective_length: The working length (total length minus overlap) of a tip.
         diameter: Nominal tip diameter.
         volume: Nominal volume capacity.
     """
@@ -255,12 +251,11 @@ class GeometryView:
         pipette_id: str,
         labware_id: str,
     ) -> float:
-        """Given a labware and a pipette's config, get the effective tip length.
+        """Given a labware and a pipette's config, get the nominal effective tip length.
 
         Effective tip length is the nominal tip length less the distance the
         tip overlaps with the pipette nozzle. This does not take calibrated
-        tip lengths into account. For calibrated data,
-        see `LabwareDataProvider.get_calibrated_tip_length`.
+        tip lengths into account.
         """
         labware_uri = self._labware.get_definition_uri(labware_id)
         nominal_overlap = self._pipettes.get_nominal_tip_overlap(
@@ -275,7 +270,7 @@ class GeometryView:
         self,
         pipette_id: str,
         labware_id: str,
-        well_name: Optional[str] = None,
+        well_name: Optional[str],
     ) -> TipGeometry:
         """Given a labware, well, and hardware pipette config, get the tip geometry.
 
