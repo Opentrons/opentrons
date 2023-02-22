@@ -13,11 +13,13 @@ from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeE
 from opentrons.motion_planning import Waypoint
 
 from opentrons.protocol_engine.state import StateStore, CurrentWell, PipetteLocationData
-from opentrons.protocol_engine.types import MotorAxis
+from opentrons.protocol_engine.types import MotorAxis, DeckPoint
 from opentrons.protocol_engine.errors import MustHomeError
 
 from opentrons.protocol_engine.execution.gantry_movement import (
     HardwareGantryMovementHandler,
+    VirtualGantryMovementHandler,
+    create_gantry_movement_handler,
 )
 
 
@@ -34,7 +36,7 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
-def subject(
+def hardware_subject(
     hardware_api: HardwareAPI,
     state_store: StateStore,
 ) -> HardwareGantryMovementHandler:
@@ -45,11 +47,46 @@ def subject(
     )
 
 
+@pytest.fixture
+def virtual_subject(
+    state_store: StateStore,
+) -> VirtualGantryMovementHandler:
+    """Create a GantryMovementHandler with its dependencies mocked out."""
+    return VirtualGantryMovementHandler(
+        state_view=state_store,
+    )
+
+
+async def test_create_gantry_movement_handler(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+) -> None:
+    """It should return virtual or real gantry movement handlers depending on config."""
+    decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
+    assert isinstance(
+        create_gantry_movement_handler(
+            state_view=state_store,
+            hardware_api=hardware_api,
+        ),
+        HardwareGantryMovementHandler,
+    )
+
+    decoy.when(state_store.config.use_virtual_pipettes).then_return(True)
+    assert isinstance(
+        create_gantry_movement_handler(
+            state_view=state_store,
+            hardware_api=hardware_api,
+        ),
+        VirtualGantryMovementHandler,
+    )
+
+
 async def test_get_position(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     state_store: StateStore,
-    subject: HardwareGantryMovementHandler,
+    hardware_subject: HardwareGantryMovementHandler,
 ) -> None:
     """It should get the position of the pipette with the hardware API."""
     current_well = CurrentWell(
@@ -73,7 +110,7 @@ async def test_get_position(
         )
     ).then_return(Point(1, 2, 3))
 
-    result = await subject.get_position(
+    result = await hardware_subject.get_position(
         "pipette-id", current_well=current_well, fail_on_not_homed=True
     )
 
@@ -84,7 +121,7 @@ async def test_get_position_raises(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     state_store: StateStore,
-    subject: HardwareGantryMovementHandler,
+    hardware_subject: HardwareGantryMovementHandler,
 ) -> None:
     """It should raise a MustHomeError."""
     decoy.when(state_store.motion.get_pipette_location("pipette-id", None)).then_return(
@@ -102,14 +139,14 @@ async def test_get_position_raises(
     ).then_raise(HardwareMustHomeError("oh no"))
 
     with pytest.raises(MustHomeError, match="oh no"):
-        await subject.get_position("pipette-id")
+        await hardware_subject.get_position("pipette-id")
 
 
 def test_get_max_travel_z(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     state_store: StateStore,
-    subject: HardwareGantryMovementHandler,
+    hardware_subject: HardwareGantryMovementHandler,
 ) -> None:
     """It should get the max travel z height with the hardware API."""
     decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(
@@ -119,16 +156,16 @@ def test_get_max_travel_z(
         42.1
     )
 
-    assert subject.get_max_travel_z("pipette-id") == 42.1
+    assert hardware_subject.get_max_travel_z("pipette-id") == 42.1
 
 
 async def test_move_to(
     decoy: Decoy,
     hardware_api: HardwareAPI,
-    subject: HardwareGantryMovementHandler,
+    hardware_subject: HardwareGantryMovementHandler,
 ) -> None:
     """It should move the gantry with the hardware API."""
-    await subject.move_to(
+    await hardware_subject.move_to(
         mount=Mount.RIGHT,
         waypoint=Waypoint(position=Point(1, 2, 3), critical_point=CriticalPoint.TIP),
         speed=9001,
@@ -148,7 +185,7 @@ async def test_move_relative(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     state_store: StateStore,
-    subject: HardwareGantryMovementHandler,
+    hardware_subject: HardwareGantryMovementHandler,
 ) -> None:
     """It should move the gantry by the delta with the hardware API."""
     decoy.when(state_store.motion.get_pipette_location("pipette-id")).then_return(
@@ -165,7 +202,7 @@ async def test_move_relative(
         )
     ).then_return(Point(4, 5, 6))
 
-    result = await subject.move_relative(
+    result = await hardware_subject.move_relative(
         pipette_id="pipette-id",
         delta=Point(1, 2, 3),
         speed=9001,
@@ -190,7 +227,7 @@ async def test_move_relative_must_home(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     state_store: StateStore,
-    subject: HardwareGantryMovementHandler,
+    hardware_subject: HardwareGantryMovementHandler,
 ) -> None:
     """It should raise a MustHomeError."""
     decoy.when(state_store.motion.get_pipette_location("pipette-id")).then_return(
@@ -209,7 +246,7 @@ async def test_move_relative_must_home(
     ).then_raise(HardwareMustHomeError("oh no"))
 
     with pytest.raises(MustHomeError, match="oh no"):
-        await subject.move_relative(
+        await hardware_subject.move_relative(
             pipette_id="pipette-id",
             delta=Point(x=1, y=2, z=3),
             speed=456.7,
@@ -219,10 +256,10 @@ async def test_move_relative_must_home(
 async def test_home(
     decoy: Decoy,
     hardware_api: HardwareAPI,
-    subject: HardwareGantryMovementHandler,
+    hardware_subject: HardwareGantryMovementHandler,
 ) -> None:
     """It should home a set of axes."""
-    await subject.home(
+    await hardware_subject.home(
         axes=[
             MotorAxis.X,
             MotorAxis.Y,
@@ -247,11 +284,11 @@ async def test_home(
     )
     decoy.reset()
 
-    await subject.home(axes=None)
+    await hardware_subject.home(axes=None)
     decoy.verify(await hardware_api.home(), times=1)
     decoy.reset()
 
-    await subject.home(axes=[])
+    await hardware_subject.home(axes=[])
     decoy.verify(await hardware_api.home(axes=[]), times=1)
 
 
@@ -260,39 +297,102 @@ async def test_home(
 async def test_home_z(
     decoy: Decoy,
     hardware_api: HardwareAPI,
-    subject: HardwareGantryMovementHandler,
+    hardware_subject: HardwareGantryMovementHandler,
 ) -> None:
     """It should home a single Z axis and plunger."""
-    await subject.home(axes=[MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER])
+    await hardware_subject.home(axes=[MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER])
     decoy.verify(
         await hardware_api.home_z(Mount.LEFT),
         await hardware_api.home_plunger(Mount.LEFT),
     )
     decoy.reset()
 
-    await subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER])
+    await hardware_subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER])
     decoy.verify(
         await hardware_api.home_z(Mount.RIGHT),
         await hardware_api.home_plunger(Mount.RIGHT),
     )
     decoy.reset()
 
-    await subject.home(axes=[MotorAxis.LEFT_PLUNGER])
+    await hardware_subject.home(axes=[MotorAxis.LEFT_PLUNGER])
     decoy.verify(
         await hardware_api.home_plunger(Mount.LEFT),
         times=1,
     )
     decoy.reset()
 
-    await subject.home(axes=[MotorAxis.RIGHT_PLUNGER])
+    await hardware_subject.home(axes=[MotorAxis.RIGHT_PLUNGER])
     decoy.verify(
         await hardware_api.home_plunger(Mount.RIGHT),
         times=1,
     )
     decoy.reset()
 
-    await subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.LEFT_PLUNGER])
+    await hardware_subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.LEFT_PLUNGER])
     decoy.verify(
         await hardware_api.home([HardwareAxis.A, HardwareAxis.B]),
         times=1,
     )
+
+
+async def test_virtual_get_position(
+    decoy: Decoy,
+    state_store: StateStore,
+    virtual_subject: VirtualGantryMovementHandler,
+) -> None:
+    """It should get the position of the pipette with the state store."""
+    decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(
+        DeckPoint(x=1, y=2, z=3)
+    )
+
+    result = await virtual_subject.get_position("pipette-id")
+
+    assert result == Point(x=1, y=2, z=3)
+
+
+async def test_virtual_get_position_default(
+    decoy: Decoy,
+    state_store: StateStore,
+    virtual_subject: VirtualGantryMovementHandler,
+) -> None:
+    """It should get a default Point if no stored deck point can be found in the state store."""
+    decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(None)
+
+    result = await virtual_subject.get_position("pipette-id")
+
+    assert result == Point(x=0, y=0, z=0)
+
+
+def test_virtual_get_max_travel_z(
+    decoy: Decoy,
+    state_store: StateStore,
+    virtual_subject: VirtualGantryMovementHandler,
+) -> None:
+    """It should get the max travel z height with the state store."""
+    decoy.when(
+        state_store.pipettes.get_instrument_max_height("pipette-id")
+    ).then_return(42)
+    decoy.when(state_store.tips.get_tip_length("pipette-id")).then_return(20)
+
+    result = virtual_subject.get_max_travel_z("pipette-id")
+
+    assert result == 22.0
+
+
+async def test_virtual_move_relative(
+    decoy: Decoy,
+    state_store: StateStore,
+    virtual_subject: VirtualGantryMovementHandler,
+) -> None:
+    """It should simulate moving the gantry by the delta with the state store."""
+    decoy.when(state_store.pipettes.get_deck_point("pipette-id")).then_return(
+        DeckPoint(x=1, y=2, z=3)
+    )
+
+    result = await virtual_subject.move_relative(
+        "pipette-id",
+        delta=Point(3, 2, 1),
+        speed=123,
+    )
+
+    assert result == Point(x=4, y=4, z=4)
