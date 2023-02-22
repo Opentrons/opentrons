@@ -19,7 +19,7 @@ from opentrons.protocol_engine.state import (
     PipetteLocationData,
 )
 from opentrons.protocol_engine.execution.movement import MovementHandler
-from opentrons.protocol_engine.execution.pipetting import PipettingHandler
+from opentrons.protocol_engine.execution.pipetting import HardwarePipettingHandler
 from opentrons.protocol_engine.resources import LabwareDataProvider
 
 from .mock_defs import MockPipettes
@@ -80,9 +80,9 @@ def subject(
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
     labware_data_provider: LabwareDataProvider,
-) -> PipettingHandler:
+) -> HardwarePipettingHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
-    return PipettingHandler(
+    return HardwarePipettingHandler(
         state_store=state_store,
         hardware_api=hardware_api,
         movement_handler=movement_handler,
@@ -96,7 +96,7 @@ async def test_handle_dispense_in_place_request(
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
     mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
+    subject: HardwarePipettingHandler,
 ) -> None:
     """It should find the pipette by ID and use it to dispense."""
     decoy.when(
@@ -135,7 +135,7 @@ async def test_touch_tip(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
-    subject: PipettingHandler,
+    subject: HardwarePipettingHandler,
 ) -> None:
     """It should be able to touch tip to the edges of a well."""
     decoy.when(
@@ -205,7 +205,7 @@ async def test_aspirate_in_place(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    subject: PipettingHandler,
+    subject: HardwarePipettingHandler,
     mock_hw_pipettes: MockPipettes,
 ) -> None:
     """Should set flow_rate and call hardware_api aspirate."""
@@ -235,7 +235,7 @@ async def test_blow_out_in_place(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    subject: PipettingHandler,
+    subject: HardwarePipettingHandler,
     mock_hw_pipettes: MockPipettes,
 ) -> None:
     """Should set flow_rate and call hardware_api blow-out."""

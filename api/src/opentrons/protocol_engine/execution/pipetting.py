@@ -1,5 +1,6 @@
 """Pipetting command handling."""
 from typing import Optional, Iterator
+from typing_extensions import Protocol as TypingProtocol
 from contextlib import contextmanager
 from dataclasses import dataclass
 
@@ -20,8 +21,62 @@ class VolumePointResult:
     position: DeckPoint
 
 
-class PipettingHandler:
-    """Implementation logic for liquid handling commands."""
+class PipettingHandler(TypingProtocol):
+    """Liquid handling commands."""
+
+    async def aspirate_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> float:
+        """Set flow-rate and aspirate."""
+
+    def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
+        """Get whether a pipette is ready to aspirate."""
+
+    async def prepare_for_aspirate(self, mount: HardwareMount) -> None:
+        """Prepare for pipette aspiration."""
+
+    async def dispense_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> float:
+        """Dispense liquid without moving the pipette."""
+
+    async def blow_out_in_place(
+        self,
+        pipette_id: str,
+        flow_rate: float,
+    ) -> None:
+        """Set flow rate and blow-out."""
+
+    @contextmanager
+    def set_flow_rate(
+        self,
+        pipette: HardwarePipette,
+        aspirate_flow_rate: Optional[float] = None,
+        dispense_flow_rate: Optional[float] = None,
+        blow_out_flow_rate: Optional[float] = None,
+    ) -> Iterator[None]:
+        """Context manager for setting flow rate before calling aspirate, dispense, or blowout."""
+
+    async def touch_tip(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+        radius: float,
+        speed: Optional[float],
+    ) -> DeckPoint:
+        """Touch the pipette tip to the sides of a well."""
+
+
+class HardwarePipettingHandler(PipettingHandler):
+    """Liquid handling, using the Hardware API.""" ""
 
     _state_store: StateStore
     _hardware_api: HardwareControlAPI
@@ -188,3 +243,20 @@ class PipettingHandler:
                 dispense=original_dispense_rate,
                 blow_out=original_blow_out_rate,
             )
+
+
+def create_pipette_handler(
+    state_store: StateStore,
+    hardware_api: HardwareControlAPI,
+    movement_handler: MovementHandler,
+) -> PipettingHandler:
+    """Create a tip handler."""
+    return (
+        HardwarePipettingHandler(
+            state_store=state_store,
+            hardware_api=hardware_api,
+            movement_handler=movement_handler,
+        )
+        # if state_view.config.use_virtual_pipettes is False
+        # else VirtualPipettingHandler(state_store=state_view)
+    )

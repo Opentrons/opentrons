@@ -7,7 +7,7 @@ from ..actions import ActionDispatcher
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .labware_movement import LabwareMovementHandler
-from .pipetting import PipettingHandler
+from .pipetting import create_pipette_handler
 from .tip_handler import create_tip_handler
 from .run_control import RunControlHandler
 from .command_executor import CommandExecutor
@@ -44,7 +44,7 @@ def create_queue_worker(
         movement=movement_handler,
     )
 
-    pipetting_handler = PipettingHandler(
+    pipetting_handler = create_pipette_handler(
         hardware_api=hardware_api,
         state_store=state_store,
         movement_handler=movement_handler,
