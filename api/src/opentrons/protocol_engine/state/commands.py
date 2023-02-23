@@ -395,7 +395,8 @@ class CommandView(HasState[CommandState]):
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
-        If the cursor is omitted, return the tail of `length` of the collection.
+        If the cursor is omitted, a cursor will be selected automatically
+        based on the currently running or most recently executed command."
         """
         # TODO(mc, 2022-01-31): this is not the most performant way to implement
         # this; if this becomes a problem, change or the underlying data structure
