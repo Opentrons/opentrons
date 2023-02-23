@@ -18,6 +18,7 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
     DropTipWellOrigin,
 )
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_api.core.engine import InstrumentCore, WellCore, ProtocolCore
@@ -728,6 +729,20 @@ def test_get_current_volume(
         )
     ).then_return(123.4)
     assert subject.get_current_volume() == 123.4
+
+
+def test_get_current_volume_returns_zero_when_no_tip_attached(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return 0 when an exception is raises."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_raise(TipNotAttachedError())
+    assert subject.get_current_volume() == 0
 
 
 def test_get_available_volume(

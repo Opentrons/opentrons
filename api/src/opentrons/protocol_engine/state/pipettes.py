@@ -372,11 +372,18 @@ class PipetteView(HasState[PipetteState]):
     def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:
         """Get the currently aspirated volume of a pipette by ID."""
         try:
-            return self._state.aspirated_volume_by_id[pipette_id]
+            aspirate_volume = self._state.aspirated_volume_by_id[pipette_id]
         except KeyError as e:
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get current volume."
             ) from e
+
+        if pipette_id not in self._state.tip_volume_by_id.keys():
+            raise errors.TipNotAttachedError(
+                f"Pipette {pipette_id} has no tip attached; unable to calculate working maximum volume."
+            )
+
+        return aspirate_volume
 
     def get_working_volume(self, pipette_id: str) -> float:
         """Get the working maximum volume of a pipette by ID."""

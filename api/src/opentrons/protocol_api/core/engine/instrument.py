@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
     WellOrigin,
     WellOffset,
 )
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -454,10 +455,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.pipettes.get_maximum_volume(self._pipette_id)
 
     def get_current_volume(self) -> float:
-        return (
-            self._engine_client.state.pipettes.get_aspirated_volume(self._pipette_id)
-            or 0
-        )
+        try:
+            current_volume = (
+                self._engine_client.state.pipettes.get_aspirated_volume(
+                    self._pipette_id
+                )
+                or 0
+            )
+        except TipNotAttachedError:
+            current_volume = 0
+        return current_volume
 
     def get_available_volume(self) -> float:
         return (
