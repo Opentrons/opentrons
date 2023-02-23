@@ -11,7 +11,6 @@ from opentrons.hardware_control.types import Axis as HardwareAxis
 
 from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis, CurrentWell
 from ..state import StateStore
-from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger

@@ -268,6 +268,8 @@ def test_get_pipette_available_volume() -> None:
                 serial_number="",
                 return_tip_scale=0,
                 nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
             ),
         },
     )

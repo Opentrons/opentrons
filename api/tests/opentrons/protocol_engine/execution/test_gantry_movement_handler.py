@@ -12,8 +12,8 @@ from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeE
 
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine.state import StateView, CurrentWell, PipetteLocationData
-from opentrons.protocol_engine.types import MotorAxis, DeckPoint
+from opentrons.protocol_engine.state import StateView, PipetteLocationData
+from opentrons.protocol_engine.types import MotorAxis, DeckPoint, CurrentWell
 from opentrons.protocol_engine.errors import MustHomeError
 
 from opentrons.protocol_engine.execution.gantry_movement import (

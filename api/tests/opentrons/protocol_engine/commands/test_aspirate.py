@@ -1,6 +1,7 @@
 """Test aspirate commands."""
 from decoy import Decoy
 
+from opentrons.types import MountType, Mount as HardwareMount
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 
 from opentrons.protocol_engine.commands.aspirate import (
@@ -15,6 +16,7 @@ from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
 )
+from opentrons.protocol_engine.types import CurrentWell, LoadedPipette
 from opentrons.hardware_control import HardwareControlAPI
 
 

@@ -10,8 +10,8 @@ from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeE
 
 from opentrons.motion_planning import Waypoint
 
-from ..state import StateView, CurrentWell
-from ..types import MotorAxis
+from ..state import StateView
+from ..types import MotorAxis, CurrentWell
 from ..errors import MustHomeError
 
 
