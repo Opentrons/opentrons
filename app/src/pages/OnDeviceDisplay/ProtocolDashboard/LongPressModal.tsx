@@ -25,6 +25,9 @@ import {
 } from '@opentrons/react-api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
+// What is the maxinum number of protocols one can pin?
+const MAXIMUM_PINNED_PROTOCOLS = 5
+
 export function LongPressModal(props: {
   longpress: UseLongPressResult
   protocol: ProtocolResource
@@ -62,7 +65,7 @@ export function LongPressModal(props: {
 
   const handlePinClick = (): void => {
     if (!pinned) {
-      if (pinnedProtocolIds.length === 5) {
+      if (pinnedProtocolIds.length === MAXIMUM_PINNED_PROTOCOLS) {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocol.id)

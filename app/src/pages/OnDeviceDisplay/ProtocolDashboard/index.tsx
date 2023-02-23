@@ -40,6 +40,9 @@ import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
+// How many pinned protocols fit horizontally on the ODD?
+const PINNED_PROTOCOLS_IN_VIEW = 3
+
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   border-collapse: collapse;
@@ -63,8 +66,17 @@ export function ProtocolDashboard(): JSX.Element {
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
-  const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
+
+  // The pinned protocols are stored as an array of IDs in config
+  const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
+  // If they're not in the list, they're not pinned.
+  const unpinnedProtocols = protocolsData.filter(
+    p => !pinnedProtocolIds.includes(p.id)
+  )
+  // We want an array of protocls in the same order as the
+  // array of IDs we stored. There are many ways to sort
+  // the pinned protocols. This way is mine.
   let pinnedProtocols: ProtocolResource[] = []
   for (const id of pinnedProtocolIds) {
     const protocol = protocolsData.find(p => p.id === id)
@@ -72,9 +84,7 @@ export function ProtocolDashboard(): JSX.Element {
       pinnedProtocols.push(protocol)
     }
   }
-  const unpinnedProtocols = protocolsData.filter(
-    p => !pinnedProtocolIds.includes(p.id)
-  )
+
   const runData = runs.data?.data != null ? runs.data?.data : []
   const sortedProtocols = sortProtocols(sortBy, unpinnedProtocols, runData)
 
@@ -110,9 +120,25 @@ export function ProtocolDashboard(): JSX.Element {
 
   const swipe = useSwipe()
 
-  if (pinnedProtocols.length > 3 && swipe.swipeType === 'swipe-left') {
-    const inView = pinnedProtocols.slice(0, 3)
-    const outOfView = pinnedProtocols.slice(3)
+  // The pinned protocols are displayed as a horizontal carousel. There can
+  // be more pinned than can be shown at once, so the user can swipe through
+  // them to "spin" the carousel. This can be simulated via css by sliding
+  // divs around, giving negative absolute coordinates, etc., but that can
+  // be dicey to get right on a full browser. We've got electron on a tiny
+  // touch screen. So let's be more clever than that. Instead of moving things
+  // on the screen, how about we just re-order the array? Every swipe, take items
+  // off the front and move them to the back. From the user's POV, the effect is
+  // the same: things that were offscreen to the right are now in view. To
+  // simplify further, I have it so they can just keep swiping to keep spinning
+  // the carousel. One could expand on this to add reverse swipes that spin it
+  // the other way. I did not because the current design doesn't have a visual
+  // prompt to show this is possible.
+  if (
+    pinnedProtocols.length > PINNED_PROTOCOLS_IN_VIEW &&
+    swipe.swipeType === 'swipe-left'
+  ) {
+    const inView = pinnedProtocols.slice(0, PINNED_PROTOCOLS_IN_VIEW)
+    const outOfView = pinnedProtocols.slice(PINNED_PROTOCOLS_IN_VIEW)
     pinnedProtocols = [...outOfView, ...inView]
     dispatch(
       updateConfigValue(
