@@ -80,6 +80,7 @@ def test_get_is_ready_to_aspirate(
     ready_to_aspirate: bool,
     expected: bool,
 ) -> None:
+    """It should be ready to aspirate if state and HW agree that we're ready."""
     decoy.when(mock_hardware_api.attached_instruments).then_return({})
     decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
         aspirated_volume
