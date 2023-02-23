@@ -297,8 +297,8 @@ class Plot:
         y_avg_text = f"{axis} Avg = {y_avg}mm"
 
         if zero:
-            y_start = -1
-            y_end = 1
+            y_start = -0.3
+            y_end = 0.3
             # y_start = round(y_min, 2) - 0.05
             # y_end = round(y_max, 2) + 0.05
         else:

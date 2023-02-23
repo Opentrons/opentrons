@@ -9,6 +9,7 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper_jaw,
     calibrate_gripper,
+    _get_calibration_square_position_in_slot,
 )
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, GripperProbe
@@ -220,8 +221,9 @@ class Gripper_Calibration_Test:
     ) -> None:
         # Calibrate gripper
         await api.home_gripper_jaw()
-        self.offset, self.slot_center = await calibrate_gripper_jaw(api, self.gripper_probe, slot)
-
+        #self.offset, self.slot_center = await calibrate_gripper_jaw(api, self.gripper_probe, slot)
+        self.offset = await calibrate_gripper_jaw(api, self.gripper_probe, slot)
+        self.slot_center = _get_calibration_square_position_in_slot(slot) - self.offset
         print(f"New Slot Center: {self.slot_center}")
         print(f"New Gripper Offset: {self.offset}")
 
