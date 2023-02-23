@@ -11,6 +11,7 @@ import type {
   Config,
   ConfigV12,
   ConfigV13,
+  ConfigV14,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
@@ -79,11 +80,27 @@ const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
   return nextConfig
 }
 
-const MIGRATIONS: [(prevConfig: ConfigV12) => ConfigV13] = [toVersion13]
+// config version 14 migration and defaults
+const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 14 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      pinnedProtocolIds: [],
+    },
+  }
+  return nextConfig
+}
+
+const MIGRATIONS: [
+  (prevConfig: ConfigV12) => ConfigV13,
+  (prevConfig: ConfigV13) => ConfigV14
+] = [toVersion13, toVersion14]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
 
-export function migrate(prevConfig: ConfigV12 | ConfigV13): Config {
+export function migrate(prevConfig: ConfigV12 | ConfigV13 | ConfigV14): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary
   // Note: the default version of app-shell-odd is version 12 (need to adjust the index range)
