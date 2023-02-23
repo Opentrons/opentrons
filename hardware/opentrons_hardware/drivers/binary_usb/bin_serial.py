@@ -10,7 +10,7 @@ import asyncio
 import logging
 import concurrent.futures
 
-from typing import Optional, Type
+from typing import Optional, Type  # , Any
 from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 
@@ -111,3 +111,19 @@ class SerialUsbDriver:
     def __exit__(self) -> None:
         self._connected = False
         self._port.close()
+
+    def __aiter__(self) -> "SerialUsbDriver":
+        """Enter iterator.
+
+        Returns:
+            SerialUsbDriver
+        """
+        return self
+
+    async def __anext__(self) -> Optional[BinaryMessageDefinition]:
+        """Async next.
+
+        Returns:
+            Binary USB message
+        """
+        return await self.read()
