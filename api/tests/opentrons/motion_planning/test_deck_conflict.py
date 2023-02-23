@@ -309,7 +309,7 @@ def test_no_modules_when_heater_shaker(
     heater_shaker_location: int,
     other_module_location: int,
 ) -> None:
-    """It should not other modules north and south of the H/S.
+    """It should not allow other modules north and south of the H/S.
 
     All modules are taller than the H/S height restriction,
     so this test only checks modules specifically in N/S.
