@@ -54,6 +54,10 @@ export function LongPressModal(props: {
     longpress.setIsLongPressed(false)
   }
 
+  const handleCloseModal = (): void => {
+    longpress.setIsLongPressed(false)
+  }
+
   // TODO const { deleteProtocol } = useDeleteProtocolMutation(protocol.id)
 
   const handleDeleteClick = (): void => {
@@ -92,7 +96,12 @@ export function LongPressModal(props: {
   return (
     <>
       {showMaxPinsAlert ? (
-        <ModalShell borderRadius="0.75rem" height="26rem" width="32.375rem">
+        <ModalShell
+          borderRadius="0.75rem"
+          height="26rem"
+          onOutsideClick={handleCloseMaxPinsAlert}
+          width="32.375rem"
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing3}
@@ -133,7 +142,11 @@ export function LongPressModal(props: {
           </Flex>
         </ModalShell>
       ) : (
-        <ModalShell borderRadius="0.75rem" width="15.625rem">
+        <ModalShell
+          borderRadius="0.75rem"
+          onOutsideClick={handleCloseModal}
+          width="15.625rem"
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
