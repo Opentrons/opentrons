@@ -19,6 +19,8 @@ class LoadedStaticPipetteData:
     min_volume: float
     max_volume: float
     channels: int
+    home_position: float
+    nozzle_offset_z: float
     flow_rates: FlowRates
     return_tip_scale: float
     nominal_tip_overlap: Dict[str, float]
@@ -32,6 +34,8 @@ def _return_static_pipette_data(config: PipetteConfig) -> LoadedStaticPipetteDat
         min_volume=config.min_volume,
         max_volume=config.max_volume,
         channels=int(config.channels),
+        home_position=config.home_position,
+        nozzle_offset_z=config.nozzle_offset[2],
         flow_rates=FlowRates(
             default_blow_out=config.default_blow_out_flow_rates,
             default_aspirate=config.default_aspirate_flow_rates,

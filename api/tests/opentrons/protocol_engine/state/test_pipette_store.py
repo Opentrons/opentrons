@@ -631,6 +631,8 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
                 ),
                 return_tip_scale=4,
                 nominal_tip_overlap={"default": 5},
+                home_position=8.9,
+                nozzle_offset_z=10.11,
             ),
         )
     )
@@ -643,6 +645,8 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
         max_volume=4.56,
         return_tip_scale=4,
         nominal_tip_overlap={"default": 5},
+        home_position=8.9,
+        nozzle_offset_z=10.11,
     )
     assert subject.state.flow_rates_by_id["pipette-id"] == FlowRates(
         default_aspirate={"a": 1},

@@ -2,7 +2,6 @@
 from typing import Optional, Iterator
 from typing_extensions import Protocol as TypingProtocol
 from contextlib import contextmanager
-from dataclasses import dataclass
 
 from opentrons.types import Mount as HardwareMount
 from opentrons.hardware_control import HardwareControlAPI
@@ -11,14 +10,6 @@ from ..state import StateStore, HardwarePipette
 from ..resources import LabwareDataProvider
 from ..types import WellLocation, DeckPoint, CurrentWell
 from .movement import MovementHandler
-
-
-@dataclass(frozen=True)
-class VolumePointResult:
-    """The returned values of an aspirate or pick up tip operation."""
-
-    volume: float
-    position: DeckPoint
 
 
 class PipettingHandler(TypingProtocol):
