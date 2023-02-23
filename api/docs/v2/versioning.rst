@@ -263,7 +263,7 @@ If you specify an API version of 2.13 or lower, your protocols will continue to 
 
   - ``InstrumentContext.speed`` property was removed.
     This property tried to allow setting a pipette's **plunger** speed in mm/s.
-    However, it could only appoximately set the plunger speed,
+    However, it could only approximately set the plunger speed,
     because the plunger's speed is a stepwise function of the volume.
     Use :py:attr:`.InstrumentContext.flow_rate` to set the flow rate in µL/s, instead.
 
