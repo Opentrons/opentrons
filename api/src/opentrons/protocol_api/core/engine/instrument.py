@@ -469,8 +469,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_available_volume(self) -> float:
         try:
             available_volume = (
-                self._engine_client.state.pipettes.get_available_volume(self._pipette_id)
-                or 0)
+                self._engine_client.state.pipettes.get_available_volume(
+                    self._pipette_id
+                )
+                or 0
+            )
         except TipNotAttachedError:
             available_volume = 0
         return available_volume
