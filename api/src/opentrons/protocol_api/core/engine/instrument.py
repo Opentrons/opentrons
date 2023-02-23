@@ -467,10 +467,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return current_volume
 
     def get_available_volume(self) -> float:
-        return (
-            self._engine_client.state.pipettes.get_available_volume(self._pipette_id)
-            or 0
-        )
+        try:
+            available_volume = (
+                self._engine_client.state.pipettes.get_available_volume(self._pipette_id)
+                or 0)
+        except TipNotAttachedError:
+            available_volume = 0
+        return available_volume
 
     def get_hardware_state(self) -> PipetteDict:
         """Get the current state of the pipette hardware as a dictionary."""
