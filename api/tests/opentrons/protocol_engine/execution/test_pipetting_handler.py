@@ -427,3 +427,42 @@ async def test_blow_out_in_place(
             mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
         ),
     )
+
+
+def test_get_is_ready_to_aspirate_virtual(
+    decoy: Decoy, state_store: StateStore
+) -> None:
+    """Should check if pipette is ready to aspirate."""
+    subject = VirtualPipettingHandler(state_store=state_store)
+
+    decoy.when(
+        state_store.pipettes.get_aspirated_volume(pipette_id="pipette-id")
+    ).then_return(None)
+
+    assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id") is False
+
+    decoy.when(
+        state_store.pipettes.get_aspirated_volume(pipette_id="pipette-id")
+    ).then_return(0)
+
+    assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id") is True
+
+
+async def test_aspirate_in_place_virtual(decoy: Decoy, state_store: StateStore) -> None:
+    """Should return the volume."""
+    subject = VirtualPipettingHandler(state_store=state_store)
+
+    result = await subject.aspirate_in_place(
+        pipette_id="pipette-id", volume=3, flow_rate=5
+    )
+    assert result == 3
+
+
+async def test_dispense_in_place_virtual(decoy: Decoy, state_store: StateStore) -> None:
+    """Should return the volume."""
+    subject = VirtualPipettingHandler(state_store=state_store)
+
+    result = await subject.dispense_in_place(
+        pipette_id="pipette-id", volume=3, flow_rate=5
+    )
+    assert result == 3
