@@ -1,5 +1,6 @@
 """Pipette config data providers."""
 from dataclasses import dataclass
+from typing import Dict
 
 from opentrons_shared_data.pipette import dummy_model_for_name
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -22,6 +23,8 @@ class LoadedStaticPipetteData:
     home_position: float
     nozzle_offset_z: float
     flow_rates: FlowRates
+    return_tip_scale: float
+    nominal_tip_overlap: Dict[str, float]
 
 
 def _return_static_pipette_data(config: PipetteConfig) -> LoadedStaticPipetteData:
@@ -39,6 +42,8 @@ def _return_static_pipette_data(config: PipetteConfig) -> LoadedStaticPipetteDat
             default_aspirate=config.default_aspirate_flow_rates,
             default_dispense=config.default_dispense_flow_rates,
         ),
+        return_tip_scale=config.return_tip_height,
+        nominal_tip_overlap=config.tip_overlap,
     )
 
 
@@ -52,10 +57,10 @@ def get_virtual_pipette_static_config(
 
 
 def get_pipette_static_config(
-    pipette_model: PipetteModel, pipette_serial: str
+    model: PipetteModel, serial_number: str
 ) -> LoadedStaticPipetteData:
     """Get the config for a pipette, given the actual model and pipette id."""
-    config = load_pipette_config(pipette_model, pipette_serial)
+    config = load_pipette_config(model, serial_number)
     return _return_static_pipette_data(config)
 
 

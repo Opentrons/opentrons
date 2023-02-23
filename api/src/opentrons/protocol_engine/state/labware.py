@@ -431,8 +431,8 @@ class LabwareView(HasState[LabwareState]):
             )
         return list(wells)
 
-    def get_tip_length(self, labware_id: str) -> float:
-        """Get the tip length of a tip rack."""
+    def get_tip_length(self, labware_id: str, overlap: float = 0) -> float:
+        """Get the nominal tip length of a tip rack."""
         definition = self.get_definition(labware_id)
         if definition.parameters.tipLength is None:
             raise errors.LabwareIsNotTipRackError(

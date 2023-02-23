@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import Optional, List, Set, Tuple, Union
 
 from opentrons.types import Point, DeckSlotName, MountType
-from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
 from ..types import (
@@ -23,7 +22,7 @@ from ..types import (
 )
 from .labware import LabwareView
 from .modules import ModuleView
-from .pipettes import CurrentWell
+from .pipettes import PipetteView, CurrentWell
 from . import move_types
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
@@ -31,14 +30,10 @@ DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
 @dataclass(frozen=True)
 class TipGeometry:
-    """Nominal tip geometry data.
-
-    This data is loaded from definitions and configurations, and does
-    not take calibration values into account.
+    """Tip geometry data.
 
     Props:
-        effective_length: The nominal working length (total length minus overlap)
-            of a tip, according to a tip rack and pipette's definitions.
+        effective_length: The working length (total length minus overlap) of a tip.
         diameter: Nominal tip diameter.
         volume: Nominal volume capacity.
     """
@@ -53,10 +48,16 @@ class TipGeometry:
 class GeometryView:
     """Geometry computed state getters."""
 
-    def __init__(self, labware_view: LabwareView, module_view: ModuleView) -> None:
+    def __init__(
+        self,
+        labware_view: LabwareView,
+        module_view: ModuleView,
+        pipette_view: PipetteView,
+    ) -> None:
         """Initialize a GeometryView instance."""
         self._labware = labware_view
         self._modules = module_view
+        self._pipettes = pipette_view
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
@@ -247,29 +248,29 @@ class GeometryView:
 
     def get_nominal_effective_tip_length(
         self,
+        pipette_id: str,
         labware_id: str,
-        pipette_config: PipetteDict,
     ) -> float:
-        """Given a labware and a pipette's config, get the effective tip length.
+        """Given a labware and a pipette's config, get the nominal effective tip length.
 
         Effective tip length is the nominal tip length less the distance the
         tip overlaps with the pipette nozzle. This does not take calibrated
-        tip lengths into account. For calibrated data,
-        see `LabwareDataProvider.get_calibrated_tip_length`.
+        tip lengths into account.
         """
         labware_uri = self._labware.get_definition_uri(labware_id)
-        nominal_length = self._labware.get_tip_length(labware_id)
-        overlap_config = pipette_config["tip_overlap"]
-        default_overlap = overlap_config.get("default", 0)
-        overlap = overlap_config.get(labware_uri, default_overlap)
+        nominal_overlap = self._pipettes.get_nominal_tip_overlap(
+            pipette_id=pipette_id, labware_uri=labware_uri
+        )
 
-        return nominal_length - overlap
+        return self._labware.get_tip_length(
+            labware_id=labware_id, overlap=nominal_overlap
+        )
 
     def get_nominal_tip_geometry(
         self,
+        pipette_id: str,
         labware_id: str,
-        pipette_config: PipetteDict,
-        well_name: Optional[str] = None,
+        well_name: Optional[str],
     ) -> TipGeometry:
         """Given a labware, well, and hardware pipette config, get the tip geometry.
 
@@ -280,8 +281,8 @@ class GeometryView:
         does not take calibrated tip lengths into account.
         """
         effective_length = self.get_nominal_effective_tip_length(
+            pipette_id=pipette_id,
             labware_id=labware_id,
-            pipette_config=pipette_config,
         )
         well_def = self._labware.get_well_definition(labware_id, well_name)
 
@@ -300,7 +301,7 @@ class GeometryView:
 
     def get_tip_drop_location(
         self,
-        pipette_config: PipetteDict,
+        pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
     ) -> WellLocation:
@@ -317,8 +318,7 @@ class GeometryView:
         else:
             z_offset = self._labware.get_tip_drop_z_offset(
                 labware_id=labware_id,
-                # TODO(mc, 2023-02-13): replace with PipetteView.get_return_tip_scale
-                length_scale=pipette_config["return_tip_height"],
+                length_scale=self._pipettes.get_return_tip_scale(pipette_id),
                 additional_offset=well_location.offset.z,
             )
 

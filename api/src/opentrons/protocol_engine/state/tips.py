@@ -61,7 +61,8 @@ class TipStore(HasState[TipState], HandlesActions):
                 ] = TipRackWellState.CLEAN
 
         elif isinstance(action, AddPipetteConfigAction):
-            self._state.channels_by_pipette_id[action.pipette_id] = action.channels
+            config = action.config
+            self._state.channels_by_pipette_id[action.pipette_id] = config.channels
 
     def _handle_command(self, command: Command) -> None:
         if (
