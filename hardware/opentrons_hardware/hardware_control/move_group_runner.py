@@ -77,7 +77,6 @@ class MoveGroupRunner:
 
     def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:
         """Constructor.
-
         Args:
             move_groups: The move groups to run.
             start_at_index: The index the MoveGroupManager will start at
@@ -96,7 +95,6 @@ class MoveGroupRunner:
 
     async def prep(self, can_messenger: CanMessenger) -> None:
         """Prepare the move group. The first thing that happens during run().
-
         prep() and execute() can be used to replace a single call to run() to
         ensure tighter timing, if you want something else to start as soon as
         possible to the actual execution of the move.
@@ -112,7 +110,6 @@ class MoveGroupRunner:
         self, can_messenger: CanMessenger
     ) -> NodeDict[Tuple[float, float, bool, bool]]:
         """Execute a pre-prepared move group. The second thing that run() does.
-
         prep() and execute() can be used to replace a single call to run() to
         ensure tighter timing, if you want something else to start as soon as
         possible to the actual execution of the move.
@@ -133,18 +130,14 @@ class MoveGroupRunner:
         self, can_messenger: CanMessenger
     ) -> NodeDict[Tuple[float, float, bool, bool]]:
         """Run the move group.
-
         Args:
             can_messenger: a can messenger
-
         Returns:
             The current position after the move for all the axes that
             acknowledged completing moves.
-
         This function first prepares all connected devices to move (by sending
         all the data for the moves over) and then executes the move with a
         single call.
-
         prep() and execute() can be used to replace a single call to run() to
         ensure tighter timing, if you want something else to start as soon as
         possible to the actual execution of the move.
@@ -193,7 +186,6 @@ class MoveGroupRunner:
 
     async def _clear_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to clear the message groups.
-
         Args:
             can_messenger: a can messenger
         """
@@ -410,13 +402,6 @@ class MoveScheduler:
                 if ack_id == UInt8Field(1):
                     condition = "Homing timed out."
                     log.warning(f"Homing failed. Condition: {condition}")
-                    raise MoveConditionNotMet()
-            if self._stop_condition[
-                group_id
-            ] == MoveStopCondition.sync_line and ack_id != UInt8Field(2):
-                if ack_id == 1:
-                    condition = "Liquid Sensing timed out."
-                    log.warning(f"Liquid Sensing timed out. Condition: {condition}")
                     raise MoveConditionNotMet()
         except IndexError:
             # If we have two move group runners running at once, they each
