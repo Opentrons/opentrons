@@ -4,6 +4,7 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     WellLocationMixin,
@@ -79,7 +80,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
         return PickUpTipResult(
             tipVolume=tip_geometry.volume,
             tipLength=tip_geometry.effective_length,
-            position=position,
+            position=DeckPoint(x=position.x, y=position.y, z=position.z),
         )
 
 

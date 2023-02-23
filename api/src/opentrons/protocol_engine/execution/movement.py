@@ -2,12 +2,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, Optional, List
-from dataclasses import dataclass
+from typing import Optional, List
 
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import Axis as HardwareAxis
 
 from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis, CurrentWell
 from ..state import StateStore
@@ -15,33 +13,10 @@ from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 
-from .gantry_movement import GantryMovementHandler, create_gantry_movement_handler
+from .gantry_mover import GantryMover
 
-MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
-    MotorAxis.X: HardwareAxis.X,
-    MotorAxis.Y: HardwareAxis.Y,
-    MotorAxis.LEFT_Z: HardwareAxis.Z,
-    MotorAxis.RIGHT_Z: HardwareAxis.A,
-    MotorAxis.LEFT_PLUNGER: HardwareAxis.B,
-    MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
-}
 
 log = logging.getLogger(__name__)
-
-
-@dataclass(frozen=True)
-class SavedPositionData:
-    """The result of a save position procedure."""
-
-    positionId: str
-    position: DeckPoint
-
-
-@dataclass(frozen=True)
-class MoveRelativeData:
-    """The result of a relative movement procedure."""
-
-    position: DeckPoint
 
 
 class MovementHandler:
@@ -54,10 +29,10 @@ class MovementHandler:
         self,
         state_store: StateStore,
         hardware_api: HardwareControlAPI,
+        gantry_mover: GantryMover,
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
         heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
-        gantry_mover: Optional[GantryMovementHandler] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
@@ -75,9 +50,7 @@ class MovementHandler:
             )
         )
 
-        self._gantry_mover = gantry_mover or create_gantry_movement_handler(
-            hardware_api=hardware_api, state_view=self._state_store
-        )
+        self._gantry_mover = gantry_mover
 
     async def move_to_well(
         self,
@@ -89,7 +62,7 @@ class MovementHandler:
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
-    ) -> DeckPoint:
+    ) -> Point:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
@@ -123,7 +96,6 @@ class MovementHandler:
             pipette_id=pipette_id,
             current_well=current_well,
         )
-        hw_mount = pipette_location.mount.to_hw_mount()
         origin_cp = pipette_location.critical_point
 
         origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
@@ -147,25 +119,18 @@ class MovementHandler:
             pipette_id=pipette_id, requested_speed=speed
         )
 
-        # move through the waypoints
-        for waypoint in waypoints:
-            await self._gantry_mover.move_to(
-                mount=hw_mount, waypoint=waypoint, speed=speed
-            )
+        final_point = await self._gantry_mover.move_to(
+            pipette_id=pipette_id, waypoints=waypoints, speed=speed
+        )
 
-        try:
-            final_point = waypoints[-1].position
-        except IndexError:
-            final_point = origin
-
-        return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
+        return final_point
 
     async def move_relative(
         self,
         pipette_id: str,
         axis: MovementAxis,
         distance: float,
-    ) -> MoveRelativeData:
+    ) -> Point:
         """Move a given pipette a relative amount in millimeters."""
         delta = Point(
             x=distance if axis == MovementAxis.X else 0,
@@ -181,27 +146,7 @@ class MovementHandler:
             speed=speed,
         )
 
-        return MoveRelativeData(
-            position=DeckPoint(x=point.x, y=point.y, z=point.z),
-        )
-
-    async def save_position(
-        self,
-        pipette_id: str,
-        position_id: Optional[str],
-    ) -> SavedPositionData:
-        """Get the pipette position and save to state."""
-        point = await self._gantry_mover.get_position(
-            pipette_id=pipette_id,
-            fail_on_not_homed=True,
-        )
-
-        position_id = position_id or self._model_utils.generate_id()
-
-        return SavedPositionData(
-            positionId=position_id,
-            position=DeckPoint(x=point.x, y=point.y, z=point.z),
-        )
+        return point
 
     async def home(self, axes: Optional[List[MotorAxis]]) -> None:
         """Send the requested axes to their "home" positions.
@@ -217,13 +162,8 @@ class MovementHandler:
         direct: bool,
         additional_min_travel_z: Optional[float],
         speed: Optional[float] = None,
-    ) -> DeckPoint:
+    ) -> Point:
         """Move pipette to a given deck coordinate."""
-        pipette_location = self._state_store.motion.get_pipette_location(
-            pipette_id=pipette_id,
-        )
-        hw_mount = pipette_location.mount.to_hw_mount()
-
         origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
@@ -243,16 +183,10 @@ class MovementHandler:
         )
 
         # move through the waypoints
-        for waypoint in waypoints:
-            await self._gantry_mover.move_to(
-                mount=hw_mount,
-                waypoint=waypoint,
-                speed=speed,
-            )
+        final_point = await self._gantry_mover.move_to(
+            pipette_id=pipette_id,
+            waypoints=waypoints,
+            speed=speed,
+        )
 
-        try:
-            final_point = waypoints[-1].position
-        except IndexError:
-            final_point = origin
-
-        return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
+        return final_point

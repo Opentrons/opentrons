@@ -1,6 +1,7 @@
 """Test blow-out command."""
 from decoy import Decoy
 
+from opentrons.types import Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands import (
@@ -47,7 +48,7 @@ async def test_blow_out_implementation(
             well_name="C6",
             well_location=location,
         )
-    ).then_return(DeckPoint(x=1, y=2, z=3))
+    ).then_return(Point(x=1, y=2, z=3))
 
     result = await subject.execute(data)
 

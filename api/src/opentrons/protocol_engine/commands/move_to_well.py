@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     WellLocationMixin,
@@ -37,7 +38,7 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
 
     async def execute(self, params: MoveToWellParams) -> MoveToWellResult:
         """Move the requested pipette to the requested well."""
-        position = await self._movement.move_to_well(
+        x, y, z = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -47,7 +48,7 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
             speed=params.speed,
         )
 
-        return MoveToWellResult(position=position)
+        return MoveToWellResult(position=DeckPoint(x=x, y=y, z=z))
 
 
 class MoveToWell(BaseCommand[MoveToWellParams, MoveToWellResult]):

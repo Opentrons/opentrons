@@ -8,7 +8,7 @@ from typing import cast, List, Tuple, Union, Optional
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Point, DeckSlotName, MountType
+from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -500,76 +500,6 @@ def test_get_well_height(
         well_def
     )
     assert subject.get_well_height("labware-id", "B2") == 10.67
-
-
-def test_get_touch_points(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    labware_view: LabwareView,
-    module_view: ModuleView,
-    subject: GeometryView,
-) -> None:
-    """It should be able to get the position of a well top in a labware."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
-    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    expected_center = Point(
-        x=slot_pos[0] + 1 + well_def.x,
-        y=slot_pos[1] - 2 + well_def.y,
-        z=slot_pos[2] + 3 + well_def.z + well_def.depth / 2.0 + 42,
-    )
-
-    decoy.when(
-        module_view.is_edge_move_unsafe(MountType.LEFT, DeckSlotName.SLOT_4)
-    ).then_return(True)
-
-    decoy.when(
-        labware_view.get_edge_path_type(
-            "labware-id", "B2", MountType.LEFT, DeckSlotName.SLOT_4, True
-        )
-    ).then_return(move_types.EdgePathType.RIGHT)
-
-    decoy.when(
-        labware_view.get_well_radial_offsets("labware-id", "B2", 0.123)
-    ).then_return((1.2, 3.4))
-
-    decoy.when(
-        move_types.get_edge_point_list(
-            expected_center, 1.2, 3.4, move_types.EdgePathType.RIGHT
-        )
-    ).then_return([Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)])
-
-    result = subject.get_touch_points(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(
-            origin=WellOrigin.CENTER, offset=WellOffset(x=0, y=0, z=42)
-        ),
-        mount=MountType.LEFT,
-        radius=0.123,
-    )
-
-    assert result == [Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)]
 
 
 def test_get_module_labware_well_position(

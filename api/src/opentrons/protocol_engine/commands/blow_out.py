@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     FlowRateMixin,
@@ -51,7 +52,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
 
     async def execute(self, params: BlowOutParams) -> BlowOutResult:
         """Move to and blow-out the requested well."""
-        position = await self._movement.move_to_well(
+        x, y, z = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
@@ -62,7 +63,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             pipette_id=params.pipetteId, flow_rate=params.flowRate
         )
 
-        return BlowOutResult(position=position)
+        return BlowOutResult(position=DeckPoint(x=x, y=y, z=z))
 
 
 class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):

@@ -11,6 +11,7 @@ from ..types import MotorAxis
 from ..errors import HardwareNotSupportedError
 
 from .movement import MovementHandler
+from .gantry_mover import HardwareGantryMover
 from .tip_handler import TipHandler, HardwareTipHandler
 from ...hardware_control.types import OT3Mount
 
@@ -37,6 +38,10 @@ class HardwareStopper:
         self._movement_handler = movement or MovementHandler(
             hardware_api=hardware_api,
             state_store=state_store,
+            gantry_mover=HardwareGantryMover(
+                hardware_api=hardware_api,
+                state_view=state_store,
+            ),
         )
         self._tip_handler = tip_handler or HardwareTipHandler(
             hardware_api=hardware_api,

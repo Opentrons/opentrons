@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.types import MountType
+from opentrons.types import MountType, Point
 
 from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
 from opentrons.protocol_engine.state import StateView, TipGeometry
@@ -57,7 +57,7 @@ async def test_pick_up_tip_implementation(
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
-    ).then_return(DeckPoint(x=111, y=222, z=333))
+    ).then_return(Point(x=111, y=222, z=333))
 
     decoy.when(
         await mock_tip_handler.pick_up_tip(

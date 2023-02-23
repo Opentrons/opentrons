@@ -16,77 +16,75 @@ from opentrons.protocol_engine.state import StateView, PipetteLocationData
 from opentrons.protocol_engine.types import MotorAxis, DeckPoint, CurrentWell
 from opentrons.protocol_engine.errors import MustHomeError
 
-from opentrons.protocol_engine.execution.gantry_movement import (
-    HardwareGantryMovementHandler,
-    VirtualGantryMovementHandler,
-    create_gantry_movement_handler,
+from opentrons.protocol_engine.execution.gantry_mover import (
+    HardwareGantryMover,
+    VirtualGantryMover,
+    create_gantry_mover,
 )
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
+def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
     """Get a mock in the shape of a HardwareAPI."""
     return decoy.mock(cls=HardwareAPI)
 
 
 @pytest.fixture
-def state_view(decoy: Decoy) -> StateView:
+def mock_state_view(decoy: Decoy) -> StateView:
     """Get a mock in the shape of a StateView."""
     return decoy.mock(cls=StateView)
 
 
 @pytest.fixture
 def hardware_subject(
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-) -> HardwareGantryMovementHandler:
-    """Create a GantryMovementHandler with its dependencies mocked out."""
-    return HardwareGantryMovementHandler(
-        hardware_api=hardware_api,
-        state_view=state_view,
+    mock_hardware_api: HardwareAPI,
+    mock_state_view: StateView,
+) -> HardwareGantryMover:
+    """Create a GantryMover with its dependencies mocked out."""
+    return HardwareGantryMover(
+        hardware_api=mock_hardware_api,
+        state_view=mock_state_view,
     )
 
 
 @pytest.fixture
 def virtual_subject(
-    state_view: StateView,
-) -> VirtualGantryMovementHandler:
-    """Create a GantryMovementHandler with its dependencies mocked out."""
-    return VirtualGantryMovementHandler(
-        state_view=state_view,
-    )
+    mock_state_view: StateView,
+) -> VirtualGantryMover:
+    """Create a GantryMover with its dependencies mocked out."""
+    return VirtualGantryMover(state_view=mock_state_view)
 
 
 async def test_create_gantry_movement_handler(
     decoy: Decoy,
-    state_view: StateView,
-    hardware_api: HardwareAPI,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
 ) -> None:
     """It should return virtual or real gantry movement handlers depending on config."""
-    decoy.when(state_view.config.use_virtual_pipettes).then_return(False)
+    decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(False)
     assert isinstance(
-        create_gantry_movement_handler(
-            state_view=state_view,
-            hardware_api=hardware_api,
+        create_gantry_mover(
+            state_view=mock_state_view,
+            hardware_api=mock_hardware_api,
         ),
-        HardwareGantryMovementHandler,
+        HardwareGantryMover,
     )
 
-    decoy.when(state_view.config.use_virtual_pipettes).then_return(True)
+    decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(True)
     assert isinstance(
-        create_gantry_movement_handler(
-            state_view=state_view,
-            hardware_api=hardware_api,
+        create_gantry_mover(
+            state_view=mock_state_view,
+            hardware_api=mock_hardware_api,
         ),
-        VirtualGantryMovementHandler,
+        VirtualGantryMover,
     )
 
 
 async def test_get_position(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    hardware_subject: HardwareGantryMovementHandler,
+    mock_hardware_api: HardwareAPI,
+    mock_state_view: StateView,
+    hardware_subject: HardwareGantryMover,
 ) -> None:
     """It should get the position of the pipette with the hardware API."""
     current_well = CurrentWell(
@@ -95,7 +93,7 @@ async def test_get_position(
         well_name="B2",
     )
     decoy.when(
-        state_view.motion.get_pipette_location("pipette-id", current_well)
+        mock_state_view.motion.get_pipette_location("pipette-id", current_well)
     ).then_return(
         PipetteLocationData(
             mount=MountType.RIGHT,
@@ -103,7 +101,7 @@ async def test_get_position(
         )
     )
     decoy.when(
-        await hardware_api.gantry_position(
+        await mock_hardware_api.gantry_position(
             mount=Mount.RIGHT,
             critical_point=CriticalPoint.XY_CENTER,
             fail_on_not_homed=True,
@@ -119,19 +117,21 @@ async def test_get_position(
 
 async def test_get_position_raises(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    hardware_subject: HardwareGantryMovementHandler,
+    mock_hardware_api: HardwareAPI,
+    mock_state_view: StateView,
+    hardware_subject: HardwareGantryMover,
 ) -> None:
     """It should raise a MustHomeError."""
-    decoy.when(state_view.motion.get_pipette_location("pipette-id", None)).then_return(
+    decoy.when(
+        mock_state_view.motion.get_pipette_location("pipette-id", None)
+    ).then_return(
         PipetteLocationData(
             mount=MountType.LEFT,
             critical_point=CriticalPoint.NOZZLE,
         )
     )
     decoy.when(
-        await hardware_api.gantry_position(
+        await mock_hardware_api.gantry_position(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.NOZZLE,
             fail_on_not_homed=False,
@@ -144,56 +144,74 @@ async def test_get_position_raises(
 
 def test_get_max_travel_z(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    hardware_subject: HardwareGantryMovementHandler,
+    mock_hardware_api: HardwareAPI,
+    mock_state_view: StateView,
+    hardware_subject: HardwareGantryMover,
 ) -> None:
     """It should get the max travel z height with the hardware API."""
-    decoy.when(state_view.pipettes.get_mount("pipette-id")).then_return(MountType.RIGHT)
-    decoy.when(hardware_api.get_instrument_max_height(mount=Mount.RIGHT)).then_return(
-        42.1
+    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+        MountType.RIGHT
     )
+    decoy.when(
+        mock_hardware_api.get_instrument_max_height(mount=Mount.RIGHT)
+    ).then_return(42.1)
 
     assert hardware_subject.get_max_travel_z("pipette-id") == 42.1
 
 
 async def test_move_to(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
-    hardware_subject: HardwareGantryMovementHandler,
+    mock_hardware_api: HardwareAPI,
+    mock_state_view: StateView,
+    hardware_subject: HardwareGantryMover,
 ) -> None:
     """It should move the gantry with the hardware API."""
-    await hardware_subject.move_to(
-        mount=Mount.RIGHT,
-        waypoint=Waypoint(position=Point(1, 2, 3), critical_point=CriticalPoint.TIP),
+    decoy.when(mock_state_view.pipettes.get_mount("abc123")).then_return(
+        MountType.RIGHT
+    )
+
+    result = await hardware_subject.move_to(
+        pipette_id="abc123",
+        waypoints=[
+            Waypoint(position=Point(1, 2, 3), critical_point=CriticalPoint.TIP),
+            Waypoint(position=Point(4, 5, 6), critical_point=CriticalPoint.XY_CENTER),
+        ],
         speed=9001,
     )
 
+    assert result == Point(4, 5, 6)
+
     decoy.verify(
-        await hardware_api.move_to(
+        await mock_hardware_api.move_to(
             mount=Mount.RIGHT,
             abs_position=Point(1, 2, 3),
             critical_point=CriticalPoint.TIP,
             speed=9001,
-        )
+        ),
+        await mock_hardware_api.move_to(
+            mount=Mount.RIGHT,
+            abs_position=Point(4, 5, 6),
+            critical_point=CriticalPoint.XY_CENTER,
+            speed=9001,
+        ),
     )
 
 
 async def test_move_relative(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    hardware_subject: HardwareGantryMovementHandler,
+    mock_hardware_api: HardwareAPI,
+    mock_state_view: StateView,
+    hardware_subject: HardwareGantryMover,
 ) -> None:
     """It should move the gantry by the delta with the hardware API."""
-    decoy.when(state_view.motion.get_pipette_location("pipette-id")).then_return(
+    decoy.when(mock_state_view.motion.get_pipette_location("pipette-id")).then_return(
         PipetteLocationData(
             mount=MountType.RIGHT,
             critical_point=CriticalPoint.XY_CENTER,
         )
     )
     decoy.when(
-        await hardware_api.gantry_position(
+        await mock_hardware_api.gantry_position(
             mount=Mount.RIGHT,
             critical_point=CriticalPoint.XY_CENTER,
             fail_on_not_homed=True,
@@ -211,7 +229,7 @@ async def test_move_relative(
     # TODO(mc, 2022-05-13): the order of these calls is difficult to manage
     # and test for. Ideally, `hardware.move_rel` would return the resulting position
     decoy.verify(
-        await hardware_api.move_rel(
+        await mock_hardware_api.move_rel(
             mount=Mount.RIGHT,
             delta=Point(1, 2, 3),
             fail_on_not_homed=True,
@@ -223,19 +241,19 @@ async def test_move_relative(
 
 async def test_move_relative_must_home(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    hardware_subject: HardwareGantryMovementHandler,
+    mock_hardware_api: HardwareAPI,
+    mock_state_view: StateView,
+    hardware_subject: HardwareGantryMover,
 ) -> None:
     """It should raise a MustHomeError."""
-    decoy.when(state_view.motion.get_pipette_location("pipette-id")).then_return(
+    decoy.when(mock_state_view.motion.get_pipette_location("pipette-id")).then_return(
         PipetteLocationData(
             mount=MountType.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
         )
     )
     decoy.when(
-        await hardware_api.move_rel(
+        await mock_hardware_api.move_rel(
             mount=Mount.LEFT,
             delta=Point(x=1, y=2, z=3),
             fail_on_not_homed=True,
@@ -253,8 +271,8 @@ async def test_move_relative_must_home(
 
 async def test_home(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
-    hardware_subject: HardwareGantryMovementHandler,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwareGantryMover,
 ) -> None:
     """It should home a set of axes."""
     await hardware_subject.home(
@@ -268,7 +286,7 @@ async def test_home(
         ]
     )
     decoy.verify(
-        await hardware_api.home(
+        await mock_hardware_api.home(
             axes=[
                 HardwareAxis.X,
                 HardwareAxis.Y,
@@ -283,63 +301,63 @@ async def test_home(
     decoy.reset()
 
     await hardware_subject.home(axes=None)
-    decoy.verify(await hardware_api.home(), times=1)
+    decoy.verify(await mock_hardware_api.home(), times=1)
     decoy.reset()
 
     await hardware_subject.home(axes=[])
-    decoy.verify(await hardware_api.home(axes=[]), times=1)
+    decoy.verify(await mock_hardware_api.home(axes=[]), times=1)
 
 
 # TODO(mc, 2022-12-01): this is overly complicated
 # https://opentrons.atlassian.net/browse/RET-1287
 async def test_home_z(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
-    hardware_subject: HardwareGantryMovementHandler,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwareGantryMover,
 ) -> None:
     """It should home a single Z axis and plunger."""
     await hardware_subject.home(axes=[MotorAxis.LEFT_Z, MotorAxis.LEFT_PLUNGER])
     decoy.verify(
-        await hardware_api.home_z(Mount.LEFT),
-        await hardware_api.home_plunger(Mount.LEFT),
+        await mock_hardware_api.home_z(Mount.LEFT),
+        await mock_hardware_api.home_plunger(Mount.LEFT),
     )
     decoy.reset()
 
     await hardware_subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.RIGHT_PLUNGER])
     decoy.verify(
-        await hardware_api.home_z(Mount.RIGHT),
-        await hardware_api.home_plunger(Mount.RIGHT),
+        await mock_hardware_api.home_z(Mount.RIGHT),
+        await mock_hardware_api.home_plunger(Mount.RIGHT),
     )
     decoy.reset()
 
     await hardware_subject.home(axes=[MotorAxis.LEFT_PLUNGER])
     decoy.verify(
-        await hardware_api.home_plunger(Mount.LEFT),
+        await mock_hardware_api.home_plunger(Mount.LEFT),
         times=1,
     )
     decoy.reset()
 
     await hardware_subject.home(axes=[MotorAxis.RIGHT_PLUNGER])
     decoy.verify(
-        await hardware_api.home_plunger(Mount.RIGHT),
+        await mock_hardware_api.home_plunger(Mount.RIGHT),
         times=1,
     )
     decoy.reset()
 
     await hardware_subject.home(axes=[MotorAxis.RIGHT_Z, MotorAxis.LEFT_PLUNGER])
     decoy.verify(
-        await hardware_api.home([HardwareAxis.A, HardwareAxis.B]),
+        await mock_hardware_api.home([HardwareAxis.A, HardwareAxis.B]),
         times=1,
     )
 
 
 async def test_virtual_get_position(
     decoy: Decoy,
-    state_view: StateView,
-    virtual_subject: VirtualGantryMovementHandler,
+    mock_state_view: StateView,
+    virtual_subject: VirtualGantryMover,
 ) -> None:
     """It should get the position of the pipette with the state store."""
-    decoy.when(state_view.pipettes.get_deck_point("pipette-id")).then_return(
+    decoy.when(mock_state_view.pipettes.get_deck_point("pipette-id")).then_return(
         DeckPoint(x=1, y=2, z=3)
     )
 
@@ -350,11 +368,11 @@ async def test_virtual_get_position(
 
 async def test_virtual_get_position_default(
     decoy: Decoy,
-    state_view: StateView,
-    virtual_subject: VirtualGantryMovementHandler,
+    mock_state_view: StateView,
+    virtual_subject: VirtualGantryMover,
 ) -> None:
     """It should get a default Point if no stored deck point can be found in the state store."""
-    decoy.when(state_view.pipettes.get_deck_point("pipette-id")).then_return(None)
+    decoy.when(mock_state_view.pipettes.get_deck_point("pipette-id")).then_return(None)
 
     result = await virtual_subject.get_position("pipette-id")
 
@@ -363,14 +381,14 @@ async def test_virtual_get_position_default(
 
 def test_virtual_get_max_travel_z(
     decoy: Decoy,
-    state_view: StateView,
-    virtual_subject: VirtualGantryMovementHandler,
+    mock_state_view: StateView,
+    virtual_subject: VirtualGantryMover,
 ) -> None:
     """It should get the max travel z height with the state store."""
     decoy.when(
-        state_view.pipettes.get_instrument_max_height_ot2("pipette-id")
+        mock_state_view.pipettes.get_instrument_max_height_ot2("pipette-id")
     ).then_return(42)
-    decoy.when(state_view.tips.get_tip_length("pipette-id")).then_return(20)
+    decoy.when(mock_state_view.tips.get_tip_length("pipette-id")).then_return(20)
 
     result = virtual_subject.get_max_travel_z("pipette-id")
 
@@ -379,11 +397,11 @@ def test_virtual_get_max_travel_z(
 
 async def test_virtual_move_relative(
     decoy: Decoy,
-    state_view: StateView,
-    virtual_subject: VirtualGantryMovementHandler,
+    mock_state_view: StateView,
+    virtual_subject: VirtualGantryMover,
 ) -> None:
     """It should simulate moving the gantry by the delta with the state store."""
-    decoy.when(state_view.pipettes.get_deck_point("pipette-id")).then_return(
+    decoy.when(mock_state_view.pipettes.get_deck_point("pipette-id")).then_return(
         DeckPoint(x=1, y=2, z=3)
     )
 
@@ -394,3 +412,19 @@ async def test_virtual_move_relative(
     )
 
     assert result == Point(x=4, y=4, z=4)
+
+
+async def test_virtual_move_to(
+    decoy: Decoy, virtual_subject: VirtualGantryMover
+) -> None:
+    """It should no-op on move to, returning the last waypoint."""
+    result = await virtual_subject.move_to(
+        pipette_id="abc123",
+        waypoints=[
+            Waypoint(position=Point(1, 2, 3), critical_point=CriticalPoint.TIP),
+            Waypoint(position=Point(4, 5, 6), critical_point=CriticalPoint.XY_CENTER),
+        ],
+        speed=None,
+    )
+
+    assert result == Point(4, 5, 6)

@@ -1,7 +1,7 @@
 """Test aspirate commands."""
 from decoy import Decoy
 
-from opentrons.types import MountType, Mount as HardwareMount
+from opentrons.types import MountType, Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 
 from opentrons.protocol_engine.commands.aspirate import (
@@ -56,7 +56,7 @@ async def test_aspirate_implementation_no_prep(
             well_location=location,
             current_well=None,
         ),
-    ).then_return(DeckPoint(x=1, y=2, z=3))
+    ).then_return(Point(x=1, y=2, z=3))
 
     decoy.when(
         await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
@@ -112,7 +112,7 @@ async def test_aspirate_implementation_with_prep(
                 well_name="A3",
             ),
         ),
-    ).then_return(DeckPoint(x=1, y=2, z=3))
+    ).then_return(Point(x=1, y=2, z=3))
 
     decoy.when(
         await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
@@ -129,9 +129,5 @@ async def test_aspirate_implementation_with_prep(
             well_name="A3",
             well_location=WellLocation(origin=WellOrigin.TOP),
         ),
-        times=1,
-    )
-    decoy.verify(
-        await pipetting.prepare_for_aspirate(mount=HardwareMount.LEFT),
-        times=1,
+        await pipetting.prepare_for_aspirate(pipette_id="abc"),
     )
