@@ -219,21 +219,6 @@ class EquipmentHandler:
                 )
             )
 
-        if (
-            use_virtual_pipettes
-            and self._state_store.config.robot_type == "OT-2 Standard"
-        ):
-            instrument_max_height = (
-                pipette_data_provider.get_virtual_instrument_max_height_ot2(
-                    static_pipette_config.home_position,
-                    static_pipette_config.nozzle_offset_z,
-                )
-            )
-        else:
-            instrument_max_height = self._hardware_api.get_instrument_max_height(
-                mount.to_hw_mount()
-            )
-
         # TODO(mc, 2023-02-22): rather than dispatch from inside the load command
         # see if additional config data like this can be returned from the command impl
         # alongside, but outside of, the command result.

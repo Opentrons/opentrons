@@ -62,10 +62,3 @@ def get_pipette_static_config(
     """Get the config for a pipette, given the actual model and pipette id."""
     config = load_pipette_config(model, serial_number)
     return _return_static_pipette_data(config)
-
-
-def get_virtual_instrument_max_height_ot2(
-    home_position: float, nozzle_offset_z: float
-) -> float:
-    """Get calculated max instrument height (minus tip length), given pipette's home position and nozzle offset."""
-    return home_position - Z_RETRACT_DISTANCE + nozzle_offset_z

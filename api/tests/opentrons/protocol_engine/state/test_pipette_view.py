@@ -229,6 +229,8 @@ def test_get_pipette_working_volume() -> None:
                 serial_number="",
                 return_tip_scale=0,
                 nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
             )
         },
     )
@@ -250,6 +252,8 @@ def test_get_pipette_available_volume() -> None:
                 serial_number="",
                 return_tip_scale=0,
                 nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
             )
         },
     )
@@ -410,6 +414,8 @@ def test_get_static_config() -> None:
         max_volume=4.56,
         return_tip_scale=7.89,
         nominal_tip_overlap={},
+        home_position=10.11,
+        nozzle_offset_z=12.13,
     )
 
     subject = get_pipette_view(static_config_by_id={"pipette-id": config})
@@ -436,6 +442,8 @@ def test_get_nominal_tip_overlap() -> None:
             "some-uri": 100,
             "default": 10,
         },
+        home_position=0,
+        nozzle_offset_z=0,
     )
 
     subject = get_pipette_view(static_config_by_id={"pipette-id": config})

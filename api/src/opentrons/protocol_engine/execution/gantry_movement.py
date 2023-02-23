@@ -204,7 +204,7 @@ class VirtualGantryMovementHandler(GantryMovementHandler):
         Args:
             pipette_id: Pipette ID to get instrument height and tip length for.
         """
-        instrument_height = self._state_view.pipettes.get_instrument_max_height(
+        instrument_height = self._state_view.pipettes.get_instrument_max_height_ot2(
             pipette_id
         )
         tip_length = self._state_view.tips.get_tip_length(pipette_id)

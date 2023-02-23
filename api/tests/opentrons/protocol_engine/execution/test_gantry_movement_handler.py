@@ -367,7 +367,7 @@ def test_virtual_get_max_travel_z(
     virtual_subject: VirtualGantryMovementHandler,
 ) -> None:
     """It should get the max travel z height with the state store."""
-    decoy.when(state_view.pipettes.get_instrument_max_height("pipette-id")).then_return(
+    decoy.when(state_view.pipettes.get_instrument_max_height_ot2("pipette-id")).then_return(
         42
     )
     decoy.when(state_view.tips.get_tip_length("pipette-id")).then_return(20)

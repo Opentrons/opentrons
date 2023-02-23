@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional
 
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
@@ -72,6 +73,8 @@ class StaticPipetteConfig:
     max_volume: float
     return_tip_scale: float
     nominal_tip_overlap: Dict[str, float]
+    home_position: float
+    nozzle_offset_z: float
 
 
 @dataclass
@@ -124,6 +127,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 max_volume=config.max_volume,
                 return_tip_scale=config.return_tip_scale,
                 nominal_tip_overlap=config.nominal_tip_overlap,
+                home_position=config.home_position,
+                nozzle_offset_z=config.nozzle_offset_z,
             )
             self._state.flow_rates_by_id[action.pipette_id] = config.flow_rates
 
@@ -461,9 +466,10 @@ class PipetteView(HasState[PipetteState]):
         """Return the given pipette's maximum volume."""
         return self.get_config(pipette_id).max_volume
 
-    def get_instrument_max_height(self, pipette_id: str) -> float:
-        """Return the given pipette's max instrument height, not including tip length."""
-        return self._get_static_config(pipette_id).instrument_max_height
+    def get_instrument_max_height_ot2(self, pipette_id: str) -> float:
+        """Get calculated max instrument height for an OT-2."""
+        config = self.get_config(pipette_id)
+        return config.home_position - Z_RETRACT_DISTANCE + config.nozzle_offset_z
 
     def get_return_tip_scale(self, pipette_id: str) -> float:
         """Return the given pipette's return tip height scale."""

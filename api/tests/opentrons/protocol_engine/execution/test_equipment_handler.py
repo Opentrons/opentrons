@@ -601,10 +601,6 @@ async def test_load_pipette_uses_provided_id(
         pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
     ).then_return(loaded_static_pipette_data)
 
-    decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
-        42.0
-    )
-
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
@@ -645,10 +641,6 @@ async def test_load_pipette_use_virtual(
             PipetteNameType.P300_SINGLE.value
         )
     ).then_return(loaded_static_pipette_data)
-
-    decoy.when(
-        pipette_data_provider.get_virtual_instrument_max_height_ot2(10.11, 12.13)
-    ).then_return(42.0)
 
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT, pipette_id=None
