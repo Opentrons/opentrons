@@ -15,7 +15,7 @@ from ..types import MotorAxis
 from ..errors import MustHomeError
 
 
-MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
+_MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.X: HardwareAxis.X,
     MotorAxis.Y: HardwareAxis.Y,
     MotorAxis.LEFT_Z: HardwareAxis.Z,
@@ -166,7 +166,7 @@ class HardwareGantryMovementHandler(GantryMovementHandler):
             await self._hardware_api.home_z(Mount.RIGHT)
             await self._hardware_api.home_plunger(Mount.RIGHT)
         else:
-            hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
+            hardware_axes = [_MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
             await self._hardware_api.home(axes=hardware_axes)
 
 

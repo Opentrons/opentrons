@@ -93,7 +93,7 @@ class TipStore(HasState[TipState], HandlesActions):
 
         elif isinstance(command.result, DropTipResult):
             pipette_id = command.params.pipetteId
-            del self._state.length_by_pipette_id[pipette_id]  # TODO maybe make this 0?
+            self._state.length_by_pipette_id.pop(pipette_id, None)
 
     def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
         pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)

@@ -112,8 +112,9 @@ class MovementHandler:
         self._hs_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,
             destination_slot=dest_slot_int,
-            is_multi_channel=self._state_store.tips.get_pipette_channels(pipette_id)
-            > 1,
+            is_multi_channel=(
+                self._state_store.tips.get_pipette_channels(pipette_id) > 1
+            ),
             destination_is_tip_rack=self._state_store.labware.is_tiprack(labware_id),
         )
 
