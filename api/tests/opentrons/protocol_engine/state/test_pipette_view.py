@@ -25,7 +25,7 @@ from opentrons.protocol_engine.state.pipettes import (
 
 def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
-    aspirated_volume_by_id: Optional[Dict[str, float]] = None,
+    aspirated_volume_by_id: Optional[Dict[str, Optional[float]]] = None,
     tip_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
     current_deck_point: CurrentDeckPoint = CurrentDeckPoint(
@@ -211,9 +211,13 @@ def test_pipette_volume_raises_if_bad_id() -> None:
 
 def test_get_pipette_aspirated_volume() -> None:
     """It should get the aspirate volume for a pipette."""
-    subject = get_pipette_view(aspirated_volume_by_id={"pipette-id": 42})
+    subject = get_pipette_view(
+        aspirated_volume_by_id={"pipette-id": 42, "pipette-id-none": None}
+    )
 
     assert subject.get_aspirated_volume("pipette-id") == 42
+
+    assert subject.get_aspirated_volume("pipette-id-none") is None
 
 
 def test_get_pipette_working_volume() -> None:
@@ -239,8 +243,8 @@ def test_get_pipette_working_volume() -> None:
 def test_get_pipette_available_volume() -> None:
     """It should get the available volume for a pipette."""
     subject = get_pipette_view(
-        tip_volume_by_id={"pipette-id": 100},
-        aspirated_volume_by_id={"pipette-id": 58},
+        tip_volume_by_id={"pipette-id": 100, "pipette-id-none": 100},
+        aspirated_volume_by_id={"pipette-id": 58, "pipette-id-none": None},
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
                 min_volume=1,
@@ -250,79 +254,22 @@ def test_get_pipette_available_volume() -> None:
                 serial_number="",
                 return_tip_scale=0,
                 nominal_tip_overlap={},
-            )
+            ),
+            "pipette-id-none": StaticPipetteConfig(
+                min_volume=1,
+                max_volume=123,
+                model="blah",
+                display_name="bleh",
+                serial_number="",
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+            ),
         },
     )
 
     assert subject.get_available_volume("pipette-id") == 42
 
-
-def test_pipette_is_ready_to_aspirate_if_has_volume() -> None:
-    """Pipette should be ready to aspirate if it's already got volume."""
-    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=False)
-
-    subject = get_pipette_view(
-        pipettes_by_id={
-            "pipette-id": LoadedPipette(
-                id="pipette-id",
-                mount=MountType.LEFT,
-                pipetteName=PipetteNameType.P300_SINGLE,
-            ),
-        },
-        aspirated_volume_by_id={"pipette-id": 42},
-    )
-
-    result = subject.get_is_ready_to_aspirate(
-        pipette_id="pipette-id", pipette_config=pipette_config
-    )
-
-    assert result is True
-
-
-def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready() -> None:
-    """Pipette should be ready to aspirate if HC says it is."""
-    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=True)
-
-    subject = get_pipette_view(
-        pipettes_by_id={
-            "pipette-id": LoadedPipette(
-                id="pipette-id",
-                mount=MountType.LEFT,
-                pipetteName=PipetteNameType.P300_SINGLE,
-            ),
-        },
-        aspirated_volume_by_id={"pipette-id": 0},
-    )
-
-    result = subject.get_is_ready_to_aspirate(
-        pipette_id="pipette-id",
-        pipette_config=pipette_config,
-    )
-
-    assert result is True
-
-
-def test_pipette_not_ready_to_aspirate() -> None:
-    """Pipette should not be ready to aspirate if HC says so and it has no volume."""
-    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=False)
-
-    subject = get_pipette_view(
-        pipettes_by_id={
-            "pipette-id": LoadedPipette(
-                id="pipette-id",
-                mount=MountType.LEFT,
-                pipetteName=PipetteNameType.P300_SINGLE,
-            ),
-        },
-        aspirated_volume_by_id={"pipette-id": 0},
-    )
-
-    result = subject.get_is_ready_to_aspirate(
-        pipette_id="pipette-id",
-        pipette_config=pipette_config,
-    )
-
-    assert result is False
+    assert subject.get_available_volume("pipette-id-none") is None
 
 
 def test_get_attached_tip_labware_by_id() -> None:

@@ -70,7 +70,7 @@ class PipetteState:
     """Basic pipette data state and getter methods."""
 
     pipettes_by_id: Dict[str, LoadedPipette]
-    aspirated_volume_by_id: Dict[str, float]
+    aspirated_volume_by_id: Dict[str, Optional[float]]
     tip_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
     current_deck_point: CurrentDeckPoint
@@ -130,19 +130,19 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 pipetteName=command.params.pipetteName,
                 mount=command.params.mount,
             )
-            self._state.aspirated_volume_by_id[pipette_id] = 0
+            self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
 
         elif isinstance(command.result, AspirateResult):
             pipette_id = command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id]
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
             next_volume = previous_volume + command.result.volume
 
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(command.result, (DispenseResult, DispenseInPlaceResult)):
             pipette_id = command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id]
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
             next_volume = max(0.0, previous_volume - command.result.volume)
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
@@ -153,17 +153,19 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
             self._state.attached_tip_labware_by_id[pipette_id] = tiprack_id
             self._state.tip_volume_by_id[pipette_id] = tip_volume
+            self._state.aspirated_volume_by_id[pipette_id] = 0
 
         elif isinstance(command.result, DropTipResult):
             pipette_id = command.params.pipetteId
             # No-op if pipette_id not found; makes unit testing easier.
             # That should never happen outside of tests. But if it somehow does,
             # it won't harm the state.
+            self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_labware_by_id.pop(pipette_id, None)
 
         elif isinstance(command.result, BlowOutResult):
             pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = 0
+            self._state.aspirated_volume_by_id[pipette_id] = None
 
     def _update_current_well(self, command: Command) -> None:
         # These commands leave the pipette in a new well.
@@ -362,7 +364,7 @@ class PipetteView(HasState[PipetteState]):
             return current_deck_point.deck_point
         return None
 
-    def get_aspirated_volume(self, pipette_id: str) -> float:
+    def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:
         """Get the currently aspirated volume of a pipette by ID."""
         try:
             return self._state.aspirated_volume_by_id[pipette_id]
@@ -383,22 +385,11 @@ class PipetteView(HasState[PipetteState]):
 
         return min(tip_volume, max_volume)
 
-    def get_available_volume(self, pipette_id: str) -> float:
+    def get_available_volume(self, pipette_id: str) -> Optional[float]:
         """Get the available volume of a pipette by ID."""
         working_volume = self.get_working_volume(pipette_id)
         current_volume = self.get_aspirated_volume(pipette_id)
-        return max(0.0, working_volume - current_volume)
-
-    def get_is_ready_to_aspirate(
-        self,
-        pipette_id: str,
-        pipette_config: PipetteDict,
-    ) -> bool:
-        """Get whether a pipette is ready to aspirate."""
-        return (
-            self.get_aspirated_volume(pipette_id) > 0
-            or pipette_config["ready_to_aspirate"]
-        )
+        return max(0.0, working_volume - current_volume) if current_volume else None
 
     def get_attached_tip_labware_by_id(self) -> Dict[str, str]:
         """Get the tiprack ids of attached tip by pipette ids."""

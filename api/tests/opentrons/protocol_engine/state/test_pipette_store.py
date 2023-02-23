@@ -87,8 +87,56 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
         pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    assert result.aspirated_volume_by_id["pipette-id"] == 0
+    assert result.aspirated_volume_by_id["pipette-id"] is None
     assert result.movement_speed_by_id["pipette-id"] is None
+
+
+def test_pick_up_tip_sets_aspirate_volume(subject: PipetteStore) -> None:
+    """It should set aspirated volume to 0."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+
+    pick_up_command = create_pick_up_tip_command(
+        pipette_id="pipette-id",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=pick_up_command))
+
+    result = subject.state
+
+    assert result.aspirated_volume_by_id["pipette-id"] == 0
+
+
+def test_drop_tip_sets_aspirate_volume(subject: PipetteStore) -> None:
+    """It should set aspirate volume to None."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id="pipette-id",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+
+    drop_tip_command = create_drop_tip_command(
+        pipette_id="pipette-id",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=drop_tip_command))
+
+    result = subject.state
+
+    assert result.aspirated_volume_by_id["pipette-id"] is None
 
 
 def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
@@ -127,7 +175,7 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
 
     result = subject.state
 
-    assert result.aspirated_volume_by_id["pipette-id"] == 0
+    assert result.aspirated_volume_by_id["pipette-id"] is None
 
     assert result.current_well == CurrentWell(
         pipette_id="pipette-id",

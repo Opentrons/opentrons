@@ -119,7 +119,7 @@ class HardwarePipettingHandler(PipettingHandler):
             attached_pipettes=self._hardware_api.attached_instruments,
         )
         return (
-            self._state_store.pipettes.get_aspirated_volume(pipette_id) > 0
+            self._state_store.pipettes.get_aspirated_volume(pipette_id) is not None
             or hw_pipette.config["ready_to_aspirate"]
         )
 
@@ -245,6 +245,125 @@ class HardwarePipettingHandler(PipettingHandler):
             )
 
 
+class VirtualPipettingHandler(PipettingHandler):
+    """Liquid handling, using the virtual pipettes.""" ""
+
+    _state_store: StateStore
+
+    def __init__(
+        self,
+        state_store: StateStore,
+    ) -> None:
+        """Initialize a PipettingHandler instance."""
+        self._state_store = state_store
+
+    async def aspirate_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> float:
+        """Aspirate liquid from a well."""
+        # get mount and config data from state and hardware controller
+        return volume
+
+    def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
+        """Get whether a pipette is ready to aspirate."""
+        return self._state_store.pipettes.get_aspirated_volume(pipette_id) is not None
+
+    async def prepare_for_aspirate(self, mount: HardwareMount) -> None:
+        """Prepare for pipette aspiration."""
+        pass
+
+    async def dispense_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> float:
+        """Dispense liquid without moving the pipette."""
+        return volume
+
+    async def blow_out_in_place(
+        self,
+        pipette_id: str,
+        flow_rate: float,
+    ) -> None:
+        """Set flow rate and blow-out."""
+        # get mount and config data from state and hardware controller
+        pass
+
+    async def touch_tip(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+        radius: float,
+        speed: Optional[float],
+    ) -> DeckPoint:
+        """Touch the pipette tip to the sides of a well."""
+        # target_well = CurrentWell(
+        #     pipette_id=pipette_id,
+        #     labware_id=labware_id,
+        #     well_name=well_name,
+        # )
+        #
+        # # get pipette mount and critical point for our touch tip moves
+        # pipette_location = self._state_store.motion.get_pipette_location(
+        #     pipette_id=pipette_id,
+        #     current_well=target_well,
+        # )
+        #
+        # touch_points = self._state_store.geometry.get_touch_points(
+        #     labware_id=labware_id,
+        #     well_name=well_name,
+        #     well_location=well_location,
+        #     mount=pipette_location.mount,
+        #     radius=radius,
+        # )
+        #
+        # speed = self._state_store.pipettes.get_movement_speed(
+        #     pipette_id=pipette_id, requested_speed=speed
+        # )
+        #
+        # # this will handle raising if the thermocycler lid is in a bad state
+        # # so we don't need to put that logic elsewhere
+        # well_position = await self._movement_handler.move_to_well(
+        #     pipette_id=pipette_id,
+        #     labware_id=labware_id,
+        #     well_name=well_name,
+        #     well_location=well_location,
+        # )
+        #
+        # for touch_point in touch_points:
+        #     await self._hardware_api.move_to(
+        #         mount=pipette_location.mount.to_hw_mount(),
+        #         critical_point=pipette_location.critical_point,
+        #         abs_position=touch_point,
+        #         speed=speed,
+        #     )
+        # try:
+        #     final_point = touch_points[-1]
+        #     position = DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
+        # except IndexError:
+        #     position = well_position
+        #
+        # return position
+        pass
+
+    @contextmanager
+    def set_flow_rate(
+        self,
+        pipette: HardwarePipette,
+        aspirate_flow_rate: Optional[float] = None,
+        dispense_flow_rate: Optional[float] = None,
+        blow_out_flow_rate: Optional[float] = None,
+    ) -> Iterator[None]:
+        """Context manager for setting flow rate before calling aspirate, dispense, or blowout."""
+        pass
+
+
 def create_pipette_handler(
     state_store: StateStore,
     hardware_api: HardwareControlAPI,
@@ -257,6 +376,6 @@ def create_pipette_handler(
             hardware_api=hardware_api,
             movement_handler=movement_handler,
         )
-        # if state_view.config.use_virtual_pipettes is False
-        # else VirtualPipettingHandler(state_store=state_view)
+        if state_store.config.use_virtual_pipettes is False
+        else VirtualPipettingHandler(state_store=state_store)
     )

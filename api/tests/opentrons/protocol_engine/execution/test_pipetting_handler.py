@@ -1,12 +1,10 @@
 """Pipetting execution handler."""
 import pytest
 from decoy import Decoy
-from typing import Tuple
 
 from opentrons.types import Mount, MountType, Point
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocol_engine import (
     WellLocation,
@@ -19,7 +17,11 @@ from opentrons.protocol_engine.state import (
     PipetteLocationData,
 )
 from opentrons.protocol_engine.execution.movement import MovementHandler
-from opentrons.protocol_engine.execution.pipetting import HardwarePipettingHandler
+from opentrons.protocol_engine.execution.pipetting import (
+    HardwarePipettingHandler,
+    create_pipette_handler,
+    VirtualPipettingHandler,
+)
 from opentrons.protocol_engine.resources import LabwareDataProvider
 
 from .mock_defs import MockPipettes
@@ -58,36 +60,172 @@ def mock_hw_pipettes(hardware_api: HardwareAPI) -> MockPipettes:
     return mock_hw_pipettes
 
 
-@pytest.fixture
-def mock_left_pipette_config(
-    mock_pipette_configs: Tuple[PipetteDict, PipetteDict]
-) -> PipetteDict:
-    """Get mock pipette config for the left pipette."""
-    return mock_pipette_configs[0]
-
-
-@pytest.fixture
-def mock_right_pipette_config(
-    mock_pipette_configs: Tuple[PipetteDict, PipetteDict]
-) -> PipetteDict:
-    """Get mock pipette config for the right pipette."""
-    return mock_pipette_configs[1]
-
-
-@pytest.fixture
-def subject(
+async def test_create_pipette_handler(
+    decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
     labware_data_provider: LabwareDataProvider,
-) -> HardwarePipettingHandler:
-    """Create a PipettingHandler with its dependencies mocked out."""
-    return HardwarePipettingHandler(
+) -> None:
+    """It should return virtual or real tip handlers depending on config."""
+    decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
+    assert isinstance(
+        create_pipette_handler(
+            state_store=state_store,
+            hardware_api=hardware_api,
+            movement_handler=movement_handler,
+        ),
+        HardwarePipettingHandler,
+    )
+
+    decoy.when(state_store.config.use_virtual_pipettes).then_return(True)
+    assert isinstance(
+        create_pipette_handler(
+            state_store=state_store,
+            hardware_api=hardware_api,
+            movement_handler=movement_handler,
+        ),
+        VirtualPipettingHandler,
+    )
+
+
+async def test_handle_get_is_ready_to_aspirate_with_state(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
+    labware_data_provider: LabwareDataProvider,
+) -> None:
+    """It should find the pipette by ID and use it to dispense."""
+    subject = HardwarePipettingHandler(
         state_store=state_store,
         hardware_api=hardware_api,
         movement_handler=movement_handler,
         labware_data_provider=labware_data_provider,
     )
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=mock_hw_pipettes.right_config,
+        )
+    )
+
+    decoy.when(state_store.pipettes.get_aspirated_volume("pipette-id")).then_return(0)
+
+    assert subject.get_is_ready_to_aspirate("pipette-id") is True
+
+
+async def test_handle_get_is_ready_to_aspirate_not_ready_with_state(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
+    labware_data_provider: LabwareDataProvider,
+) -> None:
+    """It should find the pipette by ID and use it to dispense."""
+    subject = HardwarePipettingHandler(
+        state_store=state_store,
+        hardware_api=hardware_api,
+        movement_handler=movement_handler,
+        labware_data_provider=labware_data_provider,
+    )
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=mock_hw_pipettes.right_config,
+        )
+    )
+
+    decoy.when(state_store.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        None
+    )
+
+    assert subject.get_is_ready_to_aspirate("pipette-id") is False
+
+
+async def test_handle_get_is_ready_to_aspirate_with_config(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
+    labware_data_provider: LabwareDataProvider,
+) -> None:
+    """It should find the pipette by ID and use it to dispense."""
+    subject = HardwarePipettingHandler(
+        state_store=state_store,
+        hardware_api=hardware_api,
+        movement_handler=movement_handler,
+        labware_data_provider=labware_data_provider,
+    )
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.LEFT,
+            config=mock_hw_pipettes.left_config,
+        )
+    )
+
+    decoy.when(state_store.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        None
+    )
+
+    assert subject.get_is_ready_to_aspirate("pipette-id") is True
+
+
+async def test_handle_get_is_ready_to_aspirate_not_ready_with_config(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
+    labware_data_provider: LabwareDataProvider,
+) -> None:
+    """It should find the pipette by ID and use it to dispense."""
+    subject = HardwarePipettingHandler(
+        state_store=state_store,
+        hardware_api=hardware_api,
+        movement_handler=movement_handler,
+        labware_data_provider=labware_data_provider,
+    )
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=mock_hw_pipettes.right_config,
+        )
+    )
+
+    decoy.when(state_store.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        None
+    )
+
+    assert subject.get_is_ready_to_aspirate("pipette-id") is False
 
 
 async def test_handle_dispense_in_place_request(
@@ -96,9 +234,16 @@ async def test_handle_dispense_in_place_request(
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
     mock_hw_pipettes: MockPipettes,
-    subject: HardwarePipettingHandler,
+    labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should find the pipette by ID and use it to dispense."""
+    subject = HardwarePipettingHandler(
+        state_store=state_store,
+        hardware_api=hardware_api,
+        movement_handler=movement_handler,
+        labware_data_provider=labware_data_provider,
+    )
+
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
@@ -135,9 +280,16 @@ async def test_touch_tip(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     movement_handler: MovementHandler,
-    subject: HardwarePipettingHandler,
+    labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should be able to touch tip to the edges of a well."""
+    subject = HardwarePipettingHandler(
+        state_store=state_store,
+        hardware_api=hardware_api,
+        movement_handler=movement_handler,
+        labware_data_provider=labware_data_provider,
+    )
+
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
@@ -205,10 +357,18 @@ async def test_aspirate_in_place(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    subject: HardwarePipettingHandler,
+    labware_data_provider: LabwareDataProvider,
     mock_hw_pipettes: MockPipettes,
+    movement_handler: MovementHandler,
 ) -> None:
     """Should set flow_rate and call hardware_api aspirate."""
+    subject = HardwarePipettingHandler(
+        state_store=state_store,
+        hardware_api=hardware_api,
+        movement_handler=movement_handler,
+        labware_data_provider=labware_data_provider,
+    )
+
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
@@ -235,10 +395,18 @@ async def test_blow_out_in_place(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    subject: HardwarePipettingHandler,
+    labware_data_provider: LabwareDataProvider,
     mock_hw_pipettes: MockPipettes,
+    movement_handler: MovementHandler,
 ) -> None:
     """Should set flow_rate and call hardware_api blow-out."""
+    subject = HardwarePipettingHandler(
+        state_store=state_store,
+        hardware_api=hardware_api,
+        movement_handler=movement_handler,
+        labware_data_provider=labware_data_provider,
+    )
+
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",

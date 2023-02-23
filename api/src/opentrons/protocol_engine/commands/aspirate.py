@@ -90,11 +90,11 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
             current_well=current_well,
         )
 
-        await self._pipetting.aspirate_in_place(
+        volume = await self._pipetting.aspirate_in_place(
             pipette_id=params.pipetteId, volume=params.volume, flow_rate=params.flowRate
         )
 
-        return AspirateResult(volume=params.volume, position=position)
+        return AspirateResult(volume=volume, position=position)
 
 
 class Aspirate(BaseCommand[AspirateParams, AspirateResult]):

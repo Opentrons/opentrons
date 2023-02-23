@@ -64,14 +64,13 @@ async def test_aspirate_implementation_no_prep(
         ),
     ).then_return(DeckPoint(x=1, y=2, z=3))
 
+    decoy.when(
+        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
+    ).then_return(50)
+
     result = await subject.execute(data)
 
     assert result == AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3))
-
-    decoy.verify(
-        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
-        times=1,
-    )
 
 
 async def test_aspirate_implementation_with_prep(
@@ -121,14 +120,14 @@ async def test_aspirate_implementation_with_prep(
         ),
     ).then_return(DeckPoint(x=1, y=2, z=3))
 
+    decoy.when(
+        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
+    ).then_return(50)
+
     result = await subject.execute(data)
 
     assert result == AspirateResult(volume=50, position=DeckPoint(x=1, y=2, z=3))
 
-    decoy.verify(
-        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23),
-        times=1,
-    )
     decoy.verify(
         await movement.move_to_well(
             pipette_id="abc",
