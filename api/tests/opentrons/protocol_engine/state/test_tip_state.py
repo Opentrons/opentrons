@@ -180,6 +180,8 @@ def test_get_next_tip_skips_picked_up_tip(
                 ),
                 return_tip_scale=0,
                 nominal_tip_overlap={},
+                nozzle_offset_z=1.23,
+                home_position=4.56,
             ),
         )
     )
@@ -234,6 +236,8 @@ def test_reset_tips(
                 ),
                 return_tip_scale=0,
                 nominal_tip_overlap={},
+                nozzle_offset_z=1.23,
+                home_position=4.56,
             ),
         )
     )
@@ -268,6 +272,8 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
                 ),
                 return_tip_scale=0,
                 nominal_tip_overlap={},
+                nozzle_offset_z=1.23,
+                home_position=4.56,
             ),
         )
     )
