@@ -37,6 +37,7 @@ def _build_pass_step(
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
+    acceleration: Dict[NodeId] = {},
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
     return create_step(
@@ -44,7 +45,7 @@ def _build_pass_step(
         velocity={
             ax: float64(speed[ax] * copysign(1.0, distance[ax])) for ax in movers
         },
-        acceleration={},
+        acceleration=acceleration,
         # use any node present to calculate duration of the move, assuming the durations
         #   will be the same
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
@@ -79,7 +80,8 @@ async def liquid_probe(
     sensor_group = _build_pass_step(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
-        speed={head_node: mount_speed, tool: plunger_speed},
+        speed={head_node: mount_speed/10, tool: plunger_speed/10},
+        acceleration={head_node: mount_speed/10, tool: plunger_speed/10},
         stop_condition=MoveStopCondition.sync_line,
     )
 

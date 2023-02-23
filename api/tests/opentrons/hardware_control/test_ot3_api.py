@@ -67,7 +67,6 @@ def fake_settings() -> CapacitivePassSettings:
 @pytest.fixture
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
-        starting_mount_height=100,
         max_z_distance=15,
         min_z_distance=10,
         mount_speed=40,
@@ -405,7 +404,6 @@ async def test_liquid_probe(
         # make sure aspirate while sensing reverses direction
         mock_position.return_value = return_dict
         fake_settings_aspirate = LiquidProbeSettings(
-            starting_mount_height=100,
             max_z_distance=15,
             min_z_distance=5,
             mount_speed=40,

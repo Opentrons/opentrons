@@ -114,7 +114,6 @@ def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Con
 @pytest.fixture
 def fake_liquid_settings() -> LiquidProbeSettings:
     return LiquidProbeSettings(
-        starting_mount_height=100,
         max_z_distance=15,
         min_z_distance=5,
         mount_speed=40,
