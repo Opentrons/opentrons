@@ -5,7 +5,6 @@ from typing import Dict
 from opentrons_shared_data.pipette import dummy_model_for_name
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
-from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.config.pipette_config import load as load_pipette_config, PipetteConfig
 
 from ..types import FlowRates
