@@ -6,6 +6,7 @@ from decoy import Decoy
 from typing import cast, List, Tuple, Union, Optional
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Point, DeckSlotName, MountType
@@ -817,13 +818,13 @@ def test_get_nominal_effective_tip_length(
 ) -> None:
     """It should get the effective tip length from a labware ID and pipette config."""
     decoy.when(labware_view.get_definition_uri("tip-rack-id")).then_return(
-        "opentrons/opentrons_96_tiprack_300ul/1"
+        LabwareUri("opentrons/opentrons_96_tiprack_300ul/1")
     )
 
     decoy.when(
         mock_pipette_view.get_nominal_tip_overlap(
             pipette_id="pipette-id",
-            labware_uri="opentrons/opentrons_96_tiprack_300ul/1",
+            labware_uri=LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
         )
     ).then_return(10)
 
@@ -850,7 +851,7 @@ def test_get_nominal_tip_geometry(
     well_def = tip_rack_def.wells["B2"]
 
     decoy.when(labware_view.get_definition_uri("tip-rack-id")).then_return(
-        "opentrons/opentrons_96_tiprack_300ul/1"
+        LabwareUri("opentrons/opentrons_96_tiprack_300ul/1")
     )
 
     decoy.when(labware_view.get_well_definition("tip-rack-id", "B2")).then_return(
