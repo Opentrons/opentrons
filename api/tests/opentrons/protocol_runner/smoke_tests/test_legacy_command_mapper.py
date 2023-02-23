@@ -277,7 +277,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
     assert commands_result[8] == commands.PickUpTip.construct(
@@ -293,7 +293,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
 
@@ -325,7 +325,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="B1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
     assert commands_result[11] == commands.Aspirate.construct(

@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, Location
@@ -13,7 +13,11 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     types as pe_types,
 )
-from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
+from opentrons.protocol_engine.resources import (
+    ModelUtils,
+    ModuleDataProvider,
+    pipette_data_provider,
+)
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
 
@@ -139,6 +143,7 @@ class LegacyCommandMapper:
                         update={
                             "result": pe_commands.PickUpTipResult.construct(
                                 tipVolume=command["payload"]["location"].max_volume,  # type: ignore[typeddict-item]
+                                tipLength=command["payload"]["instrument"].hw_pipette["tip_length"],  # type: ignore[typeddict-item]
                                 position=pe_types.DeckPoint(x=0, y=0, z=0),
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
@@ -225,14 +230,16 @@ class LegacyCommandMapper:
 
         return results
 
-    def map_equipment_load(self, load_info: LegacyLoadInfo) -> pe_commands.Command:
+    def map_equipment_load(
+        self, load_info: LegacyLoadInfo
+    ) -> Tuple[pe_commands.Command, Optional[pe_actions.AddPipetteConfigAction]]:
         """Map a labware, instrument (pipette), or module load to a PE command."""
         if isinstance(load_info, LegacyLabwareLoadInfo):
-            return self._map_labware_load(load_info)
+            return (self._map_labware_load(load_info), None)
         elif isinstance(load_info, LegacyInstrumentLoadInfo):
             return self._map_instrument_load(load_info)
         elif isinstance(load_info, LegacyModuleLoadInfo):
-            return self._map_module_load(load_info)
+            return (self._map_module_load(load_info), None)
 
     def _build_initial_command(
         self,
@@ -538,8 +545,12 @@ class LegacyCommandMapper:
     def _map_instrument_load(
         self,
         instrument_load_info: LegacyInstrumentLoadInfo,
-    ) -> pe_commands.Command:
-        """Map a legacy instrument (pipette) load to a ProtocolEngine command."""
+    ) -> Tuple[pe_commands.Command, pe_actions.AddPipetteConfigAction]:
+        """Map a legacy instrument (pipette) load to a ProtocolEngine command.
+
+        Also creates a `AddPipetteConfigAction`, which is not necessary for the run,
+        but is needed for stop so tip geometry is in state for the HardwareStopper.
+        """
         now = ModelUtils.get_timestamp()
         count = self._command_count["LOAD_PIPETTE"]
         command_id = f"commands.LOAD_PIPETTE-{count}"
@@ -559,10 +570,19 @@ class LegacyCommandMapper:
             ),
             result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
         )
+        pipette_config_action = pe_actions.AddPipetteConfigAction(
+            pipette_id=pipette_id,
+            serial_number=instrument_load_info.serial_number,
+            config=pipette_data_provider.get_pipette_static_config(
+                model=instrument_load_info.model,
+                serial_number=instrument_load_info.serial_number,
+            ),
+        )
 
         self._command_count["LOAD_PIPETTE"] = count + 1
         self._pipette_id_by_mount[mount] = pipette_id
-        return load_pipette_command
+
+        return (load_pipette_command, pipette_config_action)
 
     def _map_module_load(
         self, module_load_info: LegacyModuleLoadInfo

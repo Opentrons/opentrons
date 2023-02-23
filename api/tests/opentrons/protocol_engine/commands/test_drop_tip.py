@@ -1,19 +1,40 @@
 """Test pick up tip commands."""
+import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine import (
     DropTipWellLocation,
     DropTipWellOrigin,
+    WellLocation,
     WellOffset,
     DeckPoint,
 )
-from opentrons.protocol_engine.execution import PipettingHandler
+from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 
 from opentrons.protocol_engine.commands.drop_tip import (
     DropTipParams,
     DropTipResult,
     DropTipImplementation,
 )
+
+
+@pytest.fixture
+def mock_state_view(decoy: Decoy) -> StateView:
+    """Get a mock StateView."""
+    return decoy.mock(cls=StateView)
+
+
+@pytest.fixture
+def mock_movement_handler(decoy: Decoy) -> MovementHandler:
+    """Get a mock MovementHandler."""
+    return decoy.mock(cls=MovementHandler)
+
+
+@pytest.fixture
+def mock_tip_handler(decoy: Decoy) -> TipHandler:
+    """Get a mock TipHandler."""
+    return decoy.mock(cls=TipHandler)
 
 
 def test_drop_tip_params_defaults() -> None:
@@ -45,28 +66,47 @@ def test_drop_tip_params_default_origin() -> None:
 
 async def test_drop_tip_implementation(
     decoy: Decoy,
-    pipetting: PipettingHandler,
+    mock_state_view: StateView,
+    mock_movement_handler: MovementHandler,
+    mock_tip_handler: TipHandler,
 ) -> None:
     """A DropTip command should have an execution implementation."""
-    subject = DropTipImplementation(pipetting=pipetting)
+    subject = DropTipImplementation(
+        state_view=mock_state_view,
+        movement=mock_movement_handler,
+        tip_handler=mock_tip_handler,
+    )
 
-    data = DropTipParams(
+    params = DropTipParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
         wellLocation=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        homeAfter=True,
     )
 
     decoy.when(
-        await pipetting.drop_tip(
+        mock_state_view.geometry.get_tip_drop_location(
+            pipette_id="abc",
+            labware_id="123",
+            well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        )
+    ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
+
+    decoy.when(
+        await mock_movement_handler.move_to_well(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
-            well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
-            home_after=None,
+            well_location=WellLocation(offset=WellOffset(x=4, y=5, z=6)),
         )
-    ).then_return(DeckPoint(x=4, y=5, z=6))
+    ).then_return(DeckPoint(x=111, y=222, z=333))
 
-    result = await subject.execute(data)
+    result = await subject.execute(params)
 
-    assert result == DropTipResult(position=DeckPoint(x=4, y=5, z=6))
+    assert result == DropTipResult(position=DeckPoint(x=111, y=222, z=333))
+
+    decoy.verify(
+        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=True),
+        times=1,
+    )

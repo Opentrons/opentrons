@@ -4,6 +4,7 @@ from typing import cast, Dict, List, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
@@ -99,6 +100,7 @@ def test_get_pipette_data() -> None:
 
     assert result_by_id == pipette_data
     assert result_by_mount == pipette_data
+    assert subject.get_mount("pipette-id") == MountType.LEFT
 
 
 def test_get_hardware_pipette() -> None:
@@ -225,6 +227,11 @@ def test_get_pipette_working_volume() -> None:
                 max_volume=9001,
                 model="blah",
                 display_name="bleh",
+                serial_number="",
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
             )
         },
     )
@@ -243,6 +250,11 @@ def test_get_pipette_available_volume() -> None:
                 max_volume=123,
                 model="blah",
                 display_name="bleh",
+                serial_number="",
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
             )
         },
     )
@@ -318,6 +330,32 @@ def test_pipette_not_ready_to_aspirate() -> None:
     assert result is False
 
 
+def test_get_attached_tip_labware_by_id() -> None:
+    """It should get the tip-rack ID map of a pipette's attached tip."""
+    attached_tip_labware_by_id = {"foo": "bar"}
+    subject = get_pipette_view(attached_tip_labware_by_id=attached_tip_labware_by_id)
+    result = subject.get_attached_tip_labware_by_id()
+
+    assert result == {"foo": "bar"}
+    assert result is not attached_tip_labware_by_id
+
+
+def test_validate_tip_state() -> None:
+    """It should validate a pipette's tip attached state."""
+    subject = get_pipette_view(
+        attached_tip_labware_by_id={"has-tip": "some-tip-rack-id"}
+    )
+
+    subject.validate_tip_state(pipette_id="has-tip", expected_has_tip=True)
+    subject.validate_tip_state(pipette_id="no-tip", expected_has_tip=False)
+
+    with pytest.raises(errors.TipAttachedError):
+        subject.validate_tip_state(pipette_id="has-tip", expected_has_tip=False)
+
+    with pytest.raises(errors.TipNotAttachedError):
+        subject.validate_tip_state(pipette_id="no-tip", expected_has_tip=True)
+
+
 def test_get_movement_speed() -> None:
     """It should return the movement speed that was set for the given pipette."""
     subject = get_pipette_view(
@@ -369,21 +407,54 @@ def test_get_deck_point(
 
 def test_get_static_config() -> None:
     """It should return the static pipette configuration that was set for the given pipette."""
-    subject = get_pipette_view(
-        static_config_by_id={
-            "pipette-id": StaticPipetteConfig(
-                model="pipette-model",
-                display_name="display name",
-                min_volume=1.23,
-                max_volume=4.56,
-            )
-        }
+    config = StaticPipetteConfig(
+        model="pipette-model",
+        display_name="display name",
+        serial_number="serial-number",
+        min_volume=1.23,
+        max_volume=4.56,
+        return_tip_scale=7.89,
+        nominal_tip_overlap={},
+        home_position=10.12,
+        nozzle_offset_z=12.13,
     )
 
+    subject = get_pipette_view(static_config_by_id={"pipette-id": config})
+
+    assert subject.get_config("pipette-id") == config
     assert subject.get_model_name("pipette-id") == "pipette-model"
     assert subject.get_display_name("pipette-id") == "display name"
+    assert subject.get_serial_number("pipette-id") == "serial-number"
     assert subject.get_minimum_volume("pipette-id") == 1.23
     assert subject.get_maximum_volume("pipette-id") == 4.56
+    assert subject.get_return_tip_scale("pipette-id") == 7.89
+    assert (
+        subject.get_instrument_max_height_ot2("pipette-id")
+        == 22.25 - Z_RETRACT_DISTANCE
+    )
+
+
+def test_get_nominal_tip_overlap() -> None:
+    """It should return the static pipette configuration that was set for the given pipette."""
+    config = StaticPipetteConfig(
+        model="",
+        display_name="",
+        serial_number="",
+        min_volume=0,
+        max_volume=0,
+        return_tip_scale=0,
+        nominal_tip_overlap={
+            "some-uri": 100,
+            "default": 10,
+        },
+        home_position=0,
+        nozzle_offset_z=0,
+    )
+
+    subject = get_pipette_view(static_config_by_id={"pipette-id": config})
+
+    assert subject.get_nominal_tip_overlap("pipette-id", "some-uri") == 100
+    assert subject.get_nominal_tip_overlap("pipette-id", "missing-uri") == 10
 
 
 @pytest.mark.parametrize(

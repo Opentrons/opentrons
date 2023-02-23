@@ -298,10 +298,13 @@ class LegacyProtocolCore(
         self._instruments[mount] = new_instr
         logger.info("Instrument {} loaded".format(new_instr))
 
+        pipette_dict = self._sync_hardware.get_attached_instrument(mount)
         self._equipment_broker.publish(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name.value,
                 mount=mount,
+                model=pipette_dict["model"],
+                serial_number=pipette_dict["pipette_id"],
             )
         )
 

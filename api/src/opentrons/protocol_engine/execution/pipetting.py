@@ -1,29 +1,30 @@
 """Pipetting command handling."""
-from typing import NamedTuple, Optional, Iterator
+from typing import Optional, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 
-from opentrons.types import Mount as HardwareMount
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateStore, CurrentWell, HardwarePipette
 from ..resources import LabwareDataProvider
-from ..types import WellLocation, DropTipWellLocation, WellOrigin, DeckPoint
+from ..types import WellLocation, WellOrigin, DeckPoint
 from .movement import MovementHandler
 
 
-class _TipPickupData(NamedTuple):
-    hw_mount: HardwareMount
-    tip_length: float
-    tip_diameter: float
-    tip_volume: int
+@dataclass(frozen=True)
+class AspirateData:
+    """The returned values of an aspirate operation."""
+
+    volume: float
+    position: DeckPoint
 
 
 @dataclass(frozen=True)
-class VolumePointResult:
-    """The returned values of an aspirate or pick up tip operation."""
+class PickUpTipData:
+    """The returned values of a pick up tip operation."""
 
     volume: float
+    length: float
     position: DeckPoint
 
 
@@ -47,145 +48,6 @@ class PipettingHandler:
         self._movement_handler = movement_handler
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
 
-    async def _get_tip_details(
-        self,
-        pipette_id: str,
-        labware_id: str,
-        well_name: Optional[str] = None,
-    ) -> _TipPickupData:
-        """Retrieve data needed by the HardwareAPI for a tip pickup."""
-        # get mount and config data from state and hardware controller
-        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
-
-        # get the requested tip rack's definition for pulling calibrated tip length
-        tip_rack_def = self._state_store.labware.get_definition(labware_id)
-
-        # use config data to get tip geometry (length, diameter, volume)
-        nominal_tip_geometry = self._state_store.geometry.get_nominal_tip_geometry(
-            labware_id=labware_id,
-            well_name=well_name,
-            pipette_config=hw_pipette.config,
-        )
-
-        # TODO(mc, 2022-01-12): this call hits the filesystem, which has performance
-        # implications over the course of a protocol since most calls will be redundant
-        tip_length = await self._labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=hw_pipette.config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-
-        if tip_length is None:
-            tip_length = nominal_tip_geometry.effective_length
-
-        return _TipPickupData(
-            hw_mount=hw_pipette.mount,
-            tip_length=tip_length,
-            tip_diameter=nominal_tip_geometry.diameter,
-            tip_volume=nominal_tip_geometry.volume,
-        )
-
-    async def pick_up_tip(
-        self,
-        pipette_id: str,
-        labware_id: str,
-        well_name: str,
-        well_location: WellLocation,
-    ) -> VolumePointResult:
-        """Pick up a tip at the specified "well"."""
-        hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-        )
-
-        # move the pipette to the top of the tip
-        position = await self._movement_handler.move_to_well(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-        )
-
-        # perform the tip pickup routine
-        await self._hardware_api.pick_up_tip(
-            mount=hw_mount,
-            tip_length=tip_length,
-            # TODO(mc, 2020-11-12): include these parameters in the request
-            presses=None,
-            increment=None,
-        )
-
-        # after a successful pickup, update the hardware controller state
-        self._hardware_api.set_current_tiprack_diameter(
-            mount=hw_mount,
-            tiprack_diameter=tip_diameter,
-        )
-        self._hardware_api.set_working_volume(
-            mount=hw_mount,
-            tip_volume=tip_volume,
-        )
-
-        return VolumePointResult(volume=tip_volume, position=position)
-
-    async def add_tip(self, pipette_id: str, labware_id: str) -> None:
-        """Manually add a tip to a pipette in the hardware API.
-
-        Used to enable a drop tip even if the HW API thinks no tip is attached.
-
-        This is used by hardware stopper, and will not affect the pipette state store working volume tracking
-        """
-        hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-        )
-
-        await self._hardware_api.add_tip(mount=hw_mount, tip_length=tip_length)
-        self._hardware_api.set_current_tiprack_diameter(
-            mount=hw_mount,
-            tiprack_diameter=tip_diameter,
-        )
-        self._hardware_api.set_working_volume(mount=hw_mount, tip_volume=tip_volume)
-
-    async def drop_tip(
-        self,
-        pipette_id: str,
-        labware_id: str,
-        well_name: str,
-        well_location: DropTipWellLocation,
-        home_after: Optional[bool],
-    ) -> DeckPoint:
-        """Drop a tip at the specified "well"."""
-        # get mount and config data from state and hardware controller
-        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
-
-        # get the adjusted tip drop location
-        tip_drop_location = self._state_store.geometry.get_tip_drop_location(
-            pipette_config=hw_pipette.config,
-            labware_id=labware_id,
-            well_location=well_location,
-        )
-
-        # move the pipette to tip drop location
-        position = await self._movement_handler.move_to_well(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=tip_drop_location,
-        )
-
-        # perform the tip drop routine
-        await self._hardware_api.drop_tip(
-            mount=hw_pipette.mount,
-            home_after=True if home_after is None else home_after,
-        )
-        return position
-
     async def aspirate(
         self,
         pipette_id: str,
@@ -194,7 +56,7 @@ class PipettingHandler:
         well_location: WellLocation,
         volume: float,
         flow_rate: float,
-    ) -> VolumePointResult:
+    ) -> AspirateData:
         """Aspirate liquid from a well."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
@@ -238,7 +100,7 @@ class PipettingHandler:
         with self.set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
-        return VolumePointResult(volume=volume, position=position)
+        return AspirateData(volume=volume, position=position)
 
     async def dispense_in_place(
         self,

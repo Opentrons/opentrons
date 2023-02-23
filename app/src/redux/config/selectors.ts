@@ -88,3 +88,10 @@ export const getProtocolsOnDeviceSortKey: (
   getConfig,
   config => config?.protocols.protocolsOnDeviceSortKey ?? null
 )
+
+export const getPinnedProtocolIds: (
+  state: State
+) => string[] | undefined = createSelector(
+  getConfig,
+  config => config?.protocols.pinnedProtocolIds
+)
