@@ -148,12 +148,7 @@ export function ProtocolDashboard(): JSX.Element {
             overflow={OVERFLOW_HIDDEN}
           >
             {pinnedProtocols.map(protocol => {
-              return (
-                <PinnedProtocol
-                  key={protocol.key}
-                  protocol={protocol}
-                />
-              )
+              return <PinnedProtocol key={protocol.key} protocol={protocol} />
             })}
           </Flex>
         </Flex>
