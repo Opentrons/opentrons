@@ -8,9 +8,6 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
-from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
@@ -76,9 +73,6 @@ class LabwareCore(AbstractLabware[WellCore]):
         """Get the load name or the label of the labware specified by a user."""
         return self._user_display_name or self.load_name
 
-    def set_name(self, new_name: str) -> None:
-        raise APIVersionError("LabwareCore.set_name has been deprecated")
-
     def get_definition(self) -> LabwareDefinitionDict:
         """Get the labware's definition as a plain dictionary."""
         return cast(LabwareDefinitionDict, self._definition.dict(exclude_none=True))
@@ -93,8 +87,10 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._definition.parameters.quirks or []
 
     def set_calibration(self, delta: Point) -> None:
-        # TODO(jbl 2022-09-01): implement set calibration through the engine
-        pass
+        raise NotImplementedError(
+            "Setting a labware's calibration after it's been loaded"
+            " is not supported by Protocol Engine."
+        )
 
     def get_calibrated_offset(self) -> Point:
         return self._engine_client.state.geometry.get_labware_position(self._labware_id)
@@ -112,9 +108,6 @@ class LabwareCore(AbstractLabware[WellCore]):
     def get_tip_length(self) -> float:
         return self._engine_client.state.labware.get_tip_length(self._labware_id)
 
-    def set_tip_length(self, length: float) -> None:
-        raise APIVersionError("LabwareCore.set_tip_length has been deprecated")
-
     def reset_tips(self) -> None:
         self._engine_client.reset_tips(labware_id=self.labware_id)
 
@@ -131,23 +124,9 @@ class LabwareCore(AbstractLabware[WellCore]):
             ),
         )
 
-    # TODO(mc, 2022-11-09): remove from engine core
-    def get_tip_tracker(self) -> TipTracker:
-        raise NotImplementedError("LabwareCore.get_tip_tracker not implemented")
-
     def get_well_columns(self) -> List[List[str]]:
         """Get the all well names, organized by column, from the labware's definition."""
         return self._definition.ordering
-
-    def get_geometry(self) -> LabwareGeometry:
-        raise NotImplementedError("LabwareCore.get_geometry not implemented")
-
-    def get_default_magnet_engage_height(
-        self, preserve_half_mm: bool = False
-    ) -> Optional[float]:
-        raise NotImplementedError(
-            "LabwareCore.get_default_magnet_engage_height not implemented"
-        )
 
     def get_well_core(self, well_name: str) -> WellCore:
         """Create a well core interface to a well in this labware."""

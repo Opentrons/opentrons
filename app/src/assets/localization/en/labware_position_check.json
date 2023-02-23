@@ -83,5 +83,8 @@
   "all_modules_and_labware_from_protocol": "All modules and labware used in the protocol",
   "module_in_slot": "{{module}} in {{slot}}",
   "run_labware_position_check": "run labware position check",
-  "get_labware_offset_data": "Get Labware Offset Data"
+  "get_labware_offset_data": "Get Labware Offset Data",
+  "table_view": "Table View",
+  "jupyter_notebook": "Jupyter Notebook",
+  "cli_ssh": "Command Line Interface (SSH)"
 }

@@ -27,7 +27,9 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
+import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
+import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
 import { useLPCDisabledReason } from '../../hooks'
 import { getLatestCurrentOffsets } from './utils'
 
@@ -77,7 +79,6 @@ export function CurrentOffsetsModal(
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
-  const [showCodeSnippet, setShowCodeSnippet] = React.useState<boolean>(false)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
@@ -86,6 +87,55 @@ export function CurrentOffsetsModal(
   })
   const lpcDisabledReason = useLPCDisabledReason(robotName, runId)
   const latestCurrentOffsets = getLatestCurrentOffsets(currentOffsets)
+
+  const TableComponent = (
+    <OffsetTable>
+      <thead>
+        <tr>
+          <OffsetTableHeader>{t('location')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
+        </tr>
+      </thead>
+      <tbody>
+        {latestCurrentOffsets.map(offset => {
+          const labwareDisplayName =
+            offset.definitionUri in defsByURI
+              ? getLabwareDisplayName(defsByURI[offset.definitionUri])
+              : offset.definitionUri
+          return (
+            <OffsetTableRow key={offset.id}>
+              <OffsetTableDatum>
+                {t('slot', { slotName: offset.location.slotName })}
+                {offset.location.moduleModel != null
+                  ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
+                  : null}
+              </OffsetTableDatum>
+              <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
+              <OffsetTableDatum>
+                <OffsetVector {...offset.vector} />
+              </OffsetTableDatum>
+            </OffsetTableRow>
+          )
+        })}
+      </tbody>
+    </OffsetTable>
+  )
+
+  const JupyterSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="jupyter"
+      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+    />
+  )
+  const CommandLineSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="cli"
+      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+    />
+  )
   return (
     <ModalShell
       maxWidth="40rem"
@@ -99,53 +149,14 @@ export function CurrentOffsetsModal(
         padding={SPACING.spacing6}
       >
         {isLabwareOffsetCodeSnippetsOn ? (
-          <Link
-            role="link"
-            css={TYPOGRAPHY.labelSemiBold}
-            color={COLORS.darkBlackEnabled}
-            onClick={() => setShowCodeSnippet(true)}
-          >
-            {t('get_labware_offset_data')}
-          </Link>
-        ) : null}
-        {showCodeSnippet ? (
-          <PrimaryButton onClick={() => setShowCodeSnippet(false)}>
-            TODO ADD JUPYTER/CLI SNIPPET SUPPORT
-          </PrimaryButton>
-        ) : null}
-        <OffsetTable>
-          <thead>
-            <tr>
-              <OffsetTableHeader>{t('location')}</OffsetTableHeader>
-              <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
-              <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {latestCurrentOffsets.map(offset => {
-              const labwareDisplayName =
-                offset.definitionUri in defsByURI
-                  ? getLabwareDisplayName(defsByURI[offset.definitionUri])
-                  : offset.definitionUri
-              return (
-                <OffsetTableRow key={offset.id}>
-                  <OffsetTableDatum>
-                    {t('slot', { slotName: offset.location.slotName })}
-                    {offset.location.moduleModel != null
-                      ? ` - ${getModuleDisplayName(
-                          offset.location.moduleModel
-                        )}`
-                      : null}
-                  </OffsetTableDatum>
-                  <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
-                  <OffsetTableDatum>
-                    <OffsetVector {...offset.vector} />
-                  </OffsetTableDatum>
-                </OffsetTableRow>
-              )
-            })}
-          </tbody>
-        </OffsetTable>
+          <LabwareOffsetTabs
+            TableComponent={TableComponent}
+            JupyterComponent={JupyterSnippet}
+            CommandLineComponent={CommandLineSnippet}
+          />
+        ) : (
+          TableComponent
+        )}
         <Flex
           width="100%"
           marginTop={SPACING.spacing6}

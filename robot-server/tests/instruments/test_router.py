@@ -12,8 +12,12 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
 from opentrons.hardware_control.types import GripperJawState
+from opentrons.protocol_engine.types import Vec3f
 from opentrons.types import Point, Mount
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
+from opentrons_shared_data.gripper.gripper_definition import (
+    GripperModelStr,
+    GripperModel,
+)
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
 from robot_server.instruments.instrument_models import (
@@ -21,6 +25,7 @@ from robot_server.instruments.instrument_models import (
     GripperData,
     Pipette,
     PipetteData,
+    GripperCalibrationData,
 )
 from robot_server.instruments.router import get_attached_instruments
 
@@ -98,7 +103,7 @@ async def test_get_all_attached_instruments(
             "calibration_offset": GripperCalibrationOffset(
                 offset=Point(x=1, y=2, z=3),
                 source=SourceType.default,
-                status=CalibrationStatus(),
+                status=CalibrationStatus(markedBad=False),
                 last_modified=None,
             ),
         }
@@ -146,14 +151,13 @@ async def test_get_all_attached_instruments(
         Gripper.construct(
             mount="extension",
             instrumentType="gripper",
-            instrumentModel=GripperModel.v1,
+            instrumentModel=GripperModelStr("gripperV1"),
             serialNumber="GripperID321",
             data=GripperData(
-                jawState=GripperJawState.UNHOMED,
-                calibratedOffset=GripperCalibrationOffset(
-                    offset=Point(x=1, y=2, z=3),
+                jawState="unhomed",
+                calibratedOffset=GripperCalibrationData(
+                    offset=Vec3f(x=1, y=2, z=3),
                     source=SourceType.default,
-                    status=CalibrationStatus(),
                     last_modified=None,
                 ),
             ),

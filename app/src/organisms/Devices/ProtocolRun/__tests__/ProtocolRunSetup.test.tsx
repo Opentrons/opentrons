@@ -1,5 +1,4 @@
 import * as React from 'react'
-import pick from 'lodash/pick'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { parseAllRequiredModuleModels } from '@opentrons/api-client'
@@ -12,9 +11,9 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useIsOT3,
-  useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
@@ -28,10 +27,9 @@ import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
 import {
-  LegacySchemaAdapterOutput,
+  ProtocolAnalysisOutput,
   protocolHasLiquids,
 } from '@opentrons/shared-data'
-import type { StoredProtocolAnalysis } from '../../hooks'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
@@ -39,11 +37,12 @@ jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
 jest.mock('../SetupModules')
 jest.mock('../SetupLiquids')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
   typeof useProtocolAnalysisErrors
@@ -96,17 +95,12 @@ const render = () => {
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
     when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
-    when(mockUseProtocolDetailsForRun)
+    when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue({
-        protocolData: ({
-          ...noModulesProtocol,
-          ...MOCK_ROTOCOL_LIQUID_KEY,
-        } as unknown) as LegacySchemaAdapterOutput,
-        displayName: 'mock display name',
-        protocolKey: 'fakeProtocolKey',
-        robotType: 'OT-2 Standard',
-      })
+        ...noModulesProtocol,
+        ...MOCK_ROTOCOL_LIQUID_KEY,
+      } as any)
     when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
       analysisErrors: null,
     })
@@ -115,7 +109,7 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue(({
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
-      } as unknown) as StoredProtocolAnalysis)
+      } as unknown) as ProtocolAnalysisOutput)
     when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
@@ -155,12 +149,9 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
-    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
-      protocolData: null,
-      displayName: null,
-      protocolKey: null,
-      robotType: 'OT-2 Standard',
-    })
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith(RUN_ID).mockReturnValue(null)
     const { getByText } = render()
     getByText('Loading data...')
@@ -239,17 +230,12 @@ describe('ProtocolRunSetup', () => {
 
   describe('when liquids are in the protocol', () => {
     it('renders correct text for liquids', () => {
-      when(mockUseProtocolDetailsForRun)
+      when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: ({
-            ...noModulesProtocol,
-            liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-          } as unknown) as LegacySchemaAdapterOutput,
-          displayName: 'mock display name',
-          protocolKey: 'fakeProtocolKey',
-          robotType: 'OT-2 Standard',
-        })
+          ...noModulesProtocol,
+          liquids: [{ displayName: 'water', description: 'liquid H2O' }],
+        } as any)
       mockProtocolHasLiquids.mockReturnValue(true)
 
       const { getByText } = render()
@@ -266,17 +252,12 @@ describe('ProtocolRunSetup', () => {
         'magneticModuleV1',
         'temperatureModuleV1',
       ])
-      when(mockUseProtocolDetailsForRun)
+      when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: ({
-            ...withModulesProtocol,
-            ...MOCK_ROTOCOL_LIQUID_KEY,
-          } as unknown) as LegacySchemaAdapterOutput,
-          displayName: 'mock display name',
-          protocolKey: 'fakeProtocolKey',
-          robotType: 'OT-2 Standard',
-        })
+          ...withModulesProtocol,
+          ...MOCK_ROTOCOL_LIQUID_KEY,
+        } as any)
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     })
     afterEach(() => {
@@ -313,21 +294,19 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for single module', () => {
-      when(mockUseProtocolDetailsForRun)
+      when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: ({
-            ...withModulesProtocol,
-            ...MOCK_ROTOCOL_LIQUID_KEY,
-            modules: pick(
-              withModulesProtocol.modules,
-              Object.keys(withModulesProtocol.modules)[0]
-            ),
-          } as unknown) as LegacySchemaAdapterOutput,
-          displayName: 'mock display name',
-          protocolKey: 'fakeProtocolKey',
-          robotType: 'OT-2 Standard',
-        })
+          ...withModulesProtocol,
+          ...MOCK_ROTOCOL_LIQUID_KEY,
+          modules: [
+            {
+              id: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
+              location: { slot: '1' },
+              model: 'magneticModuleV1',
+            },
+          ],
+        } as any)
       when(mockParseAllRequiredModuleModels).mockReturnValue([
         'magneticModuleV1',
       ])

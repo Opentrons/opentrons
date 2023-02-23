@@ -90,7 +90,7 @@ class MovementHandler:
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
-    ) -> None:
+    ) -> DeckPoint:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
@@ -162,6 +162,13 @@ class MovementHandler:
                 critical_point=waypoint.critical_point,
                 speed=speed,
             )
+
+        try:
+            final_point = waypoints[-1].position
+        except IndexError:
+            final_point = origin
+
+        return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)
 
     async def move_relative(
         self,
@@ -271,7 +278,7 @@ class MovementHandler:
         direct: bool,
         additional_min_travel_z: Optional[float],
         speed: Optional[float] = None,
-    ) -> None:
+    ) -> DeckPoint:
         """Move pipette to a given deck coordinate."""
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
@@ -315,3 +322,10 @@ class MovementHandler:
                 critical_point=waypoint.critical_point,
                 speed=speed,
             )
+
+        try:
+            final_point = waypoints[-1].position
+        except IndexError:
+            final_point = origin
+
+        return DeckPoint(x=final_point.x, y=final_point.y, z=final_point.z)

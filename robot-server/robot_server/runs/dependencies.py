@@ -10,6 +10,7 @@ from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.hardware import get_hardware, get_robot_type
 from robot_server.persistence import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner
+from robot_server.settings import get_settings
 from robot_server.deletion_planner import RunDeletionPlanner
 
 from .run_auto_deleter import RunAutoDeleter
@@ -69,5 +70,5 @@ async def get_run_auto_deleter(
     """Get an `AutoDeleter` to delete old runs."""
     return RunAutoDeleter(
         run_store=run_store,
-        deletion_planner=RunDeletionPlanner(),
+        deletion_planner=RunDeletionPlanner(maximum_runs=get_settings().maximum_runs),
     )

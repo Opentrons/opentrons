@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union, Mapping
+from typing import (
+    Callable,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Type,
+    Union,
+    Mapping,
+    cast,
+)
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -17,10 +27,8 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.common import ModuleCore, ProtocolCore
-from ._liquid import Liquid
 from .core.core_map import LoadedCoreMap
 from .core.module import (
     AbstractTemperatureModuleCore,
@@ -28,9 +36,12 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
+from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
+from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
+from ._liquid import Liquid
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
@@ -102,13 +113,6 @@ class ProtocolContext(CommandPublisher):
                              exposed as
                              :py:attr:`.ProtocolContext.bundled_data`
         """
-        if api_version > MAX_SUPPORTED_VERSION:
-            raise RuntimeError(
-                f"API version {api_version} is not supported by this robot software."
-                f" Please reduce your API version to {MAX_SUPPORTED_VERSION} or below"
-                f" or update your robot."
-            )
-
         super().__init__(broker)
         self._api_version = api_version
         self._core = core
@@ -389,11 +393,13 @@ class ProtocolContext(CommandPublisher):
                             If False, will pause protocol execution to allow the user
                             to perform a manual move and click resume to continue
                             protocol execution.
+
         Other experimental params:
+
         :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
-                            associated with its pick up location.
+                                                associated with its pick up location.
         :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
-                            associated with its drop off location.
+                                             associated with its drop off location.
         :param pick_up_offset: Offset to use when picking up labware.
         :param drop_offset: Offset to use when dropping off labware.
 
@@ -461,11 +467,13 @@ class ProtocolContext(CommandPublisher):
                          location. You do not have to specify a location
                          when loading a Thermocycler---it will always be
                          in Slot 7.
-        :param configuration: Only valid in Python API version 2.4 and later.
-                              Used to specify the slot configuration of the
-                              Thermocycler. If you wish to use the non-full-plate
-                              configuration, you must pass the keyword
-                              value ``semi``.
+        :param configuration: Configure a thermocycler to be in the ``semi`` position.
+                              This parameter does not work. Do not use it.
+
+            .. versionchanged:: 2.14
+                This parameter dangerously modified the protocol's geometry system,
+                and it didn't function properly, so it was removed.
+
         :type location: str or int or None
         :returns: The loaded and initialized module---a
                   :py:class:`TemperatureModuleContext`,
@@ -474,12 +482,16 @@ class ProtocolContext(CommandPublisher):
                   :py:class:`HeaterShakerContext`,
                   depending on what you requested with ``module_name``.
         """
-
-        if self._api_version < APIVersion(2, 4) and configuration:
-            raise APIVersionError(
-                f"You have specified API {self._api_version}, but you are"
-                "using Thermocycler parameters only available in 2.4"
-            )
+        if configuration:
+            if self._api_version < APIVersion(2, 4):
+                raise APIVersionError(
+                    f"You have specified API {self._api_version}, but you are"
+                    "using Thermocycler parameters only available in 2.4"
+                )
+            if self._api_version >= ENGINE_CORE_API_VERSION:
+                raise APIVersionError(
+                    "The configuration parameter of load_module has been removed."
+                )
 
         requested_model = validation.ensure_module_model(module_name)
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
@@ -656,7 +668,16 @@ class ProtocolContext(CommandPublisher):
            If you're looking for a way for your protocol to resume automatically
            after a period of time, use :py:meth:`delay`.
         """
-        self._core.resume()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "A Python Protocol cannot safely resume itself after a pause."
+                " To wait automatically for a period of time, use ProtocolContext.delay()."
+            )
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyProtocolCore)
+        cast(LegacyProtocolCore, self._core).resume()
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)
@@ -752,9 +773,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._core.set_rail_lights(on=on)
 
-    # TODO (tz, 12-19-22): Limit to api version 2.14.
-    # https://opentrons.atlassian.net/browse/RCORE-537
-    @requires_version(2, 13)
+    @requires_version(2, 14)
     def define_liquid(
         self, name: str, description: Optional[str], display_color: Optional[str]
     ) -> Liquid:

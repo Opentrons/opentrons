@@ -298,10 +298,13 @@ class LegacyProtocolCore(
         self._instruments[mount] = new_instr
         logger.info("Instrument {} loaded".format(new_instr))
 
+        pipette_dict = self._sync_hardware.get_attached_instrument(mount)
         self._equipment_broker.publish(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name.value,
                 mount=mount,
+                model=pipette_dict["model"],
+                serial_number=pipette_dict["pipette_id"],
             )
         )
 
@@ -398,34 +401,30 @@ class LegacyProtocolCore(
 
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
-        raise NotImplementedError(
-            "LegacyProtocolCore.get_deck_definition not implemented"
-        )
+        assert False, "get_deck_definition only supported on engine core"
 
     def get_slot_item(
         self, slot_name: DeckSlotName
     ) -> Union[LegacyLabwareCore, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
-        raise NotImplementedError("LegacyProtocolCore.get_slot_item not implemented")
+        assert False, "get_slot_item only supported on engine core"
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
-        raise NotImplementedError("LegacyProtocolCore.get_slot_center not implemented.")
+        assert False, "get_slot_center only supported on engine core."
 
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
-        raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
+        assert False, "get_highest_z only supported on engine core"
 
     def define_liquid(
         self, name: str, description: Optional[str], display_color: Optional[str]
     ) -> Liquid:
         """Define a liquid to load into a well."""
-        raise APIVersionError("Defining a liquid is not supported in this API version.")
+        assert False, "define_liquid only supported on engine core"
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore
     ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
         """Get labware parent location."""
-        raise NotImplementedError(
-            "LegacyProtocolCore.get_labware_location not implemented"
-        )
+        assert False, "get_labware_location only supported on engine core"

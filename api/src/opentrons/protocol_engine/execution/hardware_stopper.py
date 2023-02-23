@@ -3,13 +3,15 @@ import logging
 from typing import Optional
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
+
 from ..resources.ot3_validation import ensure_ot3_hardware
 from ..state import StateStore
-from ..types import MotorAxis, WellLocation
-from ..errors import PipetteNotAttachedError, HardwareNotSupportedError
+from ..types import MotorAxis
+from ..errors import HardwareNotSupportedError
 
 from .movement import MovementHandler
-from .pipetting import PipettingHandler
+from .tip_handler import TipHandler, HardwareTipHandler
 from ...hardware_control.types import OT3Mount
 
 log = logging.getLogger(__name__)
@@ -27,7 +29,7 @@ class HardwareStopper:
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
         movement: Optional[MovementHandler] = None,
-        pipetting: Optional[PipettingHandler] = None,
+        tip_handler: Optional[TipHandler] = None,
     ) -> None:
         """Hardware stopper initializer."""
         self._hardware_api = hardware_api
@@ -36,11 +38,9 @@ class HardwareStopper:
             hardware_api=hardware_api,
             state_store=state_store,
         )
-
-        self._pipetting_handler = pipetting or PipettingHandler(
+        self._tip_handler = tip_handler or HardwareTipHandler(
             hardware_api=hardware_api,
-            state_store=state_store,
-            movement_handler=self._movement_handler,
+            state_view=state_store,
         )
 
     async def _drop_tip(self) -> None:
@@ -65,19 +65,22 @@ class HardwareStopper:
 
         for pipette_id, tiprack_id in attached_tip_racks.items():
             try:
-                await self._pipetting_handler.add_tip(
+                await self._tip_handler.add_tip(
                     pipette_id=pipette_id,
                     labware_id=tiprack_id,
                 )
                 # TODO: Add ability to drop tip onto custom trash as well.
-                await self._pipetting_handler.drop_tip(
+                await self._movement_handler.move_to_well(
                     pipette_id=pipette_id,
                     labware_id=FIXED_TRASH_ID,
                     well_name="A1",
-                    well_location=WellLocation(),
+                )
+                await self._tip_handler.drop_tip(
+                    pipette_id=pipette_id,
+                    home_after=False,
                 )
 
-            except PipetteNotAttachedError:
+            except HwPipetteNotAttachedError:
                 # this will happen normally during protocol analysis, but
                 # should not happen during an actual run
                 log.debug(f"Pipette ID {pipette_id} no longer attached.")

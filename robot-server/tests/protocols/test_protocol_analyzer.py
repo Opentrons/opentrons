@@ -63,7 +63,6 @@ async def test_analyze(
             files=[],
             metadata={},
             robot_type="OT-3 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-data-111",
     )

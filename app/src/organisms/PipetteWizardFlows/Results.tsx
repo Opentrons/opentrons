@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
-import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
+import {
+  COLORS,
+  TEXT_TRANSFORM_CAPITALIZE,
+  SPACING,
+} from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
-import { PrimaryButton } from '../../atoms/buttons'
-import { useDispatchApiRequest } from '../../redux/robot-api'
-import { fetchPipettes } from '../../redux/pipettes'
+import { usePipettesQuery } from '@opentrons/react-api-client'
+import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
-import { useCheckPipettes } from './hooks'
 import type { PipetteWizardStepProps } from './types'
 
 interface ResultsProps extends PipetteWizardStepProps {
@@ -27,19 +28,14 @@ export const Results = (props: ResultsProps): JSX.Element => {
     currentStepIndex,
     totalStepCount,
     selectedPipette,
-    robotName,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const { handleCheckPipette, isPending } = useCheckPipettes(robotName)
-  const [dispatchRequest] = useDispatchApiRequest()
+  const {
+    status: pipetteQueryStatus,
+    refetch: refetchPipettes,
+  } = usePipettesQuery()
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
-  //  when attachedPipettes updates with the try again button, if it is successful,
-  // the Results should automatically show the success screen
-  React.useEffect(() => {
-    if (robotName != null) {
-      dispatchRequest(fetchPipettes(robotName))
-    }
-  }, [dispatchRequest, robotName])
+  const isPending = pipetteQueryStatus === 'loading'
 
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
@@ -87,8 +83,11 @@ export const Results = (props: ResultsProps): JSX.Element => {
   }
 
   const handleTryAgain = (): void => {
-    handleCheckPipette()
-    setNumberOfTryAgains(numberOfTryAgains + 1)
+    refetchPipettes()
+      .then(() => {
+        setNumberOfTryAgains(numberOfTryAgains + 1)
+      })
+      .catch(() => {})
   }
 
   const handleProceed = (): void => {
@@ -108,35 +107,29 @@ export const Results = (props: ResultsProps): JSX.Element => {
     </PrimaryButton>
   )
 
-  if (
-    !isSuccess &&
-    (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) &&
-    numberOfTryAgains < 3
-  ) {
+  if (!isSuccess && (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)) {
+    subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
     button = (
-      <PrimaryButton
-        onClick={handleTryAgain}
-        disabled={isPending}
-        aria-label="Results_tryAgain"
-      >
-        {t(flowType === FLOWS.ATTACH ? 'detach_and_retry' : 'attach_and_retry')}
-      </PrimaryButton>
-    )
-  } else if (
-    !isSuccess &&
-    (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) &&
-    numberOfTryAgains <= 3
-  ) {
-    header = startCase(t('shared:something_went_wrong'))
-    button = (
-      <PrimaryButton
-        onClick={handleCleanUpAndClose}
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        disabled={isPending}
-        aria-label="Results_errorExit"
-      >
-        {t('shared:exit')}
-      </PrimaryButton>
+      <>
+        <SecondaryButton
+          onClick={handleCleanUpAndClose}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          disabled={isPending}
+          aria-label="Results_errorExit"
+          marginRight={SPACING.spacing2}
+        >
+          {t('shared:exit')}
+        </SecondaryButton>
+        <PrimaryButton
+          onClick={handleTryAgain}
+          disabled={isPending}
+          aria-label="Results_tryAgain"
+        >
+          {t(
+            flowType === FLOWS.ATTACH ? 'detach_and_retry' : 'attach_and_retry'
+          )}
+        </PrimaryButton>
+      </>
     )
   }
 

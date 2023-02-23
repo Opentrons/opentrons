@@ -2,8 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Set, Tuple, Union
 
-from opentrons.types import Point, DeckSlotName
-from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.types import Point, DeckSlotName, MountType
 
 from .. import errors
 from ..types import (
@@ -11,7 +10,9 @@ from ..types import (
     LoadedLabware,
     LoadedModule,
     WellLocation,
+    DropTipWellLocation,
     WellOrigin,
+    DropTipWellOrigin,
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
@@ -21,21 +22,18 @@ from ..types import (
 )
 from .labware import LabwareView
 from .modules import ModuleView
-from .pipettes import CurrentWell
+from .pipettes import PipetteView, CurrentWell
+from . import move_types
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
 
 @dataclass(frozen=True)
 class TipGeometry:
-    """Nominal tip geometry data.
-
-    This data is loaded from definitions and configurations, and does
-    not take calibration values into account.
+    """Tip geometry data.
 
     Props:
-        effective_length: The nominal working length (total length minus overlap)
-            of a tip, according to a tip rack and pipette's definitions.
+        effective_length: The working length (total length minus overlap) of a tip.
         diameter: Nominal tip diameter.
         volume: Nominal volume capacity.
     """
@@ -50,10 +48,16 @@ class TipGeometry:
 class GeometryView:
     """Geometry computed state getters."""
 
-    def __init__(self, labware_view: LabwareView, module_view: ModuleView) -> None:
+    def __init__(
+        self,
+        labware_view: LabwareView,
+        module_view: ModuleView,
+        pipette_view: PipetteView,
+    ) -> None:
         """Initialize a GeometryView instance."""
         self._labware = labware_view
         self._modules = module_view
+        self._pipettes = pipette_view
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
@@ -173,6 +177,8 @@ class GeometryView:
 
             if well_location.origin == WellOrigin.TOP:
                 offset = offset.copy(update={"z": offset.z + well_depth})
+            elif well_location.origin == WellOrigin.CENTER:
+                offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
 
         else:
             offset = WellOffset(x=0, y=0, z=well_depth)
@@ -204,38 +210,31 @@ class GeometryView:
         well_def = self._labware.get_well_definition(labware_id, well_name)
         return well_def.depth
 
-    def get_well_edges(
+    def get_touch_points(
         self,
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        mount: MountType,
+        radius: float = 1.0,
     ) -> List[Point]:
-        """Get list of absolute positions of four cardinal edges and center of well."""
-        well_def = self._labware.get_well_definition(labware_id, well_name)
-        if well_def.shape == "rectangular":
-            x_size = well_def.xDimension
-            y_size = well_def.yDimension
-            if x_size is None or y_size is None:
-                raise ValueError(
-                    f"Rectangular well {well_name} does not have x and y dimensions"
-                )
-        elif well_def.shape == "circular":
-            x_size = y_size = well_def.diameter
-            if x_size is None or y_size is None:
-                raise ValueError(f"Circular well {well_name} does not have diamater")
-        else:
-            raise ValueError(f'Shape "{well_def.shape}" is not a supported well shape')
+        """Get a list of touch points for a touch tip operation."""
+        labware_slot = self.get_ancestor_slot_name(labware_id)
+        next_to_module = self._modules.is_edge_move_unsafe(mount, labware_slot)
+        edge_path_type = self._labware.get_edge_path_type(
+            labware_id, well_name, mount, labware_slot, next_to_module
+        )
 
-        x_offset = x_size / 2.0
-        y_offset = y_size / 2.0
-        center = self.get_well_position(labware_id, well_name, well_location)
-        return [
-            center + Point(x=x_offset, y=0, z=0),  # right
-            center + Point(x=-x_offset, y=0, z=0),  # left
-            center,  # center
-            center + Point(x=0, y=y_offset, z=0),  # up
-            center + Point(x=0, y=-y_offset, z=0),  # down
-        ]
+        center_point = self.get_well_position(
+            labware_id, well_name, well_location=well_location
+        )
+
+        x_offset, y_offset = self._labware.get_well_radial_offsets(
+            labware_id, well_name, radius
+        )
+        return move_types.get_edge_point_list(
+            center_point, x_offset, y_offset, edge_path_type
+        )
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         labware_pos = self.get_labware_position(lw_data.id)
@@ -249,29 +248,29 @@ class GeometryView:
 
     def get_nominal_effective_tip_length(
         self,
+        pipette_id: str,
         labware_id: str,
-        pipette_config: PipetteDict,
     ) -> float:
-        """Given a labware and a pipette's config, get the effective tip length.
+        """Given a labware and a pipette's config, get the nominal effective tip length.
 
         Effective tip length is the nominal tip length less the distance the
         tip overlaps with the pipette nozzle. This does not take calibrated
-        tip lengths into account. For calibrated data,
-        see `LabwareDataProvider.get_calibrated_tip_length`.
+        tip lengths into account.
         """
         labware_uri = self._labware.get_definition_uri(labware_id)
-        nominal_length = self._labware.get_tip_length(labware_id)
-        overlap_config = pipette_config["tip_overlap"]
-        default_overlap = overlap_config.get("default", 0)
-        overlap = overlap_config.get(labware_uri, default_overlap)
+        nominal_overlap = self._pipettes.get_nominal_tip_overlap(
+            pipette_id=pipette_id, labware_uri=labware_uri
+        )
 
-        return nominal_length - overlap
+        return self._labware.get_tip_length(
+            labware_id=labware_id, overlap=nominal_overlap
+        )
 
     def get_nominal_tip_geometry(
         self,
+        pipette_id: str,
         labware_id: str,
-        pipette_config: PipetteDict,
-        well_name: Optional[str] = None,
+        well_name: Optional[str],
     ) -> TipGeometry:
         """Given a labware, well, and hardware pipette config, get the tip geometry.
 
@@ -282,8 +281,8 @@ class GeometryView:
         does not take calibrated tip lengths into account.
         """
         effective_length = self.get_nominal_effective_tip_length(
+            pipette_id=pipette_id,
             labware_id=labware_id,
-            pipette_config=pipette_config,
         )
         well_def = self._labware.get_well_definition(labware_id, well_name)
 
@@ -300,34 +299,36 @@ class GeometryView:
             volume=int(well_def.totalLiquidVolume),
         )
 
-    # TODO(mc, 2020-11-12): support pre-PAPIv2.2/2.3 behavior of dropping the tip
-    # 10mm above well bottom
     def get_tip_drop_location(
         self,
-        pipette_config: PipetteDict,
+        pipette_id: str,
         labware_id: str,
-        well_location: WellLocation,
+        well_location: DropTipWellLocation,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
-        if well_location.origin != WellOrigin.TOP:
-            raise errors.WellOriginNotAllowedError(
-                'Drop tip location must be relative to "top"'
+        if well_location.origin != DropTipWellOrigin.DEFAULT:
+            return WellLocation(
+                origin=WellOrigin(well_location.origin.value),
+                offset=well_location.offset,
             )
 
         # return to top if labware is fixed trash
         if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):
-            return well_location
-
-        nominal_length = self._labware.get_tip_length(labware_id)
-        offset_factor = pipette_config["return_tip_height"]
-        tip_z_offset = nominal_length * offset_factor
+            z_offset = well_location.offset.z
+        else:
+            z_offset = self._labware.get_tip_drop_z_offset(
+                labware_id=labware_id,
+                length_scale=self._pipettes.get_return_tip_scale(pipette_id),
+                additional_offset=well_location.offset.z,
+            )
 
         return WellLocation(
+            origin=WellOrigin.TOP,
             offset=WellOffset(
                 x=well_location.offset.x,
                 y=well_location.offset.y,
-                z=well_location.offset.z - tip_z_offset,
-            )
+                z=z_offset,
+            ),
         )
 
     def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:

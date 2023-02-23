@@ -12,14 +12,13 @@ from __future__ import annotations
 import logging
 
 from itertools import dropwhile
-from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
 
 from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -31,13 +30,14 @@ from opentrons.protocols.labware import (  # noqa: F401
 )
 
 from . import validation
-from .core import well_grid
-from .core.labware import AbstractLabware
 from ._liquid import Liquid
+from .core import well_grid
+from .core.engine import ENGINE_CORE_API_VERSION
+from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
-from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 from .core.core_map import LoadedCoreMap
-from .core.legacy.legacy_well_core import LegacyWellCore as LegacyWellCore
+from .core.legacy.legacy_labware_core import LegacyLabwareCore
+from .core.legacy.legacy_well_core import LegacyWellCore
 from .core.legacy.well_geometry import WellGeometry
 
 
@@ -210,9 +210,7 @@ class Well:
         """
         return self._core.from_center_cartesian(x, y, z)
 
-    # TODO (tz, 12-19-22): Limit to API version 2.14
-    # https://opentrons.atlassian.net/browse/RCORE-537
-    @requires_version(2, 13)
+    @requires_version(2, 14)
     def load_liquid(self, liquid: Liquid, volume: float) -> None:
         """
         Load a liquid into a well.
@@ -371,11 +369,20 @@ class Labware:
         load it, or the label of the labware specified by a user."""
         return self._core.get_name()
 
-    # TODO(jbl, 2022-12-06): deprecate officially when there is a PAPI version for the engine core
     @name.setter
     def name(self, new_name: str) -> None:
-        """Set the labware name"""
-        self._core.set_name(new_name)
+        """Set the labware name.
+
+        .. deprecated: 2.14
+            Set the name of labware in `load_labware` instead.
+        """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError("Labware.name setter has been deprecated")
+
+        # TODO(mc, 2023-02-06): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyLabwareCore)
+        cast(LegacyLabwareCore, self._core).set_name(new_name)
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -395,10 +402,28 @@ class Labware:
         """Quirks specific to this labware."""
         return self._core.get_quirks()
 
-    # TODO(mc, 2022-09-23): use `self._core.get_default_magnet_engage_height`
+    # TODO(mm, 2023-02-08):
+    # Specify units and origin after we resolve RSS-110.
+    # Remove warning once we resolve RSS-109 more broadly.
     @property  # type: ignore
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
+        """Return the default magnet engage height that
+        :py:meth:`.MagneticModuleContext.engage` will use for this labware.
+
+        .. warning::
+            This currently returns confusing and unpredictable results that do not
+            necessarily match what :py:meth:`.MagneticModuleContext.engage` will
+            actually choose for its default height.
+
+            The confusion is related to how this height's units and origin point are
+            defined, and differences between Magnetic Module generations.
+
+            For now, we recommend you avoid accessing this property directly.
+        """
+        # Return the raw value straight from the labware definition. For several
+        # reasons (see RSS-109), this may not match the actual default height chosen
+        # by MagneticModuleContext.engage().
         p = self._core.get_parameters()
         if not p["isMagneticModuleCompatible"]:
             return None
@@ -423,15 +448,32 @@ class Labware:
         even if those labware are of the same type.
 
         .. caution::
-            This method is *only* for Jupyter and command-line applications
-            of the Python Protocol API. Do not use this method in a protocol
-            uploaded via the Opentrons App.
+            This method is *only* for use with mechanisms like
+            :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
+            to adjust labware offsets. (See :ref:`advanced-control`.)
 
-            Using this method and the Opentrons App's Labware Position Check
-            at the same time will produce undefined behavior. We may choose
-            to define this behavior in a future release.
+            If you're uploading a protocol via the Opentrons App, don't use this method,
+            because it will produce undefined behavior.
+            Instead, use Labware Position Check in the app.
+
+            Because protocols using :ref:`API version <v2-versioning>` 2.14 or higher
+            can currently *only* be uploaded via the Opentrons App, it doesn't make
+            sense to use this method with them. Trying to do so will raise an exception.
         """
-        self._core.set_calibration(Point(x=x, y=y, z=z))
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            # TODO(mm, 2023-02-13): See Jira RCORE-535.
+            #
+            # Until that issue is resolved, the only way to simulate or run a
+            # >=ENGINE_CORE_API_VERSION protocol is through the Opentrons App.
+            # Therefore, in >=ENGINE_CORE_API_VERSION protocols,
+            # there's no legitimate way to use this method.
+            raise APIVersionError(
+                "Labware.set_offset() is not supported when apiLevel is 2.14 or higher."
+                " Use a lower apiLevel"
+                " or use the Opentrons App's Labware Position Check."
+            )
+        else:
+            self._core.set_calibration(Point(x=x, y=y, z=z))
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -661,10 +703,22 @@ class Labware:
     def tip_length(self) -> float:
         return self._core.get_tip_length()
 
-    # TODO(jbl, 2022-12-06): deprecate officially when there is a PAPI version for the engine core
     @tip_length.setter
     def tip_length(self, length: float) -> None:
-        self._core.set_tip_length(length)
+        """
+        Set the tip rack's tip length.
+
+        .. deprecated: 2.14
+            Ensure tip length is set properly in your tip rack's definition
+            and/or use the Opentrons App's tip length calibration feature.
+        """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError("Labware.tip_length setter has been deprecated")
+
+        # TODO(mc, 2023-02-06): this assert should be enough for mypy
+        # invvestigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyLabwareCore)
+        cast(LegacyLabwareCore, self._core).set_tip_length(length)
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
@@ -693,7 +747,6 @@ class Labware:
 
         return self._wells_by_name[well_name] if well_name is not None else None
 
-    # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def use_tips(self, start_well: Well, num_channels: int = 1) -> None:
         """
         Removes tips from the tip tracker.
@@ -713,12 +766,23 @@ class Labware:
         :type start_well: :py:class:`.Well`
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
-        """
-        assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
 
+        .. deprecated:: 2.14
+            Modification of tip tracking state outside :py:meth:`.reset` has been deprecated.
+        """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.use_tips has been deprecated."
+                " To modify tip state, use Labware.reset"
+            )
+
+        assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
         fail_if_full = self._api_version < APIVersion(2, 2)
 
-        self._core.get_tip_tracker().use_tips(
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyLabwareCore)
+        cast(LegacyLabwareCore, self._core).get_tip_tracker().use_tips(
             start_well=start_well._core,
             num_channels=num_channels,
             fail_if_full=fail_if_full,
@@ -735,7 +799,6 @@ class Labware:
     def __hash__(self) -> int:
         return hash((self._core, self._api_version))
 
-    # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
         Find the best well to drop a tip in.
@@ -747,10 +810,25 @@ class Labware:
                          column
         :type num_tips: int
         :return: The :py:class:`.Well` meeting the target criteria, or ``None``
+
+        .. versionchanged:: 2.14
+            This method has been removed.
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.previous_tip is unsupported in this API version."
+            )
+
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-        well_core = self._core.get_tip_tracker().previous_tip(num_tips=num_tips)
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyLabwareCore)
+        well_core = (
+            cast(LegacyLabwareCore, self._core)
+            .get_tip_tracker()
+            .previous_tip(num_tips=num_tips)
+        )
         return self._wells_by_name[well_core.get_name()] if well_core else None
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
@@ -774,10 +852,23 @@ class Labware:
         :type start_well: :py:class:`.Well`
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
+
+        .. versionchanged:: 2.14
+            This method has been removed. Use :py:meth:`.reset` instead.
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.return_tips() is unsupported in this API version."
+                " Use Labware.reset() instead."
+            )
+
         # This logic is the inverse of :py:meth:`use_tips`
         assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
-        self._core.get_tip_tracker().return_tips(
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyLabwareCore)
+        cast(LegacyLabwareCore, self._core).get_tip_tracker().return_tips(
             start_well=start_well._core, num_channels=num_channels
         )
 
@@ -867,7 +958,7 @@ def load_from_definition(
     :param api_level: the API version to set for the loaded labware
                       instance. The :py:class:`.Labware` will
                       conform to this level. If not specified,
-                      defaults to ``MAX_SUPPORTED_VERSION``.
+                      defaults to ``APIVersion(2, 13)``.
     """
     return Labware(
         core=LegacyLabwareCore(
@@ -875,7 +966,7 @@ def load_from_definition(
             parent=parent,
             label=label,
         ),
-        api_version=api_level or MAX_SUPPORTED_VERSION,
+        api_version=api_level or APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )
@@ -918,7 +1009,7 @@ def load(
     :param api_level: the API version to set for the loaded labware
                       instance. The :py:class:`.Labware` will
                       conform to this level. If not specified,
-                      defaults to ``MAX_SUPPORTED_VERSION``.
+                      defaults to ``APIVersion(2, 13)``.
     """
     definition = get_labware_definition(
         load_name,

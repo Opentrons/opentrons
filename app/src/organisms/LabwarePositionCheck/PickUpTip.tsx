@@ -23,7 +23,7 @@ import { TipConfirmation } from './TipConfirmation'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { chainRunCommands } from './utils/chainRunCommands'
 
-import type { Jog } from '../../molecules/DeprecatedJogControls/types'
+import type { Jog } from '../../molecules/JogControls/types'
 import type {
   PickUpTipStep,
   RegisterPositionAction,
@@ -130,7 +130,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
           {
             onSuccess: response => {
-              setInitialPosition(response.data.result.position)
+              setInitialPosition(response.data.result?.position)
             },
           }
         )

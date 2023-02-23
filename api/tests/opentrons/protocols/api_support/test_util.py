@@ -9,7 +9,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     build_edges,
-    _find_value_for_api_version,
+    find_value_for_api_version,
 )
 from opentrons.hardware_control.types import Axis
 
@@ -176,4 +176,4 @@ def test_build_edges_right_pipette(ctx):
     ],
 )
 def test_find_value_for_api_version(data, level, desired):
-    assert _find_value_for_api_version(level, data) == desired
+    assert find_value_for_api_version(level, data) == desired

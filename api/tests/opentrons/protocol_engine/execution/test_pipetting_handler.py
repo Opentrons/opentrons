@@ -8,11 +8,14 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
 
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import (
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckPoint,
+)
 from opentrons.protocol_engine.state import (
     StateStore,
-    TipGeometry,
     HardwarePipette,
     CurrentWell,
     PipetteLocationData,
@@ -89,185 +92,6 @@ def subject(
     )
 
 
-async def test_handle_pick_up_tip_request(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
-    tip_rack_def: LabwareDefinition,
-    subject: PipettingHandler,
-) -> None:
-    """It should handle a PickUpTipCreate properly."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
-    decoy.when(state_store.labware.get_definition("labware-id")).then_return(
-        tip_rack_def
-    )
-
-    decoy.when(
-        state_store.geometry.get_nominal_tip_geometry(
-            labware_id="labware-id",
-            well_name="B2",
-            pipette_config=mock_hw_pipettes.left_config,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
-
-    decoy.when(
-        await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-    ).then_return(42)
-
-    await subject.pick_up_tip(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-    )
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="B2",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-        ),
-        await hardware_api.pick_up_tip(
-            mount=Mount.LEFT,
-            tip_length=42,
-            presses=None,
-            increment=None,
-        ),
-        hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
-        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
-    )
-
-
-async def test_handle_pick_up_tip_request_tip_length_fallback(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
-    tip_rack_def: LabwareDefinition,
-    subject: PipettingHandler,
-) -> None:
-    """It should pick up a tip even if there's no calibrated tip length available."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
-    decoy.when(state_store.labware.get_definition("labware-id")).then_return(
-        tip_rack_def
-    )
-
-    decoy.when(
-        state_store.geometry.get_nominal_tip_geometry(
-            labware_id="labware-id",
-            well_name="B2",
-            pipette_config=mock_hw_pipettes.left_config,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
-
-    decoy.when(
-        await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-    ).then_return(None)
-
-    await subject.pick_up_tip(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-    )
-
-    decoy.verify(
-        await hardware_api.pick_up_tip(
-            mount=Mount.LEFT,
-            tip_length=50,
-            presses=None,
-            increment=None,
-        ),
-    )
-
-
-async def test_handle_drop_up_tip_request(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
-) -> None:
-    """It should handle a DropTipCreate properly."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(
-            mount=Mount.RIGHT,
-            config=mock_hw_pipettes.right_config,
-        )
-    )
-
-    decoy.when(
-        state_store.geometry.get_tip_drop_location(
-            pipette_config=mock_hw_pipettes.right_config,
-            labware_id="labware-id",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-        )
-    ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
-
-    await subject.drop_tip(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="A1",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-    )
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="A1",
-            well_location=WellLocation(offset=WellOffset(x=4, y=5, z=6)),
-        ),
-        await hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
-    )
-
-
 async def test_handle_aspirate_request_without_prep(
     decoy: Decoy,
     state_store: StateStore,
@@ -301,7 +125,17 @@ async def test_handle_aspirate_request_without_prep(
         )
     ).then_return(True)
 
-    volume = await subject.aspirate(
+    decoy.when(
+        await movement_handler.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="C6",
+            well_location=well_location,
+            current_well=None,
+        ),
+    ).then_return(DeckPoint(x=1, y=2, z=3))
+
+    result = await subject.aspirate(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="C6",
@@ -310,16 +144,10 @@ async def test_handle_aspirate_request_without_prep(
         flow_rate=2.5,
     )
 
-    assert volume == 25
+    assert result.volume == 25
+    assert result.position == DeckPoint(x=1, y=2, z=3)
 
     decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=well_location,
-            current_well=None,
-        ),
         hardware_api.set_flow_rate(
             mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
         ),
@@ -366,25 +194,7 @@ async def test_handle_aspirate_request_with_prep(
         )
     ).then_return(False)
 
-    volume = await subject.aspirate(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="C6",
-        well_location=well_location,
-        volume=25,
-        flow_rate=2.5,
-    )
-
-    assert volume == 25
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=WellLocation(origin=WellOrigin.TOP),
-        ),
-        await hardware_api.prepare_for_aspirate(mount=Mount.LEFT),
+    decoy.when(
         await movement_handler.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
@@ -396,6 +206,31 @@ async def test_handle_aspirate_request_with_prep(
                 well_name="C6",
             ),
         ),
+    ).then_return(DeckPoint(x=1, y=2, z=3))
+
+    result = await subject.aspirate(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="C6",
+        well_location=well_location,
+        volume=25,
+        flow_rate=2.5,
+    )
+
+    assert result.volume == 25
+    assert result.position == DeckPoint(x=1, y=2, z=3)
+
+    decoy.verify(
+        await movement_handler.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="C6",
+            well_location=WellLocation(origin=WellOrigin.TOP),
+        )
+    )
+
+    decoy.verify(
+        await hardware_api.prepare_for_aspirate(mount=Mount.LEFT),
         hardware_api.set_flow_rate(
             mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
         ),
@@ -446,112 +281,6 @@ async def test_handle_dispense_in_place_request(
     )
 
 
-async def test_handle_add_tip(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
-    tip_rack_def: LabwareDefinition,
-    subject: PipettingHandler,
-) -> None:
-    """It should add a tip manually to the hardware API."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
-    decoy.when(state_store.labware.get_definition("labware-id")).then_return(
-        tip_rack_def
-    )
-
-    decoy.when(
-        state_store.geometry.get_nominal_tip_geometry(
-            labware_id="labware-id",
-            pipette_config=mock_hw_pipettes.left_config,
-            well_name=None,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
-
-    decoy.when(
-        await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-    ).then_return(42)
-
-    await subject.add_tip(pipette_id="pipette-id", labware_id="labware-id")
-
-    decoy.verify(
-        await hardware_api.add_tip(mount=Mount.LEFT, tip_length=42),
-        hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
-        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
-    )
-
-
-async def test_handle_add_tip_length_fallback(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
-    tip_rack_def: LabwareDefinition,
-    subject: PipettingHandler,
-) -> None:
-    """It should add a tip to the HW API even if there's no calibrated length."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
-    decoy.when(state_store.labware.get_definition("labware-id")).then_return(
-        tip_rack_def
-    )
-
-    decoy.when(
-        state_store.geometry.get_nominal_tip_geometry(
-            labware_id="labware-id",
-            pipette_config=mock_hw_pipettes.left_config,
-            well_name=None,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
-
-    decoy.when(
-        await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-    ).then_return(None)
-
-    await subject.add_tip(pipette_id="pipette-id", labware_id="labware-id")
-
-    decoy.verify(
-        await hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
-        hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
-        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
-    )
-
-
 async def test_touch_tip(
     decoy: Decoy,
     state_store: StateStore,
@@ -577,22 +306,28 @@ async def test_touch_tip(
     )
 
     decoy.when(
-        state_store.geometry.get_well_edges(
+        state_store.geometry.get_touch_points(
             labware_id="labware-id",
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            mount=MountType.LEFT,
+            radius=1.23,
         )
-    ).then_return([Point(x=0, y=1, z=2), Point(x=3, y=4, z=5)])
+    ).then_return([Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)])
 
     decoy.when(
-        state_store.pipettes.get_movement_speed(pipette_id="pipette-id")
-    ).then_return(39339.5)
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=987
+        )
+    ).then_return(9001)
 
     await subject.touch_tip(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="A3",
         well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        radius=1.23,
+        speed=987,
     )
 
     decoy.verify(
@@ -605,13 +340,13 @@ async def test_touch_tip(
         await hardware_api.move_to(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=0, y=1, z=2),
-            speed=39339.5,
+            abs_position=Point(x=11, y=22, z=33),
+            speed=9001,
         ),
         await hardware_api.move_to(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=3, y=4, z=5),
-            speed=39339.5,
+            abs_position=Point(x=44, y=55, z=66),
+            speed=9001,
         ),
     )
