@@ -50,7 +50,10 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
             ignore_pause=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
-            use_virtual_pipettes=(not feature_flags.disable_fast_protocol_upload()),
+            use_virtual_pipettes=(
+                robot_type != "OT-3 Standard"
+                and not feature_flags.disable_fast_protocol_upload()
+            ),
         ),
     )
 
