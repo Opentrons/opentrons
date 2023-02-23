@@ -4,14 +4,14 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import { SetWifiCred } from '../SetWifiCred'
 
 const mockSetShowSelectAuthenticationType = jest.fn()
 const mockSetPassword = jest.fn()
 const mockHandleConnect = jest.fn()
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/robot-api')
+jest.mock('../../../../redux/discovery')
+jest.mock('../../../../redux/robot-api')
 
 const render = (props: React.ComponentProps<typeof SetWifiCred>) => {
   return renderWithProviders(

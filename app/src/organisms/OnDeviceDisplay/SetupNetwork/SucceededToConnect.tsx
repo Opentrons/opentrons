@@ -17,18 +17,18 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import { PrimaryButton, TertiaryButton } from '../../../atoms/buttons'
 import {
   getNetworkInterfaces,
   fetchStatus,
   fetchWifiList,
-} from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
+} from '../../../redux/networking'
+import { getLocalRobot } from '../../../redux/discovery'
 
-import type { State, Dispatch } from '../../redux/types'
-import type { SimpleInterfaceStatus } from '../../redux/networking/types'
-import type { AuthType } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
+import type { State, Dispatch } from '../../../redux/types'
+import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
+import type { AuthType } from '../../../pages/OnDeviceDisplay/ConnectViaWifi'
 
 interface SucceededToConnectProps {
   ssid: string

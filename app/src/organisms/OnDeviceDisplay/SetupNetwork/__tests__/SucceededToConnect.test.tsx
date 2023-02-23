@@ -4,9 +4,9 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../i18n'
-import * as Networking from '../../../redux/networking'
-import * as Fixtures from '../../../redux/networking/__fixtures__'
+import { i18n } from '../../../../i18n'
+import * as Networking from '../../../../redux/networking'
+import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import { SucceededToConnect } from '../SucceededToConnect'
 
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
@@ -18,8 +18,8 @@ const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
 >
 const mockPush = jest.fn()
 
-jest.mock('../../../redux/networking')
-jest.mock('../../../redux/discovery/selectors')
+jest.mock('../../../../redux/networking')
+jest.mock('../../../../redux/discovery/selectors')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {

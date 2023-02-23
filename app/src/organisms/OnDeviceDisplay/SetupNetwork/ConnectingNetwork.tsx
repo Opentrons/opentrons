@@ -12,7 +12,7 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
+import { StyledText } from '../../../atoms/text'
 
 export function ConnectingNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')

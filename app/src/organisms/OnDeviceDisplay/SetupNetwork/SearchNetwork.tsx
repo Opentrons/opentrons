@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
+import { StyledText } from '../../../atoms/text'
 
 export function SearchNetwork(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
