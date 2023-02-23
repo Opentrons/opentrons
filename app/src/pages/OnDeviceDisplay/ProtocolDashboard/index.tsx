@@ -3,16 +3,20 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
   Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
   Icon,
   JUSTIFY_CENTER,
-  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_HIDDEN,
+  SPACING,
+  TYPOGRAPHY,
+  useSwipe,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
@@ -26,6 +30,7 @@ import {
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '../../../redux/config'
+import { PinnedProtocol } from './PinnedProtocol'
 import { ProtocolRow } from './ProtocolRow'
 import { sortProtocols } from './utils'
 
@@ -33,6 +38,7 @@ import imgSrc from '../../../assets/images/odd/abstract@x2.png'
 
 import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
+import type { ProtocolResource } from '@opentrons/shared-data'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -59,11 +65,18 @@ export function ProtocolDashboard(): JSX.Element {
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
-  const pinnedProtocols = protocolsData.filter(p =>
-    pinnedProtocolIds.includes(p.id)
+  let pinnedProtocols: ProtocolResource[] = []
+  for (const id of pinnedProtocolIds) {
+    const protocol = protocolsData.find(p => p.id === id)
+    if (protocol !== undefined) {
+      pinnedProtocols.push(protocol)
+    }
+  }
+  const unpinnedProtocols = protocolsData.filter(
+    p => !pinnedProtocolIds.includes(p.id)
   )
   const runData = runs.data?.data != null ? runs.data?.data : []
-  const sortedProtocols = sortProtocols(sortBy, protocolsData, runData)
+  const sortedProtocols = sortProtocols(sortBy, unpinnedProtocols, runData)
 
   const handleProtocolsBySortKey = (
     sortKey: ProtocolsOnDeviceSortKey
@@ -95,6 +108,21 @@ export function ProtocolDashboard(): JSX.Element {
     }
   }
 
+  const swipe = useSwipe()
+
+  if (pinnedProtocols.length > 3 && swipe.swipeType === 'swipe-left') {
+    const inView = pinnedProtocols.slice(0, 3)
+    const outOfView = pinnedProtocols.slice(3)
+    pinnedProtocols = [...outOfView, ...inView]
+    dispatch(
+      updateConfigValue(
+        'protocols.pinnedProtocolIds',
+        pinnedProtocols.map(p => p.id)
+      )
+    )
+    swipe.setSwipeType('')
+  }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -104,27 +132,30 @@ export function ProtocolDashboard(): JSX.Element {
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          height="8rem"
-          backgroundColor={COLORS.medGreyEnabled}
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} height="15rem">
           <StyledText
-            fontSize="2rem"
-            lineHeight="2.75rem"
+            fontSize="1.25rem"
+            lineHeight="1.5rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             Pinned Protocols
           </StyledText>
-          <StyledText
-            fontSize="1rem"
-            lineHeight="1.125rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            alignItems={ALIGN_FLEX_START}
+            gridGap={SPACING.spacing3}
+            ref={swipe.ref}
+            overflow={OVERFLOW_HIDDEN}
           >
-            {JSON.stringify(pinnedProtocolIds)}
-          </StyledText>
+            {pinnedProtocols.map(protocol => {
+              return (
+                <PinnedProtocol
+                  key={protocol.key}
+                  protocol={protocol}
+                />
+              )
+            })}
+          </Flex>
         </Flex>
       )}
       {sortedProtocols.length > 0 ? (
