@@ -84,7 +84,7 @@ class PipettingHandler:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
-    ) -> None:
+    ) -> float:
         """Pick up a tip at the specified "well"."""
         hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
             pipette_id=pipette_id,
@@ -119,10 +119,14 @@ class PipettingHandler:
             tip_volume=tip_volume,
         )
 
+        return tip_volume
+
     async def add_tip(self, pipette_id: str, labware_id: str) -> None:
         """Manually add a tip to a pipette in the hardware API.
 
         Used to enable a drop tip even if the HW API thinks no tip is attached.
+
+        This is used by hardware stopper, and will not affect the pipette state store working volume tracking
         """
         hw_mount, tip_length, tip_diameter, tip_volume = await self._get_tip_details(
             pipette_id=pipette_id,
@@ -249,6 +253,8 @@ class PipettingHandler:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        radius: float,
+        speed: Optional[float],
     ) -> None:
         """Touch the pipette tip to the sides of a well."""
         target_well = CurrentWell(
@@ -263,13 +269,17 @@ class PipettingHandler:
             current_well=target_well,
         )
 
-        touch_points = self._state_store.geometry.get_well_edges(
+        touch_points = self._state_store.geometry.get_touch_points(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            mount=pipette_location.mount,
+            radius=radius,
         )
 
-        speed = self._state_store.pipettes.get_movement_speed(pipette_id=pipette_id)
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
 
         # this will handle raising if the thermocycler lid is in a bad state
         # so we don't need to put that logic elsewhere

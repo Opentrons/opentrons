@@ -17,10 +17,11 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     ThermocyclerModuleModel,
 )
-from opentrons.protocol_api.core.protocol_api.module_geometry import (
+from opentrons.protocol_api.core.legacy.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
     models_compatible,
 )
+from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
@@ -51,7 +52,7 @@ def ctx_with_tempdeck(
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=mock_hardware,
     )
 
@@ -66,7 +67,7 @@ def ctx_with_magdeck(
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=mock_hardware,
     )
 
@@ -81,7 +82,7 @@ async def ctx_with_thermocycler(
     mock_hardware.attached_modules = [mock_module_controller]
 
     return papi.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=mock_hardware,
     )
 
@@ -98,7 +99,7 @@ def ctx_with_heater_shaker(
     mock_hardware.attached_modules = [mock_module_controller]
 
     ctx = papi.create_protocol_context(
-        api_version=papi.MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         hardware_api=mock_hardware,
     )
     ctx.location_cache = mock_pipette_location
@@ -374,10 +375,7 @@ def test_module_load_labware(ctx_with_tempdeck):
         labware_def["cornerOffsetFromSlot"]["y"],
         labware_def["cornerOffsetFromSlot"]["z"],
     )
-    assert (
-        lw._implementation.get_geometry().offset
-        == lw_offset + mod.geometry.location.point
-    )
+    assert lw._core.get_geometry().offset == lw_offset + mod.geometry.location.point
     assert lw.name == labware_name
 
 

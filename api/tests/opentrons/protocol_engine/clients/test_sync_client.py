@@ -27,6 +27,7 @@ from opentrons.protocol_engine.types import (
     WellOffset,
     WellLocation,
     MotorAxis,
+    Liquid,
 )
 
 
@@ -61,6 +62,28 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(labware_definition)
 
     assert result == expected_labware_uri
+
+
+def test_add_liquid(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should add a liquid to engine state."""
+    liquid = Liquid.construct(displayName="water")  # type: ignore[call-arg]
+
+    decoy.when(
+        transport.call_method(
+            "add_liquid",
+            name="water",
+            description="water desc",
+            color="#fff",
+        )
+    ).then_return(liquid)
+
+    result = subject.add_liquid(name="water", description="water desc", color="#fff")
+
+    assert result == liquid
 
 
 def test_reset_tips(
@@ -253,7 +276,7 @@ def test_pick_up_tip(
             pipetteId="123", labwareId="456", wellName="A2", wellLocation=WellLocation()
         )
     )
-    response = commands.PickUpTipResult()
+    response = commands.PickUpTipResult(tipVolume=78.9)
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
@@ -377,6 +400,8 @@ def test_touch_tip(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
+            radius=7.89,
+            speed=65.4,
         )
     )
 
@@ -389,6 +414,8 @@ def test_touch_tip(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+        radius=7.89,
+        speed=65.4,
     )
 
     assert result == response
@@ -904,5 +931,25 @@ def test_home(
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.home(axes=[MotorAxis.X, MotorAxis.Y])
+
+    assert result == response
+
+
+def test_load_liquid(
+    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+) -> None:
+    """It should execute load liquid command."""
+    request = commands.LoadLiquidCreate(
+        params=commands.LoadLiquidParams(
+            labwareId="labware-id", liquidId="liquid-id", volumeByWell={"A1": 20}
+        )
+    )
+    response = commands.LoadLiquidResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.load_liquid(
+        labware_id="labware-id", liquid_id="liquid-id", volume_by_well={"A1": 20}
+    )
 
     assert result == response

@@ -123,7 +123,6 @@ async def test_get_protocols(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-key-111",
     )
@@ -137,7 +136,6 @@ async def test_get_protocols(
             files=[],
             metadata={},
             robot_type="OT-3 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-key-222",
     )
@@ -200,7 +198,6 @@ async def test_get_protocol_by_id(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
-            labware_definitions=[],
         ),
         protocol_key="dummy-key-111",
     )
@@ -280,7 +277,6 @@ async def test_create_protocol(
         metadata={"this_is_fake_metadata": True},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=123),
-        labware_definitions=[],
     )
 
     protocol_resource = ProtocolResource(
@@ -392,7 +388,6 @@ async def test_create_protocol_different_robot_type(
             metadata={},
             robot_type="OT-2 Standard",
             config=JsonProtocolConfig(schema_version=123),
-            labware_definitions=[],
         )
     )
 

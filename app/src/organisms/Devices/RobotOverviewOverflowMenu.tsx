@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   BORDERS,
   COLORS,
@@ -12,21 +13,24 @@ import {
   useHoverTooltip,
   useMountEffect,
 } from '@opentrons/components'
+
+import { Portal } from '../../App/portal'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { Divider } from '../../atoms/structure'
+import { Tooltip } from '../../atoms/Tooltip'
+import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
+import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+import { UpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
+import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
+import { getCanDisconnect } from '../../redux/networking'
 import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
-import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Tooltip } from '../../atoms/Tooltip'
-import { Portal } from '../../App/portal'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { Divider } from '../../atoms/structure'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useIsRobotBusy } from './hooks'
-import { UpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
@@ -53,16 +57,12 @@ export const RobotOverviewOverflowMenu = (
 
   const dispatch = useDispatch<Dispatch>()
 
-  const handleClickRestart: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
+  const handleClickRestart: React.MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))
-    setShowOverflowMenu(false)
   }
 
-  const handleClickHomeGantry: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
+  const handleClickHomeGantry: React.MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(home(robot.name, ROBOT))
-    setShowOverflowMenu(false)
   }
 
   const [
@@ -73,22 +73,28 @@ export const RobotOverviewOverflowMenu = (
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
   ] = React.useState<boolean>(false)
+  const [showDisconnectModal, setShowDisconnectModal] = React.useState<boolean>(
+    false
+  )
+
+  const canDisconnect = useSelector((state: State) =>
+    getCanDisconnect(state, robot.name)
+  )
+
+  const handleClickDisconnect: React.MouseEventHandler<HTMLButtonElement> = () => {
+    setShowDisconnectModal(true)
+  }
 
   useMountEffect(() => {
     dispatch(checkShellUpdate())
   })
 
-  const handleClickUpdateBuildroot: React.MouseEventHandler = e => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleClickUpdateBuildroot: React.MouseEventHandler = () => {
     setShowSoftwareUpdateModal(true)
   }
 
-  const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowChooseProtocolSlideout(true)
-    setShowOverflowMenu(false)
   }
 
   const { autoUpdateAction } = useSelector((state: State) => {
@@ -104,18 +110,26 @@ export const RobotOverviewOverflowMenu = (
       position={POSITION_RELATIVE}
       onClick={e => {
         e.preventDefault()
+        e.stopPropagation()
+        setShowOverflowMenu(false)
       }}
     >
-      {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
-        <Portal level="top">
+      <Portal level="top">
+        {showSoftwareUpdateModal &&
+        robot != null &&
+        robot.status !== UNREACHABLE ? (
           <UpdateBuildroot
             robot={robot}
             close={() => setShowSoftwareUpdateModal(false)}
           />
-        </Portal>
-      ) : null}
+        ) : null}
+        {showDisconnectModal ? (
+          <DisconnectModal
+            onCancel={() => setShowDisconnectModal(false)}
+            robotName={robot.name}
+          />
+        ) : null}
+      </Portal>
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
@@ -165,6 +179,14 @@ export const RobotOverviewOverflowMenu = (
           >
             {t('home_gantry')}
           </MenuItem>
+          {robot.status === CONNECTABLE ? (
+            <MenuItem
+              disabled={isRobotBusy || !canDisconnect}
+              onClick={handleClickDisconnect}
+            >
+              {t('disconnect_from_network')}
+            </MenuItem>
+          ) : null}
           <MenuItem
             disabled={isRobotUnavailable}
             onClick={handleClickRestart}

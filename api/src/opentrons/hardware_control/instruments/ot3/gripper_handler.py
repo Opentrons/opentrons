@@ -2,12 +2,17 @@ from typing import Optional
 import logging
 
 from opentrons.types import Point
-from .instrument_calibration import load_gripper_calibration_offset
+from .instrument_calibration import (
+    load_gripper_calibration_offset,
+    GripperCalibrationOffset,
+)
 from opentrons.hardware_control.dev_types import GripperDict
 from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperJawState,
     GripperProbe,
+)
+from opentrons.hardware_control.errors import (
     InvalidMoveError,
     GripperNotAttachedError,
 )
@@ -27,10 +32,6 @@ class CalibrationError(Exception):
     """An error raised if a gripper calibration is blocked"""
 
     pass
-
-
-# TODO: verify value with HW and put this value in gripper config
-DEFAULT_GRIP_FORCE_IN_NEWTON = 3.0
 
 
 class GripperHandler:
@@ -76,19 +77,18 @@ class GripperHandler:
 
     def reset_instrument_offset(self, to_default: bool) -> None:
         """
-        Tempoarily reset the gripper offsets to default values.
+        Temporarily reset the gripper offsets to default values.
         """
         gripper = self.get_gripper()
         gripper.reset_offset(to_default)
 
-    def save_instrument_offset(self, delta: Point) -> None:
+    def save_instrument_offset(self, delta: Point) -> GripperCalibrationOffset:
         """
-        Save a new instrument offset the pipette offset to a particular value.
-        :param mount: Modify the given mount.
+        Save a new instrument offset.
         :param delta: The offset to set for the pipette.
         """
         gripper = self.get_gripper()
-        gripper.save_offset(delta)
+        return gripper.save_offset(delta)
 
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         if not self._gripper:
@@ -137,12 +137,14 @@ class GripperHandler:
     def set_jaw_state(self, state: GripperJawState) -> None:
         self.get_gripper().state = state
 
-    def get_duty_cycle_by_grip_force(self, newton: Optional[float] = None) -> float:
+    def get_duty_cycle_by_grip_force(self, newton: float) -> float:
         gripper = self.get_gripper()
-        if not newton:
-            newton = DEFAULT_GRIP_FORCE_IN_NEWTON
         return gripper.duty_cycle_by_force(newton)
 
     def set_jaw_displacement(self, mm: float) -> None:
         gripper = self.get_gripper()
         gripper.current_jaw_displacement = mm
+
+    def is_valid_jaw_width(self, mm: float) -> bool:
+        conf = self.get_gripper().geometry
+        return conf.jaw_width["min"] <= mm <= conf.jaw_width["max"]

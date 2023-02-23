@@ -15,6 +15,7 @@ from opentrons.types import Mount
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
+from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
 from .instrument_models import (
     MountType,
@@ -48,11 +49,10 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     return Gripper.construct(
         mount=MountType.EXTENSION.as_string(),
-        instrumentName=gripper_dict["name"],
-        instrumentModel=gripper_dict["model"],
+        instrumentModel=GripperModelStr(str(gripper_dict["model"])),
         serialNumber=gripper_dict["gripper_id"],
         data=GripperData(
-            jawState=gripper_dict["state"],
+            jawState=gripper_dict["state"].name.lower(),
             calibratedOffset=gripper_dict["calibration_offset"],
         ),
     )

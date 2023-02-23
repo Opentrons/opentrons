@@ -242,6 +242,7 @@ def create_pick_up_tip_command(
     pipette_id: str,
     labware_id: str = "labware-id",
     well_name: str = "A1",
+    tip_volume: float = 123.4,
 ) -> cmd.PickUpTip:
     """Get a completed PickUpTip command."""
     data = cmd.PickUpTipParams(
@@ -250,7 +251,7 @@ def create_pick_up_tip_command(
         wellName=well_name,
     )
 
-    result = cmd.PickUpTipResult()
+    result = cmd.PickUpTipResult(tipVolume=tip_volume)
 
     return cmd.PickUpTip(
         id="command-id",

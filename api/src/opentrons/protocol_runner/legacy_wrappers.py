@@ -1,12 +1,13 @@
 """Wrappers for the legacy, Protocol API v2 execution pipeline."""
 import asyncio
-from typing import Optional, cast
+from typing import Dict, Iterable, Optional, cast
 
 from anyio import to_thread
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LegacyLabwareDefinition,
 )
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
@@ -19,7 +20,6 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
     HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
 
@@ -31,7 +31,8 @@ from opentrons.protocol_api import (
     Well as LegacyWell,
     create_protocol_context,
 )
-from opentrons.protocol_api.core.protocol_api.load_info import (
+from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
+from opentrons.protocol_api.core.legacy.load_info import (
     LoadInfo as LegacyLoadInfo,
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
@@ -52,7 +53,7 @@ from opentrons.protocols.types import (
 # Note that even when simulation and execution are handled by the legacy machinery,
 # Protocol Engine still has some involvement for analyzing the simulation and
 # monitoring the execution.
-LEGACY_PYTHON_API_VERSION_CUTOFF = APIVersion(3, 0)
+LEGACY_PYTHON_API_VERSION_CUTOFF = ENGINE_CORE_API_VERSION
 
 
 # The earliest JSON protocol schema version where the protocol is executed directly by
@@ -64,10 +65,21 @@ class LegacyFileReader:
     """Interface to read Protocol API v2 protocols prior to execution."""
 
     @staticmethod
-    def read(protocol_source: ProtocolSource) -> LegacyProtocol:
+    def read(
+        protocol_source: ProtocolSource,
+        labware_definitions: Iterable[LabwareDefinition],
+    ) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
         protocol_contents = protocol_file_path.read_text(encoding="utf-8")
+        legacy_labware_definitions: Dict[str, LegacyLabwareDefinition] = {
+            uri_from_details(
+                namespace=lw.namespace,
+                load_name=lw.parameters.loadName,
+                version=lw.version,
+            ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
+            for lw in labware_definitions
+        }
         data_file_paths = [
             data_file.path
             for data_file in protocol_source.files
@@ -77,14 +89,7 @@ class LegacyFileReader:
         return parse(
             protocol_file=protocol_contents,
             filename=protocol_file_path.name,
-            extra_labware={
-                uri_from_details(
-                    namespace=lw.namespace,
-                    load_name=lw.parameters.loadName,
-                    version=lw.version,
-                ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
-                for lw in protocol_source.labware_definitions
-            },
+            extra_labware=legacy_labware_definitions,
             extra_data={
                 data_path.name: data_path.read_bytes() for data_path in data_file_paths
             },

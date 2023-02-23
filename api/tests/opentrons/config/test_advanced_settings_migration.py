@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 19
+    return 21
 
 
 @pytest.fixture
@@ -21,7 +21,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "enableProtocolEnginePAPICore": None,
+        "enableOT3FirmwareUpdates": None,
     }
 
 
@@ -95,12 +95,7 @@ def v5_config(v4_config: Dict[str, Any]) -> Dict[str, Any]:
 @pytest.fixture
 def v6_config(v5_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v5_config.copy()
-    r.update(
-        {
-            "_version": 6,
-            "enableTipLengthCalibration": True,
-        }
-    )
+    r.update({"_version": 6, "enableTipLengthCalibration": True})
     return r
 
 
@@ -237,6 +232,34 @@ def v18_config(v17_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v19_config(v18_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v18_config.copy()
+    r.pop("enableLoadLiquid")
+    r.update({"_version": 19})
+    return r
+
+
+@pytest.fixture
+def v20_config(v19_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v19_config.copy()
+    r.update(
+        {
+            "_version": 20,
+            "enableOT3FirmwareUpdates": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v21_config(v20_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v20_config.copy()
+    r.pop("enableProtocolEnginePAPICore")
+    r.update({"_version": 21})
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -260,6 +283,9 @@ def v18_config(v17_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v16_config"),
         lazy_fixture("v17_config"),
         lazy_fixture("v18_config"),
+        lazy_fixture("v19_config"),
+        lazy_fixture("v20_config"),
+        lazy_fixture("v21_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
@@ -340,5 +366,5 @@ def test_ensures_config() -> None:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "enableProtocolEnginePAPICore": None,
+        "enableOT3FirmwareUpdates": None,
     }

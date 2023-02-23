@@ -71,10 +71,6 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def set_name(self, new_name: str) -> None:
-        ...
-
-    @abstractmethod
     def get_definition(self) -> LabwareDefinitionDict:
         """Get the labware's definition as a plain dictionary."""
 
@@ -104,10 +100,6 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_tip_length(self) -> float:
-        ...
-
-    @abstractmethod
-    def set_tip_length(self, length: float) -> None:
         ...
 
     @abstractmethod

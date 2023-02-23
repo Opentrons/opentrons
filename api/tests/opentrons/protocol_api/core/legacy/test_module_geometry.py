@@ -9,13 +9,13 @@ from opentrons.types import Location, Point
 
 from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
 
-from opentrons.protocol_api.core.protocol_api.module_geometry import (
+from opentrons.protocol_api.core.legacy.module_geometry import (
     create_geometry,
     ModuleGeometry,
     HeaterShakerGeometry,
     PipetteMovementRestrictedByHeaterShakerError,
 )
-from opentrons.protocol_api.core.protocol_api.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 
 from opentrons_shared_data.module.dev_types import (
     ModuleDefinitionV3,

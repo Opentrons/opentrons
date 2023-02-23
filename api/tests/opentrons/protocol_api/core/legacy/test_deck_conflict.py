@@ -5,15 +5,15 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.protocol_api.module_geometry import (
+from opentrons.protocol_api.core.legacy.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
     HeaterShakerGeometry,
 )
 from opentrons.protocol_api.core.labware import AbstractLabware
 
-from opentrons.protocol_api.core.protocol_api.deck import DeckItem
-from opentrons.protocol_api.core.protocol_api.deck_conflict import (
+from opentrons.protocol_api.core.legacy.deck import DeckItem
+from opentrons.protocol_api.core.legacy.deck_conflict import (
     DeckConflictError,
     check,
 )

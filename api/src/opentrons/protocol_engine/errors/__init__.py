@@ -5,6 +5,7 @@ from .exceptions import (
     UnexpectedProtocolError,
     FailedToLoadPipetteError,
     PipetteNotAttachedError,
+    TipNotAttachedError,
     CommandDoesNotExistError,
     LabwareNotLoadedError,
     LabwareNotLoadedOnModuleError,
@@ -55,6 +56,7 @@ __all__ = [
     "UnexpectedProtocolError",
     "FailedToLoadPipetteError",
     "PipetteNotAttachedError",
+    "TipNotAttachedError",
     "CommandDoesNotExistError",
     "LabwareNotLoadedError",
     "LabwareNotLoadedOnModuleError",
@@ -95,6 +97,7 @@ __all__ = [
     "HardwareNotSupportedError",
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
+    "FirmwareUpdateRequired",
     # error occurrence models
     "ErrorOccurrence",
 ]
