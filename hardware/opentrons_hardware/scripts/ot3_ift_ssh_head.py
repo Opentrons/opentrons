@@ -3,7 +3,7 @@ import argparse
 import asyncio
 from numpy import float64
 import termios
-import sys, tty
+import sys, tty,time
 import logging
 import datetime
 from typing import Callable
@@ -59,7 +59,7 @@ def getch():
     return _getch()
 
 async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> None:
-    step_size = [0.1, 0.5, 1, 10, 20, 50]
+    step_size = [0.1, 0.5, 1,5,10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
@@ -72,16 +72,22 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
             pos = pos + step
             position['pipette'] = pos
             res = await move_to(messenger, node, step, speed)
+            time.sleep(0.05)
+            res2 = await move_to(messenger, node, step, speed)
         elif xy == "up":
             pos = pos - step
             position['pipette'] = pos
             res = await move_to(messenger, node, step, -speed)
-        mores = res[node][0]
-        encoder =res[node][1]
-        diff = float(mores) - float(encoder)
+            time.sleep(0.005)
+            res2 = await move_to(messenger, node, step, -speed)
+        mores1 = res[node][0]
+        encoder1 =res[node][1]
+        mores2 = res2[node][0]
+        encoder2 =res2[node][1]
+        diff = float(encoder2) - float(encoder1)
         print("diff",diff)
         try:
-            if abs(diff) < 1:
+            if abs(diff) > 1:
                 if xy == "downward":
                     print("MOVEDOWN=Pass")
                 elif xy == "up":
@@ -108,7 +114,7 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
 
 async def _jog_axis(messenger: CanMessenger, node, position,current = 0.1) -> None:
     step_size = [0.1, 0.5, 1, 10, 20, 50]
-    step_length_index = 3
+    step_length_index = 2
     step = step_size[step_length_index]
     pos = 0
     speed = 10
@@ -123,7 +129,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,current = 0.1) -> No
         Click  >> q << to quit the test script
                     """
     print(information_str)
-    await set_pipette_current(messenger,current,node)
+    #await set_pipette_current(messenger,current,node)
     while True:
         input = getch()
         if input == 'w':
