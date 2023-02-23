@@ -29,29 +29,29 @@ TEST_PARAMETERS = {
     GantryLoad.NONE: {
         'X': {
             'SPEED': {
-                'MIN': 500,
-                'MAX': 1000,
+                'MIN': 450,
+                'MAX': 550,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
-                'INC': 200}},
+                'MIN': 900,
+                'MAX': 1100,
+                'INC': 50}},
         'Y': {
             'SPEED': {
-                'MIN': 500,
-                'MAX': 1000,
-                'INC': 50},
+                'MIN': 425,
+                'MAX': 475,
+                'INC': 25},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
-                'INC': 200}},
+                'MIN': 900,
+                'MAX': 1100,
+                'INC': 50}},
         'L': {
             'SPEED': {
                 'MIN': 40,
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 800,
+                'MIN': 400,
                 'MAX': 2000,
                 'INC': 200}},
         'R': {
@@ -60,7 +60,7 @@ TEST_PARAMETERS = {
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 600,
+                'MIN': 400,
                 'MAX': 2000,
                 'INC': 200}}
     },
@@ -71,8 +71,8 @@ TEST_PARAMETERS = {
                 'MAX': 700,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 1800,
-                'MAX': 2200,
+                'MIN': 800,
+                'MAX': 3000,
                 'INC': 200}},
         'Y': {
             'SPEED': {
@@ -89,7 +89,7 @@ TEST_PARAMETERS = {
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 800,
+                'MIN': 400,
                 'MAX': 2000,
                 'INC': 200}},
         'R': {
@@ -98,7 +98,7 @@ TEST_PARAMETERS = {
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 600,
+                'MIN': 400,
                 'MAX': 2000,
                 'INC': 200}}
     },
@@ -123,20 +123,20 @@ TEST_PARAMETERS = {
                 'INC': 200}},
         'L': {
             'SPEED': {
-                'MIN': 150,
-                'MAX': 160,
+                'MIN': 40,
+                'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 800,
+                'MIN': 400,
                 'MAX': 2000,
                 'INC': 200}},
         'R': {
             'SPEED': {
-                'MIN': 150,
-                'MAX': 160,
+                'MIN': 40,
+                'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 600,
+                'MIN': 400,
                 'MAX': 2000,
                 'INC': 200}}
     },
@@ -161,22 +161,22 @@ TEST_PARAMETERS = {
                 'INC': 200}},
         'L': {
             'SPEED': {
-                'MIN': 40,
-                'MAX': 60,
+                'MIN': 10,
+                'MAX': 40,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}},
+                'MIN': 50,
+                'MAX': 200,
+                'INC': 50}},
         'R': {
             'SPEED': {
                 'MIN': 40,
                 'MAX': 60,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 600,
-                'MAX': 2000,
-                'INC': 200}}
+                'MIN': 500,
+                'MAX': 800,
+                'INC': 100}}
     }
 }
 
@@ -185,7 +185,7 @@ SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
         max_speed=500,
         acceleration=1000,
-        max_start_stop_speed=20,
+        max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
         run_current=1.5
@@ -193,7 +193,7 @@ SETTINGS = {
     OT3Axis.Y: GantryLoadSettings(
         max_speed=500,
         acceleration=1000,
-        max_start_stop_speed=20,
+        max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
         run_current=1.5
@@ -233,12 +233,17 @@ GANTRY_LOAD_MAP = {'NONE': GantryLoad.NONE,
 }
 
 
-step_x = 520
-step_y = 400
+step_x = 500
+step_y = 300
 xy_home_offset = 5
 step_z = 200
-POINT_MAP = {'Y': Point(y=step_y-xy_home_offset),
-             'X': Point(x=step_x-xy_home_offset),
+HOME_POINT_MAP = {'Y': Point(y=-xy_home_offset),
+             'X': Point(x=-xy_home_offset),
+             'L': Point(z=0),
+             'R': Point(z=0)}
+
+POINT_MAP = {'Y': Point(y=step_y),
+             'X': Point(x=step_x),
              'L': Point(z=step_z),
              'R': Point(z=step_z)}
 
@@ -269,15 +274,28 @@ def check_move_error(delta_move, point_delta, axis):
 
     return abs(move_error)
 
+def get_move_correction(actual_move, axis, direction):
+    move_correction = 0
+    if(axis == 'X'):
+        move_correction = Point(x=actual_move*direction)
+    elif(axis == 'Y'):
+        move_correction = Point(y=actual_move*direction)
+    else:
+        move_correction = Point(z=actual_move*direction)
+
+    return move_correction
 
 async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
     avg_error = []
-    for c in range(cycles):
-        if(axis == 'L'):
-            MOUNT = OT3Mount.LEFT
-        else:
-            MOUNT = OT3Mount.RIGHT
+    if(axis == 'L'):
+        MOUNT = OT3Mount.LEFT
+    else:
+        MOUNT = OT3Mount.RIGHT
 
+    #move away from the limit switch before cycling
+    await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=100)
+
+    for c in range(cycles):
         #move away from homed position
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
@@ -299,9 +317,11 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         print(axis + ' Error: ' + str(move_error))
         if(move_error >= 0.1):
             #attempt to move closer to the home position quickly
-            move_error_correction = POINT_MAP[axis] - abs(move_error)
+            move_error_correction = get_move_correction(delta_move_axis,
+                                                        axis,
+                                                        -1)
             print('ERROR IN NEG MOVE, CORRECTING: ' + str(move_error_correction))
-            await api.move_rel(mount=MOUNT, delta=POINT_MAP[axis], speed=100)
+            await api.move_rel(mount=MOUNT, delta=move_error_correction, speed=100)
             return (move_error, c+1)
 
         #record the current position
@@ -320,6 +340,13 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
             return (move_error, c+1);
         else:
             avg_error.append(move_error)
+
+        #home every 100 cycles in case we have drifted
+        if(c == 100):
+            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+            #move away from the limit switch before cycling
+            await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=100)
+
     return (sum(avg_error)/len(avg_error), c+1)
 
 
