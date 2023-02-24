@@ -158,8 +158,8 @@ async def create_protocol(
         created_at: Timestamp to attach to the new resource.
     """
     buffered_files = await file_reader_writer.read(files=files)
-    resource_hash = file_hasher.hash(buffered_files)
-    resource_hash2protocol_id: Dict[str, str] = dict(
+    content_hash = file_hasher.hash(buffered_files)
+    content_hash2protocol_id: Dict[str, str] = dict(
         [
             (p["content_hash"], p["protocol_id"])
             for p in [
@@ -172,8 +172,8 @@ async def create_protocol(
         ]
     )
 
-    if resource_hash in resource_hash2protocol_id:
-        protocolId = resource_hash2protocol_id[resource_hash]
+    if content_hash in content_hash2protocol_id:
+        protocolId = content_hash2protocol_id[content_hash]
         try:
             resource = protocol_store.get(protocol_id=protocolId)
             analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
