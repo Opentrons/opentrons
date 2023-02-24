@@ -8,6 +8,8 @@ from pathlib import Path
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_reader import (
+    FileReaderWriter,
+    FileHasher,
     ProtocolReader,
     ProtocolSource,
     ProtocolSourceFile,
@@ -15,6 +17,7 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
     PythonProtocolConfig,
     ProtocolFilesInvalidError,
+    BufferedFile,
 )
 
 from robot_server.errors import ApiError
@@ -64,6 +67,18 @@ def protocol_store(decoy: Decoy) -> ProtocolStore:
 def analysis_store(decoy: Decoy) -> AnalysisStore:
     """Get a mocked out AnalysisStore interface."""
     return decoy.mock(cls=AnalysisStore)
+
+
+@pytest.fixture
+def file_hasher(decoy: Decoy) -> FileHasher:
+    """Get a mocked out FileHasher."""
+    return decoy.mock(cls=FileHasher)
+
+
+@pytest.fixture
+def file_reader_writer(decoy: Decoy) -> FileReaderWriter:
+    """Get a mocked out FileReaderWriter."""
+    return decoy.mock(cls=FileReaderWriter)
 
 
 @pytest.fixture
@@ -123,6 +138,7 @@ async def test_get_protocols(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="a_b_c",
         ),
         protocol_key="dummy-key-111",
     )
@@ -136,6 +152,7 @@ async def test_get_protocols(
             files=[],
             metadata={},
             robot_type="OT-3 Standard",
+            content_hash="1_2_3",
         ),
         protocol_key="dummy-key-222",
     )
@@ -198,6 +215,7 @@ async def test_get_protocol_by_id(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="a_b_c",
         ),
         protocol_key="dummy-key-111",
     )
@@ -256,6 +274,8 @@ async def test_create_protocol(
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
     protocol_reader: ProtocolReader,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
     protocol_analyzer: ProtocolAnalyzer,
     task_runner: TaskRunner,
     protocol_auto_deleter: ProtocolAutoDeleter,
@@ -264,6 +284,9 @@ async def test_create_protocol(
     protocol_directory = Path("/dev/null")
 
     protocol_file = UploadFile(filename="foo.json")
+    buffered_file = BufferedFile(
+        name="blah", contents=bytes("some_content", encoding="utf-8"), path=None
+    )
 
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -277,6 +300,7 @@ async def test_create_protocol(
         metadata={"this_is_fake_metadata": True},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=123),
+        content_hash="a_b_c",
     )
 
     protocol_resource = ProtocolResource(
@@ -291,9 +315,13 @@ async def test_create_protocol(
         status=AnalysisStatus.PENDING,
     )
 
+    decoy.when(await file_reader_writer.read(files=[protocol_file])).then_return(
+        [buffered_file]
+    )
+
     decoy.when(
-        await protocol_reader.read_and_save(
-            files=[protocol_file],
+        await protocol_reader.save(
+            files=[buffered_file],
             directory=protocol_directory / "protocol-id",
         )
     ).then_return(protocol_source)
@@ -302,6 +330,8 @@ async def test_create_protocol(
         analysis_store.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     ).then_return(pending_analysis)
 
+    decoy.when(protocol_store.get_all()).then_return([])
+
     result = await create_protocol(
         files=[protocol_file],
         key="dummy-key-111",
@@ -309,6 +339,8 @@ async def test_create_protocol(
         protocol_store=protocol_store,
         analysis_store=analysis_store,
         protocol_reader=protocol_reader,
+        file_reader_writer=file_reader_writer,
+        file_hasher=file_hasher,
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
         protocol_auto_deleter=protocol_auto_deleter,
@@ -343,11 +375,18 @@ async def test_create_protocol(
 
 async def test_create_protocol_not_readable(
     decoy: Decoy,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
     protocol_reader: ProtocolReader,
+    protocol_store: ProtocolStore,
 ) -> None:
     """It should 422 if the protocol is rejected by the pre-analyzer."""
+
+    decoy.when(await file_reader_writer.read(files=matchers.Anything())).then_return([])
+    decoy.when(protocol_store.get_all()).then_return([])
+
     decoy.when(
-        await protocol_reader.read_and_save(
+        await protocol_reader.save(
             directory=matchers.Anything(),
             files=matchers.Anything(),
         )
@@ -358,7 +397,10 @@ async def test_create_protocol_not_readable(
             files=[],
             protocol_directory=Path("/dev/null"),
             protocol_reader=protocol_reader,
+            protocol_store=protocol_store,
             protocol_id="protocol-id",
+            file_reader_writer=file_reader_writer,
+            file_hasher=file_hasher,
         )
 
     assert exc_info.value.status_code == 422
@@ -388,6 +430,7 @@ async def test_create_protocol_different_robot_type(
             metadata={},
             robot_type="OT-2 Standard",
             config=JsonProtocolConfig(schema_version=123),
+            content_hash="a_b_c",
         )
     )
 

@@ -5,10 +5,15 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, UploadFile, status, Form
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 from typing_extensions import Literal
 
-from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
+from opentrons.protocol_reader import (
+    ProtocolReader,
+    ProtocolFilesInvalidError,
+    FileReaderWriter,
+    FileHasher,
+)
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.errors import ErrorDetails, ErrorBody
@@ -41,6 +46,8 @@ from .dependencies import (
     get_analysis_store,
     get_protocol_analyzer,
     get_protocol_directory,
+    get_file_reader_writer,
+    get_file_hasher,
 )
 
 
@@ -120,7 +127,9 @@ async def create_protocol(
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
+    file_reader_writer: FileReaderWriter = Depends(get_file_reader_writer),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
+    file_hasher: FileHasher = Depends(get_file_hasher),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(get_task_runner),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
@@ -148,9 +157,57 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
+    buffered_files = await file_reader_writer.read(files=files)
+    resource_hash = file_hasher.hash(buffered_files)
+    resource_hash2protocol_id: Dict[str, str] = dict(
+        [
+            (p["content_hash"], p["protocol_id"])
+            for p in [
+                {
+                    "content_hash": p_resource.source.content_hash,
+                    "protocol_id": p_resource.protocol_id,
+                }
+                for p_resource in protocol_store.get_all()
+            ]
+        ]
+    )
+
+    if resource_hash in resource_hash2protocol_id:
+        protocolId = resource_hash2protocol_id[resource_hash]
+        try:
+            resource = protocol_store.get(protocol_id=protocolId)
+            analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
+            data = Protocol.construct(
+                id=protocolId,
+                createdAt=resource.created_at,
+                protocolType=resource.source.config.protocol_type,
+                robotType=resource.source.robot_type,
+                metadata=Metadata.parse_obj(resource.source.metadata),
+                analysisSummaries=analyses,
+                key=resource.protocol_key,
+                files=[
+                    ProtocolFile(name=f.path.name, role=f.role)
+                    for f in resource.source.files
+                ],
+            )
+
+            log.info(
+                f'Protocol with id "{protocol_id}" with same contents already exists. returning existing protocol data in response payload'
+            )
+
+            return await PydanticResponse.create(
+                content=SimpleBody.construct(data=data),
+                # not returning a 201 because we're not actually creating a new resource
+                status_code=status.HTTP_200_OK,
+            )
+        except ProtocolNotFoundError as e:
+            raise ProtocolNotFound(detail=str(e)).as_error(
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     try:
-        source = await protocol_reader.read_and_save(
-            files=files,
+        source = await protocol_reader.save(
+            files=buffered_files,
             directory=protocol_directory / protocol_id,
         )
     except ProtocolFilesInvalidError as e:
