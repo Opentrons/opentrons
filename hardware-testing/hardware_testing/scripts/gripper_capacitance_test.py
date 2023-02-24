@@ -16,6 +16,7 @@ from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, Gripp
 from hardware_testing.opentrons_api.helpers_ot3 import (
     home_ot3,
     build_async_ot3_hardware_api,
+    get_capacitance_ot3,
 )
 from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
@@ -23,16 +24,24 @@ def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Capacitance Test')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
+    arg_parser.add_argument('-x', '--x_increment', type=float, required=False, help='Probe increment size for X-Axis', default=0.1)
+    arg_parser.add_argument('-z', '--z_increment', type=float, required=False, help='Probe increment size for Z-Axis', default=0.01)
+    arg_parser.add_argument('-d', '--x_steps', type=int, required=False, help='Number of steps for X-Axis', default=50)
+    arg_parser.add_argument('-p', '--z_steps', type=int, required=False, help='Number of steps for Z-Axis', default=200)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Gripper_Capacitance_Test:
     def __init__(
-        self, simulate: bool, cycles: int, slot: int
+        self, simulate: bool, cycles: int, slot: int, x_increment: float, z_increment: float, x_steps: int, z_steps: int
     ) -> None:
         self.simulate = simulate
         self.cycles = cycles
         self.slot = slot
+        self.x_increment = x_increment
+        self.z_increment = z_increment
+        self.x_steps = x_steps
+        self.z_steps = z_steps
         self.api = None
         self.mount = None
         self.home = None
@@ -40,6 +49,8 @@ class Gripper_Capacitance_Test:
         self.deck_definition = None
         self.deck_z = None
         self.offset_gripper = None
+        self.START_HEIGHT = 3 # mm
+        self.PROBE_DIA = 4 # mm
         self.CUTOUT_SIZE = 20 # mm
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
@@ -47,6 +58,8 @@ class Gripper_Capacitance_Test:
         self.test_data ={
             "Time":"None",
             "Cycle":"None",
+            "X Step":"None",
+            "Z Step":"None",
             "Slot":"None",
             "Gripper":"None",
             "X Center Front":"None",
@@ -55,6 +68,7 @@ class Gripper_Capacitance_Test:
             "X Center Rear":"None",
             "Y Center Rear":"None",
             "Deck Height Rear":"None",
+            "Capacitance":"None",
         }
         self.slot_center = {
             "Front":None,
@@ -118,6 +132,80 @@ class Gripper_Capacitance_Test:
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
+    async def _get_stable_capacitance(self) -> float:
+        _reading = True
+        _try = 1
+        while _reading:
+            capacitance = []
+            for i in range(10):
+                if self.simulate:
+                    data = 0.0
+                else:
+                    # data = await self.api.capacitive_read(self.mount)
+                    data = await get_capacitance_ot3(self.api, self.mount)
+                capacitance.append(data)
+            _variance = round(abs(max(capacitance) - min(capacitance)), 5)
+            print(f"Try #{_try} Variance = {_variance}")
+            _try += 1
+            if _variance < 0.1:
+                _reading = False
+        return sum(capacitance) / len(capacitance)
+
+    async def _update_position(
+        self, api: OT3API, mount: OT3Mount, x_step: int
+    ) -> None:
+        # Move to next position
+        current_position = await api.gantry_position(mount)
+        if x_step > 1:
+            x_position = current_position.x + self.x_increment
+        else:
+            x_position = current_position.x
+        next_position = current_position._replace(x=x_position, z=self.START_HEIGHT)
+        await api.move_to(mount, next_position, speed=1)
+
+    async def _record_capacitance(
+        self, api: OT3API, mount: OT3Mount, x_step: int, z_step: int, deck_height: float
+    ) -> None:
+        # Move to next height
+        current_position = await api.gantry_position(mount)
+        next_height = current_position._replace(z=deck_height + self.z_increment*(z_step - 1))
+        await api.move_to(mount, next_height, speed=1)
+
+        # Get current position
+        current_position = await api.gantry_position(mount)
+        self.test_data["Current Position"] = str(current_position).replace(", ",";")
+        print(f"Current Position = {current_position}")
+
+        # Read capacitance
+        capacitance = await self._get_stable_capacitance()
+        print(f"Capacitance = {capacitance}")
+        self.test_data["Capacitance"] = str(capacitance)
+
+    async def _measure_capacitance(
+        self, api: OT3API, mount: OT3Mount, slot: int
+    ) -> None:
+        nominal_center = _get_calibration_square_position_in_slot(slot)
+        for probe in self.probes:
+            api.add_gripper_probe(self.gripper_probes[probe])
+            deck_height = self.slot_center[probe].z
+            edge_position = nominal_center._replace(x=nominal_center.x + self.CUTOUT_HALF - self.PROBE_DIA, z=deck_height)
+            await api.move_to(mount, edge_position)
+            input("Press ENTER to exit!")
+            for i in range(self.x_steps):
+                x_step = i + 1
+                self.test_data["X Step"] = str(x_step)
+                print(f"\n-->> Measuring X Step {x_step}/{self.x_steps}")
+                await self._update_position(self.api, self.mount, x_step)
+                for j in range(self.z_steps):
+                    z_step = j + 1
+                    self.test_data["Z Step"] = str(z_step)
+                    print(f"\n--->>> Measuring Z Step {z_step}/{self.z_steps} (X Step {x_step}/{self.x_steps})")
+                    await self._record_capacitance(self.api, self.mount, x_step, z_step, deck_height)
+            current_position = await api.gantry_position(mount)
+            home_z = current_position._replace(z=self.home.z)
+            await api.move_to(mount, home_z)
+            api.remove_gripper_probe()
+
     async def _calibrate_slot(
         self, api: OT3API, mount: OT3Mount, slot: int
     ) -> None:
@@ -135,8 +223,10 @@ class Gripper_Capacitance_Test:
             home_z = current_position._replace(z=self.home.z)
             await api.move_to(mount, home_z)
         self.offset_gripper = await calibrate_gripper(api, self.offset["Front"], self.offset["Rear"])
+        print(f"Gripper Probe Offset: {self.offset_gripper}")
         nominal_center = _get_calibration_square_position_in_slot(slot)
         await api.move_to(mount, nominal_center._replace(z=100))
+        input("Press ENTER to exit!")
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
@@ -169,6 +259,7 @@ class Gripper_Capacitance_Test:
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     await self._home(self.api, self.mount)
                     await self._calibrate_slot(self.api, self.mount, self.slot)
+                    await self._measure_capacitance(self.api, self.mount, self.slot)
                     await self._record_data(cycle)
                     await self._reset(self.api, self.mount)
         except Exception as e:
@@ -185,5 +276,5 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper Capacitance Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Capacitance_Test(args.simulate, args.cycles, args.slot)
+    test = Gripper_Capacitance_Test(args.simulate, args.cycles, args.slot, args.x_increment, args.z_increment, args.x_steps, args.z_steps)
     asyncio.run(test.run())
