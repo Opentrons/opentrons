@@ -409,11 +409,18 @@ async def test_create_protocol_not_readable(
 
 
 async def test_create_protocol_different_robot_type(
-    decoy: Decoy, protocol_reader: ProtocolReader
+    decoy: Decoy,
+    protocol_reader: ProtocolReader,
+    protocol_store: ProtocolStore,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
 ) -> None:
     """It should 422 if the protocol's robot type doesn't match the server's."""
+
+    decoy.when(await file_reader_writer.read(files=matchers.Anything())).then_return([])
+
     decoy.when(
-        await protocol_reader.read_and_save(
+        await protocol_reader.save(
             directory=matchers.Anything(),
             files=matchers.Anything(),
         )
@@ -434,11 +441,16 @@ async def test_create_protocol_different_robot_type(
         )
     )
 
+    decoy.when(protocol_store.get_all()).then_return([])
+
     with pytest.raises(ApiError) as exc_info:
         await create_protocol(
             files=[],
             protocol_directory=Path("/dev/null"),
             protocol_reader=protocol_reader,
+            protocol_store=protocol_store,
+            file_reader_writer=file_reader_writer,
+            file_hasher=file_hasher,
             protocol_id="protocol-id",
         )
 
