@@ -1,7 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import last from 'lodash/last'
 import {
   Box,
   Flex,
@@ -14,33 +12,21 @@ import {
   useOnClickOutside,
   InstrumentDiagram,
   BORDERS,
-  Btn,
 } from '@opentrons/components'
 import {
   isOT3Pipette,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { fetchPipettes, LEFT } from '../../../redux/pipettes'
+import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
-import { getHasCalibrationBlock } from '../../../redux/config'
-import { getRequestById, useDispatchApiRequest } from '../../../redux/robot-api'
-import { Banner } from '../../../atoms/Banner'
-import { fetchCalibrationStatus } from '../../../redux/calibration'
 import { ChangePipette } from '../../ChangePipette'
-import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import {
-  INTENT_CALIBRATE_PIPETTE_OFFSET,
-  INTENT_RECALIBRATE_PIPETTE_OFFSET,
-} from '../../DeprecatedCalibrationPanels'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
-import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
-import { useDeckCalibrationData, useIsOT3 } from '../hooks'
+import { useIsOT3 } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
@@ -50,7 +36,6 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
-import type { State } from '../../../redux/types'
 import type {
   PipetteWizardFlow,
   SelectablePipettes,
@@ -83,7 +68,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const isOt3 = useIsOT3(robotName)
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const pipetteName = pipetteInfo?.name
   const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteInfo?.displayName
@@ -91,7 +75,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     onClickOutside: () => setShowOverflowMenu(false),
   })
   const [showChangePipette, setChangePipette] = React.useState(false)
-  const [showBanner, setShowBanner] = React.useState(true)
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [
     pipetteWizardFlow,
@@ -99,54 +82,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   ] = React.useState<PipetteWizardFlow | null>(null)
   const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
-  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
-  const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
-  const { isDeckCalibrated } = useDeckCalibrationData(robotName)
-  const [
-    startPipetteOffsetCalibration,
-    PipetteOffsetCalibrationWizard,
-  ] = useCalibratePipetteOffset(robotName, { mount })
 
   const [
     selectedPipette,
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
-  const latestRequestId = last(requestIds)
-  const isFetching = useSelector<State, boolean>(state =>
-    latestRequestId != null
-      ? getRequestById(state, latestRequestId)?.status === 'pending'
-      : false
-  )
-
-  React.useEffect(() => {
-    dispatchRequest(fetchPipettes(robotName, true))
-    dispatchRequest(fetchCalibrationStatus(robotName))
-  }, [dispatchRequest, robotName])
-
-  const isMissingOffsetCalibration = pipetteOffsetCalibration == null
-  const isBadOffsetCalibration =
-    !isMissingOffsetCalibration && pipetteOffsetCalibration?.status.markedBad
-
-  const startPipetteOffsetCalibrationBlockModal = (
-    hasBlockModalResponse: boolean | null
-  ): void => {
-    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setShowCalBlockModal(true)
-    } else {
-      startPipetteOffsetCalibration({
-        overrideParams: {
-          hasCalibrationBlock: Boolean(
-            configHasCalibrationBlock ?? hasBlockModalResponse
-          ),
-        },
-        withIntent: pipetteOffsetCalibration
-          ? INTENT_RECALIBRATE_PIPETTE_OFFSET
-          : INTENT_CALIBRATE_PIPETTE_OFFSET,
-      })
-
-      setShowCalBlockModal(false)
-    }
-  }
 
   const handleChangePipette = (): void => {
     if (isOT3PipetteAttached && isOt3) {
@@ -158,9 +98,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     }
   }
   const handleCalibrate = (): void => {
-    isOT3PipetteAttached
-      ? setPipetteWizardFlow(FLOWS.CALIBRATE)
-      : startPipetteOffsetCalibrationBlockModal(null)
+    if (isOT3PipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
   }
   const handleAboutSlideout = (): void => {
     setShowAboutSlideout(true)
@@ -182,7 +120,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     >
       {showAttachPipette ? (
         <ChoosePipette
-          robotName={robotName}
           proceed={handleAttachPipette}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
@@ -221,7 +158,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           pipetteId={pipetteId}
         />
       )}
-      {PipetteOffsetCalibrationWizard}
       {showAboutSlideout && pipetteInfo != null && pipetteId != null && (
         <AboutPipetteSlideout
           pipetteId={pipetteId}
@@ -229,17 +165,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           onCloseClick={() => setShowAboutSlideout(false)}
           isExpanded={true}
         />
-      )}
-      {showCalBlockModal && (
-        <Portal level="top">
-          <AskForCalibrationBlockModal
-            onResponse={hasBlockModalResponse => {
-              startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
-            }}
-            titleBarTitle={t('protocol_setup:pipette_offset_cal')}
-            closePrompt={() => setShowCalBlockModal(false)}
-          />
-        </Portal>
       )}
       <Box
         padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
@@ -262,68 +187,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             flex="100%"
             paddingLeft={SPACING.spacing3}
           >
-            {!isDeckCalibrated &&
-            isMissingOffsetCalibration &&
-            pipetteInfo != null &&
-            showBanner &&
-            !isFetching ? (
-              <Flex paddingBottom={SPACING.spacing2}>
-                <Banner
-                  type="error"
-                  flex="100%"
-                  onCloseClick={() => setShowBanner(false)}
-                >
-                  {t('deck_cal_missing')}
-                </Banner>
-              </Flex>
-            ) : null}
-            {isDeckCalibrated &&
-            isMissingOffsetCalibration &&
-            pipetteInfo != null &&
-            showBanner &&
-            !isFetching &&
-            !isOT3Pipette(pipetteName as PipetteName) ? (
-              <Flex paddingBottom={SPACING.spacing2}>
-                <Banner
-                  type="error"
-                  flex="100%"
-                  onCloseClick={() => setShowBanner(false)}
-                >
-                  <Flex flexDirection={DIRECTION_COLUMN}>
-                    {t('pipette_offset_calibration_needed')}
-                    <Btn
-                      textAlign={ALIGN_START}
-                      fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                      onClick={handleCalibrate}
-                    >
-                      {t('calibrate_now')}
-                    </Btn>
-                  </Flex>
-                </Banner>
-              </Flex>
-            ) : null}
-            {isDeckCalibrated && isBadOffsetCalibration && showBanner ? (
-              <Flex paddingBottom={SPACING.spacing2}>
-                <Banner
-                  type="warning"
-                  flex="100%"
-                  onCloseClick={() => setShowBanner(false)}
-                >
-                  <Flex flexDirection={DIRECTION_COLUMN}>
-                    {t('pipette_cal_recommended')}
-                    <Btn
-                      textAlign={ALIGN_START}
-                      fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                      onClick={handleCalibrate}
-                    >
-                      {t('recalibrate_now')}
-                    </Btn>
-                  </Flex>
-                </Banner>
-              </Flex>
-            ) : null}
             <StyledText
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
@@ -371,9 +234,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteSpecs={pipetteInfo}
               mount={mount}
               handleChangePipette={handleChangePipette}
-              handleCalibrate={handleCalibrate}
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
+              handleCalibrate={handleCalibrate}
               isPipetteCalibrated={pipetteOffsetCalibration != null}
             />
           </Box>

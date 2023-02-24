@@ -37,5 +37,6 @@ opentrons = { editable = true, path = "." }
 opentrons-hardware = { editable = true, path = "./../hardware" }
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
+pytest-profiling = "~=1.7.0"
 # TODO(mc, 2022-03-31): upgrade sphinx, remove this subdep pin
 jinja2 = ">=2.3,<3.1"

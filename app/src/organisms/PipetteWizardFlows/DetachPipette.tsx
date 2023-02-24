@@ -23,7 +23,6 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     isRobotMoving,
     goBack,
     proceed,
-    robotName,
     attachedPipettes,
     mount,
     isPending,
@@ -107,7 +106,6 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       proceedButton={
         <CheckPipetteButton
           isDisabled={isPending}
-          robotName={robotName}
           proceedButtonText={capitalize(t('shared:continue'))}
           proceed={proceed}
           setPending={setPending}

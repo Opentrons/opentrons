@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   LEFT,
@@ -14,11 +13,11 @@ import {
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 import { ModalShell } from '../../molecules/Modal'
-import { getAttachedPipettes } from '../../redux/pipettes'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useAttachedPipettes } from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -32,7 +31,6 @@ import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { State } from '../../redux/types'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 interface PipetteWizardFlowsProps {
@@ -48,9 +46,7 @@ export const PipetteWizardFlows = (
 ): JSX.Element | null => {
   const { flowType, mount, closeFlow, robotName, selectedPipette } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const attachedPipettes = useSelector((state: State) =>
-    getAttachedPipettes(state, robotName)
-  )
+  const attachedPipettes = useAttachedPipettes()
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = getPipetteWizardSteps(

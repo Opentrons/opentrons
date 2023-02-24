@@ -108,7 +108,9 @@ export function TipLengthCalibrationItems({
             </StyledTableCell>
             <StyledTableCell>
               <StyledText as="p">
-                {formatLastCalibrated(calibration.lastCalibrated)}
+                {calibration.lastCalibrated !== undefined
+                  ? formatLastCalibrated(calibration.lastCalibrated)
+                  : 'Not calibrated'}
               </StyledText>
             </StyledTableCell>
             <StyledTableCell>
