@@ -134,21 +134,10 @@ def _map_module(
     # the string that the Python protocol author used to load the module.
     name_for_errors = module_model.value
 
-    # TODO: Move this logic to GeometryView.
-    try:
-        labware_id = engine_state.labware.get_id_by_module(module_id=module_id)
-    except LabwareNotLoadedOnModuleError:
-        # No labware is loaded atop this module.
-        # Its height should be just the module itself.
-        highest_z_including_labware = engine_state.modules.get_overall_height(
-            module_id=module_id
-        )
-    else:
-        # This module has a labware loaded atop it.
-        # The height should include both.
-        highest_z_including_labware = engine_state.geometry.get_labware_highest_z(
-            labware_id=labware_id
-        )
+    highest_z_including_labware = _get_module_highest_z_including_labware(
+        engine_state=engine_state,
+        module_id=module_id,
+    )
 
     if module_type == ModuleType.HEATER_SHAKER:
         return (
@@ -181,3 +170,17 @@ def _map_module(
 
 def _deck_slot_to_int(deck_slot_location: DeckSlotLocation) -> int:
     return deck_slot_location.slotName.as_int()
+
+
+def _get_module_highest_z_including_labware(
+    engine_state: StateView, module_id: str
+) -> float:
+    try:
+        labware_id = engine_state.labware.get_id_by_module(module_id=module_id)
+    except LabwareNotLoadedOnModuleError:
+        # No labware is loaded atop this module.
+        # The height should be just the module itself.
+        return engine_state.modules.get_overall_height(module_id=module_id)
+    else:
+        # This module has a labware loaded atop it. The height should include both.
+        return engine_state.geometry.get_labware_highest_z(labware_id=labware_id)
