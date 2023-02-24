@@ -13,7 +13,7 @@
   "calibrate_z_axis_on_trash": "Calibrate z-axis on trash bin",
   "calibrate_tip_on_block": "Calibrate tip on block",
   "calibrate_tip_on_trash": "Calibrate tip on trash bin",
-  "calibration_block_description": "<block>This block is a specially made tool that fits perfectly on your deck and helps with calibration.</block><block>If you do not have a Calibration Block, please <supportLink>email support</supportLink> so we can send you one. In your message, be sure to include your name, company or institution name, and shipping address. While you wait for the block to arrive, you can use the flat surface on the trash bin of your robot instead.</block>",
+  "calibration_block_description": "<block>This block is a specially made tool that fits perfectly on your deck and helps with calibration.</block><block>If you do not have a Calibration Block, please email <supportLink>support@opentrons.com</supportLink> so we can send you one. In your message, be sure to include your name, company or institution name, and shipping address. While you wait for the block to arrive, you can use the flat surface on the trash bin of your robot instead.</block>",
   "calibration_health_check": "Calibration Health Check",
   "calibration_health_check_intro_body": "<block>Calibration Health Check diagnoses problems with Deck, Tip Length, and Pipette Offset Calibration.</block><block>You will move the pipettes to various positions, which will be compared against your existing calibration data.</block><block>If there is a large difference, you will be prompted to redo some or all of your calibrations.</block>",
   "calibrate_tip_length": "Calibrate the length of a tip on this pipette.",
