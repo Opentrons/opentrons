@@ -48,6 +48,26 @@ def check(
     new_labware_id: Optional[str] = None,
     new_module_id: Optional[str] = None,
 ) -> None:
+    """Check for conflicts between items on the deck.
+
+    This is a Protocol-Engine-friendly wrapper around
+    opentrons.motion_planning.deck_conflict.check().
+
+    Params:
+        engine_state: An interface to retrieve details about the deck items.
+        robot_type: The type of robot these items are being placed in. Different
+            robots have different deck spacing, so, different conflict-checking rules.
+        existing_labware_ids: The Protocol Engine IDs of all labware already loaded.
+        existing_module_ids: The Protocol Engine IDs of all modules already loaded.
+        new_labware_id: The Protocol Engine ID of a new labware you've just added.
+            Mutually exclusive with new_module_id.
+        new_module_id: The Protocol EngineID of a new module you've just added.
+            Mutually exclusive with new_labware_id.
+
+    Raises:
+        opentrons.motion_planning.deck_conflict.DeckConflictError:
+            If the newly-added item conflicts with one of the existing items.
+    """
     if engine_state.config.robot_type == "OT-3 Standard":
         # No-op if this is an OT-3 deck, for now.
         #
