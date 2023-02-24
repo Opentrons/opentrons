@@ -190,7 +190,7 @@ class VirtualPipettingHandler(PipettingHandler):
         """Virtually blow out (no-op)."""
 
 
-def create_pipette_handler(
+def create_pipetting_handler(
     state_view: StateView, hardware_api: HardwareControlAPI
 ) -> PipettingHandler:
     """Create a pipetting handler."""
