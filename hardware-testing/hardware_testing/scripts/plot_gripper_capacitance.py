@@ -32,8 +32,10 @@ class Plot:
         self.df_data = self.import_file(self.data)
         self.x_increment = self.get_increment(self.df_data, "x")
         self.z_increment = self.get_increment(self.df_data, "z")
+        self.max_relative = self.get_max_value(self.df_data, "Relative")
         print(f"X-Axis Increment = {self.x_increment}")
         print(f"Z-Axis Increment = {self.z_increment}")
+        print(f"Max Relative Change in Capacitance = {self.max_relative}")
 
     def import_file(self, file):
         df = pd.read_csv(file)
@@ -70,6 +72,9 @@ class Plot:
         elif axis == "z":
             increment = round(abs(df["Z Position"].iloc[-1] - df["Z Position"].iloc[0]) / (df["Z Step"].max() - 1), 3)
         return increment
+
+    def get_max_value(self, df, column):
+        return df[column].max()
 
     def set_legend(self, figure, legend):
         for idx, name in enumerate(legend):
