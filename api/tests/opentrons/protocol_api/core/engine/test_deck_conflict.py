@@ -1,3 +1,5 @@
+"""Unit tests for the deck_conflict module."""
+
 from decoy import Decoy
 import pytest
 
@@ -26,6 +28,7 @@ def mock_state_view(decoy: Decoy) -> StateView:
 
 
 def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
+    """It should correcly map a labware that's loaded directly into a deck slot."""
     decoy.when(
         mock_state_view.labware.get_location(labware_id="labware-id")
     ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
@@ -74,6 +77,7 @@ def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
 
 
 def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -> None:
+    """It should correctly map a module with no labware loaded atop it."""
     decoy.when(mock_state_view.labware.get_id_by_module("module-id")).then_raise(
         LabwareNotLoadedOnModuleError()
     )
@@ -115,6 +119,10 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
 
 
 def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> None:
+    """It should correctly map a module with a labware loaded atop it.
+
+    The highest_z should include both the labware and the module.
+    """
     decoy.when(mock_state_view.labware.get_id_by_module("module-id")).then_return(
         "labware-id"
     )
@@ -156,9 +164,11 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
 
 
 @pytest.mark.parametrize("module_model", ModuleModel)
-def test_maps_different_module_types(
+def test_maps_different_module_models(
     decoy: Decoy, mock_state_view: StateView, module_model: ModuleModel
 ) -> None:
+    """It should correctly map all possible kinds of hardware module."""
+
     def get_expected_mapping_result() -> wrapped_deck_conflict.DeckItem:
         expected_name_for_errors = module_model.value
         if module_model is ModuleModel.HEATER_SHAKER_MODULE_V1:
