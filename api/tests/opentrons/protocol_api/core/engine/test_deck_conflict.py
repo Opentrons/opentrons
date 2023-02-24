@@ -115,10 +115,12 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
 
 
 def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> None:
-    decoy.when(mock_state_view.labware.get_id_by_module("module-id")).then_return("labware-id")
-    decoy.when(mock_state_view.geometry.get_labware_highest_z("labware-id")).then_return(
-        3.14159
+    decoy.when(mock_state_view.labware.get_id_by_module("module-id")).then_return(
+        "labware-id"
     )
+    decoy.when(
+        mock_state_view.geometry.get_labware_highest_z("labware-id")
+    ).then_return(3.14159)
 
     decoy.when(mock_state_view.modules.get_model("module-id")).then_return(
         ModuleModel.HEATER_SHAKER_MODULE_V1
@@ -153,5 +155,64 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
     )
 
 
-def test_maps_different_module_types(decoy: Decoy) -> None:
-    raise NotImplementedError
+@pytest.mark.parametrize("module_model", ModuleModel)
+def test_maps_different_module_types(
+    decoy: Decoy, mock_state_view: StateView, module_model: ModuleModel
+) -> None:
+    def get_expected_mapping_result() -> wrapped_deck_conflict.DeckItem:
+        expected_name_for_errors = module_model.value
+        if module_model is ModuleModel.HEATER_SHAKER_MODULE_V1:
+            return wrapped_deck_conflict.HeaterShakerModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
+            )
+        elif (
+            module_model is ModuleModel.THERMOCYCLER_MODULE_V1
+            or module_model is ModuleModel.THERMOCYCLER_MODULE_V2
+        ):
+            return wrapped_deck_conflict.ThermocyclerModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
+                is_semi_configuration=False,
+            )
+        elif (
+            module_model is ModuleModel.MAGNETIC_MODULE_V1
+            or module_model is ModuleModel.MAGNETIC_MODULE_V2
+            or module_model is ModuleModel.TEMPERATURE_MODULE_V1
+            or module_model is ModuleModel.TEMPERATURE_MODULE_V2
+        ):
+            return wrapped_deck_conflict.OtherModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
+            )
+        # There is deliberately no catch-all `else` block here.
+        # If a new value is added to ModuleModel, it should cause an error here and
+        # force us to think about how it should be mapped.
+
+    decoy.when(mock_state_view.modules.get_model("module-id")).then_return(module_model)
+
+    decoy.when(mock_state_view.labware.get_id_by_module("module-id")).then_raise(
+        LabwareNotLoadedOnModuleError()
+    )
+    decoy.when(mock_state_view.modules.get_overall_height("module-id")).then_return(
+        3.14159
+    )
+    decoy.when(mock_state_view.modules.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+    )
+
+    expected_mapping_result = get_expected_mapping_result()
+
+    deck_conflict.check(
+        engine_state=mock_state_view,
+        existing_labware_ids=[],
+        existing_module_ids=[],
+        new_module_id="module-id",
+    )
+    decoy.verify(
+        wrapped_deck_conflict.check(
+            existing_items={},
+            new_item=expected_mapping_result,
+            new_location=5,
+        )
+    )
