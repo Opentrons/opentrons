@@ -71,7 +71,7 @@ class HardwarePipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
     ) -> float:
-        """Aspirate liquid from a well."""
+        """Set flow-rate and aspirate."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
