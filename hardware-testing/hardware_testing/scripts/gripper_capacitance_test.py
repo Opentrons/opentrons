@@ -72,6 +72,7 @@ class Gripper_Capacitance_Test:
             "Z Step":"None",
             "Slot":"None",
             "Gripper":"None",
+            "Probe":"None",
             "Deck Height Front":"None",
             "Deck Height Rear":"None",
             "Edge Position Front":"None",
@@ -200,11 +201,11 @@ class Gripper_Capacitance_Test:
     ) -> None:
         nominal_center = _get_calibration_square_position_in_slot(slot)
         for probe in self.probes:
+            self.test_data["Probe"] = probe
             api.add_gripper_probe(self.gripper_probes[probe])
             deck_height = self.deck_height[probe]
             edge_position = self.edge[probe]._replace(z=deck_height)
             await api.move_to(mount, edge_position)
-            input("Press ENTER to exit!")
             for i in range(self.x_steps):
                 x_step = i + 1
                 self.test_data["X Step"] = str(x_step)
