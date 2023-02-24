@@ -185,6 +185,13 @@ export interface ConfigV13 extends Omit<ConfigV12, 'version'> {
 
 export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
   version: 14
+  protocols: ConfigV13['protocols'] & {
+    pinnedProtocolIds: string[]
+  }
+}
+
+export interface ConfigV15 extends Omit<ConfigV14, 'version'> {
+  version: 15
   onDeviceDisplaySettings: {
     sleepMs: number
     brightness: number
@@ -192,4 +199,4 @@ export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
   }
 }
 
-export type Config = ConfigV14
+export type Config = ConfigV15
