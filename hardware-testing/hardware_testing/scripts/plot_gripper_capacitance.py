@@ -33,7 +33,7 @@ class Plot:
         self.x_increment = self.get_increment(self.df_data, "x")
         self.z_increment = self.get_increment(self.df_data, "z")
         self.max_relative = self.get_max_value(self.df_data, "Relative")
-        self.min_absolute = self.get_min_value(self.df_data, "Capacitance")
+        self.min_absolute += self.get_min_value(self.df_data, "Capacitance")
         print(f"X-Axis Increment = {self.x_increment}")
         print(f"Z-Axis Increment = {self.z_increment}")
         print(f"Max Relative Change in Capacitance = {self.max_relative}")
