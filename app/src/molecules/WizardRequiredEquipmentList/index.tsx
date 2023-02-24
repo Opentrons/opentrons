@@ -42,7 +42,7 @@ export function WizardRequiredEquipmentList(
         <>
           <StyledText
             fontSize="1.25rem"
-            fontWeight={600}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginBottom={SPACING.spacing3}
           >
             {t('you_will_need')}
@@ -64,7 +64,9 @@ export function WizardRequiredEquipmentList(
                 </StyledText>
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
-                  <Box borderBottom={`${SPACING.spacingXXS} solid #16212D8C`} />
+                  <Box
+                    borderBottom={`${SPACING.spacingXXS} solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
+                  />
                 )}
               </Box>
             ))}

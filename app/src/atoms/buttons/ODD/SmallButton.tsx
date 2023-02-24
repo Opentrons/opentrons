@@ -7,7 +7,7 @@ import {
   styleProps,
 } from '@opentrons/components'
 
-export const OnDevicePrimaryButton = styled(NewPrimaryBtn)`
+export const SmallButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blueEnabled};
   border-radius: 12px;
   box-shadow: none;
@@ -24,11 +24,11 @@ export const OnDevicePrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:active {
-    background-color: #006cfa;
+    background-color: ${COLORS.blueEnabled};
   }
 
   &:disabled {
-    background-color: #16212d33;
-    color: #16212d8c;
+    background-color: ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode};
+    color: ${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode};
   }
 `

@@ -33,7 +33,7 @@ const EXIT_BUTTON_STYLE = css`
     opacity: 70%;
   }
 `
-const ON_DEVICE_BUTTON_STYLE = css`
+const ON_DEVICE_EXIT_BUTTON_STYLE = css`
   margin-right: 1.75rem;
   font-size: 1.375rem;
   font-weight: 700;
@@ -50,9 +50,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
     <Box backgroundColor={COLORS.white}>
       <Flex
         padding={
-          isOnDevice
-            ? `28px`
-            : `${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`
+          isOnDevice ? `28px` : `${SPACING.spacing4} ${SPACING.spacing6}`
         }
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -92,7 +90,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
             <StyledText
-              css={isOnDevice ? ON_DEVICE_BUTTON_STYLE : EXIT_BUTTON_STYLE}
+              css={isOnDevice ? ON_DEVICE_EXIT_BUTTON_STYLE : EXIT_BUTTON_STYLE}
             >
               {t('exit')}
             </StyledText>

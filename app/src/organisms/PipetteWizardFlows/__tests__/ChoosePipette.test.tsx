@@ -61,9 +61,9 @@ describe('ChoosePipette', () => {
     const { getByText, getByAltText, getByRole, getByTestId } = render(props)
     getByText('Attach a pipette')
     getByText('Choose a pipette to attach')
-    getByText('Single or 8-Channel pipette')
+    getByText('1- or 8-Channel pipette')
     getByText('96-Channel pipette')
-    getByAltText('Single or 8-Channel pipette')
+    getByAltText('1- or 8-Channel pipette')
     getByAltText('96-Channel pipette')
     const singleMountPipettes = getByTestId('ChoosePipette_SingleAndEight')
     const ninetySixPipette = getByTestId('ChoosePipette_NinetySix')
@@ -93,7 +93,7 @@ describe('ChoosePipette', () => {
     const { getByText, getByRole, getByTestId } = render(props)
     getByText('Attach a pipette')
     getByText('Choose a pipette to attach')
-    getByText('Single or 8-Channel pipette')
+    getByText('1- or 8-Channel pipette')
     getByText('96-Channel pipette')
     const singleMountPipettes = getByTestId(
       'ChoosePipette_SingleAndEight_OnDevice'
@@ -101,12 +101,8 @@ describe('ChoosePipette', () => {
     const ninetySixPipette = getByTestId('ChoosePipette_NinetySix_OnDevice')
 
     //  Single and 8-Channel pipettes are selected first by default
-    expect(singleMountPipettes).toHaveStyle(
-      `background-color: ${String(COLORS.flex1)}`
-    )
-    expect(ninetySixPipette).toHaveStyle(
-      `background-color: ${String(COLORS.light1)}`
-    )
+    expect(singleMountPipettes).toHaveStyle(`background-color: #68d8ff`)
+    expect(ninetySixPipette).toHaveStyle(`background-color: #cccccc`)
 
     //  Selecting 96-Channel called setSelectedPipette prop
     fireEvent.click(ninetySixPipette)

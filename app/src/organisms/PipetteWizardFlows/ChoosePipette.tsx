@@ -25,7 +25,7 @@ import {
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Portal } from '../../App/portal'
-import { OnDevicePrimaryButton } from '../../atoms/buttons'
+import { SmallButton } from '../../atoms/buttons/ODD'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -67,7 +67,7 @@ const selectedOptionStyles = css`
   }
 `
 const onDeviceUnselectedOptionStyles = css`
-  background-color: ${COLORS.light1};
+  background-color: #cccccc;
   border-radius: 1rem;
   padding: ${SPACING.spacing5};
   margin-bottom: ${SPACING.spacing3};
@@ -76,7 +76,7 @@ const onDeviceUnselectedOptionStyles = css`
 `
 const onDeviceSelectedOptionStyles = css`
   ${onDeviceUnselectedOptionStyles}
-  background-color: ${COLORS.flex1};
+  background-color: #68d8ff;
 `
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const { selectedPipette, setSelectedPipette, proceed, exit } = props
@@ -114,7 +114,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
     })
   }
   const singleMount = t('single_or_8_channel', {
-    single: 'Single',
+    single: '1-',
     eight: EIGHT_CHANNEL,
   })
 
@@ -184,7 +184,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         justifyContent={JUSTIFY_FLEX_END}
         marginTop="7.5rem"
       >
-        <OnDevicePrimaryButton
+        <SmallButton
           onClick={proceed}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
         >
@@ -195,7 +195,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           >
             {t('continue')}
           </StyledText>
-        </OnDevicePrimaryButton>
+        </SmallButton>
       </Flex>
     </Flex>
   ) : (

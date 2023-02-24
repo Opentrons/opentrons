@@ -6,24 +6,24 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { OnDevicePrimaryButton } from '..'
+import { SmallButton } from '..'
 
-const render = (props: React.ComponentProps<typeof OnDevicePrimaryButton>) => {
-  return renderWithProviders(<OnDevicePrimaryButton {...props} />)[0]
+const render = (props: React.ComponentProps<typeof SmallButton>) => {
+  return renderWithProviders(<SmallButton {...props} />)[0]
 }
 
-describe('OnDevicePrimaryButton', () => {
-  let props: React.ComponentProps<typeof OnDevicePrimaryButton>
+describe('SmallButton', () => {
+  let props: React.ComponentProps<typeof SmallButton>
 
   beforeEach(() => {
     props = {
-      children: 'on device primary button',
+      children: 'small button',
     }
   })
 
-  it('renders on device primary button with text', () => {
+  it('renders small button with text', () => {
     const { getByText } = render(props)
-    const button = getByText('on device primary button')
+    const button = getByText('small button')
     expect(button).toHaveStyle(
       `background-color: ${String(COLORS.blueEnabled)}`
     )
@@ -47,26 +47,26 @@ describe('OnDevicePrimaryButton', () => {
     expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
   })
 
-  it('renders on device primary button with text and disabled', () => {
+  it('renders small button with text and disabled', () => {
     props.disabled = true
     const { getByText } = render(props)
-    const button = getByText('on device primary button')
+    const button = getByText('small button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(`background-color: #16212d33`)
     expect(button).toHaveStyle(`color: #16212d8c`)
   })
 
-  it('applies the correct states to the button - active', () => {
+  it('applies the correct states to the small button - active', () => {
     const { getByText } = render(props)
-    const button = getByText('on device primary button')
+    const button = getByText('small button')
     expect(button).toHaveStyleRule('background-color', '#006cfa', {
       modifier: ':active',
     })
   })
 
-  it('applies the correct states to the button - focus-visible', () => {
+  it('applies the correct states to the small button - focus-visible', () => {
     const { getByText } = render(props)
-    const button = getByText('on device primary button')
+    const button = getByText('small button')
     expect(button).toHaveStyleRule(
       'box-shadow',
       `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
