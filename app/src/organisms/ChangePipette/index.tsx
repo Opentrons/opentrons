@@ -11,7 +11,6 @@ import {
   SUCCESS,
 } from '../../redux/robot-api'
 import { getCalibrationForPipette } from '../../redux/calibration'
-import { getAttachedPipettes } from '../../redux/pipettes'
 import {
   home,
   move,
@@ -28,6 +27,7 @@ import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
+import { useAttachedPipettes } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ConfirmPipette } from './ConfirmPipette'
@@ -74,9 +74,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [confirmExit, setConfirmExit] = React.useState(false)
   // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use in operator to type narrow
   const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName) : null
-  const attachedPipette = useSelector(
-    (state: State) => getAttachedPipettes(state, robotName)[mount]
-  )
+  const attachedPipette = useAttachedPipettes()[mount]
   const actualPipette = attachedPipette?.modelSpecs || null
   const actualPipetteOffset = useSelector((state: State) =>
     attachedPipette?.id
@@ -134,15 +132,14 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const direction = actualPipette ? DETACH : ATTACH
   const isSelectPipetteStep =
     direction === ATTACH && wantedName === null && wizardStep === INSTRUCTIONS
+  const isButtonDisabled =
+    movementStatus === HOMING || movementStatus === MOVING
 
   const exitModal = (
     <ExitModal
       back={() => setConfirmExit(false)}
-      exit={
-        movementStatus !== HOMING && movementStatus !== MOVING
-          ? homePipAndExit
-          : () => console.log('Gantry is moving')
-      }
+      isDisabled={isButtonDisabled}
+      exit={homePipAndExit}
       direction={direction}
     />
   )
@@ -174,7 +171,9 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   let exitWizardHeader
   let wizardTitle: string =
-    actualPipette?.displayName != null && wantedPipette === null
+    actualPipette?.displayName != null &&
+    wantedPipette === null &&
+    direction === DETACH
       ? t('detach_pipette', {
           pipette: actualPipette.displayName,
           mount: mount[0].toUpperCase() + mount.slice(1),
@@ -208,18 +207,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
   } else if (wizardStep === INSTRUCTIONS) {
     const noPipetteSelectedAttach =
       direction === ATTACH && wantedPipette === null
-    const attachWizardHeader = noPipetteSelectedAttach
-      ? t('attach_pipette')
-      : t('attach_pipette_type', {
-          pipetteName: wantedPipette?.displayName ?? '',
-        })
-
-    const detachWizardHeader = noPipetteDetach
-      ? t('detach')
-      : t('detach_pipette', {
-          pipette: actualPipette?.displayName ?? wantedPipette?.displayName,
-          mount: mount[0].toUpperCase() + mount.slice(1),
-        })
 
     let title
     if (instructionStepPage === 2) {
@@ -227,9 +214,18 @@ export function ChangePipette(props: Props): JSX.Element | null {
         pipetteName: wantedPipette?.displayName ?? '',
       })
     } else if (actualPipette?.displayName != null) {
-      title = detachWizardHeader
+      title = noPipetteDetach
+        ? t('detach')
+        : t('detach_pipette', {
+            pipette: actualPipette?.displayName ?? wantedPipette?.displayName,
+            mount: mount[0].toUpperCase() + mount.slice(1),
+          })
     } else {
-      title = attachWizardHeader
+      title = noPipetteSelectedAttach
+        ? t('attach_pipette')
+        : t('attach_pipette_type', {
+            pipetteName: wantedPipette?.displayName ?? '',
+          })
     }
 
     exitWizardHeader = confirmExit ? undefined : () => setConfirmExit(true)
@@ -321,6 +317,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
           exit: homePipAndExit,
           actualPipetteOffset: actualPipetteOffset,
           toCalibrationDashboard: toCalDashboard,
+          isDisabled: isButtonDisabled,
         }}
       />
     )

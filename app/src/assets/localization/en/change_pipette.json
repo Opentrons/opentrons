@@ -48,5 +48,6 @@
   "detach_try_again": "Detach and try again",
   "detach_pipette_from_mount": "Detach Pipette from {{mount}} Mount",
   "pipette_setup": "Pipette Setup",
-  "mount": "{{mount}} mount"
+  "mount": "{{mount}} mount",
+  "robot_is_in_motion": "Robot is in motion"
 }
