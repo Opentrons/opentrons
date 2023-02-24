@@ -745,6 +745,20 @@ def test_get_current_volume_returns_zero_when_no_tip_attached(
     assert subject.get_current_volume() == 0
 
 
+def test_get_available_volume_returns_zero_no_tip_attached(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return 0 when an exception is raises."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_raise(TipNotAttachedError())
+    assert subject.get_available_volume() == 0
+
+
 def test_get_available_volume(
     decoy: Decoy,
     subject: InstrumentCore,
