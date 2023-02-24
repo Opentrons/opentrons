@@ -8,7 +8,7 @@ from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .gantry_mover import create_gantry_mover
 from .labware_movement import LabwareMovementHandler
-from .pipetting import create_pipette_handler
+from .pipetting import create_pipetting_handler
 from .tip_handler import create_tip_handler
 from .run_control import RunControlHandler
 from .command_executor import CommandExecutor
