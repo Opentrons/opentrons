@@ -736,7 +736,7 @@ def test_get_current_volume_returns_zero_when_no_tip_attached(
     subject: InstrumentCore,
     mock_engine_client: EngineClient,
 ) -> None:
-    """It should return 0 when an exception is raises."""
+    """It should return 0 when an exception is raised."""
     decoy.when(
         mock_engine_client.state.pipettes.get_aspirated_volume(
             pipette_id=subject.pipette_id
