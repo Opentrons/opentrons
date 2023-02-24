@@ -74,10 +74,10 @@ class PipetteState:
 
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, Optional[float]]
-    tip_volume_by_id: Dict[str, float]
+    tip_volume_by_id: Dict[str, Optional[float]]
     current_well: Optional[CurrentWell]
     current_deck_point: CurrentDeckPoint
-    attached_tip_labware_by_id: Dict[str, str]
+    attached_tip_labware_by_id: Dict[str, Optional[str]]
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
@@ -137,6 +137,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
+            self._state.tip_volume_by_id[pipette_id] = None
 
         elif isinstance(command.result, AspirateResult):
             pipette_id = command.params.pipetteId
@@ -162,15 +163,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
         elif isinstance(command.result, DropTipResult):
             pipette_id = command.params.pipetteId
-            # No-op if pipette_id not found; makes unit testing easier.
-            # That should never happen outside of tests. But if it somehow does,
-            # it won't harm the state.
             self._state.aspirated_volume_by_id[pipette_id] = None
-            self._state.attached_tip_labware_by_id.pop(pipette_id, None)
+            self._state.attached_tip_labware_by_id[pipette_id] = None
+            self._state.tip_volume_by_id[pipette_id] = None
 
         elif isinstance(command.result, BlowOutResult):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
+            self._state.tip_volume_by_id[pipette_id] = None
 
     def _update_current_well(self, command: Command) -> None:
         # These commands leave the pipette in a new well.
@@ -393,6 +393,11 @@ class PipetteView(HasState[PipetteState]):
                 f"Pipette {pipette_id} has no tip attached; unable to calculate working maximum volume."
             ) from e
 
+        if not tip_volume:
+            raise errors.TipNotAttachedError(
+                f"Pipette {pipette_id} has no tip attached; unable to calculate working maximum volume."
+            )
+
         return min(tip_volume, max_volume)
 
     def get_available_volume(self, pipette_id: str) -> Optional[float]:
@@ -403,7 +408,11 @@ class PipetteView(HasState[PipetteState]):
 
     def get_attached_tip_labware_by_id(self) -> Dict[str, str]:
         """Get the tiprack ids of attached tip by pipette ids."""
-        return dict(self._state.attached_tip_labware_by_id)
+        return dict(
+            (pipette_id, labware_id)
+            for pipette_id, labware_id in self._state.attached_tip_labware_by_id.items()
+            if labware_id is not None
+        )
 
     def validate_tip_state(self, pipette_id: str, expected_has_tip: bool) -> None:
         """Validate that a pipette's tip state matches expectations."""

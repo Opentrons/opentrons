@@ -22,17 +22,18 @@ from opentrons.protocol_engine.state.pipettes import (
     HardwarePipette,
     StaticPipetteConfig,
 )
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 
 
 def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
     aspirated_volume_by_id: Optional[Dict[str, Optional[float]]] = None,
-    tip_volume_by_id: Optional[Dict[str, float]] = None,
+    tip_volume_by_id: Optional[Dict[str, Optional[float]]] = None,
     current_well: Optional[CurrentWell] = None,
     current_deck_point: CurrentDeckPoint = CurrentDeckPoint(
         mount=None, deck_point=None
     ),
-    attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
+    attached_tip_labware_by_id: Optional[Dict[str, Optional[str]]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
     flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
@@ -254,6 +255,29 @@ def test_get_pipette_working_volume() -> None:
     assert subject.get_working_volume("pipette-id") == 1337
 
 
+def test_get_pipette_working_volume_raises_if_tip_volume_is_none() -> None:
+    """Should raise an exception that no tip is attached."""
+    subject = get_pipette_view(
+        tip_volume_by_id={"pipette-id": None},
+        static_config_by_id={
+            "pipette-id": StaticPipetteConfig(
+                min_volume=1,
+                max_volume=9001,
+                model="blah",
+                display_name="bleh",
+                serial_number="",
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
+            )
+        },
+    )
+
+    with pytest.raises(TipNotAttachedError):
+        subject.get_working_volume("pipette-id") == 1337
+
+
 def test_get_pipette_available_volume() -> None:
     """It should get the available volume for a pipette."""
     subject = get_pipette_view(
@@ -292,7 +316,7 @@ def test_get_pipette_available_volume() -> None:
 
 def test_get_attached_tip_labware_by_id() -> None:
     """It should get the tip-rack ID map of a pipette's attached tip."""
-    attached_tip_labware_by_id = {"foo": "bar"}
+    attached_tip_labware_by_id = {"foo": "bar", "far": None}
     subject = get_pipette_view(attached_tip_labware_by_id=attached_tip_labware_by_id)
     result = subject.get_attached_tip_labware_by_id()
 

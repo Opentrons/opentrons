@@ -12,7 +12,7 @@ from opentrons.protocol_engine.state import StateView, HardwarePipette
 from opentrons.protocol_engine.execution.pipetting import (
     HardwarePipettingHandler,
     VirtualPipettingHandler,
-    create_pipette_handler,
+    create_pipetting_handler,
 )
 
 
@@ -47,7 +47,7 @@ async def test_create_pipette_handler(
     """It should return virtual or real tip handlers depending on config."""
     decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(False)
     assert isinstance(
-        create_pipette_handler(
+        create_pipetting_handler(
             state_view=mock_state_view, hardware_api=mock_hardware_api
         ),
         HardwarePipettingHandler,
@@ -55,7 +55,7 @@ async def test_create_pipette_handler(
 
     decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(True)
     assert isinstance(
-        create_pipette_handler(
+        create_pipetting_handler(
             state_view=mock_state_view, hardware_api=mock_hardware_api
         ),
         VirtualPipettingHandler,

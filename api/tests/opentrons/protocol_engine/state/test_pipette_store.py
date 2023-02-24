@@ -89,6 +89,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
     )
     assert result.aspirated_volume_by_id["pipette-id"] is None
     assert result.movement_speed_by_id["pipette-id"] is None
+    assert result.tip_volume_by_id["pipette-id"] is None
 
 
 def test_pick_up_tip_sets_aspirate_volume(subject: PipetteStore) -> None:
@@ -112,7 +113,7 @@ def test_pick_up_tip_sets_aspirate_volume(subject: PipetteStore) -> None:
     assert result.aspirated_volume_by_id["pipette-id"] == 0
 
 
-def test_drop_tip_sets_aspirate_volume(subject: PipetteStore) -> None:
+def test_drop_tip_sets_aspirate_volume_and_tip_volume(subject: PipetteStore) -> None:
     """It should set aspirate volume to None."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
@@ -137,6 +138,10 @@ def test_drop_tip_sets_aspirate_volume(subject: PipetteStore) -> None:
     result = subject.state
 
     assert result.aspirated_volume_by_id["pipette-id"] is None
+
+    assert result.tip_volume_by_id["pipette-id"] is None
+
+    assert result.attached_tip_labware_by_id["pipette-id"] is None
 
 
 def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
@@ -176,6 +181,7 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
     result = subject.state
 
     assert result.aspirated_volume_by_id["pipette-id"] is None
+    assert result.tip_volume_by_id["pipette-id"] is None
 
     assert result.current_well == CurrentWell(
         pipette_id="pipette-id",
@@ -594,7 +600,7 @@ def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
 
     subject.handle_action(UpdateCommandAction(command=drop_tip_command))
 
-    assert not subject.state.attached_tip_labware_by_id
+    assert subject.state.attached_tip_labware_by_id[pipette_id] is None
 
 
 def test_set_movement_speed(subject: PipetteStore) -> None:
