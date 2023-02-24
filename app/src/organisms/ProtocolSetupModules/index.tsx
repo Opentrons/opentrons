@@ -34,7 +34,10 @@ import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupM
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
-import { getAttachedProtocolModuleMatches } from './utils'
+import {
+  getAttachedProtocolModuleMatches,
+  getUnmatchedModulesForProtocol,
+} from './utils'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
@@ -212,16 +215,18 @@ export function ProtocolSetupModules({
       ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
       : []
 
-  // const moduleModels = protocolModulesInfo.map(module => module.moduleDef.model)
-  // const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
     protocolModulesInfo
   )
 
-  // TODO: rewrite useUnmatchedModulesForProtocol hook as util
-  const isModuleMismatch = true
+  const {
+    missingModuleIds,
+    remainingAttachedModules,
+  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
+
+  const isModuleMismatch =
+    remainingAttachedModules.length > 0 && missingModuleIds.length > 0
 
   return (
     <>
