@@ -51,7 +51,7 @@ def create_queue_worker(
         movement=movement_handler,
     )
 
-    pipetting_handler = create_pipette_handler(
+    pipetting_handler = create_pipetting_handler(
         hardware_api=hardware_api,
         state_view=state_store,
     )
