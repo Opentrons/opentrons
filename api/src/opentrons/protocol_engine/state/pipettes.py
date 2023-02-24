@@ -378,7 +378,7 @@ class PipetteView(HasState[PipetteState]):
                 f"Pipette {pipette_id} not found; unable to get current volume."
             ) from e
 
-        if pipette_id not in self._state.tip_volume_by_id.keys():
+        if self._state.tip_volume_by_id.get(pipette_id) is None:
             raise errors.TipNotAttachedError("Pipette has no tip attached.")
 
         return aspirate_volume
