@@ -135,6 +135,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         # to revisit some liquid configurations for tiprack types.
         self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
 
+        #: firmware update states
+        self._fw_version = 0
+        self._requires_update = False
+
     @property
     def config(self) -> PipetteConfigurations:
         return self._config
@@ -249,6 +253,22 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def pipette_id(self) -> Optional[str]:
         return self._pipette_id
+        
+    @property
+    def fw_version(self) -> int:
+        return self._fw_version
+
+    @fw_version.setter
+    def version(self, value: int) -> None:
+        self._version = value
+
+    @property
+    def requires_update(self) -> bool:
+        return self._requires_update
+
+    @requires_update.setter
+    def requires_update(self, value: bool) -> None:
+        self._requires_update = value 
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """
@@ -486,6 +506,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "available_volume": self.available_volume,
                 "name": self.name,
                 "model": self.model,
+                "fw_version": self.fw_version,
+                "requires_update": self.requires_update,
                 "pipette_id": self.pipette_id,
                 "has_tip": self.has_tip,
                 "working_volume": self.working_volume,

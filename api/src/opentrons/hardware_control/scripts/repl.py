@@ -29,7 +29,7 @@ from subprocess import run  # noqa: E402
 from typing import Union, Type, Any  # noqa: E402
 
 from opentrons.types import Mount, Point  # noqa: E402
-from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
+from opentrons.hardware_control.types import Axis, CriticalPoint, OT3SubSystem  # noqa: E402
 from opentrons.config import feature_flags as ff  # noqa: E402
 from opentrons.hardware_control.types import (  # noqa: E402
     OT3Axis,
@@ -121,6 +121,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Axis": Axis,
             "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
+            "OT3SubSystem": OT3SubSystem,
             "GripperProbe": GripperProbe,
             "find_edge": wrap_async_util_fn(find_edge_linear, api),
             "find_deck_height": wrap_async_util_fn(find_deck_height, api),

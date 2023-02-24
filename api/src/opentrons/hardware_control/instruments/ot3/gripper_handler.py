@@ -149,3 +149,9 @@ class GripperHandler:
     def is_valid_jaw_width(self, mm: float) -> bool:
         conf = self.get_gripper().geometry
         return conf.jaw_width["min"] <= mm <= conf.jaw_width["max"]
+
+    def needs_update(self) -> bool:
+        return self.get_gripper().requires_update
+
+    def set_needs_update(self, state: bool) -> None:
+        self.get_gripper().requires_update = state
