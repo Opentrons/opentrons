@@ -76,7 +76,8 @@ const onDeviceUnselectedOptionStyles = css`
 `
 const onDeviceSelectedOptionStyles = css`
   ${onDeviceUnselectedOptionStyles}
-  background-color: #68d8ff;
+  background-color: #9c3ba4;
+  color: ${COLORS.white};
 `
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const { selectedPipette, setSelectedPipette, proceed, exit } = props

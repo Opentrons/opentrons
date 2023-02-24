@@ -101,7 +101,7 @@ describe('ChoosePipette', () => {
     const ninetySixPipette = getByTestId('ChoosePipette_NinetySix_OnDevice')
 
     //  Single and 8-Channel pipettes are selected first by default
-    expect(singleMountPipettes).toHaveStyle(`background-color: #68d8ff`)
+    expect(singleMountPipettes).toHaveStyle(`background-color: #9c3ba4`)
     expect(ninetySixPipette).toHaveStyle(`background-color: #cccccc`)
 
     //  Selecting 96-Channel called setSelectedPipette prop
