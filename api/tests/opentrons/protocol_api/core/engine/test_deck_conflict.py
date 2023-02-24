@@ -1,6 +1,6 @@
 """Unit tests for the deck_conflict module."""
 
-from decoy import Decoy
+from decoy import Decoy, matchers
 import pytest
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -49,8 +49,11 @@ def test_noop_if_ot3(decoy: Decoy, mock_state_view: StateView) -> None:
     )
 
     decoy.verify(
-        wrapped_deck_conflict.check(),  # type:ignore[call-arg]
-        ignore_extra_args=True,
+        wrapped_deck_conflict.check(
+            existing_items=matchers.Anything(),
+            new_item=matchers.Anything(),
+            new_location=matchers.Anything(),
+        ),
         times=0,
     )
 
