@@ -33,9 +33,11 @@ class Plot:
         self.x_increment = self.get_increment(self.df_data, "x")
         self.z_increment = self.get_increment(self.df_data, "z")
         self.max_relative = self.get_max_value(self.df_data, "Relative")
+        self.min_absolute = self.get_min_value(self.df_data, "Capacitance")
         print(f"X-Axis Increment = {self.x_increment}")
         print(f"Z-Axis Increment = {self.z_increment}")
         print(f"Max Relative Change in Capacitance = {self.max_relative}")
+        print(f"Min Absolute Capacitance = {self.min_absolute}")
 
     def import_file(self, file):
         df = pd.read_csv(file)
@@ -75,6 +77,9 @@ class Plot:
 
     def get_max_value(self, df, column):
         return df[column].max()
+
+    def get_min_value(self, df, column):
+        return df[column].min()
 
     def set_legend(self, figure, legend):
         for idx, name in enumerate(legend):
@@ -244,7 +249,7 @@ class Plot:
         zoom_param["filename"] = "plot_absolute_all_zoom"
         zoom_param["title"] = "Absolute Capacitance vs. Deck Height Zoomed"
         zoom_param["x_range"] = [x_first, 1]
-        zoom_param["y_range"] = [3.8, 4.8]
+        zoom_param["y_range"] = [5.4, 6.8]
         self.write_plot(zoom_param)
 
     def relative_all_plot(self):
