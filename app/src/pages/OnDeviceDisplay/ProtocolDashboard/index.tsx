@@ -1,9 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { format, formatDistance } from 'date-fns'
 import {
   COLORS,
   SPACING,
@@ -11,7 +9,6 @@ import {
   Flex,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
-  truncateString,
   Btn,
   Icon,
   JUSTIFY_CENTER,
@@ -25,9 +22,11 @@ import { StyledText } from '../../../atoms/text'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import {
+  getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '../../../redux/config'
+import { ProtocolRow } from './ProtocolRow'
 import { sortProtocols } from './utils'
 
 import imgSrc from '../../../assets/images/odd/abstract@x2.png'
@@ -51,26 +50,18 @@ const TableHeader = styled('th')`
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing2};
 `
-const TableRow = styled('tr')`
-  border: 1px ${COLORS.medGreyHover} solid;
-  height: 4rem;
-  padding: ${SPACING.spacing5};
-`
-
-const TableDatum = styled('td')`
-  padding: ${SPACING.spacing2};
-  white-space: break-spaces;
-  text-overflow: wrap;
-`
 
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useAllRunsQuery()
-  const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
+  const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
+  const pinnedProtocols = protocolsData.filter(p =>
+    pinnedProtocolIds.includes(p.id)
+  )
   const runData = runs.data?.data != null ? runs.data?.data : []
   const sortedProtocols = sortProtocols(sortBy, protocolsData, runData)
 
@@ -112,6 +103,30 @@ export function ProtocolDashboard(): JSX.Element {
       minHeight="25rem"
     >
       <Navigation routes={onDeviceDisplayRoutes} />
+      {pinnedProtocols.length > 0 && (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          height="8rem"
+          backgroundColor={COLORS.medGreyEnabled}
+        >
+          <StyledText
+            fontSize="2rem"
+            lineHeight="2.75rem"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            Pinned Protocols
+          </StyledText>
+          <StyledText
+            fontSize="1rem"
+            lineHeight="1.125rem"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            {JSON.stringify(pinnedProtocolIds)}
+          </StyledText>
+        </Flex>
+      )}
       {sortedProtocols.length > 0 ? (
         <Table>
           <thead>
@@ -187,51 +202,17 @@ export function ProtocolDashboard(): JSX.Element {
           </thead>
 
           <tbody>
-            {sortedProtocols.map((protocol, index) => {
+            {sortedProtocols.map(protocol => {
               const lastRun = runs.data?.data.find(
                 run => run.protocolId === protocol.id
               )?.createdAt
 
-              const protocolName =
-                protocol.metadata.protocolName ?? protocol.files[0].name
-
               return (
-                <TableRow
-                  key={protocol.key ?? index}
-                  onClick={() => history.push(`/protocols/${protocol.id}`)}
-                >
-                  <TableDatum>
-                    <StyledText
-                      fontSize="1.5rem"
-                      lineHeight="2.0625rem"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    >
-                      {truncateString(protocolName, 88, 66)}
-                    </StyledText>
-                  </TableDatum>
-                  <TableDatum>
-                    <StyledText
-                      fontSize="1.375rem"
-                      lineHeight="1.75rem"
-                      fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    >
-                      {lastRun != null
-                        ? formatDistance(new Date(lastRun), new Date(), {
-                            addSuffix: true,
-                          })
-                        : t('no_history')}
-                    </StyledText>
-                  </TableDatum>
-                  <TableDatum>
-                    <StyledText
-                      fontSize="1.375rem"
-                      lineHeight="1.75rem"
-                      fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    >
-                      {format(new Date(protocol.createdAt), 'Pp')}
-                    </StyledText>
-                  </TableDatum>
-                </TableRow>
+                <ProtocolRow
+                  key={protocol.key}
+                  lastRun={lastRun}
+                  protocol={protocol}
+                />
               )
             })}
           </tbody>
@@ -244,7 +225,7 @@ export function ProtocolDashboard(): JSX.Element {
           height="27.75rem"
           backgroundColor={COLORS.medGreyEnabled}
         >
-          <img src={imgSrc} />
+          <img title={t('nothing_here_yet')} src={imgSrc} />
           <StyledText
             fontSize="2rem"
             lineHeight="2.75rem"

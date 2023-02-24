@@ -142,6 +142,8 @@ def loaded_static_pipette_data() -> LoadedStaticPipetteData:
         ),
         return_tip_scale=0.5,
         nominal_tip_overlap={"default": 9.87},
+        home_position=10.11,
+        nozzle_offset_z=12.13,
     )
 
 
@@ -507,6 +509,10 @@ async def test_load_pipette(
         pipette_data_provider.get_pipette_static_config(model="hello", serial_number="world")  # type: ignore[arg-type]
     ).then_return(loaded_static_pipette_data)
 
+    decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
+        42.0
+    )
+
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
@@ -552,6 +558,10 @@ async def test_load_pipette_96_channels(
     decoy.when(
         pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
     ).then_return(loaded_static_pipette_data)
+
+    decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
+        42.0
+    )
 
     result = await subject.load_pipette(
         pipette_name="p1000_96",
@@ -620,6 +630,7 @@ async def test_load_pipette_use_virtual(
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
     decoy.when(state_store.config.use_virtual_pipettes).then_return(True)
+    decoy.when(state_store.config.robot_type).then_return("OT-2 Standard")
     decoy.when(model_utils.generate_id()).then_return("unique-id")
     decoy.when(model_utils.generate_id(prefix="fake-serial-number-")).then_return(
         "fake-serial"
