@@ -4,12 +4,12 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../i18n'
-import { mockFetchModulesSuccessMeta } from '../../../redux/modules/__fixtures__'
-import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
+import { i18n } from '../../../../i18n'
+import { mockFetchModulesSuccessMeta } from '../../../../redux/modules/__fixtures__'
+import { DISCONNECT } from '../../../Devices/RobotSettings/ConnectNetwork/constants'
 import { FailedToConnect } from '../FailedToConnect'
 
-import type { RequestState } from '../../../redux/robot-api/types'
+import type { RequestState } from '../../../../redux/robot-api/types'
 
 const render = (props: React.ComponentProps<typeof FailedToConnect>) => {
   return renderWithProviders(

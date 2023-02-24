@@ -11,7 +11,14 @@ from opentrons.protocols.api_support.util import (
     FlowRates,
     find_value_for_api_version,
 )
-from opentrons.protocol_engine import DeckPoint, WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import (
+    DeckPoint,
+    DropTipWellLocation,
+    DropTipWellOrigin,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+)
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -330,14 +337,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
         """
-        if location is not None:
-            raise NotImplementedError(
-                "InstrumentCore.drop_tip with non-default drop location not implemented"
-            )
-
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
-        well_location = WellLocation()
+
+        if location is not None:
+            relative_well_location = (
+                self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=location.point,
+                )
+            )
+
+            well_location = DropTipWellLocation(
+                origin=DropTipWellOrigin(relative_well_location.origin.value),
+                offset=relative_well_location.offset,
+            )
+        else:
+            well_location = DropTipWellLocation()
 
         self._engine_client.drop_tip(
             pipette_id=self._pipette_id,
@@ -453,7 +470,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self.get_hardware_state()["has_tip"]
 
     def get_return_height(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_return_height not implemented")
+        return self._engine_client.state.pipettes.get_return_tip_scale(self._pipette_id)
 
     def get_speed(self) -> PlungerSpeeds:
         raise NotImplementedError("InstrumentCore.get_speed not implemented")

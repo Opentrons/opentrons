@@ -16,14 +16,14 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
-import { getLocalRobot } from '../../redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
+import { StyledText } from '../../../atoms/text'
+import { TertiaryButton } from '../../../atoms/buttons'
+import { getLocalRobot } from '../../../redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
 
-import type { Dispatch, State } from '../../redux/types'
-import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
-import type { AuthType } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
+import type { Dispatch, State } from '../../../redux/types'
+import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
+import type { AuthType } from '../../../pages/OnDeviceDisplay/ConnectViaWifi'
 
 interface SelectAuthenticationTypeProps {
   ssid: string

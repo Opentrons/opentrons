@@ -150,7 +150,7 @@
   "definitions": {
     "WellOrigin": {
       "title": "WellOrigin",
-      "description": "Origin of WellLocation offset.",
+      "description": "Origin of WellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well",
       "enum": ["top", "bottom", "center"],
       "type": "string"
     },
@@ -654,11 +654,40 @@
       },
       "required": ["params"]
     },
+    "DropTipWellOrigin": {
+      "title": "DropTipWellOrigin",
+      "description": "The origin of a DropTipWellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    DEFAULT: the default drop-tip location of the well,\n        based on pipette configuration and length of the tip.",
+      "enum": ["top", "bottom", "center", "default"],
+      "type": "string"
+    },
+    "DropTipWellLocation": {
+      "title": "DropTipWellLocation",
+      "description": "Like WellLocation, but for dropping tips.\n\nUnlike a typical WellLocation, the location for a drop tip\ndefaults to location based on the tip length rather than the well's top.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "default",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DropTipWellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        }
+      }
+    },
     "DropTipParams": {
       "title": "DropTipParams",
       "description": "Payload required to drop a tip in a specific well.",
       "type": "object",
       "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
         "labwareId": {
           "title": "Labwareid",
           "description": "Identifier of labware to use.",
@@ -671,17 +700,12 @@
         },
         "wellLocation": {
           "title": "Welllocation",
-          "description": "Relative well location at which to perform the operation",
+          "description": "Relative well location at which to drop the tip.",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/DropTipWellLocation"
             }
           ]
-        },
-        "pipetteId": {
-          "title": "Pipetteid",
-          "description": "Identifier of pipette to use for liquid handling.",
-          "type": "string"
         },
         "homeAfter": {
           "title": "Homeafter",
@@ -689,7 +713,7 @@
           "type": "boolean"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"]
+      "required": ["pipetteId", "labwareId", "wellName"]
     },
     "DropTipCreate": {
       "title": "DropTipCreate",

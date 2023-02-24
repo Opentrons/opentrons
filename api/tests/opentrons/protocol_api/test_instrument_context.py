@@ -791,3 +791,14 @@ def test_touch_tip(
             speed=42.0,
         )
     )
+
+
+def test_return_height(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should get the tip return scale factor."""
+    decoy.when(mock_instrument_core.get_return_height()).then_return(0.123)
+
+    result = subject.return_height
+
+    assert result == 0.123

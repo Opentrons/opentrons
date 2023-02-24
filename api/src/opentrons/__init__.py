@@ -163,7 +163,7 @@ async def initialize() -> ThreadManagedHardware:
     async def _do_updates() -> None:
         if should_use_ot3() and ff.enable_ot3_firmware_updates():
             log.info("Checking firmware updates")
-            await hardware.do_firmware_updates()
+            await hardware.start_firmware_updates()
 
     await asyncio.create_task(_do_updates())
 

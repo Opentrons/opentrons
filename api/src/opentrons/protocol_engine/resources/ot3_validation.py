@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
-from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
+from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

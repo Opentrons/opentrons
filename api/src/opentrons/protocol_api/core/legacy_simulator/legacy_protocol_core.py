@@ -45,9 +45,10 @@ class LegacyProtocolCoreSimulator(
         attached[mount] = instrument_name.value
         self._sync_hardware.cache_instruments(attached)
 
+        pipette_dict = self._sync_hardware.get_attached_instruments()[mount]
         new_instr = LegacyInstrumentCoreSimulator(
             protocol_interface=self,
-            pipette_dict=self._sync_hardware.get_attached_instruments()[mount],
+            pipette_dict=pipette_dict,
             mount=mount,
             instrument_name=instrument_name.value,
             api_version=self._api_version,
@@ -59,6 +60,8 @@ class LegacyProtocolCoreSimulator(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name.value,
                 mount=mount,
+                model=pipette_dict["model"],
+                serial_number=pipette_dict["pipette_id"],
             )
         )
 

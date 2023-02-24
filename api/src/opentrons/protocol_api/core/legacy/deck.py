@@ -11,17 +11,21 @@ from opentrons_shared_data.deck import (
     load as load_deck,
 )
 from opentrons_shared_data.deck.dev_types import SlotDefV3
+from opentrons_shared_data.labware.dev_types import LabwareUri
 
-from opentrons.types import DeckLocation, Location, Mount, Point
 from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.motion_planning import deck_conflict
 from opentrons.protocols.api_support.constants import deck_type
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.types import DeckLocation, Location, Mount, Point
 
-from ...deck import CalibrationPosition
-from ...labware import load as load_lw, Labware
+from opentrons.protocol_api.core.labware import AbstractLabware
+from opentrons.protocol_api.deck import CalibrationPosition
+from opentrons.protocol_api.labware import load as load_lw, Labware
+
 from .legacy_labware_core import LegacyLabwareCore
-from .module_geometry import ModuleGeometry, ThermocyclerGeometry
-from . import deck_conflict
+from .module_geometry import ModuleGeometry, HeaterShakerGeometry, ThermocyclerGeometry
+
 
 _log = logging.getLogger(__name__)
 
@@ -99,6 +103,55 @@ class Deck(UserDict):  # type: ignore[type-arg]
         else:
             return key_int
 
+    @staticmethod
+    def _map_to_conflict_checker_item(item: DeckItem) -> deck_conflict.DeckItem:
+        name_for_errors = item.load_name
+
+        # We have to account for both Labware and AbstractLabware because this class
+        # inappropriately contains both internal and customer-facing types.
+        # See todo comment in self._load_fixtures().
+        if isinstance(item, Labware):
+            is_fixed_trash = "fixedTrash" in item.quirks
+            return deck_conflict.Labware(
+                highest_z=item.highest_z,
+                name_for_errors=name_for_errors,
+                # TODO(mm, 2023-02-16): Refactor item.uri to return LabwareUri.
+                uri=LabwareUri(item.uri),
+                is_fixed_trash=is_fixed_trash,
+            )
+
+        elif isinstance(item, AbstractLabware):
+            is_fixed_trash = "fixedTrash" in item.get_quirks()
+            return deck_conflict.Labware(
+                highest_z=item.highest_z,
+                name_for_errors=name_for_errors,
+                # TODO(mm, 2023-02-16): Refactor item.uri to return LabwareUri.
+                uri=LabwareUri(item.get_uri()),
+                is_fixed_trash=is_fixed_trash,
+            )
+
+        elif isinstance(item, HeaterShakerGeometry):
+            return deck_conflict.HeaterShakerModule(
+                highest_z_including_labware=item.highest_z,
+                name_for_errors=name_for_errors,
+            )
+
+        elif isinstance(item, ThermocyclerGeometry):
+            return deck_conflict.ThermocyclerModule(
+                highest_z_including_labware=item.highest_z,
+                name_for_errors=name_for_errors,
+                is_semi_configuration=item.is_semi_configuration,
+            )
+
+        elif isinstance(item, ModuleGeometry):
+            return deck_conflict.OtherModule(
+                highest_z_including_labware=item.highest_z,
+                name_for_errors=name_for_errors,
+            )
+
+        else:
+            assert False, f"Deck item {item} has an unknown type."
+
     def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
         return self.data[self._check_name(key)]
 
@@ -116,14 +169,16 @@ class Deck(UserDict):  # type: ignore[type-arg]
     def __setitem__(self, key: DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
         existing_items = {
-            slot: item for slot, item in self.data.items() if item is not None
+            slot: self._map_to_conflict_checker_item(item)
+            for slot, item in self.data.items()
+            if item is not None
         }
 
         # will raise DeckConflictError if items conflict
         deck_conflict.check(
             existing_items=existing_items,
             new_location=slot_key_int,
-            new_item=val,
+            new_item=self._map_to_conflict_checker_item(val),
         )
 
         self.data[slot_key_int] = val

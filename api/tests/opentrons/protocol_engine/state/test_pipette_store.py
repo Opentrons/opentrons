@@ -27,6 +27,9 @@ from opentrons.protocol_engine.state.pipettes import (
     CurrentDeckPoint,
     StaticPipetteConfig,
 )
+from opentrons.protocol_engine.resources.pipette_data_provider import (
+    LoadedStaticPipetteData,
+)
 
 from .command_fixtures import (
     create_load_pipette_command,
@@ -566,24 +569,36 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
     subject.handle_action(
         AddPipetteConfigAction(
             pipette_id="pipette-id",
-            model="pipette-model",
-            display_name="pipette name",
-            min_volume=1.23,
-            max_volume=4.56,
-            channels=7,
-            flow_rates=FlowRates(
-                default_aspirate={"a": 1},
-                default_dispense={"b": 2},
-                default_blow_out={"c": 3},
+            serial_number="pipette-serial",
+            config=LoadedStaticPipetteData(
+                model="pipette-model",
+                display_name="pipette name",
+                min_volume=1.23,
+                max_volume=4.56,
+                channels=7,
+                flow_rates=FlowRates(
+                    default_aspirate={"a": 1},
+                    default_dispense={"b": 2},
+                    default_blow_out={"c": 3},
+                ),
+                return_tip_scale=4,
+                nominal_tip_overlap={"default": 5},
+                home_position=8.9,
+                nozzle_offset_z=10.11,
             ),
         )
     )
 
     assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
         model="pipette-model",
+        serial_number="pipette-serial",
         display_name="pipette name",
         min_volume=1.23,
         max_volume=4.56,
+        return_tip_scale=4,
+        nominal_tip_overlap={"default": 5},
+        home_position=8.9,
+        nozzle_offset_z=10.11,
     )
     assert subject.state.flow_rates_by_id["pipette-id"] == FlowRates(
         default_aspirate={"a": 1},

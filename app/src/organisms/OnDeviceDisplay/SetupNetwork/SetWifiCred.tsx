@@ -15,10 +15,10 @@ import {
   POSITION_FIXED,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { InputField } from '../../atoms/InputField'
-import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
-import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import { InputField } from '../../../atoms/InputField'
+import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { TertiaryButton } from '../../../atoms/buttons'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: ${SPACING.spacing5};
