@@ -12,24 +12,24 @@ _log = logging.getLogger(__name__)
 
 async def check_registration_token_header(
     request: Request,
-    authentication_bearer: str = Header(
+    authenticationBearer: str = Header(
         ...,
         description="An authentication header bearing a token provided by the /system/register endpoint.",
     ),
     signing_key: UUID = Depends(get_persistent_uuid),
 ) -> None:
     """A header requirement that requests a registration token from /system/register."""
-    _log.info(f"Verifying registration token: {authentication_bearer}")
+    _log.info(f"Verifying registration token: {authenticationBearer}")
     if not jwt_is_valid(
         signing_key=str(signing_key),
-        token=authentication_bearer,
+        token=authenticationBearer,
         audience=REGISTRATION_AUDIENCE,
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Registration token invalid",
         )
-    request.state.authentication_bearer = authentication_bearer
+    request.state.authentication_bearer = authenticationBearer
 
 
 async def get_registration_token_header(request: Request) -> str:
