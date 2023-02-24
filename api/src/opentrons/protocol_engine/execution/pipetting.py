@@ -31,7 +31,7 @@ class PipettingHandler(TypingProtocol):
         volume: float,
         flow_rate: float,
     ) -> float:
-        """Dispense liquid without moving the pipette."""
+        """Set flow-rate and dispense."""
 
     async def blow_out_in_place(
         self,
