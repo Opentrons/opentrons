@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, status
 from uuid import UUID
 
-from system_server.persistence import get_uuid
+from system_server.persistence import get_persistent_uuid
 from system_server.service.check_jwt_headers import (
     check_registration_token_header,
     get_registration_token_header,
@@ -23,7 +23,7 @@ authorize_router = APIRouter()
 )
 async def authorize(
     token: str = Depends(get_registration_token_header),
-    signing_uuid: UUID = Depends(get_uuid),
+    signing_uuid: UUID = Depends(get_persistent_uuid),
 ) -> PostAuthorizeResponse:
     """Router for /system/authorize endpoint."""
     authorization = authorize_token(token, str(signing_uuid))

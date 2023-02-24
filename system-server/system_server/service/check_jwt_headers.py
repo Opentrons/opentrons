@@ -5,7 +5,7 @@ import logging
 
 from system_server.jwt import jwt_is_valid
 from system_server.constants import REGISTRATION_AUDIENCE
-from system_server.persistence import get_uuid
+from system_server.persistence import get_persistent_uuid
 
 _log = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ async def check_registration_token_header(
         ...,
         description="An authentication header bearing a token provided by the /system/register endpoint.",
     ),
-    signing_key: UUID = Depends(get_uuid),
+    signing_key: UUID = Depends(get_persistent_uuid),
 ) -> None:
     """A header requirement that requests a registration token from /system/register."""
     _log.info(f"Verifying registration token: {authentication_bearer}")
