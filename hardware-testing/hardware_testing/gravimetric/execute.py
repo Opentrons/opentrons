@@ -1,5 +1,4 @@
 """Gravimetric."""
-import enum
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
@@ -21,6 +20,7 @@ from hardware_testing.gravimetric.measure.weight import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
+from hardware_testing.gravimetric.measure.weight.record import SampleTag
 from hardware_testing.gravimetric.pipette.liquid_class import PipetteLiquidClass
 
 
@@ -132,7 +132,7 @@ def run(
     recorder: GravimetricRecorder,
     grav_well: Well,
     volumes: List[float],
-    samples: int,
+    trials: int,
 ) -> None:
     """Run."""
     try:
@@ -140,10 +140,10 @@ def run(
         recorder.record(in_thread=True)
 
         # LOOP THROUGH SAMPLES
-        sample_volumes = [v for v in volumes for _ in range(samples)]
-        for i, sample_volume in enumerate(sample_volumes):
+        all_trails = [(v, t + 1,) for v in volumes for t in range(trials)]
+        for volume, trial in all_trails:
 
-            print(f"{i + 1}/{len(sample_volumes)}: {sample_volume} uL")
+            print(f"{trial}/{trials}: {volume} uL")
 
             # PICK-UP TIP
             if liquid_pipette.pipette.has_tip:
@@ -152,16 +152,18 @@ def run(
 
             # ASPIRATE
             liquid_pipette.aspirate(
-                sample_volume, grav_well, liquid_level=liquid_tracker
+                volume, grav_well, liquid_level=liquid_tracker
             )
-            with recorder.set_sample_tag("aspirate"):
+            s_tag_aspirate = SampleTag(name="aspirate", volume=volume, trial=trial)
+            with recorder.set_sample_tag(s_tag_aspirate):
                 ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
 
             # DISPENSE
             liquid_pipette.dispense(
-                sample_volume, grav_well, liquid_level=liquid_tracker
+                volume, grav_well, liquid_level=liquid_tracker
             )
-            with recorder.set_sample_tag("dispense"):
+            s_tag_dispense = SampleTag(name="dispense", volume=volume, trial=trial)
+            with recorder.set_sample_tag(s_tag_dispense):
                 ctx.delay(DELAY_SECONDS_AFTER_DISPENSE)
 
             # DROP TIP
@@ -173,7 +175,11 @@ def run(
         recorder.stop()
 
 
-def analyze(ctx: ProtocolContext, liquid_pipette: PipetteLiquidClass, recorder: GravimetricRecorder) -> None:
+def analyze(recorder: GravimetricRecorder) -> None:
     """Analyze."""
     # FIXME: skipping analysis during simulation
+    # TODO: - Isolate each aspirate/dispense sample
+    #       - Calculate grams per each aspirate/dispense
+    #       - Calculate average and %CV
+    #       - Print results
     return

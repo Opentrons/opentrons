@@ -18,6 +18,16 @@ SLEEP_TIME_IN_RECORD_LOOP = 0.05
 
 
 @dataclass
+class SampleTag:
+    name: str
+    volume: float
+    trial: int
+
+    def __str__(self) -> str:
+        return f"{self.name}-{self.volume}-{self.trial}"
+
+
+@dataclass
 class GravimetricSample:
     """Class to store individual scale readings."""
 
@@ -272,7 +282,7 @@ class GravimetricRecorder:
         self._is_recording = Event()
         self._reading_samples = Event()
         self._thread: Optional[Thread] = None
-        self._sample_tag: Optional[str] = None
+        self._sample_tag: Optional[SampleTag] = None
         super().__init__()
         self.activate()
 
@@ -317,7 +327,7 @@ class GravimetricRecorder:
         self._cfg.duration = duration
 
     @contextmanager
-    def set_sample_tag(self, tag: Optional[str]) -> None:
+    def set_sample_tag(self, tag: Optional[SampleTag]) -> None:
         """Set the sample tag."""
         self._sample_tag = tag
         try:
@@ -409,7 +419,12 @@ class GravimetricRecorder:
                 if self._cfg.stable and not mass.stable:
                     _recording.clear()  # delete all previously recorded samples
                     continue
-                _s = GravimetricSample(grams=mass.grams, stable=mass.stable, time=mass.time, tag=self._sample_tag)
+                _s = GravimetricSample(
+                    grams=mass.grams,
+                    stable=mass.stable,
+                    time=mass.time,
+                    tag=str(self._sample_tag)
+                )
                 _recording.append(_s)
                 self._reading_samples.set()
                 if callable(on_new_sample):
