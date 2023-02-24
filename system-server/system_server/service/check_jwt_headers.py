@@ -27,7 +27,7 @@ async def check_registration_token_header(
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authorization token invalid",
+            detail="Registration token invalid",
         )
     request.state.authentication_bearer = authentication_bearer
 
