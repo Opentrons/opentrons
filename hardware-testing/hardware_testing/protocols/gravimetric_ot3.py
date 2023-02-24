@@ -11,12 +11,15 @@ from hardware_testing.gravimetric import execute
 from hardware_testing.gravimetric import helpers
 
 
-metadata = {"apiLevel": "2.13", "protocolName": "ot3-p1000-single-channel-gravimetric"}
+metadata = {"apiLevel": "2.13", "protocolName": "ot3-p50-single-channel-gravimetric"}
 
 PIPETTE_VOLUME = 50
 TIP_VOLUME = 50
 
 TEST_VIAL_LIQUID = False
+
+SLOT_VIAL = 4
+SLOT_TIPRACK = 7
 
 
 def _move_to_vial_liquid_surface(
@@ -38,18 +41,18 @@ def _run(protocol: ProtocolContext) -> None:
         protocol,
         execute.ExecuteGravConfig(
             name=metadata["protocolName"],
-            vial_slot=2,
-            tiprack_slot=6,
+            vial_slot=SLOT_VIAL,
+            tiprack_slot=SLOT_TIPRACK,
             pipette_volume=PIPETTE_VOLUME,
             pipette_mount="left",
             tip_volume=TIP_VOLUME,
             labware_dir=labware_dir,
         ),
     )
-    vial_well = protocol.loaded_labwares[2]["A1"]
+    vial_well = protocol.loaded_labwares[SLOT_VIAL]["A1"]
     if TEST_VIAL_LIQUID:
         _move_to_vial_liquid_surface(protocol, l, vial_well, p.pipette)
-    execute.run(protocol, p, l, r, vial_well, volumes=[45.0], samples=12)
+    execute.run(protocol, p, l, r, vial_well, volumes=[1, 10, 45], samples=10)
     execute.analyze(protocol, p, r)
 
 

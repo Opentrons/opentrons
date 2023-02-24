@@ -24,23 +24,9 @@ from hardware_testing.gravimetric.measure.weight import (
 from hardware_testing.gravimetric.pipette.liquid_class import PipetteLiquidClass
 
 
-SCALE_SECONDS_TO_SETTLE: Final = 15
-GRAV_STABLE_DURATION: Final = 10
-GRAV_STABLE_TIMEOUT: Final = GRAV_STABLE_DURATION + 5
-DELAY_SECONDS_AFTER_ASPIRATE: Final = SCALE_SECONDS_TO_SETTLE + GRAV_STABLE_TIMEOUT
-DELAY_SECONDS_AFTER_DISPENSE: Final = SCALE_SECONDS_TO_SETTLE + GRAV_STABLE_TIMEOUT
-
-
-class SampleTag(enum.Enum):
-    PICK_UP_TIP = "pick-up-tip"
-    DROP_TIP = "drop-tip"
-    ASPIRATE = "aspirate"
-    ASPIRATE_STABILIZE = "aspirate-stabilize"
-    DISPENSE = "dispense"
-    DISPENSE_STABILIZE = "dispense-stabilize"
-
-    def __str__(self) -> str:
-        return self.value
+SCALE_SECONDS_TO_SETTLE: Final = 1
+DELAY_SECONDS_AFTER_ASPIRATE: Final = SCALE_SECONDS_TO_SETTLE
+DELAY_SECONDS_AFTER_DISPENSE: Final = SCALE_SECONDS_TO_SETTLE
 
 
 @dataclass
@@ -121,10 +107,10 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> Tuple[PipetteLiquidCl
             tag=_liq_pip.unique_name,
             start_time=start_time,
             duration=0,
-            frequency=10,
+            frequency=5,
             stable=False,
         ),
-        simulate=ctx.is_simulating
+        simulate=ctx.is_simulating()
     )
 
     # USER SETUP LIQUIDS
@@ -161,30 +147,25 @@ def run(
 
             # PICK-UP TIP
             if liquid_pipette.pipette.has_tip:
-                with recorder.set_sample_tag(SampleTag.DROP_TIP):
-                    liquid_pipette.pipette.drop_tip()
-            with recorder.set_sample_tag(SampleTag.PICK_UP_TIP):
-                liquid_pipette.pipette.pick_up_tip()
+                liquid_pipette.pipette.drop_tip()
+            liquid_pipette.pipette.pick_up_tip()
 
             # ASPIRATE
-            with recorder.set_sample_tag(SampleTag.ASPIRATE):
-                liquid_pipette.aspirate(
-                    sample_volume, grav_well, liquid_level=liquid_tracker
-                )
-            with recorder.set_sample_tag(SampleTag.ASPIRATE_STABILIZE):
+            liquid_pipette.aspirate(
+                sample_volume, grav_well, liquid_level=liquid_tracker
+            )
+            with recorder.set_sample_tag("aspirate"):
                 ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
 
             # DISPENSE
-            with recorder.set_sample_tag(SampleTag.DISPENSE):
-                liquid_pipette.dispense(
-                    sample_volume, grav_well, liquid_level=liquid_tracker
-                )
-            with recorder.set_sample_tag(SampleTag.DISPENSE_STABILIZE):
+            liquid_pipette.dispense(
+                sample_volume, grav_well, liquid_level=liquid_tracker
+            )
+            with recorder.set_sample_tag("dispense"):
                 ctx.delay(DELAY_SECONDS_AFTER_DISPENSE)
 
             # DROP TIP
-            with recorder.set_sample_tag(SampleTag.DROP_TIP):
-                liquid_pipette.pipette.drop_tip()
+            liquid_pipette.pipette.drop_tip()
 
         print("One final pause to wait for final reading to settle")
         ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)

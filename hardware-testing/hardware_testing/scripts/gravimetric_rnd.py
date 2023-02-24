@@ -23,7 +23,7 @@ def _run(is_simulating: bool) -> None:
             run_id=create_run_id(),
             start_time=time(),
             duration=0,
-            frequency=10,
+            frequency=5,
             stable=False,
         ),
         simulate=is_simulating

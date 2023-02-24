@@ -19,5 +19,5 @@ P50_SINGLE_T50_50_UL = LiquidClassSettings(
     submerge=MovementConfig(distance=1.5, speed=5, delay=None, acceleration=None),
     tracking=MovementConfig(distance=0, speed=None, delay=None, acceleration=None),
     retract=MovementConfig(distance=3, speed=5, delay=None, acceleration=None),
-    traverse=MovementConfig(distance=None, speed=50, delay=None, acceleration=None),
+    traverse=MovementConfig(distance=None, speed=500, delay=None, acceleration=None),
 )

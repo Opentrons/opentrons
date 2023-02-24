@@ -61,6 +61,6 @@ LIQUID_CLASS_DEFAULT = LiquidClassSettings(
         distance=0, speed=None, delay=None, acceleration=None
     ),  # TODO: implement w/ API >=2.13
     retract=MovementConfig(distance=3, speed=5, delay=None, acceleration=None),
-    traverse=MovementConfig(distance=None, speed=200, delay=None, acceleration=None),
+    traverse=MovementConfig(distance=None, speed=500, delay=None, acceleration=None),
     # TODO: add Accuracy Adjust parameter (requires disabling ul_per_mm conversion in HW-API)
 )

@@ -14,7 +14,7 @@ from hardware_testing.data import (
 
 from .scale import Scale
 
-SLEEP_TIME_IN_RECORD_LOOP = 0.01
+SLEEP_TIME_IN_RECORD_LOOP = 0.05
 
 
 @dataclass
@@ -434,8 +434,11 @@ class GravimetricRecorder:
         _file_name = create_file_name(self._cfg.test_name, self._cfg.run_id, self.tag)
 
         def _on_new_sample(recording: GravimetricRecording) -> None:
-            csv_line = recording[-1].as_csv(self._cfg.start_time)
+            new_sample = recording[-1]
+            csv_line = new_sample.as_csv(self._cfg.start_time)
             append_data_to_file(str(self._cfg.test_name), _file_name, csv_line + "\n")
+            if self._sample_tag:
+                print(f"{self._sample_tag}: {new_sample.grams}")
 
         # add the header to the CSV file
         dump_data_to_file(
