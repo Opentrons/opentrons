@@ -477,17 +477,12 @@ async def find_slot_center_linear(
     The XYZ-center of the slot, where the z-value is obtained by averaging the
     z's of the four found edges.
     """
-    # estimated_center = estimated_center._replace(y=estimated_center.y + 3) # front
-    estimated_center = estimated_center._replace(y=estimated_center.y - 3) # rear
     # Find +X (right) edge
     plus_x_edge = await find_edge_linear(
         hcapi, mount, estimated_center + EDGES["right"], OT3Axis.X, 1
     )
     LOG.info(f"Found +x edge at {plus_x_edge}mm")
     estimated_center = estimated_center._replace(x=plus_x_edge.x - EDGES["right"].x)
-
-    # Move over Z-axis gauge plunger
-    await _arc_move(hcapi, mount, estimated_center.z, position=estimated_center + EDGES["left"])
 
     # Find -X (left) edge
     minus_x_edge = await find_edge_linear(
@@ -496,23 +491,12 @@ async def find_slot_center_linear(
     LOG.info(f"Found -x edge at {minus_x_edge}mm")
     estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
 
-    x_center = (plus_x_edge.x + minus_x_edge.x) / 2
-    # x_center_off = x_center + 3 # front
-    x_center_off = x_center - 3 # rear
-    estimated_center = estimated_center._replace(x=x_center_off)
-
-    # Move over Z-axis gauge plunger
-    await _arc_move(hcapi, mount, estimated_center.z, position=estimated_center)
-
     # Find +Y (top) edge
     plus_y_edge = await find_edge_linear(
         hcapi, mount, estimated_center + EDGES["top"], OT3Axis.Y, 1
     )
     LOG.info(f"Found +y edge at {plus_y_edge}mm")
     estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
-
-    # Move over Z-axis gauge plunger
-    await _arc_move(hcapi, mount, estimated_center.z, position=estimated_center + EDGES["bottom"])
 
     # Find -Y (bottom) edge
     minus_y_edge = await find_edge_linear(
@@ -521,7 +505,6 @@ async def find_slot_center_linear(
     LOG.info(f"Found -y edge at {minus_y_edge}mm")
     estimated_center = estimated_center._replace(y=(plus_y_edge.y + minus_y_edge.y) / 2)
 
-    estimated_center = estimated_center._replace(x=x_center)
     # Found XY center and the average of the edges' Zs
     return estimated_center._replace(
         z=(plus_x_edge.z + minus_x_edge.z + plus_y_edge.z + minus_y_edge.z) / 4,
@@ -778,8 +761,6 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     nominal_center = _get_calibration_square_position_in_slot(slot)
-    # nominal_center = nominal_center._replace(y=nominal_center.y + 0) # front
-    nominal_center = nominal_center._replace(y=nominal_center.y - 3) # rear
     await hcapi.reset_instrument_offset(mount)
     try:
         # First, find the estimated deck height. This will be used to baseline the edge detection points.
