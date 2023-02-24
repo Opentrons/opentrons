@@ -51,7 +51,7 @@ TEST_PARAMETERS = {
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 400,
+                'MIN': 800,
                 'MAX': 2000,
                 'INC': 200}},
         'R': {
@@ -60,7 +60,7 @@ TEST_PARAMETERS = {
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 400,
+                'MIN': 800,
                 'MAX': 2000,
                 'INC': 200}}
     },
@@ -89,7 +89,7 @@ TEST_PARAMETERS = {
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 400,
+                'MIN': 800,
                 'MAX': 2000,
                 'INC': 200}},
         'R': {
@@ -98,7 +98,7 @@ TEST_PARAMETERS = {
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 400,
+                'MIN': 800,
                 'MAX': 2000,
                 'INC': 200}}
     },
@@ -115,11 +115,11 @@ TEST_PARAMETERS = {
         'Y': {
             'SPEED': {
                 'MIN': 450,
-                'MAX': 500,
+                'MAX': 650,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 1200,
-                'MAX': 2000,
+                'MIN': 800,
+                'MAX': 1800,
                 'INC': 200}},
         'L': {
             'SPEED': {
@@ -127,17 +127,17 @@ TEST_PARAMETERS = {
                 'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 400,
-                'MAX': 2000,
+                'MIN': 100,
+                'MAX': 900,
                 'INC': 200}},
         'R': {
             'SPEED': {
                 'MIN': 40,
                 'MAX': 140,
-                'INC': 10},
+                'INC': 20},
             'ACCEL': {
-                'MIN': 400,
-                'MAX': 2000,
+                'MIN': 100,
+                'MAX': 900,
                 'INC': 200}}
     },
     GantryLoad.HIGH_THROUGHPUT: {
