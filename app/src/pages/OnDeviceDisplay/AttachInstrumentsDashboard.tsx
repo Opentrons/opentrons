@@ -6,7 +6,7 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { Btn, DIRECTION_COLUMN, Flex } from '@opentrons/components'
+import { Btn, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { useAttachedPipettes } from '../../organisms/Devices/hooks'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
@@ -90,26 +90,32 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
           robotName={robotName}
         />
       ) : null}
-      <Btn onClick={() => handlePipette(LEFT)}>
-        {attachedPipettes.left != null
-          ? 'detach left pipette'
-          : 'attach left pipette'}
-      </Btn>
-      {attachedPipettes.left != null ? (
-        <Btn onClick={() => handleCalibrate(LEFT)}>
-          {'calibrate left pipette'}
+      <Flex
+        gridGap={SPACING.spacing6}
+        marginTop={SPACING.spacing6}
+        flexDirection={DIRECTION_COLUMN}
+      >
+        <Btn onClick={() => handlePipette(LEFT)}>
+          {attachedPipettes.left != null
+            ? 'detach left pipette'
+            : 'attach left pipette'}
         </Btn>
-      ) : null}
-      <Btn onClick={() => handlePipette(RIGHT)}>
-        {attachedPipettes.right != null
-          ? 'detach right pipette'
-          : 'attach right pipette'}
-      </Btn>
-      {attachedPipettes.right != null ? (
-        <Btn onClick={() => handleCalibrate(RIGHT)}>
-          {'calibrate right pipette'}
+        {attachedPipettes.left != null ? (
+          <Btn onClick={() => handleCalibrate(LEFT)}>
+            {'calibrate left pipette'}
+          </Btn>
+        ) : null}
+        <Btn onClick={() => handlePipette(RIGHT)}>
+          {attachedPipettes.right != null
+            ? 'detach right pipette'
+            : 'attach right pipette'}
         </Btn>
-      ) : null}
+        {attachedPipettes.right != null ? (
+          <Btn onClick={() => handleCalibrate(RIGHT)}>
+            {'calibrate right pipette'}
+          </Btn>
+        ) : null}
+      </Flex>
     </Flex>
   )
 }
