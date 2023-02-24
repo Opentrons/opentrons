@@ -4,10 +4,11 @@ from decoy import Decoy
 import pytest
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.protocol_api.core.engine import deck_conflict
-from opentrons.protocol_engine import DeckSlotLocation, ModuleModel, StateView
+from opentrons.protocol_engine import Config, DeckSlotLocation, ModuleModel, StateView
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName
 
@@ -22,11 +23,39 @@ def use_mock_wrapped_deck_conflict(
 
 
 @pytest.fixture
-def mock_state_view(decoy: Decoy) -> StateView:
+def mock_state_view(decoy: Decoy, robot_type: RobotType) -> StateView:
     """Return a mock in the shape of a StateView."""
-    return decoy.mock(cls=StateView)
+    mock_state_view = decoy.mock(cls=StateView)
+    config = Config(robot_type=robot_type)
+    decoy.when(mock_state_view.config).then_return(config)
+    return mock_state_view
 
 
+@pytest.mark.parametrize("robot_type", ["OT-3 Standard"])
+def test_noop_if_ot3(decoy: Decoy, mock_state_view: StateView) -> None:
+    """For now, it shouldn't do anything if it's an OT-3."""
+    deck_conflict.check(
+        engine_state=mock_state_view,
+        existing_labware_ids=["lw1", "lw2"],
+        existing_module_ids=["m1", "m2"],
+        new_labware_id="lw3",
+    )
+
+    deck_conflict.check(
+        engine_state=mock_state_view,
+        existing_labware_ids=["lw1", "lw2"],
+        existing_module_ids=["m1", "m2"],
+        new_module_id="m3",
+    )
+
+    decoy.verify(
+        wrapped_deck_conflict.check(),  # type:ignore[call-arg]
+        ignore_extra_args=True,
+        times=0,
+    )
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard"])
 def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correcly map a labware that's loaded directly into a deck slot."""
     decoy.when(
@@ -76,6 +105,7 @@ def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
     )
 
 
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard"])
 def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correctly map a module with no labware loaded atop it."""
     decoy.when(mock_state_view.labware.get_id_by_module("module-id")).then_raise(
@@ -118,6 +148,7 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
     )
 
 
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard"])
 def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correctly map a module with a labware loaded atop it.
 
@@ -163,6 +194,7 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
     )
 
 
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard"])
 @pytest.mark.parametrize("module_model", ModuleModel)
 def test_maps_different_module_models(
     decoy: Decoy, mock_state_view: StateView, module_model: ModuleModel

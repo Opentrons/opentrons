@@ -48,6 +48,14 @@ def check(
     new_labware_id: Optional[str] = None,
     new_module_id: Optional[str] = None,
 ) -> None:
+    if engine_state.config.robot_type == "OT-3 Standard":
+        # No-op if this is an OT-3 deck, for now.
+        #
+        # todo(mm, 2023-02-24): Support deck conflict checking for the OT-3.
+        # This will likely require adding support for it in the underlying
+        # wrapped_deck_conflict.check() function.
+        return
+
     if new_labware_id is not None:
         new_location_and_item = _map_labware(engine_state, new_labware_id)
     if new_module_id is not None:
