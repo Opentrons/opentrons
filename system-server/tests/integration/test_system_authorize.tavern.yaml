@@ -35,4 +35,23 @@ stages:
         authentication-bearer: "{issued_token:s}"
     response:
       status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          auth_token: "token"
+  - name: POST /system/authorize with the same token, get a new auth token
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authentication-bearer: "{issued_token:s}"
+    response:
+      status_code: 201
+      verify_response_with:
+        function: tests.integration.testing_utils:token_does_not_match
+        extra_kwargs:
+          token: '{auth_token:s}'
+      json:
+        token: !anystr
     
