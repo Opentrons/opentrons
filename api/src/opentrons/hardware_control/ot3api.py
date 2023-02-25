@@ -6,7 +6,6 @@ import logging
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
-    Tuple,
     cast,
     Callable,
     Dict,
@@ -57,7 +56,13 @@ from .instruments.ot3.instrument_calibration import (
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints, axis_convert
+from .backends.ot3utils import (
+    get_system_constraints,
+    axis_convert,
+    mount_from_subsystem,
+    sub_system_to_node_id,
+    subsystem_from_mount,
+)
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -70,7 +75,9 @@ from .types import (
     ErrorMessageNotification,
     HardwareEventHandler,
     HardwareAction,
+    InstrumentUpdateStatus,
     MotionChecks,
+    OT3SubSystem,
     PipetteSubType,
     PauseType,
     OT3Axis,
@@ -356,6 +363,95 @@ class OT3API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
+    def _get_pipette_subtypes(self) -> Dict[OT3Mount, PipetteSubType]:
+        """Get attached pipette subtypes.
+
+        The PipetteSubType is a direct map of PipetteChannelType (single, multi, 96).
+        This is needed because unlike the rest of the subsystems, the pipettes have different firmware that gets
+        installed based on the PipetteChannelType.
+        """
+        subtypes = {
+            PipetteChannelType.SINGLE_CHANNEL: PipetteSubType.pipette_single,
+            PipetteChannelType.EIGHT_CHANNEL: PipetteSubType.pipette_multi,
+            PipetteChannelType.NINETY_SIX_CHANNEL: PipetteSubType.pipette_96,
+        }
+
+        # Get the attached instruments so we can get determine the PipetteSubType attached.
+        pipette_subtypes: Dict[OT3Mount, PipetteSubType] = dict()
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        for mount, _ in attached_instruments.items():
+            # we can exclude the gripper here since we can use the OT3SubSystem to map to NodeId directly.
+            if self._pipette_handler.has_pipette(mount):
+                pipette = self._pipette_handler.get_pipette(mount)
+                pipette_subtypes[mount] = subtypes[pipette.channels]
+        return pipette_subtypes
+
+    def _cache_fw_update_status(self) -> None:
+        """Cache the current firmware update status of instruments."""
+        # fetch firmware update info
+        attached_pipettes = self._get_pipette_subtypes()
+        updates = self._backend.get_instrument_updates(attached_pipettes)
+
+        # update pipette info if attached
+        pipettes = self._pipette_handler.hardware_instruments or dict()
+        for mount, pipette in pipettes.items():
+            if pipette:
+                fw_version = updates.get(mount)
+                pipette.fw_version = fw_version or 0
+                pipette.fw_update_required = bool(fw_version)
+
+        # update gripper info if attached
+        gripper = self._gripper_handler.gripper
+        if gripper:
+            fw_version = updates.get(OT3Mount.GRIPPER)
+            gripper.fw_version = fw_version or 0
+            gripper.fw_update_required = bool(fw_version)
+
+    def get_firmware_update_progress(self) -> Dict[OT3Mount, InstrumentUpdateStatus]:
+        """Get the update progress for instruments currently updating."""
+        progress_updates: Dict[OT3Mount, InstrumentUpdateStatus] = {}
+        for update_status in self._backend.get_update_progress():
+            # we only want instruments, this will drop core substystems
+            instruments = {
+                OT3SubSystem.pipette_left,
+                OT3SubSystem.pipette_right,
+                OT3SubSystem.gripper,
+            }
+            if update_status.subsystem in instruments:
+                mount = mount_from_subsystem(update_status.subsystem)
+                state = update_status.state
+                progress = update_status.progress
+                if not progress_updates.get(mount):
+                    progress_updates[mount] = InstrumentUpdateStatus(
+                        mount, state, progress
+                    )
+                progress_updates[mount].update(state, progress)
+        return progress_updates
+
+    async def update_instrument_firmware(
+        self, mounts: Optional[Set[OT3Mount]] = None
+    ) -> None:
+        """Update the firmware on one or more instruments.
+
+        If no mounts is specified, updates all instruments (pipettes, gripper) attached
+        """
+        mounts = mounts or {OT3Mount.LEFT, OT3Mount.RIGHT, OT3Mount.GRIPPER}
+        subsystems = {subsystem_from_mount(mount) for mount in mounts}
+        async for update_status in self.update_firmware(subsystems):
+            mod_log.debug(update_status)
+
+    async def update_firmware(
+        self, subsystems: Optional[Set[OT3SubSystem]] = None
+    ) -> AsyncIterator[Set[UpdateStatus]]:
+        """Start the firmware update for one or more subsystems and return update progress iterator."""
+        subsystems = subsystems or set()
+        nodes = {sub_system_to_node_id(subsystem) for subsystem in subsystems}
+        # get the attached pipette subtypes so we can determine which binary to install for pipettes
+        pipettes = self._get_pipette_subtypes()
+        # start the updates and yield the progress
+        async for update_status in self._backend.update_firmware(pipettes, nodes=nodes):
+            yield update_status
+
     # Incidentals (i.e. not motion) API
 
     async def set_lights(
@@ -408,36 +504,6 @@ class OT3API(
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
-
-    @staticmethod
-    def _pipette_subtype_from_pipette(pipette: Pipette) -> PipetteSubType:
-        pipettes = {
-            PipetteChannelType.SINGLE_CHANNEL: PipetteSubType.pipette_single,
-            PipetteChannelType.EIGHT_CHANNEL: PipetteSubType.pipette_multi,
-            PipetteChannelType.NINETY_SIX_CHANNEL: PipetteSubType.pipette_96,
-        }
-        return pipettes[pipette.channels]
-
-    def get_fw_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
-        """Get the progress of updates currently running."""
-        return self._backend.get_update_progress()
-
-    async def start_firmware_updates(self) -> None:
-        """Helper to start firmware updates without needing to consume iterator."""
-        async for updates, progress in self.do_firmware_updates():
-            mod_log.debug(f"{updates} {progress}")
-
-    async def do_firmware_updates(self) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
-        """Update all the firmware."""
-        # get the attached instruments so we can get the type of pipettes attached
-        pipettes: Dict[OT3Mount, PipetteSubType] = dict()
-        attached_instruments = self._pipette_handler.get_attached_instruments()
-        for mount, _ in attached_instruments.items():
-            if self._pipette_handler.has_pipette(mount):
-                pipette = self._pipette_handler.get_pipette(mount)
-                pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
-        async for updates, progress in self._backend.update_firmware(pipettes):
-            yield updates, progress
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
@@ -545,6 +611,7 @@ class OT3API(
         await self._backend.probe_network()
         await self._backend.update_motor_status()
         await self.set_gantry_load(self._gantry_load_from_instruments())
+        self._cache_fw_update_status()
 
     @ExecutionManagerProvider.wait_for_running
     async def _update_position_estimation(

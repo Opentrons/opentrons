@@ -1,7 +1,17 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import NamedTuple, cast, Tuple, Union, List, Callable, Dict, TypeVar
+from typing import (
+    NamedTuple,
+    Optional,
+    cast,
+    Tuple,
+    Union,
+    List,
+    Callable,
+    Dict,
+    TypeVar,
+)
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -296,7 +306,19 @@ class UpdateStatus(NamedTuple):
     progress: int
 
 
-_subsystem_lookup = {
+@dataclass
+class InstrumentUpdateStatus:
+    mount: OT3Mount
+    status: UpdateState
+    progress: int
+
+    @classmethod
+    def update(self, status: UpdateState, progress: int) -> None:
+        self.status = status
+        self.progress = progress
+
+
+_subsystem_mount_lookup = {
     OT3Mount.LEFT: OT3SubSystem.pipette_left,
     OT3Mount.RIGHT: OT3SubSystem.pipette_right,
     OT3Mount.GRIPPER: OT3SubSystem.gripper,
@@ -304,11 +326,13 @@ _subsystem_lookup = {
 
 
 def mount_to_subsystem(mount: OT3Mount) -> OT3SubSystem:
-    return _subsystem_lookup[mount]
+    return _subsystem_mount_lookup[mount]
 
 
 def subsystem_to_mount(subsystem: OT3SubSystem) -> OT3Mount:
-    mount_lookup = {subsystem: mount for mount, subsystem in _subsystem_lookup.items()}
+    mount_lookup = {
+        subsystem: mount for mount, subsystem in _subsystem_mount_lookup.items()
+    }
     return mount_lookup[subsystem]
 
 

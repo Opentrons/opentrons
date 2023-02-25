@@ -76,6 +76,9 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
+        #: firmware update states
+        self._fw_version = 0
+        self._fw_update_required = False
 
     @property
     def grip_force_profile(self) -> GripForceProfile:
@@ -147,6 +150,22 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     @property
     def gripper_id(self) -> str:
         return self._gripper_id
+
+    @property
+    def fw_version(self) -> int:
+        return self._fw_version
+
+    @fw_version.setter
+    def fw_version(self, value: int) -> None:
+        self._fw_version = value
+
+    @property
+    def fw_update_required(self) -> bool:
+        return self._fw_update_required
+
+    @fw_update_required.setter
+    def fw_update_required(self, value: bool) -> None:
+        self._fw_update_required = value
 
     def reload_configurations(self) -> None:
         return None
@@ -225,6 +244,8 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     def as_dict(self) -> GripperDict:
         d: GripperDict = {
             "model": self._config.model,
+            "fw_version": self.fw_version,
+            "fw_update_required": self.fw_update_required,
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
             "state": self._state,

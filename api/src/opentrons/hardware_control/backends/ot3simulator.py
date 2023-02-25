@@ -49,6 +49,7 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     InstrumentProbeType,
     MotorStatus,
+    OT3SubSystem,
     PipetteSubType,
     UpdateStatus,
 )
@@ -487,16 +488,21 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
-        return set(), 0
+    def get_instrument_updates(
+        self, attached_pipettes: Dict[OT3Mount, PipetteSubType]
+    ) -> Dict[OT3Mount, int]:
+        return {}
+
+    def get_update_progress(self) -> Set[UpdateStatus]:
+        return set()
 
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
+    ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        yield (set(), 0)
+        yield set()
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""

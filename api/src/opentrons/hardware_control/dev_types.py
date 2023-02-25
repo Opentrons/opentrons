@@ -64,6 +64,8 @@ ONE_CHANNEL = Literal[1]
 
 class InstrumentDict(TypedDict):
     display_name: str
+    fw_version: int
+    fw_update_required: bool
 
 
 class PipetteDict(InstrumentDict):

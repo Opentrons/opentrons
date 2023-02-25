@@ -204,6 +204,8 @@ class PipetteHandlerProvider:
                 "display_name",
                 "tip_length",
                 "model",
+                "fw_version",
+                "fw_update_required",
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",

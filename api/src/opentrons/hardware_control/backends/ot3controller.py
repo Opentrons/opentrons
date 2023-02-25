@@ -32,6 +32,7 @@ from .ot3utils import (
     axis_to_node,
     get_current_settings,
     create_home_group,
+    node_id_to_subsystem,
     node_to_axis,
     pipette_type_for_subtype,
     sensor_node_for_mount,
@@ -95,6 +96,7 @@ from opentrons.hardware_control.types import (
     PipetteSubType,
     UpdateStatus,
     mount_to_subsystem,
+    subsystem_to_mount,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -209,14 +211,6 @@ class OT3Controller:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
-        """Returns a tuple of UpdateStatus and total progress of the updates."""
-        updates: Set[UpdateStatus] = set()
-        total_progress: int = 0
-        if self._update_tracker:
-            updates, total_progress = self._update_tracker.get_progress()
-        return updates, total_progress
-
     @staticmethod
     def _attached_pipettes_to_nodes(
         attached_pipettes: Dict[OT3Mount, PipetteSubType]
@@ -229,11 +223,47 @@ class OT3Controller:
             pipette_nodes[node_id] = pipette_type
         return pipette_nodes
 
+    def get_instrument_updates(
+        self, attached_pipettes: Dict[OT3Mount, PipetteSubType]
+    ) -> Dict[OT3Mount, int]:
+        """Returns instruments, versions for subsystems that require an update."""
+        available_updates: Dict[OT3Mount, int] = dict()
+        attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
+        firmware_updates = firmware_update.check_firmware_updates(
+            self._network_info.device_info, attached_pipette_nodes
+        )
+        for node_id in firmware_updates:
+            # we only want instruments, so filter out core subsystems
+            if node_id not in [
+                NodeId.pipette_left,
+                NodeId.pipette_right,
+                NodeId.gripper,
+            ]:
+                continue
+
+            # get the version from the device info cache
+            device_info = self._network_info.device_info.get(node_id)
+            if device_info:
+                subsystem = node_id_to_subsystem(node_id)
+                mount = subsystem_to_mount(subsystem)
+                available_updates[mount] = device_info.version
+
+        # set our internal update required flag
+        self.update_required = bool(available_updates)
+        return available_updates
+
+    def get_update_progress(self) -> Set[UpdateStatus]:
+        """Returns a set of UpdateStatus of the updates."""
+        updates: Set[UpdateStatus] = set()
+        if self._update_tracker:
+            updates = self._update_tracker.get_progress()
+        return updates
+
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
+    ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
         nodes = nodes or set()
         attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
@@ -260,10 +290,8 @@ class OT3Controller:
 
         # start the updates and yield progress to caller
         async for node_id, status_element in updater.run_updates():
-            updates, total_progress = self._update_tracker.update(
-                node_id, status_element
-            )
-            yield updates, total_progress
+            progress = self._update_tracker.update(node_id, status_element)
+            yield progress
 
         # refresh the device_info cache and reset internal states
         await self._network_info.probe()

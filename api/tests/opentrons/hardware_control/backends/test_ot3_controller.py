@@ -1053,11 +1053,10 @@ async def test_update_firmware_progress(
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        async for updates, progress in controller.update_firmware({}):
-            for update in updates:
+        async for update_status in controller.update_firmware({}):
+            for update in update_status:
                 node_id = sub_system_to_node_id(update.subsystem)
                 assert node_id in fw_node_info
-            assert progress in [0, 10, 30, 40, 45, 50, 60, 80, 90, 95, 100]
         run_updates.assert_called_once()
 
         assert not controller.update_required
