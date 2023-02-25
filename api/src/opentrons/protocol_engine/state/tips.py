@@ -10,7 +10,7 @@ from ..actions import (
     ResetTipsAction,
     AddPipetteConfigAction,
 )
-from ..commands import LoadLabwareResult, PickUpTipResult
+from ..commands import Command, LoadLabwareResult, PickUpTipResult, DropTipResult
 
 
 class TipRackWellState(Enum):
@@ -30,6 +30,7 @@ class TipState:
     tips_by_labware_id: Dict[str, TipRackStateByWellName]
     column_by_labware_id: Dict[str, List[List[str]]]
     channels_by_pipette_id: Dict[str, int]
+    length_by_pipette_id: Dict[str, float]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -43,35 +44,13 @@ class TipStore(HasState[TipState], HandlesActions):
             tips_by_labware_id={},
             column_by_labware_id={},
             channels_by_pipette_id={},
+            length_by_pipette_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if (
-            isinstance(action, UpdateCommandAction)
-            and isinstance(action.command.result, LoadLabwareResult)
-            and action.command.result.definition.parameters.isTiprack
-        ):
-            labware_id = action.command.result.labwareId
-            definition = action.command.result.definition
-            self._state.tips_by_labware_id[labware_id] = {
-                well_name: TipRackWellState.CLEAN
-                for column in definition.ordering
-                for well_name in column
-            }
-            self._state.column_by_labware_id[labware_id] = [
-                column for column in definition.ordering
-            ]
-
-        elif isinstance(action, UpdateCommandAction) and isinstance(
-            action.command.result, PickUpTipResult
-        ):
-            labware_id = action.command.params.labwareId
-            well_name = action.command.params.wellName
-            pipette_id = action.command.params.pipetteId
-            self._set_used_tips(
-                pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
-            )
+        if isinstance(action, UpdateCommandAction):
+            self._handle_command(action.command)
 
         elif isinstance(action, ResetTipsAction):
             labware_id = action.labware_id
@@ -84,6 +63,37 @@ class TipStore(HasState[TipState], HandlesActions):
         elif isinstance(action, AddPipetteConfigAction):
             config = action.config
             self._state.channels_by_pipette_id[action.pipette_id] = config.channels
+
+    def _handle_command(self, command: Command) -> None:
+        if (
+            isinstance(command.result, LoadLabwareResult)
+            and command.result.definition.parameters.isTiprack
+        ):
+            labware_id = command.result.labwareId
+            definition = command.result.definition
+            self._state.tips_by_labware_id[labware_id] = {
+                well_name: TipRackWellState.CLEAN
+                for column in definition.ordering
+                for well_name in column
+            }
+            self._state.column_by_labware_id[labware_id] = [
+                column for column in definition.ordering
+            ]
+
+        elif isinstance(command.result, PickUpTipResult):
+            labware_id = command.params.labwareId
+            well_name = command.params.wellName
+            pipette_id = command.params.pipetteId
+            length = command.result.tipLength
+
+            self._set_used_tips(
+                pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
+            )
+            self._state.length_by_pipette_id[pipette_id] = length
+
+        elif isinstance(command.result, DropTipResult):
+            pipette_id = command.params.pipetteId
+            self._state.length_by_pipette_id.pop(pipette_id, None)
 
     def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
         pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)
@@ -182,3 +192,7 @@ class TipView(HasState[TipState]):
         well_state = tip_rack.get(well_name) if tip_rack else None
 
         return well_state == TipRackWellState.CLEAN
+
+    def get_tip_length(self, pipette_id: str) -> float:
+        """Return the given pipette's tip length."""
+        return self._state.length_by_pipette_id.get(pipette_id, 0)

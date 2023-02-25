@@ -12,10 +12,19 @@ from .movement import MovementHandler
 
 
 @dataclass(frozen=True)
-class VolumePointResult:
-    """The returned values of an aspirate or pick up tip operation."""
+class AspirateData:
+    """The returned values of an aspirate operation."""
 
     volume: float
+    position: DeckPoint
+
+
+@dataclass(frozen=True)
+class PickUpTipData:
+    """The returned values of a pick up tip operation."""
+
+    volume: float
+    length: float
     position: DeckPoint
 
 
@@ -47,7 +56,7 @@ class PipettingHandler:
         well_location: WellLocation,
         volume: float,
         flow_rate: float,
-    ) -> VolumePointResult:
+    ) -> AspirateData:
         """Aspirate liquid from a well."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
@@ -91,7 +100,7 @@ class PipettingHandler:
         with self.set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
-        return VolumePointResult(volume=volume, position=position)
+        return AspirateData(volume=volume, position=position)
 
     async def dispense_in_place(
         self,

@@ -4,6 +4,7 @@ from typing import cast, Dict, List, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
@@ -229,6 +230,8 @@ def test_get_pipette_working_volume() -> None:
                 serial_number="",
                 return_tip_scale=0,
                 nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
             )
         },
     )
@@ -250,6 +253,8 @@ def test_get_pipette_available_volume() -> None:
                 serial_number="",
                 return_tip_scale=0,
                 nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
             )
         },
     )
@@ -410,6 +415,8 @@ def test_get_static_config() -> None:
         max_volume=4.56,
         return_tip_scale=7.89,
         nominal_tip_overlap={},
+        home_position=10.12,
+        nozzle_offset_z=12.13,
     )
 
     subject = get_pipette_view(static_config_by_id={"pipette-id": config})
@@ -421,6 +428,10 @@ def test_get_static_config() -> None:
     assert subject.get_minimum_volume("pipette-id") == 1.23
     assert subject.get_maximum_volume("pipette-id") == 4.56
     assert subject.get_return_tip_scale("pipette-id") == 7.89
+    assert (
+        subject.get_instrument_max_height_ot2("pipette-id")
+        == 22.25 - Z_RETRACT_DISTANCE
+    )
 
 
 def test_get_nominal_tip_overlap() -> None:
@@ -436,6 +447,8 @@ def test_get_nominal_tip_overlap() -> None:
             "some-uri": 100,
             "default": 10,
         },
+        home_position=0,
+        nozzle_offset_z=0,
     )
 
     subject = get_pipette_view(static_config_by_id={"pipette-id": config})

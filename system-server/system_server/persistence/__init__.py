@@ -75,7 +75,7 @@ async def get_sql_engine(
         # https://github.com/tiangolo/fastapi/issues/617
 
 
-async def get_uuid(
+async def get_persistent_uuid(
     app_state: AppState = Depends(get_app_state),
     persistence_directory: Path = Depends(get_persistence_directory),
 ) -> UUID:
@@ -93,7 +93,7 @@ async def get_uuid(
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
-    "get_uuid",
+    "get_persistent_uuid",
     "registration_table",
     "migration_table",
 ]
