@@ -23,8 +23,10 @@ export function createSnippet(
       let addendum = null
       if (command.commandType === 'loadLabware') {
         labwareCount = labwareCount + 1
+        if (command.result == null) return acc
+
         const loadedLabware = protocol.labware.find(
-          item => item.id === command.result.labwareId
+          item => item.id === command.result?.labwareId
         )
         if (loadedLabware == null) return acc
         const labwareDefinitions = getLoadedLabwareDefinitionsByUri(
@@ -88,7 +90,7 @@ export function createSnippet(
         }`
         moduleVariableById = {
           ...moduleVariableById,
-          [command.result.moduleId]: moduleVariable,
+          [command.result?.moduleId ?? '']: moduleVariable,
         }
         const module = protocol.modules.find(
           module => module.id === command.params.moduleId

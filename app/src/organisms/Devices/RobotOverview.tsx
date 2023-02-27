@@ -88,7 +88,7 @@ export function RobotOverview({
         alignItems={ALIGN_START}
         backgroundColor={COLORS.white}
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing3}
+        paddingTop={SPACING.spacing3}
         position={POSITION_RELATIVE}
         width="100%"
       >
@@ -97,13 +97,20 @@ export function RobotOverview({
           marginBottom={SPACING.spacing4}
           width="100%"
         >
-          <img
-            src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
-            style={{ paddingTop: SPACING.spacing3, width: '6.25rem' }}
-            id="RobotOverview_robotImage"
-          />
+          <Flex>
+            <img
+              src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+              style={{
+                width: '6rem',
+                height: '5.4375rem',
+              }}
+              id="RobotOverview_robotImage"
+            />
+          </Flex>
           <Box padding={SPACING.spacing3} width="100%">
-            <ReachableBanner robot={robot} />
+            <Box marginBottom={SPACING.spacing3}>
+              <ReachableBanner robot={robot} />
+            </Box>
             {robot != null ? (
               <UpdateRobotBanner
                 robot={robot}

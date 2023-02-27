@@ -23,8 +23,9 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.common import InstrumentCore, ProtocolCore
+from .core.engine import ENGINE_CORE_API_VERSION
 from .config import Clearances
-from . import labware
+from . import labware, validation
 
 
 AdvancedLiquidHandling = Union[
@@ -173,29 +174,30 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
 
-        well: Optional[labware.Well]
-        last_location = self._protocol_core.get_last_location()
+        well: Optional[labware.Well] = None
+        move_to_location: types.Location
 
-        if isinstance(location, labware.Well):
-            move_to_location = location.bottom(z=self._well_bottom_clearances.aspirate)
-            well = location
-        elif isinstance(location, types.Location):
-            move_to_location = location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
+        last_location = self._get_last_location_by_api_version()
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
             )
-        elif last_location:
-            move_to_location = last_location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        else:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
+            ) from e
+
+        if isinstance(target, validation.WellTarget):
+            move_to_location = target.location or target.well.bottom(
+                z=self._well_bottom_clearances.aspirate
             )
+            well = target.well
+        if isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -221,6 +223,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume=c_vol,
                 rate=rate,
                 flow_rate=flow_rate,
+                in_place=target.in_place,
             )
 
         return self
@@ -277,34 +280,34 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume, location if location else "current position", rate
             )
         )
-        well: Optional[labware.Well]
-        last_location = self._protocol_core.get_last_location()
+        well: Optional[labware.Well] = None
+        last_location = self._get_last_location_by_api_version()
 
-        if isinstance(location, labware.Well):
-            well = location
-            if well.parent._core.is_fixed_trash():
-                move_to_location = location.top()
-            else:
-                move_to_location = location.bottom(
-                    z=self._well_bottom_clearances.dispense
-                )
-        elif isinstance(location, types.Location):
-            move_to_location = location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                f"location should be a Well or Location, but it is {location}"
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
             )
-        elif last_location:
-            move_to_location = last_location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        else:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is."
-            )
+            ) from e
+
+        if isinstance(target, validation.WellTarget):
+            well = target.well
+            if target.location:
+                move_to_location = target.location
+            elif well.parent._core.is_fixed_trash():
+                move_to_location = target.well.top()
+            else:
+                move_to_location = target.well.bottom(
+                    z=self._well_bottom_clearances.dispense
+                )
+        if isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -331,6 +334,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
+                in_place=target.in_place,
             )
 
         return self
@@ -432,50 +436,41 @@ class InstrumentContext(publisher.CommandPublisher):
                               :py:meth:`dispense`)
         :returns: This instance
         """
+        well: Optional[labware.Well] = None
+        move_to_location: types.Location
 
-        well: Optional[labware.Well]
-        # TODO(jbl 2022-11-10) refactor this boolean out and make location optional when PE blow-out in place exists
-        move_to_well = True
-        last_location = self._protocol_core.get_last_location()
-
-        if isinstance(location, labware.Well):
-            if location.parent.is_tiprack:
-                _log.warning(
-                    "Blow_out being performed on a tiprack. "
-                    "Please re-check your code"
-                )
-            checked_loc = location.top()
-            well = location
-        elif isinstance(location, types.Location):
-            checked_loc = location
-            _, well = location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
+        last_location = self._get_last_location_by_api_version()
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
             )
-        elif last_location:
-            checked_loc = last_location
-            _, well = checked_loc.labware.get_parent_labware_and_well()
-            # if no explicit location given but location cache exists,
-            # pipette blows out immediately at
-            # current location, no movement is needed
-            move_to_well = False
-        else:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
-            )
+            ) from e
+
+        if isinstance(target, validation.WellTarget):
+            if target.well.parent.is_tiprack:
+                _log.warning(
+                    "Blow_out being performed on a tiprack. "
+                    "Please re-check your code"
+                )
+            move_to_location = target.location or target.well.top()
+            well = target.well
+        elif isinstance(target, validation.PointTarget):
+            move_to_location = target.location
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.blow_out(instrument=self, location=checked_loc),
+            command=cmds.blow_out(instrument=self, location=move_to_location),
         ):
             self._core.blow_out(
-                location=checked_loc,
+                location=move_to_location,
                 well_core=well._core if well is not None else None,
-                move_to_well=move_to_well,
+                in_place=target.in_place,
             )
 
         return self
@@ -1248,7 +1243,7 @@ class InstrumentContext(publisher.CommandPublisher):
             # would get a TypeError if they tried to call it like delay(minutes=10).
             # Without changing the ultimate behavior that such a call fails the
             # protocol, we can provide a more descriptive message as a courtesy.
-            raise NotImplementedError(
+            raise APIVersionError(
                 "InstrumentContext.delay() is not supported in Python Protocol API v2."
                 " Use ProtocolContext.delay() instead."
             )
@@ -1483,7 +1478,12 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 2)
     def return_height(self) -> float:
-        """The height to return a tip to its tiprack."""
+        """The height to return a tip to its tiprack.
+
+        :returns: A scaling factor to apply to the tip length.
+                  During a drop tip, this factor will be multiplied by the tip length
+                  to get the distance from the top of the well where the tip is dropped.
+        """
         return self._core.get_return_height()
 
     @property  # type: ignore
@@ -1508,6 +1508,17 @@ class InstrumentContext(publisher.CommandPublisher):
 
         """
         return self._well_bottom_clearances
+
+    def _get_last_location_by_api_version(self) -> Optional[types.Location]:
+        """Get the last location accessed by this pipette, if any.
+
+        In pre-engine Protocol API versions, this call omits the pipette mount.
+        This is to preserve pre-existing, potentially buggy behavior.
+        """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            return self._protocol_core.get_last_location(mount=self._core.get_mount())
+        else:
+            return self._protocol_core.get_last_location()
 
     def __repr__(self) -> str:
         return "<{}: {} in {}>".format(

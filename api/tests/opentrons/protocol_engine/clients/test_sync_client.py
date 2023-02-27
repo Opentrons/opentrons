@@ -26,6 +26,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     WellLocation,
+    DropTipWellLocation,
     MotorAxis,
     Liquid,
 )
@@ -300,7 +301,7 @@ def test_drop_tip(
             pipetteId="123",
             labwareId="456",
             wellName="A2",
-            wellLocation=WellLocation(),
+            wellLocation=DropTipWellLocation(),
             homeAfter=True,
         )
     )
@@ -312,7 +313,7 @@ def test_drop_tip(
         pipette_id="123",
         labware_id="456",
         well_name="A2",
-        well_location=WellLocation(),
+        well_location=DropTipWellLocation(),
         home_after=True,
     )
 
@@ -362,6 +363,35 @@ def test_aspirate(
     assert result == result_from_transport
 
 
+def test_aspirate_in_place(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should send an AspirateInPlaceCommand through the transport."""
+    request = commands.AspirateInPlaceCreate(
+        params=commands.AspirateInPlaceParams(
+            pipetteId="123",
+            volume=123.45,
+            flowRate=6.7,
+        )
+    )
+
+    result_from_transport = commands.AspirateInPlaceResult(volume=67.89)
+
+    decoy.when(transport.execute_command(request=request)).then_return(
+        result_from_transport
+    )
+
+    result = subject.aspirate_in_place(
+        pipette_id="123",
+        volume=123.45,
+        flow_rate=6.7,
+    )
+
+    assert result == result_from_transport
+
+
 def test_dispense(
     decoy: Decoy,
     transport: AbstractSyncTransport,
@@ -393,6 +423,33 @@ def test_dispense(
         well_location=WellLocation(
             origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
         ),
+        volume=10,
+        flow_rate=2.0,
+    )
+
+    assert result == response
+
+
+def test_dispense_in_place(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a DispenceInPlace command."""
+    request = commands.DispenseInPlaceCreate(
+        params=commands.DispenseInPlaceParams(
+            pipetteId="123",
+            volume=10,
+            flowRate=2.0,
+        )
+    )
+
+    response = commands.DispenseInPlaceResult(volume=1)
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.dispense_in_place(
+        pipette_id="123",
         volume=10,
         flow_rate=2.0,
     )
@@ -743,6 +800,31 @@ def test_blow_out(
         labware_id="456",
         well_name="A2",
         well_location=WellLocation(),
+        flow_rate=7.8,
+    )
+
+    assert result == response
+
+
+def test_blow_out_in_place(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a blow_out command."""
+    request = commands.BlowOutInPlaceCreate(
+        params=commands.BlowOutInPlaceParams(
+            pipetteId="123",
+            flowRate=7.8,
+        )
+    )
+
+    response = commands.BlowOutInPlaceResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.blow_out_in_place(
+        pipette_id="123",
         flow_rate=7.8,
     )
 
