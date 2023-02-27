@@ -73,6 +73,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -81,6 +82,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: The well to aspirate from, if applicable.
             rate: The rate in µL/s to aspirate at.
             flow_rate: Not used in this core.
+            in_place: Whether we should move_to location.
         """
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -100,7 +102,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                     )
                 self.prepare_for_aspirate()
             self.move_to(location=location)
-        elif location != self._protocol_interface.get_last_location():
+        elif not in_place:
             self.move_to(location=location)
 
         self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
@@ -112,6 +114,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -120,8 +123,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: The well to dispense to, if applicable.
             rate: The rate in µL/s to dispense at.
             flow_rate: Not used in this core.
+            in_place: Whether we should move_to location.
         """
-        self.move_to(location=location)
+        if not in_place:
+            self.move_to(location=location)
 
         self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
@@ -129,16 +134,16 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         self,
         location: types.Location,
         well_core: Optional[LegacyWellCore],
-        move_to_well: bool,
+        in_place: bool,
     ) -> None:
         """Blow liquid out of the tip.
 
         Args:
             location: The location to blow out into.
             well_core: Unused by legacy core.
-            move_to_well: If pipette should be moved before blow-out.
+            in_place: Whether we should move_to location.
         """
-        if move_to_well:
+        if not in_place:
             self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
 

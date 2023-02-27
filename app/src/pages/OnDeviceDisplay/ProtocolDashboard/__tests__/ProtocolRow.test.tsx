@@ -37,7 +37,7 @@ const mockProtocol: ProtocolResource = {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolRow protocol={mockProtocol} lastRun={undefined} />
+      <ProtocolRow protocol={mockProtocol} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -46,6 +46,8 @@ const render = () => {
 }
 
 describe('Protocol Row', () => {
+  jest.useFakeTimers()
+
   it('should redirect to protocol details after short click', () => {
     const [{ getByText }] = render()
     const name = getByText('yay mock protocol')
@@ -54,12 +56,10 @@ describe('Protocol Row', () => {
   })
 
   it('should display modal after long click', async () => {
-    jest.useFakeTimers()
     const [{ getByText }] = render()
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     jest.advanceTimersByTime(1005)
-    // await new Promise(resolve => setTimeout(resolve, 1005))
     getByText('Run protocol')
     getByText('Pin protocol')
     getByText('Delete protocol')

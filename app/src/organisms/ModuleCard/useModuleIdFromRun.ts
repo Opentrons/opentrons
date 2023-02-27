@@ -35,7 +35,7 @@ export function useModuleIdFromRun(
 
   const moduleIdFromRun =
     loadModuleCommands?.[moduleIndex] != null
-      ? loadModuleCommands?.[moduleIndex].result.moduleId
+      ? loadModuleCommands?.[moduleIndex].result?.moduleId
       : ''
 
   return { moduleIdFromRun }

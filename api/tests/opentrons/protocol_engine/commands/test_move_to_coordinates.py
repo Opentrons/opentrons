@@ -41,10 +41,7 @@ async def test_move_to_coordinates_implementation(
         speed=567.8,
     )
 
-    result = await subject.execute(params=params)
-
-    assert result == MoveToCoordinatesResult()
-    decoy.verify(
+    decoy.when(
         await movement.move_to_coordinates(
             pipette_id="pipette-id",
             deck_coordinates=DeckPoint(x=1.11, y=2.22, z=3.33),
@@ -52,4 +49,8 @@ async def test_move_to_coordinates_implementation(
             additional_min_travel_z=1234,
             speed=567.8,
         )
-    )
+    ).then_return(DeckPoint(x=4.44, y=5.55, z=6.66))
+
+    result = await subject.execute(params=params)
+
+    assert result == MoveToCoordinatesResult(position=DeckPoint(x=4.44, y=5.55, z=6.66))

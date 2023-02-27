@@ -57,8 +57,8 @@ export const LiquidsLabwareDetailsModal = (
   const { slotName, labwareName } = getSlotLabwareName(labwareId, commands)
   const loadLabwareCommand = commands
     ?.filter(command => command.commandType === 'loadLabware')
-    ?.find(command => command.result.labwareId === labwareId)
-  const labwareWellOrdering = loadLabwareCommand?.result.definition.ordering
+    ?.find(command => command.result?.labwareId === labwareId)
+  const labwareWellOrdering = loadLabwareCommand?.result?.definition?.ordering
   const filteredLiquidsInLoadOrder = liquids.filter(liquid => {
     return Object.keys(labwareInfo).some(key => key === liquid.id)
   })
