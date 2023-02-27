@@ -20,7 +20,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import FlowRates
+from opentrons.protocol_engine.types import FlowRates, TipGeometry
 from opentrons.protocol_api.core.engine import InstrumentCore, WellCore, ProtocolCore
 from opentrons.types import Location, Mount, MountType, Point
 
@@ -121,7 +121,6 @@ def test_get_hardware_state(
     )
 
     assert subject.get_hardware_state() == pipette_dict
-    assert subject.has_tip() is True
 
 
 def test_move_to_well(
@@ -846,3 +845,16 @@ def test_touch_tip(
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
+
+
+def test_has_tip(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return tip state."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_attached_tip("abc123")
+    ).then_return(TipGeometry(length=1, diameter=2, volume=3))
+
+    assert subject.has_tip() is True

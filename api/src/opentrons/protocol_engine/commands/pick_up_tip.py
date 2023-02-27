@@ -42,6 +42,12 @@ class PickUpTipResult(DestinationPositionResult):
         ge=0,
     )
 
+    tipDiameter: float = Field(
+        0,
+        description="The diameter of the tip in mm.",
+        ge=0,
+    )
+
 
 class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResult]):
     """Pick up tip command implementation."""
@@ -79,7 +85,8 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
 
         return PickUpTipResult(
             tipVolume=tip_geometry.volume,
-            tipLength=tip_geometry.effective_length,
+            tipLength=tip_geometry.length,
+            tipDiameter=tip_geometry.diameter,
             position=DeckPoint(x=position.x, y=position.y, z=position.z),
         )
 

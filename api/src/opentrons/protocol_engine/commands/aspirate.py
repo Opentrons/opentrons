@@ -56,7 +56,8 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
     async def execute(self, params: AspirateParams) -> AspirateResult:
         """Move to and aspirate from the requested well.
 
-        raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette.
+        Raises:
+            TipNotAttachedError: if no tip is attached to the pipette.
         """
         pipette_id = params.pipetteId
         labware_id = params.labwareId

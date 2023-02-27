@@ -18,7 +18,7 @@ from .module_substates import (
     ThermocyclerModuleSubState,
     ModuleSubStateType,
 )
-from .geometry import GeometryView, TipGeometry
+from .geometry import GeometryView
 from .motion import MotionView, PipetteLocationData
 
 __all__ = [
@@ -56,7 +56,6 @@ __all__ = [
     "ModuleSubStateType",
     # computed geometry state
     "GeometryView",
-    "TipGeometry",
     # computed motion state
     "MotionView",
     "PipetteLocationData",

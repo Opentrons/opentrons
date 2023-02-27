@@ -157,7 +157,7 @@ def test_get_labware_origin_position(
     labware_data = LoadedLabware(
         id="labware-id",
         loadName="load-name",
-        definitionUri="defintion-uri",
+        definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         offsetId=None,
     )
@@ -805,7 +805,7 @@ def test_get_nominal_tip_geometry(
         well_name="B2",
     )
 
-    assert result.effective_length == 100
+    assert result.length == 100
     assert result.diameter == well_def.diameter
     assert result.volume == well_def.totalLiquidVolume
 

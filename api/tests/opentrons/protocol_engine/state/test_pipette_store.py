@@ -15,6 +15,7 @@ from opentrons.protocol_engine.types import (
     LabwareMovementStrategy,
     FlowRates,
     CurrentWell,
+    TipGeometry,
 )
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
@@ -60,10 +61,9 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
     assert result == PipetteState(
         pipettes_by_id={},
         aspirated_volume_by_id={},
-        tip_volume_by_id={},
         current_well=None,
         current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
-        attached_tip_labware_by_id={},
+        attached_tip_by_id={},
         movement_speed_by_id={},
         static_config_by_id={},
         flow_rates_by_id={},
@@ -89,59 +89,86 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
     )
     assert result.aspirated_volume_by_id["pipette-id"] is None
     assert result.movement_speed_by_id["pipette-id"] is None
-    assert result.tip_volume_by_id["pipette-id"] is None
+    assert result.attached_tip_by_id["pipette-id"] is None
 
 
-def test_pick_up_tip_sets_aspirate_volume(subject: PipetteStore) -> None:
-    """It should set aspirated volume to 0."""
+def test_handles_pick_up_and_drop_tip(subject: PipetteStore) -> None:
+    """It should set tip and volume details on pick up and drop tip."""
     load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
+        pipette_id="abc",
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-
-    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
-
-    pick_up_command = create_pick_up_tip_command(
-        pipette_id="pipette-id",
-    )
-
-    subject.handle_action(UpdateCommandAction(command=pick_up_command))
-
-    result = subject.state
-
-    assert result.aspirated_volume_by_id["pipette-id"] == 0
-
-
-def test_drop_tip_sets_aspirate_volume_and_tip_volume(subject: PipetteStore) -> None:
-    """It should set aspirate volume to None."""
-    load_pipette_command = create_load_pipette_command(
-        pipette_id="pipette-id",
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-
-    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
 
     pick_up_tip_command = create_pick_up_tip_command(
-        pipette_id="pipette-id",
+        pipette_id="abc", tip_volume=42, tip_length=101, tip_diameter=8.0
     )
-
-    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
 
     drop_tip_command = create_drop_tip_command(
-        pipette_id="pipette-id",
+        pipette_id="abc",
     )
 
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+    assert subject.state.attached_tip_by_id["abc"] == TipGeometry(
+        volume=42, length=101, diameter=8.0
+    )
+    assert subject.state.aspirated_volume_by_id["abc"] == 0
+
     subject.handle_action(UpdateCommandAction(command=drop_tip_command))
+    assert subject.state.attached_tip_by_id["abc"] is None
+    assert subject.state.aspirated_volume_by_id["abc"] is None
 
-    result = subject.state
 
-    assert result.aspirated_volume_by_id["pipette-id"] is None
+# def test_pick_up_tip_sets_aspirate_volume(subject: PipetteStore) -> None:
+#     """It should set aspirated volume to 0."""
+#     load_pipette_command = create_load_pipette_command(
+#         pipette_id="pipette-id",
+#         pipette_name=PipetteNameType.P300_SINGLE,
+#         mount=MountType.LEFT,
+#     )
 
-    assert result.tip_volume_by_id["pipette-id"] is None
+#     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
 
-    assert result.attached_tip_labware_by_id["pipette-id"] is None
+#     pick_up_command = create_pick_up_tip_command(
+#         pipette_id="pipette-id",
+#     )
+
+#     subject.handle_action(UpdateCommandAction(command=pick_up_command))
+
+#     result = subject.state
+
+#     assert result.aspirated_volume_by_id["pipette-id"] == 0
+
+# def test_drop_tip_sets_aspirate_volume_and_tip_volume(subject: PipetteStore) -> None:
+#     """It should set aspirate volume to None."""
+#     load_pipette_command = create_load_pipette_command(
+#         pipette_id="pipette-id",
+#         pipette_name=PipetteNameType.P300_SINGLE,
+#         mount=MountType.LEFT,
+#     )
+
+#     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+
+#     pick_up_tip_command = create_pick_up_tip_command(
+#         pipette_id="pipette-id",
+#     )
+
+#     subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+
+#     drop_tip_command = create_drop_tip_command(
+#         pipette_id="pipette-id",
+#     )
+
+#     subject.handle_action(UpdateCommandAction(command=drop_tip_command))
+
+#     result = subject.state
+
+#     assert result.aspirated_volume_by_id["pipette-id"] is None
+
+#     assert result.tip_volume_by_id["pipette-id"] is None
+
+#     assert result.attached_tip_labware_by_id["pipette-id"] is None
 
 
 def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
@@ -181,7 +208,6 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
     result = subject.state
 
     assert result.aspirated_volume_by_id["pipette-id"] is None
-    assert result.tip_volume_by_id["pipette-id"] is None
 
     assert result.current_well == CurrentWell(
         pipette_id="pipette-id",
@@ -570,37 +596,37 @@ def test_move_labware_clears_current_well(
     assert subject.state.current_well == expected_current_well
 
 
-def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
-    """It should update has_tip after a successful pickUpTip command."""
-    pipette_id = "pipette-id"
-    load_pipette_command = create_load_pipette_command(
-        pipette_id=pipette_id,
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
+# def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
+#     """It should update has_tip after a successful pickUpTip command."""
+#     pipette_id = "pipette-id"
+#     load_pipette_command = create_load_pipette_command(
+#         pipette_id=pipette_id,
+#         pipette_name=PipetteNameType.P300_SINGLE,
+#         mount=MountType.LEFT,
+#     )
 
-    pick_up_tip_command = create_pick_up_tip_command(
-        pipette_id=pipette_id,
-        labware_id="pick-up-tip-labware-id",
-        well_name="pick-up-tip-well-name",
-    )
+#     pick_up_tip_command = create_pick_up_tip_command(
+#         pipette_id=pipette_id,
+#         labware_id="pick-up-tip-labware-id",
+#         well_name="pick-up-tip-well-name",
+#     )
 
-    drop_tip_command = create_drop_tip_command(
-        pipette_id=pipette_id,
-        labware_id="drop-tip-labware-id",
-        well_name="drop-tip-well-name",
-    )
-    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
-    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+#     drop_tip_command = create_drop_tip_command(
+#         pipette_id=pipette_id,
+#         labware_id="drop-tip-labware-id",
+#         well_name="drop-tip-well-name",
+#     )
+#     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+#     subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
 
-    assert (
-        subject.state.attached_tip_labware_by_id.get(pipette_id)
-        == "pick-up-tip-labware-id"
-    )
+#     assert (
+#         subject.state.attached_tip_labware_by_id.get(pipette_id)
+#         == "pick-up-tip-labware-id"
+#     )
 
-    subject.handle_action(UpdateCommandAction(command=drop_tip_command))
+#     subject.handle_action(UpdateCommandAction(command=drop_tip_command))
 
-    assert subject.state.attached_tip_labware_by_id[pipette_id] is None
+#     assert subject.state.attached_tip_labware_by_id[pipette_id] is None
 
 
 def test_set_movement_speed(subject: PipetteStore) -> None:
@@ -661,15 +687,15 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
     )
 
 
-def test_tip_volume_by_id(subject: PipetteStore) -> None:
-    """It should store the tip volume with the given pipette id."""
-    pick_up_tip_command = create_pick_up_tip_command(
-        pipette_id="pipette-id",
-        tip_volume=42,
-    )
-    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+# def test_tip_volume_by_id(subject: PipetteStore) -> None:
+#     """It should store the tip volume with the given pipette id."""
+#     pick_up_tip_command = create_pick_up_tip_command(
+#         pipette_id="pipette-id",
+#         tip_volume=42,
+#     )
+#     subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
 
-    assert subject.state.tip_volume_by_id["pipette-id"] == 42
+#     assert subject.state.tip_volume_by_id["pipette-id"] == 42
 
 
 @pytest.mark.parametrize(

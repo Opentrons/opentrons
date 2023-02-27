@@ -1,5 +1,4 @@
 """Geometry state getters."""
-from dataclasses import dataclass
 from typing import Optional, List, Set, Tuple, Union
 
 from opentrons.types import Point, DeckSlotName
@@ -20,28 +19,11 @@ from ..types import (
     LabwareOffsetVector,
     DeckType,
     CurrentWell,
+    TipGeometry,
 )
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import PipetteView
-
-
-DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
-
-
-@dataclass(frozen=True)
-class TipGeometry:
-    """Tip geometry data.
-
-    Props:
-        effective_length: The working length (total length minus overlap) of a tip.
-        diameter: Nominal tip diameter.
-        volume: Nominal volume capacity.
-    """
-
-    effective_length: float
-    diameter: float
-    volume: int
 
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
@@ -267,7 +249,7 @@ class GeometryView:
             )
 
         return TipGeometry(
-            effective_length=effective_length,
+            length=effective_length,
             diameter=well_def.diameter,  # type: ignore[arg-type]
             # TODO(mc, 2020-11-12): WellDefinition type says totalLiquidVolume
             #  is a float, but hardware controller expects an int
