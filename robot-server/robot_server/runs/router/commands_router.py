@@ -236,7 +236,7 @@ async def get_run_commands(
         description=(
             "The starting index of the desired first command in the list."
             " If unspecified, a cursor will be selected automatically"
-            " based on the next queued or more recently executed command."
+            " based on the currently running or most recently executed command."
         ),
     ),
     pageLength: int = Query(
