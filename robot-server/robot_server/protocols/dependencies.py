@@ -48,12 +48,12 @@ def get_protocol_reader() -> ProtocolReader:
 
 
 def get_file_reader_writer() -> FileReaderWriter:
-    """Get a FileReaderWriter to read file streams into memory and write file streams to disk"""
+    """Get a FileReaderWriter to read file streams into memory and write file streams to disk."""
     return FileReaderWriter()
 
 
 def get_file_hasher() -> FileHasher:
-    """Get a FileHasher to hash a file and see if it already exists on the server"""
+    """Get a FileHasher to hash a file and see if it already exists on the server."""
     return FileHasher()
 
 

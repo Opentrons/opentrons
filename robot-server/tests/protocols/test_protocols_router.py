@@ -381,7 +381,6 @@ async def test_create_protocol_not_readable(
     protocol_store: ProtocolStore,
 ) -> None:
     """It should 422 if the protocol is rejected by the pre-analyzer."""
-
     decoy.when(await file_reader_writer.read(files=matchers.Anything())).then_return([])
     decoy.when(protocol_store.get_all()).then_return([])
 
@@ -416,7 +415,6 @@ async def test_create_protocol_different_robot_type(
     file_hasher: FileHasher,
 ) -> None:
     """It should 422 if the protocol's robot type doesn't match the server's."""
-
     decoy.when(await file_reader_writer.read(files=matchers.Anything())).then_return([])
 
     decoy.when(

@@ -146,6 +146,8 @@ async def create_protocol(
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
+        file_hasher: File hashing interface.
+        file_reader_writer: Input file reader/writer.
         protocol_reader: Protocol file reading interface.
         protocol_analyzer: Protocol analysis interface.
         task_runner: Background task runner.
