@@ -42,12 +42,10 @@ export function RobotSystemVersion({
     'device_details',
     'app_settings',
   ])
-  const [showModal, setShowModal] = React.useState<boolean>(false)
-
+  const [showModal, setShowModal] = React.useState<boolean>(isUpdateAvailable)
   const updateState = useSelector(getShellUpdateState)
-  const { info: updateInfo } = updateState
-  const version = updateInfo?.version ?? ''
-  const releaseNotes = updateInfo?.releaseNotes ?? ''
+  const version = updateState?.info?.version ?? ''
+  const releaseNotes = updateState?.info?.releaseNotes ?? ''
 
   return (
     <>
@@ -137,9 +135,6 @@ export function RobotSystemVersion({
           </PrimaryButton>
         ) : null}
       </Flex>
-      <PrimaryButton onClick={() => setShowModal(true)}>
-        {'show modal'}
-      </PrimaryButton>
     </>
   )
 }

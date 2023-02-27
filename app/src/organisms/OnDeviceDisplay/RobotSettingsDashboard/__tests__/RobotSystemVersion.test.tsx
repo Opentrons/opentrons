@@ -6,6 +6,8 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { RobotSystemVersion } from '../RobotSystemVersion'
 
+jest.mock('../../../../redux/shell')
+
 const mockBack = jest.fn()
 
 const render = (props: React.ComponentProps<typeof RobotSystemVersion>) => {
