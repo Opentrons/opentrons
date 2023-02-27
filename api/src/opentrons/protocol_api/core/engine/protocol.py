@@ -160,8 +160,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             # use our own bookkeeping instead. If we fetched these IDs from Protocol
             # Engine, it would have leaked state from Labware Position Check in the
             # same HTTP run.
-            existing_labware_ids=self._labware_cores_by_id.keys(),
-            existing_module_ids=self._module_cores_by_id.keys(),
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
         )
 
         labware_core = LabwareCore(
@@ -286,8 +288,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             new_module_id=result.moduleId,
             # It's important that we don't fetch these IDs from Protocol Engine.
             # See comment in self.load_labware().
-            existing_labware_ids=self._labware_cores_by_id.keys(),
-            existing_module_ids=self._module_cores_by_id.keys(),
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
         )
 
         self._module_cores_by_id[module_core.module_id] = module_core
