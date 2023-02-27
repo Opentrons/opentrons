@@ -6,11 +6,7 @@ from typing import Optional, TYPE_CHECKING
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import (
-    PlungerSpeeds,
-    FlowRates,
-    find_value_for_api_version,
-)
+from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
 from opentrons.protocol_engine import (
     DeckPoint,
     DropTipWellLocation,
@@ -490,9 +486,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_return_height(self) -> float:
         return self._engine_client.state.pipettes.get_return_tip_scale(self._pipette_id)
 
-    def get_speed(self) -> PlungerSpeeds:
-        raise NotImplementedError("InstrumentCore.get_speed not implemented")
-
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
 
@@ -520,11 +513,3 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if blow_out is not None:
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
-
-    def set_pipette_speed(
-        self,
-        aspirate: Optional[float] = None,
-        dispense: Optional[float] = None,
-        blow_out: Optional[float] = None,
-    ) -> None:
-        raise NotImplementedError("InstrumentCore.set_pipette_speed not implemented")
