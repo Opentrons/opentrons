@@ -43,7 +43,7 @@ interface ChoosePipetteProps {
   setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
   exit: () => void
 }
-const unselectedOptionStyles = css`
+const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
@@ -56,8 +56,8 @@ const unselectedOptionStyles = css`
     border: 1px solid ${COLORS.medGreyHover};
   }
 `
-const selectedOptionStyles = css`
-  ${unselectedOptionStyles}
+const SELECTED_OPTIONS_STYLE = css`
+  ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blueEnabled};
   background-color: ${COLORS.lightBlue};
 
@@ -66,7 +66,7 @@ const selectedOptionStyles = css`
     background-color: ${COLORS.lightBlue};
   }
 `
-const onDeviceUnselectedOptionStyles = css`
+const ON_DEVICE_UNSELECTED_OPTIONS_STYLE = css`
   background-color: #cccccc;
   border-radius: 1rem;
   padding: ${SPACING.spacing5};
@@ -74,8 +74,8 @@ const onDeviceUnselectedOptionStyles = css`
   height: 5.25rem;
   width: 57.8125rem;
 `
-const onDeviceSelectedOptionStyles = css`
-  ${onDeviceUnselectedOptionStyles}
+const ON_DEVICE_SELECTED_OPTIONS_STYLE = css`
+  ${ON_DEVICE_UNSELECTED_OPTIONS_STYLE}
   background-color: #9c3ba4;
   color: ${COLORS.white};
 `
@@ -89,20 +89,20 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const proceedButtonText: string = t('next')
   const nintySixChannelWrapper =
     selectedPipette === NINETY_SIX_CHANNEL
-      ? selectedOptionStyles
-      : unselectedOptionStyles
+      ? SELECTED_OPTIONS_STYLE
+      : UNSELECTED_OPTIONS_STYLE
   const singleMountWrapper =
     selectedPipette === SINGLE_MOUNT_PIPETTES
-      ? selectedOptionStyles
-      : unselectedOptionStyles
+      ? SELECTED_OPTIONS_STYLE
+      : UNSELECTED_OPTIONS_STYLE
   const onDevice96Wrapper =
     selectedPipette === NINETY_SIX_CHANNEL
-      ? onDeviceSelectedOptionStyles
-      : onDeviceUnselectedOptionStyles
+      ? ON_DEVICE_SELECTED_OPTIONS_STYLE
+      : ON_DEVICE_UNSELECTED_OPTIONS_STYLE
   const onDeviceSingleMountWrapper =
     selectedPipette === SINGLE_MOUNT_PIPETTES
-      ? onDeviceSelectedOptionStyles
-      : onDeviceUnselectedOptionStyles
+      ? ON_DEVICE_SELECTED_OPTIONS_STYLE
+      : ON_DEVICE_UNSELECTED_OPTIONS_STYLE
 
   let ninetySix: string = t('ninety_six_channel', {
     ninetySix: NINETY_SIX_CHANNEL,

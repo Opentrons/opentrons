@@ -90,32 +90,34 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
           robotName={robotName}
         />
       ) : null}
-      <Flex
-        gridGap={SPACING.spacing6}
-        marginTop={SPACING.spacing6}
-        flexDirection={DIRECTION_COLUMN}
-      >
-        <Btn onClick={() => handlePipette(LEFT)}>
-          {attachedPipettes.left != null
-            ? 'detach left pipette'
-            : 'attach left pipette'}
-        </Btn>
-        {attachedPipettes.left != null ? (
-          <Btn onClick={() => handleCalibrate(LEFT)}>
-            {'calibrate left pipette'}
+      {showAttachPipette || pipetteWizardFlow != null ? null : (
+        <Flex
+          gridGap={SPACING.spacing6}
+          marginTop={SPACING.spacing6}
+          flexDirection={DIRECTION_COLUMN}
+        >
+          <Btn onClick={() => handlePipette(LEFT)}>
+            {attachedPipettes.left != null
+              ? 'detach left pipette'
+              : 'attach left pipette'}
           </Btn>
-        ) : null}
-        <Btn onClick={() => handlePipette(RIGHT)}>
-          {attachedPipettes.right != null
-            ? 'detach right pipette'
-            : 'attach right pipette'}
-        </Btn>
-        {attachedPipettes.right != null ? (
-          <Btn onClick={() => handleCalibrate(RIGHT)}>
-            {'calibrate right pipette'}
+          {attachedPipettes.left != null ? (
+            <Btn onClick={() => handleCalibrate(LEFT)}>
+              {'calibrate left pipette'}
+            </Btn>
+          ) : null}
+          <Btn onClick={() => handlePipette(RIGHT)}>
+            {attachedPipettes.right != null
+              ? 'detach right pipette'
+              : 'attach right pipette'}
           </Btn>
-        ) : null}
-      </Flex>
+          {attachedPipettes.right != null ? (
+            <Btn onClick={() => handleCalibrate(RIGHT)}>
+              {'calibrate right pipette'}
+            </Btn>
+          ) : null}
+        </Flex>
+      )}
     </Flex>
   )
 }

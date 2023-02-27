@@ -43,6 +43,7 @@ export function WizardRequiredEquipmentList(
           <StyledText
             fontSize="1.25rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            lineHeight="1.5rem"
             marginBottom={SPACING.spacing3}
           >
             {t('you_will_need')}
