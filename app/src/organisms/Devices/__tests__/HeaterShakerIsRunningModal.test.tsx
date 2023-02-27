@@ -6,14 +6,16 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
-import { useAttachedModules, useProtocolDetailsForRun } from '../hooks'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useAttachedModules } from '../hooks'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
+jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../HeaterShakerWizard/HeaterShakerModuleCard')
 
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -95,42 +97,40 @@ describe('HeaterShakerIsRunningModal', () => {
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: {
-        pipettes: {},
-        labware: {},
-        modules: {
-          heatershaker_id: {
-            model: 'heaterShakerModuleV1',
-          },
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+      pipettes: {},
+      labware: {},
+      modules: {
+        heatershaker_id: {
+          model: 'heaterShakerModuleV1',
         },
-        labwareDefinitions: {},
-        commands: [
-          {
-            id: '1f949fc0-bafe-4e24-bc76-15fc4cd1686f',
-            createdAt: '2022-07-27T22:26:33.846399+00:00',
-            commandType: 'loadModule',
-            key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
-            status: 'succeeded',
-            params: {
-              model: 'heaterShakerModuleV1',
-              location: {
-                slotName: '1',
-              },
-              moduleId: 'heatershaker_id',
-            },
-            result: {
-              moduleId: 'heatershaker_id',
-              definition: {},
-              model: 'heaterShakerModuleV1',
-              serialNumber:
-                'fake-serial-number-fc4994f5-9d8d-4c12-92ef-e82f7d64f0a4',
-            },
-            startedAt: '2022-07-27T22:26:33.875106+00:00',
-            completedAt: '2022-07-27T22:26:33.878079+00:00',
-          },
-        ],
       },
+      labwareDefinitions: {},
+      commands: [
+        {
+          id: '1f949fc0-bafe-4e24-bc76-15fc4cd1686f',
+          createdAt: '2022-07-27T22:26:33.846399+00:00',
+          commandType: 'loadModule',
+          key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
+          status: 'succeeded',
+          params: {
+            model: 'heaterShakerModuleV1',
+            location: {
+              slotName: '1',
+            },
+            moduleId: 'heatershaker_id',
+          },
+          result: {
+            moduleId: 'heatershaker_id',
+            definition: {},
+            model: 'heaterShakerModuleV1',
+            serialNumber:
+              'fake-serial-number-fc4994f5-9d8d-4c12-92ef-e82f7d64f0a4',
+          },
+          startedAt: '2022-07-27T22:26:33.875106+00:00',
+          completedAt: '2022-07-27T22:26:33.878079+00:00',
+        },
+      ],
     } as any)
   })
 

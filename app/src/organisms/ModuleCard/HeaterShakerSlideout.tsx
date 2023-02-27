@@ -25,7 +25,7 @@ import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'
-import type { HeaterShakerStartSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule
@@ -60,7 +60,7 @@ export const HeaterShakerSlideout = (
     e.stopPropagation()
 
     if (hsValue != null) {
-      const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
+      const setTempCommand: HeaterShakerSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: isRunIdle ? moduleIdFromRun : module.id,

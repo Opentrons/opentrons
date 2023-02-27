@@ -5,6 +5,8 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
+    AsyncIterator,
+    Tuple,
     cast,
     Callable,
     Dict,
@@ -16,6 +18,7 @@ from typing import (
     Any,
     TypeVar,
 )
+
 
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
@@ -29,6 +32,7 @@ from opentrons.config.types import (
     OT3Config,
     GantryLoad,
     CapacitivePassSettings,
+    LiquidProbeSettings,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons_hardware.hardware_control.motion_planning import (
@@ -38,16 +42,22 @@ from opentrons_hardware.hardware_control.motion_planning import (
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
 from .instruments.ot3.pipette import (
+    Pipette,
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+    PipetteOffsetByPipetteMount,
+)
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import get_system_constraints, axis_convert
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -61,14 +71,17 @@ from .types import (
     HardwareEventHandler,
     HardwareAction,
     MotionChecks,
+    PipetteSubType,
     PauseType,
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
-    OT3SubSystem,
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
+    EarlyLiquidSenseTrigger,
+    LiquidNotFound,
+    UpdateStatus,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -396,13 +409,35 @@ class OT3API(
             sim_model=model.value,
         )
 
-    async def update_firmware(
-        self,
-        firmware_file: str,
-        target: OT3SubSystem,
-    ) -> None:
-        """Update the firmware on the hardware."""
-        await self._backend.update_firmware(firmware_file, target)
+    @staticmethod
+    def _pipette_subtype_from_pipette(pipette: Pipette) -> PipetteSubType:
+        pipettes = {
+            PipetteChannelType.SINGLE_CHANNEL: PipetteSubType.pipette_single,
+            PipetteChannelType.EIGHT_CHANNEL: PipetteSubType.pipette_multi,
+            PipetteChannelType.NINETY_SIX_CHANNEL: PipetteSubType.pipette_96,
+        }
+        return pipettes[pipette.channels]
+
+    def get_fw_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Get the progress of updates currently running."""
+        return self._backend.get_update_progress()
+
+    async def start_firmware_updates(self) -> None:
+        """Helper to start firmware updates without needing to consume iterator."""
+        async for updates, progress in self.do_firmware_updates():
+            mod_log.debug(f"{updates} {progress}")
+
+    async def do_firmware_updates(self) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
+        """Update all the firmware."""
+        # get the attached instruments so we can get the type of pipettes attached
+        pipettes: Dict[OT3Mount, PipetteSubType] = dict()
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        for mount, _ in attached_instruments.items():
+            if self._pipette_handler.has_pipette(mount):
+                pipette = self._pipette_handler.get_pipette(mount)
+                pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
+        async for updates, progress in self._backend.update_firmware(pipettes):
+            yield updates, progress
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
@@ -467,6 +502,7 @@ class OT3API(
             OT3Mount.GRIPPER: self.attached_gripper,
         }
 
+    # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -489,14 +525,22 @@ class OT3API(
             # of simulation and it feels like a lot of work for this function
             # actually be doing.
             found = await self._backend.get_attached_instruments(checked_require)
-        for mount, instrument_data in found.items():
-            if mount == OT3Mount.GRIPPER:
-                await self.cache_gripper(cast(AttachedGripper, instrument_data))
-            else:
-                req_instr_name = checked_require.get(mount, None)
+
+        if OT3Mount.GRIPPER in found.keys():
+            await self.cache_gripper(cast(AttachedGripper, found.get(OT3Mount.GRIPPER)))
+        elif self._gripper_handler.gripper:
+            await self._gripper_handler.reset()
+
+        for pipette_mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            if pipette_mount in found.keys():
+                req_instr_name = checked_require.get(pipette_mount, None)
                 await self.cache_pipette(
-                    mount, cast(OT3AttachedPipette, instrument_data), req_instr_name
+                    pipette_mount,
+                    cast(OT3AttachedPipette, found.get(pipette_mount)),
+                    req_instr_name,
                 )
+            else:
+                self._pipette_handler.hardware_instruments[pipette_mount] = None
 
         await self._backend.probe_network()
         await self._backend.update_motor_status()
@@ -935,7 +979,6 @@ class OT3API(
             if ax in OT3Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 400
         self._move_manager.update_constraints(
@@ -1121,7 +1164,9 @@ class OT3API(
                 self._encoder_current_position[OT3Axis.G]
             )
         except Exception:
-            self._log.exception("Gripper grip failed")
+            self._log.exception(
+                f"Gripper grip failed, encoder pos: {self._encoder_current_position[OT3Axis.G]}"
+            )
             raise
 
     @ExecutionManagerProvider.wait_for_running
@@ -1551,13 +1596,14 @@ class OT3API(
 
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
-    ) -> None:
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount]:
         """Save a new offset for a given instrument."""
         checked_mount = OT3Mount.from_mount(mount)
         if checked_mount == OT3Mount.GRIPPER:
-            self._gripper_handler.save_instrument_offset(delta)
+            self._log.info(f"Saving instrument offset: {delta} for gripper")
+            return self._gripper_handler.save_instrument_offset(delta)
         else:
-            self._pipette_handler.save_instrument_offset(checked_mount, delta)
+            return self._pipette_handler.save_instrument_offset(checked_mount, delta)
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
@@ -1653,6 +1699,88 @@ class OT3API(
 
     def remove_gripper_probe(self) -> None:
         self._gripper_handler.remove_probe()
+
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        probe_settings: Optional[LiquidProbeSettings] = None,
+    ) -> float:
+        """Search for and return liquid level height.
+
+        This function begins by moving the mount the distance specified by starting_mount_height in the
+        LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
+        reading from the pressure sensor.
+
+        If the move is completed without the specified threshold being triggered, a
+        LiquidNotFound error will be thrown.
+        If the threshold is triggered before the minimum z distance has been traveled,
+        a EarlyLiquidSenseTrigger error will be thrown.
+
+        Otherwise, the function will stop moving once the threshold is triggered,
+        and return the position of the
+        z axis in deck coordinates, as well as the encoder position, where
+        the liquid was found.
+        """
+
+        checked_mount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(checked_mount)
+        self._pipette_handler.ready_for_tip_action(
+            instrument, HardwareAction.LIQUID_PROBE
+        )
+
+        if not probe_settings:
+            probe_settings = self.config.liquid_sense
+        mount_axis = OT3Axis.by_mount(mount)
+
+        gantry_position = await self.gantry_position(mount, refresh=True)
+
+        await self.move_to(
+            mount,
+            top_types.Point(
+                x=gantry_position.x,
+                y=gantry_position.y,
+                z=probe_settings.starting_mount_height,
+            ),
+        )
+
+        if probe_settings.aspirate_while_sensing:
+            await self.home_plunger(mount)
+
+        plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
+
+        machine_pos_node_id = await self._backend.liquid_probe(
+            mount,
+            probe_settings.max_z_distance,
+            probe_settings.mount_speed,
+            (probe_settings.plunger_speed * plunger_direction),
+            probe_settings.sensor_threshold_pascals,
+            probe_settings.log_pressure,
+        )
+        machine_pos = axis_convert(machine_pos_node_id, 0.0)
+        position = deck_from_machine(
+            machine_pos,
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+        )
+        z_distance_traveled = (
+            position[mount_axis] - probe_settings.starting_mount_height
+        )
+        if z_distance_traveled < probe_settings.min_z_distance:
+            min_z_travel_pos = position
+            min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
+            raise EarlyLiquidSenseTrigger(
+                triggered_at=position,
+                min_z_pos=min_z_travel_pos,
+            )
+        elif z_distance_traveled > probe_settings.max_z_distance:
+            max_z_travel_pos = position
+            max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
+            raise LiquidNotFound(
+                position=position,
+                max_z_pos=max_z_travel_pos,
+            )
+
+        return position[mount_axis]
 
     async def capacitive_probe(
         self,

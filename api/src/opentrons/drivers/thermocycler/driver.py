@@ -21,6 +21,7 @@ log = logging.getLogger(__name__)
 class GCODE(str, Enum):
     OPEN_LID = "M126"
     CLOSE_LID = "M127"
+    PLATE_LIFT = "M128"
     GET_LID_STATUS = "M119"
     SET_LID_TEMP = "M140"
     GET_LID_TEMP = "M141"
@@ -308,6 +309,14 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         await trigger_connection.close()
         await self._connection.close()
 
+    async def lift_plate(self) -> None:
+        """Send the Plate Lift command.
+
+        NOT SUPPORTED on TC Gen1."""
+        raise NotImplementedError(
+            "Gen1 Thermocyclers do not support the Plate Lift command."
+        )
+
 
 class ThermocyclerDriverV2(ThermocyclerDriver):
     """
@@ -345,3 +354,10 @@ class ThermocyclerDriverV2(ThermocyclerDriver):
         # No response expected, USB connection should terminate after this
         await self._connection.send_dfu_command(command=c)
         await self._connection.close()
+
+    async def lift_plate(self) -> None:
+        """Send the Plate Lift command."""
+        c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.PLATE_LIFT
+        )
+        await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)

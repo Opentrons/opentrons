@@ -1,10 +1,14 @@
 """Touch tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin, WellLocationMixin
+from .pipetting_common import (
+    PipetteIdMixin,
+    WellLocationMixin,
+    DestinationPositionResult,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..errors import TouchTipDisabledError, LabwareIsTipRackError
 
@@ -19,10 +23,23 @@ TouchTipCommandType = Literal["touchTip"]
 class TouchTipParams(PipetteIdMixin, WellLocationMixin):
     """Payload needed to touch a pipette tip the sides of a specific well."""
 
-    pass
+    radius: float = Field(
+        1.0,
+        description=(
+            "The proportion of the target well's radius the pipette tip will move towards."
+        ),
+    )
+
+    speed: Optional[float] = Field(
+        None,
+        description=(
+            "Override the travel speed in mm/s."
+            " This controls the straight linear speed of motion."
+        ),
+    )
 
 
-class TouchTipResult(BaseModel):
+class TouchTipResult(DestinationPositionResult):
     """Result data from the execution of a TouchTip."""
 
     pass
@@ -49,14 +66,16 @@ class TouchTipImplementation(AbstractCommandImpl[TouchTipParams, TouchTipResult]
         if self._state_view.labware.is_tiprack(labware_id=params.labwareId):
             raise LabwareIsTipRackError("Cannot touch tip on tiprack")
 
-        await self._pipetting.touch_tip(
+        position = await self._pipetting.touch_tip(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+            radius=params.radius,
+            speed=params.speed,
         )
 
-        return TouchTipResult()
+        return TouchTipResult(position=position)
 
 
 class TouchTip(BaseCommand[TouchTipParams, TouchTipResult]):

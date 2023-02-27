@@ -1,7 +1,7 @@
 """Test touch tip commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import PipettingHandler
 from opentrons.protocol_engine.state import StateView
 
@@ -25,17 +25,21 @@ async def test_touch_tip_implementation(
         labwareId="123",
         wellName="A3",
         wellLocation=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        radius=0.456,
+        speed=42.0,
     )
 
-    result = await subject.execute(data)
-
-    assert result == TouchTipResult()
-
-    decoy.verify(
+    decoy.when(
         await pipetting.touch_tip(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            radius=0.456,
+            speed=42.0,
         )
-    )
+    ).then_return(DeckPoint(x=4, y=5, z=6))
+
+    result = await subject.execute(data)
+
+    assert result == TouchTipResult(position=DeckPoint(x=4, y=5, z=6))

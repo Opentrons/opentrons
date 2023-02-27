@@ -10,6 +10,7 @@ from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.modules.thermocycler import ThermocyclerReader
+from opentrons.drivers.asyncio.communication.errors import ErrorResponse
 
 
 POLL_PERIOD = 1.0
@@ -41,6 +42,22 @@ async def subject(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, Non
     await therm.cleanup()
 
 
+@pytest.fixture
+async def subject_v2(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, None]:
+    """Test subject"""
+    therm = await modules.build(
+        port="/dev/ot_module_sim_thermocycler0",
+        usb_port=usb_port,
+        type=modules.ModuleType.THERMOCYCLER,
+        simulating=True,
+        hw_control_loop=asyncio.get_running_loop(),
+        execution_manager=ExecutionManager(),
+        sim_model="thermocyclerModuleV2",
+    )
+    yield cast(modules.Thermocycler, therm)
+    await therm.cleanup()
+
+
 async def test_sim_initialization(subject: modules.Thermocycler) -> None:
     assert isinstance(subject, modules.AbstractModule)
 
@@ -57,6 +74,27 @@ async def test_lid(subject: modules.Thermocycler) -> None:
 
     await subject.open()
     assert subject.lid_status == "open"
+
+
+async def test_plate_lift(
+    subject: modules.Thermocycler, subject_v2: modules.Thermocycler
+) -> None:
+    # First test Gen1 behavior
+    await subject.close()
+    with pytest.raises(NotImplementedError):
+        await subject.lift_plate()
+
+    await subject.open()
+    with pytest.raises(NotImplementedError):
+        await subject.lift_plate()
+
+    # Now emulate a V2 thermocycler
+    await subject_v2.close()
+    with pytest.raises(ErrorResponse):
+        await subject_v2.lift_plate()
+
+    await subject_v2.open()
+    await subject_v2.lift_plate()
 
 
 async def test_sim_state(subject: modules.Thermocycler) -> None:

@@ -10,16 +10,16 @@ import {
   mockAttachedGen3Pipette,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
-import { getAttachedPipettes } from '../../../redux/pipettes'
+import { useAttachedPipettes } from '../../Devices/hooks'
 import { ChoosePipette } from '../ChoosePipette'
 import { getIsGantryEmpty } from '../utils'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
-jest.mock('../../../redux/pipettes')
 jest.mock('../utils')
+jest.mock('../../Devices/hooks')
 
-const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
-  typeof getAttachedPipettes
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
 >
 const mockGetIsGantryEmpty = getIsGantryEmpty as jest.MockedFunction<
   typeof getIsGantryEmpty
@@ -40,13 +40,12 @@ describe('ChoosePipette', () => {
   let props: React.ComponentProps<typeof ChoosePipette>
   beforeEach(() => {
     mockGetIsGantryEmpty.mockReturnValue(true)
-    mockGetAttachedPipettes.mockReturnValue({ left: null, right: null })
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
     props = {
       proceed: jest.fn(),
       exit: jest.fn(),
       setSelectedPipette: jest.fn(),
       selectedPipette: SINGLE_MOUNT_PIPETTES,
-      robotName: 'otie',
     }
   })
   it('returns the correct information, buttons work as expected', () => {
@@ -118,14 +117,14 @@ describe('ChoosePipette', () => {
   })
   it('renders the correct text for the 96 channel button when there is a left pipette attached', () => {
     mockGetIsGantryEmpty.mockReturnValue(false)
-    mockGetAttachedPipettes.mockReturnValue({ left: mockPipette, right: null })
+    mockUseAttachedPipettes.mockReturnValue({ left: mockPipette, right: null })
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     const { getByText } = render(props)
     getByText('Detach mock pipette display name and attach 96-Channel pipette')
   })
   it('renders the correct text for the 96 channel button when there is a right pipette attached', () => {
     mockGetIsGantryEmpty.mockReturnValue(false)
-    mockGetAttachedPipettes.mockReturnValue({ left: null, right: mockPipette })
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: mockPipette })
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     const { getByText } = render(props)
     getByText('Detach mock pipette display name and attach 96-Channel pipette')

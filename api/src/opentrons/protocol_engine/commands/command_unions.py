@@ -25,6 +25,14 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceParams,
+    AspirateInPlaceCreate,
+    AspirateInPlaceResult,
+    AspirateInPlaceCommandType,
+)
+
 from .comment import (
     Comment,
     CommentParams,
@@ -185,13 +193,23 @@ from .blow_out import (
     BlowOutResult,
 )
 
+from .blow_out_in_place import (
+    BlowOutInPlaceParams,
+    BlowOutInPlace,
+    BlowOutInPlaceCreate,
+    BlowOutInPlaceCommandType,
+    BlowOutInPlaceResult,
+)
+
 Command = Union[
     Aspirate,
+    AspirateInPlace,
     Comment,
     Custom,
     Dispense,
     DispenseInPlace,
     BlowOut,
+    BlowOutInPlace,
     DropTip,
     Home,
     LoadLabware,
@@ -236,11 +254,13 @@ Command = Union[
 
 CommandParams = Union[
     AspirateParams,
+    AspirateInPlaceParams,
     CommentParams,
     CustomParams,
     DispenseParams,
     DispenseInPlaceParams,
     BlowOutParams,
+    BlowOutInPlaceParams,
     DropTipParams,
     HomeParams,
     LoadLabwareParams,
@@ -286,11 +306,13 @@ CommandParams = Union[
 
 CommandType = Union[
     AspirateCommandType,
+    AspirateInPlaceCommandType,
     CommentCommandType,
     CustomCommandType,
     DispenseCommandType,
     DispenseInPlaceCommandType,
     BlowOutCommandType,
+    BlowOutInPlaceCommandType,
     DropTipCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
@@ -335,11 +357,13 @@ CommandType = Union[
 
 CommandCreate = Union[
     AspirateCreate,
+    AspirateInPlaceCreate,
     CommentCreate,
     CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
     BlowOutCreate,
+    BlowOutInPlaceCreate,
     DropTipCreate,
     HomeCreate,
     LoadLabwareCreate,
@@ -384,11 +408,13 @@ CommandCreate = Union[
 
 CommandResult = Union[
     AspirateResult,
+    AspirateInPlaceResult,
     CommentResult,
     CustomResult,
     DispenseResult,
     DispenseInPlaceResult,
     BlowOutResult,
+    BlowOutInPlaceResult,
     DropTipResult,
     HomeResult,
     LoadLabwareResult,

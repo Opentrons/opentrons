@@ -11,6 +11,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorCode,
     MotorPositionFlags,
     ErrorSeverity,
+    GearMotorId,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -159,6 +160,8 @@ class MoveGroupRunner:
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
         for arbid, completion in completions:
+            if isinstance(completion, TipActionResponse):
+                continue
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
                     (
@@ -319,13 +322,20 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[MoveStopCondition] = []
         self._start_at_index = start_at_index
+        self._expected_tip_action_motors = []
 
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
             for seq_id, move in enumerate(move_group):
+                movesteps = list(move.values())
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
-                duration += float(list(move.values())[0].duration_sec)
+                duration += float(movesteps[0].duration_sec)
+                if any(isinstance(g, MoveGroupTipActionStep) for g in movesteps):
+                    self._expected_tip_action_motors = [
+                        GearMotorId.left,
+                        GearMotorId.right,
+                    ]
                 for step in move_group[seq_id]:
                     self._stop_condition.append(move_group[seq_id][step].stop_condition)
 
@@ -414,7 +424,10 @@ class MoveScheduler:
             self._remove_move_group(message, arbitration_id)
             self._handle_move_completed(message)
         elif isinstance(message, TipActionResponse):
-            self._remove_move_group(message, arbitration_id)
+            gear_id = GearMotorId(message.payload.gear_motor_id.value)
+            self._expected_tip_action_motors.remove(gear_id)
+            if len(self._expected_tip_action_motors) == 0:
+                self._remove_move_group(message, arbitration_id)
             self._handle_move_completed(message)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)

@@ -73,3 +73,7 @@ class QueueWorker:
             )
 
             await self._command_executor.execute(command_id=command_id)
+
+            # Yield to the event loop in case we're executing a long run of commands
+            # that never yields internally. For example, a long run of comment commands.
+            await asyncio.sleep(0)

@@ -47,14 +47,9 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    ProtocolContext,
-    Labware,
-    create_protocol_context,
-)
+from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
 
 
@@ -259,9 +254,7 @@ async def hardware(
 
 @pytest.fixture()
 def ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
-    return create_protocol_context(
-        api_version=MAX_SUPPORTED_VERSION, hardware_api=hardware
-    )
+    return create_protocol_context(api_version=APIVersion(2, 13), hardware_api=hardware)
 
 
 @pytest.fixture()
@@ -634,7 +627,7 @@ def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LegacyLabwareCore:
 def min_lw(min_lw_impl: LegacyLabwareCore) -> Labware:
     return Labware(
         core=min_lw_impl,
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )
@@ -644,7 +637,7 @@ def min_lw(min_lw_impl: LegacyLabwareCore) -> Labware:
 def min_lw2(min_lw2_impl: LegacyLabwareCore) -> Labware:
     return Labware(
         core=min_lw2_impl,
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )

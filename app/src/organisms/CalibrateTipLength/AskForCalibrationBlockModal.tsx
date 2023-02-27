@@ -24,7 +24,11 @@ import { StyledText } from '../../atoms/text'
 
 import type { Dispatch } from '../../redux/types'
 
-const BLOCK_REQUEST_URL = 'https://opentrons-ux.typeform.com/to/DgvBE9Ir'
+const BLOCK_REQUEST_EMAIL_BODY =
+  '• Full name\n• Company or institution name\n• Shipping address\n• VAT ID (if outside the US)'
+const BLOCK_REQUEST_URL = `mailto:support@opentrons.com?subject=Calibration%20Block%20Request&body=${encodeURIComponent(
+  BLOCK_REQUEST_EMAIL_BODY
+)}`
 const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 
 interface Props {

@@ -15,12 +15,12 @@ export interface MoveToMaintenancePositionCreateCommand
 export interface CalibratePipetteRunTimeCommand
   extends CommonCommandRunTimeInfo,
     CalibratePipetteCreateCommand {
-  result: CalibratePipetteResult
+  result?: CalibratePipetteResult
 }
 
 export interface MoveToMaintenancePositionRunTimeCommand
   extends MoveToMaintenancePositionCreateCommand {
-  result: {}
+  result?: {}
 }
 
 export type CalibrationRunTimeCommand =

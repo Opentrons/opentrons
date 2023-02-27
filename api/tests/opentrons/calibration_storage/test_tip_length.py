@@ -21,7 +21,9 @@ def reload_module(robot_model: "RobotModel") -> None:
 
 @pytest.fixture
 def starting_calibration_data(
-    ot_config_tempdir: Any, minimal_labware_def: "LabwareDefinition"
+    ot_config_tempdir: Any,
+    minimal_labware_def: "LabwareDefinition",
+    minimal_labware_def2: "LabwareDefinition",
 ) -> None:
     """
     Starting calibration data fixture.
@@ -35,8 +37,10 @@ def starting_calibration_data(
 
     tip_length1 = create_tip_length_data(minimal_labware_def, 22.0)
     tip_length2 = create_tip_length_data(minimal_labware_def, 31.0)
+    tip_length3 = create_tip_length_data(minimal_labware_def2, 31.0)
     save_tip_length_calibration("pip1", tip_length1)
     save_tip_length_calibration("pip2", tip_length2)
+    save_tip_length_calibration("pip1", tip_length3)
 
 
 def test_save_tip_length_calibration(
@@ -93,11 +97,11 @@ def test_delete_specific_tip_calibration(
         delete_tip_length_calibration,
     )
 
-    assert tip_lengths_for_pipette("pip1") != {}
+    assert len(tip_lengths_for_pipette("pip1").keys()) == 2
     assert tip_lengths_for_pipette("pip2") != {}
     tip_rack_hash = helpers.hash_labware_def(minimal_labware_def)
     delete_tip_length_calibration(tip_rack_hash, "pip1")
-    assert tip_lengths_for_pipette("pip1") == {}
+    assert len(tip_lengths_for_pipette("pip1").keys()) == 1
     assert tip_lengths_for_pipette("pip2") != {}
 
 

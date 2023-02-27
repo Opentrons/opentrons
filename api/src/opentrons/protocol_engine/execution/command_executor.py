@@ -14,6 +14,7 @@ from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .labware_movement import LabwareMovementHandler
 from .pipetting import PipettingHandler
+from .tip_handler import TipHandler
 from .run_control import RunControlHandler
 from .rail_lights import RailLightsHandler
 
@@ -37,6 +38,7 @@ class CommandExecutor:
         movement: MovementHandler,
         labware_movement: LabwareMovementHandler,
         pipetting: PipettingHandler,
+        tip_handler: TipHandler,
         run_control: RunControlHandler,
         rail_lights: RailLightsHandler,
         model_utils: Optional[ModelUtils] = None,
@@ -49,6 +51,7 @@ class CommandExecutor:
         self._movement = movement
         self._labware_movement = labware_movement
         self._pipetting = pipetting
+        self._tip_handler = tip_handler
         self._run_control = run_control
         self._rail_lights = rail_lights
         self._model_utils = model_utils or ModelUtils()
@@ -68,6 +71,7 @@ class CommandExecutor:
             movement=self._movement,
             labware_movement=self._labware_movement,
             pipetting=self._pipetting,
+            tip_handler=self._tip_handler,
             run_control=self._run_control,
             rail_lights=self._rail_lights,
         )
