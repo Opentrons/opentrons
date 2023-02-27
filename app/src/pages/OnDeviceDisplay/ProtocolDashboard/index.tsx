@@ -285,29 +285,33 @@ export function ProtocolDashboard(): JSX.Element {
           </tbody>
         </Table>
       ) : (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          height="27.75rem"
-          backgroundColor={COLORS.medGreyEnabled}
-        >
-          <img title={t('nothing_here_yet')} src={imgSrc} />
-          <StyledText
-            fontSize="2rem"
-            lineHeight="2.75rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
-            {t('nothing_here_yet')}
-          </StyledText>
-          <StyledText
-            fontSize="1.25rem"
-            lineHeight="1.6875rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('send_a_protocol_to_store')}
-          </StyledText>
-        </Flex>
+        <>
+          {pinnedProtocols.length === 0 && (
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              justifyContent={JUSTIFY_CENTER}
+              alignItems={ALIGN_CENTER}
+              height="27.75rem"
+              backgroundColor={COLORS.medGreyEnabled}
+            >
+              <img title={t('nothing_here_yet')} src={imgSrc} />
+              <StyledText
+                fontSize="2rem"
+                lineHeight="2.75rem"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
+                {t('nothing_here_yet')}
+              </StyledText>
+              <StyledText
+                fontSize="1.25rem"
+                lineHeight="1.6875rem"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+              >
+                {t('send_a_protocol_to_store')}
+              </StyledText>
+            </Flex>
+          )}
+        </>
       )}
     </Flex>
   )
