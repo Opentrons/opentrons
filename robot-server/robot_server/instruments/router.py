@@ -1,7 +1,9 @@
 """Instruments routes."""
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, cast
 
 from fastapi import APIRouter, status, Depends, Query
+from typing_extensions import Literal
+
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
 from robot_server.hardware import get_hardware
@@ -9,6 +11,9 @@ from robot_server.service.json_api import (
     SimpleMultiBody,
     PydanticResponse,
     MultiBodyMeta,
+    RequestModel,
+    EmptyBody,
+    ResourceLink,
 )
 
 from opentrons.types import Mount
@@ -26,9 +31,35 @@ from .instrument_models import (
     Gripper,
     AttachedInstrument,
     GripperCalibrationData,
+    UpdateRequestModel,
+    UpdateProgressStatus,
+    MountTypesStr,
+    UpdateStatusLink,
 )
+from ..errors import ErrorDetails
 
 instruments_router = APIRouter()
+
+
+class PeripheralNotFound(ErrorDetails):
+    """An error if a specified peripheral is not found."""
+
+    id: Literal["PeripheralNotFound"] = "PeripheralNotFound"
+    title: str = "Peripheral Not Found"
+
+
+class UpdateInProgress(ErrorDetails):
+    """An error thrown if there is already an update in progress."""
+
+    id: Literal["UpdateInProgress"] = "UpdateInProgress"
+    title: str = "An update is already in progress."
+
+
+class NotSupportedOnOT2(ErrorDetails):
+    """An error if one tries to update instruments on the OT2."""
+
+    id: Literal["NotSupportedOnOT2"] = "NotSupportedOnOT2"
+    title: str = "Cannot update OT2 instruments' firmware."
 
 
 def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pipette:
@@ -39,6 +70,7 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
             instrumentName=pipette_dict["name"],
             instrumentModel=pipette_dict["model"],
             serialNumber=pipette_dict["pipette_id"],
+            firmwareUpdateRequired=pipette_dict["fw_update_required"],
             data=PipetteData(
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
@@ -54,6 +86,7 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
         mount=MountType.EXTENSION.as_string(),
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
         serialNumber=gripper_dict["gripper_id"],
+        firmwareUpdateRequired=gripper_dict["fw_update_required"],
         data=GripperData(
             jawState=gripper_dict["state"].name.lower(),
             calibratedOffset=GripperCalibrationData.construct(
@@ -119,6 +152,89 @@ async def get_attached_instruments(
         content=SimpleMultiBody.construct(
             data=response_data,
             meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
+        ),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@instruments_router.put(
+    path="/instruments/update",
+    summary="Initiate a firmware update on a specific instrument.",
+    description="Update the firmware of the instrument attached to the specified mount"
+    " if a firmware update is available for it. If no instrument is"
+    " specified, attempts to update all attached instruments.",
+    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedInstrument]}},
+)
+async def update_firmware(
+    request_body: RequestModel[Optional[UpdateRequestModel]],
+    hardware: HardwareControlAPI = Depends(get_hardware),
+) -> PydanticResponse[EmptyBody[UpdateStatusLink]]:
+    """Update the firmware of the OT3 instrument on the specified mount.
+
+    Arguments:
+        request_body: Optional request body with instrument to update. If not specified,
+                      will start an update of all attached instruments.
+        hardware: hardware controller instance
+    """
+    try:
+        ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
+    except HardwareNotSupportedError as e:
+        raise NotSupportedOnOT2(detail=str(e)).as_error(
+            status.HTTP_403_FORBIDDEN
+        ) from e
+
+    requested_mount = request_body.data
+    mount_to_update = (
+        MountType.to_ot3_mount(requested_mount.mount)
+        if requested_mount is not None
+        else None
+    )
+    await ot3_hardware.update_instrument_firmware(
+        mounts={mount_to_update} if mount_to_update else None
+    )
+
+    return await PydanticResponse.create(
+        content=EmptyBody.construct(
+            links=UpdateStatusLink(
+                updateStatus=ResourceLink.construct(href="/instruments/update/status")
+            )
+        )
+    )
+
+
+@instruments_router.get(
+    path="/instruments/update/status",
+    summary="Get firmware update status of all attached instruments.",
+    description="Get firmware update status of all attached instruments. "
+    "Shows update progress if instrument is being updated.",
+    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressStatus]}},
+)
+async def get_firmware_update_status(
+    hardware: HardwareControlAPI = Depends(get_hardware),
+) -> PydanticResponse[SimpleMultiBody[UpdateProgressStatus]]:
+    """Get status of instrument firmware update."""
+    try:
+        ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
+    except HardwareNotSupportedError as e:
+        raise NotSupportedOnOT2(detail=str(e)).as_error(
+            status.HTTP_403_FORBIDDEN
+        ) from e
+
+    update_progress = ot3_hardware.get_firmware_update_progress()
+    instrument_update_status: List[UpdateProgressStatus] = []
+    for mount, update_status in update_progress.items():
+        instrument_update_status.append(
+            UpdateProgressStatus(
+                mount=cast(MountTypesStr, MountType.from_ot3_mount(mount).as_string()),
+                updateStatus=str(update_status.status),
+                updateProgress=update_status.progress,
+            )
+        )
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=instrument_update_status,
+            meta=MultiBodyMeta(cursor=0, totalLength=len(instrument_update_status)),
         ),
         status_code=status.HTTP_200_OK,
     )
