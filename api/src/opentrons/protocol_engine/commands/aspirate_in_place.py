@@ -52,7 +52,10 @@ class AspirateInPlaceImplementation(
         self._hardware_api = hardware_api
 
     async def execute(self, params: AspirateInPlaceParams) -> AspirateInPlaceResult:
-        """Aspirate without moving the pipette."""
+        """Aspirate without moving the pipette.
+
+        raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette.
+        """
         ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
             pipette_id=params.pipetteId,
         )

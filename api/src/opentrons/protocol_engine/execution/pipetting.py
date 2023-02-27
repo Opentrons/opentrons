@@ -6,7 +6,6 @@ from contextlib import contextmanager
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateView, HardwarePipette
-from ..errors.exceptions import TipNotAttachedError
 
 
 class PipettingHandler(TypingProtocol):
@@ -56,13 +55,10 @@ class HardwarePipettingHandler(PipettingHandler):
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,
         )
-        try:
-            aspirated_volume = self._state_view.pipettes.get_aspirated_volume(
-                pipette_id
-            )
-        except TipNotAttachedError:
-            return False
-        return aspirated_volume is not None and hw_pipette.config["ready_to_aspirate"]
+        return (
+            self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
+            and hw_pipette.config["ready_to_aspirate"]
+        )
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Prepare for pipette aspiration."""
@@ -160,13 +156,7 @@ class VirtualPipettingHandler(PipettingHandler):
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
-        try:
-            aspirated_volume = self._state_view.pipettes.get_aspirated_volume(
-                pipette_id
-            )
-        except TipNotAttachedError:
-            return False
-        return aspirated_volume is not None
+        return self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Virtually prepare to aspirate (no-op)."""

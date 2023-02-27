@@ -370,7 +370,10 @@ class PipetteView(HasState[PipetteState]):
         return None
 
     def get_aspirated_volume(self, pipette_id: str) -> float:
-        """Get the currently aspirated volume of a pipette by ID."""
+        """Get the currently aspirated volume of a pipette by ID.
+
+        raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette.
+        """
         try:
             aspirate_volume = self._state.aspirated_volume_by_id[pipette_id]
         except KeyError as e:
@@ -384,7 +387,10 @@ class PipetteView(HasState[PipetteState]):
         return aspirate_volume
 
     def get_working_volume(self, pipette_id: str) -> float:
-        """Get the working maximum volume of a pipette by ID."""
+        """Get the working maximum volume of a pipette by ID.
+
+        raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette.
+        """
         max_volume = self.get_maximum_volume(pipette_id)
         try:
             tip_volume = self._state.tip_volume_by_id[pipette_id]

@@ -97,6 +97,30 @@ def test_get_is_ready_to_aspirate(
     assert hardware_subject.get_is_ready_to_aspirate("pipette-id") == expected
 
 
+def test_get_is_ready_to_aspirate_raises_no_tip_attached(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
+) -> None:
+    """Should raise a TipNotAttachedError error."""
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_raise(
+        TipNotAttachedError()
+    )
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette("pipette-id", {})
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=cast(PipetteDict, {"ready_to_aspirate": True}),
+        )
+    )
+
+    with pytest.raises(TipNotAttachedError):
+        assert hardware_subject.get_is_ready_to_aspirate("pipette-id")
+
+
 async def test_dispense_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
@@ -237,7 +261,8 @@ def test_get_is_ready_to_aspirate_virtual(
         mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
     ).then_raise(TipNotAttachedError())
 
-    assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id") is False
+    with pytest.raises(TipNotAttachedError):
+        subject.get_is_ready_to_aspirate(pipette_id="pipette-id")
 
     decoy.when(
         mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id-123")
