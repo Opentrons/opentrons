@@ -20,13 +20,14 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
+import { TooManyPinsModal } from './TooManyPinsModal'
 
 import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
-// What is the maxinum number of protocols one can pin?
-const MAXIMUM_PINNED_PROTOCOLS = 5
+// What is the maxinum number of protocols one can pin? This many.
+const MAXIMUM_PINNED_PROTOCOLS = 8
 
 export function LongPressModal(props: {
   longpress: UseLongPressResult
@@ -48,11 +49,6 @@ export function LongPressModal(props: {
       history.push(`/protocols/${runId}/setup`)
     },
   })
-
-  const handleCloseMaxPinsAlert = (): void => {
-    setShowMaxPinsAlert(false)
-    longpress.setIsLongPressed(false)
-  }
 
   const handleCloseModal = (): void => {
     longpress.setIsLongPressed(false)
@@ -96,51 +92,7 @@ export function LongPressModal(props: {
   return (
     <>
       {showMaxPinsAlert ? (
-        <ModalShell
-          borderRadius="0.75rem"
-          height="26rem"
-          onOutsideClick={handleCloseMaxPinsAlert}
-          width="32.375rem"
-        >
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing3}
-            padding={SPACING.spacingXXL}
-          >
-            <StyledText
-              fontSize="2rem"
-              lineHeight="2.625rem"
-              fontWeight={TYPOGRAPHY.fontWeightBold}
-              textAlign={TYPOGRAPHY.textAlignCenter}
-            >
-              {t('too_many_pins_header')}
-            </StyledText>
-            <StyledText
-              fontSize="1.75rem"
-              lineHeight="2.625rem"
-              textAlign={TYPOGRAPHY.textAlignCenter}
-            >
-              {t('too_many_pins_body')}
-            </StyledText>
-            <Flex
-              backgroundColor={COLORS.blueEnabled}
-              borderRadius="0.75rem"
-              flexDirection={DIRECTION_COLUMN}
-              marginTop={SPACING.spacing6}
-              onClick={handleCloseMaxPinsAlert}
-              padding={SPACING.spacing4}
-            >
-              <StyledText
-                color={COLORS.white}
-                fontSize="1.375rem"
-                lineHeight="1.75rem"
-                textAlign={TYPOGRAPHY.textAlignCenter}
-              >
-                {t('got_it')}
-              </StyledText>
-            </Flex>
-          </Flex>
-        </ModalShell>
+        <TooManyPinsModal longpress={longpress} />
       ) : (
         <ModalShell
           borderRadius="0.75rem"
