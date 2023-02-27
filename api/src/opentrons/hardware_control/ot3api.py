@@ -1765,7 +1765,7 @@ class OT3API(
                 max_z_pos=max_z_travel_pos,
             )
 
-        encoder_pos = await self.encoder_current_position(
+        encoder_pos = await self.encoder_current_position_ot3(
             mount=mount, critical_point=CriticalPoint.TIP, refresh=True
         )
 
