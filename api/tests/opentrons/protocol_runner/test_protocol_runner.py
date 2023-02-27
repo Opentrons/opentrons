@@ -244,6 +244,7 @@ async def test_load_json(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
     )
 
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
@@ -316,6 +317,7 @@ async def test_load_json_liquids_ff_on(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
     )
 
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
@@ -376,6 +378,7 @@ async def test_load_legacy_python(
         metadata={},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
+        content_hash="abc123",
     )
 
     extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
@@ -439,6 +442,7 @@ async def test_load_python_with_pe_papi_core(
         metadata={},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
+        content_hash="abc123",
     )
 
     legacy_protocol = LegacyPythonProtocol(
@@ -493,6 +497,7 @@ async def test_load_legacy_json(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=5),
+        content_hash="abc123",
     )
 
     legacy_protocol = LegacyJsonProtocol(

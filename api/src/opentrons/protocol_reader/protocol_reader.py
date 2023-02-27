@@ -2,7 +2,6 @@
 from pathlib import Path
 from typing import Optional, Sequence, List
 
-from .input_file import AbstractInputFile
 from .file_identifier import (
     FileIdentifier,
     IdentifiedFile,
