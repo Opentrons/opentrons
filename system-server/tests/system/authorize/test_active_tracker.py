@@ -1,6 +1,14 @@
+import pytest
+from typing import List
+
 from system_server.system.authorize.active_tracker import AuthorizationTracker
 from system_server.jwt import Registrant
 from datetime import datetime, timedelta
+
+
+@pytest.fixture
+def registrant_list() -> List[Registrant]:
+    return [Registrant(f"sub{n}", f"agent{n}", f"agent_id{n}") for n in range(100)]
 
 
 async def test_authorization_tracking_counting() -> None:
@@ -33,20 +41,36 @@ async def test_authorization_tracking_counting() -> None:
     assert await subject.active_connections() == 1
 
 
-async def test_authorization_tracking_getter() -> None:
+async def test_authorization_tracking_getter(registrant_list: List[Registrant]) -> None:
     subject = AuthorizationTracker()
     # Generate a list of registrants
-    registrants = [
-        Registrant(f"sub{n}", f"agent{n}", f"agent_id{n}") for n in range(100)
-    ]
     expiration = datetime.now() + timedelta(days=100)
 
-    for r in registrants:
+    for r in registrant_list:
         await subject.add_connection(r, expiration)
 
-    assert await subject.active_connections() == len(registrants)
+    assert await subject.active_connections() == len(registrant_list)
 
     check = await subject.get_connected()
 
-    for r in registrants:
+    for r in registrant_list:
+        assert check.count(r) == 1
+
+
+async def test_authorization_tracking_overwrite(
+    registrant_list: List[Registrant],
+) -> None:
+    subject = AuthorizationTracker()
+    # Generate a list of registrants
+    expiration_short = datetime.now() + timedelta(days=1)
+
+    for r in registrant_list:
+        await subject.add_connection(r, expiration_short)
+
+    expiration_long = datetime.now() + timedelta(days=10)
+    for r in registrant_list:
+        await subject.add_connection(r, expiration_long)
+
+    check = await subject.get_connected()
+    for r in registrant_list:
         assert check.count(r) == 1
