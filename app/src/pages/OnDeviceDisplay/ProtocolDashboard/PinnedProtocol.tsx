@@ -46,8 +46,8 @@ export function PinnedProtocol(props: {
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       ref={longpress.ref}
       border={`1px ${COLORS.medGreyHover} solid`}
-      maxWidth="290px"
-      minWidth="290px"
+      maxWidth="18.125rem"
+      minWidth="18.125rem"
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >

@@ -12,6 +12,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  useCreateRunMutation,
+  // TODO useDeleteProtocolMutation,
+} from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
@@ -19,10 +23,6 @@ import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
-import {
-  useCreateRunMutation,
-  // TODO useDeleteProtocolMutation,
-} from '@opentrons/react-api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 // What is the maxinum number of protocols one can pin?
@@ -105,7 +105,7 @@ export function LongPressModal(props: {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing3}
-            padding="2.5rem"
+            padding={SPACING.spacingXXL}
           >
             <StyledText
               fontSize="2rem"
@@ -153,13 +153,12 @@ export function LongPressModal(props: {
           >
             <Flex
               alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacingSM}
               height="4.875rem"
-              justifyContent={JUSTIFY_CENTER}
               padding={SPACING.spacing5}
               onClick={handleRunClick}
             >
-              <Icon name="play-circle" size="1.5rem" color={COLORS.black} />
+              <Icon name="play-circle" size="1.75rem" color={COLORS.black} />
               <StyledText
                 fontSize="1.375rem"
                 lineHeight="1.5rem"
@@ -171,13 +170,12 @@ export function LongPressModal(props: {
             </Flex>
             <Flex
               alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacingSM}
               height="4.875rem"
-              justifyContent={JUSTIFY_CENTER}
               padding={SPACING.spacing5}
               onClick={handlePinClick}
             >
-              <Icon name="push-pin" size="1.5rem" color={COLORS.black} />
+              <Icon name="push-pin" size="1.875rem" color={COLORS.black} />
               <StyledText
                 fontSize="1.375rem"
                 lineHeight="1.5rem"
@@ -190,13 +188,12 @@ export function LongPressModal(props: {
             <Flex
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.errorEnabled}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacingSM}
               height="4.875rem"
-              justifyContent={JUSTIFY_CENTER}
               padding={SPACING.spacing5}
               onClick={handleDeleteClick}
             >
-              <Icon name="trash" size="1.5rem" color={COLORS.white} />
+              <Icon name="trash" size="1.875rem" color={COLORS.white} />
               <StyledText
                 color={COLORS.white}
                 fontSize="1.375rem"
