@@ -151,19 +151,17 @@ async def test_recv_iterator(
     subject: SerialUsbDriver, test_port_host: SerialEmulator
 ) -> None:
     """Test receiving and parsing data from the USB driver."""
-    m = [b"\x00\x01\x00\x00",
-         b"\x00\x02\x00\x00",
-         b"\x00\x05\x00\x00"]
+    m = [b"\x00\x01\x00\x00", b"\x00\x02\x00\x00", b"\x00\x05\x00\x00"]
 
-    for msg in m:
-        length = test_port_host.write(msg)
+    for msg_s in m:
+        length = test_port_host.write(msg_s)
         assert length == 4
 
     messages = []
-    async for msg in subject:
-        messages.append(msg)
+    async for msg_r in subject:
+        messages.append(msg_r)
         if len(messages) == len(m):
-            break;
+            break
 
     assert len(messages) == 3
     assert type(messages[0]) == Ack
