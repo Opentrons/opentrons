@@ -1,7 +1,7 @@
 import pytest
 from typing import List
 
-from system_server.system.authorize.active_tracker import AuthorizationTracker
+from system_server.connection.active_tracker import AuthorizationTracker
 from system_server.jwt import Registrant
 from datetime import datetime, timedelta
 

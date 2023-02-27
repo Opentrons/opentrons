@@ -38,6 +38,19 @@ def registrant_from_jwt(token: str, signing_key: str) -> Registrant:
     )
 
 
+def expiration_from_jwt(token: str, signing_key: str) -> datetime:
+    """Decode the expiration time from a JWT."""
+    decoded = jwt.decode(
+        jwt=token,
+        key=signing_key,
+        algorithms=[_JWT_ALGORITHM],
+        options={"verify_aud": False},
+    )
+    exp = decoded["exp"]
+    print(f"Timestamp: {exp}")
+    return datetime.fromtimestamp(float(exp))
+
+
 def create_jwt(
     signing_key: str,
     duration: timedelta,
