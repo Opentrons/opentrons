@@ -7,11 +7,16 @@ from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
-from opentrons.hardware_control.types import GripperJawState
+from opentrons.hardware_control.types import (
+    GripperJawState,
+    OT3Mount,
+    InstrumentUpdateStatus,
+    UpdateState,
+)
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.types import Point, Mount
 from opentrons_shared_data.gripper.gripper_definition import (
@@ -26,8 +31,17 @@ from robot_server.instruments.instrument_models import (
     Pipette,
     PipetteData,
     GripperCalibrationData,
+    UpdateRequestModel,
+    MountTypesStr,
+    UpdateProgressStatus,
+    UpdateStatusLink,
 )
-from robot_server.instruments.router import get_attached_instruments
+from robot_server.instruments.router import (
+    get_attached_instruments,
+    update_firmware,
+    get_firmware_update_status,
+)
+from robot_server.service.json_api import RequestModel, ResourceLink
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -53,6 +67,8 @@ def get_sample_pipette_dict(
         "min_volume": 1,
         "max_volume": 1,
         "channels": 1,
+        "fw_version": 123,
+        "fw_update_required": False,
     }
     return pipette_dict
 
@@ -87,7 +103,7 @@ async def test_get_instruments_empty(
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
 #  OT2 vs OT3 tests correclty
-@pytest.mark.xfail
+# @pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
     decoy: Decoy,
@@ -95,18 +111,23 @@ async def test_get_all_attached_instruments(
 ) -> None:
     """It should get data of all attached instruments."""
     decoy.when(ot3_hardware_api.attached_gripper).then_return(
-        {
-            "model": GripperModel.v1,
-            "gripper_id": "GripperID321",
-            "display_name": "my-special-gripper",
-            "state": GripperJawState.UNHOMED,
-            "calibration_offset": GripperCalibrationOffset(
-                offset=Point(x=1, y=2, z=3),
-                source=SourceType.default,
-                status=CalibrationStatus(markedBad=False),
-                last_modified=None,
-            ),
-        }
+        cast(
+            GripperDict,
+            {
+                "model": GripperModel.v1,
+                "fw_version": 123,
+                "fw_update_required": True,
+                "gripper_id": "GripperID321",
+                "display_name": "my-special-gripper",
+                "state": GripperJawState.UNHOMED,
+                "calibration_offset": GripperCalibrationOffset(
+                    offset=Point(x=1, y=2, z=3),
+                    source=SourceType.default,
+                    status=CalibrationStatus(markedBad=False),
+                    last_modified=None,
+                ),
+            },
+        )
     )
     decoy.when(ot3_hardware_api.attached_pipettes).then_return(
         {
@@ -130,6 +151,7 @@ async def test_get_all_attached_instruments(
             instrumentName="p10_multi",
             instrumentModel=PipetteModel("abc"),
             serialNumber="my-pipette-id",
+            firmwareUpdateRequired=False,
             data=PipetteData(
                 channels=1,
                 min_volume=1,
@@ -142,6 +164,7 @@ async def test_get_all_attached_instruments(
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),
             serialNumber="my-other-pipette-id",
+            firmwareUpdateRequired=False,
             data=PipetteData(
                 channels=1,
                 min_volume=1,
@@ -153,6 +176,7 @@ async def test_get_all_attached_instruments(
             instrumentType="gripper",
             instrumentModel=GripperModelStr("gripperV1"),
             serialNumber="GripperID321",
+            firmwareUpdateRequired=True,
             data=GripperData(
                 jawState="unhomed",
                 calibratedOffset=GripperCalibrationData(
@@ -196,10 +220,80 @@ async def test_get_ot2_instruments(
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),
             serialNumber="pipette-id",
+            firmwareUpdateRequired=False,
             data=PipetteData(
                 channels=1,
                 min_volume=1,
                 max_volume=1,
             ),
         )
+    ]
+
+
+@pytest.mark.ot3_only
+async def test_update_instrument_firmware(
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+) -> None:
+    """It should call hardware control's firmware update method."""
+    one_instrument_result = await update_firmware(
+        request_body=RequestModel(
+            data=UpdateRequestModel(mount=cast(MountTypesStr, "left"))
+        ),
+        hardware=ot3_hardware_api,
+    )
+    assert one_instrument_result.content.links == UpdateStatusLink(
+        updateStatus=ResourceLink(href="/instruments/update/status")
+    )
+    assert one_instrument_result.status_code == 200
+    decoy.verify(
+        await ot3_hardware_api.update_instrument_firmware(mounts={OT3Mount.LEFT})
+    )
+
+    all_instruments_result = await update_firmware(
+        request_body=RequestModel(data=None),
+        hardware=ot3_hardware_api,
+    )
+    assert all_instruments_result.content.links == UpdateStatusLink(
+        updateStatus=ResourceLink(href="/instruments/update/status")
+    )
+    assert all_instruments_result.status_code == 200
+    decoy.verify(await ot3_hardware_api.update_instrument_firmware(mounts=None))
+
+
+# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
+#  OT2 vs OT3 tests correclty
+# @pytest.mark.xfail
+@pytest.mark.ot3_only
+async def test_get_firmware_update_status(
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+) -> None:
+    """It should get firmware update status of all attached instruments."""
+    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
+        {
+            OT3Mount.LEFT: InstrumentUpdateStatus(
+                mount=OT3Mount.LEFT,
+                status=UpdateState.updating,
+                progress=75,
+            ),
+            OT3Mount.GRIPPER: InstrumentUpdateStatus(
+                mount=OT3Mount.GRIPPER,
+                status=UpdateState.done,
+                progress=100,
+            ),
+        }
+    )
+    result = await get_firmware_update_status(hardware=ot3_hardware_api)
+    assert result.content.data == [
+        UpdateProgressStatus.construct(
+            mount="left",
+            updateStatus="updating",
+            updateProgress=75,
+        ),
+        UpdateProgressStatus.construct(
+            mount="extension",
+            updateStatus="done",
+            updateProgress=100,
+        ),
     ]

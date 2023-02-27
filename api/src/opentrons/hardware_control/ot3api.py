@@ -428,6 +428,8 @@ class OT3API(
                 progress_updates[mount].update(state, progress)
         return progress_updates
 
+    # TODO (spp): we are only ever going to update one instrument at a time via robot server,
+    #  so maybe we should have this method take only a single instrument (instead of a Set) or None.
     async def update_instrument_firmware(
         self, mounts: Optional[Set[OT3Mount]] = None
     ) -> None:

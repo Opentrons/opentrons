@@ -64,8 +64,11 @@ ONE_CHANNEL = Literal[1]
 
 class InstrumentDict(TypedDict):
     display_name: str
+    # TODO (spp): should this be a string?
+    #  or a special datatype with (major, minor, patch) attributes?
     fw_version: int
     fw_update_required: bool
+    # TODO (spp, question): how are the firmware update fields handled for the OT2?
 
 
 class PipetteDict(InstrumentDict):
