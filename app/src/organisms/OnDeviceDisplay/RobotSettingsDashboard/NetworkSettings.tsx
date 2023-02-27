@@ -52,8 +52,8 @@ export function NetworkSettings({
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const list = useSelector((state: State) => getWifiList(state, robotName))
-  const connectedWifiAuthType =
-    list.find(wifi => wifi.ssid === activeSsid)?.securityType ?? 'none'
+  const connectedWifiAuthType = list.find(wifi => wifi.ssid === activeSsid)
+    ?.securityType
 
   let screenTitle = ''
 
