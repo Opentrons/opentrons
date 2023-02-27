@@ -50,7 +50,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
     <Box backgroundColor={COLORS.white}>
       <Flex
         padding={
-          isOnDevice ? `28px` : `${SPACING.spacing4} ${SPACING.spacing6}`
+          isOnDevice ? '1.75rem' : `${SPACING.spacing4} ${SPACING.spacing6}`
         }
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
