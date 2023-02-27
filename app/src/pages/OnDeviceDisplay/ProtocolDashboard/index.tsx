@@ -41,7 +41,7 @@ import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 // How many pinned protocols fit horizontally on the ODD?
-const PINNED_PROTOCOLS_IN_VIEW = 3
+const PINNED_PROTOCOLS_IN_VIEW = 2
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -145,23 +145,34 @@ export function ProtocolDashboard(): JSX.Element {
   // off the front and move them to the back. From the user's POV, the effect is
   // the same: things that were offscreen to the right are now in view. To
   // simplify further, I have it so they can just keep swiping to keep spinning
-  // the carousel. One could expand on this to add reverse swipes that spin it
-  // the other way. I did not because the current design doesn't have a visual
-  // prompt to show this is possible.
-  if (
-    pinnedProtocols.length > PINNED_PROTOCOLS_IN_VIEW &&
-    swipe.swipeType === 'swipe-left'
-  ) {
-    const inView = pinnedProtocols.slice(0, PINNED_PROTOCOLS_IN_VIEW)
-    const outOfView = pinnedProtocols.slice(PINNED_PROTOCOLS_IN_VIEW)
-    pinnedProtocols = [...outOfView, ...inView]
-    dispatch(
-      updateConfigValue(
-        'protocols.pinnedProtocolIds',
-        pinnedProtocols.map(p => p.id)
+  // the carousel.
+  if (pinnedProtocols.length > PINNED_PROTOCOLS_IN_VIEW) {
+    if (swipe.swipeType === 'swipe-left') {
+      const inView = pinnedProtocols.slice(0, PINNED_PROTOCOLS_IN_VIEW)
+      const outOfView = pinnedProtocols.slice(PINNED_PROTOCOLS_IN_VIEW)
+      pinnedProtocols = [...outOfView, ...inView]
+      dispatch(
+        updateConfigValue(
+          'protocols.pinnedProtocolIds',
+          pinnedProtocols.map(p => p.id)
+        )
       )
-    )
-    swipe.setSwipeType('')
+      swipe.setSwipeType('')
+    } else if (swipe.swipeType === 'swipe-right') {
+      const lastView = pinnedProtocols.slice(0 - PINNED_PROTOCOLS_IN_VIEW)
+      const outOfView = pinnedProtocols.slice(
+        0,
+        pinnedProtocols.length - PINNED_PROTOCOLS_IN_VIEW
+      )
+      pinnedProtocols = [...lastView, ...outOfView]
+      dispatch(
+        updateConfigValue(
+          'protocols.pinnedProtocolIds',
+          pinnedProtocols.map(p => p.id)
+        )
+      )
+      swipe.setSwipeType('')
+    }
   }
 
   return (
