@@ -1459,7 +1459,7 @@ class OT3API(
         instrument.current_tiprack_diameter = tiprack_diameter
 
     def set_working_volume(
-        self, mount: Union[top_types.Mount, OT3Mount], tip_volume: int
+        self, mount: Union[top_types.Mount, OT3Mount], tip_volume: float
     ) -> None:
         instrument = self._pipette_handler.get_pipette(OT3Mount.from_mount(mount))
         self._log.info(

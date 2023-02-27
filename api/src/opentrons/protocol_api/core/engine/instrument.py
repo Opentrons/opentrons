@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
     WellOrigin,
     WellOffset,
 )
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -454,10 +455,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.pipettes.get_maximum_volume(self._pipette_id)
 
     def get_current_volume(self) -> float:
-        return self._engine_client.state.pipettes.get_aspirated_volume(self._pipette_id)
+        try:
+            current_volume = self._engine_client.state.pipettes.get_aspirated_volume(
+                self._pipette_id
+            )
+        except TipNotAttachedError:
+            current_volume = None
+
+        return current_volume or 0
 
     def get_available_volume(self) -> float:
-        return self._engine_client.state.pipettes.get_available_volume(self._pipette_id)
+        try:
+            available_volume = self._engine_client.state.pipettes.get_available_volume(
+                self._pipette_id
+            )
+        except TipNotAttachedError:
+            available_volume = None
+
+        return available_volume or 0
 
     def get_hardware_state(self) -> PipetteDict:
         """Get the current state of the pipette hardware as a dictionary."""
@@ -467,7 +482,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.tips.get_pipette_channels(self._pipette_id)
 
     def has_tip(self) -> bool:
-        return self.get_hardware_state()["has_tip"]
+        return (
+            self._engine_client.state.pipettes.get_attached_tip(self._pipette_id)
+            is not None
+        )
 
     def get_return_height(self) -> float:
         return self._engine_client.state.pipettes.get_return_tip_scale(self._pipette_id)
