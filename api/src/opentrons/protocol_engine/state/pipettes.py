@@ -369,7 +369,7 @@ class PipetteView(HasState[PipetteState]):
             return current_deck_point.deck_point
         return None
 
-    def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:
+    def get_aspirated_volume(self, pipette_id: str) -> float:
         """Get the currently aspirated volume of a pipette by ID."""
         try:
             aspirate_volume = self._state.aspirated_volume_by_id[pipette_id]
@@ -378,7 +378,7 @@ class PipetteView(HasState[PipetteState]):
                 f"Pipette {pipette_id} not found; unable to get current volume."
             ) from e
 
-        if self._state.attached_tip_labware_by_id.get(pipette_id) is None:
+        if aspirate_volume is None:
             raise errors.TipNotAttachedError("Pipette has no tip attached.")
 
         return aspirate_volume

@@ -1,5 +1,5 @@
 """Pipetting execution handler."""
-from typing import Optional, cast
+from typing import cast
 
 import pytest
 from decoy import Decoy
@@ -14,6 +14,7 @@ from opentrons.protocol_engine.execution.pipetting import (
     VirtualPipettingHandler,
     create_pipetting_handler,
 )
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 
 
 @pytest.fixture
@@ -67,7 +68,6 @@ async def test_create_pipette_handler(
     [
         (0.0, True, True),
         (1.0, True, True),
-        (None, True, False),
         (1.0, False, False),
     ],
 )
@@ -76,7 +76,7 @@ def test_get_is_ready_to_aspirate(
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
     hardware_subject: HardwarePipettingHandler,
-    aspirated_volume: Optional[float],
+    aspirated_volume: float,
     ready_to_aspirate: bool,
     expected: bool,
 ) -> None:
@@ -235,15 +235,15 @@ def test_get_is_ready_to_aspirate_virtual(
 
     decoy.when(
         mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
-    ).then_return(None)
+    ).then_raise(TipNotAttachedError())
 
     assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id") is False
 
     decoy.when(
-        mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
+        mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id-123")
     ).then_return(0)
 
-    assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id") is True
+    assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is True
 
 
 async def test_aspirate_in_place_virtual(mock_state_view: StateView) -> None:

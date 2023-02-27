@@ -456,11 +456,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def get_current_volume(self) -> float:
         try:
-            current_volume = (
-                self._engine_client.state.pipettes.get_aspirated_volume(
-                    self._pipette_id
-                )
-                or 0
+            current_volume = self._engine_client.state.pipettes.get_aspirated_volume(
+                self._pipette_id
             )
         except TipNotAttachedError:
             current_volume = 0

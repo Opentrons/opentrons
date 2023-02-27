@@ -215,22 +215,22 @@ def test_get_pipette_aspirated_volume() -> None:
     """It should get the aspirate volume for a pipette."""
     subject = get_pipette_view(
         aspirated_volume_by_id={"pipette-id": 42, "pipette-id-none": None},
-        tip_volume_by_id={"pipette-id": 1337, "pipette-id-none": 1337},
     )
 
     assert subject.get_aspirated_volume("pipette-id") == 42
 
-    assert subject.get_aspirated_volume("pipette-id-none") is None
+    with pytest.raises(TipNotAttachedError):
+        subject.get_aspirated_volume("pipette-id-none")
 
 
-def test_pipette_volume_raises_no_tip_attached() -> None:
+def test_pipette_volume_raises_no_pipette_attached() -> None:
     """get_aspirated_volume should raise if the given pipette doesn't exist."""
     subject = get_pipette_view(
         aspirated_volume_by_id={"pipette-id": 42, "pipette-id-none": None}
     )
 
-    with pytest.raises(errors.TipNotAttachedError):
-        subject.get_aspirated_volume("pipette-id")
+    with pytest.raises(errors.PipetteNotLoadedError):
+        subject.get_aspirated_volume("pipette-id-123")
 
 
 def test_get_pipette_working_volume() -> None:
@@ -281,8 +281,8 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none() -> None:
 def test_get_pipette_available_volume() -> None:
     """It should get the available volume for a pipette."""
     subject = get_pipette_view(
-        tip_volume_by_id={"pipette-id": 100, "pipette-id-none": 100},
-        aspirated_volume_by_id={"pipette-id": 58, "pipette-id-none": None},
+        tip_volume_by_id={"pipette-id": 100},
+        aspirated_volume_by_id={"pipette-id": 58},
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
                 min_volume=1,
@@ -310,8 +310,6 @@ def test_get_pipette_available_volume() -> None:
     )
 
     assert subject.get_available_volume("pipette-id") == 42
-
-    assert subject.get_available_volume("pipette-id-none") is None
 
 
 def test_get_attached_tip_labware_by_id() -> None:
