@@ -92,7 +92,6 @@ async def test_save(
     file_hasher: FileHasher,
 ) -> None:
     """It should compute a single file protocol source."""
-
     buffered_main_file = BufferedFile(
         name="protocol.py",
         contents=b"# hello world",

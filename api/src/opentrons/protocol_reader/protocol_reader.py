@@ -42,6 +42,7 @@ class ProtocolReader:
             file_identifier: File identifier. Default impl. used if None.
             role_analyzer: File role analyzer. Default impl. used if None.
             file_format_validator: File format validator. Default impl. used if None.
+            file_hasher: File hasher. Default impl. used if None.
         """
         self._file_reader_writer = file_reader_writer or FileReaderWriter()
         self._file_identifier = file_identifier or FileIdentifier()
