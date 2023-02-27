@@ -158,7 +158,7 @@ const DisplayConnectedNetworkInfo = ({
   ssid,
   authType,
 }: DisplayConnectedNetworkInfoProps): JSX.Element => {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
@@ -176,7 +176,7 @@ const DisplayConnectedNetworkInfo = ({
           lineHeight="1.8rem"
           fontWeight="700"
         >
-          {ssid ?? 'No data'}
+          {ssid ?? t('shared:no_data')}
         </StyledText>
       </Flex>
       <Flex
