@@ -49,7 +49,6 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     InstrumentProbeType,
     MotorStatus,
-    OT3SubSystem,
     PipetteSubType,
     UpdateStatus,
 )

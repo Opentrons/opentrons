@@ -3,7 +3,6 @@ import logging
 from dataclasses import dataclass
 from typing import (
     NamedTuple,
-    Optional,
     cast,
     Tuple,
     Union,

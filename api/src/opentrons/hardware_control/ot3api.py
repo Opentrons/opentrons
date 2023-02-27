@@ -46,7 +46,6 @@ from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 from .util import use_or_initialize_loop, check_motion_bounds
 
 from .instruments.ot3.pipette import (
-    Pipette,
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip

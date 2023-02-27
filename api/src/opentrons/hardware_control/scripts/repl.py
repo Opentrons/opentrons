@@ -29,15 +29,12 @@ from subprocess import run  # noqa: E402
 from typing import Union, Type, Any  # noqa: E402
 
 from opentrons.types import Mount, Point  # noqa: E402
-from opentrons.hardware_control.types import (
-    Axis,
-    CriticalPoint,
-    OT3SubSystem,
-)  # noqa: E402
+from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
 from opentrons.config import feature_flags as ff  # noqa: E402
 from opentrons.hardware_control.types import (  # noqa: E402
     OT3Axis,
     OT3Mount,
+    OT3SubSystem,
     GripperProbe,
 )
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
