@@ -65,12 +65,35 @@ class DeviceInfoResponse(utils.BinarySerializable):
     revision: OptionalRevisionField = OptionalRevisionField("", "", "")
 
 
+@dataclass
+class EnterBootloaderRequest(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.enter_bootloader_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class EnterBootloaderResponse(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.enter_bootloader_response
+    )
+    success = utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = utils.UInt16Field(1)
+
+
 BinaryMessageDefinition = Union[
     Echo,
     Ack,
     AckFailed,
     DeviceInfoRequest,
     DeviceInfoResponse,
+    EnterBootloaderRequest,
+    EnterBootloaderResponse,
 ]
 
 
