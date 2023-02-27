@@ -433,9 +433,9 @@ class OT3API(
     ) -> None:
         """Update the firmware on one or more instruments.
 
-        If no mounts is specified, updates all instruments (pipettes, gripper) attached
+        If no mount is specified, updates all firmware for subsystems attached and (pipettes, gripper) and (head, gantry-x, gantry-y).
         """
-        mounts = mounts or {OT3Mount.LEFT, OT3Mount.RIGHT, OT3Mount.GRIPPER}
+        mounts = mounts or set()
         subsystems = {subsystem_from_mount(mount) for mount in mounts}
         async for update_status in self.update_firmware(subsystems):
             mod_log.debug(update_status)
