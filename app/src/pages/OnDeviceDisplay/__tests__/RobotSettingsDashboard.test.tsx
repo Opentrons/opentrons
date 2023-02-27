@@ -9,8 +9,9 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import {
-  NetworkSettings,
   DeviceReset,
+  DisplaySleepSettings,
+  NetworkSettings,
   RobotSystemVersion,
 } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
@@ -18,8 +19,11 @@ import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')
-jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
 jest.mock('../hooks/useNetworkConnection')
+jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DisplaySleepSettings'
+)
 jest.mock(
   '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
 )
@@ -34,6 +38,9 @@ const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
+const mockDisplaySleepSettings = DisplaySleepSettings as jest.MockedFunction<
+  typeof DisplaySleepSettings
+>
 const mockNetworkSettings = NetworkSettings as jest.MockedFunction<
   typeof NetworkSettings
 >
@@ -58,6 +65,9 @@ describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
+    mockDisplaySleepSettings.mockReturnValue(
+      <div>Mock Display Sleep Settings</div>
+    )
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
@@ -106,7 +116,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Display Sleep Settings')
     fireEvent.click(button)
-    getByText('Display Sleep Settings')
+    getByText('Mock Display Sleep Settings')
   })
 
   it('should render component when tapping display brightness', () => {

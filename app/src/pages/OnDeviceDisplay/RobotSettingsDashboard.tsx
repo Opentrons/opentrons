@@ -270,7 +270,6 @@ const SettingsContent = ({
   switch (currentOption) {
     case 'RobotName':
       return <RobotName setCurrentOption={setCurrentOption} />
-
     case 'RobotSystemVersion':
       return (
         <RobotSystemVersion

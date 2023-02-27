@@ -6,6 +6,7 @@ import type {
   ConfigV12,
   ConfigV13,
   ConfigV14,
+  ConfigV15,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V12: ConfigV12 = {
@@ -70,5 +71,15 @@ export const MOCK_CONFIG_V14: ConfigV14 = {
   protocols: {
     ...MOCK_CONFIG_V13.protocols,
     pinnedProtocolIds: [],
+  },
+}
+
+export const MOCK_CONFIG_V15: ConfigV15 = {
+  ...MOCK_CONFIG_V14,
+  version: 15,
+  onDeviceDisplaySettings: {
+    sleepMs: 60 * 1000 * 60 * 24 * 7,
+    brightness: 4,
+    textSize: 1,
   },
 }
