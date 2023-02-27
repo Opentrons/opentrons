@@ -8,12 +8,11 @@ from opentrons_hardware.firmware_update.run import RunUSBUpdate
 from opentrons_hardware.drivers.binary_usb import (
     SerialUsbDriver,
     BinaryMessenger,
+    build_rear_panel_messenger,
 )
 
 logger = logging.getLogger(__name__)
 
-RP_VID = 0x04D8
-RP_PID = 0xEF01
 
 LOG_CONFIG = {
     "version": 1,
@@ -41,9 +40,8 @@ async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     retry_count = args.retry_count
     timeout_seconds = args.timeout_seconds
-
-    driver: SerialUsbDriver = SerialUsbDriver(asyncio.get_running_loop())
-    driver.find_and_connect(RP_VID, RP_PID)
+    
+    driver: SerialUsbDriver = build_rear_panel_messenger(asyncio.get_running_loop())
 
     messenger = BinaryMessenger(driver)
     updater = RunUSBUpdate(
