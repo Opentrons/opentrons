@@ -19,12 +19,7 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
-import { getBuildrootUpdateInfo } from '../../../redux/buildroot'
-import {
-  getShellUpdateState,
-  downloadShellUpdate,
-  applyShellUpdate,
-} from '../../../redux/shell'
+import { getShellUpdateState } from '../../../redux/shell'
 
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
@@ -50,15 +45,9 @@ export function RobotSystemVersion({
   const [showModal, setShowModal] = React.useState<boolean>(false)
 
   const updateState = useSelector(getShellUpdateState)
-  const { downloaded, downloading, error, info: updateInfo } = updateState
+  const { info: updateInfo } = updateState
   const version = updateInfo?.version ?? ''
-  const releaseNotes = updateInfo?.releaseNotes
-
-  // const updateInfo = useSelector(getBuildrootUpdateInfo)
-
-  console.log('version', version)
-  console.log(downloaded)
-  console.log(downloading)
+  const releaseNotes = updateInfo?.releaseNotes ?? ''
 
   return (
     <>
