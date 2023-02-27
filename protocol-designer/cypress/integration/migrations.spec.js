@@ -1,6 +1,7 @@
 import 'cypress-file-upload'
 import cloneDeep from 'lodash/cloneDeep'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
+const semver = require('semver')
 
 // TODO: (sa 2022-03-31: change these migration fixtures to v6 protocols once the liquids key is added to PD protocols
 // https://github.com/Opentrons/opentrons/issues/9852
@@ -141,6 +142,13 @@ describe('Protocol fixtures migrate and match snapshots', () => {
               const blobText = await blob.text()
               const savedFile = JSON.parse(blobText)
               const expectedFile = cloneDeep(expectedExportProtocol)
+              const version = semver.parse(
+                savedFile.designerApplication.version
+              )
+              assert(
+                version != null,
+                `PD version ${version} is not valid semver`
+              )
               ;[savedFile, expectedFile].forEach(f => {
                 // Homogenize fields we don't want to compare
                 f.metadata.lastModified = 123
