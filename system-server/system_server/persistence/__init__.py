@@ -14,11 +14,15 @@ from .system_uuid import get_system_uuid
 
 from system_server.app_state import AppState, AppStateAccessor, get_app_state
 from system_server.settings import get_settings
+from system_server.connection import AuthorizationTracker
 
 
 _sql_engine_accessor = AppStateAccessor[sqlalchemy.engine.Engine]("sql_engine")
 _persistence_directory_accessor = AppStateAccessor[Path]("persistence_directory")
 _uuid_accessor = AppStateAccessor[UUID]("system_uuid")
+_authorization_tracker_accessor = AppStateAccessor[AuthorizationTracker](
+    "authorization_tracker"
+)
 
 _DATABASE_FILE: Final = "system_server.db"
 _UUID_FILE: Final = "system_server_uuid"
@@ -29,6 +33,7 @@ _log = logging.getLogger(__name__)
 _persistence_dir_lock = Lock()
 _sql_lock = Lock()
 _uuid_lock = Lock()
+_authorization_tracker_lock = Lock()
 
 
 async def get_persistence_directory(
@@ -90,10 +95,25 @@ async def get_persistent_uuid(
         return system_uuid
 
 
+async def get_authorization_tracker(
+    app_state: AppState = Depends(get_app_state),
+) -> AuthorizationTracker:
+    """Return a singleton authorization tracker for the server instance."""
+    async with _authorization_tracker_lock:
+        tracker = _authorization_tracker_accessor.get_from(app_state)
+
+        if tracker is None:
+            tracker = AuthorizationTracker()
+            _authorization_tracker_accessor.set_on(app_state, tracker)
+
+        return tracker
+
+
 __all__ = [
     "get_persistence_directory",
     "get_sql_engine",
     "get_persistent_uuid",
+    "get_authorization_tracker",
     "registration_table",
     "migration_table",
 ]
