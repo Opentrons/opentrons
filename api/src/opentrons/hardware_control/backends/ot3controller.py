@@ -971,7 +971,7 @@ class OT3Controller:
         threshold_pascals: float,
         log_pressure: bool = True,
         sensor_id: SensorId = SensorId.S0,
-    ) -> Dict[NodeId, float]:
+    ) -> None:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
         tool = sensor_node_for_mount(OT3Mount(mount.value))
         positions = await liquid_probe(
@@ -988,7 +988,6 @@ class OT3Controller:
         for node, point in positions.items():
             self._position.update({node: point[0]})
             self._encoder_position.update({node: point[1]})
-        return self._position
 
     async def capacitive_probe(
         self,

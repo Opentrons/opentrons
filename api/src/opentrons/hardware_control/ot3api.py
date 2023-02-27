@@ -1733,8 +1733,7 @@ class OT3API(
         starting_position = await self.current_position_ot3(
             mount=mount, critical_point=CriticalPoint.TIP, refresh=True
         )
-
-        machine_pos_node_id = await self._backend.liquid_probe(
+        await self._backend.liquid_probe(
             mount,
             probe_settings.max_z_distance,
             probe_settings.mount_speed,
@@ -1742,13 +1741,12 @@ class OT3API(
             probe_settings.sensor_threshold_pascals,
             probe_settings.log_pressure,
         )
-        machine_pos = axis_convert(machine_pos_node_id, 0.0)
-        final_position = deck_from_machine(
-            machine_pos,
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
+
+        # get final position in deck coordinates
+        final_position = await self.current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
         )
-        # find distance traveled in deck coordinates
+
         z_distance_traveled = (
             starting_position[mount_axis] - final_position[mount_axis]
         )
