@@ -298,7 +298,7 @@ class RunUSBUpdate:
         self._retry_count = retry_count
         self._timeout_seconds = timeout_seconds
 
-    async def run_updates(self) -> bool:
+    async def run_update(self) -> bool:
         """Perform a firmware update on a connected USB device."""
         vid, pid, baudrate, timeout = self._messenger.get_driver().get_connection_info()
         for i in range(self._retry_count):
