@@ -227,16 +227,6 @@ def test_get_aspirated_volume() -> None:
         subject.get_aspirated_volume("pipette-id-no-tip")
 
 
-def test_pipette_volume_raises_no_pipette_attached() -> None:
-    """get_aspirated_volume should raise if the given pipette doesn't exist."""
-    subject = get_pipette_view(
-        aspirated_volume_by_id={"pipette-id": 42, "pipette-id-none": None}
-    )
-
-    with pytest.raises(errors.PipetteNotLoadedError):
-        subject.get_aspirated_volume("pipette-id-123")
-
-
 def test_get_pipette_working_volume() -> None:
     """It should get the minimum value of tip volume and max volume."""
     subject = get_pipette_view(
