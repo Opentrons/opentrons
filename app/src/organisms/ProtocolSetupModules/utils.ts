@@ -50,6 +50,7 @@ interface UnmatchedModuleResults {
 }
 
 // get requested protocol module ids that do not map to a robot-attached module of the requested model
+// some logic copied from useUnmatchedModulesForProtocol
 export function getUnmatchedModulesForProtocol(
   attachedModules: AttachedModule[],
   protocolModulesInfo: ProtocolModuleInfo[]
