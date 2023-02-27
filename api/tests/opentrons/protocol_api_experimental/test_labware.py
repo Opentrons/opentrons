@@ -51,7 +51,7 @@ def test_labware_uri(
     """It should get its definition's URI from the engine."""
     decoy.when(
         engine_client.state.labware.get_definition_uri(labware_id="labware-id")
-    ).then_return("42")
+    ).then_return(dev_types.LabwareUri("42"))
     assert subject.uri == "42"
 
 

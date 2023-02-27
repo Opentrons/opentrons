@@ -43,6 +43,7 @@ from .module_core import (
 )
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
+from . import deck_conflict
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
@@ -141,6 +142,30 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             version=version,
             display_name=label,
         )
+
+        # FIXME(mm, 2023-02-21):
+        #
+        # We're wrongly checking for deck conflicts *after* we've already loaded the
+        # labware into the ProtocolEngine. If it turns out there is a conflict,
+        # and this check raises, it will leave this object and its ProtocolEngine
+        # in a confusing inconsistent state.
+        #
+        # I expect we can get away with this in practice a lot of the time because
+        # exceptions in Python protocols are mostly treated as fatal, anyway.
+        # Users rarely catch them.
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_labware_id=load_result.labwareId,
+            # It's important that we don't fetch these IDs from Protocol Engine, and
+            # use our own bookkeeping instead. If we fetched these IDs from Protocol
+            # Engine, it would have leaked state from Labware Position Check in the
+            # same HTTP run.
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
+        )
+
         labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
@@ -185,6 +210,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             if drop_offset
             else None
         )
+
+        # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
+        # when move_labware() support is no longer experimental.
+
         self._engine_client.move_labware(
             labware_id=labware_core.labware_id,
             new_location=to_location,
@@ -249,6 +278,20 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             engine_client=self._engine_client,
             api_version=self.api_version,
             sync_module_hardware=SynchronousAdapter(selected_hardware),
+        )
+
+        # FIXME(mm, 2023-02-21):
+        # We're wrongly doing this conflict check *after* we've already loaded the
+        # module into the ProtocolEngine. See FIXME comment in self.load_labware().
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_module_id=result.moduleId,
+            # It's important that we don't fetch these IDs from Protocol Engine.
+            # See comment in self.load_labware().
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
         )
 
         self._module_cores_by_id[module_core.module_id] = module_core
