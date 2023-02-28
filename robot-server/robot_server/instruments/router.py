@@ -41,11 +41,19 @@ from ..errors import ErrorDetails
 instruments_router = APIRouter()
 
 
-class PeripheralNotFound(ErrorDetails):
-    """An error if a specified peripheral is not found."""
+class InstrumentNotFound(ErrorDetails):
+    """An error if no instrument is found on the given mount."""
 
     id: Literal["PeripheralNotFound"] = "PeripheralNotFound"
     title: str = "Peripheral Not Found"
+
+
+class NoUpdateAvailable(ErrorDetails):
+    """An error if no update is available for the specified mount."""
+
+    id: Literal["NoUpdateAvailable"] = "NoUpdateAvailable"
+    title: str = "No Update Available"
+
 
 
 class UpdateInProgress(ErrorDetails):
@@ -183,12 +191,22 @@ async def update_firmware(
             status.HTTP_403_FORBIDDEN
         ) from e
 
+    # TODO: Check that there isn't already an update in progress
+    
     requested_mount = request_body.data
     mount_to_update = (
         MountType.to_ot3_mount(requested_mount.mount)
         if requested_mount is not None
         else None
     )
+    # TODO: Check that there's an instrument attached on the mount
+
+    # TODO: Check that there's actually an update available for this mount
+    #  else throw `NoUpdateAvailable` error. The hardware controller skips the update
+    #  if the instrument is already up-to-date. So a wrong mount could end up
+    #  confusing a client since there won't be any clear indication that it's wrong.
+
+
     await ot3_hardware.update_instrument_firmware(
         mounts={mount_to_update} if mount_to_update else None
     )
