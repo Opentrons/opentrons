@@ -542,12 +542,12 @@ async def move_to_arched_ot3(
         await api.move_to(mount=mount, abs_position=p, speed=speed)
 
 
-async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
+async def get_capacitance_ot3(api: OT3API, mount: OT3Mount, sensor_id: SensorId) -> float:
     """Get the capacitance reading from the pipette."""
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
-    capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
+    capacitive = sensor_types.CapacitiveSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
         api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
