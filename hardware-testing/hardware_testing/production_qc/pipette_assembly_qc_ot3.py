@@ -44,6 +44,8 @@ PRESSURE_DATA_HEADER = ["PHASE", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7"
 
 SPEED_REDUCTION_PERCENTAGE = 0.3
 
+MULTI_CHANNEL_1_OFFSET = Point(y=9 * 7 * 0.5)
+
 # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
 #       so here we cache these readings, and append them to the CSV in the end
 PRESSURE_DATA_CACHE = []
@@ -140,8 +142,19 @@ def _get_operator_answer_to_question(question: str) -> bool:
     return "y" in user_inp
 
 
+def _get_tips_used_for_droplet_test(
+    pipette_channels: int, num_trials: int
+) -> List[str]:
+    if pipette_channels == 1:
+        tip_columns = COLUMNS[:num_trials]
+        return [f"{c}1" for c in tip_columns]
+    elif pipette_channels == 8:
+        return [f"A{r}" for r in range(num_trials)]
+    raise RuntimeError(f"unexpected number of channels: {pipette_channels}")
+
+
 def _get_ideal_labware_locations(
-    test_config: TestConfig, pipette_volume: int
+    test_config: TestConfig, pipette_volume: int, pipette_channels: int
 ) -> LabwareLocations:
     tip_rack_liquid_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack_liquid,
@@ -166,6 +179,9 @@ def _get_ideal_labware_locations(
     fixture_loc_ideal = fixture_slot_pos + pressure_fixture_a1_location(
         test_config.fixture_side
     )
+    if pipette_channels == 8:
+        reservoir_loc_ideal += MULTI_CHANNEL_1_OFFSET
+        trash_loc_ideal += MULTI_CHANNEL_1_OFFSET
     return LabwareLocations(
         tip_rack_liquid=tip_rack_liquid_loc_ideal,
         tip_rack_fixture=tip_rack_fixture_loc_ideal,
@@ -877,7 +893,7 @@ async def _main(test_config: TestConfig) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=test_config.simulate,
         pipette_left="p1000_single_v3.4",
-        pipette_right="p1000_single_v3.4",
+        pipette_right="p1000_multi_v3.4",
     )
     # FIXME: remove reducing speeds/accelerations once stall detection bug is fixed
     await _reduce_speeds_and_accelerations(
@@ -895,8 +911,9 @@ async def _main(test_config: TestConfig) -> None:
 
         # setup our labware locations
         pipette_volume = int(pipette.working_volume)
+        pipette_channels = int(pipette.channels.as_int)
         IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(
-            test_config, pipette_volume
+            test_config, pipette_volume, pipette_channels
         )
         CALIBRATED_LABWARE_LOCATIONS = LabwareLocations(
             trash=None,
@@ -951,8 +968,9 @@ async def _main(test_config: TestConfig) -> None:
             for f in fields(config):
                 csv_cb.write([t.value, f.name, getattr(config, f.name)])
 
-        tip_columns = COLUMNS[: test_config.num_trials]
-        tips_used = [f"{c}1" for c in tip_columns]
+        tips_used = _get_tips_used_for_droplet_test(
+            pipette_channels, test_config.num_trials
+        )
 
         # run the test
         csv_cb.write(["----"])
