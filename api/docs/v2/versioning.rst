@@ -36,7 +36,11 @@ Version specification is required by the system. If you do not specify a target 
 
 The version you specify determines the features and behaviors available to your protocol. For example, support for the Heater-Shaker Module was added in version 2.13, so you can't specify a lower version and then call ``HeaterShakerContext`` methods without causing an error. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
 
-In general, consider what features you need in your protocol and keep the API level as low as possible. Using the lowest API version is good protocol design, as it helps the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software.
+When choosing an API level, consider what features you need and how widely you plan to share your protocol. On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
+
+.. note::
+
+    Python protocols with an ``apiLevel`` of 2.14 can't currently be simulated with the ``opentrons_simulate`` command-line tool, the :py:func:`opentrons.simulate.simulate` function, or the :py:func:`opentrons.simulate.get_protocol_api` function. If your protocol doesn't rely on new functionality added in version 2.14, use a lower ``apiLevel``. For protocols that require 2.14, analyze your protocol with the Opentrons App instead.
 
 
 Maximum Supported Versions
@@ -97,6 +101,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 |     2.14    |          6.3.0               |
 +-------------+------------------------------+
+
+.. _version-notes:
 
 Changes in API Versions
 -----------------------
