@@ -3,7 +3,14 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { ApplyHistoricOffsets } from '..'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
+
+jest.mock('../../../redux/config')
+
+const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
+  typeof getIsLabwareOffsetCodeSnippetsOn
+>
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',
@@ -115,5 +122,14 @@ describe('ApplyHistoricOffsets', () => {
       'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
     )
     expect(queryByText('location')).toBeNull()
+  })
+
+  it('renders tabbed offset data with snippets when config option is selected', () => {
+    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('View data').click()
+    expect(getByText('Table View')).toBeTruthy()
+    expect(getByText('Jupyter Notebook')).toBeTruthy()
+    expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
   })
 })

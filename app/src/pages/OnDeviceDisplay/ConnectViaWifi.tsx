@@ -17,13 +17,15 @@ import {
   CONNECT,
   JOIN_OTHER,
 } from '../../organisms/Devices/RobotSettings/ConnectNetwork/constants'
-import { DisplayWifiList } from '../../organisms/SetupNetwork/DisplayWifiList'
-import { SetWifiSsid } from '../../organisms/SetupNetwork/SetWifiSsid'
-import { SelectAuthenticationType } from '../../organisms/SetupNetwork/SelectAuthenticationType'
-import { SetWifiCred } from '../../organisms/SetupNetwork/SetWifiCred'
-import { ConnectingNetwork } from '../../organisms/SetupNetwork/ConnectingNetwork'
-import { SucceededToConnect } from '../../organisms/SetupNetwork/SucceededToConnect'
-import { FailedToConnect } from '../../organisms/SetupNetwork/FailedToConnect'
+import {
+  ConnectingNetwork,
+  DisplayWifiList,
+  FailedToConnect,
+  SetWifiSsid,
+  SelectAuthenticationType,
+  SetWifiCred,
+  WifiConnectionDetails,
+} from '../../organisms/OnDeviceDisplay/SetupNetwork'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
@@ -133,7 +135,7 @@ export function ConnectViaWifi(): JSX.Element {
       currentRequestState.status === RobotApi.SUCCESS
     ) {
       return (
-        <SucceededToConnect
+        <WifiConnectionDetails
           ssid={changeState.ssid}
           authType={selectedAuthType}
         />

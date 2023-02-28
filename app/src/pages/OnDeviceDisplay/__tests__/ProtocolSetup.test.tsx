@@ -5,45 +5,56 @@ import { when, resetAllWhenMocks } from 'jest-when'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
+import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
   useRunCreatedAtTimestamp,
-  useUnmatchedModulesForProtocol,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
+import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunControls,
   useRunStatus,
 } from '../../../organisms/RunTimeControl/hooks'
-import { getLocalRobot } from '../../../redux/discovery'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { ProtocolSetup } from '../ProtocolSetup'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { State } from '../../../redux/types'
 
+jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
+jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+jest.mock('../../../organisms/ProtocolSetupModules')
+jest.mock('../../../organisms/ProtocolSetupModules/utils')
 jest.mock('../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../redux/discovery')
 
+const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
+  typeof getDeckDefFromRobotType
+>
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
 const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
   typeof useRunCreatedAtTimestamp
 >
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
+const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
+  typeof getProtocolModulesInfo
 >
-const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof useUnmatchedModulesForProtocol
+const mockProtocolSetupModules = ProtocolSetupModules as jest.MockedFunction<
+  typeof ProtocolSetupModules
+>
+const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jest.MockedFunction<
+  typeof getUnmatchedModulesForProtocol
 >
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
@@ -79,15 +90,9 @@ const mockPlay = jest.fn()
 describe('ProtocolSetup', () => {
   beforeEach(() => {
     when(mockUseAttachedModules).calledWith().mockReturnValue([])
-    when(mockGetLocalRobot)
-      .calledWith({} as State)
-      .mockReturnValue(mockConnectedRobot)
-    when(mockUseUnmatchedModulesForProtocol)
-      .calledWith(mockConnectedRobot.name, RUN_ID)
-      .mockReturnValue({
-        missingModuleIds: [],
-        remainingAttachedModules: [],
-      })
+    mockProtocolSetupModules.mockReturnValue(
+      <div>Mock ProtocolSetupModules</div>
+    )
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     when(mockUseRunControls)
       .calledWith(RUN_ID)
@@ -111,6 +116,21 @@ describe('ProtocolSetup', () => {
     when(mockUseRunCreatedAtTimestamp)
       .calledWith(RUN_ID)
       .mockReturnValue(CREATED_AT)
+    when(mockGetProtocolModulesInfo)
+      .calledWith(
+        ({
+          modules: [],
+          labware: [],
+        } as unknown) as CompletedProtocolAnalysis,
+        ot3StandardDeckDef as any
+      )
+      .mockReturnValue([])
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith([], [])
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
+    when(mockGetDeckDefFromRobotType)
+      .calledWith('OT-3 Standard')
+      .mockReturnValue(ot3StandardDeckDef as any)
   })
 
   afterEach(() => {
@@ -119,11 +139,12 @@ describe('ProtocolSetup', () => {
   })
 
   it('should render text, image, and buttons', () => {
-    const [{ getByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
     getByText('Prepare to Run')
     getByText(`Run: ${CREATED_AT}`)
     getByText(`Status: ${RUN_STATUS_IDLE}`)
     getByText('Instruments')
+    expect(queryByText('Modules')).toBeNull()
     getByText('Labware')
     getByText('Labware Position Check')
     getByText('Liquids')
@@ -143,5 +164,18 @@ describe('ProtocolSetup', () => {
     expect(queryByText('Mock ConfirmCancelModal')).toBeNull()
     getByRole('button', { name: 'close' }).click()
     getByText('Mock ConfirmCancelModal')
+  })
+
+  it('should launch protocol setup modules screen when click modules', () => {
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue(mockRobotSideAnalysis)
+    when(mockGetProtocolModulesInfo)
+      .calledWith(mockRobotSideAnalysis, ot3StandardDeckDef as any)
+      .mockReturnValue([])
+    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
+    queryByText('Modules')?.click()
+    getByText('Mock ProtocolSetupModules')
   })
 })

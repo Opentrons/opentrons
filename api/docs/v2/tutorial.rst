@@ -55,20 +55,19 @@ For this tutorial, you’ll write very little Python outside of the ``run()`` fu
 Metadata
 ^^^^^^^^
 
-Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version <version-table>` of the API the protocol requires. If you plan to share your protocols, you should specify the lowest API version that includes all the features your protocol uses. For this tutorial, you can just use the latest version of the API:
+Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version <version-table>` of the API the protocol requires. The `scripts <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/>`_ for this tutorial were validated against API version 2.13, so specify:
 
 .. code-block:: python
-    :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.13'}
 
-You can use this dictionary to include any other information you like. The fields ``protocolName``, ``description``, and ``author`` are all displayed in the Opentrons App, so it’s a good idea to expand your metadata dictionary to include them:
+You can include any other information you like in the metadata dictionary. The fields ``protocolName``, ``description``, and ``author`` are all displayed in the Opentrons App, so it’s a good idea to expand the dictionary to include them:
 
 .. code-block:: python
     :substitutions:
 
     metadata = {
-        'apiLevel': '|apiLevel|',
+        'apiLevel': '2.13',
         'protocolName': 'Serial Dilution Tutorial',
         'description': '''This protocol is the outcome of following the 
                        Python Protocol API Tutorial located at 

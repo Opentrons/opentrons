@@ -8,6 +8,8 @@ import {
 import interact from 'interactjs'
 import type PointerEvent from 'interactjs'
 
+const HOLD_DURATION_MS = 1000
+
 // Note kj 12/05/2022
 // ODD needs setIsLongPressed since when a user use long press, ODD app needs to show overflow menu.
 // Then if a user takes clicking outside action, the ODD app needs to reset the isLongPressed.
@@ -40,7 +42,7 @@ export const useLongPress = (): UseLongPressResult => {
     if (interactiveRef?.current != null) {
       interact((interactiveRef.current as unknown) as HTMLElement)
         .pointerEvents({
-          holdDuration: 600,
+          holdDuration: HOLD_DURATION_MS,
         })
         .on('hold', (event: PointerEvent) => {
           setIsLongPressed(isLongPressed => !isLongPressed)
