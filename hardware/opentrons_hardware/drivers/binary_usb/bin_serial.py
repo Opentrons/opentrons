@@ -1,6 +1,7 @@
 """The usb binary protocol over serial transport."""
 
 import serial  # type: ignore[import]
+from serial.tools.list_ports import comports
 from functools import partial
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     BinaryMessageDefinition,
