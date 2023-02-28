@@ -163,7 +163,12 @@ class OneshotToolDetector:
     async def detect(self, timeout_sec: float = 1.0) -> ToolSummary:
         """Run once and detect tools."""
         with WaitableCallback(self._messenger) as wc:
-            attached = ToolDetectionResult(left=ToolType.pipette, right=ToolType.nothing_attached, gripper=ToolType.nothing_attached)
+            attached_status_request = message_definitions.AttachedToolsRequest()
+
+            await self._messenger.send(
+                node_id=NodeId.head, message=attached_status_request
+            )
+            attached = await _await_one_result(wc)
             should_respond: Set[NodeId] = set()
 
             def _should_query(attach_response: ToolType) -> bool:
