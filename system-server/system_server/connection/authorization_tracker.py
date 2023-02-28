@@ -32,9 +32,7 @@ class AuthorizationTracker:
             expiration: When this registrant is considered expired.
         """
         # If this registrant already exists, remove it
-        for c in self._connections:
-            if c.registrant == registrant:
-                self._connections.remove(c)
+        self._connections = [c for c in self._connections if c.registrant != registrant]
         # We now know there's no other copy, so add this to the end of the list
         self._connections.append(
             _Authorization(registrant=registrant, expiration=expiration)
@@ -43,9 +41,7 @@ class AuthorizationTracker:
     def _update_active_connections(self) -> None:
         """Clear out any expired connections."""
         now = datetime.now()
-        for c in self._connections:
-            if c.expiration < now:
-                self._connections.remove(c)
+        self._connections = [c for c in self._connections if c.expiration > now]
 
     def active_connections(self) -> int:
         """Get the current number of active connections."""
