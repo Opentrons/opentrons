@@ -64,6 +64,38 @@ class DeviceInfoResponse(utils.BinarySerializable):
     shortsha: FirmwareShortSHADataField = FirmwareShortSHADataField(bytes())
     revision: OptionalRevisionField = OptionalRevisionField("", "", "")
 
+    @classmethod
+    def build(cls, data: bytes) -> "DeviceInfoResponse":
+        """Build a response payload from incoming bytes.
+
+        This override is required to handle optionally-present revision data.
+        """
+        if len(data) < DeviceInfoResponse.get_size():
+            data = data + b"\x00\x00\x00\x00"
+        data_iter = 0
+        message_id = utils.UInt16Field.build(data[data_iter : data_iter + 2])
+        data_iter = data_iter + 2
+
+        length = utils.UInt16Field.build(data[data_iter : data_iter + 2])
+        data_iter = data_iter + 2
+
+        version = utils.UInt32Field.build(data[data_iter : data_iter + 4])
+        data_iter = data_iter + 4
+
+        flags = VersionFlagsField.build(data[data_iter : data_iter + 4])
+        data_iter = data_iter + 4
+
+        shortsha = FirmwareShortSHADataField.build(
+            data[data_iter : data_iter + FirmwareShortSHADataField.NUM_BYTES]
+        )
+        data_iter = data_iter + FirmwareShortSHADataField.NUM_BYTES
+
+        revision = OptionalRevisionField.build(data[data_iter:])
+
+        return DeviceInfoResponse(
+            message_id, length, version, flags, shortsha, revision
+        )
+
 
 @dataclass
 class EnterBootloaderRequest(utils.BinarySerializable):
