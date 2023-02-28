@@ -164,7 +164,6 @@ class OneshotToolDetector:
         """Run once and detect tools."""
         with WaitableCallback(self._messenger) as wc:
             attached_status_request = message_definitions.AttachedToolsRequest()
-
             await self._messenger.send(
                 node_id=NodeId.head, message=attached_status_request
             )
