@@ -317,7 +317,7 @@ export function ProtocolRunHeader({
           </Flex>
         </Box>
       ) : null}
-      <RunProgressMeter {...{ makeHandleJumpToStep, runId }} />
+      <RunProgressMeter {...{ makeHandleJumpToStep, runId, robotName }} />
       {showConfirmCancelModal ? (
         <ConfirmCancelModal
           onClose={() => setShowConfirmCancelModal(false)}

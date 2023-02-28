@@ -13,7 +13,6 @@ import * as Sessions from '../../../../redux/sessions'
 import { tipLengthCalibrationStarted } from '../../../../redux/analytics'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { getTipLengthCalibrationSession } from '../../../../redux/sessions/tip-length-calibration/selectors'
-import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../../organisms/DeprecatedCalibrationPanels/constants'
 
 import type { RequestState } from '../../../../redux/robot-api/types'
 import type {
@@ -32,6 +31,7 @@ export interface DashboardTipLengthCalInvokerProps {
   params: Pick<TipLengthCalibrationSessionParams, 'mount'> &
     Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>
   hasBlockModalResponse: boolean | null
+  invalidateHandler?: () => void
 }
 
 export type DashboardCalTipLengthInvoker = (
@@ -49,11 +49,11 @@ export function useDashboardCalibrateTipLength(
         Partial<Omit<TipLengthCalibrationSessionParams, 'mount'>>)
     | null
   >(null)
+  const invalidateHandlerRef = React.useRef<(() => void) | undefined>()
   const dispatch = useDispatch()
   const { t } = useTranslation('robot_calibration')
 
   const sessionType = Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
-  const withIntent = INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -100,7 +100,8 @@ export function useDashboardCalibrateTipLength(
   >(null)
 
   const handleStartDashboardTipLengthCalSession: DashboardCalTipLengthInvoker = props => {
-    const { params, hasBlockModalResponse } = props
+    const { params, hasBlockModalResponse, invalidateHandler } = props
+    invalidateHandlerRef.current = invalidateHandler
     sessionParams.current = params
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModal(true)
@@ -119,7 +120,6 @@ export function useDashboardCalibrateTipLength(
       )
       dispatch(
         tipLengthCalibrationStarted(
-          withIntent, // TODO: remove intent param entirely once calibration wizards ff is removed
           mount,
           hasCalibrationBlock,
           'default Opentrons tip rack for pipette on mount'
@@ -179,6 +179,7 @@ export function useDashboardCalibrateTipLength(
         showSpinner={showSpinner}
         dispatchRequests={dispatchRequests}
         isJogging={isJogging}
+        offsetInvalidationHandler={invalidateHandlerRef.current}
       />
     </Portal>
   )

@@ -36,8 +36,11 @@ export function getPrepCommands(
     protocolData.commands
       .filter(isLoadCommand)
       .reduce<LPCPrepCommand[]>((acc, command) => {
-        if (command.commandType === 'loadPipette') {
-          const pipetteId = command.result?.pipetteId
+        if (
+          command.commandType === 'loadPipette' &&
+          command.result?.pipetteId != null
+        ) {
+          const { pipetteId } = command.result
           const loadWithPipetteId = {
             ...command,
             params: {
@@ -55,7 +58,10 @@ export function getPrepCommands(
           }
           dropTipCommands = [...dropTipCommands, dropTipToBeSafe]
           return [...acc, loadWithPipetteId]
-        } else if (command.commandType === 'loadLabware') {
+        } else if (
+          command.commandType === 'loadLabware' &&
+          command.result?.labwareId != null
+        ) {
           // load all labware off-deck so that LPC can move them on individually later
           return [
             ...acc,
@@ -70,7 +76,10 @@ export function getPrepCommands(
               },
             },
           ]
-        } else if (command.commandType === 'loadModule') {
+        } else if (
+          command.commandType === 'loadModule' &&
+          command.result?.moduleId != null
+        ) {
           return [
             ...acc,
             {

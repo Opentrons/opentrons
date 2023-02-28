@@ -26,13 +26,14 @@ from typing import (
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
+    UpdateProgress,
     axis_convert,
     create_move_group,
     axis_to_node,
     get_current_settings,
     create_home_group,
     node_to_axis,
-    sub_system_to_node_id,
+    pipette_type_for_subtype,
     sensor_node_for_mount,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
@@ -40,6 +41,7 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_tip_action_group,
     PipetteAction,
+    sub_system_to_node_id,
 )
 
 try:
@@ -74,8 +76,11 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
+    SensorId,
+    PipetteType,
 )
 from opentrons_hardware import firmware_update
+
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
@@ -85,9 +90,11 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
-    OT3SubSystem,
     MotorStatus,
     InstrumentProbeType,
+    PipetteSubType,
+    UpdateStatus,
+    mount_to_subsystem,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -105,6 +112,7 @@ from opentrons_hardware.hardware_control.tools import detector, types as ohc_too
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
+    liquid_probe,
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -175,6 +183,7 @@ class OT3Controller:
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._update_required = False
+        self._update_tracker: Optional[UpdateProgress] = None
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -194,24 +203,72 @@ class OT3Controller:
     def update_required(self) -> bool:
         return self._update_required
 
-    async def update_firmware(self, filename: str, target: OT3SubSystem) -> None:
-        """Update the firmware."""
-        with open(filename, "r") as f:
-            update_details = {
-                sub_system_to_node_id(target): f,
-            }
-            updater = firmware_update.RunUpdate(
-                messenger=self._messenger,
-                update_details=update_details,
-                # TODO (amit, 2022-04-05): Fill in retry_count and timeout_seconds from
-                #  config values.
-                retry_count=3,
-                timeout_seconds=20,
-                erase=True,
+    @update_required.setter
+    def update_required(self, value: bool) -> None:
+        if self._update_required != value:
+            log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
+            self._update_required = value
+
+    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Returns a tuple of UpdateStatus and total progress of the updates."""
+        updates: Set[UpdateStatus] = set()
+        total_progress: int = 0
+        if self._update_tracker:
+            updates, total_progress = self._update_tracker.get_progress()
+        return updates, total_progress
+
+    @staticmethod
+    def _attached_pipettes_to_nodes(
+        attached_pipettes: Dict[OT3Mount, PipetteSubType]
+    ) -> Dict[NodeId, PipetteType]:
+        pipette_nodes = {}
+        for mount, subtype in attached_pipettes.items():
+            subsystem = mount_to_subsystem(mount)
+            node_id = sub_system_to_node_id(subsystem)
+            pipette_type = pipette_type_for_subtype(subtype)
+            pipette_nodes[node_id] = pipette_type
+        return pipette_nodes
+
+    async def update_firmware(
+        self,
+        attached_pipettes: Dict[OT3Mount, PipetteSubType],
+        nodes: Optional[Set[NodeId]] = None,
+    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
+        """Updates the firmware on the OT3."""
+        nodes = nodes or set()
+        attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
+        # Check if devices need an update, force update if nodes are specified
+        firmware_updates = firmware_update.check_firmware_updates(
+            self._network_info.device_info, attached_pipette_nodes, nodes=nodes
+        )
+        if not firmware_updates:
+            log.info("No firmware updates required.")
+            self.update_required = False
+            return
+
+        log.info("Firmware updates are available.")
+        self._update_tracker = UpdateProgress(set(firmware_updates))
+        self.update_required = True
+
+        updater = firmware_update.RunUpdate(
+            messenger=self._messenger,
+            update_details=firmware_updates,
+            retry_count=3,
+            timeout_seconds=20,
+            erase=True,
+        )
+
+        # start the updates and yield progress to caller
+        async for node_id, status_element in updater.run_updates():
+            updates, total_progress = self._update_tracker.update(
+                node_id, status_element
             )
-            async for progress in updater.run_updates():
-                pass
-                # TODO (peter, 2023-02-08): Pass this progress data up the stack for reporting
+            yield updates, total_progress
+
+        # refresh the device_info cache and reset internal states
+        await self._network_info.probe()
+        self._update_tracker = None
+        self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
@@ -751,9 +808,6 @@ class OT3Controller:
             OT3Axis.Q: phony_bounds,
         }
 
-    def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
-        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
-
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
         return {}
@@ -926,6 +980,34 @@ class OT3Controller:
     ) -> NodeMap[MapPayload]:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._present_nodes}
+
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        max_z_distance: float,
+        mount_speed: float,
+        plunger_speed: float,
+        threshold_pascals: float,
+        log_pressure: bool = True,
+        sensor_id: SensorId = SensorId.S0,
+    ) -> Dict[NodeId, float]:
+        head_node = axis_to_node(OT3Axis.by_mount(mount))
+        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        positions = await liquid_probe(
+            self._messenger,
+            tool,
+            head_node,
+            max_z_distance,
+            plunger_speed,
+            mount_speed,
+            threshold_pascals,
+            log_pressure,
+            sensor_id,
+        )
+        for node, point in positions.items():
+            self._position.update({node: point[0]})
+            self._encoder_position.update({node: point[1]})
+        return self._position
 
     async def capacitive_probe(
         self,

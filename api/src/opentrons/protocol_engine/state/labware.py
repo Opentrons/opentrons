@@ -431,18 +431,26 @@ class LabwareView(HasState[LabwareState]):
             )
         return list(wells)
 
-    def get_tip_length(self, labware_id: str) -> float:
-        """Get the tip length of a tip rack."""
+    def get_tip_length(self, labware_id: str, overlap: float = 0) -> float:
+        """Get the nominal tip length of a tip rack."""
         definition = self.get_definition(labware_id)
         if definition.parameters.tipLength is None:
             raise errors.LabwareIsNotTipRackError(
                 f"Labware {labware_id} has no tip length defined."
             )
+
         return definition.parameters.tipLength
 
-    def get_definition_uri(self, labware_id: str) -> str:
+    def get_tip_drop_z_offset(
+        self, labware_id: str, length_scale: float, additional_offset: float
+    ) -> float:
+        """Get the tip drop offset from the top of the well."""
+        tip_length = self.get_tip_length(labware_id)
+        return -tip_length * length_scale + additional_offset
+
+    def get_definition_uri(self, labware_id: str) -> LabwareUri:
         """Get a labware's definition URI."""
-        return self.get(labware_id).definitionUri
+        return LabwareUri(self.get(labware_id).definitionUri)
 
     def get_uri_from_definition(
         self,

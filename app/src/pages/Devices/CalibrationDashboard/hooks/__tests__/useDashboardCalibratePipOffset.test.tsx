@@ -12,7 +12,6 @@ import { useDashboardCalibratePipOffset } from '../useDashboardCalibratePipOffse
 import { pipetteOffsetCalibrationStarted } from '../../../../../redux/analytics'
 
 import type { DashboardCalOffsetInvoker } from '../useDashboardCalibratePipOffset'
-import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../../../organisms/DeprecatedCalibrationPanels'
 import { i18n } from '../../../../../i18n'
 
 jest.mock('../../../../../redux/sessions/selectors')
@@ -69,7 +68,6 @@ describe('useDashboardCalibratePipOffset hook', () => {
     act(() =>
       startCalibration({
         params: { mount: mountString },
-        withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
       })
     )
 
@@ -87,13 +85,7 @@ describe('useDashboardCalibratePipOffset hook', () => {
       meta: { requestId: expect.any(String) },
     })
     expect(store.dispatch).toHaveBeenCalledWith(
-      pipetteOffsetCalibrationStarted(
-        'pipette-offset',
-        mountString,
-        false,
-        false,
-        null
-      )
+      pipetteOffsetCalibrationStarted(mountString, false, false, null)
     )
   })
 
@@ -123,12 +115,7 @@ describe('useDashboardCalibratePipOffset hook', () => {
         status: 200,
       },
     })
-    act(() =>
-      startCalibration({
-        params: { mount: mountString },
-        withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
-      })
-    )
+    act(() => startCalibration({ params: { mount: mountString } }))
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
 
@@ -166,12 +153,7 @@ describe('useDashboardCalibratePipOffset hook', () => {
     mockGetRequestById.mockReturnValue({
       status: RobotApi.PENDING,
     })
-    act(() =>
-      startCalibration({
-        params: { mount: mountString },
-        withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
-      })
-    )
+    act(() => startCalibration({ params: { mount: mountString } }))
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
     expect(LoadingState).not.toBe(null)

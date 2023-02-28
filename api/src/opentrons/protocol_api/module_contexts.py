@@ -35,7 +35,7 @@ from .labware import Labware
 from . import validation
 
 
-ENGAGE_HEIGHT_UNIT_CNV = 2
+_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 
 
 _log = logging.getLogger(__name__)
@@ -372,6 +372,8 @@ class MagneticModuleContext(ModuleContext):
 
              This is the recommended way to adjust the magnets' height.
 
+             .. versionadded:: 2.2
+
            - ``offset`` – Move this many millimeters above (positive value) or below
              (negative value) the default height for the loaded labware. The sum of
              the default height and ``offset`` must be between 0 and 25.
@@ -381,15 +383,19 @@ class MagneticModuleContext(ModuleContext):
              labware, this may produce unpredictable results. You should normally use
              ``height_from_base`` instead.
 
-             This parameter may be deprecated in a future release of the Python API.
+             .. versionchanged:: 2.14
+                This parameter has been removed.
 
         You shouldn't specify more than one of these parameters. However, if you do,
         their order of precedence is ``height``, then ``height_from_base``, then ``offset``.
-
-        .. versionadded:: 2.2
-            The *height_from_base* parameter.
         """
         if height is not None:
+            if self._api_version >= _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN:
+                raise APIVersionError(
+                    "The height parameter of MagneticModuleContext.engage() was removed"
+                    " in {_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}."
+                    " Use offset or height_from_base instead."
+                )
             self._core.engage(height_from_home=height)
 
         # This version check has a bug:

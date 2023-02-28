@@ -166,7 +166,7 @@ export function CommandText(props: Props): JSX.Element | null {
         </StyledText>
       )
     }
-    case 'pause': // deprecated pause command
+    case 'pause': // legacy pause command
     case 'waitForResume': {
       return (
         <StyledText as="p">
@@ -177,7 +177,7 @@ export function CommandText(props: Props): JSX.Element | null {
       )
     }
     case 'delay': {
-      // deprecated delay command
+      // legacy delay command
       const { message = '' } = command.params
       if ('waitForResume' in command.params) {
         return (
