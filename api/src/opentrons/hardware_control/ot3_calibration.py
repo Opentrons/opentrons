@@ -821,3 +821,69 @@ async def calibrate_pipette(
         return offset
     finally:
         await hcapi.remove_tip(mount)
+
+
+async def find_slot_center_binary_from_nominal_center(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    slot: int,
+) -> Tuple[Point, Point]:
+    """
+    For use with calibrate_belts. For specified slot, finds actual slot center via binary search and nominal slot center
+
+    Params
+    ------
+    hcapi: a hardware control api to run commands against
+    mount: the mount to calibration
+    slot: a specific deck slot
+
+    Returns
+    -------
+    The actual and nominal centers of the specified slot.
+    """
+    nominal_center = _get_calibration_square_position_in_slot(slot)
+    z_height = await find_deck_height(hcapi, mount, nominal_center)
+    return (
+        await find_slot_center_binary(
+            hcapi, mount, nominal_center._replace(z=z_height)
+        ),
+        nominal_center,
+    )
+
+
+async def calibrate_belts(
+    hcapi: OT3API,
+    mount: OT3Mount,
+) -> Tuple[Tuple[float, float], Tuple[float, float]]:
+    """
+    Run automatic calibration for the x and y belts attached to the specified mount.
+
+    Params
+    ------
+    hcapi: a hardware control api to run commands against
+    mount: the mount to calibration
+
+    Returns
+    -------
+    The location of slot A (back right), slot B (front right), and slot C (back left),
+    to be used to determine the x-axis and y-axis transfer functions for the belt
+    stretch.
+    """
+    slot_a, slot_b, slot_c = 9, 3, 7
+    point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_a
+    )
+    point_b, nominal_point_b = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_b
+    )
+    point_c, nominal_point_c = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_c
+    )
+
+    nominal_x = nominal_point_c.x - nominal_point_a.x
+    nominal_y = nominal_point_b.y - nominal_point_a.y
+
+    return (
+        ((point_c.x - point_a.x) / nominal_x),
+        ((point_b.x - point_a.x) / nominal_y),
+    ), (((point_c.y - point_a.y) / nominal_x), ((point_b.y - point_a.y) / nominal_y))
