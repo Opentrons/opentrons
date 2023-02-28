@@ -40,10 +40,11 @@ async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     retry_count = args.retry_count
     timeout_seconds = args.timeout_seconds
-    
+
     driver: SerialUsbDriver = build_rear_panel_messenger(asyncio.get_running_loop())
 
     messenger = BinaryMessenger(driver)
+    messenger.start()
     updater = RunUSBUpdate(
         messenger=messenger,
         update_file=args.file,

@@ -13,6 +13,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     EnterBootloaderRequest,
+    DeviceInfoRequest,
+    BinaryMessageDefinition,
 )
 from opentrons_hardware.firmware_update import (
     FirmwareUpdateInitiator,
@@ -250,7 +252,7 @@ async def upload_via_dfu(
     dfu_args = [
         "dfu-util",
         "-a 0",
-        "-s 0x08000000:leave",
+        "-s 0x08008000:leave",
         f"-D{firmware_file_path}",
         "-R",
     ]
@@ -297,17 +299,52 @@ class RunUSBUpdate:
         self._update_file = update_file
         self._retry_count = retry_count
         self._timeout_seconds = timeout_seconds
+        self._messenger.add_listener(self)
+
+    async def _reconnect(self, vid: int, pid: int, baudrate: int, timeout: int) -> bool:
+        device_running = False
+        for i in range(self._retry_count):
+            logger.info(f"attempt #{i} to reconnect")
+            # it takes a ~5 seconds for it to reconnect as the startup app copies over the backup image
+            await asyncio.sleep(5)
+            try:
+                self._messenger.get_driver().find_and_connect(
+                    vid, pid, baudrate, timeout
+                )
+                device_running = self._messenger.get_driver().connected()
+                if device_running:
+                    logger.info("device is reconnected")
+                    self._messenger.start()
+                    break
+                else:
+                    logger.error("device did not restart properly")
+            except IOError:
+                pass
+        return device_running
+
+    def __call__(self, message: BinaryMessageDefinition) -> None:
+        logger.info(f"received msg from device {message}")
+
+    async def _request_version(self) -> None:
+        await self._messenger.send(DeviceInfoRequest())
+        # give time for the device to respond
+        await asyncio.sleep(1)
 
     async def run_update(self) -> bool:
         """Perform a firmware update on a connected USB device."""
+        await self._request_version()
+        await self._messenger.stop()
         vid, pid, baudrate, timeout = self._messenger.get_driver().get_connection_info()
+        result = False
         for i in range(self._retry_count):
-            logger.info(f"Running attempt number {i} to update device {vid}:{pid}")
+            logger.info(
+                f"Running attempt number {i} to update device {vid:04x}:{pid:04x}"
+            )
             if not await self._messenger.send(EnterBootloaderRequest()):
                 logger.error("unable to send enter bootloader message")
                 continue
 
-            dfu_dev_serial = await find_dfu_device(DFU_PID, 1)
+            dfu_dev_serial = await find_dfu_device(DFU_PID, 3)
             kwargs: Dict[str, Any] = {
                 "stdout": asyncio.subprocess.PIPE,
                 "stderr": asyncio.subprocess.PIPE,
@@ -317,16 +354,13 @@ class RunUSBUpdate:
                 dfu_dev_serial, self._update_file, kwargs
             )
             if success:
-                logger.info(f"Device {vid}:{pid} updated successfully with {msg}")
-                self._messenger.get_driver().find_and_connect(
-                    vid, pid, baudrate, timeout
+                logger.info(
+                    f"Device {vid:04x}:{pid:04x} updated successfully with {msg}"
                 )
-                device_running = self._messenger.get_driver().connected()
-                if device_running:
-                    logger.error("device did not restart properly")
-                else:
-                    logger.info("device is reconnected")
-                return success and device_running
+                device_running = await self._reconnect(vid, pid, baudrate, timeout)
+                result = success and device_running
+                break
             else:
                 continue
-        return False
+        await self._request_version()
+        return result
