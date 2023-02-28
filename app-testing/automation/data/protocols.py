@@ -217,6 +217,16 @@ class Protocols:
         robot_error=False,
     )
 
+    OT2_P300M_P20S_TC_HS_TM_6_13_SmokeTest3: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_HS_TM_6_13_SmokeTest3",
+        file_extension="py",
+        protocol_name="🛠 Logo-Modules-CustomLabware 🛠",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["cpx_4_tuberack_100ul"],
+    )
+
     OT2_P300M_P20S_MM_TM_TC1_5_2_6_PD40Error: Protocol = Protocol(
         file_name="OT2_P300M_P20S_MM_TM_TC1_5_2_6_PD40Error",
         file_extension="json",

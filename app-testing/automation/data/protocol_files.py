@@ -20,6 +20,7 @@ names = Literal[
     "OT2_P20S_None_2_7_Walkthrough",
     "OT2_P300MLeft_MM_TM_2_4_Zymo",
     "OT2_P300M_P20S_None_2_12_FailOnRun",
+    "OT2_P300M_P20S_TC_HS_TM_6_13_SmokeTest3",
     "OT2_P300M_P20S_TC_MM_TM_6_13_Smoke620Release",
     "OT2_P300SLeft_MM1_MM_2_2_EngageMagHeightFromBase",
     "OT2_P300SLeft_MM1_MM_TM_2_3_Mix",
