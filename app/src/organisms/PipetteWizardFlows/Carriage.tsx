@@ -13,54 +13,58 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
 import { FLOWS } from './constants'
-import { CheckZAxisButton } from './CheckZaxisButton'
 
-import type { PipetteWizardStepProps, ZAxisScrewStatus } from './types'
+import type { MotorAxis } from '@opentrons/shared-data'
+import type { PipetteWizardStepProps } from './types'
 
 export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
-  const { goBack, proceed, flowType, selectedPipette } = props
+  const { goBack, proceed, flowType, selectedPipette, chainRunCommands } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const [
-    zAxisScrewStatus,
-    setZAxisScrewStatus,
-  ] = React.useState<ZAxisScrewStatus>('unknown')
+  const [errorMessage, setErrorMessage] = React.useState<boolean>(false)
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
-
-  React.useEffect(() => {
-    if (zAxisScrewStatus === 'attached' || zAxisScrewStatus === 'detached')
-      proceed()
-  }, [proceed, zAxisScrewStatus])
-
-  const handleErrorTryAgain = (): void => {
-    setZAxisScrewStatus('attached')
+  const handleCheckZAxis = (): void => {
     setNumberOfTryAgains(numberOfTryAgains + 1)
+    chainRunCommands(
+      [
+        {
+          commandType: 'home' as const,
+          params: { axes: ('rightZ' as unknown) as MotorAxis },
+        },
+      ],
+      false
+    )
+      .then(() => {
+        proceed()
+      })
+      .catch(error => {
+        console.error(error.message)
+        setErrorMessage(true)
+      })
   }
   //  this should never happen but to be safe
   if (selectedPipette === SINGLE_MOUNT_PIPETTES || flowType === FLOWS.CALIBRATE)
     return null
 
-  return zAxisScrewStatus === 'stillAttached' ? (
+  return errorMessage ? (
     <SimpleWizardBody
       iconColor={COLORS.errorEnabled}
       header={t('z_axis_still_attached')}
-      subHeader={t('detach_z_axis_screw_again')}
+      subHeader={t(
+        numberOfTryAgains > 2
+          ? 'something_seems_wrong'
+          : 'detach_z_axis_screw_again'
+      )}
       isSuccess={false}
     >
-      <SecondaryButton
-        onClick={() => setZAxisScrewStatus('unknown')}
-        marginRight={SPACING.spacing2}
-      >
+      <SecondaryButton onClick={goBack} marginRight={SPACING.spacing2}>
         {t('cancel_attachment')}
       </SecondaryButton>
-      {numberOfTryAgains < 2 ? (
-        <PrimaryButton
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          //  TODO(jr 1/12/23): wire this up correctly when we wire up backend for checking z axis screw
-          onClick={handleErrorTryAgain}
-        >
-          {t('shared:try_again')}
-        </PrimaryButton>
-      ) : null}
+      <PrimaryButton
+        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        onClick={handleCheckZAxis}
+      >
+        {t('shared:try_again')}
+      </PrimaryButton>
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
@@ -90,12 +94,9 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       }
       back={goBack}
       proceedButton={
-        <CheckZAxisButton
-          proceedButtonText={capitalize(t('shared:continue'))}
-          numberOfTryAgains={numberOfTryAgains}
-          setZAxisScrewStatus={setZAxisScrewStatus}
-          setNumberOfTryAgains={setNumberOfTryAgains}
-        />
+        <PrimaryButton onClick={handleCheckZAxis}>
+          {capitalize(t('shared:continue'))}
+        </PrimaryButton>
       }
     />
   )

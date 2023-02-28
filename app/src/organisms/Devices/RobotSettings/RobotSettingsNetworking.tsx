@@ -76,11 +76,6 @@ export function RobotSettingsNetworking({
   useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
 
   React.useEffect(() => {
-    dispatch(fetchStatus(robotName))
-    dispatch(fetchWifiList(robotName))
-  }, [robotName, dispatch])
-
-  React.useEffect(() => {
     updateRobotStatus(isRobotBusy)
   }, [isRobotBusy, updateRobotStatus])
 

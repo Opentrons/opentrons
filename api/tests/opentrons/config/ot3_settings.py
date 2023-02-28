@@ -180,6 +180,18 @@ ot3_dummy_settings = {
     "right_mount_offset": (3, 2, 1),
     "left_mount_offset": (2, 2, 2),
     "gripper_mount_offset": (1, 1, 1),
+    "liquid_sense": {
+        "starting_mount_height": 80,
+        "max_z_distance": 20,
+        "min_z_distance": 3,
+        "mount_speed": 10,
+        "plunger_speed": 10,
+        "sensor_threshold_pascals": 17,
+        "expected_liquid_height": 90,
+        "log_pressure": True,
+        "aspirate_while_sensing": False,
+        "data_file": "/var/pressure_sensor_data.csv",
+    },
     "calibration": {
         "z_offset": {
             "pass_settings": {
