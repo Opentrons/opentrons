@@ -103,7 +103,7 @@ async def test_get_instruments_empty(
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
 #  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
     decoy: Decoy,
@@ -230,6 +230,9 @@ async def test_get_ot2_instruments(
     ]
 
 
+# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
+#  OT2 vs OT3 tests correclty
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware(
     decoy: Decoy,
@@ -263,7 +266,7 @@ async def test_update_instrument_firmware(
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
 #  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_firmware_update_status(
     decoy: Decoy,
