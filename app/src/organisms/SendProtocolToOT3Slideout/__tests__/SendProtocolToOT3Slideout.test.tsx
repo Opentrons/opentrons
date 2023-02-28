@@ -138,11 +138,8 @@ describe('SendProtocolToOT3Slideout', () => {
     resetAllWhenMocks()
   })
 
-  const PROTOCOL_DISPLAY_NAME = 'A Protocol for Otie'
-
   it('renders slideout title and button', () => {
     const [{ getByRole, getByText }] = render({
-      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -153,7 +150,6 @@ describe('SendProtocolToOT3Slideout', () => {
 
   it('renders an available robot option for every connectable OT-3, and link for other robots', () => {
     const [{ queryByText }] = render({
-      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -173,7 +169,6 @@ describe('SendProtocolToOT3Slideout', () => {
         })
       )
     const [{ queryByText }] = render({
-      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -190,7 +185,6 @@ describe('SendProtocolToOT3Slideout', () => {
       },
     ])
     const [{ queryByText }] = render({
-      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -200,7 +194,6 @@ describe('SendProtocolToOT3Slideout', () => {
   it('if scanning, show robots, but do not show link to other devices', () => {
     mockGetScanning.mockReturnValue(true)
     const [{ queryByText }] = render({
-      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -212,7 +205,6 @@ describe('SendProtocolToOT3Slideout', () => {
   })
   it('if not scanning, show refresh button, start discovery if clicked', () => {
     const [{ getByRole }, { dispatch }] = render({
-      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
@@ -227,7 +219,6 @@ describe('SendProtocolToOT3Slideout', () => {
       mockConnectableOT3,
     ])
     const [{ getByRole, getByText }] = render({
-      protocolDisplayName: PROTOCOL_DISPLAY_NAME,
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,

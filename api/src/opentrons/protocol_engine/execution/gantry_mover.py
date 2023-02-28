@@ -10,8 +10,8 @@ from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeE
 
 from opentrons.motion_planning import Waypoint
 
-from ..state import StateView, CurrentWell
-from ..types import MotorAxis
+from ..state import StateView
+from ..types import MotorAxis, CurrentWell
 from ..errors import MustHomeError
 
 
@@ -25,7 +25,7 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
 }
 
 
-class GantryMovementHandler(TypingProtocol):
+class GantryMover(TypingProtocol):
     """Abstract class for gantry movement handler."""
 
     async def get_position(
@@ -42,8 +42,8 @@ class GantryMovementHandler(TypingProtocol):
         ...
 
     async def move_to(
-        self, mount: Mount, waypoint: Waypoint, speed: Optional[float]
-    ) -> None:
+        self, pipette_id: str, waypoints: List[Waypoint], speed: Optional[float]
+    ) -> Point:
         """Move the hardware gantry to a waypoint."""
         ...
 
@@ -61,7 +61,7 @@ class GantryMovementHandler(TypingProtocol):
         ...
 
 
-class HardwareGantryMovementHandler(GantryMovementHandler):
+class HardwareGantryMover(GantryMover):
     """Hardware API based gantry movement handler."""
 
     def __init__(self, hardware_api: HardwareControlAPI, state_view: StateView) -> None:
@@ -104,15 +104,22 @@ class HardwareGantryMovementHandler(GantryMovementHandler):
         return self._hardware_api.get_instrument_max_height(mount=hw_mount)
 
     async def move_to(
-        self, mount: Mount, waypoint: Waypoint, speed: Optional[float]
-    ) -> None:
+        self, pipette_id: str, waypoints: List[Waypoint], speed: Optional[float]
+    ) -> Point:
         """Move the hardware gantry to a waypoint."""
-        await self._hardware_api.move_to(
-            mount=mount,
-            abs_position=waypoint.position,
-            critical_point=waypoint.critical_point,
-            speed=speed,
-        )
+        assert len(waypoints) > 0, "Must have at least one waypoint"
+
+        hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+
+        for waypoint in waypoints:
+            await self._hardware_api.move_to(
+                mount=hw_mount,
+                abs_position=waypoint.position,
+                critical_point=waypoint.critical_point,
+                speed=speed,
+            )
+
+        return waypoints[-1].position
 
     async def move_relative(
         self,
@@ -170,7 +177,7 @@ class HardwareGantryMovementHandler(GantryMovementHandler):
             await self._hardware_api.home(axes=hardware_axes)
 
 
-class VirtualGantryMovementHandler(GantryMovementHandler):
+class VirtualGantryMover(GantryMover):
     """State store based gantry movement handler for simulation/analysis."""
 
     def __init__(self, state_view: StateView) -> None:
@@ -211,10 +218,11 @@ class VirtualGantryMovementHandler(GantryMovementHandler):
         return instrument_height - tip_length
 
     async def move_to(
-        self, mount: Mount, waypoint: Waypoint, speed: Optional[float]
-    ) -> None:
+        self, pipette_id: str, waypoints: List[Waypoint], speed: Optional[float]
+    ) -> Point:
         """Move the hardware gantry to a waypoint. No-op in virtual implementation."""
-        pass
+        assert len(waypoints) > 0, "Must have at least one waypoint"
+        return waypoints[-1].position
 
     async def move_relative(
         self,
@@ -237,12 +245,12 @@ class VirtualGantryMovementHandler(GantryMovementHandler):
         pass
 
 
-def create_gantry_movement_handler(
+def create_gantry_mover(
     state_view: StateView, hardware_api: HardwareControlAPI
-) -> GantryMovementHandler:
+) -> GantryMover:
     """Create a tip handler."""
     return (
-        HardwareGantryMovementHandler(hardware_api=hardware_api, state_view=state_view)
+        HardwareGantryMover(hardware_api=hardware_api, state_view=state_view)
         if state_view.config.use_virtual_pipettes is False
-        else VirtualGantryMovementHandler(state_view=state_view)
+        else VirtualGantryMover(state_view=state_view)
     )

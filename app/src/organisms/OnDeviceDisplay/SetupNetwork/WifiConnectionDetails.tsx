@@ -27,18 +27,27 @@ import {
 import { getLocalRobot } from '../../../redux/discovery'
 
 import type { State, Dispatch } from '../../../redux/types'
-import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
-import type { AuthType } from '../../../pages/OnDeviceDisplay/ConnectViaWifi'
+import type {
+  SimpleInterfaceStatus,
+  WifiNetwork,
+  WifiSecurityType,
+} from '../../../redux/networking/types'
 
-interface SucceededToConnectProps {
-  ssid: string
-  authType: AuthType
+interface WifiConnectionDetailsProps {
+  ssid?: string
+  authType?: WifiSecurityType
+  showHeader?: boolean
+  showWifiListButton?: boolean
+  wifiList?: WifiNetwork[]
 }
 
-export function SucceededToConnect({
+export function WifiConnectionDetails({
   ssid,
   authType,
-}: SucceededToConnectProps): JSX.Element {
+  showHeader = true,
+  showWifiListButton = false,
+  wifiList,
+}: WifiConnectionDetailsProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -53,14 +62,14 @@ export function SucceededToConnect({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing5}>
-      <TitleHeader />
-      <DisplayConnectionStatus />
+      {showHeader && <TitleHeader />}
+      <DisplayConnectionStatus connected={wifi != null} />
       <DisplayConnectedNetworkInfo
         wifi={wifi}
         ssid={ssid}
-        authType={authType}
+        authType={authType ?? 'none'}
       />
-      <DisplayButtons />
+      <DisplayButtons showWifiListButton={showWifiListButton} />
       <Flex
         alignSelf={ALIGN_FLEX_END}
         marginTop={SPACING.spacing5}
@@ -92,18 +101,30 @@ const TitleHeader = (): JSX.Element => {
   )
 }
 
-const DisplayConnectionStatus = (): JSX.Element => {
+interface DisplayConnectionStatusProps {
+  connected: boolean
+}
+
+const DisplayConnectionStatus = ({
+  connected,
+}: DisplayConnectionStatusProps): JSX.Element => {
   const { t } = useTranslation('device_settings')
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
       padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
-      backgroundColor={COLORS.successBackgroundMed}
+      backgroundColor={
+        connected ? COLORS.successBackgroundMed : COLORS.greyDisabled
+      }
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       borderRadius="12px"
     >
-      <Icon name="ot-check" size="2.5rem" color={COLORS.successEnabled} />
+      <Icon
+        name="ot-check"
+        size="2.5rem"
+        color={connected ? COLORS.successEnabled : COLORS.greyDisabled}
+      />
       <StyledText
         marginLeft={SPACING.spacing5}
         fontSize="1.625rem"
@@ -120,16 +141,16 @@ const DisplayConnectionStatus = (): JSX.Element => {
         lineHeight="2.1875rem"
         color={COLORS.black}
       >
-        {t('connected')}
+        {t(connected ? 'connected' : 'not_connected')}
       </StyledText>
     </Flex>
   )
 }
 
 interface DisplayConnectedNetworkInfoProps {
-  ssid: string
+  ssid?: string
   wifi: SimpleInterfaceStatus | null
-  authType: 'wpa-psk' | 'none'
+  authType: WifiSecurityType
 }
 
 const DisplayConnectedNetworkInfo = ({
@@ -137,7 +158,7 @@ const DisplayConnectedNetworkInfo = ({
   ssid,
   authType,
 }: DisplayConnectedNetworkInfoProps): JSX.Element => {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
@@ -155,7 +176,7 @@ const DisplayConnectedNetworkInfo = ({
           lineHeight="1.8rem"
           fontWeight="700"
         >
-          {ssid}
+          {ssid ?? t('shared:no_data')}
         </StyledText>
       </Flex>
       <Flex
@@ -165,7 +186,7 @@ const DisplayConnectedNetworkInfo = ({
       >
         <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
           {/* ToDo: if wifi is undefined no data or empty */}
-          {`${t('ip_address')}:  ${String(wifi?.ipAddress)}`}
+          {`${t('ip_address')}:  ${wifi?.ipAddress ?? 'No data'}`}
         </StyledText>
         <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
           {`Authentication: ${String(
@@ -173,17 +194,23 @@ const DisplayConnectedNetworkInfo = ({
           )}`}
         </StyledText>
         <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
-          {`${t('subnet_mask')}: ${String(wifi?.subnetMask)}`}
+          {`${t('subnet_mask')}: ${wifi?.subnetMask ?? 'No data'}`}
         </StyledText>
         <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
-          {`${t('mac_address')}: ${String(wifi?.macAddress)}`}
+          {`${t('mac_address')}: ${wifi?.macAddress ?? 'No data'}`}
         </StyledText>
       </Flex>
     </Flex>
   )
 }
 
-const DisplayButtons = (): JSX.Element => {
+interface DisplayButtonsProps {
+  showWifiListButton: boolean
+}
+
+const DisplayButtons = ({
+  showWifiListButton,
+}: DisplayButtonsProps): JSX.Element => {
   const { t } = useTranslation('device_settings')
   const history = useHistory()
   return (
@@ -193,19 +220,35 @@ const DisplayButtons = (): JSX.Element => {
       height="4.375rem"
       marginTop="1.4375rem"
     >
-      <PrimaryButton
-        onClick={() => history.push('/robot-settings/update-robot')}
-        width="100%"
-      >
-        <StyledText
-          fontSize="1.5rem"
-          lineHeight="1.375rem"
-          fontWeight="500"
-          color={COLORS.white}
+      {showWifiListButton ? (
+        <PrimaryButton
+          onClick={() => console.log('Not implemented')}
+          width="100%"
         >
-          {t('check_for_updates')}
-        </StyledText>
-      </PrimaryButton>
+          <StyledText
+            fontSize="1.5rem"
+            lineHeight="1.375rem"
+            fontWeight="500"
+            color={COLORS.white}
+          >
+            {t('change_network')}
+          </StyledText>
+        </PrimaryButton>
+      ) : (
+        <PrimaryButton
+          onClick={() => history.push('/robot-settings/update-robot')}
+          width="100%"
+        >
+          <StyledText
+            fontSize="1.5rem"
+            lineHeight="1.375rem"
+            fontWeight="500"
+            color={COLORS.white}
+          >
+            {t('check_for_updates')}
+          </StyledText>
+        </PrimaryButton>
+      )}
     </Flex>
   )
 }
