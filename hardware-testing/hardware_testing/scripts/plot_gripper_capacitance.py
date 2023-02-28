@@ -15,6 +15,7 @@ class Plot:
         self.PLOT_FONT = 16
         self.PLOT_PATH = "plot_gripper_capacitance/"
         self.PLOT_FORMAT = ".png"
+        self.probes = ["Front","Rear"]
         self.plot_param = {
             "figure":None,
             "filename":None,
@@ -33,7 +34,7 @@ class Plot:
         self.x_increment = self.get_increment(self.df_data, "x")
         self.z_increment = self.get_increment(self.df_data, "z")
         self.max_relative = self.get_max_value(self.df_data, "Relative")
-        self.min_absolute += self.get_min_value(self.df_data, "Capacitance")
+        self.min_absolute = self.get_min_value(self.df_data, "Capacitance")
         print(f"X-Axis Increment = {self.x_increment}")
         print(f"Z-Axis Increment = {self.z_increment}")
         print(f"Max Relative Change in Capacitance = {self.max_relative}")
@@ -57,15 +58,16 @@ class Plot:
             os.makedirs(path)
 
     def create_plot(self):
-        print("Plotting Sensor Data...")
-        self.sensor_plot()
-        print("Plotting Distance Beyond Edge...")
-        self.edge_plot()
-        print("Plotting Absolute Capacitance...")
-        self.absolute_all_plot()
-        print("Plotting Relative Capacitance...")
-        self.relative_all_plot()
-        print("Plots Saved!")
+        for probe in self.probes:
+            print(f"Plotting Sensor Data ({probe})...")
+            self.sensor_plot(probe)
+            print(f"Plotting Distance Beyond Edge ({probe})...")
+            self.edge_plot(probe)
+            print(f"Plotting Absolute Capacitance ({probe})...")
+            self.absolute_all_plot(probe)
+            print(f"Plotting Relative Capacitance ({probe})...")
+            self.relative_all_plot(probe)
+        print("All Plots Saved!")
 
     def get_increment(self, df, axis):
         axis = axis.lower()
@@ -134,8 +136,9 @@ class Plot:
         for key, value in self.plot_param.items():
             self.plot_param[key] = None
 
-    def sensor_plot(self):
+    def sensor_plot(self, probe):
         df = self.df_data
+        df = df[df["Probe"]==probe]
         x_axis = "Time"
         y_axis = "Capacitance"
         x_first = df[x_axis].min()
@@ -144,18 +147,19 @@ class Plot:
         y_last = df[y_axis].max()
         fig = px.line(df, x=x_axis, y=[y_axis], markers=True)
         self.plot_param["figure"] = fig
-        self.plot_param["filename"] = "plot_sensor"
-        self.plot_param["title"] = "Sensor Data"
+        self.plot_param["filename"] = "plot_sensor_" + str(probe.lower())
+        self.plot_param["title"] = f"({probe} Probe) Sensor Data"
         self.plot_param["x_title"] = "Time (min)"
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
-        self.plot_param["y_range"] = [0, 14]
+        self.plot_param["y_range"] = [4, 14]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
 
-    def edge_plot(self):
+    def edge_plot(self, probe):
         df = self.df_data
+        df = df[df["Probe"]==probe]
         x_axis = "Edge Distance"
         y_axis = "Capacitance"
         x_first = df[x_axis].min()
@@ -164,8 +168,8 @@ class Plot:
         y_last = df[y_axis].max()
         fig = px.line(df, x=x_axis, y=[y_axis], markers=True)
         self.plot_param["figure"] = fig
-        self.plot_param["filename"] = "plot_edge"
-        self.plot_param["title"] = "Edge Distance Data"
+        self.plot_param["filename"] = "plot_edge_" + str(probe.lower())
+        self.plot_param["title"] = f"({probe} Probe) Edge Distance Data"
         self.plot_param["x_title"] = "Distance Beyond Edge (mm)"
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
@@ -174,42 +178,9 @@ class Plot:
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
 
-    def add_probe_inset(self,
-        fig, step_size, probe_width, probe_height,
-        x_center, y_zero, y_offset,
-        text_x_center, text_y_center, title_height
-    ) -> None:
-        for i in range(5):
-            distance = i * step_size
-            percentage = i * (step_size*100/4)
-            circle_offset = probe_width*percentage/100
-            y_start = y_zero - (i*y_offset)
-            y_end = (y_zero + probe_height) - (i*y_offset)
-            fig.add_shape(type="rect",
-                x0=x_center, y0=y_start,
-                x1=(x_center + probe_width), y1=y_end,
-                line_color="RoyalBlue",
-                fillcolor="LightSkyBlue",
-            )
-            fig.add_shape(type="circle",
-                x0=(x_center - probe_width) + circle_offset, y0=y_start,
-                x1=(x_center + circle_offset), y1=y_end,
-                line_color="LightSeaGreen",
-                fillcolor="PaleTurquoise",
-            )
-            fig.add_annotation(
-                x=text_x_center, y=text_y_center-(i*y_offset),
-                text=f"{distance} mm [{percentage} %]",
-                showarrow=False,
-            )
-        fig.add_annotation(
-            x=x_center, y=title_height,
-            text="[Top View]<br>Probe / Edge",
-            showarrow=False,
-        )
-
-    def absolute_all_plot(self):
+    def absolute_all_plot(self, probe):
         df = self.df_data
+        df = df[df["Probe"]==probe]
         x_axis = "Deck Height"
         y_axis = "Capacitance"
         x_first = df[x_axis].min()
@@ -223,37 +194,26 @@ class Plot:
             percentage = i * (self.x_increment*100/4)
             legend.append(f"{distance} mm [{percentage} %]")
         self.set_legend(fig, legend)
-        self.add_probe_inset(fig, step_size=1,
-            probe_width=0.16, probe_height=0.8,
-            x_center=1.6, y_zero=10.1, y_offset=1,
-            text_x_center=1.2, text_y_center=10.5,
-            title_height=11.4
-        )
         self.plot_param["figure"] = fig
-        self.plot_param["filename"] = "plot_absolute_all"
-        self.plot_param["title"] = "Absolute Capacitance vs. Deck Height"
+        self.plot_param["filename"] = "plot_absolute_all_" + str(probe.lower())
+        self.plot_param["title"] = f"({probe} Probe) Absolute Capacitance vs. Deck Height"
         self.plot_param["x_title"] = "Distance from Deck (mm)"
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
-        self.plot_param["y_range"] = [3, 12]
+        self.plot_param["y_range"] = [5, 12]
         self.plot_param["legend"] = "Probe Side to Edge"
         self.plot_param["annotation"] = None
         zoom_param = self.plot_param.copy()
         self.write_plot(self.plot_param)
-        self.add_probe_inset(fig, step_size=1,
-            probe_width=0.08, probe_height=0.08,
-            x_center=0.8, y_zero=4.61, y_offset=0.1,
-            text_x_center=0.6, text_y_center=4.65,
-            title_height=4.74
-        )
-        zoom_param["filename"] = "plot_absolute_all_zoom"
-        zoom_param["title"] = "Absolute Capacitance vs. Deck Height Zoomed"
+        zoom_param["filename"] = "plot_absolute_all_zoom_" + str(probe.lower())
+        zoom_param["title"] = f"({probe} Probe) Absolute Capacitance vs. Deck Height Zoomed"
         zoom_param["x_range"] = [x_first, 1]
         zoom_param["y_range"] = [5.4, 6.8]
         self.write_plot(zoom_param)
 
-    def relative_all_plot(self):
+    def relative_all_plot(self, probe):
         df = self.df_data
+        df = df[df["Probe"]==probe]
         x_axis = "Deck Height"
         y_axis = "Relative"
         x_first = df[x_axis].min()
@@ -267,15 +227,9 @@ class Plot:
             percentage = i * (self.x_increment*100/4)
             legend.append(f"{distance} mm [{percentage} %]")
         self.set_legend(fig, legend)
-        self.add_probe_inset(fig, step_size=1,
-            probe_width=0.16, probe_height=0.2,
-            x_center=1.6, y_zero=1.76, y_offset=0.24,
-            text_x_center=1.2, text_y_center=1.86,
-            title_height=2.1
-        )
         self.plot_param["figure"] = fig
-        self.plot_param["filename"] = "plot_relative_all"
-        self.plot_param["title"] = "Relative Capacitance vs. Deck Height"
+        self.plot_param["filename"] = "plot_relative_all_" + str(probe.lower())
+        self.plot_param["title"] = f"({probe} Probe) Relative Capacitance vs. Deck Height"
         self.plot_param["x_title"] = "Distance from Deck (mm)"
         self.plot_param["y_title"] = "∆C/C<sub>O</sub>"
         self.plot_param["x_range"] = [x_first, x_last]
@@ -284,14 +238,8 @@ class Plot:
         self.plot_param["annotation"] = None
         zoom_param = self.plot_param.copy()
         self.write_plot(self.plot_param)
-        self.add_probe_inset(fig, step_size=1,
-            probe_width=0.08, probe_height=0.018,
-            x_center=0.8, y_zero=0.152, y_offset=0.022,
-            text_x_center=0.6, text_y_center=0.161,
-            title_height=0.18
-        )
-        zoom_param["filename"] = "plot_relative_all_zoom"
-        zoom_param["title"] = "Relative Capacitance vs. Deck Height Zoomed"
+        zoom_param["filename"] = "plot_relative_all_zoom_" + str(probe.lower())
+        zoom_param["title"] = f"({probe} Probe) Relative Capacitance vs. Deck Height Zoomed"
         zoom_param["x_range"] = [x_first, 1]
         zoom_param["y_range"] = [0, 0.2]
         self.write_plot(zoom_param)
