@@ -15,6 +15,7 @@ import { FLOWS } from '../constants'
 import { Carriage } from '../Carriage'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
+import { fireEvent, waitFor } from '@testing-library/react'
 
 const render = (props: React.ComponentProps<typeof Carriage>) => {
   return renderWithProviders(<Carriage {...props} />, {
@@ -33,7 +34,9 @@ describe('Carriage', () => {
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
+      chainRunCommands: jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
       attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.ATTACH,
@@ -41,6 +44,7 @@ describe('Carriage', () => {
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
@@ -88,18 +92,23 @@ describe('Carriage', () => {
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
   })
-  it('renders the error z axis still attached modal when check z axis button still detects the attachment', async () => {
-    const { getByText, getByRole } = render(props)
-    getByRole('button', { name: 'Continue' }).click()
-    getByText('Z-axis Screw Still Secure')
-    getByText(
-      'You need to loosen the screw before you can attach the 96-Channel Pipette'
+  it('clicking on continue button executes the commands correctly', async () => {
+    const { getByRole } = render(props)
+    const contBtn = getByRole('button', { name: 'Continue' })
+    fireEvent.click(contBtn)
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'home',
+          params: {
+            axes: 'rightZ',
+          },
+        },
+      ],
+      false
     )
-    getByRole('button', { name: 'try again' })
-    getByRole('button', { name: 'Cancel attachment' })
+    await waitFor(() => {
+      expect(props.proceed).toHaveBeenCalled()
+    })
   })
-  //  TODO(jr 1/13/23): when z axis screw status is fully wired up, extend test cases for:
-  // 2nd case try again button where button disappears
-  // try again button click being a success
-  // cancel attachment click
 })

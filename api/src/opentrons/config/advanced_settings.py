@@ -177,14 +177,6 @@ settings = [
         restart_required=True,
     ),
     SettingDefinition(
-        _id="enableProtocolEnginePAPICore",
-        title="Enable experimental execution core for Python protocols",
-        description=(
-            "This is an Opentrons-internal setting to test new execution logic."
-            " Do not enable."
-        ),
-    ),
-    SettingDefinition(
         _id="enableOT3FirmwareUpdates",
         title="Enable experimental OT-3 firmware updates",
         description=(
@@ -518,6 +510,16 @@ def _migrate19to20(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate20to21(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 21 of the feature flags file.
+
+    - Removes deprecated enableProtocolEnginePAPICore option
+    """
+    removals = ["enableProtocolEnginePAPICore"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -539,6 +541,7 @@ _MIGRATIONS = [
     _migrate17to18,
     _migrate18to19,
     _migrate19to20,
+    _migrate20to21,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

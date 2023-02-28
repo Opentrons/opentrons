@@ -15,14 +15,17 @@ import { getLocalRobot } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
 import {
   CONNECT,
-  /* JOIN_OTHER, this will need for a following PR */
+  JOIN_OTHER,
 } from '../../organisms/Devices/RobotSettings/ConnectNetwork/constants'
-import { DisplayWifiList } from '../../organisms/SetupNetwork/DisplayWifiList'
-import { SelectAuthenticationType } from '../../organisms/SetupNetwork/SelectAuthenticationType'
-import { SetWifiCred } from '../../organisms/SetupNetwork/SetWifiCred'
-import { ConnectingNetwork } from '../../organisms/SetupNetwork/ConnectingNetwork'
-import { SucceededToConnect } from '../../organisms/SetupNetwork/SucceededToConnect'
-import { FailedToConnect } from '../../organisms/SetupNetwork/FailedToConnect'
+import {
+  ConnectingNetwork,
+  DisplayWifiList,
+  FailedToConnect,
+  SetWifiSsid,
+  SelectAuthenticationType,
+  SetWifiCred,
+  WifiConnectionDetails,
+} from '../../organisms/OnDeviceDisplay/SetupNetwork'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
@@ -65,14 +68,16 @@ export function ConnectViaWifi(): JSX.Element {
     const options = {
       ssid: selectedSsid,
       securityType: selectedAuthType,
-      hidden: selectedAuthType === 'none' && false,
+      hidden:
+        selectedAuthType === 'none' ||
+        (changeState.type === JOIN_OTHER && false),
       psk: password,
     }
     dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
     // Note: kj 1/18/2023 for join_other network , this will be required by a following PR
-    // if (changeState.type === JOIN_OTHER) {
-    //   setChangeState({ type: changeState.type, ssid: options.ssid })
-    // }
+    if (changeState.type === JOIN_OTHER) {
+      setChangeState({ type: changeState.type, ssid: options.ssid })
+    }
     setPassword('')
   }
 
@@ -85,6 +90,14 @@ export function ConnectViaWifi(): JSX.Element {
           setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setChangeState={setChangeState}
           setSelectedSsid={setSelectedSsid}
+        />
+      )
+    } else if (changeState.type === JOIN_OTHER && changeState.ssid === null) {
+      return (
+        <SetWifiSsid
+          setSelectedSsid={setSelectedSsid}
+          setShowSelectAuthenticationType={setShowSelectAuthenticationType}
+          setChangeState={setChangeState}
         />
       )
     } else if (showSelectAuthenticationType) {
@@ -122,7 +135,7 @@ export function ConnectViaWifi(): JSX.Element {
       currentRequestState.status === RobotApi.SUCCESS
     ) {
       return (
-        <SucceededToConnect
+        <WifiConnectionDetails
           ssid={changeState.ssid}
           authType={selectedAuthType}
         />

@@ -162,8 +162,8 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     def save_offset(self, delta: Point) -> GripperCalibrationOffset:
         """Save a new gripper offset."""
-        save_gripper_calibration_offset(self._gripper_id, delta)
-        self._calibration_offset = load_gripper_calibration_offset(self._gripper_id)
+        save_gripper_calibration_offset(self.gripper_id, delta)
+        self._calibration_offset = load_gripper_calibration_offset(self.gripper_id)
         return self._calibration_offset
 
     def check_calibration_pin_location_is_accurate(self) -> None:

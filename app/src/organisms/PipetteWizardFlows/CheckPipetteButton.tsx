@@ -1,10 +1,8 @@
 import * as React from 'react'
-import { SUCCESS, FAILURE } from '../../redux/robot-api'
 import { PrimaryButton } from '../../atoms/buttons'
-import { useCheckPipettes } from './hooks'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 
 interface CheckPipetteButtonProps {
-  robotName: string
   proceedButtonText: string
   setPending: React.Dispatch<React.SetStateAction<boolean>>
   proceed: () => void
@@ -13,27 +11,28 @@ interface CheckPipetteButtonProps {
 export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
 ): JSX.Element => {
-  const {
-    robotName,
-    proceedButtonText,
-    setPending,
-    proceed,
-    isDisabled,
-  } = props
-  const { handleCheckPipette, isPending, requestStatus } = useCheckPipettes(
-    robotName
-  )
-  React.useEffect(() => {
-    setPending(isPending)
-  }, [isPending, setPending])
+  const { proceedButtonText, proceed, setPending, isDisabled } = props
+  const { status, refetch } = usePipettesQuery()
 
   React.useEffect(() => {
-    //  if requestStatus is FAILURE then the error modal will be in the results page
-    if (requestStatus === SUCCESS || requestStatus === FAILURE) proceed()
-  }, [proceed, requestStatus])
+    //  if requestStatus is error then the error modal will be in the results page
+    if (status === 'success' || status === 'error') {
+      proceed()
+      setPending(false)
+    } else if (status === 'loading') {
+      setPending(true)
+    }
+  }, [proceed, status, setPending])
 
   return (
-    <PrimaryButton disabled={isDisabled} onClick={handleCheckPipette}>
+    <PrimaryButton
+      disabled={isDisabled}
+      onClick={() => {
+        refetch()
+          .then(() => {})
+          .catch(() => {})
+      }}
+    >
       {proceedButtonText}
     </PrimaryButton>
   )

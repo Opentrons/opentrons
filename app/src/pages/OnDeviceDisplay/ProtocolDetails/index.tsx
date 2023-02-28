@@ -18,7 +18,7 @@ import {
 } from '@opentrons/react-api-client'
 import {
   BackButton,
-  SecondaryTertiaryButton,
+  QuaternaryButton,
   TertiaryButton,
 } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
@@ -81,9 +81,7 @@ const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
     <Flex gridGap={SPACING.spacing3} margin={SPACING.spacing4}>
       {protocolSectionTabOptions.map(option => {
         const Button =
-          option === props.currentOption
-            ? TertiaryButton
-            : SecondaryTertiaryButton
+          option === props.currentOption ? TertiaryButton : QuaternaryButton
         return (
           <Button key={option} onClick={() => props.setCurrentOption(option)}>
             {option}
