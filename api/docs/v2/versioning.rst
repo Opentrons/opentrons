@@ -243,8 +243,11 @@ Version 2.13
 Version 2.14
 ++++++++++++
 
-This version introduces a new protocol runtime. Several older parts of the Protocol API were deprecated as part of this switchover.
-If you specify an API version of 2.13 or lower, your protocols will continue to execute on the old runtime.
+This version introduces a new protocol runtime that offers more reliable run control
+and builds a strong foundation for future Protocol API improvements.
+
+Several older parts of the Protocol API deprecated as part of this switchover.
+If you specify an API version of ``2.13`` or lower, your protocols will continue to execute on the old runtime.
 
 - Feature additions
 
@@ -261,6 +264,14 @@ If you specify an API version of 2.13 or lower, your protocols will continue to 
 
   - :py:meth:`.ProtocolContext.load_labware` now prefers loading user-provided labware definitions
     rather than built-in definitions if no explicit ``namespace`` is specified.
+
+  - :py:meth:`.ProtocolContext.pause` will now properly wait until you resume the protocol before moving on.
+    In previous versions, the run will not pause until the first call to a different `ProtocolContext` method.
+
+  - Motion planning has been improved to avoid certain erroneous downward movements,
+    especially when using :py:meth:`.InstrumentContext.aspirate`.
+
+  - :py:attr:`.Labware.tip_length` will raise a useful error if called on a non-tip-rack.
 
 - Removals
 
@@ -291,7 +302,8 @@ If you specify an API version of 2.13 or lower, your protocols will continue to 
   - Various methods and setters were removed that could modify tip state outside of
     calls to :py:meth:`.InstrumentContext.pick_up_tip` and :py:meth:`.InstrumentContext.drop_tip`.
     This change allows the robot to track tip usage more completely and reliably.
-    You may still use :py:meth:`.Labware.reset` to reset your tip rack's state.
+    You may still use :py:meth:`.Labware.reset` and :py:meth:`.InstrumentContext.reset_tipracks`
+    to reset your tip racks' state.
 
       - The :py:attr:`.Well.has_tip` **setter** was removed. **The getter is still supported.**
 
