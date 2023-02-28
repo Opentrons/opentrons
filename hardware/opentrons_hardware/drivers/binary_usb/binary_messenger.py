@@ -79,6 +79,8 @@ class BinaryMessenger:
                 await self._task
             except asyncio.CancelledError:
                 log.info("Task cancelled.")
+            self._task = None
+
         else:
             log.warning("task not running.")
 
