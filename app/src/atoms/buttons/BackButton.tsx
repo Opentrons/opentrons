@@ -7,6 +7,7 @@ import { ALIGN_CENTER, Box, Btn, Flex, Icon } from '@opentrons/components'
 // TODO(bh, 2022-12-7): finish styling when designs finalized
 export function BackButton({
   onClick,
+  children,
 }: React.HTMLProps<HTMLButtonElement>): JSX.Element {
   const history = useHistory()
   const { t } = useTranslation('shared')
@@ -21,7 +22,8 @@ export function BackButton({
       <Flex alignItems={ALIGN_CENTER}>
         <Icon name="chevron-left" height="3rem" />
         <Box fontSize="2rem" fontWeight="700">
-          {t('back')}
+          {/* render "Back" if no children given */}
+          {children != null ? children : t('back')}
         </Box>
       </Flex>
     </Btn>

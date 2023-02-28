@@ -18,8 +18,9 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
     DropTipWellOrigin,
 )
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import FlowRates
+from opentrons.protocol_engine.types import FlowRates, TipGeometry
 from opentrons.protocol_api.core.engine import InstrumentCore, WellCore, ProtocolCore
 from opentrons.types import Location, Mount, MountType, Point
 
@@ -120,7 +121,6 @@ def test_get_hardware_state(
     )
 
     assert subject.get_hardware_state() == pipette_dict
-    assert subject.has_tip() is True
 
 
 def test_move_to_well(
@@ -730,6 +730,34 @@ def test_get_current_volume(
     assert subject.get_current_volume() == 123.4
 
 
+def test_get_current_volume_returns_zero_when_no_tip_attached(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return 0 when an exception is raised."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_raise(TipNotAttachedError())
+    assert subject.get_current_volume() == 0
+
+
+def test_get_available_volume_returns_zero_no_tip_attached(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return 0 when an exception is raised."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_available_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_raise(TipNotAttachedError())
+    assert subject.get_available_volume() == 0
+
+
 def test_get_available_volume(
     decoy: Decoy,
     subject: InstrumentCore,
@@ -817,3 +845,16 @@ def test_touch_tip(
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
+
+
+def test_has_tip(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return tip state."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_attached_tip("abc123")
+    ).then_return(TipGeometry(length=1, diameter=2, volume=3))
+
+    assert subject.has_tip() is True

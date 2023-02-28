@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 from typing import NamedTuple
 
-from opentrons.types import MountType, Mount, Point, DeckSlotName
+from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
@@ -15,24 +15,20 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     DeckSlotLocation,
+    CurrentWell,
 )
 from opentrons.protocol_engine.state import (
     StateStore,
     PipetteLocationData,
-    CurrentWell,
 )
-from opentrons.protocol_engine.execution.movement import (
-    MovementHandler,
-    MoveRelativeData,
-    SavedPositionData,
-)
+from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
 )
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
     HeaterShakerMovementFlagger,
 )
-from opentrons.protocol_engine.execution.gantry_movement import GantryMovementHandler
+from opentrons.protocol_engine.execution.gantry_mover import GantryMover
 
 
 @pytest.fixture
@@ -60,9 +56,9 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
 
 
 @pytest.fixture
-def gantry_movement_handler(decoy: Decoy) -> GantryMovementHandler:
-    """Get a mock in the shape of a GantryMovementHandler."""
-    return decoy.mock(cls=GantryMovementHandler)
+def mock_gantry_mover(decoy: Decoy) -> GantryMover:
+    """Get a mock in the shape of a GantryMover."""
+    return decoy.mock(cls=GantryMover)
 
 
 @pytest.fixture
@@ -71,7 +67,7 @@ def subject(
     hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
-    gantry_movement_handler: GantryMovementHandler,
+    mock_gantry_mover: GantryMover,
 ) -> MovementHandler:
     """Create a MovementHandler with its dependencies mocked out."""
     return MovementHandler(
@@ -79,7 +75,7 @@ def subject(
         hardware_api=hardware_api,
         thermocycler_movement_flagger=thermocycler_movement_flagger,
         heater_shaker_movement_flagger=heater_shaker_movement_flagger,
-        gantry_mover=gantry_movement_handler,
+        gantry_mover=mock_gantry_mover,
     )
 
 
@@ -88,7 +84,7 @@ async def test_move_to_well(
     state_store: StateStore,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
-    gantry_movement_handler: GantryMovementHandler,
+    mock_gantry_mover: GantryMover,
     subject: MovementHandler,
 ) -> None:
     """Move requests should call hardware controller with movement data."""
@@ -123,14 +119,14 @@ async def test_move_to_well(
     )
 
     decoy.when(
-        await gantry_movement_handler.get_position(
+        await mock_gantry_mover.get_position(
             pipette_id="pipette-id",
         )
     ).then_return(Point(1, 1, 1))
 
-    decoy.when(
-        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
-    ).then_return(42.0)
+    decoy.when(mock_gantry_mover.get_max_travel_z(pipette_id="pipette-id")).then_return(
+        42.0
+    )
 
     decoy.when(
         state_store.pipettes.get_movement_speed(
@@ -155,6 +151,17 @@ async def test_move_to_well(
         [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
     )
 
+    decoy.when(
+        await mock_gantry_mover.move_to(
+            pipette_id="pipette-id",
+            waypoints=[
+                Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER),
+                Waypoint(Point(4, 5, 6)),
+            ],
+            speed=39339.5,
+        ),
+    ).then_return(Point(4, 5, 6))
+
     result = await subject.move_to_well(
         pipette_id="pipette-id",
         labware_id="labware-id",
@@ -165,7 +172,7 @@ async def test_move_to_well(
         speed=45.6,
     )
 
-    assert result == DeckPoint(x=4, y=5, z=6)
+    assert result == Point(x=4, y=5, z=6)
 
     decoy.verify(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
@@ -177,16 +184,6 @@ async def test_move_to_well(
             is_multi_channel=False,
             destination_is_tip_rack=False,
         ),
-        await gantry_movement_handler.move_to(
-            mount=Mount.LEFT,
-            waypoint=Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER),
-            speed=39339.5,
-        ),
-        await gantry_movement_handler.move_to(
-            mount=Mount.LEFT,
-            waypoint=Waypoint(Point(4, 5, 6)),
-            speed=39339.5,
-        ),
     )
 
 
@@ -195,7 +192,7 @@ async def test_move_to_well_from_starting_location(
     state_store: StateStore,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
-    gantry_movement_handler: GantryMovementHandler,
+    mock_gantry_mover: GantryMover,
     subject: MovementHandler,
 ) -> None:
     """It should be able to move to a well from a start location."""
@@ -236,14 +233,14 @@ async def test_move_to_well_from_starting_location(
     )
 
     decoy.when(
-        await gantry_movement_handler.get_position(
+        await mock_gantry_mover.get_position(
             pipette_id="pipette-id",
         )
     ).then_return(Point(1, 2, 5))
 
-    decoy.when(
-        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
-    ).then_return(42.0)
+    decoy.when(mock_gantry_mover.get_max_travel_z(pipette_id="pipette-id")).then_return(
+        42.0
+    )
 
     decoy.when(
         state_store.motion.get_movement_waypoints_to_well(
@@ -266,13 +263,23 @@ async def test_move_to_well_from_starting_location(
         )
     ).then_return(39339.5)
 
-    await subject.move_to_well(
+    decoy.when(
+        await mock_gantry_mover.move_to(
+            pipette_id="pipette-id",
+            waypoints=[Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER)],
+            speed=39339.5,
+        ),
+    ).then_return(Point(4, 5, 6))
+
+    result = await subject.move_to_well(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B2",
         well_location=well_location,
         current_well=current_well,
     )
+
+    assert result == Point(4, 5, 6)
 
     decoy.verify(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
@@ -284,95 +291,7 @@ async def test_move_to_well_from_starting_location(
             is_multi_channel=False,
             destination_is_tip_rack=False,
         ),
-        await gantry_movement_handler.move_to(
-            mount=Mount.RIGHT,
-            waypoint=Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER),
-            speed=39339.5,
-        ),
     )
-
-
-async def test_move_to_well_no_waypoints(
-    decoy: Decoy,
-    state_store: StateStore,
-    thermocycler_movement_flagger: ThermocyclerMovementFlagger,
-    heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
-    gantry_movement_handler: GantryMovementHandler,
-    subject: MovementHandler,
-) -> None:
-    """Move requests should return origin if no waypoints are returned from MotionView."""
-    well_location = WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=WellOffset(x=0, y=0, z=1),
-    )
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    decoy.when(
-        state_store.modules.get_heater_shaker_movement_restrictors()
-    ).then_return([])
-
-    decoy.when(state_store.geometry.get_ancestor_slot_name("labware-id")).then_return(
-        DeckSlotName.SLOT_1
-    )
-
-    decoy.when(state_store.tips.get_pipette_channels("pipette-id")).then_return(1)
-    decoy.when(state_store.labware.is_tiprack("labware-id")).then_return(False)
-
-    decoy.when(
-        state_store.motion.get_pipette_location(
-            pipette_id="pipette-id",
-            current_well=None,
-        )
-    ).then_return(
-        PipetteLocationData(
-            mount=MountType.LEFT,
-            critical_point=CriticalPoint.FRONT_NOZZLE,
-        )
-    )
-
-    decoy.when(
-        await gantry_movement_handler.get_position(
-            pipette_id="pipette-id",
-        )
-    ).then_return(Point(11, 22, 33))
-
-    decoy.when(
-        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
-    ).then_return(42.0)
-
-    decoy.when(
-        state_store.pipettes.get_movement_speed(
-            pipette_id="pipette-id", requested_speed=45.6
-        )
-    ).then_return(39339.5)
-
-    decoy.when(
-        state_store.motion.get_movement_waypoints_to_well(
-            origin=Point(11, 22, 33),
-            origin_cp=CriticalPoint.FRONT_NOZZLE,
-            max_travel_z=42.0,
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="B2",
-            well_location=well_location,
-            current_well=None,
-            force_direct=True,
-            minimum_z_height=12.3,
-        )
-    ).then_return([])
-
-    result = await subject.move_to_well(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=well_location,
-        force_direct=True,
-        minimum_z_height=12.3,
-        speed=45.6,
-    )
-
-    assert result == DeckPoint(x=11, y=22, z=33)
 
 
 class MoveRelativeSpec(NamedTuple):
@@ -403,7 +322,7 @@ class MoveRelativeSpec(NamedTuple):
 async def test_move_relative(
     decoy: Decoy,
     state_store: StateStore,
-    gantry_movement_handler: GantryMovementHandler,
+    mock_gantry_mover: GantryMover,
     subject: MovementHandler,
     axis: MovementAxis,
     expected_delta: Point,
@@ -411,7 +330,7 @@ async def test_move_relative(
 ) -> None:
     """Test that move_relative triggers a relative move with the HardwareAPI."""
     decoy.when(
-        await gantry_movement_handler.move_relative(
+        await mock_gantry_mover.move_relative(
             pipette_id="pipette-id",
             delta=expected_delta,
             speed=39339.5,
@@ -428,39 +347,16 @@ async def test_move_relative(
         distance=distance,
     )
 
-    assert result == MoveRelativeData(position=DeckPoint(x=1, y=2, z=3))
-
-
-async def test_save_position(
-    decoy: Decoy,
-    state_store: StateStore,
-    gantry_movement_handler: GantryMovementHandler,
-    subject: MovementHandler,
-) -> None:
-    """Test that `save_position` fetches gantry position from hardwareAPI."""
-    decoy.when(
-        await gantry_movement_handler.get_position(
-            pipette_id="pipette-id",
-            fail_on_not_homed=True,
-        )
-    ).then_return(Point(1, 1, 1))
-
-    result = await subject.save_position(pipette_id="pipette-id", position_id="123")
-
-    assert result == SavedPositionData(
-        positionId="123", position=DeckPoint(x=1, y=1, z=1)
-    )
+    assert result == Point(x=1, y=2, z=3)
 
 
 async def test_move_to_coordinates(
     decoy: Decoy,
     state_store: StateStore,
-    gantry_movement_handler: GantryMovementHandler,
+    mock_gantry_mover: GantryMover,
     subject: MovementHandler,
 ) -> None:
     """Test that move_to_coordinates correctly calls api.move_to."""
-    mount = Mount.RIGHT
-
     current_position = Point(4.44, 5.55, 6.66)
     destination_deck = DeckPoint(x=1.11, y=2.22, z=3.33)
     destination_point = Point(1.11, 2.22, 3.33)
@@ -482,12 +378,12 @@ async def test_move_to_coordinates(
     )
 
     decoy.when(
-        await gantry_movement_handler.get_position(pipette_id="pipette-id")
+        await mock_gantry_mover.get_position(pipette_id="pipette-id")
     ).then_return(current_position)
 
-    decoy.when(
-        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
-    ).then_return(5678)
+    decoy.when(mock_gantry_mover.get_max_travel_z(pipette_id="pipette-id")).then_return(
+        5678
+    )
 
     decoy.when(
         state_store.motion.get_movement_waypoints_to_coords(
@@ -505,6 +401,14 @@ async def test_move_to_coordinates(
         )
     ).then_return(39339.5)
 
+    decoy.when(
+        await mock_gantry_mover.move_to(
+            pipette_id="pipette-id",
+            waypoints=[planned_waypoint_1, planned_waypoint_2],
+            speed=39339.5,
+        )
+    ).then_return(Point(x=1, y=5, z=9))
+
     result = await subject.move_to_coordinates(
         pipette_id="pipette-id",
         deck_coordinates=destination_deck,
@@ -513,70 +417,4 @@ async def test_move_to_coordinates(
         speed=567,
     )
 
-    assert result == DeckPoint(x=1, y=5, z=9)
-
-    decoy.verify(
-        await gantry_movement_handler.move_to(
-            mount=mount,
-            waypoint=planned_waypoint_1,
-            speed=39339.5,
-        ),
-        await gantry_movement_handler.move_to(
-            mount=mount,
-            waypoint=planned_waypoint_2,
-            speed=39339.5,
-        ),
-    )
-
-
-async def test_move_to_coordinates_no_waypoints(
-    decoy: Decoy,
-    state_store: StateStore,
-    gantry_movement_handler: GantryMovementHandler,
-    subject: MovementHandler,
-) -> None:
-    """Test that move_to_coordinates correctly returns origin if no waypoints are returned from MotionView."""
-    decoy.when(
-        state_store.motion.get_pipette_location(
-            pipette_id="pipette-id",
-        )
-    ).then_return(
-        PipetteLocationData(
-            mount=MountType.RIGHT,
-            critical_point=CriticalPoint.XY_CENTER,
-        )
-    )
-
-    decoy.when(
-        await gantry_movement_handler.get_position(pipette_id="pipette-id")
-    ).then_return(Point(11, 22, 33))
-
-    decoy.when(
-        gantry_movement_handler.get_max_travel_z(pipette_id="pipette-id")
-    ).then_return(5678)
-
-    decoy.when(
-        state_store.motion.get_movement_waypoints_to_coords(
-            origin=Point(11, 22, 33),
-            dest=Point(x=1, y=2, z=3),
-            max_travel_z=5678,
-            direct=True,
-            additional_min_travel_z=1234,
-        )
-    ).then_return([])
-
-    decoy.when(
-        state_store.pipettes.get_movement_speed(
-            pipette_id="pipette-id", requested_speed=567
-        )
-    ).then_return(39339.5)
-
-    result = await subject.move_to_coordinates(
-        pipette_id="pipette-id",
-        deck_coordinates=DeckPoint(x=1, y=2, z=3),
-        direct=True,
-        additional_min_travel_z=1234,
-        speed=567,
-    )
-
-    assert result == DeckPoint(x=11, y=22, z=33)
+    assert result == Point(x=1, y=5, z=9)

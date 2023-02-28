@@ -6,7 +6,8 @@ from opentrons.types import Mount, MountType
 from opentrons.hardware_control import API as HardwareAPI
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.state import StateView, TipGeometry
+from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.types import TipGeometry
 from opentrons.protocol_engine.resources import LabwareDataProvider
 
 from opentrons.protocol_engine.execution.tip_handler import (
@@ -97,13 +98,7 @@ async def test_pick_up_tip(
             labware_id="labware-id",
             well_name="B2",
         )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
+    ).then_return(TipGeometry(length=50, diameter=5, volume=300))
 
     decoy.when(
         await mock_labware_data_provider.get_calibrated_tip_length(
@@ -119,11 +114,7 @@ async def test_pick_up_tip(
         well_name="B2",
     )
 
-    assert result == TipGeometry(
-        effective_length=42,
-        diameter=5,
-        volume=300,
-    )
+    assert result == TipGeometry(length=42, diameter=5, volume=300)
 
     decoy.verify(
         await mock_hardware_api.pick_up_tip(
@@ -170,7 +161,6 @@ async def test_add_tip(
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
     mock_labware_data_provider: LabwareDataProvider,
-    tip_rack_definition: LabwareDefinition,
 ) -> None:
     """It should add a tip manually to the hardware API."""
     subject = HardwareTipHandler(
@@ -179,46 +169,23 @@ async def test_add_tip(
         labware_data_provider=mock_labware_data_provider,
     )
 
-    decoy.when(mock_state_view.labware.get_definition("labware-id")).then_return(
-        tip_rack_definition
-    )
-
-    decoy.when(mock_state_view.pipettes.get_serial_number("pipette-id")).then_return(
-        "pipette-serial"
+    tip = TipGeometry(
+        length=50,
+        diameter=5,
+        volume=300,
     )
 
     decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
         MountType.LEFT
     )
 
-    decoy.when(
-        mock_state_view.geometry.get_nominal_tip_geometry(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name=None,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
-
-    decoy.when(
-        await mock_labware_data_provider.get_calibrated_tip_length(
-            pipette_serial="pipette-serial",
-            labware_definition=tip_rack_definition,
-            nominal_fallback=50,
-        )
-    ).then_return(42)
-
-    await subject.add_tip(pipette_id="pipette-id", labware_id="labware-id")
+    await subject.add_tip(pipette_id="pipette-id", tip=tip)
 
     decoy.verify(
-        await mock_hardware_api.add_tip(mount=Mount.LEFT, tip_length=42),
+        await mock_hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
         mock_hardware_api.set_current_tiprack_diameter(
-            mount=Mount.LEFT, tiprack_diameter=5
+            mount=Mount.LEFT,
+            tiprack_diameter=5,
         ),
         mock_hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
     )
@@ -246,7 +213,7 @@ async def test_virtual_pick_up_tip(
             labware_id="labware-id",
             well_name="B2",
         )
-    ).then_return(TipGeometry(effective_length=50, diameter=5, volume=300))
+    ).then_return(TipGeometry(length=50, diameter=5, volume=300))
 
     result = await subject.pick_up_tip(
         pipette_id="pipette-id",
@@ -254,7 +221,7 @@ async def test_virtual_pick_up_tip(
         well_name="B2",
     )
 
-    assert result == TipGeometry(effective_length=50, diameter=5, volume=300)
+    assert result == TipGeometry(length=50, diameter=5, volume=300)
 
     decoy.verify(
         mock_state_view.pipettes.validate_tip_state("pipette-id", False),
@@ -272,11 +239,3 @@ async def test_virtual_drop_tip(decoy: Decoy, mock_state_view: StateView) -> Non
         mock_state_view.pipettes.validate_tip_state("pipette-id", True),
         times=1,
     )
-
-
-async def test_virtual_add_tip(decoy: Decoy, mock_state_view: StateView) -> None:
-    """It should disallow `add_tip` when using virtual pipettes."""
-    subject = VirtualTipHandler(state_view=mock_state_view)
-
-    with pytest.raises(AssertionError):
-        await subject.add_tip(pipette_id="pipette-id", labware_id="labware-id")

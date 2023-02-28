@@ -15,7 +15,7 @@ from opentrons.protocol_engine.execution import (
     TipHandler,
     HardwareStopper,
 )
-from opentrons.protocol_engine.types import MotorAxis
+from opentrons.protocol_engine.types import MotorAxis, TipGeometry
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -81,8 +81,10 @@ async def test_hardware_stopping_sequence(
     subject: HardwareStopper,
 ) -> None:
     """It should stop the hardware, home the robot and perform drop tip if required."""
-    decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
-        {"pipette-id": "tiprack-id"}
+    decoy.when(state_store.pipettes.get_all_attached_tips()).then_return(
+        [
+            ("pipette-id", TipGeometry(length=1.0, volume=2.0, diameter=3.0)),
+        ]
     )
 
     await subject.do_stop_and_recover(drop_tips_and_home=True)
@@ -94,17 +96,14 @@ async def test_hardware_stopping_sequence(
         ),
         await mock_tip_handler.add_tip(
             pipette_id="pipette-id",
-            labware_id="tiprack-id",
+            tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
         await movement.move_to_well(
             pipette_id="pipette-id",
             labware_id="fixedTrash",
             well_name="A1",
         ),
-        await mock_tip_handler.drop_tip(
-            pipette_id="pipette-id",
-            home_after=False,
-        ),
+        await mock_tip_handler.drop_tip(pipette_id="pipette-id", home_after=False),
         await hardware_api.stop(home_after=True),
     )
 
@@ -116,7 +115,7 @@ async def test_hardware_stopping_sequence_without_pipette_tips(
     subject: HardwareStopper,
 ) -> None:
     """Don't drop tip when there aren't any tips attached to pipettes."""
-    decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return({})
+    decoy.when(state_store.pipettes.get_all_attached_tips()).then_return([])
 
     await subject.do_stop_and_recover(drop_tips_and_home=True)
 
@@ -129,17 +128,26 @@ async def test_hardware_stopping_sequence_no_home(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
+    mock_tip_handler: TipHandler,
     subject: HardwareStopper,
 ) -> None:
     """Don't drop tip when told not to, even if tips are attached."""
-    decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
-        {"pipette-id": "tiprack-id"}
+    decoy.when(state_store.pipettes.get_all_attached_tips()).then_return(
+        [
+            ("pipette-id", TipGeometry(length=1.0, volume=2.0, diameter=3.0)),
+        ]
     )
 
     await subject.do_stop_and_recover(drop_tips_and_home=False)
 
+    decoy.verify(await hardware_api.stop(home_after=False), times=1)
+
     decoy.verify(
-        await hardware_api.stop(home_after=False),
+        await mock_tip_handler.add_tip(
+            pipette_id="pipette-id",
+            tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
+        ),
+        times=0,
     )
 
 
@@ -151,14 +159,16 @@ async def test_hardware_stopping_sequence_no_pipette(
     subject: HardwareStopper,
 ) -> None:
     """It should gracefully no-op if the HW API reports no attached pipette."""
-    decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
-        {"pipette-id": "tiprack-id"}
+    decoy.when(state_store.pipettes.get_all_attached_tips()).then_return(
+        [
+            ("pipette-id", TipGeometry(length=1.0, volume=2.0, diameter=3.0)),
+        ]
     )
 
     decoy.when(
         await mock_tip_handler.add_tip(
             pipette_id="pipette-id",
-            labware_id="tiprack-id",
+            tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
     ).then_raise(HwPipetteNotAttachedError("oh no"))
 
@@ -166,6 +176,7 @@ async def test_hardware_stopping_sequence_no_pipette(
 
     decoy.verify(
         await hardware_api.stop(home_after=True),
+        times=1,
     )
 
 
@@ -184,8 +195,10 @@ async def test_hardware_stopping_sequence_with_gripper(
         movement=movement,
         tip_handler=mock_tip_handler,
     )
-    decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
-        {"pipette-id": "tiprack-id"}
+    decoy.when(state_store.pipettes.get_all_attached_tips()).then_return(
+        [
+            ("pipette-id", TipGeometry(length=1.0, volume=2.0, diameter=3.0)),
+        ]
     )
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
@@ -199,7 +212,7 @@ async def test_hardware_stopping_sequence_with_gripper(
         ),
         await mock_tip_handler.add_tip(
             pipette_id="pipette-id",
-            labware_id="tiprack-id",
+            tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
         await movement.move_to_well(
             pipette_id="pipette-id",

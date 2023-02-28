@@ -448,9 +448,9 @@ class LabwareView(HasState[LabwareState]):
         tip_length = self.get_tip_length(labware_id)
         return -tip_length * length_scale + additional_offset
 
-    def get_definition_uri(self, labware_id: str) -> str:
+    def get_definition_uri(self, labware_id: str) -> LabwareUri:
         """Get a labware's definition URI."""
-        return self.get(labware_id).definitionUri
+        return LabwareUri(self.get(labware_id).definitionUri)
 
     def get_uri_from_definition(
         self,
