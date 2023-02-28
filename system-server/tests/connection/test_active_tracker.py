@@ -16,29 +16,29 @@ async def test_authorization_tracking_counting() -> None:
 
     reg1 = Registrant("a", "b", "c")
     future_exp = datetime.now() + timedelta(days=10)
-    assert await subject.active_connections() == 0
+    assert subject.active_connections() == 0
 
     # Adding one auth
-    await subject.add_connection(reg1, future_exp)
-    assert await subject.active_connections() == 1
+    subject.add_connection(reg1, future_exp)
+    assert subject.active_connections() == 1
 
     # Adding an auth that is already expired
     reg2 = Registrant("aaa", "bbb", "ccc")
     past_exp = datetime.now() - timedelta(days=10)
-    await subject.add_connection(reg2, past_exp)
-    assert await subject.active_connections() == 1
+    subject.add_connection(reg2, past_exp)
+    assert subject.active_connections() == 1
 
     # Adding a second, non-expired auth
-    await subject.add_connection(reg2, future_exp)
-    assert await subject.active_connections() == 2
+    subject.add_connection(reg2, future_exp)
+    assert subject.active_connections() == 2
 
     # Adding an auth that already exists
-    await subject.add_connection(reg1, future_exp)
-    assert await subject.active_connections() == 2
+    subject.add_connection(reg1, future_exp)
+    assert subject.active_connections() == 2
 
     # Overwriting an auth that exists with an expired date
-    await subject.add_connection(reg1, past_exp)
-    assert await subject.active_connections() == 1
+    subject.add_connection(reg1, past_exp)
+    assert subject.active_connections() == 1
 
 
 async def test_authorization_tracking_getter(registrant_list: List[Registrant]) -> None:
@@ -47,11 +47,11 @@ async def test_authorization_tracking_getter(registrant_list: List[Registrant]) 
     expiration = datetime.now() + timedelta(days=100)
 
     for r in registrant_list:
-        await subject.add_connection(r, expiration)
+        subject.add_connection(r, expiration)
 
-    assert await subject.active_connections() == len(registrant_list)
+    assert subject.active_connections() == len(registrant_list)
 
-    check = await subject.get_connected()
+    check = subject.get_connected()
 
     for r in registrant_list:
         assert check.count(r) == 1
@@ -65,12 +65,12 @@ async def test_authorization_tracking_overwrite(
     expiration_short = datetime.now() + timedelta(days=1)
 
     for r in registrant_list:
-        await subject.add_connection(r, expiration_short)
+        subject.add_connection(r, expiration_short)
 
     expiration_long = datetime.now() + timedelta(days=10)
     for r in registrant_list:
-        await subject.add_connection(r, expiration_long)
+        subject.add_connection(r, expiration_long)
 
-    check = await subject.get_connected()
+    check = subject.get_connected()
     for r in registrant_list:
         assert check.count(r) == 1

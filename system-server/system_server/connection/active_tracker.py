@@ -2,13 +2,14 @@
 from datetime import datetime
 from typing import List
 from dataclasses import dataclass
-from asyncio import Lock
 
 from system_server.jwt import Registrant
 
 
 @dataclass
 class _Authorization:
+    """Simple wrapper of data to hold in auth tracker."""
+
     registrant: Registrant
     expiration: datetime
 
@@ -18,11 +19,8 @@ class AuthorizationTracker:
 
     def __init__(self) -> None:
         self._connections: List[_Authorization] = []
-        self._lock = Lock()
 
-    async def add_connection(
-        self, registrant: Registrant, expiration: datetime
-    ) -> None:
+    def add_connection(self, registrant: Registrant, expiration: datetime) -> None:
         """Add a new connection, or refresh an existing one.
 
         If this registrant isn't already connected, it will be added to the authorization
@@ -34,30 +32,27 @@ class AuthorizationTracker:
             expiration: When this registrant is considered expired.
         """
         # If this registrant already exists, remove it
-        async with self._lock:
-            for c in self._connections:
-                if c.registrant == registrant:
-                    self._connections.remove(c)
+        for c in self._connections:
+            if c.registrant == registrant:
+                self._connections.remove(c)
+        # We now know there's no other copy, so add this to the end of the list
+        self._connections.append(
+            _Authorization(registrant=registrant, expiration=expiration)
+        )
 
-            self._connections.append(
-                _Authorization(registrant=registrant, expiration=expiration)
-            )
-
-    async def _update_active_connections(self) -> None:
+    def _update_active_connections(self) -> None:
         """Clear out any expired connections."""
-        async with self._lock:
-            now = datetime.now()
-            for c in self._connections:
-                if c.expiration < now:
-                    self._connections.remove(c)
+        now = datetime.now()
+        for c in self._connections:
+            if c.expiration < now:
+                self._connections.remove(c)
 
-    async def active_connections(self) -> int:
+    def active_connections(self) -> int:
         """Get the current number of active connections."""
-        await self._update_active_connections()
+        self._update_active_connections()
         return len(self._connections)
 
-    async def get_connected(self) -> List[Registrant]:
+    def get_connected(self) -> List[Registrant]:
         """Get a list of all of the current active connections."""
-        await self._update_active_connections()
-        async with self._lock:
-            return [n.registrant for n in self._connections]
+        self._update_active_connections()
+        return [n.registrant for n in self._connections]

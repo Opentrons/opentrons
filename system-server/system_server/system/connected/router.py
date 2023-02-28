@@ -19,7 +19,7 @@ async def get_connected(
     authorization_tracker: AuthorizationTracker = Depends(get_authorization_tracker),
 ) -> GetConnectedResponse:
     """Get connected registrants."""
-    connections = await authorization_tracker.get_connected()
+    connections = authorization_tracker.get_connected()
     return GetConnectedResponse(
         connections=[
             Connection(subject=c.subject, agent=c.agent, agentId=c.agent_id)

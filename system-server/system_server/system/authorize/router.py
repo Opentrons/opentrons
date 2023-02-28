@@ -31,7 +31,7 @@ async def authorize(
     """Router for /system/authorize endpoint."""
     key = str(signing_uuid)
     authorization = authorize_token(token, key)
-    await authorization_tracker.add_connection(
+    authorization_tracker.add_connection(
         registrant_from_jwt(authorization, key),
         expiration_from_jwt(authorization, key),
     )
