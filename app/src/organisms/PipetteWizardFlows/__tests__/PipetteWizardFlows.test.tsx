@@ -146,7 +146,7 @@ describe('PipetteWizardFlows', () => {
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
     const { getByText, getByRole } = render(props)
     //  first page
-    getByText('Calibrate a pipette')
+    getByText('Recalibrate Left Pipette')
     getByText('Before you begin')
     getByText(
       'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
@@ -154,7 +154,7 @@ describe('PipetteWizardFlows', () => {
     getByText(
       'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
     )
-    const getStarted = getByRole('button', { name: 'Get started' })
+    const getStarted = getByRole('button', { name: 'Move gantry to front' })
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -180,7 +180,7 @@ describe('PipetteWizardFlows', () => {
     getByText('Step 1 / 3')
     getByText('Attach Calibration Probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
     const initiate = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(initiate)
@@ -233,7 +233,7 @@ describe('PipetteWizardFlows', () => {
   it('renders the correct first page for calibrating single mount when rendering from on device display', () => {
     mockGetIsOnDevice.mockReturnValue(true)
     const { getByText } = render(props)
-    getByText('Calibrate a pipette')
+    getByText('Recalibrate Left Pipette')
     getByText('Before you begin')
     getByText(
       'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
@@ -246,7 +246,7 @@ describe('PipetteWizardFlows', () => {
     const { getByText, getByRole } = render(props)
     //  first page
     getByText('Before you begin')
-    getByRole('button', { name: 'Get started' }).click()
+    getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
       expect(mockCreateRun).toHaveBeenCalled()
@@ -578,7 +578,7 @@ describe('PipetteWizardFlows', () => {
     getByText(
       'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
     )
-    getByRole('button', { name: 'Get started' }).click()
+    getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
@@ -603,7 +603,7 @@ describe('PipetteWizardFlows', () => {
     getByText('Step 1 / 3')
     getByText('Attach Calibration Probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
     getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -15,13 +16,46 @@ import {
   JUSTIFY_START,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
+import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
+import { SmallButton } from '../../atoms/buttons/ODD'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
     text-transform: uppercase;
+  }
+`
+const GO_BACK_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
+  }
+
+  @media ${ODD_MEDIA_QUERY_SPECS} {
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    font-size: 1.375rem;
+
+    &:hover {
+      opacity: 100%;
+    }
+  }
+`
+const GO_BACK_BUTTON_DISABLED_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.darkGreyEnabled};
+  opacity: 70%;
+`
+const HEADER_STYLE = css`
+  ${TYPOGRAPHY.h1Default};
+
+  @media ${ODD_MEDIA_QUERY_SPECS} {
+    font-size: 1.75rem;
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   }
 `
 export interface GenericWizardTileProps {
@@ -37,20 +71,6 @@ export interface GenericWizardTileProps {
   backIsDisabled?: boolean
 }
 
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
-
-  &:hover {
-    opacity: 70%;
-  }
-`
-const GO_BACK_BUTTON_DISABLED_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
-  opacity: 70%;
-`
-
 export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   const {
     rightHandBody,
@@ -65,6 +85,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     backIsDisabled,
   } = props
   const { t } = useTranslation('shared')
+  const isOnDevice = useSelector(getIsOnDevice)
 
   let buttonPositioning: string = ''
   if (
@@ -96,7 +117,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           gridGap={SPACING.spacing3}
         >
           {typeof header === 'string' ? (
-            <StyledText as="h1">{header}</StyledText>
+            <StyledText css={HEADER_STYLE}>{header}</StyledText>
           ) : (
             header
           )}
@@ -122,13 +143,31 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (
-          <PrimaryButton
-            disabled={proceedIsDisabled}
-            css={CAPITALIZE_FIRST_LETTER_STYLE}
-            onClick={proceed}
-          >
-            {proceedButtonText}
-          </PrimaryButton>
+          isOnDevice ? (
+            <SmallButton
+              marginTop="4rem"
+              disabled={proceedIsDisabled}
+              css={CAPITALIZE_FIRST_LETTER_STYLE}
+              onClick={proceed}
+              aria-label="isOnDevice_button"
+            >
+              <StyledText
+                fontSize="1.375rem"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                padding={SPACING.spacing4}
+              >
+                {proceedButtonText}
+              </StyledText>
+            </SmallButton>
+          ) : (
+            <PrimaryButton
+              disabled={proceedIsDisabled}
+              css={CAPITALIZE_FIRST_LETTER_STYLE}
+              onClick={proceed}
+            >
+              {proceedButtonText}
+            </PrimaryButton>
+          )
         ) : null}
         {proceed == null && proceedButton != null ? proceedButton : null}
       </Flex>

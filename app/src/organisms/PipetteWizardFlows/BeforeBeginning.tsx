@@ -22,6 +22,7 @@ import {
   HEX_SCREWDRIVER,
   NINETY_SIX_CHANNEL_PIPETTE,
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
+  BODY_STYLE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
 import type { AxiosError } from 'axios'
@@ -33,7 +34,6 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
   isCreateLoading: boolean
 }
-
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
@@ -74,6 +74,7 @@ export const BeforeBeginning = (
 
   switch (flowType) {
     case FLOWS.CALIBRATE: {
+      proceedButtonText = t('move_gantry_to_front')
       bodyTranslationKey = 'remove_labware_to_get_started'
       break
     }
@@ -193,7 +194,9 @@ export const BeforeBeginning = (
           <Trans
             t={t}
             i18nKey={bodyTranslationKey}
-            components={{ block: <StyledText as="p" /> }}
+            components={{
+              block: <StyledText css={BODY_STYLE} />,
+            }}
           />
           {selectedPipette === NINETY_SIX_CHANNEL &&
           (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (

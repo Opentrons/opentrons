@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import startCase from 'lodash/startCase'
 import {
   Flex,
   useConditionalConfirm,
@@ -287,7 +288,7 @@ export const PipetteWizardFlows = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = t('calibrate_pipette')
+        wizardTitle = startCase(t('recalibrate_pipette', { mount: mount }))
       } else {
         wizardTitle = t('calibrate_96_channel')
       }

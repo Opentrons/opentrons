@@ -56,11 +56,9 @@ describe('MountPipette', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Connect and screw in pipette')
     getByText(
-      'Hold onto the pipette so it does not fall. Attach the pipette to the robot by alinging the pins and ensuring a secure connection with the pins.'
+      'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
     )
-    getByText(
-      'Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
-    )
+
     getByAltText('Screw pattern')
 
     const backBtn = getByLabelText('back')
@@ -77,7 +75,7 @@ describe('MountPipette', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Connect and Attach 96 Channel Pipette')
     getByText(
-      'Hold onto the pipette so it does not fall. Attach the 96 channel to thegantry by alinging the 2 protruding rods on the mounting plate and ensuring a secure connection by screwing in the 4 front screws with the provided screw driver.'
+      'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
     )
     getByAltText('Attach 96 channel pipette')
     const backBtn = getByLabelText('back')

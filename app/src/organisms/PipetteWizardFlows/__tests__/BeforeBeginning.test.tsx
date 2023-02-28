@@ -83,7 +83,7 @@ describe('BeforeBeginning', () => {
       getByText('You will need:')
       // getByText('mock need help link')
       getByAltText('Calibration Probe')
-      const proceedBtn = getByRole('button', { name: 'Get started' })
+      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -121,7 +121,7 @@ describe('BeforeBeginning', () => {
         isCreateLoading: true,
       }
       const { getByRole } = render(props)
-      const proceedBtn = getByRole('button', { name: 'Get started' })
+      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
       expect(proceedBtn).toBeDisabled()
     })
 

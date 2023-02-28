@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-import { Flex, JUSTIFY_CENTER, SPACING } from '@opentrons/components'
+import { Flex, JUSTIFY_CENTER } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import screwPattern from '../../assets/images/change-pip/screw-pattern.png'
 import attach96Pipette from '../../assets/images/change-pip/attach-96-pipette.png'
 import { Skeleton } from '../../atoms/Skeleton'
 import { CheckPipetteButton } from './CheckPipetteButton'
+import { BODY_STYLE } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
 interface MountPipetteProps extends PipetteWizardStepProps {
@@ -17,7 +18,14 @@ interface MountPipetteProps extends PipetteWizardStepProps {
 const BACKGROUND_SIZE = '47rem'
 
 export const MountPipette = (props: MountPipetteProps): JSX.Element => {
-  const { proceed, goBack, selectedPipette, isPending, setPending } = props
+  const {
+    proceed,
+    goBack,
+    selectedPipette,
+    isPending,
+    setPending,
+    isOnDevice,
+  } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
   const bodyTextSkeleton = (
@@ -37,18 +45,10 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
         {bodyTextSkeleton}
       </>
     )
-  } else if (isSingleMountPipette) {
-    bodyText = (
-      <Trans
-        t={t}
-        i18nKey="hold_onto_pipette"
-        components={{
-          block: <StyledText as="p" marginBottom={SPACING.spacing4} />,
-        }}
-      />
-    )
   } else {
-    bodyText = <StyledText as="p"> {t('hold_pipette_carefully')}</StyledText>
+    bodyText = (
+      <StyledText css={BODY_STYLE}> {t('hold_pipette_carefully')}</StyledText>
+    )
   }
 
   return (
@@ -96,6 +96,7 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
       back={goBack}
       proceedButton={
         <CheckPipetteButton
+          isOnDevice={isOnDevice}
           isDisabled={isPending}
           proceed={proceed}
           proceedButtonText={t('continue')}

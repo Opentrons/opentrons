@@ -22,6 +22,7 @@ describe('CheckPipetteButton', () => {
       proceedButtonText: 'continue',
       setPending: jest.fn(),
       isDisabled: false,
+      isOnDevice: false,
     }
     mockUsePipettesQuery.mockReturnValue({
       refetch,
@@ -34,6 +35,14 @@ describe('CheckPipetteButton', () => {
     const { getByRole } = render(props)
     getByRole('button', { name: 'continue' }).click()
     expect(refetch).toHaveBeenCalled()
+  })
+  it('renders button for on device display', () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton')
   })
   it('renders button disabled when isDisabled is true', () => {
     props = {

@@ -27,6 +27,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     mount,
     isPending,
     setPending,
+    isOnDevice,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const is96ChannelPipette = attachedPipettes[mount]?.name === 'p1000_96'
@@ -105,6 +106,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       back={goBack}
       proceedButton={
         <CheckPipetteButton
+          isOnDevice={isOnDevice}
           isDisabled={isPending}
           proceedButtonText={capitalize(t('shared:continue'))}
           proceed={proceed}

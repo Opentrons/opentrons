@@ -46,7 +46,7 @@ describe('AttachProbe', () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Attach Calibration Probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
     getByAltText('Attach probe')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
@@ -79,7 +79,9 @@ describe('AttachProbe', () => {
       isRobotMoving: true,
     }
     const { getByText, getByAltText } = render(props)
-    getByText('Stand Back, Pipette is Calibrating')
+    getByText(
+      'Stand back, connect and secure, <ShortPipetteName> is calibrating'
+    )
     getByText(
       'The calibration probe will touch the sides of the calibration square in slot 2 to determine its exact position'
     )
@@ -94,5 +96,37 @@ describe('AttachProbe', () => {
     const { getByText } = render(props)
     getByText('Error encountered')
     getByText('error shmerror')
+  })
+
+  it('renders the correct text when is on device', async () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+    }
+    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    getByText('Attach Calibration Probe')
+    getByText(
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+    )
+    getByAltText('Attach probe')
+    getByRole('button', { name: 'Begin calibration' }).click()
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'calibration/calibratePipette',
+          params: { mount: 'left' },
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left' },
+        },
+      ],
+      false
+    )
+    await waitFor(() => {
+      expect(props.proceed).toHaveBeenCalled()
+    })
+    getByLabelText('back').click()
+    expect(props.goBack).toHaveBeenCalled()
   })
 })
