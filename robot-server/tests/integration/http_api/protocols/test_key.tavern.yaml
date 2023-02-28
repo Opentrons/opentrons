@@ -60,6 +60,12 @@ stages:
         data:
           id: '{protocol_id}'
           key: protocol_key
+  - name: Delete the protocol
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200
 
 ---
 test_name: Protocols may have a duplicate key.
@@ -95,12 +101,12 @@ stages:
             protocolName: basic_transfer_standalone
             author: engineer@opentrons.com
           key: duplicate_key
-  - name: Upload basic_transfer_standalone protocol with key
+  - name: Upload basic_transfer_with_config protocol with same key
     request:
       url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+        files: 'tests/integration/protocols/basic_transfer_with_config.py'
       data:
         key: duplicate_key
     response:
@@ -115,12 +121,10 @@ stages:
           id: !anystr
           protocolType: python
           files:
-            - name: basic_transfer_standalone.py
+            - name: basic_transfer_with_config.py
               role: main
           metadata:
             apiLevel: '2.6'
-            protocolName: basic_transfer_standalone
-            author: engineer@opentrons.com
           key: duplicate_key
   - name: Get protocols and validate id and key
     request:
@@ -134,4 +138,89 @@ stages:
           - id: '{protocol_id1}'
             key: duplicate_key
           - id: '{protocol_id2}'
+            key: duplicate_key
+  - name: Delete the protocol 1
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id1}'
+      method: DELETE
+    response:
+      status_code: 200
+  - name: Delete the protocol 2
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id2}'
+      method: DELETE
+    response:
+      status_code: 200
+    
+
+---
+test_name: Protocols sources not get duplicated.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload basic_transfer_standalone protocol with key
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+      data:
+        key: duplicate_key
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id1: data.id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: basic_transfer_standalone.py
+              role: main
+          metadata:
+            apiLevel: '2.6'
+            protocolName: basic_transfer_standalone
+            author: engineer@opentrons.com
+          key: duplicate_key
+  - name: Upload basic_transfer_standalone protocol with same key
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+      data:
+        key: duplicate_key
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id2: data.id
+      # 200 instead of 201 because a new resource should not get created
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: basic_transfer_standalone.py
+              role: main
+          metadata:
+            apiLevel: '2.6'
+          key: duplicate_key
+  - name: Get protocols and validate id and key
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          - id: '{protocol_id1}'
             key: duplicate_key
