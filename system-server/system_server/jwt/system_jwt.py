@@ -47,8 +47,7 @@ def expiration_from_jwt(token: str, signing_key: str) -> datetime:
         options={"verify_aud": False},
     )
     exp = decoded["exp"]
-    print(f"Timestamp: {exp}")
-    return datetime.fromtimestamp(float(exp))
+    return datetime.fromtimestamp(int(exp))
 
 
 def create_jwt(

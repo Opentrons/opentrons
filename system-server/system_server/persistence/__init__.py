@@ -29,7 +29,8 @@ _UUID_FILE: Final = "system_server_uuid"
 
 _log = logging.getLogger(__name__)
 
-
+# TODO(fs, 2/28/23): ideally we do not depend on locks stored this way, should move to
+# how the robot server initializes these kinds of shared resources.
 _persistence_dir_lock = Lock()
 _sql_lock = Lock()
 _uuid_lock = Lock()
