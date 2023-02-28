@@ -856,7 +856,8 @@ async def calibrate_belts(
     mount: OT3Mount,
 ) -> Tuple[Tuple[float, float], Tuple[float, float]]:
     """
-    Run automatic calibration for the x and y belts attached to the specified mount.
+    Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the 
+    actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
 
     Params
     ------
@@ -865,9 +866,7 @@ async def calibrate_belts(
 
     Returns
     -------
-    The location of slot A (back right), slot B (front right), and slot C (back left),
-    to be used to determine the x-axis and y-axis transfer functions for the belt
-    stretch.
+    A matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
     slot_a, slot_b, slot_c = 9, 3, 7
     point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
