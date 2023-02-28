@@ -24,7 +24,7 @@ stages:
       url: "{host:s}:{port:d}/system/authorize"
       method: POST 
       headers: 
-        authentication-bearer: 'not-a-valid-token'
+        authenticationBearer: 'not-a-valid-token'
     response:
       status_code: 401
   - name: POST /system/authorize with valid token
@@ -32,9 +32,28 @@ stages:
       url: "{host:s}:{port:d}/system/authorize"
       method: POST 
       headers: 
-        authentication-bearer: "{issued_token:s}"
+        authenticationBearer: "{issued_token:s}"
     response:
       status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          auth_token: "token"
+  - name: POST /system/authorize with the same token, get a new auth token
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{issued_token:s}"
+    response:
+      status_code: 201
+      verify_response_with:
+        function: tests.integration.testing_utils:token_does_not_match
+        extra_kwargs:
+          token: '{auth_token:s}'
+      json:
+        token: !anystr
 ---
 test_name: GET System Connected
 marks:
@@ -69,7 +88,7 @@ stages:
       url: "{host:s}:{port:d}/system/authorize"
       method: POST 
       headers: 
-        authentication-bearer: "{issued_token:s}"
+        authenticationBearer: "{issued_token:s}"
     response:
       status_code: 201
   - name: Get single-entry connection list
@@ -103,7 +122,7 @@ stages:
       url: "{host:s}:{port:d}/system/authorize"
       method: POST 
       headers: 
-        authentication-bearer: "{second_token:s}"
+        authenticationBearer: "{second_token:s}"
     response:
       status_code: 201
   - name: Get two-entry connection list
@@ -127,7 +146,7 @@ stages:
       url: "{host:s}:{port:d}/system/authorize"
       method: POST 
       headers: 
-        authentication-bearer: "{issued_token:s}"
+        authenticationBearer: "{issued_token:s}"
     response:
       status_code: 201
   - name: Get two-entry connection list
