@@ -206,11 +206,11 @@ class EquipmentHandler:
                 mount.to_hw_mount()
             )
 
-            model = pipette_dict["model"]
             serial_number = pipette_dict["pipette_id"]
             static_pipette_config = pipette_data_provider.get_pipette_static_config(
-                model, serial_number
+                pipette_dict
             )
+
         else:
             serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
             static_pipette_config = (

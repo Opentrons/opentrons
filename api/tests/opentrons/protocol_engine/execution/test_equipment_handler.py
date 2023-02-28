@@ -496,17 +496,19 @@ async def test_load_pipette(
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
+    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
     decoy.when(state_store.pipettes.get_by_mount(MountType.RIGHT)).then_return(
         LoadedPipette.construct(pipetteName=PipetteNameType.P300_MULTI)  # type: ignore[call-arg]
     )
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+        pipette_dict
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(model="hello", serial_number="world")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -548,15 +550,15 @@ async def test_load_pipette_96_channels(
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
+    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
-
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+        pipette_dict
     )
-
     decoy.when(
-        pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -592,13 +594,14 @@ async def test_load_pipette_uses_provided_id(
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
+    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+        pipette_dict
     )
-
     decoy.when(
-        pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
