@@ -73,6 +73,7 @@ async def _read_gantry_position_and_check_alignment(
     #       so the absolute encoder position moves in the opposite direction.
     #       For reference, we can know a DVT2.0 firmware Z-Stages passes
     #       if it's "max" encoder value is read close to 468.475
+    # FIXME: switch to expected behavior once FW bug is resolved
     all_aligned_axes = [
         ax
         for ax in GANTRY_AXES

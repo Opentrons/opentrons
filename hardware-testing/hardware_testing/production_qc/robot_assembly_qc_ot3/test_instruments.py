@@ -310,15 +310,17 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             report(section, f"gripper-{t}", [CSVResult.PASS])
         else:
             report(section, f"gripper-{t}", [0.0, 0.0, CSVResult.PASS])
+
+    # TODO: uncomment once EVT grippers have been tested on DVT robots
     # if not api.is_simulator:
     #     ui.get_user_ready("attach a gripper")
     # await _test_gripper(api, report, section)
     # while not api.is_simulator and await _has_gripper(api):
     #     ui.get_user_ready("remove the gripper")
-    #
-    # print("moving back near home position")
-    # await api.move_rel(
-    #     OT3Mount.LEFT,
-    #     RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,
-    #     speed=RELATIVE_MOVE_FROM_HOME_SPEED,
-    # )
+
+    print("moving back near home position")
+    await api.move_rel(
+        OT3Mount.LEFT,
+        RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,
+        speed=RELATIVE_MOVE_FROM_HOME_SPEED,
+    )

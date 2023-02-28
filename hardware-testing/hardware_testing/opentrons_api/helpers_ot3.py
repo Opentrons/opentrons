@@ -545,7 +545,6 @@ async def _jog_do_print_then_input_then_move(
             terminator="stop", home_key="home"
         )
     except OT3JogNoInput:
-        # print("\tno input, repeating previous jog")
         pass
     if do_home:
         str_to_axes = {
