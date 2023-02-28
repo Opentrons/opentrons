@@ -316,8 +316,7 @@ class LegacyProtocolCore(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name.value,
                 mount=mount,
-                model=pipette_dict["model"],
-                serial_number=pipette_dict["pipette_id"],
+                pipette_dict=pipette_dict,
             )
         )
 

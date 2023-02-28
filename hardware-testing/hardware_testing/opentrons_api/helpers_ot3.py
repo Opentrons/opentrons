@@ -98,7 +98,9 @@ def _create_attached_instruments_dict(
 ) -> Dict[OT3Mount, Dict[str, Optional[str]]]:
     fake_id_left = _create_fake_pipette_id(OT3Mount.LEFT, pipette_left)
     fake_id_right = _create_fake_pipette_id(OT3Mount.RIGHT, pipette_right)
-    fake_id_gripper = "GRPV1020221101A02" if gripper else None
+    fake_id_gripper = (
+        "GRPV1020221101A02" if gripper else None
+    )  # FIXME: EVT grippers all have same ID
     sim_pip_left = {"model": pipette_left, "id": fake_id_left}
     sim_pip_right = {"model": pipette_right, "id": fake_id_right}
     sim_gripper = {"model": gripper, "id": fake_id_gripper}
@@ -543,7 +545,6 @@ async def _jog_do_print_then_input_then_move(
             terminator="stop", home_key="home"
         )
     except OT3JogNoInput:
-        # print("\tno input, repeating previous jog")
         pass
     if do_home:
         str_to_axes = {
