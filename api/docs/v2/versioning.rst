@@ -246,7 +246,7 @@ Version 2.14
 This version introduces a new protocol runtime that offers more reliable run control
 and builds a strong foundation for future Protocol API improvements.
 
-Several older parts of the Protocol API deprecated as part of this switchover.
+Several older parts of the Protocol API were deprecated as part of this switchover.
 If you specify an API version of ``2.13`` or lower, your protocols will continue to execute on the old runtime.
 
 - Feature additions
@@ -271,7 +271,7 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
   - Motion planning has been improved to avoid certain erroneous downward movements,
     especially when using :py:meth:`.InstrumentContext.aspirate`.
 
-  - :py:attr:`.Labware.tip_length` will raise a useful error if called on a non-tip-rack.
+  - :py:attr:`.Labware.tip_length` will raise a useful error if called on labware that is not a tip rack.
 
 - Removals
 
