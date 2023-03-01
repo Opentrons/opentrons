@@ -2,7 +2,11 @@ import {
   OT2_MANIFEST_URL,
   OT3_MANIFEST_URL,
 } from '@opentrons/app/src/redux/config'
-import type { ConfigV12 } from '@opentrons/app/src/redux/config/types'
+import type {
+  ConfigV12,
+  ConfigV13,
+  ConfigV14,
+} from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V12: ConfigV12 = {
   version: 12,
@@ -48,5 +52,23 @@ export const MOCK_CONFIG_V12: ConfigV12 = {
       OT2: OT2_MANIFEST_URL,
       OT3: OT3_MANIFEST_URL,
     },
+  },
+}
+
+export const MOCK_CONFIG_V13: ConfigV13 = {
+  ...MOCK_CONFIG_V12,
+  version: 13,
+  protocols: {
+    ...MOCK_CONFIG_V12.protocols,
+    protocolsOnDeviceSortKey: null,
+  },
+}
+
+export const MOCK_CONFIG_V14: ConfigV14 = {
+  ...MOCK_CONFIG_V13,
+  version: 14,
+  protocols: {
+    ...MOCK_CONFIG_V13.protocols,
+    pinnedProtocolIds: [],
   },
 }

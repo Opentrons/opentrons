@@ -22,6 +22,8 @@ import type {
   ConfigV10,
   ConfigV11,
   ConfigV12,
+  ConfigV13,
+  ConfigV14,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
@@ -247,7 +249,7 @@ const toVersion11 = (prevConfig: ConfigV10): ConfigV11 => {
   return nextConfig
 }
 
-// config version 11 migration and defaults
+// config version 12 migration and defaults
 const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
   // @ts-expect-error deleting a key from the config removes a required param from the prev config
   delete prevConfig.buildroot
@@ -265,6 +267,32 @@ const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
   return nextConfig
 }
 
+// config version 13 migration and defaults
+const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 13 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      protocolsOnDeviceSortKey: null,
+    },
+  }
+  return nextConfig
+}
+
+// config version 14 migration and defaults
+const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 14 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      pinnedProtocolIds: [],
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -277,7 +305,9 @@ const MIGRATIONS: [
   (prevConfig: ConfigV8) => ConfigV9,
   (prevConfig: ConfigV9) => ConfigV10,
   (prevConfig: ConfigV10) => ConfigV11,
-  (prevConfig: ConfigV11) => ConfigV12
+  (prevConfig: ConfigV11) => ConfigV12,
+  (prevConfig: ConfigV12) => ConfigV13,
+  (prevConfig: ConfigV13) => ConfigV14
 ] = [
   toVersion1,
   toVersion2,
@@ -291,6 +321,8 @@ const MIGRATIONS: [
   toVersion10,
   toVersion11,
   toVersion12,
+  toVersion13,
+  toVersion14,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -310,6 +342,8 @@ export function migrate(
     | ConfigV10
     | ConfigV11
     | ConfigV12
+    | ConfigV13
+    | ConfigV14
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

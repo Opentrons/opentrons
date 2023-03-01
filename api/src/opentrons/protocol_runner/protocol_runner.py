@@ -1,23 +1,21 @@
 """Protocol run control and management."""
-from typing import List, NamedTuple, Optional
+import asyncio
+from typing import Iterable, List, NamedTuple, Optional
+
+import anyio
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
-from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_reader import (
-    ProtocolSource,
-    PythonProtocolConfig,
-    JsonProtocolConfig,
-)
+from opentrons import protocol_reader
+from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
-from .python_file_reader import PythonFileReader
-from .python_context_creator import PythonContextCreator
-from .python_executor import PythonExecutor
 from .legacy_context_plugin import LegacyContextPlugin
 from .legacy_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
@@ -57,9 +55,6 @@ class ProtocolRunner:
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_translator: Optional[JsonTranslator] = None,
-        python_file_reader: Optional[PythonFileReader] = None,
-        python_context_creator: Optional[PythonContextCreator] = None,
-        python_executor: Optional[PythonExecutor] = None,
         legacy_file_reader: Optional[LegacyFileReader] = None,
         legacy_context_creator: Optional[LegacyContextCreator] = None,
         legacy_executor: Optional[LegacyExecutor] = None,
@@ -69,9 +64,6 @@ class ProtocolRunner:
         self._hardware_api = hardware_api
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_translator = json_translator or JsonTranslator()
-        self._python_file_reader = python_file_reader or PythonFileReader()
-        self._python_context_creator = python_context_creator or PythonContextCreator()
-        self._python_executor = python_executor or PythonExecutor()
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
             hardware_api=hardware_api,
@@ -89,7 +81,7 @@ class ProtocolRunner:
         """
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    def load(self, protocol_source: ProtocolSource) -> None:
+    async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
 
         Calling this method is only necessary if the runner will be used
@@ -97,24 +89,21 @@ class ProtocolRunner:
         """
         config = protocol_source.config
 
-        for definition in protocol_source.labware_definitions:
+        labware_definitions = await protocol_reader.extract_labware_definitions(
+            protocol_source=protocol_source
+        )
+        for definition in labware_definitions:
+            # Assume adding a labware definition is fast and there are not many labware
+            # definitions, so we don't need to yield here.
             self._protocol_engine.add_labware_definition(definition)
 
-        if isinstance(config, JsonProtocolConfig):
-            schema_version = config.schema_version
-
-            if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
-                self._load_json(protocol_source)
-            else:
-                self._load_legacy(protocol_source)
-
-        elif isinstance(config, PythonProtocolConfig):
-            api_version = config.api_version
-
-            if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
-                self._load_python(protocol_source)
-            else:
-                self._load_legacy(protocol_source)
+        if (
+            isinstance(config, JsonProtocolConfig)
+            and config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
+        ):
+            await self._load_json(protocol_source)
+        else:
+            self._load_python_or_legacy_json(protocol_source, labware_definitions)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -142,7 +131,7 @@ class ProtocolRunner:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
-            self.load(protocol_source)
+            await self.load(protocol_source)
 
         await self._hardware_api.home()
         self.play()
@@ -153,36 +142,55 @@ class ProtocolRunner:
         commands = self._protocol_engine.state_view.commands.get_all()
         return ProtocolRunResult(commands=commands, state_summary=run_data)
 
-    def _load_json(self, protocol_source: ProtocolSource) -> None:
-        protocol = self._json_file_reader.read(protocol_source)
-        commands = self._json_translator.translate_commands(protocol)
-
-        liquids = self._json_translator.translate_liquids(protocol)
-        for liquid in liquids:
-            self._protocol_engine.add_liquid(liquid=liquid)
-
-        for command in commands:
-            self._protocol_engine.add_command(request=command)
-        self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
-
-    def _load_python(self, protocol_source: ProtocolSource) -> None:
-        protocol = self._python_file_reader.read(protocol_source)
-        context = self._python_context_creator.create(self._protocol_engine)
-        self._task_queue.set_run_func(
-            func=self._python_executor.execute,
-            protocol=protocol,
-            context=context,
+    async def _load_json(self, protocol_source: ProtocolSource) -> None:
+        protocol = await anyio.to_thread.run_sync(
+            self._json_file_reader.read,
+            protocol_source,
         )
 
-    def _load_legacy(
+        commands = await anyio.to_thread.run_sync(
+            self._json_translator.translate_commands,
+            protocol,
+        )
+
+        # Add commands and liquids to the ProtocolEngine.
+        #
+        # We yield on every iteration so that loading large protocols doesn't block the
+        # event loop. With a 24-step 10k-command protocol (See RQA-443), adding all the
+        # commands can take 3 to 7 seconds.
+        #
+        # It wouldn't be safe to do this in a worker thread because each addition
+        # invokes the ProtocolEngine's ChangeNotifier machinery, which is not
+        # thread-safe.
+        liquids = await anyio.to_thread.run_sync(
+            self._json_translator.translate_liquids, protocol
+        )
+        for liquid in liquids:
+            self._protocol_engine.add_liquid(
+                id=liquid.id,
+                name=liquid.displayName,
+                description=liquid.description,
+                color=liquid.displayColor,
+            )
+            await _yield()
+        for command in commands:
+            self._protocol_engine.add_command(request=command)
+            await _yield()
+
+        self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
+
+    def _load_python_or_legacy_json(
         self,
         protocol_source: ProtocolSource,
+        labware_definitions: Iterable[LabwareDefinition],
     ) -> None:
-        protocol = self._legacy_file_reader.read(protocol_source)
+        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+        # the event loop. Jira RSS-165.
+        protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
         broker = None
         equipment_broker = None
 
-        if not feature_flags.enable_protocol_engine_papi_core():
+        if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
             broker = Broker()
             equipment_broker = EquipmentBroker[LegacyLoadInfo]()
 
@@ -201,3 +209,8 @@ class ProtocolRunner:
             protocol=protocol,
             context=context,
         )
+
+
+async def _yield() -> None:
+    """Yield execution to the event loop, giving other tasks a chance to run."""
+    await asyncio.sleep(0)

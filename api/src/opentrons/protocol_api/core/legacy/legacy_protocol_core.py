@@ -11,10 +11,11 @@ from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import AxisMaxSpeeds, UnsupportedAPIError
+from opentrons.protocols.api_support.util import AxisMaxSpeeds, APIVersionError
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
+from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -182,6 +183,19 @@ class LegacyProtocolCore(
 
         self._labware_cores.append(labware_core)
         if isinstance(location, DeckSlotName):
+            # This assignment will raise if the new item conflicts with something else
+            # on the deck--for example, if something tall is placed next to a
+            # Heater-Shaker.
+            #
+            # It's a latent bug that we only do this conflict checking when loading
+            # directly into a deck slot. We should also do conflict checking when
+            # labware is loaded atop a module, because that affects the module's
+            # maximum height.
+            #
+            # In practice, I don't think this matters now (2023-02-22) because of the
+            # exact conflict checks that we perform. Wherever we have a constraint on
+            # maximum height, we also happen to have a constraint disallowing modules
+            # in the first place.
             self._deck_layout[location.value] = labware_core
 
         self._equipment_broker.publish(
@@ -211,9 +225,7 @@ class LegacyProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move labware to new location."""
-        raise UnsupportedAPIError(
-            "Labware movement is not supported in this API version"
-        )
+        raise APIVersionError("Labware movement is not supported in this API version")
 
     def load_module(
         self,
@@ -299,10 +311,12 @@ class LegacyProtocolCore(
         self._instruments[mount] = new_instr
         logger.info("Instrument {} loaded".format(new_instr))
 
+        pipette_dict = self._sync_hardware.get_attached_instrument(mount)
         self._equipment_broker.publish(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name.value,
                 mount=mount,
+                pipette_dict=pipette_dict,
             )
         )
 
@@ -399,28 +413,30 @@ class LegacyProtocolCore(
 
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
-        raise NotImplementedError(
-            "LegacyProtocolCore.get_deck_definition not implemented"
-        )
+        assert False, "get_deck_definition only supported on engine core"
 
     def get_slot_item(
         self, slot_name: DeckSlotName
     ) -> Union[LegacyLabwareCore, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
-        raise NotImplementedError("LegacyProtocolCore.get_slot_item not implemented")
+        assert False, "get_slot_item only supported on engine core"
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
-        raise NotImplementedError("LegacyProtocolCore.get_slot_center not implemented.")
+        assert False, "get_slot_center only supported on engine core."
 
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
-        raise NotImplementedError("LegacyProtocolCore.get_highest_z not implemented")
+        assert False, "get_highest_z only supported on engine core"
+
+    def define_liquid(
+        self, name: str, description: Optional[str], display_color: Optional[str]
+    ) -> Liquid:
+        """Define a liquid to load into a well."""
+        assert False, "define_liquid only supported on engine core"
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore
     ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
         """Get labware parent location."""
-        raise NotImplementedError(
-            "LegacyProtocolCore.get_labware_location not implemented"
-        )
+        assert False, "get_labware_location only supported on engine core"

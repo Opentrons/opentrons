@@ -1,7 +1,7 @@
 export { PrimaryButton } from './PrimaryButton'
 export { SecondaryButton } from './SecondaryButton'
 export { TertiaryButton } from './TertiaryButton'
-export { SecondaryTertiaryButton } from './SecondaryTertiaryButton'
+export { QuaternaryButton } from './QuaternaryButton'
 export { AlertPrimaryButton } from './AlertPrimaryButton'
 export { SubmitPrimaryButton } from './SubmitPrimaryButton'
 export { ToggleButton } from './ToggleButton'

@@ -21,12 +21,9 @@ import { SecondaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { StyledText } from '../../../../atoms/text'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { HowLPCWorksModal } from './HowLPCWorksModal'
-import {
-  useLPCDisabledReason,
-  useProtocolDetailsForRun,
-  useStoredProtocolAnalysis,
-} from '../../hooks'
+import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
 import { CurrentOffsetsModal } from './CurrentOffsetsModal'
 
 interface LaunchLabwarePositionCheckProps {
@@ -43,9 +40,7 @@ export function LaunchLabwarePositionCheck(
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const currentOffsets = runRecord?.data?.labwareOffsets ?? []
   const lpcDisabledReason = useLPCDisabledReason(robotName, runId)
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [showHelpModal, setShowHelpModal] = React.useState(false)

@@ -12,7 +12,6 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteTipType,
     PlungerPositions,
     MotorConfigurations,
-    PickUpTipConfigurations,
     SupportedTipsDefinition,
     TipHandlingConfigurations,
     PipetteModelType,
@@ -29,7 +28,8 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
     PipetteModel,
 )
-from opentrons.hardware_control.types import CriticalPoint, OT3Mount, InvalidMoveError
+from opentrons.hardware_control.types import CriticalPoint, OT3Mount
+from opentrons.hardware_control.errors import InvalidMoveError
 
 mod_log = logging.getLogger(__name__)
 
@@ -164,11 +164,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._plunger_motor_current
 
     @property
-    def pick_up_configurations(self) -> PickUpTipConfigurations:
+    def pick_up_configurations(self) -> TipHandlingConfigurations:
         return self._pick_up_configurations
 
     @pick_up_configurations.setter
-    def pick_up_configurations(self, pick_up_configs: PickUpTipConfigurations) -> None:
+    def pick_up_configurations(
+        self, pick_up_configs: TipHandlingConfigurations
+    ) -> None:
         self._pick_up_configurations = pick_up_configs
 
     @property
@@ -224,10 +226,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         else:
             self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
 
-    def save_pipette_offset(self, mount: OT3Mount, offset: Point) -> None:
+    def save_pipette_offset(
+        self, mount: OT3Mount, offset: Point
+    ) -> PipetteOffsetByPipetteMount:
         """Update the pipette offset to a new value."""
         save_pipette_offset_calibration(self._pipette_id, mount, offset)
         self._pipette_offset = load_pipette_offset(self._pipette_id, mount)
+        return self._pipette_offset
 
     @property
     def name(self) -> PipetteName:
@@ -267,7 +272,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             NUM_ROWS = 12
             NUM_COLS = 8
             X_DIRECTION_VALUE = -1
-            Y_DIVISION = 3
         elif self.channels.value == 8:
             NUM_ROWS = 1
             NUM_COLS = 8
@@ -288,7 +292,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             raise InvalidMoveError(
                 f"Critical point {cp_override.name} is not valid for a pipette"
             )
-
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0
@@ -526,8 +529,9 @@ def _reload_and_check_skip(
             p = Pipette(new_config, pipette_offset, attached_instr._pipette_id)
             p.act_as(attached_instr.acting_as)
             return p, False
-    # Good to skip
-    return attached_instr, True
+        # Good to skip, just need to update calibration offset
+        attached_instr._pipette_offset = pipette_offset
+        return attached_instr, True
 
 
 def load_from_config_and_check_skip(

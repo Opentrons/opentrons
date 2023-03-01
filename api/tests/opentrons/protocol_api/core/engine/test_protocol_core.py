@@ -15,7 +15,6 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -32,11 +31,11 @@ from opentrons.protocol_engine import (
     LabwareMovementStrategy,
     LoadedLabware,
     LoadedModule,
-    LoadedPipette,
     commands,
     LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor, FlowRates
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.protocol_engine.state.labware import (
     LabwareLoadParams as EngineLabwareLoadParams,
@@ -44,12 +43,14 @@ from opentrons.protocol_engine.state.labware import (
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import (
+    deck_conflict,
     ProtocolCore,
     InstrumentCore,
     LabwareCore,
     ModuleCore,
     load_labware_params,
 )
+from opentrons.protocol_api._liquid import Liquid
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
@@ -58,6 +59,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     HeaterShakerModuleCore,
 )
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -68,6 +70,15 @@ def patch_mock_load_labware_params(
     """Mock out point_calculations.py functions."""
     for name, func in inspect.getmembers(load_labware_params, inspect.isfunction):
         monkeypatch.setattr(load_labware_params, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_deck_conflict_check(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Replace deck_conflict.check() with a mock."""
+    mock = decoy.mock(func=deck_conflict.check)
+    monkeypatch.setattr(deck_conflict, "check", mock)
 
 
 @pytest.fixture
@@ -166,19 +177,14 @@ def test_load_instrument(
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 
-    decoy.when(mock_engine_client.state.pipettes.get("cool-pipette")).then_return(
-        LoadedPipette.construct(mount=MountType.LEFT)  # type: ignore[call-arg]
-    )
-    pipette_dict = cast(
-        PipetteDict,
-        {
-            "default_aspirate_flow_rates": {"1.1": 22},
-            "default_dispense_flow_rates": {"3.3": 44},
-            "default_blow_out_flow_rates": {"5.5": 66},
-        },
-    )
-    decoy.when(mock_sync_hardware_api.get_attached_instrument(Mount.LEFT)).then_return(
-        pipette_dict
+    decoy.when(
+        mock_engine_client.state.pipettes.get_flow_rates("cool-pipette")
+    ).then_return(
+        FlowRates(
+            default_aspirate={"1.1": 22},
+            default_dispense={"3.3": 44},
+            default_blow_out={"5.5": 66},
+        ),
     )
 
     result = subject.load_instrument(
@@ -239,6 +245,15 @@ def test_load_labware(
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
     assert subject.get_labware_cores() == [subject.fixed_trash, result]
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_labware_id="abc123",
+        )
+    )
 
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
@@ -376,6 +391,15 @@ def test_load_labware_on_module(
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
 
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_labware_id="abc123",
+        )
+    )
+
     decoy.when(
         mock_engine_client.state.labware.get_id_by_module("module-id")
     ).then_return("abc123")
@@ -480,12 +504,21 @@ def test_load_module(
     result = subject.load_module(
         model=requested_model,
         deck_slot=DeckSlotName.SLOT_1,
-        configuration="",
+        configuration=None,
     )
 
     assert isinstance(result, expected_core_cls)
     assert result.module_id == "abc123"
     assert subject.get_module_cores() == [result]
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_module_id="abc123",
+        )
+    )
 
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
@@ -549,7 +582,16 @@ def test_load_module_thermocycler_with_no_location(
     result = subject.load_module(
         model=requested_model,
         deck_slot=None,
-        configuration="",
+        configuration=None,
+    )
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_module_id="abc123",
+        )
     )
 
     assert isinstance(result, ThermocyclerModuleCore)
@@ -571,7 +613,7 @@ def test_load_module_no_location(
 ) -> None:
     """Should raise an InvalidModuleLocationError exception."""
     with pytest.raises(InvalidModuleLocationError):
-        subject.load_module(model=requested_model, deck_slot=None, configuration="")
+        subject.load_module(model=requested_model, deck_slot=None, configuration=None)
 
 
 @pytest.mark.parametrize("message", [None, "Hello, world!", ""])
@@ -690,3 +732,36 @@ def test_get_highest_z(
     result = subject.get_highest_z()
 
     assert result == 9001
+
+
+def test_add_liquid(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should return the created liquid."""
+    liquid = PE_Liquid.construct(
+        id="water-id",
+        displayName="water",
+        description="water desc",
+        displayColor=HexColor(__root__="#fff"),
+    )
+
+    expected_result = Liquid(
+        _id="water-id",
+        name="water",
+        description="water desc",
+        display_color="#fff",
+    )
+
+    decoy.when(
+        mock_engine_client.add_liquid(
+            name="water", color="#fff", description="water desc"
+        )
+    ).then_return(liquid)
+
+    result = subject.define_liquid(
+        name="water", description="water desc", display_color="#fff"
+    )
+
+    assert result == expected_result

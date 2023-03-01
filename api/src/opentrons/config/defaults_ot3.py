@@ -12,27 +12,48 @@ from .types import (
     Offset,
     OT3CalibrationSettings,
     CapacitivePassSettings,
+    LiquidProbeSettings,
     ZSenseSettings,
     EdgeSenseSettings,
 )
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
+DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
+    starting_mount_height=100,
+    max_z_distance=40,
+    min_z_distance=5,
+    mount_speed=10,
+    plunger_speed=5,
+    sensor_threshold_pascals=100,
+    expected_liquid_height=110,
+    log_pressure=True,
+    aspirate_while_sensing=False,
+    data_file="/var/pressure_sensor_data.csv",
+)
+
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
     z_offset=ZSenseSettings(
-        point=(239, 160, 1),
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=3,
-            max_overrun_distance_mm=3,
-            speed_mm_per_s=1,
-            sensor_threshold_pf=1.0,
+            max_overrun_distance_mm=2,
+            speed_mm_per_s=1.0,
+            sensor_threshold_pf=0.5,
         ),
     ),
     edge_sense=EdgeSenseSettings(
-        plus_x_pos=(239, 150, 0),
-        minus_x_pos=(217, 150, 0),
-        plus_y_pos=(228, 161, 0),
-        minus_y_pos=(228, 139, 0),
+        overrun_tolerance_mm=0.1,
+        early_sense_tolerance_mm=0.1,
+        pass_settings=CapacitivePassSettings(
+            prep_distance_mm=0.2,
+            max_overrun_distance_mm=0.5,
+            speed_mm_per_s=0.5,
+            sensor_threshold_pf=0.5,
+        ),
+        search_initial_tolerance_mm=5.0,
+        search_iteration_limit=10,
+    ),
+    edge_sense_binary=EdgeSenseSettings(
         overrun_tolerance_mm=0.5,
         early_sense_tolerance_mm=0.2,
         pass_settings=CapacitivePassSettings(
@@ -43,9 +64,8 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         ),
         search_initial_tolerance_mm=5.0,
         search_iteration_limit=10,
-        nominal_center=(228, 150, 0),
     ),
-    probe_length=34.5,
+    probe_length=44.5,
 )
 
 ROBOT_CONFIG_VERSION: Final = 1
@@ -77,7 +97,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.Y: 500,
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 5,
-        OT3AxisKind.Q: 40,
+        OT3AxisKind.Q: 5.5,
     },
     low_throughput={
         OT3AxisKind.X: 500,
@@ -129,7 +149,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 10,
-        OT3AxisKind.Z_G: 15,
+        OT3AxisKind.Z_G: 10,
         OT3AxisKind.P: 5,
     },
     high_throughput={
@@ -222,7 +242,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
         OT3AxisKind.P: 1.0,
-        OT3AxisKind.Z_G: 0.7,
+        OT3AxisKind.Z_G: 0.67,
     },
     high_throughput={
         OT3AxisKind.X: 1.4,
@@ -334,9 +354,33 @@ def _build_default_cap_pass(
     )
 
 
+def _build_default_liquid_probe(
+    from_conf: Any, default: LiquidProbeSettings
+) -> LiquidProbeSettings:
+    return LiquidProbeSettings(
+        starting_mount_height=from_conf.get(
+            "starting_mount_height", default.starting_mount_height
+        ),
+        max_z_distance=from_conf.get("max_z_distance", default.max_z_distance),
+        min_z_distance=from_conf.get("min_z_distance", default.min_z_distance),
+        mount_speed=from_conf.get("mount_speed", default.mount_speed),
+        plunger_speed=from_conf.get("plunger_speed", default.plunger_speed),
+        sensor_threshold_pascals=from_conf.get(
+            "sensor_threshold_pascals", default.sensor_threshold_pascals
+        ),
+        expected_liquid_height=from_conf.get(
+            "expected_liquid_height", default.expected_liquid_height
+        ),
+        log_pressure=from_conf.get("log_pressure", default.log_pressure),
+        aspirate_while_sensing=from_conf.get(
+            "aspirate_while_sensing", default.aspirate_while_sensing
+        ),
+        data_file=from_conf.get("data_file", default.data_file),
+    )
+
+
 def _build_default_z_pass(from_conf: Any, default: ZSenseSettings) -> ZSenseSettings:
     return ZSenseSettings(
-        point=from_conf.get("point", default.point),
         pass_settings=_build_default_cap_pass(
             from_conf.get("pass_settings", {}), default.pass_settings
         ),
@@ -347,10 +391,6 @@ def _build_default_edge_sense(
     from_conf: Any, default: EdgeSenseSettings
 ) -> EdgeSenseSettings:
     return EdgeSenseSettings(
-        plus_x_pos=from_conf.get("plus_x_pos", default.plus_x_pos),
-        minus_x_pos=from_conf.get("minus_x_pos", default.minus_x_pos),
-        plus_y_pos=from_conf.get("plus_y_pos", default.plus_y_pos),
-        minus_y_pos=from_conf.get("minus_y_pos", default.minus_y_pos),
         overrun_tolerance_mm=from_conf.get(
             "overrun_tolerance_mm", default.overrun_tolerance_mm
         ),
@@ -366,7 +406,6 @@ def _build_default_edge_sense(
         search_iteration_limit=from_conf.get(
             "search_iteration_limit", default.search_iteration_limit
         ),
-        nominal_center=from_conf.get("nominal_center", default.nominal_center),
     )
 
 
@@ -377,6 +416,9 @@ def _build_default_calibration(
         z_offset=_build_default_z_pass(from_conf.get("z_offset", {}), default.z_offset),
         edge_sense=_build_default_edge_sense(
             from_conf.get("edge_sense", {}), default.edge_sense
+        ),
+        edge_sense_binary=_build_default_edge_sense(
+            from_conf.get("edge_sense_binary", {}), default.edge_sense_binary
         ),
         probe_length=from_conf.get("probe_length", default.probe_length),
     )
@@ -439,6 +481,9 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         ),
         calibration=_build_default_calibration(
             robot_settings.get("calibration", {}), DEFAULT_CALIBRATION_SETTINGS
+        ),
+        liquid_sense=_build_default_liquid_probe(
+            robot_settings.get("liquid_sense", {}), DEFAULT_LIQUID_PROBE_SETTINGS
         ),
     )
 

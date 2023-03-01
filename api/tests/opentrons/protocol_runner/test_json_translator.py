@@ -23,7 +23,9 @@ from opentrons.protocol_engine import (
     DeckPoint,
     DeckSlotLocation,
     WellLocation,
+    DropTipWellLocation,
     WellOrigin,
+    DropTipWellOrigin,
     WellOffset,
     ModuleModel,
     ModuleLocation,
@@ -111,7 +113,10 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=WellLocation(),
+                wellLocation=DropTipWellLocation(
+                    origin=DropTipWellOrigin.DEFAULT,
+                    offset=WellOffset(x=0, y=0, z=0),
+                ),
             )
         ),
     ),

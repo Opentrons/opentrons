@@ -395,17 +395,25 @@ class CommandView(HasState[CommandState]):
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
-        If the cursor is omitted, return the tail of `length` of the collection.
+        If the cursor is omitted, a cursor will be selected automatically
+        based on the currently running or most recently executed command."
         """
         # TODO(mc, 2022-01-31): this is not the most performant way to implement
         # this; if this becomes a problem, change or the underlying data structure
         # to something that isn't just an OrderedDict
         all_command_ids = self._state.all_command_ids
         commands_by_id = self._state.commands_by_id
+        running_command_id = self._state.running_command_id
+        queued_command_ids = self._state.queued_command_ids
         total_length = len(all_command_ids)
 
         if cursor is None:
-            cursor = total_length - length
+            if running_command_id is not None:
+                cursor = commands_by_id[running_command_id].index
+            elif len(queued_command_ids) > 0:
+                cursor = commands_by_id[queued_command_ids.head()].index - 1
+            else:
+                cursor = total_length - length
 
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
@@ -466,13 +474,13 @@ class CommandView(HasState[CommandState]):
             raise RunStoppedError("Engine was stopped")
 
         # if there is a setup command queued, prioritize it
-        next_setup_cmd = next(iter(self._state.queued_setup_command_ids), None)
+        next_setup_cmd = self._state.queued_setup_command_ids.head(None)
         if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
         if self._state.queue_status == QueueStatus.RUNNING:
-            return next(iter(self._state.queued_command_ids), None)
+            return self._state.queued_command_ids.head(None)
 
         # otherwise we've got nothing to do
         return None

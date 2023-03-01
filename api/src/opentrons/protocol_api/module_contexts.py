@@ -22,6 +22,7 @@ from .core.common import (
     HeaterShakerCore,
 )
 from .core.core_map import LoadedCoreMap
+from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_module_core import LegacyModuleCore
 from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
 from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
@@ -34,7 +35,7 @@ from .labware import Labware
 from . import validation
 
 
-ENGAGE_HEIGHT_UNIT_CNV = 2
+_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 
 
 _log = logging.getLogger(__name__)
@@ -65,30 +66,22 @@ class ModuleContext(CommandPublisher):
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
     def model(self) -> ModuleModel:
         """Get the module's model identifier."""
-        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
-        if isinstance(self._core, LegacyModuleCore):
-            raise APIVersionError("ModuleContext.model not supported for legacy core.")
         return cast(ModuleModel, self._core.get_model().value)
 
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
-        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
-        if isinstance(self._core, LegacyModuleCore):
-            raise APIVersionError("ModuleContext.type not supported for legacy core.")
         return cast(ModuleType, self._core.MODULE_TYPE.value)
 
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        # TODO(jbl 2023-01-05) replace this was requires_version decorator when API version is bumped to 2.14
-        if isinstance(self._core, LegacyModuleCore):
-            raise APIVersionError(
-                "ModuleContext.serial_number not supported for legacy core."
-            )
         return self._core.get_serial_number()
 
     @requires_version(2, 0)
@@ -221,9 +214,8 @@ class ModuleContext(CommandPublisher):
         labware_core = self._protocol_core.get_labware_on_module(self._core)
         return self._core_map.get(labware_core)
 
-    # TODO (tz, 1-7-23): change this to version 2.14
     @property  # type: ignore[misc]
-    @requires_version(2, 13)
+    @requires_version(2, 14)
     def parent(self) -> str:
         """The name of the slot the module is on."""
         return self._core.get_deck_slot().value
@@ -357,7 +349,7 @@ class MagneticModuleContext(ModuleContext):
             "`MagneticModuleContext.calibrate` doesn't do anything useful"
             " and will no-op in Protocol API version 2.14 and higher."
         )
-        if self._api_version < APIVersion(2, 14):
+        if self._api_version < ENGINE_CORE_API_VERSION:
             self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
 
     @publish(command=cmds.magdeck_engage)
@@ -380,6 +372,8 @@ class MagneticModuleContext(ModuleContext):
 
              This is the recommended way to adjust the magnets' height.
 
+             .. versionadded:: 2.2
+
            - ``offset`` – Move this many millimeters above (positive value) or below
              (negative value) the default height for the loaded labware. The sum of
              the default height and ``offset`` must be between 0 and 25.
@@ -389,15 +383,19 @@ class MagneticModuleContext(ModuleContext):
              labware, this may produce unpredictable results. You should normally use
              ``height_from_base`` instead.
 
-             This parameter may be deprecated in a future release of the Python API.
+             .. versionchanged:: 2.14
+                This parameter has been removed.
 
         You shouldn't specify more than one of these parameters. However, if you do,
         their order of precedence is ``height``, then ``height_from_base``, then ``offset``.
-
-        .. versionadded:: 2.2
-            The *height_from_base* parameter.
         """
         if height is not None:
+            if self._api_version >= _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN:
+                raise APIVersionError(
+                    "The height parameter of MagneticModuleContext.engage() was removed"
+                    " in {_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}."
+                    " Use offset or height_from_base instead."
+                )
             self._core.engage(height_from_home=height)
 
         # This version check has a bug:

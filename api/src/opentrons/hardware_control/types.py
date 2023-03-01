@@ -1,7 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar
+from typing import NamedTuple, cast, Tuple, Union, List, Callable, Dict, TypeVar
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -9,18 +9,6 @@ from opentrons import types as top_types
 MODULE_LOG = logging.getLogger(__name__)
 
 MachineType = Literal["ot2", "ot3"]
-
-
-class OutOfBoundsMove(RuntimeError):
-    def __init__(self, message: str):
-        self.message = message
-        super().__init__()
-
-    def __str__(self) -> str:
-        return f"OutOfBoundsMove: {self.message}"
-
-    def __repr__(self) -> str:
-        return f"<{str(self.__class__)}: {self.message}>"
 
 
 class MotionChecks(enum.Enum):
@@ -280,6 +268,50 @@ class OT3SubSystem(enum.Enum):
         return self.name
 
 
+class PipetteSubType(enum.Enum):
+    """Pipette type to map from lower level PipetteType."""
+
+    pipette_single = 1
+    pipette_multi = 2
+    pipette_96 = 3
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class UpdateState(enum.Enum):
+    """Update state to map from lower level FirmwareUpdateStatus"""
+
+    queued = enum.auto()
+    updating = enum.auto()
+    done = enum.auto()
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class UpdateStatus(NamedTuple):
+    subsystem: OT3SubSystem
+    state: UpdateState
+    progress: int
+
+
+_subsystem_lookup = {
+    OT3Mount.LEFT: OT3SubSystem.pipette_left,
+    OT3Mount.RIGHT: OT3SubSystem.pipette_right,
+    OT3Mount.GRIPPER: OT3SubSystem.gripper,
+}
+
+
+def mount_to_subsystem(mount: OT3Mount) -> OT3SubSystem:
+    return _subsystem_lookup[mount]
+
+
+def subsystem_to_mount(subsystem: OT3SubSystem) -> OT3Mount:
+    mount_lookup = {subsystem: mount for mount, subsystem in _subsystem_lookup.items()}
+    return mount_lookup[subsystem]
+
+
 BCAxes = Union[Axis, OT3Axis]
 AxisMapValue = TypeVar("AxisMapValue")
 OT3AxisMap = Dict[OT3Axis, AxisMapValue]
@@ -440,6 +472,7 @@ class HardwareAction(enum.Enum):
     DISPENSE = enum.auto()
     BLOWOUT = enum.auto()
     PREPARE_ASPIRATE = enum.auto()
+    LIQUID_PROBE = enum.auto()
 
     def __str__(self) -> str:
         return self.name
@@ -465,22 +498,6 @@ class AionotifyEvent:
         flag_list = [f.name for f in flags]
         Flag = enum.Enum("Flag", flag_list)  # type: ignore
         return cls(flags=Flag, name=name)
-
-
-class ExecutionCancelledError(RuntimeError):
-    pass
-
-
-class MustHomeError(RuntimeError):
-    pass
-
-
-class NoTipAttachedError(RuntimeError):
-    pass
-
-
-class TipAttachedError(RuntimeError):
-    pass
 
 
 class GripperJawState(enum.Enum):
@@ -514,40 +531,27 @@ class GripperProbe(enum.Enum):
             return InstrumentProbeType.SECONDARY
 
 
-class InvalidMoveError(ValueError):
-    pass
+class EarlyLiquidSenseTrigger(RuntimeError):
+    """Error raised if sensor threshold reached before minimum probing distance."""
+
+    def __init__(
+        self, triggered_at: Dict[OT3Axis, float], min_z_pos: Dict[OT3Axis, float]
+    ) -> None:
+        """Initialize EarlyLiquidSenseTrigger error."""
+        super().__init__(
+            f"Liquid threshold triggered early at z={triggered_at}mm, "
+            f"minimum z position = {min_z_pos}"
+        )
 
 
-class GripperNotAttachedError(Exception):
-    """An error raised if a gripper is accessed that is not attached"""
+class LiquidNotFound(RuntimeError):
+    """Error raised if liquid sensing move completes without detecting liquid."""
 
-    pass
-
-
-class InvalidPipetteName(KeyError):
-    """Raised for an invalid pipette."""
-
-    def __init__(self, name: int, mount: OT3Mount) -> None:
-        self.name = name
-        self.mount = mount
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: name={self.name} mount={self.mount}>"
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}: Pipette name key {self.name} on mount {self.mount.name} is not valid"
-
-
-class InvalidPipetteModel(KeyError):
-    """Raised for a pipette with an unknown model."""
-
-    def __init__(self, name: str, model: str, mount: OT3Mount) -> None:
-        self.name = name
-        self.model = model
-        self.mount = mount
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: name={self.name}, model={self.model}, mount={self.mount}>"
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"
+    def __init__(
+        self, position: Dict[OT3Axis, float], max_z_pos: Dict[OT3Axis, float]
+    ) -> None:
+        """Initialize LiquidNotFound error."""
+        super().__init__(
+            f"Liquid threshold not found, current_position = {position}"
+            f"position at max travel allowed = {max_z_pos}"
+        )

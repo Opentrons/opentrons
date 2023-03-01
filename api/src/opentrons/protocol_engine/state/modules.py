@@ -21,8 +21,11 @@ from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
 )
 from opentrons.hardware_control.modules.types import LiveData
-
-from opentrons.types import DeckSlotName
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_east_slot,
+    get_west_slot,
+)
+from opentrons.types import DeckSlotName, MountType
 
 from ..types import (
     LoadedModule,
@@ -573,7 +576,7 @@ class ModuleView(HasState[ModuleState]):
         )
 
     def get_overall_height(self, module_id: str) -> float:
-        """Get the height of the module."""
+        """Get the height of the module, excluding any labware loaded atop it."""
         return self.get_dimensions(module_id).bareOverallHeight
 
     # TODO(mc, 2022-01-19): this method is missing unit test coverage
@@ -712,6 +715,27 @@ class ModuleView(HasState[ModuleState]):
             if transit in _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
                 return True
         return False
+
+    def is_edge_move_unsafe(self, mount: MountType, target_slot: DeckSlotName) -> bool:
+        """Check if the slot next to target contains a module to be avoided, depending on mount."""
+        slot_int = target_slot.as_int()
+
+        if mount is MountType.RIGHT:
+            # Check left of the target
+            neighbor_int = get_west_slot(slot_int)
+            if neighbor_int is None:
+                return False
+            else:
+                neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
+        else:
+            # Check right of the target
+            neighbor_int = get_east_slot(slot_int)
+            if neighbor_int is None:
+                return False
+            else:
+                neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
+
+        return neighbor_slot in self._state.slot_by_module_id.values()
 
     def select_hardware_module_to_load(
         self,

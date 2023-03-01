@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import nullcontext
-from typing import Any, List, Optional, Sequence, Union
+from typing import Any, List, Optional, Sequence, Union, cast
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
@@ -14,7 +14,6 @@ from opentrons.protocols.advanced_control import transfers
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
-from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
@@ -24,8 +23,10 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.common import InstrumentCore, ProtocolCore
+from .core.engine import ENGINE_CORE_API_VERSION
+from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
-from . import labware
+from . import labware, validation
 
 
 AdvancedLiquidHandling = Union[
@@ -42,6 +43,8 @@ _log = logging.getLogger(__name__)
 
 _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
 """The version after which the pick-up tip procedure should also prepare the plunger."""
+_PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
+"""The version after which the pick-up tip procedure deprecates presses and increment arguments."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -172,29 +175,30 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
 
-        well: Optional[labware.Well]
-        last_location = self._protocol_core.get_last_location()
+        well: Optional[labware.Well] = None
+        move_to_location: types.Location
 
-        if isinstance(location, labware.Well):
-            move_to_location = location.bottom(z=self._well_bottom_clearances.aspirate)
-            well = location
-        elif isinstance(location, types.Location):
-            move_to_location = location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
+        last_location = self._get_last_location_by_api_version()
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
             )
-        elif last_location:
-            move_to_location = last_location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        else:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
+            ) from e
+
+        if isinstance(target, validation.WellTarget):
+            move_to_location = target.location or target.well.bottom(
+                z=self._well_bottom_clearances.aspirate
             )
+            well = target.well
+        if isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -202,7 +206,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         c_vol = self._core.get_available_volume() if not volume else volume
-        flow_rate = self._core.get_absolute_aspirate_flow_rate(rate)
+        flow_rate = self._core.get_aspirate_flow_rate(rate)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -220,6 +224,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume=c_vol,
                 rate=rate,
                 flow_rate=flow_rate,
+                in_place=target.in_place,
             )
 
         return self
@@ -276,34 +281,34 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume, location if location else "current position", rate
             )
         )
-        well: Optional[labware.Well]
-        last_location = self._protocol_core.get_last_location()
+        well: Optional[labware.Well] = None
+        last_location = self._get_last_location_by_api_version()
 
-        if isinstance(location, labware.Well):
-            well = location
-            if well.parent._core.is_fixed_trash():
-                move_to_location = location.top()
-            else:
-                move_to_location = location.bottom(
-                    z=self._well_bottom_clearances.dispense
-                )
-        elif isinstance(location, types.Location):
-            move_to_location = location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                f"location should be a Well or Location, but it is {location}"
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
             )
-        elif last_location:
-            move_to_location = last_location
-            _, well = move_to_location.labware.get_parent_labware_and_well()
-        else:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is."
-            )
+            ) from e
+
+        if isinstance(target, validation.WellTarget):
+            well = target.well
+            if target.location:
+                move_to_location = target.location
+            elif well.parent._core.is_fixed_trash():
+                move_to_location = target.well.top()
+            else:
+                move_to_location = target.well.bottom(
+                    z=self._well_bottom_clearances.dispense
+                )
+        if isinstance(target, validation.PointTarget):
+            move_to_location = target.location
+
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -312,7 +317,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         c_vol = self._core.get_current_volume() if not volume else volume
 
-        flow_rate = self._core.get_absolute_dispense_flow_rate(rate)
+        flow_rate = self._core.get_dispense_flow_rate(rate)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -330,6 +335,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
+                in_place=target.in_place,
             )
 
         return self
@@ -431,50 +437,41 @@ class InstrumentContext(publisher.CommandPublisher):
                               :py:meth:`dispense`)
         :returns: This instance
         """
+        well: Optional[labware.Well] = None
+        move_to_location: types.Location
 
-        well: Optional[labware.Well]
-        # TODO(jbl 2022-11-10) refactor this boolean out and make location optional when PE blow-out in place exists
-        move_to_well = True
-        last_location = self._protocol_core.get_last_location()
-
-        if isinstance(location, labware.Well):
-            if location.parent.is_tiprack:
-                _log.warning(
-                    "Blow_out being performed on a tiprack. "
-                    "Please re-check your code"
-                )
-            checked_loc = location.top()
-            well = location
-        elif isinstance(location, types.Location):
-            checked_loc = location
-            _, well = location.labware.get_parent_labware_and_well()
-        elif location is not None:
-            raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
+        last_location = self._get_last_location_by_api_version()
+        try:
+            target = validation.validate_location(
+                location=location, last_location=last_location
             )
-        elif last_location:
-            checked_loc = last_location
-            _, well = checked_loc.labware.get_parent_labware_and_well()
-            # if no explicit location given but location cache exists,
-            # pipette blows out immediately at
-            # current location, no movement is needed
-            move_to_well = False
-        else:
+        except validation.NoLocationError as e:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
-            )
+            ) from e
+
+        if isinstance(target, validation.WellTarget):
+            if target.well.parent.is_tiprack:
+                _log.warning(
+                    "Blow_out being performed on a tiprack. "
+                    "Please re-check your code"
+                )
+            move_to_location = target.location or target.well.top()
+            well = target.well
+        elif isinstance(target, validation.PointTarget):
+            move_to_location = target.location
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.blow_out(instrument=self, location=checked_loc),
+            command=cmds.blow_out(instrument=self, location=move_to_location),
         ):
             self._core.blow_out(
-                location=checked_loc,
+                location=move_to_location,
                 well_core=well._core if well is not None else None,
-                move_to_well=move_to_well,
+                in_place=target.in_place,
             )
 
         return self
@@ -538,37 +535,35 @@ class InstrumentContext(publisher.CommandPublisher):
             last_location = self._protocol_core.get_last_location()
             if not last_location:
                 raise RuntimeError("No valid current location cache present")
-            else:
-                well = last_location.labware
-                # type checked below
-        else:
-            well = LabwareLike(location)
-
-        if well.is_well:
-            if "touchTipDisabled" in well.quirks_from_any_parent():
-                _log.info(f"Ignoring touch tip on labware {well}")
-                return self
-            if well.parent.as_labware().is_tiprack:
-                _log.warning(
-                    "Touch_tip being performed on a tiprack. "
-                    "Please re-check your code"
+            parent_labware, well = last_location.labware.get_parent_labware_and_well()
+            if not well or not parent_labware:
+                raise RuntimeError(
+                    f"Last location {location} has no associated well or labware."
                 )
-
-            if self.api_version < APIVersion(2, 4):
-                to_loc = well.as_well().top()
-            else:
-                move_with_z_offset = well.as_well().top().point + types.Point(
-                    0, 0, v_offset
-                )
-                to_loc = types.Location(move_with_z_offset, well)
-            self.move_to(to_loc, publish=False)
+        elif isinstance(location, labware.Well):
+            well = location
+            parent_labware = well.parent
         else:
-            raise TypeError("location should be a Well, but it is {}".format(location))
+            raise TypeError(f"location should be a Well, but it is {location}")
+
+        if "touchTipDisabled" in parent_labware.quirks:
+            _log.info(f"Ignoring touch tip on labware {well}")
+            return self
+        if parent_labware.is_tiprack:
+            _log.warning(
+                "Touch_tip being performed on a tiprack. Please re-check your code"
+            )
+
+        if self.api_version < APIVersion(2, 4):
+            move_to_location = well.top()
+        else:
+            move_to_location = well.top(z=v_offset)
 
         self._core.touch_tip(
-            location=well.as_well()._core,
+            location=move_to_location,
+            well_core=well._core,
             radius=radius,
-            v_offset=v_offset,
+            z_offset=v_offset,
             speed=checked_speed,
         )
         return self
@@ -624,7 +619,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @publisher.publish(command=cmds.return_tip)
     @requires_version(2, 0)
-    def return_tip(self, home_after: bool = True) -> InstrumentContext:
+    def return_tip(self, home_after: Optional[bool] = None) -> InstrumentContext:
         """
         If a tip is currently attached to the pipette, then the pipette will
         return the tip to its location in the tip rack.
@@ -648,7 +643,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 0)
+    @requires_version(2, 0)  # noqa: C901
     def pick_up_tip(
         self,
         location: Union[types.Location, labware.Well, labware.Labware, None] = None,
@@ -691,11 +686,17 @@ class InstrumentContext(publisher.CommandPublisher):
                         will result in the pipette hovering over the tip but
                         not picking it up--generally not desirable, but could
                         be used for dry-run).
+
+                        .. deprecated:: 2.14
+                            Use the Opentrons App to change pipette pick-up settings.
         :type presses: int
         :param increment: The additional distance to travel on each successive
                           press (e.g.: if `presses=3` and `increment=1.0`, then
                           the first press will travel down into the tip by
                           3.5mm, the second by 4.5mm, and the third by 5.5mm).
+
+                        .. deprecated:: 2.14
+                            Use the Opentrons App to change pipette pick-up settings.
         :type increment: float
         :param prep_after: Whether the pipette plunger should prepare itself
                            to aspirate immediately after picking up a tip.
@@ -728,6 +729,19 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
+
+        if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
+            raise APIVersionError(
+                f"presses is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
+                f" but you are using API {self._api_version}."
+            )
+
+        if increment is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
+            raise APIVersionError(
+                f"increment is only available in API versions lower than {_PRESSES_INCREMENT_REMOVED_IN},"
+                f" but you are using API {self._api_version}."
+            )
+
         if prep_after is not None and self._api_version < _PREP_AFTER_ADDED_IN:
             raise APIVersionError(
                 f"prep_after is only available in API {_PREP_AFTER_ADDED_IN} and newer,"
@@ -814,7 +828,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def drop_tip(
         self,
         location: Optional[Union[types.Location, labware.Well]] = None,
-        home_after: bool = True,
+        home_after: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Drop the current tip.
@@ -846,7 +860,7 @@ class InstrumentContext(publisher.CommandPublisher):
             :py:class:`.types.Location` or :py:class:`.Well` or None
         :param home_after:
             Whether to home this pipette's plunger after dropping the tip.
-            Defaults to ``True``.
+            If not specified, defaults to ``True`` on an OT-2.
 
             Setting ``home_after=False`` saves waiting a couple of seconds
             after the pipette drops the tip, but risks causing other problems.
@@ -1230,7 +1244,7 @@ class InstrumentContext(publisher.CommandPublisher):
             # would get a TypeError if they tried to call it like delay(minutes=10).
             # Without changing the ultimate behavior that such a call fails the
             # protocol, we can provide a more descriptive message as a courtesy.
-            raise NotImplementedError(
+            raise APIVersionError(
                 "InstrumentContext.delay() is not supported in Python Protocol API v2."
                 " Use ProtocolContext.delay() instead."
             )
@@ -1317,8 +1331,21 @@ class InstrumentContext(publisher.CommandPublisher):
 
             instrument.speed.aspirate = 50
 
+        .. versionchanged:: 2.14
+            This property has been removed because it's fundamentally misaligned
+            with the step-wise nature of a pipette's plunger speed configuration.
+            Use :py:attr:`.flow_rate` instead.
         """
-        return self._core.get_speed()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "InstrumentContext.speed has been removed."
+                " Use InstrumentContext.flow_rate, instead."
+            )
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyInstrumentCore)
+        return cast(LegacyInstrumentCore, self._core).get_speed()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1465,7 +1492,12 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 2)
     def return_height(self) -> float:
-        """The height to return a tip to its tiprack."""
+        """The height to return a tip to its tiprack.
+
+        :returns: A scaling factor to apply to the tip length.
+                  During a drop tip, this factor will be multiplied by the tip length
+                  to get the distance from the top of the well where the tip is dropped.
+        """
         return self._core.get_return_height()
 
     @property  # type: ignore
@@ -1491,6 +1523,17 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._well_bottom_clearances
 
+    def _get_last_location_by_api_version(self) -> Optional[types.Location]:
+        """Get the last location accessed by this pipette, if any.
+
+        In pre-engine Protocol API versions, this call omits the pipette mount.
+        This is to preserve pre-existing, potentially buggy behavior.
+        """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            return self._protocol_core.get_last_location(mount=self._core.get_mount())
+        else:
+            return self._protocol_core.get_last_location()
+
     def __repr__(self) -> str:
         return "<{}: {} in {}>".format(
             self.__class__.__name__,
@@ -1499,4 +1542,4 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
     def __str__(self) -> str:
-        return "{} on {} mount".format(self.hw_pipette["display_name"], self.mount)
+        return "{} on {} mount".format(self._core.get_display_name(), self.mount)
