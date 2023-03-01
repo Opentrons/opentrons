@@ -66,7 +66,7 @@ class BinaryMessenger:
 
     def start(self) -> None:
         """Start the reader task."""
-        if self._task:
+        if self._task and not self._task.done():
             log.warning("task already running.")
             return
         self._task = asyncio.get_event_loop().create_task(self._read_task_shield())
@@ -79,7 +79,6 @@ class BinaryMessenger:
                 await self._task
             except asyncio.CancelledError:
                 log.info("Task cancelled.")
-            self._task = None
 
         else:
             log.warning("task not running.")
