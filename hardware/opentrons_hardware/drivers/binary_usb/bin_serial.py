@@ -57,7 +57,7 @@ class SerialUsbDriver:
         return self._connected
 
     def _find_serial_port(self, vid: int, pid: int) -> Optional[str]:
-        ports = serial.tools.list_ports.comports()
+        ports = comports()
 
         for check_port in ports:
             if (check_port.vid, check_port.pid) == (vid, pid):
