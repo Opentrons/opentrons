@@ -457,7 +457,7 @@
     ]
   },
   "p50_single_gen3": {
-    "displayName": "P50 Single-Channel GEN3",
+    "displayName": "Flex 1-Channel 50 μL",
     "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 7.85,
@@ -497,7 +497,7 @@
     ]
   },
   "p1000_single_gen3": {
-    "displayName": "P1000 Single-Channel GEN3",
+    "displayName": "Flex 1-Channel 1000 μL",
     "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 137.35,
@@ -541,7 +541,7 @@
     ]
   },
   "p1000_multi_gen3": {
-    "displayName": "P1000 8-Channel GEN3",
+    "displayName": "Flex 8-Channel 1000 μL",
     "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 159.04,
@@ -583,7 +583,7 @@
     ]
   },
   "p50_multi_gen3": {
-    "displayName": "P50 8-Channel GEN3",
+    "displayName": "Flex 8-Channel 50 μL",
     "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 7.85,
@@ -623,7 +623,7 @@
     ]
   },
   "p1000_96": {
-    "displayName": "P1000 96-Channel GEN1",
+    "displayName": "Flex 96-Channel 1000 μL",
     "displayCategory": "GEN1",
     "defaultAspirateFlowRate": {
       "value": 7.85,
