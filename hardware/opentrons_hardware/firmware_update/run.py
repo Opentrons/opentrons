@@ -299,7 +299,12 @@ class RunUSBUpdate:
         self._update_file = update_file
         self._retry_count = retry_count
         self._timeout_seconds = timeout_seconds
-        self._messenger.add_listener(self)
+        self._messenger.add_listener(
+            self,
+            lambda message_type: bool(
+                message_type == BinaryMessageId.device_info_response
+            ),
+        )
 
     async def _reconnect(self, vid: int, pid: int, baudrate: int, timeout: int) -> bool:
         device_running = False
