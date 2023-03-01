@@ -1,7 +1,15 @@
 from opentrons.types import Point
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocol_api import Labware
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 
-def test_wells_accessor(min_lw, min_lw_impl, minimal_labware_def):
+
+def test_wells_accessor(
+    min_lw: Labware,
+    min_lw_impl: LegacyLabwareCore,
+    minimal_labware_def: LabwareDefinition,
+) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
     x = minimal_labware_def["wells"]["A2"]["x"]
@@ -13,7 +21,11 @@ def test_wells_accessor(min_lw, min_lw_impl, minimal_labware_def):
     assert min_lw.wells()[1].geometry._position == a2
 
 
-def test_wells_name_accessor(min_lw, min_lw_impl, minimal_labware_def):
+def test_wells_name_accessor(
+    min_lw: Labware,
+    min_lw_impl: LegacyLabwareCore,
+    minimal_labware_def: LabwareDefinition,
+) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
     x = minimal_labware_def["wells"]["A2"]["x"]
@@ -25,13 +37,17 @@ def test_wells_name_accessor(min_lw, min_lw_impl, minimal_labware_def):
     assert min_lw.wells_by_name()["A2"].geometry._position == a2
 
 
-def test_deprecated_index_accessors(min_lw):
+def test_deprecated_index_accessors(min_lw: Labware) -> None:
     assert min_lw.wells_by_name() == min_lw.wells_by_index()
     assert min_lw.rows_by_name() == min_lw.rows_by_index()
     assert min_lw.columns_by_name() == min_lw.columns_by_index()
 
 
-def test_dict_accessor(min_lw, min_lw_impl, minimal_labware_def):
+def test_dict_accessor(
+    min_lw: Labware,
+    min_lw_impl: LegacyLabwareCore,
+    minimal_labware_def: LabwareDefinition,
+) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
     x = minimal_labware_def["wells"]["A2"]["x"]
@@ -43,7 +59,11 @@ def test_dict_accessor(min_lw, min_lw_impl, minimal_labware_def):
     assert min_lw["A2"].geometry._position == a2
 
 
-def test_rows_accessor(min_lw2_impl, min_lw2, minimal_labware_def2):
+def test_rows_accessor(
+    min_lw2_impl: LegacyLabwareCore,
+    min_lw2: Labware,
+    minimal_labware_def2: LabwareDefinition,
+) -> None:
     depth1 = minimal_labware_def2["wells"]["A1"]["depth"]
     x1 = minimal_labware_def2["wells"]["A1"]["x"]
     y1 = minimal_labware_def2["wells"]["A1"]["y"]
@@ -57,7 +77,11 @@ def test_rows_accessor(min_lw2_impl, min_lw2, minimal_labware_def2):
     assert min_lw2.rows()[1][1].geometry._position == b2
 
 
-def test_row_name_accessor(min_lw2_impl, min_lw2, minimal_labware_def2):
+def test_row_name_accessor(
+    min_lw2_impl: LegacyLabwareCore,
+    min_lw2: Labware,
+    minimal_labware_def2: LabwareDefinition,
+) -> None:
     depth1 = minimal_labware_def2["wells"]["A1"]["depth"]
     x1 = minimal_labware_def2["wells"]["A1"]["x"]
     y1 = minimal_labware_def2["wells"]["A1"]["y"]
@@ -71,7 +95,11 @@ def test_row_name_accessor(min_lw2_impl, min_lw2, minimal_labware_def2):
     assert min_lw2.rows_by_name()["B"][1].geometry._position == b2
 
 
-def test_cols_accessor(min_lw_impl, min_lw, minimal_labware_def):
+def test_cols_accessor(
+    min_lw_impl: LegacyLabwareCore,
+    min_lw: Labware,
+    minimal_labware_def: LabwareDefinition,
+) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
     x = minimal_labware_def["wells"]["A2"]["x"]
@@ -83,7 +111,11 @@ def test_cols_accessor(min_lw_impl, min_lw, minimal_labware_def):
     assert min_lw.columns()[1][0].geometry._position == a2
 
 
-def test_col_name_accessor(min_lw, min_lw_impl, minimal_labware_def):
+def test_col_name_accessor(
+    min_lw: Labware,
+    min_lw_impl: LegacyLabwareCore,
+    minimal_labware_def: LabwareDefinition,
+) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
     x = minimal_labware_def["wells"]["A2"]["x"]

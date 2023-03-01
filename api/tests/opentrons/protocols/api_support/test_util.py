@@ -1,8 +1,10 @@
+from typing import Dict
+
 import pytest
 
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.types import Point, Location, Mount
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ProtocolContext
 from opentrons.protocol_api.labware import Labware, get_labware_definition
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.types import APIVersion
@@ -14,7 +16,7 @@ from opentrons.protocols.api_support.util import (
 from opentrons.hardware_control.types import Axis
 
 
-def test_max_speeds_userdict():
+def test_max_speeds_userdict() -> None:
     defaults = AxisMaxSpeeds()
     assert defaults.data == {}
     assert dict(defaults) == {}
@@ -45,8 +47,8 @@ def test_max_speeds_userdict():
     assert defaults["a"] == 20
     assert defaults[Axis.A] == 20
 
-    assert sorted(list(defaults.keys())) == sorted(["X", "A"])
-    assert "X" in defaults.keys()
+    assert sorted(list(defaults.keys())) == sorted(["X", "A"])  # type: ignore[no-untyped-call]
+    assert "X" in defaults.keys()  # type: ignore[no-untyped-call]
 
     del defaults["A"]
     assert "A" not in defaults
@@ -55,7 +57,7 @@ def test_max_speeds_userdict():
     assert "x" not in defaults
 
 
-def test_build_edges():
+def test_build_edges() -> None:
     lw_def = get_labware_definition("corning_96_wellplate_360ul_flat")
     test_lw = Labware(
         core=LegacyLabwareCore(lw_def, Location(Point(0, 0, 0), None)),
@@ -85,7 +87,7 @@ def test_build_edges():
     assert res2 == new_correct_edges
 
 
-def test_build_edges_left_pipette(ctx):
+def test_build_edges_left_pipette(ctx: ProtocolContext) -> None:
     test_lw = ctx.load_labware("corning_96_wellplate_360ul_flat", "2")
     test_lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", "6")
     mod = ctx.load_module("magnetic module", "3")
@@ -102,7 +104,7 @@ def test_build_edges_left_pipette(ctx):
         test_lw["A12"],
         1.0,
         Mount.LEFT,
-        ctx._core.get_deck(),
+        ctx._core.get_deck(),  # type: ignore[attr-defined]
         version=APIVersion(2, 4),
     )
     assert res == left_pip_edges
@@ -118,13 +120,13 @@ def test_build_edges_left_pipette(ctx):
         test_lw2["A12"],
         1.0,
         Mount.LEFT,
-        ctx._core.get_deck(),
+        ctx._core.get_deck(),  # type: ignore[attr-defined]
         version=APIVersion(2, 4),
     )
     assert res2 == left_pip_edges
 
 
-def test_build_edges_right_pipette(ctx):
+def test_build_edges_right_pipette(ctx: ProtocolContext) -> None:
     test_lw = ctx.load_labware("corning_96_wellplate_360ul_flat", "2")
     test_lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", "6")
     mod = ctx.load_module("magnetic module", "1")
@@ -141,7 +143,7 @@ def test_build_edges_right_pipette(ctx):
         test_lw["A1"],
         1.0,
         Mount.RIGHT,
-        ctx._core._deck_layout,
+        ctx._core._deck_layout,  # type: ignore[attr-defined]
         version=APIVersion(2, 4),
     )
     assert res == right_pip_edges
@@ -158,7 +160,7 @@ def test_build_edges_right_pipette(ctx):
         test_lw2["A12"],
         1.0,
         Mount.RIGHT,
-        ctx._core.get_deck(),
+        ctx._core.get_deck(),  # type: ignore[attr-defined]
         version=APIVersion(2, 4),
     )
     assert res2 == right_pip_edges
@@ -175,5 +177,7 @@ def test_build_edges_right_pipette(ctx):
         ({"2.0": 5, "2.6": 4}, APIVersion(2, 6), 4),
     ],
 )
-def test_find_value_for_api_version(data, level, desired):
+def test_find_value_for_api_version(
+    data: Dict[str, float], level: APIVersion, desired: float
+) -> None:
     assert find_value_for_api_version(level, data) == desired

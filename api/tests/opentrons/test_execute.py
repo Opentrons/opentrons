@@ -3,7 +3,7 @@ import io
 import os
 import mock
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, TextIO, cast
+from typing import Any, TextIO, cast
 
 import pytest
 
@@ -13,8 +13,7 @@ from opentrons.hardware_control import Controller, api
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.config.pipette_config import load
 
-if TYPE_CHECKING:
-    from tests.opentrons.conftest import Bundle, Protocol
+from .fixture_types import BundleFixtureGetter, JsonProtocolFixtureGetter, Protocol
 
 
 HERE = Path(__file__).parent
@@ -72,7 +71,7 @@ def test_execute_function_apiv2(
 
 
 def test_execute_function_json_v3_apiv2(
-    get_json_protocol_fixture: Callable[[str, str, bool], str],
+    get_json_protocol_fixture: JsonProtocolFixtureGetter,
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
@@ -102,7 +101,7 @@ def test_execute_function_json_v3_apiv2(
 
 
 def test_execute_function_json_v4_apiv2(
-    get_json_protocol_fixture: Callable[[str, str, bool], str],
+    get_json_protocol_fixture: JsonProtocolFixtureGetter,
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
@@ -132,7 +131,7 @@ def test_execute_function_json_v4_apiv2(
 
 
 def test_execute_function_json_v5_apiv2(
-    get_json_protocol_fixture: Callable[[str, str, bool], str],
+    get_json_protocol_fixture: JsonProtocolFixtureGetter,
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
@@ -164,7 +163,7 @@ def test_execute_function_json_v5_apiv2(
 
 
 def test_execute_function_bundle_apiv2(
-    get_bundle_fixture: Callable[[str], Bundle],
+    get_bundle_fixture: BundleFixtureGetter,
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:

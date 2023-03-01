@@ -1,4 +1,6 @@
-from typing import Optional, Callable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional, Callable
 import pytest
 
 from opentrons.types import Point
@@ -10,10 +12,15 @@ from opentrons_shared_data.gripper import GripperModel
 
 fake_gripper_conf = gripper_config.load(GripperModel.v1)
 
+if TYPE_CHECKING:
+    from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+        GripperCalibrationOffset,
+    )
+
 
 @pytest.mark.ot3_only
 @pytest.fixture
-def fake_offset():
+def fake_offset() -> GripperCalibrationOffset:
     from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
         load_gripper_calibration_offset,
     )
@@ -22,7 +29,7 @@ def fake_offset():
 
 
 @pytest.mark.ot3_only
-def test_id_get_added_to_dict(fake_offset):
+def test_id_get_added_to_dict(fake_offset: GripperCalibrationOffset) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     assert gripr.as_dict()["gripper_id"] == "fakeid123"
 
@@ -47,14 +54,14 @@ def test_id_get_added_to_dict(fake_offset):
 def test_critical_point(
     override: Optional[CriticalPoint],
     result_accessor: Callable[[gripper.Gripper], Point],
-    fake_offset,
-):
+    fake_offset: GripperCalibrationOffset,
+) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     assert gripr.critical_point(override) == result_accessor(gripr)
 
 
 @pytest.mark.ot3_only
-def test_load_gripper_cal_offset(fake_offset):
+def test_load_gripper_cal_offset(fake_offset: GripperCalibrationOffset) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     # if offset data do not exist, loaded values should match DEFAULT
     assert gripr._calibration_offset.offset == Point(
@@ -63,7 +70,7 @@ def test_load_gripper_cal_offset(fake_offset):
 
 
 @pytest.mark.ot3_only
-def test_reload_instrument_cal_ot3(fake_offset) -> None:
+def test_reload_instrument_cal_ot3(fake_offset: GripperCalibrationOffset) -> None:
     old_gripper = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     # if only calibration is changed
     new_cal = instrument_calibration.GripperCalibrationOffset(

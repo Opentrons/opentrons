@@ -2,7 +2,7 @@ from __future__ import annotations
 import io
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, TextIO, cast
+from typing import TextIO, cast
 
 import pytest
 
@@ -10,8 +10,7 @@ from opentrons import simulate, protocols
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 
-if TYPE_CHECKING:
-    from tests.opentrons.conftest import Bundle, Protocol
+from .fixture_types import Protocol, BundleFixtureGetter, JsonProtocolFixtureGetter
 
 
 HERE = Path(__file__).parent
@@ -36,7 +35,7 @@ def test_simulate_function_apiv2(
 
 
 def test_simulate_function_json_apiv2(
-    get_json_protocol_fixture: Callable[[str, str, bool], str]
+    get_json_protocol_fixture: JsonProtocolFixtureGetter,
 ) -> None:
     jp = get_json_protocol_fixture("3", "simple", False)
     filelike = io.StringIO(jp)
@@ -55,7 +54,7 @@ def test_simulate_function_json_apiv2(
 
 
 def test_simulate_function_bundle_apiv2(
-    get_bundle_fixture: Callable[[str], Bundle]
+    get_bundle_fixture: BundleFixtureGetter,
 ) -> None:
     bundle_fixture = get_bundle_fixture("simple_bundle")
     runlog, bundle = simulate.simulate(

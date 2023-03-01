@@ -4,11 +4,8 @@ from typing import AsyncIterator
 
 import pytest
 
-from opentrons.hardware_control.emulation.proxy import (
-    Proxy,
-    ProxySettings,
-    ProxyListener,
-)
+from opentrons.hardware_control.emulation.proxy import Proxy, ProxyListener
+from opentrons.hardware_control.emulation.settings import ProxySettings
 
 
 @pytest.fixture

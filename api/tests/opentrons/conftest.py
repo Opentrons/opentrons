@@ -5,21 +5,21 @@ import inspect
 import io
 import json
 import os
-import pathlib
 import zipfile
+from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
     AsyncGenerator,
     Callable,
-    Dict,
     Generator,
     NamedTuple,
     TextIO,
     Union,
     cast,
+    overload,
 )
-from typing_extensions import TypedDict
+from typing_extensions import Literal
 
 import pytest
 from decoy import Decoy
@@ -52,6 +52,8 @@ from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
 
+from .fixture_types import Bundle, BundleFixtureGetter, JsonProtocolFixtureGetter
+
 
 if TYPE_CHECKING:
     from opentrons.drivers.smoothie_drivers import SmoothieDriver as SmoothieDriverType
@@ -63,20 +65,8 @@ class Protocol(NamedTuple):
     filelike: TextIO
 
 
-class Bundle(TypedDict):
-    source_dir: pathlib.Path
-    filename: str
-    contents: str
-    filelike: io.BytesIO
-    binary_zipfile: bytes
-    metadata: Dict[str, str]
-    bundled_data: Dict[str, str]
-    bundled_labware: Dict[str, LabwareDefinition]
-    bundled_python: Dict[str, Any]
-
-
 @pytest.fixture()
-def ot_config_tempdir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, None]:
+def ot_config_tempdir(tmp_path: Path) -> Generator[Path, None, None]:
     os.environ["OT_API_CONFIG_DIR"] = str(tmp_path)
     config.reload()
 
@@ -279,8 +269,8 @@ async def smoothie(
 
 @pytest.fixture
 def hardware_controller_lockfile(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
-) -> pathlib.Path:
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> Path:
     lockfile_dir = tmp_path / "hardware_controller_lockfile"
     lockfile_dir.mkdir()
     lockfile = lockfile_dir / "hardware.lock"
@@ -314,7 +304,7 @@ def get_labware_fixture() -> Callable[[str], LabwareDefinition]:
     def _get_labware_fixture(fixture_name: str) -> LabwareDefinition:
         with open(
             (
-                pathlib.Path(__file__).parent
+                Path(__file__).parent
                 / ".."
                 / ".."
                 / ".."
@@ -331,15 +321,31 @@ def get_labware_fixture() -> Callable[[str], LabwareDefinition]:
     return _get_labware_fixture
 
 
-@pytest.fixture()
-def get_json_protocol_fixture() -> Callable[[str, str, bool], Union[str, JsonProtocol]]:
+@pytest.fixture
+def get_json_protocol_fixture() -> JsonProtocolFixtureGetter:
+    @overload
+    def _get_json_protocol_fixture(
+        fixture_version: str,
+        fixture_name: str,
+        decode: Literal[True] = True,
+    ) -> JsonProtocol:
+        ...
+
+    @overload
+    def _get_json_protocol_fixture(
+        fixture_version: str,
+        fixture_name: str,
+        decode: Literal[False],
+    ) -> str:
+        ...
+
     def _get_json_protocol_fixture(
         fixture_version: str,
         fixture_name: str,
         decode: bool = True,
     ) -> Union[str, JsonProtocol]:
         with open(
-            pathlib.Path(__file__).parent
+            Path(__file__).parent
             / ".."
             / ".."
             / ".."
@@ -360,10 +366,10 @@ def get_json_protocol_fixture() -> Callable[[str, str, bool], Union[str, JsonPro
 
 
 @pytest.fixture
-def get_bundle_fixture() -> Callable[[str], Bundle]:
+def get_bundle_fixture() -> BundleFixtureGetter:
     def get_std_labware(loadName: str, version: int = 1) -> LabwareDefinition:
         with open(
-            pathlib.Path(__file__).parent
+            Path(__file__).parent
             / ".."
             / ".."
             / ".."
@@ -387,7 +393,7 @@ def get_bundle_fixture() -> Callable[[str], Bundle]:
         their assertions.
         """
         fixture_dir = (
-            pathlib.Path(__file__).parent
+            Path(__file__).parent
             / "protocols"
             / "fixtures"
             / "bundled_protocols"

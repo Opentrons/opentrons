@@ -1179,7 +1179,7 @@ def test_move_to_with_heater_shaker(
 ) -> None:
     """Test move_to raises for unsafe moves with heater-shaker."""
 
-    def raiser(*args, **kwargs):
+    def raiser(*args: Any, **kwargs: Any) -> None:
         raise RuntimeError("Cannot")
 
     mod = ctx.load_module("heaterShakerModuleV1", 1)

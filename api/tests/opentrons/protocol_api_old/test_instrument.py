@@ -1,19 +1,34 @@
 """ Test the InstrumentContext class and its functions """
+from typing import Callable
+from typing_extensions import TypedDict
+
 import pytest
 from unittest import mock
 
 from opentrons.types import Mount
 from opentrons.protocols.advanced_control import transfers
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.hardware_control import ThreadManagedHardware
 
 import opentrons.protocol_api as papi
 
 pytestmark = pytest.mark.ot2_only
 
 
+class ContextFixture(TypedDict):
+    ctx: papi.ProtocolContext
+    instr: papi.InstrumentContext
+    lw1: papi.Labware
+
+
+ContextFixtureBuilder = Callable[[APIVersion], ContextFixture]
+
+
 @pytest.fixture
-def make_context_and_labware(hardware):
-    def _make_context_and_labware(api_version):
+def make_context_and_labware(
+    hardware: ThreadManagedHardware,
+) -> ContextFixtureBuilder:
+    def _make_context_and_labware(api_version: APIVersion) -> ContextFixture:
         ctx = papi.create_protocol_context(
             api_version=api_version,
             hardware_api=hardware,
@@ -30,8 +45,8 @@ def make_context_and_labware(hardware):
     "liquid_handling_command", ["transfer", "consolidate", "distribute"]
 )
 def test_blowout_location_unsupported_version(
-    make_context_and_labware, liquid_handling_command
-):
+    make_context_and_labware: ContextFixtureBuilder, liquid_handling_command: str
+) -> None:
     # not supported in versions below 2.8
     context_and_labware = make_context_and_labware(APIVersion(2, 7))
     context_and_labware["ctx"].home()
@@ -64,11 +79,11 @@ def test_blowout_location_unsupported_version(
     ],
 )
 def test_blowout_location_invalid(
-    make_context_and_labware,
-    liquid_handling_command,
-    blowout_location,
-    expected_error_match,
-):
+    make_context_and_labware: ContextFixtureBuilder,
+    liquid_handling_command: str,
+    blowout_location: str,
+    expected_error_match: str,
+) -> None:
     context_and_labware = make_context_and_labware(APIVersion(2, 8))
     context_and_labware["ctx"].home()
     lw1 = context_and_labware["lw1"]
@@ -93,8 +108,11 @@ def test_blowout_location_invalid(
     ],
 )
 def test_valid_blowout_location(
-    make_context_and_labware, liquid_handling_command, blowout_location, expected_strat
-):
+    make_context_and_labware: ContextFixtureBuilder,
+    liquid_handling_command: str,
+    blowout_location: str,
+    expected_strat: transfers.BlowOutStrategy,
+) -> None:
     context_and_labware = make_context_and_labware(APIVersion(2, 8))
     context_and_labware["ctx"].home()
     lw1 = context_and_labware["lw1"]

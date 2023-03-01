@@ -1,3 +1,5 @@
+from typing import List, Tuple, Optional
+
 import pytest
 
 from opentrons.types import Location, Point
@@ -22,7 +24,10 @@ trough_name = "usascientific_12_reservoir_22ml"
 P300M_GEN2_MAX_HEIGHT = 155.75
 
 
-def check_arc_basic(arc, from_loc, to_loc):
+Arc = List[Tuple[Point, Optional[CriticalPoint]]]
+
+
+def check_arc_basic(arc: Arc, from_loc: Location, to_loc: Location) -> None:
     """Check the tests that should always be true for different-well moves
     - we should always go only up, then only xy, then only down
     - we should have three moves
@@ -36,7 +41,7 @@ def check_arc_basic(arc, from_loc, to_loc):
     assert arc[1][0].z >= to_loc.point.z
 
 
-def test_direct_moves():
+def test_direct_moves() -> None:
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
 
@@ -57,7 +62,7 @@ def test_direct_moves():
     assert same_well == [(lw1.wells()[0].bottom().point, None)]
 
 
-def test_basic_arc():
+def test_basic_arc() -> None:
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
     lw2 = labware.load(labware_name, deck.position_for(2))
@@ -90,7 +95,7 @@ def test_basic_arc():
     assert different_lw[0][0].z == deck.highest_z + 10.0
 
 
-def test_force_direct():
+def test_force_direct() -> None:
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
     lw2 = labware.load(labware_name, deck.position_for(2))
@@ -119,7 +124,7 @@ def test_force_direct():
     assert different_lw == [(lw2.wells()[0].bottom().point, None)]
 
 
-def test_no_labware_loc():
+def test_no_labware_loc() -> None:
     labware_def = labware.get_labware_definition(labware_name)
 
     deck = Deck()
@@ -161,7 +166,7 @@ def test_no_labware_loc():
     assert no_to_well_height == lw_height_expected
 
 
-def test_arc_tall_point():
+def test_arc_tall_point() -> None:
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
     tall_z = 100
@@ -181,7 +186,7 @@ def test_arc_tall_point():
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
 
 
-def test_arc_lower_minimum_z_height():
+def test_arc_lower_minimum_z_height() -> None:
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
     tall_z = 100
@@ -221,7 +226,7 @@ def test_arc_lower_minimum_z_height():
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
 
 
-def test_direct_minimum_z_height():
+def test_direct_minimum_z_height() -> None:
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
     from_loc = lw1.wells()[0].bottom().move(Point(x=-2))
@@ -237,7 +242,7 @@ def test_direct_minimum_z_height():
     check_arc_basic(moves, from_loc, to_loc)
 
 
-def test_direct_cp():
+def test_direct_cp() -> None:
     deck = Deck()
     trough = labware.load(trough_name, deck.position_for(1))
     lw1 = labware.load(labware_name, deck.position_for(2))
@@ -281,7 +286,7 @@ def test_direct_cp():
     assert to_normal[2][1] is None
 
 
-def test_gen2_module_transforms():
+def test_gen2_module_transforms() -> None:
     deck = Deck()
     tmod = module_geometry.create_geometry(
         definition=module_geometry.load_definition(
@@ -314,7 +319,7 @@ def test_gen2_module_transforms():
     assert mmod2.labware_offset == Point(1.425, -0.125, 82.25)
 
 
-def test_instr_max_height():
+def test_instr_max_height() -> None:
     deck = Deck()
     fixed_trash = deck.get_fixed_trash()
     trough = labware.load(trough_name, deck.position_for(1))
@@ -325,7 +330,7 @@ def test_instr_max_height():
     # if the highest deck height is between 1 mm and 10 mm below
     # the max instrument achievable height, we use the max instrument
     # height as the safe height
-    instr_max_height = fixed_trash.wells()[0].top().point.z + 1
+    instr_max_height = fixed_trash.wells()[0].top().point.z + 1  # type: ignore[union-attr]
     height = safe_height(
         from_loc=trough.wells()[0].top(),
         to_loc=trough2.wells()[0].top(),
@@ -338,7 +343,7 @@ def test_instr_max_height():
 
     # if the highest deck height is > 10 mm below the max instrument
     # height, we use the lw_z_margin instead
-    instr_max_height = fixed_trash.wells()[0].top().point.z + 30
+    instr_max_height = fixed_trash.wells()[0].top().point.z + 30  # type: ignore[union-attr]
     height2 = safe_height(
         from_loc=trough.wells()[0].top(),
         to_loc=trough2.wells()[0].top(),
@@ -347,11 +352,11 @@ def test_instr_max_height():
         well_z_margin=5.0,
         lw_z_margin=10.0,
     )
-    assert height2 == round(fixed_trash.wells()[0].top().point.z, 2) + 10.0
+    assert height2 == round(fixed_trash.wells()[0].top().point.z, 2) + 10.0  # type: ignore[union-attr]
 
     # it fails if the highest deck height is less than 1 mm below
     # the max instr achievable height
-    instr_max_height = fixed_trash.wells()[0].top().point.z
+    instr_max_height = fixed_trash.wells()[0].top().point.z  # type: ignore[union-attr]
     with pytest.raises(Exception):
         safe_height(
             from_loc=trough.wells()[0].top(),
@@ -363,7 +368,7 @@ def test_instr_max_height():
         )
 
 
-def test_should_dodge():
+def test_should_dodge() -> None:
     deck = Deck()
     # with no tc loaded, doesn't matter what the positions are
     assert not should_dodge_thermocycler(
@@ -392,7 +397,7 @@ def test_should_dodge():
     )
 
 
-def test_labware_in_next_slot():
+def test_labware_in_next_slot() -> None:
     deck = Deck()
     trough = labware.load(trough_name, deck.position_for(4))
     trough2 = labware.load(trough_name, deck.position_for(1))
@@ -407,7 +412,7 @@ def test_labware_in_next_slot():
     assert deck.right_of("9") is None
 
 
-def test_get_non_fixture_slots():
+def test_get_non_fixture_slots() -> None:
     deck = Deck()
     trough = labware.load(trough_name, deck.position_for(4))
     deck[4] = trough

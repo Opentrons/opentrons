@@ -1,6 +1,8 @@
 import pytest
 from opentrons.protocols.models import json_protocol
 
+from tests.opentrons.fixture_types import JsonProtocolFixtureGetter
+
 
 @pytest.mark.parametrize(
     argnames=["version", "name"],
@@ -12,7 +14,9 @@ from opentrons.protocols.models import json_protocol
         ["3", "testAllAtomicSingleV3"],
     ],
 )
-def test_json_protocol_model(get_json_protocol_fixture, version: str, name: str):
+def test_json_protocol_model(
+    get_json_protocol_fixture: JsonProtocolFixtureGetter, version: str, name: str
+) -> None:
     """It should be parsed and validated correctly."""
     fx = get_json_protocol_fixture(
         fixture_version=version, fixture_name=name, decode=True

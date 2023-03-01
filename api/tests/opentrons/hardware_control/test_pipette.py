@@ -1,9 +1,12 @@
 import pytest
 from mock import patch
 from typing import Union, Callable
+
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Point, Mount
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+
+from opentrons_shared_data.pipette.dev_types import PipetteModel
 from opentrons.hardware_control.instruments.ot2 import (
     pipette as ot2_pipette,
     instrument_calibration,
@@ -31,7 +34,7 @@ OT3_PIP_CAL = ot3_calibration.PipetteOffsetByPipetteMount(
 @pytest.fixture
 def hardware_pipette_ot2() -> Callable:
     def _create_pipette(
-        model: str,
+        model: PipetteModel,
         calibration: instrument_calibration.PipetteOffsetByPipetteMount = OT2_PIP_CAL,
         id: str = "testID",
     ):
@@ -60,7 +63,7 @@ def hardware_pipette_ot3() -> Callable:
         [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1"],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_single_v1.0")),
         ],
     ],
 )
@@ -89,7 +92,7 @@ def test_tip_tracking(
         [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1", Point(0, 0, 12.0)],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v3.3"),
+            ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_single_v3.3")),
             Point(-8.0, -22.0, -259.15),
         ],
     ],
@@ -131,7 +134,7 @@ def test_tip_nozzle_position_tracking(
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_single_v1.0")),
             ot3_calibration.PipetteOffsetByPipetteMount(
                 offset=Point(10, 10, 10),
                 source=cal_types.SourceType.user,
@@ -173,7 +176,7 @@ def test_critical_points_pipette_offset(
         [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1", 10.0],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_single_v1.0")),
             1000.0,
         ],
     ],
@@ -277,19 +280,19 @@ def test_flow_rate_setting(
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v3.3"),
+            ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_single_v3.3")),
             Point(-8.0, -22.0, -259.15),
             Point(-8.0, -22.0, -259.15),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_multi_v3.3"),
+            ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_multi_v3.3")),
             Point(-8.0, -47.5, -259.15),
             Point(-8.0, -79.0, -259.15),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_96", "3.3"),
+            ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_96"), "3.3"),
             Point(13.5, -57.0, -259.15),
             Point(-36.0, -88.5, -259.15),
         ],
@@ -326,7 +329,7 @@ def test_alternative_critical_points(
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_single_v1.0")),
             ot3_calibration.PipetteOffsetByPipetteMount(
                 offset=Point(1, 1, 1),
                 source=cal_types.SourceType.user,
@@ -369,7 +372,7 @@ def test_save_instrument_offset_ot3(hardware_pipette_ot3: Callable) -> None:
     # which should be done in a follow-up refactor.
     path_to_calibrations = "opentrons.hardware_control.instruments.ot3.pipette"
     hw_pipette = hardware_pipette_ot3(
-        ot3_pipette_config.convert_pipette_model("p1000_single_v1.0")
+        ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_single_v1.0"))
     )
 
     assert hw_pipette.pipette_offset.offset == Point(0, 0, 0)
@@ -386,7 +389,7 @@ def test_save_instrument_offset_ot3(hardware_pipette_ot3: Callable) -> None:
 
 def test_reload_instrument_cal_ot3(hardware_pipette_ot3: Callable) -> None:
     old_pip = hardware_pipette_ot3(
-        ot3_pipette_config.convert_pipette_model("p1000_single_v1.0")
+        ot3_pipette_config.convert_pipette_model(PipetteModel("p1000_single_v1.0"))
     )
     # if only calibration is changed
     new_cal = ot3_calibration.PipetteOffsetByPipetteMount(

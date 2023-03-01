@@ -27,16 +27,16 @@ def wells_by_column(well_ordering: List[List[str]]) -> List[List[LegacyWellCore]
 
 
 @pytest.fixture
-def wells(wells_by_column) -> List[LegacyWellCore]:
+def wells(wells_by_column: List[List[LegacyWellCore]]) -> List[LegacyWellCore]:
     return [well_impl for column in wells_by_column for well_impl in column]
 
 
 @pytest.fixture
-def tiptracker(wells_by_column) -> TipTracker:
+def tiptracker(wells_by_column: List[List[LegacyWellCore]]) -> TipTracker:
     return TipTracker(wells_by_column)
 
 
-def test_use_tips(wells, tiptracker):
+def test_use_tips(wells: List[LegacyWellCore], tiptracker: TipTracker) -> None:
     well_list = wells
 
     # Test only using one tip
@@ -71,7 +71,7 @@ def test_use_tips(wells, tiptracker):
         assert well.has_tip()
 
 
-def test_select_next_tip(wells, tiptracker):
+def test_select_next_tip(wells: List[LegacyWellCore], tiptracker: TipTracker) -> None:
     well_list = wells
 
     next_one = tiptracker.next_tip()
@@ -120,7 +120,9 @@ def test_select_next_tip(wells, tiptracker):
     tiptracker.use_tips(well_list[0])
 
 
-def test_use_tips_fail_if_full(wells, tiptracker):
+def test_use_tips_fail_if_full(
+    wells: List[LegacyWellCore], tiptracker: TipTracker
+) -> None:
     well_list = wells
 
     tiptracker.use_tips(well_list[0])
@@ -128,7 +130,7 @@ def test_use_tips_fail_if_full(wells, tiptracker):
         tiptracker.use_tips(well_list[0], fail_if_full=True)
 
 
-def test_previous_tip(wells, tiptracker):
+def test_previous_tip(wells: List[LegacyWellCore], tiptracker: TipTracker) -> None:
     # If all wells are used, we can't get a previous tip
     assert tiptracker.previous_tip() is None
     # If one well is empty, wherever it is, we can get a slot
@@ -144,7 +146,7 @@ def test_previous_tip(wells, tiptracker):
     assert tiptracker.previous_tip(3) is wells[5]
 
 
-def test_return_tips(wells, tiptracker):
+def test_return_tips(wells: List[LegacyWellCore], tiptracker: TipTracker) -> None:
     # If all wells are used, we get an error if we try to return
     with pytest.raises(AssertionError):
         tiptracker.return_tips(wells[0])

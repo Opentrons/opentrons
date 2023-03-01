@@ -3,7 +3,7 @@ from typing import Dict
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import WellDefinition
+from opentrons_shared_data.labware.dev_types import LabwareDefinition, WellDefinition
 
 from opentrons.hardware_control.modules.types import (
     MagneticModuleModel,
@@ -138,7 +138,7 @@ def test_bottom() -> None:
     assert well.bottom() == Location(Point(expected_x, expected_y, expected_z), well)
 
 
-def test_from_center_cartesian():
+def test_from_center_cartesian() -> None:
     slot1 = Location(Point(10, 11, 12), 1)  # type: ignore[arg-type]
     well_name = "circular_well_json"
     has_tip = False
@@ -162,9 +162,9 @@ def test_from_center_cartesian():
     percent1_z = -0.5
     point1 = well1.from_center_cartesian(percent1_x, percent1_y, percent1_z)
 
-    # slot.x + well.x + 1 * well.diamter/2
+    # slot.x + well.x + 1 * well.diameter/2
     expected_x: float = 10 + 40 + 15
-    # slot.y + well.y + 1 * well.diamter/2
+    # slot.y + well.y + 1 * well.diameter/2
     expected_y: float = 11 + 50 + 15
     # slot.z + well.z + (1 - 0.5) * well.depth/2
     expected_z: float = 12 + 3 + 20 - 10
@@ -208,13 +208,15 @@ def test_from_center_cartesian():
 
 
 @pytest.fixture
-def corning_96_wellplate_360ul_flat_def():
+def corning_96_wellplate_360ul_flat_def() -> LabwareDefinition:
     labware_name = "corning_96_wellplate_360ul_flat"
     return labware.get_labware_definition(labware_name)
 
 
 @pytest.fixture
-def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
+def corning_96_wellplate_360ul_flat(
+    corning_96_wellplate_360ul_flat_def: LabwareDefinition,
+) -> labware.Labware:
     return labware.Labware(
         core=LegacyLabwareCore(
             definition=corning_96_wellplate_360ul_flat_def,
@@ -227,13 +229,15 @@ def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
 
 
 @pytest.fixture
-def opentrons_96_tiprack_300ul_def():
+def opentrons_96_tiprack_300ul_def() -> LabwareDefinition:
     labware_name = "opentrons_96_tiprack_300ul"
     return labware.get_labware_definition(labware_name)
 
 
 @pytest.fixture
-def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
+def opentrons_96_tiprack_300ul(
+    opentrons_96_tiprack_300ul_def: LabwareDefinition,
+) -> labware.Labware:
     return labware.Labware(
         core=LegacyLabwareCore(
             definition=opentrons_96_tiprack_300ul_def,
@@ -245,7 +249,7 @@ def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
     )
 
 
-def test_back_compat(corning_96_wellplate_360ul_flat) -> None:
+def test_back_compat(corning_96_wellplate_360ul_flat: labware.Labware) -> None:
     lw = corning_96_wellplate_360ul_flat
 
     # Note that this test uses the display name of wells to test for equality,
@@ -291,7 +295,7 @@ def test_back_compat(corning_96_wellplate_360ul_flat) -> None:
     assert repr(w11[1][2]) == well_c3_name
 
 
-def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
+def test_well_parent(corning_96_wellplate_360ul_flat: labware.Labware) -> None:
     lw = corning_96_wellplate_360ul_flat
     parent = Location(Point(7, 8, 9), lw)
     well_name = "circular_well_json"
@@ -320,7 +324,8 @@ def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
 
 
 def test_tip_tracking_init(
-    corning_96_wellplate_360ul_flat, opentrons_96_tiprack_300ul
+    corning_96_wellplate_360ul_flat: labware.Labware,
+    opentrons_96_tiprack_300ul: labware.Labware,
 ) -> None:
     tiprack = opentrons_96_tiprack_300ul
     assert tiprack.is_tiprack
@@ -333,7 +338,7 @@ def test_tip_tracking_init(
         assert not well.has_tip
 
 
-def test_use_tips(opentrons_96_tiprack_300ul) -> None:
+def test_use_tips(opentrons_96_tiprack_300ul: labware.Labware) -> None:
     tiprack = opentrons_96_tiprack_300ul
     well_list = tiprack.wells()
 
@@ -370,7 +375,8 @@ def test_use_tips(opentrons_96_tiprack_300ul) -> None:
 
 
 def test_select_next_tip(
-    opentrons_96_tiprack_300ul, opentrons_96_tiprack_300ul_def
+    opentrons_96_tiprack_300ul: labware.Labware,
+    opentrons_96_tiprack_300ul_def: LabwareDefinition,
 ) -> None:
     tiprack = opentrons_96_tiprack_300ul
     well_list = tiprack.wells()
@@ -421,7 +427,7 @@ def test_select_next_tip(
     tiprack.use_tips(well_list[0])
 
 
-def test_previous_tip(opentrons_96_tiprack_300ul) -> None:
+def test_previous_tip(opentrons_96_tiprack_300ul: labware.Labware) -> None:
     tiprack = opentrons_96_tiprack_300ul
     # If all wells are used, we can't get a previous tip
     assert tiprack.previous_tip() is None
@@ -438,7 +444,7 @@ def test_previous_tip(opentrons_96_tiprack_300ul) -> None:
     assert tiprack.previous_tip(3) == tiprack.wells()[5]
 
 
-def test_return_tips(opentrons_96_tiprack_300ul) -> None:
+def test_return_tips(opentrons_96_tiprack_300ul: labware.Labware) -> None:
     tiprack = opentrons_96_tiprack_300ul
 
     # If all wells are used, we get an error if we try to return
@@ -470,7 +476,7 @@ def test_return_tips(opentrons_96_tiprack_300ul) -> None:
         + list(HeaterShakerModuleModel)
     ),
 )
-def test_module_geometry_load(module_model) -> None:
+def test_module_geometry_load(module_model: str) -> None:
     definition = module_geometry.load_definition(module_model)
     geometry = module_geometry.create_geometry(
         definition=definition,
@@ -501,7 +507,7 @@ def test_module_geometry_load(module_model) -> None:
         "thermocyclerModuleV2",
     ],
 )
-def test_module_load_labware(module_name) -> None:
+def test_module_load_labware(module_name: str) -> None:
     labware_name = "corning_96_wellplate_360ul_flat"
     labware_def = labware.get_labware_definition(labware_name)
     mod_model = validation.ensure_module_model(module_name)
@@ -527,7 +533,7 @@ def test_module_load_labware(module_name) -> None:
     assert mod.highest_z == old_z
 
 
-def test_tiprack_list():
+def test_tiprack_list() -> None:
     labware_name = "opentrons_96_tiprack_300ul"
     labware_def = labware.get_labware_definition(labware_name)
     tiprack = labware.Labware(
@@ -566,7 +572,7 @@ def test_tiprack_list():
         labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[95])
 
 
-def test_uris():
+def test_uris() -> None:
     details = ("opentrons", "opentrons_96_tiprack_300ul", "1")
     uri = "opentrons/opentrons_96_tiprack_300ul/1"
     assert helpers.uri_from_details(*details) == uri
@@ -583,7 +589,9 @@ def test_uris():
     assert lw.uri == uri
 
 
-def test_labware_hash_func_same_implementation(minimal_labware_def) -> None:
+def test_labware_hash_func_same_implementation(
+    minimal_labware_def: LabwareDefinition,
+) -> None:
     """Test that multiple Labware objects with same implementation and version
     have the same __hash__"""
     impl = LegacyLabwareCore(minimal_labware_def, Location(Point(0, 0, 0), "Test Slot"))
@@ -600,7 +608,7 @@ def test_labware_hash_func_same_implementation(minimal_labware_def) -> None:
 
 
 def test_labware_hash_func_same_implementation_different_version(
-    minimal_labware_def,
+    minimal_labware_def: LabwareDefinition,
 ) -> None:
     """Test that multiple Labware objects with same implementation yet
     different version have different __hash__"""
@@ -623,7 +631,7 @@ def test_labware_hash_func_same_implementation_different_version(
 
 
 def test_labware_hash_func_diff_implementation_same_version(
-    minimal_labware_def,
+    minimal_labware_def: LabwareDefinition,
 ) -> None:
     """Test that multiple Labware objects with different implementation yet
     sane version have different __hash__"""

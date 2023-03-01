@@ -1,6 +1,6 @@
 import asyncio
 import mock
-from typing import AsyncGenerator, cast
+from typing import Any, AsyncGenerator, cast
 from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
 
 import pytest
@@ -308,7 +308,7 @@ async def test_cycle_temperature(
 async def test_sync_error_response_to_poller(
     subject_mocked_driver: modules.Thermocycler,
     mock_driver: mock.AsyncMock,
-):
+) -> None:
     """Test that poll after synchronous temperature response with error updates module live data and status."""
     mock_driver.get_plate_temperature.return_value = PlateTemperature(
         current=50, target=50, hold=None
@@ -316,7 +316,7 @@ async def test_sync_error_response_to_poller(
     mock_driver.get_lid_temperature.side_effect = Exception()
     mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
 
-    async def fake_temperature_setter(*args, **kwargs):
+    async def fake_temperature_setter(*args: Any, **kwargs: Any) -> None:
         pass
 
     mock_driver.set_plate_temperature.return_value = (  # to trigger the poll
@@ -332,7 +332,7 @@ async def test_sync_error_response_to_poller(
 async def test_async_error_response_to_poller(
     subject_mocked_driver: modules.Thermocycler,
     mock_driver: mock.AsyncMock,
-):
+) -> None:
     """Test that asynchronous error is detected by poller and module live data and status are updated."""
     mock_driver.get_lid_temperature.return_value = Temperature(current=50, target=50)
     mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
