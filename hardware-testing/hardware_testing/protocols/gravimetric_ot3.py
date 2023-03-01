@@ -52,8 +52,8 @@ def _run(protocol: ProtocolContext) -> None:
     vial_well = protocol.loaded_labwares[SLOT_VIAL]["A1"]
     if TEST_VIAL_LIQUID:
         _move_to_vial_liquid_surface(protocol, l, vial_well, p.pipette)
-    execute.run(protocol, p, l, r, vial_well, volumes=[1, 10, 45], samples=10)
-    execute.analyze(protocol, p, r)
+    execute.run(protocol, p, l, r, vial_well, volumes=[1, 10, 45], trials=10)
+    execute.analyze(r)
 
 
 if __name__ == "__main__":

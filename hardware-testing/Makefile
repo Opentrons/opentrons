@@ -73,6 +73,9 @@ test-cov:
 
 .PHONY: test-integration
 test-integration:
+	$(python) -m hardware_testing.protocols.gravimetric_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
+	$(python) -m hardware_testing.examples.test_report
 	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
 	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
 	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
@@ -164,8 +167,17 @@ push-all-and-term: push-all term
 
 .PHONY: pull-data-ot3
 pull-data-ot3:
-	mkdir -p ./.pulled-data
-	scp -r root@$(host):/data/testing_data/$(test) ./.pulled-data
+	mkdir -p "./.pulled-data"
+	scp -r "root@$(host):/data/testing_data/$(test)" "./.pulled-data"
+
+define delete-test-data-cmd
+ssh -i $(2) $(3) root@$(1) \
+"rm -rf /data/testing_data/$(4)"
+endef
+
+.PHONY: delete-data-ot3
+delete-data-ot3:
+	$(call delete-test-data-cmd,$(host),$(br_ssh_key),$(ssh_opts),$(test))
 
 define push-and-update-fw
 scp -i $(2) $(3) ot3-firmware.tar.gz root@$(1):/data/$(notdir ot3-firmware.tar.gz)

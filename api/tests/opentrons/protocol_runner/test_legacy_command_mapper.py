@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 from decoy import matchers, Decoy
 
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.commands.types import CommentMessage, PauseMessage, CommandMessage
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -35,7 +36,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, Mount, MountType
 
 
@@ -291,19 +292,16 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
 
 def test_map_instrument_load(decoy: Decoy) -> None:
     """It should correctly map an instrument load."""
+    pipette_dict = cast(PipetteDict, {"pipette_id": "fizzbuzz"})
     input = LegacyInstrumentLoadInfo(
         instrument_load_name="p1000_single_gen2",
         mount=Mount.LEFT,
-        model=PipetteModel("foobar"),
-        serial_number="fizzbuzz",
+        pipette_dict=pipette_dict,
     )
     pipette_config = cast(LoadedStaticPipetteData, {"config": True})
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(
-            model=PipetteModel("foobar"),
-            serial_number="fizzbuzz",
-        )
+        pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(pipette_config)
 
     result = LegacyCommandMapper().map_equipment_load(input)
