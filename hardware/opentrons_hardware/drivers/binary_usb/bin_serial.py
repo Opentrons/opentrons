@@ -10,7 +10,7 @@ import asyncio
 import logging
 import concurrent.futures
 
-from typing import Optional, Type  # , Any
+from typing import Optional, Type
 from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 
