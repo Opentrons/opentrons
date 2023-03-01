@@ -5,7 +5,7 @@ import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
-  mockP300PipetteSpecs,
+  mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
@@ -19,7 +19,7 @@ const render = (props: React.ComponentProps<typeof AttachProbe>) => {
 }
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
-  modelSpecs: mockP300PipetteSpecs,
+  modelSpecs: mockGen3P1000PipetteSpecs,
 }
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
@@ -80,7 +80,7 @@ describe('AttachProbe', () => {
     }
     const { getByText, getByAltText } = render(props)
     getByText(
-      'Stand back, connect and secure, <ShortPipetteName> is calibrating'
+      'Stand back, connect and secure, Flex 1-Channel 1000 μL is calibrating'
     )
     getByText(
       'The calibration probe will touch the sides of the calibration square in slot 2 to determine its exact position'

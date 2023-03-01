@@ -39,7 +39,6 @@ export const CheckPipetteButton = (
   return isOnDevice != null && isOnDevice ? (
     <SmallButton
       aria-label="SmallButton"
-      marginTop="7rem"
       disabled={isDisabled}
       onClick={() => {
         refetch()

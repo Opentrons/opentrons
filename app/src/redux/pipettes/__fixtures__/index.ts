@@ -49,7 +49,7 @@ export const mockAttachedGen3Pipette: Omit<AttachedPipette, 'modelSpecs'> = {
 }
 
 export const mockGen3P1000PipetteSpecs: any = {
-  displayName: 'P1000 Single-Channel GEN3',
+  displayName: 'Flex 1-Channel 1000 μL',
   name: 'p1000_single_gen3',
   backCompatNames: ['p1000_single'],
 }

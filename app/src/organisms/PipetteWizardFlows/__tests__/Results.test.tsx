@@ -76,7 +76,7 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('P1000 Single-Channel GEN3 Successfully Attached')
+    getByText('Flex 1-Channel 1000 μL Successfully Attached')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )

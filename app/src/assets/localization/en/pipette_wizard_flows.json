@@ -54,7 +54,6 @@
   "connect_96_channel": "Connect and Attach 96 Channel Pipette",
   "hold_pipette_carefully": "Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.",
   "unscrew_remove_96_channel": "Loosen Screws and Detach 96-Channel Pipette",
-  "secure_pipette": "Hold the pipette so it does not fall. Then loosen the four captive screws on the front of the pipette. Once all the screws are loosened, slowly remove the pipette by sliding it towards the front of the robot, off the supporting pins.",
   "calibrate_96_channel": "Calibrate 96-Channel pipette",
   "attach_96_channel": "Attach 96-Channel Pipette",
   "detach_96_channel": "Detach 96-Channel Pipette",

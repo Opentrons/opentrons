@@ -60,7 +60,7 @@ describe('DetachPipette', () => {
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3')
+    getByText('Loosen Screws and Detach Flex 1-Channel 1000 μL')
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
@@ -99,7 +99,7 @@ describe('DetachPipette', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Loosen Screws and Detach 96-Channel Pipette')
     getByText(
-      'Hold the pipette so it does not fall. Then loosen the four captive screws on the front of the pipette. Once all the screws are loosened, slowly remove the pipette by sliding it towards the front of the robot, off the supporting pins.'
+      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
     getByText(
       'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
@@ -128,7 +128,7 @@ describe('DetachPipette', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Loosen Screws and Detach P1000 Single-Channel GEN3')
+    getByText('Loosen Screws and Detach Flex 1-Channel 1000 μL')
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )

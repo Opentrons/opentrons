@@ -10,6 +10,7 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import detachPipette from '../../assets/images/change-pip/single-channel-detach-pipette.png'
 import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.png'
 import { CheckPipetteButton } from './CheckPipetteButton'
+import { BODY_STYLE } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
@@ -51,9 +52,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
-        <StyledText as="p">
-          {t(!is96ChannelPipette ? 'hold_and_loosen' : 'secure_pipette')}
-        </StyledText>
+        <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
         {!is96ChannelPipette ? null : (
           <Banner type="warning">
             {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}

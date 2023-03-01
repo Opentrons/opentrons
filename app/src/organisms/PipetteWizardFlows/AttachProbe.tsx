@@ -47,6 +47,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   const pipetteId = attachedPipettes[mount]?.id
+  const displayName = attachedPipettes[mount]?.modelSpecs.displayName
   //  hard coding calibration slot number for now in case it changes
   //  in the future
   const calSlotNum = '2'
@@ -91,7 +92,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         alternativeSpinner={isExiting ? null : pipetteCalibratingImage}
         description={t('pipette_calibrating', {
           //  todo(jr 2/28/23): insert short pipette name const when we know how to get it
-          pipetteName: '<ShortPipetteName>',
+          pipetteName: displayName,
         })}
       >
         {isExiting ? undefined : (
