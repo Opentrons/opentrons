@@ -93,7 +93,7 @@ class BinaryMessenger:
     def remove_listener(self, listener: BinaryMessageListenerCallback) -> None:
         """Remove a message listener."""
         if listener in self._listeners:
-            del self._listeners[listener]
+            self._listeners.pop(listener)
 
     async def _read_task_shield(self) -> None:
         try:
