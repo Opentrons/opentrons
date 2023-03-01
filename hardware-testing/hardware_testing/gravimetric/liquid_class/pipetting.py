@@ -11,8 +11,8 @@ from .definition import LiquidClassSettings
 from .defaults import get_liquid_class
 
 
-LABWARE_BOTTOM_CLEARANCE = 1.5  # FIXME: not sure who should own this
-TIP_SPEED_WHILE_SUBMERGED = 5  # FIXME: not sure who should own this
+LABWARE_BOTTOM_CLEARANCE = 1.5
+TIP_SPEED_WHILE_SUBMERGED = 5
 
 
 @dataclass
