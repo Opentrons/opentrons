@@ -7,7 +7,7 @@ from .types import FirmwareUpdateStatus, StatusElement
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings import NodeId, BinaryMessageId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateStartApp,
 )
@@ -323,6 +323,8 @@ class RunUSBUpdate:
         return device_running
 
     def __call__(self, message: BinaryMessageDefinition) -> None:
+        """Function called when bus receives messages."""
+        # this is just here for now to log the version before and after updating
         logger.info(f"received msg from device {message}")
 
     async def _request_version(self) -> None:

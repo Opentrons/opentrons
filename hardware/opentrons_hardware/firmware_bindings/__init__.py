@@ -6,6 +6,7 @@ from .arbitration_id import (
     ArbitrationIdParts,
 )
 from .constants import NodeId, FunctionCode, MessageId, ErrorCode
+from .binary_constants import BinaryMessageId
 
 __all__ = [
     "CanMessage",
@@ -15,4 +16,5 @@ __all__ = [
     "MessageId",
     "ArbitrationIdParts",
     "ErrorCode",
+    "BinaryMessageId",
 ]

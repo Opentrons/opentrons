@@ -1,3 +1,4 @@
+"""Factory for building drivers and messengers."""
 from .bin_serial import SerialUsbDriver
 import asyncio
 
