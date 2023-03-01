@@ -126,7 +126,10 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
         'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
         { selectedSlot }
       )
-    } else if (moduleOnDeck?.type === HEATERSHAKER_MODULE_TYPE) {
+    } else if (
+      moduleOnDeck?.type === HEATERSHAKER_MODULE_TYPE &&
+      !hasSlotIssue(selectedSlot)
+    ) {
       const isHeaterShakerAdjacentToAnotherModule = some(
         initialDeckSetup.modules,
         hwModule =>
@@ -230,7 +233,6 @@ const EditModulesModalComponent = (
       {i18n.t('tooltip.edit_module_modal.slot_selection')}
     </div>
   )
-
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
   // NOTE: selectedSlot error could either be required field (though the field is auto-populated)
   // or occupied slot error. `slotIssue` is only for occupied slot error.
