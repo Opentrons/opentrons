@@ -73,16 +73,24 @@ class DeviceInfoResponse(utils.BinarySerializable):
         if len(data) < DeviceInfoResponse.get_size():
             data = data + b"\x00\x00\x00\x00"
         data_iter = 0
-        message_id = utils.UInt16Field.build(data[data_iter : data_iter + 2])
+        message_id = utils.UInt16Field.build(
+            int.from_bytes(data[data_iter : data_iter + 2], "big")
+        )
         data_iter = data_iter + 2
 
-        length = utils.UInt16Field.build(data[data_iter : data_iter + 2])
+        length = utils.UInt16Field.build(
+            int.from_bytes(data[data_iter : data_iter + 2], "big")
+        )
         data_iter = data_iter + 2
 
-        version = utils.UInt32Field.build(data[data_iter : data_iter + 4])
+        version = utils.UInt32Field.build(
+            int.from_bytes(data[data_iter : data_iter + 4], "big")
+        )
         data_iter = data_iter + 4
 
-        flags = VersionFlagsField.build(data[data_iter : data_iter + 4])
+        flags = VersionFlagsField.build(
+            int.from_bytes(data[data_iter : data_iter + 4], "big")
+        )
         data_iter = data_iter + 4
 
         shortsha = FirmwareShortSHADataField.build(
