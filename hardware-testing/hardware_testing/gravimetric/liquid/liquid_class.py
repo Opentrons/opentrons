@@ -1,66 +1,45 @@
 """Liquid Class."""
 from dataclasses import dataclass
-from typing import Optional
-
-# NOTE: Nick Starno calculated the actual Pipette.blow_out() volumes:
-ACTUAL_OT2_BLOW_OUT_VOLUME_P1000 = 123.6
-ACTUAL_OT2_BLOW_OUT_VOLUME_P300 = 41.7
-ACTUAL_OT2_BLOW_OUT_VOLUME_P20 = 2.39
 
 
 @dataclass
-class SampleConfig:
-    """Sample Config."""
+class LiquidSettings:
+    """Liquid Settings for both aspirate and dispense."""
 
-    acceleration: Optional[float]  # TODO: API update so acceleration is configurable
-    flow_rate: float
-    delay: float
-
-
-@dataclass
-class AirConfig:
-    """Air Config."""
-
-    flow_rate: float
-    volume: float
+    flow_rate: float  # ul/sec
+    delay: float  # seconds
+    submerge: float  # millimeters below meniscus
+    retract: float  # millimeters above meniscus
 
 
 @dataclass
-class MovementConfig:
-    """Movement Config."""
+class AirGapSettings:
+    """Air Gap Settings."""
 
-    distance: Optional[float]
-    speed: Optional[float]
-    acceleration: Optional[float]  # TODO: API update so acceleration is configurable
-    delay: Optional[float]
+    leading_air_gap: float  # microliters
+    trailing_air_gap: float  # microliters
+
+
+@dataclass
+class AspirateSettings(LiquidSettings):
+    """Aspirate Settings."""
+
+    air_gap: AirGapSettings
+
+
+@dataclass
+class DispenseSettings(LiquidSettings):
+    """Dispense Settings."""
+
+    acceleration: float  # ul/sec^2 FIXME: get working within protocol
+    deceleration: float  # ul/sec^2 FIXME: get working within protocol
 
 
 @dataclass
 class LiquidClassSettings:
     """Liquid Class Settings."""
 
-    aspirate: SampleConfig
-    dispense: SampleConfig
-    blow_out: AirConfig
-    wet_air_gap: AirConfig
-    dry_air_gap: AirConfig
-    submerge: MovementConfig
-    tracking: MovementConfig  # TODO: APi update to aspirate/dispense while also moving Z axis
-    retract: MovementConfig
-    traverse: MovementConfig
-
-
-LIQUID_CLASS_DEFAULT = LiquidClassSettings(
-    aspirate=SampleConfig(flow_rate=30, delay=0, acceleration=None),
-    dispense=SampleConfig(flow_rate=30, delay=0, acceleration=None),
-    blow_out=AirConfig(flow_rate=30, volume=10),  # FIXME: volume is ignore
-    wet_air_gap=AirConfig(flow_rate=50, volume=0),
-    dry_air_gap=AirConfig(flow_rate=50, volume=0),
-    submerge=MovementConfig(distance=1.5, speed=5, delay=None, acceleration=None),
-    tracking=MovementConfig(
-        distance=0, speed=None, delay=None, acceleration=None
-    ),  # TODO: implement w/ API >=2.13
-    retract=MovementConfig(distance=3, speed=5, delay=None, acceleration=None),
-    traverse=MovementConfig(distance=None, speed=500, delay=None, acceleration=None),
-    # TODO: add Accuracy Adjust parameter (requires disabling ul_per_mm conversion in HW-API)
-)
+    aspirate: AspirateSettings
+    dispense: DispenseSettings
+    blow_out: bool
+    tracking: bool  # FIXME: get working within protocol
