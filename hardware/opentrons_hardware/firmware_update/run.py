@@ -331,11 +331,13 @@ class RunUSBUpdate:
         """Function called when bus receives messages."""
         # this is just here for now to log the version before and after updating
         logger.info(f"received msg from device {message}")
+        self._version_event.set()
 
     async def _request_version(self) -> None:
+        self._version_event = asyncio.Event()
         await self._messenger.send(DeviceInfoRequest())
         # give time for the device to respond
-        await asyncio.sleep(1)
+        await self._version_event.wait()
 
     async def run_update(self) -> bool:
         """Perform a firmware update on a connected USB device."""
