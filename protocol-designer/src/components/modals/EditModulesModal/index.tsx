@@ -233,6 +233,7 @@ const EditModulesModalComponent = (
       {i18n.t('tooltip.edit_module_modal.slot_selection')}
     </div>
   )
+
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
   // NOTE: selectedSlot error could either be required field (though the field is auto-populated)
   // or occupied slot error. `slotIssue` is only for occupied slot error.
