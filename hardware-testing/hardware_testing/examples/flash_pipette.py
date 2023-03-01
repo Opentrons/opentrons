@@ -41,7 +41,7 @@ async def flash_serials(
                 print("flash_serials_err")
         except:
             print("flash_serials_err")
-            
+
 async def get_and_update_serial_once(
     messenger: CanMessenger,
     which_pipette: NodeId,
@@ -79,13 +79,12 @@ async def get_serial(
             base_log.exception("invalid serial")
             if isinstance(Exception, KeyboardInterrupt):
                 raise
-            
+            print("flash_serials_tryerr")
         else:
             base_log.info(
                 f"parsed name {name} model {model} datecode {data!r} from {serial}"
             )
             return name, model, data
-
 def flash_pipette() -> None:
     i = 0 
     while i == 0:

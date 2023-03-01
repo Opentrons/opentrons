@@ -41,7 +41,13 @@ from opentrons_hardware.drivers.gpio import OT3GPIO
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
 from typing import Dict, Tuple
-
+PIPETTE_NAMES = {
+    "p1000_single": "P1KS",
+    "p1000_multi": "P1KM",
+    "p50_single": "P50S",
+    "p50_multi": "P50M",
+    "P1000_96": "P1KH",
+}
 def getch():
     """
         fd: file descriptor stdout, stdin, stderr
@@ -255,6 +261,26 @@ async def read_epprom(messenger: CanMessenger, node):
                 return serial_number
     except asyncio.TimeoutError:
         return "None"
+async def _read_epprom(messenger: CanMessenger,node) -> Tuple[str, str]:
+    await messenger.send(node, InstrumentInfoRequest())
+    with WaitableCallback(messenger) as wc:
+        message, _ = await asyncio.wait_for(wc.read(), 1.0)
+        payload = message.payload
+        payload_name = payload.name  # type: ignore[attr-defined]
+        payload_model = payload.model  # type: ignore[attr-defined]
+        payload_serial = payload.serial  # type: ignore[attr-defined]
+        pipette_name = PipetteName(payload_name.value).name
+        pipette_version = str(payload_model.value)
+        pipette_id = str(payload_serial.value.decode("ascii").rstrip("\x00"))
+        serial_number = (
+            _determine_abbreviation(pipette_name) + pipette_version + pipette_id
+        )
+        model = "{}_v{}".format(pipette_name, pipette_version)
+        return serial_number, model
+def _determine_abbreviation(pipette_name: str) -> str:
+    if pipette_name not in PIPETTE_NAMES:
+        raise ValueError(f"Unknown Pipette: {pipette_name}")
+    return PIPETTE_NAMES[pipette_name]
 
 async def  run(args: argparse.Namespace) -> None:
     """Entry point for script."""
@@ -288,7 +314,7 @@ async def  run(args: argparse.Namespace) -> None:
         print(f'Current Limit switch State: {res}')
 
     if args.read_epprom:
-        serial_number = await read_epprom(messenger, node)
+        serial_number = await _read_epprom(messenger, node)
         print(f'READEPPROM={serial_number}')
     
     if args.downward:
