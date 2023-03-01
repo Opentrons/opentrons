@@ -178,7 +178,7 @@ class RunUpdate:
 
 
 async def find_dfu_device(pid: str, expected_device_count: int) -> str:
-    """Find the dfu device and return its serial number (separate from module serial).
+    """Find the dfu device and return its serial number.
 
     Args:
         pid: The USB Product ID of the device
@@ -187,7 +187,7 @@ async def find_dfu_device(pid: str, expected_device_count: int) -> str:
         will enumerate with multiple DFU devices, representing the
         separate programmable memory regions on the device. If more than
         this many devices are found, it is assumed that either the wrong
-        module is in DFU mode *or* multiple modules are in DFU mode.
+        device is in DFU mode *or* multiple device are in DFU mode.
     """
     retries = 5
     logger.info(f"Searching for a dfu device with PID {pid}")
@@ -236,14 +236,14 @@ async def upload_via_dfu(
     """Run firmware upload command for DFU.
 
     Unlike other firmware upload methods, this one doesn't take a `port` argument since
-    the module isn't recognized as a cdc device in dfu mode and hence doesn't get
-    a port. The firmware upload utility, dfu-util, looks for the specific module
+    the board isn't recognized as a cdc device in dfu mode and hence doesn't get
+    a port. The firmware upload utility, dfu-util, looks for the specific board
     by searching for available dfu devices. Since we check beforehand that only one
     dfu device is available during the upload process, this check is sufficient for us.
 
     In the future, if we want to make sure that the dfu device available is in fact
     the one we seek, then we can ask dfu-util to check for available dfu devices with
-    a specific serial number (unrelated to Opentrons' module serial numbers).
+    a specific serial number (unrelated to Opentrons' board serial numbers).
     Hence, this method takes a `dfu_serial` argument instead.
 
     Returns tuple of success boolean and message from bootloader
@@ -266,7 +266,7 @@ async def upload_via_dfu(
         return True, res
     else:
         logger.error(
-            f"Failed to update module firmware for {dfu_serial}. "
+            f"Failed to update rear-panel firmware for {dfu_serial}. "
             # It isn't easy to decipher the issue from stderror alone
             f"stdout: {res} \n"
             f"stderr: {stderr.decode()}"
