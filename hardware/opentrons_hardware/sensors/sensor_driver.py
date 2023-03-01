@@ -259,4 +259,4 @@ class LogListener:
             ).to_float()
             self.response_queue.put_nowait(data)
             current_time = round((time.time() - self.start_time), 3)
-            self.csv_writer.writerow([data, current_time])  # type: ignore
+            self.csv_writer.writerow([current_time, data])  # type: ignore
