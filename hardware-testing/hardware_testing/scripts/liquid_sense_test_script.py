@@ -7,7 +7,9 @@ import os
 import time
 import json
 import shutil
+import datetime
 
+from typing import Dict
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, CriticalPoint
 from hardware_testing.opentrons_api.helpers_ot3 import (
     OT3API,
@@ -83,7 +85,7 @@ def getch():
         return ch
     return _getch()
 
-async def _jog_axis(api, position) -> None:
+async def _jog_axis(api, position) -> Dict[OT3Axis, float]:
     step_size = [0.05, 0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
@@ -171,6 +173,7 @@ async def _jog_axis(api, position) -> None:
 
         elif input == '\r':
             sys.stdout.flush()
+            position = await api.current_position_ot3(mount, refresh=True)
             return position
         position = await api.current_position_ot3(mount, refresh=True)
 
@@ -182,6 +185,7 @@ async def _jog_axis(api, position) -> None:
         print('\r', end='')
 
 async def _main() -> None:
+    today = datetime.date.today()
     hw_api = await build_async_ot3_hardware_api(is_simulating=args.simulate,
                                     use_defaults=True)
     # Some Constants
@@ -191,7 +195,9 @@ async def _main() -> None:
                     "B1": (13.42, 288.42 , 110), "B2": (177.32 , 288.92 ,110), "B3": (341.03, 288.92,110),
                     "C1": (13.42, 181.92, 110), "C2": (177.32, 181.92,110), "C3": (341.03, 181.92,110),
                     "D1": (13.42, 75.5, 110), "D2": (177.32, 75.5,110), "D3": (341.03, 75.5,110)}
-
+    lp_file_name = '/var/pressure_sensor_data_P-{}_Z-{}-{}.csv'.format(args.plunger_speed,
+                                                                    args.mount_speed,
+                                                                    today.strftime("%b-%d-%Y"))
     liquid_probe_settings = LiquidProbeSettings(
                                                 max_z_distance = args.max_z_distance,
                                                 min_z_distance = args.min_z_distance,
@@ -200,8 +206,8 @@ async def _main() -> None:
                                                 sensor_threshold_pascals = args.sensor_threshold,
                                                 expected_liquid_height = args.expected_liquid_height,
                                                 log_pressure = args.log_pressure,
-                                                aspirate_while_sensing = False,
-                                                data_file = '/var/pressure_sensor_data.csv'
+                                                aspirate_while_sensing = lp_method,
+                                                data_file = lp_file_name,
                                                 )
     try:
         # Home
@@ -229,8 +235,8 @@ async def _main() -> None:
             # Jog Nozzle to Dial Indicator
             nozzle_loc = await _jog_axis(hw_api, current_position)
             # Save Dial Indicator Nozzle Position
-            await asyncio.sleep(2)
-            nozzle_measurement = gauge.read_stable(timeout=20)
+            await asyncio.sleep(1)
+            nozzle_measurement = gauge.read()
             start_time =  time.time()
             elasped_time = (time.time() - start_time)
             test_data["Time"] = round(elasped_time, 3)
@@ -240,7 +246,8 @@ async def _main() -> None:
             d_str = f"{elasped_time}, {nozzle_measurement}, Nozzle \n"
             data.append_data_to_file(test_n, test_f, d_str)
             z_retract_distance = 130
-            tip_length = 85.0
+            # tip_length = 85.0
+            tip_length = 47.8
             approach_speed = 20
             for tip in range(1, tips_to_use+1):
                 if tip <= 1:
@@ -262,6 +269,7 @@ async def _main() -> None:
                     # Pick up tip
                     await hw_api.pick_up_tip(mount, tip_length)
                     current_position = await hw_api.current_position_ot3(mount, refresh=True)
+                    tip_home_pos = current_position
                     await hw_api.move_to(mount, Point(current_position[OT3Axis.X],
                                                         current_position[OT3Axis.Y],
                         current_position[OT3Axis.by_mount(mount)]))
@@ -284,12 +292,17 @@ async def _main() -> None:
                                                         tiprack_loc[OT3Axis.by_mount(mount)]))
                     await hw_api.pick_up_tip(mount, tip_length)
                     current_position = await hw_api.current_position_ot3(mount, refresh=True)
+                    tip_home_pos = current_position
                     await hw_api.move_to(mount, Point(current_position[OT3Axis.X],
                                                         current_position[OT3Axis.Y],
                         current_position[OT3Axis.by_mount(mount)]))
                     position = await hw_api.current_position_ot3(mount, refresh=True)
-
-                await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[0])
+                if args.lp_method == 'push_air':
+                    # Move the plunger to the top position
+                    await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[0])
+                else:
+                    # Move the plunger to the bottom position
+                    await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[1])
                 z_safe_height = 20
                 current_position = await hw_api.current_position_ot3(mount, refresh = True)
                 # Relative to tip
@@ -315,8 +328,8 @@ async def _main() -> None:
                                                         speed = approach_speed,
                                                         critical_point = CriticalPoint.TIP)
                 # Save Dial Indicator Nozzle Position
-                await asyncio.sleep(2)
-                tip_measurement = gauge.read_stable(timeout=20)
+                await asyncio.sleep(1)
+                tip_measurement = gauge.read()
                 elasped_time = (time.time() - start_time)
                 test_data["Time_D"] = round(elasped_time, 3)
                 test_data["Pipette Pos(mm)"] = tip_measurement
@@ -393,18 +406,18 @@ async def _main() -> None:
                             {end_motor_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
                             {end_enc_pos[OT3Axis.of_main_tool_actuator(mount)]}, \
                             {tip}, \
-                            {true_liquid_height}, \
+                            {true_liquid_height[OT3Axis.by_mount(mount)]}, \
                             {args.mount_speed}, \
                             {args.plunger_speed} \n"
                 print(d_str)
                 data.append_data_to_file(test_n, test_f, d_str)
                 # Blow out a bit
-                await move_plunger_relative_ot3(hw_api, mount, 1, None, speed = 2)
+                await move_plunger_relative_ot3(hw_api, mount, 1.5, None, speed = 2)
                 print(liquid_height_pos)
                 # Move to home position as fast as possible
-                await hw_api.move_to(mount, Point(home_pos[OT3Axis.X],
-                                                    home_pos[OT3Axis.Y],
-                                                    home_pos[OT3Axis.by_mount(mount)]))
+                await hw_api.move_to(mount, Point(tip_home_pos[OT3Axis.X],
+                                                    tip_home_pos[OT3Axis.Y],
+                                                    tip_home_pos[OT3Axis.by_mount(mount)]))
                 await hw_api.home([OT3Axis.by_mount(mount)])
                 # move plunger to bottom
                 await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[1])
@@ -445,15 +458,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="right")
+    parser.add_argument("--lp_method", type=str, choices=["push_air", "pull_air"], default="pull_air")
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C2")
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
     parser.add_argument("--tips", type=int, default = 40)
     parser.add_argument("--max_z_distance", type=float, default = 40)
     parser.add_argument("--min_z_distance", type=float, default = 5)
-    parser.add_argument("--mount_speed", type=float, default = 25)
-    parser.add_argument("--plunger_speed", type=float, default = 25)
-    parser.add_argument("--sensor_threshold", type=float, default = 110, help = "Threshold in Pascals")
+    parser.add_argument("--mount_speed", type=float, default = 1)
+    parser.add_argument("--plunger_speed", type=float, default = 1)
+    parser.add_argument("--sensor_threshold", type=float, default = 10, help = "Threshold in Pascals")
     parser.add_argument("--expected_liquid_height", type=int, default = 0)
     parser.add_argument("--log_pressure", action="store_true")
     parser.add_argument(
@@ -468,6 +482,10 @@ if __name__ == "__main__":
         mount = OT3Mount.LEFT
     else:
         mount = OT3Mount.RIGHT
+    if args.lp_method == "pull_air":
+        lp_method = True
+    else:
+        lp_method = False
     if args.dial_indicator:
         test_data ={
                     "Time_D": None,
