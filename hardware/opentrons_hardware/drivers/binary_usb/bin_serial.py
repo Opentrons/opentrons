@@ -84,6 +84,8 @@ class SerialUsbDriver:
             header_data = await self._loop.run_in_executor(
                 self._executor, partial(self._port.read, size=4)
             )  # read the message id and length
+            if len(header_data) < 4:
+                return None
             message_type = BinaryMessageId(
                 int.from_bytes(utils.UInt16Field.build(header_data[0:2]).value, "big")  # type: ignore[arg-type]
             )
@@ -111,3 +113,19 @@ class SerialUsbDriver:
     def __exit__(self) -> None:
         self._connected = False
         self._port.close()
+
+    def __aiter__(self) -> "SerialUsbDriver":
+        """Enter iterator.
+
+        Returns:
+            SerialUsbDriver
+        """
+        return self
+
+    async def __anext__(self) -> Optional[BinaryMessageDefinition]:
+        """Async next.
+
+        Returns:
+            Binary USB message
+        """
+        return await self.read()
