@@ -57,6 +57,7 @@ class MockStatusResponder:
                         version=utils.UInt32Field(0),
                         flags=fields.VersionFlagsField(0),
                         shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
+                        revision=fields.OptionalRevisionField.build(b""),
                     )
                 )
                 asyncio.get_running_loop().call_soon(

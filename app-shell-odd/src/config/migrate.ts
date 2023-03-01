@@ -7,7 +7,12 @@ import {
   OT3_MANIFEST_URL,
 } from '@opentrons/app/src/redux/config'
 
-import type { Config, ConfigV12 } from '@opentrons/app/src/redux/config/types'
+import type {
+  Config,
+  ConfigV12,
+  ConfigV13,
+  ConfigV14,
+} from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
 // any default values for later config versions are specified in the migration
@@ -60,18 +65,52 @@ export const DEFAULTS_V12: ConfigV12 = {
   },
 }
 
-// when we add our first migration, change to [(prevConfig: ConfigV12) => Config13]
-const MIGRATIONS: Array<(prevConfig: ConfigV12) => Config> = []
+const BASE_CONFIG_VERSION = Number(DEFAULTS_V12.version)
+
+// config version 13 migration and defaults
+const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 13 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      protocolsOnDeviceSortKey: null,
+    },
+  }
+  return nextConfig
+}
+
+// config version 14 migration and defaults
+const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 14 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      pinnedProtocolIds: [],
+    },
+  }
+  return nextConfig
+}
+
+const MIGRATIONS: [
+  (prevConfig: ConfigV12) => ConfigV13,
+  (prevConfig: ConfigV13) => ConfigV14
+] = [toVersion13, toVersion14]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
 
-export function migrate(prevConfig: ConfigV12): Config {
-  const prevVersion = prevConfig.version
+export function migrate(prevConfig: ConfigV12 | ConfigV13 | ConfigV14): Config {
   let result = prevConfig
-
   // loop through the migrations, skipping any migrations that are unnecessary
-  for (let i: number = prevVersion; i < MIGRATIONS.length; i++) {
-    const migrateVersion = MIGRATIONS[i]
+  // Note: the default version of app-shell-odd is version 12 (need to adjust the index range)
+  for (
+    let i: number = prevConfig.version;
+    i < BASE_CONFIG_VERSION + MIGRATIONS.length;
+    i++
+  ) {
+    const migrateVersion = MIGRATIONS[i - BASE_CONFIG_VERSION]
+    // @ts-expect-error (kj: 01/27/2023): migrateVersion function input typed to never
     result = migrateVersion(result)
   }
 
@@ -81,5 +120,5 @@ export function migrate(prevConfig: ConfigV12): Config {
     )
   }
 
-  return result
+  return result as Config
 }

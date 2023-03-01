@@ -5,6 +5,7 @@ import { NavLink, useHistory } from 'react-router-dom'
 
 import {
   Flex,
+  Icon,
   POSITION_ABSOLUTE,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -13,6 +14,9 @@ import {
   useOnClickOutside,
   useHoverTooltip,
   Box,
+  SPACING,
+  SIZE_1,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   useDeleteRunMutation,
@@ -41,7 +45,7 @@ export interface HistoricalProtocolRunOverflowMenuProps {
 export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
 ): JSX.Element {
-  const { runId, robotName } = props
+  const { runId } = props
   const {
     menuOverlay,
     handleOverflowClick,
@@ -51,6 +55,37 @@ export function HistoricalProtocolRunOverflowMenu(
   const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
+
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
+    >
+      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
+      {showOverflowMenu ? (
+        <>
+          <Box
+            ref={protocolRunOverflowWrapperRef}
+            data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
+          >
+            <MenuDropdown {...props} closeOverflowMenu={handleOverflowClick} />
+          </Box>
+          {menuOverlay}
+        </>
+      ) : null}
+    </Flex>
+  )
+}
+
+interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
+  closeOverflowMenu: React.MouseEventHandler<HTMLButtonElement>
+}
+function MenuDropdown(props: MenuDropdownProps): JSX.Element {
+  const { t } = useTranslation('device_details')
+  const history = useHistory()
+
+  const { runId, robotName, robotIsBusy, closeOverflowMenu } = props
 
   const commands = useAllCommandsQuery(
     runId,
@@ -65,50 +100,6 @@ export function HistoricalProtocolRunOverflowMenu(
     runTotalCommandCount
   )
 
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      position={POSITION_RELATIVE}
-      data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
-    >
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
-      {showOverflowMenu && (
-        <>
-          <Box
-            ref={protocolRunOverflowWrapperRef}
-            data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
-          >
-            <MenuDropdown
-              {...props}
-              closeOverflowMenu={handleOverflowClick}
-              downloadRunLog={downloadRunLog}
-              isRunLogLoading={isRunLogLoading}
-            />
-          </Box>
-          {menuOverlay}
-        </>
-      )}
-    </Flex>
-  )
-}
-
-interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
-  closeOverflowMenu: React.MouseEventHandler<HTMLButtonElement>
-  downloadRunLog: () => void
-  isRunLogLoading: boolean
-}
-function MenuDropdown(props: MenuDropdownProps): JSX.Element {
-  const { t } = useTranslation('device_details')
-  const history = useHistory()
-
-  const {
-    runId,
-    robotName,
-    robotIsBusy,
-    closeOverflowMenu,
-    downloadRunLog,
-    isRunLogLoading,
-  } = props
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
       return getBuildrootUpdateDisplayInfo(state, robotName)
@@ -117,7 +108,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
-      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
+      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
   const onDownloadClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -163,7 +154,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       right={0}
       flexDirection={DIRECTION_COLUMN}
     >
-      <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}>
+      <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
           {t('view_run_record')}
         </MenuItem>
@@ -186,7 +177,18 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         disabled={isRunLogLoading}
         onClick={onDownloadClick}
       >
-        {t('download_run_log')}
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+          {t('download_run_log')}
+          {isRunLogLoading ? (
+            <Icon
+              name="ot-spinner"
+              size={SIZE_1}
+              color={COLORS.darkGreyEnabled}
+              aria-label="spinner"
+              spin
+            />
+          ) : null}
+        </Flex>
       </MenuItem>
       <Divider marginY="0" />
       <MenuItem

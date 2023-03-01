@@ -21,7 +21,7 @@
     "pathTo3D": {
       "description": "path to the gltf file representing the 3D pipette model",
       "type": "string",
-      "pattern": "^pipette/definitions/[2]/([a-z]*_[a-z]*)+/p[0-9]{2,4}/[a-z]*[.]gltf"
+      "pattern": "^pipette/definitions/[2]/geometry/([a-z]*_[a-z]*)+/p[0-9]{2,4}/[a-z]*[.]gltf"
     }
   }
 }

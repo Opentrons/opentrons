@@ -141,12 +141,16 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        if height_from_home is not None:
-            raise NotImplementedError(
-                "MagneticModuleCore.engage with height_from_home not implemented"
-            )
 
-        assert height_from_base is not None, "Expected engage height"
+        # This core will only be used in apiLevels >=2.14, where
+        # MagneticModuleContext.engage(height=...) is no longer available.
+        # So these asserts should always pass.
+        assert (
+            height_from_home is None
+        ), "Expected engage height to be specified from base."
+        assert (
+            height_from_base is not None
+        ), "Expected engage height to be specified from base."
 
         self._engine_client.magnetic_module_engage(
             module_id=self._module_id, engage_height=height_from_base

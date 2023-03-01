@@ -3,7 +3,7 @@
 Versioning
 ==========
 
-The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows you to specify the API version that your protocol requires without worrying about what robot software versions it will work with. 
+The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows you to specify the API version that your protocol requires without worrying about what robot software versions it will work with.
 
 Major and Minor Versions
 ------------------------
@@ -12,7 +12,7 @@ The API uses a major and minor version number and does not use patch version num
 
 The major version of the API increases whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because it required protocols to have a ``run`` function that takes a ``protocol`` argument rather than importing the ``robot``, ``instruments``, and ``labware`` modules. Protocols written with major version 1 of the API will not run without modification in major version 2. A similar level of structural change would require a major version 3. This documentation only deals with features found in major version 2 of the API; see the `archived version 1 documentation <https://docs.opentrons.com/v1/index.html>`_ for information on older protocols.
 
-The minor version of the API increases whenever there is new functionality that might change the way a protocol is written, or when a behavior changes in one aspect of the API but does not affect all protocols. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API. 
+The minor version of the API increases whenever there is new functionality that might change the way a protocol is written, or when a behavior changes in one aspect of the API but does not affect all protocols. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API.
 
 Specifying Versions
 -------------------
@@ -36,7 +36,11 @@ Version specification is required by the system. If you do not specify a target 
 
 The version you specify determines the features and behaviors available to your protocol. For example, support for the Heater-Shaker Module was added in version 2.13, so you can't specify a lower version and then call ``HeaterShakerContext`` methods without causing an error. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
 
-In general, consider what features you need in your protocol and keep the API level as low as possible. Using the lowest API version is good protocol design, as it helps the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software.
+When choosing an API level, consider what features you need and how widely you plan to share your protocol. On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
+
+.. note::
+
+    Python protocols with an ``apiLevel`` of 2.14 can't currently be simulated with the ``opentrons_simulate`` command-line tool, the :py:func:`opentrons.simulate.simulate` function, or the :py:func:`opentrons.simulate.get_protocol_api` function. If your protocol doesn't rely on new functionality added in version 2.14, use a lower ``apiLevel``. For protocols that require 2.14, analyze your protocol with the Opentrons App instead.
 
 
 Maximum Supported Versions
@@ -95,8 +99,10 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 |     2.13    |          6.1.0               |
 +-------------+------------------------------+
-|     2.14    |        unreleased            |
+|     2.14    |          6.3.0               |
 +-------------+------------------------------+
+
+.. _version-notes:
 
 Changes in API Versions
 -----------------------
@@ -175,7 +181,7 @@ Version 2.6
 Version 2.7
 +++++++++++
 
-- Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously. 
+- Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously.
 
   .. note::
 
@@ -237,18 +243,69 @@ Version 2.13
 Version 2.14
 ++++++++++++
 
-Upcoming, not yet released.
+This version introduces a new protocol runtime. Several older parts of the Protocol API were deprecated as part of this switchover.
+If you specify an API version of 2.13 or lower, your protocols will continue to execute on the old runtime.
 
-- :py:meth:`.ProtocolContext.define_liquid` and :py:meth:`.Well.load_liquid` added will allow you to define different liquid types and add them to wells at the beginning of your protocol.
-- :py:class:`.Labware` and :py:class:`.Well` objects will adhere to the protocol's API level setting. Prior to this version, they incorrectly ignore the setting.
-- :py:meth:`.ModuleContext.load_labware_object` will be deprecated.
-- :py:meth:`.MagneticModuleContext.calibrate` will be deprecated.
-- The ``presses`` and ``increment`` arguments of  :py:meth:`.InstrumentContext.pick_up_tip` will be deprecated. Configure your pipettes pick-up settings with the Opentrons App, instead.
-- Several internal properties of :py:class:`.Labware`, :py:class:`.Well`, and :py:class:`.ModuleContext` will be deprecated and/or removed:
-    - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration``, which are holdovers from a calibration system that no longer exists.
-    - The ``Well.has_tip`` setter, which will cease to function in a future upgrade to the Python protocol execution system. The corresponding ``Well.has_tip`` getter will not be deprecated.
-- :py:meth:`.ModuleContext.geometry` will be deprecated
-    - The ``model`` and ``type`` properties of this interface will be replaced by :py:meth:`.ModuleContext.model` and :py:meth:`.ModuleContext.type`, respectively
-- :py:meth:`.ProtocolContext.load_labware` will favor loading custom labware over Opentrons defaults if a name shadows a default and no namespace is included.
- - :py:meth:`.InstrumentContext.touch_tip` will end with the pipette tip in the center of the well instead of on the edge closest to the front of the machine.
- 
+- Feature additions
+
+  - :py:meth:`.ProtocolContext.define_liquid` and :py:meth:`.Well.load_liquid` added
+    to define different liquid types and add them to wells, respectively.
+
+- Bug fixes
+
+  - :py:class:`.Labware` and :py:class:`.Well` now adhere to the protocol's API level setting.
+    Prior to this version, they incorrectly ignored the setting.
+
+  - :py:meth:`.InstrumentContext.touch_tip` will end with the pipette tip in the center of the well
+    instead of on the edge closest to the front of the machine.
+
+  - :py:meth:`.ProtocolContext.load_labware` now prefers loading user-provided labware definitions
+    rather than built-in definitions if no explicit ``namespace`` is specified.
+
+- Removals
+
+  - The ``presses`` and ``increment`` arguments of  :py:meth:`.InstrumentContext.pick_up_tip` were deprecated.
+    Configure your pipette pick-up settings with the Opentrons App, instead.
+
+  - ``InstrumentContext.speed`` property was removed.
+    This property tried to allow setting a pipette's **plunger** speed in mm/s.
+    However, it could only approximately set the plunger speed,
+    because the plunger's speed is a stepwise function of the volume.
+    Use :py:attr:`.InstrumentContext.flow_rate` to set the flow rate in µL/s, instead.
+
+  - ``ModuleContext.load_labware_object`` was removed as an unnecessary internal method.
+
+  - ``ModuleContext.geometry`` was removed in favor of
+    :py:attr:`.ModuleContext.model` and :py:attr:`.ModuleContext.type`
+
+  - ``Well.geometry`` was removed as unnecessary.
+
+  - ``MagneticModuleContext.calibrate`` was removed since it was never needed nor implemented.
+
+  - The ``height`` parameter of :py:meth:`.MagneticModuleContext.engage` was removed.
+    Use ``offset`` or ``height_from_base`` instead.
+
+  - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed,
+    since they were holdovers from a calibration system that no longer exists.
+
+  - Various methods and setters were removed that could modify tip state outside of
+    calls to :py:meth:`.InstrumentContext.pick_up_tip` and :py:meth:`.InstrumentContext.drop_tip`.
+    This change allows the robot to track tip usage more completely and reliably.
+    You may still use :py:meth:`.Labware.reset` to reset your tip rack's state.
+
+      - The :py:attr:`.Well.has_tip` **setter** was removed. **The getter is still supported.**
+
+      - Internal methods ``Labware.use_tips``, ``Labware.previous_tip``, and ``Labware.return_tips``
+        were removed.
+
+  - The ``configuration`` argument of :py:meth:`.ProtocolContext.load_module` was removed
+    because it made unsafe modifications to the protocol's geometry system,
+    and the Thermocycler's "semi" configuration is not officially supported.
+
+- Known limitations
+
+  - :py:meth:`.Labware.set_offset` is not yet supported on this API version.
+    Run protocols via the Opentrons App, instead.
+
+  - :py:attr:`.ProtocolContext.max_speeds` is not yet supported on the API version.
+    Use :py:attr:`.InstrumentContext.default_speed` or the per-method `speed` argument, instead.

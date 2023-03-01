@@ -162,8 +162,8 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     def save_offset(self, delta: Point) -> GripperCalibrationOffset:
         """Save a new gripper offset."""
-        save_gripper_calibration_offset(self._gripper_id, delta)
-        self._calibration_offset = load_gripper_calibration_offset(self._gripper_id)
+        save_gripper_calibration_offset(self.gripper_id, delta)
+        self._calibration_offset = load_gripper_calibration_offset(self.gripper_id)
         return self._calibration_offset
 
     def check_calibration_pin_location_is_accurate(self) -> None:
@@ -171,10 +171,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
             raise RuntimeError("must attach a probe before starting calibration")
         if self.state != GripperJawState.GRIPPING:
             raise RuntimeError("must grip the jaws before starting calibration")
-        if self.current_jaw_displacement == 0.0:
-            raise RuntimeError(
-                f"must grip the jaws before starting calibration (jaw displacement is {self.current_jaw_displacement})"
-            )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """

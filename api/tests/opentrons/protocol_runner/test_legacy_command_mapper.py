@@ -1,9 +1,12 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
-import pytest
-from decoy import matchers, Decoy
+import inspect
 from datetime import datetime
 from typing import cast
 
+import pytest
+from decoy import matchers, Decoy
+
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.commands.types import CommentMessage, PauseMessage, CommandMessage
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -13,7 +16,13 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     actions as pe_actions,
 )
-from opentrons.protocol_engine.resources.module_data_provider import ModuleDataProvider
+from opentrons.protocol_engine.resources import (
+    ModuleDataProvider,
+    pipette_data_provider,
+)
+from opentrons.protocol_engine.resources.pipette_data_provider import (
+    LoadedStaticPipetteData,
+)
 from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyContextCommandError,
     LegacyCommandMapper,
@@ -35,6 +44,15 @@ from opentrons.types import DeckSlotName, Mount, MountType
 def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     """Mock module definition fetcher."""
     return decoy.mock(cls=ModuleDataProvider)
+
+
+@pytest.fixture(autouse=True)
+def _use_mock_pipette_data_provider(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock module definition fetcher."""
+    for name, func in inspect.getmembers(pipette_data_provider, inspect.isfunction):
+        monkeypatch.setattr(pipette_data_provider, name, decoy.mock(func=func))
 
 
 def test_map_before_command() -> None:
@@ -268,16 +286,28 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         ),
     )
     output = LegacyCommandMapper().map_equipment_load(input)
-    assert output == expected_output
+    assert output[0] == expected_output
+    assert output[1] is None
 
 
-def test_map_instrument_load() -> None:
+def test_map_instrument_load(decoy: Decoy) -> None:
     """It should correctly map an instrument load."""
+    pipette_dict = cast(PipetteDict, {"pipette_id": "fizzbuzz"})
     input = LegacyInstrumentLoadInfo(
         instrument_load_name="p1000_single_gen2",
         mount=Mount.LEFT,
+        pipette_dict=pipette_dict,
     )
-    expected_output = pe_commands.LoadPipette.construct(
+    pipette_config = cast(LoadedStaticPipetteData, {"config": True})
+
+    decoy.when(
+        pipette_data_provider.get_pipette_static_config(pipette_dict)
+    ).then_return(pipette_config)
+
+    result = LegacyCommandMapper().map_equipment_load(input)
+    pipette_id_captor = matchers.Captor()
+
+    assert result[0] == pe_commands.LoadPipette.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
@@ -287,11 +317,13 @@ def test_map_instrument_load() -> None:
         params=pe_commands.LoadPipetteParams.construct(
             pipetteName=PipetteNameType.P1000_SINGLE_GEN2, mount=MountType.LEFT
         ),
-        result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),
+        result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id_captor),
     )
-
-    output = LegacyCommandMapper().map_equipment_load(input)
-    assert output == expected_output
+    assert result[1] == pe_actions.AddPipetteConfigAction(
+        pipette_id=pipette_id_captor.value,
+        serial_number="fizzbuzz",
+        config=pipette_config,
+    )
 
 
 def test_map_module_load(
@@ -334,7 +366,8 @@ def test_map_module_load(
     output = LegacyCommandMapper(
         module_data_provider=module_data_provider
     ).map_equipment_load(input)
-    assert output == expected_output
+    assert output[0] == expected_output
+    assert output[1] is None
 
 
 def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None:
@@ -374,7 +407,9 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
     subject = LegacyCommandMapper()
     subject._module_id_by_slot = {DeckSlotName.SLOT_1: "module-123"}
     output = subject.map_equipment_load(load_input)
-    assert output == expected_output
+
+    assert output[0] == expected_output
+    assert output[1] is None
 
 
 def test_map_pause() -> None:
