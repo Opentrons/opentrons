@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {
+  LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
@@ -52,6 +53,7 @@ describe('ChoosePipette', () => {
       exit: jest.fn(),
       setSelectedPipette: jest.fn(),
       selectedPipette: SINGLE_MOUNT_PIPETTES,
+      mount: LEFT,
     }
   })
   afterEach(() => {
@@ -59,7 +61,7 @@ describe('ChoosePipette', () => {
   })
   it('returns the correct information, buttons work as expected', () => {
     const { getByText, getByAltText, getByRole, getByTestId } = render(props)
-    getByText('Attach a pipette')
+    getByText('Attach Left Pipette')
     getByText('Choose a pipette to attach')
     getByText('1- or 8-Channel pipette')
     getByText('96-Channel pipette')
@@ -91,7 +93,7 @@ describe('ChoosePipette', () => {
   it('returns the correct information, buttons work as expected for on device display', () => {
     mockGetIsOnDevice.mockReturnValue(true)
     const { getByText, getByRole, getByTestId } = render(props)
-    getByText('Attach a pipette')
+    getByText('Attach Left Pipette')
     getByText('Choose a pipette to attach')
     getByText('1- or 8-Channel pipette')
     getByText('96-Channel pipette')

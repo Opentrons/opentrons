@@ -70,6 +70,7 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
           exit={() => setShowAttachPipette(false)}
+          mount={mount}
         />
       ) : null}
       {pipetteWizardFlow != null ? (

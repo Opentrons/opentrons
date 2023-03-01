@@ -287,7 +287,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText } = render(props)
-    getByText('Detach a pipette')
+    getByText('Detach Left Pipette')
     //  TODO(jr 11/11/22): finish the rest of the test
   })
 
@@ -329,7 +329,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Attach a pipette')
+    getByText('Attach Left Pipette')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })

@@ -91,7 +91,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       <InProgressModal
         alternativeSpinner={isExiting ? null : pipetteCalibratingImage}
         description={t('pipette_calibrating', {
-          //  todo(jr 2/28/23): insert short pipette name const when we know how to get it
           pipetteName: displayName,
         })}
       >

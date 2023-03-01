@@ -124,6 +124,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
           exit={() => setShowAttachPipette(false)}
+          mount={mount}
         />
       ) : null}
       {pipetteWizardFlow != null ? (

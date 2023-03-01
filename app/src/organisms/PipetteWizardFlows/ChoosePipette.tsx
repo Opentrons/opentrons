@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import startCase from 'lodash/startCase'
 import {
   ALIGN_FLEX_END,
   BORDERS,
@@ -35,6 +36,7 @@ import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
 import { getIsGantryEmpty } from './utils'
 
+import type { PipetteMount } from '@opentrons/shared-data'
 import type { SelectablePipettes } from './types'
 
 interface ChoosePipetteProps {
@@ -42,6 +44,7 @@ interface ChoosePipetteProps {
   selectedPipette: SelectablePipettes
   setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
   exit: () => void
+  mount: PipetteMount
 }
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
@@ -80,7 +83,7 @@ const ON_DEVICE_SELECTED_OPTIONS_STYLE = css`
   color: ${COLORS.white};
 `
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
-  const { selectedPipette, setSelectedPipette, proceed, exit } = props
+  const { selectedPipette, setSelectedPipette, proceed, exit, mount } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettesByMount = useAttachedPipettes()
@@ -126,7 +129,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
       position={POSITION_ABSOLUTE}
     >
       <WizardHeader
-        title={t('attach_pipette')}
+        title={startCase(t('attach_pipette', { mount: mount }))}
         currentStep={0}
         totalSteps={3}
         onExit={setShowExit ? exit : () => showExit(true)}
@@ -206,7 +209,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         height="30rem"
         header={
           <WizardHeader
-            title={t('attach_pipette')}
+            title={startCase(t('attach_pipette', { mount: mount }))}
             currentStep={0}
             totalSteps={3}
             onExit={setShowExit ? exit : () => showExit(true)}
