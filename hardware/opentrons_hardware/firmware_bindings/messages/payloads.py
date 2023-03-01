@@ -403,6 +403,13 @@ class BaselineSensorRequestPayload(SensorPayload):
     sample_rate: utils.UInt16Field
 
 
+@dataclass
+class BaselineSensorResponsePayload(SensorPayload):
+    """A response containing an averaged offset reading from a sensor."""
+
+    offset_average: utils.Int32Field
+
+
 @dataclass(eq=False)
 class ReadFromSensorResponsePayload(SensorPayload):
     """A response for either a single reading or an averaged reading of a sensor."""

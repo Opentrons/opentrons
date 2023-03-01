@@ -29,6 +29,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
     SensorThresholdResponse,
     ReadFromSensorResponse,
+    BaselineSensorResponse,
     PeripheralStatusResponse,
     BindSensorOutputRequest,
     ErrorMessage,
@@ -68,8 +69,10 @@ ResponseType = TypeVar("ResponseType", bound=MessageDefinition)
 
 
 def _format_sensor_response(response: MessageDefinition) -> SensorDataType:
-    assert isinstance(response, ReadFromSensorResponse)
-    return SensorDataType.build(response.payload.sensor_data, response.payload.sensor)
+    assert isinstance(response, BaselineSensorResponse)
+    return SensorDataType.build(
+        response.payload.offset_average, response.payload.sensor
+    )
 
 
 class SensorScheduler:
@@ -101,16 +104,13 @@ class SensorScheduler:
         sensor: PollSensorInformation,
         can_messenger: CanMessenger,
         timeout: int,
-        expected_num_messages: int = 1,
     ) -> List[SensorDataType]:
         """Send poll message."""
         sensor_info = sensor.sensor
-        with MultipleMessagesWaitableCallback(
+        with WaitableCallback(
             can_messenger,
-            self._create_filter(sensor_info.node_id, ReadFromSensorResponse.message_id),
-            number_of_messages=expected_num_messages,
+            self._create_filter(sensor_info.node_id, BaselineSensorResponse.message_id),
         ) as reader:
-            data_list: List[SensorDataType] = []
             await can_messenger.send(
                 node_id=sensor_info.node_id,
                 message=BaselineSensorRequest(
@@ -124,13 +124,13 @@ class SensorScheduler:
             try:
 
                 data_list = await asyncio.wait_for(
-                    self._multi_wait_for_response(reader, _format_sensor_response),
+                    self._wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
                 log.warning("Sensor poll timed out")
             finally:
-                return data_list
+                return [data_list]
 
     async def send_write(
         self, sensor: WriteSensorInformation, can_messenger: CanMessenger

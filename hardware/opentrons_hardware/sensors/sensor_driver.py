@@ -90,9 +90,7 @@ class SensorDriver(AbstractSensorDriver):
     ) -> Optional[SensorReturnType]:
         """Poll the given sensor."""
         poll = PollSensorInformation(sensor.sensor, poll_for_ms)
-        sensor_data = await self._scheduler.run_poll(
-            poll, can_messenger, timeout, sensor.expected_responses
-        )
+        sensor_data = await self._scheduler.run_poll(poll, can_messenger, timeout)
         if not sensor_data:
             return None
         return sensor.set_sensor_data(sensor_data)
@@ -260,4 +258,4 @@ class LogListener:
             ).to_float()
             self.response_queue.put_nowait(data)
             current_time = round((time.time() - self.start_time), 3)
-            self.csv_writer.writerow([data, current_time])  # type: ignore
+            self.csv_writer.writerow([current_time, data])  # type: ignore
