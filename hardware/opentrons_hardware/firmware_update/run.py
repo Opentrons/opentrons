@@ -305,6 +305,7 @@ class RunUSBUpdate:
                 message_type == BinaryMessageId.device_info_response
             ),
         )
+        self._status_queue: "asyncio.Queue[StatusElement]" = asyncio.Queue()
 
     async def _reconnect(self, vid: int, pid: int, baudrate: int, timeout: int) -> bool:
         device_running = False
@@ -339,37 +340,54 @@ class RunUSBUpdate:
         # give time for the device to respond
         await self._version_event.wait()
 
-    async def run_update(self) -> bool:
-        """Perform a firmware update on a connected USB device."""
+    async def _run_update(
+        self, messenger: BinaryMessenger, retry_count: int, update_file: str
+    ) -> None:
+        await self._status_queue.put((FirmwareUpdateStatus.updating, 0))
         await self._request_version()
+        await self._status_queue.put((FirmwareUpdateStatus.updating, 0.1))
         await self._messenger.stop()
-        vid, pid, baudrate, timeout = self._messenger.get_driver().get_connection_info()
-        result = False
-        for i in range(self._retry_count):
+        await self._status_queue.put((FirmwareUpdateStatus.updating, 0.2))
+        vid, pid, baudrate, timeout = messenger.get_driver().get_connection_info()
+        await self._status_queue.put((FirmwareUpdateStatus.updating, 0.3))
+        for i in range(retry_count):
             logger.info(
                 f"Running attempt number {i} to update device {vid:04x}:{pid:04x}"
             )
-            if not await self._messenger.send(EnterBootloaderRequest()):
+            if not await messenger.send(EnterBootloaderRequest()):
                 logger.error("unable to send enter bootloader message")
                 continue
-
+            await self._status_queue.put((FirmwareUpdateStatus.updating, 0.4))
             dfu_dev_serial = await find_dfu_device(DFU_PID, 3)
+            await self._status_queue.put((FirmwareUpdateStatus.updating, 0.5))
             kwargs: Dict[str, Any] = {
                 "stdout": asyncio.subprocess.PIPE,
                 "stderr": asyncio.subprocess.PIPE,
                 "loop": asyncio.get_running_loop(),
             }
-            success, msg = await upload_via_dfu(
-                dfu_dev_serial, self._update_file, kwargs
-            )
+            success, msg = await upload_via_dfu(dfu_dev_serial, update_file, kwargs)
             if success:
+                await self._status_queue.put((FirmwareUpdateStatus.updating, 0.9))
                 logger.info(
                     f"Device {vid:04x}:{pid:04x} updated successfully with {msg}"
                 )
-                device_running = await self._reconnect(vid, pid, baudrate, timeout)
-                result = success and device_running
+                await self._reconnect(vid, pid, baudrate, timeout)
+                await self._status_queue.put((FirmwareUpdateStatus.done, 1))
                 break
             else:
                 continue
+
+    async def run_update(self) -> AsyncIterator[StatusElement]:
+        """Perform a firmware update on a connected USB device."""
+        await self._status_queue.put((FirmwareUpdateStatus.queued, 0))
+        task = asyncio.gather(
+            self._run_update(self._messenger, self._retry_count, self._update_file)
+        )
+        while True:
+            try:
+                yield await asyncio.wait_for(self._status_queue.get(), 0.25)
+            except asyncio.TimeoutError:
+                pass
+            if task.done():
+                break
         await self._request_version()
-        return result

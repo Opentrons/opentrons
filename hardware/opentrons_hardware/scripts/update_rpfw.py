@@ -51,8 +51,14 @@ async def run(args: argparse.Namespace) -> None:
         retry_count=retry_count,
         timeout_seconds=timeout_seconds,
     )
-    success = await updater.run_update()
-    logger.info(f"Rear panel update success: {success}")
+    updater = RunUSBUpdate(
+        messenger=messenger,
+        update_file=args.file,
+        retry_count=retry_count,
+        timeout_seconds=timeout_seconds,
+    )
+    async for progress in updater.run_update():
+        logger.info(f"rear-panel is {progress[0]} and {progress[1]} done")
     logger.info("Done")
 
 
