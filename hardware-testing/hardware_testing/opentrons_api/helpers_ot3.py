@@ -118,7 +118,7 @@ async def build_async_ot3_hardware_api(
     pipette_left: Optional[str] = None,
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
-    loop: Optional[asyncio.AbstractEventLoop] = None
+    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
     config = build_config_ot3({}) if use_defaults else load_ot3_config()

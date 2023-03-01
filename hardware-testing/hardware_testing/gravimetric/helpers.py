@@ -50,15 +50,15 @@ def get_api_context(
     gripper: Optional[str] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
 ) -> protocol_api.ProtocolContext:
-
     async def _thread_manager_build_hw_api(
-            *args: Any, loop: asyncio.AbstractEventLoop, **kwargs: Any) -> OT3API:
+        *args: Any, loop: asyncio.AbstractEventLoop, **kwargs: Any
+    ) -> OT3API:
         return await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=is_simulating,
             pipette_left=pipette_left,
             pipette_right=pipette_right,
             gripper=gripper,
-            loop=loop
+            loop=loop,
         )
 
     return protocol_api.create_protocol_context(

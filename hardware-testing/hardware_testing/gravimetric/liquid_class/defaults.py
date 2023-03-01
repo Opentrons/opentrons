@@ -1,6 +1,7 @@
 """Defaults."""
+from typing import List
 
-from .liquid_class import (
+from .definition import (
     LiquidClassSettings,
     AspirateSettings,
     DispenseSettings,
@@ -17,8 +18,8 @@ _dispense_defaults = {
             delay=0.4,
             submerge=_dispense_default_submerge_mm,
             retract=_dispense_default_retract_mm,
-            acceleration=10000,
-            deceleration=20000,
+            acceleration=40000,
+            deceleration=40000,
         ),
     },
     1000: {  # P1000
@@ -61,13 +62,11 @@ OT3_LIQUID_CLASS = {
                     submerge=_aspirate_default_submerge_mm,
                     retract=_aspirate_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=15,
+                        leading_air_gap=2,
                         trailing_air_gap=2,
                     ),
                 ),
                 dispense=_dispense_defaults[50][50],
-                blow_out=True,
-                tracking=False,
             ),
             10: LiquidClassSettings(  # 10uL
                 aspirate=AspirateSettings(
@@ -76,13 +75,11 @@ OT3_LIQUID_CLASS = {
                     submerge=_aspirate_default_submerge_mm,
                     retract=_aspirate_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=15,
+                        leading_air_gap=2,
                         trailing_air_gap=0.1,
                     ),
                 ),
                 dispense=_dispense_defaults[50][50],
-                blow_out=True,
-                tracking=False,
             ),
             50: LiquidClassSettings(  # 50uL
                 aspirate=AspirateSettings(
@@ -91,13 +88,11 @@ OT3_LIQUID_CLASS = {
                     submerge=_aspirate_default_submerge_mm,
                     retract=_aspirate_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=15,
+                        leading_air_gap=2,
                         trailing_air_gap=0.1,
                     ),
                 ),
                 dispense=_dispense_defaults[50][50],
-                blow_out=True,
-                tracking=False,
             ),
         },
     },
@@ -115,8 +110,6 @@ OT3_LIQUID_CLASS = {
                     ),
                 ),
                 dispense=_dispense_defaults[1000][50],
-                blow_out=True,
-                tracking=False,
             ),
             10: LiquidClassSettings(  # 10uL
                 aspirate=AspirateSettings(
@@ -130,8 +123,6 @@ OT3_LIQUID_CLASS = {
                     ),
                 ),
                 dispense=_dispense_defaults[1000][50],
-                blow_out=True,
-                tracking=False,
             ),
             50: LiquidClassSettings(  # 50uL
                 aspirate=AspirateSettings(
@@ -145,8 +136,6 @@ OT3_LIQUID_CLASS = {
                     ),
                 ),
                 dispense=_dispense_defaults[1000][50],
-                blow_out=True,
-                tracking=False,
             ),
         },
         200: {  # T200
@@ -162,8 +151,6 @@ OT3_LIQUID_CLASS = {
                     ),
                 ),
                 dispense=_dispense_defaults[1000][200],
-                blow_out=True,
-                tracking=False,
             ),
             50: LiquidClassSettings(  # 50uL
                 aspirate=AspirateSettings(
@@ -177,8 +164,6 @@ OT3_LIQUID_CLASS = {
                     ),
                 ),
                 dispense=_dispense_defaults[1000][200],
-                blow_out=True,
-                tracking=False,
             ),
             200: LiquidClassSettings(  # 200uL
                 aspirate=AspirateSettings(
@@ -192,8 +177,6 @@ OT3_LIQUID_CLASS = {
                     ),
                 ),
                 dispense=_dispense_defaults[1000][200],
-                blow_out=True,
-                tracking=False,
             ),
         },
         1000: {  # T1000
@@ -209,8 +192,6 @@ OT3_LIQUID_CLASS = {
                     ),
                 ),
                 dispense=_dispense_defaults[1000][1000],
-                blow_out=True,
-                tracking=False,
             ),
             100: LiquidClassSettings(  # 100uL
                 aspirate=AspirateSettings(
@@ -221,11 +202,9 @@ OT3_LIQUID_CLASS = {
                     air_gap=AirGapSettings(
                         leading_air_gap=9.8,
                         trailing_air_gap=10,
-                    )
+                    ),
                 ),
                 dispense=_dispense_defaults[1000][1000],
-                blow_out=True,
-                tracking=False,
             ),
             1000: LiquidClassSettings(  # 1000uL
                 aspirate=AspirateSettings(
@@ -239,9 +218,22 @@ OT3_LIQUID_CLASS = {
                     ),
                 ),
                 dispense=_dispense_defaults[1000][1000],
-                blow_out=True,
-                tracking=False,
             ),
         },
     },
 }
+
+
+def get_liquid_class(
+    pipette_volume: int, tip_volume: int, test_volume: int
+) -> LiquidClassSettings:
+    """Get liquid class."""
+    pip_classes = OT3_LIQUID_CLASS[pipette_volume]
+    tip_classes = pip_classes[tip_volume]
+    return tip_classes[test_volume]
+
+
+def get_test_volumes(pipette_volume: int, tip_volume: int) -> List[float]:
+    pip_classes = OT3_LIQUID_CLASS[pipette_volume]
+    tip_classes = pip_classes[tip_volume]
+    return list(tip_classes.keys())

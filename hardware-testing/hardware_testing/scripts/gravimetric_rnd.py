@@ -26,7 +26,7 @@ def _run(is_simulating: bool) -> None:
             frequency=5,
             stable=False,
         ),
-        simulate=is_simulating
+        simulate=is_simulating,
     )
     if CALIBRATE_SCALE:
         _rec.calibrate_scale()

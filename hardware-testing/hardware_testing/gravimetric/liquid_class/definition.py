@@ -41,5 +41,3 @@ class LiquidClassSettings:
 
     aspirate: AspirateSettings
     dispense: DispenseSettings
-    blow_out: bool
-    tracking: bool  # FIXME: get working within protocol

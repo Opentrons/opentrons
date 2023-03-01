@@ -49,9 +49,7 @@ class ScaleReading:
 class Scale:
     """Scale Class."""
 
-    def __init__(
-        self, scale: Union[SimRadwagScale, RadwagScale]
-    ) -> None:
+    def __init__(self, scale: Union[SimRadwagScale, RadwagScale]) -> None:
         """Scale Class."""
         self._scale = scale
 
