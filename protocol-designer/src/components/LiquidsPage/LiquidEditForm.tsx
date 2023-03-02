@@ -149,7 +149,10 @@ export function LiquidEditForm(props: Props): JSX.Element {
               <PrimaryButton onClick={cancelForm}>
                 {i18n.t('button.cancel')}
               </PrimaryButton>
-              <PrimaryButton disabled={!dirty} type="submit">
+              <PrimaryButton
+                disabled={!dirty || errors.name != null}
+                type="submit"
+              >
                 {i18n.t('button.save')}
               </PrimaryButton>
             </div>
