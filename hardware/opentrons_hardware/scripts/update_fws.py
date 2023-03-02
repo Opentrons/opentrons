@@ -5,9 +5,13 @@ import logging
 import json
 from logging.config import dictConfig
 from typing import Dict, Any, TextIO
-
+from opentrons_hardware.drivers.binary_usb import (
+    SerialUsbDriver,
+    BinaryMessenger,
+    build_rear_panel_messenger,
+)
 from opentrons_hardware.drivers.can_bus import build
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings import NodeId, USBTarget, FirmwareTarget
 from opentrons_hardware.firmware_update.run import RunUpdate
 from .can_args import add_can_args, build_settings
 
@@ -35,7 +39,7 @@ LOG_CONFIG = {
     },
 }
 
-UpdateDict = Dict[NodeId, TextIO]
+UpdateDict = Dict[FirmwareTarget, TextIO]
 
 
 async def run(args: argparse.Namespace) -> None:
@@ -45,13 +49,19 @@ async def run(args: argparse.Namespace) -> None:
     erase = not args.no_erase
 
     update_dict = json.load(args.dict)
-    update_details = {
-        NodeId[node_id]: filepath for node_id, filepath in update_dict.items()
+    update_details: Dict[FirmwareTarget, str] = {
+        NodeId[target] if target in NodeId else USBTarget[target]: filepath
+        for target, filepath in update_dict.items()
     }
 
-    async with build.can_messenger(build_settings(args)) as messenger:
+    driver: SerialUsbDriver = build_rear_panel_messenger(asyncio.get_running_loop())
+    usb_messenger = BinaryMessenger(driver)
+    usb_messenger.start()
+
+    async with build.can_messenger(build_settings(args)) as can_messenger:
         updater = RunUpdate(
-            messenger=messenger,
+            can_messenger=can_messenger,
+            usb_messenger=usb_messenger,
             update_details=update_details,
             retry_count=retry_count,
             timeout_seconds=timeout_seconds,
@@ -70,7 +80,7 @@ def main() -> None:
 
     parser.add_argument(
         "--dict",
-        help="Path to json file containing the dictionary of node ids and hex files to be updated.",
+        help="Path to json file containing the dictionary of node ids or usb targets and hex/bin files to be updated.",
         type=str,
         required=True,
     )

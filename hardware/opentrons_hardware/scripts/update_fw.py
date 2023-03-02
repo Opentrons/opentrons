@@ -13,10 +13,9 @@ from opentrons_hardware.drivers.binary_usb import (
     BinaryMessenger,
     build_rear_panel_messenger,
 )
-from opentrons_hardware.firmware_bindings import NodeId
-from opentrons_hardware.firmware_update.run import RunUpdate, RunUSBUpdate
+from opentrons_hardware.firmware_bindings import NodeId, USBTarget, FirmwareTarget
+from opentrons_hardware.firmware_update.run import RunUpdate
 from .can_args import add_can_args, build_settings
-
 
 logger = logging.getLogger(__name__)
 
@@ -41,14 +40,14 @@ LOG_CONFIG = {
     },
 }
 
-TARGETS: Final = {
+TARGETS: Final[Dict[str, FirmwareTarget]] = {
     "head": NodeId.head,
     "gantry-x": NodeId.gantry_x,
     "gantry-y": NodeId.gantry_y,
     "pipette-left": NodeId.pipette_left,
     "pipette-right": NodeId.pipette_right,
     "gripper": NodeId.gripper,
-    "rear-panel": NodeId.host,
+    "rear-panel": USBTarget.rear_panel,
 }
 
 
@@ -57,34 +56,26 @@ async def run(args: argparse.Namespace) -> None:
     retry_count = args.retry_count
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
-    if args.target == "rear-panel":
-        driver: SerialUsbDriver = build_rear_panel_messenger(asyncio.get_running_loop())
-        usbmessenger = BinaryMessenger(driver)
-        usbmessenger.start()
-        usbupdater = RunUSBUpdate(
-            messenger=usbmessenger,
-            update_file=args.file,
+
+    driver: SerialUsbDriver = build_rear_panel_messenger(asyncio.get_running_loop())
+    usb_messenger = BinaryMessenger(driver)
+    usb_messenger.start()
+
+    update_details = {
+        TARGETS[args.target]: args.file,
+    }
+
+    async with build.can_messenger(build_settings(args)) as can_messenger:
+        updater = RunUpdate(
+            can_messenger=can_messenger,
+            usb_messenger=usb_messenger,
+            update_details=update_details,
             retry_count=retry_count,
             timeout_seconds=timeout_seconds,
+            erase=erase,
         )
-        async for usbprogress in usbupdater.run_update():
-            logger.info(f"rear-panel is {usbprogress[0]} and {usbprogress[1]} done")
-    else:
-        update_details = {
-            TARGETS[args.target]: args.file,
-        }
-        async with build.can_messenger(build_settings(args)) as messenger:
-            updater = RunUpdate(
-                messenger=messenger,
-                update_details=update_details,
-                retry_count=retry_count,
-                timeout_seconds=timeout_seconds,
-                erase=erase,
-            )
-            async for progress in updater.run_updates():
-                logger.info(
-                    f"{progress[0]} is {progress[1][0]} and {progress[1][1]} done"
-                )
+        async for progress in updater.run_updates():
+            logger.info(f"{progress[0]} is {progress[1][0]} and {progress[1][1]} done")
 
     logger.info("Done")
 

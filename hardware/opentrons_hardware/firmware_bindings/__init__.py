@@ -5,7 +5,14 @@ from .arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-from .constants import NodeId, FunctionCode, MessageId, ErrorCode
+from .constants import (
+    NodeId,
+    FunctionCode,
+    MessageId,
+    ErrorCode,
+    USBTarget,
+    FirmwareTarget,
+)
 from .binary_constants import BinaryMessageId
 
 __all__ = [
@@ -17,4 +24,6 @@ __all__ = [
     "ArbitrationIdParts",
     "ErrorCode",
     "BinaryMessageId",
+    "USBTarget",
+    "FirmwareTarget",
 ]

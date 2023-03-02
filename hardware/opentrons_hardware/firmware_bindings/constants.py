@@ -5,6 +5,7 @@ by default. Please do not unconditionally import things outside the python stand
 library.
 """
 from enum import Enum, unique
+from typing import Union
 
 
 @unique
@@ -29,6 +30,17 @@ class NodeId(int, Enum):
     gantry_y_bootloader = gantry_y | 0xF
     head_bootloader = head | 0xF
     gripper_bootloader = gripper | 0xF
+
+
+# make these negative numbers so there is no chance they overlap with NodeId
+@unique
+class USBTarget(int, Enum):
+    """List of firmware targets connected over usb."""
+
+    rear_panel = -1
+
+
+FirmwareTarget = Union[NodeId, USBTarget]
 
 
 @unique
