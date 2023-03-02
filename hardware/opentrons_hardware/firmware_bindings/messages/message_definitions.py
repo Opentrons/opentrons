@@ -778,3 +778,14 @@ class InstrumentInfoRequest(EmptyPayloadMessage):
     message_id: Literal[
         MessageId.instrument_info_request
     ] = MessageId.instrument_info_request
+
+
+@dataclass
+class SetGripperErrorTolerance(BaseMessage):  # noqa: D101
+    payload: payloads.GripperErrorTolerancePayload
+    payload_type: Type[
+        payloads.GripperErrorTolerancePayload
+    ] = payloads.GripperErrorTolerancePayload
+    message_id: Literal[
+        MessageId.set_gripper_error_tolerance
+    ] = MessageId.set_gripper_error_tolerance

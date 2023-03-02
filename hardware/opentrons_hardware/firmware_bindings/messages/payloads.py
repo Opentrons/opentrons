@@ -503,6 +503,14 @@ class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
 
 
 @dataclass(eq=False)
+class GripperErrorTolerancePayload(EmptyPayload):
+    """A request to update the position error tolerance of the gripper."""
+
+    max_pos_error_mm: utils.UInt32Field
+    max_unwanted_movement_mm: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
