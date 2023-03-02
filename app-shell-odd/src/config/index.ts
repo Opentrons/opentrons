@@ -79,13 +79,13 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
 
         // change brightness
         if (path === 'onDeviceDisplaySettings.brightness') {
-          fs.outputFile(BRIGHTNESS_FILE, String(nextValue))
-            .then(() => fs.readFile(BRIGHTNESS_FILE, 'utf8'))
+          fs.writeFile(BRIGHTNESS_FILE, String(nextValue))
+            .then(() => fs.readFile(BRIGHTNESS_FILE))
             .then(data => {
               log().debug('Change display brightness', { nextValue })
             })
             .catch(err => {
-              console.error(err)
+              log().debug('Something wrong during overwriting', { err })
             })
         }
 
