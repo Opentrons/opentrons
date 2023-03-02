@@ -87,7 +87,7 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
         diff = float(mores) - float(encoder)
         print("diff",diff)
         try:
-            if abs(diff) < 1:
+            if abs(diff) < 2:
                 if xy == "downward":
                     print("MOVEDOWN=Pass")
                 elif xy == "up":
@@ -261,22 +261,23 @@ async def read_epprom(messenger: CanMessenger, node):
                 return serial_number
     except asyncio.TimeoutError:
         return "None"
-async def _read_epprom(messenger: CanMessenger,node) -> Tuple[str, str]:
+
+async def _read_epprom(messenger: CanMessenger, node: NodeId) -> str:
+    """Read from the Pipette EPPROM."""
     await messenger.send(node, InstrumentInfoRequest())
-    with WaitableCallback(messenger) as wc:
-        message, _ = await asyncio.wait_for(wc.read(), 1.0)
-        payload = message.payload
-        payload_name = payload.name  # type: ignore[attr-defined]
-        payload_model = payload.model  # type: ignore[attr-defined]
-        payload_serial = payload.serial  # type: ignore[attr-defined]
-        pipette_name = PipetteName(payload_name.value).name
-        pipette_version = str(payload_model.value)
-        pipette_id = str(payload_serial.value.decode("ascii").rstrip("\x00"))
-        serial_number = (
-            _determine_abbreviation(pipette_name) + pipette_version + pipette_id
-        )
-        model = "{}_v{}".format(pipette_name, pipette_version)
-        return serial_number, model
+    try:
+        with WaitableCallback(messenger) as wc:
+            message, arb = await asyncio.wait_for(wc.read(), 1.0)
+            pipette_val = PipetteName(message.payload.name.value)  # type: ignore[attr-defined]
+            pipette_version = "V" + str(message.payload.model.value)  # type: ignore[attr-defined]
+            sn = str(message.payload.serial.value.decode("ascii").rstrip("\x00"))  # type: ignore[attr-defined]
+            serial_number = determine_abbreviation(pipette_val) + pipette_version + sn
+    except asyncio.TimeoutError:
+        pass
+    finally:
+        print(serial_number)
+        return serial_number
+
 def _determine_abbreviation(pipette_name: str) -> str:
     if pipette_name not in PIPETTE_NAMES:
         raise ValueError(f"Unknown Pipette: {pipette_name}")

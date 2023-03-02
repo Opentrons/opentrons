@@ -87,7 +87,7 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
         diff = float(encoder2) - float(encoder1)
         print("diff",diff)
         try:
-            if abs(diff) > 1:
+            if abs(diff) > 0:
                 if xy == "downward":
                     print("MOVEDOWN=Pass")
                 elif xy == "up":
@@ -286,6 +286,10 @@ async def  run(args: argparse.Namespace) -> None:
         node = NodeId.gantry_x
     elif args.node == "gantry_y":
         node = NodeId.gantry_y
+    elif args.node == "pipette_left":
+        node = NodeId.pipette_left
+    elif args.node == "pipette_right":
+        node = NodeId.pipette_right   
 
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
