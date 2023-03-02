@@ -160,27 +160,17 @@ async def create_protocol(
         created_at: Timestamp to attach to the new resource.
     """
     buffered_files = await file_reader_writer.read(files=files)
-    content_hash = file_hasher.hash(buffered_files)
-    content_hash2protocol_id: Dict[str, str] = dict(
-        [
-            (p["content_hash"], p["protocol_id"])
-            for p in [
-                {
-                    "content_hash": p_resource.source.content_hash,
-                    "protocol_id": p_resource.protocol_id,
-                }
-                for p_resource in protocol_store.get_all()
-            ]
-        ]
-    )
+    content_hash = await file_hasher.hash(buffered_files)
+    cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
-    if content_hash in content_hash2protocol_id:
-        protocolId = content_hash2protocol_id[content_hash]
+    if cached_protocol_id is not None:
         try:
-            resource = protocol_store.get(protocol_id=protocolId)
-            analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
+            resource = protocol_store.get(protocol_id=cached_protocol_id)
+            analyses = analysis_store.get_summaries_by_protocol(
+                protocol_id=cached_protocol_id
+            )
             data = Protocol.construct(
-                id=protocolId,
+                id=cached_protocol_id,
                 createdAt=resource.created_at,
                 protocolType=resource.source.config.protocol_type,
                 robotType=resource.source.robot_type,
@@ -194,7 +184,7 @@ async def create_protocol(
             )
 
             log.info(
-                f'Protocol with id "{protocol_id}" with same contents already exists. returning existing protocol data in response payload'
+                f'Protocol with id "{cached_protocol_id}" with same contents already exists. returning existing protocol data in response payload'
             )
 
             return await PydanticResponse.create(
@@ -211,6 +201,7 @@ async def create_protocol(
         source = await protocol_reader.save(
             files=buffered_files,
             directory=protocol_directory / protocol_id,
+            content_hash=content_hash,
         )
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(

@@ -50,7 +50,9 @@ class ProtocolReader:
         self._file_format_validator = file_format_validator or FileFormatValidator()
         self._file_hasher = file_hasher or FileHasher()
 
-    async def save(self, files: List[BufferedFile], directory: Path) -> ProtocolSource:
+    async def save(
+        self, files: List[BufferedFile], directory: Path, content_hash: str
+    ) -> ProtocolSource:
         """Compute a `ProtocolSource` from buffered files and save them as files.
 
         The input is parsed and statically analyzed to ensure it's basically
@@ -83,8 +85,6 @@ class ProtocolReader:
             )
             for f in role_analysis.all_files
         ]
-
-        content_hash = self._file_hasher.hash(files)
 
         return ProtocolSource(
             directory=directory,
