@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   TEXT_ALIGN_CENTER,
@@ -48,6 +48,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const { t } = useTranslation('pipette_wizard_flows')
   const pipetteId = attachedPipettes[mount]?.id
   const displayName = attachedPipettes[mount]?.modelSpecs.displayName
+  const is8Channel = attachedPipettes[mount]?.modelSpecs.channels === 8
   //  hard coding calibration slot number for now in case it changes
   //  in the future
   const calSlotNum = '2'
@@ -115,7 +116,20 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       header={t('attach_probe')}
       //  TODO(Jr, 10/26/22): replace image with correct one!
       rightHandBody={<img src={attachProbe} width="100%" alt="Attach probe" />}
-      bodyText={<StyledText css={BODY_STYLE}>{t('install_probe')}</StyledText>}
+      bodyText={
+        is8Channel ? (
+          <Trans
+            t={t}
+            i18nKey={'install_probe_8_channel'}
+            components={{
+              strong: <strong />,
+              block: <StyledText css={BODY_STYLE} />,
+            }}
+          />
+        ) : (
+          <StyledText css={BODY_STYLE}>{t('install_probe')}</StyledText>
+        )
+      }
       proceedButtonText={t('begin_calibration')}
       proceed={handleOnClick}
       back={goBack}

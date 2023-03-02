@@ -4,6 +4,7 @@
   "remove_labware_to_get_started": "<block>To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side</block><block>The calibration probe is included with the robot and should be stored on the right hand side of the door opening.</block>",
   "attach_probe": "Attach Calibration Probe",
   "install_probe": "Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.",
+  "install_probe_8_channel": "<block>Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the <strong>backmost</strong> pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.</block>",
   "begin_calibration": "Begin calibration",
   "remove_cal_probe": "Remove Calibration Probe",
   "remove_probe": "Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.",

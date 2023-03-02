@@ -54,6 +54,13 @@ export const mockGen3P1000PipetteSpecs: any = {
   backCompatNames: ['p1000_single'],
 }
 
+export const mockGen3P1000Pipette8ChannelSpecs: any = {
+  displayName: 'Flex 8-Channel 1000 μL',
+  name: 'p1000_multi_gen3',
+  channels: 8,
+  backCompatNames: ['p1000_multi'],
+}
+
 export const mockFetchPipettesSuccessMeta: RobotApiResponseMeta = {
   method: 'GET',
   path: '/pipettes',

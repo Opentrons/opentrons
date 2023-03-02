@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
+  mockGen3P1000Pipette8ChannelSpecs,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -21,6 +22,11 @@ const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
   modelSpecs: mockGen3P1000PipetteSpecs,
 }
+const mock8ChannelPipette: AttachedPipette = {
+  ...mockAttachedPipette,
+  modelSpecs: mockGen3P1000Pipette8ChannelSpecs,
+}
+
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
   beforeEach(() => {
@@ -71,6 +77,19 @@ describe('AttachProbe', () => {
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
+  })
+
+  it('returns the correct info when the pipette is a 8 channel', () => {
+    props = {
+      ...props,
+      attachedPipettes: { left: mock8ChannelPipette, right: null },
+    }
+    const { getByText } = render(props)
+    getByText(
+      nestedTextMatcher(
+        'backmost pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      )
+    )
   })
 
   it('returns the correct information when robot is in motion', () => {
