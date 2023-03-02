@@ -1,4 +1,3 @@
-import os
 import asyncio
 from pathlib import Path
 import time
@@ -9,11 +8,8 @@ from collections import namedtuple
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.types import ModuleType
-from opentrons.hardware_control.protocols import HardwareControlAPI
-from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.state.config import Config
-from opentrons.protocol_reader.protocol_reader import ProtocolReader
 from opentrons.protocol_reader.protocol_source import (
     JsonProtocolConfig,
     ProtocolConfig,
@@ -115,12 +111,12 @@ class GCodeEngine:
         proc.join()
 
     @staticmethod
-    def _get_protocol(file_path: str) -> Protocol:
+    def _get_protocol(file_path: Path) -> Protocol:
         with open(file_path) as file:
             text = "".join(list(file))
             file.seek(0)
 
-        return Protocol(text=text, filename=file_path, filelike=file)
+        return Protocol(text=text, filename=file_path.name, filelike=file)
 
     @asynccontextmanager
     async def run_protocol(
@@ -134,7 +130,7 @@ class GCodeEngine:
         :return: GCodeProgram with all the parsed data
         """
         file_path = Path(get_configuration_dir(), path)
-        robot_type = "OT-2 Standard"
+        robot_type: RobotType = "OT-2 Standard"
 
         with self._emulate() as hardware:
             if (isinstance(version, APIVersion) and version >= APIVersion(2, 14)) or (
@@ -159,26 +155,24 @@ class GCodeEngine:
 
                 protocol_runner: ProtocolRunner = ProtocolRunner(
                     protocol_engine=await create_protocol_engine(
-                        hardware_api=hardware,
+                        hardware_api=hardware,  # type: ignore
                         config=Config(robot_type=robot_type),
                     ),
-                    hardware_api=hardware,
+                    hardware_api=hardware,  # type: ignore
                 )
                 with GCodeWatcher(emulator_settings=self._config) as watcher:
                     await protocol_runner.run(protocol_source=protocol_source)
                     yield GCodeProgram.from_g_code_watcher(watcher)
             elif isinstance(version, APIVersion) and version < APIVersion(2, 14):
-                file_path = os.path.join(get_configuration_dir(), path)
-                with self._emulate() as hardware:
-                    protocol = self._get_protocol(file_path)
-                    context = create_protocol_context(
-                        api_version=version,
-                        hardware_api=hardware,
-                    )
-                    parsed_protocol = parse(protocol.text, protocol.filename)
-                    with GCodeWatcher(emulator_settings=self._config) as watcher:
-                        execute.run_protocol(parsed_protocol, context=context)
-                    yield GCodeProgram.from_g_code_watcher(watcher)
+                protocol = self._get_protocol(file_path)
+                context = create_protocol_context(
+                    api_version=version,
+                    hardware_api=hardware,
+                )
+                parsed_protocol = parse(protocol.text, protocol.filename)
+                with GCodeWatcher(emulator_settings=self._config) as watcher:
+                    execute.run_protocol(parsed_protocol, context=context)
+                yield GCodeProgram.from_g_code_watcher(watcher)
             else:
                 raise ValueError(f"APIVersion is {version}")
 

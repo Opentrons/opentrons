@@ -121,10 +121,10 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
         file = open(self._get_full_path(), "r")
         return ''.join(file.readlines()).strip()
 
-    def update_comparison(self) -> str:
+    async def update_comparison(self) -> str:
         """Run config and override the comparison file with output."""
         with open(self._get_full_path(), 'w') as file:
-            file.write(self.execute())
+            file.write(await self.execute())
         return "File uploaded successfully"
 
     def execute(self):

@@ -1,13 +1,13 @@
 """Command Line Interface for making use of G-Code Parsing Commands."""
-
+from __future__ import annotations
 import asyncio
-import inspect
+import os
 import sys
 import re
 import argparse
 from dataclasses import dataclass
 from pathlib import PurePath
-from types import CoroutineType
+import time
 from typing import (
     Callable,
     Dict,
@@ -27,7 +27,6 @@ from g_code_test_data.g_code_configuration import (
 )
 from g_code_test_data.http.http_configurations import HTTP_CONFIGURATIONS
 from g_code_test_data.protocol.protocol_configurations import PROTOCOL_CONFIGURATIONS
-from functools import partial
 
 
 @dataclass
@@ -90,11 +89,15 @@ class GCodeCLI:
         return configurations
 
     def __init__(self) -> None:
-        """Create GCodeCLI object."""
+        """Init GCodeCLI object."""
         self._args = self.parse_args(sys.argv[1:])
         self.configurations = self._create_configuration_dict()
         self.respond_with_error_code = False
 
+    @classmethod
+    async def create(cls) -> GCodeCLI:
+        """Create GCodeCLI object."""
+        self = GCodeCLI()
         self._command_lookup_dict = {
             self.RUN_COMMAND: self._run,
             self.DIFF_FILES_COMMAND: self._diff,
@@ -103,29 +106,30 @@ class GCodeCLI:
             self.CONFIGURATION_COMMAND: self._configurations,
             self.CHECK_MISSING_COMP_FILES: self._check_for_missing_comparison_files,
         }
+        return self
 
     @staticmethod
-    def _run(run_config: RunnableConfiguration) -> str:
+    async def _run(run_config: RunnableConfiguration) -> str:
         """Execute G-Code Configuration."""
         configuration = run_config.configuration
         version = run_config.version
         return (
-            configuration.execute(version)
+            await configuration.execute(version)
             if version is not None
-            else configuration.execute()
+            else await configuration.execute()
         )
 
-    def _diff(self, run_config: RunnableConfiguration) -> str:
+    async def _diff(self, run_config: RunnableConfiguration) -> str:
         """Diff G-Code Configuration against stored comparison file."""
         configuration = run_config.configuration
         version = run_config.version
         able_to_respond_with_error_code = self.args[self.ERROR_ON_DIFFERENT_FILES]
 
         if version is not None:
-            actual = configuration.execute(version)
+            actual = await configuration.execute(version)
             expected = configuration.get_comparison_file(version)
         else:
-            actual = configuration.execute()
+            actual = await configuration.execute()
             expected = configuration.get_comparison_file()
 
         differ = GCodeDiffer(actual, expected)
@@ -136,6 +140,9 @@ class GCodeCLI:
 
         if not strings_equal:
             text = differ.get_html_diff()
+            differ.save_html_diff_to_file(
+                os.path.join("results", f"{str(time.time_ns())[:-3]}result.html")
+            )
         else:
             text = "No difference between compared strings"
 
@@ -160,14 +167,14 @@ class GCodeCLI:
         )
 
     @staticmethod
-    def _update_comparison(run_config: RunnableConfiguration) -> str:
+    async def _update_comparison(run_config: RunnableConfiguration) -> str:
         """Create/Override comparison file with output of execution."""
         configuration = run_config.configuration
         version = run_config.version
         return (
-            configuration.update_comparison(version)
+            await configuration.update_comparison(version)
             if version is not None
-            else configuration.update_comparison()
+            else await configuration.update_comparison()
         )
 
     def _check_for_missing_comparison_files(self) -> str:
@@ -278,8 +285,19 @@ class GCodeCLI:
             self._get_config_matches(config_name)
         )
 
+        def async_partial(f: callable, *args: Any) -> callable:
+            """Make the partial async."""
+
+            async def f2(*args2: Any) -> Any:
+                result = f(*args, *args2)
+                if asyncio.iscoroutinefunction(f):
+                    result = await result
+                return result
+
+            return f2
+
         return [
-            partial(self._get_command_func(passed_command_name), run_config)
+            async_partial(self._get_command_func(passed_command_name), run_config)
             for run_config in runnable_configurations
         ]
 
@@ -385,8 +403,9 @@ class GCodeCLI:
         return self._args
 
 
-async def main():
-    cli = GCodeCLI()
+async def main() -> None:
+    """Main function."""
+    cli = await GCodeCLI.create()
     funcs_to_run = cli.get_runnable_commands()
     output = await cli.run_commands(funcs_to_run)
 
