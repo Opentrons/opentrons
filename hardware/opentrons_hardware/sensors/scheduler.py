@@ -104,13 +104,16 @@ class SensorScheduler:
         sensor: PollSensorInformation,
         can_messenger: CanMessenger,
         timeout: int,
+        expected_num_messages: int = 1,
     ) -> List[SensorDataType]:
         """Send poll message."""
         sensor_info = sensor.sensor
-        with WaitableCallback(
+        with MultipleMessagesWaitableCallback(
             can_messenger,
             self._create_filter(sensor_info.node_id, BaselineSensorResponse.message_id),
+            number_of_messages=expected_num_messages,
         ) as reader:
+            data_list: List[SensorDataType] = []
             await can_messenger.send(
                 node_id=sensor_info.node_id,
                 message=BaselineSensorRequest(
@@ -124,13 +127,13 @@ class SensorScheduler:
             try:
 
                 data_list = await asyncio.wait_for(
-                    self._wait_for_response(reader, _format_sensor_response),
+                    self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
             except asyncio.TimeoutError:
                 log.warning("Sensor poll timed out")
             finally:
-                return [data_list]
+                return data_list
 
     async def send_write(
         self, sensor: WriteSensorInformation, can_messenger: CanMessenger

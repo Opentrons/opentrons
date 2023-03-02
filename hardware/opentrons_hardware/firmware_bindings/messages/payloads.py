@@ -403,7 +403,7 @@ class BaselineSensorRequestPayload(SensorPayload):
     sample_rate: utils.UInt16Field
 
 
-@dataclass
+@dataclass(eq=False)
 class BaselineSensorResponsePayload(SensorPayload):
     """A response containing an averaged offset reading from a sensor."""
 

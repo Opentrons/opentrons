@@ -23,6 +23,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
+    BaselineSensorResponse,
     ReadFromSensorRequest,
     SetSensorThresholdRequest,
     WriteToSensorRequest,
@@ -31,7 +32,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
     PeripheralStatusRequest,
     PeripheralStatusResponse,
-    BaselineSensorResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
