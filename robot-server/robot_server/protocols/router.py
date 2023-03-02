@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, UploadFile, status, Form
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import (
