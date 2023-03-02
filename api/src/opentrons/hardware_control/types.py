@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass
 from typing import (
     NamedTuple,
+    Optional,
     cast,
     Tuple,
     Union,
@@ -13,6 +14,7 @@ from typing import (
 )
 from typing_extensions import Literal
 from opentrons import types as top_types
+from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -287,6 +289,15 @@ class PipetteSubType(enum.Enum):
     def __str__(self) -> str:
         return self.name
 
+    @classmethod
+    def from_channels(cls, channels: PipetteChannelType) -> "PipetteSubType":
+        pipette_subtype_lookup = {
+            PipetteChannelType.SINGLE_CHANNEL: cls.pipette_single,
+            PipetteChannelType.EIGHT_CHANNEL: cls.pipette_multi,
+            PipetteChannelType.NINETY_SIX_CHANNEL: cls.pipette_96,
+        }
+        return pipette_subtype_lookup[channels]
+
 
 class UpdateState(enum.Enum):
     """Update state to map from lower level FirmwareUpdateStatus"""
@@ -311,10 +322,20 @@ class InstrumentUpdateStatus:
     status: UpdateState
     progress: int
 
-    @classmethod
     def update(self, status: UpdateState, progress: int) -> None:
         self.status = status
         self.progress = progress
+
+
+@dataclass
+class InstrumentFWInfo:
+    mount: OT3Mount
+    update_required: bool
+    current_version: int
+    next_version: Optional[int]
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: mount={self.mount} needs_update={self.update_required} version={self.current_version} -> {self.next_version}>"
 
 
 _subsystem_mount_lookup = {

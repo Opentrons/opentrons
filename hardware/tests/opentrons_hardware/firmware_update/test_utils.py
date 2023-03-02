@@ -147,14 +147,14 @@ def test_firmware_file_selected_for_revision() -> None:
     """Given a device and revision, the right firmware file should be selected."""
     stimulus = [
         # a matching rev should be found
-        (NodeId.head, {"a1": "test-head.hex", "b1": "test-head-wrong.hex"}, "a1"),
+        (NodeId.head, 0, {"a1": "test-head.hex", "b1": "test-head-wrong.hex"}, "a1"),
         # an empty revs dict should be ignored
-        (NodeId.gantry_x, {"": ""}, "a1"),
+        (NodeId.gantry_x, 2, {"": ""}, "a1"),
         # a present but non matching revs dict should be ignored
-        (NodeId.gantry_y, {"b1": "test-gantry-y.hex"}, "c1"),
+        (NodeId.gantry_y, 1, {"b1": "test-gantry-y.hex"}, "c1"),
     ]
     response = list(_update_files_from_types(stimulus))
-    assert response == [(NodeId.head, "test-head.hex")]
+    assert response == [(NodeId.head, 0, "test-head.hex")]
 
 
 def test_load_firmware_manifest_success(mock_manifest: Dict[str, Any]) -> None:

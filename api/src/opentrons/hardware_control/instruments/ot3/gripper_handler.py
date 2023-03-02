@@ -3,7 +3,6 @@ import logging
 
 from opentrons.types import Point
 from .instrument_calibration import (
-    load_gripper_calibration_offset,
     GripperCalibrationOffset,
 )
 from opentrons.hardware_control.dev_types import GripperDict
@@ -54,15 +53,9 @@ class GripperHandler:
 
     def reset_gripper(self) -> None:
         """Reset the internal state of the gripper."""
-        og_gripper = self._gripper
-        if not og_gripper:
-            return
-        new_gripper = Gripper(
-            og_gripper.config,
-            load_gripper_calibration_offset(og_gripper.gripper_id),
-            og_gripper.gripper_id,
-        )
-        self._gripper = new_gripper
+        if self._gripper is not None:
+            self._gripper.reset_offset(False)
+            self._gripper.reset_state()
 
     async def reset(self) -> None:
         self._gripper = None

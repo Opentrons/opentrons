@@ -32,7 +32,6 @@ from .ot3utils import (
     axis_to_node,
     get_current_settings,
     create_home_group,
-    node_id_to_subsystem,
     node_to_axis,
     pipette_type_for_subtype,
     sensor_node_for_mount,
@@ -86,6 +85,7 @@ from opentrons_hardware import firmware_update
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
+    InstrumentFWInfo,
     OT3Axis,
     AionotifyEvent,
     OT3Mount,
@@ -96,7 +96,6 @@ from opentrons.hardware_control.types import (
     PipetteSubType,
     UpdateStatus,
     mount_to_subsystem,
-    subsystem_to_mount,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -138,7 +137,7 @@ def requires_update(func: Wrapped) -> Wrapped:
 
     @wraps(func)
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
-        if self.update_required:
+        if self.update_required and self.initialized:
             raise FirmwareUpdateRequired()
         return await func(self, *args, **kwargs)
 
@@ -185,6 +184,7 @@ class OT3Controller:
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._update_required = False
+        self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
         try:
             self._event_watcher = self._build_event_watcher()
@@ -195,6 +195,15 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+
+    @property
+    def initialized(self) -> bool:
+        """True when the hardware controller has initialized and is ready."""
+        return self._initialized
+
+    @initialized.setter
+    def initialized(self, value: bool) -> None:
+        self._initialized = value
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -223,34 +232,32 @@ class OT3Controller:
             pipette_nodes[node_id] = pipette_type
         return pipette_nodes
 
-    def get_instrument_updates(
-        self, attached_pipettes: Dict[OT3Mount, PipetteSubType]
-    ) -> Dict[OT3Mount, int]:
-        """Returns instruments, versions for subsystems that require an update."""
-        available_updates: Dict[OT3Mount, int] = dict()
-        attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
+    def get_instrument_update(
+        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
+    ) -> InstrumentFWInfo:
+        """Check wether the given instrument requires an update."""
+        subsystem = mount_to_subsystem(mount)
+        node_id = sub_system_to_node_id(subsystem)
+        # get the pipette_type if this is a pipette
+        attached_pipettes: Dict[NodeId, PipetteType] = dict()
+        if mount in [OT3Mount.LEFT, OT3Mount.RIGHT] and pipette_subtype:
+            attached_pipettes[node_id] = pipette_type_for_subtype(pipette_subtype)
+
+        # check if this instrument requires an update
         firmware_updates = firmware_update.check_firmware_updates(
-            self._network_info.device_info, attached_pipette_nodes
+            self._network_info.device_info, attached_pipettes, nodes={node_id}
         )
-        for node_id in firmware_updates:
-            # we only want instruments, so filter out core subsystems
-            if node_id not in [
-                NodeId.pipette_left,
-                NodeId.pipette_right,
-                NodeId.gripper,
-            ]:
-                continue
-
-            # get the version from the device info cache
-            device_info = self._network_info.device_info.get(node_id)
-            if device_info:
-                subsystem = node_id_to_subsystem(node_id)
-                mount = subsystem_to_mount(subsystem)
-                available_updates[mount] = device_info.version
-
-        # set our internal update required flag
-        self.update_required = bool(available_updates)
-        return available_updates
+        device_info = self._network_info.device_info.get(node_id)
+        current_fw_version = device_info.version if device_info else 0
+        update_info = firmware_updates.get(node_id)
+        update_required = bool(update_info)
+        next_version = update_info[0] if update_info else None
+        # set our global firmware update state if any updates are available
+        self.update_required |= bool(firmware_updates)
+        instrument_fw_info = InstrumentFWInfo(
+            mount, update_required, current_fw_version, next_version
+        )
+        return instrument_fw_info
 
     def get_update_progress(self) -> Set[UpdateStatus]:
         """Returns a set of UpdateStatus of the updates."""
@@ -263,13 +270,17 @@ class OT3Controller:
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
+        force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
         nodes = nodes or set()
         attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
-        # Check if devices need an update, force update if nodes are specified
+        # Check if devices need an update, only checks nodes if given
         firmware_updates = firmware_update.check_firmware_updates(
-            self._network_info.device_info, attached_pipette_nodes, nodes=nodes
+            self._network_info.device_info,
+            attached_pipette_nodes,
+            nodes=nodes,
+            force=force,
         )
         if not firmware_updates:
             log.info("No firmware updates required.")
@@ -280,9 +291,12 @@ class OT3Controller:
         self._update_tracker = UpdateProgress(set(firmware_updates))
         self.update_required = True
 
+        update_details = {
+            node_id: update_info[1] for node_id, update_info in firmware_updates.items()
+        }
         updater = firmware_update.RunUpdate(
             messenger=self._messenger,
-            update_details=firmware_updates,
+            update_details=update_details,
             retry_count=3,
             timeout_seconds=20,
             erase=True,
@@ -304,14 +318,12 @@ class OT3Controller:
         )
         await self.set_default_currents()
 
-    @requires_update
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
         assert len(self._present_nodes)
         response = await get_motor_position(self._messenger, self._present_nodes)
         self._handle_motor_status_response(response)
 
-    @requires_update
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
@@ -727,7 +739,6 @@ class OT3Controller:
     def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
         return [axis_to_node(OT3Axis.Q)] if OT3Axis.Q in axis_current_keys else []
 
-    @requires_update
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
@@ -741,7 +752,6 @@ class OT3Controller:
             ),
         )
 
-    @requires_update
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
@@ -760,7 +770,6 @@ class OT3Controller:
         for axis, current in axis_currents.items():
             self._current_settings[axis].run_current = current
 
-    @requires_update
     async def set_hold_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the hold current for motor.
 

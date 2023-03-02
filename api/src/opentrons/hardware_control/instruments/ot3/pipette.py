@@ -28,7 +28,7 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
     PipetteModel,
 )
-from opentrons.hardware_control.types import CriticalPoint, OT3Mount
+from opentrons.hardware_control.types import CriticalPoint, InstrumentFWInfo, OT3Mount
 from opentrons.hardware_control.errors import InvalidMoveError
 
 mod_log = logging.getLogger(__name__)
@@ -78,6 +78,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self,
         config: PipetteConfigurations,
         pipette_offset_cal: PipetteOffsetByPipetteMount,
+        fw_update_info: InstrumentFWInfo,
         pipette_id: Optional[str] = None,
     ) -> None:
         self._config = config
@@ -136,8 +137,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
 
         #: firmware update states
-        self._fw_version = 0
-        self._fw_update_required = False
+        self._fw_update_info = fw_update_info
 
     @property
     def config(self) -> PipetteConfigurations:
@@ -255,20 +255,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._pipette_id
 
     @property
-    def fw_version(self) -> int:
-        return self._fw_version
+    def fw_update_info(self) -> InstrumentFWInfo:
+        return self._fw_update_info
 
-    @fw_version.setter
-    def fw_version(self, value: int) -> None:
-        self._fw_version = value
-
-    @property
-    def fw_update_required(self) -> bool:
-        return self._fw_update_required
-
-    @fw_update_required.setter
-    def fw_update_required(self, value: bool) -> None:
-        self._fw_update_required = value
+    @fw_update_info.setter
+    def fw_update_info(self, value: InstrumentFWInfo) -> None:
+        self._fw_update_info = value
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """
@@ -506,8 +498,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "available_volume": self.available_volume,
                 "name": self.name,
                 "model": self.model,
-                "fw_version": self.fw_version,
-                "fw_update_required": self.fw_update_required,
                 "pipette_id": self.pipette_id,
                 "has_tip": self.has_tip,
                 "working_volume": self.working_volume,
@@ -520,6 +510,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,
+                "fw_update_required": self._fw_update_info.update_required,
+                "fw_current_version": self._fw_update_info.current_version,
+                "fw_next_version": self._fw_update_info.next_version,
             }
         )
         return self._config_as_dict
@@ -529,6 +522,7 @@ def _reload_and_check_skip(
     new_config: PipetteConfigurations,
     attached_instr: Pipette,
     pipette_offset: PipetteOffsetByPipetteMount,
+    fw_update_info: InstrumentFWInfo,
 ) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
@@ -550,11 +544,14 @@ def _reload_and_check_skip(
                 changed.add(k)
         if changed.intersection("quirks"):
             # Something has changed that requires reconfig
-            p = Pipette(new_config, pipette_offset, attached_instr._pipette_id)
+            p = Pipette(
+                new_config, pipette_offset, fw_update_info, attached_instr._pipette_id
+            )
             p.act_as(attached_instr.acting_as)
             return p, False
-        # Good to skip, just need to update calibration offset
+        # Good to skip, just need to update calibration offset and update_info
         attached_instr._pipette_offset = pipette_offset
+        attached_instr.fw_update_info = fw_update_info
         return attached_instr, True
 
 
@@ -564,6 +561,7 @@ def load_from_config_and_check_skip(
     requested: Optional[PipetteName],
     serial: Optional[str],
     pipette_offset: PipetteOffsetByPipetteMount,
+    fw_update_info: InstrumentFWInfo,
 ) -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
@@ -591,15 +589,19 @@ def load_from_config_and_check_skip(
                 # configured to the request
                 if requested == attached.acting_as:
                     # similar enough to check
-                    return _reload_and_check_skip(config, attached, pipette_offset)
+                    return _reload_and_check_skip(
+                        config, attached, pipette_offset, fw_update_info
+                    )
             else:
                 # if there is no request, make sure that the old pipette
                 # did not have backcompat applied
                 if attached.acting_as == attached.name:
                     # similar enough to check
-                    return _reload_and_check_skip(config, attached, pipette_offset)
+                    return _reload_and_check_skip(
+                        config, attached, pipette_offset, fw_update_info
+                    )
 
     if config:
-        return Pipette(config, pipette_offset, serial), False
+        return Pipette(config, pipette_offset, fw_update_info, serial), False
     else:
         return None, False

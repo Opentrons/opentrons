@@ -174,6 +174,8 @@ async def initialize() -> ThreadManagedHardware:
             await hardware.home_z()
 
         await hardware.set_lights(button=True)
+        # set hardware controller as ready to be used
+        hardware.done_initializing()
         return hardware
     finally:
         blink_task.cancel()

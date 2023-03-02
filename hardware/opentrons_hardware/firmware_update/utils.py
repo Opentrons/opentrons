@@ -222,17 +222,21 @@ def _update_types_from_devices(
 ) -> Iterator[Tuple[DeviceInfoCache, FirmwareUpdateType, str]]:
     for version_cache in devices:
         log.debug(f"Checking firmware update for {version_cache.node_id.name}")
+        # skip pipettes that dont have a PipetteType
+        node_id = version_cache.node_id
+        if node_id != NodeId.gripper and not attached_pipettes.get(node_id):
+            continue
         update_type, rev = _update_type_for_device(attached_pipettes, version_cache)
         if not rev or not update_type:
             continue
         yield (version_cache, update_type, rev)
 
 
-def _devices_with_force(
-    device_info: Dict[NodeId, DeviceInfoCache], force: Set[NodeId]
+def _devices_to_check(
+    device_info: Dict[NodeId, DeviceInfoCache], nodes: Set[NodeId]
 ) -> Iterator[DeviceInfoCache]:
     known_nodes = set(device_info.keys())
-    check_nodes = known_nodes.intersection(force) if force else known_nodes
+    check_nodes = known_nodes.intersection(nodes) if nodes else known_nodes
     return (device_info[node] for node in check_nodes)
 
 
@@ -271,12 +275,12 @@ def _update_info_for_type(
 
 
 def _update_files_from_types(
-    info: Iterable[Tuple[NodeId, Dict[str, str], str]]
-) -> Iterator[Tuple[NodeId, str]]:
-    for node, files_by_revision, revision in info:
+    info: Iterable[Tuple[NodeId, int, Dict[str, str], str]]
+) -> Iterator[Tuple[NodeId, int, str]]:
+    for node, next_version, files_by_revision, revision in info:
         # if we have a force set, we always update (we're only checking nodes in the force set anyway)
         try:
-            yield node, files_by_revision[revision]
+            yield node, next_version, files_by_revision[revision]
         except KeyError:
             log.error(f"No available firmware for revision {revision}")
 
@@ -285,31 +289,32 @@ def _info_for_required_updates(
     force: bool,
     known_firmware: Dict[FirmwareUpdateType, UpdateInfo],
     details: Iterable[Tuple[DeviceInfoCache, FirmwareUpdateType, str]],
-) -> Iterator[Tuple[NodeId, Dict[str, str], str]]:
+) -> Iterator[Tuple[NodeId, int, Dict[str, str], str]]:
     for version_cache, update_type, rev in details:
         update_info = _update_info_for_type(known_firmware, update_type)
         if not update_info:
             continue
         if _should_update(version_cache, update_info, force):
-            yield version_cache.node_id, update_info.files_by_revision, rev
+            yield version_cache.node_id, update_info.version, update_info.files_by_revision, rev
 
 
 def check_firmware_updates(
     device_info: Dict[NodeId, DeviceInfoCache],
     attached_pipettes: Dict[NodeId, PipetteType],
     nodes: Optional[Set[NodeId]] = None,
-) -> Dict[NodeId, str]:
+    force: bool = False,
+) -> Dict[NodeId, Tuple[int, str]]:
     """Returns a dict of NodeIds that require a firmware update and the path to the file to update them."""
-    forced_nodes = nodes or set()
+    nodes = nodes or set()
 
     known_firmware = load_firmware_manifest()
     if known_firmware is None:
         log.error("Could not load the known firmware.")
         return
-    devices_to_check = _devices_with_force(device_info, forced_nodes)
+    devices_to_check = _devices_to_check(device_info, nodes)
     update_types = _update_types_from_devices(attached_pipettes, devices_to_check)
-    update_info = _info_for_required_updates(
-        bool(forced_nodes), known_firmware, update_types
-    )
+    update_info = _info_for_required_updates(force, known_firmware, update_types)
     update_files = _update_files_from_types(update_info)
-    return {node: filepath for node, filepath in update_files}
+    return {
+        node: (next_version, filepath) for node, next_version, filepath in update_files
+    }

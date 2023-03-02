@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any, Dict, Mapping, cast
 import mock
 
 import pytest
@@ -282,7 +283,9 @@ async def test_cache_instruments_sim(sim_and_instr):
     sim = await sim_builder(attached_instruments=dummy_instruments)
     await sim.cache_instruments()
     attached = sim.attached_instruments
-    typeguard.check_type("after config", attached[types.Mount.LEFT], PipetteDict)
+    ot2_pipette_dict = cast(Dict[str, Any], PipetteDict)
+    for key_name in attached[types.Mount.LEFT]:
+        assert key_name in ot2_pipette_dict
 
     # If we specify conflicting expectations and init arguments we should
     # get a RuntimeError
