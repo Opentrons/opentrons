@@ -266,7 +266,7 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
     rather than built-in definitions if no explicit ``namespace`` is specified.
 
   - :py:meth:`.ProtocolContext.pause` will now properly wait until you resume the protocol before moving on.
-    In previous versions, the run will not pause until the first call to a different `ProtocolContext` method.
+    In previous versions, the run will not pause until the first call to a different ``ProtocolContext`` method.
 
   - Motion planning has been improved to avoid certain erroneous downward movements,
     especially when using :py:meth:`.InstrumentContext.aspirate`.
