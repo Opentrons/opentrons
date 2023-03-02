@@ -130,25 +130,8 @@ push-no-restart-ot3: sdist Pipfile.lock
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3 restart-ot3
 
-define move-directory-ot3
-ssh -i $(2) $(3) root@$(1) \
-"function cleanup () { mount -o remount,ro / ; } ;\
-mount -o remount,rw / &&\
-(rm -rf "$(6)/$(4)" || true) &&\
-mv "$(5)/$(4)" $(6) &&\
-ls "$(6)/$(4)" &&\
-cleanup"
-endef
-
-.PHONY: push-labware-definitions-ot3
-push-labware-definitions-ot3:
-	scp -r ./labware-definitions root@$(host):/data/testing_data
-
 .PHONY: push-all
 push-all: clean wheel push-no-restart push-plot-webpage
-
-.PHONY: push-all-ot3
-push-all-ot3: push-no-restart-ot3 push-labware-definitions-ot3
 
 .PHONY: term
 term:

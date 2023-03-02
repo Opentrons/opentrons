@@ -1,11 +1,8 @@
 """Gravimetric."""
 from dataclasses import dataclass
-import json
-from pathlib import Path
 from typing_extensions import Final
 
 from opentrons.protocol_api import ProtocolContext
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from hardware_testing.data import create_run_id_and_start_time
 
@@ -18,14 +15,12 @@ from .liquid_class.pipetting import (
     dispense_with_liquid_class,
     PipettingCallbacks,
 )
+from .radwag_pipette_calibration_file import VIAL_DEFINITION
 
 
-SLOT_VIAL = 4
-SLOT_TIPRACK = 7
 VIAL_SAFE_Z_OFFSET: Final = 10
-SCALE_SECONDS_TO_SETTLE: Final = 1
-DELAY_SECONDS_AFTER_ASPIRATE: Final = SCALE_SECONDS_TO_SETTLE
-DELAY_SECONDS_AFTER_DISPENSE: Final = SCALE_SECONDS_TO_SETTLE
+DELAY_SECONDS_AFTER_ASPIRATE: Final = 1
+DELAY_SECONDS_AFTER_DISPENSE: Final = 1
 
 
 @dataclass
@@ -33,28 +28,12 @@ class ExecuteGravConfig:
     """Execute Gravimetric Setup Config."""
 
     name: str
-    labware_dir: Path
     pipette_volume: int
     pipette_mount: str
     tip_volume: int
     trials: int
-
-
-# the custom labware file for the pipette-calibration glass-vial
-# NOTE: if running through the App, this custom labware definition
-#       must have already been saved to that App installation
-SCALE_JSON_FILENAME = "radwag_pipette_calibration_vial.json"
-
-
-def _load_radwag_vial_definition(directory: Path) -> LabwareDefinition:
-    # load custom labware definition from this file's directory
-    with open(directory / SCALE_JSON_FILENAME) as f:
-        # NOTE: b/c we are using the run() both inside and outside the App
-        #       this means we must support loading our custom labware in
-        #       both scenarios. So, because here we are outside the App,
-        #       we must load the labware definition from disk
-        radwag_vial_def = json.load(f)
-    return radwag_vial_def
+    slot_vial: int
+    slot_tiprack: int
 
 
 def _initialize_liquid_from_deck(ctx: ProtocolContext, lt: LiquidTracker) -> None:
@@ -88,17 +67,20 @@ def _generate_callbacks_for_trial(
 
 
 def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
+    if ctx.is_simulating():
+        get_input = print
+    else:
+        get_input = input
+
     """Setup."""
     run_id, start_time = create_run_id_and_start_time()
 
     # LOAD LABWARE
     tiprack = ctx.load_labware(
         f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
-        location=SLOT_TIPRACK,
+        location=cfg.slot_tiprack,
     )
-    vial = ctx.load_labware_from_definition(
-        _load_radwag_vial_definition(directory=cfg.labware_dir), location=SLOT_VIAL
-    )
+    vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_vial)
     # TODO: apply offsets from LPC
 
     # LIQUID TRACKING
@@ -134,16 +116,13 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     # USER SETUP LIQUIDS
     setup_str = liquid_tracker.get_setup_instructions_string()
     print(setup_str)
-    if ctx.is_simulating():
-        print("press ENTER when ready...")
-    else:
-        input("press ENTER when ready...")
+    get_input("press ENTER when ready...")
 
     # TEST VIAL LIQUID HEIGHT
     expected_height = liquid_tracker.get_liquid_height(vial["A1"])
     pipette.pick_up_tip()
     pipette.move_to(vial["A1"].bottom(expected_height))
-    ctx.pause("Check that tip is touching liquid surface (+/-) 0.1 mm")
+    get_input("Check that tip is touching liquid surface (+/-) 0.1 mm")
     pipette.drop_tip()
 
     try:
@@ -188,7 +167,8 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     finally:
         recorder.stop()
 
-    # TODO: - Isolate each aspirate/dispense sample
+    # TODO: - Read in recording from CSV file
+    #       - Isolate each aspirate/dispense sample
     #       - Calculate grams per each aspirate/dispense
-    #       - Calculate average and %CV
+    #       - Calculate uL Average and %CV
     #       - Print results

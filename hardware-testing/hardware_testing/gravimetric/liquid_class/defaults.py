@@ -6,6 +6,7 @@ from .definition import (
     AspirateSettings,
     DispenseSettings,
     AirGapSettings,
+    interpolate,
 )
 
 # dispense settings are constant across volumes
@@ -227,10 +228,28 @@ OT3_LIQUID_CLASS = {
 def get_liquid_class(
     pipette_volume: int, tip_volume: int, test_volume: int
 ) -> LiquidClassSettings:
-    """Get liquid class."""
     pip_classes = OT3_LIQUID_CLASS[pipette_volume]
     tip_classes = pip_classes[tip_volume]
-    return tip_classes[test_volume]
+    defined_volumes = list(tip_classes.keys())
+    defined_volumes.sort()
+    assert len(defined_volumes) == 3
+
+    def _get_interp_liq_class(lower: int, upper: int) -> LiquidClassSettings:
+        factor = (test_volume - lower) / (upper - lower)
+        return interpolate(
+            tip_classes[lower], tip_classes[upper], factor
+        )
+
+    if test_volume <= defined_volumes[0]:
+        return tip_classes[defined_volumes[0]]
+    elif test_volume < defined_volumes[1]:
+        return _get_interp_liq_class(defined_volumes[0], defined_volumes[1])
+    elif test_volume == defined_volumes[1]:
+        return tip_classes[defined_volumes[1]]
+    elif test_volume < defined_volumes[2]:
+        return _get_interp_liq_class(defined_volumes[1], defined_volumes[2])
+    else:
+        return tip_classes[defined_volumes[2]]
 
 
 def get_test_volumes(pipette_volume: int, tip_volume: int) -> List[float]:

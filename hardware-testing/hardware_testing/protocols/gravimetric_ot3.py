@@ -1,4 +1,4 @@
-"""OT3 P1000 Single Channel Gravimetric Test."""
+"""Gravimetric OT3."""
 import argparse
 from pathlib import Path
 
@@ -9,26 +9,21 @@ from hardware_testing.gravimetric import execute
 from hardware_testing.gravimetric import helpers
 
 
-metadata = {"apiLevel": "2.13", "protocolName": "ot3-p50-single-channel-gravimetric"}
-
-PIPETTE_VOLUME = 50
-TIP_VOLUME = 50
+metadata = {"apiLevel": "2.13", "protocolName": "gravimetric-ot3"}
 
 
-def _run(protocol: ProtocolContext) -> None:
-    if IS_ROBOT:
-        labware_dir = infer_config_base_dir() / "testing_data" / "labware-definitions"
-    else:
-        labware_dir = Path(__file__).parent.parent.parent / "labware-definitions"
+def run(protocol: ProtocolContext) -> None:
+    """Run."""
     execute.run(
         protocol,
         execute.ExecuteGravConfig(
             name=metadata["protocolName"],
-            pipette_volume=PIPETTE_VOLUME,
             pipette_mount="left",
-            tip_volume=TIP_VOLUME,
-            labware_dir=labware_dir,
+            pipette_volume=50,
+            tip_volume=50,
             trials=10,
+            slot_vial=4,
+            slot_tiprack=7,
         ),
     )
 
@@ -45,4 +40,4 @@ if __name__ == "__main__":
         pipette_left="p50_single_v3.3",
     )
     _ctx.home()
-    _run(_ctx)
+    run(_ctx)

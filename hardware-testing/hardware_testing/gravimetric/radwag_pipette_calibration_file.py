@@ -1,4 +1,6 @@
-{
+"""Vial definition."""
+
+VIAL_DEFINITION = {
   "ordering": [["A1"]],
   "brand": {
     "brand": "Radwag",
@@ -42,8 +44,8 @@
   "parameters": {
     "format": "irregular",
     "quirks": [],
-    "isTiprack": false,
-    "isMagneticModuleCompatible": false,
+    "isTiprack": False,
+    "isMagneticModuleCompatible": False,
     "loadName": "radwag_pipette_calibration_vial"
   },
   "namespace": "custom_beta",

@@ -41,3 +41,34 @@ class LiquidClassSettings:
 
     aspirate: AspirateSettings
     dispense: DispenseSettings
+
+
+def interpolate(a: LiquidClassSettings, b: LiquidClassSettings, factor: float) -> LiquidClassSettings:
+
+    def _interp(lower: float, upper: float) -> float:
+        return lower + ((upper - lower) * factor)
+
+    return LiquidClassSettings(
+        aspirate=AspirateSettings(
+            flow_rate=_interp(a.aspirate.flow_rate, b.aspirate.flow_rate),
+            delay=_interp(a.aspirate.delay, b.aspirate.delay),
+            submerge=_interp(a.aspirate.submerge, b.aspirate.submerge),
+            retract=_interp(a.aspirate.retract, b.aspirate.retract),
+            air_gap=AirGapSettings(
+                leading_air_gap=_interp(
+                    a.aspirate.air_gap.leading_air_gap,
+                    b.aspirate.air_gap.leading_air_gap),
+                trailing_air_gap=_interp(
+                    a.aspirate.air_gap.trailing_air_gap,
+                    b.aspirate.air_gap.trailing_air_gap),
+            ),
+        ),
+        dispense=DispenseSettings(
+            flow_rate=_interp(a.dispense.flow_rate, b.dispense.flow_rate),
+            delay=_interp(a.dispense.delay, b.dispense.delay),
+            submerge=_interp(a.dispense.submerge, b.dispense.submerge),
+            retract=_interp(a.dispense.retract, b.dispense.retract),
+            acceleration=_interp(a.dispense.acceleration, b.dispense.acceleration),
+            deceleration=_interp(a.dispense.deceleration, b.dispense.deceleration),
+        )
+    )
