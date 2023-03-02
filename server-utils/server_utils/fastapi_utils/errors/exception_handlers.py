@@ -14,7 +14,7 @@ from server_utils.fastapi_utils.versioning import (
     API_VERSION_HEADER,
     MIN_API_VERSION_HEADER,
 )
-from server_utils.fastapi_utils.constants import V1_TAG
+from robot_server.constants import V1_TAG
 from .global_errors import UnexpectedError, BadRequest, InvalidRequest
 
 from .error_responses import (
