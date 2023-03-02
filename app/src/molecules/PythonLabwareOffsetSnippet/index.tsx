@@ -23,9 +23,9 @@ const JsonTextArea = styled.textarea`
 `
 interface PythonLabwareOffsetSnippetProps {
   mode: 'jupyter' | 'cli'
-  commands: RunTimeCommand[],
-  labware: LoadedLabware[],
-  modules: LoadedModule[],
+  commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  modules: LoadedModule[]
   labwareOffsets: LabwareOffsetCreateData[] | null
 }
 
@@ -36,13 +36,9 @@ export function PythonLabwareOffsetSnippet(
   const [snippet, setSnippet] = React.useState<string | null>(null)
   React.useEffect(() => {
     if (labware.length > 0 && labwareOffsets != null) {
-      setSnippet(createSnippet(
-        mode,
-        commands,
-        labware,
-        modules,
-        labwareOffsets,
-      ))
+      setSnippet(
+        createSnippet(mode, commands, labware, modules, labwareOffsets)
+      )
     }
   }, [mode, JSON.stringify(labwareOffsets)])
 

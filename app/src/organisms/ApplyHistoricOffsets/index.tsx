@@ -22,7 +22,11 @@ import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { CheckboxField } from '../../atoms/CheckboxField'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
-import type { LoadedLabware, LoadedModule, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LoadedLabware,
+  LoadedModule,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -35,14 +39,21 @@ interface ApplyHistoricOffsetsProps {
   offsetCandidates: OffsetCandidate[]
   shouldApplyOffsets: boolean
   setShouldApplyOffsets: (shouldApplyOffsets: boolean) => void
-  commands: RunTimeCommand[],
-  labware: LoadedLabware[],
-  modules: LoadedModule[],
+  commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  modules: LoadedModule[]
 }
 export function ApplyHistoricOffsets(
   props: ApplyHistoricOffsetsProps
 ): JSX.Element {
-  const { offsetCandidates, shouldApplyOffsets, setShouldApplyOffsets, labware, modules, commands  } = props
+  const {
+    offsetCandidates,
+    shouldApplyOffsets,
+    setShouldApplyOffsets,
+    labware,
+    modules,
+    commands,
+  } = props
   const [showOffsetDataModal, setShowOffsetDataModal] = React.useState(false)
   const { t } = useTranslation('labware_position_check')
   const isLabwareOffsetCodeSnippetsOn = useSelector(
@@ -51,15 +62,19 @@ export function ApplyHistoricOffsets(
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={offsetCandidates.map(o => pick(o, ['definitionUri', 'vector', 'location']))}
-      {...{labware, modules, commands}}
+      labwareOffsets={offsetCandidates.map(o =>
+        pick(o, ['definitionUri', 'vector', 'location'])
+      )}
+      {...{ labware, modules, commands }}
     />
   )
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={offsetCandidates.map(o => pick(o, ['definitionUri', 'vector', 'location']))}
-      {...{labware, modules, commands}}
+      labwareOffsets={offsetCandidates.map(o =>
+        pick(o, ['definitionUri', 'vector', 'location'])
+      )}
+      {...{ labware, modules, commands }}
     />
   )
   return (

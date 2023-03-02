@@ -65,13 +65,7 @@ interface CurrentOffsetsModalProps {
 export function CurrentOffsetsModal(
   props: CurrentOffsetsModalProps
 ): JSX.Element {
-  const {
-    currentOffsets,
-    commands,
-    labware,
-    modules,
-    onCloseClick,
-  } = props
+  const { currentOffsets, commands, labware, modules, onCloseClick } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
@@ -116,7 +110,9 @@ export function CurrentOffsetsModal(
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={latestCurrentOffsets.map(o => pick(o, ['definitionUri', 'location', 'vector']))}
+      labwareOffsets={latestCurrentOffsets.map(o =>
+        pick(o, ['definitionUri', 'location', 'vector'])
+      )}
       commands={commands ?? []}
       labware={labware ?? []}
       modules={modules ?? []}
@@ -125,7 +121,9 @@ export function CurrentOffsetsModal(
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={latestCurrentOffsets.map(o => pick(o, ['definitionUri', 'location', 'vector']))}
+      labwareOffsets={latestCurrentOffsets.map(o =>
+        pick(o, ['definitionUri', 'location', 'vector'])
+      )}
       commands={commands ?? []}
       labware={labware ?? []}
       modules={modules ?? []}
