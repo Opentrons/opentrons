@@ -1,8 +1,6 @@
 """Opentrons API Workarounds."""
 from datetime import datetime
 from typing import Tuple, List, Dict
-import json
-from urllib.request import Request, urlopen
 import platform
 
 from opentrons.config import robot_configs

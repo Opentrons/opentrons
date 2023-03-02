@@ -228,6 +228,7 @@ OT3_LIQUID_CLASS = {
 def get_liquid_class(
     pipette_volume: int, tip_volume: int, test_volume: int
 ) -> LiquidClassSettings:
+    """Get liquid class."""
     pip_classes = OT3_LIQUID_CLASS[pipette_volume]
     tip_classes = pip_classes[tip_volume]
     defined_volumes = list(tip_classes.keys())
@@ -236,9 +237,7 @@ def get_liquid_class(
 
     def _get_interp_liq_class(lower: int, upper: int) -> LiquidClassSettings:
         factor = (test_volume - lower) / (upper - lower)
-        return interpolate(
-            tip_classes[lower], tip_classes[upper], factor
-        )
+        return interpolate(tip_classes[lower], tip_classes[upper], factor)
 
     if test_volume <= defined_volumes[0]:
         return tip_classes[defined_volumes[0]]
@@ -253,6 +252,7 @@ def get_liquid_class(
 
 
 def get_test_volumes(pipette_volume: int, tip_volume: int) -> List[float]:
+    """Get test volumes."""
     pip_classes = OT3_LIQUID_CLASS[pipette_volume]
     tip_classes = pip_classes[tip_volume]
     return list(tip_classes.keys())

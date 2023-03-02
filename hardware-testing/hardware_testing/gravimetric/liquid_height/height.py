@@ -5,7 +5,7 @@ import math
 from typing import List, Optional, Tuple
 
 from opentrons.protocol_api.labware import Well
-from opentrons.protocol_api import InstrumentContext
+from opentrons.protocol_api import ProtocolContext, InstrumentContext
 
 from hardware_testing.gravimetric.helpers import (
     well_is_reservoir,
@@ -339,3 +339,18 @@ class LiquidTracker:
                 after_dispense=actual_dispense_amount,
             )
         return
+
+
+def initialize_liquid_from_deck(ctx: ProtocolContext, lt: LiquidTracker) -> None:
+    """Initialize liquid from deck."""
+    # NOTE: For Corning 3631, assuming a perfect cylinder creates
+    #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
+    #       This means the software will think the liquid is
+    #       0.78mm lower than it is in reality. To make it more
+    #       accurate, give .init_liquid_height() a lookup table
+    lt.reset()
+    for lw in ctx.loaded_labwares.values():
+        if lw.is_tiprack or "trash" in lw.name.lower():
+            continue
+        for w in lw.wells():
+            lt.init_well_liquid_height(w)

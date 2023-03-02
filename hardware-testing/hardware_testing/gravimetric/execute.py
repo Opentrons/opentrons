@@ -5,9 +5,12 @@ from typing_extensions import Final
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import create_run_id_and_start_time
+from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from .helpers import get_pipette_unique_name
-from .liquid_height.height import LiquidTracker
+from .increments import get_volume_increments
+from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
 from .measure.weight import GravimetricRecorder, GravimetricRecorderConfig
 from .liquid_class.defaults import get_test_volumes
 from .liquid_class.pipetting import (
@@ -34,20 +37,7 @@ class ExecuteGravConfig:
     trials: int
     slot_vial: int
     slot_tiprack: int
-
-
-def _initialize_liquid_from_deck(ctx: ProtocolContext, lt: LiquidTracker) -> None:
-    # NOTE: For Corning 3631, assuming a perfect cylinder creates
-    #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
-    #       This means the software will think the liquid is
-    #       0.78mm lower than it is in reality. To make it more
-    #       accurate, give .init_liquid_height() a lookup table
-    lt.reset()
-    for lw in ctx.loaded_labwares.values():
-        if lw.is_tiprack or "trash" in lw.name.lower():
-            continue
-        for w in lw.wells():
-            lt.init_well_liquid_height(w)
+    increment: bool
 
 
 def _generate_callbacks_for_trial(
@@ -67,10 +57,11 @@ def _generate_callbacks_for_trial(
 
 
 def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
+    """Run."""
     if ctx.is_simulating():
         get_input = print
     else:
-        get_input = input
+        get_input = input  # type: ignore[assignment]
 
     """Setup."""
     run_id, start_time = create_run_id_and_start_time()
@@ -85,7 +76,7 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
 
     # LIQUID TRACKING
     liquid_tracker = LiquidTracker()
-    _initialize_liquid_from_deck(ctx, liquid_tracker)
+    initialize_liquid_from_deck(ctx, liquid_tracker)
     liquid_tracker.set_start_volume_from_liquid_height(
         vial["A1"], vial["A1"].depth - VIAL_SAFE_Z_OFFSET, name="Water"
     )
@@ -130,7 +121,15 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
         recorder.record(in_thread=True)
 
         # LOOP THROUGH SAMPLES
-        test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
+        if cfg.increment:
+            test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
+            clear_pipette_ul_per_mm(
+                ctx._core.get_hardware()._obj_to_adapt,  # type: ignore[arg-type]
+                OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
+            )
+        else:
+            test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
+        # TODO: if single channel and volume is <2uL, use low-volume scale
         for volume in test_volumes:
             for trial in range(cfg.trials):
                 print(f"{trial + 1}/{cfg.trials}: {volume} uL")

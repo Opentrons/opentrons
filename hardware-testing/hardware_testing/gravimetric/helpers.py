@@ -6,7 +6,6 @@ from typing import Any, List, Dict, Optional
 from opentrons import protocol_api
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.types import APIVersion
-from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.ot3api import OT3API
@@ -50,6 +49,8 @@ def get_api_context(
     gripper: Optional[str] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
 ) -> protocol_api.ProtocolContext:
+    """Get api context."""
+
     async def _thread_manager_build_hw_api(
         *args: Any, loop: asyncio.AbstractEventLoop, **kwargs: Any
     ) -> OT3API:

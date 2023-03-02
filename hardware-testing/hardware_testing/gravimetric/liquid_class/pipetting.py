@@ -58,6 +58,8 @@ def _create_pipetting_heights(
 
 @dataclass
 class PipettingCallbacks:
+    """Pipetting callbacks."""
+
     on_submerging: Optional[Callable]
     on_aspirating: Optional[Callable]
     on_dispensing: Optional[Callable]
@@ -77,7 +79,6 @@ def _pipette_with_liquid_settings(
     callbacks: Optional[PipettingCallbacks] = None,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
-
     # CALCULATE HEIGHTS
     height_before, height_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
@@ -85,7 +86,7 @@ def _pipette_with_liquid_settings(
     if aspirate:
         height_settings = liquid_class.aspirate
     else:
-        height_settings = liquid_class.dispense
+        height_settings = liquid_class.dispense  # type: ignore[assignment]
     pipetting_heights = _create_pipetting_heights(
         height_before, height_after, height_settings.submerge, height_settings.retract
     )
@@ -156,6 +157,7 @@ def aspirate_with_liquid_class(
     liquid_tracker: LiquidTracker,
     callbacks: Optional[PipettingCallbacks] = None,
 ) -> None:
+    """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
         int(pipette.max_volume), tip_volume, int(aspirate_volume)
     )
@@ -184,6 +186,7 @@ def dispense_with_liquid_class(
     liquid_tracker: LiquidTracker,
     callbacks: Optional[PipettingCallbacks] = None,
 ) -> None:
+    """Dispense with liquid class."""
     liquid_class = get_liquid_class(
         int(pipette.max_volume), tip_volume, int(dispense_volume)
     )

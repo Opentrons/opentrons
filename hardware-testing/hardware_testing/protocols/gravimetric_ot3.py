@@ -1,9 +1,7 @@
 """Gravimetric OT3."""
 import argparse
-from pathlib import Path
 
 from opentrons.protocol_api import ProtocolContext
-from opentrons.config import infer_config_base_dir, IS_ROBOT
 
 from hardware_testing.gravimetric import execute
 from hardware_testing.gravimetric import helpers
@@ -19,11 +17,12 @@ def run(protocol: ProtocolContext) -> None:
         execute.ExecuteGravConfig(
             name=metadata["protocolName"],
             pipette_mount="left",
-            pipette_volume=50,
+            pipette_volume=1000,
             tip_volume=50,
-            trials=10,
+            trials=3,
             slot_vial=4,
             slot_tiprack=7,
+            increment=True,
         ),
     )
 
@@ -37,7 +36,7 @@ if __name__ == "__main__":
     _ctx = helpers.get_api_context(
         metadata["apiLevel"],
         is_simulating=args.simulate,
-        pipette_left="p50_single_v3.3",
+        pipette_left="p1000_single_v3.3",
     )
     _ctx.home()
     run(_ctx)

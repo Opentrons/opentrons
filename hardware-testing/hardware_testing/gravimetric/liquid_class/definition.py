@@ -43,7 +43,10 @@ class LiquidClassSettings:
     dispense: DispenseSettings
 
 
-def interpolate(a: LiquidClassSettings, b: LiquidClassSettings, factor: float) -> LiquidClassSettings:
+def interpolate(
+    a: LiquidClassSettings, b: LiquidClassSettings, factor: float
+) -> LiquidClassSettings:
+    """Interpolate."""
 
     def _interp(lower: float, upper: float) -> float:
         return lower + ((upper - lower) * factor)
@@ -57,10 +60,12 @@ def interpolate(a: LiquidClassSettings, b: LiquidClassSettings, factor: float) -
             air_gap=AirGapSettings(
                 leading_air_gap=_interp(
                     a.aspirate.air_gap.leading_air_gap,
-                    b.aspirate.air_gap.leading_air_gap),
+                    b.aspirate.air_gap.leading_air_gap,
+                ),
                 trailing_air_gap=_interp(
                     a.aspirate.air_gap.trailing_air_gap,
-                    b.aspirate.air_gap.trailing_air_gap),
+                    b.aspirate.air_gap.trailing_air_gap,
+                ),
             ),
         ),
         dispense=DispenseSettings(
@@ -70,5 +75,5 @@ def interpolate(a: LiquidClassSettings, b: LiquidClassSettings, factor: float) -
             retract=_interp(a.dispense.retract, b.dispense.retract),
             acceleration=_interp(a.dispense.acceleration, b.dispense.acceleration),
             deceleration=_interp(a.dispense.deceleration, b.dispense.deceleration),
-        )
+        ),
     )

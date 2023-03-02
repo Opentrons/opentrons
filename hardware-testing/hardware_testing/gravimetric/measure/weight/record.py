@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from statistics import stdev
 from threading import Thread, Event
 from time import sleep, time
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Generator
 
 from hardware_testing.data import (
     dump_data_to_file,
@@ -317,12 +317,12 @@ class GravimetricRecorder:
         self._cfg.duration = duration
 
     @contextmanager
-    def samples_of_tag(self, tag: str) -> None:
+    def samples_of_tag(self, tag: str) -> Generator:
         """Set the sample tag."""
         prev = str(self._sample_tag)
         self._sample_tag = tag
         try:
-            yield
+            yield  # type: ignore[misc]
         finally:
             self._sample_tag = prev
 
