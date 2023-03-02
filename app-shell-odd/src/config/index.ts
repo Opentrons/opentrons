@@ -22,6 +22,7 @@ import type { Config, Overrides } from './types'
 
 export * from './types'
 
+// Note (kj:03/02/2023) this file path will be updated when the embed team cleans up
 const BRIGHTNESS_FILE =
   '/sys/class/backlight/backlight/device/backlight/backlight/brightness'
 
@@ -77,9 +78,9 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
           getFullConfig()
         )
 
-        // change brightness
+        // Note (kj:03/02/2023)  this is to change brightness
         if (path === 'onDeviceDisplaySettings.brightness') {
-          fs.writeFile(BRIGHTNESS_FILE, String(nextValue))
+          fs.writeFile(BRIGHTNESS_FILE, String(nextValue), 'ascii')
             .then(() => fs.readFile(BRIGHTNESS_FILE))
             .then(data => {
               log().debug('Change display brightness', { nextValue })
