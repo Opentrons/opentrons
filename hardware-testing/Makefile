@@ -73,8 +73,9 @@ test-cov:
 
 .PHONY: test-integration
 test-integration:
-	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
+	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) protocols/ot2_p300_single_channel_gravimetric.py --simulate
+	$(python) -m hardware_testing.examples.test_report
 	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
 	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
 	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
@@ -165,11 +166,11 @@ push-all-and-term: push-all term
 .PHONY: pull-data-ot3
 pull-data-ot3:
 	mkdir -p "./.pulled-data"
-	scp -r "root@$(host):/home/root/.opentrons/testing_data/$(test)" "./.pulled-data"
+	scp -r "root@$(host):/data/testing_data/$(test)" "./.pulled-data"
 
 define delete-test-data-cmd
 ssh -i $(2) $(3) root@$(1) \
-"rm -rf /home/root/.opentrons/testing_data/$(4)"
+"rm -rf /data/testing_data/$(4)"
 endef
 
 .PHONY: delete-data-ot3

@@ -16,10 +16,10 @@ export const FLOWS = {
 }
 export const CALIBRATION_PROBE_DISPLAY_NAME = 'Calibration Probe'
 export const HEX_SCREWDRIVER_DISPLAY_NAME = '2.5 mm Hex Screwdriver'
-export const PIPETTE_DISPLAY_NAME = 'GEN3 Pipette'
-export const NINETY_SIX_CHANNEL_DISPLAY_NAME = '96 Channel Pipette'
+export const PIPETTE_DISPLAY_NAME = '1- or 8-Channel Pipette'
+export const NINETY_SIX_CHANNEL_DISPLAY_NAME = '96-Channel Pipette'
 export const NINETY_SIX_CHANNEL_MOUNTING_PLATE_DISPLAY_NAME =
-  '96 Channel Mounting Plate'
+  '96-Channel Mounting Plate'
 
 //  required equipment list
 export const CALIBRATION_PROBE = {

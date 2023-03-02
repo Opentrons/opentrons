@@ -28,6 +28,7 @@ import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
+import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { UploadInput } from './UploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
@@ -53,7 +54,18 @@ interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
-  const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
+  const [
+    showImportProtocolSlideout,
+    setShowImportProtocolSlideout,
+  ] = React.useState<boolean>(false)
+  const [
+    showChooseRobotToRunProtocolSlideout,
+    setShowChooseRobotToRunProtocolSlideout,
+  ] = React.useState<boolean>(false)
+  const [
+    showSendProtocolToOT3Slideout,
+    setShowSendProtocolToOT3Slideout,
+  ] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
@@ -97,14 +109,33 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     },
   }
 
+  const handleRunProtocol = (storedProtocol: StoredProtocolData): void => {
+    setSelectedProtocol(storedProtocol)
+    setShowChooseRobotToRunProtocolSlideout(true)
+  }
+
+  const handleSendProtocolToOT3 = (
+    storedProtocol: StoredProtocolData
+  ): void => {
+    setSelectedProtocol(storedProtocol)
+    setShowSendProtocolToOT3Slideout(true)
+  }
+
   return (
     <Box padding={SPACING.spacing4}>
       {selectedProtocol != null ? (
-        <ChooseRobotToRunProtocolSlideout
-          onCloseClick={() => setSelectedProtocol(null)}
-          showSlideout={selectedProtocol != null}
-          storedProtocolData={selectedProtocol}
-        />
+        <>
+          <ChooseRobotToRunProtocolSlideout
+            onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
+            showSlideout={showChooseRobotToRunProtocolSlideout}
+            storedProtocolData={selectedProtocol}
+          />
+          <SendProtocolToOT3Slideout
+            isExpanded={showSendProtocolToOT3Slideout}
+            onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
+            storedProtocolData={selectedProtocol}
+          />
+        </>
       ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
@@ -182,7 +213,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               backgroundColor={COLORS.transparent}
             />
           ) : null}
-          <SecondaryButton onClick={() => setShowSlideout(true)}>
+          <SecondaryButton onClick={() => setShowImportProtocolSlideout(true)}>
             {t('import')}
           </SecondaryButton>
         </Flex>
@@ -195,19 +226,20 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         {sortedStoredProtocols.map(storedProtocol => (
           <ProtocolCard
             key={storedProtocol.protocolKey}
-            handleRunProtocol={() => setSelectedProtocol(storedProtocol)}
-            {...storedProtocol}
+            handleRunProtocol={handleRunProtocol}
+            handleSendProtocolToOT3={handleSendProtocolToOT3}
+            storedProtocolData={storedProtocol}
           />
         ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout
         title={t('import_new_protocol')}
-        isExpanded={showSlideout}
-        onCloseClick={() => setShowSlideout(false)}
+        isExpanded={showImportProtocolSlideout}
+        onCloseClick={() => setShowImportProtocolSlideout(false)}
       >
         <Box marginTop={SPACING.spacing4}>
-          <UploadInput onUpload={() => setShowSlideout(false)} />
+          <UploadInput onUpload={() => setShowImportProtocolSlideout(false)} />
         </Box>
       </Slideout>
     </Box>

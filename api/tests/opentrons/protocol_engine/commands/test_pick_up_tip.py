@@ -2,10 +2,11 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.types import MountType
+from opentrons.types import MountType, Point
 
 from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
-from opentrons.protocol_engine.state import StateView, TipGeometry
+from opentrons.protocol_engine.types import TipGeometry
+from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 
 from opentrons.protocol_engine.commands.pick_up_tip import (
@@ -57,7 +58,7 @@ async def test_pick_up_tip_implementation(
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
-    ).then_return(DeckPoint(x=111, y=222, z=333))
+    ).then_return(Point(x=111, y=222, z=333))
 
     decoy.when(
         await mock_tip_handler.pick_up_tip(
@@ -65,7 +66,7 @@ async def test_pick_up_tip_implementation(
             labware_id="labware-id",
             well_name="A3",
         )
-    ).then_return(TipGeometry(effective_length=42, diameter=5, volume=300))
+    ).then_return(TipGeometry(length=42, diameter=5, volume=300))
 
     result = await subject.execute(
         PickUpTipParams(
@@ -79,5 +80,6 @@ async def test_pick_up_tip_implementation(
     assert result == PickUpTipResult(
         tipLength=42,
         tipVolume=300,
+        tipDiameter=5,
         position=DeckPoint(x=111, y=222, z=333),
     )

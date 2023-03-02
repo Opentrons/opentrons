@@ -143,6 +143,7 @@ class LegacyCommandMapper:
                         update={
                             "result": pe_commands.PickUpTipResult.construct(
                                 tipVolume=command["payload"]["location"].max_volume,  # type: ignore[typeddict-item]
+                                tipLength=command["payload"]["instrument"].hw_pipette["tip_length"],  # type: ignore[typeddict-item]
                                 position=pe_types.DeckPoint(x=0, y=0, z=0),
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
@@ -571,10 +572,9 @@ class LegacyCommandMapper:
         )
         pipette_config_action = pe_actions.AddPipetteConfigAction(
             pipette_id=pipette_id,
-            serial_number=instrument_load_info.serial_number,
+            serial_number=instrument_load_info.pipette_dict["pipette_id"],
             config=pipette_data_provider.get_pipette_static_config(
-                model=instrument_load_info.model,
-                serial_number=instrument_load_info.serial_number,
+                instrument_load_info.pipette_dict
             ),
         )
 

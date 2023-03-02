@@ -154,6 +154,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
         result=commands.PickUpTipResult(
             tipVolume=300.0,
             tipLength=59.3,
+            tipDiameter=5.23,
             position=DeckPoint(x=14.38, y=74.24, z=64.69),
         ),
     )
@@ -211,7 +212,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
 
@@ -269,7 +270,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
 

@@ -4,7 +4,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { getIs96ChannelPipetteAttached } from '../../../organisms/Devices/utils'
 import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import {
   mockAttachedGen3Pipette,
   mockGen3P1000PipetteSpecs,
@@ -37,7 +36,6 @@ const mockGetIs96ChannelPipetteAttached = getIs96ChannelPipetteAttached as jest.
 const mockChoosePipette = ChoosePipette as jest.MockedFunction<
   typeof ChoosePipette
 >
-const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 
 const render = () => {
   return renderWithProviders(
@@ -54,7 +52,6 @@ const mockPipette: AttachedPipette = {
 }
 describe('AttachInstrumentsDashboard', () => {
   beforeEach(() => {
-    mockNavigation.mockReturnValue(<div>mock Navigation</div>)
     mockChoosePipette.mockReturnValue(<div>mock choose pipette</div>)
     mockGetIs96ChannelPipetteAttached.mockReturnValue(false)
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
@@ -63,10 +60,6 @@ describe('AttachInstrumentsDashboard', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
-  })
-  it('should render the navigation', () => {
-    const [{ getByText }] = render()
-    getByText('mock Navigation')
   })
   it('should render attach pipette for both mounts when gantry is empty, clicking on btn renders choose pipette', () => {
     const [{ getByText }] = render()

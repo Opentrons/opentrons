@@ -85,4 +85,5 @@ export interface PipetteWizardStepProps {
   errorMessage: string | null
   robotName: string
   selectedPipette: SelectablePipettes
+  isOnDevice: boolean | null
 }
