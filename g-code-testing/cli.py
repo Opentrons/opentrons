@@ -1,6 +1,7 @@
 """Command Line Interface for making use of G-Code Parsing Commands."""
 from __future__ import annotations
 import asyncio
+from functools import partial
 import os
 import sys
 import re
@@ -267,7 +268,7 @@ class GCodeCLI:
     # run_commands to allow for validation that get_runnable_commands is returning the
     # correct commands. Tests for this are in test_cli.py
 
-    def get_runnable_commands(self) -> List[Callable]:
+    def get_runnable_commands(self, is_async: bool = True) -> List[Callable]:
         """Run command and return it's output."""
         passed_command_name = self.args[self.COMMAND_KEY]
 
@@ -296,8 +297,13 @@ class GCodeCLI:
 
             return f2
 
+        if is_async:
+            return [
+                async_partial(self._get_command_func(passed_command_name), run_config)
+                for run_config in runnable_configurations
+            ]
         return [
-            async_partial(self._get_command_func(passed_command_name), run_config)
+            partial(self._get_command_func(passed_command_name), run_config)
             for run_config in runnable_configurations
         ]
 
