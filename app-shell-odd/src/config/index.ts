@@ -4,6 +4,7 @@ import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
+import fs from 'fs-extra'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
@@ -20,6 +21,9 @@ import type { Action, Dispatch, Logger } from '../types'
 import type { Config, Overrides } from './types'
 
 export * from './types'
+
+const BRIGHTNESS_FILE =
+  '/sys/class/backlight/backlight/device/backlight/backlight/brightness'
 
 // make sure all arguments are included in production
 const argv = process.argv0.endsWith('defaultApp')
@@ -72,6 +76,18 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
           action as ConfigValueChangeAction,
           getFullConfig()
         )
+
+        // change brightness
+        if (path === 'onDeviceDisplaySettings.brightness') {
+          fs.outputFile(BRIGHTNESS_FILE, String(nextValue))
+            .then(() => fs.readFile(BRIGHTNESS_FILE, 'utf8'))
+            .then(data => {
+              log().debug('Change display brightness', { nextValue })
+            })
+            .catch(err => {
+              console.error(err)
+            })
+        }
 
         log().debug('Updating config', { path, nextValue })
         store().set(path, nextValue)
