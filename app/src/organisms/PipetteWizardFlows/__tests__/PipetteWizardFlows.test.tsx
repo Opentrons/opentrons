@@ -545,7 +545,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Detach P1000 Single-Channel GEN3 and Attach 96-Channel Pipette')
+    getByText('Detach Flex 1-Channel 1000 μL and Attach 96-Channel Pipette')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })

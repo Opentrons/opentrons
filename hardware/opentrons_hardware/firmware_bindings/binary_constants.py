@@ -16,3 +16,5 @@ class BinaryMessageId(int, Enum):
     ack_failed = 0x02
     device_info_request = 0x03
     device_info_response = 0x04
+    enter_bootloader_request = 0x05
+    enter_bootloader_response = 0x06

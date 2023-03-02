@@ -6,7 +6,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
@@ -157,8 +157,7 @@ def test_load_instrument(
             InstrumentLoadInfo(
                 instrument_load_name="p300_single",
                 mount=Mount.RIGHT,
-                model=PipetteModel("cool-model"),
-                serial_number="cool-serial-number",
+                pipette_dict=pipette_dict,
             )
         ),
     )
