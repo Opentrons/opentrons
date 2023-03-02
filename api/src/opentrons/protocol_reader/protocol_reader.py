@@ -140,7 +140,7 @@ class ProtocolReader:
         )
 
         main_file = role_analysis.main_file.original_file.path
-        content_hash = self._file_hasher.hash(buffered_files)
+        content_hash = await self._file_hasher.hash(buffered_files)
 
         output_files = [
             ProtocolSourceFile(path=f.original_file.path, role=self._map_file_role(f))  # type: ignore[arg-type]

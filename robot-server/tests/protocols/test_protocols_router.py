@@ -323,6 +323,7 @@ async def test_create_protocol(
         await protocol_reader.save(
             files=[buffered_file],
             directory=protocol_directory / "protocol-id",
+            content_hash=matchers.Anything(),
         )
     ).then_return(protocol_source)
 
@@ -388,6 +389,7 @@ async def test_create_protocol_not_readable(
         await protocol_reader.save(
             directory=matchers.Anything(),
             files=matchers.Anything(),
+            content_hash=matchers.Anything(),
         )
     ).then_raise(ProtocolFilesInvalidError("oh no"))
 
@@ -421,6 +423,7 @@ async def test_create_protocol_different_robot_type(
         await protocol_reader.save(
             directory=matchers.Anything(),
             files=matchers.Anything(),
+            content_hash=matchers.Anything(),
         )
     ).then_return(
         ProtocolSource(

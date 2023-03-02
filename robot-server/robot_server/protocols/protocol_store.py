@@ -199,7 +199,7 @@ class ProtocolStore:
             for r in all_sql_resources
         ]
 
-    def get_id_by_hash(self, hash) -> Optional[str]:
+    def get_id_by_hash(self, hash: str) -> Optional[str]:
         """Get all protocol hashes keyed by protocol id."""
         try:
             p_source = next(p for p in self.get_all() if p.source.content_hash == hash)

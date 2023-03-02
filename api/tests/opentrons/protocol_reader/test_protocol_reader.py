@@ -89,7 +89,6 @@ async def test_save(
     role_analyzer: RoleAnalyzer,
     file_format_validator: FileFormatValidator,
     subject: ProtocolReader,
-    file_hasher: FileHasher,
 ) -> None:
     """It should compute a single file protocol source."""
     buffered_main_file = BufferedFile(
@@ -133,15 +132,10 @@ async def test_save(
         role_analysis
     )
 
-    decoy.when(
-        file_hasher.hash(
-            [buffered_main_file, buffered_labware_file, buffered_data_file]
-        )
-    ).then_return("abc123")
-
     result = await subject.save(
         files=[buffered_main_file, buffered_labware_file, buffered_data_file],
         directory=tmp_path,
+        content_hash="abc123",
     )
 
     assert result == ProtocolSource(
@@ -245,7 +239,7 @@ async def test_read_saved(
         role_analysis
     )
     decoy.when(
-        file_hasher.hash(
+        await file_hasher.hash(
             [buffered_main_file, buffered_labware_file, buffered_data_file]
         )
     ).then_return("abc123")
