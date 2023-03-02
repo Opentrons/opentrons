@@ -75,7 +75,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   ) {
     countOfTotalText = ` ${lastRunCommandIndex + 1}/${analysisCommands.length}`
   } else if (analysis == null) {
-    countOfTotalText = '?/?'
+    countOfTotalText = ''
   }
 
   let currentStepContents: React.ReactNode = null
@@ -158,7 +158,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           `}
           innerStyles={css`
             height: 0.375rem;
-            background-color: ${COLORS.darkBlackEnabled};
+            background-color: ${COLORS.darkGreyEnabled};
             border-radius: ${BORDERS.radiusSoftCorners};
           `}
         >
