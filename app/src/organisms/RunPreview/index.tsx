@@ -80,7 +80,7 @@ export const RunPreviewComponent = (
           if (currentRunCommandIndex >= 0) {
             setIsCurrentCommandVisible(
               currentRunCommandIndex >= lowestVisibleIndex &&
-              currentRunCommandIndex <= highestVisibleIndex
+                currentRunCommandIndex <= highestVisibleIndex
             )
           }
         }}
@@ -111,8 +111,9 @@ export const RunPreviewComponent = (
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing2}
                 width="100%"
-                border={`solid 1px ${index === jumpedIndex ? COLORS.warningEnabled : borderColor
-                  }`}
+                border={`solid 1px ${
+                  index === jumpedIndex ? COLORS.warningEnabled : borderColor
+                }`}
                 backgroundColor={
                   index === jumpedIndex
                     ? COLORS.warningBackgroundLight
