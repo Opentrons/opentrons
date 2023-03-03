@@ -573,9 +573,6 @@ async def run(args: argparse.Namespace) -> None:
             position.update({OT3Axis.Z_L.name: position[OT3Axis.Z_L.name] + pick_up_distance})
             # position[OT3Axis.Z_L.name] = position[OT3Axis.Z_L.name] + pick_up_distance
             await asyncio.sleep(delay)
-            await set_current(messenger, 1.4, NodeId.head_l)
-            await home_z.run(can_messenger = messenger)
-            position.update({OT3Axis.Z_L.name: 0})
             if press:
                 slower_speed = 1
                 await set_current(messenger, 1.5, NodeId.head_l)
@@ -588,6 +585,9 @@ async def run(args: argparse.Namespace) -> None:
                 await move_z_axis(5+2, slower_speed).run(can_messenger = messenger)
                 position[OT3Axis.Z_L.name] = position[OT3Axis.Z_L.name] + pick_up_distance
                 await asyncio.sleep(delay)
+            await set_current(messenger, 1.4, NodeId.head_l)
+            await home_z.run(can_messenger = messenger)
+            position.update({OT3Axis.Z_L.name: 0})
             if t <= 1:
                 measure_loc = await _jog_axis(messenger, position)
                 position.update(measure_loc)
