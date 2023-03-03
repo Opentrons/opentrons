@@ -93,10 +93,7 @@ export function createSnippet(
         ...moduleVariableById,
         [command.result.moduleId]: moduleVariable,
       }
-      const module = modules.find(
-        module => module.id === command.result?.moduleId
-      )
-      const model = module?.model
+      const { model } = command.params
       const { slotName } = command.params.location
       addendum = [
         `${moduleVariable} = protocol.load_module("${String(

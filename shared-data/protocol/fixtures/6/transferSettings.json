@@ -4581,6 +4581,7 @@
       "commandType": "loadModule",
       "params": {
         "moduleId": "3e012450-3412-11eb-ad93-ed232a2337cf:magneticModuleType",
+        "model": "magneticModuleV2",
         "location": {
           "slotName": "1"
         }
@@ -4593,6 +4594,7 @@
       "id": "3",
       "commandType": "loadModule",
       "params": {
+        "model": "temperatureModuleV2",
         "moduleId": "3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType",
         "location": {
           "slotName": "3"
@@ -4607,6 +4609,7 @@
       "commandType": "loadModule",
       "params": {
         "moduleId": "3e039550-3412-11eb-ad93-ed232a2337cf:thermocyclerModuleType",
+        "model": "thermocyclerModuleV1",
         "location": {
           "slotName": "7"
         }
