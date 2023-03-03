@@ -6,6 +6,7 @@ from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
 
 from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
+from hardware_testing.opentrons_api.types import OT3Mount
 
 from .definition import LiquidClassSettings
 from .defaults import get_liquid_class
@@ -112,6 +113,7 @@ def _pipette_with_liquid_settings(
         assert dispense is not None and dispense > 0
     pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
     pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
+    pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate  # use dispense flow-rate
 
     # CALCULATE HEIGHTS
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
@@ -130,10 +132,10 @@ def _pipette_with_liquid_settings(
     # APPROACH
     pipette.move_to(well.bottom(approach_mm))
 
-    if aspirate:
-        # LEADING AIR-GAP
-        pipette.aspirate(liquid_class.aspirate.air_gap.leading_air_gap)
-    else:
+    # if aspirate:
+    #     # LEADING AIR-GAP
+    #     pipette.aspirate(liquid_class.aspirate.air_gap.leading_air_gap)
+    if dispense:
         # TRAILING AIR-GAP
         pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
 
@@ -155,7 +157,10 @@ def _pipette_with_liquid_settings(
         pipette.aspirate(aspirate)
     else:
         callbacks.on_dispensing()
-        pipette.dispense()  # includes air from leading air-gap
+        hw_api = ctx._core.get_hardware()
+        hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+        hw_api.blow_out(hw_mount, liquid_class.aspirate.air_gap.leading_air_gap)
+        # pipette.dispense()  # includes air from leading air-gap
     liquid_tracker.update_affected_wells(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
