@@ -1,5 +1,6 @@
 """Instruments routes."""
-from typing import Optional, List, Dict, cast
+from datetime import datetime
+from typing import Optional, List, Dict
 
 from fastapi import APIRouter, status, Depends, Query
 from typing_extensions import Literal
@@ -12,8 +13,7 @@ from robot_server.service.json_api import (
     PydanticResponse,
     MultiBodyMeta,
     RequestModel,
-    EmptyBody,
-    ResourceLink,
+    SimpleBody,
 )
 
 from opentrons.types import Mount
@@ -31,15 +31,18 @@ from .instrument_models import (
     Gripper,
     AttachedInstrument,
     GripperCalibrationData,
-    UpdateRequestModel,
-    UpdateProgressStatus,
-    MountTypesStr,
-    UpdateStatusLink,
+    UpdateCreate,
+    UpdateProgressData,
 )
-from ..errors import ErrorDetails
+from .update_status_monitor import UpdateProgressMonitor
+from ..errors import ErrorDetails, ErrorBody
+from ..runs.dependencies import get_update_progress_monitor
+from ..service.dependencies import get_unique_id, get_current_time
 
 instruments_router = APIRouter()
 
+
+update_ids: List[str]
 
 class InstrumentNotFound(ErrorDetails):
     """An error if no instrument is found on the given mount."""
@@ -68,6 +71,13 @@ class NotSupportedOnOT2(ErrorDetails):
 
     id: Literal["NotSupportedOnOT2"] = "NotSupportedOnOT2"
     title: str = "Cannot update OT2 instruments' firmware."
+
+
+class InvalidUpdateId(ErrorDetails):
+    """And error raised if trying to fetch a non-existent update process' status."""
+
+    id: Literal["InvalidUpdateId"] = "InvalidUpdateId"
+    title: str = "No such update ID found."
 
 
 def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pipette:
@@ -165,18 +175,26 @@ async def get_attached_instruments(
     )
 
 
-@instruments_router.put(
-    path="/instruments/update",
+@instruments_router.post(
+    path="/instruments/updates",
     summary="Initiate a firmware update on a specific instrument.",
     description="Update the firmware of the instrument attached to the specified mount"
-    " if a firmware update is available for it. If no instrument is"
-    " specified, attempts to update all attached instruments.",
-    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedInstrument]}},
+    " if a firmware update is available for it.",
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_201_CREATED: {"model": SimpleBody[AttachedInstrument]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[InstrumentNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[UpdateInProgress]},
+        status.HTTP_412_PRECONDITION_FAILED: {"model": ErrorBody[NoUpdateAvailable]},
+    },
 )
 async def update_firmware(
-    request_body: RequestModel[Optional[UpdateRequestModel]],
+    request_body: RequestModel[UpdateCreate],
+    update_progress_monitor: UpdateProgressMonitor = Depends(get_update_progress_monitor),
+    update_process_id: str = Depends(get_unique_id),
+    created_at: datetime = Depends(get_current_time),
     hardware: HardwareControlAPI = Depends(get_hardware),
-) -> PydanticResponse[EmptyBody[UpdateStatusLink]]:
+) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     """Update the firmware of the OT3 instrument on the specified mount.
 
     Arguments:
@@ -191,68 +209,56 @@ async def update_firmware(
             status.HTTP_403_FORBIDDEN
         ) from e
 
-    # TODO: Check that there isn't already an update in progress
-    
-    requested_mount = request_body.data
-    mount_to_update = (
-        MountType.to_ot3_mount(requested_mount.mount)
-        if requested_mount is not None
-        else None
-    )
-    # TODO: Check that there's an instrument attached on the mount
+    mount_to_update = request_body.data.mount
+    ot3_mount = MountType.to_ot3_mount(mount_to_update)
 
-    # TODO: Check that there's actually an update available for this mount
-    #  else throw `NoUpdateAvailable` error. The hardware controller skips the update
-    #  if the instrument is already up-to-date. So a wrong mount could end up
-    #  confusing a client since there won't be any clear indication that it's wrong.
+    await hardware.cache_instruments()
+    attached_instrument = ot3_hardware.get_all_attached_instr()[ot3_mount]
+    if attached_instrument is None:
+        raise InstrumentNotFound(
+            detail=f"No instrument found on {mount_to_update} mount."
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
+    if ot3_hardware.get_firmware_update_progress()[ot3_mount]:
+        raise UpdateInProgress(
+            detail=f"{mount_to_update} is already either queued for update"
+                   f" or is currently updating").as_error(status.HTTP_409_CONFLICT)
 
-    await ot3_hardware.update_instrument_firmware(
-        mounts={mount_to_update} if mount_to_update else None
+    # The hardware controller skips the update if the instrument is already up-to-date.
+    # So a wrong mount could end up confusing a client since there won't be any
+    # clear indication that it's wrong.
+    if not attached_instrument["fw_update_required"]:
+        raise NoUpdateAvailable(
+            detail=f"There is no update available for mount {mount_to_update}"
+        ).as_error(status.HTTP_412_PRECONDITION_FAILED)
+
+    await ot3_hardware.update_instrument_firmware(mount=ot3_mount)
+
+    update_response = update_progress_monitor.create(
+        update_id=update_process_id,
+        created_at=created_at,
+        mount=mount_to_update
     )
 
     return await PydanticResponse.create(
-        content=EmptyBody.construct(
-            links=UpdateStatusLink(
-                updateStatus=ResourceLink.construct(href="/instruments/update/status")
-            )
-        )
+        content=SimpleBody.construct(data=update_response),
+        status_code=status.HTTP_201_CREATED,
     )
 
 
 @instruments_router.get(
-    path="/instruments/update/status",
-    summary="Get firmware update status of all attached instruments.",
-    description="Get firmware update status of all attached instruments. "
-    "Shows update progress if instrument is being updated.",
-    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressStatus]}},
+    path="/instruments/updates/{update_id}",
+    summary="Get specified firmware update process' information.",
+    description="Get firmware update status & progress of the specified update.",
+    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}},
 )
 async def get_firmware_update_status(
-    hardware: HardwareControlAPI = Depends(get_hardware),
-) -> PydanticResponse[SimpleMultiBody[UpdateProgressStatus]]:
+    update_id: str,
+    update_progress_monitor: UpdateProgressMonitor = Depends(get_update_progress_monitor),
+) -> PydanticResponse[SimpleMultiBody[UpdateProgressData]]:
     """Get status of instrument firmware update."""
-    try:
-        ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
-    except HardwareNotSupportedError as e:
-        raise NotSupportedOnOT2(detail=str(e)).as_error(
-            status.HTTP_403_FORBIDDEN
-        ) from e
-
-    update_progress = ot3_hardware.get_firmware_update_progress()
-    instrument_update_status: List[UpdateProgressStatus] = []
-    for mount, update_status in update_progress.items():
-        instrument_update_status.append(
-            UpdateProgressStatus(
-                mount=cast(MountTypesStr, MountType.from_ot3_mount(mount).as_string()),
-                updateStatus=str(update_status.status),
-                updateProgress=update_status.progress,
-            )
-        )
-
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
-            data=instrument_update_status,
-            meta=MultiBodyMeta(cursor=0, totalLength=len(instrument_update_status)),
-        ),
+            data=update_progress_monitor.get_progress_status(update_id)),
         status_code=status.HTTP_200_OK,
     )

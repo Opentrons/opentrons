@@ -17,6 +17,7 @@ from .run_auto_deleter import RunAutoDeleter
 from .engine_store import EngineStore
 from .run_store import RunStore
 from .run_data_manager import RunDataManager
+from ..instruments.update_status_monitor import UpdateProgressMonitor
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _engine_store_accessor = AppStateAccessor[EngineStore]("engine_store")
@@ -72,3 +73,10 @@ async def get_run_auto_deleter(
         run_store=run_store,
         deletion_planner=RunDeletionPlanner(maximum_runs=get_settings().maximum_runs),
     )
+
+
+async def get_update_progress_monitor(
+    hardware_api: HardwareControlAPI = Depends(get_hardware),
+) -> UpdateProgressMonitor:
+    """Get an 'UpdateProgressMonitor' to track firmware update statuses."""
+    return UpdateProgressMonitor(hardware_api=hardware_api)

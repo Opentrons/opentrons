@@ -11,7 +11,7 @@ from pydantic.generics import GenericModel
 
 from opentrons.types import Mount
 from opentrons.calibration_storage.types import SourceType
-from opentrons.hardware_control.types import OT3Mount
+from opentrons.hardware_control.types import OT3Mount, UpdateState
 from opentrons.protocol_engine.types import Vec3f
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
@@ -19,7 +19,6 @@ from opentrons_shared_data.pipette.dev_types import (
     ChannelCount,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
-from robot_server.service.json_api import ResourceLink
 
 InstrumentModelT = TypeVar(
     "InstrumentModelT", bound=Union[GripperModelStr, PipetteModel]
@@ -136,27 +135,21 @@ class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
 AttachedInstrument = Union[Pipette, Gripper]
 
 
-class UpdateRequestModel(BaseModel):
+class UpdateCreate(BaseModel):
     """Request data for updating instruments."""
 
-    mount: MountTypesStr = Field(None, description="Mount of the instrument to update.")
+    mount: MountTypesStr = Field(..., description="Mount of the instrument to update.")
 
 
-class UpdateProgressStatus(BaseModel):
+class UpdateProgressData(BaseModel):
     """Model for status of firmware update progress."""
 
+    id: str = Field(..., description="Unique ID for the update process.")
+    createdAt: datetime = Field(..., description="When the update was posted.")
     mount: MountTypesStr = Field(..., description="The mount that is being updated.")
-    updateStatus: str = Field(
+    updateStatus: UpdateState = Field(
         ..., description="Whether an update is queued, in progress or completed. "
     )
     updateProgress: int = Field(
         ..., description="Progress of the update depicted as an integer from 0 to 100."
-    )
-
-
-class UpdateStatusLink(BaseModel):
-    """Link returned for monitoring firmware update status."""
-
-    updateStatus: ResourceLink = Field(
-        ..., description="Path to update status monitor."
     )

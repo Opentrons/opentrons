@@ -302,12 +302,12 @@ class PipetteSubType(enum.Enum):
 class UpdateState(enum.Enum):
     """Update state to map from lower level FirmwareUpdateStatus"""
 
-    queued = enum.auto()
-    updating = enum.auto()
-    done = enum.auto()
+    queued = "queued"
+    updating = "updating"
+    done = "done"
 
     def __str__(self) -> str:
-        return self.name
+        return self.value
 
 
 class UpdateStatus(NamedTuple):

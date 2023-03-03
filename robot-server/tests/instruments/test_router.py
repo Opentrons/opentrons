@@ -31,10 +31,10 @@ from robot_server.instruments.instrument_models import (
     Pipette,
     PipetteData,
     GripperCalibrationData,
-    UpdateRequestModel,
+    UpdateCreate,
     MountTypesStr,
     UpdateProgressStatus,
-    UpdateStatusLink,
+    UpdateResponse,
 )
 from robot_server.instruments.router import (
     get_attached_instruments,
@@ -241,11 +241,11 @@ async def test_update_instrument_firmware(
     """It should call hardware control's firmware update method."""
     one_instrument_result = await update_firmware(
         request_body=RequestModel(
-            data=UpdateRequestModel(mount=cast(MountTypesStr, "left"))
+            data=UpdateCreate(mount=cast(MountTypesStr, "left"))
         ),
         hardware=ot3_hardware_api,
     )
-    assert one_instrument_result.content.links == UpdateStatusLink(
+    assert one_instrument_result.content.links == UpdateResponse(
         updateStatus=ResourceLink(href="/instruments/update/status")
     )
     assert one_instrument_result.status_code == 200
@@ -257,7 +257,7 @@ async def test_update_instrument_firmware(
         request_body=RequestModel(data=None),
         hardware=ot3_hardware_api,
     )
-    assert all_instruments_result.content.links == UpdateStatusLink(
+    assert all_instruments_result.content.links == UpdateResponse(
         updateStatus=ResourceLink(href="/instruments/update/status")
     )
     assert all_instruments_result.status_code == 200
