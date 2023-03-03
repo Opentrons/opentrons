@@ -17,19 +17,21 @@ export const CheckPipetteButton = (
   React.useEffect(() => {
     //  if requestStatus is error then the error modal will be in the results page
     if (status === 'success' || status === 'error') {
-      proceed()
       setPending(false)
     } else if (status === 'loading') {
       setPending(true)
     }
-  }, [proceed, status, setPending])
+  }, [status, setPending])
 
   return (
     <PrimaryButton
       disabled={isDisabled}
       onClick={() => {
+        setPending(status === 'loading')
         refetch()
-          .then(() => {})
+          .then(() => {
+            proceed()
+          })
           .catch(() => {})
       }}
     >

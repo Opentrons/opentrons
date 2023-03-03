@@ -35,14 +35,12 @@ export function CheckPipettesButton(
 
   const handleClick = (): void => {
     refetchPipettes()
-      .then(() => {})
+      .then(() => {
+        if (pipetteQueryStatus === 'success' && onDone != null) onDone()
+      })
       .catch(() => {})
   }
   const isPending = pipetteQueryStatus === 'loading'
-
-  React.useEffect(() => {
-    if (pipetteQueryStatus === 'success' && onDone != null) onDone()
-  }, [onDone, pipetteQueryStatus])
 
   const icon = (
     <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />
