@@ -10,12 +10,11 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Set, cast
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 
 from opentrons_shared_data import module
-from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons.types import Location, Point, LocationLabware
@@ -117,7 +116,8 @@ class ModuleGeometry:
         self._location = Location(point=self._offset + self._parent.point, labware=self)
 
     def add_labware(self, labware: Labware) -> Labware:
-        assert not self._labware, "{} is already on this module".format(self._labware)
+        if self._labware is not None:
+            raise RuntimeError(f"{self._labware} is already on this module")
         self._labware = labware
         return self._labware
 
@@ -134,7 +134,10 @@ class ModuleGeometry:
 
     @property
     def load_name(self) -> str:
-        return cast(str, self.model.value)
+        # Mypy (at the time of writing, v0.910) incorrectly types self.model.value as
+        # Any. It seems to have trouble with it being a union of enums.
+        assert isinstance(self.model.value, str)
+        return self.model.value
 
     @property
     def module_type(self) -> ModuleType:
@@ -259,13 +262,6 @@ class ThermocyclerGeometry(ModuleGeometry):
     def is_semi_configuration(self) -> bool:
         return bool(self._configuration == ThermocyclerConfiguration.SEMI)
 
-    @property
-    def covered_slots(self) -> Set[int]:
-        if self.is_semi_configuration:
-            return {7, 10}
-        else:
-            return {7, 8, 10, 11}
-
     # TODO(mc, 2022-11-16): this method causes bugs and should not be used;
     # Thermocycler `configuration="semi"` does not work properly and should be removed
     # https://opentrons.atlassian.net/browse/RSS-106
@@ -286,8 +282,10 @@ class ThermocyclerGeometry(ModuleGeometry):
         )
 
     def add_labware(self, labware: Labware) -> Labware:
-        assert not self._labware, "{} is already on this module".format(self._labware)
-        assert self.lid_status != "closed", "Cannot place labware in closed module"
+        if self._labware is not None:
+            raise RuntimeError(f"{self._labware} is already on this module")
+        if self.lid_status == "closed":
+            raise RuntimeError("Cannot place labware in closed module")
         if self.is_semi_configuration:
             self._labware = self.labware_accessor(labware)
         else:
@@ -316,32 +314,6 @@ class ThermocyclerGeometry(ModuleGeometry):
 
 class HeaterShakerGeometry(ModuleGeometry):
     """Class holding the state of a Heater-Shaker's physical geometry."""
-
-    # TODO(mc, 2022-06-16): move these constants to the module definition
-    MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
-    """Maximum height of an adjacent item in the x-direction.
-
-    This value selected to avoid interference
-    with the Heater-Shaker's labware latch.
-
-    For background, see: https://github.com/Opentrons/opentrons/issues/10316
-    """
-
-    ALLOWED_ADJACENT_TALL_LABWARE = [
-        LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
-        LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
-        LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
-        LabwareUri("opentrons/opentrons_96_tiprack_10ul/1"),
-        LabwareUri("opentrons/opentrons_96_tiprack_20ul/1"),
-        LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
-    ]
-    """URI's of labware that are allowed to exceed the height limit above.
-
-    These labware do not take up the full with of the slot
-    in the area that would interfere with the labware latch.
-
-    For background, see: https://github.com/Opentrons/opentrons/issues/10316
-    """
 
     def flag_unsafe_move(
         self,

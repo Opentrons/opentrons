@@ -15,9 +15,12 @@ from opentrons.protocol_engine import (
     WellLocation,
     WellOffset,
     WellOrigin,
+    DropTipWellLocation,
+    DropTipWellOrigin,
 )
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import FlowRates
+from opentrons.protocol_engine.types import FlowRates, TipGeometry
 from opentrons.protocol_api.core.engine import InstrumentCore, WellCore, ProtocolCore
 from opentrons.types import Location, Mount, MountType, Point
 
@@ -118,7 +121,6 @@ def test_get_hardware_state(
     )
 
     assert subject.get_hardware_state() == pipette_dict
-    assert subject.has_tip() is True
 
 
 def test_move_to_well(
@@ -240,6 +242,19 @@ def test_pick_up_tip(
     )
 
 
+def test_get_return_height(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should get the return tip scale from the engine state."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_return_tip_scale("abc123")
+    ).then_return(0.123)
+
+    result = subject.get_return_height()
+
+    assert result == 0.123
+
+
 def test_drop_tip_no_location(
     decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
 ) -> None:
@@ -257,8 +272,44 @@ def test_drop_tip_no_location(
             pipette_id="abc123",
             labware_id="labware-id",
             well_name="well-name",
-            well_location=WellLocation(
-                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.DEFAULT,
+                offset=WellOffset(x=0, y=0, z=0),
+            ),
+            home_after=True,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_with_location(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should drop a tip given a well core."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    well_core = WellCore(
+        name="well-name",
+        labware_id="labware-id",
+        engine_client=mock_engine_client,
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_relative_well_location(
+            labware_id="labware-id",
+            well_name="well-name",
+            absolute_point=Point(1, 2, 3),
+        )
+    ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
+
+    subject.drop_tip(location=location, well_core=well_core, home_after=True)
+
+    decoy.verify(
+        mock_engine_client.drop_tip(
+            pipette_id="abc123",
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             home_after=True,
         ),
@@ -286,7 +337,12 @@ def test_aspirate_from_well(
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
     subject.aspirate(
-        location=location, well_core=well_core, volume=12.34, rate=5.6, flow_rate=7.8
+        location=location,
+        well_core=well_core,
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        in_place=False,
     )
 
     decoy.verify(
@@ -304,13 +360,74 @@ def test_aspirate_from_well(
     )
 
 
+def test_aspirate_from_location(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should aspirate from coordinates."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.aspirate(
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        well_core=None,
+        location=location,
+        in_place=False,
+    )
+
+    decoy.verify(
+        mock_engine_client.move_to_coordinates(
+            pipette_id="abc123",
+            coordinates=DeckPoint(x=1, y=2, z=3),
+            minimum_z_height=None,
+            force_direct=False,
+            speed=None,
+        ),
+        mock_engine_client.aspirate_in_place(
+            pipette_id="abc123",
+            volume=12.34,
+            flow_rate=7.8,
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_aspirate_in_place(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should aspirate in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.aspirate(
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        well_core=None,
+        location=location,
+        in_place=True,
+    )
+
+    decoy.verify(
+        mock_engine_client.aspirate_in_place(
+            pipette_id="abc123",
+            volume=12.34,
+            flow_rate=7.8,
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
 def test_blow_out_to_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
-    """It should aspirate from a well."""
+    """It should blow out from a well."""
     location = Location(point=Point(1, 2, 3), labware=None)
 
     well_core = WellCore(
@@ -323,7 +440,7 @@ def test_blow_out_to_well(
         )
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
-    subject.blow_out(location=location, well_core=well_core, move_to_well=True)
+    subject.blow_out(location=location, well_core=well_core, in_place=False)
 
     decoy.verify(
         mock_engine_client.blow_out(
@@ -336,6 +453,55 @@ def test_blow_out_to_well(
             flow_rate=6.7,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_blow_to_coordinates(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should move to coordinate and blow out in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+
+    subject.blow_out(location=location, well_core=None, in_place=False)
+
+    decoy.verify(
+        mock_engine_client.move_to_coordinates(
+            pipette_id="abc123",
+            coordinates=DeckPoint(x=1, y=2, z=3),
+            minimum_z_height=None,
+            speed=None,
+            force_direct=False,
+        ),
+        mock_engine_client.blow_out_in_place(
+            pipette_id="abc123",
+            flow_rate=6.7,
+        ),
+        mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_blow_out_in_place(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """Should blow-out in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.blow_out(
+        location=location,
+        well_core=None,
+        in_place=True,
+    )
+
+    decoy.verify(
+        mock_engine_client.blow_out_in_place(
+            pipette_id="abc123",
+            flow_rate=6.7,
+        ),
     )
 
 
@@ -359,7 +525,12 @@ def test_dispense_to_well(
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
     subject.dispense(
-        location=location, well_core=well_core, volume=12.34, rate=5.6, flow_rate=6.0
+        location=location,
+        well_core=well_core,
+        volume=12.34,
+        rate=5.6,
+        flow_rate=6.0,
+        in_place=False,
     )
 
     decoy.verify(
@@ -374,6 +545,65 @@ def test_dispense_to_well(
             flow_rate=6.0,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
+    )
+
+
+def test_dispense_in_place(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should dispense in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.dispense(
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        well_core=None,
+        location=location,
+        in_place=True,
+    )
+
+    decoy.verify(
+        mock_engine_client.dispense_in_place(
+            pipette_id="abc123",
+            volume=12.34,
+            flow_rate=7.8,
+        ),
+    )
+
+
+def test_dispense_to_coordinates(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should dispense in place."""
+    location = Location(point=Point(1, 2, 3), labware=None)
+    subject.dispense(
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        well_core=None,
+        location=location,
+        in_place=False,
+    )
+
+    decoy.verify(
+        mock_engine_client.move_to_coordinates(
+            pipette_id="abc123",
+            coordinates=DeckPoint(x=1, y=2, z=3),
+            minimum_z_height=None,
+            force_direct=False,
+            speed=None,
+        ),
+        mock_engine_client.dispense_in_place(
+            pipette_id="abc123",
+            volume=12.34,
+            flow_rate=7.8,
+        ),
     )
 
 
@@ -500,6 +730,34 @@ def test_get_current_volume(
     assert subject.get_current_volume() == 123.4
 
 
+def test_get_current_volume_returns_zero_when_no_tip_attached(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return 0 when an exception is raised."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_raise(TipNotAttachedError())
+    assert subject.get_current_volume() == 0
+
+
+def test_get_available_volume_returns_zero_no_tip_attached(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return 0 when an exception is raised."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_available_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_raise(TipNotAttachedError())
+    assert subject.get_available_volume() == 0
+
+
 def test_get_available_volume(
     decoy: Decoy,
     subject: InstrumentCore,
@@ -587,3 +845,16 @@ def test_touch_tip(
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
+
+
+def test_has_tip(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should return tip state."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_attached_tip("abc123")
+    ).then_return(TipGeometry(length=1, diameter=2, volume=3))
+
+    assert subject.has_tip() is True

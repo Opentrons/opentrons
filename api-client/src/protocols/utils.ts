@@ -2,6 +2,7 @@
 import reduce from 'lodash/reduce'
 
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
   ModuleModel,
   PipetteName,
@@ -53,14 +54,14 @@ export function parsePipetteEntity(
   )
   if (rightPipetteCommand != null) {
     pipetteEntity.push({
-      id: rightPipetteCommand.result?.pipetteId,
+      id: rightPipetteCommand.result?.pipetteId ?? '',
       pipetteName: rightPipetteCommand.params.pipetteName,
       mount: rightPipetteCommand.params.mount,
     })
   }
   if (leftPipetteCommand != null) {
     pipetteEntity.push({
-      id: leftPipetteCommand.result?.pipetteId,
+      id: leftPipetteCommand.result?.pipetteId ?? '',
       pipetteName: leftPipetteCommand.params.pipetteName,
       mount: leftPipetteCommand.params.mount,
     })
@@ -94,7 +95,7 @@ export function parseRequiredModulesEntity(
   )
   return loadModuleCommands.map(command => {
     return {
-      id: command.result?.moduleId,
+      id: command.result?.moduleId ?? '',
       model: command.params.model,
       location: command.params.location,
       serialNumber: '',
@@ -156,20 +157,14 @@ export function parseInitialLoadedLabwareEntity(
       command.commandType === 'loadLabware'
   )
   const filterOutTrashCommands = loadLabwareCommands.filter(
-    command => command.result?.definition?.metadata?.displayCategory !== 'trash'
+    command => command.result?.definition?.metadata.displayCategory !== 'trash'
   )
   return filterOutTrashCommands.map(command => {
-    const labwareId = command.result?.labwareId ?? ''
-    const {
-      namespace,
-      version,
-      parameters: { loadName },
-    } = command.result?.definition
-    const definitionUri = `${namespace}/${loadName}/${version}`
+    const definition = command.result?.definition
     return {
-      id: labwareId,
-      loadName,
-      definitionUri,
+      id: command.result?.labwareId ?? '',
+      loadName: definition?.parameters?.loadName ?? '',
+      definitionUri: definition != null ? getLabwareDefURI(definition) : '',
       location: command.params.location,
       displayName: command.params.displayName,
     }

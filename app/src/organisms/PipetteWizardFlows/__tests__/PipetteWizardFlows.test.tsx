@@ -4,6 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
+  RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import {
@@ -19,6 +20,7 @@ import {
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import * as RobotApi from '../../../redux/robot-api'
+import { getIsOnDevice } from '../../../redux/config'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
@@ -36,6 +38,7 @@ jest.mock('../ExitModal')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../../redux/robot-api')
 jest.mock('../UnskippableModal')
+jest.mock('../../../redux/config')
 
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
@@ -64,6 +67,9 @@ const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
 const mockExitModal = ExitModal as jest.MockedFunction<typeof ExitModal>
 const mockUnskippableModal = UnskippableModal as jest.MockedFunction<
   typeof UnskippableModal
+>
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
 >
 const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
   return renderWithProviders(<PipetteWizardFlows {...props} />, {
@@ -141,6 +147,7 @@ describe('PipetteWizardFlows', () => {
     ])
     mockGetRequestById.mockReturnValue(null)
     mockUnskippableModal.mockReturnValue(<div>mock unskippable modal</div>)
+    mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
     const { getByText, getByRole } = render(props)
@@ -228,6 +235,18 @@ describe('PipetteWizardFlows', () => {
     // await waitFor(() => {
     //   expect(props.closeFlow).toHaveBeenCalled()
     // })
+  })
+  it('renders the correct first page for calibrating single mount when rendering from on device display', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText } = render(props)
+    getByText('Calibrate a pipette')
+    getByText('Before you begin')
+    getByText(
+      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+    )
+    getByText(
+      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+    )
   })
   it('renders 3rd page and clicking back button redirects to the first page', async () => {
     const { getByText, getByRole } = render(props)
@@ -387,6 +406,10 @@ describe('PipetteWizardFlows', () => {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
           },
+          {
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: { mount: RIGHT },
+          },
         ],
         false
       )
@@ -522,7 +545,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Detach P1000 Single-Channel GEN3 and Attach 96-Channel Pipette')
+    getByText('Detach Flex 1-Channel 1000 μL and Attach 96-Channel Pipette')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })

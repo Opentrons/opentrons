@@ -54,6 +54,7 @@ describe('Results', () => {
       handleCleanUpAndClose: jest.fn(),
       currentStepIndex: 2,
       totalStepCount: 6,
+      isOnDevice: false,
     }
     pipettePromise = Promise.resolve()
     mockRefetchPipette = jest.fn(() => pipettePromise)
@@ -100,13 +101,14 @@ describe('Results', () => {
     await act(() => pipettePromise)
     expect(mockRefetchPipette).toHaveBeenCalled()
   })
-  it('renders the try again button when fail to attach and clicking on buton several times renders exit button', async () => {
+  it('renders the try again button when fail to attach and clicking on buton several times renders the warning subheader', async () => {
     props = {
       ...props,
       attachedPipettes: { left: null, right: null },
       flowType: FLOWS.ATTACH,
     }
     const { getByText, getByRole } = render(props)
+    getByText('exit')
     getByText('Detach and retry')
     getByRole('button', { name: 'Results_tryAgain' }).click()
     await act(() => pipettePromise)
@@ -116,18 +118,21 @@ describe('Results', () => {
     expect(mockRefetchPipette).toHaveBeenCalled()
     getByRole('button', { name: 'Results_tryAgain' }).click()
     await act(() => pipettePromise)
-    //  critical error modal after tryAgain failing 2 times
-    getByText('Something Went Wrong')
+    //  warning subheader after clicking on try again 3 times
+    getByText(
+      'There may be a problem with your pipette. Exit setup and contact Opentrons Support for assistance.'
+    )
     getByRole('button', { name: 'Results_errorExit' }).click()
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
-  it('renders the try again button when fail to detach and clicking on buton several times renders exit button', async () => {
+  it('renders the try again button when fail to detach and clicking on buton several times renders the warning subheader', async () => {
     props = {
       ...props,
       attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByRole } = render(props)
+    getByText('exit')
     getByText('Attach and retry')
     getByRole('button', { name: 'Results_tryAgain' }).click()
     await act(() => pipettePromise)
@@ -137,8 +142,10 @@ describe('Results', () => {
     expect(mockRefetchPipette).toHaveBeenCalled()
     getByRole('button', { name: 'Results_tryAgain' }).click()
     await act(() => pipettePromise)
-    //  critical error modal after tryAgain failing 2 times
-    getByText('Something Went Wrong')
+    //  warning subheader after clicking on try again 3 times
+    getByText(
+      'There may be a problem with your pipette. Exit setup and contact Opentrons Support for assistance.'
+    )
     getByRole('button', { name: 'Results_errorExit' }).click()
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })

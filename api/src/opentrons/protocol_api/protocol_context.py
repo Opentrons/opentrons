@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union, Mapping
+from typing import (
+    Callable,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Type,
+    Union,
+    Mapping,
+    cast,
+)
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -19,7 +29,6 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.common import ModuleCore, ProtocolCore
-from .core.engine import ENGINE_CORE_API_VERSION
 from .core.core_map import LoadedCoreMap
 from .core.module import (
     AbstractTemperatureModuleCore,
@@ -27,7 +36,9 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
+from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
+from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
@@ -191,7 +202,19 @@ class ProtocolContext(CommandPublisher):
                                                # 10 mm/s
                 protocol.max_speeds['X'] = None  # reset to default
 
+        .. caution::
+            This property is not yet supported on
+            :ref:`API version <v2-versioning>` 2.14 or higher.
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            # TODO(mc, 2023-02-23): per-axis max speeds not yet supported on the engine
+            # See https://opentrons.atlassian.net/browse/RCORE-373
+            raise APIVersionError(
+                "ProtocolContext.max_speeds is not supported at apiLevel 2.14 or higher."
+                " Use a lower apiLevel or set speeds using InstrumentContext.default_speed"
+                " or the per-method 'speed' argument."
+            )
+
         return self._core.get_max_speeds()
 
     @requires_version(2, 0)
@@ -382,11 +405,13 @@ class ProtocolContext(CommandPublisher):
                             If False, will pause protocol execution to allow the user
                             to perform a manual move and click resume to continue
                             protocol execution.
+
         Other experimental params:
+
         :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
-                            associated with its pick up location.
+                                                associated with its pick up location.
         :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
-                            associated with its drop off location.
+                                             associated with its drop off location.
         :param pick_up_offset: Offset to use when picking up labware.
         :param drop_offset: Offset to use when dropping off labware.
 
@@ -655,7 +680,16 @@ class ProtocolContext(CommandPublisher):
            If you're looking for a way for your protocol to resume automatically
            after a period of time, use :py:meth:`delay`.
         """
-        self._core.resume()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "A Python Protocol cannot safely resume itself after a pause."
+                " To wait automatically for a period of time, use ProtocolContext.delay()."
+            )
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyProtocolCore)
+        cast(LegacyProtocolCore, self._core).resume()
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)

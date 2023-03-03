@@ -29,8 +29,10 @@ from opentrons.protocol_engine.execution import (
     CommandExecutor,
     EquipmentHandler,
     MovementHandler,
+    GantryMover,
     LabwareMovementHandler,
     PipettingHandler,
+    TipHandler,
     RunControlHandler,
     RailLightsHandler,
 )
@@ -67,6 +69,12 @@ def movement(decoy: Decoy) -> MovementHandler:
 
 
 @pytest.fixture
+def mock_gantry_mover(decoy: Decoy) -> GantryMover:
+    """Get a mocked out GantryMover."""
+    return decoy.mock(cls=GantryMover)
+
+
+@pytest.fixture
 def labware_movement(decoy: Decoy) -> LabwareMovementHandler:
     """Get a mocked out LabwareMovementHandler."""
     return decoy.mock(cls=LabwareMovementHandler)
@@ -76,6 +84,12 @@ def labware_movement(decoy: Decoy) -> LabwareMovementHandler:
 def pipetting(decoy: Decoy) -> PipettingHandler:
     """Get a mocked out PipettingHandler."""
     return decoy.mock(cls=PipettingHandler)
+
+
+@pytest.fixture
+def mock_tip_handler(decoy: Decoy) -> TipHandler:
+    """Get a mocked out TipHandler."""
+    return decoy.mock(cls=TipHandler)
 
 
 @pytest.fixture
@@ -103,8 +117,10 @@ def subject(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
@@ -116,8 +132,10 @@ def subject(
         action_dispatcher=action_dispatcher,
         equipment=equipment,
         movement=movement,
+        gantry_mover=mock_gantry_mover,
         labware_movement=labware_movement,
         pipetting=pipetting,
+        tip_handler=mock_tip_handler,
         run_control=run_control,
         model_utils=model_utils,
         rail_lights=rail_lights,
@@ -144,8 +162,10 @@ async def test_execute(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
@@ -214,8 +234,10 @@ async def test_execute(
             hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
+            gantry_mover=mock_gantry_mover,
             labware_movement=labware_movement,
             pipetting=pipetting,
+            tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
         )
@@ -262,8 +284,10 @@ async def test_execute_raises_protocol_engine_error(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
@@ -319,8 +343,10 @@ async def test_execute_raises_protocol_engine_error(
             hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
+            gantry_mover=mock_gantry_mover,
             labware_movement=labware_movement,
             pipetting=pipetting,
+            tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
         )

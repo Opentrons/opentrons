@@ -717,26 +717,6 @@ def test_get_slice() -> None:
     )
 
 
-def test_get_slice_default_cursor() -> None:
-    """It should use the tail as the default cursor location."""
-    command_1 = create_succeeded_command(command_id="command-id-1")
-    command_2 = create_succeeded_command(command_id="command-id-2")
-    command_3 = create_running_command(command_id="command-id-3")
-    command_4 = create_queued_command(command_id="command-id-4")
-
-    subject = get_command_view(
-        commands=[command_1, command_2, command_3, command_4],
-    )
-
-    result = subject.get_slice(cursor=None, length=2)
-
-    assert result == CommandSlice(
-        commands=[command_3, command_4],
-        cursor=2,
-        total_length=4,
-    )
-
-
 def test_get_slice_default_cursor_no_current() -> None:
     """It should return a slice from the tail if no current command."""
     command_1 = create_succeeded_command(command_id="command-id-1")
@@ -752,6 +732,51 @@ def test_get_slice_default_cursor_no_current() -> None:
         commands=[command_2, command_3, command_4],
         cursor=1,
         total_length=4,
+    )
+
+
+def test_get_slice_default_cursor_running() -> None:
+    """It should select a cursor based on the running command, if present."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_succeeded_command(command_id="command-id-2")
+    command_3 = create_running_command(command_id="command-id-3")
+    command_4 = create_queued_command(command_id="command-id-4")
+    command_5 = create_queued_command(command_id="command-id-5")
+
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3, command_4, command_5],
+        running_command_id="command-id-3",
+    )
+
+    result = subject.get_slice(cursor=None, length=2)
+
+    assert result == CommandSlice(
+        commands=[command_3, command_4],
+        cursor=2,
+        total_length=5,
+    )
+
+
+def test_get_slice_default_cursor_queued() -> None:
+    """It should select a cursor based on the next queued command, if present."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_succeeded_command(command_id="command-id-2")
+    command_3 = create_succeeded_command(command_id="command-id-3")
+    command_4 = create_queued_command(command_id="command-id-4")
+    command_5 = create_queued_command(command_id="command-id-5")
+
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3, command_4, command_5],
+        running_command_id=None,
+        queued_command_ids=["command-id-4", "command-id-4", "command-id-5"],
+    )
+
+    result = subject.get_slice(cursor=None, length=2)
+
+    assert result == CommandSlice(
+        commands=[command_3, command_4],
+        cursor=2,
+        total_length=5,
     )
 
 

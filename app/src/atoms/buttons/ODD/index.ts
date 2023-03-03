@@ -1,0 +1,1 @@
+export { SmallButton } from './SmallButton'
