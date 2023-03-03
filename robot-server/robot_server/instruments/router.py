@@ -34,22 +34,25 @@ from .instrument_models import (
     UpdateCreate,
     UpdateProgressData,
 )
-from .update_status_monitor import UpdateProgressMonitor, UpdateIdNotFound
+from .update_progress_monitor import UpdateProgressMonitor, UpdateIdNotFound
 from ..errors import ErrorDetails, ErrorBody
-from ..runs.dependencies import get_update_progress_monitor
 from ..service.dependencies import get_unique_id, get_current_time
 
 instruments_router = APIRouter()
 
 
-update_ids: List[str]
+async def get_update_progress_monitor(
+    hardware_api: HardwareControlAPI = Depends(get_hardware),
+) -> UpdateProgressMonitor:
+    """Get an 'UpdateProgressMonitor' to track firmware update statuses."""
+    return UpdateProgressMonitor(hardware_api=hardware_api)
 
 
 class InstrumentNotFound(ErrorDetails):
     """An error if no instrument is found on the given mount."""
 
-    id: Literal["PeripheralNotFound"] = "PeripheralNotFound"
-    title: str = "Peripheral Not Found"
+    id: Literal["InstrumentNotFound"] = "InstrumentNotFound"
+    title: str = "Instrument Not Found"
 
 
 class NoUpdateAvailable(ErrorDetails):
@@ -224,7 +227,7 @@ async def update_firmware(
             detail=f"No instrument found on {mount_to_update} mount."
         ).as_error(status.HTTP_404_NOT_FOUND)
 
-    if ot3_hardware.get_firmware_update_progress()[ot3_mount]:
+    if ot3_hardware.get_firmware_update_progress().get(ot3_mount):
         raise UpdateInProgress(
             detail=f"{mount_to_update} is already either queued for update"
             f" or is currently updating"
