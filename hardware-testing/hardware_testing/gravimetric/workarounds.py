@@ -1,7 +1,7 @@
 """Opentrons API Workarounds."""
 from datetime import datetime
 from urllib.request import Request, urlopen
-from typing import Tuple, List, Dict
+from typing import List
 import platform
 from json import loads as json_loads
 

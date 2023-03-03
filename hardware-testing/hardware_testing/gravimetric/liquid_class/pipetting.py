@@ -116,7 +116,7 @@ def _pipette_with_liquid_settings(
     pipette.move_to(
         well.bottom(pipetting_heights.end.below),
         force_direct=True,
-        speed=TIP_SPEED_WHILE_SUBMERGED
+        speed=TIP_SPEED_WHILE_SUBMERGED,
     )
 
     # ASPIRATE/DISPENSE

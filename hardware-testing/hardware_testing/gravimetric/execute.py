@@ -6,7 +6,7 @@ from typing_extensions import Final
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import create_run_id_and_start_time
-from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from .helpers import get_pipette_unique_name
@@ -77,13 +77,9 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
         f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
         location=cfg.slot_tiprack,
     )
-    tiprack.set_calibration(
-        get_latest_offset_for_labware(cfg.labware_offsets, tiprack)
-    )
+    tiprack.set_calibration(get_latest_offset_for_labware(cfg.labware_offsets, tiprack))
     vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_vial)
-    vial.set_calibration(
-        get_latest_offset_for_labware(cfg.labware_offsets, vial)
-    )
+    vial.set_calibration(get_latest_offset_for_labware(cfg.labware_offsets, vial))
 
     # LIQUID TRACKING
     liquid_tracker = LiquidTracker()
