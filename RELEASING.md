@@ -129,6 +129,7 @@ git merge --no-ff release
 ### tag usage
 
 We specify the version of a release artifact through a specifically-formatted git tag. We consider our monorepo to support several projects: robot stack, ot3, protocol-designer, etc. Tags look like this:
+
 ```shell
 ${projectPrefix}${projectVersion}
 ```
