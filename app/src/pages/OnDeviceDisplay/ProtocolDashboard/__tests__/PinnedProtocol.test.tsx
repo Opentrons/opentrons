@@ -62,7 +62,7 @@ describe('Pinned Protocol', () => {
     jest.advanceTimersByTime(1005)
     getByText('Run protocol')
     // This should ne "Unpin protocol" but I don't know how to pass state into the render
-    // call to the longpress modal can see the pinned ids.
+    // call so the longpress modal can see the pinned ids.
     getByText('Pin protocol')
     getByText('Delete protocol')
   })

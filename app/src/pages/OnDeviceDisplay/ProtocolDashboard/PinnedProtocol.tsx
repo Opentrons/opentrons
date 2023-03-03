@@ -32,7 +32,7 @@ export function PinnedProtocol(props: {
     longpress: UseLongPressResult,
     protocolId: string
   ): void => {
-    if (longpress.isLongPressed !== true) {
+    if (!longpress.isLongPressed) {
       history.push(`/protocols/${protocolId}`)
     }
   }
