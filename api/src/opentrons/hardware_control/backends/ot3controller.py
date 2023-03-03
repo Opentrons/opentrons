@@ -235,7 +235,7 @@ class OT3Controller:
     def get_instrument_update(
         self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
     ) -> InstrumentFWInfo:
-        """Check wether the given instrument requires an update."""
+        """Check whether the given instrument requires an update."""
         subsystem = mount_to_subsystem(mount)
         node_id = sub_system_to_node_id(subsystem)
         # get the pipette_type if this is a pipette
