@@ -45,21 +45,11 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
     >
       {isOnDevice ? (
         <>
-          <SmallButton
-            onClick={goBack}
-            aria-label="isOnDevice_goBack"
-            marginRight={SPACING.spacing6}
+          <AlertSmallButton
+            onClick={proceed}
+            aria-label="isOnDevice_exit"
+            marginRight={SPACING.spacing3}
           >
-            <StyledText
-              fontSize="1.375rem"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              padding={SPACING.spacing4}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            >
-              {t('shared:go_back')}
-            </StyledText>
-          </SmallButton>
-          <AlertSmallButton onClick={proceed} aria-label="isOnDevice_exit">
             <StyledText
               fontSize="1.375rem"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -69,6 +59,16 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
               {t('shared:exit')}
             </StyledText>
           </AlertSmallButton>
+          <SmallButton onClick={goBack} aria-label="isOnDevice_goBack">
+            <StyledText
+              fontSize="1.375rem"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              padding={SPACING.spacing4}
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            >
+              {t('shared:go_back')}
+            </StyledText>
+          </SmallButton>
         </>
       ) : (
         <>
