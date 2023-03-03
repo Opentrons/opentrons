@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import csv
 import numpy as np
+import time
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -67,8 +68,8 @@ TEST_PARAMETERS = {
     GantryLoad.LOW_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 500,
-                'MAX': 700,
+                'MIN': 450,
+                'MAX': 800,
                 'INC': 50},
             'ACCEL': {
                 'MIN': 800,
@@ -76,12 +77,12 @@ TEST_PARAMETERS = {
                 'INC': 200}},
         'Y': {
             'SPEED': {
-                'MIN': 500,
-                'MAX': 700,
-                'INC': 50},
+                'MIN': 475,
+                'MAX': 525,
+                'INC': 25},
             'ACCEL': {
-                'MIN': 1200,
-                'MAX': 1300,
+                'MIN': 1000,
+                'MAX': 1200,
                 'INC': 50}},
         'L': {
             'SPEED': {
@@ -105,22 +106,22 @@ TEST_PARAMETERS = {
     GantryLoad.TWO_LOW_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 650,
-                'MAX': 800,
-                'INC': 50},
+                'MIN': 475,
+                'MAX': 525,
+                'INC': 25},
             'ACCEL': {
-                'MIN': 1400,
-                'MAX': 1800,
-                'INC': 200}},
+                'MIN': 1000,
+                'MAX': 1200,
+                'INC': 50}},
         'Y': {
             'SPEED': {
-                'MIN': 450,
-                'MAX': 650,
-                'INC': 50},
+                'MIN': 475,
+                'MAX': 525,
+                'INC': 25},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 1800,
-                'INC': 200}},
+                'MIN': 1000,
+                'MAX': 1200,
+                'INC': 50}},
         'L': {
             'SPEED': {
                 'MIN': 40,
@@ -232,6 +233,7 @@ GANTRY_LOAD_MAP = {'NONE': GantryLoad.NONE,
                    'HIGH': GantryLoad.HIGH_THROUGHPUT
 }
 
+DELAY = 0
 
 step_x = 500
 step_y = 300
@@ -300,7 +302,7 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
-        print('Executing Move:')
+        print('Executing Move: ' + str(c))
         print(' Speed - ' + str(cur_speed))
         print(' Acceleration - ' + str(SETTINGS[AXIS_MAP[axis]].acceleration))
 
@@ -341,11 +343,14 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         else:
             avg_error.append(move_error)
 
-        #home every 100 cycles in case we have drifted
-        if(c == 100):
+        #home every 50 cycles in case we have drifted
+        if((c+1)%50 == 0):
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             #move away from the limit switch before cycling
             await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=100)
+
+    if(DELAY > 0):
+        time.sleep(DELAY)
 
     return (sum(avg_error)/len(avg_error), c+1)
 
@@ -474,12 +479,14 @@ if __name__ == "__main__":
     parser.add_argument("--axis", type=str, default='Y')
     parser.add_argument("--cycles", type=int, default=CYCLES)
     parser.add_argument("--load", type=str, default='NONE')
+    parser.add_argument("--delay", type=int, default=0)
 
     args = parser.parse_args()
     CYCLES = args.cycles
 
     AXIS = args.axis
     LOAD = GANTRY_LOAD_MAP[args.load]
+    DELAY = args.delay
     TEST_LIST = make_test_list(AXIS, LOAD)
 
     asyncio.run(_main(args.simulate))
