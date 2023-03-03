@@ -6,9 +6,19 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import UpdateState
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.resources import ensure_ot3_hardware
-from robot_server.instruments.instrument_models import MountType, \
-    UpdateProgressData, MountTypesStr
-from .router import InvalidUpdateId
+from robot_server.instruments.instrument_models import (
+    MountType,
+    UpdateProgressData,
+    MountTypesStr,
+)
+
+
+class InstrumentNotFound(RuntimeError):
+    """Error raised when there is no instrument attached on the specified mount."""
+
+
+class UpdateIdNotFound(KeyError):
+    """Error raised when a specified Update ID is not found."""
 
 
 class UpdateProgressMonitor:
@@ -19,20 +29,20 @@ class UpdateProgressMonitor:
         self._status_by_id: Dict[str, UpdateProgressData] = {}
 
     def create(
-            self,
-            update_id: str,
-            created_at: datetime,
-            mount: MountTypesStr,
+        self,
+        update_id: str,
+        created_at: datetime,
+        mount: MountTypesStr,
     ) -> UpdateProgressData:
         """Update the status for the given id."""
         try:
             ot3_hardware = ensure_ot3_hardware(hardware_api=self._hardware)
         except HardwareNotSupportedError as e:
-            raise from e
+            raise e
 
-        update_status = ot3_hardware.get_firmware_update_progress().get(
+        update_status = ot3_hardware.get_firmware_update_progress()[
             MountType.to_ot3_mount(mount)
-        )
+        ]
 
         self._status_by_id[update_id] = UpdateProgressData(
             id=update_id,
@@ -44,15 +54,16 @@ class UpdateProgressMonitor:
         return self._status_by_id[update_id]
 
     def get_progress_status(self, update_id: str) -> UpdateProgressData:
+        """Get the firmware update progress status for the given update resource ID."""
         try:
             ot3_hardware = ensure_ot3_hardware(hardware_api=self._hardware)
         except HardwareNotSupportedError as e:
-            raise from e
+            raise e
 
         try:
             saved_status = self._status_by_id[update_id]
         except KeyError as e:
-            raise InvalidUpdateId from e
+            raise UpdateIdNotFound from e
 
         mount = saved_status.mount
         mount_update_status = ot3_hardware.get_firmware_update_progress().get(
@@ -63,7 +74,11 @@ class UpdateProgressMonitor:
             # In the case where an instrument was updated and reset, hardwareControlAPI
             # cannot provide a status of the finished update anymore. So we try to
             # interpret it by checking if there's an update available for that mount now.
-            instrument_dict = ot3_hardware.get_all_attached_instr()[MountType.to_ot3_mount(mount)]
+            instrument_dict = ot3_hardware.get_all_attached_instr().get(
+                MountType.to_ot3_mount(mount)
+            )
+            if instrument_dict is None:
+                raise InstrumentNotFound(f"No instrument attached on mount {mount}")
 
             if instrument_dict["fw_update_required"]:
                 # TODO: add some 'something went wrong during update process' error type

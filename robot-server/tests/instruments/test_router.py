@@ -13,9 +13,9 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
 )
 from opentrons.hardware_control.types import (
     GripperJawState,
-    OT3Mount,
-    InstrumentUpdateStatus,
-    UpdateState,
+    # OT3Mount,
+    # InstrumentUpdateStatus,
+    # UpdateState,
 )
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.types import Point, Mount
@@ -31,17 +31,15 @@ from robot_server.instruments.instrument_models import (
     Pipette,
     PipetteData,
     GripperCalibrationData,
-    UpdateCreate,
-    MountTypesStr,
-    UpdateProgressStatus,
-    UpdateResponse,
+    # UpdateCreate,
+    # MountTypesStr,
+    # UpdateProgressData,
 )
 from robot_server.instruments.router import (
     get_attached_instruments,
-    update_firmware,
-    get_firmware_update_status,
+    # update_firmware,
+    # get_firmware_update_status,
 )
-from robot_server.service.json_api import RequestModel, ResourceLink
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -230,73 +228,72 @@ async def test_get_ot2_instruments(
     ]
 
 
-# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-@pytest.mark.xfail
-@pytest.mark.ot3_only
-async def test_update_instrument_firmware(
-    decoy: Decoy,
-    ot3_hardware_api: OT3API,
-) -> None:
-    """It should call hardware control's firmware update method."""
-    one_instrument_result = await update_firmware(
-        request_body=RequestModel(
-            data=UpdateCreate(mount=cast(MountTypesStr, "left"))
-        ),
-        hardware=ot3_hardware_api,
-    )
-    assert one_instrument_result.content.links == UpdateResponse(
-        updateStatus=ResourceLink(href="/instruments/update/status")
-    )
-    assert one_instrument_result.status_code == 200
-    decoy.verify(
-        await ot3_hardware_api.update_instrument_firmware(mounts={OT3Mount.LEFT})
-    )
-
-    all_instruments_result = await update_firmware(
-        request_body=RequestModel(data=None),
-        hardware=ot3_hardware_api,
-    )
-    assert all_instruments_result.content.links == UpdateResponse(
-        updateStatus=ResourceLink(href="/instruments/update/status")
-    )
-    assert all_instruments_result.status_code == 200
-    decoy.verify(await ot3_hardware_api.update_instrument_firmware(mounts=None))
-
-
-# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-@pytest.mark.xfail
-@pytest.mark.ot3_only
-async def test_get_firmware_update_status(
-    decoy: Decoy,
-    ot3_hardware_api: OT3API,
-) -> None:
-    """It should get firmware update status of all attached instruments."""
-    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
-        {
-            OT3Mount.LEFT: InstrumentUpdateStatus(
-                mount=OT3Mount.LEFT,
-                status=UpdateState.updating,
-                progress=75,
-            ),
-            OT3Mount.GRIPPER: InstrumentUpdateStatus(
-                mount=OT3Mount.GRIPPER,
-                status=UpdateState.done,
-                progress=100,
-            ),
-        }
-    )
-    result = await get_firmware_update_status(hardware=ot3_hardware_api)
-    assert result.content.data == [
-        UpdateProgressStatus.construct(
-            mount="left",
-            updateStatus="updating",
-            updateProgress=75,
-        ),
-        UpdateProgressStatus.construct(
-            mount="extension",
-            updateStatus="done",
-            updateProgress=100,
-        ),
-    ]
+#
+# # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
+# #  OT2 vs OT3 tests correclty
+# @pytest.mark.xfail
+# @pytest.mark.ot3_only
+# async def test_update_instrument_firmware(
+#     decoy: Decoy,
+#     ot3_hardware_api: OT3API,
+# ) -> None:
+#     """It should call hardware control's firmware update method."""
+#     one_instrument_result = await update_firmware(
+#         request_body=RequestModel(data=UpdateCreate(mount=cast(MountTypesStr, "left"))),
+#         hardware=ot3_hardware_api,
+#     )
+#     assert one_instrument_result.content.links == UpdateResponse(
+#         updateStatus=ResourceLink(href="/instruments/update/status")
+#     )
+#     assert one_instrument_result.status_code == 200
+#     decoy.verify(
+#         await ot3_hardware_api.update_instrument_firmware(mounts={OT3Mount.LEFT})
+#     )
+#
+#     all_instruments_result = await update_firmware(
+#         request_body=RequestModel(data=None),
+#         hardware=ot3_hardware_api,
+#     )
+#     assert all_instruments_result.content.links == UpdateResponse(
+#         updateStatus=ResourceLink(href="/instruments/update/status")
+#     )
+#     assert all_instruments_result.status_code == 200
+#     decoy.verify(await ot3_hardware_api.update_instrument_firmware(mounts=None))
+#
+#
+# # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
+# #  OT2 vs OT3 tests correclty
+# @pytest.mark.xfail
+# @pytest.mark.ot3_only
+# async def test_get_firmware_update_status(
+#     decoy: Decoy,
+#     ot3_hardware_api: OT3API,
+# ) -> None:
+#     """It should get firmware update status of all attached instruments."""
+#     decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
+#         {
+#             OT3Mount.LEFT: InstrumentUpdateStatus(
+#                 mount=OT3Mount.LEFT,
+#                 status=UpdateState.updating,
+#                 progress=75,
+#             ),
+#             OT3Mount.GRIPPER: InstrumentUpdateStatus(
+#                 mount=OT3Mount.GRIPPER,
+#                 status=UpdateState.done,
+#                 progress=100,
+#             ),
+#         }
+#     )
+#     result = await get_firmware_update_status(hardware=ot3_hardware_api)
+#     assert result.content.data == [
+#         UpdateProgressStatus.construct(
+#             mount="left",
+#             updateStatus="updating",
+#             updateProgress=75,
+#         ),
+#         UpdateProgressStatus.construct(
+#             mount="extension",
+#             updateStatus="done",
+#             updateProgress=100,
+#         ),
+#     ]

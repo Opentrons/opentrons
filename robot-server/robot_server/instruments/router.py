@@ -34,7 +34,7 @@ from .instrument_models import (
     UpdateCreate,
     UpdateProgressData,
 )
-from .update_status_monitor import UpdateProgressMonitor
+from .update_status_monitor import UpdateProgressMonitor, UpdateIdNotFound
 from ..errors import ErrorDetails, ErrorBody
 from ..runs.dependencies import get_update_progress_monitor
 from ..service.dependencies import get_unique_id, get_current_time
@@ -43,6 +43,7 @@ instruments_router = APIRouter()
 
 
 update_ids: List[str]
+
 
 class InstrumentNotFound(ErrorDetails):
     """An error if no instrument is found on the given mount."""
@@ -56,7 +57,6 @@ class NoUpdateAvailable(ErrorDetails):
 
     id: Literal["NoUpdateAvailable"] = "NoUpdateAvailable"
     title: str = "No Update Available"
-
 
 
 class UpdateInProgress(ErrorDetails):
@@ -190,17 +190,22 @@ async def get_attached_instruments(
 )
 async def update_firmware(
     request_body: RequestModel[UpdateCreate],
-    update_progress_monitor: UpdateProgressMonitor = Depends(get_update_progress_monitor),
     update_process_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     hardware: HardwareControlAPI = Depends(get_hardware),
+    update_progress_monitor: UpdateProgressMonitor = Depends(
+        get_update_progress_monitor
+    ),
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     """Update the firmware of the OT3 instrument on the specified mount.
 
     Arguments:
         request_body: Optional request body with instrument to update. If not specified,
                       will start an update of all attached instruments.
+        update_process_id: Generated ID to assign to the update resource.
+        created_at: Timestamp to attach to created update resource.
         hardware: hardware controller instance
+        update_progress_monitor: Update progress monitoring utility
     """
     try:
         ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
@@ -222,7 +227,8 @@ async def update_firmware(
     if ot3_hardware.get_firmware_update_progress()[ot3_mount]:
         raise UpdateInProgress(
             detail=f"{mount_to_update} is already either queued for update"
-                   f" or is currently updating").as_error(status.HTTP_409_CONFLICT)
+            f" or is currently updating"
+        ).as_error(status.HTTP_409_CONFLICT)
 
     # The hardware controller skips the update if the instrument is already up-to-date.
     # So a wrong mount could end up confusing a client since there won't be any
@@ -235,9 +241,7 @@ async def update_firmware(
     await ot3_hardware.update_instrument_firmware(mount=ot3_mount)
 
     update_response = update_progress_monitor.create(
-        update_id=update_process_id,
-        created_at=created_at,
-        mount=mount_to_update
+        update_id=update_process_id, created_at=created_at, mount=mount_to_update
     )
 
     return await PydanticResponse.create(
@@ -254,11 +258,17 @@ async def update_firmware(
 )
 async def get_firmware_update_status(
     update_id: str,
-    update_progress_monitor: UpdateProgressMonitor = Depends(get_update_progress_monitor),
-) -> PydanticResponse[SimpleMultiBody[UpdateProgressData]]:
+    update_progress_monitor: UpdateProgressMonitor = Depends(
+        get_update_progress_monitor
+    ),
+) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     """Get status of instrument firmware update."""
+    try:
+        update_response = update_progress_monitor.get_progress_status(update_id)
+    except UpdateIdNotFound as e:
+        raise InvalidUpdateId(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
-            data=update_progress_monitor.get_progress_status(update_id)),
+        content=SimpleBody.construct(data=update_response),
         status_code=status.HTTP_200_OK,
     )
