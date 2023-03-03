@@ -211,6 +211,19 @@ async def test_aspirate_in_place(
     )
 
 
+def test_virtual_validate_aspirated_volume_raises(
+    decoy: Decoy,
+    mock_state_view: StateView,
+) -> None:
+    """Should validate if trying to aspirate more than the working volume."""
+    decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(3)
+
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    with pytest.raises(AssertionError):
+        subject.validate_aspirated_volume(pipette_id="pipette-id", volume=4)
+
+
 async def test_blow_out_in_place(
     decoy: Decoy,
     mock_state_view: StateView,

@@ -62,6 +62,10 @@ class AspirateInPlaceImplementation(
             pipette_id=params.pipetteId,
         )
 
+        self._pipetting.validate_aspirated_volume(
+            pipette_id=params.pipetteId, volume=params.volume
+        )
+
         if not ready_to_aspirate:
             raise PipetteNotReadyToAspirateError(
                 "Pipette cannot aspirate in place because of a previous blow out."
