@@ -113,7 +113,7 @@ stages:
               labwareId: !anystr
               wellName: A1
               wellLocation:
-                origin: top
+                origin: default
                 offset:
                   x: 0
                   y: 0

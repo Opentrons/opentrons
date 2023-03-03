@@ -10,10 +10,8 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    ModuleType,
-)
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -29,6 +27,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
+from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
@@ -42,18 +41,16 @@ from .module_core import (
 )
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
+from . import deck_conflict
 
 
-# TODO(mc, 2022-08-24): many of these methods are likely unnecessary
-# in a ProtocolEngine world. As we develop this core, we should remove
-# and consolidate logic as we need to across all cores rather than
-# necessarily try to support every one of these behaviors in the engine.
 class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     """Protocol API core using a ProtocolEngine.
 
     Args:
-        engine_client: A synchronous client to the ProtocolEngine
-            that is executing the protocol.
+        engine_client: A client to the ProtocolEngine that is executing the protocol.
+        api_version: The Python Protocol API versionat which  this core is operating.
+        sync_hardware: A SynchronousAdapter-wrapped Hardware Control API.
     """
 
     def __init__(
@@ -88,20 +85,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_id=trash_id,
             engine_client=self._engine_client,
         )
-
-    def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
-        """Get a map of labware names to definition dicts.
-
-        Deprecated method used for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_labware not implemented")
-
-    def get_extra_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
-        """Get a map of extra labware names to definition dicts.
-
-        Used to assist load custom labware definitions.
-        """
-        raise NotImplementedError("ProtocolCore.get_extra_labware not implemented")
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
@@ -154,6 +137,30 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             version=version,
             display_name=label,
         )
+
+        # FIXME(mm, 2023-02-21):
+        #
+        # We're wrongly checking for deck conflicts *after* we've already loaded the
+        # labware into the ProtocolEngine. If it turns out there is a conflict,
+        # and this check raises, it will leave this object and its ProtocolEngine
+        # in a confusing inconsistent state.
+        #
+        # I expect we can get away with this in practice a lot of the time because
+        # exceptions in Python protocols are mostly treated as fatal, anyway.
+        # Users rarely catch them.
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_labware_id=load_result.labwareId,
+            # It's important that we don't fetch these IDs from Protocol Engine, and
+            # use our own bookkeeping instead. If we fetched these IDs from Protocol
+            # Engine, it would have leaked state from Labware Position Check in the
+            # same HTTP run.
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
+        )
+
         labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
@@ -198,6 +205,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             if drop_offset
             else None
         )
+
+        # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
+        # when move_labware() support is no longer experimental.
+
         self._engine_client.move_labware(
             labware_id=labware_core.labware_id,
             new_location=to_location,
@@ -228,6 +239,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         configuration: Optional[str],
     ) -> ModuleCore:
         """Load a module into the protocol."""
+        assert configuration is None, "Module `configuration` is deprecated"
+
         # TODO(mc, 2022-10-20): move to public ProtocolContext
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
@@ -260,6 +273,20 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             engine_client=self._engine_client,
             api_version=self.api_version,
             sync_module_hardware=SynchronousAdapter(selected_hardware),
+        )
+
+        # FIXME(mm, 2023-02-21):
+        # We're wrongly doing this conflict check *after* we've already loaded the
+        # module into the ProtocolEngine. See FIXME comment in self.load_labware().
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_module_id=result.moduleId,
+            # It's important that we don't fetch these IDs from Protocol Engine.
+            # See comment in self.load_labware().
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
         )
 
         self._module_cores_by_id[module_core.module_id] = module_core
@@ -296,12 +323,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Pause the protocol."""
         self._engine_client.wait_for_resume(message=msg)
 
-    def resume(self) -> None:
-        """Resume the protocol."""
-        # TODO(mm, 2022-11-08): This method is not usable in practice. Consider removing
-        # it from both cores. https://github.com/Opentrons/opentrons/issues/8209
-        raise NotImplementedError("ProtocolCore.resume not implemented")
-
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
         self._engine_client.comment(message=msg)
@@ -324,7 +345,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def door_closed(self) -> bool:
         """Get whether the device's front door is closed."""
-        raise NotImplementedError("ProtocolCore.door_closed not implemented")
+        return self._sync_hardware.door_state == DoorState.CLOSED  # type: ignore[no-any-return]
 
     def get_last_location(
         self,
@@ -392,6 +413,26 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def get_module_cores(self) -> List[ModuleCore]:
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
+
+    def define_liquid(
+        self,
+        name: str,
+        description: Optional[str],
+        display_color: Optional[str],
+    ) -> Liquid:
+        """Define a liquid to load into a well."""
+        liquid = self._engine_client.add_liquid(
+            name=name, description=description, color=display_color
+        )
+
+        return Liquid(
+            _id=liquid.id,
+            name=liquid.displayName,
+            description=liquid.description,
+            display_color=(
+                liquid.displayColor.__root__ if liquid.displayColor else None
+            ),
+        )
 
     def get_labware_location(
         self, labware_core: LabwareCore

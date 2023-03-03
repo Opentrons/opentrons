@@ -7,7 +7,6 @@ import {
   Flex,
   ALIGN_CENTER,
   SPACING,
-  Icon,
   COLORS,
   TYPOGRAPHY,
   BORDERS,
@@ -112,43 +111,16 @@ export function PipetteOffsetCalibrationItems({
                         </StyledText>
                       </>
                     ) : (
-                      <>
-                        {calibration.markedBad ?? false ? (
+                      <StyledText as="p">
+                        {calibration.lastCalibrated != null &&
+                        calibration.markedBad === true ? (
                           <>
-                            <Icon
-                              name="alert-circle"
-                              backgroundColor={COLORS.warningBackgroundLight}
-                              color={COLORS.warningEnabled}
-                              size={SPACING.spacing4}
-                            />
-                            <StyledText
-                              as="p"
-                              marginLeft={SPACING.spacing2}
-                              width="100%"
-                              color={COLORS.warningText}
-                            >
-                              {t('recalibration_recommended')}
-                            </StyledText>
+                            {formatLastCalibrated(calibration.lastCalibrated)}
                           </>
                         ) : (
-                          <>
-                            <Icon
-                              name="alert-circle"
-                              backgroundColor={COLORS.errorBackgroundLight}
-                              color={COLORS.errorEnabled}
-                              size={SPACING.spacing4}
-                            />
-                            <StyledText
-                              as="p"
-                              marginLeft={SPACING.spacing2}
-                              width="100%"
-                              color={COLORS.errorText}
-                            >
-                              {t('missing_calibration')}
-                            </StyledText>
-                          </>
+                          <>{t('not_calibrated_short')}</>
                         )}
-                      </>
+                      </StyledText>
                     )}
                   </Flex>
                 </StyledTableCell>

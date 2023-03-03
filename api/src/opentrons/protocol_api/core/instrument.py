@@ -7,7 +7,7 @@ from typing import Any, Generic, Optional, TypeVar
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates
+from opentrons.protocols.api_support.util import FlowRates
 
 from .well import WellCoreType
 
@@ -29,6 +29,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -37,6 +38,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
             well_core: The well to aspirate from, if applicable.
             rate: The rate for how quickly to aspirate.
             flow_rate: The flow rate in µL/s to aspirate at.
+            in_place: Whether this is in-place.
         """
         ...
 
@@ -48,6 +50,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -56,6 +59,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
             well_core: The well to dispense to, if applicable.
             rate: The rate for how quickly to dispense.
             flow_rate: The flow rate in µL/s to dispense at.
+            in_place: Whether this is in-place.
         """
         ...
 
@@ -64,20 +68,25 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         self,
         location: types.Location,
         well_core: Optional[WellCoreType],
-        move_to_well: bool,
+        in_place: bool,
     ) -> None:
         """Blow liquid out of the tip.
 
         Args:
             location: The location to blow out into.
             well_core: The well to blow out into.
-            move_to_well: If pipette should be moved before blow-out.
+            in_place: Whether this is in-place.
         """
         ...
 
     @abstractmethod
     def touch_tip(
-        self, location: WellCoreType, radius: float, v_offset: float, speed: float
+        self,
+        location: types.Location,
+        well_core: WellCoreType,
+        radius: float,
+        z_offset: float,
+        speed: float,
     ) -> None:
         ...
 
@@ -106,7 +115,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         self,
         location: Optional[types.Location],
         well_core: WellCoreType,
-        home_after: bool,
+        home_after: Optional[bool],
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -150,6 +159,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_display_name(self) -> str:
+        ...
+
+    @abstractmethod
     def get_min_volume(self) -> float:
         ...
 
@@ -179,19 +192,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def is_ready_to_aspirate(self) -> bool:
-        ...
-
-    @abstractmethod
-    def prepare_for_aspirate(self) -> None:
-        ...
-
-    @abstractmethod
     def get_return_height(self) -> float:
-        ...
-
-    @abstractmethod
-    def get_speed(self) -> PlungerSpeeds:
         ...
 
     @abstractmethod
@@ -199,27 +200,18 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
+    def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     @abstractmethod
-    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
+    def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     @abstractmethod
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
+    def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
     def set_flow_rate(
-        self,
-        aspirate: Optional[float] = None,
-        dispense: Optional[float] = None,
-        blow_out: Optional[float] = None,
-    ) -> None:
-        ...
-
-    @abstractmethod
-    def set_pipette_speed(
         self,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,

@@ -28,7 +28,7 @@ import type {
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { Jog } from '../../molecules/DeprecatedJogControls/types'
+import type { Jog } from '../../molecules/JogControls/types'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { chainRunCommands } from './utils/chainRunCommands'

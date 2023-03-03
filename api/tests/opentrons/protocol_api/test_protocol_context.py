@@ -12,6 +12,8 @@ from opentrons.types import Mount, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -22,6 +24,7 @@ from opentrons.protocol_api import (
     Labware,
     Deck,
     validation as mock_validation,
+    Liquid,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.labware import LabwareLoadParams
@@ -71,12 +74,21 @@ def mock_deck(decoy: Decoy) -> Deck:
 
 
 @pytest.fixture
+def api_version() -> APIVersion:
+    """The API version under test."""
+    return MAX_SUPPORTED_VERSION
+
+
+@pytest.fixture
 def subject(
-    mock_core: ProtocolCore, mock_core_map: LoadedCoreMap, mock_deck: Deck
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    mock_deck: Deck,
+    api_version: APIVersion,
 ) -> ProtocolContext:
     """Get a ProtocolContext test subject with its dependencies mocked out."""
     return ProtocolContext(
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=api_version,
         core=mock_core,
         core_map=mock_core_map,
         deck=mock_deck,
@@ -447,6 +459,17 @@ def test_load_module_default_location(
     assert isinstance(result, ModuleContext)
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_load_module_with_configuration(subject: ProtocolContext) -> None:
+    """It should raise an APIVersionError if the deprecated `configuration` argument is used."""
+    with pytest.raises(APIVersionError, match="removed"):
+        subject.load_module(
+            module_name="spline reticulator",
+            location=42,
+            configuration="semi",
+        )
+
+
 def test_loaded_modules(
     decoy: Decoy,
     mock_core_map: LoadedCoreMap,
@@ -478,6 +501,30 @@ def test_home(
     """It should home all axes."""
     subject.home()
     decoy.verify(mock_core.home(), times=1)
+
+
+def test_add_liquid(
+    decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
+) -> None:
+    """It should add a liquid to the state."""
+    expected_result = Liquid(
+        _id="water-id",
+        name="water",
+        description="water desc",
+        display_color="#1234",
+    )
+
+    decoy.when(
+        mock_core.define_liquid(
+            name="water", description="water desc", display_color="#1234"
+        )
+    ).then_return(expected_result)
+
+    result = subject.define_liquid(
+        name="water", description="water desc", display_color="#1234"
+    )
+
+    assert result == expected_result
 
 
 def test_bundled_data(

@@ -12,9 +12,11 @@ from robot_server.service.json_api import (
 )
 
 from opentrons.types import Mount
+from opentrons.protocol_engine.types import Vec3f
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
+from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
 from .instrument_models import (
     MountType,
@@ -23,6 +25,7 @@ from .instrument_models import (
     GripperData,
     Gripper,
     AttachedInstrument,
+    GripperCalibrationData,
 )
 
 instruments_router = APIRouter()
@@ -46,13 +49,22 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
 
 def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     """Convert GripperDict to Gripper response model."""
+    calibration_data = gripper_dict["calibration_offset"]
     return Gripper.construct(
         mount=MountType.EXTENSION.as_string(),
-        instrumentModel=gripper_dict["model"],
+        instrumentModel=GripperModelStr(str(gripper_dict["model"])),
         serialNumber=gripper_dict["gripper_id"],
         data=GripperData(
-            jawState=gripper_dict["state"],
-            calibratedOffset=gripper_dict["calibration_offset"],
+            jawState=gripper_dict["state"].name.lower(),
+            calibratedOffset=GripperCalibrationData.construct(
+                offset=Vec3f(
+                    x=calibration_data.offset.x,
+                    y=calibration_data.offset.y,
+                    z=calibration_data.offset.z,
+                ),
+                source=calibration_data.source,
+                last_modified=calibration_data.last_modified,
+            ),
         ),
     )
 

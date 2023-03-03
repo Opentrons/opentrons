@@ -1,5 +1,5 @@
 from typing_extensions import Literal
-from typing import List, Dict, Tuple, cast
+from typing import List, Dict, Tuple, cast, Optional
 from pydantic import BaseModel, Field, validator
 from enum import Enum
 from dataclasses import dataclass
@@ -9,19 +9,22 @@ PLUNGER_CURRENT_MAXIMUM = 1.5
 
 
 PipetteModelMajorVersion = [1, 2, 3]
-PipetteModelMinorVersion = [0, 1, 2, 3]
+PipetteModelMinorVersion = [0, 1, 2, 3, 4, 5]
 
 # TODO Literals are only good for writing down
 # exact values. Is there a better typing mechanism
 # so we don't need to keep track of versions in two
 # different places?
 PipetteModelMajorVersionType = Literal[1, 2, 3]
-PipetteModelMinorVersionType = Literal[0, 1, 2, 3]
+PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5]
 
 
 class PipetteTipType(Enum):
+    t10 = 10
+    t20 = 20
     t50 = 50
     t200 = 200
+    t300 = 300
     t1000 = 1000
 
 
@@ -44,7 +47,10 @@ class PipetteChannelType(Enum):
 
 
 class PipetteModelType(Enum):
+    p10 = "p10"
+    p20 = "p20"
     p50 = "p50"
+    p300 = "p300"
     p1000 = "p1000"
 
 
@@ -108,7 +114,7 @@ class SupportedTipsDefinition(BaseModel):
         description="The default tip overlap associated with this tip type.",
         alias="defaultTipOverlap",
     )
-    default_return_tip_height: float = Field(
+    default_return_tip_height: Optional[float] = Field(
         ...,
         description="The height to return a tip to its tiprack.",
         alias="defaultReturnTipHeight",
@@ -118,6 +124,11 @@ class SupportedTipsDefinition(BaseModel):
     )
     dispense: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for dispensing."
+    )
+    tip_overlap_dictionary: Dict[str, float] = Field(
+        default={},
+        description="The default tip overlap associated with this tip type.",
+        alias="defaultTipOverlapDictionary",
     )
 
 
@@ -158,18 +169,15 @@ class TipHandlingConfigurations(BaseModel):
         ...,
         description="The speed to move the z or plunger axis for tip pickup or drop off.",
     )
-
-
-class PickUpTipConfigurations(TipHandlingConfigurations):
     presses: int = Field(
-        ..., description="The number of tries required to force pick up a tip."
+        default=0.0, description="The number of tries required to force pick up a tip."
     )
     increment: float = Field(
-        ...,
+        default=0.0,
         description="The increment to move the pipette down for force tip pickup retries.",
     )
     distance: float = Field(
-        ..., description="The distance to begin a pick up tip from."
+        default=0.0, description="The distance to begin a pick up tip from."
     )
 
 
@@ -208,7 +216,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     display_category: PipetteGenerationType = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
     )
-    pick_up_tip_configurations: PickUpTipConfigurations = Field(
+    pick_up_tip_configurations: TipHandlingConfigurations = Field(
         ..., alias="pickUpTipConfigurations"
     )
     drop_tip_configurations: TipHandlingConfigurations = Field(
@@ -241,6 +249,13 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         if not v:
             return PipetteGenerationType.GEN1
         return PipetteGenerationType(v)
+
+    class Config:
+        json_encoders = {
+            PipetteChannelType: lambda v: v.value,
+            PipetteModelType: lambda v: v.value,
+            PipetteGenerationType: lambda v: v.value,
+        }
 
 
 class PipetteGeometryDefinition(BaseModel):

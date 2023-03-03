@@ -48,8 +48,16 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self._instrument_name = instrument_name
         self._default_speed = default_speed
         self._api_version = api_version or MAX_SUPPORTED_VERSION
+
         self._flow_rate = FlowRates(self)
-        self._flow_rate.set_defaults(api_level=self._api_version)
+        pipette_state = self.get_hardware_state()
+        self._flow_rate.set_defaults(
+            aspirate_defaults=pipette_state["default_aspirate_flow_rates"],
+            dispense_defaults=pipette_state["default_dispense_flow_rates"],
+            blow_out_defaults=pipette_state["default_blow_out_flow_rates"],
+            api_level=self._api_version,
+        )
+
         self._plunger_speeds = PlungerSpeeds(self)
         # Cache the maximum instrument height
         self._instrument_max_height = (
@@ -69,6 +77,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -108,8 +117,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
-        self.move_to(location=location, well_core=well_core)
+        if not in_place:
+            self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 
@@ -117,9 +128,9 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self,
         location: types.Location,
         well_core: Optional[LegacyWellCore],
-        move_to_well: bool,
+        in_place: bool,
     ) -> None:
-        if move_to_well:
+        if not in_place:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._update_volume(0)
@@ -132,9 +143,14 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         )
 
     def touch_tip(
-        self, location: LegacyWellCore, radius: float, v_offset: float, speed: float
+        self,
+        location: types.Location,
+        well_core: LegacyWellCore,
+        radius: float,
+        z_offset: float,
+        speed: float,
     ) -> None:
-        pass
+        self.move_to(location)
 
     def pick_up_tip(
         self,
@@ -173,7 +189,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self,
         location: Optional[types.Location],
         well_core: LegacyWellCore,
-        home_after: bool,
+        home_after: Optional[bool],
     ) -> None:
         labware_core = well_core.geometry.parent
 
@@ -268,6 +284,9 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def get_model(self) -> str:
         return self._pipette_dict["model"]
 
+    def get_display_name(self) -> str:
+        return self._pipette_dict["display_name"]
+
     def get_min_volume(self) -> float:
         return self._pipette_dict["min_volume"]
 
@@ -304,14 +323,14 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rate
 
-    def get_absolute_aspirate_flow_rate(self, rate: float) -> float:
-        return self._flow_rate.aspirate * rate
+    def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
+        return self._pipette_dict["aspirate_flow_rate"] * rate
 
-    def get_absolute_dispense_flow_rate(self, rate: float) -> float:
-        return self._flow_rate.dispense * rate
+    def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
+        return self._pipette_dict["dispense_flow_rate"] * rate
 
-    def get_absolute_blow_out_flow_rate(self, rate: float) -> float:
-        return self._flow_rate.blow_out * rate
+    def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
+        return self._pipette_dict["blow_out_flow_rate"] * rate
 
     def set_flow_rate(
         self,

@@ -69,12 +69,6 @@ export type CreateRunCommand = (
 
 export type SelectablePipettes = '96-Channel' | 'Single-Channel_and_8-Channel'
 
-export type ZAxisScrewStatus =
-  | 'detached'
-  | 'attached'
-  | 'stillAttached'
-  | 'unknown'
-
 export interface PipetteWizardStepProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
@@ -91,4 +85,5 @@ export interface PipetteWizardStepProps {
   errorMessage: string | null
   robotName: string
   selectedPipette: SelectablePipettes
+  isOnDevice: boolean | null
 }

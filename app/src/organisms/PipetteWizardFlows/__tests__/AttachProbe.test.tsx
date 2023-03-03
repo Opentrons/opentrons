@@ -40,6 +40,7 @@ describe('AttachProbe', () => {
       isRobotMoving: false,
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
@@ -81,7 +82,7 @@ describe('AttachProbe', () => {
     const { getByText, getByAltText } = render(props)
     getByText('Stand Back, Pipette is Calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration divot in slot 2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot 2 to determine its exact position'
     )
     getByAltText('Pipette is calibrating')
   })

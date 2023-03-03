@@ -29,10 +29,7 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
         />
       </div>
       {showColorPicker ? (
-        <div
-          className={styles.popover}
-          onBlur={() => setShowColorPicker(false)}
-        >
+        <div className={styles.popover}>
           <div
             className={styles.cover}
             onClick={() => setShowColorPicker(false)}
