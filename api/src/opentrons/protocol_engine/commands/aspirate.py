@@ -67,10 +67,6 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
             pipette_id=pipette_id
         )
 
-        self._pipetting.validate_aspirated_volume(
-            pipette_id=pipette_id, volume=params.volume
-        )
-
         current_well = None
 
         if not ready_to_aspirate:

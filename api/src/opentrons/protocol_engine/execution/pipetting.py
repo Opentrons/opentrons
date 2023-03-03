@@ -14,9 +14,6 @@ class PipettingHandler(TypingProtocol):
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
 
-    def validate_aspirated_volume(self, pipette_id: str, volume: float) -> None:
-        """Get whether the aspirated volume is valid to aspirate. No-op with hardware-api."""
-
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Prepare for pipette aspiration."""
 
@@ -62,9 +59,6 @@ class HardwarePipettingHandler(PipettingHandler):
             self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
             and hw_pipette.config["ready_to_aspirate"]
         )
-
-    def validate_aspirated_volume(self, pipette_id: str, volume: float) -> None:
-        """Get whether the aspirated volume is valid to aspirate. No-op with hardware-api."""
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Prepare for pipette aspiration."""
@@ -164,7 +158,7 @@ class VirtualPipettingHandler(PipettingHandler):
         """Get whether a pipette is ready to aspirate."""
         return self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
 
-    def validate_aspirated_volume(self, pipette_id: str, volume: float) -> None:
+    def _validate_aspirated_volume(self, pipette_id: str, volume: float) -> None:
         """Get whether the aspirated volume is valid to aspirate."""
         working_volume = self._state_view.pipettes.get_working_volume(
             pipette_id=pipette_id
@@ -181,6 +175,7 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> float:
         """Virtually aspirate (no-op)."""
+        self._validate_aspirated_volume(pipette_id=pipette_id, volume=volume)
         return volume
 
     async def dispense_in_place(

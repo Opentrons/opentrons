@@ -221,7 +221,7 @@ def test_virtual_validate_aspirated_volume_raises(
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
     with pytest.raises(AssertionError):
-        subject.validate_aspirated_volume(pipette_id="pipette-id", volume=4)
+        subject._validate_aspirated_volume(pipette_id="pipette-id", volume=4)
 
 
 async def test_blow_out_in_place(
