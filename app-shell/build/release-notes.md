@@ -6,6 +6,20 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 6.3.0
+
+Welcome to the v6.3.0 release of the Opentrons App!
+
+## Bug Fixes
+
+TODO
+
+## Improved Features
+
+TODO
+
+---
+
 ## Opentrons App Changes in 6.2.1
 
 Welcome to the v6.2.1 release of the Opentrons App!

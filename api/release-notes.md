@@ -6,6 +6,19 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## OT-2 Software Changes in 6.3.0
+
+Welcome to the v6.3.0 release of the OT-2 software! This hotfix release addresses a few problems.
+
+### Bug Fixes
+
+TODO
+
+## Improved Features
+
+TODO
+
+---
 ## OT-2 Software Changes in 6.2.1
 
 Welcome to the v6.2.1 release of the OT-2 software! This hotfix release addresses a few problems.
