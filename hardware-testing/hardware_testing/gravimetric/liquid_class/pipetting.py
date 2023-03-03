@@ -1,6 +1,6 @@
 """Pipette motions."""
 from dataclasses import dataclass
-from typing import Optional, Callable
+from typing import Optional, Callable, Tuple
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
@@ -56,6 +56,30 @@ def _create_pipetting_heights(
     )
 
 
+def _get_heights_in_well(
+    height_before: float,
+    height_after: float,
+    submerge: float,
+    retract: float,
+    stay_above_well: bool,
+) -> Tuple[float, float, float]:
+    pipetting_heights = _create_pipetting_heights(
+        height_before, height_after, submerge, retract
+    )
+    approach = max(pipetting_heights.start.above, pipetting_heights.end.below)
+    if not stay_above_well:
+        submerge = pipetting_heights.end.below
+        retract = pipetting_heights.end.above
+    else:
+        # when doing fake/dry pipetting, stay above the well at all times
+        # but move the same distances, to closely simulate real timing
+        s_diff = abs(approach - pipetting_heights.end.below)
+        submerge = approach + s_diff
+        r_diff = abs(pipetting_heights.end.above - pipetting_heights.end.below)
+        retract = submerge - r_diff
+    return approach, submerge, retract
+
+
 @dataclass
 class PipettingCallbacks:
     """Pipetting callbacks."""
@@ -77,6 +101,7 @@ def _pipette_with_liquid_settings(
     aspirate: Optional[float] = None,
     dispense: Optional[float] = None,
     callbacks: Optional[PipettingCallbacks] = None,
+    stay_above_well: bool = True,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     if aspirate:
@@ -87,20 +112,21 @@ def _pipette_with_liquid_settings(
     pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
 
     # CALCULATE HEIGHTS
-    height_before, height_after = liquid_tracker.get_before_and_after_heights(
+    liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
     if aspirate:
-        height_settings = liquid_class.aspirate
+        liq_submerge = liquid_class.aspirate.submerge
+        liq_retract = liquid_class.aspirate.retract
     else:
-        height_settings = liquid_class.dispense  # type: ignore[assignment]
-    pipetting_heights = _create_pipetting_heights(
-        height_before, height_after, height_settings.submerge, height_settings.retract
+        liq_submerge = liquid_class.dispense.submerge
+        liq_retract = liquid_class.dispense.retract
+    approach_mm, submerge_mm, retract_mm = _get_heights_in_well(
+        liquid_before, liquid_after, liq_submerge, liq_retract, stay_above_well
     )
 
     # APPROACH
-    start_above = max(pipetting_heights.start.above, pipetting_heights.end.below)
-    pipette.move_to(well.bottom(start_above))
+    pipette.move_to(well.bottom(approach_mm))
 
     if aspirate:
         # LEADING AIR-GAP
@@ -112,9 +138,8 @@ def _pipette_with_liquid_settings(
     # SUBMERGE
     if callbacks and callbacks.on_submerging:
         callbacks.on_submerging()
-    # TODO: implement liquid-height tracking here
     pipette.move_to(
-        well.bottom(pipetting_heights.end.below),
+        well.bottom(submerge_mm),
         force_direct=True,
         speed=TIP_SPEED_WHILE_SUBMERGED,
     )
@@ -142,7 +167,7 @@ def _pipette_with_liquid_settings(
     if callbacks and callbacks.on_retracting:
         callbacks.on_retracting()
     pipette.move_to(
-        well.bottom(pipetting_heights.end.above),
+        well.bottom(retract_mm),
         force_direct=True,
         speed=TIP_SPEED_WHILE_SUBMERGED,
     )
@@ -171,20 +196,17 @@ def aspirate_with_liquid_class(
     well: Well,
     liquid_tracker: LiquidTracker,
     callbacks: Optional[PipettingCallbacks] = None,
+    stay_above_well: bool = True,
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
         int(pipette.max_volume), tip_volume, int(aspirate_volume)
     )
-    print(f"\taspirate:\n"
-          f"\t\tleading = {liquid_class.aspirate.air_gap.leading_air_gap}\n"
-          f"\t\tvolume = {aspirate_volume}\n"
-          f"\t\ttrailing = {liquid_class.aspirate.air_gap.trailing_air_gap}")
     # FIXME: change API to allow going beyond tip max volume
     artificial_aspirate_max = tip_volume * 0.9
     if aspirate_volume > artificial_aspirate_max:
         aspirate_volume = artificial_aspirate_max
-        print(f"WARNING: using workaround volume: {aspirate_volume}")
+        print(f"FIXME: using workaround volume: {aspirate_volume}")
     _pipette_with_liquid_settings(
         ctx,
         pipette,
@@ -193,6 +215,7 @@ def aspirate_with_liquid_class(
         liquid_tracker,
         aspirate=aspirate_volume,
         callbacks=callbacks,
+        stay_above_well=stay_above_well,
     )
 
 
@@ -204,6 +227,7 @@ def dispense_with_liquid_class(
     well: Well,
     liquid_tracker: LiquidTracker,
     callbacks: Optional[PipettingCallbacks] = None,
+    stay_above_well: bool = True,
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
@@ -217,4 +241,5 @@ def dispense_with_liquid_class(
         liquid_tracker,
         dispense=dispense_volume,
         callbacks=callbacks,
+        stay_above_well=stay_above_well,
     )

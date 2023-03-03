@@ -20,11 +20,11 @@ def run(protocol: ProtocolContext, labware_offsets: List[dict]) -> None:
             pipette_mount="left",
             pipette_volume=1000,
             tip_volume=50,
-            trials=3,
+            trials=10,
             labware_offsets=labware_offsets,
             slot_vial=4,
             slot_tiprack=7,
-            increment=True,
+            increment=False,
             low_volume=False,
         ),
     )

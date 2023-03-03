@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List
 from typing_extensions import Final
 
-from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well
 
 from hardware_testing.data import create_run_id_and_start_time
 from hardware_testing.opentrons_api.types import OT3Mount
@@ -23,6 +23,7 @@ from .liquid_class.pipetting import (
 from .radwag_pipette_calibration_file import VIAL_DEFINITION
 
 
+NUM_EVAPORATION_TRIALS: Final = 3
 LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
 VIAL_SAFE_Z_OFFSET: Final = 10
 DELAY_SECONDS_BEFORE_ASPIRATE: Final = 1
@@ -62,14 +63,57 @@ def _generate_callbacks_for_trial(
     )
 
 
+def _run_sample(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    well: Well,
+    tip_volume: int,
+    volume: float,
+    trial: int,
+    recorder: GravimetricRecorder,
+    liquid_tracker: LiquidTracker,
+    stay_above_well: bool,
+) -> None:
+    pipette.move_to(well.top())
+    if stay_above_well:
+        vol_tag = "evaporation"
+    else:
+        vol_tag = str(int(volume))
+    with recorder.samples_of_tag(f"measure-init-{vol_tag}-{trial}"):
+        ctx.delay(DELAY_SECONDS_BEFORE_ASPIRATE)
+    callbacks = _generate_callbacks_for_trial(recorder, volume, trial)
+    aspirate_with_liquid_class(
+        ctx,
+        pipette,
+        tip_volume,
+        volume,
+        well,
+        liquid_tracker,
+        callbacks=callbacks,
+        stay_above_well=stay_above_well,
+    )
+    with recorder.samples_of_tag(f"measure-aspirate-{vol_tag}-{trial}"):
+        ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
+    dispense_with_liquid_class(
+        ctx,
+        pipette,
+        tip_volume,
+        volume,
+        well,
+        liquid_tracker,
+        callbacks=callbacks,
+        stay_above_well=stay_above_well,
+    )
+    with recorder.samples_of_tag(f"measure-dispense-{vol_tag}-{trial}"):
+        ctx.delay(DELAY_SECONDS_AFTER_DISPENSE)
+
+
 def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     """Run."""
     if ctx.is_simulating():
         get_input = print
     else:
         get_input = input  # type: ignore[assignment]
-
-    """Setup."""
     run_id, start_time = create_run_id_and_start_time()
 
     # LOAD LABWARE
@@ -144,37 +188,42 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     recorder.record(in_thread=True)
 
     try:
+        total = len(test_volumes) * cfg.trials + NUM_EVAPORATION_TRIALS
+        count = 0
+        # MEASURE EVAPORATION
+        for trial in range(NUM_EVAPORATION_TRIALS):
+            count += 1
+            print(f"{count}/{total}: evaporation (trial {trial + 1}/{NUM_EVAPORATION_TRIALS})")
+            pipette.pick_up_tip()
+            _run_sample(
+                ctx,
+                pipette,
+                vial["A1"],
+                cfg.tip_volume,
+                test_volumes[-1],
+                trial,
+                recorder,
+                liquid_tracker,
+                stay_above_well=True,  # stay away from the liquid
+            )
+            pipette.drop_tip()
         # LOOP THROUGH SAMPLES
         for volume in test_volumes:
             for trial in range(cfg.trials):
-                print(f"{trial + 1}/{cfg.trials}: {volume} uL")
+                count += 1
+                print(f"{count}/{total}: {volume} uL (trial {trial + 1}/{cfg.trials})")
                 pipette.pick_up_tip()
-                pipette.move_to(vial["A1"].top())
-                with recorder.samples_of_tag(f"measure-init-{int(volume)}-{trial}"):
-                    ctx.delay(DELAY_SECONDS_BEFORE_ASPIRATE)
-                callbacks = _generate_callbacks_for_trial(recorder, volume, trial)
-                aspirate_with_liquid_class(
+                _run_sample(
                     ctx,
                     pipette,
+                    vial["A1"],
                     cfg.tip_volume,
                     volume,
-                    vial["A1"],
+                    trial,
+                    recorder,
                     liquid_tracker,
-                    callbacks=callbacks,
+                    stay_above_well=False
                 )
-                with recorder.samples_of_tag(f"measure-aspirate-{int(volume)}-{trial}"):
-                    ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
-                dispense_with_liquid_class(
-                    ctx,
-                    pipette,
-                    cfg.tip_volume,
-                    volume,
-                    vial["A1"],
-                    liquid_tracker,
-                    callbacks=callbacks,
-                )
-                with recorder.samples_of_tag(f"measure-dispense-{int(volume)}-{trial}"):
-                    ctx.delay(DELAY_SECONDS_AFTER_DISPENSE)
                 pipette.drop_tip()
     finally:
         recorder.stop()
