@@ -38,9 +38,15 @@ async def authorize(
     summary="Verify an authorization token.",
     dependencies=[Depends(check_authorization_token_header)],
     responses={
-        status.HTTP_200_OK: {"description": "the authorization is valid"},
-        status.HTTP_403_FORBIDDEN: {"description": "the authorization token is not valid for the given scopes"}
-    }
+        status.HTTP_200_OK: {
+            "description": "The authorization token is valid",
+            "model": None,
+        },
+        status.HTTP_403_FORBIDDEN: {
+            "description": "the authorization token is not valid for the given scopes",
+            "model": None,
+        },
+    },
 )
 async def check_authorization(
     token: str = Depends(get_authorization_token_header),
@@ -48,5 +54,10 @@ async def check_authorization(
     scopes: Optional[List[str]] = Query(
         None, description="List of scopes to verify token access to."
     ),
-) -> None:
+) -> Response:
+    """Check an authorization token for validity."""
+    # NOTE: The `scopes` parameter is included as a placeholder for future validation.
+    # In the current implementation of this server, an auth token gives unilateral access
+    # to system functionality; thus, there is no scope restraint to be concerned with.
+
     return Response(status_code=status.HTTP_200_OK)
