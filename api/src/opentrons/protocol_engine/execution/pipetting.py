@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateView, HardwarePipette
+from ..errors import TipNotAttachedError
 
 
 class PipettingHandler(TypingProtocol):
@@ -185,6 +186,13 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> None:
         """Virtually blow out (no-op)."""
+        self._validate_tip_attached(pipette_id=pipette_id)
+
+    def _validate_tip_attached(self, pipette_id: str) -> None:
+        """Validate if there is a tip attached."""
+        tip_geometry = self._state_view.pipettes.get_attached_tip(pipette_id)
+        if not tip_geometry:
+            raise TipNotAttachedError("Cannot perform BLOWOUT without a tip attachedxs")
 
 
 def create_pipetting_handler(
