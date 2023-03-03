@@ -8,11 +8,7 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string[]
 
-export type DevInternalFlag =
-  | 'allPipetteConfig'
-  | 'enableBundleUpload'
-  | 'enableCalibrationWizards'
-  | 'enableExtendedHardware'
+export type DevInternalFlag = 'enableExtendedHardware'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -181,4 +177,11 @@ export interface ConfigV13 extends Omit<ConfigV12, 'version'> {
   }
 }
 
-export type Config = ConfigV13
+export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
+  version: 14
+  protocols: ConfigV13['protocols'] & {
+    pinnedProtocolIds: string[]
+  }
+}
+
+export type Config = ConfigV14

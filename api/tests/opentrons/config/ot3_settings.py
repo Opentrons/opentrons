@@ -180,9 +180,20 @@ ot3_dummy_settings = {
     "right_mount_offset": (3, 2, 1),
     "left_mount_offset": (2, 2, 2),
     "gripper_mount_offset": (1, 1, 1),
+    "liquid_sense": {
+        "starting_mount_height": 80,
+        "max_z_distance": 20,
+        "min_z_distance": 3,
+        "mount_speed": 10,
+        "plunger_speed": 10,
+        "sensor_threshold_pascals": 17,
+        "expected_liquid_height": 90,
+        "log_pressure": True,
+        "aspirate_while_sensing": False,
+        "data_file": "/var/pressure_sensor_data.csv",
+    },
     "calibration": {
         "z_offset": {
-            "point": [1, 2, 3],
             "pass_settings": {
                 "prep_distance_mm": 1,
                 "max_overrun_distance_mm": 2,
@@ -191,11 +202,7 @@ ot3_dummy_settings = {
             },
         },
         "edge_sense": {
-            "plus_x_pos": [4, 5, 6],
-            "plus_y_pos": [7, 8, 9],
-            "minus_x_pos": [10, 11, 12],
-            "minus_y_pos": [13, 14, 15],
-            "overrun_tolerance_mm": 16,
+            "overrun_tolerance_mm": 2,
             "early_sense_tolerance_mm": 17,
             "pass_settings": {
                 "prep_distance_mm": 4,
@@ -205,7 +212,18 @@ ot3_dummy_settings = {
             },
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,
-            "nominal_center": [8, 8, 0],
+        },
+        "edge_sense_binary": {
+            "overrun_tolerance_mm": 2,
+            "early_sense_tolerance_mm": 17,
+            "pass_settings": {
+                "prep_distance_mm": 4,
+                "max_overrun_distance_mm": 5,
+                "speed_mm_per_s": 6,
+                "sensor_threshold_pf": 7,
+            },
+            "search_initial_tolerance_mm": 18,
+            "search_iteration_limit": 3,
         },
         "probe_length": 40,
     },

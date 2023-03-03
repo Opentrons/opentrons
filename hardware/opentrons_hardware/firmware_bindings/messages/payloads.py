@@ -2,7 +2,7 @@
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from . import message_definitions
 
 from .fields import (
@@ -25,6 +25,7 @@ from .fields import (
     MotorPositionFlagsField,
     MoveStopConditionField,
     GearMotorIdField,
+    OptionalRevisionField,
 )
 from .. import utils
 
@@ -63,12 +64,35 @@ class ErrorMessagePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
-class DeviceInfoResponsePayload(EmptyPayload):
-    """Device info response."""
-
+class _DeviceInfoResponsePayloadBase(EmptyPayload):
     version: utils.UInt32Field
     flags: VersionFlagsField
     shortsha: FirmwareShortSHADataField
+
+
+@dataclass(eq=False)
+class DeviceInfoResponsePayload(_DeviceInfoResponsePayloadBase):
+    """Device info response."""
+
+    @classmethod
+    def build(cls, data: bytes) -> "DeviceInfoResponsePayload":
+        """Build a response payload from incoming bytes.
+
+        This override is required to handle optionally-present revision data.
+        """
+        consumed_by_super = _DeviceInfoResponsePayloadBase.get_size()
+        superdict = asdict(_DeviceInfoResponsePayloadBase.build(data))
+        message_index = superdict.pop("message_index")
+        inst = cls(
+            **superdict,
+            revision=OptionalRevisionField.build(
+                (data + b"\x00\x00\x00\x00")[consumed_by_super:]
+            ),
+        )
+        inst.message_index = message_index
+        return inst
+
+    revision: OptionalRevisionField
 
 
 @dataclass(eq=False)
@@ -476,6 +500,14 @@ class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
 
     duty_cycle: utils.UInt32Field
     encoder_position_um: utils.Int32Field
+
+
+@dataclass(eq=False)
+class GripperErrorTolerancePayload(EmptyPayload):
+    """A request to update the position error tolerance of the gripper."""
+
+    max_pos_error_mm: utils.UInt32Field
+    max_unwanted_movement_mm: utils.UInt32Field
 
 
 @dataclass(eq=False)

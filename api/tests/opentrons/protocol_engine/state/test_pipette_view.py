@@ -4,40 +4,50 @@ from typing import cast, Dict, List, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedPipette,
     MotorAxis,
+    FlowRates,
+    DeckPoint,
+    CurrentWell,
+    TipGeometry,
 )
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,
-    CurrentWell,
+    CurrentDeckPoint,
     HardwarePipette,
     StaticPipetteConfig,
 )
+from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
 
 
 def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
-    aspirated_volume_by_id: Optional[Dict[str, float]] = None,
-    tip_volume_by_id: Optional[Dict[str, float]] = None,
+    aspirated_volume_by_id: Optional[Dict[str, Optional[float]]] = None,
     current_well: Optional[CurrentWell] = None,
-    attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
+    current_deck_point: CurrentDeckPoint = CurrentDeckPoint(
+        mount=None, deck_point=None
+    ),
+    attached_tip_by_id: Optional[Dict[str, Optional[TipGeometry]]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
+    flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
         pipettes_by_id=pipettes_by_id or {},
         aspirated_volume_by_id=aspirated_volume_by_id or {},
-        tip_volume_by_id=tip_volume_by_id or {},
         current_well=current_well,
-        attached_tip_labware_by_id=attached_tip_labware_by_id or {},
+        current_deck_point=current_deck_point,
+        attached_tip_by_id=attached_tip_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
         static_config_by_id=static_config_by_id or {},
+        flow_rates_by_id=flow_rates_by_id or {},
     )
 
     return PipetteView(state=state)
@@ -90,6 +100,7 @@ def test_get_pipette_data() -> None:
 
     assert result_by_id == pipette_data
     assert result_by_mount == pipette_data
+    assert subject.get_mount("pipette-id") == MountType.LEFT
 
 
 def test_get_hardware_pipette() -> None:
@@ -191,28 +202,48 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
         )
 
 
-def test_pipette_volume_raises_if_bad_id() -> None:
-    """get_aspirated_volume should raise if the given pipette doesn't exist."""
-    subject = get_pipette_view()
-
-    with pytest.raises(errors.PipetteNotLoadedError):
-        subject.get_aspirated_volume("pipette-id")
-
-
-def test_get_pipette_aspirated_volume() -> None:
+def test_get_aspirated_volume() -> None:
     """It should get the aspirate volume for a pipette."""
-    subject = get_pipette_view(aspirated_volume_by_id={"pipette-id": 42})
+    subject = get_pipette_view(
+        aspirated_volume_by_id={
+            "pipette-id": 42,
+            "pipette-id-none": None,
+            "pipette-id-no-tip": None,
+        },
+        attached_tip_by_id={
+            "pipette-id": TipGeometry(length=1, volume=2, diameter=3),
+            "pipette-id-none": TipGeometry(length=4, volume=5, diameter=6),
+            "pipette-id-no-tip": None,
+        },
+    )
 
     assert subject.get_aspirated_volume("pipette-id") == 42
+    assert subject.get_aspirated_volume("pipette-id-none") is None
+
+    with pytest.raises(errors.PipetteNotLoadedError):
+        subject.get_aspirated_volume("not-an-id")
+
+    with pytest.raises(errors.TipNotAttachedError):
+        subject.get_aspirated_volume("pipette-id-no-tip")
 
 
 def test_get_pipette_working_volume() -> None:
     """It should get the minimum value of tip volume and max volume."""
     subject = get_pipette_view(
-        tip_volume_by_id={"pipette-id": 1337},
+        attached_tip_by_id={
+            "pipette-id": TipGeometry(length=1, volume=1337, diameter=42.0),
+        },
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                min_volume=1, max_volume=9001, model="blah"
+                min_volume=1,
+                max_volume=9001,
+                model="blah",
+                display_name="bleh",
+                serial_number="",
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
             )
         },
     )
@@ -220,87 +251,109 @@ def test_get_pipette_working_volume() -> None:
     assert subject.get_working_volume("pipette-id") == 1337
 
 
+def test_get_pipette_working_volume_raises_if_tip_volume_is_none() -> None:
+    """Should raise an exception that no tip is attached."""
+    subject = get_pipette_view(
+        attached_tip_by_id={
+            "pipette-id": None,
+        },
+        static_config_by_id={
+            "pipette-id": StaticPipetteConfig(
+                min_volume=1,
+                max_volume=9001,
+                model="blah",
+                display_name="bleh",
+                serial_number="",
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
+            )
+        },
+    )
+
+    with pytest.raises(TipNotAttachedError):
+        subject.get_working_volume("pipette-id")
+
+    with pytest.raises(PipetteNotLoadedError):
+        subject.get_working_volume("wrong-id")
+
+
 def test_get_pipette_available_volume() -> None:
     """It should get the available volume for a pipette."""
     subject = get_pipette_view(
-        tip_volume_by_id={"pipette-id": 100},
+        attached_tip_by_id={
+            "pipette-id": TipGeometry(
+                length=1,
+                diameter=2,
+                volume=100,
+            ),
+        },
         aspirated_volume_by_id={"pipette-id": 58},
         static_config_by_id={
             "pipette-id": StaticPipetteConfig(
-                min_volume=1, max_volume=123, model="blah"
-            )
+                min_volume=1,
+                max_volume=123,
+                model="blah",
+                display_name="bleh",
+                serial_number="",
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
+            ),
+            "pipette-id-none": StaticPipetteConfig(
+                min_volume=1,
+                max_volume=123,
+                model="blah",
+                display_name="bleh",
+                serial_number="",
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
+            ),
         },
     )
 
     assert subject.get_available_volume("pipette-id") == 42
 
 
-def test_pipette_is_ready_to_aspirate_if_has_volume() -> None:
-    """Pipette should be ready to aspirate if it's already got volume."""
-    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=False)
-
+def test_get_attached_tip() -> None:
+    """It should get the tip-rack ID map of a pipette's attached tip."""
     subject = get_pipette_view(
-        pipettes_by_id={
-            "pipette-id": LoadedPipette(
-                id="pipette-id",
-                mount=MountType.LEFT,
-                pipetteName=PipetteNameType.P300_SINGLE,
-            ),
-        },
-        aspirated_volume_by_id={"pipette-id": 42},
+        attached_tip_by_id={
+            "foo": TipGeometry(length=1, volume=2, diameter=3),
+            "bar": None,
+        }
     )
 
-    result = subject.get_is_ready_to_aspirate(
-        pipette_id="pipette-id", pipette_config=pipette_config
+    assert subject.get_attached_tip("foo") == TipGeometry(
+        length=1, volume=2, diameter=3
     )
+    assert subject.get_attached_tip("bar") is None
+    assert subject.get_all_attached_tips() == [
+        ("foo", TipGeometry(length=1, volume=2, diameter=3)),
+    ]
 
-    assert result is True
 
-
-def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready() -> None:
-    """Pipette should be ready to aspirate if HC says it is."""
-    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=True)
-
+def test_validate_tip_state() -> None:
+    """It should validate a pipette's tip attached state."""
     subject = get_pipette_view(
-        pipettes_by_id={
-            "pipette-id": LoadedPipette(
-                id="pipette-id",
-                mount=MountType.LEFT,
-                pipetteName=PipetteNameType.P300_SINGLE,
-            ),
-        },
-        aspirated_volume_by_id={"pipette-id": 0},
+        attached_tip_by_id={
+            "has-tip": TipGeometry(length=1, volume=2, diameter=3),
+            "no-tip": None,
+        }
     )
 
-    result = subject.get_is_ready_to_aspirate(
-        pipette_id="pipette-id",
-        pipette_config=pipette_config,
-    )
+    subject.validate_tip_state(pipette_id="has-tip", expected_has_tip=True)
+    subject.validate_tip_state(pipette_id="no-tip", expected_has_tip=False)
 
-    assert result is True
+    with pytest.raises(errors.TipAttachedError):
+        subject.validate_tip_state(pipette_id="has-tip", expected_has_tip=False)
 
-
-def test_pipette_not_ready_to_aspirate() -> None:
-    """Pipette should not be ready to aspirate if HC says so and it has no volume."""
-    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=False)
-
-    subject = get_pipette_view(
-        pipettes_by_id={
-            "pipette-id": LoadedPipette(
-                id="pipette-id",
-                mount=MountType.LEFT,
-                pipetteName=PipetteNameType.P300_SINGLE,
-            ),
-        },
-        aspirated_volume_by_id={"pipette-id": 0},
-    )
-
-    result = subject.get_is_ready_to_aspirate(
-        pipette_id="pipette-id",
-        pipette_config=pipette_config,
-    )
-
-    assert result is False
+    with pytest.raises(errors.TipNotAttachedError):
+        subject.validate_tip_state(pipette_id="no-tip", expected_has_tip=True)
 
 
 def test_get_movement_speed() -> None:
@@ -320,19 +373,88 @@ def test_get_movement_speed() -> None:
     )
 
 
-def test_get_static_config() -> None:
-    """It should return the static pipette configuration that was set for the given pipette."""
-    subject = get_pipette_view(
-        static_config_by_id={
-            "pipette-id": StaticPipetteConfig(
-                model="pipette-model", min_volume=1.23, max_volume=4.56
-            )
-        }
+@pytest.mark.parametrize(
+    ("mount", "deck_point", "expected_deck_point"),
+    [
+        (MountType.LEFT, DeckPoint(x=1, y=2, z=3), DeckPoint(x=1, y=2, z=3)),
+        (MountType.LEFT, None, None),
+        (MountType.RIGHT, DeckPoint(x=1, y=2, z=3), None),
+        (None, DeckPoint(x=1, y=2, z=3), None),
+        (None, None, None),
+    ],
+)
+def test_get_deck_point(
+    mount: Optional[MountType],
+    deck_point: Optional[DeckPoint],
+    expected_deck_point: Optional[DeckPoint],
+) -> None:
+    """It should return the deck point for the given pipette."""
+    pipette_data = LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
     )
 
+    subject = get_pipette_view(
+        pipettes_by_id={"pipette-id": pipette_data},
+        current_deck_point=CurrentDeckPoint(
+            mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
+        ),
+    )
+
+    assert subject.get_deck_point(pipette_id="pipette-id") == DeckPoint(x=1, y=2, z=3)
+
+
+def test_get_static_config() -> None:
+    """It should return the static pipette configuration that was set for the given pipette."""
+    config = StaticPipetteConfig(
+        model="pipette-model",
+        display_name="display name",
+        serial_number="serial-number",
+        min_volume=1.23,
+        max_volume=4.56,
+        return_tip_scale=7.89,
+        nominal_tip_overlap={},
+        home_position=10.12,
+        nozzle_offset_z=12.13,
+    )
+
+    subject = get_pipette_view(static_config_by_id={"pipette-id": config})
+
+    assert subject.get_config("pipette-id") == config
     assert subject.get_model_name("pipette-id") == "pipette-model"
+    assert subject.get_display_name("pipette-id") == "display name"
+    assert subject.get_serial_number("pipette-id") == "serial-number"
     assert subject.get_minimum_volume("pipette-id") == 1.23
     assert subject.get_maximum_volume("pipette-id") == 4.56
+    assert subject.get_return_tip_scale("pipette-id") == 7.89
+    assert (
+        subject.get_instrument_max_height_ot2("pipette-id")
+        == 22.25 - Z_RETRACT_DISTANCE
+    )
+
+
+def test_get_nominal_tip_overlap() -> None:
+    """It should return the static pipette configuration that was set for the given pipette."""
+    config = StaticPipetteConfig(
+        model="",
+        display_name="",
+        serial_number="",
+        min_volume=0,
+        max_volume=0,
+        return_tip_scale=0,
+        nominal_tip_overlap={
+            "some-uri": 100,
+            "default": 10,
+        },
+        home_position=0,
+        nozzle_offset_z=0,
+    )
+
+    subject = get_pipette_view(static_config_by_id={"pipette-id": config})
+
+    assert subject.get_nominal_tip_overlap("pipette-id", "some-uri") == 100
+    assert subject.get_nominal_tip_overlap("pipette-id", "missing-uri") == 10
 
 
 @pytest.mark.parametrize(

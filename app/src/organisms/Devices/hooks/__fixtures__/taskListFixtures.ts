@@ -1,13 +1,13 @@
 import { formatTimestamp } from '../../utils'
 
-import { PipetteModelSpecs } from '@opentrons/shared-data'
-import {
-  DeckCalibrationInfo,
+import type {
   TipLengthCalibration,
   PipetteOffsetCalibration,
 } from '../../../../redux/calibration/api-types'
-import { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
-import { TaskListProps } from '../../../TaskList/types'
+import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+import type { TaskListProps } from '../../../TaskList/types'
+import type { DeckCalibrationData } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 export const TASK_COUNT = 3
 
@@ -55,7 +55,7 @@ export const mockBadDeckCalibration = {
   isDeckCalibrated: false,
   deckCalibrationData: {
     lastModified: '2022-01-01T12:00:00.000000+00:00',
-  } as DeckCalibrationInfo,
+  } as DeckCalibrationData,
   markedBad: true,
 }
 
@@ -63,7 +63,7 @@ export const mockCompleteDeckCalibration = {
   isDeckCalibrated: true,
   deckCalibrationData: {
     lastModified: '2022-01-01T12:00:00.000000+00:00',
-  } as DeckCalibrationInfo,
+  } as DeckCalibrationData,
 }
 
 export const mockIncompleteDeckCalibration = {

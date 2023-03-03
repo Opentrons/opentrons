@@ -88,6 +88,7 @@ class GripperHandler:
         :param delta: The offset to set for the pipette.
         """
         gripper = self.get_gripper()
+        self._log.info(f"Saving gripper {gripper.gripper_id} offset: {delta}")
         return gripper.save_offset(delta)
 
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:

@@ -58,7 +58,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
-          if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
+          if (slot.matingSurfaceUnitVector == null) return null // if slot has no mating surface, don't render anything in it
 
           const moduleInSlot =
             slotId in initialLoadedModulesBySlot
@@ -69,16 +69,18 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               ? initialLoadedLabwareBySlot[slotId]
               : null
           const labwareInModule =
-            moduleInSlot &&
+            moduleInSlot?.result?.moduleId != null &&
             moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
               ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
               : null
-          let labwareId = labwareInSlot ? labwareInSlot.result.labwareId : null
-          labwareId = labwareInModule
-            ? labwareInModule.result.labwareId
-            : labwareId
+          let labwareId =
+            labwareInSlot != null ? labwareInSlot.result?.labwareId : null
+          labwareId =
+            labwareInModule != null
+              ? labwareInModule.result?.labwareId
+              : labwareId
           const wellFill =
-            labwareId && liquids != null
+            labwareId != null && liquids != null
               ? getWellFillFromLabwareId(
                   labwareId,
                   liquidsInLoadOrder,
@@ -101,7 +103,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                       : {}
                   }
                 >
-                  {labwareInModule != null ? (
+                  {labwareInModule?.result?.definition != null ? (
                     <LabwareRender
                       definition={labwareInModule.result.definition}
                       wellFill={wellFill ?? undefined}
@@ -109,7 +111,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                   ) : null}
                 </Module>
               ) : null}
-              {labwareInSlot != null ? (
+              {labwareInSlot?.result?.definition != null ? (
                 <g
                   transform={`translate(${String(slot.position[0])},${String(
                     slot.position[1]

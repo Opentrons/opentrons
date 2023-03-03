@@ -85,7 +85,6 @@ describe('useDashboardCalibrateTipLength hook', () => {
     })
     expect(store.dispatch).toHaveBeenCalledWith(
       tipLengthCalibrationStarted(
-        'tip-length-no-protocol',
         mountString,
         true,
         'default Opentrons tip rack for pipette on mount'

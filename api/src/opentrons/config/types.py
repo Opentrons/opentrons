@@ -131,28 +131,55 @@ class CapacitivePassSettings:
 
 @dataclass(frozen=True)
 class ZSenseSettings:
-    point: Offset
     pass_settings: CapacitivePassSettings
+
+
+@dataclass
+class LiquidProbeSettings:
+    starting_mount_height: float
+    max_z_distance: float
+    min_z_distance: float
+    mount_speed: float
+    plunger_speed: float
+    sensor_threshold_pascals: float
+    expected_liquid_height: float
+    log_pressure: bool
+    aspirate_while_sensing: bool
+    data_file: str
 
 
 @dataclass(frozen=True)
 class EdgeSenseSettings:
-    plus_x_pos: Offset
-    minus_x_pos: Offset
-    plus_y_pos: Offset
-    minus_y_pos: Offset
     overrun_tolerance_mm: float
     early_sense_tolerance_mm: float
     pass_settings: CapacitivePassSettings
     search_initial_tolerance_mm: float
     search_iteration_limit: int
-    nominal_center: Offset
+
+    def __init__(
+        self,
+        overrun_tolerance_mm: float,
+        early_sense_tolerance_mm: float,
+        pass_settings: CapacitivePassSettings,
+        search_initial_tolerance_mm: float,
+        search_iteration_limit: int,
+    ) -> None:
+        if overrun_tolerance_mm > pass_settings.max_overrun_distance_mm:
+            raise ValueError("Overrun tolerance and pass setting distance do not match")
+        object.__setattr__(self, "overrun_tolerance_mm", overrun_tolerance_mm)
+        object.__setattr__(self, "early_sense_tolerance_mm", early_sense_tolerance_mm)
+        object.__setattr__(self, "pass_settings", pass_settings)
+        object.__setattr__(
+            self, "search_initial_tolerance_mm", search_initial_tolerance_mm
+        )
+        object.__setattr__(self, "search_iteration_limit", search_iteration_limit)
 
 
 @dataclass(frozen=True)
 class OT3CalibrationSettings:
     z_offset: ZSenseSettings
     edge_sense: EdgeSenseSettings
+    edge_sense_binary: EdgeSenseSettings
     probe_length: float
 
 
@@ -172,3 +199,4 @@ class OT3Config:
     right_mount_offset: Offset
     gripper_mount_offset: Offset
     calibration: OT3CalibrationSettings
+    liquid_sense: LiquidProbeSettings

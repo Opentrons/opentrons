@@ -8,9 +8,11 @@ from .equipment import (
     LoadedPipetteData,
     LoadedModuleData,
 )
-from .movement import MovementHandler, MoveRelativeData, SavedPositionData
+from .movement import MovementHandler
+from .gantry_mover import GantryMover
 from .labware_movement import LabwareMovementHandler
 from .pipetting import PipettingHandler
+from .tip_handler import TipHandler
 from .queue_worker import QueueWorker
 from .rail_lights import RailLightsHandler
 from .run_control import RunControlHandler
@@ -28,9 +30,9 @@ __all__ = [
     "LoadedPipetteData",
     "LoadedModuleData",
     "MovementHandler",
-    "MoveRelativeData",
-    "SavedPositionData",
+    "GantryMover",
     "PipettingHandler",
+    "TipHandler",
     "LabwareMovementHandler",
     "QueueWorker",
     "RunControlHandler",

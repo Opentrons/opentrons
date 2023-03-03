@@ -16,9 +16,6 @@ from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
-from .python_file_reader import PythonFileReader
-from .python_context_creator import PythonContextCreator
-from .python_executor import PythonExecutor
 from .legacy_context_plugin import LegacyContextPlugin
 from .legacy_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
@@ -58,9 +55,6 @@ class ProtocolRunner:
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_translator: Optional[JsonTranslator] = None,
-        python_file_reader: Optional[PythonFileReader] = None,
-        python_context_creator: Optional[PythonContextCreator] = None,
-        python_executor: Optional[PythonExecutor] = None,
         legacy_file_reader: Optional[LegacyFileReader] = None,
         legacy_context_creator: Optional[LegacyContextCreator] = None,
         legacy_executor: Optional[LegacyExecutor] = None,
@@ -70,9 +64,6 @@ class ProtocolRunner:
         self._hardware_api = hardware_api
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_translator = json_translator or JsonTranslator()
-        self._python_file_reader = python_file_reader or PythonFileReader()
-        self._python_context_creator = python_context_creator or PythonContextCreator()
-        self._python_executor = python_executor or PythonExecutor()
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
             hardware_api=hardware_api,

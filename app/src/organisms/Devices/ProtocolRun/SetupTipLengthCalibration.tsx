@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -8,19 +7,15 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
-import * as TipLength from '../../../redux/calibration/tip-length'
 import { useRunPipetteInfoByMount } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
-import { DeprecatedSetupTipLengthCalibrationButton } from './DeprecatedSetupTipLengthCalibrationButton'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
 
-import type { Dispatch } from '../../../redux/types'
-import { useFeatureFlag } from '../../../redux/config'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 
 const CALIBRATIONS_FETCH_MS = 5000
 interface SetupTipLengthCalibrationProps {
@@ -33,18 +28,9 @@ export function SetupTipLengthCalibration({
   runId,
 }: SetupTipLengthCalibrationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
-  const dispatch = useDispatch<Dispatch>()
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
 
-  const enableCalibrationWizards = useFeatureFlag('enableCalibrationWizards')
-
-  useInterval(
-    () =>
-      robotName != null &&
-      dispatch(TipLength.fetchTipLengthCalibrations(robotName)),
-    CALIBRATIONS_FETCH_MS,
-    true
-  )
+  useAllTipLengthCalibrationsQuery({ refetchInterval: CALIBRATIONS_FETCH_MS })
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
@@ -77,27 +63,15 @@ export function SetupTipLengthCalibration({
                         : undefined
                     }
                     button={
-                      enableCalibrationWizards ? (
-                        <SetupTipLengthCalibrationButton
-                          mount={mount}
-                          disabled={pipetteNotAttached}
-                          robotName={robotName}
-                          runId={runId}
-                          hasCalibrated={tipRackInfo.lastModifiedDate !== null}
-                          tipRackDefinition={tipRackInfo.tipRackDef}
-                          isExtendedPipOffset={false}
-                        />
-                      ) : (
-                        <DeprecatedSetupTipLengthCalibrationButton
-                          mount={mount}
-                          disabled={pipetteNotAttached}
-                          robotName={robotName}
-                          runId={runId}
-                          hasCalibrated={tipRackInfo.lastModifiedDate !== null}
-                          tipRackDefinition={tipRackInfo.tipRackDef}
-                          isExtendedPipOffset={false}
-                        />
-                      )
+                      <SetupTipLengthCalibrationButton
+                        mount={mount}
+                        disabled={pipetteNotAttached}
+                        robotName={robotName}
+                        runId={runId}
+                        hasCalibrated={tipRackInfo.lastModifiedDate !== null}
+                        tipRackDefinition={tipRackInfo.tipRackDef}
+                        isExtendedPipOffset={false}
+                      />
                     }
                     runId={runId}
                   />
