@@ -23,7 +23,7 @@ from .liquid_class.pipetting import (
 from .radwag_pipette_calibration_file import VIAL_DEFINITION
 
 
-NUM_EVAPORATION_TRIALS: Final = 3
+NUM_BLANK_TRIALS: Final = 3
 LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
 VIAL_SAFE_Z_OFFSET: Final = 10
 DELAY_SECONDS_BEFORE_ASPIRATE: Final = 1
@@ -77,7 +77,7 @@ def _run_sample(
 ) -> None:
     pipette.move_to(well.top())
     if stay_above_well:
-        vol_tag = "evaporation"
+        vol_tag = "blank"
     else:
         vol_tag = str(int(volume))
     with recorder.samples_of_tag(f"measure-init-{vol_tag}-{trial}"):
@@ -189,13 +189,13 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     recorder.record(in_thread=True)
 
     try:
-        total = len(test_volumes) * cfg.trials + NUM_EVAPORATION_TRIALS
+        total = len(test_volumes) * cfg.trials + NUM_BLANK_TRIALS
         count = 0
         # MEASURE EVAPORATION
-        for trial in range(NUM_EVAPORATION_TRIALS):
+        for trial in range(NUM_BLANK_TRIALS):
             count += 1
             print(
-                f"{count}/{total}: evaporation (trial {trial + 1}/{NUM_EVAPORATION_TRIALS})"
+                f"{count}/{total}: blank (trial {trial + 1}/{NUM_BLANK_TRIALS})"
             )
             pipette.pick_up_tip()
             _run_sample(
