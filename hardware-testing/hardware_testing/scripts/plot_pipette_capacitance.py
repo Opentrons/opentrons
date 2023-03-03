@@ -1,4 +1,4 @@
-"""Plot Gripper Probe Capacitance Results."""
+"""Plot Pipette Capacitance Results."""
 import os
 import sys
 import argparse
@@ -13,7 +13,7 @@ class Plot:
         self.PLOT_HEIGHT = 800
         self.PLOT_WIDTH = 1000
         self.PLOT_FONT = 16
-        self.PLOT_PATH = "plot_gripper_capacitance/"
+        self.PLOT_PATH = "plot_pipette_capacitance/"
         self.PLOT_FORMAT = ".png"
         self.probes = ["Front","Rear"]
         self.plot_param = {
