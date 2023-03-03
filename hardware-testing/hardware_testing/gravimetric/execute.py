@@ -55,6 +55,7 @@ def _generate_callbacks_for_trial(
 
     return PipettingCallbacks(
         on_submerging=lambda: recorder.set_sample_tag(_tag("submerge")),
+        on_mixing=lambda: recorder.set_sample_tag(_tag("mix")),
         on_aspirating=lambda: recorder.set_sample_tag(_tag("aspirate")),
         on_dispensing=lambda: recorder.set_sample_tag(_tag("dispense")),
         on_retracting=lambda: recorder.set_sample_tag(_tag("retract")),
@@ -193,7 +194,9 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
         # MEASURE EVAPORATION
         for trial in range(NUM_EVAPORATION_TRIALS):
             count += 1
-            print(f"{count}/{total}: evaporation (trial {trial + 1}/{NUM_EVAPORATION_TRIALS})")
+            print(
+                f"{count}/{total}: evaporation (trial {trial + 1}/{NUM_EVAPORATION_TRIALS})"
+            )
             pipette.pick_up_tip()
             _run_sample(
                 ctx,
@@ -222,7 +225,7 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
                     trial,
                     recorder,
                     liquid_tracker,
-                    stay_above_well=False
+                    stay_above_well=False,
                 )
                 pipette.drop_tip()
     finally:

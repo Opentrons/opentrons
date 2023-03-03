@@ -11,6 +11,7 @@ from .definition import LiquidClassSettings
 from .defaults import get_liquid_class
 
 
+NUM_MIXES_BEFORE_ASPIRATE = 5
 LABWARE_BOTTOM_CLEARANCE = 1.5
 TIP_SPEED_WHILE_SUBMERGED = 5
 
@@ -84,12 +85,13 @@ def _get_heights_in_well(
 class PipettingCallbacks:
     """Pipetting callbacks."""
 
-    on_submerging: Optional[Callable]
-    on_aspirating: Optional[Callable]
-    on_dispensing: Optional[Callable]
-    on_retracting: Optional[Callable]
-    on_blowing_out: Optional[Callable]
-    on_exiting: Optional[Callable]
+    on_submerging: Callable
+    on_mixing: Callable
+    on_aspirating: Callable
+    on_dispensing: Callable
+    on_retracting: Callable
+    on_blowing_out: Callable
+    on_exiting: Callable
 
 
 def _pipette_with_liquid_settings(
@@ -98,9 +100,9 @@ def _pipette_with_liquid_settings(
     liquid_class: LiquidClassSettings,
     well: Well,
     liquid_tracker: LiquidTracker,
+    callbacks: PipettingCallbacks,
     aspirate: Optional[float] = None,
     dispense: Optional[float] = None,
-    callbacks: Optional[PipettingCallbacks] = None,
     stay_above_well: bool = True,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
@@ -136,8 +138,7 @@ def _pipette_with_liquid_settings(
         pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
 
     # SUBMERGE
-    if callbacks and callbacks.on_submerging:
-        callbacks.on_submerging()
+    callbacks.on_submerging()
     pipette.move_to(
         well.bottom(submerge_mm),
         force_direct=True,
@@ -146,12 +147,14 @@ def _pipette_with_liquid_settings(
 
     # ASPIRATE/DISPENSE
     if aspirate:
-        if callbacks and callbacks.on_aspirating:
-            callbacks.on_aspirating()
+        callbacks.on_mixing()
+        for _ in range(NUM_MIXES_BEFORE_ASPIRATE):
+            pipette.aspirate(aspirate)
+            pipette.dispense(aspirate)
+        callbacks.on_aspirating()
         pipette.aspirate(aspirate)
     else:
-        if callbacks and callbacks.on_dispensing:
-            callbacks.on_dispensing()
+        callbacks.on_dispensing()
         pipette.dispense()  # includes air from leading air-gap
     liquid_tracker.update_affected_wells(
         pipette, well, aspirate=aspirate, dispense=dispense
@@ -164,8 +167,7 @@ def _pipette_with_liquid_settings(
         ctx.delay(liquid_class.dispense.delay)
 
     # RETRACT
-    if callbacks and callbacks.on_retracting:
-        callbacks.on_retracting()
+    callbacks.on_retracting()
     pipette.move_to(
         well.bottom(retract_mm),
         force_direct=True,
@@ -177,14 +179,12 @@ def _pipette_with_liquid_settings(
         pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
     else:
         # BLOW-OUT
-        if callbacks and callbacks.on_blowing_out:
-            callbacks.on_blowing_out()
+        callbacks.on_blowing_out()
         pipette.blow_out()
         pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
 
     # EXIT WELL
-    if callbacks and callbacks.on_exiting:
-        callbacks.on_exiting()
+    callbacks.on_exiting()
     pipette.move_to(well.top(), force_direct=True)
 
 
@@ -195,7 +195,7 @@ def aspirate_with_liquid_class(
     aspirate_volume: float,
     well: Well,
     liquid_tracker: LiquidTracker,
-    callbacks: Optional[PipettingCallbacks] = None,
+    callbacks: PipettingCallbacks,
     stay_above_well: bool = True,
 ) -> None:
     """Aspirate with liquid class."""
@@ -213,8 +213,8 @@ def aspirate_with_liquid_class(
         liquid_class,
         well,
         liquid_tracker,
+        callbacks,
         aspirate=aspirate_volume,
-        callbacks=callbacks,
         stay_above_well=stay_above_well,
     )
 
@@ -226,7 +226,7 @@ def dispense_with_liquid_class(
     dispense_volume: float,
     well: Well,
     liquid_tracker: LiquidTracker,
-    callbacks: Optional[PipettingCallbacks] = None,
+    callbacks: PipettingCallbacks,
     stay_above_well: bool = True,
 ) -> None:
     """Dispense with liquid class."""
@@ -239,7 +239,7 @@ def dispense_with_liquid_class(
         liquid_class,
         well,
         liquid_tracker,
+        callbacks,
         dispense=dispense_volume,
-        callbacks=callbacks,
         stay_above_well=stay_above_well,
     )
