@@ -20,8 +20,9 @@ import { useCreateRunMutation, useDeleteRunMutation, useStopRunMutation } from '
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useToggleGroup } from '../../molecules/ToggleGroup/useToggleGroup'
-import { AttachedPipettesByMount, Mount, VectorOffset } from '@opentrons/api-client'
+import { AttachedPipettesByMount, Mount, RUN_STATUS_STOPPED, VectorOffset } from '@opentrons/api-client'
 import { LiveOffsetValue } from '../LabwarePositionCheck/LiveOffsetValue'
+import { useRunStatus } from '../RunTimeControl/hooks'
 
 interface JogGantryProps {
   handleClose: () => void
@@ -35,15 +36,16 @@ export const JogGantry = (props: JogGantryProps): JSX.Element | null => {
     { onSuccess: response => { setRunId(response.data.id) } },
   )
   React.useEffect(() => { createRun({}) }, [])
+
+  const runStatus = useRunStatus(runId)
+  React.useEffect(() => {
+    if (runId != null && runStatus === RUN_STATUS_STOPPED) deleteRun(runId)
+  }, [runStatus])
+
   const { deleteRun } = useDeleteRunMutation({
     onSuccess: () => { handleClose() }
   })
-  const { stopRun } = useStopRunMutation({
-    onSuccess: () => {
-      runId != null && deleteRun(runId)
-      setRunId(null)
-    }
-  })
+  const { stopRun } = useStopRunMutation()
 
   const handleExit = (): void => {
     setIsExiting(true)
@@ -134,7 +136,7 @@ function GantryControlsInner(props: GantryControlsProps): JSX.Element {
         },
         waitUntilComplete: true
       })
-        .then(({data}) => { 
+        .then(({ data }) => {
           console.log('result', data)
           setLastKnownPosition(data.result?.position)
         })

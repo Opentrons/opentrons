@@ -138,7 +138,7 @@ export const RobotOverviewOverflowMenu = (
           />
         ) : null}
         {showJogGantry ? (
-          <JogGantry handleClose={() => setShowJogGantry(false)}/>
+          <JogGantry handleClose={() => setShowJogGantry(false)} />
         ) : null}
       </Portal>
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
@@ -193,7 +193,7 @@ export const RobotOverviewOverflowMenu = (
           {devToolsOn ? (
             <MenuItem
               disabled={isRobotUnavailable}
-              onClick={() => {setShowJogGantry(true)}}
+              onClick={() => { setShowJogGantry(true) }}
             >
               {t('Jog Gantry')}
             </MenuItem>
