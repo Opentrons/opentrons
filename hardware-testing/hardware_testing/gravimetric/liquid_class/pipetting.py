@@ -176,8 +176,12 @@ def aspirate_with_liquid_class(
     liquid_class = get_liquid_class(
         int(pipette.max_volume), tip_volume, int(aspirate_volume)
     )
-    # FIXME: change API to allow going beyond pipette max volume
-    artificial_aspirate_max = pipette.max_volume * 0.9
+    print(f"\taspirate:\n"
+          f"\t\tleading = {liquid_class.aspirate.air_gap.leading_air_gap}\n"
+          f"\t\tvolume = {aspirate_volume}\n"
+          f"\t\ttrailing = {liquid_class.aspirate.air_gap.trailing_air_gap}")
+    # FIXME: change API to allow going beyond tip max volume
+    artificial_aspirate_max = tip_volume * 0.9
     if aspirate_volume > artificial_aspirate_max:
         aspirate_volume = artificial_aspirate_max
         print(f"WARNING: using workaround volume: {aspirate_volume}")

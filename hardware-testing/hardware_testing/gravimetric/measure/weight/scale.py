@@ -71,6 +71,11 @@ class Scale:
             # also try looking for the RS232 USB adapter cable
             return find_port(vid=1659, pid=8963)
 
+    @property
+    def is_simulator(self) -> bool:
+        """Is simulator."""
+        return isinstance(self._scale, SimRadwagScale)
+
     def connect(self) -> None:
         """Scale connect."""
         self._scale.connect()

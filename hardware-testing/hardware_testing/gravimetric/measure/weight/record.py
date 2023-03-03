@@ -15,6 +15,7 @@ from hardware_testing.data import (
 from .scale import Scale
 
 SLEEP_TIME_IN_RECORD_LOOP = 0.05
+SLEEP_TIME_IN_RECORD_LOOP_SIMULATING = 0.005
 
 
 @dataclass
@@ -286,6 +287,11 @@ class GravimetricRecorder:
         """Config."""
         return self._cfg
 
+    @property
+    def is_simulator(self) -> bool:
+        """Is simulator."""
+        return self._scale.is_simulator
+
     def activate(self) -> None:
         """Activate."""
         # Some Radwag settings cannot be controlled remotely.
@@ -429,7 +435,10 @@ class GravimetricRecorder:
                 if callable(on_new_sample):
                     on_new_sample(_recording)
             if self.is_in_thread:
-                sleep(SLEEP_TIME_IN_RECORD_LOOP)
+                if self.is_simulator:
+                    sleep(SLEEP_TIME_IN_RECORD_LOOP_SIMULATING)
+                else:
+                    sleep(SLEEP_TIME_IN_RECORD_LOOP)
         self._reading_samples.clear()
         assert len(_recording) == length or not self.is_recording, (
             f"Scale recording timed out before accumulating "
@@ -451,8 +460,6 @@ class GravimetricRecorder:
             new_sample = recording[-1]
             csv_line = new_sample.as_csv(self._cfg.start_time)
             append_data_to_file(str(self._cfg.test_name), _file_name, csv_line + "\n")
-            if self._sample_tag:
-                print(f"{self._sample_tag}: {new_sample.grams}")
 
         # add the header to the CSV file
         dump_data_to_file(
