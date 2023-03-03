@@ -125,6 +125,20 @@ const labwareOffsets = [
     vector: { x: 0, y: 0, z: 2.99999 },
   },
 ]
+const analysisCommands = protocolWithMagTempTC.commands.map(c => {
+  if (c.commandType === 'loadModule') {
+    return {
+      ...c,
+      params: {
+        ...c.params,
+        model: protocolWithMagTempTC.modules.find(
+          m => m.id === c.params.moduleId
+        )?.model,
+      },
+    }
+  }
+  return c
+})
 
 const juptyerPrefix =
   'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.13")\n\n'
@@ -142,7 +156,7 @@ describe('createSnippet', () => {
 
     const resultingSnippet = createSnippet(
       'jupyter',
-      protocolWithMagTempTC.commands,
+      analysisCommands,
       protocolWithMagTempTC.labware,
       protocolWithMagTempTC.modules,
       labwareOffsets
@@ -193,7 +207,7 @@ describe('createSnippet', () => {
       'labware_9 = protocol.load_labware("corning_24_wellplate_3.4ml_flat", location="6")\n    labware_9.set_offset(x=0.00, y=0.00, z=3.00)'
     const resultingSnippet = createSnippet(
       'cli',
-      protocolWithMagTempTC.commands,
+      analysisCommands,
       protocolWithMagTempTC.labware,
       protocolWithMagTempTC.modules,
       labwareOffsets
