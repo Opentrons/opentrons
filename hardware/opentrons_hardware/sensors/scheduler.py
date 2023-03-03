@@ -68,11 +68,16 @@ log = logging.getLogger(__name__)
 ResponseType = TypeVar("ResponseType", bound=MessageDefinition)
 
 
-def _format_sensor_response(response: MessageDefinition) -> SensorDataType:
-    assert isinstance(response, BaselineSensorResponse)
-    return SensorDataType.build(
-        response.payload.offset_average, response.payload.sensor
-    )
+def _format_sensor_response(response: MessageDefinition) -> Optional[SensorDataType]:
+    if isinstance(response, BaselineSensorResponse):
+        return SensorDataType.build(
+            response.payload.offset_average, response.payload.sensor
+        )
+    elif isinstance(response, ReadFromSensorResponse):
+        return SensorDataType.build(
+            response.payload.sensor_data, response.payload.sensor
+        )
+    return None
 
 
 class SensorScheduler:
@@ -270,7 +275,7 @@ class SensorScheduler:
     @staticmethod
     async def _multi_wait_for_response(
         reader: WaitableCallback,
-        response_handler: Callable[[MessageDefinition], SensorDataType],
+        response_handler: Callable[[MessageDefinition], Optional[SensorDataType]],
     ) -> List[SensorDataType]:
         """Listener for receiving messages back."""
         # TODO we should refactor the rest of the code that relies on
@@ -279,7 +284,9 @@ class SensorScheduler:
         # from an async for loop.
         data: List[SensorDataType] = []
         async for response, _ in reader:
-            data.append(response_handler(response))
+            response_data = response_handler(response)
+            if response_data:
+                data.append(response_data)
         return data
 
     @staticmethod
