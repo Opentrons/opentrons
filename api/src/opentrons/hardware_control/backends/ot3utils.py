@@ -383,10 +383,15 @@ class UpdateProgress:
     """Class to keep track of Update progress."""
 
     def __init__(self, nodes: Set[NodeId]):
-        self._tracker: Dict[OT3SubSystem, UpdateStatus] = {}
+        self._tracker: Dict[NodeId, UpdateStatus] = {}
         for node in nodes:
             subsystem = node_id_to_subsystem(node)
-            self._tracker[subsystem] = UpdateStatus(subsystem, UpdateState.queued, 0)
+            self._tracker[node] = UpdateStatus(subsystem, UpdateState.queued, 0)
+
+    @property
+    def nodes(self) -> Set[NodeId]:
+        """Gets the set of Nodes queued or updating."""
+        return set(self._tracker)
 
     def get_progress(self) -> Set[UpdateStatus]:
         """Gets the update status and total progress"""
@@ -400,5 +405,5 @@ class UpdateProgress:
         subsystem = node_id_to_subsystem(node_id)
         state = fw_update_state_from_status(fw_update_status)
         progress = int(progress * 100)
-        self._tracker[subsystem] = UpdateStatus(subsystem, state, progress)
+        self._tracker[node_id] = UpdateStatus(subsystem, state, progress)
         return set(self._tracker.values())

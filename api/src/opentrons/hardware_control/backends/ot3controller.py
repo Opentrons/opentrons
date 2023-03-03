@@ -24,7 +24,7 @@ from typing import (
     KeysView,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config
+from opentrons.config import ot3_pipette_config, gripper_config, feature_flags as ff
 from .ot3utils import (
     UpdateProgress,
     axis_convert,
@@ -137,7 +137,7 @@ def requires_update(func: Wrapped) -> Wrapped:
 
     @wraps(func)
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
-        if self.update_required and self.initialized:
+        if ff.enable_ot3_firmware_updates() and self.update_required:
             raise FirmwareUpdateRequired()
         return await func(self, *args, **kwargs)
 
@@ -184,7 +184,6 @@ class OT3Controller:
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._update_required = False
-        self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
         try:
             self._event_watcher = self._build_event_watcher()
@@ -195,15 +194,6 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
-
-    @property
-    def initialized(self) -> bool:
-        """True when the hardware controller has initialized and is ready."""
-        return self._initialized
-
-    @initialized.setter
-    def initialized(self, value: bool) -> None:
-        self._initialized = value
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -254,10 +244,9 @@ class OT3Controller:
         next_version = update_info[0] if update_info else None
         # set our global firmware update state if any updates are available
         self.update_required |= bool(firmware_updates)
-        instrument_fw_info = InstrumentFWInfo(
+        return InstrumentFWInfo(
             mount, update_required, current_fw_version, next_version
         )
-        return instrument_fw_info
 
     def get_update_progress(self) -> Set[UpdateStatus]:
         """Returns a set of UpdateStatus of the updates."""
@@ -273,13 +262,23 @@ class OT3Controller:
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        nodes = nodes or set()
+        if not ff.enable_ot3_firmware_updates():
+            log.info("Firmware Updates are Disabled")
+            return
+        # Check that there arent updates already running for given nodes
+        nodes = nodes or set(self._network_info.device_info)
+        nodes_updating = self._update_tracker.nodes if self._update_tracker else set()
+        nodes_to_update = nodes - nodes_updating
+        if not nodes_to_update:
+            log.info("No viable subsystem to update.")
+            return
+
         attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
         # Check if devices need an update, only checks nodes if given
         firmware_updates = firmware_update.check_firmware_updates(
             self._network_info.device_info,
             attached_pipette_nodes,
-            nodes=nodes,
+            nodes=nodes_to_update,
             force=force,
         )
         if not firmware_updates:

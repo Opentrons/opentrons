@@ -163,7 +163,7 @@ async def initialize() -> ThreadManagedHardware:
     async def _do_updates() -> None:
         if should_use_ot3() and ff.enable_ot3_firmware_updates():
             log.info("Checking firmware updates")
-            await hardware.update_instrument_firmware()
+            await hardware.start_firmware_updates()
 
     await asyncio.create_task(_do_updates())
 
@@ -174,8 +174,6 @@ async def initialize() -> ThreadManagedHardware:
             await hardware.home_z()
 
         await hardware.set_lights(button=True)
-        # set hardware controller as ready to be used
-        hardware.done_initializing()
         return hardware
     finally:
         blink_task.cancel()

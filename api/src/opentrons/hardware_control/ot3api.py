@@ -332,21 +332,6 @@ class OT3API(
         """`True` if this is a simulator; `False` otherwise."""
         return isinstance(self._backend, OT3Simulator)
 
-    def done_initializing(self) -> None:
-        """Tells the hardware controller that we are ready for non-startup commands.
-
-        Since we check for updates on startup, if updates are available we set
-        OT3Controller.update_required flag which raises `FirmwareUpdateRequired`
-        if a non-fw-update can command is attempted to be sent.
-
-        However, there are other operations as part of system startup (homing, etc)
-        that need to happen without triggering `FirmwareUpdateRequired`. So this
-        flag is set once we finish initializing the hardware controller in the
-        opentrons.__init__.initialize function, which will raise `FirmwareUpdateRequired`
-        for future can commands if updates are required.
-        """
-        self._backend.initialized = True
-
     def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
         """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
@@ -417,22 +402,32 @@ class OT3API(
     async def update_instrument_firmware(
         self, mount: Optional[OT3Mount] = None
     ) -> None:
-        """Update the firmware on one or all instruments.
-
-        If no mount is specified, updates all firmware for subsystems attached and (pipettes, gripper) and (head, gantry-x, gantry-y).
-        """
+        """Update the firmware on one or all instruments."""
         # check that mount is actually attached
-        # TODO: get_attached_instruments should probably return gripper as well, for now just add it
+        # TODO (ba, 2023-03-03) get_attached_instruments should probably return gripper as well, for now just add it
         attached_instruments = self._pipette_handler.get_attached_instruments()
         attached_instruments[OT3Mount.GRIPPER] = self.attached_gripper  # type: ignore
         if mount and not attached_instruments.get(mount):
             mod_log.debug(f"Can't update instrument, mount {mount} is not attached.")
             return
-        subsystems = {subsystem_from_mount(mount)} if mount else set()
+        mounts = {mount} if mount else set(attached_instruments)
+        subsystems = {subsystem_from_mount(mount) for mount in mounts}
         async for update_status in self.update_firmware(subsystems):
             mod_log.debug(update_status)
-        # refresh Instrument cache
-        await self.cache_instruments()
+
+    async def start_firmware_updates(self) -> None:
+        """Helper function to be able to call update_firmware without consuming an iterator.
+
+        This will update all the firmware for subsystems (head, gantry-x, gantry-y)
+        as well as any intruments attached (pipettes, gripper, etc).
+
+        This is required because we call this function from opentrons.__init__.initialize()
+        And Since the hardware controller gets wrapped in a ThreadManager object, the asyncio loop
+        runs under a different context. This means we cant directly call update_firmware which
+        is an AsyncIterator that cannot be awaited.
+        """
+        async for update_status in self.update_firmware():
+            mod_log.debug(update_status)
 
     async def update_firmware(
         self, subsystems: Optional[Set[OT3SubSystem]] = None, force: bool = False
@@ -447,6 +442,8 @@ class OT3API(
             pipettes, nodes, force
         ):
             yield update_status
+        # refresh Instrument cache
+        await self.cache_instruments()
 
     # Incidentals (i.e. not motion) API
 

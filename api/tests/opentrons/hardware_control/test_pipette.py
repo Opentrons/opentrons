@@ -390,7 +390,9 @@ def test_save_instrument_offset_ot3(hardware_pipette_ot3: Callable) -> None:
         load_cal.assert_called_once_with("testID", Mount.LEFT)
 
 
-def test_reload_instrument_cal_ot3(hardware_pipette_ot3: Callable, fake_fw_info) -> None:
+def test_reload_instrument_cal_ot3(
+    hardware_pipette_ot3: Callable, fake_fw_info
+) -> None:
     old_pip = hardware_pipette_ot3(
         ot3_pipette_config.convert_pipette_model("p1000_single_v1.0")
     )
