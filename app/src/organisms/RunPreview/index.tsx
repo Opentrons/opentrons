@@ -11,9 +11,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   COLORS,
-  Icon,
   POSITION_FIXED,
-  SIZE_1,
 } from '@opentrons/components'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -30,26 +28,24 @@ const COLOR_FADE_MS = 500
 interface RunPreviewProps {
   runId: string
   jumpedIndex: number | null
-  makeHandleJumpToStep: (index: number) => () => void
+  makeHandleScrollToStep: (index: number) => () => void
 }
 export const RunPreviewComponent = (
-  { runId, jumpedIndex, makeHandleJumpToStep }: RunPreviewProps,
+  { runId, jumpedIndex, makeHandleScrollToStep }: RunPreviewProps,
   ref: React.ForwardedRef<ViewportListRef>
 ): JSX.Element | null => {
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useLastRunCommandKey(runId)
-  // -1 -> current earlier than visible commands
-  //  0 -> current within visible commands
-  //  1 -> current later than visible commands
-  const [currentCommandDirection, setCurrentCommandDirection] = React.useState<
-    -1 | 0 | 1
-  >(0)
+  const [
+    isCurrentCommandVisible,
+    setIsCurrentCommandVisible,
+  ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
-  const currentRunCommandIndex =
-    robotSideAnalysis.commands.findIndex(c => c.key === currentRunCommandKey) ??
-    0
+  const currentRunCommandIndex = robotSideAnalysis.commands.findIndex(
+    c => c.key === currentRunCommandKey
+  )
 
   return (
     <Flex
@@ -77,61 +73,71 @@ export const RunPreviewComponent = (
         viewportRef={viewPortRef}
         ref={ref}
         items={robotSideAnalysis.commands}
-        onViewportIndexesChange={visibleIndices => {
+        onViewportIndexesChange={([
+          lowestVisibleIndex,
+          highestVisibleIndex,
+        ]) => {
           if (currentRunCommandIndex >= 0) {
-            if (visibleIndices[0] > currentRunCommandIndex) {
-              setCurrentCommandDirection(-1)
-            } else if (visibleIndices[1] > currentRunCommandIndex) {
-              setCurrentCommandDirection(0)
-            } else {
-              setCurrentCommandDirection(1)
-            }
+            setIsCurrentCommandVisible(
+              currentRunCommandIndex >= lowestVisibleIndex &&
+                currentRunCommandIndex <= highestVisibleIndex
+            )
           }
         }}
         initialIndex={currentRunCommandIndex}
       >
-        {(command, index) => (
-          <Flex
-            key={command.id}
-            alignItems={ALIGN_CENTER}
-            gridGap={SPACING.spacing3}
-          >
-            <StyledText
-              minWidth={SPACING.spacing4}
-              fontSize={TYPOGRAPHY.fontSizeCaption}
-            >
-              {index + 1}
-            </StyledText>
+        {(command, index) => {
+          const borderColor =
+            index === currentRunCommandIndex
+              ? COLORS.blueEnabled
+              : COLORS.transparent
+          const backgroundColor =
+            index === currentRunCommandIndex
+              ? COLORS.lightBlue
+              : COLORS.fundamentalsBackground
+          return (
             <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing2}
-              width="100%"
-              border={`solid 1px ${
-                index === jumpedIndex ? COLORS.blueEnabled : COLORS.transparent
-              }`}
-              backgroundColor={
-                index === jumpedIndex
-                  ? COLORS.lightBlue
-                  : COLORS.fundamentalsBackground
-              }
-              color={COLORS.darkBlackEnabled}
-              borderRadius={BORDERS.radiusSoftCorners}
-              padding={SPACING.spacing3}
-              css={css`
-                transition: background-color ${COLOR_FADE_MS}ms ease-out,
-                  border-color ${COLOR_FADE_MS}ms ease-out;
-              `}
+              key={command.id}
+              alignItems={ALIGN_CENTER}
+              gridGap={SPACING.spacing3}
             >
-              <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-                <CommandIcon command={command} />
-                <CommandText
-                  command={command}
-                  robotSideAnalysis={robotSideAnalysis}
-                />
+              <StyledText
+                minWidth={SPACING.spacing4}
+                fontSize={TYPOGRAPHY.fontSizeCaption}
+              >
+                {index + 1}
+              </StyledText>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing2}
+                width="100%"
+                border={`solid 1px ${
+                  index === jumpedIndex ? COLORS.warningEnabled : borderColor
+                }`}
+                backgroundColor={
+                  index === jumpedIndex
+                    ? COLORS.warningBackgroundLight
+                    : backgroundColor
+                }
+                color={COLORS.darkBlackEnabled}
+                borderRadius={BORDERS.radiusSoftCorners}
+                padding={SPACING.spacing3}
+                css={css`
+                  transition: background-color ${COLOR_FADE_MS}ms ease-out,
+                    border-color ${COLOR_FADE_MS}ms ease-out;
+                `}
+              >
+                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+                  <CommandIcon command={command} />
+                  <CommandText
+                    command={command}
+                    robotSideAnalysis={robotSideAnalysis}
+                  />
+                </Flex>
               </Flex>
             </Flex>
-          </Flex>
-        )}
+          )
+        }}
       </ViewportList>
       {currentRunCommandIndex >= 0 ? (
         <PrimaryButton
@@ -140,16 +146,11 @@ export const RunPreviewComponent = (
           left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
           transform="translate(-50%)"
           borderRadius={SPACING.spacing6}
-          display={currentCommandDirection !== 0 ? DISPLAY_FLEX : DISPLAY_NONE}
-          onClick={makeHandleJumpToStep(currentRunCommandIndex)}
+          display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
+          onClick={makeHandleScrollToStep(currentRunCommandIndex)}
           id="RunLog_jumpToCurrentStep"
         >
-          <Icon
-            name={currentCommandDirection > 0 ? 'ot-arrow-down' : 'ot-arrow-up'}
-            size={SIZE_1}
-            marginRight={SPACING.spacing3}
-          />
-          {t('jump_to_current_step')}
+          {t('view_current_step')}
         </PrimaryButton>
       ) : null}
     </Flex>
