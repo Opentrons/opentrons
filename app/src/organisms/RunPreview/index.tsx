@@ -80,7 +80,7 @@ export const RunPreviewComponent = (
           if (currentRunCommandIndex >= 0) {
             setIsCurrentCommandVisible(
               currentRunCommandIndex >= lowestVisibleIndex &&
-                currentRunCommandIndex <= highestVisibleIndex
+              currentRunCommandIndex <= highestVisibleIndex
             )
           }
         }}
@@ -111,9 +111,8 @@ export const RunPreviewComponent = (
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing2}
                 width="100%"
-                border={`solid 1px ${
-                  index === jumpedIndex ? COLORS.warningEnabled : borderColor
-                }`}
+                border={`solid 1px ${index === jumpedIndex ? COLORS.warningEnabled : borderColor
+                  }`}
                 backgroundColor={
                   index === jumpedIndex
                     ? COLORS.warningBackgroundLight
@@ -139,18 +138,20 @@ export const RunPreviewComponent = (
           )
         }}
       </ViewportList>
-      <PrimaryButton
-        position={POSITION_FIXED}
-        bottom={SPACING.spacingXXL}
-        left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
-        transform="translate(-50%)"
-        borderRadius={SPACING.spacing6}
-        display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
-        onClick={makeHandleScrollToStep(currentRunCommandIndex)}
-        id="RunLog_jumpToCurrentStep"
-      >
-        {t('view_current_step')}
-      </PrimaryButton>
+      {currentRunCommandIndex >= 0 ? (
+        <PrimaryButton
+          position={POSITION_FIXED}
+          bottom={SPACING.spacingXXL}
+          left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
+          transform="translate(-50%)"
+          borderRadius={SPACING.spacing6}
+          display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
+          onClick={makeHandleScrollToStep(currentRunCommandIndex)}
+          id="RunLog_jumpToCurrentStep"
+        >
+          {t('view_current_step')}
+        </PrimaryButton>
+      ) : null}
     </Flex>
   )
 }
