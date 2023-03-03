@@ -68,7 +68,7 @@ Once the tag looks good, you can push it:
 git push origin v${version}
 ```
 
-The tag push will kick off release builds and deploys create a release page where those builds and automatically generated in-depth changelogs will be posted.
+The tag push will kick off release builds and deploy the results to customers. It will also create a release page where those builds and automatically generated in-depth changelogs will be posted.
 
 9. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
 
