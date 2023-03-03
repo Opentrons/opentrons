@@ -156,9 +156,7 @@ async def test_aspirate_raises_volume_error(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
 
     decoy.when(
-        await pipetting.aspirate_in_place(
-            pipette_id="abc", volume=50, flow_rate=1.23
-        )
+        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23)
     ).then_raise(AssertionError("blah blah"))
 
     with pytest.raises(AssertionError):

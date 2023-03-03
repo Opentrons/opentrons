@@ -211,7 +211,7 @@ async def test_aspirate_in_place(
     )
 
 
-def test_virtual_validate_aspirated_volume_raises(
+async def test_virtual_validate_aspirated_volume_raises(
     decoy: Decoy,
     mock_state_view: StateView,
 ) -> None:
@@ -221,7 +221,7 @@ def test_virtual_validate_aspirated_volume_raises(
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
     with pytest.raises(AssertionError):
-        subject._validate_aspirated_volume(pipette_id="pipette-id", volume=4)
+        await subject.aspirate_in_place(pipette_id="pipette-id", volume=4, flow_rate=1)
 
 
 async def test_blow_out_in_place(
@@ -284,8 +284,14 @@ def test_get_is_ready_to_aspirate_virtual(
     assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is True
 
 
-async def test_aspirate_in_place_virtual(mock_state_view: StateView) -> None:
+async def test_aspirate_in_place_virtual(
+    mock_state_view: StateView, decoy: Decoy
+) -> None:
     """Should return the volume."""
+    decoy.when(
+        mock_state_view.pipettes.get_working_volume(pipette_id="pipette-id")
+    ).then_return(3)
+
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
     result = await subject.aspirate_in_place(
