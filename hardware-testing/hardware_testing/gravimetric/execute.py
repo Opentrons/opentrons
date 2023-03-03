@@ -1,14 +1,16 @@
 """Gravimetric."""
 from dataclasses import dataclass
+from typing import List
 from typing_extensions import Final
 
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import create_run_id_and_start_time
-from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from .helpers import get_pipette_unique_name
+from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
 from .increments import get_volume_increments
 from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
 from .measure.weight import GravimetricRecorder, GravimetricRecorderConfig
@@ -21,7 +23,9 @@ from .liquid_class.pipetting import (
 from .radwag_pipette_calibration_file import VIAL_DEFINITION
 
 
+LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
 VIAL_SAFE_Z_OFFSET: Final = 10
+DELAY_SECONDS_BEFORE_ASPIRATE: Final = 1
 DELAY_SECONDS_AFTER_ASPIRATE: Final = 1
 DELAY_SECONDS_AFTER_DISPENSE: Final = 1
 
@@ -35,9 +39,11 @@ class ExecuteGravConfig:
     pipette_mount: str
     tip_volume: int
     trials: int
+    labware_offsets: List[dict]
     slot_vial: int
     slot_tiprack: int
     increment: bool
+    low_volume: bool
 
 
 def _generate_callbacks_for_trial(
@@ -71,8 +77,13 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
         f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
         location=cfg.slot_tiprack,
     )
+    tiprack.set_calibration(
+        get_latest_offset_for_labware(cfg.labware_offsets, tiprack)
+    )
     vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_vial)
-    # TODO: apply offsets from LPC
+    vial.set_calibration(
+        get_latest_offset_for_labware(cfg.labware_offsets, vial)
+    )
 
     # LIQUID TRACKING
     liquid_tracker = LiquidTracker()
@@ -85,6 +96,23 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     pipette = ctx.load_instrument(
         f"p{cfg.pipette_volume}_single", cfg.pipette_mount, tip_racks=[tiprack]
     )
+
+    # GET TEST VOLUMES
+    if cfg.increment:
+        test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
+        clear_pipette_ul_per_mm(
+            get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
+            OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
+        )
+    else:
+        test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
+    # anything volumes < 2uL must be done on the super-high-precision scale
+    if cfg.low_volume:
+        test_volumes = [v for v in test_volumes if v < LOW_VOLUME_UPPER_LIMIT_UL]
+    else:
+        test_volumes = [v for v in test_volumes if v >= LOW_VOLUME_UPPER_LIMIT_UL]
+    if not test_volumes:
+        raise ValueError("no volumes to test, check the configuration")
 
     # SCALE
     # Some Radwag settings cannot be controlled remotely.
@@ -116,27 +144,19 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     get_input("Check that tip is touching liquid surface (+/-) 0.1 mm")
     pipette.drop_tip()
 
-    try:
-        # RECORD SCALE
-        recorder.record(in_thread=True)
+    # RECORD SCALE
+    recorder.record(in_thread=True)
 
+    try:
         # LOOP THROUGH SAMPLES
-        if cfg.increment:
-            test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
-            clear_pipette_ul_per_mm(
-                ctx._core.get_hardware()._obj_to_adapt,  # type: ignore[arg-type]
-                OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
-            )
-        else:
-            test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
-        # TODO: if single channel and volume is <2uL, use low-volume scale
         for volume in test_volumes:
             for trial in range(cfg.trials):
                 print(f"{trial + 1}/{cfg.trials}: {volume} uL")
-                callbacks = _generate_callbacks_for_trial(recorder, volume, trial)
-                if pipette.has_tip:
-                    pipette.drop_tip()
                 pipette.pick_up_tip()
+                pipette.move_to(vial["A1"].top())
+                with recorder.samples_of_tag(f"measure-init-{int(volume)}-{trial}"):
+                    ctx.delay(DELAY_SECONDS_BEFORE_ASPIRATE)
+                callbacks = _generate_callbacks_for_trial(recorder, volume, trial)
                 aspirate_with_liquid_class(
                     ctx,
                     pipette,
@@ -160,9 +180,6 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
                 with recorder.samples_of_tag(f"measure-dispense-{int(volume)}-{trial}"):
                     ctx.delay(DELAY_SECONDS_AFTER_DISPENSE)
                 pipette.drop_tip()
-
-        print("One final pause to wait for final reading to settle")
-        ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
     finally:
         recorder.stop()
 

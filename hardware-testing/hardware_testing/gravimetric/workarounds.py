@@ -1,29 +1,16 @@
 """Opentrons API Workarounds."""
 from datetime import datetime
+from urllib.request import Request, urlopen
 from typing import Tuple, List, Dict
 import platform
+from json import loads as json_loads
 
-from opentrons.config import robot_configs
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 
-DEFAULT_ACCELERATION_XYZA = 500
-DEFAULT_ACCELERATION_BC = 100
-DEFAULT_ACCELERATION_X = DEFAULT_ACCELERATION_XYZA  # API's default is 3000
-DEFAULT_ACCELERATION_Y = DEFAULT_ACCELERATION_XYZA  # API's default is 2000
-DEFAULT_ACCELERATION_Z = DEFAULT_ACCELERATION_XYZA  # API's default is 1500
-DEFAULT_ACCELERATION_A = DEFAULT_ACCELERATION_XYZA  # API's default is 1500
-DEFAULT_ACCELERATION_B = DEFAULT_ACCELERATION_BC  # API's default is 200
-DEFAULT_ACCELERATION_C = DEFAULT_ACCELERATION_BC  # API's default is 200
-DEFAULT_ACCELERATION: Dict[str, float] = {
-    "X": DEFAULT_ACCELERATION_X,
-    "Y": DEFAULT_ACCELERATION_Y,
-    "Z": DEFAULT_ACCELERATION_Z,
-    "A": DEFAULT_ACCELERATION_A,
-    "B": DEFAULT_ACCELERATION_B,
-    "C": DEFAULT_ACCELERATION_C,
-}
+from hardware_testing.opentrons_api.helpers_ot3 import start_server_ot3, stop_server_ot3
+from hardware_testing.opentrons_api.types import Point
 
 
 def is_running_in_app() -> bool:
@@ -34,16 +21,6 @@ def is_running_in_app() -> bool:
 def is_running_on_robot() -> bool:
     """Is running on Robot."""
     return str(platform.system()).lower() == "linux"
-
-
-def apply_additional_offset_to_labware(
-    labware: Labware, x: float = 0.0, y: float = 0.0, z: float = 0.0
-) -> None:
-    """Apply additional offset to labware."""
-    # NOTE: this will re-instantiate all the labware's WELLs
-    #       so this must be ran before rest of protocol
-    # FIXME: remove dependency on this feature, b/c it isn't supported in engine
-    return
 
 
 def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
@@ -58,20 +35,23 @@ def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
 
 def http_get_all_labware_offsets() -> List[dict]:
     """Request (HTTP GET) from the local robot-server all runs information."""
-    # req = Request("http://localhost:31950/runs")
-    # req.add_header("Opentrons-Version", "2")
-    # runs_response = urlopen(req)
-    # runs_response_data = runs_response.read()
-    # runs_json = json.loads(runs_response_data)
-    #
-    # protocols_list = runs_json["data"]
-    # return [offset for p in protocols_list for offset in p["labwareOffsets"]]
-    return []
+    req = Request("http://localhost:31950/runs")
+    req.add_header("Opentrons-Version", "2")
+
+    # temporarily start the server, so we can read from it
+    start_server_ot3()
+    runs_response = urlopen(req)
+    runs_response_data = runs_response.read()
+    stop_server_ot3()
+
+    runs_json = json_loads(runs_response_data)
+    protocols_list = runs_json["data"]
+    return [offset for p in protocols_list for offset in p["labwareOffsets"]]
 
 
 def get_latest_offset_for_labware(
     labware_offsets: List[dict], labware: Labware
-) -> Tuple[float, float, float]:
+) -> Point:
     """Get latest offset for labware."""
     lw_uri = str(labware.uri)
     lw_slot = str(labware.parent)
@@ -92,33 +72,16 @@ def get_latest_offset_for_labware(
     ]
 
     if not lw_offsets:
-        return 0.0, 0.0, 0.0
+        return Point()
 
     def _sort_by_created_at(_offset: dict) -> datetime:
         return datetime.fromisoformat(_offset["createdAt"])
 
     lw_offsets.sort(key=_sort_by_created_at)
     v = lw_offsets[-1]["vector"]
-    return round(v["x"], 2), round(v["y"], 2), round(v["z"], 2)
+    return Point(x=v["x"], y=v["y"], z=v["z"])
 
 
-def get_hw_api(ctx: ProtocolContext) -> SyncHardwareAPI:
+def get_sync_hw_api(ctx: ProtocolContext) -> SyncHardwareAPI:
     """Get HW API."""
     return ctx._core.get_hardware()
-
-
-def store_robot_acceleration(
-    x: float = DEFAULT_ACCELERATION_X,
-    y: float = DEFAULT_ACCELERATION_Y,
-    z: float = DEFAULT_ACCELERATION_Z,
-    a: float = DEFAULT_ACCELERATION_A,
-    b: float = DEFAULT_ACCELERATION_B,
-    c: float = DEFAULT_ACCELERATION_C,
-) -> None:
-    """Store Robot Acceleration."""
-    # TODO: figure out way to immediately set in smoothie
-    cfg = robot_configs.load_ot2()
-    settings = {"x": x, "y": y, "z": z, "a": a, "b": b, "c": c}
-    for ax, val in settings.items():
-        cfg.acceleration[ax.upper()] = val
-    robot_configs.save_robot_settings(cfg)

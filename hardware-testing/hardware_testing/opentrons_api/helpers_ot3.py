@@ -69,6 +69,12 @@ def stop_server_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
+def start_server_ot3() -> None:
+    """Start opentrons-robot-server on the OT3."""
+    print('Starting "opentrons-robot-server"...')
+    run(["systemctl", "start", "opentrons-robot-server"])
+
+
 def restart_canbus_ot3() -> None:
     """Restart opentrons-ot3-canbus on the OT3."""
     print('Restarting "opentrons-ot3-canbus"...')

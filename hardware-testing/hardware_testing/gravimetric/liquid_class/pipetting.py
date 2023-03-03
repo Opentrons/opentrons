@@ -79,6 +79,13 @@ def _pipette_with_liquid_settings(
     callbacks: Optional[PipettingCallbacks] = None,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
+    if aspirate:
+        assert dispense is None
+    else:
+        assert dispense is not None and dispense > 0
+    pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
+    pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
+
     # CALCULATE HEIGHTS
     height_before, height_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
@@ -92,32 +99,35 @@ def _pipette_with_liquid_settings(
     )
 
     # APPROACH
-    pipette.move_to(well.top())
+    start_above = max(pipetting_heights.start.above, pipetting_heights.end.below)
+    pipette.move_to(well.bottom(start_above))
 
-    # LEADING AIR-GAP
     if aspirate:
-        leading_air_vol = liquid_class.aspirate.air_gap.leading_air_gap
-        pipette.aspirate(leading_air_vol)
+        # LEADING AIR-GAP
+        pipette.aspirate(liquid_class.aspirate.air_gap.leading_air_gap)
+    else:
+        # TRAILING AIR-GAP
+        pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
 
     # SUBMERGE
-    start_above = max(pipetting_heights.start.above, pipetting_heights.end.below)
-    pipette.move_to(well.bottom(start_above), force_direct=False)
-    submerged_loc = well.bottom(pipetting_heights.end.below)
     if callbacks and callbacks.on_submerging:
         callbacks.on_submerging()
-    pipette.move_to(submerged_loc, force_direct=True, speed=TIP_SPEED_WHILE_SUBMERGED)
+    # TODO: implement liquid-height tracking here
+    pipette.move_to(
+        well.bottom(pipetting_heights.end.below),
+        force_direct=True,
+        speed=TIP_SPEED_WHILE_SUBMERGED
+    )
 
     # ASPIRATE/DISPENSE
     if aspirate:
-        pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
         if callbacks and callbacks.on_aspirating:
             callbacks.on_aspirating()
         pipette.aspirate(aspirate)
     else:
-        pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
         if callbacks and callbacks.on_dispensing:
             callbacks.on_dispensing()
-        pipette.dispense()  # includes leading air-gap
+        pipette.dispense()  # includes air from leading air-gap
     liquid_tracker.update_affected_wells(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
@@ -137,10 +147,15 @@ def _pipette_with_liquid_settings(
         speed=TIP_SPEED_WHILE_SUBMERGED,
     )
 
-    # BLOW-OUT
-    if callbacks and callbacks.on_blowing_out:
-        callbacks.on_blowing_out()
-    pipette.blow_out()
+    if aspirate:
+        # TRAILING AIR-GAP
+        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
+    else:
+        # BLOW-OUT
+        if callbacks and callbacks.on_blowing_out:
+            callbacks.on_blowing_out()
+        pipette.blow_out()
+        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
 
     # EXIT WELL
     if callbacks and callbacks.on_exiting:
