@@ -957,7 +957,7 @@ class API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: top_types.Mount) -> None:
+    async def blow_out(self, mount: top_types.Mount, volume: Optional[float] = None) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette

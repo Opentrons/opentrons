@@ -1340,13 +1340,13 @@ class OT3API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
+    async def blow_out(self, mount: Union[top_types.Mount, OT3Mount], volume: Optional[float] = None) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
         realmount = OT3Mount.from_mount(mount)
-        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount)
+        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, volume)
         await self._backend.set_active_current(
             {blowout_spec.axis: blowout_spec.current}
         )
