@@ -181,7 +181,6 @@ def _pipette_with_liquid_settings(
         # BLOW-OUT
         callbacks.on_blowing_out()
         pipette.blow_out()
-        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
 
     # EXIT WELL
     callbacks.on_exiting()

@@ -18,9 +18,9 @@ def run(protocol: ProtocolContext, labware_offsets: List[dict]) -> None:
         execute.ExecuteGravConfig(
             name=metadata["protocolName"],
             pipette_mount="left",
-            pipette_volume=1000,
+            pipette_volume=50,
             tip_volume=50,
-            trials=10,
+            trials=1,
             labware_offsets=labware_offsets,
             slot_vial=4,
             slot_tiprack=7,
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     _ctx = helpers.get_api_context(
         metadata["apiLevel"],
         is_simulating=args.simulate,
-        pipette_left="p1000_single_v3.3",
+        pipette_left="p50_single_v3.3",
     )
     _ctx.home()
     run(_ctx, _offsets)
