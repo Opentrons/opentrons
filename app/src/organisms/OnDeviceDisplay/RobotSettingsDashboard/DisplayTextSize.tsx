@@ -49,7 +49,7 @@ export function DisplayTextSize({
       <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
         <Btn
           onClick={() => setCurrentOption(null)}
-          data-testid="DisplayBrightness_back_button"
+          data-testid="DisplayTextSize_back_button"
         >
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
@@ -78,7 +78,7 @@ export function DisplayTextSize({
           <Btn
             // disabled={}
             onClick={() => handleClick('down')}
-            data-testid="DisplayBrightness_decrease"
+            data-testid="DisplayTextSize_decrease"
           >
             <Icon size="5rem" name="minus" />
           </Btn>
@@ -92,7 +92,7 @@ export function DisplayTextSize({
           <Btn
             // disabled={}
             onClick={() => handleClick('up')}
-            data-testid="DisplayBrightness_increase"
+            data-testid="DisplayTextSize_increase"
           >
             <Icon size="5rem" name="plus" />
           </Btn>
