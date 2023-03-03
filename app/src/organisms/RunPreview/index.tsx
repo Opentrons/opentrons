@@ -43,9 +43,9 @@ export const RunPreviewComponent = (
     setIsCurrentCommandVisible,
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
-  const currentRunCommandIndex =
-    robotSideAnalysis.commands.findIndex(c => c.key === currentRunCommandKey) ??
-    0
+  const currentRunCommandIndex = robotSideAnalysis.commands.findIndex(
+    c => c.key === currentRunCommandKey
+  )
 
   return (
     <Flex
