@@ -14,7 +14,7 @@ Welcome to the v6.3.0 release of the OT-2 software! This hotfix release addresse
 
 TODO
 
-## Improved Features
+### Improved Features
 
 TODO
 

@@ -10,11 +10,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v6.3.0 release of the Opentrons App!
 
-## Bug Fixes
+### Bug Fixes
 
 TODO
 
-## Improved Features
+### Improved Features
 
 TODO
 
