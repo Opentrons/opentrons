@@ -94,7 +94,7 @@ export function createSnippet(
         [command.result.moduleId]: moduleVariable,
       }
       const module = modules.find(
-        module => module.id === command.params.moduleId
+        module => module.id === command.result?.moduleId
       )
       const model = module?.model
       const { slotName } = command.params.location
