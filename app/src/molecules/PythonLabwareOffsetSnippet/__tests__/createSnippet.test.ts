@@ -133,7 +133,7 @@ const analysisCommands = protocolWithMagTempTC.commands.map(c => {
         ...c.params,
         model: protocolWithMagTempTC.modules.find(
           m => m.id === c.params.moduleId
-        )?.model,
+        )?.model as ModuleModel,
       },
     }
   }
