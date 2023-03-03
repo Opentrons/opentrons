@@ -13,12 +13,20 @@ from robot_server.instruments.instrument_models import (
 )
 
 
+class UpdateInfoNotFound(RuntimeError):
+    """Error raised when there was no update information found."""
+
+
 class InstrumentNotFound(RuntimeError):
     """Error raised when there is no instrument attached on the specified mount."""
 
 
 class UpdateIdNotFound(KeyError):
     """Error raised when a specified Update ID is not found."""
+
+
+class UpdatePossiblyFailed(RuntimeError):
+    """Error raised when the information from hardware controller points to a failed update."""
 
 
 class UpdateProgressMonitor:
@@ -40,9 +48,13 @@ class UpdateProgressMonitor:
         except HardwareNotSupportedError as e:
             raise e
 
-        update_status = ot3_hardware.get_firmware_update_progress()[
+        update_status = ot3_hardware.get_firmware_update_progress().get(
             MountType.to_ot3_mount(mount)
-        ]
+        )
+        if update_status is None:
+            raise UpdateInfoNotFound(
+                "No update progress info received " "from hardware control"
+            )
 
         self._status_by_id[update_id] = UpdateProgressData(
             id=update_id,
@@ -81,8 +93,10 @@ class UpdateProgressMonitor:
                 raise InstrumentNotFound(f"No instrument attached on mount {mount}")
 
             if instrument_dict["fw_update_required"]:
-                # TODO: add some 'something went wrong during update process' error type
-                raise RuntimeError
+                raise UpdatePossiblyFailed(
+                    "Update should have completed but instrument"
+                    " indicates that it still needs an update"
+                )
 
             # This way of interpreting whether an update finished successfully based
             # solely on details of an instrument attached to the specified mount

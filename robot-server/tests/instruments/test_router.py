@@ -35,16 +35,17 @@ from robot_server.instruments.instrument_models import (
     PipetteData,
     GripperCalibrationData,
     UpdateCreate,
-    MountTypesStr,
     UpdateProgressData,
 )
 from robot_server.instruments.router import (
     get_attached_instruments,
     update_firmware,
     get_firmware_update_status,
-    InstrumentNotFound,
 )
-from robot_server.instruments.update_progress_monitor import UpdateProgressMonitor
+from robot_server.instruments.update_progress_monitor import (
+    UpdateProgressMonitor,
+    UpdateIdNotFound,
+)
 from robot_server.service.json_api import RequestModel
 
 if TYPE_CHECKING:
@@ -429,39 +430,55 @@ async def test_update_instrument_firmware_without_update_available(
     assert exc_info.value.content["errors"][0]["id"] == "NoUpdateAvailable"
 
 
-# # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-# #  OT2 vs OT3 tests correclty
+# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
+#  OT2 vs OT3 tests correclty
 # @pytest.mark.xfail
-# @pytest.mark.ot3_only
-# async def test_get_firmware_update_status(
-#     decoy: Decoy,
-#     ot3_hardware_api: OT3API,
-# ) -> None:
-#     """It should get firmware update status of all attached instruments."""
-#     decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
-#         {
-#             OT3Mount.LEFT: InstrumentUpdateStatus(
-#                 mount=OT3Mount.LEFT,
-#                 status=UpdateState.updating,
-#                 progress=75,
-#             ),
-#             OT3Mount.GRIPPER: InstrumentUpdateStatus(
-#                 mount=OT3Mount.GRIPPER,
-#                 status=UpdateState.done,
-#                 progress=100,
-#             ),
-#         }
-#     )
-#     result = await get_firmware_update_status(hardware=ot3_hardware_api)
-#     assert result.content.data == [
-#         UpdateProgressStatus.construct(
-#             mount="left",
-#             updateStatus="updating",
-#             updateProgress=75,
-#         ),
-#         UpdateProgressStatus.construct(
-#             mount="extension",
-#             updateStatus="done",
-#             updateProgress=100,
-#         ),
-#     ]
+@pytest.mark.ot3_only
+async def test_get_firmware_update_status(
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+    update_progress_monitor: UpdateProgressMonitor,
+) -> None:
+    """It should get firmware update status of specified update process."""
+    expected_response = UpdateProgressData(
+        id="shiny-new-update-id",
+        createdAt=datetime(year=3000, month=12, day=1),
+        mount="extension",
+        updateStatus=UpdateState.done,
+        updateProgress=123,
+    )
+
+    decoy.when(update_progress_monitor.get_progress_status("update-id")).then_return(
+        expected_response
+    )
+
+    update_status = await get_firmware_update_status(
+        update_id="update-id",
+        update_progress_monitor=update_progress_monitor,
+    )
+
+    assert update_status.content.data == expected_response
+    assert update_status.status_code == 200
+
+
+# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
+#  OT2 vs OT3 tests correclty
+# @pytest.mark.xfail
+@pytest.mark.ot3_only
+async def test_get_firmware_update_status_of_invalid_id(
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+    update_progress_monitor: UpdateProgressMonitor,
+) -> None:
+    """It should raise error when fetching status of an invalid update resource."""
+    decoy.when(
+        update_progress_monitor.get_progress_status(update_id="imaginary-update-id")
+    ).then_raise(UpdateIdNotFound("womp womp.."))
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_firmware_update_status(
+            update_id="imaginary-update-id",
+            update_progress_monitor=update_progress_monitor,
+        )
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "InvalidUpdateId"

@@ -17,7 +17,6 @@ from .run_auto_deleter import RunAutoDeleter
 from .engine_store import EngineStore
 from .run_store import RunStore
 from .run_data_manager import RunDataManager
-from ..instruments.update_progress_monitor import UpdateProgressMonitor
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _engine_store_accessor = AppStateAccessor[EngineStore]("engine_store")

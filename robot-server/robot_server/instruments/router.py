@@ -257,7 +257,10 @@ async def update_firmware(
     path="/instruments/updates/{update_id}",
     summary="Get specified firmware update process' information.",
     description="Get firmware update status & progress of the specified update.",
-    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}},
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[InvalidUpdateId]},
+    },
 )
 async def get_firmware_update_status(
     update_id: str,
