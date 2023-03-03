@@ -57,6 +57,14 @@ describe('Carriage', () => {
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
   })
+  it('renders the correct button when is the on device display', () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('isOnDevice_button')
+  })
   it('returns the correct information, buttons work as expected when flow is detach', () => {
     props = {
       ...props,

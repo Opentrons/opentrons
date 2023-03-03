@@ -70,6 +70,9 @@ describe('BeforeBeginning', () => {
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
     mockGetIsGantryEmpty.mockReturnValue(false)
   })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   describe('calibrate flow single mount', () => {
     it('returns the correct information for calibrate flow', async () => {
       const { getByText, getByAltText, getByRole } = render(props)
@@ -189,7 +192,7 @@ describe('BeforeBeginning', () => {
       getByText(
         'Provided with robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', { name: 'Get started' })
+      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -231,7 +234,7 @@ describe('BeforeBeginning', () => {
         'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
       )
       getByText(
-        'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
+        'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
@@ -279,7 +282,7 @@ describe('BeforeBeginning', () => {
         'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
       )
       getByText(
-        'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
+        'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
@@ -330,7 +333,7 @@ describe('BeforeBeginning', () => {
         'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
       )
       getByText(
-        'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
+        'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
@@ -366,6 +369,24 @@ describe('BeforeBeginning', () => {
     })
   })
   describe('detach flow 96 channel', () => {
+    it('renders the banner for 96 channel with correct info for on device display', () => {
+      props = {
+        ...props,
+        attachedPipettes: { left: mockPipette, right: null },
+        flowType: FLOWS.DETACH,
+        selectedPipette: NINETY_SIX_CHANNEL,
+        isOnDevice: true,
+      }
+      const { getByLabelText, getByText } = render(props)
+      getByLabelText('icon_warning')
+      getByText('Before you begin')
+      getByText(
+        'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
+      )
+      getByText(
+        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
+      )
+    })
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
@@ -376,13 +397,13 @@ describe('BeforeBeginning', () => {
       const { getByText, getByAltText, getByRole } = render(props)
       getByText('Before you begin')
       getByText(
-        'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
+        'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByText(
         'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
       )
       getByAltText('2.5 mm Hex Screwdriver')
-      const proceedBtn = getByRole('button', { name: 'Get started' })
+      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [

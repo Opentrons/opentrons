@@ -469,7 +469,7 @@ describe('PipetteWizardFlows', () => {
     getByText('Detach 96-Channel Pipette')
     getByText('Before you begin')
     // page 1
-    const getStarted = getByRole('button', { name: 'Get started' })
+    const getStarted = getByRole('button', { name: 'Move gantry to front' })
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -689,7 +689,7 @@ describe('PipetteWizardFlows', () => {
     ])
     const { getByText, getByRole, getByLabelText } = render(props)
     // page 1
-    getByRole('button', { name: 'Get started' }).click()
+    getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
       expect(mockCreateRun).toHaveBeenCalled()

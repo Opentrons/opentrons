@@ -1,6 +1,5 @@
 {
   "before_you_begin": "Before you begin",
-  "get_started": "Get started",
   "remove_labware_to_get_started": "<block>To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side</block><block>The calibration probe is included with the robot and should be stored on the right hand side of the door opening.</block>",
   "attach_probe": "Attach Calibration Probe",
   "install_probe": "Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.",
@@ -51,7 +50,7 @@
   "single_mount_attached_error": "Single mount pipette is selected when this is the 96 channel flow",
   "detach_mounting_plate_instructions": "Hold onto the plate so it does not fall. Then remove the pins on the plate from the slots on the gantry carriage.",
   "unscrew_and_detach": "Loosen Screws and Detach Mounting Plate",
-  "pipette_heavy": "The 96-Channel Pipette is heavy ({{weight}}). You may want to have a second person to help hold it up during installation.",
+  "pipette_heavy": "The 96-Channel Pipette is heavy ({{weight}}). Ask a labmate for help, if needed.",
   "connect_96_channel": "Connect and Attach 96 Channel Pipette",
   "hold_pipette_carefully": "Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.",
   "unscrew_remove_96_channel": "Loosen Screws and Detach 96-Channel Pipette",

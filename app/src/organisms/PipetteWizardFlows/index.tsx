@@ -173,6 +173,7 @@ export const PipetteWizardFlows = (
       goBack={cancelExit}
       proceed={handleCleanUpAndClose}
       flowType={flowType}
+      isOnDevice={isOnDevice}
     />
   )
   const [
@@ -180,7 +181,10 @@ export const PipetteWizardFlows = (
     setIsUnskippableStep,
   ] = React.useState<boolean>(false)
   const unskippableModal = (
-    <UnskippableModal goBack={() => setIsUnskippableStep(false)} />
+    <UnskippableModal
+      goBack={() => setIsUnskippableStep(false)}
+      isOnDevice={isOnDevice}
+    />
   )
   let onExit
   if (currentStep == null) return null

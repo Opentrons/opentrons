@@ -14,11 +14,23 @@ describe('UnskippableModal', () => {
   it('returns the correct information for unskippable modal, pressing return button calls goBack prop', () => {
     props = {
       goBack: jest.fn(),
+      isOnDevice: false,
     }
     const { getByText, getByRole } = render(props)
     getByText('This is a critical step that cannot be skipped')
     getByText('You must detach the mounting plate before using other pipettes.')
     getByRole('button', { name: 'return' }).click()
+    expect(props.goBack).toHaveBeenCalled()
+  })
+  it('renders the is on device button with correct text when it is on device display', () => {
+    props = {
+      goBack: jest.fn(),
+      isOnDevice: true,
+    }
+    const { getByText, getByLabelText } = render(props)
+    getByText('This is a critical step that cannot be skipped')
+    getByText('You must detach the mounting plate before using other pipettes.')
+    getByLabelText('isOnDevice_button').click()
     expect(props.goBack).toHaveBeenCalled()
   })
 })

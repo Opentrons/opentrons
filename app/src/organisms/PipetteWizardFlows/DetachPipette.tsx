@@ -1,6 +1,7 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
+import { SIZE_1 } from '@opentrons/components'
 import { WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -54,7 +55,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       <>
         <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
         {!is96ChannelPipette ? null : (
-          <Banner type="warning">
+          <Banner type="warning" size={isOnDevice ? '1.5rem' : SIZE_1}>
             {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
           </Banner>
         )}

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
-import { COLORS } from '@opentrons/components'
+import { COLORS, SIZE_1, SPACING } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -49,13 +49,13 @@ export const BeforeBeginning = (
     errorMessage,
     setShowErrorMessage,
     selectedPipette,
+    isOnDevice,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   React.useEffect(() => {
     createRun({})
   }, [])
   const pipetteId = attachedPipettes[mount]?.id
-
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
     isGantryEmpty &&
@@ -69,18 +69,16 @@ export const BeforeBeginning = (
     return null
 
   let equipmentList = [CALIBRATION_PROBE]
-  let proceedButtonText: string = t('get_started')
+  const proceedButtonText: string = t('move_gantry_to_front')
   let bodyTranslationKey: string = ''
 
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      proceedButtonText = t('move_gantry_to_front')
       bodyTranslationKey = 'remove_labware_to_get_started'
       break
     }
     case FLOWS.ATTACH: {
       bodyTranslationKey = 'remove_labware'
-      proceedButtonText = t('move_gantry_to_front')
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
       } else {
@@ -200,7 +198,11 @@ export const BeforeBeginning = (
           />
           {selectedPipette === NINETY_SIX_CHANNEL &&
           (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
-            <Banner type="warning">
+            <Banner
+              type="warning"
+              size={isOnDevice ? '1.5rem' : SIZE_1}
+              marginTop={SPACING.spacing5}
+            >
               {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
             </Banner>
           ) : null}

@@ -139,6 +139,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           goBack={() => showExit(false)}
           proceed={exit}
           flowType={FLOWS.ATTACH}
+          isOnDevice={isOnDevice}
         />
       ) : (
         <Flex
@@ -221,6 +222,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             goBack={() => showExit(false)}
             proceed={exit}
             flowType={FLOWS.ATTACH}
+            isOnDevice={null}
           />
         ) : (
           <GenericWizardTile
