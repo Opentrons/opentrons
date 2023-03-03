@@ -477,8 +477,8 @@ async def find_slot_center_linear(
     The XYZ-center of the slot, where the z-value is obtained by averaging the
     z's of the four found edges.
     """
-    # estimated_center = estimated_center._replace(y=estimated_center.y + 3) # front
-    estimated_center = estimated_center._replace(y=estimated_center.y - 3) # rear
+    estimated_center = estimated_center._replace(y=estimated_center.y + 3) # front
+    # estimated_center = estimated_center._replace(y=estimated_center.y - 3) # rear
     # Find +X (right) edge
     plus_x_edge = await find_edge_linear(
         hcapi, mount, estimated_center + EDGES["right"], OT3Axis.X, 1
@@ -497,8 +497,8 @@ async def find_slot_center_linear(
     estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
 
     x_center = (plus_x_edge.x + minus_x_edge.x) / 2
-    # x_center_off = x_center + 3 # front
-    x_center_off = x_center - 3 # rear
+    x_center_off = x_center + 3 # front
+    # x_center_off = x_center - 3 # rear
     estimated_center = estimated_center._replace(x=x_center_off)
 
     # Move over Z-axis gauge plunger
@@ -778,8 +778,8 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     nominal_center = _get_calibration_square_position_in_slot(slot)
-    # nominal_center = nominal_center._replace(y=nominal_center.y + 0) # front
-    nominal_center = nominal_center._replace(y=nominal_center.y - 3) # rear
+    nominal_center = nominal_center._replace(y=nominal_center.y + 0) # front
+    # nominal_center = nominal_center._replace(y=nominal_center.y - 3) # rear
     await hcapi.reset_instrument_offset(mount)
     try:
         # First, find the estimated deck height. This will be used to baseline the edge detection points.
