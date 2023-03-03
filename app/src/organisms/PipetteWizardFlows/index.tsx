@@ -319,7 +319,7 @@ export const PipetteWizardFlows = (
     exitWizardButton = handleCleanUpAndClose
   }
 
-  return isOnDevice != null ? (
+  return isOnDevice ? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
