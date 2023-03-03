@@ -88,6 +88,7 @@ MessageDefinition = Union[
     defs.InstrumentInfoRequest,
     defs.BrushedMotorConfRequest,
     defs.BrushedMotorConfResponse,
+    defs.SetGripperErrorTolerance,
 ]
 
 
