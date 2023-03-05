@@ -107,15 +107,17 @@ def _pipette_with_liquid_settings(
     stay_above_well: bool = True,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
-    if aspirate:
-        assert dispense is None
-    else:
-        assert dispense is not None and dispense > 0
-    pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
-    pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
-    pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate  # use dispense flow-rate
+    if aspirate is None and dispense is None:
+        raise ValueError("either a aspirate or dispense volume must be set")
+    if aspirate and dispense:
+        raise ValueError("both aspirate and dispense volumes cannot be set together")
 
-    # CALCULATE HEIGHTS
+    # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
+    #  1. APPROACH
+    #  2. SUBMERGE
+    #  3. RETRACT
+
+    # CALCULATE TIP HEIGHTS FOR EACH PHASE
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
@@ -129,65 +131,87 @@ def _pipette_with_liquid_settings(
         liquid_before, liquid_after, liq_submerge, liq_retract, stay_above_well
     )
 
-    # APPROACH
-    pipette.move_to(well.bottom(approach_mm))
+    # CREATE CALLBACKS FOR EACH PHASE
+    def _aspirate_on_approach() -> None:
+        # set plunger speeds
+        pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
+        pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
+        # Note: Here, we previously would aspirate some air, to account for the leading-air-gap.
+        #       However, we can instead use the already-present air between the pipette's
+        #       "bottom" and "blow-out" plunger positions. This would require the `pipette.blow_out`
+        #       method to accept a microliter amount as an optional argument.
+        # Advantage: guarantee all aspirations begin at same position, helping low-volume accuracy.
+        # Disadvantage: limit our max leading-air-gap volume, potentially leaving droplets behind.
+        return
 
-    # if aspirate:
-    #     # LEADING AIR-GAP
-    #     pipette.aspirate(liquid_class.aspirate.air_gap.leading_air_gap)
-    if dispense:
-        # TRAILING AIR-GAP
+    def _aspirate_on_submerge() -> None:
+        # mix 5x times
+        callbacks.on_mixing()
+        for _ in range(NUM_MIXES_BEFORE_ASPIRATE):
+            pipette.aspirate(aspirate)
+            pipette.dispense(aspirate)
+        # aspirate specified volume
+        callbacks.on_aspirating()
+        pipette.aspirate(aspirate)
+        # update liquid-height tracker
+        liquid_tracker.update_affected_wells(pipette, well, aspirate=aspirate)
+        # delay
+        ctx.delay(liquid_class.aspirate.delay)
+
+    def _aspirate_on_retract() -> None:
+        # add trailing-air-gap
+        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
+
+    def _dispense_on_approach() -> None:
+        # remove trailing-air-gap
         pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
 
-    # SUBMERGE
+    def _dispense_on_submerge() -> None:
+        # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
+        # TODO: if P50 has droplets inside the tip after dispense with a full blow-out,
+        #       try increasing the blow-out volume by raising the "bottom" plunger position
+        # temporarily set blow-out flow-rate to be same as dispense
+        old_blow_out_flow_rate = pipette.flow_rate.blow_out
+        pipette.flow_rate.blow_out = pipette.flow_rate.dispense
+        # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
+        hw_api = ctx._core.get_hardware()
+        hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+        callbacks.on_dispensing()
+        hw_api.blow_out(hw_mount, liquid_class.aspirate.air_gap.leading_air_gap)
+        pipette.flow_rate.blow_out = old_blow_out_flow_rate
+        # update liquid-height tracker
+        liquid_tracker.update_affected_wells(pipette, well, dispense=dispense)
+        # delay
+        ctx.delay(liquid_class.dispense.delay)
+
+    def _dispense_on_retract() -> None:
+        # blow-out any remaining air in pipette (any reason why not?)
+        callbacks.on_blowing_out()
+        pipette.blow_out()
+
+    # PHASE 1: APPROACH
+    pipette.move_to(well.bottom(approach_mm))
+    _aspirate_on_approach() if aspirate else _dispense_on_approach()
+
+    # PHASE 2: SUBMERGE
     callbacks.on_submerging()
     pipette.move_to(
         well.bottom(submerge_mm),
         force_direct=True,
         speed=TIP_SPEED_WHILE_SUBMERGED,
     )
+    _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
-    # ASPIRATE/DISPENSE
-    if aspirate:
-        callbacks.on_mixing()
-        for _ in range(NUM_MIXES_BEFORE_ASPIRATE):
-            pipette.aspirate(aspirate)
-            pipette.dispense(aspirate)
-        callbacks.on_aspirating()
-        pipette.aspirate(aspirate)
-    else:
-        callbacks.on_dispensing()
-        hw_api = ctx._core.get_hardware()
-        hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.blow_out(hw_mount, liquid_class.aspirate.air_gap.leading_air_gap)
-        # pipette.dispense()  # includes air from leading air-gap
-    liquid_tracker.update_affected_wells(
-        pipette, well, aspirate=aspirate, dispense=dispense
-    )
-
-    # DELAY
-    if aspirate and liquid_class.aspirate.delay:
-        ctx.delay(liquid_class.aspirate.delay)
-    elif dispense and liquid_class.dispense.delay:
-        ctx.delay(liquid_class.dispense.delay)
-
-    # RETRACT
+    # PHASE 3: RETRACT
     callbacks.on_retracting()
     pipette.move_to(
         well.bottom(retract_mm),
         force_direct=True,
         speed=TIP_SPEED_WHILE_SUBMERGED,
     )
+    _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
-    if aspirate:
-        # TRAILING AIR-GAP
-        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
-    else:
-        # BLOW-OUT
-        callbacks.on_blowing_out()
-        pipette.blow_out()
-
-    # EXIT WELL
+    # EXIT
     callbacks.on_exiting()
     pipette.move_to(well.top(), force_direct=True)
 

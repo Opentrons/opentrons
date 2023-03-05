@@ -194,9 +194,7 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
         # MEASURE EVAPORATION
         for trial in range(NUM_BLANK_TRIALS):
             count += 1
-            print(
-                f"{count}/{total}: blank (trial {trial + 1}/{NUM_BLANK_TRIALS})"
-            )
+            print(f"{count}/{total}: blank (trial {trial + 1}/{NUM_BLANK_TRIALS})")
             pipette.pick_up_tip()
             _run_sample(
                 ctx,
