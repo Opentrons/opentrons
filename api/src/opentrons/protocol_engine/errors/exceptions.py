@@ -22,7 +22,7 @@ class UnexpectedProtocolError(ProtocolEngineError):
 # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect.
 # By comparison, loadModule uses ModuleAlreadyPresentError and ModuleNotAttachedError.
 class FailedToLoadPipetteError(ProtocolEngineError):
-    """Raised when executing a LoadPipette command fails.
+    """Raised when a LoadPipette command fails.
 
     This failure may be caused by:
     - An incorrect pipette already attached to the mount
@@ -142,7 +142,7 @@ class WrongModuleTypeError(ProtocolEngineError):
 
 
 class ThermocyclerNotOpenError(ProtocolEngineError):
-    """Raised when trying to move to labware that's covered inside a TC."""
+    """Raised when trying to move to a labware that's in a closed Thermocycler."""
 
 
 class RobotDoorOpenError(ProtocolEngineError):
@@ -154,7 +154,7 @@ class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
 
 
 class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
-    """Raised when heater-shaker latch is not open when it is expected to be so."""
+    """Raised when Heater-Shaker latch is not open when it is expected to be so."""
 
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):
