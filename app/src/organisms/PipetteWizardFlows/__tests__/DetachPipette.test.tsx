@@ -102,7 +102,7 @@ describe('DetachPipette', () => {
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
     getByText(
-      'The 96-Channel Pipette is heavy (~10kg). You may want to have a second person to help hold it up during installation.'
+      'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
     )
     getByAltText('Unscrew 96 channel pipette')
     getByText('mock check pipette button')
