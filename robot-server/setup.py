@@ -22,7 +22,7 @@ from python_build_utils import normalize_version  # noqa: E402
 def get_version():
     buildno = os.getenv("BUILD_NUMBER")
     project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
-    git_dir = os.getenv('OPENTRONS_GIT_DIR', None)
+    git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
