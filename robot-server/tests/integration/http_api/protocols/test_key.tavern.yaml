@@ -224,3 +224,9 @@ stages:
         data:
           - id: '{protocol_id1}'
             key: duplicate_key
+  - name: Delete the protocol
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id1}'
+      method: DELETE
+    response:
+      status_code: 200

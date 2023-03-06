@@ -319,11 +319,13 @@ async def test_create_protocol(
         [buffered_file]
     )
 
+    decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("abc123")
+
     decoy.when(
         await protocol_reader.save(
             files=[buffered_file],
             directory=protocol_directory / "protocol-id",
-            content_hash=matchers.Anything(),
+            content_hash="abc123",
         )
     ).then_return(protocol_source)
 
@@ -383,13 +385,15 @@ async def test_create_protocol_not_readable(
 ) -> None:
     """It should 422 if the protocol is rejected by the pre-analyzer."""
     decoy.when(await file_reader_writer.read(files=matchers.Anything())).then_return([])
+    decoy.when(await file_hasher.hash(files=[])).then_return("abc123")
+
     decoy.when(protocol_store.get_all()).then_return([])
 
     decoy.when(
         await protocol_reader.save(
             directory=matchers.Anything(),
             files=matchers.Anything(),
-            content_hash=matchers.Anything(),
+            content_hash="abc123",
         )
     ).then_raise(ProtocolFilesInvalidError("oh no"))
 
@@ -418,12 +422,13 @@ async def test_create_protocol_different_robot_type(
 ) -> None:
     """It should 422 if the protocol's robot type doesn't match the server's."""
     decoy.when(await file_reader_writer.read(files=matchers.Anything())).then_return([])
+    decoy.when(await file_hasher.hash(files=[])).then_return("abc123")
 
     decoy.when(
         await protocol_reader.save(
             directory=matchers.Anything(),
             files=matchers.Anything(),
-            content_hash=matchers.Anything(),
+            content_hash="abc123",
         )
     ).then_return(
         ProtocolSource(
