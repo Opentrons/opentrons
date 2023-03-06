@@ -200,7 +200,7 @@ async def _main(arguments: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--cycles", type=int, default=1)
+    parser.add_argument("--cycles", type=int, default=2)
     parser.add_argument("--operator", type=str, required=True)
     parser.add_argument("--sn", type=str, required=True)
     parser.add_argument("--skip_bowtie", action="store_true")
