@@ -5,16 +5,12 @@ from typing import Optional, Callable, Tuple
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
 
+from hardware_testing.gravimetric import config
 from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
 from hardware_testing.opentrons_api.types import OT3Mount
 
 from .definition import LiquidClassSettings
 from .defaults import get_liquid_class
-
-
-NUM_MIXES_BEFORE_ASPIRATE = 5
-LABWARE_BOTTOM_CLEARANCE = 1.5
-TIP_SPEED_WHILE_SUBMERGED = 5
 
 
 @dataclass
@@ -48,12 +44,12 @@ def _create_pipetting_heights(
     #     4) Submerged in the ending liquid height
     return PipettingHeights(
         start=LiquidSurfaceHeights(
-            above=max(start_mm + retract, LABWARE_BOTTOM_CLEARANCE),
-            below=max(start_mm - submerge, LABWARE_BOTTOM_CLEARANCE),
+            above=max(start_mm + retract, config.LABWARE_BOTTOM_CLEARANCE),
+            below=max(start_mm - submerge, config.LABWARE_BOTTOM_CLEARANCE),
         ),
         end=LiquidSurfaceHeights(
-            above=max(end_mm + retract, LABWARE_BOTTOM_CLEARANCE),
-            below=max(end_mm - submerge, LABWARE_BOTTOM_CLEARANCE),
+            above=max(end_mm + retract, config.LABWARE_BOTTOM_CLEARANCE),
+            below=max(end_mm - submerge, config.LABWARE_BOTTOM_CLEARANCE),
         ),
     )
 
@@ -147,7 +143,7 @@ def _pipette_with_liquid_settings(
     def _aspirate_on_submerge() -> None:
         # mix 5x times
         callbacks.on_mixing()
-        for _ in range(NUM_MIXES_BEFORE_ASPIRATE):
+        for _ in range(config.NUM_MIXES_BEFORE_ASPIRATE):
             pipette.aspirate(aspirate)
             pipette.dispense(aspirate)
         # aspirate specified volume
@@ -198,7 +194,7 @@ def _pipette_with_liquid_settings(
     pipette.move_to(
         well.bottom(submerge_mm),
         force_direct=True,
-        speed=TIP_SPEED_WHILE_SUBMERGED,
+        speed=config.TIP_SPEED_WHILE_SUBMERGED,
     )
     _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
@@ -207,7 +203,7 @@ def _pipette_with_liquid_settings(
     pipette.move_to(
         well.bottom(retract_mm),
         force_direct=True,
-        speed=TIP_SPEED_WHILE_SUBMERGED,
+        speed=config.TIP_SPEED_WHILE_SUBMERGED,
     )
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 

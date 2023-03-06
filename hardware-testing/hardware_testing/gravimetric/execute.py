@@ -1,57 +1,31 @@
 """Gravimetric."""
-from dataclasses import dataclass
-from typing import List
-from typing_extensions import Final
-
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well
 
 from hardware_testing.data import create_run_id_and_start_time
 from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
+from . import report
+from . import config
 from .helpers import get_pipette_unique_name
 from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
 from .increments import get_volume_increments
 from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
-from .measure.weight import GravimetricRecorder, GravimetricRecorderConfig
+from .measurement.record import GravimetricRecorder, GravimetricRecorderConfig
 from .liquid_class.defaults import get_test_volumes
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
     dispense_with_liquid_class,
     PipettingCallbacks,
 )
-from .radwag_pipette_calibration_file import VIAL_DEFINITION
-
-
-NUM_BLANK_TRIALS: Final = 3
-LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
-VIAL_SAFE_Z_OFFSET: Final = 10
-DELAY_SECONDS_BEFORE_ASPIRATE: Final = 1
-DELAY_SECONDS_AFTER_ASPIRATE: Final = 1
-DELAY_SECONDS_AFTER_DISPENSE: Final = 1
-
-
-@dataclass
-class ExecuteGravConfig:
-    """Execute Gravimetric Setup Config."""
-
-    name: str
-    pipette_volume: int
-    pipette_mount: str
-    tip_volume: int
-    trials: int
-    labware_offsets: List[dict]
-    slot_vial: int
-    slot_tiprack: int
-    increment: bool
-    low_volume: bool
+from .vial_labware_definition import VIAL_DEFINITION
 
 
 def _generate_callbacks_for_trial(
     recorder: GravimetricRecorder, volume: float, trial: int
 ) -> PipettingCallbacks:
     def _tag(t: str) -> str:
-        return f"{t}-{int(volume)}-{trial}"
+        return report.create_measurement_tag(t, volume, trial)
 
     return PipettingCallbacks(
         on_submerging=lambda: recorder.set_sample_tag(_tag("submerge")),
@@ -81,7 +55,7 @@ def _run_sample(
     else:
         vol_tag = str(int(volume))
     with recorder.samples_of_tag(f"measure-init-{vol_tag}-{trial}"):
-        ctx.delay(DELAY_SECONDS_BEFORE_ASPIRATE)
+        ctx.delay(config.DELAY_SECONDS_BEFORE_ASPIRATE)
     callbacks = _generate_callbacks_for_trial(recorder, volume, trial)
     aspirate_with_liquid_class(
         ctx,
@@ -94,7 +68,7 @@ def _run_sample(
         stay_above_well=stay_above_well,
     )
     with recorder.samples_of_tag(f"measure-aspirate-{vol_tag}-{trial}"):
-        ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
+        ctx.delay(config.DELAY_SECONDS_AFTER_ASPIRATE)
     dispense_with_liquid_class(
         ctx,
         pipette,
@@ -106,16 +80,18 @@ def _run_sample(
         stay_above_well=stay_above_well,
     )
     with recorder.samples_of_tag(f"measure-dispense-{vol_tag}-{trial}"):
-        ctx.delay(DELAY_SECONDS_AFTER_DISPENSE)
+        ctx.delay(config.DELAY_SECONDS_AFTER_DISPENSE)
 
 
-def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
+def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
     if ctx.is_simulating():
         get_input = print
     else:
         get_input = input  # type: ignore[assignment]
     run_id, start_time = create_run_id_and_start_time()
+
+    # TODO: create test-report
 
     # LOAD LABWARE
     tiprack = ctx.load_labware(
@@ -130,7 +106,7 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     liquid_tracker = LiquidTracker()
     initialize_liquid_from_deck(ctx, liquid_tracker)
     liquid_tracker.set_start_volume_from_liquid_height(
-        vial["A1"], vial["A1"].depth - VIAL_SAFE_Z_OFFSET, name="Water"
+        vial["A1"], vial["A1"].depth - config.VIAL_SAFE_Z_OFFSET, name="Water"
     )
 
     # PIPETTE
@@ -149,9 +125,11 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
         test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
     # anything volumes < 2uL must be done on the super-high-precision scale
     if cfg.low_volume:
-        test_volumes = [v for v in test_volumes if v < LOW_VOLUME_UPPER_LIMIT_UL]
+        test_volumes = [v for v in test_volumes if v < config.LOW_VOLUME_UPPER_LIMIT_UL]
     else:
-        test_volumes = [v for v in test_volumes if v >= LOW_VOLUME_UPPER_LIMIT_UL]
+        test_volumes = [
+            v for v in test_volumes if v >= config.LOW_VOLUME_UPPER_LIMIT_UL
+        ]
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
 
@@ -173,6 +151,9 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
         simulate=ctx.is_simulating(),
     )
 
+    # CREATE CSV TEST REPORT
+    test_report = report.create_csv_test_report(__file__, test_volumes, cfg)
+
     # USER SETUP LIQUIDS
     setup_str = liquid_tracker.get_setup_instructions_string()
     print(setup_str)
@@ -189,12 +170,14 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     recorder.record(in_thread=True)
 
     try:
-        total = len(test_volumes) * cfg.trials + NUM_BLANK_TRIALS
+        total = len(test_volumes) * cfg.trials + config.NUM_BLANK_TRIALS
         count = 0
         # MEASURE EVAPORATION
-        for trial in range(NUM_BLANK_TRIALS):
+        for trial in range(config.NUM_BLANK_TRIALS):
             count += 1
-            print(f"{count}/{total}: blank (trial {trial + 1}/{NUM_BLANK_TRIALS})")
+            print(
+                f"{count}/{total}: blank (trial {trial + 1}/{config.NUM_BLANK_TRIALS})"
+            )
             pipette.pick_up_tip()
             _run_sample(
                 ctx,
@@ -229,8 +212,7 @@ def run(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> None:
     finally:
         recorder.stop()
 
-    # TODO: - Read in recording from CSV file
-    #       - Isolate each aspirate/dispense sample
+    # TODO: - Isolate each aspirate/dispense sample
     #       - Calculate grams per each aspirate/dispense
     #       - Calculate uL Average and %CV
-    #       - Print results
+    #       - Store results in the test-report

@@ -13,13 +13,6 @@ EXAMPLE_REPORT = CSVReport(
     script_path=__file__,
     sections=[
         CSVSection(
-            title="TEST-INFO",
-            lines=[
-                CSVLine("software-version", [str]),
-                CSVLine("operator", [str]),
-            ],
-        ),
-        CSVSection(
             title="PIPETTE-LEFT",
             lines=[
                 CSVLine("pipette-serial", [str, str, CSVResult]),

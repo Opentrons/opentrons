@@ -4,6 +4,7 @@ from typing import List
 
 from opentrons.protocol_api import ProtocolContext
 
+from hardware_testing.gravimetric.config import GravimetricConfig
 from hardware_testing.gravimetric import execute, helpers, workarounds
 
 
@@ -15,7 +16,7 @@ def run(protocol: ProtocolContext, labware_offsets: List[dict]) -> None:
     """Run."""
     execute.run(
         protocol,
-        execute.ExecuteGravConfig(
+        GravimetricConfig(
             name=metadata["protocolName"],
             pipette_mount="left",
             pipette_volume=50,

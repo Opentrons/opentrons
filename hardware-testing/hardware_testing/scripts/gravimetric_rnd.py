@@ -3,7 +3,7 @@ import argparse
 from time import time
 
 from hardware_testing.data import create_run_id, create_datetime_string
-from hardware_testing.gravimetric.measure.weight import (
+from hardware_testing.gravimetric.measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
