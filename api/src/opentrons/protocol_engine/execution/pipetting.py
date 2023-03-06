@@ -192,7 +192,7 @@ class VirtualPipettingHandler(PipettingHandler):
         """Validate if there is a tip attached."""
         tip_geometry = self._state_view.pipettes.get_attached_tip(pipette_id)
         if not tip_geometry:
-            raise TipNotAttachedError("Cannot perform BLOWOUT without a tip attachedxs")
+            raise TipNotAttachedError("Cannot perform BLOWOUT without a tip attached")
 
 
 def create_pipetting_handler(
