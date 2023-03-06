@@ -813,14 +813,14 @@ def test_get_calibration_coordinates() -> None:
         "locations": {
             "orderedSlots": [
                 {
-                    "id": "2",
+                    "id": "1",
                     "position": [2, 2, 0.0],
                     "boundingBox": {
                         "xDimension": 4.0,
                         "yDimension": 6.0,
                         "zDimension": 0,
                     },
-                    "displayName": "Slot 2",
+                    "displayName": "Slot 1",
                 }
             ]
         }
@@ -830,7 +830,7 @@ def test_get_calibration_coordinates() -> None:
 
     result = subject.get_calibration_coordinates(current_z_position=3.0)
 
-    assert result == Point(x=4, y=5, z=3)
+    assert result == Point(x=4, y=15, z=63)
 
 
 def test_get_by_slot() -> None:

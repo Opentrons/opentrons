@@ -59,7 +59,8 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
-_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
+_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_1
+_INSTRUMENT_ATTACH_OFFSET = Point(y=10, z=60)
 
 
 class LabwareLoadParams(NamedTuple):
@@ -604,8 +605,8 @@ class LabwareView(HasState[LabwareState]):
 
         return Point(
             x=target_center.x,
-            y=target_center.y,
-            z=current_z_position,
+            y=target_center.y + _INSTRUMENT_ATTACH_OFFSET.y,
+            z=current_z_position + _INSTRUMENT_ATTACH_OFFSET.z,
         )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
