@@ -9,6 +9,11 @@ import {
   SIZE_4,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
+  COLORS,
+  BORDERS,
+  TYPOGRAPHY,
+  SIZE_1,
+  Box
 } from '@opentrons/components'
 import { JogControls } from '../../molecules/JogControls'
 
@@ -23,12 +28,16 @@ import { useToggleGroup } from '../../molecules/ToggleGroup/useToggleGroup'
 import { AttachedPipettesByMount, Mount, RUN_STATUS_STOPPED, VectorOffset } from '@opentrons/api-client'
 import { LiveOffsetValue } from '../LabwarePositionCheck/LiveOffsetValue'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { RobotModel } from '../../redux/discovery/types'
+import { DeckView } from './DeckView'
+import { StyledText } from '../../atoms/text'
 
-interface JogGantryProps {
+interface ManualControlPanelProps {
   handleClose: () => void
+  robotModel: RobotModel
 }
-export const JogGantry = (props: JogGantryProps): JSX.Element | null => {
-  const { handleClose } = props
+export const ManualControlPanel = (props: ManualControlPanelProps): JSX.Element | null => {
+  const { handleClose, robotModel } = props
   const [runId, setRunId] = React.useState<string | null>(null)
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
   const attachedPipettes = useAttachedPipettes()
@@ -52,6 +61,8 @@ export const JogGantry = (props: JogGantryProps): JSX.Element | null => {
     runId != null ? stopRun(runId) : handleClose()
   }
 
+  const [lastKnownPosition, setLastKnownPosition] = React.useState<VectorOffset>({ x: 0, y: 0, z: 0 })
+
   return (
     <ModalShell
       width="100vw"
@@ -74,7 +85,17 @@ export const JogGantry = (props: JogGantryProps): JSX.Element | null => {
           padding={SPACING.spacing6}
           minHeight="25rem"
         >
-          {runId != null ? <GantryControlsComponent runId={runId} attachedPipettes={attachedPipettes} /> : null}
+          {runId != null ? (
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+              <Box flex="2">
+                <GantryControlsComponent {...{ runId, attachedPipettes, lastKnownPosition, setLastKnownPosition }} />
+              </Box>
+              <Flex flex="3" flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+                <DeckView {...{robotModel, lastKnownPosition, setLastKnownPosition}} />
+                <CurrentCoords lastKnownPosition={lastKnownPosition} />
+              </Flex>
+            </Flex>
+          ) : null}
         </Flex>
       )}
     </ModalShell>
@@ -84,11 +105,11 @@ export const JogGantry = (props: JogGantryProps): JSX.Element | null => {
 interface GantryControlsProps {
   runId: string,
   attachedPipettes: AttachedPipettesByMount
+  setLastKnownPosition: (position: VectorOffset) => void
 }
 function GantryControlsInner(props: GantryControlsProps): JSX.Element {
-  const { runId, attachedPipettes } = props
+  const { runId, attachedPipettes, setLastKnownPosition } = props
   const { createRunCommand } = useCreateRunCommandMutation(runId)
-  const [lastKnownPosition, setLastKnownPosition] = React.useState<VectorOffset>({ x: 0, y: 0, z: 0 })
 
   let loadCommands: CreateCommand[] = []
   if (attachedPipettes.left != null) {
@@ -137,7 +158,6 @@ function GantryControlsInner(props: GantryControlsProps): JSX.Element {
         waitUntilComplete: true
       })
         .then(({ data }) => {
-          console.log('result', data)
           setLastKnownPosition(data.result?.position)
         })
         .catch((e: Error) => {
@@ -146,19 +166,43 @@ function GantryControlsInner(props: GantryControlsProps): JSX.Element {
     }
   }
   return (
-    <Flex>
-      <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-        {toggleGroup}
-        <LiveOffsetValue {...lastKnownPosition} />
-      </Flex>
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      {toggleGroup}
+      <JogControls
+        flexWrap='wrap'
+        jog={(axis, direction, step, _onSuccess) =>
+          handleJog(axis, direction, step)
+        }
+      />
+    </Flex>
+  )
+}
 
-      <Flex flex="4">
-        <JogControls
-          jog={(axis, direction, step, _onSuccess) =>
-            handleJog(axis, direction, step)
-          }
-        />
-      </Flex>
+interface CurrentCoordsProps { lastKnownPosition: VectorOffset }
+function CurrentCoords(props: CurrentCoordsProps): JSX.Element {
+  const { lastKnownPosition } = props
+  return (
+    <Flex
+      flex="0 1 auto"
+      alignItems={ALIGN_CENTER}
+      border={`${BORDERS.styleSolid} ${SPACING.spacingXXS} ${COLORS.lightGreyHover}`}
+      borderRadius={BORDERS.radiusSoftCorners}
+      padding={SPACING.spacing3}
+    >
+      <Icon name="reticle" size={SIZE_1} />
+      {[lastKnownPosition.x, lastKnownPosition.y, lastKnownPosition.z].map((axis, index) => (
+        <React.Fragment key={index}>
+          <StyledText
+            as="p"
+            marginLeft={SPACING.spacing3}
+            marginRight={SPACING.spacing2}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            {['X', 'Y', 'Z'][index]}
+          </StyledText>
+          <StyledText as="p">{axis.toFixed(1)}</StyledText>
+        </React.Fragment>
+      ))}
     </Flex>
   )
 }

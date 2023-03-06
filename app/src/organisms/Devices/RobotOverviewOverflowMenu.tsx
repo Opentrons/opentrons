@@ -36,7 +36,7 @@ import { useIsRobotBusy } from './hooks'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
-import { JogGantry } from '../JogGantry'
+import { ManualControlPanel } from '../ManualControlPanel'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
@@ -108,7 +108,7 @@ export const RobotOverviewOverflowMenu = (
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
   const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
-  const [showJogGantry, setShowJogGantry] = React.useState(false)
+  const [showManualControlPanel, setShowManualControlPanel] = React.useState(false)
 
   useInterval(() => dispatch(fetchWifiList(robot.name)), LIST_REFRESH_MS, true)
 
@@ -137,8 +137,8 @@ export const RobotOverviewOverflowMenu = (
             robotName={robot.name}
           />
         ) : null}
-        {showJogGantry ? (
-          <JogGantry handleClose={() => setShowJogGantry(false)} />
+        {showManualControlPanel ? (
+          <ManualControlPanel robotModel={robot.robotModel} handleClose={() => setShowManualControlPanel(false)} />
         ) : null}
       </Portal>
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
@@ -193,7 +193,7 @@ export const RobotOverviewOverflowMenu = (
           {devToolsOn ? (
             <MenuItem
               disabled={isRobotUnavailable}
-              onClick={() => { setShowJogGantry(true) }}
+              onClick={() => { setShowManualControlPanel(true) }}
             >
               {t('Jog Gantry')}
             </MenuItem>
