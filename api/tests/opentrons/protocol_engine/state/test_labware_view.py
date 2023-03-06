@@ -373,7 +373,7 @@ def test_get_tip_length_gets_length_from_definition(
     )
 
     length = subject.get_tip_length("tip-rack-id", 12.3)
-    assert length == tip_rack_def.parameters.tipLength - 12.3
+    assert length == tip_rack_def.parameters.tipLength - 12.3  # type: ignore[operator]
 
 
 def test_get_tip_drop_z_offset() -> None:
