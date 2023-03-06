@@ -549,8 +549,27 @@ class ModuleView(HasState[ModuleState]):
             )
         return location
 
+    def get_requested_model(self, module_id: str) -> Optional[ModuleModel]:
+        """Return the model by which this module was requested.
+
+        Or, if this module was not loaded with an explicit ``loadModule`` command,
+        return ``None``.
+
+        See also `get_actual_model()`.
+        """
+        try:
+            return self._state.requested_model_by_id[module_id]
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+
     def get_actual_model(self, module_id: str) -> ModuleModel:
-        """Get the model name of the given module."""
+        """Return the model of the connected module.
+
+        This can differ from `get_requested_model()` because of module compatibility.
+        For example, a ``loadModule`` command might request a ``temperatureModuleV1``
+        but return a ``temperatureModuleV2`` if that's what it finds actually connected
+        at run time.
+        """
         return self.get(module_id).model
 
     def get_serial_number(self, module_id: str) -> str:
