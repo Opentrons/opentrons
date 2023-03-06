@@ -141,16 +141,16 @@ async def test_receive_data_polling(
         """Message responder."""
         if sensor_type.sensor.sensor_type == SensorType.environment:
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(SensorType.humidity),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -158,16 +158,16 @@ async def test_receive_data_polling(
                 ),
             )
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(SensorType.temperature),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -176,16 +176,16 @@ async def test_receive_data_polling(
             )
         else:
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
