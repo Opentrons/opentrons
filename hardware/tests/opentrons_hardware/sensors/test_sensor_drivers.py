@@ -94,7 +94,8 @@ def sensor_driver() -> SensorDriver:
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
                     sensor_id=SensorIdField(SensorId.S0),
-                    sample_rate=UInt16Field(10),
+                    number_of_reads=UInt16Field(10),
+                    report=UInt8Field(1),
                 )
             ),
         ],
@@ -104,7 +105,8 @@ def sensor_driver() -> SensorDriver:
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
                     sensor_id=SensorIdField(SensorId.S0),
-                    sample_rate=UInt16Field(10),
+                    number_of_reads=UInt16Field(10),
+                    report=UInt8Field(1),
                 )
             ),
         ],

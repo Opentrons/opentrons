@@ -85,13 +85,14 @@ class SensorDriver(AbstractSensorDriver):
         self,
         can_messenger: CanMessenger,
         sensor: BaseSensorType,
-        poll_for_ms: int,
+        number_of_reads: int,
         timeout: int = 1,
+        report: bool = True,
     ) -> Optional[SensorReturnType]:
         """Poll the given sensor."""
-        poll = PollSensorInformation(sensor.sensor, poll_for_ms)
+        poll = PollSensorInformation(sensor.sensor, number_of_reads)
         sensor_data = await self._scheduler.run_poll(
-            poll, can_messenger, timeout, sensor.expected_responses
+            poll, can_messenger, timeout, sensor.expected_responses, report
         )
         if not sensor_data:
             return None

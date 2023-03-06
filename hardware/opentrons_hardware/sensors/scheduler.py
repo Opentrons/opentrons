@@ -110,6 +110,7 @@ class SensorScheduler:
         can_messenger: CanMessenger,
         timeout: int,
         expected_num_messages: int = 1,
+        report: bool = True,
     ) -> List[SensorDataType]:
         """Send poll message."""
         sensor_info = sensor.sensor
@@ -125,7 +126,8 @@ class SensorScheduler:
                     payload=BaselineSensorRequestPayload(
                         sensor=SensorTypeField(sensor_info.sensor_type),
                         sensor_id=SensorIdField(sensor_info.sensor_id),
-                        sample_rate=UInt16Field(sensor.poll_for),
+                        number_of_reads=UInt16Field(sensor.poll_for),
+                        report=UInt8Field(report),
                     )
                 ),
             )
