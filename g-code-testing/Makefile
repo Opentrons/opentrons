@@ -63,7 +63,7 @@ lint:
 	$(python) -m flake8 g_code_parsing tests setup.py cli.py
 
 .PHONY: format
-format:
+format: format-readme
 	$(python) -m black g_code_parsing tests setup.py cli.py
 
 
