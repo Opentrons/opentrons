@@ -100,11 +100,20 @@ class HardwareModule:
 
 @dataclass
 class ModuleState:
-    """Basic module data state and getter methods."""
+    """The internal data to keep track of loaded modules."""
 
     slot_by_module_id: Dict[str, Optional[DeckSlotName]]
+    """The deck slot that each module has been loaded into.
+
+    This will be None when a module has been added via
+    ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
+    """
+
     hardware_by_module_id: Dict[str, HardwareModule]
+    """Information about each module's physical hardware."""
+
     substate_by_module_id: Dict[str, ModuleSubStateType]
+    """Information about each module that's specific to the module type."""
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
@@ -128,6 +137,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=action.module_id,
                 serial_number=action.serial_number,
                 definition=action.definition,
+                slot_name=None,
                 module_live_data=action.module_live_data,
             )
 
@@ -138,6 +148,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=command.result.serialNumber,
                 definition=command.result.definition,
                 slot_name=command.params.location.slotName,
+                module_live_data=None,
             )
 
         if isinstance(
@@ -180,8 +191,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module_id: str,
         serial_number: str,
         definition: ModuleDefinition,
-        slot_name: Optional[DeckSlotName] = None,
-        module_live_data: Optional[LiveData] = None,
+        slot_name: Optional[DeckSlotName],
+        module_live_data: Optional[LiveData],
     ) -> None:
         model = definition.model
         live_data = module_live_data["data"] if module_live_data else None
