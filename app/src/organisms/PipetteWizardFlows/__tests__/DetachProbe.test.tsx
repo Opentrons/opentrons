@@ -44,6 +44,7 @@ describe('DetachProbe', () => {
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
+      isOnDevice: false,
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })

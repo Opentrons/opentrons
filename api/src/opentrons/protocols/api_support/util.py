@@ -23,9 +23,15 @@ from opentrons.hardware_control.types import Axis
 
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.core.instrument import AbstractInstrument
     from opentrons.protocol_api.labware import Well, Labware
+    from opentrons.protocol_api.core.engine.instrument import InstrumentCore
     from opentrons.protocol_api.core.legacy.deck import Deck
+    from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+        LegacyInstrumentCore,
+    )
+    from opentrons.protocol_api.core.legacy_simulator.legacy_instrument_core import (
+        LegacyInstrumentCoreSimulator,
+    )
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -138,7 +144,12 @@ def labware_column_shift(
 class FlowRates:
     """Utility class for rich setters/getters for flow rates"""
 
-    def __init__(self, instr: AbstractInstrument) -> None:
+    def __init__(
+        self,
+        instr: Union[
+            InstrumentCore, LegacyInstrumentCore, LegacyInstrumentCoreSimulator
+        ],
+    ) -> None:
         self._instr = instr
 
     def set_defaults(
@@ -214,7 +225,9 @@ def find_value_for_api_version(
 class PlungerSpeeds:
     """Utility class for rich setters/getters for speeds"""
 
-    def __init__(self, instr: AbstractInstrument) -> None:
+    def __init__(
+        self, instr: Union[LegacyInstrumentCore, LegacyInstrumentCoreSimulator]
+    ) -> None:
         self._instr = instr
 
     @property

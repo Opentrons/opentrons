@@ -89,7 +89,7 @@ def test_tip_tracking(
         [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1", Point(0, 0, 12.0)],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v3.3"),
             Point(-8.0, -22.0, -259.15),
         ],
     ],
@@ -277,20 +277,20 @@ def test_flow_rate_setting(
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v3.3"),
             Point(-8.0, -22.0, -259.15),
             Point(-8.0, -22.0, -259.15),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_multi_v1.0"),
+            ot3_pipette_config.convert_pipette_model("p1000_multi_v3.3"),
             Point(-8.0, -47.5, -259.15),
             Point(-8.0, -79.0, -259.15),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_96", "1.0"),
-            Point(13.5, -46.5, -259.15),
+            ot3_pipette_config.convert_pipette_model("p1000_96", "3.3"),
+            Point(13.5, -57.0, -259.15),
             Point(-36.0, -88.5, -259.15),
         ],
     ],

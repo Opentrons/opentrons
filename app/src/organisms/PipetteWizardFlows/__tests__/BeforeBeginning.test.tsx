@@ -65,6 +65,7 @@ describe('BeforeBeginning', () => {
       setShowErrorMessage: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
+      isOnDevice: false,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
@@ -150,7 +151,7 @@ describe('BeforeBeginning', () => {
       getByText(
         'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
       )
-      getByAltText('GEN3 Pipette')
+      getByAltText('1- or 8-Channel Pipette')
       getByText('You will need:')
       getByAltText('Calibration Probe')
       getByAltText('2.5 mm Hex Screwdriver')
@@ -235,8 +236,8 @@ describe('BeforeBeginning', () => {
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
-      getByAltText('96 Channel Pipette')
-      getByAltText('96 Channel Mounting Plate')
+      getByAltText('96-Channel Pipette')
+      getByAltText('96-Channel Mounting Plate')
       getByText(
         'Provided with robot. Using another size can strip the instruments’s screws.'
       )
@@ -249,6 +250,10 @@ describe('BeforeBeginning', () => {
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: RIGHT },
           },
         ],
         false
@@ -279,8 +284,8 @@ describe('BeforeBeginning', () => {
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
-      getByAltText('96 Channel Pipette')
-      getByAltText('96 Channel Mounting Plate')
+      getByAltText('96-Channel Pipette')
+      getByAltText('96-Channel Mounting Plate')
       getByText(
         'Provided with robot. Using another size can strip the instruments’s screws.'
       )
@@ -330,8 +335,8 @@ describe('BeforeBeginning', () => {
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
-      getByAltText('96 Channel Pipette')
-      getByAltText('96 Channel Mounting Plate')
+      getByAltText('96-Channel Pipette')
+      getByAltText('96-Channel Mounting Plate')
       getByText(
         'Provided with robot. Using another size can strip the instruments’s screws.'
       )

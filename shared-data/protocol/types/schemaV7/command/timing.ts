@@ -19,7 +19,7 @@ export interface WaitForResumeCreateCommand extends CommonCommandCreateInfo {
 export interface WaitForResumeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     WaitForResumeCreateCommand {
-  result: any
+  result?: any
 }
 
 interface WaitForResumeParams {
@@ -34,7 +34,7 @@ export interface WaitForDurationCreateCommand extends CommonCommandCreateInfo {
 export interface WaitForDurationRunTimeCommand
   extends CommonCommandRunTimeInfo,
     WaitForDurationCreateCommand {
-  result: any
+  result?: any
 }
 
 interface WaitForDurationParams {
@@ -50,7 +50,7 @@ export interface DeprecatedDelayCreateCommand extends CommonCommandCreateInfo {
 export interface DeprecatedDelayRunTimeCommand
   extends CommonCommandRunTimeInfo,
     DeprecatedDelayCreateCommand {
-  result: {}
+  result?: {}
 }
 
 type DeprecatedDelayParams =

@@ -1,13 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import {
-  useDispatchApiRequests,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-} from '../../redux/robot-api'
-import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
 import { StyledText } from '../../atoms/text'
 import {
   Icon,
@@ -20,9 +12,8 @@ import {
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 
-import type { State } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 
 export interface CheckPipetteButtonProps {
   robotName: string
@@ -34,31 +25,24 @@ export interface CheckPipetteButtonProps {
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
 ): JSX.Element | null {
-  const { robotName, onDone, children, actualPipette } = props
+  const { onDone, children, actualPipette } = props
   const { t } = useTranslation('change_pipette')
-  const fetchPipettesRequestId = React.useRef<string | null>(null)
-  const [dispatch] = useDispatchApiRequests(dispatchedAction => {
-    if (
-      dispatchedAction.type === FETCH_PIPETTES &&
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
-      dispatchedAction.meta.requestId
-    ) {
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
-      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
-    }
-  })
 
-  const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    fetchPipettesRequestId.current != null
-      ? getRequestById(state, fetchPipettesRequestId.current)
-      : null
-  )?.status
-  const isPending = requestStatus === PENDING
+  const {
+    status: pipetteQueryStatus,
+    refetch: refetchPipettes,
+  } = usePipettesQuery()
+
+  const handleClick = (): void => {
+    refetchPipettes()
+      .then(() => {})
+      .catch(() => {})
+  }
+  const isPending = pipetteQueryStatus === 'loading'
 
   React.useEffect(() => {
-    if (requestStatus === SUCCESS && onDone) onDone()
-  }, [onDone, requestStatus])
+    if (pipetteQueryStatus === 'success' && onDone != null) onDone()
+  }, [onDone, pipetteQueryStatus])
 
   const icon = (
     <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />

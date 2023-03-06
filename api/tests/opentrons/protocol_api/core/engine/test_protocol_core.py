@@ -43,6 +43,7 @@ from opentrons.protocol_engine.state.labware import (
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import (
+    deck_conflict,
     ProtocolCore,
     InstrumentCore,
     LabwareCore,
@@ -58,6 +59,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     HeaterShakerModuleCore,
 )
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -68,6 +70,15 @@ def patch_mock_load_labware_params(
     """Mock out point_calculations.py functions."""
     for name, func in inspect.getmembers(load_labware_params, inspect.isfunction):
         monkeypatch.setattr(load_labware_params, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_deck_conflict_check(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Replace deck_conflict.check() with a mock."""
+    mock = decoy.mock(func=deck_conflict.check)
+    monkeypatch.setattr(deck_conflict, "check", mock)
 
 
 @pytest.fixture
@@ -235,6 +246,15 @@ def test_load_labware(
     assert result.labware_id == "abc123"
     assert subject.get_labware_cores() == [subject.fixed_trash, result]
 
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_labware_id="abc123",
+        )
+    )
+
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
             slot_name=DeckSlotName.SLOT_5,
@@ -371,6 +391,15 @@ def test_load_labware_on_module(
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
 
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_labware_id="abc123",
+        )
+    )
+
     decoy.when(
         mock_engine_client.state.labware.get_id_by_module("module-id")
     ).then_return("abc123")
@@ -475,12 +504,21 @@ def test_load_module(
     result = subject.load_module(
         model=requested_model,
         deck_slot=DeckSlotName.SLOT_1,
-        configuration="",
+        configuration=None,
     )
 
     assert isinstance(result, expected_core_cls)
     assert result.module_id == "abc123"
     assert subject.get_module_cores() == [result]
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_module_id="abc123",
+        )
+    )
 
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
@@ -544,7 +582,16 @@ def test_load_module_thermocycler_with_no_location(
     result = subject.load_module(
         model=requested_model,
         deck_slot=None,
-        configuration="",
+        configuration=None,
+    )
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_module_id="abc123",
+        )
     )
 
     assert isinstance(result, ThermocyclerModuleCore)
@@ -566,7 +613,7 @@ def test_load_module_no_location(
 ) -> None:
     """Should raise an InvalidModuleLocationError exception."""
     with pytest.raises(InvalidModuleLocationError):
-        subject.load_module(model=requested_model, deck_slot=None, configuration="")
+        subject.load_module(model=requested_model, deck_slot=None, configuration=None)
 
 
 @pytest.mark.parametrize("message", [None, "Hello, world!", ""])

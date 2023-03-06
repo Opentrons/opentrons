@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
@@ -26,6 +27,8 @@ import {
 } from '@opentrons/components'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 
 import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type {
@@ -33,6 +36,7 @@ import type {
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import { getDisplayLocation } from './utils/getDisplayLocation'
+import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -55,6 +59,9 @@ export const ResultsSummary = (
   } = props
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
+  )
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    getIsLabwareOffsetCodeSnippetsOn
   )
 
   const offsetsToApply = React.useMemo(() => {
@@ -92,6 +99,31 @@ export const ResultsSummary = (
     )
   }, [workingOffsets])
 
+  const TableComponent = (
+    <OffsetTable
+      offsets={offsetsToApply}
+      labwareDefinitions={labwareDefinitions}
+    />
+  )
+  const JupyterSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="jupyter"
+      labwareOffsets={offsetsToApply}
+      commands={protocolData?.commands ?? []}
+      labware={protocolData?.labware ?? []}
+      modules={protocolData?.modules ?? []}
+    />
+  )
+  const CommandLineSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="cli"
+      labwareOffsets={offsetsToApply}
+      commands={protocolData?.commands ?? []}
+      labware={protocolData?.labware ?? []}
+      modules={protocolData?.modules ?? []}
+    />
+  )
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -100,10 +132,18 @@ export const ResultsSummary = (
       minHeight="25rem"
     >
       <StyledText as="h1">{t('new_labware_offset_data')}</StyledText>
-      <OffsetTable
-        offsets={offsetsToApply}
-        labwareDefinitions={labwareDefinitions}
-      />
+      {isLabwareOffsetCodeSnippetsOn ? (
+        <LabwareOffsetTabs
+          TableComponent={TableComponent}
+          JupyterComponent={JupyterSnippet}
+          CommandLineComponent={CommandLineSnippet}
+        />
+      ) : (
+        <OffsetTable
+          offsets={offsetsToApply}
+          labwareDefinitions={labwareDefinitions}
+        />
+      )}
       <Flex
         width="100%"
         marginTop={SPACING.spacing6}

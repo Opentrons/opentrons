@@ -18,6 +18,7 @@ export const opacity17HexCode = '2b' // 17% opacity
 export const opacity20HexCode = '33' // 20% opacity
 export const opacity35HexCode = '59' // 35% opacity
 export const opacity50HexCode = '80' // 50% opacity
+export const opacity55HexCode = '8c' // 55% opacity
 
 // colors blue
 export const blueEnabled = '#006cfa'

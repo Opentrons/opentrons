@@ -4,7 +4,7 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    project: './tsconfig-eslint.json',
+    project: require('path').join(__dirname, 'tsconfig-eslint.json'),
   },
 
   extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],

@@ -13,7 +13,10 @@ import {
   useToast,
 } from '../../atoms/Toast'
 import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
-import { getAnalysisStatus } from '../../organisms/ProtocolsLanding/utils'
+import {
+  getAnalysisStatus,
+  getProtocolDisplayName,
+} from '../../organisms/ProtocolsLanding/utils'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 
 import type { AxiosError } from 'axios'
@@ -23,7 +26,6 @@ import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 
 interface SendProtocolToOT3SlideoutProps extends StyleProps {
-  protocolDisplayName: string
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
   isExpanded: boolean
@@ -32,12 +34,13 @@ interface SendProtocolToOT3SlideoutProps extends StyleProps {
 export function SendProtocolToOT3Slideout(
   props: SendProtocolToOT3SlideoutProps
 ): JSX.Element | null {
+  const { isExpanded, onCloseClick, storedProtocolData } = props
   const {
-    isExpanded,
-    onCloseClick,
-    protocolDisplayName,
-    storedProtocolData,
-  } = props
+    protocolKey,
+    srcFileNames,
+    srcFiles,
+    mostRecentAnalysis,
+  } = storedProtocolData
   const { t } = useTranslation('protocol_details')
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
@@ -53,14 +56,10 @@ export function SendProtocolToOT3Slideout(
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
 
-  const analysisStatus = getAnalysisStatus(
-    isAnalyzing,
-    storedProtocolData.mostRecentAnalysis
-  )
+  const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   const isAnalysisError = analysisStatus === 'error'
 
-  const { protocolKey, srcFileNames, srcFiles } = storedProtocolData
   if (protocolKey == null || srcFileNames == null || srcFiles == null) {
     // TODO: do more robust corrupt file catching and handling here
     return null
@@ -70,6 +69,12 @@ export function SendProtocolToOT3Slideout(
     const srcFilePath = srcFileNames[index]
     return new File([srcFileBuffer], path.basename(srcFilePath))
   })
+
+  const protocolDisplayName = getProtocolDisplayName(
+    protocolKey,
+    srcFileNames,
+    mostRecentAnalysis
+  )
 
   const icon: IconProps = { name: 'ot-spinner', spin: true }
 

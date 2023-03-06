@@ -40,6 +40,7 @@ describe('AttachProbe', () => {
       isRobotMoving: false,
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {

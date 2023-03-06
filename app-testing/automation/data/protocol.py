@@ -20,6 +20,7 @@ class Protocol(BaseModel):
     robot_error: bool = Field(description="will analysis with the robot raise an error")
     app_analysis_error: Optional[str] = Field(description="the exact error shown in the app popout", default=None)
     robot_analysis_error: Optional[str] = Field(description="the exact analysis error from the robot", default=None)
+    custom_labware: Optional[list[str]] = Field(description="list of custom labware file stems", default=None)
     instruments: Optional[list[str]] = Field(description="list of instruments that will show in the app", default=None)
     modules: Optional[list[module_types]] = Field(description="list of modules that will show in the app", default=None)
     description: Optional[str] = Field(description="Details about this protocol", default=None)
@@ -34,3 +35,18 @@ class Protocol(BaseModel):
             f"{self.file_extension}",
             f"{self.file_name}.{self.file_extension}",
         )
+
+    @property
+    def labware_paths(self) -> list[Path]:
+        """Path of the file."""
+        if self.custom_labware is None:
+            return []
+        return [
+            Path(
+                Path(__file__).resolve().parent.parent.parent,
+                os.getenv("FILES_FOLDER", "files"),
+                "labware",
+                f"{p}.json",
+            )
+            for p in self.custom_labware
+        ]

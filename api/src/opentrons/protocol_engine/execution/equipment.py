@@ -206,28 +206,28 @@ class EquipmentHandler:
                 mount.to_hw_mount()
             )
 
-            pipette_model = pipette_dict["model"]
-            pipette_serial = pipette_dict["pipette_id"]
-
+            serial_number = pipette_dict["pipette_id"]
             static_pipette_config = pipette_data_provider.get_pipette_static_config(
-                pipette_model, pipette_serial
+                pipette_dict
             )
+
         else:
+            serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
             static_pipette_config = (
                 pipette_data_provider.get_virtual_pipette_static_config(
                     pipette_name_value
                 )
             )
 
+        # TODO(mc, 2023-02-22): rather than dispatch from inside the load command
+        # see if additional config data like this can be returned from the command impl
+        # alongside, but outside of, the command result.
+        # this pattern could potentially improve `loadLabware` and `loadModule`, too
         self._action_dispatcher.dispatch(
             AddPipetteConfigAction(
                 pipette_id=pipette_id,
-                model=static_pipette_config.model,
-                display_name=static_pipette_config.display_name,
-                min_volume=static_pipette_config.min_volume,
-                max_volume=static_pipette_config.max_volume,
-                channels=static_pipette_config.channels,
-                flow_rates=static_pipette_config.flow_rates,
+                serial_number=serial_number,
+                config=static_pipette_config,
             )
         )
 

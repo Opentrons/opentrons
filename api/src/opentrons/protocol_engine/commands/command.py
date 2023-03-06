@@ -163,8 +163,10 @@ class AbstractCommandImpl(
         hardware_api: HardwareControlAPI,
         equipment: execution.EquipmentHandler,
         movement: execution.MovementHandler,
+        gantry_mover: execution.GantryMover,
         labware_movement: execution.LabwareMovementHandler,
         pipetting: execution.PipettingHandler,
+        tip_handler: execution.TipHandler,
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
     ) -> None:

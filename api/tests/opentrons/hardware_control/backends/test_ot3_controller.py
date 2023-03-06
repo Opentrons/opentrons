@@ -1,20 +1,23 @@
+import asyncio
 from unittest.mock import mock_open
 import mock
 import pytest
-from typing import Dict, List, Optional, Set, Tuple, Any
+from typing import AsyncIterator, Dict, List, Optional, Set, Tuple, Any
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
     axis_to_node,
+    sensor_node_for_mount,
+    sub_system_to_node_id,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
     MessageListenerCallbackFilter,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, LiquidProbeSettings
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -36,6 +39,7 @@ from opentrons.hardware_control.errors import (
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.firmware_update.utils import FirmwareUpdateType, UpdateInfo
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
@@ -49,6 +53,7 @@ from opentrons_hardware.hardware_control.tools.types import (
     PipetteInformation,
     GripperInformation,
 )
+from opentrons_hardware.hardware_control.types import PCBARevision
 
 
 @pytest.fixture
@@ -107,6 +112,31 @@ def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Con
 
 
 @pytest.fixture
+def fake_liquid_settings() -> LiquidProbeSettings:
+    return LiquidProbeSettings(
+        starting_mount_height=100,
+        max_z_distance=15,
+        min_z_distance=5,
+        mount_speed=40,
+        plunger_speed=10,
+        sensor_threshold_pascals=15,
+        expected_liquid_height=109,
+        log_pressure=False,
+        aspirate_while_sensing=False,
+        data_file="fake_data_file",
+    )
+
+
+@pytest.fixture
+def mock_send_stop_threshold() -> None:
+    with patch(
+        "opentrons_hardware.sensors.sensor_driver.SensorDriver.send_stop_threshold",
+        autospec=True,
+    ) as mock_stop_threshold:
+        yield mock_stop_threshold
+
+
+@pytest.fixture
 def mock_move_group_run():
     with patch(
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner.run",
@@ -152,33 +182,19 @@ def mock_tool_detector(controller: OT3Controller):
 
 
 @pytest.fixture
-def fw_update_info() -> Dict[FirmwareUpdateType, UpdateInfo]:
-    update_info1 = UpdateInfo(
-        FirmwareUpdateType.head,
-        2,
-        "abc12345",
-        {"rev1": "/some/path/head.hex"},
-        filepath="/some/path/head.hex",
-    )
-    update_info2 = UpdateInfo(
-        FirmwareUpdateType.gantry_x,
-        2,
-        "abc12345",
-        {"rev1": "/some/path/gantry.hex"},
-        filepath="/some/path/gantry.hex",
-    )
-
-    update_info = {
-        FirmwareUpdateType.head: update_info1,
-        FirmwareUpdateType.gantry_x: update_info2,
+def fw_update_info() -> Dict[NodeId, str]:
+    return {
+        NodeId.head: "/some/path/head.hex",
+        NodeId.gantry_x: "/some/path/gantry.hex",
     }
-    return update_info
 
 
 @pytest.fixture
 def fw_node_info() -> Dict[NodeId, DeviceInfoCache]:
-    node_cache1 = DeviceInfoCache(NodeId.head, 1, "12345678", None)
-    node_cache2 = DeviceInfoCache(NodeId.gantry_x, 1, "12345678", None)
+    node_cache1 = DeviceInfoCache(NodeId.head, 1, "12345678", None, PCBARevision(None))
+    node_cache2 = DeviceInfoCache(
+        NodeId.gantry_x, 1, "12345678", None, PCBARevision(None)
+    )
     return {NodeId.head: node_cache1, NodeId.gantry_x: node_cache2}
 
 
@@ -619,6 +635,30 @@ async def test_ready_for_movement(
     assert controller.check_ready_for_movement(axes) == ready
 
 
+@pytest.mark.parametrize("mount", [OT3Mount.LEFT, OT3Mount.RIGHT])
+async def test_liquid_probe(
+    mount: OT3Mount,
+    controller: OT3Controller,
+    fake_liquid_settings: LiquidProbeSettings,
+    mock_move_group_run,
+    mock_send_stop_threshold,
+) -> None:
+    await controller.liquid_probe(
+        mount=mount,
+        max_z_distance=fake_liquid_settings.max_z_distance,
+        mount_speed=fake_liquid_settings.mount_speed,
+        plunger_speed=fake_liquid_settings.plunger_speed,
+        threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
+        log_pressure=fake_liquid_settings.log_pressure,
+    )
+    move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
+    head_node = axis_to_node(OT3Axis.by_mount(mount))
+    tool_node = sensor_node_for_mount(mount)
+    assert move_groups[head_node].stop_condition == MoveStopCondition.sync_line
+    assert len(move_groups) == 2
+    assert move_groups[head_node], move_groups[tool_node]
+
+
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
     await controller.tip_action([OT3Axis.P_L], 33, -5.5, tip_action="clamp")
     for call in mock_move_group_run.call_args_list:
@@ -831,14 +871,14 @@ async def test_update_required_bypass_firmware_update(controller: OT3Controller)
         "opentrons.hardware_control.backends.ot3controller.firmware_update.utils.load_firmware_manifest"
     ):
         try:
-            await controller.update_firmware({})
+            async for node_id, status_element in controller.update_firmware({}):
+                pass
         except FirmwareUpdateRequired:
             assert False, "update_firmware raised an exception."
 
 
 async def test_update_required_flag_false(controller: OT3Controller):
     """Do not raise FirmwareUpdateRequired if update_required is False."""
-    axes = [OT3Axis.X, OT3Axis.Y]
     controller._present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
     for node in controller._present_nodes:
         controller._motor_status.update(
@@ -858,42 +898,33 @@ async def test_update_required_flag_false(controller: OT3Controller):
         fake_umpe,
     ):
         try:
-            await controller.update_motor_estimation(axes)
+            async for node_id, status_element in controller.update_firmware({}):
+                pass
         except FirmwareUpdateRequired:
             assert False, "update_motor_estimation raised an exception."
 
 
 async def test_update_firmware_update_required(
-    controller: OT3Controller, fw_update_info: Dict[FirmwareUpdateType, UpdateInfo]
+    controller: OT3Controller, fw_update_info: Dict[NodeId, str]
 ) -> None:
     """Test that updates are started when shortsha's dont match."""
-    node_cache1 = DeviceInfoCache(NodeId.head, 1, "12345678", None)
-    node_cache2 = DeviceInfoCache(NodeId.gantry_x, 1, "12345678", None)
-
-    device_info_cache = {NodeId.head: node_cache1, NodeId.gantry_x: node_cache2}
-    controller._network_info._device_info_cache = device_info_cache
-
-    expected_update_details = {
-        NodeId.head: fw_update_info[FirmwareUpdateType.head].filepath,
-        NodeId.gantry_x: fw_update_info[FirmwareUpdateType.gantry_x].filepath,
-    }
 
     # no updates have been started, but lets set this to true so we can assert later on
     controller.update_required = True
 
-    # test that nodes in NetworkInfo._device_info_cache are updated if they are out of date
     with mock.patch(
-        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        "opentrons_hardware.firmware_update.check_firmware_updates",
         mock.Mock(return_value=fw_update_info),
     ), mock.patch(
         "opentrons_hardware.firmware_update.RunUpdate"
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        await controller.update_firmware({})
+        async for node_id, status_element in controller.update_firmware({}):
+            pass
         run_updates.assert_called_with(
             messenger=controller._messenger,
-            update_details=expected_update_details,
+            update_details=fw_update_info,
             retry_count=mock.ANY,
             timeout_seconds=mock.ANY,
             erase=True,
@@ -904,24 +935,19 @@ async def test_update_firmware_update_required(
 
 
 async def test_update_firmware_up_to_date(
-    controller: OT3Controller,
-    fw_node_info: Dict[NodeId, DeviceInfoCache],
-    fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
+    controller: OT3Controller, fw_update_info: Dict[NodeId, str]
 ):
-    """Test that updates are not started if they are not out-of-date (shortsha's match)."""
-    for node, update_info in fw_update_info.items():
-        node_id = NodeId.__members__.get(node.name)
-        fw_node_info[node_id].shortsha = update_info.shortsha
-
+    """Test that updates are not started if they are not required."""
     with mock.patch(
-        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
-        mock.Mock(return_value=update_info),
-    ), mock.patch(
         "opentrons_hardware.firmware_update.RunUpdate.run_updates"
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
-    ) as probe:
-        await controller.update_firmware({})
+    ) as probe, mock.patch(
+        "opentrons_hardware.firmware_update.check_firmware_updates",
+        mock.Mock(return_value={}),
+    ):
+        async for node_id, status_element in controller.update_firmware({}):
+            pass
         assert not controller.update_required
         run_updates.assert_not_called()
         probe.assert_not_called()
@@ -930,29 +956,31 @@ async def test_update_firmware_up_to_date(
 async def test_update_firmware_specified_nodes(
     controller: OT3Controller,
     fw_node_info: Dict[NodeId, DeviceInfoCache],
-    fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
+    fw_update_info: Dict[NodeId, str],
 ):
     """Test that updates are started if nodes are NOT out-of-date when nodes are specified."""
     for node_cache in fw_node_info.values():
         node_cache.shortsha = "978abcde"
 
     controller._network_info._device_info_cache = fw_node_info
-    expected_update_details = {
-        NodeId.head: fw_update_info[FirmwareUpdateType.head].filepath,
-        NodeId.gantry_x: fw_update_info[FirmwareUpdateType.gantry_x].filepath,
-    }
     with mock.patch(
-        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        "opentrons_hardware.firmware_update.check_firmware_updates",
         mock.Mock(return_value=fw_update_info),
-    ), mock.patch(
+    ) as check_updates, mock.patch(
         "opentrons_hardware.firmware_update.RunUpdate"
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        await controller.update_firmware({}, nodes={NodeId.head, NodeId.gantry_x})
+        async for node_id, status_element in controller.update_firmware(
+            {}, nodes={NodeId.head, NodeId.gantry_x}
+        ):
+            pass
+        check_updates.assert_called_with(
+            fw_node_info, {}, nodes={NodeId.head, NodeId.gantry_x}
+        )
         run_updates.assert_called_with(
             messenger=controller._messenger,
-            update_details=expected_update_details,
+            update_details=fw_update_info,
             retry_count=mock.ANY,
             timeout_seconds=mock.ANY,
             erase=True,
@@ -968,26 +996,70 @@ async def test_update_firmware_invalid_specified_node(
     fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
 ):
     """Test that only nodes in device_info_cache are updated when nodes are specified."""
-    expected_update_details = {
-        NodeId.head: fw_update_info[FirmwareUpdateType.head].filepath
-    }
     controller._network_info._device_info_cache = fw_node_info
     with mock.patch(
-        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        "opentrons_hardware.firmware_update.check_firmware_updates",
         mock.Mock(return_value=fw_update_info),
     ), mock.patch(
         "opentrons_hardware.firmware_update.RunUpdate"
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        await controller.update_firmware({}, nodes={NodeId.head})
+        async for node_id, status_element in controller.update_firmware(
+            {}, nodes={NodeId.head}
+        ):
+            pass
         run_updates.assert_called_with(
             messenger=controller._messenger,
-            update_details=expected_update_details,
+            update_details=fw_update_info,
             retry_count=mock.ANY,
             timeout_seconds=mock.ANY,
             erase=True,
         )
 
         assert not controller.update_required
+        probe.assert_called_once()
+
+
+async def test_update_firmware_progress(
+    controller: OT3Controller,
+    fw_node_info: Dict[NodeId, DeviceInfoCache],
+    fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
+):
+    """Test that the progress is reported for nodes updating."""
+    controller._network_info._device_info_cache = fw_node_info
+
+    async def _fake_update_progress(
+        fw_node_info: Dict[NodeId, DeviceInfoCache]
+    ) -> AsyncIterator[Tuple[NodeId, StatusElement]]:
+        for node_id in fw_node_info:
+            await asyncio.sleep(0)
+            progress_bar = [0, 0.2, 0.6, 0.8, 0.9, 1]
+            for progress in progress_bar:
+                if progress == 0:
+                    status = FirmwareUpdateStatus.queued
+                elif progress == 1:
+                    status = FirmwareUpdateStatus.done
+                else:
+                    status = FirmwareUpdateStatus.updating
+                yield (node_id, (status, progress))
+
+    with mock.patch(
+        "opentrons_hardware.firmware_update.check_firmware_updates",
+        mock.Mock(return_value=fw_update_info),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.RunUpdate.run_updates",
+        mock.Mock(return_value=_fake_update_progress(fw_node_info)),
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        async for updates, progress in controller.update_firmware({}):
+            for update in updates:
+                node_id = sub_system_to_node_id(update.subsystem)
+                assert node_id in fw_node_info
+            assert progress in [0, 10, 30, 40, 45, 50, 60, 80, 90, 95, 100]
+        run_updates.assert_called_once()
+
+        assert not controller.update_required
+        assert controller._update_tracker is None
         probe.assert_called_once()

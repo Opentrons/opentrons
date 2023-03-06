@@ -14,6 +14,8 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     LabwareMovementStrategy,
     FlowRates,
+    CurrentWell,
+    TipGeometry,
 )
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
@@ -23,8 +25,11 @@ from opentrons.protocol_engine.actions import (
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
-    CurrentWell,
+    CurrentDeckPoint,
     StaticPipetteConfig,
+)
+from opentrons.protocol_engine.resources.pipette_data_provider import (
+    LoadedStaticPipetteData,
 )
 
 from .command_fixtures import (
@@ -34,9 +39,12 @@ from .command_fixtures import (
     create_dispense_in_place_command,
     create_pick_up_tip_command,
     create_drop_tip_command,
+    create_touch_tip_command,
     create_move_to_well_command,
     create_blow_out_command,
     create_move_labware_command,
+    create_move_to_coordinates_command,
+    create_move_relative_command,
 )
 
 
@@ -53,9 +61,9 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
     assert result == PipetteState(
         pipettes_by_id={},
         aspirated_volume_by_id={},
-        tip_volume_by_id={},
         current_well=None,
-        attached_tip_labware_by_id={},
+        current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
+        attached_tip_by_id={},
         movement_speed_by_id={},
         static_config_by_id={},
         flow_rates_by_id={},
@@ -79,8 +87,37 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
         pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-    assert result.aspirated_volume_by_id["pipette-id"] == 0
+    assert result.aspirated_volume_by_id["pipette-id"] is None
     assert result.movement_speed_by_id["pipette-id"] is None
+    assert result.attached_tip_by_id["pipette-id"] is None
+
+
+def test_handles_pick_up_and_drop_tip(subject: PipetteStore) -> None:
+    """It should set tip and volume details on pick up and drop tip."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="abc",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id="abc", tip_volume=42, tip_length=101, tip_diameter=8.0
+    )
+
+    drop_tip_command = create_drop_tip_command(
+        pipette_id="abc",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+    assert subject.state.attached_tip_by_id["abc"] == TipGeometry(
+        volume=42, length=101, diameter=8.0
+    )
+    assert subject.state.aspirated_volume_by_id["abc"] == 0
+
+    subject.handle_action(UpdateCommandAction(command=drop_tip_command))
+    assert subject.state.attached_tip_by_id["abc"] is None
+    assert subject.state.aspirated_volume_by_id["abc"] is None
 
 
 def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
@@ -119,7 +156,7 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
 
     result = subject.state
 
-    assert result.aspirated_volume_by_id["pipette-id"] == 0
+    assert result.aspirated_volume_by_id["pipette-id"] is None
 
     assert result.current_well == CurrentWell(
         pipette_id="pipette-id",
@@ -381,7 +418,7 @@ def test_movement_commands_without_well_clear_current_well(
 def test_heater_shaker_command_without_movement(
     subject: PipetteStore, command: cmd.Command
 ) -> None:
-    """Heater Shaker commands that don't move pipettes shouldn't clear current_well."""
+    """Heater Shaker commands that don't move pipettes shouldn't clear current_well or deck point."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
         pipette_name=PipetteNameType.P300_SINGLE,
@@ -391,6 +428,7 @@ def test_heater_shaker_command_without_movement(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="well-name",
+        destination=DeckPoint(x=1, y=2, z=3),
     )
 
     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
@@ -401,6 +439,10 @@ def test_heater_shaker_command_without_movement(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="well-name",
+    )
+
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
     )
 
 
@@ -503,39 +545,6 @@ def test_move_labware_clears_current_well(
     assert subject.state.current_well == expected_current_well
 
 
-def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
-    """It should update has_tip after a successful pickUpTip command."""
-    pipette_id = "pipette-id"
-    load_pipette_command = create_load_pipette_command(
-        pipette_id=pipette_id,
-        pipette_name=PipetteNameType.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-
-    pick_up_tip_command = create_pick_up_tip_command(
-        pipette_id=pipette_id,
-        labware_id="pick-up-tip-labware-id",
-        well_name="pick-up-tip-well-name",
-    )
-
-    drop_tip_command = create_drop_tip_command(
-        pipette_id=pipette_id,
-        labware_id="drop-tip-labware-id",
-        well_name="drop-tip-well-name",
-    )
-    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
-    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
-
-    assert (
-        subject.state.attached_tip_labware_by_id.get(pipette_id)
-        == "pick-up-tip-labware-id"
-    )
-
-    subject.handle_action(UpdateCommandAction(command=drop_tip_command))
-
-    assert not subject.state.attached_tip_labware_by_id
-
-
 def test_set_movement_speed(subject: PipetteStore) -> None:
     """It should issue an action to set the movement speed."""
     pipette_id = "pipette-id"
@@ -556,24 +565,36 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
     subject.handle_action(
         AddPipetteConfigAction(
             pipette_id="pipette-id",
-            model="pipette-model",
-            display_name="pipette name",
-            min_volume=1.23,
-            max_volume=4.56,
-            channels=7,
-            flow_rates=FlowRates(
-                default_aspirate={"a": 1},
-                default_dispense={"b": 2},
-                default_blow_out={"c": 3},
+            serial_number="pipette-serial",
+            config=LoadedStaticPipetteData(
+                model="pipette-model",
+                display_name="pipette name",
+                min_volume=1.23,
+                max_volume=4.56,
+                channels=7,
+                flow_rates=FlowRates(
+                    default_aspirate={"a": 1},
+                    default_dispense={"b": 2},
+                    default_blow_out={"c": 3},
+                ),
+                return_tip_scale=4,
+                nominal_tip_overlap={"default": 5},
+                home_position=8.9,
+                nozzle_offset_z=10.11,
             ),
         )
     )
 
     assert subject.state.static_config_by_id["pipette-id"] == StaticPipetteConfig(
         model="pipette-model",
+        serial_number="pipette-serial",
         display_name="pipette name",
         min_volume=1.23,
         max_volume=4.56,
+        return_tip_scale=4,
+        nominal_tip_overlap={"default": 5},
+        home_position=8.9,
+        nozzle_offset_z=10.11,
     )
     assert subject.state.flow_rates_by_id["pipette-id"] == FlowRates(
         default_aspirate={"a": 1},
@@ -582,12 +603,165 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
     )
 
 
-def test_tip_volume_by_id(subject: PipetteStore) -> None:
-    """It should store the tip volume with the given pipette id."""
-    pick_up_tip_command = create_pick_up_tip_command(
+@pytest.mark.parametrize(
+    "command",
+    (
+        create_aspirate_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            volume=1337,
+            flow_rate=1.23,
+            destination=DeckPoint(x=11, y=22, z=33),
+        ),
+        create_dispense_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            volume=1337,
+            flow_rate=1.23,
+            destination=DeckPoint(x=11, y=22, z=33),
+        ),
+        create_blow_out_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            flow_rate=1.23,
+            destination=DeckPoint(x=11, y=22, z=33),
+        ),
+        create_pick_up_tip_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            destination=DeckPoint(x=11, y=22, z=33),
+        ),
+        create_drop_tip_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            destination=DeckPoint(x=11, y=22, z=33),
+        ),
+        create_touch_tip_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            destination=DeckPoint(x=11, y=22, z=33),
+        ),
+        create_move_to_well_command(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="well-name",
+            destination=DeckPoint(x=11, y=22, z=33),
+        ),
+        create_move_to_coordinates_command(
+            pipette_id="pipette-id",
+            coordinates=DeckPoint(x=11, y=22, z=33),
+        ),
+        create_move_relative_command(
+            pipette_id="pipette-id",
+            destination=DeckPoint(x=11, y=22, z=33),
+        ),
+    ),
+)
+def test_movement_commands_update_deck_point(
+    command: cmd.Command,
+    subject: PipetteStore,
+) -> None:
+    """It should save the last used pipette, labware, and well for movement commands."""
+    load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        tip_volume=42,
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
     )
-    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
 
-    assert subject.state.tip_volume_by_id["pipette-id"] == 42
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=command))
+
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.LEFT, deck_point=DeckPoint(x=11, y=22, z=33)
+    )
+
+
+@pytest.mark.parametrize(
+    "command",
+    (
+        cmd.Home(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.HomeParams(),
+            result=cmd.HomeResult(),
+        ),
+        cmd.thermocycler.OpenLid(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.thermocycler.OpenLidParams(moduleId="xyz"),
+            result=cmd.thermocycler.OpenLidResult(),
+        ),
+        cmd.thermocycler.CloseLid(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.thermocycler.CloseLidParams(moduleId="xyz"),
+            result=cmd.thermocycler.CloseLidResult(),
+        ),
+        cmd.heater_shaker.SetAndWaitForShakeSpeed(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.heater_shaker.SetAndWaitForShakeSpeedParams(
+                moduleId="xyz",
+                rpm=123,
+            ),
+            result=cmd.heater_shaker.SetAndWaitForShakeSpeedResult(
+                pipetteRetracted=True
+            ),
+        ),
+        cmd.heater_shaker.OpenLabwareLatch(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.heater_shaker.OpenLabwareLatchParams(moduleId="xyz"),
+            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True),
+        ),
+        create_move_labware_command(
+            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            strategy=LabwareMovementStrategy.USING_GRIPPER,
+        ),
+    ),
+)
+def test_homing_commands_clear_deck_point(
+    command: cmd.Command,
+    subject: PipetteStore,
+) -> None:
+    """It should save the last used pipette, labware, and well for movement commands."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    move_command = create_move_to_well_command(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+        destination=DeckPoint(x=1, y=2, z=3),
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=move_command))
+
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=MountType.LEFT, deck_point=DeckPoint(x=1, y=2, z=3)
+    )
+
+    subject.handle_action(UpdateCommandAction(command=command))
+
+    assert subject.state.current_deck_point == CurrentDeckPoint(
+        mount=None, deck_point=None
+    )

@@ -71,6 +71,7 @@ def test_initialization_by_iterable() -> None:
     subject_2 = OrderedSet[int]()
     for element in source_iterable:
         subject_2.add(element)
+
     assert subject_1 == subject_2
 
 
@@ -120,3 +121,19 @@ def test_clear() -> None:
     subject = OrderedSet([1, 2, 3, 4, 5])
     subject.clear()
     assert list(subject) == []
+
+
+def test_head() -> None:
+    """It should return the head of the set."""
+    subject = OrderedSet([1, 2])
+
+    assert subject.head() == 1
+    subject.remove(1)
+
+    assert subject.head() == 2
+    subject.remove(2)
+
+    with pytest.raises(IndexError):
+        subject.head()
+
+    assert subject.head(default_value=42) == 42

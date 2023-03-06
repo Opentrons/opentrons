@@ -2,9 +2,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
-from pydantic import BaseModel
 
-from .pipetting_common import PipetteIdMixin, FlowRateMixin, WellLocationMixin
+from ..types import DeckPoint
+from .pipetting_common import (
+    PipetteIdMixin,
+    FlowRateMixin,
+    WellLocationMixin,
+    DestinationPositionResult,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -23,7 +28,7 @@ class BlowOutParams(PipetteIdMixin, FlowRateMixin, WellLocationMixin):
     pass
 
 
-class BlowOutResult(BaseModel):
+class BlowOutResult(DestinationPositionResult):
     """Result data from the execution of a blow-out command."""
 
     pass
@@ -47,24 +52,18 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
 
     async def execute(self, params: BlowOutParams) -> BlowOutResult:
         """Move to and blow-out the requested well."""
-        hw_pipette = self._state_view.pipettes.get_hardware_pipette(
-            pipette_id=params.pipetteId,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
-
-        await self._movement.move_to_well(
+        x, y, z = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
         )
 
-        with self._pipetting.set_flow_rate(
-            pipette=hw_pipette, blow_out_flow_rate=params.flowRate
-        ):
-            await self._hardware_api.blow_out(mount=hw_pipette.mount)
+        await self._pipetting.blow_out_in_place(
+            pipette_id=params.pipetteId, flow_rate=params.flowRate
+        )
 
-        return BlowOutResult()
+        return BlowOutResult(position=DeckPoint(x=x, y=y, z=z))
 
 
 class BlowOut(BaseCommand[BlowOutParams, BlowOutResult]):
