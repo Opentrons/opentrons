@@ -209,7 +209,7 @@ async def test_move_labware_raises_for_labware_or_module_not_found(
             labware_definition_uri="opentrons-test/load-name/1",
             labware_location=ModuleLocation(moduleId="imaginary-module-id-2"),
         )
-    ).then_raise(errors.ModuleNotLoadedError("Woops 2.0!"))
+    ).then_raise(errors.ModuleNotLoadedError(module_id="woops-i-dont-exist"))
 
     with pytest.raises(errors.ModuleNotLoadedError):
         await subject.execute(move_labware_from_questionable_module_params)

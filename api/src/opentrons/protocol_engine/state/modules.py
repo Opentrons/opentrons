@@ -420,7 +420,7 @@ class ModuleView(HasState[ModuleState]):
             attached_module = self._state.hardware_by_module_id[module_id]
 
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         location = (
             DeckSlotLocation(slotName=slot_name) if slot_name is not None else None
@@ -471,7 +471,7 @@ class ModuleView(HasState[ModuleState]):
         try:
             substate = self._state.substate_by_module_id[module_id]
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         if isinstance(substate, expected_type):
             return substate
@@ -560,7 +560,7 @@ class ModuleView(HasState[ModuleState]):
         try:
             return self._state.requested_model_by_id[module_id]
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
     def get_actual_model(self, module_id: str) -> ModuleModel:
         """Return the model of the connected module.
@@ -585,7 +585,7 @@ class ModuleView(HasState[ModuleState]):
         try:
             attached_module = self._state.hardware_by_module_id[module_id]
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         return attached_module.definition
 
