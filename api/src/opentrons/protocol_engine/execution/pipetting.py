@@ -169,6 +169,7 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> float:
         """Virtually aspirate (no-op)."""
+        self._validate_tip_attached(pipette_id=pipette_id, command_name="aspirate")
         return volume
 
     async def dispense_in_place(
@@ -178,6 +179,7 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> float:
         """Virtually dispense (no-op)."""
+        self._validate_tip_attached(pipette_id=pipette_id, command_name="dispense")
         return volume
 
     async def blow_out_in_place(
@@ -186,13 +188,15 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> None:
         """Virtually blow out (no-op)."""
-        self._validate_tip_attached(pipette_id=pipette_id)
+        self._validate_tip_attached(pipette_id=pipette_id, command_name="blow-out")
 
-    def _validate_tip_attached(self, pipette_id: str) -> None:
+    def _validate_tip_attached(self, pipette_id: str, command_name: str) -> None:
         """Validate if there is a tip attached."""
         tip_geometry = self._state_view.pipettes.get_attached_tip(pipette_id)
         if not tip_geometry:
-            raise TipNotAttachedError("Cannot perform BLOWOUT without a tip attached")
+            raise TipNotAttachedError(
+                f"Cannot perform {command_name} without a tip attached"
+            )
 
 
 def create_pipetting_handler(
