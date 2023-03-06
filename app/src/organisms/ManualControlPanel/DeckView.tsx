@@ -11,11 +11,11 @@ import type { RobotModel } from '../../redux/discovery/types'
 interface DeckViewProps {
   robotModel: RobotModel
   lastKnownPosition: VectorOffset 
-  setLastKnownPosition: (position: VectorOffset) => void
+  handleMoveToXYCoords: (x: number, y: number) => void
 }
 export function DeckView(props: DeckViewProps): JSX.Element | null {
-  const { robotModel, lastKnownPosition } = props
-
+  const { robotModel, lastKnownPosition, handleMoveToXYCoords } = props
+  
   const deckDef = getDeckDefFromRobotType(robotModel)
   return (
 
@@ -23,15 +23,11 @@ export function DeckView(props: DeckViewProps): JSX.Element | null {
       deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotModel)}
       deckDef={deckDef}
       viewBox={getStandardDeckViewBox(robotModel)}
+      handleCoordinateClick={handleMoveToXYCoords}
     >
-      {({getRobotCoordsFromDOMCoords}) => (
-        <rect onClick={e => {
-          console.log('event', e)
-          console.log('gtranstlir', getRobotCoordsFromDOMCoords(e?.currentTarget?.x, e?.currentTarget?.y))
-        }} x={lastKnownPosition.x} y={lastKnownPosition.y} height="10" width="10" fill="red"></rect>
+      {() => (
+        <circle cx={lastKnownPosition.x} cy={lastKnownPosition.y} r="5" fill="red"></circle>
       )}
     </RobotWorkSpace>
   )
 }
-
-

@@ -20,12 +20,13 @@ export interface RobotWorkSpaceProps {
   children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
   deckLayerBlocklist?: string[]
   id?: string
+  handleCoordinateClick?: (x: number, y: number) => void
 }
 
 type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 
 export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
-  const { children, deckDef, deckLayerBlocklist = [], viewBox, id } = props
+  const { children, deckDef, deckLayerBlocklist = [], viewBox, id, handleCoordinateClick } = props
   const wrapperRef = React.useRef<SVGSVGElement>(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
@@ -33,7 +34,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
   // Until Firefox fixes this and conforms to SVG2 draft,
   // it will suffer from inverted y behavior (ignores css transform)
   const getRobotCoordsFromDOMCoords: GetRobotCoordsFromDOMCoords = (x, y) => {
-    if (!wrapperRef.current) return { x: 0, y: 0 }
+    if (wrapperRef.current == null) return { x: 0, y: 0 }
 
     const cursorPoint = wrapperRef.current.createSVGPoint()
 
@@ -44,7 +45,8 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       wrapperRef.current.getScreenCTM()?.inverse()
     )
   }
-  if (!deckDef && !viewBox) return null
+
+  if (deckDef == null && viewBox == null) return null
 
   let wholeDeckViewBox
   let deckSlotsById = {}
@@ -58,13 +60,18 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     )
     wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
   }
-
+  const resultViewBox = viewBox != null ? viewBox : wholeDeckViewBox
   return (
     <svg
       className={cx(styles.robot_work_space, props.className)}
-      viewBox={viewBox || wholeDeckViewBox}
+      viewBox={resultViewBox}
       ref={wrapperRef}
       id={id}
+      onClick={e => {
+        const { x, y } = getRobotCoordsFromDOMCoords(e.clientX, e.clientY)
+        handleCoordinateClick?.(x, y)
+      }}
+      style={{ cursor: handleCoordinateClick != null ? 'pointer': 'default' }}
     >
       {deckDef != null && (
         <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
