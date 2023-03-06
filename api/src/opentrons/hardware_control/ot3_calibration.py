@@ -61,7 +61,6 @@ class DeckHeightValidRange:
 
 
 class CalibrationMethod(Enum):
-    LINEAR_SEARCH = "linear search"
     BINARY_SEARCH = "binary search"
     NONCONTACT_PASS = "noncontact pass"
 
@@ -87,13 +86,6 @@ class InaccurateNonContactSweepError(RuntimeError):
             f"Calibration detected a slot width of {detected_width:.3f}mm "
             f"which is too far from the design width of {nominal_width:.3f}mm"
         )
-
-
-# TODO: we should further investigate and compare the results of the two
-# calibration methods: linear vs binary. We currently will be using the linear
-# search as the default as it has been thoroughly tested by the testing team
-
-# BINARY SEARCH METHODS
 
 
 async def find_edge_binary(
@@ -175,6 +167,8 @@ async def find_edge_binary(
         else:
             LOG.info(f"hit at {interaction_pos}")
             # In this block, we've hit the deck
+            # update the fonud deck value
+            slot_edge_nominal = slot_edge_nominal._replace(z=interaction_pos)
             if copysign(stride, search_direction) == stride:
                 # If we're in our primary direction, the last probe was on the deck,
                 # so we want to continue
