@@ -172,12 +172,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
                 gripper_id=self._gripper_id
             )
 
-    def reset_state(self) -> None:
-        """Resets the internal state of the gripper."""
-        self._state = GripperJawState.UNHOMED
-        self._current_jaw_displacement = 0.0
-        self._attached_probe = None
-
     def save_offset(self, delta: Point) -> GripperCalibrationOffset:
         """Save a new gripper offset."""
         save_gripper_calibration_offset(self.gripper_id, delta)

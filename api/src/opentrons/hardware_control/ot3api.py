@@ -25,7 +25,7 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, ot3_pipette_config
+from opentrons.config import robot_configs, ot3_pipette_config, feature_flags as ff
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -270,12 +270,20 @@ class OT3API(
             checked_config = config
         backend = await OT3Controller.build(checked_config)
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
-        await api_instance.cache_instruments()
+        await api_instance._cache_instruments()
+
+        # check for and start firmware updates if required
+        if ff.enable_ot3_firmware_updates():
+            async for _ in api_instance.update_firmware():
+                pass
+
+        await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
         checked_loop.create_task(backend.watch(loop=checked_loop))
+        backend.initialized = True
         return api_instance
 
     @classmethod
@@ -443,7 +451,7 @@ class OT3API(
         ):
             yield update_status
         # refresh Instrument cache
-        await self.cache_instruments()
+        await self._cache_instruments()
 
     # Incidentals (i.e. not motion) API
 
@@ -577,6 +585,13 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
+        await self._cache_instruments(require)
+        await self._configure_instruments()
+
+    async def _cache_instruments(
+        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+    ) -> None:
+        """Actually cache instruments and scan network."""
         self._log.info("Updating instrument model cache")
         checked_require = {
             OT3Mount.from_mount(m): v for m, v in (require or {}).items()
@@ -610,6 +625,9 @@ class OT3API(
                 self._pipette_handler.hardware_instruments[pipette_mount] = None
 
         await self._backend.probe_network()
+
+    async def _configure_instruments(self) -> None:
+        """Configure instruments"""
         await self._backend.update_motor_status()
         await self.set_gantry_load(self._gantry_load_from_instruments())
 

@@ -137,7 +137,11 @@ def requires_update(func: Wrapped) -> Wrapped:
 
     @wraps(func)
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
-        if ff.enable_ot3_firmware_updates() and self.update_required:
+        if (
+            ff.enable_ot3_firmware_updates()
+            and self.update_required
+            and self.initialized
+        ):
             raise FirmwareUpdateRequired()
         return await func(self, *args, **kwargs)
 
@@ -184,6 +188,7 @@ class OT3Controller:
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._update_required = False
+        self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
         try:
             self._event_watcher = self._build_event_watcher()
@@ -194,6 +199,15 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+
+    @property
+    def initialized(self) -> bool:
+        """True when the hardware controller has initialized and is ready."""
+        return self._initialized
+
+    @initialized.setter
+    def initialized(self, value: bool) -> None:
+        self._initialized = value
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -317,12 +331,14 @@ class OT3Controller:
         )
         await self.set_default_currents()
 
+    @requires_update
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
         assert len(self._present_nodes)
         response = await get_motor_position(self._messenger, self._present_nodes)
         self._handle_motor_status_response(response)
 
+    @requires_update
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
@@ -738,6 +754,7 @@ class OT3Controller:
     def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
         return [axis_to_node(OT3Axis.Q)] if OT3Axis.Q in axis_current_keys else []
 
+    @requires_update
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
@@ -751,6 +768,7 @@ class OT3Controller:
             ),
         )
 
+    @requires_update
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
@@ -769,6 +787,7 @@ class OT3Controller:
         for axis, current in axis_currents.items():
             self._current_settings[axis].run_current = current
 
+    @requires_update
     async def set_hold_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the hold current for motor.
 
