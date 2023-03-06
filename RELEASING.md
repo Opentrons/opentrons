@@ -78,7 +78,7 @@ git pull
 git merge --no-ff release
 ```
 
-10. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as ong as the PR is approved and status checks pass.
+10. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
 11. Release the docs for this version (see below under Releasing Web Projects)
 
 ## Releasing Robot Software Stack Hotfixes
