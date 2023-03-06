@@ -531,7 +531,7 @@ class ModuleView(HasState[ModuleState]):
             )
         return location
 
-    def get_model(self, module_id: str) -> ModuleModel:
+    def get_actual_model(self, module_id: str) -> ModuleModel:
         """Get the model name of the given module."""
         return self.get(module_id).model
 

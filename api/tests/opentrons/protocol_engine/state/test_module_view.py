@@ -207,7 +207,7 @@ def test_get_properties_by_id(
 
     assert subject.get_definition("module-1") == tempdeck_v1_def
     assert subject.get_dimensions("module-1") == tempdeck_v1_def.dimensions
-    assert subject.get_model("module-1") == ModuleModel.TEMPERATURE_MODULE_V1
+    assert subject.get_actual_model("module-1") == ModuleModel.TEMPERATURE_MODULE_V1
     assert subject.get_serial_number("module-1") == "serial-1"
     assert subject.get_location("module-1") == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_1
@@ -215,7 +215,7 @@ def test_get_properties_by_id(
 
     assert subject.get_definition("module-2") == tempdeck_v2_def
     assert subject.get_dimensions("module-2") == tempdeck_v2_def.dimensions
-    assert subject.get_model("module-2") == ModuleModel.TEMPERATURE_MODULE_V2
+    assert subject.get_actual_model("module-2") == ModuleModel.TEMPERATURE_MODULE_V2
     assert subject.get_serial_number("module-2") == "serial-2"
     assert subject.get_location("module-2") == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_2

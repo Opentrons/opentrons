@@ -354,7 +354,9 @@ class EquipmentHandler:
         elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
             # Allow ModuleNotLoadedError to propagate.
-            module_model = self._state_store.modules.get_model(module_id=module_id)
+            module_model = self._state_store.modules.get_actual_model(
+                module_id=module_id
+            )
             module_location = self._state_store.modules.get_location(
                 module_id=module_id
             )
