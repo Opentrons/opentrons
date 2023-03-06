@@ -37,6 +37,7 @@ from .instrument_models import (
 from .update_progress_monitor import UpdateProgressMonitor, UpdateIdNotFound
 from ..errors import ErrorDetails, ErrorBody
 from ..service.dependencies import get_unique_id, get_current_time
+from ..service.task_runner import TaskRunner, get_task_runner
 
 instruments_router = APIRouter()
 
@@ -91,7 +92,9 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
             instrumentName=pipette_dict["name"],
             instrumentModel=pipette_dict["model"],
             serialNumber=pipette_dict["pipette_id"],
-            firmwareUpdateRequired=pipette_dict["fw_update_required"],
+            currentFirmwareVersion=pipette_dict.get("fw_current_version"),
+            firmwareUpdateRequired=pipette_dict.get("fw_update_required"),
+            nextAvailableFirmwareVersion=pipette_dict.get("fw_next_version"),
             data=PipetteData(
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
@@ -107,7 +110,9 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
         mount=MountType.EXTENSION.as_string(),
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
         serialNumber=gripper_dict["gripper_id"],
+        currentFirmwareVersion=gripper_dict["fw_current_version"],
         firmwareUpdateRequired=gripper_dict["fw_update_required"],
+        nextAvailableFirmwareVersion=gripper_dict.get("fw_next_version"),
         data=GripperData(
             jawState=gripper_dict["state"].name.lower(),
             calibratedOffset=GripperCalibrationData.construct(
@@ -196,6 +201,7 @@ async def update_firmware(
     update_process_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     hardware: HardwareControlAPI = Depends(get_hardware),
+    task_runner: TaskRunner = Depends(get_task_runner),
     update_progress_monitor: UpdateProgressMonitor = Depends(
         get_update_progress_monitor
     ),
@@ -207,8 +213,9 @@ async def update_firmware(
                       will start an update of all attached instruments.
         update_process_id: Generated ID to assign to the update resource.
         created_at: Timestamp to attach to created update resource.
-        hardware: hardware controller instance
-        update_progress_monitor: Update progress monitoring utility
+        hardware: hardware controller instance.
+        task_runner: Background task runner.
+        update_progress_monitor: Update progress monitoring utility.
     """
     try:
         ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
@@ -241,7 +248,7 @@ async def update_firmware(
             detail=f"There is no update available for mount {mount_to_update}"
         ).as_error(status.HTTP_412_PRECONDITION_FAILED)
 
-    await ot3_hardware.update_instrument_firmware(mount=ot3_mount)
+    task_runner.run(ot3_hardware.update_instrument_firmware, mount=ot3_mount)
 
     update_response = update_progress_monitor.create(
         update_id=update_process_id, created_at=created_at, mount=mount_to_update

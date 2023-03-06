@@ -80,8 +80,16 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
     # TODO (spp, 2023-01-06): add firmware version field
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
-    firmwareUpdateRequired: bool = Field(
-        ..., description="Whether the instrument requires a firmware update."
+    currentFirmwareVersion: Optional[int] = Field(
+        None, description="The instrument's current firmware version."
+    )
+    firmwareUpdateRequired: Optional[bool] = Field(
+        None, description="Whether the instrument requires a firmware update."
+    )
+    nextAvailableFirmwareVersion: Optional[int] = Field(
+        None,
+        description="The latest firmware version available for the instrument"
+        " on the robot.",
     )
     data: InstrumentDataT
 
