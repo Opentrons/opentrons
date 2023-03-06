@@ -1,6 +1,9 @@
 """Class to monitor firmware update status."""
+import asyncio
 from datetime import datetime
 from typing import Dict
+
+from anyio import fail_after
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import UpdateState
@@ -12,9 +15,7 @@ from robot_server.instruments.instrument_models import (
     MountTypesStr,
 )
 
-
-class UpdateInfoNotFound(RuntimeError):
-    """Error raised when there was no update information found."""
+_UPDATE_STATUS_GETTER_TIMEOUT = 5  # seconds
 
 
 class InstrumentNotFound(RuntimeError):
@@ -36,7 +37,7 @@ class UpdateProgressMonitor:
         self._hardware = hardware_api
         self._status_by_id: Dict[str, UpdateProgressData] = {}
 
-    def create(
+    async def create(
         self,
         update_id: str,
         created_at: datetime,
@@ -48,13 +49,14 @@ class UpdateProgressMonitor:
         except HardwareNotSupportedError as e:
             raise e
 
-        update_status = ot3_hardware.get_firmware_update_progress().get(
-            MountType.to_ot3_mount(mount)
-        )
-        if update_status is None:
-            raise UpdateInfoNotFound(
-                "No update progress info received " "from hardware control"
-            )
+        update_status = None
+
+        with fail_after(_UPDATE_STATUS_GETTER_TIMEOUT):
+            while update_status is None:
+                await asyncio.sleep(0.5)
+                update_status = ot3_hardware.get_firmware_update_progress().get(
+                    MountType.to_ot3_mount(mount)
+                )
 
         self._status_by_id[update_id] = UpdateProgressData(
             id=update_id,

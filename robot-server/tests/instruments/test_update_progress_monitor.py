@@ -26,6 +26,10 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
+# TODO (spp, 2022-01-17): remove all xfails once robot server test flow is set up to
+#  handle OT2 vs OT3 tests correclty
+
+
 @pytest.mark.ot3_only
 @pytest.fixture
 def ot3_hardware_api(decoy: Decoy) -> OT3API:
@@ -59,11 +63,9 @@ def get_sample_pipette_dict(
     return pipette_dict
 
 
-# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
 @pytest.mark.xfail
 @pytest.mark.ot3_only
-def test_create_and_save_update_resource(
+async def test_create_and_save_update_resource(
     decoy: Decoy, ot3_hardware_api: OT3API
 ) -> None:
     """It should create an update resource and save to memory."""
@@ -85,17 +87,36 @@ def test_create_and_save_update_resource(
         updateProgress=42,
     )
     subject = UpdateProgressMonitor(hardware_api=ot3_hardware_api)
-    result = subject.create(update_id="update-id", created_at=created_at, mount="right")
+    result = await subject.create(
+        update_id="update-id", created_at=created_at, mount="right"
+    )
 
     assert result == expected_data
     assert subject.get_progress_status("update-id") == expected_data
 
 
-# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
 @pytest.mark.xfail
 @pytest.mark.ot3_only
-def test_get_completed_update_progress(decoy: Decoy, ot3_hardware_api: OT3API) -> None:
+async def test_create_update_resource_without_update_progress(
+    decoy: Decoy, ot3_hardware_api: OT3API
+) -> None:
+    """It should fail to create resource when there is no update progress from HC."""
+    created_at = datetime(year=2023, month=12, day=2)
+    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return({})
+    subject = UpdateProgressMonitor(hardware_api=ot3_hardware_api)
+
+    # TODO: This test will take 5 seconds to complete. Shorten this wait time
+    with pytest.raises(TimeoutError):
+        await subject.create(
+            update_id="update-id", created_at=created_at, mount="right"
+        )
+
+
+@pytest.mark.xfail
+@pytest.mark.ot3_only
+async def test_get_completed_update_progress(
+    decoy: Decoy, ot3_hardware_api: OT3API
+) -> None:
     """It should provide a valid status for an existent resource with no status from hardware API."""
     created_at = datetime(year=2023, month=12, day=2)
     decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
@@ -109,7 +130,7 @@ def test_get_completed_update_progress(decoy: Decoy, ot3_hardware_api: OT3API) -
     )
 
     subject = UpdateProgressMonitor(hardware_api=ot3_hardware_api)
-    subject.create(update_id="update-id", created_at=created_at, mount="right")
+    await subject.create(update_id="update-id", created_at=created_at, mount="right")
 
     decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return({})
     decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
@@ -132,11 +153,9 @@ def test_get_completed_update_progress(decoy: Decoy, ot3_hardware_api: OT3API) -
     )
 
 
-# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
 @pytest.mark.xfail
 @pytest.mark.ot3_only
-def test_get_update_progress_of_non_attached_instrument(
+async def test_get_update_progress_of_non_attached_instrument(
     decoy: Decoy, ot3_hardware_api: OT3API
 ) -> None:
     """It should raise error if instrument is no longer attached."""
@@ -152,7 +171,7 @@ def test_get_update_progress_of_non_attached_instrument(
     )
 
     subject = UpdateProgressMonitor(hardware_api=ot3_hardware_api)
-    subject.create(update_id="update-id", created_at=created_at, mount="right")
+    await subject.create(update_id="update-id", created_at=created_at, mount="right")
 
     decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return({})
     decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
@@ -163,11 +182,9 @@ def test_get_update_progress_of_non_attached_instrument(
         subject.get_progress_status("update-id")
 
 
-# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
 @pytest.mark.xfail
 @pytest.mark.ot3_only
-def test_get_update_progress_of_a_failed_update(
+async def test_get_update_progress_of_a_failed_update(
     decoy: Decoy, ot3_hardware_api: OT3API
 ) -> None:
     """It should raise error if an instrument completes update process but still requires update."""
@@ -183,7 +200,7 @@ def test_get_update_progress_of_a_failed_update(
     )
 
     subject = UpdateProgressMonitor(hardware_api=ot3_hardware_api)
-    subject.create(update_id="update-id", created_at=created_at, mount="right")
+    await subject.create(update_id="update-id", created_at=created_at, mount="right")
 
     decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return({})
     decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
@@ -201,8 +218,6 @@ def test_get_update_progress_of_a_failed_update(
         subject.get_progress_status("update-id")
 
 
-# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
 @pytest.mark.xfail
 @pytest.mark.ot3_only
 def test_get_non_existent_update_progress(
