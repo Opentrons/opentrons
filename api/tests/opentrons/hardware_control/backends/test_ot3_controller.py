@@ -736,8 +736,7 @@ async def test_update_motor_estimation(
 @pytest.mark.parametrize(
     argnames=["gantry_load", "expected_call"],
     argvalues=[
-        [GantryLoad.NONE, []],
-        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],
+        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],  ## this uses the Q motor
         [GantryLoad.LOW_THROUGHPUT, []],
     ],
 )
@@ -757,9 +756,21 @@ async def test_set_default_currents(
         )
 
         for k, v in mock_present_nodes._current_settings.items():
-            assert (
-                mocked_currents.call_args_list[0][0][1][axis_to_node(k)] == v.as_tuple()
-            )
+            if k == OT3Axis.P_L and (
+                gantry_load == GantryLoad.HIGH_THROUGHPUT
+                and expected_call[0] == NodeId.pipette_left
+            ):
+                # q motor config
+                v = mock_present_nodes._current_settings[OT3Axis.Q]
+                assert (
+                    mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
+                    == v.as_tuple()
+                )
+            else:
+                assert (
+                    mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
+                    == v.as_tuple()
+                )
 
 
 @pytest.mark.parametrize(
@@ -767,7 +778,7 @@ async def test_set_default_currents(
     argvalues=[
         [
             {OT3Axis.X: 1.0, OT3Axis.Y: 2.0},
-            GantryLoad.NONE,
+            GantryLoad.LOW_THROUGHPUT,
             [{NodeId.gantry_x: 1.0, NodeId.gantry_y: 2.0}, []],
         ],
         [
@@ -805,7 +816,7 @@ async def test_set_run_current(
     argvalues=[
         [
             {OT3Axis.P_L: 0.5, OT3Axis.Y: 0.8},
-            GantryLoad.NONE,
+            GantryLoad.LOW_THROUGHPUT,
             [{NodeId.pipette_left: 0.5, NodeId.gantry_y: 0.8}, []],
         ],
         [

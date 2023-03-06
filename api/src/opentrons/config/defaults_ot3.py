@@ -238,11 +238,6 @@ def _build_default_bpk(
         high_throughput=_build_dict_with_default(
             from_conf.get("high_throughput", {}), default.high_throughput
         ),
-        two_low_throughput=_build_dict_with_default(
-            from_conf.get("two_low_throughput", {}), default.two_low_throughput
-        ),
-        none=_build_dict_with_default(from_conf.get("none", {}), default.none),
-        gripper=_build_dict_with_default(from_conf.get("gripper", {}), default.gripper),
     )
 
 
