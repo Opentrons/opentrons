@@ -34,6 +34,7 @@ module.exports = {
           '^@opentrons/step-generation$': `@opentrons/step-generation/src/index.ts`,
           '^@opentrons/api-client$': `@opentrons/api-client/src/index.ts`,
           '^@opentrons/react-api-client$': `@opentrons/react-api-client/src/index.ts`,
+          '^@opentrons/usb-bridge/node-client': `@opentrons/usb-bridge/node-client/src/index.ts`,
         },
       },
     ],

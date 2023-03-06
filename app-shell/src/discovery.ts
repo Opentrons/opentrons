@@ -1,5 +1,5 @@
 // app shell discovery module
-import { app } from 'electron'
+import { app, MessageChannelMain } from 'electron'
 import Store from 'electron-store'
 import groupBy from 'lodash/groupBy'
 import throttle from 'lodash/throttle'
@@ -19,6 +19,8 @@ import {
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
+
+import type { BrowserWindow } from 'electron'
 
 import type {
   Address,
@@ -82,7 +84,8 @@ const migrateLegacyServices = (
 }
 
 export function registerDiscovery(
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  mainWindow: BrowserWindow
 ): (action: Action) => unknown {
   const handleRobotListChange = throttle(handleRobots, UPDATE_THROTTLE_MS)
 
@@ -116,6 +119,18 @@ export function registerDiscovery(
     onListChange: handleRobotListChange,
     logger: log,
   })
+
+  // // create message ports
+  const { port1, port2 } = new MessageChannelMain()
+
+  port2.postMessage({ test: 21 })
+  port2.on('message', event => {
+    console.log('from renderer main world:', event.data)
+  })
+  port2.postMessage({ httpAgent: client.httpAgent })
+  port2.start()
+
+  mainWindow.webContents.postMessage('main-world-port', null, [port1])
 
   client.start({
     initialRobots,

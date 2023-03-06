@@ -1,3 +1,5 @@
+import * as http from 'http'
+
 import type {
   RobotState,
   HostState,
@@ -172,6 +174,7 @@ export interface DiscoveryClient {
   removeRobot: (robotName: string) => void
   start: (config: DiscoveryClientConfig) => void
   stop: () => void
+  httpAgent: http.Agent
 }
 
 /**

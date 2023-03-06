@@ -1,5 +1,5 @@
 // electron main entry point
-import { app, ipcMain } from 'electron'
+import { app, ipcMain, MessageChannelMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 
 import { createUi } from './ui'
@@ -80,7 +80,7 @@ function startUp(): void {
 
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),
-    registerDiscovery(dispatch),
+    registerDiscovery(dispatch, mainWindow),
     registerProtocolAnalysis(dispatch, mainWindow),
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
@@ -96,6 +96,17 @@ function startUp(): void {
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })
+
+  // // create message ports
+  // const { port1, port2 } = new MessageChannelMain()
+
+  // port2.postMessage({ test: 21 })
+  // port2.on('message', event => {
+  //   console.log('from renderer main world:', event.data)
+  // })
+  // port2.start()
+
+  // mainWindow.webContents.postMessage('main-world-port', null, [port1])
 }
 
 function createRendererLogger(): Logger {

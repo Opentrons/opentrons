@@ -2,6 +2,8 @@ import { DEFAULT_PORT } from './constants'
 import { createHealthPoller } from './health-poller'
 import { createMdnsBrowser } from './mdns-browser'
 
+import { buildUSBAgent } from '@opentrons/usb-bridge/node-client'
+
 import * as Store from './store'
 
 import type {
@@ -21,6 +23,9 @@ export function createDiscoveryClient(
   const getRobots = (): DiscoveryClientRobot[] => Store.getRobots(getState())
   let unsubscribe: (() => void) | null = null
 
+  const httpAgent = buildUSBAgent({ serialPort: '/dev/tty.usbmodem011219971' })
+
+  logger?.info('httpAgent2', httpAgent)
   const healthPoller = createHealthPoller({
     onPollResult: result => dispatch(Store.healthPolled(result)),
     logger,
@@ -72,5 +77,5 @@ export function createDiscoveryClient(
     }
   }
 
-  return { getRobots, removeRobot, start, stop }
+  return { getRobots, removeRobot, start, stop, httpAgent }
 }
