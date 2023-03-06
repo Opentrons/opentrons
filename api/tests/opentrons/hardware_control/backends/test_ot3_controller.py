@@ -736,7 +736,7 @@ async def test_update_motor_estimation(
 @pytest.mark.parametrize(
     argnames=["gantry_load", "expected_call"],
     argvalues=[
-        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],  ## this uses the Q motor
+        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],  # this uses the Q motor
         [GantryLoad.LOW_THROUGHPUT, []],
     ],
 )
