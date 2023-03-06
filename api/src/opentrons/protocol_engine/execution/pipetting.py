@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateView, HardwarePipette
+from ..errors.exceptions import InvalidPipettingVolumeError
 
 
 class PipettingHandler(TypingProtocol):
@@ -163,7 +164,17 @@ class VirtualPipettingHandler(PipettingHandler):
         working_volume = self._state_view.pipettes.get_working_volume(
             pipette_id=pipette_id
         )
-        assert volume <= working_volume, "Cannot aspirate more than pipette max volume"
+
+        current_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id=pipette_id) or 0
+
+        new_volume = (
+            current_volume + volume
+        )
+
+        if new_volume > working_volume:
+            raise InvalidPipettingVolumeError(
+                "Cannot aspirate more than pipette max volume"
+            )
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Virtually prepare to aspirate (no-op)."""

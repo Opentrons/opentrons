@@ -14,7 +14,7 @@ from opentrons.protocol_engine.execution.pipetting import (
     VirtualPipettingHandler,
     create_pipetting_handler,
 )
-from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError, InvalidPipettingVolumeError
 
 
 @pytest.fixture
@@ -218,9 +218,11 @@ async def test_virtual_validate_aspirated_volume_raises(
     """Should validate if trying to aspirate more than the working volume."""
     decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(3)
 
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(2)
+
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(InvalidPipettingVolumeError):
         await subject.aspirate_in_place(pipette_id="pipette-id", volume=4, flow_rate=1)
 
 
@@ -292,12 +294,16 @@ async def test_aspirate_in_place_virtual(
         mock_state_view.pipettes.get_working_volume(pipette_id="pipette-id")
     ).then_return(3)
 
+    decoy.when(
+        mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
+    ).then_return(1)
+
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
     result = await subject.aspirate_in_place(
-        pipette_id="pipette-id", volume=3, flow_rate=5
+        pipette_id="pipette-id", volume=2, flow_rate=5
     )
-    assert result == 3
+    assert result == 2
 
 
 async def test_dispense_in_place_virtual(mock_state_view: StateView) -> None:
