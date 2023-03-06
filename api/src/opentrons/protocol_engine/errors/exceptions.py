@@ -47,10 +47,6 @@ class CommandDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a command that does not exist."""
 
 
-class PipetteTipInfoNotFoundError(ProtocolEngineError):
-    """An error raised when fetching information (like tiprack id) of attached tip."""
-
-
 class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
