@@ -63,7 +63,7 @@ lint:
 	$(python) -m flake8 g_code_parsing tests setup.py cli.py
 
 .PHONY: format
-format: format-readme
+format: format-other
 	$(python) -m black g_code_parsing tests setup.py cli.py
 
 
@@ -95,6 +95,8 @@ update-g-code-configuration-comparison:
 check-for-missing-comparison-files:
 	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
 
-.PHONY: format-readme
-format-readme:
-	yarn prettier --ignore-path .eslintignore --write g-code-testing/**/*.md
+FORMAT_FILE_GLOB = "g-code-testing/**/*.@(json|md|yml|yaml)"
+
+.PHONY: format-other
+format-other:
+	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
