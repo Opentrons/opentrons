@@ -141,3 +141,15 @@ stages:
               location:
                 slotName: '3'
               model: heaterShakerModuleV1
+  - name: Delete the run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: DELETE
+    response:
+      status_code: 200
+  - name: Delete the protocol
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200
