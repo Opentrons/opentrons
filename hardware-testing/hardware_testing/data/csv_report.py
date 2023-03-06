@@ -268,7 +268,13 @@ def _generate_results_overview_section(tags: List[str]) -> CSVSection:
 class CSVReport:
     """CSV Report."""
 
-    def __init__(self, test_name: str, sections: List[CSVSection], run_id: Optional[str] = None, start_time: Optional[float] = None) -> None:
+    def __init__(
+        self,
+        test_name: str,
+        sections: List[CSVSection],
+        run_id: Optional[str] = None,
+        start_time: Optional[float] = None,
+    ) -> None:
         """CSV Report init."""
         self._test_name = test_name
         self._run_id = run_id if run_id else data_io.create_run_id()

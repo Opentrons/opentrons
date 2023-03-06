@@ -5,7 +5,6 @@ from typing import Optional, List
 
 from hardware_testing.data.csv_report import (
     CSVReport,
-    CSVResult,
     CSVSection,
     CSVLine,
 )
@@ -60,30 +59,23 @@ CSV Test Report:
 """
 
 
-class Measurements(str, Enum):
+class MeasurementType(str, Enum):
     """Measurements."""
 
-    INIT = "init"
-    ASPIRATE = "aspirate"
-    DISPENSE = "dispense"
+    INIT = "measure-init"
+    ASPIRATE = "measure-aspirate"
+    DISPENSE = "measure-dispense"
 
 
 class EnvironmentReportState(str, Enum):
     """Environment Report State."""
 
-    FIRST = "first"
-    LAST = "last"
-    MIN = "min"
-    MAX = "max"
+    FIRST = "environment-first"
+    LAST = "environment-last"
+    MIN = "environment-min"
+    MAX = "environment-max"
 
 
-ENVIRONMENT_INFO = [
-    "celsius-pipette",
-    "celsius-air",
-    "humidity-air",
-    "pascals-air",
-    "celsius-liquid",
-]
 MEASUREMENT_INFO = [
     "grams-average",
     "grams-cv",
@@ -101,30 +93,20 @@ def create_measurement_tag(t: str, volume: Optional[float], trial: int) -> str:
         vol_in_tag = "blank"
     else:
         vol_in_tag = str(round(volume, 2))
-    return f"{t}-{vol_in_tag}-ul-{trial}"
+    return f"{t}-{vol_in_tag}-ul-{trial + 1}"
 
 
 def create_csv_test_report(
     volumes: List[float], cfg: config.GravimetricConfig, run_id: str
 ) -> CSVReport:
     """Create CSV test report."""
-    def _create_measurement_lines(
-        volume: Optional[float], trials: int
-    ) -> List[CSVLine]:
-        return [
-            CSVLine(
-                create_measurement_tag(f"measure-{m}", volume, t) + f"-{info}",
-                [str, str, str, str],
-            )
-            for m in Measurements
-            for t in range(trials)
-            for info in (MEASUREMENT_INFO + ENVIRONMENT_INFO)
-        ]
-
-    all_measurement_lines = _create_measurement_lines(None, config.NUM_BLANK_TRIALS)
-    for v in volumes:
-        for line in _create_measurement_lines(v, cfg.trials):
-            all_measurement_lines.append(line)
+    env_info = [
+        field.name.replace("_", "-") for field in fields(config.EnvironmentData)
+    ]
+    meas_info = [
+        field.name.replace("_", "-") for field in fields(config.MeasurementData)
+    ]
+    meas_vols = ([None] * config.NUM_BLANK_TRIALS) + volumes  # type: ignore[operator]
 
     report = CSVReport(
         test_name=cfg.name,
@@ -137,7 +119,7 @@ def create_csv_test_report(
                     CSVLine("pipette", [str]),
                     CSVLine("scale", [str]),
                     CSVLine("environment", [str]),
-                    CSVLine("liquid-temperature", [str]),
+                    CSVLine("liquid", [str]),
                 ],
             ),
             CSVSection(
@@ -151,9 +133,9 @@ def create_csv_test_report(
             CSVSection(
                 title="VOLUMES",
                 lines=[
-                    CSVLine(f"volume-{round(v, 2)}-{t}", [float])
+                    CSVLine(f"volume-{round(v, 2)}-{i}", [float])
                     for v in volumes
-                    for t in ["average", "cv", "d"]
+                    for i in ["average", "cv", "d"]
                 ],
             ),
             CSVSection(
@@ -174,14 +156,20 @@ def create_csv_test_report(
             CSVSection(
                 title="ENVIRONMENT",
                 lines=[
-                    CSVLine(f"environment-{s}-{i}", [float])
+                    CSVLine(f"{s}-{i}", [float])
                     for s in EnvironmentReportState
-                    for i in ENVIRONMENT_INFO
+                    for i in env_info
                 ],
             ),
             CSVSection(
                 title="MEASUREMENTS",
-                lines=all_measurement_lines,  # type: ignore[arg-type]
+                lines=[
+                    CSVLine(create_measurement_tag(m, v, t) + f"-{i}", [float])
+                    for v in meas_vols
+                    for t in range(cfg.trials)
+                    for m in MeasurementType
+                    for i in meas_info
+                ],
             ),
         ],
     )
@@ -193,35 +181,66 @@ def create_csv_test_report(
     return report
 
 
-def report_serial_numbers(
-    robot: str, pipette: str, scale: str, environment: str, liquid: str
+def store_serial_numbers(
+    report: CSVReport,
+    robot: str,
+    pipette: str,
+    scale: str,
+    environment: str,
+    liquid: str,
 ) -> None:
     """Report serial numbers."""
-    return
+    report("SERIAL-NUMBERS", "robot", [robot])
+    report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "scale", [scale])
+    report("SERIAL-NUMBERS", "environment", [environment])
+    report("SERIAL-NUMBERS", "liquid", [liquid])
 
 
-def report_volume(volume: float, average: float, cv: float, d: float) -> None:
+def store_volume(
+    report: CSVReport, volume: float, average: float, cv: float, d: float
+) -> None:
     """Report volume."""
-    return
+    vol_in_tag = str(round(volume, 2))
+    report("VOLUMES", f"volume-{vol_in_tag}-average", [average])
+    report("VOLUMES", f"volume-{vol_in_tag}-cv", [cv])
+    report("VOLUMES", f"volume-{vol_in_tag}-d", [d])
 
 
-def report_trial(trial: int, volume: float) -> None:
+def store_trial(report: CSVReport, trial: int, volume: float) -> None:
     """Report trial."""
-    return
+    vol_in_tag = str(round(volume, 2))
+    report("TRIALS", f"trial-{trial + 1}-at-{vol_in_tag}-ul", [volume])
 
 
-def report_average_evaporation(aspirate: float, dispense: float) -> None:
+def store_average_evaporation(
+    report: CSVReport, aspirate: float, dispense: float
+) -> None:
     """Report average evaporation."""
-    return
+    report("EVAPORATION", "aspirate-average-grams", [aspirate])
+    report("EVAPORATION", "dispense-average-grams", [dispense])
 
 
-def report_environment(
+def store_environment(
+    report: CSVReport,
     state: EnvironmentReportState,
-    pipette_celsius: float,
-    air_celsius: float,
-    air_relative_humidity: float,
-    air_pascals: float,
-    liquid_celsius: float,
+    data: config.EnvironmentData,
 ) -> None:
     """Report environment."""
-    return
+    for field in fields(config.EnvironmentData):
+        f_tag = field.name.replace("_", "-")
+        report("ENVIRONMENT", f"{state}-{f_tag}", [getattr(data, field.name)])
+
+
+def store_measurement(
+    report: CSVReport,
+    measurement_type: MeasurementType,
+    volume: Optional[float],
+    trial: int,
+    data: config.MeasurementData,
+) -> None:
+    """Report measurement."""
+    tag_root = create_measurement_tag(measurement_type, volume, trial)
+    for field in fields(config.EnvironmentData):
+        f_tag = field.name.replace("_", "-")
+        report("MEASUREMENTS", f"{tag_root}-{f_tag}", [getattr(data, field.name)])

@@ -292,6 +292,11 @@ class GravimetricRecorder:
         """Is simulator."""
         return self._scale.is_simulator
 
+    @property
+    def scale(self) -> Scale:
+        """Scale."""
+        return self._scale
+
     def activate(self) -> None:
         """Activate."""
         # Some Radwag settings cannot be controlled remotely.
@@ -364,9 +369,9 @@ class GravimetricRecorder:
         """Run."""
         self._wait_for_record_start()
         if self._cfg.save_to_disk:
-            self._recording = self._record_samples_to_disk()
+            self._record_samples_to_disk()
         else:
-            self._recording = self._record_samples()
+            self._record_samples()
         self._is_recording.clear()
 
     @property
@@ -407,22 +412,22 @@ class GravimetricRecorder:
         else:
             length = 0
         interval = 1.0 / self._cfg.frequency
-        _recording = GravimetricRecording()
+        self._recording = GravimetricRecording()
         _start_time = time()
         while self.is_recording:
-            if length and len(_recording) >= length:
+            if length and len(self._recording) >= length:
                 break
             if _record_did_exceed_time(_start_time, timeout):
                 break
             interval_w_overlap = interval - _record_get_interval_overlap(
-                _recording, interval
+                self._recording, interval
             )
-            if not len(_recording) or _record_did_exceed_time(
-                _recording.end_time, interval_w_overlap
+            if not len(self._recording) or _record_did_exceed_time(
+                self._recording.end_time, interval_w_overlap
             ):
                 mass = self._scale.read()
                 if self._cfg.stable and not mass.stable:
-                    _recording.clear()  # delete all previously recorded samples
+                    self._recording.clear()  # delete all previously recorded samples
                     continue
                 _s = GravimetricSample(
                     grams=mass.grams,
@@ -430,21 +435,21 @@ class GravimetricRecorder:
                     time=mass.time,
                     tag=self._sample_tag,
                 )
-                _recording.append(_s)
+                self._recording.append(_s)
                 self._reading_samples.set()
                 if callable(on_new_sample):
-                    on_new_sample(_recording)
+                    on_new_sample(self._recording)
             if self.is_in_thread:
                 if self.is_simulator:
                     sleep(SLEEP_TIME_IN_RECORD_LOOP_SIMULATING)
                 else:
                     sleep(SLEEP_TIME_IN_RECORD_LOOP)
         self._reading_samples.clear()
-        assert len(_recording) == length or not self.is_recording, (
+        assert len(self._recording) == length or not self.is_recording, (
             f"Scale recording timed out before accumulating "
-            f"{length} samples (recorded {len(_recording)} samples)"
+            f"{length} samples (recorded {len(self._recording)} samples)"
         )
-        return _recording
+        return self._recording
 
     def _record_samples_to_disk(
         self, timeout: Optional[float] = None

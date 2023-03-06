@@ -10,7 +10,7 @@ from hardware_testing.data.csv_report import (
 
 NUM_REPEATING_DATA = 30
 EXAMPLE_REPORT = CSVReport(
-    script_path=__file__,
+    test_name="example-test-report",
     sections=[
         CSVSection(
             title="PIPETTE-LEFT",
