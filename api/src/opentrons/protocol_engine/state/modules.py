@@ -105,7 +105,18 @@ class ModuleState:
     slot_by_module_id: Dict[str, Optional[DeckSlotName]]
     """The deck slot that each module has been loaded into.
 
-    This will be None when a module has been added via
+    This will be None when the module was added via
+    ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
+    """
+
+    requested_model_by_id: Dict[str, Optional[ModuleModel]]
+    """The model by which each loaded module was requested.
+
+    Becuse of module compatibility, this can differ from the model found through
+    hardware_module_by_id. See `ModuleView.get_requested_model()` versus
+    `ModuleView.get_actual_model()`.
+
+    This will be None when the module was added via
     ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
     """
 
@@ -124,7 +135,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def __init__(self) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
-            slot_by_module_id={}, hardware_by_module_id={}, substate_by_module_id={}
+            slot_by_module_id={},
+            requested_model_by_id={},
+            hardware_by_module_id={},
+            substate_by_module_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -138,6 +152,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=action.serial_number,
                 definition=action.definition,
                 slot_name=None,
+                requested_model=None,
                 module_live_data=action.module_live_data,
             )
 
@@ -148,6 +163,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=command.result.serialNumber,
                 definition=command.result.definition,
                 slot_name=command.params.location.slotName,
+                requested_model=command.params.model,
                 module_live_data=None,
             )
 
@@ -192,23 +208,25 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         serial_number: str,
         definition: ModuleDefinition,
         slot_name: Optional[DeckSlotName],
+        requested_model: Optional[ModuleModel],
         module_live_data: Optional[LiveData],
     ) -> None:
-        model = definition.model
+        actual_model = definition.model
         live_data = module_live_data["data"] if module_live_data else None
 
+        self._state.requested_model_by_id[module_id] = requested_model
         self._state.slot_by_module_id[module_id] = slot_name
         self._state.hardware_by_module_id[module_id] = HardwareModule(
             serial_number=serial_number,
             definition=definition,
         )
 
-        if ModuleModel.is_magnetic_module_model(model):
+        if ModuleModel.is_magnetic_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
                 module_id=MagneticModuleId(module_id),
-                model=model,
+                model=actual_model,
             )
-        elif ModuleModel.is_heater_shaker_module_model(model):
+        elif ModuleModel.is_heater_shaker_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
                 is_labware_latch_closed=(
@@ -220,12 +238,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 ),
                 plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
-        elif ModuleModel.is_temperature_module_model(model):
+        elif ModuleModel.is_temperature_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
                 module_id=TemperatureModuleId(module_id),
                 plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
-        elif ModuleModel.is_thermocycler_module_model(model):
+        elif ModuleModel.is_thermocycler_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
                 is_lid_open=live_data is not None and live_data["lid"] == "open",
