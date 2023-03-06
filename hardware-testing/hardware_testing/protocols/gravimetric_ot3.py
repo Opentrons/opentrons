@@ -19,14 +19,14 @@ def run(protocol: ProtocolContext, labware_offsets: List[dict]) -> None:
         GravimetricConfig(
             name=metadata["protocolName"],
             pipette_mount="left",
-            pipette_volume=50,
-            tip_volume=50,
-            trials=1,
+            pipette_volume=50,  # 50 or 1000
+            tip_volume=50,  # 50, 200, or 1000
+            trials=10,
             labware_offsets=labware_offsets,
             slot_vial=4,
             slot_tiprack=7,
             increment=False,
-            low_volume=False,
+            low_volume=False,  # "low-volume" is < 2uL
         ),
     )
 

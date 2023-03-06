@@ -113,6 +113,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette = ctx.load_instrument(
         f"p{cfg.pipette_volume}_single", cfg.pipette_mount, tip_racks=[tiprack]
     )
+    pipette_tag = get_pipette_unique_name(pipette)
 
     # GET TEST VOLUMES
     if cfg.increment:
@@ -142,7 +143,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         GravimetricRecorderConfig(
             test_name=cfg.name,
             run_id=run_id,
-            tag=get_pipette_unique_name(pipette),
+            tag=pipette_tag,
             start_time=start_time,
             duration=0,
             frequency=5,
@@ -152,7 +153,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     )
 
     # CREATE CSV TEST REPORT
-    test_report = report.create_csv_test_report(__file__, test_volumes, cfg)
+    test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
+    test_report.set_tag(pipette_tag)
+    print(test_report.parent)
 
     # USER SETUP LIQUIDS
     setup_str = liquid_tracker.get_setup_instructions_string()

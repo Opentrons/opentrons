@@ -77,7 +77,6 @@ class EnvironmentReportState(str, Enum):
     MAX = "max"
 
 
-VOLUMES_INFO = ["target", "average", "cv", "d"]
 ENVIRONMENT_INFO = [
     "celsius-pipette",
     "celsius-air",
@@ -102,29 +101,24 @@ def create_measurement_tag(t: str, volume: Optional[float], trial: int) -> str:
         vol_in_tag = "blank"
     else:
         vol_in_tag = str(round(volume, 2))
-    return f"{t}-{vol_in_tag}-{trial}"
+    return f"{t}-{vol_in_tag}-ul-{trial}"
 
 
 def create_csv_test_report(
-    script_path: str, volumes: List[float], cfg: config.GravimetricConfig
+    volumes: List[float], cfg: config.GravimetricConfig, run_id: str
 ) -> CSVReport:
     """Create CSV test report."""
-    volume_lines = [CSVLine("header", [str, str, str, str])]
-    for v in volumes:
-        line = CSVLine(f"volume-{round(v, 2)}", [float, float, float, float])
-        volume_lines.append(line)
-
     def _create_measurement_lines(
         volume: Optional[float], trials: int
     ) -> List[CSVLine]:
         return [
             CSVLine(
-                create_measurement_tag(f"measure-{m}", volume, t) + i,
+                create_measurement_tag(f"measure-{m}", volume, t) + f"-{info}",
                 [str, str, str, str],
             )
             for m in Measurements
             for t in range(trials)
-            for i in (MEASUREMENT_INFO + ENVIRONMENT_INFO)
+            for info in (MEASUREMENT_INFO + ENVIRONMENT_INFO)
         ]
 
     all_measurement_lines = _create_measurement_lines(None, config.NUM_BLANK_TRIALS)
@@ -133,7 +127,8 @@ def create_csv_test_report(
             all_measurement_lines.append(line)
 
     report = CSVReport(
-        script_path=script_path,
+        test_name=cfg.name,
+        run_id=run_id,
         sections=[
             CSVSection(
                 title="SERIAL-NUMBERS",
@@ -155,12 +150,16 @@ def create_csv_test_report(
             ),
             CSVSection(
                 title="VOLUMES",
-                lines=volume_lines,  # type: ignore[arg-type]
+                lines=[
+                    CSVLine(f"volume-{round(v, 2)}-{t}", [float])
+                    for v in volumes
+                    for t in ["average", "cv", "d"]
+                ],
             ),
             CSVSection(
                 title="TRIALS",
                 lines=[
-                    CSVLine(f"trial-{t + 1}-{round(v, 2)}", [float])
+                    CSVLine(f"trial-{t + 1}-at-{round(v, 2)}-ul", [float])
                     for v in volumes
                     for t in range(cfg.trials)
                 ],
@@ -175,11 +174,9 @@ def create_csv_test_report(
             CSVSection(
                 title="ENVIRONMENT",
                 lines=[
-                    CSVLine("header", [str, str, str, str, str]),
-                    CSVLine("environment-first", [float, float, float, float, float]),
-                    CSVLine("environment-last", [float, float, float, float, float]),
-                    CSVLine("environment-min", [float, float, float, float, float]),
-                    CSVLine("environment-max", [float, float, float, float, float]),
+                    CSVLine(f"environment-{s}-{i}", [float])
+                    for s in EnvironmentReportState
+                    for i in ENVIRONMENT_INFO
                 ],
             ),
             CSVSection(
@@ -188,9 +185,7 @@ def create_csv_test_report(
             ),
         ],
     )
-
-    report("VOLUMES", "header", VOLUMES_INFO)
-    report("ENVIRONMENT", "header", ENVIRONMENT_INFO)
+    # might as well set the configuration values now
     for field in fields(config.GravimetricConfig):
         if field.name in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT:
             continue
