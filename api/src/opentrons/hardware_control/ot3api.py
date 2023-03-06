@@ -423,20 +423,6 @@ class OT3API(
         async for update_status in self.update_firmware(subsystems):
             mod_log.debug(update_status)
 
-    async def start_firmware_updates(self) -> None:
-        """Helper function to be able to call update_firmware without consuming an iterator.
-
-        This will update all the firmware for subsystems (head, gantry-x, gantry-y)
-        as well as any intruments attached (pipettes, gripper, etc).
-
-        This is required because we call this function from opentrons.__init__.initialize()
-        And Since the hardware controller gets wrapped in a ThreadManager object, the asyncio loop
-        runs under a different context. This means we cant directly call update_firmware which
-        is an AsyncIterator that cannot be awaited.
-        """
-        async for update_status in self.update_firmware():
-            mod_log.debug(update_status)
-
     async def update_firmware(
         self, subsystems: Optional[Set[OT3SubSystem]] = None, force: bool = False
     ) -> AsyncIterator[Set[UpdateStatus]]:

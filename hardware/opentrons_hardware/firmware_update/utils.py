@@ -224,7 +224,10 @@ def _update_types_from_devices(
         log.debug(f"Checking firmware update for {version_cache.node_id.name}")
         # skip pipettes that dont have a PipetteType
         node_id = version_cache.node_id
-        if node_id != NodeId.gripper and not attached_pipettes.get(node_id):
+        if node_id in [
+            NodeId.pipette_left,
+            NodeId.pipette_right,
+        ] and not attached_pipettes.get(node_id):
             continue
         update_type, rev = _update_type_for_device(attached_pipettes, version_cache)
         if not rev or not update_type:
