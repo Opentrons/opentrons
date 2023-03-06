@@ -12,6 +12,7 @@ from opentrons_hardware.drivers.binary_usb import (
     SerialUsbDriver,
     BinaryMessenger,
     build_rear_panel_messenger,
+    build_rear_panel_driver,
 )
 from opentrons_hardware.firmware_bindings import NodeId, USBTarget, FirmwareTarget
 from opentrons_hardware.firmware_update.run import RunUpdate
@@ -57,10 +58,9 @@ async def run(args: argparse.Namespace) -> None:
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
 
-    driver: SerialUsbDriver = build_rear_panel_messenger(asyncio.get_running_loop())
-    usb_messenger = BinaryMessenger(driver)
+    usb_driver: SerialUsbDriver = await (build_rear_panel_driver())
+    usb_messenger: BinaryMessenger = build_rear_panel_messenger(usb_driver)
     usb_messenger.start()
-
     update_details = {
         TARGETS[args.target]: args.file,
     }
