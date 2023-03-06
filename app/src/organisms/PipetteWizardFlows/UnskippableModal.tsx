@@ -1,15 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
-  TYPOGRAPHY,
-  SPACING,
-} from '@opentrons/components'
+import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { AlertPrimaryButton } from '../../atoms/buttons'
-import { AlertSmallButton } from '../../atoms/buttons/ODD'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { StyledText } from '../../atoms/text'
 
 interface UnskippableModalProps {
   goBack: () => void
@@ -27,16 +21,12 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
       isSuccess={false}
     >
       {isOnDevice ? (
-        <AlertSmallButton onClick={goBack} aria-label="isOnDevice_button">
-          <StyledText
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            padding={SPACING.spacing4}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          >
-            {t('shared:return')}
-          </StyledText>
-        </AlertSmallButton>
+        <SmallButton
+          onClick={goBack}
+          aria-label="isOnDevice_button"
+          buttonText={t('shared:return')}
+          buttonType="alert"
+        />
       ) : (
         <AlertPrimaryButton
           onClick={goBack}

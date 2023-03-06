@@ -192,15 +192,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         <SmallButton
           onClick={proceed}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        >
-          <StyledText
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            padding={SPACING.spacing4}
-          >
-            {t('continue')}
-          </StyledText>
-        </SmallButton>
+          buttonText={t('continue')}
+          buttonType="default"
+        />
       </Flex>
     </Flex>
   ) : (

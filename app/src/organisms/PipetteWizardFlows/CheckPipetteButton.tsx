@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { TYPOGRAPHY, SPACING } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { PrimaryButton } from '../../atoms/buttons'
-import { SmallButton } from '../../atoms/buttons/ODD'
-import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
 interface CheckPipetteButtonProps {
   proceedButtonText: string
@@ -40,20 +38,14 @@ export const CheckPipetteButton = (
     <SmallButton
       aria-label="SmallButton"
       disabled={isDisabled}
+      buttonText={proceedButtonText}
+      buttonType="default"
       onClick={() => {
         refetch()
           .then(() => {})
           .catch(() => {})
       }}
-    >
-      <StyledText
-        fontSize="1.375rem"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        padding={SPACING.spacing4}
-      >
-        {proceedButtonText}
-      </StyledText>
-    </SmallButton>
+    />
   ) : (
     <PrimaryButton
       disabled={isDisabled}

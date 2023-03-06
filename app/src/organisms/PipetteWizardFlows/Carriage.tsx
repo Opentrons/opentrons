@@ -5,11 +5,10 @@ import {
   COLORS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons/ODD'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
@@ -106,15 +105,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       back={goBack}
       proceedButton={
         isOnDevice ? (
-          <SmallButton onClick={proceed} aria-label="isOnDevice_button">
-            <StyledText
-              fontSize="1.375rem"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              padding={SPACING.spacing4}
-            >
-              {capitalize(t('shared:continue'))}
-            </StyledText>
-          </SmallButton>
+          <SmallButton
+            onClick={proceed}
+            aria-label="isOnDevice_button"
+            buttonText={capitalize(t('shared:continue'))}
+            buttonType="default"
+          />
         ) : (
           <PrimaryButton onClick={handleCheckZAxis}>
             {capitalize(t('shared:continue'))}

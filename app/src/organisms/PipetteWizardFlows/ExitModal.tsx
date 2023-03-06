@@ -4,12 +4,10 @@ import {
   COLORS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
-  TYPOGRAPHY,
 } from '@opentrons/components'
-import { SmallButton, AlertSmallButton } from '../../atoms/buttons/ODD'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { StyledText } from '../../atoms/text'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
 
@@ -45,30 +43,19 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
     >
       {isOnDevice ? (
         <>
-          <AlertSmallButton
+          <SmallButton
             onClick={proceed}
             aria-label="isOnDevice_exit"
             marginRight={SPACING.spacing3}
-          >
-            <StyledText
-              fontSize="1.375rem"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              padding={SPACING.spacing4}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            >
-              {t('shared:exit')}
-            </StyledText>
-          </AlertSmallButton>
-          <SmallButton onClick={goBack} aria-label="isOnDevice_goBack">
-            <StyledText
-              fontSize="1.375rem"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              padding={SPACING.spacing4}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            >
-              {t('shared:go_back')}
-            </StyledText>
-          </SmallButton>
+            buttonText={t('shared:exit')}
+            buttonType="alert"
+          />
+          <SmallButton
+            buttonText={t('shared:go_back')}
+            buttonType="default"
+            onClick={goBack}
+            aria-label="isOnDevice_goBack"
+          />
         </>
       ) : (
         <>

@@ -1,12 +1,7 @@
 import * as React from 'react'
-import {
-  renderWithProviders,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 
-import { SmallButton } from '..'
+import { SmallButton } from '../SmallButton'
 
 const render = (props: React.ComponentProps<typeof SmallButton>) => {
   return renderWithProviders(<SmallButton {...props} />)[0]
@@ -17,62 +12,71 @@ describe('SmallButton', () => {
 
   beforeEach(() => {
     props = {
-      children: 'small button',
+      onClick: jest.fn(),
+      buttonType: 'default',
+      buttonText: 'small button',
     }
   })
-
-  it('renders small button with text', () => {
-    const { getByText } = render(props)
-    const button = getByText('small button')
-    expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.blueEnabled)}`
+  it('renders the default button and it works as expected', () => {
+    const { getByText, getByRole } = render(props)
+    getByText('small button').click()
+    expect(props.onClick).toHaveBeenCalled()
+    expect(getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.blueEnabled}`
     )
-    expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing3)} ${String(
-        SPACING.spacing4
-      )} ${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`
-    )
-    expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeP)}`)
-    expect(button).toHaveStyle(
-      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
-    )
-    expect(button).toHaveStyle(
-      `line-height: ${String(TYPOGRAPHY.lineHeight20)}`
-    )
-    expect(button).toHaveStyle(`border-radius: 12px`)
-    expect(button).toHaveStyle(
-      `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
-    )
-    expect(button).toHaveStyle(`box-shadow: none`)
-    expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
   })
-
-  it('renders small button with text and disabled', () => {
-    props.disabled = true
-    const { getByText } = render(props)
-    const button = getByText('small button')
-    expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: #16212d33`)
-    expect(button).toHaveStyle(`color: #16212d8c`)
-  })
-
-  it('applies the correct states to the small button - active', () => {
-    const { getByText } = render(props)
-    const button = getByText('small button')
-    expect(button).toHaveStyleRule('background-color', '#006cfa', {
-      modifier: ':active',
-    })
-  })
-
-  it('applies the correct states to the small button - focus-visible', () => {
-    const { getByText } = render(props)
-    const button = getByText('small button')
-    expect(button).toHaveStyleRule(
-      'box-shadow',
-      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
-      {
-        modifier: ':focus-visible',
-      }
+  it('renders the alert button', () => {
+    props = {
+      ...props,
+      buttonType: 'alert',
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.errorEnabled}`
     )
+  })
+  it('renders the alt button', () => {
+    props = {
+      ...props,
+      buttonType: 'alt',
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toHaveStyle(`background-color: #b4d4ff`)
+  })
+  it('renders the ghost low button', () => {
+    props = {
+      ...props,
+      buttonType: 'ghostLow',
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toHaveStyle(
+      `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
+    )
+  })
+  it('renders the ghost high blue', () => {
+    props = {
+      ...props,
+      buttonType: 'ghostHigh',
+      textColor: COLORS.blueEnabled,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.blueEnabled}`)
+  })
+  it('renders the ghost high black', () => {
+    props = {
+      ...props,
+      buttonType: 'ghostHigh',
+      textColor: COLORS.darkBlackEnabled,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
+  })
+  it('renders the button as disabled', () => {
+    props = {
+      ...props,
+      disabled: true,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toBeDisabled()
   })
 })

@@ -21,7 +21,7 @@ import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
-import { SmallButton } from '../../atoms/buttons/ODD'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
@@ -145,19 +145,10 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         {proceed != null && proceedButton == null ? (
           isOnDevice ? (
             <SmallButton
-              disabled={proceedIsDisabled}
-              css={CAPITALIZE_FIRST_LETTER_STYLE}
+              buttonText={proceedButtonText}
+              buttonType="default"
               onClick={proceed}
-              aria-label="isOnDevice_button"
-            >
-              <StyledText
-                fontSize="1.375rem"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                padding={SPACING.spacing4}
-              >
-                {proceedButtonText}
-              </StyledText>
-            </SmallButton>
+            />
           ) : (
             <PrimaryButton
               disabled={proceedIsDisabled}
