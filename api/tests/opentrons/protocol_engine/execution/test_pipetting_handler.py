@@ -14,7 +14,10 @@ from opentrons.protocol_engine.execution.pipetting import (
     VirtualPipettingHandler,
     create_pipetting_handler,
 )
-from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError, InvalidPipettingVolumeError
+from opentrons.protocol_engine.errors.exceptions import (
+    TipNotAttachedError,
+    InvalidPipettingVolumeError,
+)
 
 
 @pytest.fixture
@@ -218,7 +221,9 @@ async def test_virtual_validate_aspirated_volume_raises(
     """Should validate if trying to aspirate more than the working volume."""
     decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(3)
 
-    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(2)
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        2
+    )
 
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 

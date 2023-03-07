@@ -165,11 +165,11 @@ class VirtualPipettingHandler(PipettingHandler):
             pipette_id=pipette_id
         )
 
-        current_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id=pipette_id) or 0
-
-        new_volume = (
-            current_volume + volume
+        current_volume = (
+            self._state_view.pipettes.get_aspirated_volume(pipette_id=pipette_id) or 0
         )
+
+        new_volume = current_volume + volume
 
         if new_volume > working_volume:
             raise InvalidPipettingVolumeError(
