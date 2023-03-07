@@ -405,7 +405,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
+            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
 
         distances_pipette = {
@@ -434,7 +434,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
+            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
 
         distances_gantry = {
