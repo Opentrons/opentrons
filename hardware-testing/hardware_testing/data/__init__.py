@@ -73,11 +73,9 @@ def append_data_to_file(test_name: str, file_name: str, data: str) -> Path:
     """Append new content to an already existing file on disk."""
     return _save_data(test_name, file_name, data, perm="a+")
 
-<<<<<<< HEAD
 def convert_list_to_csv_line(data: List[Any]) -> str:
     """Convert list to csv line."""
     return ",".join([str(n) for n in data]) + '\n'
-=======
 
 def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) -> None:
     """Insert new data at a specified line."""
@@ -89,4 +87,3 @@ def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) ->
     contents.insert(line, data)
     with open(data_path, "w") as f:
         f.write("".join(contents))
->>>>>>> edge
