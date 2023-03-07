@@ -105,7 +105,7 @@ export const liquidColors = [
 ]
 
 // touchscreen light mode colors
-// Note darkBlack_hundred is the same as darkBlackEnabled
+export const darkBlack_hundred = darkBlackEnabled
 export const darkBlack_ninety = `${darkBlackEnabled}${opacity90HexCode}`
 export const darkBlack_seventy = `${darkBlackEnabled}${opacity70HexCode}`
 export const darkBlack_sixty = `${darkBlackEnabled}${opacity60HexCode}`
