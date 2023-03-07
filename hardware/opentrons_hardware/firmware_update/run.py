@@ -196,14 +196,9 @@ class RunUpdate:
         update_file: str,
         usb_target: USBTarget,
     ) -> None:
-        await self._status_queue.put(
-            (usb_target, (FirmwareUpdateStatus.updating, 0.05))
-        )
-        await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.1)))
-        await self._usb_messenger.stop()
-        await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.2)))
+        await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.01)))
         vid, pid, baudrate, timeout = messenger.get_driver().get_connection_info()
-        await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.3)))
+        await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.2)))
         for i in range(retry_count):
             logger.info(
                 f"Running attempt number {i} to update device {vid:04x}:{pid:04x}"
@@ -211,6 +206,7 @@ class RunUpdate:
             if not await messenger.send(EnterBootloaderRequest()):
                 logger.error("unable to send enter bootloader message")
                 continue
+            await messenger.stop()        
             await self._status_queue.put(
                 (usb_target, (FirmwareUpdateStatus.updating, 0.4))
             )
