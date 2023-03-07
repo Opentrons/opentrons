@@ -11,7 +11,7 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, cleanup, clear_commands, commands
+   :exclude-members: location_cache, cleanup, clear_commands, commands, move_labware
 
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
