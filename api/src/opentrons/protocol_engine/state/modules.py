@@ -114,7 +114,7 @@ class ModuleState:
 
     Becuse of module compatibility, this can differ from the model found through
     hardware_module_by_id. See `ModuleView.get_requested_model()` versus
-    `ModuleView.get_actual_model()`.
+    `ModuleView.get_connected_model()`.
 
     This will be None when the module was added via
     ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
@@ -555,14 +555,14 @@ class ModuleView(HasState[ModuleState]):
         Or, if this module was not loaded with an explicit ``loadModule`` command,
         return ``None``.
 
-        See also `get_actual_model()`.
+        See also `get_connected_model()`.
         """
         try:
             return self._state.requested_model_by_id[module_id]
         except KeyError as e:
             raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
-    def get_actual_model(self, module_id: str) -> ModuleModel:
+    def get_connected_model(self, module_id: str) -> ModuleModel:
         """Return the model of the connected module.
 
         This can differ from `get_requested_model()` because of module compatibility.
