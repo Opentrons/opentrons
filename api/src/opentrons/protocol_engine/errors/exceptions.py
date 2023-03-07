@@ -98,6 +98,9 @@ class PipetteNotLoadedError(ProtocolEngineError):
 class ModuleNotLoadedError(ProtocolEngineError):
     """And error raised when referencing a module that has not been loaded."""
 
+    def __init__(self, *, module_id: str) -> None:
+        super().__init__(f"Module {module_id} not found.")
+
 
 class ModuleNotOnDeckError(ProtocolEngineError):
     """And error raised when trying to use a module that is loaded off the deck."""
