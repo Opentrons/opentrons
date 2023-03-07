@@ -1,6 +1,6 @@
 """Gravimetric."""
-from time import sleep
-from typing import Optional, Dict, Tuple
+from statistics import stdev
+from typing import Optional, Tuple, List
 
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well
 
@@ -14,17 +14,17 @@ from .helpers import get_pipette_unique_name
 from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
 from .increments import get_volume_increments
 from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
-from .measurement.environment import (
-    read_blank_environment_data,
-    get_first_reading,
-    get_last_reading,
-    get_min_reading,
-    get_max_reading,
+from .measurement import (
+    MeasurementData,
+    MeasurementType,
+    record_measurement_data,
+    calculate_change_in_volume,
+    create_measurement_tag,
 )
+from .measurement.environment import get_min_reading, get_max_reading
 from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
-    GravimetricRecording,
 )
 from .liquid_class.defaults import get_test_volumes
 from .liquid_class.pipetting import (
@@ -35,67 +35,61 @@ from .liquid_class.pipetting import (
 from .vial_labware_definition import VIAL_DEFINITION
 
 
-_MEASUREMENTS: Dict[str, config.MeasurementData] = dict()
+_MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 
 def _generate_callbacks_for_trial(
-    recorder: GravimetricRecorder, volume: Optional[float], trial: int
+    recorder: GravimetricRecorder,
+    volume: Optional[float],
+    trial: int,
+    blank_measurement: bool,
 ) -> PipettingCallbacks:
-    def _tag(t: str) -> str:
-        return report.create_measurement_tag(t, volume, trial)
-
+    # it is useful to tag the scale data by what is physically happening,
+    # so we can graph the data and color-code the lines based on these tags.
+    # very helpful for debugging and learning more about the system.
+    if blank_measurement:
+        volume = None
     return PipettingCallbacks(
-        on_submerging=lambda: recorder.set_sample_tag(_tag("submerge")),
-        on_mixing=lambda: recorder.set_sample_tag(_tag("mix")),
-        on_aspirating=lambda: recorder.set_sample_tag(_tag("aspirate")),
-        on_dispensing=lambda: recorder.set_sample_tag(_tag("dispense")),
-        on_retracting=lambda: recorder.set_sample_tag(_tag("retract")),
-        on_blowing_out=lambda: recorder.set_sample_tag(_tag("blowout")),
+        on_submerging=lambda: recorder.set_sample_tag(
+            create_measurement_tag("submerge", volume, trial)
+        ),
+        on_mixing=lambda: recorder.set_sample_tag(
+            create_measurement_tag("mix", volume, trial)
+        ),
+        on_aspirating=lambda: recorder.set_sample_tag(
+            create_measurement_tag("aspirate", volume, trial)
+        ),
+        on_dispensing=lambda: recorder.set_sample_tag(
+            create_measurement_tag("dispense", volume, trial)
+        ),
+        on_retracting=lambda: recorder.set_sample_tag(
+            create_measurement_tag("retract", volume, trial)
+        ),
+        on_blowing_out=lambda: recorder.set_sample_tag(
+            create_measurement_tag("blowout", volume, trial)
+        ),
         on_exiting=recorder.clear_sample_tag,
     )
 
 
-def _build_measurement_data(
-    recorder: GravimetricRecorder, tag: str, environment: config.EnvironmentData
-) -> config.MeasurementData:
-    recording_slice = GravimetricRecording(
-        [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
+def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
+    # update this regularly, because the script may exit early
+    env_data_list = [m.environment for tag, m in _MEASUREMENTS]
+    report.store_environment(
+        test_report, report.EnvironmentReportState.FIRST, env_data_list[0]
     )
-    recording_grams_as_list = recording_slice.grams_as_list
-
-    return config.MeasurementData(
-        celsius_pipette=environment.celsius_pipette,
-        celsius_air=environment.celsius_air,
-        humidity_air=environment.humidity_air,
-        pascals_air=environment.pascals_air,
-        celsius_liquid=environment.celsius_liquid,
-        grams_average=recording_slice.average,
-        grams_cv=recording_slice.calculate_cv(),
-        grams_min=min(recording_grams_as_list),
-        grams_max=max(recording_grams_as_list),
-        samples_start_time=recording_slice.start_time,
-        samples_duration=recording_slice.duration,
-        samples_count=len(recording_grams_as_list),
+    report.store_environment(
+        test_report, report.EnvironmentReportState.LAST, env_data_list[-1]
+    )
+    report.store_environment(
+        test_report, report.EnvironmentReportState.MIN, get_min_reading(env_data_list)
+    )
+    report.store_environment(
+        test_report, report.EnvironmentReportState.MAX, get_max_reading(env_data_list)
     )
 
 
-def _tags_for_measurement(
-    volume: float, trial: int, blank: Optional[bool] = False
-) -> Tuple[str, str, str]:
-    vol_in_tag = None if blank else volume
-    sample_tag_init = report.create_measurement_tag(
-        report.MeasurementType.INIT, vol_in_tag, trial
-    )
-    sample_tag_aspirate = report.create_measurement_tag(
-        report.MeasurementType.ASPIRATE, vol_in_tag, trial
-    )
-    sample_tag_dispense = report.create_measurement_tag(
-        report.MeasurementType.DISPENSE, vol_in_tag, trial
-    )
-    return sample_tag_init, sample_tag_aspirate, sample_tag_dispense
-
-
-def _run_sample(
+def _run_trial(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     well: Well,
@@ -105,32 +99,34 @@ def _run_sample(
     recorder: GravimetricRecorder,
     test_report: report.CSVReport,
     liquid_tracker: LiquidTracker,
-    stay_above_well: bool,
-) -> None:
-    tags = _tags_for_measurement(volume, trial, blank=stay_above_well)
-    sample_tag_init, sample_tag_aspirate, sample_tag_dispense = tags
-    vol_in_tag = None if stay_above_well else volume
-    callbacks = _generate_callbacks_for_trial(recorder, vol_in_tag, trial)
+    blank: bool,
+) -> Tuple[float, float]:
+    pipetting_callbacks = _generate_callbacks_for_trial(recorder, volume, trial, blank)
 
-    # NOTE: give a bit of time during simulation, so some fake data can be stored
-    def _delay(seconds: float) -> None:
-        if ctx.is_simulating():
-            sleep(0.1)
-        else:
-            ctx.delay(seconds)
+    def _tag(m_type: MeasurementType) -> str:
+        return create_measurement_tag(m_type, None if blank else volume, trial)
 
-    def _save_measurement_data(
-        tag: str, m_type: report.MeasurementType, env_data: config.EnvironmentData
-    ) -> None:
-        meas_data = _build_measurement_data(recorder, tag, env_data)
-        report.store_measurement(test_report, m_type, None, trial, meas_data)
-        _MEASUREMENTS[tag] = meas_data
+    def _record_measurement_and_store(m_type: MeasurementType) -> MeasurementData:
+        m_tag = _tag(m_type)
+        if recorder.is_simulator and not blank:
+            if m_type == MeasurementType.ASPIRATE:
+                recorder.scale.add_simulation_mass(volume * -1)
+            elif m_type == MeasurementType.DISPENSE:
+                recorder.scale.add_simulation_mass(volume)
+        m_data = record_measurement_data(ctx, m_tag, m_type, recorder)
+        report.store_measurement(test_report, m_tag, m_data)
+        _MEASUREMENTS.append(
+            (
+                m_tag,
+                m_data,
+            )
+        )
+        _update_environment_first_last_min_max(test_report)
+        return m_data
 
     # RUN INIT
     pipette.move_to(well.top())
-    env_data_init = read_blank_environment_data()  # cache state of environment
-    with recorder.samples_of_tag(sample_tag_init):
-        _delay(config.DELAY_SECONDS_BEFORE_ASPIRATE)
+    m_data_init = _record_measurement_and_store(MeasurementType.INIT)
 
     # RUN ASPIRATE
     aspirate_with_liquid_class(
@@ -140,12 +136,10 @@ def _run_sample(
         volume,
         well,
         liquid_tracker,
-        callbacks=callbacks,
-        stay_above_well=stay_above_well,
+        callbacks=pipetting_callbacks,
+        blank=blank,
     )
-    env_data_aspirate = read_blank_environment_data()  # cache state of environment
-    with recorder.samples_of_tag(sample_tag_aspirate):
-        _delay(config.DELAY_SECONDS_AFTER_ASPIRATE)
+    m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
 
     # RUN DISPENSE
     dispense_with_liquid_class(
@@ -155,34 +149,15 @@ def _run_sample(
         volume,
         well,
         liquid_tracker,
-        callbacks=callbacks,
-        stay_above_well=stay_above_well,
+        callbacks=pipetting_callbacks,
+        blank=blank,
     )
-    env_data_dispense = read_blank_environment_data()  # cache state of environment
-    with recorder.samples_of_tag(sample_tag_dispense):
-        _delay(config.DELAY_SECONDS_AFTER_DISPENSE)
+    m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
 
-    # STORE MEASUREMENT DATA
-    _save_measurement_data(sample_tag_init, report.MeasurementType.INIT, env_data_init)
-    _save_measurement_data(
-        sample_tag_aspirate, report.MeasurementType.ASPIRATE, env_data_aspirate
-    )
-    _save_measurement_data(
-        sample_tag_dispense, report.MeasurementType.DISPENSE, env_data_dispense
-    )
-    # STORE ENVIRONMENT STATES
-    report.store_environment(
-        test_report, report.EnvironmentReportState.FIRST, get_first_reading()
-    )
-    report.store_environment(
-        test_report, report.EnvironmentReportState.LAST, get_last_reading()
-    )
-    report.store_environment(
-        test_report, report.EnvironmentReportState.MIN, get_min_reading()
-    )
-    report.store_environment(
-        test_report, report.EnvironmentReportState.MAX, get_max_reading()
-    )
+    # calculate volumes
+    volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
+    volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense)
+    return volume_aspirate, volume_dispense
 
 
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
@@ -192,8 +167,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     else:
         get_input = input  # type: ignore[assignment]
     run_id, start_time = create_run_id_and_start_time()
-
-    # TODO: create test-report
 
     # LOAD LABWARE
     tiprack = ctx.load_labware(
@@ -253,6 +226,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         ),
         simulate=ctx.is_simulating(),
     )
+    if recorder.is_simulator:
+        recorder.scale.set_simulation_mass(max(test_volumes) * 2)
 
     # CREATE CSV TEST REPORT
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
@@ -284,14 +259,17 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     try:
         total = len(test_volumes) * cfg.trials + config.NUM_BLANK_TRIALS
         count = 0
+
         # MEASURE EVAPORATION
+        actual_asp_list: List[float] = list()
+        actual_disp_list: List[float] = list()
         for trial in range(config.NUM_BLANK_TRIALS):
             count += 1
             print(
                 f"{count}/{total}: blank (trial {trial + 1}/{config.NUM_BLANK_TRIALS})"
             )
             pipette.pick_up_tip()
-            _run_sample(
+            evap_aspirate, evap_dispense = _run_trial(
                 ctx,
                 pipette,
                 vial["A1"],
@@ -301,16 +279,30 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 recorder,
                 test_report,
                 liquid_tracker,
-                stay_above_well=True,  # stay away from the liquid
+                blank=True,  # stay away from the liquid
             )
+            actual_asp_list.append(evap_aspirate)
+            actual_disp_list.append(evap_dispense)
             pipette.drop_tip()
-        # LOOP THROUGH SAMPLES
+
+        # CALCULATE AVERAGE EVAPORATION
+        average_aspirate_evaporation_ul = sum(actual_asp_list) / len(actual_asp_list)
+        average_dispense_evaporation_ul = sum(actual_disp_list) / len(actual_disp_list)
+        report.store_average_evaporation(
+            test_report,
+            average_aspirate_evaporation_ul,
+            average_dispense_evaporation_ul,
+        )
+
+        # TEST
+        actual_asp_list = list()
+        actual_disp_list = list()
         for volume in test_volumes:
             for trial in range(cfg.trials):
                 count += 1
                 print(f"{count}/{total}: {volume} uL (trial {trial + 1}/{cfg.trials})")
                 pipette.pick_up_tip()
-                _run_sample(
+                actual_aspirate, actual_dispense = _run_trial(
                     ctx,
                     pipette,
                     vial["A1"],
@@ -320,10 +312,37 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     recorder,
                     test_report,
                     liquid_tracker,
-                    stay_above_well=False,
+                    blank=False,
                 )
-                # TODO: calculate volume, and store in TRIAL section
+                report.store_trial(
+                    test_report, trial, volume, actual_aspirate, actual_dispense
+                )
+                actual_asp_list.append(actual_aspirate)
+                actual_disp_list.append(actual_dispense)
                 pipette.drop_tip()
-            # TODO: calculate volume Average, CV, and D, and store in VOLUME section
+
+            # CALCULATE AVERAGE, %CV, %D
+            aspirate_average = sum(actual_asp_list) / len(actual_asp_list)
+            dispense_average = sum(actual_asp_list) / len(actual_asp_list)
+            aspirate_cv = stdev(actual_asp_list) / aspirate_average
+            dispense_cv = stdev(actual_disp_list) / dispense_average
+            aspirate_d = (aspirate_average - volume) / volume
+            dispense_d = (dispense_average - volume) / volume
+            report.store_volume(
+                test_report,
+                "aspirate",
+                volume,
+                aspirate_average,
+                aspirate_cv,
+                aspirate_d,
+            )
+            report.store_volume(
+                test_report,
+                "dispense",
+                volume,
+                dispense_average,
+                dispense_cv,
+                dispense_d,
+            )
     finally:
         recorder.stop()

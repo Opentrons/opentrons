@@ -59,13 +59,13 @@ def _get_heights_in_well(
     height_after: float,
     submerge: float,
     retract: float,
-    stay_above_well: bool,
+    blank: bool,
 ) -> Tuple[float, float, float]:
     pipetting_heights = _create_pipetting_heights(
         height_before, height_after, submerge, retract
     )
     approach = max(pipetting_heights.start.above, pipetting_heights.end.below)
-    if not stay_above_well:
+    if not blank:
         submerge = pipetting_heights.end.below
         retract = pipetting_heights.end.above
     else:
@@ -100,7 +100,7 @@ def _pipette_with_liquid_settings(
     callbacks: PipettingCallbacks,
     aspirate: Optional[float] = None,
     dispense: Optional[float] = None,
-    stay_above_well: bool = True,
+    blank: bool = True,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     if aspirate is None and dispense is None:
@@ -124,7 +124,7 @@ def _pipette_with_liquid_settings(
         liq_submerge = liquid_class.dispense.submerge
         liq_retract = liquid_class.dispense.retract
     approach_mm, submerge_mm, retract_mm = _get_heights_in_well(
-        liquid_before, liquid_after, liq_submerge, liq_retract, stay_above_well
+        liquid_before, liquid_after, liq_submerge, liq_retract, blank
     )
 
     # CREATE CALLBACKS FOR EACH PHASE
@@ -220,7 +220,7 @@ def aspirate_with_liquid_class(
     well: Well,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
-    stay_above_well: bool = True,
+    blank: bool = True,
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
@@ -239,7 +239,7 @@ def aspirate_with_liquid_class(
         liquid_tracker,
         callbacks,
         aspirate=aspirate_volume,
-        stay_above_well=stay_above_well,
+        blank=blank,
     )
 
 
@@ -251,7 +251,7 @@ def dispense_with_liquid_class(
     well: Well,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
-    stay_above_well: bool = True,
+    blank: bool = True,
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
@@ -265,5 +265,5 @@ def dispense_with_liquid_class(
         liquid_tracker,
         callbacks,
         dispense=dispense_volume,
-        stay_above_well=stay_above_well,
+        blank=blank,
     )

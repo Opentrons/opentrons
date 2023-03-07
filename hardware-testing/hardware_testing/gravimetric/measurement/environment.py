@@ -1,20 +1,20 @@
 """Environment."""
-from dataclasses import fields
+from dataclasses import dataclass, fields
 from typing import Callable, List
 
-from hardware_testing.gravimetric.config import EnvironmentData
+
+@dataclass
+class EnvironmentData:
+    """Environment data."""
+
+    celsius_pipette: float
+    celsius_air: float
+    humidity_air: float
+    pascals_air: float
+    celsius_liquid: float
 
 
-_CACHED_DATA: List[EnvironmentData] = list()
-
-
-def clear_cached_data() -> None:
-    """Clear cached data."""
-    global _CACHED_DATA
-    _CACHED_DATA = list()
-
-
-def read_blank_environment_data() -> EnvironmentData:
+def read_environment_data() -> EnvironmentData:
     """Read blank environment data."""
     d = EnvironmentData(
         celsius_pipette=25.0,
@@ -23,23 +23,14 @@ def read_blank_environment_data() -> EnvironmentData:
         pascals_air=1000,
         celsius_liquid=25.0,
     )
-    _CACHED_DATA.append(d)
     return d
 
 
-def get_first_reading() -> EnvironmentData:
-    """Get first reading."""
-    return _CACHED_DATA[0]
-
-
-def get_last_reading() -> EnvironmentData:
-    """Get last reading."""
-    return _CACHED_DATA[-1]
-
-
-def _get_min_max_reading(min_or_max_func: Callable) -> EnvironmentData:
+def _get_min_max_reading(
+    data: List[EnvironmentData], min_or_max_func: Callable
+) -> EnvironmentData:
     min_or_max_vals = {
-        field.name: min_or_max_func([getattr(d, field.name) for d in _CACHED_DATA])
+        field.name: min_or_max_func([getattr(d, field.name) for d in data])
         for field in fields(EnvironmentData)
     }
     return EnvironmentData(
@@ -51,11 +42,11 @@ def _get_min_max_reading(min_or_max_func: Callable) -> EnvironmentData:
     )
 
 
-def get_min_reading() -> EnvironmentData:
+def get_min_reading(data: List[EnvironmentData]) -> EnvironmentData:
     """Get min reading."""
-    return _get_min_max_reading(min)
+    return _get_min_max_reading(data, min)
 
 
-def get_max_reading() -> EnvironmentData:
+def get_max_reading(data: List[EnvironmentData]) -> EnvironmentData:
     """Get max reading."""
-    return _get_min_max_reading(max)
+    return _get_min_max_reading(data, max)

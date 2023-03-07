@@ -1,14 +1,20 @@
 """Report."""
 from dataclasses import fields
 from enum import Enum
-from typing import Optional, List
+from typing import List
 
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVSection,
     CSVLine,
 )
+from hardware_testing.gravimetric.measurement import (
+    EnvironmentData,
+    MeasurementData,
+    MeasurementType,
+)
 from . import config
+from .measurement import create_measurement_tag
 
 """
 CSV Test Report:
@@ -29,11 +35,15 @@ CSV Test Report:
    - increment
    - low_volume
  - Volumes (per each):
-   - Average micro-liters
-   - %CV
-   - %D
+   - Aspirate Average
+   - Aspirate %CV
+   - Aspirate %D
+   - Dispense Average
+   - Dispense %CV
+   - Dispense %D
  - Trials (per each):
-   - Calculated micro-liters
+   - Aspirate micro-liters
+   - Dispense micro-liters
  - Evaporation:
    - Aspirate average (grams)
    - Dispense average (grams)
@@ -59,14 +69,6 @@ CSV Test Report:
 """
 
 
-class MeasurementType(str, Enum):
-    """Measurements."""
-
-    INIT = "measure-init"
-    ASPIRATE = "measure-aspirate"
-    DISPENSE = "measure-dispense"
-
-
 class EnvironmentReportState(str, Enum):
     """Environment Report State."""
 
@@ -76,36 +78,12 @@ class EnvironmentReportState(str, Enum):
     MAX = "environment-max"
 
 
-MEASUREMENT_INFO = [
-    "grams-average",
-    "grams-cv",
-    "grams-min",
-    "grams-max",
-    "samples-start-time",
-    "samples-duration",
-    "samples-count",
-]
-
-
-def create_measurement_tag(t: str, volume: Optional[float], trial: int) -> str:
-    """Create measurement tag."""
-    if volume is None:
-        vol_in_tag = "blank"
-    else:
-        vol_in_tag = str(round(volume, 2))
-    return f"{t}-{vol_in_tag}-ul-{trial + 1}"
-
-
 def create_csv_test_report(
     volumes: List[float], cfg: config.GravimetricConfig, run_id: str
 ) -> CSVReport:
     """Create CSV test report."""
-    env_info = [
-        field.name.replace("_", "-") for field in fields(config.EnvironmentData)
-    ]
-    meas_info = [
-        field.name.replace("_", "-") for field in fields(config.MeasurementData)
-    ]
+    env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
+    meas_info = [field.name.replace("_", "-") for field in fields(MeasurementData)]
     meas_vols = ([None] * config.NUM_BLANK_TRIALS) + volumes  # type: ignore[operator]
 
     report = CSVReport(
@@ -133,24 +111,26 @@ def create_csv_test_report(
             CSVSection(
                 title="VOLUMES",
                 lines=[
-                    CSVLine(f"volume-{round(v, 2)}-{i}", [float])
+                    CSVLine(f"volume-{m}-{round(v, 2)}-{i}", [float])
                     for v in volumes
+                    for m in ["aspirate", "dispense"]
                     for i in ["average", "cv", "d"]
                 ],
             ),
             CSVSection(
                 title="TRIALS",
                 lines=[
-                    CSVLine(f"trial-{t + 1}-at-{round(v, 2)}-ul", [float])
+                    CSVLine(f"trial-{t + 1}-{m}-{round(v, 2)}-ul", [float])
                     for v in volumes
                     for t in range(cfg.trials)
+                    for m in ["aspirate", "dispense"]
                 ],
             ),
             CSVSection(
                 title="EVAPORATION",
                 lines=[
-                    CSVLine("aspirate-average-grams", [float]),
-                    CSVLine("dispense-average-grams", [float]),
+                    CSVLine("aspirate-average-ul", [float]),
+                    CSVLine("dispense-average-ul", [float]),
                 ],
             ),
             CSVSection(
@@ -198,49 +178,50 @@ def store_serial_numbers(
 
 
 def store_volume(
-    report: CSVReport, volume: float, average: float, cv: float, d: float
+    report: CSVReport, mode: str, volume: float, average: float, cv: float, d: float
 ) -> None:
     """Report volume."""
+    assert mode in ["aspirate", "dispense"]
     vol_in_tag = str(round(volume, 2))
-    report("VOLUMES", f"volume-{vol_in_tag}-average", [average])
-    report("VOLUMES", f"volume-{vol_in_tag}-cv", [cv])
-    report("VOLUMES", f"volume-{vol_in_tag}-d", [d])
+    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-average", [average])
+    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-cv", [cv])  # convert to percentage
+    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-d", [d])
 
 
-def store_trial(report: CSVReport, trial: int, volume: float) -> None:
+def store_trial(
+    report: CSVReport, trial: int, volume: float, aspirate: float, dispense: float
+) -> None:
     """Report trial."""
     vol_in_tag = str(round(volume, 2))
-    report("TRIALS", f"trial-{trial + 1}-at-{vol_in_tag}-ul", [volume])
+    report("TRIALS", f"trial-{trial + 1}-aspirate-{vol_in_tag}-ul", [aspirate])
+    report("TRIALS", f"trial-{trial + 1}-dispense-{vol_in_tag}-ul", [dispense])
 
 
 def store_average_evaporation(
     report: CSVReport, aspirate: float, dispense: float
 ) -> None:
     """Report average evaporation."""
-    report("EVAPORATION", "aspirate-average-grams", [aspirate])
-    report("EVAPORATION", "dispense-average-grams", [dispense])
+    report("EVAPORATION", "aspirate-average-ul", [aspirate])
+    report("EVAPORATION", "dispense-average-ul", [dispense])
 
 
 def store_environment(
     report: CSVReport,
     state: EnvironmentReportState,
-    data: config.EnvironmentData,
+    data: EnvironmentData,
 ) -> None:
     """Report environment."""
-    for field in fields(config.EnvironmentData):
+    for field in fields(EnvironmentData):
         f_tag = field.name.replace("_", "-")
         report("ENVIRONMENT", f"{state}-{f_tag}", [getattr(data, field.name)])
 
 
 def store_measurement(
     report: CSVReport,
-    measurement_type: MeasurementType,
-    volume: Optional[float],
-    trial: int,
-    data: config.MeasurementData,
+    tag: str,
+    data: MeasurementData,
 ) -> None:
     """Report measurement."""
-    tag_root = create_measurement_tag(measurement_type, volume, trial)
-    for field in fields(config.EnvironmentData):
+    for field in fields(EnvironmentData):
         f_tag = field.name.replace("_", "-")
-        report("MEASUREMENTS", f"{tag_root}-{f_tag}", [getattr(data, field.name)])
+        report("MEASUREMENTS", f"{tag}-{f_tag}", [getattr(data, field.name)])

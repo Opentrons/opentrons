@@ -76,6 +76,16 @@ class Scale:
         """Is simulator."""
         return isinstance(self._scale, SimRadwagScale)
 
+    def set_simulation_mass(self, mass: float) -> None:
+        """Set simulation mass."""
+        assert self.is_simulator
+        self._scale.set_simulation_mass(mass)  # type: ignore[union-attr]
+
+    def add_simulation_mass(self, mass: float) -> None:
+        """Add simulation mass."""
+        assert self.is_simulator
+        self._scale.set_simulation_mass(self._scale.sim_mass + mass)  # type: ignore[union-attr]
+
     def connect(self) -> None:
         """Scale connect."""
         self._scale.connect()
