@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   Link,
@@ -77,6 +77,7 @@ export function ApplyHistoricOffsets(
       {...{ labware, modules, commands }}
     />
   )
+  const noOffsetData = offsetCandidates.length < 1
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <CheckboxField
@@ -84,12 +85,14 @@ export function ApplyHistoricOffsets(
           setShouldApplyOffsets(e.currentTarget.checked)
         }}
         value={shouldApplyOffsets}
-        disabled={offsetCandidates.length < 1}
-        isIndeterminate={offsetCandidates.length < 1}
+        disabled={noOffsetData}
+        isIndeterminate={noOffsetData}
         label={
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2}>
             <Icon size={SIZE_1} name="reticle" />
-            <StyledText as="p">{t('apply_offset_data')}</StyledText>
+            <StyledText as="p">
+              {t(noOffsetData ? 'no_offset_data' : 'apply_offset_data')}
+            </StyledText>
           </Flex>
         }
       />
@@ -97,7 +100,7 @@ export function ApplyHistoricOffsets(
         onClick={() => setShowOffsetDataModal(true)}
         css={TYPOGRAPHY.linkPSemiBold}
       >
-        {t('view_data')}
+        {t(noOffsetData ? 'learn_more' : 'view_data')}
       </Link>
       {showOffsetDataModal ? (
         <Portal level="top">
@@ -105,26 +108,55 @@ export function ApplyHistoricOffsets(
             maxWidth="40rem"
             header={
               <ModalHeader
-                title={t('stored_offset_data')}
+                title={t(
+                  noOffsetData
+                    ? 'no_offset_data_available'
+                    : 'stored_offset_data'
+                )}
                 onClose={() => setShowOffsetDataModal(false)}
               />
             }
           >
-            <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
-              <StyledText as="p">
-                {offsetCandidates.length > 0
-                  ? t('robot_has_offsets_from_previous_runs')
-                  : t('robot_has_no_offsets_from_previous_runs')}
-              </StyledText>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              padding={
+                noOffsetData
+                  ? `${SPACING.spacing4} ${SPACING.spacing6} ${SPACING.spacing6} ${SPACING.spacing6}`
+                  : SPACING.spacing6
+              }
+            >
+              {noOffsetData ? (
+                <>
+                  <StyledText as="p" marginBottom={SPACING.spacing3}>
+                    {t('no_offset_data_on_robot')}
+                  </StyledText>
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('what_labware_offset')}
+                  </StyledText>
+                  <Trans
+                    t={t}
+                    i18nKey={'robot_has_no_offsets_from_previous_runs'}
+                    components={{
+                      block: (
+                        <StyledText as="p" marginBottom={SPACING.spacing3} />
+                      ),
+                    }}
+                  />
+                </>
+              ) : (
+                <StyledText as="p">
+                  {t('robot_has_offsets_from_previous_runs')}
+                </StyledText>
+              )}
               <Link
                 external
                 css={TYPOGRAPHY.linkPSemiBold}
-                marginTop={SPACING.spacing3}
+                marginTop={noOffsetData ? '0px' : SPACING.spacing3}
                 href={HOW_OFFSETS_WORK_SUPPORT_URL}
               >
                 {t('see_how_offsets_work')}
               </Link>
-              {offsetCandidates.length > 0 ? (
+              {!noOffsetData ? (
                 isLabwareOffsetCodeSnippetsOn ? (
                   <LabwareOffsetTabs
                     TableComponent={
