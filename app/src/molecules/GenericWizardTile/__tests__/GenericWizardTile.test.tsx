@@ -46,7 +46,7 @@ describe('GenericWizardTile', () => {
     const { getByText, getByLabelText } = render(props)
     getByText('body')
     getByText('header')
-    getByLabelText('isOnDevice_button').click()
+    getByLabelText('SmallButton_Default').click()
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders correct generic tile information with a back button', () => {
