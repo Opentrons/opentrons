@@ -41,21 +41,6 @@ EDGES = {
 }
 
 
-@dataclass
-class DeckHeightValidRange:
-    min: float
-    max: float
-
-    @classmethod
-    def build(
-        cls, nominal_z: float, edge_settings: EdgeSenseSettings
-    ) -> "DeckHeightValidRange":
-        return cls(
-            min=nominal_z - edge_settings.overrun_tolerance_mm,
-            max=nominal_z + edge_settings.early_sense_tolerance_mm,
-        )
-
-
 class CalibrationMethod(Enum):
     BINARY_SEARCH = "binary search"
     NONCONTACT_PASS = "noncontact pass"
