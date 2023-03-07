@@ -27,17 +27,16 @@ export function CheckPipettesButton(
 ): JSX.Element | null {
   const { onDone, children, actualPipette } = props
   const { t } = useTranslation('change_pipette')
-  const [refresh, setRefresh] = React.useState(true)
   const [isPending, setPending] = React.useState(false)
+
   const { refetch: refetchPipettes } = usePipettesQuery(
-    { refresh: refresh },
+    { refresh: true },
     {
       enabled: false,
       onSuccess: () => {
         onDone?.()
       },
       onSettled: () => {
-        setRefresh(false)
         setPending(false)
       },
     }
