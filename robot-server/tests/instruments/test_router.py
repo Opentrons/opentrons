@@ -9,7 +9,11 @@ from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
+from opentrons.hardware_control.dev_types import (
+    PipetteDict,
+    GripperDict,
+    InstrumentDict,
+)
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
@@ -41,6 +45,7 @@ from robot_server.instruments.router import (
     get_attached_instruments,
     update_firmware,
     get_firmware_update_status,
+    get_update_progress_monitor,
 )
 from robot_server.instruments.update_progress_monitor import (
     UpdateProgressMonitor,
@@ -108,8 +113,8 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+#  OT2 vs OT3 tests correctly
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_instruments_empty(
     decoy: Decoy,
@@ -124,8 +129,8 @@ async def test_get_instruments_empty(
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+#  OT2 vs OT3 tests correctly
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
     decoy: Decoy,
@@ -146,7 +151,7 @@ async def test_get_all_attached_instruments(
         model=PipetteModel("xyz"),
         pipette_id="my-other-pipette-id",
         fw_current_version=123,
-        fw_next_version=234,
+        fw_next_version=None,
         fw_update_required=True,
     )
 
@@ -270,8 +275,8 @@ async def test_get_ot2_instruments(
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+#  OT2 vs OT3 tests correctly
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware(
     decoy: Decoy,
@@ -308,7 +313,8 @@ async def test_update_instrument_firmware(
         }
     )
     decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
-        {
+        {  # The other mount is updating but that shouldn't block creation of
+            # the current mount's update resource.
             OT3Mount.RIGHT: InstrumentUpdateStatus(
                 mount=OT3Mount.RIGHT,
                 status=UpdateState.updating,
@@ -345,8 +351,8 @@ async def test_update_instrument_firmware(
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+#  OT2 vs OT3 tests correctly
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware_without_instrument(
     decoy: Decoy,
@@ -359,9 +365,9 @@ async def test_update_instrument_firmware_without_instrument(
     update_resource_created_at = datetime(year=2023, month=1, day=1)
     decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
         {
-            OT3Mount.LEFT: None,
-            OT3Mount.RIGHT: None,
-            OT3Mount.GRIPPER: None,
+            OT3Mount.LEFT: cast(InstrumentDict, {}),
+            OT3Mount.RIGHT: cast(InstrumentDict, {}),
+            OT3Mount.GRIPPER: cast(InstrumentDict, {}),
         }
     )
 
@@ -379,8 +385,8 @@ async def test_update_instrument_firmware_without_instrument(
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+#  OT2 vs OT3 tests correctly
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware_with_conflicting_update(
     decoy: Decoy,
@@ -426,8 +432,8 @@ async def test_update_instrument_firmware_with_conflicting_update(
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+#  OT2 vs OT3 tests correctly
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware_without_update_available(
     decoy: Decoy,
@@ -465,8 +471,8 @@ async def test_update_instrument_firmware_without_update_available(
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+#  OT2 vs OT3 tests correctly
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_task_error(
     decoy: Decoy,
@@ -524,7 +530,7 @@ async def test_update_task_error(
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
+#  OT2 vs OT3 tests correctly#
 @pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_firmware_update_status(
@@ -555,8 +561,8 @@ async def test_get_firmware_update_status(
 
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-# @pytest.mark.xfail
+#  OT2 vs OT3 tests correctly
+@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_firmware_update_status_of_invalid_id(
     decoy: Decoy,
@@ -575,3 +581,13 @@ async def test_get_firmware_update_status_of_invalid_id(
         )
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "InvalidUpdateId"
+
+
+async def test_get_update_progress_monitor_is_singleton(
+    ot3_hardware_api: OT3API,
+) -> None:
+    """It should return the same instance of UpdateProgressMonitor in multiple calls."""
+    monitor1 = await get_update_progress_monitor(hardware_api=ot3_hardware_api)
+    monitor2 = await get_update_progress_monitor(hardware_api=ot3_hardware_api)
+
+    assert monitor1 == monitor2

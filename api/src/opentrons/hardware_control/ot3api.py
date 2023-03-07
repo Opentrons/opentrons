@@ -566,6 +566,11 @@ class OT3API(
         self._gripper_handler.gripper = g
 
     def get_all_attached_instr(self) -> Dict[OT3Mount, Optional[InstrumentDict]]:
+        # NOTE (spp, 2023-03-07): The return type of this method indicates that
+        #  if a particular mount has no attached instrument then it will provide a
+        #  None value for that mount. But in reality, we get an empty dict.
+        #  We should either not call the value Optional, or have `_attached_...` return
+        #  a None for empty mounts.
         return {
             OT3Mount.LEFT: self.attached_pipettes[top_types.Mount.LEFT],
             OT3Mount.RIGHT: self.attached_pipettes[top_types.Mount.RIGHT],

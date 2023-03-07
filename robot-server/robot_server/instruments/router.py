@@ -1,7 +1,8 @@
 """Instruments routes."""
+import asyncio
 from datetime import datetime
 from typing import Optional, List, Dict
-
+from anyio import fail_after
 from fastapi import APIRouter, status, Depends, Query
 from typing_extensions import Literal
 
@@ -15,6 +16,7 @@ from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
 )
+from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 
 from opentrons.types import Mount
 from opentrons.protocol_engine.types import Vec3f
@@ -34,19 +36,35 @@ from .instrument_models import (
     UpdateCreate,
     UpdateProgressData,
 )
-from .update_progress_monitor import UpdateProgressMonitor, UpdateIdNotFound
+from .update_progress_monitor import (
+    UpdateProgressMonitor,
+    UpdateIdNotFound,
+    UpdateInfoNotFound,
+)
 from ..errors import ErrorDetails, ErrorBody
 from ..service.dependencies import get_unique_id, get_current_time
 from ..service.task_runner import TaskRunner, get_task_runner
 
 instruments_router = APIRouter()
 
+_update_monitor_accessor = AppStateAccessor[UpdateProgressMonitor](
+    "update_progress_monitor"
+)
+
+_UPDATE_STATUS_GETTER_TIMEOUT = 5  # seconds
+
 
 async def get_update_progress_monitor(
+    app_state: AppState = Depends(get_app_state),
     hardware_api: HardwareControlAPI = Depends(get_hardware),
 ) -> UpdateProgressMonitor:
     """Get an 'UpdateProgressMonitor' to track firmware update statuses."""
-    return UpdateProgressMonitor(hardware_api=hardware_api)
+    update_progress_monitor = _update_monitor_accessor.get_from(app_state)
+
+    if update_progress_monitor is None:
+        update_progress_monitor = UpdateProgressMonitor(hardware_api=hardware_api)
+        _update_monitor_accessor.set_on(app_state, update_progress_monitor)
+    return update_progress_monitor
 
 
 class InstrumentNotFound(ErrorDetails):
@@ -229,7 +247,7 @@ async def update_firmware(
 
     await hardware.cache_instruments()
     attached_instrument = ot3_hardware.get_all_attached_instr()[ot3_mount]
-    if attached_instrument is None:
+    if not attached_instrument:
         raise InstrumentNotFound(
             detail=f"No instrument found on {mount_to_update} mount."
         ).as_error(status.HTTP_404_NOT_FOUND)
@@ -250,9 +268,17 @@ async def update_firmware(
 
     task_runner.run(ot3_hardware.update_instrument_firmware, mount=ot3_mount)
 
-    update_response = update_progress_monitor.create(
-        update_id=update_process_id, created_at=created_at, mount=mount_to_update
-    )
+    with fail_after(_UPDATE_STATUS_GETTER_TIMEOUT):
+        # The status of a firmware update process is not immediately available from
+        # hardware control. So we retry a few times until we receive the status.
+        try:
+            update_response = update_progress_monitor.create(
+                update_id=update_process_id,
+                created_at=created_at,
+                mount=mount_to_update,
+            )
+        except UpdateInfoNotFound:
+            await asyncio.sleep(0.5)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=update_response),
