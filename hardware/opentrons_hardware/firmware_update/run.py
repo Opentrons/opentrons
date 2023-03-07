@@ -167,12 +167,6 @@ class RunUpdate:
         self._status_queue: "asyncio.Queue[Tuple[FirmwareTarget,StatusElement]]" = (
             asyncio.Queue()
         )
-        self._usb_messenger.add_listener(
-            self,
-            lambda message_type: bool(
-                message_type == BinaryMessageId.device_info_response
-            ),
-        )
 
     async def _reconnect(self, vid: int, pid: int, baudrate: int, timeout: int) -> bool:
         device_running = False
@@ -195,17 +189,6 @@ class RunUpdate:
                 pass
         return device_running
 
-    def __call__(self, message: BinaryMessageDefinition) -> None:
-        """Function called when bus receives a device info response."""
-        logger.info(f"received version info from device {message}")
-        self._version_event.set()
-
-    async def _request_version(self) -> None:
-        self._version_event = asyncio.Event()
-        await self._usb_messenger.send(DeviceInfoRequest())
-        # give time for the device to respond
-        await self._version_event.wait()
-
     async def _run_usb_update(
         self,
         messenger: BinaryMessenger,
@@ -216,7 +199,6 @@ class RunUpdate:
         await self._status_queue.put(
             (usb_target, (FirmwareUpdateStatus.updating, 0.05))
         )
-        await self._request_version()
         await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.1)))
         await self._usb_messenger.stop()
         await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.2)))
@@ -256,7 +238,6 @@ class RunUpdate:
                 break
             else:
                 continue
-        await self._request_version()
 
     async def _run_can_update(
         self,
