@@ -7,8 +7,7 @@ import time
 from opentrons_shared_data.deck import load
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
-    calibrate_gripper_jaw,
-    calibrate_gripper,
+    calibrate_pipette,
     find_deck_height,
     _get_calibration_square_position_in_slot,
 )
@@ -189,7 +188,7 @@ class Pipette_Capacitance_Test:
         self, api: OT3API, mount: OT3Mount, slot: int, cycle: int
     ) -> None:
         nominal_center = _get_calibration_square_position_in_slot(slot)
-        api.add_gripper_probe(self.gripper_probes)
+        await api.add_tip(mount, api.config.calibration.probe_length)
         edge_position = self.edge._replace(z=self.deck_height)
         await api.move_to(mount, edge_position)
         for i in range(self.x_steps):
@@ -206,12 +205,13 @@ class Pipette_Capacitance_Test:
         current_position = await api.gantry_position(mount)
         home_z = current_position._replace(z=self.home.z)
         await api.move_to(mount, home_z)
-        api.remove_gripper_probe()
+        await api.remove_tip(mount)
 
     async def _get_edge(
         self, api: OT3API, mount: OT3Mount, nominal_center: Point, deck_height: float
     ) -> None:
         # Move inside the cutout
+        nominal_center = nominal_center._replace(y=nominal_center.y-5)
         below_z = deck_height - 2
         current_position = await api.gantry_position(mount)
         slot_center_above = nominal_center._replace(z=current_position.z)
@@ -220,7 +220,6 @@ class Pipette_Capacitance_Test:
         await api.move_to(mount, slot_center_below, speed=20)
 
         # Probe slot X-Axis right edge
-        # x_right = await api.capacitive_probe(mount, OT3Axis.X, nominal_center.x + self.CUTOUT_HALF, self.PROBE_SETTINGS)
         x_right = await self._probe_axis(OT3Axis.X, nominal_center.x + self.CUTOUT_HALF)
 
         # Return edge position
@@ -232,20 +231,19 @@ class Pipette_Capacitance_Test:
         self, api: OT3API, mount: OT3Mount, slot: int
     ) -> None:
         # Calibrate pipette
-        api.add_gripper_probe(self.gripper_probes[probe])
-        await api.grip(self.GRIP_FORCE)
+        await api.add_tip(mount, api.config.calibration.probe_length)
         home = await api.gantry_position(mount)
         nominal_center = _get_calibration_square_position_in_slot(slot)
-        self.deck_height[probe] = await find_deck_height(api, mount, nominal_center)
-        self.test_data[f"Deck Height {probe}"] = str(self.deck_height[probe])
-        print(f"{probe} Probe Deck Height: {self.deck_height[probe]}")
-        self.edge[probe] = await self._get_edge(api, mount, nominal_center, self.deck_height[probe])
-        self.test_data[f"Edge Position {probe}"] = str(self.edge[probe]).replace(", ",";")
-        print(f"{probe} Probe Edge Position: {self.edge[probe]}")
+        self.deck_height = await find_deck_height(api, mount, nominal_center)
+        self.test_data["Deck Height"] = str(self.deck_height)
+        print(f"Deck Height: {self.deck_height}")
+        self.edge = await self._get_edge(api, mount, nominal_center, self.deck_height)
+        self.test_data[f"Edge Position"] = str(self.edge).replace(", ",";")
+        print(f"Edge Position: {self.edge}")
         current_position = await api.gantry_position(mount)
         home_z = current_position._replace(z=home.z)
         await api.move_to(mount, home_z)
-        api.remove_gripper_probe()
+        await api.remove_tip(mount)
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
