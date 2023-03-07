@@ -11,6 +11,11 @@ from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADE
 from .dev_server import DevServer
 
 
+# Must match our Tavern config in common.yaml.
+_SESSION_SERVER_HOST = "http://localhost"
+_SESSION_SERVER_PORT = "31950"
+
+
 def pytest_tavern_beta_before_every_test_run(
     test_dict: Dict[str, Any],
     variables: Any,
@@ -37,27 +42,13 @@ def request_session() -> requests.Session:
 
 
 @pytest.fixture(scope="session")
-def session_server_host() -> str:
-    """Return the host of the session-scoped dev server."""
-    return "http://localhost"  # Must match our Tavern config in common.yaml.
-
-
-@pytest.fixture(scope="session")
-def session_server_port() -> str:
-    """Return the port of the session-scoped dev server."""
-    return "31950"  # Must match our Tavern config in common.yaml.
-
-
-@pytest.fixture(scope="session")
 def run_server(
     request_session: requests.Session,
     server_temp_directory: str,
-    session_server_host: str,
-    session_server_port: str,
 ) -> Iterator[None]:
     """Run the robot server in a background process."""
     with DevServer(
-        port=session_server_port,
+        port=_SESSION_SERVER_PORT,
         ot_api_config_dir=Path(server_temp_directory),
     ) as dev_server:
         dev_server.start()
@@ -68,7 +59,7 @@ def run_server(
         while True:
             try:
                 request_session.get(
-                    f"{session_server_host}:{session_server_port}/health"
+                    f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/health"
                 )
             except ConnectionError:
                 pass
@@ -76,11 +67,23 @@ def run_server(
                 break
             time.sleep(0.5)
         request_session.post(
-            f"{session_server_host}:{session_server_port}/home",
+            f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/home",
             json={"target": "robot"},
         )
 
         yield
+
+
+@pytest.fixture(scope="session")
+def session_server_host(run_server: object) -> str:
+    """Return the host of the running session-scoped dev server."""
+    return _SESSION_SERVER_HOST
+
+
+@pytest.fixture(scope="session")
+def session_server_port(run_server: object) -> str:
+    """Return the port of the running session-scoped dev server."""
+    return _SESSION_SERVER_PORT
 
 
 @pytest.fixture
