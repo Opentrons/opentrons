@@ -9,6 +9,7 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocol_engine.state import StateView, HardwarePipette
+from opentrons.protocol_engine.types import TipGeometry
 from opentrons.protocol_engine.execution.pipetting import (
     HardwarePipettingHandler,
     VirtualPipettingHandler,
@@ -271,9 +272,15 @@ def test_get_is_ready_to_aspirate_virtual(
     assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is True
 
 
-async def test_aspirate_in_place_virtual(mock_state_view: StateView) -> None:
+async def test_aspirate_in_place_virtual(
+    decoy: Decoy, mock_state_view: StateView
+) -> None:
     """Should return the volume."""
     subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
 
     result = await subject.aspirate_in_place(
         pipette_id="pipette-id", volume=3, flow_rate=5
@@ -281,11 +288,63 @@ async def test_aspirate_in_place_virtual(mock_state_view: StateView) -> None:
     assert result == 3
 
 
-async def test_dispense_in_place_virtual(mock_state_view: StateView) -> None:
+async def test_dispense_in_place_virtual(
+    decoy: Decoy, mock_state_view: StateView
+) -> None:
     """Should return the volume."""
     subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
 
     result = await subject.dispense_in_place(
         pipette_id="pipette-id", volume=3, flow_rate=5
     )
     assert result == 3
+
+
+async def test_validate_tip_attached_in_blow_out(
+    mock_state_view: StateView, decoy: Decoy
+) -> None:
+    """Should raise an error that a tip is not attached."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        None
+    )
+
+    with pytest.raises(TipNotAttachedError):
+        await subject.blow_out_in_place("pipette-id", flow_rate=1)
+
+
+async def test_validate_tip_attached_in_aspirate(
+    mock_state_view: StateView, decoy: Decoy
+) -> None:
+    """Should raise an error that a tip is not attached."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        None
+    )
+
+    with pytest.raises(
+        TipNotAttachedError, match="Cannot perform aspirate without a tip attached"
+    ):
+        await subject.aspirate_in_place("pipette-id", volume=20, flow_rate=1)
+
+
+async def test_validate_tip_attached_in_dispense(
+    mock_state_view: StateView, decoy: Decoy
+) -> None:
+    """Should raise an error that a tip is not attached."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        None
+    )
+
+    with pytest.raises(
+        TipNotAttachedError, match="Cannot perform dispense without a tip attached"
+    ):
+        await subject.dispense_in_place("pipette-id", volume=20, flow_rate=1)
