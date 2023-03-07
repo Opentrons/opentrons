@@ -8,10 +8,15 @@ from typing import Dict, Any
 from typing_extensions import Final
 
 from opentrons_hardware.drivers.can_bus import build
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.drivers.binary_usb import (
+    SerialUsbDriver,
+    BinaryMessenger,
+    build_rear_panel_messenger,
+    build_rear_panel_driver,
+)
+from opentrons_hardware.firmware_bindings import NodeId, USBTarget, FirmwareTarget
 from opentrons_hardware.firmware_update.run import RunUpdate
 from .can_args import add_can_args, build_settings
-
 
 logger = logging.getLogger(__name__)
 
@@ -36,13 +41,14 @@ LOG_CONFIG = {
     },
 }
 
-TARGETS: Final = {
+TARGETS: Final[Dict[str, FirmwareTarget]] = {
     "head": NodeId.head,
     "gantry-x": NodeId.gantry_x,
     "gantry-y": NodeId.gantry_y,
     "pipette-left": NodeId.pipette_left,
     "pipette-right": NodeId.pipette_right,
     "gripper": NodeId.gripper,
+    "rear-panel": USBTarget.rear_panel,
 }
 
 
@@ -51,13 +57,18 @@ async def run(args: argparse.Namespace) -> None:
     retry_count = args.retry_count
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
+
+    usb_driver: SerialUsbDriver = await (build_rear_panel_driver())
+    usb_messenger: BinaryMessenger = build_rear_panel_messenger(usb_driver)
+    usb_messenger.start()
     update_details = {
         TARGETS[args.target]: args.file,
     }
 
-    async with build.can_messenger(build_settings(args)) as messenger:
+    async with build.can_messenger(build_settings(args)) as can_messenger:
         updater = RunUpdate(
-            messenger=messenger,
+            can_messenger=can_messenger,
+            usb_messenger=usb_messenger,
             update_details=update_details,
             retry_count=retry_count,
             timeout_seconds=timeout_seconds,
