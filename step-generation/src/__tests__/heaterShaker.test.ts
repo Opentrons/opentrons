@@ -101,6 +101,7 @@ describe('heaterShaker compound command creator', () => {
         key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
+          celsius: 80,
         },
       },
       {
@@ -165,6 +166,7 @@ describe('heaterShaker compound command creator', () => {
         key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
+          celsius: 80,
         },
       },
       {
