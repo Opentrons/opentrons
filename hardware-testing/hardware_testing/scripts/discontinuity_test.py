@@ -1,4 +1,4 @@
-"""OT3 Speed and Acceleration Profile Test."""
+"""OT3 Speed Discontinuity Test."""
 import argparse
 import asyncio
 import csv
@@ -19,188 +19,33 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 import logging
 logging.basicConfig(level=logging.INFO)
 
-BASE_DIRECTORY = '/userfs/data/testing_data/speed_accel_profile/'
-SAVE_NAME = 'speed_test_output_'
+BASE_DIRECTORY = '/userfs/data/testing_data/discontinuity_test/'
+SAVE_NAME = 'discontinuity_test_output_'
 
 CYCLES = 1
 
 TEST_LIST = {}
-
-TEST_PARAMETERS = {
-    GantryLoad.NONE: {
-        'X': {
-            'SPEED': {
-                'MIN': 450,
-                'MAX': 550,
-                'INC': 50},
-            'ACCEL': {
-                'MIN': 900,
-                'MAX': 1100,
-                'INC': 50}},
-        'Y': {
-            'SPEED': {
-                'MIN': 425,
-                'MAX': 475,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 900,
-                'MAX': 1100,
-                'INC': 50}},
-        'L': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}},
-        'R': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}}
-    },
-    GantryLoad.LOW_THROUGHPUT: {
-        'X': {
-            'SPEED': {
-                'MIN': 475,
-                'MAX': 525,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 950,
-                'MAX': 1050,
-                'INC': 50}},
-        'Y': {
-            'SPEED': {
-                'MIN': 375,
-                'MAX': 425,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 750,
-                'MAX': 850,
-                'INC': 50}},
-        'L': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}},
-        'R': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}}
-    },
-    GantryLoad.TWO_LOW_THROUGHPUT: {
-        'X': {
-            'SPEED': {
-                'MIN': 575,
-                'MAX': 625,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 1550,
-                'MAX': 1650,
-                'INC': 50}},
-        'Y': {
-            'SPEED': {
-                'MIN': 475,
-                'MAX': 525,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 950,
-                'MAX': 1050,
-                'INC': 50}},
-        'L': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 100,
-                'MAX': 900,
-                'INC': 200}},
-        'R': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 20},
-            'ACCEL': {
-                'MIN': 100,
-                'MAX': 900,
-                'INC': 200}}
-    },
-    GantryLoad.HIGH_THROUGHPUT: {
-        'X': {
-            'SPEED': {
-                'MIN': 475,
-                'MAX': 525,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 950,
-                'MAX': 1050,
-                'INC': 50}},
-        'Y': {
-            'SPEED': {
-                'MIN': 375,
-                'MAX': 425,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 750,
-                'MAX': 850,
-                'INC': 50}},
-        'L': {
-            'SPEED': {
-                'MIN': 10,
-                'MAX': 40,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 50,
-                'MAX': 200,
-                'INC': 50}},
-        'R': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 60,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 500,
-                'MAX': 800,
-                'INC': 100}}
-    }
-}
-
+DISCONTINUITY_TEST_LIST = [0, 1, 5, 10, 15, 30, 50, 100];
 
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
-        max_speed=500,
-        acceleration=1000,
+        max_speed=300,
+        acceleration=500,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
         run_current=1.5
     ),
     OT3Axis.Y: GantryLoadSettings(
-        max_speed=500,
-        acceleration=1000,
+        max_speed=300,
+        acceleration=500,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
         run_current=1.5
     ),
     OT3Axis.Z_L: GantryLoadSettings(
-        max_speed=35,
+        max_speed=300,
         acceleration=100,
         max_start_stop_speed=10,
         max_change_dir_speed=1,
@@ -303,8 +148,7 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
         print('Executing Move: ' + str(c))
-        print(' Speed - ' + str(cur_speed))
-        print(' Acceleration - ' + str(SETTINGS[AXIS_MAP[axis]].acceleration))
+        print(' Discontinuity - ' + str(SETTINGS[AXIS_MAP[axis]].max_start_stop_speed))
 
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[axis], speed=cur_speed)
 
@@ -359,12 +203,10 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
     return (sum(avg_error)/len(avg_error), c+1)
 
 
-async def match_z_settings(axis, speed, accel):
+async def match_z_settings(axis, discon):
     if(axis == 'L' or axis == 'R'):
-        SETTINGS[AXIS_MAP['L']].acceleration = accel
-        SETTINGS[AXIS_MAP['L']].max_speed = speed
-        SETTINGS[AXIS_MAP['R']].acceleration = accel
-        SETTINGS[AXIS_MAP['R']].max_speed = speed
+        SETTINGS[AXIS_MAP['L']].max_start_stop_speed = discon
+        SETTINGS[AXIS_MAP['R']].max_start_stop_speed = discon
 
     return True
 
@@ -375,7 +217,7 @@ async def _main(is_simulating: bool) -> None:
         #run the test while recording raw results
         table_results = {}
         with open(BASE_DIRECTORY + SAVE_NAME + AXIS + '.csv', mode='w') as csv_file:
-            fieldnames = ['axis','speed', 'acceleration', 'error', 'cycles']
+            fieldnames = ['axis','discontinuity', 'error', 'cycles']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -388,17 +230,17 @@ async def _main(is_simulating: bool) -> None:
                 for p in axis_parameters:
                     print("Testing Parameters:")
                     print(p)
-                    SETTINGS[AXIS_MAP[test_axis]].acceleration = p['ACCEL']
-                    SETTINGS[AXIS_MAP[test_axis]].max_speed = p['SPEED']
-
+                    SETTINGS[AXIS_MAP[test_axis]].max_start_stop_speed = p['DISCON']
+                    print(test_axis)
+                    print(LOAD)
                     #update the robot settings to use test speed/accel
                     await match_z_settings(test_axis,
-                                     SETTINGS[AXIS_MAP[test_axis]].max_speed,
-                                     SETTINGS[AXIS_MAP[test_axis]].acceleration)
+                                     SETTINGS[AXIS_MAP[test_axis]].max_start_stop_speed)
 
                     await set_gantry_load_per_axis_settings_ot3(api,
                                                     SETTINGS,
                                                     load=LOAD)
+                    print(api.config.motion_settings.max_speed_discontinuity)
 
                     #attempt to cycle with the test settings
                     # await api.home([AXIS_MAP[test_axis]])
@@ -409,44 +251,42 @@ async def _main(is_simulating: bool) -> None:
                     run_avg_error = move_output_tuple[0]
                     cycles_completed = move_output_tuple[1]
 
-                    #record results to dictionary for neat formatting later
-                    if p['SPEED'] in table_results[test_axis].keys():
-                        table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
-                    else:
-                        table_results[test_axis][p['SPEED']] = {}
-                        table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+                    # #record results to dictionary for neat formatting later
+                    # if p['SPEED'] in table_results[test_axis].keys():
+                    #     table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+                    # else:
+                    #     table_results[test_axis][p['SPEED']] = {}
+                    #     table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
 
                     #record results of cycles to raw csv
                     print("Cycles complete")
-                    print("Speed: " + str(p['SPEED']))
-                    print("Acceleration: " + str(p['ACCEL']))
+                    print("Discontinuity: " + str(p['DISCON']))
                     print("Error: " + str(run_avg_error))
                     writer.writerow({'axis': test_axis,
-                                     'speed': p['SPEED'],
-                                     'acceleration': p['ACCEL'],
+                                     'discontinuity': p['DISCON'],
                                      'error': run_avg_error,
                                      'cycles': cycles_completed})
 
         #create tableized output csv for neat presentation
         # print(table_results)
-        test_axis_list = list(AXIS)
-        for test_axis in test_axis_list:
-            with open(BASE_DIRECTORY + SAVE_NAME + test_axis + '_table.csv', mode='w') as csv_file:
-                fieldnames = ['Speed'] + [*parameter_range(LOAD, test_axis, 'ACCEL')]
-                # print(fieldnames)
-                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                td = {'Speed': LOAD}
-                writer.writerow(td)
-                td = {'Speed': test_axis}
-                writer.writerow(td)
-                td = {'Speed': 'Acceleration'}
-                writer.writerow(td)
-                writer.writeheader()
-                for i in parameter_range(LOAD, test_axis, 'SPEED'):
-                    td = {'Speed': i}
-                    td.update(table_results[test_axis][i])
-                    writer.writerow(td)
-                # print(table_results[test_axis])
+        # test_axis_list = list(AXIS)
+        # for test_axis in test_axis_list:
+        #     with open(BASE_DIRECTORY + SAVE_NAME + test_axis + '_table.csv', mode='w') as csv_file:
+        #         fieldnames = ['Speed'] + [*parameter_range(LOAD, test_axis, 'ACCEL')]
+        #         # print(fieldnames)
+        #         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        #         td = {'Speed': LOAD}
+        #         writer.writerow(td)
+        #         td = {'Speed': test_axis}
+        #         writer.writerow(td)
+        #         td = {'Speed': 'Acceleration'}
+        #         writer.writerow(td)
+        #         writer.writeheader()
+        #         for i in parameter_range(LOAD, test_axis, 'SPEED'):
+        #             td = {'Speed': i}
+        #             td.update(table_results[test_axis][i])
+        #             writer.writerow(td)
+        #         # print(table_results[test_axis])
 
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
@@ -467,10 +307,8 @@ def make_test_list(test_axis, test_load):
     complete_test_list = {}
     for axis_t in test_axis:
         axis_test_list = []
-        for speed_t in parameter_range(test_load, axis_t, 'SPEED'):
-            for accel_t in parameter_range(test_load, axis_t, 'ACCEL'):
-                axis_test_list.append({'SPEED': speed_t,
-                                       'ACCEL': accel_t})
+        for discontinuity_t in DISCONTINUITY_TEST_LIST:
+            axis_test_list.append({'DISCON': discontinuity_t})
 
         complete_test_list[axis_t] = axis_test_list
 
