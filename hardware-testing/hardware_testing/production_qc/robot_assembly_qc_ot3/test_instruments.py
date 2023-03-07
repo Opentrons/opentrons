@@ -310,6 +310,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         ui.get_user_ready("remove the gripper")
 
     print("moving back near home position")
+    await api.home([OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G, OT3Axis.G])
     await api.move_rel(
         OT3Mount.LEFT,
         RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,
