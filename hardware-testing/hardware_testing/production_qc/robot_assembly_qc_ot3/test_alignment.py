@@ -26,8 +26,8 @@ EXPECTED_POINTS = {
     3: helpers_ot3.get_slot_calibration_square_position_ot3(3),
     10: helpers_ot3.get_slot_calibration_square_position_ot3(10),
 }
-SLOT_10_TO_SLOT_3 = Point(y=-1 * (EXPECTED_POINTS[10].y - EXPECTED_POINTS[3].y))
-SLOT_3_TO_SLOT_1 = Point(x=-1 * (EXPECTED_POINTS[3].x - EXPECTED_POINTS[1].x))
+SLOT_10_TO_SLOT_1 = Point(y=-1 * (EXPECTED_POINTS[10].y - EXPECTED_POINTS[1].y))
+SLOT_1_TO_SLOT_3 = Point(x=-1 * (EXPECTED_POINTS[1].x - EXPECTED_POINTS[3].x))
 
 ALIGNMENT_TESTS: Final = [
     "alignment-x",
@@ -93,10 +93,10 @@ async def _wait_for_pipette(api: OT3API, mount: OT3Mount, present: bool) -> None
         return
     is_present = api.hardware_pipettes[mount.to_mount()]
     if present and not is_present:
-        ui.get_user_ready(f"ATTACH pipette to the {mount.value} mount")
+        ui.get_user_ready(f"ATTACH pipette to the {mount.name} mount")
         return await _wait_for_pipette(api, mount, present)
     elif not present and is_present:
-        ui.get_user_ready(f"REMOVE pipette from the {mount.value} mount")
+        ui.get_user_ready(f"REMOVE pipette from the {mount.name} mount")
         return await _wait_for_pipette(api, mount, present)
 
 
@@ -125,8 +125,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # PROBE SLOTS
     ui.print_header("PROBE SLOTS 10, 3, 1")
     actual_10 = await _find_slot(api, mount, EXPECTED_POINTS[10])
-    actual_3 = await _find_slot(api, mount, actual_10 + SLOT_10_TO_SLOT_3)
-    actual_1 = await _find_slot(api, mount, actual_3 + SLOT_3_TO_SLOT_1)
+    actual_3 = await _find_slot(api, mount, actual_10 + SLOT_10_TO_SLOT_1)
+    actual_1 = await _find_slot(api, mount, actual_3 + SLOT_1_TO_SLOT_3)
     print("retracting")
     pos = await api.gantry_position(mount, critical_point=cp)
     await api.move_to(mount, pos._replace(z=home_pos.z))
@@ -136,6 +136,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     alignment_y = actual_1.y - actual_3.y  # left to right
     flatness_x = actual_1.z - actual_3.z  # left to right
     flatness_y = actual_3.z - actual_10.z  # front to rear
+    print(f"alignment-x: {alignment_x}")
+    print(f"alignment-y: {alignment_y}")
+    print(f"flatness-x: {flatness_x}")
+    print(f"flatness-y: {flatness_y}")
     # compare to thresholds
     alignment_x_passed = abs(alignment_x) < ALIGNMENT_THRESHOLDS["alignment-x"]
     alignment_y_passed = abs(alignment_y) < ALIGNMENT_THRESHOLDS["alignment-y"]
