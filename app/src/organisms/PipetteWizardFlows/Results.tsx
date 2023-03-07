@@ -6,9 +6,9 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
-import { usePipettesQuery } from '@opentrons/react-api-client'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
@@ -30,12 +30,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
     selectedPipette,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const {
-    status: pipetteQueryStatus,
-    refetch: refetchPipettes,
-  } = usePipettesQuery()
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
-  const isPending = pipetteQueryStatus === 'loading'
+  const [isPending, setPending] = React.useState(false)
 
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
@@ -82,14 +78,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
   }
 
-  const handleTryAgain = (): void => {
-    refetchPipettes()
-      .then(() => {
-        setNumberOfTryAgains(numberOfTryAgains + 1)
-      })
-      .catch(() => {})
-  }
-
   const handleProceed = (): void => {
     if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
@@ -120,15 +108,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
         >
           {t('shared:exit')}
         </SecondaryButton>
-        <PrimaryButton
-          onClick={handleTryAgain}
-          disabled={isPending}
-          aria-label="Results_tryAgain"
-        >
-          {t(
+        <CheckPipetteButton
+          proceed={() => setNumberOfTryAgains(numberOfTryAgains + 1)}
+          proceedButtonText={t(
             flowType === FLOWS.ATTACH ? 'detach_and_retry' : 'attach_and_retry'
           )}
-        </PrimaryButton>
+          isDisabled={isPending}
+          setPending={setPending}
+          aria-label="Results_tryAgain"
+        ></CheckPipetteButton>
       </>
     )
   }
