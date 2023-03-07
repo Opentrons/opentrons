@@ -37,12 +37,27 @@ def request_session() -> requests.Session:
 
 
 @pytest.fixture(scope="session")
+def session_server_host() -> str:
+    """Return the host of the session-scoped dev server."""
+    return "http://localhost"  # Must match our Tavern config in common.yaml.
+
+
+@pytest.fixture(scope="session")
+def session_server_port() -> str:
+    """Return the port of the session-scoped dev server."""
+    return "31950"  # Must match our Tavern config in common.yaml.
+
+
+@pytest.fixture(scope="session")
 def run_server(
-    request_session: requests.Session, server_temp_directory: str
+    request_session: requests.Session,
+    server_temp_directory: str,
+    session_server_host: str,
+    session_server_port: str,
 ) -> Iterator[None]:
     """Run the robot server in a background process."""
     with DevServer(
-        port="31950",
+        port=session_server_port,
         ot_api_config_dir=Path(server_temp_directory),
     ) as dev_server:
         dev_server.start()
@@ -52,14 +67,17 @@ def run_server(
 
         while True:
             try:
-                request_session.get("http://localhost:31950/health")
+                request_session.get(
+                    f"{session_server_host}:{session_server_port}/health"
+                )
             except ConnectionError:
                 pass
             else:
                 break
             time.sleep(0.5)
         request_session.post(
-            "http://localhost:31950/robot/home", json={"target": "robot"}
+            f"{session_server_host}:{session_server_port}/home",
+            json={"target": "robot"},
         )
 
         yield
