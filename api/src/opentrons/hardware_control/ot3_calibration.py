@@ -1,6 +1,5 @@
 """Functions and utilites for OT3 calibration."""
 from __future__ import annotations
-from dataclasses import dataclass
 from typing_extensions import Final, Literal, TYPE_CHECKING
 from typing import Union, Tuple, List, Dict, Any, Optional
 import datetime
@@ -12,7 +11,7 @@ from opentrons.util.linal import solve_attitude
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
-from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
+from opentrons.config.types import CapacitivePassSettings
 import json
 
 from opentrons_shared_data.deck import load as load_deck
