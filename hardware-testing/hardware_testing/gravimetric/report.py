@@ -84,7 +84,7 @@ def create_csv_test_report(
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
     meas_info = [field.name.replace("_", "-") for field in fields(MeasurementData)]
-    meas_vols = ([None] * config.NUM_BLANK_TRIALS) + volumes  # type: ignore[operator]
+    meas_vols = [None] + volumes  # type: ignore[operator]
 
     report = CSVReport(
         test_name=cfg.name,
@@ -149,6 +149,7 @@ def create_csv_test_report(
                     for t in range(cfg.trials)
                     for m in MeasurementType
                     for i in meas_info
+                    if v is not None or t < config.NUM_BLANK_TRIALS
                 ],
             ),
         ],
@@ -222,6 +223,6 @@ def store_measurement(
     data: MeasurementData,
 ) -> None:
     """Report measurement."""
-    for field in fields(EnvironmentData):
+    for field in fields(MeasurementData):
         f_tag = field.name.replace("_", "-")
         report("MEASUREMENTS", f"{tag}-{f_tag}", [getattr(data, field.name)])

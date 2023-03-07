@@ -12,10 +12,11 @@ from hardware_testing.gravimetric import execute, helpers, workarounds
 metadata = {"apiLevel": "2.13", "protocolName": "gravimetric-ot3"}
 
 
-def run(protocol: ProtocolContext, labware_offsets: List[dict]) -> None:
+def run(protocol: ProtocolContext, labware_offsets: List[dict], operator: str) -> None:
     """Run."""
     execute.run(
         protocol,
+        operator,
         GravimetricConfig(
             name=metadata["protocolName"],
             pipette_mount="left",
@@ -33,6 +34,7 @@ def run(protocol: ProtocolContext, labware_offsets: List[dict]) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
+    parser.add_argument("--operator", type=str, required=True)
     parser.add_argument(
         "--simulate", action="store_true", help="If set, the protocol will be simulated"
     )
@@ -49,4 +51,4 @@ if __name__ == "__main__":
         pipette_left="p50_single_v3.3",
     )
     _ctx.home()
-    run(_ctx, _offsets)
+    run(_ctx, _offsets, args.operator)

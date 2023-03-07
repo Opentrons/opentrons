@@ -160,7 +160,7 @@ def _run_trial(
     return volume_aspirate, volume_dispense
 
 
-def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
+def run(ctx: ProtocolContext, operator: str, cfg: config.GravimetricConfig) -> None:
     """Run."""
     if ctx.is_simulating():
         get_input = print
@@ -232,6 +232,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     # CREATE CSV TEST REPORT
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
     test_report.set_tag(pipette_tag)
+    test_report.set_operator(operator)
+    test_report.set_version("unknown")
     report.store_serial_numbers(
         test_report,
         robot="ot3",
@@ -295,9 +297,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         )
 
         # TEST
-        actual_asp_list = list()
-        actual_disp_list = list()
         for volume in test_volumes:
+            actual_asp_list = list()
+            actual_disp_list = list()
             for trial in range(cfg.trials):
                 count += 1
                 print(f"{count}/{total}: {volume} uL (trial {trial + 1}/{cfg.trials})")
@@ -323,7 +325,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
 
             # CALCULATE AVERAGE, %CV, %D
             aspirate_average = sum(actual_asp_list) / len(actual_asp_list)
-            dispense_average = sum(actual_asp_list) / len(actual_asp_list)
+            dispense_average = sum(actual_disp_list) / len(actual_disp_list)
             aspirate_cv = stdev(actual_asp_list) / aspirate_average
             dispense_cv = stdev(actual_disp_list) / dispense_average
             aspirate_d = (aspirate_average - volume) / volume
