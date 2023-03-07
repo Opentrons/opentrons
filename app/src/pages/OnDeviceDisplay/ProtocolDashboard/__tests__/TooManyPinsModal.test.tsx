@@ -9,13 +9,10 @@ import { TooManyPinsModal } from '../TooManyPinsModal'
 
 import type { UseLongPressResult } from '@opentrons/components'
 
-const mockPush = jest.fn()
-
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
   }
 })
 
