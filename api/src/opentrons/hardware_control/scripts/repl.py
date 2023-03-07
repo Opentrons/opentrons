@@ -43,8 +43,8 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_belts,
     calibrate_gripper_jaw,
     calibrate_module,
-    find_edge_linear,
     find_calibration_structure_height,
+    find_edge_binary,
     CalibrationMethod,
     find_axis_center,
     gripper_pin_offsets_mean,
@@ -130,7 +130,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "OT3SubSystem": OT3SubSystem,
             "GripperProbe": GripperProbe,
             "ModuleType": ModuleType,
-            "find_edge": wrap_async_util_fn(find_edge_linear, api),
+            "find_edge": wrap_async_util_fn(find_edge_binary, api),
             "find_calibration_structure_height": wrap_async_util_fn(
                 find_calibration_structure_height, api
             ),

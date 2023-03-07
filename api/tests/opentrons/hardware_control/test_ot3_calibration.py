@@ -12,7 +12,6 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.config.types import OT3CalibrationSettings, Offset
 from opentrons.hardware_control.ot3_calibration import (
-    find_edge_linear,
     find_edge_binary,
     find_axis_center,
     EarlyCapacitiveSenseTrigger,
@@ -22,7 +21,6 @@ from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
     CalibrationMethod,
     _edges_from_data,
-    _take_stride,
     _probe_deck_at,
     _get_calibration_square_position_in_slot,
     InaccurateNonContactSweepError,
@@ -103,9 +101,7 @@ def mock_data_analysis() -> Iterator[Mock]:
 def _update_edge_sense_config(
     old: OT3CalibrationSettings, **new_edge_sense_settings
 ) -> OT3CalibrationSettings:
-    return replace(
-        old, edge_sense_binary=replace(old.edge_sense_binary, **new_edge_sense_settings)
-    )
+    return replace(old, edge_sense=replace(old.edge_sense, **new_edge_sense_settings))
 
 
 plus_x_point = (0, 10, 0)
@@ -392,7 +388,7 @@ async def test_find_edge_early_trigger(
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = (3,)
     with pytest.raises(EarlyCapacitiveSenseTrigger):
-        await find_edge_linear(
+        await find_edge_binary(
             ot3_hardware,
             OT3Mount.RIGHT,
             Point(0.0, 0.0, 0.0),

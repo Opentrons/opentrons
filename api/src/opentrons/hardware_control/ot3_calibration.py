@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 LOG = getLogger(__name__)
 
-CAL_TRANSIT_HEIGHT: Final[float] = 10
+CAL_TRANSIT_HEIGHT: Final[float] = 5
 LINEAR_TRANSIT_HEIGHT: Final[float] = 1
 SEARCH_TRANSIT_HEIGHT: Final[float] = 5
 GRIPPER_GRIP_FORCE: Final[float] = 20
@@ -31,8 +31,6 @@ BELT_CAL_TRANSIT_HEIGHT: Final[float] = 50
 
 # FIXME: add these to shared-data
 Z_PREP_OFFSET = Point(x=13, y=13, z=0)
-CALIBRATION_MIN_VALID_STRIDE: Final[float] = 0.1
-CALIBRATION_PROBE_DIAMETER: Final[float] = 4
 CALIBRATION_SQUARE_DEPTH: Final[float] = -0.25
 CALIBRATION_SQUARE_SIZE: Final[float] = 20
 EDGES = {
@@ -41,8 +39,6 @@ EDGES = {
     "top": Point(y=CALIBRATION_SQUARE_SIZE * 0.5),
     "bottom": Point(y=-CALIBRATION_SQUARE_SIZE * 0.5),
 }
-NON_REPEATABLE_STRIDES: List[float] = [0.0, 3.0]
-REPEATABLE_STRIDES: List[float] = [1.0, 0.25, 0.1, 0.025]
 
 
 @dataclass
@@ -94,7 +90,7 @@ async def find_edge_binary(
     slot_edge_nominal: Point,
     search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
     search_direction: Literal[1, -1],
-) -> float:
+) -> Point:
     """
     Find the true position of one edge of the calibration slot in the deck.
     The nominal position of the calibration slots is known because they're
@@ -125,7 +121,7 @@ async def find_edge_binary(
     """
     here = await hcapi.gantry_position(mount)
     await hcapi.move_to(mount, here._replace(z=CAL_TRANSIT_HEIGHT))
-    edge_settings = hcapi.config.calibration.edge_sense_binary
+    edge_settings = hcapi.config.calibration.edge_sense
     # Our first search position is at the nominal offset by our stride
     # against the search direction. That way we always start on the deck
     stride = edge_settings.search_initial_tolerance_mm * search_direction
@@ -143,17 +139,14 @@ async def find_edge_binary(
         interaction_pos = await hcapi.capacitive_probe(
             mount,
             OT3Axis.by_mount(mount),
-            slot_edge_nominal.z,
+            checking_pos.z,
             edge_settings.pass_settings,
         )
         await hcapi.move_to(mount, check_prep)
-        if (
-            interaction_pos
-            > slot_edge_nominal.z + edge_settings.early_sense_tolerance_mm
-        ):
+        if interaction_pos > checking_pos.z + edge_settings.early_sense_tolerance_mm:
             await hcapi.home_z()
             raise EarlyCapacitiveSenseTrigger(interaction_pos, slot_edge_nominal.z)
-        if interaction_pos < (slot_edge_nominal.z - edge_settings.overrun_tolerance_mm):
+        if interaction_pos < (checking_pos.z - edge_settings.overrun_tolerance_mm):
             LOG.info(f"Miss at {interaction_pos}")
             # In this block, we've missed the deck
             if copysign(stride, search_direction) == stride:
@@ -168,7 +161,7 @@ async def find_edge_binary(
             LOG.info(f"hit at {interaction_pos}")
             # In this block, we've hit the deck
             # update the fonud deck value
-            slot_edge_nominal = slot_edge_nominal._replace(z=interaction_pos)
+            checking_pos = checking_pos._replace(z=interaction_pos)
             if copysign(stride, search_direction) == stride:
                 # If we're in our primary direction, the last probe was on the deck,
                 # so we want to continue
@@ -182,7 +175,7 @@ async def find_edge_binary(
     LOG.debug(
         f"Found edge {search_axis} direction {search_direction} at {checking_pos}"
     )
-    return search_axis.of_point(checking_pos)
+    return checking_pos
 
 
 async def find_slot_center_binary(
@@ -199,7 +192,9 @@ async def find_slot_center_binary(
         OT3Axis.X,
         -1,
     )
-    LOG.info(f"Found +x edge at {plus_x_edge}mm")
+    LOG.info(f"Found +x edge at {plus_x_edge.x}mm")
+    estimated_center = estimated_center._replace(x=plus_x_edge.x - EDGES["right"].x)
+
     minus_x_edge = await find_edge_binary(
         hcapi,
         mount,
@@ -207,7 +202,9 @@ async def find_slot_center_binary(
         OT3Axis.X,
         1,
     )
-    LOG.info(f"Found -x edge at {minus_x_edge}mm")
+    LOG.info(f"Found -x edge at {minus_x_edge.x}mm")
+    estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
+
     plus_y_edge = await find_edge_binary(
         hcapi,
         mount,
@@ -215,7 +212,9 @@ async def find_slot_center_binary(
         OT3Axis.Y,
         -1,
     )
-    LOG.info(f"Found +y edge at {plus_y_edge}mm")
+    LOG.info(f"Found +y edge at {plus_y_edge.y}mm")
+    estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
+
     minus_y_edge = await find_edge_binary(
         hcapi,
         mount,
@@ -223,15 +222,14 @@ async def find_slot_center_binary(
         OT3Axis.Y,
         1,
     )
-    LOG.info(f"Found -y edge at {minus_y_edge}mm")
-    return Point(
-        x=(plus_x_edge + minus_x_edge) / 2,
-        y=(plus_y_edge + minus_y_edge) / 2,
-        z=estimated_center.z,
+    LOG.info(f"Found -y edge at {minus_y_edge.y}mm")
+    estimated_center = estimated_center._replace(y=(plus_y_edge.y + minus_y_edge.y) / 2)
+
+    # Found XY center and the average of the edges' Zs
+    return estimated_center._replace(
+        z=(plus_x_edge.z + minus_x_edge.z + plus_y_edge.z + minus_y_edge.z) / 4,
     )
 
-
-# LINEAR SEARCH METHODS
 
 # FIXME: this should live in shared-data deck definition
 def _get_calibration_square_position_in_slot(slot: int) -> Point:
@@ -270,22 +268,6 @@ async def find_calibration_structure_height(
     return structure_z
 
 
-def edge_offset_from_probe(
-    search_axis: OT3Axis,
-    search_direction: Literal[1, -1],
-    probe_pos: Point,
-) -> Point:
-    """Find the position of the edge from the center point of a probe.
-
-    The edge position can be found by offseting the center point with the
-    radius of the probe in the search direction.
-    """
-    offset_from_center = np.copysign(CALIBRATION_PROBE_DIAMETER * 0.5, search_direction)
-    return search_axis.set_in_point(
-        probe_pos, search_axis.of_point(probe_pos) + offset_from_center
-    )
-
-
 async def _probe_deck_at(
     api: OT3API, mount: OT3Mount, target: Point, settings: CapacitivePassSettings
 ) -> float:
@@ -304,211 +286,6 @@ async def _probe_deck_at(
     # because the probe may have gone through the hole
     await api.move_to(mount, target._replace(z=abs_transit_height))
     return _found_pos
-
-
-async def _take_stride(
-    hcapi: OT3API,
-    mount: OT3Mount,
-    search_axis: OT3Axis,
-    probe_pos: Point,
-    stride_size: float,
-    max_stride_distance: float,
-    valid_z_range: DeckHeightValidRange,
-    in_search_direction: bool,
-    repeat_if_failed: bool,
-) -> Tuple[Point, Literal[1, -1], bool]:
-    """
-    Detect the presence of an edge by moving a probe along the search axis.
-
-    Returns
-    -------
-    1. The last target position of the stride sequence.
-    2. Whether or not we find the presence of the edge. If so, the last target position
-       is where the edge is.
-    3. The direction of the next stride sequence.
-    """
-    LOG.info(f"Probing at {probe_pos} with stride at {stride_size}mm")
-    edge_sense = hcapi.config.calibration.edge_sense
-    traveled = 0.0
-    stride_vector = search_axis.set_in_point(Point(0, 0, 0), stride_size)
-    target = probe_pos
-
-    goal_reached = False
-    while traveled < abs(max_stride_distance) or not repeat_if_failed:
-        target += stride_vector
-        found_height = await _probe_deck_at(
-            hcapi, mount, target, edge_sense.pass_settings
-        )
-        traveled += abs(stride_size)
-        # Something is wrong when we found deck too soon, end it now
-        if found_height > valid_z_range.max:
-            raise EarlyCapacitiveSenseTrigger(found_height, target.z)
-        # check against reasonble minimum height of the deck to see if we have made contact
-        touched_deck = found_height >= valid_z_range.min
-        if touched_deck:
-            LOG.info(f"Deck found; new deck height: {found_height}mm")
-            # Use the most updated deck height for the next movement
-            target = target._replace(z=found_height)
-        else:
-            LOG.info("Deck missed")
-        # If we're in our search direction, the goal is to find the deck.
-        # Or if we're against the search direction, we want to miss the deck.
-        goal_reached = touched_deck if in_search_direction else not touched_deck
-        LOG.info(
-            f"Goal reached for {stride_size} mm: {goal_reached}, stride_vector: {stride_vector}"
-        )
-        if goal_reached or not repeat_if_failed:
-            # reverse direction if reached goal
-            return (
-                target,
-                np.sign(
-                    (stride_size if stride_size != 0.0 else 1)
-                    * (-1 if goal_reached else 1)
-                ),
-                goal_reached,
-            )
-    # did not reach out goal before we ran out of strides, we should continue
-    # going the same direction in the next stride size
-    LOG.info(f"Ran out of {stride_size} stride")
-    return target, np.sign(stride_size), False
-
-
-async def find_edge_linear(
-    hcapi: OT3API,
-    mount: OT3Mount,
-    slot_edge_nominal: Point,
-    search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
-    search_direction: Literal[1, -1],
-) -> Point:
-    """
-    Find the true position of one edge of the calibration slot in the deck.
-
-    The nominal position of the calibration slots is known because they're
-    machined into the deck, but if we haven't yet calibrated we won't know
-    quite where they are. This routine finds the XY position that will
-    place the calibration probe such that its center is in the slot, and
-    one edge is on the edge of the slot.
-
-    Params
-    ------
-    hcapi: The api instance to run commands through
-    mount: The mount to calibrate
-    slot_edge_nominal: The point describing the nominal position of the
-        edge that we're checking. Its in-axis coordinate (i.e. its x coordinate
-        for an x edge) should be the nominal position that we'll compare to. Its
-        cross-axis coordiante (i.e. its y coordinate for an x edge) should be
-        the point along the edge to search at, usually the midpoint. Its z-axis
-        coordinate should be the current best estimate for the height of the deck.
-    search_axis: The axis along which to search
-    search_direction: The direction along which to search. This should be set
-        such that it goes from on the deck to off the deck. For instance, on
-        the minus y edge - the y-axis-aligned edge such that more negative
-        y coordinates than the edge are on the deck, and more positive y coordinates
-        than the edge are in the slot - the search direction should be +1.
-
-    Returns
-    -------
-    The absolute position at which the center of the effector is inside the slot
-    and its edge is aligned with the calibration slot edge.
-    """
-    edge_settings = hcapi.config.calibration.edge_sense
-    abs_position: Optional[Point] = None
-
-    # Every probe event has a Z-axis window where detections are considered valid
-    valid_z_range = DeckHeightValidRange.build(slot_edge_nominal.z, edge_settings)
-    next_target = slot_edge_nominal
-    next_dir = search_direction
-    for s in NON_REPEATABLE_STRIDES:
-        stride = np.copysign(s, next_dir)
-        in_search_direction = search_direction == next_dir
-        next_target, next_dir, _ = await _take_stride(
-            hcapi,
-            mount,
-            search_axis,
-            next_target,
-            stride,
-            abs(stride),  # not repeatable, max stride should be same as stride size
-            valid_z_range,
-            in_search_direction,
-            False,
-        )
-
-    for s in REPEATABLE_STRIDES:
-        stride = np.copysign(s, next_dir)
-        in_search_direction = search_direction == next_dir
-        next_target, next_dir, goal_reached = await _take_stride(
-            hcapi,
-            mount,
-            search_axis,
-            next_target,
-            stride,
-            abs(s * edge_settings.search_iteration_limit),
-            valid_z_range,
-            in_search_direction,
-            True,
-        )
-        if goal_reached and s <= CALIBRATION_MIN_VALID_STRIDE:
-            LOG.info(f"Edge found at {next_target}, stride size: {s} in {search_axis}")
-            abs_position = edge_offset_from_probe(
-                search_axis, search_direction, next_target
-            )
-
-    if not abs_position:
-        raise RuntimeError(
-            f"Unable to find edge for {search_direction} {search_axis} direction."
-        )
-    return abs_position
-
-
-async def find_slot_center_linear(
-    hcapi: OT3API, mount: OT3Mount, estimated_center: Point
-) -> Point:
-    """Find the center of the calibration slot by binary-searching its edges.
-
-    Params
-    ------
-    hcapi: The api instance to run commands through
-    mount: The mount to calibrate
-    estimated_center: The XY-center of a slot based on deck definition with the
-    estimated Z height obtained from `find_calibration_structure_center()`
-
-    Returns
-    -------
-    The XYZ-center of the slot, where the z-value is obtained by averaging the
-    z's of the four found edges.
-    """
-    # Find +X (right) edge
-    plus_x_edge = await find_edge_linear(
-        hcapi, mount, estimated_center + EDGES["right"], OT3Axis.X, 1
-    )
-    LOG.info(f"Found +x edge at {plus_x_edge}mm")
-    estimated_center = estimated_center._replace(x=plus_x_edge.x - EDGES["right"].x)
-
-    # Find -X (left) edge
-    minus_x_edge = await find_edge_linear(
-        hcapi, mount, estimated_center + EDGES["left"], OT3Axis.X, -1
-    )
-    LOG.info(f"Found -x edge at {minus_x_edge}mm")
-    estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
-
-    # Find +Y (top) edge
-    plus_y_edge = await find_edge_linear(
-        hcapi, mount, estimated_center + EDGES["top"], OT3Axis.Y, 1
-    )
-    LOG.info(f"Found +y edge at {plus_y_edge}mm")
-    estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
-
-    # Find -Y (bottom) edge
-    minus_y_edge = await find_edge_linear(
-        hcapi, mount, estimated_center + EDGES["bottom"], OT3Axis.Y, -1
-    )
-    LOG.info(f"Found -y edge at {minus_y_edge}mm")
-    estimated_center = estimated_center._replace(y=(plus_y_edge.y + minus_y_edge.y) / 2)
-
-    # Found XY center and the average of the edges' Zs
-    return estimated_center._replace(
-        z=(plus_x_edge.z + minus_x_edge.z + plus_y_edge.z + minus_y_edge.z) / 4,
-    )
 
 
 async def find_axis_center(
