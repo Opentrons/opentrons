@@ -97,14 +97,6 @@ describe('heaterShaker compound command creator', () => {
         },
       },
       {
-        commandType: 'heaterShaker/waitForTemperature',
-        key: expect.any(String),
-        params: {
-          moduleId: 'heaterShakerId',
-          celsius: 80,
-        },
-      },
-      {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         key: expect.any(String),
         params: {
@@ -159,14 +151,6 @@ describe('heaterShaker compound command creator', () => {
         params: {
           celsius: 80,
           moduleId: 'heaterShakerId',
-        },
-      },
-      {
-        commandType: 'heaterShaker/waitForTemperature',
-        key: expect.any(String),
-        params: {
-          moduleId: 'heaterShakerId',
-          celsius: 80,
         },
       },
       {
