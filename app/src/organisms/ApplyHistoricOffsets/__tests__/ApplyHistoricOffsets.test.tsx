@@ -57,6 +57,9 @@ describe('ApplyHistoricOffsets', () => {
           ]}
           setShouldApplyOffsets={mockSetShouldApplyOffsets}
           shouldApplyOffsets
+          commands={[]}
+          labware={[]}
+          modules={[]}
           {...props}
         />,
         { i18nInstance: i18n }

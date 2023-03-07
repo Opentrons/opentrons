@@ -76,13 +76,13 @@ def test_load_per_pipette_vals() -> None:
 
     # added values are preserved
     altered_default = copy.deepcopy(defaults_ot3.DEFAULT_ACCELERATIONS)
-    altered_default.two_low_throughput.pop(OT3AxisKind.X, None)
+    altered_default.high_throughput.pop(OT3AxisKind.X, None)
 
-    mostly_right["motion_settings"]["acceleration"]["two_low_throughput"]["X"] = -72
+    mostly_right["motion_settings"]["acceleration"]["high_throughput"]["X"] = -72
     assert (
         defaults_ot3._build_default_bpk(
             mostly_right["motion_settings"]["acceleration"], altered_default
-        ).two_low_throughput[OT3AxisKind.X]
+        ).high_throughput[OT3AxisKind.X]
         == -72
     )
 
@@ -166,92 +166,32 @@ def test_motion_settings_dataclass() -> None:
     assert isinstance(built_config, OT3Config)
     motion_settings = built_config.motion_settings
 
-    none_setting = motion_settings.by_gantry_load(GantryLoad.NONE)
-    assert none_setting["acceleration"] == {
+    low_setting = motion_settings.by_gantry_load(GantryLoad.LOW_THROUGHPUT)
+    assert low_setting["acceleration"] == {
         OT3AxisKind.X: 3,
         OT3AxisKind.Y: 2,
         OT3AxisKind.Z: 15,
-        OT3AxisKind.P: 2,
+        OT3AxisKind.P: 15,
         OT3AxisKind.Z_G: 5,
     }
-    assert none_setting["default_max_speed"] == {
+    assert low_setting["default_max_speed"] == {
         OT3AxisKind.X: 1,
         OT3AxisKind.Y: 2,
         OT3AxisKind.Z: 3,
         OT3AxisKind.P: 4,
         OT3AxisKind.Z_G: 5,
     }
-    assert none_setting["max_speed_discontinuity"] == {
+    assert low_setting["max_speed_discontinuity"] == {
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 20,
         OT3AxisKind.Z: 30,
         OT3AxisKind.P: 40,
         OT3AxisKind.Z_G: 50,
     }
-    assert none_setting["direction_change_speed_discontinuity"] == {
+    assert low_setting["direction_change_speed_discontinuity"] == {
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 15,
         OT3AxisKind.P: 20,
-        OT3AxisKind.Z_G: 15,
-    }
-
-    gripper_setting = motion_settings.by_gantry_load(GantryLoad.GRIPPER)
-    assert gripper_setting["acceleration"] == {
-        OT3AxisKind.X: 3,
-        OT3AxisKind.Y: 2,
-        OT3AxisKind.Z: 2.8,
-        OT3AxisKind.P: 2,
-        OT3AxisKind.Z_G: 6,
-    }
-    assert gripper_setting["default_max_speed"] == {
-        OT3AxisKind.X: 1,
-        OT3AxisKind.Y: 2,
-        OT3AxisKind.Z: 2.8,
-        OT3AxisKind.P: 4,
-        OT3AxisKind.Z_G: 5,
-    }
-    assert gripper_setting["max_speed_discontinuity"] == {
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 20,
-        OT3AxisKind.Z: 2.8,
-        OT3AxisKind.P: 40,
-        OT3AxisKind.Z_G: 50,
-    }
-    assert gripper_setting["direction_change_speed_discontinuity"] == {
-        OT3AxisKind.X: 5,
-        OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 2.8,
-        OT3AxisKind.P: 20,
-        OT3AxisKind.Z_G: 15,
-    }
-
-    two_low_setting = motion_settings.by_gantry_load(GantryLoad.TWO_LOW_THROUGHPUT)
-    assert two_low_setting["acceleration"] == {
-        OT3AxisKind.X: 1.1,
-        OT3AxisKind.Y: 2.2,
-        OT3AxisKind.Z: 15,
-        OT3AxisKind.P: 2,
-        OT3AxisKind.Z_G: 5,
-    }
-    assert two_low_setting["default_max_speed"] == {
-        OT3AxisKind.X: 4,
-        OT3AxisKind.Y: 3,
-        OT3AxisKind.Z: 2,
-        OT3AxisKind.P: 1,
-        OT3AxisKind.Z_G: 5,
-    }
-    assert two_low_setting["max_speed_discontinuity"] == {
-        OT3AxisKind.X: 1,
-        OT3AxisKind.Y: 2,
-        OT3AxisKind.Z: 3,
-        OT3AxisKind.P: 6,
-        OT3AxisKind.Z_G: 50,
-    }
-    assert two_low_setting["direction_change_speed_discontinuity"] == {
-        OT3AxisKind.X: 0.5,
-        OT3AxisKind.Y: 1,
-        OT3AxisKind.Z: 1.5,
-        OT3AxisKind.P: 3,
         OT3AxisKind.Z_G: 15,
     }

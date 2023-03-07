@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 96-Channel 1000 μL",
+  "displayName": "P1000 96 Channel GEN3",
   "model": "p1000",
   "displayCategory": "GEN3",
   "pickUpTipConfigurations": {
