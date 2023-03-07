@@ -154,14 +154,8 @@ def set_gantry_per_axis_setting_ot3(
     axis_kind = OT3Axis.to_kind(axis)
     if load == GantryLoad.HIGH_THROUGHPUT:
         settings.high_throughput[axis_kind] = value
-    elif load == GantryLoad.LOW_THROUGHPUT:
+    else:
         settings.low_throughput[axis_kind] = value
-    elif load == GantryLoad.TWO_LOW_THROUGHPUT:
-        settings.two_low_throughput[axis_kind] = value
-    elif load == GantryLoad.NONE:
-        settings.none[axis_kind] = value
-    elif load == GantryLoad.GRIPPER:
-        settings.gripper[axis_kind] = value
 
 
 def get_gantry_per_axis_setting_ot3(
@@ -171,15 +165,7 @@ def get_gantry_per_axis_setting_ot3(
     axis_kind = OT3Axis.to_kind(axis)
     if load == GantryLoad.HIGH_THROUGHPUT:
         return settings.high_throughput[axis_kind]
-    elif load == GantryLoad.LOW_THROUGHPUT:
-        return settings.low_throughput[axis_kind]
-    elif load == GantryLoad.TWO_LOW_THROUGHPUT:
-        return settings.two_low_throughput[axis_kind]
-    elif load == GantryLoad.NONE:
-        return settings.none[axis_kind]
-    elif load == GantryLoad.GRIPPER:
-        return settings.gripper[axis_kind]
-    raise ValueError(f"unexpected gantry load: {load}")
+    return settings.low_throughput[axis_kind]
 
 
 def set_gantry_load_per_axis_current_settings_ot3(
@@ -278,13 +264,13 @@ def get_gantry_load_per_axis_motion_settings_ot3(
         try:
             return getattr(m_cfg, a)[load][ax_kind]
         except KeyError:
-            return getattr(m_cfg, a)[GantryLoad.NONE][ax_kind]
+            return getattr(m_cfg, a)[GantryLoad.LOW_THROUGHPUT][ax_kind]
 
     def _default_current(a: str) -> float:
         try:
             return getattr(c_cfg, a)[load][ax_kind]
         except KeyError:
-            return getattr(c_cfg, a)[GantryLoad.NONE][ax_kind]
+            return getattr(c_cfg, a)[GantryLoad.LOW_THROUGHPUT][ax_kind]
 
     return GantryLoadSettings(
         max_speed=_default_motion("default_max_speed"),
