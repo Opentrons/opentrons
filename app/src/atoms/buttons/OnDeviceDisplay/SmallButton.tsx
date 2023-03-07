@@ -111,8 +111,8 @@ const Default = styled(NewPrimaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
-&:focus {
-    background-color: ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode};
+  &:focus {
+    background-color: #045dd1;
     box-shadow: none;
   }
   &:hover {
@@ -126,7 +126,7 @@ const Default = styled(NewPrimaryBtn)`
   }
 
   &:active {
-    background-color: ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode};
+    background-color: #045dd1;
   }
 
   &:disabled {
@@ -148,8 +148,8 @@ const Alert = styled(NewPrimaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
-&:focus {
-    background-color: #e31e1e;
+  &:focus {
+    background-color: ${COLORS.errorEnabled};
     box-shadow: none;
   }
   &:hover {
@@ -163,7 +163,7 @@ const Alert = styled(NewPrimaryBtn)`
   }
 
   &:active {
-    background-color: #e31e1e;
+    background-color: #b01f22;
   }
 
   &:disabled {
@@ -185,7 +185,7 @@ const Alt = styled(NewPrimaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
-&:focus {
+  &:focus {
     background-color: #b4d4ff ${COLORS.opacity20HexCode};
     box-shadow: none;
   }
@@ -200,7 +200,7 @@ const Alt = styled(NewPrimaryBtn)`
   }
 
   &:active {
-    background-color: #b4d4ff ${COLORS.opacity20HexCode};
+    background-color: #94b0d5;
   }
 
   &:disabled {
@@ -222,7 +222,7 @@ const GhostLow = styled(NewPrimaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
-&:focus {
+  &:focus {
     background-color: ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode};
     box-shadow: none;
   }
@@ -259,7 +259,7 @@ const GhostHighBlackColor = styled(NewPrimaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
-&:focus {
+  &:focus {
     background-color: ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode};
     box-shadow: none;
   }
@@ -295,7 +295,7 @@ const GhostHighBlue = styled(NewPrimaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
-&:focus {
+  &:focus {
     background-color: ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode};
     box-shadow: none;
   }
