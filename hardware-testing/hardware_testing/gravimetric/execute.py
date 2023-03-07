@@ -271,6 +271,7 @@ def run(ctx: ProtocolContext, operator: str, cfg: config.GravimetricConfig) -> N
                 f"{count}/{total}: blank (trial {trial + 1}/{config.NUM_BLANK_TRIALS})"
             )
             pipette.pick_up_tip()
+            # both volumes measured should be negative (-)
             evap_aspirate, evap_dispense = _run_trial(
                 ctx,
                 pipette,
@@ -304,6 +305,7 @@ def run(ctx: ProtocolContext, operator: str, cfg: config.GravimetricConfig) -> N
                 count += 1
                 print(f"{count}/{total}: {volume} uL (trial {trial + 1}/{cfg.trials})")
                 pipette.pick_up_tip()
+                # NOTE: aspirate will be negative, dispense will be positive
                 actual_aspirate, actual_dispense = _run_trial(
                     ctx,
                     pipette,
@@ -316,11 +318,17 @@ def run(ctx: ProtocolContext, operator: str, cfg: config.GravimetricConfig) -> N
                     liquid_tracker,
                     blank=False,
                 )
+                # factor in average evaporation (which should each be negative uL amounts)
+                asp_with_evap = actual_aspirate - average_aspirate_evaporation_ul
+                disp_with_evap = actual_dispense - average_dispense_evaporation_ul
+                # convert volumes to positive amounts
+                aspirate_rectified = abs(asp_with_evap)
+                dispense_rectified = abs(disp_with_evap)
+                actual_asp_list.append(aspirate_rectified)
+                actual_disp_list.append(dispense_rectified)
                 report.store_trial(
-                    test_report, trial, volume, actual_aspirate, actual_dispense
+                    test_report, trial, volume, aspirate_rectified, dispense_rectified
                 )
-                actual_asp_list.append(actual_aspirate)
-                actual_disp_list.append(actual_dispense)
                 pipette.drop_tip()
 
             # CALCULATE AVERAGE, %CV, %D

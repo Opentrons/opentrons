@@ -50,3 +50,15 @@ def get_min_reading(data: List[EnvironmentData]) -> EnvironmentData:
 def get_max_reading(data: List[EnvironmentData]) -> EnvironmentData:
     """Get max reading."""
     return _get_min_max_reading(data, max)
+
+
+def get_average_reading(data: List[EnvironmentData]) -> EnvironmentData:
+    """Get average reading."""
+    length = len(data)
+    return EnvironmentData(
+        celsius_pipette=sum([d.celsius_pipette for d in data]) / length,
+        celsius_air=sum([d.celsius_air for d in data]) / length,
+        humidity_air=sum([d.humidity_air for d in data]) / length,
+        pascals_air=sum([d.pascals_air for d in data]) / length,
+        celsius_liquid=sum([d.celsius_liquid for d in data]) / length,
+    )

@@ -15,7 +15,7 @@ from hardware_testing.data import (
 from .scale import Scale
 
 SLEEP_TIME_IN_RECORD_LOOP = 0.05
-SLEEP_TIME_IN_RECORD_LOOP_SIMULATING = 0.005
+SLEEP_TIME_IN_RECORD_LOOP_SIMULATING = 0.01
 
 
 @dataclass

@@ -3,11 +3,41 @@ from dataclasses import dataclass
 from enum import Enum
 from time import sleep
 from typing import Optional
+from typing_extensions import Final
 
 from opentrons.protocol_api import ProtocolContext
 
 from .record import GravimetricRecorder, GravimetricRecording
-from .environment import read_environment_data, EnvironmentData
+from .environment import read_environment_data, EnvironmentData, get_average_reading
+
+
+RELATIVE_DENSITY_WATER: Final = 1.0
+
+CONSTANT_SCALE_CALIBRATED_DENSITY_KG_M3: Final = 7950  # from certificate
+CONSTANT_TEMPERATURE_TA0: Final = 273.15
+CONSTANT_DEW_POINT: Final = {"a": 17.625, "b": 243.04}
+CONSTANT_AIR_DENSITY_K: Final = {"1": 0.34844, "2": -0.00252, "3": 0.020582}
+CONSTANT_AIR_DENSITY_ESO: Final = 6.1078
+CONSTANT_AIR_DENSITY_C: Final = [
+    0.99999683,
+    -0.0090826951,
+    0.000078736169,
+    -0.00000061117958,
+    0.0000000043884187,
+    -2.9883885e-11,
+    2.1874425e-13,
+    -1.7892321e-15,
+    1.1112018e-17,
+    -3.0994571e-20,
+]
+CONSTANT_AIR_DENSITY_R: Final = {"d": 287.0531, "v": 461.4964}
+CONSTANT_WATER_DENSITY: Final = {
+    "1": 999.85308,
+    "2": 6.32693,
+    "3": -8.523829,
+    "4": 6.943248,
+    "5": -3.821216,
+}
 
 
 class MeasurementType(str, Enum):
@@ -105,4 +135,40 @@ def calculate_change_in_volume(
 ) -> float:
     """Calculate volume of water."""
     # TODO: actually calculate volume
-    return abs(after.grams_average - before.grams_average)
+    avg_env = get_average_reading([before.environment, after.environment])
+    water_density_at_this_temperature_kg_m3 = sum(
+        [
+            CONSTANT_WATER_DENSITY["1"],
+            CONSTANT_WATER_DENSITY["2"] * pow(10, -2) * pow(avg_env.celsius_liquid, 1),
+            CONSTANT_WATER_DENSITY["3"] * pow(10, -3) * pow(avg_env.celsius_liquid, 2),
+            CONSTANT_WATER_DENSITY["4"] * pow(10, -5) * pow(avg_env.celsius_liquid, 3),
+            CONSTANT_WATER_DENSITY["5"] * pow(10, -7) * pow(avg_env.celsius_liquid, 4),
+        ]
+    )
+    liquid_density_kg_m3 = (
+        RELATIVE_DENSITY_WATER * water_density_at_this_temperature_kg_m3
+    )
+    # equations in ISO use hPa, so sticking with that
+    air_pressure_hpa = avg_env.pascals_air / 100
+    air_density_kg_m3 = (
+        (CONSTANT_AIR_DENSITY_K["1"] * air_pressure_hpa)
+        + (
+            avg_env.humidity_air
+            * (
+                (CONSTANT_AIR_DENSITY_K["2"] * avg_env.celsius_air)
+                + CONSTANT_AIR_DENSITY_K["3"]
+            )
+        )
+    ) / (avg_env.celsius_air + CONSTANT_TEMPERATURE_TA0)
+    z_factor = (
+        (1.0 / CONSTANT_SCALE_CALIBRATED_DENSITY_KG_M3)
+        * (
+            (CONSTANT_SCALE_CALIBRATED_DENSITY_KG_M3 - air_density_kg_m3)
+            / (liquid_density_kg_m3 - air_density_kg_m3)
+        )
+        * 1000.0
+    )
+    # NOTE: aspirate will be negative, dispense will be positive
+    liquid_grams = before.grams_average - after.grams_average
+    liquid_micro_liters = liquid_grams * z_factor
+    return liquid_micro_liters
