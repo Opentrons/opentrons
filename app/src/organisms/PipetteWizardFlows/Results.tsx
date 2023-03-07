@@ -91,7 +91,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
     <SmallButton
       textTransform={TEXT_TRANSFORM_CAPITALIZE}
       onClick={handleProceed}
-      aria-label="Results_exit_isOnDevice"
       buttonText={buttonText}
       buttonType="default"
     />
@@ -111,7 +110,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
       <SmallButton
         onClick={handleTryAgain}
         disabled={isPending}
-        aria-label="Results_tryAgain_onDevice"
         buttonText={t(
           flowType === FLOWS.ATTACH ? 'try_again' : 'attach_and_retry'
         )}

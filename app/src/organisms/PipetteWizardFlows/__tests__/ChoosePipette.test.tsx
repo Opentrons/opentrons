@@ -92,7 +92,7 @@ describe('ChoosePipette', () => {
   })
   it('returns the correct information, buttons work as expected for on device display', () => {
     mockGetIsOnDevice.mockReturnValue(true)
-    const { getByText, getByRole, getByTestId } = render(props)
+    const { getByText, getByLabelText, getByTestId } = render(props)
     getByText('Attach Left Pipette')
     getByText('Choose a pipette to attach')
     getByText('1- or 8-Channel pipette')
@@ -114,7 +114,7 @@ describe('ChoosePipette', () => {
     fireEvent.click(singleMountPipettes)
     expect(props.setSelectedPipette).toHaveBeenCalled()
 
-    const proceedBtn = getByRole('button', { name: 'Continue' })
+    const proceedBtn = getByLabelText('SmallButton_Default')
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })

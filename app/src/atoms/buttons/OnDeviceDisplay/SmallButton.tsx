@@ -40,30 +40,54 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   let button
   switch (buttonType) {
     case 'default': {
-      button = <Default {...buttonProps}>{styledButtonText}</Default>
+      button = (
+        <Default {...buttonProps} aria-label="SmallButton_Default">
+          {styledButtonText}
+        </Default>
+      )
       break
     }
     case 'alert': {
-      button = <Alert {...buttonProps}>{styledButtonText}</Alert>
+      button = (
+        <Alert {...buttonProps} aria-label="SmallButton_Alert">
+          {styledButtonText}
+        </Alert>
+      )
       break
     }
     case 'alt': {
-      button = <Alt {...buttonProps}>{styledButtonText}</Alt>
+      button = (
+        <Alt {...buttonProps} aria-label="SmallButton_Alt">
+          {styledButtonText}
+        </Alt>
+      )
       break
     }
     case 'ghostLow': {
-      button = <GhostLow {...buttonProps}>{styledButtonText}</GhostLow>
+      button = (
+        <GhostLow {...buttonProps} aria-label="SmallButton_GhostLow">
+          {styledButtonText}
+        </GhostLow>
+      )
 
       break
     }
     case 'ghostHigh': {
       if (textColor === COLORS.blueEnabled) {
         button = (
-          <GhostHighBlue {...buttonProps}>{styledButtonText}</GhostHighBlue>
+          <GhostHighBlue
+            {...buttonProps}
+            aria-label="SmallButton_GhostHighBlue"
+          >
+            {styledButtonText}
+          </GhostHighBlue>
         )
       } else {
         button = (
-          <GhostHighBlackColor {...buttonProps}>
+          <GhostHighBlackColor
+            {...buttonProps}
+            aria-label="SmallButton_GhostHighBlack"
+          >
             {styledButtonText}
           </GhostHighBlackColor>
         )

@@ -23,7 +23,6 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
       {isOnDevice ? (
         <SmallButton
           onClick={goBack}
-          aria-label="isOnDevice_button"
           buttonText={t('shared:return')}
           buttonType="alert"
         />

@@ -36,7 +36,6 @@ export const CheckPipetteButton = (
 
   return isOnDevice != null && isOnDevice ? (
     <SmallButton
-      aria-label="SmallButton"
       disabled={isDisabled}
       buttonText={proceedButtonText}
       buttonType="default"

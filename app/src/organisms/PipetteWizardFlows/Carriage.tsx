@@ -107,7 +107,6 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         isOnDevice ? (
           <SmallButton
             onClick={proceed}
-            aria-label="isOnDevice_button"
             buttonText={capitalize(t('shared:continue'))}
             buttonType="default"
           />

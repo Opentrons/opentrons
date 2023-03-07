@@ -45,7 +45,6 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
         <>
           <SmallButton
             onClick={proceed}
-            aria-label="isOnDevice_exit"
             marginRight={SPACING.spacing3}
             buttonText={t('shared:exit')}
             buttonType="alert"
@@ -54,7 +53,6 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
             buttonText={t('shared:go_back')}
             buttonType="default"
             onClick={goBack}
-            aria-label="isOnDevice_goBack"
           />
         </>
       ) : (
