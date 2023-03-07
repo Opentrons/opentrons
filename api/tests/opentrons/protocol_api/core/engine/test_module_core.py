@@ -67,9 +67,9 @@ def test_get_model(
     decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient
 ) -> None:
     """It should return the module model."""
-    decoy.when(mock_engine_client.state.modules.get_model("1234")).then_return(
-        ModuleModel.HEATER_SHAKER_MODULE_V1
-    )
+    decoy.when(
+        mock_engine_client.state.modules.get_connected_model("1234")
+    ).then_return(ModuleModel.HEATER_SHAKER_MODULE_V1)
 
     result = subject.get_model()
 

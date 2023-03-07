@@ -41,6 +41,7 @@ def test_initial_state() -> None:
     subject = ModuleStore()
 
     assert subject.state == ModuleState(
+        requested_model_by_id={},
         slot_by_module_id={},
         hardware_by_module_id={},
         substate_by_module_id={},
@@ -48,10 +49,11 @@ def test_initial_state() -> None:
 
 
 @pytest.mark.parametrize(
-    argnames=["module_definition", "model", "expected_substate"],
+    argnames=["module_definition", "params_model", "result_model", "expected_substate"],
     argvalues=[
         (
             lazy_fixture("magdeck_v2_def"),
+            ModuleModel.MAGNETIC_MODULE_V2,
             ModuleModel.MAGNETIC_MODULE_V2,
             MagneticModuleSubState(
                 module_id=MagneticModuleId("module-id"),
@@ -60,6 +62,7 @@ def test_initial_state() -> None:
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
+            ModuleModel.HEATER_SHAKER_MODULE_V1,
             ModuleModel.HEATER_SHAKER_MODULE_V1,
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
@@ -71,6 +74,34 @@ def test_initial_state() -> None:
         (
             lazy_fixture("tempdeck_v1_def"),
             ModuleModel.TEMPERATURE_MODULE_V1,
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            ModuleModel.TEMPERATURE_MODULE_V2,
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            ModuleModel.TEMPERATURE_MODULE_V2,
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            ModuleModel.TEMPERATURE_MODULE_V2,
+            ModuleModel.TEMPERATURE_MODULE_V2,
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
                 plate_target_temperature=None,
@@ -78,6 +109,7 @@ def test_initial_state() -> None:
         ),
         (
             lazy_fixture("thermocycler_v1_def"),
+            ModuleModel.THERMOCYCLER_MODULE_V1,
             ModuleModel.THERMOCYCLER_MODULE_V1,
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
@@ -90,19 +122,20 @@ def test_initial_state() -> None:
 )
 def test_load_module(
     module_definition: ModuleDefinition,
-    model: ModuleModel,
+    params_model: ModuleModel,
+    result_model: ModuleModel,
     expected_substate: ModuleSubStateType,
 ) -> None:
     """It should handle a successful LoadModule command."""
     action = actions.UpdateCommandAction(
         command=commands.LoadModule.construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
-                model=model,
+                model=params_model,
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             ),
             result=commands.LoadModuleResult(
                 moduleId="module-id",
-                model=model,
+                model=result_model,
                 serialNumber="serial-number",
                 definition=module_definition,
             ),
@@ -114,6 +147,7 @@ def test_load_module(
 
     assert subject.state == ModuleState(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        requested_model_by_id={"module-id": params_model},
         hardware_by_module_id={
             "module-id": HardwareModule(
                 serial_number="serial-number",
@@ -198,6 +232,7 @@ def test_add_module_action(
 
     assert subject.state == ModuleState(
         slot_by_module_id={"module-id": None},
+        requested_model_by_id={"module-id": None},
         hardware_by_module_id={
             "module-id": HardwareModule(
                 serial_number="serial-number",
