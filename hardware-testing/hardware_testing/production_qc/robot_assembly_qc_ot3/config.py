@@ -56,7 +56,7 @@ TESTS = [
         test_peripherals.run,
     ),
     (
-        TestSection.PERIPHERALS,
+        TestSection.ALIGNMENT,
         test_alignment.run,
     ),
 ]
