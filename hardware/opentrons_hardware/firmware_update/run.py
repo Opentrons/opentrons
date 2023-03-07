@@ -9,7 +9,6 @@ from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings import (
     NodeId,
-    BinaryMessageId,
     FirmwareTarget,
     USBTarget,
 )
@@ -18,8 +17,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     EnterBootloaderRequest,
-    DeviceInfoRequest,
-    BinaryMessageDefinition,
 )
 from opentrons_hardware.firmware_update import (
     FirmwareUpdateInitiator,
@@ -196,7 +193,9 @@ class RunUpdate:
         update_file: str,
         usb_target: USBTarget,
     ) -> None:
-        await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.01)))
+        await self._status_queue.put(
+            (usb_target, (FirmwareUpdateStatus.updating, 0.01))
+        )
         vid, pid, baudrate, timeout = messenger.get_driver().get_connection_info()
         await self._status_queue.put((usb_target, (FirmwareUpdateStatus.updating, 0.2)))
         for i in range(retry_count):
@@ -206,7 +205,7 @@ class RunUpdate:
             if not await messenger.send(EnterBootloaderRequest()):
                 logger.error("unable to send enter bootloader message")
                 continue
-            await messenger.stop()        
+            await messenger.stop()
             await self._status_queue.put(
                 (usb_target, (FirmwareUpdateStatus.updating, 0.4))
             )

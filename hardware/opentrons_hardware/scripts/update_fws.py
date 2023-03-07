@@ -51,7 +51,11 @@ async def run(args: argparse.Namespace) -> None:
     with open(args.dict) as fp:
         update_dict = json.load(fp)
     update_details: Dict[FirmwareTarget, str] = {
-        NodeId(int(target)) if int(target) in iter(NodeId) else USBTarget(int(target)): filepath
+        (
+            NodeId(int(target))
+            if (int(target) in iter(NodeId))  # type: ignore[operator]
+            else USBTarget(int(target))
+        ): filepath
         for target, filepath in update_dict.items()
     }
 
