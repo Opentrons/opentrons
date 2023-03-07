@@ -58,13 +58,7 @@ class MoveToMaintenancePositionImplementation(
 
         await self._hardware_api.home()
 
-        mount_current_position = await self._hardware_api.gantry_position(
-            hardware_mount
-        )
-
-        calibration_coordinates = self._state_view.labware.get_calibration_coordinates(
-            current_z_position=mount_current_position.z
-        )
+        calibration_coordinates = self._state_view.labware.get_calibration_coordinates()
 
         await self._hardware_api.move_to(
             mount=hardware_mount,

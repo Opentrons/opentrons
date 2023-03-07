@@ -597,7 +597,7 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def get_calibration_coordinates(self, current_z_position: float) -> Point:
+    def get_calibration_coordinates(self) -> Point:
         """Get calibration critical point and target position."""
         target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
         # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
@@ -606,7 +606,7 @@ class LabwareView(HasState[LabwareState]):
         return Point(
             x=target_center.x,
             y=target_center.y + _INSTRUMENT_ATTACH_OFFSET.y,
-            z=current_z_position + _INSTRUMENT_ATTACH_OFFSET.z,
+            z=_INSTRUMENT_ATTACH_OFFSET.z,
         )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
