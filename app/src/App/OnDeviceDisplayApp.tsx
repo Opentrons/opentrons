@@ -21,6 +21,7 @@ import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
+import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { AttachInstrumentsDashboard } from '../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
@@ -94,12 +95,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:runId/setup',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>protocol run</Box>
-      </>
-    ),
+    Component: RunningProtocol,
     exact: true,
     name: 'Protocol Run',
     path: '/protocols/:runId/run',
