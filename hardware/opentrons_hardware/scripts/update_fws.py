@@ -48,10 +48,10 @@ async def run(args: argparse.Namespace) -> None:
     retry_count = args.retry_count
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
-
-    update_dict = json.load(args.dict)
+    with open(args.dict) as fp:
+        update_dict = json.load(fp)
     update_details: Dict[FirmwareTarget, str] = {
-        NodeId[target] if target in NodeId else USBTarget[target]: filepath
+        NodeId(int(target)) if int(target) in iter(NodeId) else USBTarget(int(target)): filepath
         for target, filepath in update_dict.items()
     }
 
