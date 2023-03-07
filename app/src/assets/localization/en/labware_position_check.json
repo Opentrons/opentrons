@@ -62,7 +62,7 @@
   "robot_has_offsets_from_previous_runs": "This robot has offsets for labware used in this protocol. If you apply these offsets, you can still adjust them with Labware Position Check.",
   "no_offset_data_on_robot": "This robot has no useable labware offset data for this run.",
   "what_labware_offset": "What is labware offset?",
-  "robot_has_no_offsets_from_previous_runs": "<block>Labware offsets data references pervious protocol run labware locations to save you time. Labware that has been used in the same slot as a protocol you are running will not need additional calibration. If all the labware in a new protocol have been checked in previous runs, you do not have to run Labware Position Check.</block> <block>You can add new offsets with Labware Position Check in later steps if you desire.</block>",
+  "robot_has_no_offsets_from_previous_runs": "<block>Labware offsets data references previous protocol run labware locations to save you time. Labware that has been used in the same slot as a protocol you are running will not need additional calibration. If all the labware in a new protocol have been checked in previous runs, you do not have to run Labware Position Check.</block> <block>You can add new offsets with Labware Position Check in later steps if you desire.</block>",
   "see_how_offsets_work": "See how labware offsets work",
   "stored_offset_data": "Stored Labware Offset data",
   "applied_offset_data": "Applied Labware Offset data",
@@ -91,5 +91,5 @@
   "jupyter_notebook": "Jupyter Notebook",
   "cli_ssh": "Command Line Interface (SSH)",
   "learn_more": "Learn more",
-  "no_offset_data_available": "No labware offset data avaliable"
+  "no_offset_data_available": "No labware offset data available"
 }
