@@ -265,9 +265,9 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
 
     await api.home([jaw_ax])
     await api.grip(GRIPPER_GRIP_FORCE)
-    await _get_jaw_width_and_record_result("max")
-    await api.ungrip()
     await _get_jaw_width_and_record_result("min")
+    await api.ungrip()
+    await _get_jaw_width_and_record_result("max")
 
     # PROBE-DISTANCE
     await _probe_mount_and_record_result(
@@ -311,12 +311,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         else:
             report(section, f"gripper-{t}", [0.0, 0.0, CSVResult.PASS])
 
-    # TODO: uncomment once EVT grippers have been tested on DVT robots
-    # if not api.is_simulator:
-    #     ui.get_user_ready("attach a gripper")
-    # await _test_gripper(api, report, section)
-    # while not api.is_simulator and await _has_gripper(api):
-    #     ui.get_user_ready("remove the gripper")
+    if not api.is_simulator:
+        ui.get_user_ready("attach a gripper")
+    await _test_gripper(api, report, section)
+    while not api.is_simulator and await _has_gripper(api):
+        ui.get_user_ready("remove the gripper")
 
     print("moving back near home position")
     await api.move_rel(
