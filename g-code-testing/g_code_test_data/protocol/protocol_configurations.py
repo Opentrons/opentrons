@@ -6,6 +6,7 @@ from opentrons.hardware_control.emulation.settings import (
     PipetteSettings,
 )
 from g_code_test_data.g_code_configuration import ProtocolGCodeConfirmConfig
+from opentrons.hardware_control.emulation.types import ModuleType
 import pytest
 
 
@@ -172,11 +173,26 @@ SWIFT_TURBO = ProtocolGCodeConfirmConfig(
     settings=SWIFT_SMOOTHIE_SETTINGS,
 )
 
+# JSON v6 protocols
+
 NO_MODS = ProtocolGCodeConfirmConfig(
     name="no_mods",
     path="protocol/protocols/fast/OT2_P300M_P20S_NoMod_6_1_MixTransferManyLiquids.json",
     versions={6},
     settings=Settings(
+        smoothie=SmoothieSettings(
+            left=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
+            right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
+        )
+    ),
+)
+
+JSON_SMOKE = ProtocolGCodeConfirmConfig(
+    name="json_smoke",
+    path="protocol/protocols/fast/OT2_P300M_P20S_HS_TM_6_3_SmokeV3.json",
+    versions={6},
+    settings=Settings(
+        modules=[ModuleType.Temperature, ModuleType.Heatershaker],
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
             right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
@@ -208,6 +224,7 @@ FAST_PROTOCOLS = [
     SET_MAX_SPEED,
     TWO_SINGLE_CHANNEL,
     NO_MODS,
+    JSON_SMOKE,
 ]
 
 PROTOCOL_CONFIGURATIONS = SLOW_PROTOCOLS + FAST_PROTOCOLS

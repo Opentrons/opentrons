@@ -57,7 +57,7 @@ test-g-code-omega:
 	$(pytest) -m 'slow' -k 'test_omega_biotek_magbind_totalpure_ngs' $(tests) $(test_opts)
 
 .PHONY: lint
-lint:
+lint: lint-other
 	$(python) -m mypy g_code_parsing $(tests_to_typecheck)
 	$(python) -m black --check g_code_parsing tests setup.py cli.py
 	$(python) -m flake8 g_code_parsing tests setup.py cli.py
@@ -100,3 +100,7 @@ FORMAT_FILE_GLOB = "g-code-testing/**/*.@(json|md|yml|yaml)"
 .PHONY: format-other
 format-other:
 	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+
+.PHONY: lint-other
+lint-other:
+	yarn prettier --check --ignore-path .eslintignore $(FORMAT_FILE_GLOB)

@@ -7,7 +7,6 @@ from collections import namedtuple
 
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_reader.protocol_source import (
@@ -61,7 +60,7 @@ class GCodeEngine:
     def _emulate(self) -> Iterator[ThreadManager]:
         """Context manager that starts emulated OT-2 hardware environment. A
         hardware controller is returned."""
-        modules = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
+        modules = self._config.modules
 
         # Entry point for the emulator app process
         def _run_app():

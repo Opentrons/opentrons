@@ -19,7 +19,7 @@ Framework supporting the following:
   - [Run G-Code Program](#run-g-code-program)
   - [Load Stored G-Code Program Comparison](#load-stored-g-code-program-comparison)
   - [Print Diff Between Comparison and Local Code](#print-diff-between-comparison-and-local-code)
-  - [Update Storage Comparision](#update-storage-comparision)
+  - [Update Storage Comparision](#update-storage-comparison)
 
 ## Setup
 
@@ -119,6 +119,7 @@ protocols/customizable_serial_dilution_ot2/2.12
 protocols/customizable_serial_dilution_ot2/2.13
 protocols/illumina_nextera_xt_library_prep_part1/2.12
 protocols/illumina_nextera_xt_library_prep_part1/2.13
+protocols/json_smoke/6
 protocols/no_mods/6
 protocols/omega_biotek_magbind_totalpure_ngs/2.12
 protocols/omega_biotek_magbind_totalpure_ngs/2.13
@@ -191,7 +192,7 @@ To run the G-Code Program locally and print the diff between the result and the 
 make diff-g-code-configuration-comparison name=protocol/2.13/swift_turbo
 ```
 
-### Update Storage Comparision
+### Update Storage Comparison
 
 To update comparison files, with output of a locally ran G-Code Program, use `update-g-code-configuration-comparison`
 
@@ -247,6 +248,6 @@ generate a comparison file. To do this follow these steps:
    1. Configuration will be in format of `protocol/<protocol_name>/<version>`
 3. Run `make run-g-code-configuration name=<configuration_path>` and verify the output of your
    protocol is correct.
-4. Run `update-g-code-configuration-comparison name=<configuration_path>`
+4. Run `make update-g-code-configuration-comparison name=<configuration_path>`
 5. Run `make check-for-missing-comparison-files` and confirm that your protocol no longer shows
    up as having a missing comparison file.
