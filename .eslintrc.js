@@ -106,5 +106,9 @@ module.exports = {
       files: ['**/cypress/**'],
       extends: ['plugin:cypress/recommended'],
     },
+    {
+      selector: 'variable',
+      format: ['camelCase', 'snake_case', 'PascalCase', 'UPPER_CASE'],
+    },
   ],
 }

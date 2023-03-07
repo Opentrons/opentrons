@@ -22,7 +22,7 @@ import { getLocalRobot } from '../../../redux/discovery'
 import type { RouteProps } from '../../../App/types'
 
 const NavigationLink = styled(NavLink)`
-  color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode};
+  color: ${COLORS.darkBlack_seventy};
   display: flex;
   grid-gap: 0.5rem;
   position: relative;
@@ -36,7 +36,7 @@ const NavigationLink = styled(NavLink)`
       display: block;
       width: 2.5rem;
       height: 0.3125rem;
-      background: #9c3ba4;
+      background: ${COLORS.highlightPurple_one};
       right: 50%;
       bottom: -0.5rem;
     }
