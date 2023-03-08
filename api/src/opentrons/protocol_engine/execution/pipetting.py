@@ -9,7 +9,6 @@ from ..state import StateView, HardwarePipette
 from ..errors.exceptions import TipNotAttachedError, InvalidPipettingVolumeError
 
 
-
 class PipettingHandler(TypingProtocol):
     """Liquid handling commands."""
 

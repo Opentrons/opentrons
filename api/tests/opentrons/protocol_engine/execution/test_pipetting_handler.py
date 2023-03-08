@@ -220,6 +220,10 @@ async def test_virtual_validate_aspirated_volume_raises(
     mock_state_view: StateView,
 ) -> None:
     """Should validate if trying to aspirate more than the working volume."""
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+
     decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(3)
 
     decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
@@ -294,7 +298,6 @@ def test_get_is_ready_to_aspirate_virtual(
 
 async def test_aspirate_in_place_virtual(
     mock_state_view: StateView, decoy: Decoy
-    decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should return the volume."""
     decoy.when(
