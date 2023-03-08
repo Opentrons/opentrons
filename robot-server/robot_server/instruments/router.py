@@ -271,14 +271,17 @@ async def update_firmware(
     with fail_after(_UPDATE_STATUS_GETTER_TIMEOUT):
         # The status of a firmware update process is not immediately available from
         # hardware control. So we retry a few times until we receive the status.
-        try:
-            update_response = update_progress_monitor.create(
-                update_id=update_process_id,
-                created_at=created_at,
-                mount=mount_to_update,
-            )
-        except UpdateInfoNotFound:
-            await asyncio.sleep(0.5)
+        while True:
+            try:
+                update_response = update_progress_monitor.create(
+                    update_id=update_process_id,
+                    created_at=created_at,
+                    mount=mount_to_update,
+                )
+            except UpdateInfoNotFound:
+                await asyncio.sleep(0.5)
+            else:
+                break
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=update_response),
