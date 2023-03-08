@@ -43,6 +43,7 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
     BoardRevision,
+    InstrumentFWInfo,
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
@@ -120,6 +121,7 @@ class OT3Simulator:
         self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
         self._update_required = False
+        self._initialized = False
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -161,6 +163,15 @@ class OT3Simulator:
         self._motor_status = {}
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+
+    @property
+    def initialized(self) -> bool:
+        """True when the hardware controller has initialized and is ready."""
+        return self._initialized
+
+    @initialized.setter
+    def initialized(self, value: bool) -> None:
+        self._initialized = value
 
     @property
     def board_revision(self) -> BoardRevision:
@@ -487,16 +498,22 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
-        return set(), 0
+    def get_instrument_update(
+        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
+    ) -> InstrumentFWInfo:
+        return InstrumentFWInfo(mount, False, 0, 0)
+
+    def get_update_progress(self) -> Set[UpdateStatus]:
+        return set()
 
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
+        force: bool = False,
+    ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        yield (set(), 0)
+        yield set()
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
