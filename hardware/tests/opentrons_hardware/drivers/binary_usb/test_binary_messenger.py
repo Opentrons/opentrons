@@ -51,6 +51,20 @@ async def test_context(mock_driver: AsyncMock) -> None:
     assert m._task.done()
 
 
+async def test_star_stop(mock_driver: AsyncMock) -> None:
+    """It should start and stop."""
+    messenger = BinaryMessenger(mock_driver)
+    messenger.start()
+    assert messenger._task
+    assert not messenger._task.done()
+    await messenger.stop()
+    assert messenger._task.done()
+    messenger.start()
+    assert not messenger._task.done()
+    # clean up
+    await messenger.stop()
+
+
 @pytest.mark.parametrize(
     "message",
     [

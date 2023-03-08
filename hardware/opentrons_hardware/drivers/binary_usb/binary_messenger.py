@@ -66,7 +66,7 @@ class BinaryMessenger:
 
     def start(self) -> None:
         """Start the reader task."""
-        if self._task:
+        if self._task and not self._task.done():
             log.warning("task already running.")
             return
         self._task = asyncio.get_event_loop().create_task(self._read_task_shield())
@@ -79,6 +79,7 @@ class BinaryMessenger:
                 await self._task
             except asyncio.CancelledError:
                 log.info("Task cancelled.")
+
         else:
             log.warning("task not running.")
 
@@ -128,6 +129,10 @@ class BinaryMessenger:
 
     async def _handle_error(self, message_definition: BinaryMessageDefinition) -> None:
         log.error("Got a error message.")
+
+    def get_driver(self) -> SerialUsbDriver:
+        """Return the underling driver for this messenger."""
+        return self._drive
 
 
 class BinaryWaitableCallback:
