@@ -62,6 +62,23 @@ export function GripperWizardFlows(props: MaintenanceRunManagerProps): JSX.Eleme
       )
     }
   }
+
+  const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    if (
+      isCommandMutationLoading ||
+      isStopLoading ||
+      isExiting
+    ) {
+      const timer = setTimeout(() => setIsRobotMoving(true), 700)
+      return () => clearTimeout(timer)
+    } else {
+      setIsRobotMoving(false)
+    }
+  }, [isCommandMutationLoading, isStopLoading, isExiting])
+
+
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     chainRunCommands([{ commandType: 'home' as const, params: {} }], true).then(() => {
@@ -78,6 +95,7 @@ export function GripperWizardFlows(props: MaintenanceRunManagerProps): JSX.Eleme
       attachedGripper={attachedGripper}
       createRun={createRun}
       isCreateLoading={isCreateLoading}
+      isRobotMoving={isRobotMoving}
       handleCleanUpAndClose={handleCleanUpAndClose}
       chainRunCommands={chainRunCommands}
       proceed={proceed}
@@ -91,6 +109,7 @@ interface GripperWizardProps {
   attachedGripper: InstrumentData | null
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
   isCreateLoading: boolean
+  isRobotMoving: boolean
   handleCleanUpAndClose: () => void
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   proceed: () => void
@@ -129,8 +148,8 @@ export const GripperWizard = (
   const sharedProps = {
     flowType,
     runId,
-    isCreateLoading: false,
-    isRobotMoving: false,
+    isCreateLoading,
+    isRobotMoving,
     attachedGripper,
     proceed: handleProceed,
     goBack,
