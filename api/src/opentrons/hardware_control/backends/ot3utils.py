@@ -18,6 +18,8 @@ import numpy as np
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    FirmwareTarget,
+    USBTarget,
     PipetteType,
     SensorId,
     PipetteTipActionType,
@@ -364,23 +366,32 @@ def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
 class UpdateProgress:
     """Class to keep track of Update progress."""
 
-    def __init__(self, nodes: Set[NodeId]):
+    def __init__(self, targets: Set[FirmwareTarget]):
         self._tracker: Dict[OT3SubSystem, UpdateStatus] = {}
         self._total_progress = 0
+        nodes = [NodeId(node) for node in targets if (node in NodeId)]
         for node in nodes:
             subsystem = node_id_to_subsystem(node)
             self._tracker[subsystem] = UpdateStatus(subsystem, UpdateState.queued, 0)
+        if USBTarget.rear_panel in targets:
+            self._tracker[OT3SubSystem.rear_panel] = UpdateStatus(
+                OT3SubSystem.rear_panel, UpdateState.queued, 0
+            )
 
     def get_progress(self) -> Tuple[Set[UpdateStatus], int]:
         """Gets the update status and total progress"""
         return set(self._tracker.values()), self._total_progress
 
     def update(
-        self, node_id: NodeId, status_element: StatusElement
+        self, target: FirmwareTarget, status_element: StatusElement
     ) -> Tuple[Set[UpdateStatus], int]:
         """Update internal states/progress of firmware updates."""
         fw_update_status, progress = status_element
-        subsystem = node_id_to_subsystem(node_id)
+        subsystem = (
+            node_id_to_subsystem(NodeId(target))
+            if target in NodeId
+            else OT3SubSystem.rear_panel
+        )
         state = fw_update_state_from_status(fw_update_status)
         progress = int(progress * 100)
         self._tracker[subsystem] = UpdateStatus(subsystem, state, progress)
