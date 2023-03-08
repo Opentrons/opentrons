@@ -18,7 +18,11 @@ from typing import (
     Iterable,
     Iterator,
 )
-from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, NodeId, PipetteType
+from opentrons_hardware.firmware_bindings.constants import (
+    FirmwareTarget,
+    NodeId,
+    PipetteType,
+)
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
 
 
