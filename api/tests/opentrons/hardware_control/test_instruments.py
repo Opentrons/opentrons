@@ -9,12 +9,10 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None  # type: ignore
 
-import typeguard
 
 from opentrons import types, config
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import Axis, OT3Mount
-from opentrons.hardware_control.dev_types import PipetteDict
 
 
 LEFT_PIPETTE_PREFIX = "p10_single"
