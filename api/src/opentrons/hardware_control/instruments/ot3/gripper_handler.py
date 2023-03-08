@@ -3,8 +3,8 @@ import logging
 
 from opentrons.types import Point
 from .instrument_calibration import (
-    load_gripper_calibration_offset,
     GripperCalibrationOffset,
+    load_gripper_calibration_offset,
 )
 from opentrons.hardware_control.dev_types import GripperDict
 from opentrons.hardware_control.types import (
@@ -61,6 +61,7 @@ class GripperHandler:
             og_gripper.config,
             load_gripper_calibration_offset(og_gripper.gripper_id),
             og_gripper.gripper_id,
+            og_gripper.fw_update_info,
         )
         self._gripper = new_gripper
 
