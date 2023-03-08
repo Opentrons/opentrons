@@ -21,21 +21,22 @@ from hardware_testing.data import ui
 
 
 ATTACH_DETACH_POS = helpers_ot3.get_slot_calibration_square_position_ot3(4)
-EXPECTED_POINTS = {
-    1: helpers_ot3.get_slot_calibration_square_position_ot3(1),
-    3: helpers_ot3.get_slot_calibration_square_position_ot3(3),
-    10: helpers_ot3.get_slot_calibration_square_position_ot3(10),
+PROBE_SLOTS: Final = {
+    "back-left": 10,
+    "front-left": 1,
+    "front-right": 3,
 }
-SLOT_10_TO_SLOT_1 = Point(y=-1 * (EXPECTED_POINTS[10].y - EXPECTED_POINTS[1].y))
-SLOT_1_TO_SLOT_3 = Point(x=-1 * (EXPECTED_POINTS[1].x - EXPECTED_POINTS[3].x))
+EXPECTED_POINTS = {
+    t: helpers_ot3.get_slot_calibration_square_position_ot3(s)
+    for t, s in PROBE_SLOTS.items()
+}
 
-ALIGNMENT_TESTS: Final = [
-    "alignment-x",
-    "alignment-y",
-    "flatness-x",
-    "flatness-y",
-]
-ALIGNMENT_THRESHOLDS: Final = {t: 0.3 for t in ALIGNMENT_TESTS}
+ALIGNMENT_THRESHOLDS: Final = {
+    "alignment-x": 0.3,
+    "alignment-y": 0.2,
+    "flatness-x": 0.2,
+    "flatness-y": 0.3,
+}
 
 MOVE_FROM_HOME_SPEED = 200
 
@@ -43,7 +44,7 @@ MOVE_FROM_HOME_SPEED = 200
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
-    for t in ALIGNMENT_TESTS:
+    for t in ALIGNMENT_THRESHOLDS.keys():
         lines.append(CSVLine(t, [float, CSVResult]))
     return lines
 
@@ -119,23 +120,25 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await _move_to_accessible_spot(api, mount, arch_z=home_pos.z)
     await _wait_for_pipette(api, mount, True)
     if not api.is_simulator:
-        ui.get_user_ready("attached a CALIBRATION-PROBE to the pipette")
+        ui.get_user_ready("attach a CALIBRATION-PROBE to the pipette")
     await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
 
     # PROBE SLOTS
-    ui.print_header("PROBE SLOTS 10, 3, 1")
-    actual_10 = await _find_slot(api, mount, EXPECTED_POINTS[10])
-    actual_3 = await _find_slot(api, mount, actual_10 + SLOT_10_TO_SLOT_1)
-    actual_1 = await _find_slot(api, mount, actual_3 + SLOT_1_TO_SLOT_3)
-    print("retracting")
+    slots_msg = ", ".join([str(s) for s in PROBE_SLOTS.values()])
+    ui.print_header(f"PROBE SLOTS {slots_msg}")
+    if not api.is_simulator:
+        ui.get_user_ready(f"check SLOTS {slots_msg} are ready to be probed")
+    actual_pos = {
+        k: await _find_slot(api, mount, p) for k, p in EXPECTED_POINTS.items()
+    }
     pos = await api.gantry_position(mount, critical_point=cp)
     await api.move_to(mount, pos._replace(z=home_pos.z))
 
     # calculate alignment
-    alignment_x = actual_3.x - actual_10.x  # front to rear
-    alignment_y = actual_1.y - actual_3.y  # left to right
-    flatness_x = actual_1.z - actual_3.z  # left to right
-    flatness_y = actual_3.z - actual_10.z  # front to rear
+    alignment_x = actual_pos["front-left"].x - actual_pos["back-left"].x
+    alignment_y = actual_pos["front-left"].y - actual_pos["front-right"].y
+    flatness_x = actual_pos["front-left"].z - actual_pos["front-right"].z
+    flatness_y = actual_pos["front-left"].z - actual_pos["back-left"].z
     print(f"alignment-x: {alignment_x}")
     print(f"alignment-y: {alignment_y}")
     print(f"flatness-x: {flatness_x}")
