@@ -34,24 +34,29 @@ def rename_file(path, target_file):
             shutil.copyfile( source,
                              path +'liquid_sense/pressure_data_{}.csv'.format(time.time()))
 
-def file_setup(test_data):
-        test_name = "Liquid_Sense_Test"
-        test_header = dict_keys_to_line(test_data)
-        test_tag = "-start-time-{}".format(int(time.time()))
-        test_id = data.create_run_id()
-        test_path = data.create_folder_for_test_data(test_name)
-        test_file = data.create_file_name(test_name, test_id, test_tag)
-        data.append_data_to_file(test_name, test_file, test_header)
-        print("FILE PATH = ", test_path)
-        print("FILE NAME = ", test_file)
-        return test_name, test_file
+def file_setup(test_data, details):
+    today = datetime.date.today()
+    pipette_model = 'P50S'
+    test_name = "{}-LSD-Z-{}-P-{}-Threshold-{}".format(pipette_model,
+                                            details[0], # mount_speed
+                                            details[1], # plunger_speed
+                                            details[2]) # sensor threshold
+    test_header = dict_keys_to_line(test_data)
+    test_tag = "-{}".format(today.strftime("%b-%d-%Y"))
+    test_id = data.create_run_id()
+    test_path = data.create_folder_for_test_data(test_name)
+    test_file = data.create_file_name(test_name, test_id, test_tag)
+    data.append_data_to_file(test_name, test_file, test_header)
+    print("FILE PATH = ", test_path)
+    print("FILE NAME = ", test_file)
+    return test_name, test_file
 
 def store_data(test_data, trial):
-
+    today = datetime.date.today()
     test_name = "LS_Pipette_data"
     headers = {'Time(s)': None, 'Pressure(Pa)': None}
     test_header = dict_keys_to_line(headers)
-    test_tag = "-start-time-{}-{}".format(time.time(), trial)
+    test_tag = "-{}".format(today.strftime("%b-%d-%Y"), trial)
     test_id = data.create_run_id()
     test_path = data.create_folder_for_test_data(test_name)
     test_file = data.create_file_name(test_name, test_id, test_tag)
@@ -408,15 +413,17 @@ async def _main() -> None:
                             {tip}, \
                             {true_liquid_height[OT3Axis.by_mount(mount)]}, \
                             {args.mount_speed}, \
-                            {args.plunger_speed} \n"
+                            {args.plunger_speed}, \
+                            {args.sensor_threshold}, \n"
                 print(d_str)
                 data.append_data_to_file(test_n, test_f, d_str)
                 # Blow out a bit
                 await move_plunger_relative_ot3(hw_api, mount, 1.5, None, speed = 2)
                 print(liquid_height_pos)
+                current_position = await hw_api.current_position_ot3(mount, refresh=True)
                 # Move to home position as fast as possible
-                await hw_api.move_to(mount, Point(tip_home_pos[OT3Axis.X],
-                                                    tip_home_pos[OT3Axis.Y],
+                await hw_api.move_to(mount, Point(current_position[OT3Axis.X],
+                                                    current_position[OT3Axis.Y],
                                                     tip_home_pos[OT3Axis.by_mount(mount)]))
                 await hw_api.home([OT3Axis.by_mount(mount)])
                 # move plunger to bottom
@@ -458,7 +465,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="right")
-    parser.add_argument("--lp_method", type=str, choices=["push_air", "pull_air"], default="pull_air")
+    parser.add_argument("--lp_method", type=str, choices=["push_air", "pull_air"], default="push_air")
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C2")
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
@@ -467,7 +474,7 @@ if __name__ == "__main__":
     parser.add_argument("--min_z_distance", type=float, default = 5)
     parser.add_argument("--mount_speed", type=float, default = 1)
     parser.add_argument("--plunger_speed", type=float, default = 1)
-    parser.add_argument("--sensor_threshold", type=float, default = 10, help = "Threshold in Pascals")
+    parser.add_argument("--sensor_threshold", type=float, default = 110, help = "Threshold in Pascals")
     parser.add_argument("--expected_liquid_height", type=int, default = 0)
     parser.add_argument("--log_pressure", action="store_true")
     parser.add_argument(
@@ -506,8 +513,12 @@ if __name__ == "__main__":
                     "tip": None,
                     "true_liquid_height": None,
                     "mount_speed(mm/s)": None,
-                    "plunger_speed(mm/s)": None
+                    "plunger_speed(mm/s)": None,
+                    "sensor_threshold(Pa)": None
                 }
         gauge = dial_indicator_setup()
-        test_n , test_f  = file_setup(test_data)
+        details = [ args.mount_speed,
+                    args.plunger_speed,
+                    args.sensor_threshold]
+        test_n , test_f  = file_setup(test_data, details)
     asyncio.run(_main())
