@@ -15,7 +15,10 @@ from opentrons.protocol_engine.execution.pipetting import (
     VirtualPipettingHandler,
     create_pipetting_handler,
 )
-from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
+from opentrons.protocol_engine.errors.exceptions import (
+    TipNotAttachedError,
+    InvalidPipettingVolumeError,
+)
 
 
 @pytest.fixture
@@ -212,6 +215,27 @@ async def test_aspirate_in_place(
     )
 
 
+async def test_virtual_validate_aspirated_volume_raises(
+    decoy: Decoy,
+    mock_state_view: StateView,
+) -> None:
+    """Should validate if trying to aspirate more than the working volume."""
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+
+    decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(3)
+
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        2
+    )
+
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    with pytest.raises(InvalidPipettingVolumeError):
+        await subject.aspirate_in_place(pipette_id="pipette-id", volume=4, flow_rate=1)
+
+
 async def test_blow_out_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
@@ -273,9 +297,17 @@ def test_get_is_ready_to_aspirate_virtual(
 
 
 async def test_aspirate_in_place_virtual(
-    decoy: Decoy, mock_state_view: StateView
+    mock_state_view: StateView, decoy: Decoy
 ) -> None:
     """Should return the volume."""
+    decoy.when(
+        mock_state_view.pipettes.get_working_volume(pipette_id="pipette-id")
+    ).then_return(3)
+
+    decoy.when(
+        mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
+    ).then_return(1)
+
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
     decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
@@ -283,9 +315,9 @@ async def test_aspirate_in_place_virtual(
     )
 
     result = await subject.aspirate_in_place(
-        pipette_id="pipette-id", volume=3, flow_rate=5
+        pipette_id="pipette-id", volume=2, flow_rate=5
     )
-    assert result == 3
+    assert result == 2
 
 
 async def test_dispense_in_place_virtual(

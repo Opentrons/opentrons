@@ -214,3 +214,7 @@ class FirmwareUpdateRequired(ProtocolEngineError):
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):
     """An error raised when the pipette is not ready to aspirate."""
+
+
+class InvalidPipettingVolumeError(ProtocolEngineError):
+    """An error raised when pipetting a volume larger than the pipette volume."""

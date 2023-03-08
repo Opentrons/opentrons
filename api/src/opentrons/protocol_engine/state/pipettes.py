@@ -401,6 +401,10 @@ class PipetteView(HasState[PipetteState]):
     def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:
         """Get the currently aspirated volume of a pipette by ID.
 
+        Returns:
+            The volume the pipette has aspirated.
+            None, after blow-out and the plunger is in an unsafe position or drop-tip and there is no tip attached.
+
         Raises:
             PipetteNotLoadedError: pipette ID does not exist.
             TipNotAttachedError: if no tip is attached to the pipette.
