@@ -48,6 +48,11 @@ export function GripperWizardFlows(props: MaintenanceRunManagerProps): JSX.Eleme
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
 
   const proceed = (): void => {
+    console.table({
+      isCommandMutationLoading,
+      isStopLoading,
+      isExiting
+    })
     if (
       !(
         isCommandMutationLoading ||
@@ -55,6 +60,7 @@ export function GripperWizardFlows(props: MaintenanceRunManagerProps): JSX.Eleme
         isExiting
       )
     ) {
+      console.log('steo inc', currentStepIndex, gripperWizardSteps.length - 1)
       setCurrentStepIndex(
         currentStepIndex !== gripperWizardSteps.length - 1
           ? currentStepIndex + 1
@@ -125,18 +131,17 @@ export const GripperWizard = (
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]
   const isFinalStep = currentStepIndex === gripperWizardSteps.length - 1
-
   const goBack = (): void => {
     setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
   }
 
   const handleProceed = (): void => {
     proceed()
-    setCurrentStepIndex(
-      currentStepIndex !== gripperWizardSteps.length - 1
-        ? currentStepIndex + 1
-        : currentStepIndex
-    )
+    if (isFinalStep) {
+      handleCleanUpAndClose()
+    } else {
+      setCurrentStepIndex(currentStepIndex + 1)
+    }
   }
 
   const {
@@ -193,7 +198,7 @@ export const GripperWizard = (
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <Success {...currentStep} proceed={isFinalStep ? handleCleanUpAndClose : proceed} />
+      <Success {...currentStep} proceed={handleProceed} />
     )
   }
 

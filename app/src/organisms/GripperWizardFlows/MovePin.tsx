@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -10,7 +11,7 @@ import {
 } from './constants'
 import type { GripperWizardStepProps, MovePinStep } from './types'
 
-interface MovePinProps extends GripperWizardStepProps, MovePinStep {}
+interface MovePinProps extends GripperWizardStepProps, MovePinStep { }
 
 export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const {
@@ -24,29 +25,32 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null
   const handleOnClick = (): void => {
-    chainRunCommands([
-      // {
-      //   // @ts-expect-error calibration type not yet supported
-      //   commandType: 'calibration/calibrateGripper' as const,
-      //   params: { },
-      // },
-      {
-        commandType: 'home' as const,
-        params: {
-          axes: [], // TODO: use gripper motor axis const here
-        },
-      },
-      // {
-      //   // @ts-expect-error calibration type not yet supported
-      //   commandType: 'calibration/moveToLocation' as const,
-      //   params: {
-      //     location: 'attachOrDetach',
-      //   },
-      // },
-    ]).then(() => {
+    if (movement === REMOVE_PIN_FROM_REAR_JAW) {
       proceed()
-    })
-    proceed()
+    } else {
+      chainRunCommands([
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: [], // TODO: use gripper motor axis const here
+          },
+        },
+        {
+          commandType: 'calibration/calibrateGripper' as const,
+          params: { jaw: movement === MOVE_PIN_TO_FRONT_JAW ? 'front' : 'rear'},
+        },
+        {
+          // @ts-expect-error calibration type not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+          },
+        },
+      ], true).then(() => {
+        proceed()
+      })
+    }
+
   }
   const infoByMovement: {
     [m in typeof movement]: {

@@ -5,7 +5,7 @@ import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import type { GripperWizardStepProps } from './types'
 
 export const UnmountGripper = (
@@ -20,6 +20,7 @@ export const UnmountGripper = (
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const [showGripperStillDetected, setShowGripperStillDetected] = React.useState(false)
+  console.log('AG', attachedGripper)
   const handleContinue = (): void => {
     if (attachedGripper == null) {
       chainRunCommands([{ commandType: 'home' as const, params: {} }], true).then(() => {
