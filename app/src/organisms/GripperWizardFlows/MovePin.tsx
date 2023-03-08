@@ -10,9 +10,7 @@ import {
 } from './constants'
 import type { GripperWizardStepProps, MovePinStep } from './types'
 
-interface MovePinProps extends GripperWizardStepProps, MovePinStep {
-  isExiting: boolean
-}
+interface MovePinProps extends GripperWizardStepProps, MovePinStep {}
 
 export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const {
@@ -22,7 +20,6 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     goBack,
     movement,
     chainRunCommands,
-    // isExiting,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null

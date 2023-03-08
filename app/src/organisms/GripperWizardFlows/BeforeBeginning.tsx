@@ -53,7 +53,6 @@ export const BeforeBeginning = (
     proceed,
     createRun,
     flowType,
-    attachedGripper,
     isCreateLoading,
     isRobotMoving,
     chainRunCommands,
@@ -76,9 +75,6 @@ export const BeforeBeginning = (
     commandsOnProceed = [{ commandType: 'home' as const, params: {} }, ...commandsOnProceed]
   }
 
-
-
-  if (attachedGripper == null) return null
   const handleOnClick = (): void => {
     chainRunCommands(commandsOnProceed, true).then(() => {
       proceed()
