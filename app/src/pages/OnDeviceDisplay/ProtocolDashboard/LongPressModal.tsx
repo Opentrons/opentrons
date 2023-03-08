@@ -26,7 +26,7 @@ import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
-// What is the maxinum number of protocols one can pin? This many.
+// What is the maximum number of protocols one can pin? This many.
 const MAXIMUM_PINNED_PROTOCOLS = 8
 
 export function LongPressModal(props: {
@@ -43,12 +43,22 @@ export function LongPressModal(props: {
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
 
-  const { createRun } = useCreateRunMutation({
+  // This looks totally bonkers, and it is. This construction is to make
+  // it easier to use in unit tests, where we have to mock both the mutation
+  // and the createRun function. The real code didn't like the mock:
+  //
+  // TypeError: Cannot read properties of undefined (reading 'createRun')
+  //
+  // Having the empty function fallback lets the mocks get called. In real use it
+  // shouldn't ever get needed.
+  const createRunUse = useCreateRunMutation({
     onSuccess: data => {
       const runId: string = data.data.id
       history.push(`/protocols/${runId}/setup`)
     },
   })
+  const createRun =
+    createRunUse?.createRun !== undefined ? createRunUse.createRun : () => {}
 
   const handleCloseModal = (): void => {
     longpress.setIsLongPressed(false)
