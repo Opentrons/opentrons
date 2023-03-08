@@ -388,17 +388,18 @@ class UpdateProgress:
         self._tracker: Dict[FirmwareTarget, UpdateStatus] = {}
         self._total_progress = 0
         for target in targets:
-            if target == USBTarget.rear_panel:
-                subsystem = OT3SubSystem.rear_panel
-            else:
-                subsystem = node_id_to_subsystem(target)
+            subsystem = (
+                node_id_to_subsystem(NodeId(target))
+                if isinstance(target, NodeId)
+                else OT3SubSystem.rear_panel
+            )
             self._tracker[target] = UpdateStatus(subsystem, UpdateState.queued, 0)
 
     @property
     def nodes(self) -> Set[NodeId]:
         """Gets the set of update Targets queued or updating."""
         # NOTE: (ba, 2023-03-08) ignore rear panel for now
-        return {target for target in set(self._tracker) if target != USBTarget}
+        return {target for target in set(self._tracker) if isinstance(target, NodeId)}
 
     def get_progress(self) -> Set[UpdateStatus]:
         """Gets the update status and total progress"""
@@ -411,7 +412,7 @@ class UpdateProgress:
         fw_update_status, progress = status_element
         subsystem = (
             node_id_to_subsystem(NodeId(target))
-            if target in NodeId
+            if isinstance(target, NodeId)
             else OT3SubSystem.rear_panel
         )
         state = fw_update_state_from_status(fw_update_status)

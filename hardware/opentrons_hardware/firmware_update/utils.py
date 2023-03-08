@@ -18,7 +18,7 @@ from typing import (
     Iterable,
     Iterator,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteType
+from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, NodeId, PipetteType
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
 
 
@@ -306,7 +306,7 @@ def check_firmware_updates(
     attached_pipettes: Dict[NodeId, PipetteType],
     nodes: Optional[Set[NodeId]] = None,
     force: bool = False,
-) -> Dict[NodeId, Tuple[int, str]]:
+) -> Dict[FirmwareTarget, Tuple[int, str]]:
     """Returns a dict of NodeIds that require a firmware update and the path to the file to update them."""
     nodes = nodes or set()
 
