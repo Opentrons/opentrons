@@ -491,6 +491,9 @@ class OT3API(
             sim_model=model.value,
         )
 
+    async def connect_usb_to_rear_panel(self) -> None:
+        await self._backend.connect_usb_to_rear_panel()
+
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)

@@ -627,3 +627,8 @@ class OT3Simulator:
     ) -> List[float]:
         self._position[axis_to_node(moving)] += distance_mm
         return []
+
+    @ensure_yield
+    async def connect_usb_to_rear_panel(self) -> None:
+        """Connect to rear panel over usb."""
+        return None

@@ -53,7 +53,6 @@ from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.binary_usb import (
-    SerialUsbDriver,
     BinaryMessenger,
     build_rear_panel_driver,
 )
@@ -170,19 +169,9 @@ class OT3Controller:
             Instance.
         """
         driver = await build_driver(DriverSettings())
-        usb_driver = None
-        try:
-            usb_driver = await build_rear_panel_driver()
-        except IOError:
-            log.error("No rear panel device found, probably an EVT bot")
-        return cls(config, driver=driver, usb_driver=usb_driver)
+        return cls(config, driver=driver)
 
-    def __init__(
-        self,
-        config: OT3Config,
-        driver: AbstractCanDriver,
-        usb_driver: Optional[SerialUsbDriver],
-    ) -> None:
+    def __init__(self, config: OT3Config, driver: AbstractCanDriver) -> None:
         """Construct.
 
         Args:
@@ -194,11 +183,7 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        if usb_driver is not None:
-            self._usb_messenger = BinaryMessenger(usb_driver)
-            self._usb_messenger.start()
-        else:
-            self._usb_messenger = None
+        self._usb_messenger = None
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger)
         self._position = self._get_home_position()
@@ -1115,3 +1100,15 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
+
+    async def connect_usb_to_rear_panel(self) -> None:
+        usb_driver = None
+        try:
+            usb_driver = await build_rear_panel_driver()
+        except IOError as e:
+            log.error(
+                "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
+            )
+            raise e
+        self._usb_messenger = BinaryMessenger(usb_driver)
+        self._usb_messenger.start()

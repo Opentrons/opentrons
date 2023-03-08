@@ -21,6 +21,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
+        "rearPanelIntegration": None,
     }
 
 
@@ -267,6 +268,17 @@ def v22_config(v21_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v23_config(v22_config: Dict[str, Any]) -> Dict[str, Any]:
+    r.update(
+        {
+            "_version": 23,
+            "rearPanelIntegration": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -294,6 +306,7 @@ def v22_config(v21_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v20_config"),
         lazy_fixture("v21_config"),
         lazy_fixture("v22_config"),
+        lazy_fixture("v23_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
@@ -374,4 +387,5 @@ def test_ensures_config() -> None:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
+        "rearPanelIntegration": None,
     }

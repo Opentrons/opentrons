@@ -159,6 +159,9 @@ async def initialize() -> ThreadManagedHardware:
     # is returned. Do our own blinking here to keep it going while we home the robot.
     blink_task = asyncio.create_task(_blink())
 
+    if should_use_ot3() and ff.rear_panel_integration():
+        hardware.connect_usb_to_rear_panel()
+
     try:
 
         if not ff.disable_home_on_boot():
