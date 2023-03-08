@@ -19,7 +19,6 @@ import numpy as np
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     FirmwareTarget,
-    USBTarget,
     PipetteType,
     SensorId,
     PipetteTipActionType,
