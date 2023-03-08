@@ -112,19 +112,6 @@ async def enable_ot3_hardware_controller(
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
-@pytest.fixture
-async def enable_ot3_firmware_updates(
-    request: pytest.FixtureRequest,
-    decoy: Decoy,
-    mock_feature_flags: None,
-) -> None:
-    # this is from the command line parameters added in root conftest
-    if request.config.getoption("--ot2-only"):
-        pytest.skip("testing only ot2")
-
-    decoy.when(config.feature_flags.enable_ot3_firmware_updates()).then_return(True)
-
-
 @pytest.fixture()
 def protocol_file() -> str:
     return "testosaur_v2.py"

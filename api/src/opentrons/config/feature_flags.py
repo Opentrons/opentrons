@@ -29,9 +29,3 @@ def enable_ot3_hardware_controller() -> bool:
     """Get whether to use the OT-3 hardware controller."""
 
     return advs.get_setting_with_env_overload("enableOT3HardwareController")
-
-
-def enable_ot3_firmware_updates() -> bool:
-    """Whether to enable firmware updates for the OT-3 subsystems."""
-
-    return advs.get_setting_with_env_overload("enableOT3FirmwareUpdates")

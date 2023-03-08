@@ -261,6 +261,7 @@ def _reload_gripper(
     if (
         new_config == attached_instr.config
         and cal_offset == attached_instr._calibration_offset
+        and fw_update_info == attached_instr.fw_update_info
     ):
         # Same config, good enough
         return attached_instr

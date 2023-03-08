@@ -25,7 +25,7 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, ot3_pipette_config, feature_flags as ff
+from opentrons.config import robot_configs, ot3_pipette_config
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -273,9 +273,8 @@ class OT3API(
         await api_instance._cache_instruments()
 
         # check for and start firmware updates if required
-        if ff.enable_ot3_firmware_updates():
-            async for _ in api_instance.update_firmware():
-                pass
+        async for _ in api_instance.update_firmware():
+            pass
 
         await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(

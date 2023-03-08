@@ -283,7 +283,7 @@ async def test_cache_instruments_sim(sim_and_instr):
     sim = await sim_builder(attached_instruments=dummy_instruments)
     await sim.cache_instruments()
     attached = sim.attached_instruments
-    ot2_pipette_dict = PipetteDict.__dict__['__annotations__'].keys()
+    ot2_pipette_dict = PipetteDict.__dict__["__annotations__"].keys()
     for key_name in attached[types.Mount.LEFT]:
         assert key_name in ot2_pipette_dict
 

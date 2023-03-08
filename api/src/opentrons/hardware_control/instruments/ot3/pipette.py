@@ -532,6 +532,7 @@ def _reload_and_check_skip(
     if (
         new_config == attached_instr.config
         and pipette_offset == attached_instr._pipette_offset
+        and fw_update_info == attached_instr.fw_update_info
     ):
         # Same config, good enough
         return attached_instr, True

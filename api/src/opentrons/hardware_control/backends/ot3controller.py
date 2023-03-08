@@ -24,7 +24,7 @@ from typing import (
     KeysView,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config, feature_flags as ff
+from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
     UpdateProgress,
     axis_convert,
@@ -137,11 +137,7 @@ def requires_update(func: Wrapped) -> Wrapped:
 
     @wraps(func)
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
-        if (
-            ff.enable_ot3_firmware_updates()
-            and self.update_required
-            and self.initialized
-        ):
+        if self.update_required and self.initialized:
             raise FirmwareUpdateRequired()
         return await func(self, *args, **kwargs)
 
@@ -276,9 +272,6 @@ class OT3Controller:
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        if not ff.enable_ot3_firmware_updates():
-            log.info("Firmware Updates are Disabled")
-            return
         # Check that there arent updates already running for given nodes
         nodes = nodes or set(self._network_info.device_info)
         nodes_updating = self._update_tracker.nodes if self._update_tracker else set()
@@ -331,14 +324,12 @@ class OT3Controller:
         )
         await self.set_default_currents()
 
-    @requires_update
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
         assert len(self._present_nodes)
         response = await get_motor_position(self._messenger, self._present_nodes)
         self._handle_motor_status_response(response)
 
-    @requires_update
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
@@ -741,7 +732,6 @@ class OT3Controller:
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
         return current_tools
 
-    @requires_update
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
         assert (
@@ -754,7 +744,6 @@ class OT3Controller:
     def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
         return [axis_to_node(OT3Axis.Q)] if OT3Axis.Q in axis_current_keys else []
 
-    @requires_update
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
