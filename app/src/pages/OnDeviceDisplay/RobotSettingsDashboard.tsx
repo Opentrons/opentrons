@@ -38,6 +38,7 @@ import {
   RobotSystemVersion,
 } from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
+import type { IconName } from '@opentrons/components'
 import type { NetworkConnection } from './hooks'
 import type { State } from '../../redux/types'
 
@@ -101,6 +102,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingInfo={robotName}
             currentOption="RobotName"
             setCurrentOption={setCurrentOption}
+            iconName="flex-robot"
           />
 
           {/* Robot System Version */}
@@ -114,6 +116,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             currentOption="RobotSystemVersion"
             setCurrentOption={setCurrentOption}
             isUpdateAvailable={isUpdateAvailable}
+            iconName="update"
           />
           {/* Network Settings */}
           <RobotSettingButton
@@ -121,6 +124,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingInfo={networkConnection?.connectionStatus}
             currentOption="NetworkSettings"
             setCurrentOption={setCurrentOption}
+            iconName="wifi"
           />
 
           {/* Display Sleep Settings */}
@@ -128,6 +132,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingName={t('display_sleep_settings')}
             currentOption="DisplaySleepSettings"
             setCurrentOption={setCurrentOption}
+            iconName="sleep"
           />
 
           {/* Display Brightness */}
@@ -135,6 +140,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingName={t('display_brightness')}
             currentOption="DisplayBrightness"
             setCurrentOption={setCurrentOption}
+            iconName="brightness"
           />
 
           {/* Display Text Size */}
@@ -142,6 +148,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingName={t('display_text_size')}
             currentOption="DisplayTextSize"
             setCurrentOption={setCurrentOption}
+            iconName="text-size"
           />
 
           {/* Device Reset */}
@@ -149,6 +156,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingName={t('device_reset')}
             currentOption="DeviceReset"
             setCurrentOption={setCurrentOption}
+            iconName="reset"
           />
         </>
       )}
@@ -173,6 +181,7 @@ interface RobotSettingButtonProps {
   setCurrentOption: (currentOption: SettingOption) => void
   robotName?: string
   isUpdateAvailable?: boolean
+  iconName: IconName
 }
 
 const RobotSettingButton = ({
@@ -182,6 +191,7 @@ const RobotSettingButton = ({
   setCurrentOption,
   robotName,
   isUpdateAvailable,
+  iconName,
 }: RobotSettingButtonProps): JSX.Element => {
   const { t } = useTranslation('app_settings')
   return (
@@ -196,7 +206,7 @@ const RobotSettingButton = ({
         alignItems={ALIGN_CENTER}
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
-          <Icon name="wifi" size="3rem" />
+          <Icon name={iconName} size="3rem" />
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing1}
