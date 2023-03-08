@@ -32,11 +32,13 @@ BELT_CAL_TRANSIT_HEIGHT: Final[float] = 50
 Z_PREP_OFFSET = Point(x=13, y=13, z=0)
 CALIBRATION_SQUARE_DEPTH: Final[float] = -0.25
 CALIBRATION_SQUARE_SIZE: Final[float] = 20
+CALIBRATION_PROBE_RADIUS: Final[float] = 2
+# edges are offset by the radius of the probe to get the edge-to-edge position
 EDGES = {
-    "left": Point(x=-CALIBRATION_SQUARE_SIZE * 0.5),
-    "right": Point(x=CALIBRATION_SQUARE_SIZE * 0.5),
-    "top": Point(y=CALIBRATION_SQUARE_SIZE * 0.5),
-    "bottom": Point(y=-CALIBRATION_SQUARE_SIZE * 0.5),
+    "left": Point(x=-CALIBRATION_SQUARE_SIZE * 0.5 + CALIBRATION_PROBE_RADIUS),
+    "right": Point(x=CALIBRATION_SQUARE_SIZE * 0.5 - CALIBRATION_PROBE_RADIUS),
+    "top": Point(y=CALIBRATION_SQUARE_SIZE * 0.5 - CALIBRATION_PROBE_RADIUS),
+    "bottom": Point(y=-CALIBRATION_SQUARE_SIZE * 0.5 + CALIBRATION_PROBE_RADIUS),
 }
 
 
