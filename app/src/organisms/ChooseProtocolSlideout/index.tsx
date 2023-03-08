@@ -120,7 +120,6 @@ export function ChooseProtocolSlideoutComponent(
       logger.warn('failed to create protocol, no protocol selected')
     }
   }
-
   return (
     <Slideout
       isExpanded={showSlideout}
@@ -132,6 +131,9 @@ export function ChooseProtocolSlideoutComponent(
             offsetCandidates={offsetCandidates}
             shouldApplyOffsets={shouldApplyOffsets}
             setShouldApplyOffsets={setShouldApplyOffsets}
+            commands={selectedProtocol?.mostRecentAnalysis?.commands ?? []}
+            labware={selectedProtocol?.mostRecentAnalysis?.labware ?? []}
+            modules={selectedProtocol?.mostRecentAnalysis?.modules ?? []}
           />
           <PrimaryButton
             onClick={handleProceed}

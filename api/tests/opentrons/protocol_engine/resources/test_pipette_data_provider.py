@@ -1,6 +1,7 @@
 """Test pipette data provider."""
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
 
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
@@ -42,26 +43,63 @@ def test_get_virtual_pipette_static_config() -> None:
 
 
 def test_get_pipette_static_config() -> None:
-    """It should return config data given a pipette model and serial."""
-    result = subject.get_pipette_static_config("p1000_multi_v3.1", "abc-123")  # type: ignore[arg-type]
+    """It should return config data given a PipetteDict."""
+    pipette_dict: PipetteDict = {
+        "name": "p300_single_gen2",
+        "min_volume": 20,
+        "max_volume": 300,
+        "channels": 1,
+        "aspirate_flow_rate": 46.43,
+        "dispense_flow_rate": 46.43,
+        "pipette_id": "P3HSV202020060308",
+        "current_volume": 0.0,
+        "display_name": "P300 Single-Channel GEN2",
+        "tip_length": 0.0,
+        "model": PipetteModel("p300_single_v2.0"),
+        "blow_out_flow_rate": 46.43,
+        "working_volume": 300,
+        "tip_overlap": {
+            "default": 8.2,
+            "opentrons/opentrons_96_tiprack_300ul/1": 8.2,
+            "opentrons/opentrons_96_filtertiprack_200ul/1": 8.2,
+        },
+        "available_volume": 300.0,
+        "return_tip_height": 0.5,
+        "default_aspirate_flow_rates": {"2.0": 46.43, "2.1": 92.86},
+        "default_blow_out_flow_rates": {"2.0": 46.43, "2.2": 92.86},
+        "default_dispense_flow_rates": {"2.0": 46.43, "2.3": 92.86},
+        "back_compat_names": ["p300_single"],
+        "has_tip": False,
+        "aspirate_speed": 5.021202,
+        "dispense_speed": 5.021202,
+        "blow_out_speed": 5.021202,
+        "ready_to_aspirate": False,
+        "default_blow_out_speeds": {"2.0": 5.021202, "2.6": 10.042404},
+        "default_dispense_speeds": {"2.0": 5.021202, "2.6": 10.042404},
+        "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
+    }
+
+    result = subject.get_pipette_static_config(pipette_dict)
 
     assert result == LoadedStaticPipetteData(
-        model="p1000_multi_v3.1",
-        display_name="P1000 8-Channel GEN3",
-        min_volume=1,
-        max_volume=1000.0,
-        channels=8,
-        nozzle_offset_z=-259.15,
-        home_position=230.15,
+        model="p300_single_v2.0",
+        display_name="P300 Single-Channel GEN2",
+        min_volume=20,
+        max_volume=300,
+        channels=1,
         flow_rates=FlowRates(
-            default_aspirate={"2.0": 159.04, "2.6": 159.04},
-            default_dispense={"2.0": 159.04},
-            default_blow_out={"2.0": 78.52},
+            default_aspirate={"2.0": 46.43, "2.1": 92.86},
+            default_dispense={"2.0": 46.43, "2.3": 92.86},
+            default_blow_out={"2.0": 46.43, "2.2": 92.86},
         ),
-        return_tip_scale=0.83,
+        return_tip_scale=0.5,
         nominal_tip_overlap={
-            "default": 10.5,
-            "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-            "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5,
+            "default": 8.2,
+            "opentrons/opentrons_96_tiprack_300ul/1": 8.2,
+            "opentrons/opentrons_96_filtertiprack_200ul/1": 8.2,
         },
+        # TODO(mc, 2023-02-28): these two values are not present in PipetteDict
+        # https://opentrons.atlassian.net/browse/RCORE-655
+        nozzle_offset_z=0,
+        home_position=0,
     )

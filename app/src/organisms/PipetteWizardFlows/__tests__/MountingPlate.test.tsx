@@ -45,6 +45,7 @@ describe('MountingPlate', () => {
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected for attach flow', () => {

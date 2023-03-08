@@ -202,12 +202,12 @@ async def mock_instrument_handlers(
                 OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p50"},
                 OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"},
             },
-            GantryLoad.TWO_LOW_THROUGHPUT,
+            GantryLoad.LOW_THROUGHPUT,
         ),
-        ({}, GantryLoad.NONE),
+        ({}, GantryLoad.LOW_THROUGHPUT),
         (
             {OT3Mount.GRIPPER: {"model": GripperModel.v1, "id": "g12345"}},
-            GantryLoad.GRIPPER,
+            GantryLoad.LOW_THROUGHPUT,
         ),
         (
             {OT3Mount.LEFT: {"channels": 8, "version": (3, 3), "model": "p1000"}},

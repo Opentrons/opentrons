@@ -25,6 +25,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
 from opentrons.hardware_control.types import (
     OT3Axis,
     OT3Mount,
@@ -101,14 +102,23 @@ def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> AsyncMock:
 
 
 @pytest.fixture
-def mock_driver(mock_messenger: AsyncMock) -> AbstractCanDriver:
+def mock_can_driver(mock_messenger: AsyncMock) -> AbstractCanDriver:
     return AsyncMock(spec=AbstractCanDriver)
 
 
 @pytest.fixture
-def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Controller:
+def mock_usb_driver() -> SerialUsbDriver:
+    return AsyncMock(spec=SerialUsbDriver)
+
+
+@pytest.fixture
+def controller(
+    mock_config: OT3Config,
+    mock_can_driver: AbstractCanDriver,
+    mock_usb_driver: SerialUsbDriver,
+) -> OT3Controller:
     with mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"):
-        yield OT3Controller(mock_config, mock_driver)
+        yield OT3Controller(mock_config, mock_can_driver, mock_usb_driver)
 
 
 @pytest.fixture
@@ -736,8 +746,7 @@ async def test_update_motor_estimation(
 @pytest.mark.parametrize(
     argnames=["gantry_load", "expected_call"],
     argvalues=[
-        [GantryLoad.NONE, []],
-        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],
+        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],  # this uses the Q motor
         [GantryLoad.LOW_THROUGHPUT, []],
     ],
 )
@@ -757,9 +766,21 @@ async def test_set_default_currents(
         )
 
         for k, v in mock_present_nodes._current_settings.items():
-            assert (
-                mocked_currents.call_args_list[0][0][1][axis_to_node(k)] == v.as_tuple()
-            )
+            if k == OT3Axis.P_L and (
+                gantry_load == GantryLoad.HIGH_THROUGHPUT
+                and expected_call[0] == NodeId.pipette_left
+            ):
+                # q motor config
+                v = mock_present_nodes._current_settings[OT3Axis.Q]
+                assert (
+                    mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
+                    == v.as_tuple()
+                )
+            else:
+                assert (
+                    mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
+                    == v.as_tuple()
+                )
 
 
 @pytest.mark.parametrize(
@@ -767,7 +788,7 @@ async def test_set_default_currents(
     argvalues=[
         [
             {OT3Axis.X: 1.0, OT3Axis.Y: 2.0},
-            GantryLoad.NONE,
+            GantryLoad.LOW_THROUGHPUT,
             [{NodeId.gantry_x: 1.0, NodeId.gantry_y: 2.0}, []],
         ],
         [
@@ -805,7 +826,7 @@ async def test_set_run_current(
     argvalues=[
         [
             {OT3Axis.P_L: 0.5, OT3Axis.Y: 0.8},
-            GantryLoad.NONE,
+            GantryLoad.LOW_THROUGHPUT,
             [{NodeId.pipette_left: 0.5, NodeId.gantry_y: 0.8}, []],
         ],
         [
@@ -923,7 +944,8 @@ async def test_update_firmware_update_required(
         async for node_id, status_element in controller.update_firmware({}):
             pass
         run_updates.assert_called_with(
-            messenger=controller._messenger,
+            can_messenger=controller._messenger,
+            usb_messenger=controller._usb_messenger,
             update_details=fw_update_info,
             retry_count=mock.ANY,
             timeout_seconds=mock.ANY,
@@ -979,7 +1001,8 @@ async def test_update_firmware_specified_nodes(
             fw_node_info, {}, nodes={NodeId.head, NodeId.gantry_x}
         )
         run_updates.assert_called_with(
-            messenger=controller._messenger,
+            can_messenger=controller._messenger,
+            usb_messenger=controller._usb_messenger,
             update_details=fw_update_info,
             retry_count=mock.ANY,
             timeout_seconds=mock.ANY,
@@ -1010,7 +1033,8 @@ async def test_update_firmware_invalid_specified_node(
         ):
             pass
         run_updates.assert_called_with(
-            messenger=controller._messenger,
+            can_messenger=controller._messenger,
+            usb_messenger=controller._usb_messenger,
             update_details=fw_update_info,
             retry_count=mock.ANY,
             timeout_seconds=mock.ANY,

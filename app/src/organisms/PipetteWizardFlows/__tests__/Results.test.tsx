@@ -54,6 +54,7 @@ describe('Results', () => {
       handleCleanUpAndClose: jest.fn(),
       currentStepIndex: 2,
       totalStepCount: 6,
+      isOnDevice: false,
     }
     pipettePromise = Promise.resolve()
     mockRefetchPipette = jest.fn(() => pipettePromise)

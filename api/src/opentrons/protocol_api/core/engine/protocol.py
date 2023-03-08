@@ -10,10 +10,8 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    ModuleType,
-)
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -46,16 +44,13 @@ from . import load_labware_params
 from . import deck_conflict
 
 
-# TODO(mc, 2022-08-24): many of these methods are likely unnecessary
-# in a ProtocolEngine world. As we develop this core, we should remove
-# and consolidate logic as we need to across all cores rather than
-# necessarily try to support every one of these behaviors in the engine.
 class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     """Protocol API core using a ProtocolEngine.
 
     Args:
-        engine_client: A synchronous client to the ProtocolEngine
-            that is executing the protocol.
+        engine_client: A client to the ProtocolEngine that is executing the protocol.
+        api_version: The Python Protocol API versionat which  this core is operating.
+        sync_hardware: A SynchronousAdapter-wrapped Hardware Control API.
     """
 
     def __init__(
@@ -350,7 +345,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def door_closed(self) -> bool:
         """Get whether the device's front door is closed."""
-        raise NotImplementedError("ProtocolCore.door_closed not implemented")
+        return self._sync_hardware.door_state == DoorState.CLOSED  # type: ignore[no-any-return]
 
     def get_last_location(
         self,

@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import WellLocation, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.move_to_well import (
     MoveToWellParams,
@@ -38,7 +39,7 @@ async def test_move_to_well_implementation(
             minimum_z_height=4.56,
             speed=7.89,
         )
-    ).then_return(DeckPoint(x=9, y=8, z=7))
+    ).then_return(Point(x=9, y=8, z=7))
 
     result = await subject.execute(data)
 

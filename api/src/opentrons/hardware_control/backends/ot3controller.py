@@ -52,6 +52,11 @@ except (OSError, ModuleNotFoundError):
 from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.binary_usb import (
+    SerialUsbDriver,
+    BinaryMessenger,
+    build_rear_panel_driver,
+)
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
@@ -147,6 +152,7 @@ class OT3Controller:
     """OT3 Hardware Controller Backend."""
 
     _messenger: CanMessenger
+    _usb_messenger: BinaryMessenger
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
@@ -163,9 +169,12 @@ class OT3Controller:
             Instance.
         """
         driver = await build_driver(DriverSettings())
-        return cls(config, driver=driver)
+        usb_driver = await build_rear_panel_driver()
+        return cls(config, driver=driver, usb_driver=usb_driver)
 
-    def __init__(self, config: OT3Config, driver: AbstractCanDriver) -> None:
+    def __init__(
+        self, config: OT3Config, driver: AbstractCanDriver, usb_driver: SerialUsbDriver
+    ) -> None:
         """Construct.
 
         Args:
@@ -177,6 +186,8 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
+        self._usb_messenger = BinaryMessenger(usb_driver)
+        self._usb_messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger)
         self._position = self._get_home_position()
@@ -251,7 +262,8 @@ class OT3Controller:
         self.update_required = True
 
         updater = firmware_update.RunUpdate(
-            messenger=self._messenger,
+            can_messenger=self._messenger,
+            usb_messenger=self._usb_messenger,
             update_details=firmware_updates,
             retry_count=3,
             timeout_seconds=20,
@@ -405,7 +417,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
+            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
 
         distances_pipette = {
@@ -434,7 +446,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
+            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
 
         distances_gantry = {
