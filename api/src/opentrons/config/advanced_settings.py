@@ -179,7 +179,7 @@ settings = [
     SettingDefinition(
         _id="rearPanelIntegration",
         title="Enable robots with the new usb connected rear-panel board.",
-        description="This is an Opentrons-internal setting to test new rear-panel."
+        description="This is an Opentrons-internal setting to test new rear-panel.",
     ),
 ]
 
@@ -525,6 +525,7 @@ def _migrate21to22(previous: SettingsMap) -> SettingsMap:
     removals = ["enableOT3FirmwareUpdates"]
     newmap = {k: v for k, v in previous.items() if k not in removals}
     return newmap
+
 
 def _migrate22to23(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 23 of the feature flags file.

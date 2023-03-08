@@ -30,6 +30,7 @@ def enable_ot3_hardware_controller() -> bool:
 
     return advs.get_setting_with_env_overload("enableOT3HardwareController")
 
+
 def rear_panel_integration() -> bool:
     """Whether to enable usb connected rear_panel for the OT-3."""
 
