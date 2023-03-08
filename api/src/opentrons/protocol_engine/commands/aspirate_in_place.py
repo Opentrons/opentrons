@@ -52,15 +52,14 @@ class AspirateInPlaceImplementation(
         self._hardware_api = hardware_api
 
     async def execute(self, params: AspirateInPlaceParams) -> AspirateInPlaceResult:
-        """Aspirate without moving the pipette."""
-        hw_pipette = self._state_view.pipettes.get_hardware_pipette(
-            pipette_id=params.pipetteId,
-            attached_pipettes=self._hardware_api.attached_instruments,
-        )
+        """Aspirate without moving the pipette.
 
-        ready_to_aspirate = self._state_view.pipettes.get_is_ready_to_aspirate(
+        Raises:
+            TipNotAttachedError: if no tip is attached to the pipette.
+            PipetteNotReadyToAspirateError: pipette plunger is not ready.
+        """
+        ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
             pipette_id=params.pipetteId,
-            pipette_config=hw_pipette.config,
         )
 
         if not ready_to_aspirate:
@@ -69,15 +68,11 @@ class AspirateInPlaceImplementation(
                 " The first aspirate following a blow-out must be from a specific well"
                 " so the plunger can be reset in a known safe position."
             )
+        volume = await self._pipetting.aspirate_in_place(
+            pipette_id=params.pipetteId, volume=params.volume, flow_rate=params.flowRate
+        )
 
-        with self._pipetting.set_flow_rate(
-            pipette=hw_pipette, aspirate_flow_rate=params.flowRate
-        ):
-            await self._hardware_api.aspirate(
-                mount=hw_pipette.mount, volume=params.volume
-            )
-
-        return AspirateInPlaceResult(volume=params.volume)
+        return AspirateInPlaceResult(volume=volume)
 
 
 class AspirateInPlace(BaseCommand[AspirateInPlaceParams, AspirateInPlaceResult]):

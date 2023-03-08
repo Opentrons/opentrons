@@ -189,10 +189,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
             raise RuntimeError("must attach a probe before starting calibration")
         if self.state != GripperJawState.GRIPPING:
             raise RuntimeError("must grip the jaws before starting calibration")
-        if self.current_jaw_displacement == 0.0:
-            raise RuntimeError(
-                f"must grip the jaws before starting calibration (jaw displacement is {self.current_jaw_displacement})"
-            )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """
@@ -267,6 +263,7 @@ def _reload_gripper(
     if (
         new_config == attached_instr.config
         and cal_offset == attached_instr._calibration_offset
+        and fw_update_info == attached_instr.fw_update_info
     ):
         # Same config, good enough
         return attached_instr

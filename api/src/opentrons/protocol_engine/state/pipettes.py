@@ -1,15 +1,21 @@
 """Basic pipette data state and store."""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional
+from typing import Dict, List, Mapping, Optional, Tuple
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import LoadedPipette, MotorAxis, FlowRates, DeckPoint
-
+from ..types import (
+    LoadedPipette,
+    MotorAxis,
+    FlowRates,
+    DeckPoint,
+    CurrentWell,
+    TipGeometry,
+)
 from ..commands import (
     Command,
     LoadPipetteResult,
@@ -46,15 +52,6 @@ class HardwarePipette:
 
 
 @dataclass(frozen=True)
-class CurrentWell:
-    """The latest well that the robot has accessed."""
-
-    pipette_id: str
-    labware_id: str
-    well_name: str
-
-
-@dataclass(frozen=True)
 class CurrentDeckPoint:
     """The latest deck point and mount the robot has accessed."""
 
@@ -82,11 +79,10 @@ class PipetteState:
     """Basic pipette data state and getter methods."""
 
     pipettes_by_id: Dict[str, LoadedPipette]
-    aspirated_volume_by_id: Dict[str, float]
-    tip_volume_by_id: Dict[str, float]
+    aspirated_volume_by_id: Dict[str, Optional[float]]
     current_well: Optional[CurrentWell]
     current_deck_point: CurrentDeckPoint
-    attached_tip_labware_by_id: Dict[str, str]
+    attached_tip_by_id: Dict[str, Optional[TipGeometry]]
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
@@ -102,10 +98,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self._state = PipetteState(
             pipettes_by_id={},
             aspirated_volume_by_id={},
-            tip_volume_by_id={},
+            attached_tip_by_id={},
             current_well=None,
             current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
-            attached_tip_labware_by_id={},
             movement_speed_by_id={},
             static_config_by_id={},
             flow_rates_by_id={},
@@ -144,40 +139,42 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 pipetteName=command.params.pipetteName,
                 mount=command.params.mount,
             )
-            self._state.aspirated_volume_by_id[pipette_id] = 0
+            self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
+            self._state.attached_tip_by_id[pipette_id] = None
 
         elif isinstance(command.result, AspirateResult):
             pipette_id = command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id]
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
             next_volume = previous_volume + command.result.volume
 
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(command.result, (DispenseResult, DispenseInPlaceResult)):
             pipette_id = command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id]
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
             next_volume = max(0.0, previous_volume - command.result.volume)
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(command.result, PickUpTipResult):
             pipette_id = command.params.pipetteId
-            tiprack_id = command.params.labwareId
-            tip_volume = command.result.tipVolume
+            attached_tip = TipGeometry(
+                length=command.result.tipLength,
+                volume=command.result.tipVolume,
+                diameter=command.result.tipDiameter,
+            )
 
-            self._state.attached_tip_labware_by_id[pipette_id] = tiprack_id
-            self._state.tip_volume_by_id[pipette_id] = tip_volume
+            self._state.attached_tip_by_id[pipette_id] = attached_tip
+            self._state.aspirated_volume_by_id[pipette_id] = 0
 
         elif isinstance(command.result, DropTipResult):
             pipette_id = command.params.pipetteId
-            # No-op if pipette_id not found; makes unit testing easier.
-            # That should never happen outside of tests. But if it somehow does,
-            # it won't harm the state.
-            self._state.attached_tip_labware_by_id.pop(pipette_id, None)
+            self._state.aspirated_volume_by_id[pipette_id] = None
+            self._state.attached_tip_by_id[pipette_id] = None
 
         elif isinstance(command.result, BlowOutResult):
             pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = 0
+            self._state.aspirated_volume_by_id[pipette_id] = None
 
     def _update_current_well(self, command: Command) -> None:
         # These commands leave the pipette in a new well.
@@ -376,57 +373,81 @@ class PipetteView(HasState[PipetteState]):
             return current_deck_point.deck_point
         return None
 
-    def get_aspirated_volume(self, pipette_id: str) -> float:
-        """Get the currently aspirated volume of a pipette by ID."""
+    def get_attached_tip(self, pipette_id: str) -> Optional[TipGeometry]:
+        """Get details of the pipette's attached tip.
+
+        Returns:
+            The tip's volume and length, or None if there is no tip attached,
+        """
+        try:
+            return self._state.attached_tip_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} no found; unable to get attached tip."
+            ) from e
+
+    def get_all_attached_tips(self) -> List[Tuple[str, TipGeometry]]:
+        """Get a list of all attached tips.
+
+        Returns:
+            A list of pipette ID, tip details tuples.
+        """
+        return [
+            (pipette_id, tip)
+            for pipette_id, tip in self._state.attached_tip_by_id.items()
+            if tip is not None
+        ]
+
+    def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:
+        """Get the currently aspirated volume of a pipette by ID.
+
+        Raises:
+            PipetteNotLoadedError: pipette ID does not exist.
+            TipNotAttachedError: if no tip is attached to the pipette.
+        """
+        self.validate_tip_state(pipette_id, True)
+
         try:
             return self._state.aspirated_volume_by_id[pipette_id]
+
         except KeyError as e:
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get current volume."
             ) from e
 
     def get_working_volume(self, pipette_id: str) -> float:
-        """Get the working maximum volume of a pipette by ID."""
+        """Get the working maximum volume of a pipette by ID.
+
+        Raises:
+            PipetteNotLoadedError: pipette ID does not exist.
+            TipNotAttachedError: if no tip is attached to the pipette.
+        """
         max_volume = self.get_maximum_volume(pipette_id)
-        try:
-            tip_volume = self._state.tip_volume_by_id[pipette_id]
-        except KeyError as e:
+        attached_tip = self.get_attached_tip(pipette_id)
+
+        if not attached_tip:
             raise errors.TipNotAttachedError(
                 f"Pipette {pipette_id} has no tip attached; unable to calculate working maximum volume."
-            ) from e
+            )
 
-        return min(tip_volume, max_volume)
+        return min(attached_tip.volume, max_volume)
 
-    def get_available_volume(self, pipette_id: str) -> float:
+    def get_available_volume(self, pipette_id: str) -> Optional[float]:
         """Get the available volume of a pipette by ID."""
         working_volume = self.get_working_volume(pipette_id)
         current_volume = self.get_aspirated_volume(pipette_id)
-        return max(0.0, working_volume - current_volume)
 
-    def get_is_ready_to_aspirate(
-        self,
-        pipette_id: str,
-        pipette_config: PipetteDict,
-    ) -> bool:
-        """Get whether a pipette is ready to aspirate."""
-        return (
-            self.get_aspirated_volume(pipette_id) > 0
-            or pipette_config["ready_to_aspirate"]
-        )
-
-    def get_attached_tip_labware_by_id(self) -> Dict[str, str]:
-        """Get the tiprack ids of attached tip by pipette ids."""
-        return dict(self._state.attached_tip_labware_by_id)
+        return max(0.0, working_volume - current_volume) if current_volume else None
 
     def validate_tip_state(self, pipette_id: str, expected_has_tip: bool) -> None:
         """Validate that a pipette's tip state matches expectations."""
-        tip_rack_id = self._state.attached_tip_labware_by_id.get(pipette_id)
+        attached_tip = self.get_attached_tip(pipette_id)
 
-        if expected_has_tip is True and tip_rack_id is None:
+        if expected_has_tip is True and attached_tip is None:
             raise errors.TipNotAttachedError(
                 "Pipette should have a tip attached, but does not."
             )
-        if expected_has_tip is False and tip_rack_id is not None:
+        if expected_has_tip is False and attached_tip is not None:
             raise errors.TipAttachedError(
                 "Pipette should not have a tip attached, but does."
             )

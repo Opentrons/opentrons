@@ -52,6 +52,11 @@ except (OSError, ModuleNotFoundError):
 from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.binary_usb import (
+    SerialUsbDriver,
+    BinaryMessenger,
+    build_rear_panel_driver,
+)
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
@@ -148,6 +153,7 @@ class OT3Controller:
     """OT3 Hardware Controller Backend."""
 
     _messenger: CanMessenger
+    _usb_messenger: BinaryMessenger
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
@@ -164,9 +170,12 @@ class OT3Controller:
             Instance.
         """
         driver = await build_driver(DriverSettings())
-        return cls(config, driver=driver)
+        usb_driver = await build_rear_panel_driver()
+        return cls(config, driver=driver, usb_driver=usb_driver)
 
-    def __init__(self, config: OT3Config, driver: AbstractCanDriver) -> None:
+    def __init__(
+        self, config: OT3Config, driver: AbstractCanDriver, usb_driver: SerialUsbDriver
+    ) -> None:
         """Construct.
 
         Args:
@@ -178,6 +187,8 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
+        self._usb_messenger = BinaryMessenger(usb_driver)
+        self._usb_messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger)
         self._position = self._get_home_position()
@@ -235,7 +246,7 @@ class OT3Controller:
     def get_instrument_update(
         self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
     ) -> InstrumentFWInfo:
-        """Check wether the given instrument requires an update."""
+        """Check whether the given instrument requires an update."""
         subsystem = mount_to_subsystem(mount)
         node_id = sub_system_to_node_id(subsystem)
         # get the pipette_type if this is a pipette
@@ -254,10 +265,9 @@ class OT3Controller:
         next_version = update_info[0] if update_info else None
         # set our global firmware update state if any updates are available
         self.update_required |= bool(firmware_updates)
-        instrument_fw_info = InstrumentFWInfo(
+        return InstrumentFWInfo(
             mount, update_required, current_fw_version, next_version
         )
-        return instrument_fw_info
 
     def get_update_progress(self) -> Set[UpdateStatus]:
         """Returns a set of UpdateStatus of the updates."""
@@ -273,13 +283,21 @@ class OT3Controller:
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        nodes = nodes or set()
+        # Check that there arent updates already running for given nodes
+        nodes = nodes or set(self._network_info.device_info)
+        nodes_updating = self._update_tracker.nodes if self._update_tracker else set()
+        nodes_to_update = nodes - nodes_updating
+        if not nodes_to_update:
+            log.info("No viable subsystem to update.")
+            return
+
         attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
         # Check if devices need an update, only checks nodes if given
         firmware_updates = firmware_update.check_firmware_updates(
             self._network_info.device_info,
             attached_pipette_nodes,
-            nodes=nodes,
+
+            nodes=nodes_to_update,
             force=force,
         )
         if not firmware_updates:
@@ -295,7 +313,8 @@ class OT3Controller:
             node_id: update_info[1] for node_id, update_info in firmware_updates.items()
         }
         updater = firmware_update.RunUpdate(
-            messenger=self._messenger,
+            can_messenger=self._messenger,
+            usb_messenger=self._usb_messenger,
             update_details=update_details,
             retry_count=3,
             timeout_seconds=20,
@@ -303,8 +322,8 @@ class OT3Controller:
         )
 
         # start the updates and yield progress to caller
-        async for node_id, status_element in updater.run_updates():
-            progress = self._update_tracker.update(node_id, status_element)
+        async for target, status_element in updater.run_updates():
+            progress = self._update_tracker.update(target, status_element)
             yield progress
 
         # refresh the device_info cache and reset internal states
@@ -445,7 +464,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
+            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
 
         distances_pipette = {
@@ -474,7 +493,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
+            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
 
         distances_gantry = {
@@ -726,7 +745,6 @@ class OT3Controller:
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
         return current_tools
 
-    @requires_update
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
         assert (
