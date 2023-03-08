@@ -828,9 +828,9 @@ def test_get_calibration_coordinates() -> None:
 
     subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
 
-    result = subject.get_calibration_coordinates()
+    result = subject.get_calibration_coordinates(offset=Point(y=1, z=2))
 
-    assert result == Point(x=4, y=15, z=400)
+    assert result == Point(x=4, y=6, z=2)
 
 
 def test_get_by_slot() -> None:
