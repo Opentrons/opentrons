@@ -152,7 +152,7 @@ class OT3Controller:
     """OT3 Hardware Controller Backend."""
 
     _messenger: CanMessenger
-    _usb_messenger: BinaryMessenger
+    _usb_messenger: Optional[BinaryMessenger]
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
@@ -169,11 +169,18 @@ class OT3Controller:
             Instance.
         """
         driver = await build_driver(DriverSettings())
-        usb_driver = await build_rear_panel_driver()
+        usb_driver = None
+        try:
+            usb_driver = await build_rear_panel_driver()
+        except IOError:
+            log.error("No rear panel device found, probably an EVT bot")
         return cls(config, driver=driver, usb_driver=usb_driver)
 
     def __init__(
-        self, config: OT3Config, driver: AbstractCanDriver, usb_driver: SerialUsbDriver
+        self,
+        config: OT3Config,
+        driver: AbstractCanDriver,
+        usb_driver: Optional[SerialUsbDriver],
     ) -> None:
         """Construct.
 
@@ -186,8 +193,11 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._usb_messenger = BinaryMessenger(usb_driver)
-        self._usb_messenger.start()
+        if usb_driver is not None:
+            self._usb_messenger = BinaryMessenger(usb_driver)
+            self._usb_messenger.start()
+        else:
+            self._usb_messenger = None
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger)
         self._position = self._get_home_position()
