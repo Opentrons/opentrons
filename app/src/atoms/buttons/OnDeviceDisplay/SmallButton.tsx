@@ -139,7 +139,7 @@ const Alert = styled(NewPrimaryBtn)`
   color: ${COLORS.white};
   background-color: ${COLORS.errorEnabled};
   cursor: default;
-  border-radius: 12px;
+  border-radius: ${BORDERS.size_three};
   box-shadow: none;
   padding-left: ${SPACING.spacing4};
   padding-right: ${SPACING.spacing4};
@@ -174,9 +174,9 @@ const Alert = styled(NewPrimaryBtn)`
 
 const Alt = styled(NewPrimaryBtn)`
   color: ${COLORS.darkBlackEnabled};
-  background-color: #b4d4ff;
+  background-color: ${COLORS.foundationalBlue};
   cursor: default;
-  border-radius: 12px;
+  border-radius: ${BORDERS.size_three};
   box-shadow: none;
   padding-left: ${SPACING.spacing4};
   padding-right: ${SPACING.spacing4};
@@ -186,13 +186,13 @@ const Alt = styled(NewPrimaryBtn)`
 
   ${styleProps}
   &:focus {
-    background-color: #b4d4ff ${COLORS.opacity20HexCode};
+    background-color: ${COLORS.foundationalBlue}${COLORS.opacity20HexCode};
     box-shadow: none;
   }
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: #b4d4ff;
+    background-color: ${COLORS.foundationalBlue};
     color: ${COLORS.darkBlackEnabled};
   }
   &:focus-visible {
@@ -213,7 +213,7 @@ const GhostLow = styled(NewPrimaryBtn)`
   color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode};
   background-color: ${COLORS.blueEnabled}00;
   cursor: default;
-  border-radius: 12px;
+  border-radius: ${BORDERS.size_three};
   box-shadow: none;
   padding-left: ${SPACING.spacing4};
   padding-right: ${SPACING.spacing4};
@@ -250,7 +250,7 @@ const GhostHighBlackColor = styled(NewPrimaryBtn)`
   color: ${COLORS.darkBlackEnabled};
   background-color: ${COLORS.blueEnabled}00;
   cursor: default;
-  border-radius: 12px;
+  border-radius: ${BORDERS.size_three};
   box-shadow: none;
   padding-left: ${SPACING.spacing4};
   padding-right: ${SPACING.spacing4};
@@ -286,7 +286,7 @@ const GhostHighBlue = styled(NewPrimaryBtn)`
   color: ${COLORS.blueEnabled};
   background-color: ${COLORS.blueEnabled}00;
   cursor: default;
-  border-radius: 12px;
+  border-radius: ${BORDERS.size_three};
   box-shadow: none;
   padding-left: ${SPACING.spacing4};
   padding-right: ${SPACING.spacing4};

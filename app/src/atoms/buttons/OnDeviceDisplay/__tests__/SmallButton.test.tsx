@@ -41,7 +41,9 @@ describe('SmallButton', () => {
       buttonType: 'alt',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: #b4d4ff`)
+    expect(getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.foundationalBlue}`
+    )
   })
   it('renders the ghost low button', () => {
     props = {
