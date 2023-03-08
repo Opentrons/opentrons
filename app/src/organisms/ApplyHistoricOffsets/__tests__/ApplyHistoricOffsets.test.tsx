@@ -112,11 +112,17 @@ describe('ApplyHistoricOffsets', () => {
     const [{ getByText, getByRole, queryByText }] = render({
       offsetCandidates: [],
     })
-    getByText('View data').click()
+    getByText('No offset data available')
+    getByText('Learn more').click()
 
-    getByRole('heading', { name: 'Stored Labware Offset data' })
+    getByRole('heading', { name: 'No labware offset data available' })
+    getByText('This robot has no useable labware offset data for this run.')
+    getByText('What is labware offset?')
     getByText(
-      'This robot has no useable offsets for labware used in this protocol. You can still add new offsets with Labware Position Check.'
+      'Labware offset data references previous protocol run labware locations to save you time. Labware that has been used in the same slot as a protocol you are running will not need additional calibration. If all the labware in a new protocol have been checked in previous runs, you do not have to run Labware Position Check.'
+    )
+    getByText(
+      'You can add new offsets with Labware Position Check in later steps if you desire.'
     )
     expect(
       getByRole('link', { name: 'See how labware offsets work' })
