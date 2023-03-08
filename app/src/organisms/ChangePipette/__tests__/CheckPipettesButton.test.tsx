@@ -43,6 +43,7 @@ describe('CheckPipettesButton', () => {
     const refetch = jest.fn(() => Promise.resolve())
     mockUsePipettesQuery.mockReturnValue({
       refetch,
+      isFetching: false,
     } as any)
     props = {
       robotName: 'otie',
@@ -59,6 +60,7 @@ describe('CheckPipettesButton', () => {
     const refetch = jest.fn(() => Promise.resolve())
     mockUsePipettesQuery.mockReturnValue({
       refetch,
+      isFetching: false,
     } as any)
     props = {
       robotName: 'otie',
@@ -72,10 +74,26 @@ describe('CheckPipettesButton', () => {
     expect(refetch).toHaveBeenCalled()
   })
 
+  it('renders button disabled when pipettes query status is loading', () => {
+    const refetch = jest.fn(() => Promise.resolve())
+    mockUsePipettesQuery.mockReturnValue({
+      refetch,
+      isFetching: true,
+    } as any)
+    props = {
+      robotName: 'otie',
+      onDone: jest.fn(),
+      actualPipette: MOCK_ACTUAL_PIPETTE,
+    }
+    const { getByLabelText } = render(props)
+    expect(getByLabelText('Confirm')).toBeDisabled()
+  })
+
   it('renders the confirm detachment btn and with children and clicking on it calls fetchPipettes', () => {
     const refetch = jest.fn(() => Promise.resolve())
     mockUsePipettesQuery.mockReturnValue({
       refetch,
+      isFetching: false,
     } as any)
     props = {
       ...props,

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -176,7 +177,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     direction === DETACH
       ? t('detach_pipette', {
           pipette: actualPipette.displayName,
-          mount: mount[0].toUpperCase() + mount.slice(1),
+          mount: capitalize(mount),
         })
       : t('attach_pipette')
   let currentStep: number = 0
@@ -218,7 +219,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
         ? t('detach')
         : t('detach_pipette', {
             pipette: actualPipette?.displayName ?? wantedPipette?.displayName,
-            mount: mount[0].toUpperCase() + mount.slice(1),
+            mount: capitalize(mount),
           })
     } else {
       title = noPipetteSelectedAttach
@@ -250,7 +251,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
             actualPipette?.displayName != null
               ? t('detach_pipette', {
                   pipette: actualPipette.displayName,
-                  mount: mount[0].toUpperCase() + mount.slice(1),
+                  mount: capitalize(mount),
                 })
               : t('attach_pipette'),
         }}
@@ -284,7 +285,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     let wizardTitleConfirmPipette
     if (wantedPipette == null && actualPipette == null) {
       wizardTitleConfirmPipette = t('detach_pipette_from_mount', {
-        mount: mount[0].toUpperCase() + mount.slice(1),
+        mount: capitalize(mount),
       })
     } else if (wantedPipette == null && actualPipette != null) {
       wizardTitleConfirmPipette = t('detach')

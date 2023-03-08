@@ -115,8 +115,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           )}
           isDisabled={isPending}
           setPending={setPending}
-          aria-label="Results_tryAgain"
-        ></CheckPipetteButton>
+        />
       </>
     )
   }

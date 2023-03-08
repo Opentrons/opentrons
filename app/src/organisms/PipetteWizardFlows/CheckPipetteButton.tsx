@@ -12,24 +12,24 @@ export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
 ): JSX.Element => {
   const { proceedButtonText, proceed, setPending, isDisabled } = props
-  const { refetch } = usePipettesQuery(
+  const { refetch, isFetching } = usePipettesQuery(
     { refresh: true },
     {
       enabled: false,
       onSuccess: () => {
         proceed()
       },
-      onSettled: () => {
-        setPending(false)
-      },
     }
   )
+
+  React.useEffect(() => {
+    setPending(isFetching)
+  }, [isFetching, setPending])
 
   return (
     <PrimaryButton
       disabled={isDisabled}
       onClick={() => {
-        setPending(true)
         refetch()
           .then(() => {})
           .catch(() => {})
