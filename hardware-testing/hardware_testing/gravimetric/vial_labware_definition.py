@@ -11,16 +11,16 @@ VIAL_DEFINITION: LabwareDefinition = {
         "displayVolumeUnits": "µL",
         "tags": [],
     },
-    "dimensions": {"xDimension": 127.8, "yDimension": 85.5, "zDimension": 80},
+    "dimensions": {"xDimension": 128, "yDimension": 86, "zDimension": 86},
     "wells": {
         "A1": {
-            "depth": 60,
-            "totalLiquidVolume": 10252.4,
+            "depth": 40,
+            "totalLiquidVolume": 2152.38,
             "shape": "circular",
-            "diameter": 14.75,
-            "x": 105,
-            "y": 72.5,
-            "z": 20,
+            "diameter": 14.5,
+            "x": 64,
+            "y": 43,
+            "z": 46,
         }
     },
     "groups": [
