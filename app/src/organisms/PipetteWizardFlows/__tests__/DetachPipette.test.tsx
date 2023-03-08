@@ -54,6 +54,7 @@ describe('DetachPipette', () => {
       isRobotMoving: false,
       isPending: false,
       setPending: jest.fn(),
+      isOnDevice: false,
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)

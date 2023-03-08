@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import nullcontext
-from typing import Any, List, Optional, Sequence, Union
+from typing import Any, List, Optional, Sequence, Union, cast
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
@@ -24,6 +24,7 @@ from opentrons.protocols.api_support.util import (
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
+from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
 from . import labware, validation
 
@@ -1330,8 +1331,21 @@ class InstrumentContext(publisher.CommandPublisher):
 
             instrument.speed.aspirate = 50
 
+        .. versionchanged:: 2.14
+            This property has been removed because it's fundamentally misaligned
+            with the step-wise nature of a pipette's plunger speed configuration.
+            Use :py:attr:`.flow_rate` instead.
         """
-        return self._core.get_speed()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "InstrumentContext.speed has been removed."
+                " Use InstrumentContext.flow_rate, instead."
+            )
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyInstrumentCore)
+        return cast(LegacyInstrumentCore, self._core).get_speed()
 
     @property  # type: ignore
     @requires_version(2, 0)

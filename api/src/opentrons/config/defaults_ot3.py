@@ -12,11 +12,25 @@ from .types import (
     Offset,
     OT3CalibrationSettings,
     CapacitivePassSettings,
+    LiquidProbeSettings,
     ZSenseSettings,
     EdgeSenseSettings,
 )
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
+
+DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
+    starting_mount_height=100,
+    max_z_distance=40,
+    min_z_distance=5,
+    mount_speed=10,
+    plunger_speed=5,
+    sensor_threshold_pascals=100,
+    expected_liquid_height=110,
+    log_pressure=True,
+    aspirate_while_sensing=False,
+    data_file="/var/pressure_sensor_data.csv",
+)
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
     z_offset=ZSenseSettings(
@@ -69,18 +83,12 @@ DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 DEFAULT_GRIPPER_JAW_HOME_DUTY_CYCLE: Final = 25
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-    none={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 65,
-        OT3AxisKind.P: 45,
-        OT3AxisKind.Z_G: 100,
-    },
     high_throughput={
         OT3AxisKind.X: 500,
         OT3AxisKind.Y: 500,
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 5,
+        OT3AxisKind.Z_G: 100,
         OT3AxisKind.Q: 5.5,
     },
     low_throughput={
@@ -88,59 +96,37 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.Y: 500,
         OT3AxisKind.Z: 65,
         OT3AxisKind.P: 45,
+        OT3AxisKind.Z_G: 100,
     },
-    two_low_throughput={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
-    },
-    gripper={OT3AxisKind.Z: 65},
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-    none={
+    high_throughput={
+        OT3AxisKind.X: 1000,
+        OT3AxisKind.Y: 1000,
+        OT3AxisKind.Z: 100,
+        OT3AxisKind.P: 10,
+        OT3AxisKind.Z_G: 20,
+        OT3AxisKind.Q: 10,
+    },
+    low_throughput={
         OT3AxisKind.X: 1000,
         OT3AxisKind.Y: 1000,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 50,
         OT3AxisKind.Z_G: 20,
     },
-    high_throughput={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 100,
-        OT3AxisKind.P: 10,
-        OT3AxisKind.Q: 10,
-    },
-    low_throughput={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 100,
-        OT3AxisKind.P: 50,
-    },
-    two_low_throughput={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-    },
-    gripper={
-        OT3AxisKind.Z: 100,
-    },
 )
 
 DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
-    none={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 10,
-        OT3AxisKind.Z_G: 10,
-        OT3AxisKind.P: 5,
-    },
     high_throughput={
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 10,
         OT3AxisKind.P: 10,
+        OT3AxisKind.Z_G: 10,
         OT3AxisKind.Q: 10,
     },
     low_throughput={
@@ -148,61 +134,37 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 10,
         OT3AxisKind.P: 10,
-    },
-    two_low_throughput={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
-    },
-    gripper={
-        OT3AxisKind.Z: 10,
+        OT3AxisKind.Z_G: 10,
     },
 )
 
 DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
-    none={
-        OT3AxisKind.X: 5,
-        OT3AxisKind.Y: 5,
-        OT3AxisKind.Z: 5,
-        OT3AxisKind.P: 5,
-        OT3AxisKind.Z_G: 5,
-    },
     high_throughput={
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 5,
         OT3AxisKind.Z: 5,
         OT3AxisKind.P: 5,
         OT3AxisKind.Q: 5,
+        OT3AxisKind.Z_G: 5,
     },
     low_throughput={
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 5,
         OT3AxisKind.Z: 5,
         OT3AxisKind.P: 5,
-    },
-    two_low_throughput={
-        OT3AxisKind.X: 5,
-        OT3AxisKind.Y: 5,
-    },
-    gripper={
-        OT3AxisKind.Z: 5,
+        OT3AxisKind.Z_G: 5,
     },
 )
 
 DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-    none={
-        OT3AxisKind.X: 0.5,
-        OT3AxisKind.Y: 0.5,
-        OT3AxisKind.Z: 0.1,
-        OT3AxisKind.P: 0.3,
-        OT3AxisKind.Z_G: 0.2,
-    },
     high_throughput={
         OT3AxisKind.X: 0.5,
         OT3AxisKind.Y: 0.5,
         OT3AxisKind.Z: 0.8,
         OT3AxisKind.P: 0.3,
+        OT3AxisKind.Z_G: 0.2,
         OT3AxisKind.Q: 0.3,
     },
     low_throughput={
@@ -210,44 +172,27 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
         OT3AxisKind.Y: 0.5,
         OT3AxisKind.Z: 0.1,
         OT3AxisKind.P: 0.3,
-    },
-    two_low_throughput={
-        OT3AxisKind.X: 0.5,
-        OT3AxisKind.Y: 0.5,
-    },
-    gripper={
-        OT3AxisKind.Z: 0.1,
+        OT3AxisKind.Z_G: 0.2,
     },
 )
 
 DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-    none={
-        OT3AxisKind.X: 1.4,
-        OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.4,
-        OT3AxisKind.P: 1.0,
-        OT3AxisKind.Z_G: 0.67,
-    },
     high_throughput={
         OT3AxisKind.X: 1.4,
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
+        # TODO: verify this value
         OT3AxisKind.P: 2.0,
-        OT3AxisKind.Q: 2.0,
+        OT3AxisKind.Z_G: 0.67,
+        OT3AxisKind.Q: 1.5,
     },
     low_throughput={
         OT3AxisKind.X: 1.4,
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
+        # TODO: verify this value
         OT3AxisKind.P: 1.0,
-    },
-    two_low_throughput={
-        OT3AxisKind.X: 1.4,
-        OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.4,
-    },
-    gripper={
-        OT3AxisKind.Z: 1.4,
+        OT3AxisKind.Z_G: 0.67,
     },
 )
 
@@ -293,11 +238,6 @@ def _build_default_bpk(
         high_throughput=_build_dict_with_default(
             from_conf.get("high_throughput", {}), default.high_throughput
         ),
-        two_low_throughput=_build_dict_with_default(
-            from_conf.get("two_low_throughput", {}), default.two_low_throughput
-        ),
-        none=_build_dict_with_default(from_conf.get("none", {}), default.none),
-        gripper=_build_dict_with_default(from_conf.get("gripper", {}), default.gripper),
     )
 
 
@@ -335,6 +275,31 @@ def _build_default_cap_pass(
         sensor_threshold_pf=from_conf.get(
             "sensor_threshold_pf", default.sensor_threshold_pf
         ),
+    )
+
+
+def _build_default_liquid_probe(
+    from_conf: Any, default: LiquidProbeSettings
+) -> LiquidProbeSettings:
+    return LiquidProbeSettings(
+        starting_mount_height=from_conf.get(
+            "starting_mount_height", default.starting_mount_height
+        ),
+        max_z_distance=from_conf.get("max_z_distance", default.max_z_distance),
+        min_z_distance=from_conf.get("min_z_distance", default.min_z_distance),
+        mount_speed=from_conf.get("mount_speed", default.mount_speed),
+        plunger_speed=from_conf.get("plunger_speed", default.plunger_speed),
+        sensor_threshold_pascals=from_conf.get(
+            "sensor_threshold_pascals", default.sensor_threshold_pascals
+        ),
+        expected_liquid_height=from_conf.get(
+            "expected_liquid_height", default.expected_liquid_height
+        ),
+        log_pressure=from_conf.get("log_pressure", default.log_pressure),
+        aspirate_while_sensing=from_conf.get(
+            "aspirate_while_sensing", default.aspirate_while_sensing
+        ),
+        data_file=from_conf.get("data_file", default.data_file),
     )
 
 
@@ -440,6 +405,9 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         ),
         calibration=_build_default_calibration(
             robot_settings.get("calibration", {}), DEFAULT_CALIBRATION_SETTINGS
+        ),
+        liquid_sense=_build_default_liquid_probe(
+            robot_settings.get("liquid_sense", {}), DEFAULT_LIQUID_PROBE_SETTINGS
         ),
     )
 

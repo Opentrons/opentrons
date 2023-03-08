@@ -1,6 +1,12 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useConditionalConfirm } from '@opentrons/components'
+import {
+  Flex,
+  useConditionalConfirm,
+  DIRECTION_COLUMN,
+  POSITION_ABSOLUTE,
+} from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -17,6 +23,7 @@ import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainRunCommands } from '../../resources/runs/hooks'
+import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettes } from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
@@ -45,6 +52,7 @@ export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
   const { flowType, mount, closeFlow, robotName, selectedPipette } = props
+  const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettes = useAttachedPipettes()
   const isGantryEmpty =
@@ -148,6 +156,7 @@ export const PipetteWizardFlows = (
     errorMessage,
     robotName,
     selectedPipette,
+    isOnDevice,
   }
   const exitModal = (
     <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
@@ -310,7 +319,22 @@ export const PipetteWizardFlows = (
     exitWizardButton = handleCleanUpAndClose
   }
 
-  return (
+  return isOnDevice ? (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      width="100%"
+      position={POSITION_ABSOLUTE}
+    >
+      <WizardHeader
+        exitDisabled={isRobotMoving || isFetchingPipettes}
+        title={wizardTitle}
+        currentStep={currentStepIndex}
+        totalSteps={totalStepCount}
+        onExit={exitWizardButton}
+      />
+      {modalContent}
+    </Flex>
+  ) : (
     <Portal level="top">
       <ModalShell
         width="47rem"

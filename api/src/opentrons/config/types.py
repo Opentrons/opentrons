@@ -20,18 +20,12 @@ Vt = TypeVar("Vt")
 class GantryLoad(Enum):
     HIGH_THROUGHPUT = "high_throughput"
     LOW_THROUGHPUT = "low_throughput"
-    TWO_LOW_THROUGHPUT = "two_low_throughput"
-    NONE = "none"
-    GRIPPER = "gripper"
 
 
 @dataclass
 class ByGantryLoad(Generic[Vt]):
     high_throughput: Vt
     low_throughput: Vt
-    two_low_throughput: Vt
-    none: Vt
-    gripper: Vt
 
     def __getitem__(self, key: GantryLoad) -> Vt:
         return cast(Vt, asdict(self)[key.value])
@@ -89,16 +83,10 @@ class OT3MotionSettings:
     def by_gantry_load(
         self, gantry_load: GantryLoad
     ) -> Dict[str, Dict[OT3AxisKind, float]]:
-        # create a shallow copy
-        base = dict(
-            (field.name, getattr(self, field.name)[GantryLoad.NONE])
+        return dict(
+            (field.name, getattr(self, field.name)[gantry_load])
             for field in fields(self)
         )
-        if gantry_load is GantryLoad.NONE:
-            return base
-        for key in base.keys():
-            base[key].update(getattr(self, key)[gantry_load])
-        return base
 
 
 @dataclass(frozen=True)
@@ -109,16 +97,10 @@ class OT3CurrentSettings:
     def by_gantry_load(
         self, gantry_load: GantryLoad
     ) -> Dict[str, Dict[OT3AxisKind, float]]:
-        # create a shallow copy
-        base = dict(
-            (field.name, getattr(self, field.name)[GantryLoad.NONE])
+        return dict(
+            (field.name, getattr(self, field.name)[gantry_load])
             for field in fields(self)
         )
-        if gantry_load is GantryLoad.NONE:
-            return base
-        for key in base.keys():
-            base[key].update(getattr(self, key)[gantry_load])
-        return base
 
 
 @dataclass(frozen=True)
@@ -132,6 +114,20 @@ class CapacitivePassSettings:
 @dataclass(frozen=True)
 class ZSenseSettings:
     pass_settings: CapacitivePassSettings
+
+
+@dataclass
+class LiquidProbeSettings:
+    starting_mount_height: float
+    max_z_distance: float
+    min_z_distance: float
+    mount_speed: float
+    plunger_speed: float
+    sensor_threshold_pascals: float
+    expected_liquid_height: float
+    log_pressure: bool
+    aspirate_while_sensing: bool
+    data_file: str
 
 
 @dataclass(frozen=True)
@@ -185,3 +181,4 @@ class OT3Config:
     right_mount_offset: Offset
     gripper_mount_offset: Offset
     calibration: OT3CalibrationSettings
+    liquid_sense: LiquidProbeSettings

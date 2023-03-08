@@ -26,6 +26,7 @@ from typing import (
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
+    UpdateProgress,
     axis_convert,
     create_move_group,
     axis_to_node,
@@ -51,6 +52,11 @@ except (OSError, ModuleNotFoundError):
 from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.binary_usb import (
+    SerialUsbDriver,
+    BinaryMessenger,
+    build_rear_panel_driver,
+)
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
@@ -75,6 +81,7 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
+    SensorId,
     PipetteType,
 )
 from opentrons_hardware import firmware_update
@@ -91,6 +98,7 @@ from opentrons.hardware_control.types import (
     MotorStatus,
     InstrumentProbeType,
     PipetteSubType,
+    UpdateStatus,
     mount_to_subsystem,
 )
 from opentrons.hardware_control.errors import (
@@ -109,6 +117,7 @@ from opentrons_hardware.hardware_control.tools import detector, types as ohc_too
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
+    liquid_probe,
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -143,6 +152,7 @@ class OT3Controller:
     """OT3 Hardware Controller Backend."""
 
     _messenger: CanMessenger
+    _usb_messenger: BinaryMessenger
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
@@ -159,9 +169,12 @@ class OT3Controller:
             Instance.
         """
         driver = await build_driver(DriverSettings())
-        return cls(config, driver=driver)
+        usb_driver = await build_rear_panel_driver()
+        return cls(config, driver=driver, usb_driver=usb_driver)
 
-    def __init__(self, config: OT3Config, driver: AbstractCanDriver) -> None:
+    def __init__(
+        self, config: OT3Config, driver: AbstractCanDriver, usb_driver: SerialUsbDriver
+    ) -> None:
         """Construct.
 
         Args:
@@ -173,12 +186,15 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
+        self._usb_messenger = BinaryMessenger(usb_driver)
+        self._usb_messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger)
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._update_required = False
+        self._update_tracker: Optional[UpdateProgress] = None
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -204,6 +220,14 @@ class OT3Controller:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
+    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
+        """Returns a tuple of UpdateStatus and total progress of the updates."""
+        updates: Set[UpdateStatus] = set()
+        total_progress: int = 0
+        if self._update_tracker:
+            updates, total_progress = self._update_tracker.get_progress()
+        return updates, total_progress
+
     @staticmethod
     def _attached_pipettes_to_nodes(
         attached_pipettes: Dict[OT3Mount, PipetteSubType]
@@ -220,7 +244,7 @@ class OT3Controller:
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> None:
+    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
         """Updates the firmware on the OT3."""
         nodes = nodes or set()
         attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
@@ -234,19 +258,28 @@ class OT3Controller:
             return
 
         log.info("Firmware updates are available.")
+        self._update_tracker = UpdateProgress(set(firmware_updates))
         self.update_required = True
 
         updater = firmware_update.RunUpdate(
-            messenger=self._messenger,
+            can_messenger=self._messenger,
+            usb_messenger=self._usb_messenger,
             update_details=firmware_updates,
             retry_count=3,
             timeout_seconds=20,
             erase=True,
         )
-        async for progress in updater.run_updates():
-            pass
-        # refresh the device_info cache and reset the update_required flag
+
+        # start the updates and yield progress to caller
+        async for node_id, status_element in updater.run_updates():
+            updates, total_progress = self._update_tracker.update(
+                node_id, status_element
+            )
+            yield updates, total_progress
+
+        # refresh the device_info cache and reset internal states
         await self._network_info.probe()
+        self._update_tracker = None
         self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
@@ -384,7 +417,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
+            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
 
         distances_pipette = {
@@ -413,7 +446,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
+            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
 
         distances_gantry = {
@@ -787,9 +820,6 @@ class OT3Controller:
             OT3Axis.Q: phony_bounds,
         }
 
-    def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
-        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
-
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
         return {}
@@ -962,6 +992,34 @@ class OT3Controller:
     ) -> NodeMap[MapPayload]:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._present_nodes}
+
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        max_z_distance: float,
+        mount_speed: float,
+        plunger_speed: float,
+        threshold_pascals: float,
+        log_pressure: bool = True,
+        sensor_id: SensorId = SensorId.S0,
+    ) -> Dict[NodeId, float]:
+        head_node = axis_to_node(OT3Axis.by_mount(mount))
+        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        positions = await liquid_probe(
+            self._messenger,
+            tool,
+            head_node,
+            max_z_distance,
+            plunger_speed,
+            mount_speed,
+            threshold_pascals,
+            log_pressure,
+            sensor_id,
+        )
+        for node, point in positions.items():
+            self._position.update({node: point[0]})
+            self._encoder_position.update({node: point[1]})
+        return self._position
 
     async def capacitive_probe(
         self,

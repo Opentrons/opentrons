@@ -4,18 +4,12 @@ ot3_dummy_settings = {
     "version": 1,
     "motion_settings": {
         "acceleration": {
-            "none": {
-                "X": 3,
-                "Y": 2,
-                "Z": 15,
-                "P": 2,
-                "Z_G": 5,
-            },
             "low_throughput": {
                 "X": 3,
                 "Y": 2,
                 "Z": 15,
                 "P": 15,
+                "Z_G": 5,
             },
             "high_throughput": {
                 "X": 3,
@@ -23,26 +17,16 @@ ot3_dummy_settings = {
                 "Z": 15,
                 "P": 15,
                 "Q": 5,
-            },
-            "two_low_throughput": {"X": 1.1, "Y": 2.2},
-            "gripper": {
-                "Z": 2.8,
-                "Z_G": 6,
+                "Z_G": 5,
             },
         },
         "default_max_speed": {
-            "none": {
-                "X": 1,
-                "Y": 2,
-                "Z": 3,
-                "P": 4,
-                "Z_G": 5,
-            },
             "low_throughput": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
                 "P": 4,
+                "Z_G": 5,
             },
             "high_throughput": {
                 "X": 1,
@@ -50,88 +34,52 @@ ot3_dummy_settings = {
                 "Z": 3,
                 "P": 4,
                 "Q": 5,
+                "Z_G": 6,
             },
-            "two_low_throughput": {
-                "X": 4,
-                "Y": 3,
-                "Z": 2,
-                "P": 1,
-            },
-            "gripper": {"Z": 2.8, "Z_G": 5},
         },
         "max_speed_discontinuity": {
-            "none": {
+            "low_throughput": {
                 "X": 10,
                 "Y": 20,
                 "Z": 30,
                 "P": 40,
                 "Z_G": 50,
             },
-            "low_throughput": {
-                "X": 1,
-                "Y": 2,
-                "Z": 3,
-                "P": 6,
-            },
             "high_throughput": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
                 "P": 6,
                 "Q": 5,
+                "Z_G": 7,
             },
-            "two_low_throughput": {
-                "X": 1,
-                "Y": 2,
-                "Z": 3,
-                "P": 6,
-            },
-            "gripper": {"Z": 2.8},
         },
         "direction_change_speed_discontinuity": {
-            "none": {
+            "low_throughput": {
                 "X": 5,
                 "Y": 10,
                 "Z": 15,
                 "P": 20,
                 "Z_G": 15,
             },
-            "low_throughput": {
-                "X": 0.8,
-                "Y": 1,
-                "Z": 2,
-                "P": 4,
-            },
             "high_throughput": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
                 "P": 6,
                 "Q": 5,
+                "Z_G": 15,
             },
-            "two_low_throughput": {
-                "X": 0.5,
-                "Y": 1,
-                "Z": 1.5,
-                "P": 3,
-            },
-            "gripper": {"Z": 2.8},
         },
     },
     "current_settings": {
         "hold_current": {
-            "none": {
-                "X": 0.7,
-                "Y": 0.7,
-                "Z": 0.7,
-                "P": 0.8,
-                "Z_G": 0.5,
-            },
             "low_throughput": {
                 "X": 0.7,
                 "Y": 0.7,
                 "Z": 0.7,
                 "P": 0.8,
+                "Z_G": 0.5,
             },
             "high_throughput": {
                 "X": 0.7,
@@ -139,25 +87,16 @@ ot3_dummy_settings = {
                 "Z": 0.7,
                 "P": 0.8,
                 "Q": 0.3,
-            },
-            "two_low_throughput": {"X": 0.7, "Y": 0.7, "Z": 0.6},
-            "gripper": {
-                "Z": 0.7,
+                "Z_G": 0.5,
             },
         },
         "run_current": {
-            "none": {
+            "low_throughput": {
                 "X": 7.0,
                 "Y": 7.0,
                 "Z": 7.0,
                 "P": 5.0,
                 "Z_G": 5.0,
-            },
-            "low_throughput": {
-                "X": 1,
-                "Y": 2,
-                "Z": 3,
-                "P": 4.0,
             },
             "high_throughput": {
                 "X": 0.2,
@@ -165,10 +104,7 @@ ot3_dummy_settings = {
                 "Z": 0.4,
                 "P": 2.0,
                 "Q": 0.3,
-            },
-            "two_low_throughput": {"X": 9, "Y": 0.1, "Z": 0.6},
-            "gripper": {
-                "Z": 10,
+                "Z_G": 0.5,
             },
         },
     },
@@ -180,6 +116,18 @@ ot3_dummy_settings = {
     "right_mount_offset": (3, 2, 1),
     "left_mount_offset": (2, 2, 2),
     "gripper_mount_offset": (1, 1, 1),
+    "liquid_sense": {
+        "starting_mount_height": 80,
+        "max_z_distance": 20,
+        "min_z_distance": 3,
+        "mount_speed": 10,
+        "plunger_speed": 10,
+        "sensor_threshold_pascals": 17,
+        "expected_liquid_height": 90,
+        "log_pressure": True,
+        "aspirate_while_sensing": False,
+        "data_file": "/var/pressure_sensor_data.csv",
+    },
     "calibration": {
         "z_offset": {
             "pass_settings": {

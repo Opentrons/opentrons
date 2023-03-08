@@ -6,8 +6,10 @@ from ..state import StateStore
 from ..actions import ActionDispatcher
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
+from .gantry_mover import create_gantry_mover
 from .labware_movement import LabwareMovementHandler
-from .pipetting import PipettingHandler
+from .pipetting import create_pipetting_handler
+from .tip_handler import create_tip_handler
 from .run_control import RunControlHandler
 from .command_executor import CommandExecutor
 from .queue_worker import QueueWorker
@@ -25,6 +27,11 @@ def create_queue_worker(
         state_store: StateStore to pass down to dependencies.
         action_dispatcher: ActionDispatcher to pass down to dependencies.
     """
+    gantry_mover = create_gantry_mover(
+        hardware_api=hardware_api,
+        state_view=state_store,
+    )
+
     equipment_handler = EquipmentHandler(
         hardware_api=hardware_api,
         state_store=state_store,
@@ -34,6 +41,7 @@ def create_queue_worker(
     movement_handler = MovementHandler(
         hardware_api=hardware_api,
         state_store=state_store,
+        gantry_mover=gantry_mover,
     )
 
     labware_movement_handler = LabwareMovementHandler(
@@ -43,10 +51,14 @@ def create_queue_worker(
         movement=movement_handler,
     )
 
-    pipetting_handler = PipettingHandler(
+    pipetting_handler = create_pipetting_handler(
         hardware_api=hardware_api,
-        state_store=state_store,
-        movement_handler=movement_handler,
+        state_view=state_store,
+    )
+
+    tip_handler = create_tip_handler(
+        hardware_api=hardware_api,
+        state_view=state_store,
     )
 
     run_control_handler = RunControlHandler(
@@ -63,8 +75,10 @@ def create_queue_worker(
         action_dispatcher=action_dispatcher,
         equipment=equipment_handler,
         movement=movement_handler,
+        gantry_mover=gantry_mover,
         labware_movement=labware_movement_handler,
         pipetting=pipetting_handler,
+        tip_handler=tip_handler,
         run_control=run_control_handler,
         rail_lights=rail_lights_handler,
     )
