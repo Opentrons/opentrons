@@ -38,7 +38,7 @@ class ThermocyclerPlateLifter:
         if isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
             if (
-                self._state_store.modules.get_model(module_id)
+                self._state_store.modules.get_connected_model(module_id)
                 == ModuleModel.THERMOCYCLER_MODULE_V2
             ):
                 # We already verify that TC lid is open before moving labware. So,

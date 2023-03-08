@@ -86,6 +86,7 @@ const RoundNavLink = styled(NavLink)`
     }
   }
 `
+const JUMP_OFFSET_FROM_TOP_PX = 20
 
 interface RoundTabProps {
   disabled: boolean
@@ -163,7 +164,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
   ) : null
 }
 
-const JUMPED_STEP_HIGHLIGHT_DELAY_MS = 500
+const JUMPED_STEP_HIGHLIGHT_DELAY_MS = 1000
 interface PageContentsProps {
   runId: string
   robotName: string
@@ -180,8 +181,11 @@ function PageContents(props: PageContentsProps): JSX.Element {
     }
   }, [jumpedIndex])
 
+  const makeHandleScrollToStep = (i: number) => () => {
+    listRef.current?.scrollToIndex(i, true, -1 * JUMP_OFFSET_FROM_TOP_PX)
+  }
   const makeHandleJumpToStep = (i: number) => () => {
-    listRef.current?.scrollToIndex(i)
+    makeHandleScrollToStep(i)()
     setJumpedIndex(i)
   }
   const protocolRunDetailsContentByTab: {
@@ -202,7 +206,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
         runId={runId}
         ref={listRef}
         jumpedIndex={jumpedIndex}
-        makeHandleJumpToStep={makeHandleJumpToStep}
+        makeHandleScrollToStep={makeHandleScrollToStep}
       />
     ),
   }

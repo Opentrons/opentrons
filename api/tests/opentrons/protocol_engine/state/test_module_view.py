@@ -38,12 +38,14 @@ from opentrons.protocol_engine.state.module_substates import (
 
 def make_module_view(
     slot_by_module_id: Optional[Dict[str, Optional[DeckSlotName]]] = None,
+    requested_model_by_module_id: Optional[Dict[str, Optional[ModuleModel]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
         slot_by_module_id=slot_by_module_id or {},
+        requested_model_by_id=requested_model_by_module_id or {},
         hardware_by_module_id=hardware_by_module_id or {},
         substate_by_module_id=substate_by_module_id or {},
     )
@@ -184,8 +186,8 @@ def test_get_all_modules(
 
 
 def test_get_properties_by_id(
-    tempdeck_v1_def: ModuleDefinition,
     tempdeck_v2_def: ModuleDefinition,
+    magdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should return a loaded module's properties by ID."""
     subject = make_module_view(
@@ -193,29 +195,36 @@ def test_get_properties_by_id(
             "module-1": DeckSlotName.SLOT_1,
             "module-2": DeckSlotName.SLOT_2,
         },
+        requested_model_by_module_id={
+            "module-1": ModuleModel.TEMPERATURE_MODULE_V1,
+            "module-2": ModuleModel.MAGNETIC_MODULE_V1,
+        },
         hardware_by_module_id={
             "module-1": HardwareModule(
                 serial_number="serial-1",
-                definition=tempdeck_v1_def,
+                # Intentionally different from requested model.
+                definition=tempdeck_v2_def,
             ),
             "module-2": HardwareModule(
                 serial_number="serial-2",
-                definition=tempdeck_v2_def,
+                definition=magdeck_v1_def,
             ),
         },
     )
 
-    assert subject.get_definition("module-1") == tempdeck_v1_def
-    assert subject.get_dimensions("module-1") == tempdeck_v1_def.dimensions
-    assert subject.get_model("module-1") == ModuleModel.TEMPERATURE_MODULE_V1
+    assert subject.get_definition("module-1") == tempdeck_v2_def
+    assert subject.get_dimensions("module-1") == tempdeck_v2_def.dimensions
+    assert subject.get_requested_model("module-1") == ModuleModel.TEMPERATURE_MODULE_V1
+    assert subject.get_connected_model("module-1") == ModuleModel.TEMPERATURE_MODULE_V2
     assert subject.get_serial_number("module-1") == "serial-1"
     assert subject.get_location("module-1") == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_1
     )
 
-    assert subject.get_definition("module-2") == tempdeck_v2_def
-    assert subject.get_dimensions("module-2") == tempdeck_v2_def.dimensions
-    assert subject.get_model("module-2") == ModuleModel.TEMPERATURE_MODULE_V2
+    assert subject.get_definition("module-2") == magdeck_v1_def
+    assert subject.get_dimensions("module-2") == magdeck_v1_def.dimensions
+    assert subject.get_requested_model("module-2") == ModuleModel.MAGNETIC_MODULE_V1
+    assert subject.get_connected_model("module-2") == ModuleModel.MAGNETIC_MODULE_V1
     assert subject.get_serial_number("module-2") == "serial-2"
     assert subject.get_location("module-2") == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_2
