@@ -7,6 +7,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well
 from hardware_testing.data import create_run_id_and_start_time
 from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
+from hardware_testing.data import ui
 
 from . import report
 from . import config
@@ -160,7 +161,7 @@ def _run_trial(
     return volume_aspirate, volume_dispense
 
 
-def run(ctx: ProtocolContext, operator: str, cfg: config.GravimetricConfig) -> None:
+def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
     if ctx.is_simulating():
         get_input = print
@@ -232,7 +233,7 @@ def run(ctx: ProtocolContext, operator: str, cfg: config.GravimetricConfig) -> N
     # CREATE CSV TEST REPORT
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
     test_report.set_tag(pipette_tag)
-    test_report.set_operator(operator)
+    test_report.set_operator("unknown")
     test_report.set_version("unknown")
     report.store_serial_numbers(
         test_report,

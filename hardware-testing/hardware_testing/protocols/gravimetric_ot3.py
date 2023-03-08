@@ -7,48 +7,55 @@ from opentrons.protocol_api import ProtocolContext
 from hardware_testing.gravimetric.config import GravimetricConfig
 from hardware_testing.gravimetric import execute, helpers, workarounds
 
+from .gravimetric_ot3_fake import SLOTS_TIPRACK, SLOT_VIAL, metadata
 
-# FIXME: bump to v2.14 to utilize protocol engine
-metadata = {"apiLevel": "2.13", "protocolName": "gravimetric-ot3"}
+LABWARE_OFFSETS: List[dict] = list()
 
 
-def run(protocol: ProtocolContext, labware_offsets: List[dict], operator: str) -> None:
+def run(
+    protocol: ProtocolContext,
+    pipette_volume: int,
+    tip_volume: int,
+    trials: int,
+    increment: bool,
+    low_volume: bool,
+) -> None:
     """Run."""
     execute.run(
         protocol,
-        operator,
         GravimetricConfig(
             name=metadata["protocolName"],
             pipette_mount="left",
-            pipette_volume=50,  # 50 or 1000
-            tip_volume=50,  # 50, 200, or 1000
-            trials=10,
-            labware_offsets=labware_offsets,
-            slot_vial=4,
-            slot_tiprack=7,
-            increment=False,
-            low_volume=False,  # "low-volume" is < 2uL
+            pipette_volume=pipette_volume,
+            tip_volume=tip_volume,
+            trials=trials,
+            labware_offsets=LABWARE_OFFSETS,
+            slot_vial=SLOT_VIAL,
+            slot_tiprack=SLOTS_TIPRACK[tip_volume][0],
+            increment=increment,
+            low_volume=low_volume,
         ),
     )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
-    parser.add_argument("--operator", type=str, required=True)
-    parser.add_argument(
-        "--simulate", action="store_true", help="If set, the protocol will be simulated"
-    )
+    parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
+    parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
+    parser.add_argument("--trials", type=int, required=True)
+    parser.add_argument("--increment", action="store_true")
+    parser.add_argument("--low-volume", action="store_true")
     args = parser.parse_args()
     if not args.simulate:
         # getting labware offsets must be done before creating the protocol context
         # because it requires the robot-server to be running
-        _offsets = workarounds.http_get_all_labware_offsets()
-    else:
-        _offsets = []
+        for offset in workarounds.http_get_all_labware_offsets():
+            LABWARE_OFFSETS.append(offset)
     _ctx = helpers.get_api_context(
         metadata["apiLevel"],
         is_simulating=args.simulate,
-        pipette_left="p50_single_v3.3",
+        pipette_left=f"p{args.pipette}_single_v3.3",
     )
     _ctx.home()
-    run(_ctx, _offsets, args.operator)
+    run(_ctx, args.pipette, args.tip, args.trials, args.increment, args.low_volume)
