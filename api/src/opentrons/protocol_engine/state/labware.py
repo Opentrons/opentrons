@@ -60,7 +60,8 @@ _MAGDECK_HALF_MM_LABWARE = {
 }
 
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_1
-_INSTRUMENT_ATTACH_OFFSET = Point(y=10, z=60)
+# These offsets are based on testing attach flows with 8/1 channel pipettes
+_INSTRUMENT_ATTACH_OFFSET = Point(y=10, z=400)
 
 
 class LabwareLoadParams(NamedTuple):

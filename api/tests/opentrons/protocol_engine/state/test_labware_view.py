@@ -830,7 +830,7 @@ def test_get_calibration_coordinates() -> None:
 
     result = subject.get_calibration_coordinates()
 
-    assert result == Point(x=4, y=15, z=60)
+    assert result == Point(x=4, y=15, z=400)
 
 
 def test_get_by_slot() -> None:
