@@ -194,7 +194,7 @@ class OT3API(
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager()
         self._transforms = build_ot3_transforms(self._config)
-        self._gantry_load = GantryLoad.NONE
+        self._gantry_load = GantryLoad.LOW_THROUGHPUT
         self._move_manager = MoveManager(
             constraints=get_system_constraints(
                 self._config.motion_settings, self._gantry_load
@@ -494,27 +494,11 @@ class OT3API(
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
-        right = self._pipette_handler.has_pipette(OT3Mount.RIGHT)
-        gripper = self._gripper_handler.has_gripper()
-        if left and right:
-            # Only low-throughputs can have the two-instrument case
-            return GantryLoad.TWO_LOW_THROUGHPUT
-        if right:
-            # only a low-throughput pipette can be on the right mount
-            return GantryLoad.LOW_THROUGHPUT
         if left:
-            # as good a measure as any to define low vs high throughput, though
-            # we'll want to touch this up as we get pipette definitions for HT
-            # pipettes
-            left_hw_pipette = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-            if left_hw_pipette.config.channels.as_int <= 8:
-                return GantryLoad.LOW_THROUGHPUT
-            else:
+            pip = self._pipette_handler.get_pipette(OT3Mount.LEFT)
+            if pip.config.channels.as_int > 8:
                 return GantryLoad.HIGH_THROUGHPUT
-        if gripper:
-            # only a gripper is attached
-            return GantryLoad.GRIPPER
-        return GantryLoad.NONE
+        return GantryLoad.LOW_THROUGHPUT
 
     async def cache_pipette(
         self,
@@ -1529,7 +1513,7 @@ class OT3API(
         instrument.current_tiprack_diameter = tiprack_diameter
 
     def set_working_volume(
-        self, mount: Union[top_types.Mount, OT3Mount], tip_volume: int
+        self, mount: Union[top_types.Mount, OT3Mount], tip_volume: float
     ) -> None:
         instrument = self._pipette_handler.get_pipette(OT3Mount.from_mount(mount))
         self._log.info(

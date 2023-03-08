@@ -116,7 +116,8 @@ class ModuleGeometry:
         self._location = Location(point=self._offset + self._parent.point, labware=self)
 
     def add_labware(self, labware: Labware) -> Labware:
-        assert not self._labware, "{} is already on this module".format(self._labware)
+        if self._labware is not None:
+            raise RuntimeError(f"{self._labware} is already on this module")
         self._labware = labware
         return self._labware
 
@@ -281,8 +282,10 @@ class ThermocyclerGeometry(ModuleGeometry):
         )
 
     def add_labware(self, labware: Labware) -> Labware:
-        assert not self._labware, "{} is already on this module".format(self._labware)
-        assert self.lid_status != "closed", "Cannot place labware in closed module"
+        if self._labware is not None:
+            raise RuntimeError(f"{self._labware} is already on this module")
+        if self.lid_status == "closed":
+            raise RuntimeError("Cannot place labware in closed module")
         if self.is_semi_configuration:
             self._labware = self.labware_accessor(labware)
         else:

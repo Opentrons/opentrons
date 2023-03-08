@@ -274,6 +274,7 @@ class OT3SubSystem(enum.Enum):
     pipette_left = 3
     pipette_right = 4
     gripper = 5
+    rear_panel = 6
 
     def __str__(self) -> str:
         return self.name

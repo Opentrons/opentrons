@@ -1,11 +1,8 @@
 """Test aspirate-in-place commands."""
 import pytest
 from decoy import Decoy
-from typing import cast
 
-from opentrons.types import Mount
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocol_engine.execution import PipettingHandler
 from opentrons.protocol_engine.commands.aspirate_in_place import (
@@ -17,7 +14,6 @@ from opentrons.protocol_engine.errors.exceptions import PipetteNotReadyToAspirat
 
 from opentrons.protocol_engine.state import (
     StateStore,
-    HardwarePipette,
 )
 
 
@@ -58,39 +54,17 @@ async def test_aspirate_in_place_implementation(
         flowRate=1.234,
     )
 
-    left_config = cast(PipetteDict, {"name": "p300_single", "pipette_id": "123"})
-    right_config = cast(PipetteDict, {"name": "p300_multi", "pipette_id": "abc"})
-
-    pipette_dict_by_mount = {Mount.LEFT: left_config, Mount.RIGHT: right_config}
-
-    hw_pipette_result = HardwarePipette(
-        mount=Mount.RIGHT,
-        config=right_config,
-    )
-
-    decoy.when(hardware_api.attached_instruments).then_return(pipette_dict_by_mount)
-
     decoy.when(
-        state_store.pipettes.get_hardware_pipette(
+        pipetting.get_is_ready_to_aspirate(
             pipette_id="pipette-id-abc",
-            attached_pipettes=pipette_dict_by_mount,
-        )
-    ).then_return(hw_pipette_result)
-
-    decoy.when(
-        state_store.pipettes.get_is_ready_to_aspirate(
-            pipette_id="pipette-id-abc",
-            pipette_config=hw_pipette_result.config,
         )
     ).then_return(True)
 
-    mock_flow_rate_context = decoy.mock(name="mock flow rate context")
     decoy.when(
-        pipetting.set_flow_rate(
-            pipette=hw_pipette_result,
-            aspirate_flow_rate=1.234,
+        await pipetting.aspirate_in_place(
+            pipette_id="pipette-id-abc", volume=123, flow_rate=1.234
         )
-    ).then_return(mock_flow_rate_context)
+    ).then_return(123)
 
     result = await subject.execute(params=data)
 
@@ -116,29 +90,9 @@ async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
         flowRate=1.234,
     )
 
-    left_config = cast(PipetteDict, {"name": "p300_single", "pipette_id": "123"})
-    right_config = cast(PipetteDict, {"name": "p300_multi", "pipette_id": "abc"})
-
-    pipette_dict_by_mount = {Mount.LEFT: left_config, Mount.RIGHT: right_config}
-
-    hw_pipette_result = HardwarePipette(
-        mount=Mount.RIGHT,
-        config=right_config,
-    )
-
-    decoy.when(hardware_api.attached_instruments).then_return(pipette_dict_by_mount)
-
     decoy.when(
-        state_store.pipettes.get_hardware_pipette(
+        pipetting.get_is_ready_to_aspirate(
             pipette_id="pipette-id-abc",
-            attached_pipettes=pipette_dict_by_mount,
-        )
-    ).then_return(hw_pipette_result)
-
-    decoy.when(
-        state_store.pipettes.get_is_ready_to_aspirate(
-            pipette_id="pipette-id-abc",
-            pipette_config=hw_pipette_result.config,
         )
     ).then_return(False)
 

@@ -126,7 +126,10 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
         'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
         { selectedSlot }
       )
-    } else if (moduleOnDeck?.type === HEATERSHAKER_MODULE_TYPE) {
+    } else if (
+      moduleOnDeck?.type === HEATERSHAKER_MODULE_TYPE &&
+      !hasSlotIssue(selectedSlot)
+    ) {
       const isHeaterShakerAdjacentToAnotherModule = some(
         initialDeckSetup.modules,
         hwModule =>
