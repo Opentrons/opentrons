@@ -27,28 +27,21 @@ export function CheckPipettesButton(
 ): JSX.Element | null {
   const { onDone, children, actualPipette } = props
   const { t } = useTranslation('change_pipette')
-  const [isPending, setPending] = React.useState(false)
-
-  const { refetch: refetchPipettes } = usePipettesQuery(
+  const { isFetching: isPending, refetch: refetchPipettes } = usePipettesQuery(
     { refresh: true },
     {
       enabled: false,
       onSuccess: () => {
         onDone?.()
       },
-      onSettled: () => {
-        setPending(false)
-      },
+      onSettled: () => {},
     }
   )
-
   const handleClick = (): void => {
-    setPending(true)
     refetchPipettes()
       .then(() => {})
       .catch(() => {})
   }
-
   const icon = (
     <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />
   )
