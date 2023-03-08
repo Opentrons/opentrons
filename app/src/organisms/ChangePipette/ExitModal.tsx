@@ -14,10 +14,11 @@ interface Props {
   back: () => void
   exit: () => void
   direction: Direction
+  isDisabled: boolean
 }
 
 export function ExitModal(props: Props): JSX.Element {
-  const { back, exit, direction } = props
+  const { back, exit, direction, isDisabled } = props
   const { t } = useTranslation(['change_pipette', 'shared'])
   const flow = direction === 'attach' ? t('attaching') : t('detaching')
 
@@ -28,12 +29,17 @@ export function ExitModal(props: Props): JSX.Element {
       subHeader={t('are_you_sure_exit', { direction: flow })}
       isSuccess={false}
     >
-      <SecondaryButton onClick={back} marginRight={SPACING.spacing2}>
+      <SecondaryButton
+        onClick={back}
+        marginRight={SPACING.spacing2}
+        disabled={isDisabled}
+      >
         {t('go_back')}
       </SecondaryButton>
       <AlertPrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
         onClick={exit}
+        disabled={isDisabled}
       >
         {t('shared:exit')}
       </AlertPrimaryButton>

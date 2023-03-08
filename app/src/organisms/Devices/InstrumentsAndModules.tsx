@@ -42,9 +42,12 @@ export function InstrumentsAndModules({
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
 
-  const attachedPipettes = usePipettesQuery({
-    refetchInterval: EQUIPMENT_POLL_MS,
-  })?.data ?? { left: undefined, right: undefined }
+  const attachedPipettes = usePipettesQuery(
+    {},
+    {
+      refetchInterval: EQUIPMENT_POLL_MS,
+    }
+  )?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()

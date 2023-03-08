@@ -12,17 +12,19 @@ export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
 ): JSX.Element => {
   const { proceedButtonText, proceed, setPending, isDisabled } = props
-  const { status, refetch } = usePipettesQuery()
+  const { refetch, isFetching } = usePipettesQuery(
+    { refresh: true },
+    {
+      enabled: false,
+      onSuccess: () => {
+        proceed()
+      },
+    }
+  )
 
   React.useEffect(() => {
-    //  if requestStatus is error then the error modal will be in the results page
-    if (status === 'success' || status === 'error') {
-      proceed()
-      setPending(false)
-    } else if (status === 'loading') {
-      setPending(true)
-    }
-  }, [proceed, status, setPending])
+    setPending(isFetching)
+  }, [isFetching, setPending])
 
   return (
     <PrimaryButton
