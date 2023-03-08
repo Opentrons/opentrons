@@ -177,7 +177,10 @@ describe('InstrumentsAndModules', () => {
     expect(mockUseAllPipetteOffsetCalibrationsQuery).toHaveBeenCalledWith({
       refetchInterval: 30000,
     })
-    expect(mockUsePipettesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
+    expect(mockUsePipettesQuery).toHaveBeenCalledWith(
+      {},
+      { refetchInterval: 5000 }
+    )
     expect(mockUseModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
   })
 })
