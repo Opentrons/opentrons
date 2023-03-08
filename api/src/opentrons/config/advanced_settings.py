@@ -178,10 +178,8 @@ settings = [
     ),
     SettingDefinition(
         _id="rearPanelIntegration",
-        title="Enable robots with the new usb connected rear-panel board",
-        description="Connect to the rear-panel over usb."
-        "Pre-DVT models don't have communication to their rear-panel board"
-        "and should disable this flag to build the backend without failing",
+        title="Enable robots with the new usb connected rear-panel board.",
+        description="This is an Opentrons-internal setting to test new rear-panel."
     ),
 ]
 
