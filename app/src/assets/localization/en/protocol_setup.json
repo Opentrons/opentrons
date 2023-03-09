@@ -161,5 +161,6 @@
   "view_current_offsets": "View current offsets",
   "view_module_setup_instructions": "View module setup instructions",
   "deck_map": "Deck Map",
-  "setup_instructions": "Setup Instructions"
+  "setup_instructions": "Setup Instructions",
+  "labware_latch_instructions": "To add labware to the Heater-Shaker Module, use the labware latch in the controls to the right."
 }
