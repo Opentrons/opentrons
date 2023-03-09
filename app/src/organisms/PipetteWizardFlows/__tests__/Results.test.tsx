@@ -218,12 +218,12 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
       isOnDevice: true,
     }
-    const { getByText, getByLabelText } = render(props)
+    const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Pipette failed to attach')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    getByLabelText('SmallButton').click()
+    getByRole('button', { name: 'SmallButton_Default' }).click()
     await act(() => pipettePromise)
     expect(mockRefetchPipette).toHaveBeenCalled()
   })

@@ -106,20 +106,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
 
   if (!isSuccess && (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)) {
     subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
-    button = isOnDevice ? (
-      <SmallButton
-        onClick={handleTryAgain}
-        disabled={isPending}
-        buttonText={t(
-          flowType === FLOWS.ATTACH ? 'try_again' : 'attach_and_retry'
-        )}
-        buttonType="default"
-      />
-    ) : (
+    button = (
       <>
-        {isOnDevice ? (
-          false
-        ) : (
+        {isOnDevice ? null : (
           <SecondaryButton
             onClick={handleCleanUpAndClose}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
