@@ -116,5 +116,6 @@
   "not_started_yet": "Not started yet",
   "preview_of_protocol_steps": "This is a preview of your protocol's steps",
   "steps_total": "{{count}} steps total",
-  "protocol_completed": "Protocol completed"
+  "protocol_completed": "Protocol completed",
+  "complete_protocol_to_download": "Complete the protocol to download the run log"
 }
