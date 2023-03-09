@@ -89,5 +89,4 @@ module.exports = async () => ({
   publish: project === 'ot3' ? ot3PublishConfig : robotStackPublishConfig,
   generateUpdatesFilesForAllChannels: true,
   beforePack: path.join(__dirname, './scripts/before-pack.js'),
-  afterSign: path.join(__dirname, './scripts/after-sign.js'),
 })

@@ -14,19 +14,21 @@ import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
-import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
-import { RobotInformation } from './AdvancedTab/RobotInformation'
-import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
 import { UsageSettings } from './AdvancedTab/UsageSettings'
-import { DisableHoming } from './AdvancedTab/DisableHoming'
-import { OpenJupyterControl } from './AdvancedTab/OpenJupyterControl'
-import { UpdateRobotSoftware } from './AdvancedTab/UpdateRobotSoftware'
-import { Troubleshooting } from './AdvancedTab/Troubleshooting'
-import { FactoryReset } from './AdvancedTab/FactoryReset'
-import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
-import { LegacySettings } from './AdvancedTab/LegacySettings'
-import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
-import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
+import {
+  DisableHoming,
+  DisplayRobotName,
+  FactoryReset,
+  LegacySettings,
+  OpenJupyterControl,
+  RobotInformation,
+  RobotServerVersion,
+  ShortTrashBin,
+  Troubleshooting,
+  UpdateRobotSoftware,
+  UseOlderAspirateBehavior,
+  UseOlderProtocol,
+} from './AdvancedTab'
 import {
   updateSetting,
   getRobotSettings,

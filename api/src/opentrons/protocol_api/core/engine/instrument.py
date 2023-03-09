@@ -6,11 +6,7 @@ from typing import Optional, TYPE_CHECKING
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import (
-    PlungerSpeeds,
-    FlowRates,
-    find_value_for_api_version,
-)
+from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
 from opentrons.protocol_engine import (
     DeckPoint,
     DropTipWellLocation,
@@ -19,6 +15,7 @@ from opentrons.protocol_engine import (
     WellOrigin,
     WellOffset,
 )
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -454,10 +451,24 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.pipettes.get_maximum_volume(self._pipette_id)
 
     def get_current_volume(self) -> float:
-        return self._engine_client.state.pipettes.get_aspirated_volume(self._pipette_id)
+        try:
+            current_volume = self._engine_client.state.pipettes.get_aspirated_volume(
+                self._pipette_id
+            )
+        except TipNotAttachedError:
+            current_volume = None
+
+        return current_volume or 0
 
     def get_available_volume(self) -> float:
-        return self._engine_client.state.pipettes.get_available_volume(self._pipette_id)
+        try:
+            available_volume = self._engine_client.state.pipettes.get_available_volume(
+                self._pipette_id
+            )
+        except TipNotAttachedError:
+            available_volume = None
+
+        return available_volume or 0
 
     def get_hardware_state(self) -> PipetteDict:
         """Get the current state of the pipette hardware as a dictionary."""
@@ -467,13 +478,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.tips.get_pipette_channels(self._pipette_id)
 
     def has_tip(self) -> bool:
-        return self.get_hardware_state()["has_tip"]
+        return (
+            self._engine_client.state.pipettes.get_attached_tip(self._pipette_id)
+            is not None
+        )
 
     def get_return_height(self) -> float:
-        raise NotImplementedError("InstrumentCore.get_return_height not implemented")
-
-    def get_speed(self) -> PlungerSpeeds:
-        raise NotImplementedError("InstrumentCore.get_speed not implemented")
+        return self._engine_client.state.pipettes.get_return_tip_scale(self._pipette_id)
 
     def get_flow_rate(self) -> FlowRates:
         return self._flow_rates
@@ -502,11 +513,3 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if blow_out is not None:
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
-
-    def set_pipette_speed(
-        self,
-        aspirate: Optional[float] = None,
-        dispense: Optional[float] = None,
-        blow_out: Optional[float] = None,
-    ) -> None:
-        raise NotImplementedError("InstrumentCore.set_pipette_speed not implemented")

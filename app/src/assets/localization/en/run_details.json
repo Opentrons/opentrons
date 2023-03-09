@@ -85,7 +85,7 @@
   "clear_protocol_to_make_available": "Clear protocol from robot to make it available.",
   "download_run_log": "Download run log",
   "downloading_run_log": "Downloading run log",
-  "jump_to_current_step": "Jump to current step",
+  "view_current_step": "View current step",
   "run_has_diverged_from_predicted": "Run has diverged from predicted state. Cannot anticipate new steps.",
   "unable_to_determine_steps": "Unable to determine steps",
   "robot_has_previous_offsets": "This robot has stored Labware Offset data from previous protocol runs. Do you want to apply that data to this protocol run? You can still adjust any offsets with Labware Position Check.",

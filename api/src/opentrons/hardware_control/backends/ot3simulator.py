@@ -43,6 +43,7 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
     BoardRevision,
+    InstrumentFWInfo,
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
@@ -50,6 +51,7 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     MotorStatus,
     PipetteSubType,
+    UpdateStatus,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -119,6 +121,7 @@ class OT3Simulator:
         self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
         self._update_required = False
+        self._initialized = False
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -160,6 +163,15 @@ class OT3Simulator:
         self._motor_status = {}
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+
+    @property
+    def initialized(self) -> bool:
+        """True when the hardware controller has initialized and is ready."""
+        return self._initialized
+
+    @initialized.setter
+    def initialized(self, value: bool) -> None:
+        self._initialized = value
 
     @property
     def board_revision(self) -> BoardRevision:
@@ -494,13 +506,22 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
+    def get_instrument_update(
+        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
+    ) -> InstrumentFWInfo:
+        return InstrumentFWInfo(mount, False, 0, 0)
+
+    def get_update_progress(self) -> Set[UpdateStatus]:
+        return set()
+
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
         nodes: Optional[Set[NodeId]] = None,
-    ) -> None:
+        force: bool = False,
+    ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        return None
+        yield set()
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
@@ -614,3 +635,8 @@ class OT3Simulator:
     ) -> List[float]:
         self._position[axis_to_node(moving)] += distance_mm
         return []
+
+    @ensure_yield
+    async def connect_usb_to_rear_panel(self) -> None:
+        """Connect to rear panel over usb."""
+        return None

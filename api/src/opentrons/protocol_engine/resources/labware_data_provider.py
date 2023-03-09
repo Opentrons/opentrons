@@ -5,7 +5,6 @@ abstract away rough edges until we can improve those underlying interfaces.
 """
 import logging
 from anyio import to_thread
-from typing import Optional
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.labware import get_labware_definition
@@ -53,7 +52,8 @@ class LabwareDataProvider:
     async def get_calibrated_tip_length(
         pipette_serial: str,
         labware_definition: LabwareDefinition,
-    ) -> Optional[float]:
+        nominal_fallback: float,
+    ) -> float:
         """Get the calibrated tip length of a tip rack / pipette pair.
 
         Note: this method hits the filesystem, which will have performance
@@ -63,20 +63,24 @@ class LabwareDataProvider:
             LabwareDataProvider._get_calibrated_tip_length_sync,
             pipette_serial,
             labware_definition,
+            nominal_fallback,
         )
 
     @staticmethod
     def _get_calibrated_tip_length_sync(
         pipette_serial: str,
         labware_definition: LabwareDefinition,
-    ) -> Optional[float]:
+        nominal_fallback: float,
+    ) -> float:
         try:
             return instr_cal.load_tip_length_for_pipette(
                 pipette_serial, labware_definition
             ).tip_length
 
         except TipLengthCalNotFound as e:
-            log.warning(
-                f"No calibrated tip length found for {pipette_serial}", exc_info=e
+            message = (
+                f"No calibrated tip length found for {pipette_serial},"
+                f" using nominal fallback value of {nominal_fallback}"
             )
-            return None
+            log.warning(message, exc_info=e)
+            return nominal_fallback

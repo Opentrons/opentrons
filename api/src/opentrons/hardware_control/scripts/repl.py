@@ -34,6 +34,7 @@ from opentrons.config import feature_flags as ff  # noqa: E402
 from opentrons.hardware_control.types import (  # noqa: E402
     OT3Axis,
     OT3Mount,
+    OT3SubSystem,
     GripperProbe,
 )
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
@@ -121,6 +122,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Axis": Axis,
             "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
+            "OT3SubSystem": OT3SubSystem,
             "GripperProbe": GripperProbe,
             "find_edge": wrap_async_util_fn(find_edge_linear, api),
             "find_deck_height": wrap_async_util_fn(find_deck_height, api),

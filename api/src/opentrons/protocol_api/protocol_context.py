@@ -202,7 +202,19 @@ class ProtocolContext(CommandPublisher):
                                                # 10 mm/s
                 protocol.max_speeds['X'] = None  # reset to default
 
+        .. caution::
+            This property is not yet supported on
+            :ref:`API version <v2-versioning>` 2.14 or higher.
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            # TODO(mc, 2023-02-23): per-axis max speeds not yet supported on the engine
+            # See https://opentrons.atlassian.net/browse/RCORE-373
+            raise APIVersionError(
+                "ProtocolContext.max_speeds is not supported at apiLevel 2.14 or higher."
+                " Use a lower apiLevel or set speeds using InstrumentContext.default_speed"
+                " or the per-method 'speed' argument."
+            )
+
         return self._core.get_max_speeds()
 
     @requires_version(2, 0)

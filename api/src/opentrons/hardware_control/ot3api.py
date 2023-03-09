@@ -5,6 +5,7 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
+    AsyncIterator,
     cast,
     Callable,
     Dict,
@@ -41,12 +42,10 @@ from opentrons_hardware.hardware_control.motion_planning import (
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
-from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
 from .instruments.ot3.pipette import (
-    Pipette,
     load_from_config_and_check_skip,
 )
 from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
@@ -56,7 +55,13 @@ from .instruments.ot3.instrument_calibration import (
 )
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import get_system_constraints, axis_convert
+from .backends.ot3utils import (
+    get_system_constraints,
+    axis_convert,
+    mount_from_subsystem,
+    sub_system_to_node_id,
+    subsystem_from_mount,
+)
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -69,7 +74,9 @@ from .types import (
     ErrorMessageNotification,
     HardwareEventHandler,
     HardwareAction,
+    InstrumentUpdateStatus,
     MotionChecks,
+    OT3SubSystem,
     PipetteSubType,
     PauseType,
     OT3Axis,
@@ -81,6 +88,7 @@ from .types import (
     GripperProbe,
     EarlyLiquidSenseTrigger,
     LiquidNotFound,
+    UpdateStatus,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -188,7 +196,7 @@ class OT3API(
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager()
         self._transforms = build_ot3_transforms(self._config)
-        self._gantry_load = GantryLoad.NONE
+        self._gantry_load = GantryLoad.LOW_THROUGHPUT
         self._move_manager = MoveManager(
             constraints=get_system_constraints(
                 self._config.motion_settings, self._gantry_load
@@ -273,12 +281,19 @@ class OT3API(
             checked_config = config
         backend = await OT3Controller.build(checked_config)
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
-        await api_instance.cache_instruments()
+        await api_instance._cache_instruments()
+
+        # check for and start firmware updates if required
+        async for _ in api_instance.update_firmware():
+            pass
+
+        await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
         checked_loop.create_task(backend.watch(loop=checked_loop))
+        backend.initialized = True
         return api_instance
 
     @classmethod
@@ -364,6 +379,76 @@ class OT3API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
+    def _get_pipette_subtypes(self) -> Dict[OT3Mount, PipetteSubType]:
+        """Get attached pipette subtypes.
+
+        The PipetteSubType is a direct map of PipetteChannelType (single, multi, 96).
+        This is needed because unlike the rest of the subsystems, the pipettes have different firmware that gets
+        installed based on the PipetteChannelType.
+        """
+        # Get the attached instruments so we can get determine the PipetteSubType attached.
+        pipette_subtypes: Dict[OT3Mount, PipetteSubType] = dict()
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        for mount, _ in attached_instruments.items():
+            # we can exclude the gripper here since we can use the OT3SubSystem to map to NodeId directly.
+            if self._pipette_handler.has_pipette(mount):
+                pipette = self._pipette_handler.get_pipette(mount)
+                pipette_subtypes[mount] = PipetteSubType.from_channels(pipette.channels)
+        return pipette_subtypes
+
+    def get_firmware_update_progress(self) -> Dict[OT3Mount, InstrumentUpdateStatus]:
+        """Get the update progress for instruments currently updating."""
+        progress_updates: Dict[OT3Mount, InstrumentUpdateStatus] = {}
+        instruments = {
+            OT3SubSystem.pipette_left,
+            OT3SubSystem.pipette_right,
+            OT3SubSystem.gripper,
+        }
+        for update_status in self._backend.get_update_progress():
+            # we only want instruments, this will drop core substystems
+            if update_status.subsystem in instruments:
+                mount = mount_from_subsystem(update_status.subsystem)
+                state = update_status.state
+                progress = update_status.progress
+                if not progress_updates.get(mount):
+                    progress_updates[mount] = InstrumentUpdateStatus(
+                        mount, state, progress
+                    )
+                progress_updates[mount].update(state, progress)
+        return progress_updates
+
+    async def update_instrument_firmware(
+        self, mount: Optional[OT3Mount] = None
+    ) -> None:
+        """Update the firmware on one or all instruments."""
+        # check that mount is actually attached
+        # TODO (ba, 2023-03-03) get_attached_instruments should probably return gripper as well, for now just add it
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        attached_instruments[OT3Mount.GRIPPER] = self.attached_gripper  # type: ignore
+        if mount and not attached_instruments.get(mount):
+            mod_log.debug(f"Can't update instrument, mount {mount} is not attached.")
+            return
+        mounts = {mount} if mount else set(attached_instruments)
+        subsystems = {subsystem_from_mount(mount) for mount in mounts}
+        async for update_status in self.update_firmware(subsystems):
+            mod_log.debug(update_status)
+
+    async def update_firmware(
+        self, subsystems: Optional[Set[OT3SubSystem]] = None, force: bool = False
+    ) -> AsyncIterator[Set[UpdateStatus]]:
+        """Start the firmware update for one or more subsystems and return update progress iterator."""
+        subsystems = subsystems or set()
+        nodes = {sub_system_to_node_id(subsystem) for subsystem in subsystems}
+        # get the attached pipette subtypes so we can determine which binary to install for pipettes
+        pipettes = self._get_pipette_subtypes()
+        # start the updates and yield the progress
+        async for update_status in self._backend.update_firmware(
+            pipettes, nodes, force
+        ):
+            yield update_status
+        # refresh Instrument cache
+        await self._cache_instruments()
+
     # Incidentals (i.e. not motion) API
 
     async def set_lights(
@@ -417,50 +502,17 @@ class OT3API(
             sim_model=model.value,
         )
 
-    @staticmethod
-    def _pipette_subtype_from_pipette(pipette: Pipette) -> PipetteSubType:
-        pipettes = {
-            PipetteChannelType.SINGLE_CHANNEL: PipetteSubType.pipette_single,
-            PipetteChannelType.EIGHT_CHANNEL: PipetteSubType.pipette_multi,
-            PipetteChannelType.NINETY_SIX_CHANNEL: PipetteSubType.pipette_96,
-        }
-        return pipettes[pipette.channels]
-
-    async def do_firmware_updates(self) -> None:
-        """Update all the firmware."""
-        # get the attached instruments so we can get the type of pipettes attached
-        pipettes: Dict[OT3Mount, PipetteSubType] = dict()
-        attached_instruments = self._pipette_handler.get_attached_instruments()
-        for mount, _ in attached_instruments.items():
-            if self._pipette_handler.has_pipette(mount):
-                pipette = self._pipette_handler.get_pipette(mount)
-                pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
-        await self._backend.update_firmware(pipettes)
+    async def connect_usb_to_rear_panel(self) -> None:
+        await self._backend.connect_usb_to_rear_panel()
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
-        right = self._pipette_handler.has_pipette(OT3Mount.RIGHT)
-        gripper = self._gripper_handler.has_gripper()
-        if left and right:
-            # Only low-throughputs can have the two-instrument case
-            return GantryLoad.TWO_LOW_THROUGHPUT
-        if right:
-            # only a low-throughput pipette can be on the right mount
-            return GantryLoad.LOW_THROUGHPUT
         if left:
-            # as good a measure as any to define low vs high throughput, though
-            # we'll want to touch this up as we get pipette definitions for HT
-            # pipettes
-            left_hw_pipette = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-            if left_hw_pipette.config.channels.as_int <= 8:
-                return GantryLoad.LOW_THROUGHPUT
-            else:
+            pip = self._pipette_handler.get_pipette(OT3Mount.LEFT)
+            if pip.config.channels.as_int > 8:
                 return GantryLoad.HIGH_THROUGHPUT
-        if gripper:
-            # only a gripper is attached
-            return GantryLoad.GRIPPER
-        return GantryLoad.NONE
+        return GantryLoad.LOW_THROUGHPUT
 
     async def cache_pipette(
         self,
@@ -472,12 +524,18 @@ class OT3API(
         config = instrument_data.get("config")
         pip_id = instrument_data.get("id")
         pip_offset_cal = load_pipette_offset(pip_id, mount)
+
+        pipete_subtype = (
+            PipetteSubType.from_channels(config.channels) if config else None
+        )
+        fw_update_info = self._backend.get_instrument_update(mount, pipete_subtype)
         p, _ = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
             pip_id,
             pip_offset_cal,
+            fw_update_info,
         )
         self._pipette_handler.hardware_instruments[mount] = p
         # TODO (lc 12-5-2022) Properly support backwards compatibility
@@ -485,11 +543,13 @@ class OT3API(
 
     async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
         """Set up gripper based on scanned information."""
+        fw_update_info = self._backend.get_instrument_update(OT3Mount.GRIPPER)
         grip_cal = load_gripper_calibration_offset(instrument_data.get("id"))
         g = compare_gripper_config_and_check_skip(
             instrument_data,
             self._gripper_handler._gripper,
             grip_cal,
+            fw_update_info,
         )
         self._gripper_handler.gripper = g
 
@@ -508,6 +568,13 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
+        await self._cache_instruments(require)
+        await self._configure_instruments()
+
+    async def _cache_instruments(
+        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+    ) -> None:
+        """Actually cache instruments and scan network."""
         self._log.info("Updating instrument model cache")
         checked_require = {
             OT3Mount.from_mount(m): v for m, v in (require or {}).items()
@@ -542,6 +609,10 @@ class OT3API(
 
         await self._backend.probe_network()
         await self.refresh_positions()
+
+    async def _configure_instruments(self) -> None:
+        """Configure instruments"""
+        await self._backend.update_motor_status()
         await self.set_gantry_load(self._gantry_load_from_instruments())
 
     @ExecutionManagerProvider.wait_for_running
@@ -1536,7 +1607,7 @@ class OT3API(
         instrument.current_tiprack_diameter = tiprack_diameter
 
     def set_working_volume(
-        self, mount: Union[top_types.Mount, OT3Mount], tip_volume: int
+        self, mount: Union[top_types.Mount, OT3Mount], tip_volume: float
     ) -> None:
         instrument = self._pipette_handler.get_pipette(OT3Mount.from_mount(mount))
         self._log.info(

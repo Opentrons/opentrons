@@ -16,12 +16,10 @@ import { Portal } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { SendProtocolToOT3Slideout } from '../../organisms/SendProtocolToOT3Slideout'
 import { useTrackEvent } from '../../redux/analytics'
 import { getSendAllProtocolsToOT3 } from '../../redux/config'
 import {
   analyzeProtocol,
-  getStoredProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
@@ -29,18 +27,24 @@ import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
 import { getIsOT3Protocol } from './utils'
 
 import type { StyleProps } from '@opentrons/components'
-import type { Dispatch, State } from '../../redux/types'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { Dispatch } from '../../redux/types'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
-  protocolDisplayName: string
-  protocolKey: string
-  handleRunProtocol: () => void
+  handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  storedProtocolData: StoredProtocolData
 }
 
 export function ProtocolOverflowMenu(
   props: ProtocolOverflowMenuProps
 ): JSX.Element {
-  const { protocolDisplayName, protocolKey, handleRunProtocol } = props
+  const {
+    storedProtocolData,
+    handleRunProtocol,
+    handleSendProtocolToOT3,
+  } = props
+  const { protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
@@ -59,10 +63,6 @@ export function ProtocolOverflowMenu(
     trackEvent({ name: 'deleteProtocolFromApp', properties: {} })
   }, true)
   const sendAllProtocolsToOT3 = useSelector(getSendAllProtocolsToOT3)
-  const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
-  const storedProtocolData = useSelector((state: State) =>
-    getStoredProtocol(state, protocolKey)
-  )
 
   const isOT3Protocol = getIsOT3Protocol(storedProtocolData?.mostRecentAnalysis)
 
@@ -79,13 +79,13 @@ export function ProtocolOverflowMenu(
       name: 'proceedToRun',
       properties: { sourceLocation: 'ProtocolsLanding' },
     })
-    handleRunProtocol()
+    handleRunProtocol(storedProtocolData)
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickSendToOT3: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    setShowSlideout(true)
+    handleSendProtocolToOT3(storedProtocolData)
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -172,14 +172,6 @@ export function ProtocolOverflowMenu(
         </Portal>
       ) : null}
       {menuOverlay}
-      {storedProtocolData != null ? (
-        <SendProtocolToOT3Slideout
-          isExpanded={showSlideout}
-          onCloseClick={() => setShowSlideout(false)}
-          protocolDisplayName={protocolDisplayName}
-          storedProtocolData={storedProtocolData}
-        />
-      ) : null}
     </Flex>
   )
 }

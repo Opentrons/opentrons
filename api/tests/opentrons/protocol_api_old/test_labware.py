@@ -520,7 +520,7 @@ def test_module_load_labware(module_name) -> None:
         + labware_def["dimensions"]["zDimension"]
         + mod._over_labware
     )
-    with pytest.raises(AssertionError):
+    with pytest.raises(RuntimeError):
         mod.add_labware(lw)
     mod.reset_labware()
     assert mod.labware is None
