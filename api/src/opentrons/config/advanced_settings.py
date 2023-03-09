@@ -176,6 +176,11 @@ settings = [
         ),
         restart_required=True,
     ),
+    SettingDefinition(
+        _id="rearPanelIntegration",
+        title="Enable robots with the new usb connected rear-panel board.",
+        description="This is an Opentrons-internal setting to test new rear-panel.",
+    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -522,6 +527,16 @@ def _migrate21to22(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate22to23(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 23 of the feature flags file.
+
+    - Adds the rearPanelIntegration config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["rearPanelIntegration"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -545,6 +560,7 @@ _MIGRATIONS = [
     _migrate19to20,
     _migrate20to21,
     _migrate21to22,
+    _migrate22to23,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

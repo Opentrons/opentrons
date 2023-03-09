@@ -113,12 +113,10 @@ def mock_usb_driver() -> SerialUsbDriver:
 
 @pytest.fixture
 def controller(
-    mock_config: OT3Config,
-    mock_can_driver: AbstractCanDriver,
-    mock_usb_driver: SerialUsbDriver,
+    mock_config: OT3Config, mock_can_driver: AbstractCanDriver
 ) -> OT3Controller:
     with mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"):
-        yield OT3Controller(mock_config, mock_can_driver, mock_usb_driver)
+        yield OT3Controller(mock_config, mock_can_driver)
 
 
 @pytest.fixture
