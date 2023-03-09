@@ -10,7 +10,7 @@ import {
   SUCCESSFULLY_CALIBRATED,
 } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
 
 export type GripperWizardStep =
   | BeforeBeginningStep
@@ -47,6 +47,11 @@ export interface SuccessStep {
     | typeof SUCCESSFULLY_ATTACHED_AND_CALIBRATED
     | typeof SUCCESSFULLY_DETACHED
     | typeof SUCCESSFULLY_CALIBRATED
+}
+
+export interface RegisterJawOffsetAction {
+  jaw: 'front' | 'rear'
+  offset: Coordinates | null
 }
 
 type CreateCommandMutate = ReturnType<

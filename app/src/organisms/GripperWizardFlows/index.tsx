@@ -9,7 +9,7 @@ import {
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainRunCommands, useCreateRunCommandMutation } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -22,6 +22,7 @@ import { ExitConfirmation } from './ExitConfirmation'
 import type { GripperWizardFlowType } from './types'
 import type { AxiosError } from 'axios'
 import type { Run, CreateRunData, InstrumentData } from '@opentrons/api-client'
+import type { Coordinates } from '@opentrons/shared-data'
 
 
 interface MaintenanceRunManagerProps {
@@ -31,49 +32,21 @@ interface MaintenanceRunManagerProps {
 }
 export function GripperWizardFlows(props: MaintenanceRunManagerProps): JSX.Element {
   const { flowType, closeFlow, attachedGripper } = props
-  const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [runId, setRunId] = React.useState<string>('')
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-
-  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(runId)
-
+  const { chainRunCommands, isCommandMutationLoading: isChainCommandMutationLoading } = useChainRunCommands(runId)
+  const { createRunCommand, isLoading: isCommandLoading } = useCreateRunCommandMutation(runId)
   const { createRun, isLoading: isCreateLoading } = useCreateRunMutation({
-    onSuccess: response => {
-      setRunId(response.data.id)
-    },
+    onSuccess: response => { setRunId(response.data.id) },
   })
   const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
     onSuccess: closeFlow,
   })
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-
-  const proceed = (): void => {
-    console.table({
-      isCommandMutationLoading,
-      isStopLoading,
-      isExiting
-    })
-    if (
-      !(
-        isCommandMutationLoading ||
-        isStopLoading ||
-        isExiting
-      )
-    ) {
-      console.log('steo inc', currentStepIndex, gripperWizardSteps.length - 1)
-      setCurrentStepIndex(
-        currentStepIndex !== gripperWizardSteps.length - 1
-          ? currentStepIndex + 1
-          : currentStepIndex
-      )
-    }
-  }
-
   const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
-
   React.useEffect(() => {
     if (
-      isCommandMutationLoading ||
+      isChainCommandMutationLoading ||
+      isCommandLoading ||
       isStopLoading ||
       isExiting
     ) {
@@ -82,7 +55,7 @@ export function GripperWizardFlows(props: MaintenanceRunManagerProps): JSX.Eleme
     } else {
       setIsRobotMoving(false)
     }
-  }, [isCommandMutationLoading, isStopLoading, isExiting])
+  }, [isChainCommandMutationLoading, isStopLoading, isExiting])
 
 
   const handleCleanUpAndClose = (): void => {
@@ -104,10 +77,12 @@ export function GripperWizardFlows(props: MaintenanceRunManagerProps): JSX.Eleme
       isRobotMoving={isRobotMoving}
       handleCleanUpAndClose={handleCleanUpAndClose}
       chainRunCommands={chainRunCommands}
-      proceed={proceed}
+      createRunCommand={createRunCommand}
     />
   )
 }
+
+
 
 interface GripperWizardProps {
   flowType: GripperWizardFlowType
@@ -118,16 +93,18 @@ interface GripperWizardProps {
   isRobotMoving: boolean
   handleCleanUpAndClose: () => void
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
-  proceed: () => void
+  createRunCommand: ReturnType<typeof useCreateRunCommandMutation>['createRunCommand']
 }
 
 export const GripperWizard = (
   props: GripperWizardProps
 ): JSX.Element | null => {
-  const { flowType, runId, createRun, handleCleanUpAndClose, chainRunCommands, proceed, attachedGripper, isCreateLoading, isRobotMoving } = props
+  const { flowType, runId, createRun, handleCleanUpAndClose, chainRunCommands, attachedGripper, isCreateLoading, isRobotMoving, createRunCommand } = props
   const { t } = useTranslation('gripper_wizard_flows')
   const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+  const [frontJawOffset, setFrontJawOffset] = React.useState<Coordinates | null>(null)
+
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]
   const isFinalStep = currentStepIndex === gripperWizardSteps.length - 1
@@ -136,7 +113,6 @@ export const GripperWizard = (
   }
 
   const handleProceed = (): void => {
-    proceed()
     if (isFinalStep) {
       handleCleanUpAndClose()
     } else {
@@ -162,6 +138,7 @@ export const GripperWizard = (
   }
   let onExit
   if (currentStep == null) return null
+  console.log('current', currentStep, currentStepIndex, gripperWizardSteps)
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmExit) {
     modalContent = (
@@ -183,7 +160,7 @@ export const GripperWizard = (
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <MovePin {...currentStep} {...sharedProps} />
+      <MovePin {...currentStep} {...sharedProps} {...{setFrontJawOffset, frontJawOffset, createRunCommand}}/>
     )
   } else if (currentStep.section === SECTIONS.MOUNT_GRIPPER) {
     onExit = confirmExit

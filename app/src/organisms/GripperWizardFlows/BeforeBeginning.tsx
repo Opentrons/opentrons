@@ -64,7 +64,6 @@ export const BeforeBeginning = (
 
   let commandsOnProceed: CreateCommand[] = [
     {
-      // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed

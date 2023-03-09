@@ -9,9 +9,15 @@ import {
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
 } from './constants'
+import { useCreateRunCommandMutation } from '../../resources/runs/hooks'
 import type { GripperWizardStepProps, MovePinStep } from './types'
+import type { Coordinates } from '@opentrons/shared-data'
 
-interface MovePinProps extends GripperWizardStepProps, MovePinStep { }
+interface MovePinProps extends GripperWizardStepProps, MovePinStep {
+  setFrontJawOffset: (offset: Coordinates) => void
+  frontJawOffset: Coordinates | null
+  createRunCommand: ReturnType<typeof useCreateRunCommandMutation>['createRunCommand']
+}
 
 export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const {
@@ -20,37 +26,50 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     isRobotMoving,
     goBack,
     movement,
-    chainRunCommands,
+    setFrontJawOffset,
+    frontJawOffset,
+    createRunCommand,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   if (attachedGripper == null) return null
+
   const handleOnClick = (): void => {
     if (movement === REMOVE_PIN_FROM_REAR_JAW) {
       proceed()
     } else {
-      chainRunCommands([
-        {
+      const jaw = movement === MOVE_PIN_TO_FRONT_JAW ? 'front' : 'rear'
+      createRunCommand({
+        command: {
           commandType: 'home' as const,
           params: {
             axes: [], // TODO: use gripper motor axis const here
           },
         },
-        {
-          commandType: 'calibration/calibrateGripper' as const,
-          params: { jaw: movement === MOVE_PIN_TO_FRONT_JAW ? 'front' : 'rear'},
-        },
-        {
-          // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+        waitUntilComplete: true
+      }).then(() => {
+        createRunCommand({
+          command: {
+            commandType: 'calibration/calibrateGripper' as const,
+            params: jaw === 'rear' && frontJawOffset != null ? { jaw, otherJawOffset: frontJawOffset } : { jaw },
           },
-        },
-      ], true).then(() => {
-        proceed()
-      })
+          waitUntilComplete: true
+        }).then(({ data }) => {
+          if (jaw === 'front' && data?.result?.jawOffset != null) {
+            setFrontJawOffset(data.result.jawOffset)
+          }
+          createRunCommand({
+            command: {
+              commandType: 'calibration/moveToMaintenancePosition' as const,
+              params: {
+                mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+              },
+            },
+          }).then(() => {
+            proceed()
+          }).catch()
+        }).catch()
+      }).catch()
     }
-
   }
   const infoByMovement: {
     [m in typeof movement]: {

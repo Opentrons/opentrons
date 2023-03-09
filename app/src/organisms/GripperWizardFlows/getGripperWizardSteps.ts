@@ -19,6 +19,10 @@ export const getGripperWizardSteps = (
       return [
         { section: SECTIONS.BEFORE_BEGINNING },
         { section: SECTIONS.MOVE_PIN, movement: MOVE_PIN_TO_FRONT_JAW },
+        {
+          section: SECTIONS.MOVE_PIN,
+          movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
+        },
         { section: SECTIONS.MOVE_PIN, movement: REMOVE_PIN_FROM_REAR_JAW },
         {
           section: SECTIONS.SUCCESS,
