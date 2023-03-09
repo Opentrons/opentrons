@@ -63,7 +63,7 @@ function ProtocolSetupStep({
   const backgroundColorByStepStatus = {
     ready: `${COLORS.successEnabled}${COLORS.opacity20HexCode}`,
     'not ready': COLORS.warningBackgroundMed,
-    general: COLORS.greyDisabled,
+    general: COLORS.light_two,
   }
   return (
     <Btn onClick={onClickSetupStep} width="100%">

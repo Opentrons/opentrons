@@ -41,7 +41,7 @@ const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing4} ${SPACING.spacing5};
   border: 2px solid
     ${({ isSelected }) =>
-      isSelected === true ? COLORS.blueEnabled : COLORS.greyDisabled};
+      isSelected === true ? COLORS.blueEnabled : COLORS.light_two};
   border-radius: 16px;
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.medBlue : COLORS.white};
