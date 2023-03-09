@@ -6,7 +6,7 @@ class ProtocolEngineError(RuntimeError):
 
 
 class UnexpectedProtocolError(ProtocolEngineError):
-    """Raised when an unexpected error occurs.
+    """An error raised when an unexpected error occurs.
 
     This error is indicative of a software bug. If it happens, it means an
     exception was raised somewhere in the stack and it was not properly caught
@@ -22,7 +22,7 @@ class UnexpectedProtocolError(ProtocolEngineError):
 # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect.
 # By comparison, loadModule uses ModuleAlreadyPresentError and ModuleNotAttachedError.
 class FailedToLoadPipetteError(ProtocolEngineError):
-    """Raised when a LoadPipette command fails.
+    """An error raised when executing a LoadPipette command fails.
 
     This failure may be caused by:
     - An incorrect pipette already attached to the mount
@@ -32,186 +32,189 @@ class FailedToLoadPipetteError(ProtocolEngineError):
 
 # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
 class PipetteNotAttachedError(ProtocolEngineError):
-    """Raised when an operation's required pipette is not attached."""
+    """An error raised when an operation's required pipette is not attached."""
 
 
 class TipNotAttachedError(ProtocolEngineError):
-    """Raised when an operation's required pipette tip is not attached."""
+    """An error raised when an operation's required pipette tip is not attached."""
 
 
 class TipAttachedError(ProtocolEngineError):
-    """Raised when a tip shouldn't be attached, but is."""
+    """An error raised when a tip shouldn't be attached, but is."""
 
 
 class CommandDoesNotExistError(ProtocolEngineError):
-    """Raised when referencing a command that does not exist."""
+    """An error raised when referencing a command that does not exist."""
 
 
 class PipetteTipInfoNotFoundError(ProtocolEngineError):
-    """Raised when fetching information (like tiprack id) of attached tip."""
+    """An error raised when fetching information (like tiprack id) of attached tip."""
 
 
 class LabwareNotLoadedError(ProtocolEngineError):
-    """Raised when referencing a labware that has not been loaded."""
+    """An error raised when referencing a labware that has not been loaded."""
 
 
 class LabwareNotLoadedOnModuleError(ProtocolEngineError):
-    """Raised when referencing a labware on a module that has not been loaded."""
+    """An error raised when referencing a labware on a module that has not been loaded."""
 
 
 class LabwareNotOnDeckError(ProtocolEngineError):
-    """Raised when a labware can't be used because it's off-deck."""
+    """An error raised when a labware can't be used because it's off-deck."""
 
 
 class LiquidDoesNotExistError(ProtocolEngineError):
-    """Raised when referencing a liquid that has not been loaded."""
+    """An error raised when referencing a liquid that has not been loaded."""
 
 
 class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
-    """Raised when referencing a labware definition that does not exist."""
+    """An error raised when referencing a labware definition that does not exist."""
 
 
 class LabwareOffsetDoesNotExistError(ProtocolEngineError):
-    """Raised when referencing a labware offset that does not exist."""
+    """An error raised when referencing a labware offset that does not exist."""
 
 
 class LabwareIsNotTipRackError(ProtocolEngineError):
-    """Raised when trying to use a regular labware as a tip rack."""
+    """An error raised when trying to use a regular labware as a tip rack."""
 
 
 class LabwareIsTipRackError(ProtocolEngineError):
-    """Raised when trying to use a command not allowed on tip rack."""
+    """An error raised when trying to use a command not allowed on tip rack."""
 
 
 class TouchTipDisabledError(ProtocolEngineError):
-    """Raised when touch tip is used on well with touchTipDisabled quirk."""
+    """An error raised when touch tip is used on well with touchTipDisabled quirk."""
 
 
 class WellDoesNotExistError(ProtocolEngineError):
-    """Raised when referencing a well that does not exist."""
+    """An error raised when referencing a well that does not exist."""
 
 
 class PipetteNotLoadedError(ProtocolEngineError):
-    """Raised when referencing a pipette that has not been loaded."""
+    """An error raised when referencing a pipette that has not been loaded."""
 
 
 class ModuleNotLoadedError(ProtocolEngineError):
-    """Raised when referencing a module that has not been loaded."""
+    """And error raised when referencing a module that has not been loaded."""
+
+    def __init__(self, *, module_id: str) -> None:
+        super().__init__(f"Module {module_id} not found.")
 
 
 class ModuleNotOnDeckError(ProtocolEngineError):
-    """Raised when trying to use a module that is loaded off the deck."""
+    """And error raised when trying to use a module that is loaded off the deck."""
 
 
 class SlotDoesNotExistError(ProtocolEngineError):
-    """Raised when referencing a deck slot that does not exist."""
+    """An error raised when referencing a deck slot that does not exist."""
 
 
 # TODO(mc, 2020-11-06): flesh out with structured data to replicate
 # existing LabwareHeightError
 class FailedToPlanMoveError(ProtocolEngineError):
-    """Raised when a requested movement could not be planned."""
+    """An error raised when a requested movement could not be planned."""
 
 
 class MustHomeError(ProtocolEngineError):
-    """Raised when motors must be homed due to unknown current position."""
+    """An error raised when motors must be homed due to unknown current position."""
 
 
 class SetupCommandNotAllowedError(ProtocolEngineError):
-    """Raised when adding a setup command to a non-idle/non-paused engine."""
+    """An error raised when adding a setup command to a non-idle/non-paused engine."""
 
 
 class PauseNotAllowedError(ProtocolEngineError):
-    """Raised when attempting to pause a run that is not running."""
+    """An error raised when attempting to pause a run that is not running."""
 
 
 class RunStoppedError(ProtocolEngineError):
-    """Raised when attempting to interact with a stopped engine."""
+    """An error raised when attempting to interact with a stopped engine."""
 
 
 class ModuleNotAttachedError(ProtocolEngineError):
-    """Raised when a requested module is not attached."""
+    """An error raised when a requested module is not attached."""
 
 
 class ModuleAlreadyPresentError(ProtocolEngineError):
-    """Raised when a module is already present in a requested location."""
+    """An error raised when a module is already present in a requested location."""
 
 
 class WrongModuleTypeError(ProtocolEngineError):
-    """Raised when performing a module action on the wrong kind of module."""
+    """An error raised when performing a module action on the wrong kind of module."""
 
 
 class ThermocyclerNotOpenError(ProtocolEngineError):
-    """Raised when trying to move to a labware that's in a closed Thermocycler."""
+    """An error raised when trying to move to labware that's covered inside a TC."""
 
 
 class RobotDoorOpenError(ProtocolEngineError):
-    """Raised when executing a protocol command when a robot door is open."""
+    """An error raised when executing a protocol command when a robot door is open."""
 
 
 class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
-    """Raised when trying to move to labware that's restricted by a module."""
+    """An error raised when trying to move to labware that's restricted by a module."""
 
 
 class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
-    """Raised when Heater-Shaker latch is not open when it is expected to be so."""
+    """An error raised when heater-shaker latch is not open when it is expected to be so."""
 
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):
-    """Raised when a Magnetic Module engage height is out of bounds."""
+    """An error raised when a Magnetic Module engage height is out of bounds."""
 
 
 class NoMagnetEngageHeightError(ProtocolEngineError):
-    """Raised if a Magnetic Module engage height is missing."""
+    """Error raised if a Magnetic Module engage height is missing."""
 
 
 class NoTargetTemperatureSetError(ProtocolEngineError):
-    """Raised when awaiting temperature when no target was set."""
+    """An error raised when awaiting temperature when no target was set."""
 
 
 class InvalidTargetTemperatureError(ProtocolEngineError):
-    """Raised when attempting to set an invalid target temperature."""
+    """An error raised when attempting to set an invalid target temperature."""
 
 
 class InvalidBlockVolumeError(ProtocolEngineError):
-    """Raised when attempting to set an invalid block max volume."""
+    """An error raised when attempting to set an invalid block max volume."""
 
 
 class InvalidTargetSpeedError(ProtocolEngineError):
-    """Raised when attempting to set an invalid target speed."""
+    """An error raised when attempting to set an invalid target speed."""
 
 
 class CannotPerformModuleAction(ProtocolEngineError):
-    """Raised when trying to perform an illegal hardware module action."""
+    """An error raised when trying to perform an illegal hardware module action."""
 
 
 class ProtocolCommandFailedError(ProtocolEngineError):
-    """Raised if a fatal command execution error has occurred."""
+    """An error raised if a fatal command execution error has occurred."""
 
 
 class HardwareNotSupportedError(ProtocolEngineError):
-    """Raised when executing a command on the wrong hardware."""
+    """An error raised when executing a command on the wrong hardware."""
 
 
 class GripperNotAttachedError(ProtocolEngineError):
-    """Raised when executing a gripper action without an attached gripper."""
+    """An error raised when executing a gripper action without an attached gripper."""
 
 
 class LabwareMovementNotAllowedError(ProtocolEngineError):
-    """Raised when attempting an illegal labware movement."""
+    """An error raised when attempting an illegal labware movement."""
 
 
 class LocationIsOccupiedError(ProtocolEngineError):
-    """Raised when attempting to place labware in a non-empty location."""
+    """An error raised when attempting to place labware in a non-empty location."""
 
 
 class FirmwareUpdateRequired(ProtocolEngineError):
-    """Raised when the firmware needs to be updated."""
+    """An error raised when the firmware needs to be updated."""
 
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):
-    """Raised when the pipette is not ready to aspirate."""
+    """An error raised when the pipette is not ready to aspirate."""
 
 
 class InvalidPipettingVolumeError(ProtocolEngineError):
-    """Raised when pipetting a volume larger than the pipette volume."""
+    """An error raised when pipetting a volume larger than the pipette volume."""
