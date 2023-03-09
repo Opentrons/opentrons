@@ -31,6 +31,7 @@ export interface JogControlsProps extends StyleProps {
   auxiliaryControl?: React.ReactNode | null
   directionControlButtonColor?: string
   initialPlane?: Plane
+  enableKeyboardShortcuts?: boolean
 }
 
 export {
@@ -49,6 +50,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
     auxiliaryControl = null,
     initialPlane = HORIZONTAL_PLANE,
+    enableKeyboardShortcuts = true,
     ...styleProps
   } = props
   const [currentStepSize, setCurrentStepSize] = React.useState<StepSize>(
@@ -90,6 +92,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
           stepSize={currentStepSize}
           buttonColor={directionControlButtonColor}
           initialPlane={initialPlane}
+          enableKeyboardShortcuts={enableKeyboardShortcuts}
         />
       </Flex>
       {auxiliaryControl}

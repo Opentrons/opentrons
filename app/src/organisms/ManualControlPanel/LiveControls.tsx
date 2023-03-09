@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import {
   Flex,
   Icon,
@@ -13,7 +14,6 @@ import {
   Box,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
-  SIZE_3
 } from '@opentrons/components'
 import { JogControls } from '../../molecules/JogControls'
 
@@ -28,9 +28,10 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RobotModel } from '../../redux/discovery/types'
 import { Banner } from '../../atoms/Banner'
+import { PrimaryButton } from '../../atoms/buttons'
 
 
-const RELATIVELY_HIGH_Z = 200
+const RELATIVELY_HIGH_Z = 160
 interface LiveControlsProps {
   runId: string
   robotModel: RobotModel
@@ -39,8 +40,9 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
   const { runId, robotModel } = props
   const attachedPipettes = useAttachedPipettes(false)
   const { createRunCommand, isLoading: isCommandInProgress } = useCreateRunCommandMutation(runId)
-  const [lastKnownPosition, setLastKnownPosition] = React.useState<VectorOffset | null>({ x: 0, y: 0, z: RELATIVELY_HIGH_Z })
+  const [lastKnownPosition, setLastKnownPosition] = React.useState<VectorOffset | null>(null)
   const [lastError, setLastError] = React.useState<string>('')
+  const [isEditingCoordsManually, setIsEditingCoordsManually] = React.useState<boolean>(false)
 
   let setupCommands: CreateCommand[] = [
     { commandType: 'home', params: { axes: [] } }
@@ -67,7 +69,10 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
   }
   React.useEffect(() => {
     setupCommands.forEach(c => {
-      createRunCommand({ command: c })
+      createRunCommand({
+        command: c,
+        waitUntilComplete: true
+      })
         .then(() => { })
         .catch(e => {
           setLastError(e.message)
@@ -128,7 +133,7 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
       createRunCommand({
         command: {
           commandType: 'moveToCoordinates',
-          params: { pipetteId, coordinates: { x, y, z: lastKnownPosition?.z || RELATIVELY_HIGH_Z } },
+          params: { pipetteId, coordinates: { x, y, z: lastKnownPosition == null ? RELATIVELY_HIGH_Z : lastKnownPosition.z } },
         },
         waitUntilComplete: true
       })
@@ -148,9 +153,6 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-      <Flex minHeight={SIZE_3}>
-      {isCommandInProgress ? <Icon spin name="ot-spinner" size={SIZE_3} /> : null}
-      </Flex>
       <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box flex="9">
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3} alignItems={ALIGN_FLEX_START}>
@@ -165,24 +167,42 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
               jog={(axis, direction, step, _onSuccess) =>
                 handleJog(axis, direction, step)
               }
+              enableKeyboardShortcuts={!isEditingCoordsManually}
             />
-            <CurrentCoords lastKnownPosition={lastKnownPosition} />
+            <CurrentCoords {...{ handleMoveToXYCoords, lastKnownPosition, isEditingCoordsManually, setIsEditingCoordsManually }} />
             {lastError !== '' ? <Banner type="error" onCloseClick={() => setLastError('')}>{lastError}</Banner> : null}
           </Flex>
         </Box>
         <Flex flex="13" gridGap={SPACING.spacing2} flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_START}>
-          <DeckView {...{ robotModel, lastKnownPosition, handleMoveToXYCoords }} />
+          <DeckView {...{ robotModel, lastKnownPosition, handleMoveToXYCoords, isCommandInProgress }} />
         </Flex>
       </Flex>
     </Flex>
   )
 }
 
-interface CurrentCoordsProps { lastKnownPosition: VectorOffset | null }
+const CoordInput = styled('input')`
+  width: 2.4rem;
+`
+
+interface CurrentCoordsProps {
+  lastKnownPosition: VectorOffset | null
+  handleMoveToXYCoords: (x: number, y: number) => void
+  isEditingCoordsManually: boolean
+  setIsEditingCoordsManually: (isEditing: boolean) => void
+}
 function CurrentCoords(props: CurrentCoordsProps): JSX.Element {
-  const { lastKnownPosition } = props
+  const { lastKnownPosition, handleMoveToXYCoords, isEditingCoordsManually, setIsEditingCoordsManually } = props
+  const [formValues, setFormValues] = React.useState<{ x: number, y: number, z: number }>(lastKnownPosition != null ? lastKnownPosition : { x: 0, y: 0, z: 0 })
   return (
-    <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex
+      cursor='pointer'
+      alignSelf={ALIGN_STRETCH}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      onClick={() => {
+        setFormValues(lastKnownPosition != null ? lastKnownPosition : { x: 0, y: 0, z: 0 })
+        // setIsEditingCoordsManually(true)
+      }}>
       <StyledText as="h6">Last Known Position</StyledText>
       <Flex
         flex="0 1 auto"
@@ -192,20 +212,53 @@ function CurrentCoords(props: CurrentCoordsProps): JSX.Element {
         padding={SPACING.spacing3}
       >
         <Icon name="reticle" size={SIZE_1} />
-        {lastKnownPosition != null ? [lastKnownPosition.x, lastKnownPosition.y, lastKnownPosition.z].map((axis, index) => (
-          <React.Fragment key={index}>
-            <StyledText
-              as="p"
-              marginLeft={SPACING.spacing3}
-              marginRight={SPACING.spacing2}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
-              {['X', 'Y', 'Z'][index]}
-            </StyledText>
-            <StyledText as="p">{axis.toFixed(1)}</StyledText>
-          </React.Fragment>
-        )) : <StyledText as="p">UNKNOWN</StyledText>}
-      </Flex></Flex>
+        {isEditingCoordsManually ? (
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing1}>
+            {Object.entries(formValues).map(([axis, value], index) => (
+              <React.Fragment key={index}>
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {['X', 'Y', 'Z'][index]}
+                </StyledText>
+                <CoordInput
+                  type="text"
+                  value={value.toFixed(1)}
+                  onChange={e => {
+                    console.log('input', e.target.value, formValues, axis)
+                    setFormValues({ ...formValues, [axis]: Number(e.target.value) })
+                  }} />
+              </React.Fragment>
+            ))}
+            <PrimaryButton
+              padding="0.2rem"
+              height="1.375rem"
+              alignItems={ALIGN_CENTER}
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleMoveToXYCoords(formValues.x, formValues.y)
+                setIsEditingCoordsManually(false)
+              }}>
+              <Icon name="check" size={SIZE_1} />
+            </PrimaryButton>
+          </Flex>
+        ) : (
+          <>
+            {lastKnownPosition != null ? [lastKnownPosition.x, lastKnownPosition.y, lastKnownPosition.z].map((axis, index) => (
+              <React.Fragment key={index}>
+                <StyledText
+                  as="p"
+                  marginLeft={SPACING.spacing3}
+                  marginRight={SPACING.spacing2}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
+                  {['X', 'Y', 'Z'][index]}
+                </StyledText>
+                <StyledText as="p">{axis.toFixed(1)}</StyledText>
+              </React.Fragment>
+            )) : <StyledText as="p">UNKNOWN</StyledText>}
+          </>
+        )}
+      </Flex></Flex >
   )
 }
 

@@ -173,10 +173,11 @@ interface DirectionControlProps {
   stepSize: StepSize
   initialPlane?: Plane
   buttonColor?: string
+  enableKeyboardShortcuts?: string
 }
 
 export function DirectionControl(props: DirectionControlProps): JSX.Element {
-  const { planes, jog, stepSize, initialPlane } = props
+  const { planes, jog, stepSize, initialPlane, enableKeyboardShortcuts } = props
   const [currentPlane, setCurrentPlane] = React.useState<Plane>(
     initialPlane ?? planes[0]
   )
@@ -226,22 +227,26 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
           })}
         </Flex>
         <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
-          <HandleKeypress
-            preventDefault
-            handlers={[
-              ...CONTROLS_CONTENTS_BY_PLANE.vertical.controls,
-              ...CONTROLS_CONTENTS_BY_PLANE.horizontal.controls,
-            ].map(({ keyName, shiftKey, axis, sign }) => ({
-              key: keyName,
-              shiftKey,
-              onPress: () => {
-                setCurrentPlane(shiftKey ? 'vertical' : 'horizontal')
-                jog(axis, sign, stepSize)
-              },
-            }))}
-          >
+          {enableKeyboardShortcuts ? (
+            <HandleKeypress
+              preventDefault
+              handlers={[
+                ...CONTROLS_CONTENTS_BY_PLANE.vertical.controls,
+                ...CONTROLS_CONTENTS_BY_PLANE.horizontal.controls,
+              ].map(({ keyName, shiftKey, axis, sign }) => ({
+                key: keyName,
+                shiftKey,
+                onPress: () => {
+                  setCurrentPlane(shiftKey ? 'vertical' : 'horizontal')
+                  jog(axis, sign, stepSize)
+                },
+              }))}
+            >
+              <ArrowKeys plane={currentPlane} jog={jog} stepSize={stepSize} />
+            </HandleKeypress>
+          ) : (
             <ArrowKeys plane={currentPlane} jog={jog} stepSize={stepSize} />
-          </HandleKeypress>
+          )}
         </Flex>
       </Flex>
     </ControlContainer>
