@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from fastapi import routing
 from mock import MagicMock
 from starlette.testclient import TestClient
-from typing import Any, Callable, Generator, Iterator, cast
+from typing import Any, Callable, Generator, Iterator, List, cast
 from typing_extensions import NoReturn
 from pathlib import Path
 from sqlalchemy.engine import Engine as SQLEngine
@@ -37,6 +37,7 @@ from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
 from robot_server.persistence import get_sql_engine, create_sql_engine
+from .integration.robot_client import RobotClient
 
 test_router = routing.APIRouter()
 
@@ -149,7 +150,7 @@ def server_temp_directory() -> Iterator[str]:
 
 
 @pytest.fixture(scope="session")
-def run_server(
+async def run_server(
     request_session: requests.Session, server_temp_directory: str
 ) -> Iterator["subprocess.Popen[Any]"]:
     """Run the robot server in a background process."""
@@ -200,6 +201,39 @@ def run_server(
         yield proc
         proc.send_signal(signal.SIGTERM)
         proc.wait()
+        # # clean up server state
+        # port = "31950"
+        # async with RobotClient.make(
+        #     host="http://localhost", port=port, version="*"
+        # ) as robot_client:
+        #     assert (
+        #         await robot_client.wait_until_dead()
+        #     ), "Dev Robot is running and must not be."
+        #     assert (
+        #         await robot_client.wait_until_alive()
+        #     ), "Dev Robot never became available."
+
+        #     await _delete_all_runs(robot_client)
+        #     await _delete_all_protocols(robot_client)
+
+        # proc.send_signal(signal.SIGTERM)
+        # proc.wait()
+
+
+async def _delete_all_runs(robot_client: RobotClient) -> None:
+    """Delete all runs on the robot server."""
+    response = await robot_client.get_runs()
+    run_ids = [r["id"] for r in response.json()["data"]]
+    for run_id in run_ids:
+        await robot_client.delete_run(run_id)
+
+
+async def _delete_all_protocols(robot_client: RobotClient) -> None:
+    """Delete all protocols on the robot server"""
+    response = await robot_client.get_protocols()
+    protocol_ids = [p["id"] for p in response.json()["data"]]
+    for protocol_id in protocol_ids:
+        await robot_client.delete_protocol(protocol_id)
 
 
 @pytest.fixture
