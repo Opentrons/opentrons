@@ -5,7 +5,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from typing import Iterator
 
-from server_utils.fastapi_utils.versioning import API_VERSION_HEADER, API_VERSION
+from robot_server.versioning import API_VERSION_HEADER, API_VERSION
 
 
 @pytest.fixture

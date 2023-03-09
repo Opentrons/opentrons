@@ -34,7 +34,7 @@ from opentrons.types import Point, Mount
 
 from robot_server import app
 from robot_server.hardware import get_hardware
-from server_utils.fastapi_utils.versioning import (
+from robot_server.versioning import (
     API_VERSION_HEADER,
     LATEST_API_VERSION_HEADER_VALUE,
 )

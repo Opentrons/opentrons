@@ -8,7 +8,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from traceback import format_exception, format_exception_only
 from typing import Any, Callable, Coroutine, Dict, Optional, Sequence, Type, Union
 
-from server_utils.fastapi_utils.versioning import (
+from robot_server.versioning import (
     API_VERSION,
     MIN_API_VERSION,
     API_VERSION_HEADER,
