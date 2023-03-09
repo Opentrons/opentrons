@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors import ApiError
-from server_utils.fastapi_utils.service.json_api import (
+from robot_server.service.json_api import (
     RequestModel,
     MultiBodyMeta,
 )

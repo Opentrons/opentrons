@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from starlette.testclient import TestClient
 from typing import Iterator
 
-from server_utils.fastapi_utils.service.json_api import (
+from robot_server.service.json_api import (
     ResourceLink,
     ResourceLinks,
     ResourceLinkKey,

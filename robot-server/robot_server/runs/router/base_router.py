@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 
-from server_utils.fastapi_utils.service.json_api import (
+from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
     SimpleEmptyBody,

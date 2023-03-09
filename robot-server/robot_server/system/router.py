@@ -7,7 +7,7 @@ Endpoints include:
 from datetime import datetime
 from fastapi import APIRouter
 
-from server_utils.fastapi_utils.service.json_api.resource_links import (
+from robot_server.service.json_api.resource_links import (
     ResourceLinkKey,
     ResourceLink,
 )

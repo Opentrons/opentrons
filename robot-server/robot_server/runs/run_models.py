@@ -17,7 +17,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     Liquid,
 )
-from server_utils.fastapi_utils.service.json_api import ResourceModel
+from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
 
 

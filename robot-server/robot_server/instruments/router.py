@@ -5,7 +5,7 @@ from fastapi import APIRouter, status, Depends, Query
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
 from robot_server.hardware import get_hardware
-from server_utils.fastapi_utils.service.json_api import (
+from robot_server.service.json_api import (
     SimpleMultiBody,
     PydanticResponse,
     MultiBodyMeta,

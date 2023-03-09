@@ -2,8 +2,8 @@ from pytest import raises
 from pydantic import ValidationError
 from typing import Any, Dict
 
-from server_utils.fastapi_utils.service.json_api.request import RequestModel
-from tests.fastapi_utils.service.helpers import ItemModel
+from robot_server.service.json_api.request import RequestModel
+from tests.service.helpers import ItemModel
 
 
 def test_attributes_as_dict():

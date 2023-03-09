@@ -10,7 +10,7 @@ from opentrons.protocol_engine import EngineStatus, types as pe_types
 from opentrons.protocols.models import LabwareDefinition
 
 from robot_server.errors import ApiError
-from server_utils.fastapi_utils.service.json_api import RequestModel, SimpleBody
+from robot_server.service.json_api import RequestModel, SimpleBody
 from robot_server.runs.run_models import Run, LabwareDefinitionSummary
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.labware_router import (

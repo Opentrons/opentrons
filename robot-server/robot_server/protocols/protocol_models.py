@@ -10,7 +10,7 @@ from opentrons.protocol_reader import (
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from server_utils.fastapi_utils.service.json_api import ResourceModel
+from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary
 
 

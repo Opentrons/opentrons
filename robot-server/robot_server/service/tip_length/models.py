@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import Field
 
 from opentrons.calibration_storage.types import SourceType
-from server_utils.fastapi_utils.service.json_api import (
+from robot_server.service.json_api import (
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
     DeprecatedResponseDataModel,

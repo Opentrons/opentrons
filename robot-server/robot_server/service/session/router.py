@@ -6,8 +6,8 @@ from fastapi import APIRouter, Query, Depends
 from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError, CommonErrorDef
-from server_utils.fastapi_utils.service.json_api import ResourceLink
-from server_utils.fastapi_utils.service.json_api.resource_links import (
+from robot_server.service.json_api import ResourceLink
+from robot_server.service.json_api.resource_links import (
     ResourceLinkKey,
     ResourceLinks,
 )

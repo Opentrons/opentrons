@@ -9,7 +9,7 @@ from opentrons.protocol_engine import ProtocolEngine, CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors import ErrorDetails, ErrorBody
-from server_utils.fastapi_utils.service.json_api import (
+from robot_server.service.json_api import (
     MultiBodyMeta,
     RequestModel,
     SimpleBody,

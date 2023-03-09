@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, Field
 
-from server_utils.fastapi_utils.service.json_api import ResourceModel
+from robot_server.service.json_api import ResourceModel
 
 
 class RunActionType(str, Enum):

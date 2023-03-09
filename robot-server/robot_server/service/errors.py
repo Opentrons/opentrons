@@ -11,7 +11,7 @@ from robot_server.errors import (
     ErrorDetails,
     ErrorBody,
 )
-from server_utils.fastapi_utils.service.json_api import ResourceLinks
+from robot_server.service.json_api import ResourceLinks
 
 
 @dataclass(frozen=True)

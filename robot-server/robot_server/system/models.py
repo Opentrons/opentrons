@@ -1,7 +1,7 @@
 """Request and response models for /system endpoints."""
 from datetime import datetime
 from pydantic import BaseModel
-from server_utils.fastapi_utils.service.json_api import (
+from robot_server.service.json_api import (
     DeprecatedResponseModel,
     DeprecatedResponseDataModel,
     RequestModel,
