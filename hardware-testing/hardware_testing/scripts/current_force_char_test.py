@@ -18,26 +18,18 @@ max_overrun_distance_mm=10,
 speed_mm_per_s=1,
 sensor_threshold_pf=1.0)
 
-MOUNT = OT3Mount.LEFT
-AXIS = OT3Axis.Z_L
+MOUNT = OT3Mount.RIGHT
+AXIS = OT3Axis.Z_R
 TRIALS = 2
 
 def force_record(stop_event, motor_current, trial, test_robot, test_name, file_name):
-    ### global stop_threads
-    # global stop_threads
-    # global in_motion
-
-    # force_thread = currentThread()
     start_time = time.perf_counter()
-    # if trial > 0:
-    #     test_robot = ""
     # try:
         # in_motion = True
         # stop_threads = False
     print("Start of thread\n")
     max_val = 0
     while True:
-    # while not stop_event.is_set():##while getattr(force_thread, "do_run", True):##while not stop_event.is_set():
         reading = float(fg.read_force())
         if reading > max_val:
             max_val = reading
@@ -55,11 +47,8 @@ def force_record(stop_event, motor_current, trial, test_robot, test_name, file_n
     #     raise e
 
 async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
-    # global stop_threads
-    # global in_motion
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
-    # stop_threads = Event()
 
     test_tag = input("Enter test tag:\n\t>> ")
     test_robot = input("Enter robot ID:\n\t>> ")
@@ -81,11 +70,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     await api.home_plunger(mount)
     for current in current_list:
         for i in range(TRIALS):
-    # i = 0
-    # current = 0.1
             print(f"Trial {i+1}, Current: {current}\n")
             stop_event = Event()
-            # stop_threads = Event()
             # final_position = await helpers_ot3.jog_mount_ot3(api, mount)
             # print(f"Jogged the mount to deck coordinate: {final_position}")
 
@@ -94,47 +80,16 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
             await helpers_ot3.update_pick_up_current(api, mount, current)
             force_thread = Thread(target=force_record, args=(stop_event, current,
                                                              i+1, test_robot, test_name, file_name))
-            # stop_threads = False
-            # in_motion = True
             force_thread.start()
             tip_len = 57 # 50uL Tip
             # tip_len = 85 # 1K tip
             print("pick up tip in main\n")
-            await api.pick_up_tip(mount, tip_length=57)
+            await api.pick_up_tip(mount, tip_length=tip_len)
             print("sleep...\n")
             await asyncio.sleep(1)
-            # print("set in main\n")
-            # stop_threads = True
-            # in_motion = False
             stop_event.set()
-            ##force_thread.do_run = False
-            # print("join in main\n")
             force_thread.join()
-            # print("end of loop in main")
             await api.remove_tip(mount)
-
-# def force_record(motor_current, trial, test_robot, test_name, file_name):
-#     ### global stop_threads
-#
-#     force_thread = currentThread()
-#     start_time = time.perf_counter()
-#     # if trial > 0:
-#     #     test_robot = ""
-#     try:
-#         while getattr(force_thread, "do_run", True):##while not stop_event.is_set():
-#             reading = float(fg.read_force())
-#             print(f"Reading: {reading} N\n")
-#             cycle_data = [time.perf_counter()-start_time, reading, motor_current, trial, test_robot]
-#             cycle_data_str = data.convert_list_to_csv_line(cycle_data)
-#             data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
-#             # if stop_threads:
-#             #     break
-#         printf("outside loop\n")
-#     except KeyboardInterrupt:
-#         print("Test Cancelled")
-#     except Exception as e:
-#         print("ERROR OCCURED")
-#         raise e
 
 if __name__ == "__main__":
     mount_options = {
