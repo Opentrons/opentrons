@@ -20,12 +20,6 @@
     "geometry": {
       "$ref": "#/definitions/Geometry"
     },
-    "zMotorConfigurations": {
-      "$ref": "#/definitions/ZMotorConfigurations"
-    },
-    "jawMotorConfigurations": {
-      "$ref": "#/definitions/JawMotorConfigurations"
-    },
     "gripForceProfile": {
       "$ref": "#/definitions/GripForceProfile"
     }
@@ -35,8 +29,6 @@
     "displayName",
     "model",
     "geometry",
-    "zMotorConfigurations",
-    "jawMotorConfigurations",
     "gripForceProfile"
   ],
   "definitions": {
@@ -126,43 +118,6 @@
         "pinTwoOffsetFromBase",
         "jawWidth"
       ]
-    },
-    "ZMotorConfigurations": {
-      "title": "ZMotorConfigurations",
-      "description": "Gripper z motor configurations.",
-      "type": "object",
-      "properties": {
-        "idle": {
-          "title": "Idle",
-          "description": "Motor idle current in A",
-          "minimum": 0.02,
-          "maximum": 1.0,
-          "type": "number"
-        },
-        "run": {
-          "title": "Run",
-          "description": "Motor active current in A",
-          "minimum": 0.67,
-          "maximum": 2.5,
-          "type": "number"
-        }
-      },
-      "required": ["idle", "run"]
-    },
-    "JawMotorConfigurations": {
-      "title": "JawMotorConfigurations",
-      "description": "Gripper z motor configurations.",
-      "type": "object",
-      "properties": {
-        "vref": {
-          "title": "Vref",
-          "description": "Reference voltage in V",
-          "minimum": 0.5,
-          "maximum": 2.5,
-          "type": "number"
-        }
-      },
-      "required": ["vref"]
     },
     "GripForceProfile": {
       "title": "GripForceProfile",

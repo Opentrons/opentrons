@@ -159,7 +159,7 @@ jobs:
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID }}
           HOST_PYTHON: python
           OPENTRONS_PROJECT: robot-stack
@@ -238,7 +238,7 @@ jobs:
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID }}
           HOST_PYTHON: python
           OPENTRONS_PROJECT: ot3
