@@ -11,7 +11,7 @@ from typing_extensions import Literal
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from server_utils.fastapi_utils.errors import ErrorDetails, ErrorBody
+from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time

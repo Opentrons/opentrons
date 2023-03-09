@@ -1,5 +1,5 @@
 """Tests for API error exceptions and response model serialization."""
-from server_utils.fastapi_utils.errors.error_responses import (
+from robot_server.errors.error_responses import (
     ApiError,
     ErrorSource,
     ErrorDetails,

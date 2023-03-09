@@ -14,7 +14,7 @@ from opentrons.config import (
     advanced_settings,
 )
 
-from server_utils.fastapi_utils.errors import LegacyErrorResponse
+from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (

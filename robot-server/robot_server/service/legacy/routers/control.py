@@ -12,7 +12,7 @@ from opentrons.hardware_control import HardwareControlAPI
 
 from opentrons.types import Mount, Point
 
-from server_utils.fastapi_utils.errors import LegacyErrorResponse
+from robot_server.errors import LegacyErrorResponse
 from robot_server.service.dependencies import get_motion_lock
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse

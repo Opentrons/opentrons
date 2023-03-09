@@ -5,7 +5,7 @@ from pydantic import ValidationError
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control import HardwareControlAPI
 
-from server_utils.fastapi_utils.errors import LegacyErrorResponse
+from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import motors as model

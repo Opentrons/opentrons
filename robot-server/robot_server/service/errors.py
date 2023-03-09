@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Any, Dict, Optional
 from starlette import status as status_codes
 
-from server_utils.fastapi_utils.errors import (
+from robot_server.errors import (
     ApiError,
     ErrorSource,
     ErrorDetails,
@@ -33,7 +33,7 @@ class RobotServerError(ApiError):
     """A BaseRobotServerError that uses an ErrorDef enum.
 
     .. deprecated::
-        Use `server_utils.fastapi_utils.errors.ErrorDetails(...).as_error(status_code)` instead.
+        Use `robot_server.errors.ErrorDetails(...).as_error(status_code)` instead.
     """
 
     def __init__(

@@ -6,7 +6,7 @@ from fastapi import Depends, status
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine
 
-from server_utils.fastapi_utils.errors import ErrorDetails
+from robot_server.errors import ErrorDetails
 from robot_server.hardware import get_hardware
 from robot_server.runs import EngineStore, EngineConflictError, get_engine_store
 from robot_server.modules import ModuleIdentifier

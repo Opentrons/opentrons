@@ -6,7 +6,7 @@ from fastapi import Path, APIRouter, Depends
 from opentrons.hardware_control import modules, HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule
 
-from server_utils.fastapi_utils.errors import LegacyErrorResponse
+from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware
 from server_utils.fastapi_utils.versioning import get_requested_version
 from robot_server.service.legacy.models import V1BasicResponse

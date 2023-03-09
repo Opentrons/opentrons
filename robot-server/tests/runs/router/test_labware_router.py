@@ -9,7 +9,7 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import EngineStatus, types as pe_types
 from opentrons.protocols.models import LabwareDefinition
 
-from server_utils.fastapi_utils.errors import ApiError
+from robot_server.errors import ApiError
 from server_utils.fastapi_utils.service.json_api import RequestModel, SimpleBody
 from robot_server.runs.run_models import Run, LabwareDefinitionSummary
 from robot_server.runs.engine_store import EngineStore

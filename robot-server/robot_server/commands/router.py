@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, Query, status
 from opentrons.protocol_engine import ProtocolEngine, CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
-from server_utils.fastapi_utils.errors import ErrorDetails, ErrorBody
+from robot_server.errors import ErrorDetails, ErrorBody
 from server_utils.fastapi_utils.service.json_api import (
     MultiBodyMeta,
     RequestModel,
