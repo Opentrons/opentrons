@@ -3,7 +3,7 @@ import argparse
 import asyncio
 import logging
 from logging.config import dictConfig
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from typing_extensions import Final
 
@@ -57,10 +57,15 @@ async def run(args: argparse.Namespace) -> None:
     retry_count = args.retry_count
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
+    usb_messenger: Optional[BinaryMessenger] = None
+    try:
+        usb_driver: SerialUsbDriver = await (build_rear_panel_driver())
+        usb_messenger = build_rear_panel_messenger(usb_driver)
+        usb_messenger.start()
+    except IOError as e:
+        if args.target == "rear-panel":
+            raise e
 
-    usb_driver: SerialUsbDriver = await (build_rear_panel_driver())
-    usb_messenger: BinaryMessenger = build_rear_panel_messenger(usb_driver)
-    usb_messenger.start()
     update_details = {
         TARGETS[args.target]: args.file,
     }
