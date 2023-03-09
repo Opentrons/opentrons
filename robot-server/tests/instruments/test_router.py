@@ -106,6 +106,9 @@ async def test_get_all_attached_instruments(
                 status=CalibrationStatus(markedBad=False),
                 last_modified=None,
             ),
+            "fw_update_required": False,
+            "fw_current_version": 1,
+            "fw_next_version": None,
         }
     )
     decoy.when(ot3_hardware_api.attached_pipettes).then_return(
