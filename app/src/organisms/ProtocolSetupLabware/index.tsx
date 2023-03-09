@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+import map from 'lodash/map'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -26,6 +28,10 @@ import {
   LabwareDefinition2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import {
+  useCreateLiveCommandMutation,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { BackButton } from '../../atoms/buttons'
@@ -36,23 +42,15 @@ import { Modal } from '../../molecules/Modal'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareDisplayLocation } from '../CommandText/utils'
 import { getLabwareSetupItemGroups } from '../Devices/ProtocolRun/SetupLabware/utils'
+import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
+import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { LabwareSetupItem } from '../Devices/ProtocolRun/SetupLabware/types'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import {
-  AttachedProtocolModuleMatch,
-  getAttachedProtocolModuleMatches,
-} from '../ProtocolSetupModules/utils'
-import {
-  useCreateLiveCommandMutation,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
-import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import map from 'lodash/map'
-import { LatchStatus } from '../../redux/modules/api-types'
-import styled from 'styled-components'
+import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
+import type { LatchStatus } from '../../redux/modules/api-types'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
