@@ -44,3 +44,23 @@ async def test_hash_files_same_contents_different_file_names() -> None:
     result2 = await subject.hash([file_2])
 
     assert result1 != result2
+
+
+async def test_hash_files_swapped_names_and_content() -> None:
+    """It should return a different value when name and contents are swapped."""
+    file_1 = BufferedFile(
+        name="some_protocol.json",
+        contents=bytes("some_content", encoding="utf-8"),
+        path=None,
+    )
+    file_2 = BufferedFile(
+        name="some_protocol",
+        contents=bytes(".jsonsome_content", encoding="utf-8"),
+        path=None,
+    )
+
+    subject = FileHasher()
+    result1 = await subject.hash([file_1])
+    result2 = await subject.hash([file_2])
+
+    assert result1 != result2

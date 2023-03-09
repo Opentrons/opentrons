@@ -17,8 +17,8 @@ class FileHasher:
 
 
 def _hash_sync(files: List[BufferedFile]) -> str:
-    md5_hasher = md5()
     sorted_files = sorted(files, key=lambda x: unicodedata.normalize("NFC", x.name))
     for file in sorted_files:
-        md5_hasher.update(file.name.encode("utf-8") + file.contents)
-    return md5_hasher.hexdigest()
+        name_hash = md5(file.name.encode("utf-8")).digest()
+        contents_hash = md5(file.contents).digest()
+    return md5(name_hash + contents_hash).hexdigest()
