@@ -108,15 +108,19 @@ export const ResultsSummary = (
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
-      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      labwareOffsets={offsetsToApply}
+      commands={protocolData?.commands ?? []}
+      labware={protocolData?.labware ?? []}
+      modules={protocolData?.modules ?? []}
     />
   )
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
-      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      labwareOffsets={offsetsToApply}
+      commands={protocolData?.commands ?? []}
+      labware={protocolData?.labware ?? []}
+      modules={protocolData?.modules ?? []}
     />
   )
 

@@ -57,7 +57,7 @@ class Mark10(Mark10Base):
 
     @classmethod
     def create(cls, port: str, baudrate: int = 115200, timeout: float = 1) -> "Mark10":
-        """Create a Radwag scale driver."""
+        """Create a Mark10 driver."""
         conn = Serial()
         conn.port = port
         conn.baudrate = baudrate
