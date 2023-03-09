@@ -1,14 +1,20 @@
-"""Fake Gravimetric OT3."""
+"""Gravimetric LPC OT3."""
 from opentrons.protocol_api import ProtocolContext
 
+metadata = {
+    "protocolName": "gravimetric-lpc-ot3"
+}
 # FIXME: bump to v2.14 to utilize protocol engine
-metadata = {"apiLevel": "2.13", "protocolName": "gravimetric-ot3-fake"}
+requirements = {
+    'robotType': 'OT-3',
+    'apiLevel': '2.13'
+}
 
 SLOT_VIAL = 4
 SLOTS_TIPRACK = {
     50: [3],
-    200: [4],
-    1000: [5],
+    200: [6],
+    1000: [9],
 }
 
 

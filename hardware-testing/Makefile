@@ -73,7 +73,7 @@ test-cov:
 
 .PHONY: test-integration
 test-integration:
-	$(python) -m hardware_testing.protocols.gravimetric_ot3 --simulate --pipette 1000 --tip 1000 --trials 3
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3
 	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.examples.test_report

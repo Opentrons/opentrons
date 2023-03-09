@@ -32,7 +32,7 @@ from .liquid_class.pipetting import (
     dispense_with_liquid_class,
     PipettingCallbacks,
 )
-from .vial_labware_definition import VIAL_DEFINITION
+from .radwag_pipette_calibration_vial import VIAL_DEFINITION
 
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
@@ -258,7 +258,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette.pick_up_tip()
     pipette.move_to(vial["A1"].bottom(expected_height))
     get_input("Check that tip is touching liquid surface (+/-) 0.1 mm")
-    pipette.drop_tip()
+    pipette.drop_tip(home_after=False)
 
     try:
         total = len(test_volumes) * cfg.trials + config.NUM_BLANK_TRIALS
@@ -288,7 +288,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             )
             actual_asp_list.append(evap_aspirate)
             actual_disp_list.append(evap_dispense)
-            pipette.drop_tip()
+            pipette.drop_tip(home_after=False)
 
         # CALCULATE AVERAGE EVAPORATION
         average_aspirate_evaporation_ul = sum(actual_asp_list) / len(actual_asp_list)
@@ -331,7 +331,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 report.store_trial(
                     test_report, trial, volume, aspirate_rectified, dispense_rectified
                 )
-                pipette.drop_tip()
+                pipette.drop_tip(home_after=False)
 
             # CALCULATE AVERAGE, %CV, %D
             aspirate_average = sum(actual_asp_list) / len(actual_asp_list)

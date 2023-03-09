@@ -4,10 +4,15 @@ from typing import List
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.gravimetric.config import GravimetricConfig
-from hardware_testing.gravimetric import execute, helpers, workarounds
+from hardware_testing.protocols.gravimetric_lpc_ot3 import (
+    SLOTS_TIPRACK,
+    SLOT_VIAL,
+    metadata,
+    requirements,
+)
 
-from .gravimetric_ot3_fake import SLOTS_TIPRACK, SLOT_VIAL, metadata
+from . import execute, helpers, workarounds
+from .config import GravimetricConfig
 
 LABWARE_OFFSETS: List[dict] = list()
 
@@ -54,7 +59,7 @@ if __name__ == "__main__":
         for offset in workarounds.http_get_all_labware_offsets():
             LABWARE_OFFSETS.append(offset)
     _ctx = helpers.get_api_context(
-        metadata["apiLevel"],
+        requirements["apiLevel"],
         is_simulating=args.simulate,
         pipette_left=f"p{args.pipette}_single_v3.3",
     )
