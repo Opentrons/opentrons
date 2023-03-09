@@ -33,7 +33,11 @@ from .ot3utils import (
     PipetteAction,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    FirmwareTarget,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -509,7 +513,7 @@ class OT3Simulator:
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
-        nodes: Optional[Set[NodeId]] = None,
+        nodes: Optional[Set[FirmwareTarget]] = None,
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""

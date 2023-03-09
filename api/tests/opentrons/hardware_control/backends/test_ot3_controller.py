@@ -1021,11 +1021,11 @@ async def test_update_firmware_specified_nodes(
         controller._network_info, "probe"
     ) as probe:
         async for status_element in controller.update_firmware(
-            {}, nodes={NodeId.head, NodeId.gantry_x}
+            {}, targets={NodeId.head, NodeId.gantry_x}
         ):
             pass
         check_updates.assert_called_with(
-            fw_node_info, {}, nodes={NodeId.head, NodeId.gantry_x}, force=False
+            fw_node_info, {}, targets={NodeId.head, NodeId.gantry_x}, force=False
         )
         run_updates.assert_called_with(
             can_messenger=controller._messenger,
@@ -1059,7 +1059,7 @@ async def test_update_firmware_invalid_specified_node(
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        async for status_element in controller.update_firmware({}, nodes={NodeId.head}):
+        async for status_element in controller.update_firmware({}, targets={NodeId.head}):
             pass
         run_updates.assert_called_with(
             can_messenger=controller._messenger,

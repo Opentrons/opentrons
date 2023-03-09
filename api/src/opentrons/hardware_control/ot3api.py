@@ -133,6 +133,8 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
 
+from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, USBTarget
+
 mod_log = logging.getLogger(__name__)
 
 
@@ -427,12 +429,17 @@ class OT3API(
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
-        nodes = {sub_system_to_node_id(subsystem) for subsystem in subsystems}
+        targets: Set[FirmwareTarget] = set()
+        for subsystem in subsystems:
+            if subsystem is OT3SubSystem.rear_panel:
+                targets.add(USBTarget.rear_panel)
+            else:
+                targets.add(sub_system_to_node_id(subsystem))
         # get the attached pipette subtypes so we can determine which binary to install for pipettes
         pipettes = self._get_pipette_subtypes()
         # start the updates and yield the progress
         async for update_status in self._backend.update_firmware(
-            pipettes, nodes, force
+            pipettes, targets, force
         ):
             yield update_status
         # refresh Instrument cache
