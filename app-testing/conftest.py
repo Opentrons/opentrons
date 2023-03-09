@@ -47,14 +47,21 @@ def _chrome_options() -> Options:
     assert executable_path is not None, "EXECUTABLE_PATH environment variable must be set"
     _console.print(f"EXECUTABLE_PATH is {executable_path}", style="white on blue")
     options.binary_location = executable_path
-    options.add_argument("whitelisted-ips=''")  # type: ignore
-    options.add_argument("disable-xss-auditor")  # type: ignore
-    options.add_argument("disable-web-security")  # type: ignore
-    options.add_argument("allow-running-insecure-content")  # type: ignore
-    options.add_argument("no-sandbox")  # type: ignore
-    options.add_argument("disable-setuid-sandbox")  # type: ignore
-    options.add_argument("disable-popup-blocking")  # type: ignore
-    options.add_argument("allow-elevated-browser")  # type: ignore
+    options.add_argument("--whitelisted-ips=''")  # type: ignore
+    options.add_argument("--disable-xss-auditor")  # type: ignore
+    options.add_argument("--disable-web-security")  # type: ignore
+    options.add_argument("--allow-running-insecure-content")  # type: ignore
+    options.add_argument("--no-sandbox")  # type: ignore
+    options.add_argument("--disable-setuid-sandbox")  # type: ignore
+    options.add_argument("--disable-popup-blocking")  # type: ignore
+    options.add_argument("--allow-elevated-browser")  # type: ignore
+    options.add_argument("--disable-crash-reporter")  # type: ignore
+    options.add_argument("--disable-extensions")  # type: ignore
+    options.add_argument("--disable-in-process-stack-traces")  # type: ignore
+    options.add_argument("--disable-logging")  # type: ignore
+    options.add_argument("--disable-dev-shm-usage")  # type: ignore
+    options.add_argument("--log-level=3")  # type: ignore
+    options.add_argument("--enable-automation")  # type: ignore
     return options
 
 

@@ -26,4 +26,5 @@ names = Literal[
     "OT2_P300SLeft_MM1_MM_TM_2_3_Mix",
     "OT2_P300S_Thermocycler_Moam_Error",
     "OT2_P300S_Twinning_Error",
+    "OT2_P300M_P20S_TC_HS_TM_6_3_SmokeV3",
 ]

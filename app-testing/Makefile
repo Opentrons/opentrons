@@ -23,12 +23,14 @@ lint:
 	$(MAKE) black-check
 	$(MAKE) ruff-check
 	$(MAKE) mypy
+	$(MAKE) lint-other
+	$(MAKE) check-protocols
 
 .PHONY: format
 format:
 	$(MAKE) black
 	$(MAKE) ruff
-	$(MAKE) format-readme
+	$(MAKE) format-other
 
 .PHONY: test-ci
 test-ci:
@@ -42,10 +44,21 @@ setup:
 teardown:
 	pipenv --rm
 
-.PHONY: format-readme
-format-readme:
-	yarn prettier --ignore-path .eslintignore --write app-testing/**/*.md
-
 .PHONY: print-protocols
 print-protocols:
 	pipenv run python print_protocols.py
+
+.PHONY: check-protocols
+check-protocols:
+	pipenv run python print_protocols.py --check
+
+FORMAT_FILE_GLOB = "app-testing/**/*.@(json|md|yml|yaml)"
+
+.PHONY: format-other
+format-other:
+	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+
+.PHONY: lint-other
+lint-other:
+	yarn prettier --check --ignore-path .eslintignore $(FORMAT_FILE_GLOB)
+

@@ -6,15 +6,15 @@ This launches the installed app.
 import importlib
 import os
 
-import src.driver.base
-import src.menus.left_menu
-import src.pages.app_settings
-import src.pages.device_landing
-import src.pages.labware_landing
-import src.pages.labware_position_check
-import src.pages.protocol_landing
-import src.resources.ot_robot
-import src.resources.robot_data
+import automation.driver.base
+import automation.menus.left_menu
+import automation.pages.app_settings
+import automation.pages.device_landing
+import automation.pages.labware_landing
+import automation.pages.labware_position_check
+import automation.pages.protocol_landing
+import automation.resources.ot_robot
+import automation.resources.robot_data
 from conftest import _chrome_options
 from dotenv import find_dotenv, load_dotenv
 from rich import pretty, traceback
@@ -31,15 +31,15 @@ traceback.install(console=console)
 def reimport() -> None:
     """Reimport so that changes in teh files show up."""
     # tools
-    importlib.reload(src.driver.base)
-    importlib.reload(src.resources.ot_robot)
-    importlib.reload(src.resources.robot_data)
+    importlib.reload(automation.driver.base)
+    importlib.reload(automation.resources.ot_robot)
+    importlib.reload(automation.resources.robot_data)
     # page objects
-    importlib.reload(src.menus.left_menu)
-    importlib.reload(src.pages.device_landing)
-    importlib.reload(src.pages.app_settings)
-    importlib.reload(src.pages.protocol_landing)
-    importlib.reload(src.pages.labware_position_check)
+    importlib.reload(automation.menus.left_menu)
+    importlib.reload(automation.pages.device_landing)
+    importlib.reload(automation.pages.app_settings)
+    importlib.reload(automation.pages.protocol_landing)
+    importlib.reload(automation.pages.labware_position_check)
 
 
 # variables
@@ -71,39 +71,39 @@ variables = [
 def instantiate(driver: WebDriver, console: Console) -> None:
     """Tie the imported or reimported packages to variables."""
     global base
-    base = src.driver.base.Base(driver, console, "REPL")
+    base = automation.driver.base.Base(driver, console, "REPL")
     global kansas
-    kansas = src.resources.ot_robot.OtRobot(console, src.resources.robot_data.Kansas())
+    kansas = automation.resources.ot_robot.OtRobot(console, automation.resources.robot_data.Kansas())
     global dev
-    dev = src.resources.ot_robot.OtRobot(console, src.resources.robot_data.Dev())
+    dev = automation.resources.ot_robot.OtRobot(console, automation.resources.robot_data.Dev())
     global emulated_alpha
-    emulated_alpha = src.resources.ot_robot.OtRobot(console, src.resources.robot_data.EmulatedAlpha())
+    emulated_alpha = automation.resources.ot_robot.OtRobot(console, automation.resources.robot_data.EmulatedAlpha())
     global device_landing
-    device_landing = src.pages.device_landing.DeviceLanding(driver, console, "REPL")
+    device_landing = automation.pages.device_landing.DeviceLanding(driver, console, "REPL")
     global left_menu
-    left_menu = src.menus.left_menu.LeftMenu(driver, console, "REPL")
+    left_menu = automation.menus.left_menu.LeftMenu(driver, console, "REPL")
     global app_settings
-    app_settings = src.pages.app_settings.AppSettings(driver, console, "REPL")
+    app_settings = automation.pages.app_settings.AppSettings(driver, console, "REPL")
     global protocol_landing
-    protocol_landing = src.pages.protocol_landing.ProtocolLanding(driver, console, "REPL")
+    protocol_landing = automation.pages.protocol_landing.ProtocolLanding(driver, console, "REPL")
     global labware_landing
-    labware_landing = src.pages.labware_landing.LabwareLanding(driver, console, "REPL")
+    labware_landing = automation.pages.labware_landing.LabwareLanding(driver, console, "REPL")
     global labware_position_check
-    labware_position_check = src.pages.labware_position_check.LabwarePositionCheck(driver, console, "REPL")
+    labware_position_check = automation.pages.labware_position_check.LabwarePositionCheck(driver, console, "REPL")
 
 
 # Check to see if we have a dotenv file and use it
 if find_dotenv():
     load_dotenv(find_dotenv())
-# use env variable to prevent the analytics pop up
 os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
-# app should look on localhost for robots
-# currently broken
-# os.environ["OT_APP_DISCOVERY__CANDIDATES"] = '["localhost"]'
-# dev tools open at start
+os.environ["OT_APP_ANALYTICS__OPTED_IN"] = "true"
+os.environ["OT_APP_ANALYTICS__APP_ID"] = "6dcc8733-c3e6-4ac4-b14f-638ede114ac5"
+os.environ["OT_APP_ANALYTICS__USER_ID"] = "b806c211-3b21-4c5e-8b06-aedc58887cce"
+os.environ["OT_APP_UPDATE__CHANNEL"] = "alpha"  # latest beta alpha
+os.environ["OT_APP_LOG__LEVEL__CONSOLE"] = "error"
+os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
 os.environ["OT_APP_DEVTOOLS"] = "true"
 driver: WebDriver = WebDriver(options=_chrome_options())
-
 # instantiate the variables for easy use of our
 # page objects and resources in the REPL
 instantiate(driver, console)
