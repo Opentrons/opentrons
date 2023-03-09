@@ -10,7 +10,10 @@ import {
   BORDERS,
   TYPOGRAPHY,
   SIZE_1,
-  Box
+  Box,
+  ALIGN_FLEX_START,
+  ALIGN_STRETCH,
+  SIZE_3
 } from '@opentrons/components'
 import { JogControls } from '../../molecules/JogControls'
 
@@ -24,7 +27,10 @@ import { StyledText } from '../../atoms/text'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RobotModel } from '../../redux/discovery/types'
+import { Banner } from '../../atoms/Banner'
 
+
+const RELATIVELY_HIGH_Z = 200
 interface LiveControlsProps {
   runId: string
   robotModel: RobotModel
@@ -32,12 +38,15 @@ interface LiveControlsProps {
 export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
   const { runId, robotModel } = props
   const attachedPipettes = useAttachedPipettes(false)
-  const { createRunCommand } = useCreateRunCommandMutation(runId)
-  const [lastKnownPosition, setLastKnownPosition] = React.useState<VectorOffset>({ x: 0, y: 0, z: 100 })
+  const { createRunCommand, isLoading: isCommandInProgress } = useCreateRunCommandMutation(runId)
+  const [lastKnownPosition, setLastKnownPosition] = React.useState<VectorOffset | null>({ x: 0, y: 0, z: RELATIVELY_HIGH_Z })
+  const [lastError, setLastError] = React.useState<string>('')
 
-  let loadCommands: CreateCommand[] = []
+  let setupCommands: CreateCommand[] = [
+    { commandType: 'home', params: { axes: [] } }
+  ]
   if (attachedPipettes.left != null) {
-    loadCommands = [...loadCommands, {
+    setupCommands = [...setupCommands, {
       commandType: 'loadPipette',
       params: {
         pipetteName: attachedPipettes.left.name,
@@ -47,7 +56,7 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
     }]
   }
   if (attachedPipettes.right != null) {
-    loadCommands = [...loadCommands, {
+    setupCommands = [...setupCommands, {
       commandType: 'loadPipette',
       params: {
         pipetteName: attachedPipettes.right.name,
@@ -57,10 +66,11 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
     }]
   }
   React.useEffect(() => {
-    loadCommands.forEach(c => {
+    setupCommands.forEach(c => {
       createRunCommand({ command: c })
         .then(() => { })
         .catch(e => {
+          setLastError(e.message)
           console.error(`error issuing load pipette command: ${e.message}`)
         })
     })
@@ -79,9 +89,10 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
         waitUntilComplete: true
       })
         .then(({ data }) => {
-          data.result?.position != null && setLastKnownPosition(data.result?.position)
+          data.result?.position != null && setLastKnownPosition(data.result?.position ?? null)
         })
         .catch(e => {
+          setLastError(e.message)
           console.error(`error issuing save position command: ${e.message}`)
         })
     }
@@ -101,11 +112,15 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
         waitUntilComplete: true
       })
         .then(({ data }) => {
-          setLastKnownPosition(data.result?.position)
+          console.log('jog DATA', data)
+          setLastKnownPosition(data.result?.position ?? null)
         })
         .catch((e: Error) => {
+          setLastError(e.message)
           console.error(`error issuing jog command: ${e.message}`)
         })
+    } else {
+      setLastError(`No Pipette found on mount: ${selectedMount}`)
     }
   }
   const handleMoveToXYCoords = (x: number, y: number): void => {
@@ -113,67 +128,84 @@ export const LiveControls = (props: LiveControlsProps): JSX.Element | null => {
       createRunCommand({
         command: {
           commandType: 'moveToCoordinates',
-          params: { pipetteId, coordinates: { x, y, z: lastKnownPosition.z } },
+          params: { pipetteId, coordinates: { x, y, z: lastKnownPosition?.z || RELATIVELY_HIGH_Z } },
         },
         waitUntilComplete: true
       })
         .then(({ data }) => {
-          setLastKnownPosition(data.result?.position)
+          console.log('to coord DATA', data)
+          setLastKnownPosition(data.result?.position ?? null)
         })
         .catch((e: Error) => {
+          setLastError(e.message)
           console.error(`error issuing jog command: ${e.message}`)
         })
+    } else {
+      setLastError(`No Pipette found on mount: ${selectedMount}`)
     }
   }
 
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Box flex="2">
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          {toggleGroup}
-          <JogControls
-            flexWrap='wrap'
-            jog={(axis, direction, step, _onSuccess) =>
-              handleJog(axis, direction, step)
-            }
-          />
+    <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+      <Flex minHeight={SIZE_3}>
+      {isCommandInProgress ? <Icon spin name="ot-spinner" size={SIZE_3} /> : null}
+      </Flex>
+      <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Box flex="9">
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3} alignItems={ALIGN_FLEX_START}>
+            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+              <StyledText as="h6" >
+                Mount To Control
+              </StyledText>
+              {toggleGroup}
+            </Flex>
+            <JogControls
+              flexWrap='wrap'
+              jog={(axis, direction, step, _onSuccess) =>
+                handleJog(axis, direction, step)
+              }
+            />
+            <CurrentCoords lastKnownPosition={lastKnownPosition} />
+            {lastError !== '' ? <Banner type="error" onCloseClick={() => setLastError('')}>{lastError}</Banner> : null}
+          </Flex>
+        </Box>
+        <Flex flex="13" gridGap={SPACING.spacing2} flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_START}>
+          <DeckView {...{ robotModel, lastKnownPosition, handleMoveToXYCoords }} />
         </Flex>
-      </Box>
-      <Flex flex="3" flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-        <DeckView {...{ robotModel, lastKnownPosition, handleMoveToXYCoords }} />
-        <CurrentCoords lastKnownPosition={lastKnownPosition} />
       </Flex>
     </Flex>
   )
 }
 
-interface CurrentCoordsProps { lastKnownPosition: VectorOffset }
+interface CurrentCoordsProps { lastKnownPosition: VectorOffset | null }
 function CurrentCoords(props: CurrentCoordsProps): JSX.Element {
   const { lastKnownPosition } = props
   return (
-    <Flex
-      flex="0 1 auto"
-      alignItems={ALIGN_CENTER}
-      border={`${BORDERS.styleSolid} ${SPACING.spacingXXS} ${COLORS.lightGreyHover}`}
-      borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing3}
-    >
-      <Icon name="reticle" size={SIZE_1} />
-      {[lastKnownPosition.x, lastKnownPosition.y, lastKnownPosition.z].map((axis, index) => (
-        <React.Fragment key={index}>
-          <StyledText
-            as="p"
-            marginLeft={SPACING.spacing3}
-            marginRight={SPACING.spacing2}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
-            {['X', 'Y', 'Z'][index]}
-          </StyledText>
-          <StyledText as="p">{axis.toFixed(1)}</StyledText>
-        </React.Fragment>
-      ))}
-    </Flex>
+    <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <StyledText as="h6">Last Known Position</StyledText>
+      <Flex
+        flex="0 1 auto"
+        alignItems={ALIGN_CENTER}
+        border={`${BORDERS.styleSolid} ${SPACING.spacingXXS} ${COLORS.lightGreyHover}`}
+        borderRadius={BORDERS.radiusSoftCorners}
+        padding={SPACING.spacing3}
+      >
+        <Icon name="reticle" size={SIZE_1} />
+        {lastKnownPosition != null ? [lastKnownPosition.x, lastKnownPosition.y, lastKnownPosition.z].map((axis, index) => (
+          <React.Fragment key={index}>
+            <StyledText
+              as="p"
+              marginLeft={SPACING.spacing3}
+              marginRight={SPACING.spacing2}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {['X', 'Y', 'Z'][index]}
+            </StyledText>
+            <StyledText as="p">{axis.toFixed(1)}</StyledText>
+          </React.Fragment>
+        )) : <StyledText as="p">UNKNOWN</StyledText>}
+      </Flex></Flex>
   )
 }
 

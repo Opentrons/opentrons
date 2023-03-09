@@ -10,12 +10,12 @@ import type { RobotModel } from '../../redux/discovery/types'
 
 interface DeckViewProps {
   robotModel: RobotModel
-  lastKnownPosition: VectorOffset 
+  lastKnownPosition: VectorOffset | null
   handleMoveToXYCoords: (x: number, y: number) => void
 }
 export function DeckView(props: DeckViewProps): JSX.Element | null {
   const { robotModel, lastKnownPosition, handleMoveToXYCoords } = props
-  
+
   const deckDef = getDeckDefFromRobotType(robotModel)
   return (
 
@@ -26,7 +26,7 @@ export function DeckView(props: DeckViewProps): JSX.Element | null {
       handleCoordinateClick={handleMoveToXYCoords}
     >
       {() => (
-        <circle cx={lastKnownPosition.x} cy={lastKnownPosition.y} r="5" fill="red"></circle>
+        lastKnownPosition != null ? <circle cx={lastKnownPosition.x} cy={lastKnownPosition.y} r="5" fill="red"></circle> : null
       )}
     </RobotWorkSpace>
   )
