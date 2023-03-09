@@ -25,6 +25,7 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
+import { Labware } from './Labware'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
 
@@ -135,6 +136,7 @@ const ProtocolSectionContent = (
       protocolSection = <Hardware protocolId={props.protocolId} />
       break
     case 'Labware':
+      protocolSection = <Labware protocolId={props.protocolId} />
       break
     case 'Liquids':
       break
