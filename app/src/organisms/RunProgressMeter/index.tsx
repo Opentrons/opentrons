@@ -108,9 +108,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
   let currentStepContents: React.ReactNode = null
   if (
-    (runStatus === RUN_STATUS_IDLE &&
-      analysisCommands[lastRunCommandIndex] == null) ||
-    runStatus === RUN_STATUS_IDLE
+    runStatus === RUN_STATUS_IDLE ||
+    analysisCommands[lastRunCommandIndex] == null
   ) {
     currentStepContents = (
       <StyledText as="h2">{t('not_started_yet')}</StyledText>
@@ -161,9 +160,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
           )}${
-            (runStatus === RUN_STATUS_IDLE &&
-              analysisCommands[lastRunCommandIndex] == null) ||
-            runStatus === RUN_STATUS_IDLE
+            runStatus === RUN_STATUS_IDLE ||
+            analysisCommands[lastRunCommandIndex] == null
               ? ':'
               : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''}`
           }`}</StyledText>
