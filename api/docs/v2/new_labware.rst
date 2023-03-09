@@ -202,36 +202,21 @@ and it will return the individual well objects in row A.
 Labelling Liquids in Wells
 ****************************************
 
-The labelling methods are optional code features that help you keep track of the liquids in, or dispensed to, the various wells used at the beginning of your protocol. They let you identify well contents by name and volume and add corresponding labels to a single well, or groups of wells, in well plates and reservoirs. They also extend the liquid labelling functionality currently available in the Opentrons app (v6.3 or higher) to our Python API.
+The labelling methods are optional code features that help you keep track of the liquids in the various wells used at the beginning of your protocol. They let you identify well contents by name and volume and add corresponding labels to a single well, or groups of wells, in well plates and reservoirs. They also extend the liquid labelling functionality currently available in the Opentrons app (v6.3 or higher) to our Python API.
 
 To use these optional methods, you first create a liquid object with :py:meth:`.define_liquid` and label individual wells by calling :py:meth:`.load_liquid`, both within the ``run()`` function of your Python protocol.
 
 Additionally, ``define_liquid`` accepts a hex color code, which provides visual identification for that liquid when you import a protocol into the Opentrons app. The ``define_liquid`` method accepts standard 3-, 4-, 6-, and 8-character hex color codes.
 
-Here’s a simple example that defines two colored water samples for a reservoir and well plate. The code is truncated for brevity.
+Let's examine how these two labelling methods work. For this example, show you how to define two colored water samples, green and blue, for a reservoir and well plate.
 
-Examples
-^^^^^^^^
+Defining Liquids
+^^^^^^^^^^^^^^^^
 
-
+This example uses ``define_liquid`` to create two liquid objects and defines them through the variables ``greenWater`` and ``blueWater``, respectively. It accepts arguments that let you name the liquid, describe it, and assign it a color. This information shows up in the Opentrons app (v6.3 or higher) if you import it into that system.
 
 .. code-block:: python
 
-    from opentrons import protocol_api
-    metadata = {'apiLevel': '2.13'}
-    
-    def run(protocol: protocol_api.ProtocolContext):
-
-        #Load labware
-        reservoir = protocol.load_labware(
-            load_name= 'nest_12_reservoir_15ml',
-            location= 4
-        )
-        well_plate = protocol.load_labware(
-            load_name= 'nest_96_wellplate_200ul_flat',
-            location= 3
-        )
-        # Define liquid
         greenWater = protocol.define_liquid(
             name= 'Green water',
             description= 'Green colored water for demo',
@@ -242,42 +227,28 @@ Examples
             description= 'Blue colored water for demo',
             display_color='#0000FF'
         )
-        #Load liquid
+
+Label Wells and Reservoirs
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This example uses ``load_liquid`` to label the starting well location, contents, and volume (in µl) for the liquids objects created by ``define_liquid``. Notice how the load liquid method accepts the variable names (defined above) to associate each well with a particular liquid. This information shows up in the Opentrons app (v6.3 or higher) if you import your protocol into that system.
+
+.. note::
+    ``load_liquid`` does not validate volume amounts for your labware. For example, you could label a 40 µL well plate with ``volume= 50``. It's your responsibility to ensure the label accurately reflects the amount dispensed into a well or reservoir.
+
+.. code-block:: python
+
         well_plate["A1"].load_liquid(liquid= greenWater, volume= 50)
         well_plate["A2"].load_liquid(greenWater, volume= 50)
         well_plate["B1"].load_liquid(blueWater, volume= 50)
         well_plate["B2"].load_liquid(blueWater, volume= 50)
         reservoir["A1"].load_liquid(greenWater, volume= 200)
-        reservoir["A2"].load_liquid(blueWater, volume=200) 
-        #Transfer methods
-        . . .
+        reservoir["A2"].load_liquid(blueWater, volume=200)
 
-Explanation
-^^^^^^^^^^^
-
-Let’s look at what’s going on in the code sample above.
-
-+-------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|   Code Section                      |         Description                                                                                                                                                                                                                                                                                                                                                              |
-+=====================================+==================================================================================================================================================================================================================================================================================================================================================================================+
-| Import and metadata                 | The import statement indicates this is an Opentrons protocol. The metadata section defines the API version.                                                                                                                                                                                                                                                                      |
-+-------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Load labware                        | This section defines and loads the labware you want to use. For labware, the example above uses a NEST 12-well reservoir and a NEST 96-well plate.                                                                                                                                                                                                                               |
-+-------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Define liquid                       | The ``define_liquid`` method creates a liquid object. It accepts arguments that let you name the liquid, describe it, and assign it a color. This information shows up in the Protocol Designer and the Opentrons app (v6.3 or higher) if you import your protocol into those systems. The example above defines two liquids, blue water and green water, for our test protocol. |
-+-------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Load liquid                         | The ``load_liquid`` method identifies the starting location of a liquid (created by ``define_liquid``) in a well and the amount in µl. This information shows up in the Protocol Designer and the Opentrons app (v6.3 or higher) if you import your protocol into those systems. The example above indicates:                                                                    |
-|                                     |                                                                                                                                                                                                                                                                                                                                                                                  |
-|                                     | * The 96-well plate contains 50 µl of green water in wells A1 and A2 and 50 µl of blue water in wells B1 and B2.                                                                                                                                                                                                                                                                 |
-|                                     | * The 12-well reservoir contains 200 µl of green water in well A1 and 200 µl of blue water in well A2.                                                                                                                                                                                                                                                                           |
-+-------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Transfer methods                    | These commands transfer liquids to different locations. We’ve omitted them here, but you can refer to the :ref:`commands section <tutorial-commands>` of the tutorial for information and examples.                                                                                                                                                                              |
-+-------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-Moving vs Labelling
+Labelling Liquids vs Loading Liquids
 ^^^^^^^^^^^^^^^^^^^
 
-You’ll notice the arguments for ``load_liquid`` include a volume amount (``volume= n`` in µl). The volume value is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid is in a well. You need to use the :py:meth:`.transfer` method to physically move liquids from a source to a destination.
+You may have noticed the arguments for ``load_liquid`` include a volume amount (``volume= n`` in µl). This volume value is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid should be in a well. You need to use a method like :py:meth:`.transfer` to physically move liquids from a source to a destination.
 
 .. versionadded:: 2.14
 
