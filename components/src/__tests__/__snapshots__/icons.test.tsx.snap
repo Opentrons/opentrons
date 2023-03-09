@@ -1077,6 +1077,54 @@ exports[`icons jump-size renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons latch-closed renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 40 40"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M33.6663 10H6.33301V17H10.333V14H14.167V19.166H26.667V14H29.6663V17H33.6663V10Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons latch-open renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 40 40"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M33.6663 10H6.33301V17H10.333V14H14.167V29.166H26.667V14H29.6663V17H33.6663V10Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons light renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
