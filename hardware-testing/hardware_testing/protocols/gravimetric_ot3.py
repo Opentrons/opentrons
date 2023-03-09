@@ -46,8 +46,9 @@ if __name__ == "__main__":
     parser.add_argument("--trials", type=int, required=True)
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--low-volume", action="store_true")
+    parser.add_argument("--skip-labware-offsets", action="store_true")
     args = parser.parse_args()
-    if not args.simulate:
+    if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
         # because it requires the robot-server to be running
         for offset in workarounds.http_get_all_labware_offsets():
@@ -57,5 +58,4 @@ if __name__ == "__main__":
         is_simulating=args.simulate,
         pipette_left=f"p{args.pipette}_single_v3.3",
     )
-    _ctx.home()
     run(_ctx, args.pipette, args.tip, args.trials, args.increment, args.low_volume)

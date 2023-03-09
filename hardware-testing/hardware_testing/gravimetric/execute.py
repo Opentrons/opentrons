@@ -7,7 +7,6 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well
 from hardware_testing.data import create_run_id_and_start_time
 from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
-from hardware_testing.data import ui
 
 from . import report
 from . import config
@@ -114,7 +113,7 @@ def _run_trial(
                 recorder.scale.add_simulation_mass(volume * -1)
             elif m_type == MeasurementType.DISPENSE:
                 recorder.scale.add_simulation_mass(volume)
-        m_data = record_measurement_data(ctx, m_tag, m_type, recorder)
+        m_data = record_measurement_data(ctx, m_tag, recorder)
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
             (
@@ -189,6 +188,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette = ctx.load_instrument(
         f"p{cfg.pipette_volume}_single", cfg.pipette_mount, tip_racks=[tiprack]
     )
+    pipette.default_speed = config.GANTRY_MAX_SPEED
     pipette_tag = get_pipette_unique_name(pipette)
 
     # GET TEST VOLUMES
@@ -229,6 +229,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     )
     if recorder.is_simulator:
         recorder.scale.set_simulation_mass(max(test_volumes) * 2)
+    recorder.record(in_thread=True)
 
     # CREATE CSV TEST REPORT
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
@@ -249,15 +250,15 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     print(setup_str)
     get_input("press ENTER when ready...")
 
+    # HOME
+    ctx.home()
+
     # TEST VIAL LIQUID HEIGHT
     expected_height = liquid_tracker.get_liquid_height(vial["A1"])
     pipette.pick_up_tip()
     pipette.move_to(vial["A1"].bottom(expected_height))
     get_input("Check that tip is touching liquid surface (+/-) 0.1 mm")
     pipette.drop_tip()
-
-    # RECORD SCALE
-    recorder.record(in_thread=True)
 
     try:
         total = len(test_volumes) * cfg.trials + config.NUM_BLANK_TRIALS

@@ -2,12 +2,12 @@
 from dataclasses import dataclass
 from enum import Enum
 from time import sleep
-from typing import Optional
+from typing import Optional, List
 from typing_extensions import Final
 
 from opentrons.protocol_api import ProtocolContext
 
-from .record import GravimetricRecorder, GravimetricRecording
+from .record import GravimetricRecorder, GravimetricRecording, GravimetricSample
 from .environment import read_environment_data, EnvironmentData, get_average_reading
 
 
@@ -48,11 +48,8 @@ class MeasurementType(str, Enum):
     DISPENSE = "measure-dispense"
 
 
-DELAY_FOR_MEASUREMENT = {
-    MeasurementType.INIT: 1,
-    MeasurementType.ASPIRATE: 1,
-    MeasurementType.DISPENSE: 1,
-}
+DELAY_FOR_MEASUREMENT = 10
+MIN_DURATION_STABLE_SEGMENT = 3
 
 
 @dataclass
@@ -88,26 +85,55 @@ def create_measurement_tag(t: str, volume: Optional[float], trial: int) -> str:
     return f"{t}-{vol_in_tag}-ul-{trial + 1}"
 
 
+class UnstableMeasurementError(Exception):
+    """Unstable measurement error."""
+
+    pass
+
+
 def _build_measurement_data(
     recorder: GravimetricRecorder, tag: str, e_data: EnvironmentData
 ) -> MeasurementData:
-    recording_slice = GravimetricRecording(
+    # gather only samples of the specified tag
+    tagged_segment = GravimetricRecording(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
-    recording_grams_as_list = recording_slice.grams_as_list
+    # split into sequences of stable samples
+    stable_segments: List[GravimetricRecording] = list()
+    tmp_list_of_samples: List[GravimetricSample] = list()
 
+    def _store_new_stable_segment() -> None:
+        nonlocal tmp_list_of_samples
+        _seg = GravimetricRecording(tmp_list_of_samples)
+        tmp_list_of_samples = list()
+        if recorder.is_simulator or _seg.duration >= MIN_DURATION_STABLE_SEGMENT:
+            stable_segments.append(_seg)
+
+    for sample in tagged_segment:
+        if sample.stable:
+            tmp_list_of_samples.append(sample)
+        elif len(tmp_list_of_samples):
+            _store_new_stable_segment()
+    if len(tmp_list_of_samples):
+        _store_new_stable_segment()
+    if not stable_segments:
+        raise UnstableMeasurementError()
+
+    # default to using the final stable segment
+    segment = stable_segments[-1]
+    recording_grams_as_list = segment.grams_as_list
     return MeasurementData(
         celsius_pipette=e_data.celsius_pipette,
         celsius_air=e_data.celsius_air,
         humidity_air=e_data.humidity_air,
         pascals_air=e_data.pascals_air,
         celsius_liquid=e_data.celsius_liquid,
-        grams_average=recording_slice.average,
-        grams_cv=recording_slice.calculate_cv(),
+        grams_average=segment.average,
+        grams_cv=segment.calculate_cv(),
         grams_min=min(recording_grams_as_list),
         grams_max=max(recording_grams_as_list),
-        samples_start_time=recording_slice.start_time,
-        samples_duration=recording_slice.duration,
+        samples_start_time=segment.start_time,
+        samples_duration=segment.duration,
         samples_count=len(recording_grams_as_list),
     )
 
@@ -115,7 +141,6 @@ def _build_measurement_data(
 def record_measurement_data(
     ctx: ProtocolContext,
     tag: str,
-    m_type: MeasurementType,
     recorder: GravimetricRecorder,
 ) -> MeasurementData:
     """Record measurement data."""
@@ -126,7 +151,9 @@ def record_measurement_data(
             # NOTE: give a bit of time during simulation, so some fake data can be stored
             sleep(0.1)
         else:
-            ctx.delay(DELAY_FOR_MEASUREMENT[m_type])
+            for i in range(int(DELAY_FOR_MEASUREMENT)):
+                print(f"[delay] {tag}: {i + 1}/{DELAY_FOR_MEASUREMENT} seconds")
+                ctx.delay(1)
     return _build_measurement_data(recorder, tag, env_data)
 
 
