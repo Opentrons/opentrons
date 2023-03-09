@@ -55,7 +55,7 @@ from opentrons_hardware.sensors.sensor_types import SensorInformation
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
     WriteSensorInformation,
-    PollSensorInformation,
+    BaselineSensorInformation,
     SensorThresholdInformation,
 )
 from opentrons_hardware.firmware_bindings.utils import (
@@ -68,7 +68,7 @@ log = logging.getLogger(__name__)
 ResponseType = TypeVar("ResponseType", bound=MessageDefinition)
 
 
-def _format_sensor_response(response: MessageDefinition) -> Optional[SensorDataType]:
+def _format_sensor_response(response: MessageDefinition) -> SensorDataType:
     if isinstance(response, BaselineSensorResponse):
         return SensorDataType.build(
             response.payload.offset_average, response.payload.sensor
@@ -104,13 +104,12 @@ class SensorScheduler:
 
         return _filter
 
-    async def run_poll(
+    async def run_baseline(
         self,
-        sensor: PollSensorInformation,
+        sensor: BaselineSensorInformation,
         can_messenger: CanMessenger,
         timeout: int,
         expected_num_messages: int = 1,
-        report: bool = True,
     ) -> List[SensorDataType]:
         """Send poll message."""
         sensor_info = sensor.sensor
@@ -126,8 +125,7 @@ class SensorScheduler:
                     payload=BaselineSensorRequestPayload(
                         sensor=SensorTypeField(sensor_info.sensor_type),
                         sensor_id=SensorIdField(sensor_info.sensor_id),
-                        number_of_reads=UInt16Field(sensor.poll_for),
-                        report=UInt8Field(report),
+                        number_of_reads=UInt16Field(sensor.number_of_reads)
                     )
                 ),
             )
@@ -277,7 +275,7 @@ class SensorScheduler:
     @staticmethod
     async def _multi_wait_for_response(
         reader: WaitableCallback,
-        response_handler: Callable[[MessageDefinition], Optional[SensorDataType]],
+        response_handler: Callable[[MessageDefinition], SensorDataType],
     ) -> List[SensorDataType]:
         """Listener for receiving messages back."""
         # TODO we should refactor the rest of the code that relies on
@@ -286,9 +284,7 @@ class SensorScheduler:
         # from an async for loop.
         data: List[SensorDataType] = []
         async for response, _ in reader:
-            response_data = response_handler(response)
-            if response_data:
-                data.append(response_data)
+            data.append(response_handler(response))
         return data
 
     @staticmethod

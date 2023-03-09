@@ -398,10 +398,9 @@ class WriteToSensorRequestPayload(SensorPayload):
 
 @dataclass(eq=False)
 class BaselineSensorRequestPayload(SensorPayload):
-    """Take a specified amount of readings from a sensor request payload."""
+    """Provide a specified amount of readings to take the average of the current sensor."""
 
     number_of_reads: utils.UInt16Field
-    report: utils.UInt8Field
 
 
 @dataclass(eq=False)

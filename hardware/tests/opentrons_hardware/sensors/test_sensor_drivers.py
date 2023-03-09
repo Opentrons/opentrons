@@ -95,7 +95,6 @@ def sensor_driver() -> SensorDriver:
                     sensor=SensorTypeField(SensorType.pressure),
                     sensor_id=SensorIdField(SensorId.S0),
                     number_of_reads=UInt16Field(10),
-                    report=UInt8Field(1),
                 )
             ),
         ],
@@ -106,7 +105,6 @@ def sensor_driver() -> SensorDriver:
                     sensor=SensorTypeField(SensorType.capacitive),
                     sensor_id=SensorIdField(SensorId.S0),
                     number_of_reads=UInt16Field(10),
-                    report=UInt8Field(1),
                 )
             ),
         ],
@@ -131,7 +129,7 @@ async def test_polling(
         [lazy_fixture("environment_sensor")],
     ],
 )
-async def test_receive_data_polling(
+async def test_baseline_averaging(
     sensor_driver: SensorDriver,
     sensor_type: BaseSensorType,
     mock_messenger: mock.AsyncMock,
