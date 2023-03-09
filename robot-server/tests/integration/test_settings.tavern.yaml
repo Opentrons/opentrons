@@ -54,12 +54,6 @@ stages:
             description: !re_search 'Opentrons-internal setting to test new hardware'
             restart_required: true
             value: !anything
-          - id: enableOT3FirmwareUpdates
-            old_id: Null
-            title: Enable experimental OT-3 firmware updates
-            description: !re_search 'This is an Opentrons-internal setting to test new firmware updates.'
-            restart_required: true
-            value: !anything
         links: !anydict
 
 ---

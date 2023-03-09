@@ -147,14 +147,14 @@ def test_firmware_file_selected_for_revision() -> None:
     """Given a device and revision, the right firmware file should be selected."""
     stimulus = [
         # a matching rev should be found
-        (NodeId.head, {"a1": "test-head.hex", "b1": "test-head-wrong.hex"}, "a1"),
+        (NodeId.head, 0, {"a1": "test-head.hex", "b1": "test-head-wrong.hex"}, "a1"),
         # an empty revs dict should be ignored
-        (NodeId.gantry_x, {"": ""}, "a1"),
+        (NodeId.gantry_x, 2, {"": ""}, "a1"),
         # a present but non matching revs dict should be ignored
-        (NodeId.gantry_y, {"b1": "test-gantry-y.hex"}, "c1"),
+        (NodeId.gantry_y, 1, {"b1": "test-gantry-y.hex"}, "c1"),
     ]
     response = list(_update_files_from_types(stimulus))
-    assert response == [(NodeId.head, "test-head.hex")]
+    assert response == [(NodeId.head, 0, "test-head.hex")]
 
 
 def test_load_firmware_manifest_success(mock_manifest: Dict[str, Any]) -> None:
@@ -299,7 +299,44 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
 def test_check_firmware_updates_available_nodes_specified(
     mock_manifest: Dict[str, Any]
 ) -> None:
-    """Test updates when nodes are specified, which updates the device regardless of the shortsha."""
+    """Test that only specified devices are updated if given."""
+    manifest = mock_manifest.copy()
+    manifest["subsystems"].update(
+        {
+            "gantry-x": {
+                "version": 2,
+                "shortsha": "25755efd",
+                "files_by_revision": {"c1": "gantry-x-rev1.hex"},
+            },
+            "gantry-y": {
+                "version": 2,
+                "shortsha": "25755efd",
+                "files_by_revision": {"c1": "gantry-y-rev1.hex"},
+            },
+            "gripper": {
+                "version": 2,
+                "shortsha": "25755efd",
+                "files_by_revision": {"c1": "gripper-rev1.hex"},
+            },
+        }
+    )
+    device_info_cache = generate_device_info(manifest)
+    # change the shortsha so they all require an update
+    known_firmware_updates = generate_update_info(manifest, random_sha=True)
+    with mock.patch(
+        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        mock.Mock(return_value=known_firmware_updates),
+    ):
+        firmware_updates = check_firmware_updates(
+            device_info_cache, attached_pipettes={}, nodes={NodeId.gripper}
+        )
+        # only the gripper needs an update
+        assert len(firmware_updates) == 1
+        assert NodeId.gripper in firmware_updates
+
+
+def test_check_firmware_updates_available_forced(mock_manifest: Dict[str, Any]) -> None:
+    """Test updates when force flag is set devices are updated regardless of the shortsha."""
     device_info_cache = generate_device_info(mock_manifest)
     known_firmware_updates = generate_update_info(mock_manifest)
     with mock.patch(
@@ -307,7 +344,7 @@ def test_check_firmware_updates_available_nodes_specified(
         mock.Mock(return_value=known_firmware_updates),
     ):
         firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}, nodes=set(device_info_cache)
+            device_info_cache, attached_pipettes={}, force=True
         )
         assert firmware_updates
         assert len(firmware_updates) == len(device_info_cache)
