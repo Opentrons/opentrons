@@ -1,8 +1,8 @@
 """Application routes."""
 from fastapi import APIRouter, Depends, status
 
-from robot_server.constants import V1_TAG
-from robot_server.errors import LegacyErrorResponse
+from .constants import V1_TAG
+from .errors import LegacyErrorResponse
 from .health import health_router
 from .protocols import protocols_router
 from .runs import runs_router
@@ -10,7 +10,7 @@ from .commands import commands_router
 from .modules import modules_router
 from .instruments import instruments_router
 from .system import system_router
-from robot_server.versioning import check_version_header
+from .versioning import check_version_header
 from .service.legacy.routers import legacy_routes
 from .service.session.router import router as deprecated_session_router
 from .service.pipette_offset.router import router as pip_os_router

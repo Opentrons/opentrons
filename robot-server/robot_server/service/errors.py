@@ -5,12 +5,7 @@ from enum import Enum
 from typing import Any, Dict, Optional
 from starlette import status as status_codes
 
-from robot_server.errors import (
-    ApiError,
-    ErrorSource,
-    ErrorDetails,
-    ErrorBody,
-)
+from robot_server.errors import ApiError, ErrorSource, ErrorDetails, ErrorBody
 from robot_server.service.json_api import ResourceLinks
 
 

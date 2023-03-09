@@ -7,10 +7,7 @@ Endpoints include:
 from datetime import datetime
 from fastapi import APIRouter
 
-from robot_server.service.json_api.resource_links import (
-    ResourceLinkKey,
-    ResourceLink,
-)
+from robot_server.service.json_api.resource_links import ResourceLinkKey, ResourceLink
 
 from .models import SystemTimeRequest, SystemTimeResponse, SystemTimeResponseAttributes
 from .time_utils import get_system_time, set_system_time

@@ -1,9 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from robot_server.versioning import (
-    check_version_header,
-    set_version_response_headers,
-)
+from robot_server.versioning import check_version_header, set_version_response_headers
 
 from . import (
     networking,

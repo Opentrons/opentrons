@@ -1,1 +1,1 @@
-"""HTTP server error handling tests."""
+"""Robot server error handling tests."""

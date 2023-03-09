@@ -7,10 +7,7 @@ from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ResourceLink
-from robot_server.service.json_api.resource_links import (
-    ResourceLinkKey,
-    ResourceLinks,
-)
+from robot_server.service.json_api.resource_links import ResourceLinkKey, ResourceLinks
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session.models.command import CommandResponse, CommandRequest
