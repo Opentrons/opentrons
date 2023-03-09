@@ -14,9 +14,11 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   ALIGN_END,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { getLocalRobot } from '../../../redux/discovery'
 
 import type { RouteProps } from '../../../App/types'
@@ -49,6 +51,10 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
+
+  const handleOverflowClick = (): void => {
+    console.log('this will show a modal')
+  }
 
   return (
     <Flex
@@ -92,7 +98,12 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
       </Flex>
       <Flex alignItems={ALIGN_END}>
         {/* This icon is temporary since the current design is mid-fi and the icon will be varied in hi-fi */}
-        <Icon name="radiobox-blank" size="3rem" />
+        <OverflowBtn
+          alignSelf={ALIGN_FLEX_END}
+          onClick={handleOverflowClick}
+          height="3.75rem"
+          data-testid="Navigation_overflowBtn"
+        />
       </Flex>
     </Flex>
   )
