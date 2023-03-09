@@ -76,7 +76,7 @@ const ON_DEVICE_UNSELECTED_OPTIONS_STYLE = css`
 `
 const ON_DEVICE_SELECTED_OPTIONS_STYLE = css`
   ${ON_DEVICE_UNSELECTED_OPTIONS_STYLE}
-  background-color: #9c3ba4;
+  background-color: ${COLORS.highlightPurple_one};
   color: ${COLORS.white};
 `
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {

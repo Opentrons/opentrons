@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import {
@@ -13,7 +14,6 @@ import {
 import { PrimaryButton } from '../../atoms/buttons'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import { usePipettesQuery } from '@opentrons/react-api-client'
 
 export interface CheckPipetteButtonProps {
   robotName: string
@@ -27,23 +27,21 @@ export function CheckPipettesButton(
 ): JSX.Element | null {
   const { onDone, children, actualPipette } = props
   const { t } = useTranslation('change_pipette')
-
-  const {
-    status: pipetteQueryStatus,
-    refetch: refetchPipettes,
-  } = usePipettesQuery()
-
+  const { isFetching: isPending, refetch: refetchPipettes } = usePipettesQuery(
+    { refresh: true },
+    {
+      enabled: false,
+      onSuccess: () => {
+        onDone?.()
+      },
+      onSettled: () => {},
+    }
+  )
   const handleClick = (): void => {
     refetchPipettes()
       .then(() => {})
       .catch(() => {})
   }
-  const isPending = pipetteQueryStatus === 'loading'
-
-  React.useEffect(() => {
-    if (pipetteQueryStatus === 'success' && onDone != null) onDone()
-  }, [onDone, pipetteQueryStatus])
-
   const icon = (
     <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />
   )
@@ -80,7 +78,11 @@ export function CheckPipettesButton(
   }
 
   return (
-    <PrimaryButton onClick={handleClick} aria-label="Confirm">
+    <PrimaryButton
+      onClick={handleClick}
+      aria-label="Confirm"
+      disabled={isPending}
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         color={COLORS.white}
