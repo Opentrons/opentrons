@@ -241,7 +241,7 @@ This example uses ``load_liquid`` to label the starting well location, contents,
         reservoir["A2"].load_liquid(blueWater, volume=200)
 
 .. note::
-    ``load_liquid`` does not validate volume amounts for your labware. For example, you could label a 40 µL well plate with ``volume= 50``. It's your responsibility to ensure labels accurately reflect the amounts a protocol dispenses into wells and reservoirs.
+    ``load_liquid`` does not validate volume for your labware. For example, you could label a 40 µL well plate with ``volume= 50``. It's your responsibility to ensure the labels you use accurately reflect the amount of liquid a protocol dispenses into wells and reservoirs.
 
 Labelling Liquids vs Loading Liquids
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
