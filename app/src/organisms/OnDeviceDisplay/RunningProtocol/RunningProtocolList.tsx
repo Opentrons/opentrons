@@ -1,17 +1,24 @@
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, Icon, Btn, DIRECTION_ROW, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_ROW,
+  COLORS,
+  SPACING,
+  Icon,
+} from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
 
-import type { OnDeviceRouteParams } from '../../../App/types'
+interface RunningProtocolListProps {
+  runId: string
+}
 
-export function RunningProtocol(): JSX.Element {
-  const { t } = useTranslation()
-  const { runId } = useParams<OnDeviceRouteParams>()
-
+export function RunningProtocolList({
+  runId,
+}: RunningProtocolListProps): JSX.Element {
+  const { t } = useTranslation('run_details')
   return (
     <Flex>
       <StyledText>{t('status_running')}</StyledText>
