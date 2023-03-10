@@ -408,7 +408,7 @@ class TransferPlan:
         # then avoid iterating through its Wells.
         # ii. if using single channel pipettes, flatten a multi-dimensional
         # list of Wells into a 1 dimensional list of Wells
-        if self._instr.hw_pipette["channels"] > 1:
+        if self._instr.channels > 1:
             sources, dests = self._multichannel_transfer(sources, dests)
         else:
             if isinstance(sources, List) and isinstance(sources[0], List):
