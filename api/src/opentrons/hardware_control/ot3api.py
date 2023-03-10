@@ -793,20 +793,20 @@ class OT3API(
         """Request and update both the motor and encoder positions from backend."""
         async with self._motion_lock:
             await self._backend.update_motor_status()
-            self._cache_current_position()
-            self._cache_encoder_position()
+            await self._cache_current_position()
+            await self._cache_encoder_position()
 
-    def _cache_current_position(self) -> Dict[OT3Axis, float]:
+    async def _cache_current_position(self) -> Dict[OT3Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
         self._current_position = self._deck_from_machine(
-            self._backend.update_position()
+            await self._backend.update_position()
         )
         return self._current_position
 
-    def _cache_encoder_position(self) -> Dict[OT3Axis, float]:
+    async def _cache_encoder_position(self) -> Dict[OT3Axis, float]:
         """Cache encoder position from backend and return in absolute deck coords."""
         self._encoder_position = self._deck_from_machine(
-            self._backend.update_encoder_position()
+            await self._backend.update_encoder_position()
         )
         return self._encoder_position
 
@@ -918,8 +918,8 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
 
         # Refresh current position
-        self._cache_current_position()
-        self._cache_encoder_position()
+        await self._cache_current_position()
+        await self._cache_encoder_position()
 
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_motor_status(axes_moving):
@@ -1076,7 +1076,7 @@ class OT3API(
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
 
-        origin = self._backend.update_position()
+        origin = await self._backend.update_position()
         try:
             moves = self._build_moves(origin, machine_pos, speed)
         except ZeroLengthMoveError as zero_length_error:
@@ -1100,8 +1100,8 @@ class OT3API(
                 self._current_position.clear()
                 raise
             else:
-                self._cache_current_position()
-                self._cache_encoder_position()
+                await self._cache_current_position()
+                await self._cache_encoder_position()
 
     async def _home_axis(self, axis: OT3Axis) -> None:
         """
@@ -1122,7 +1122,7 @@ class OT3API(
         assert axis not in [OT3Axis.G, OT3Axis.Q]
 
         # retrieve home position
-        origin = self._backend.update_position()
+        origin = await self._backend.update_position()
         target_pos = {ax: pos for ax, pos in origin.items()}
         target_pos.update({axis: self._backend.home_position()[axis]})
         if self._backend.check_motor_status([axis]):
@@ -1180,8 +1180,8 @@ class OT3API(
                     self._current_position.clear()
                     raise
                 else:
-                    self._cache_current_position()
-                    self._cache_encoder_position()
+                    await self._cache_current_position()
+                    await self._cache_encoder_position()
                     if axis == OT3Axis.G:
                         try:
                             self._gripper_handler.set_jaw_state(
@@ -1290,7 +1290,7 @@ class OT3API(
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
-            encoder_pos = self._backend.update_encoder_position()
+            encoder_pos = await self._backend.update_encoder_position()
             self._encoder_position = deck_from_machine(
                 encoder_pos,
                 self._transforms.deck_calibration.attitude,
@@ -1310,7 +1310,7 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
-            encoder_pos = self._backend.update_encoder_position()
+            encoder_pos = await self._backend.update_encoder_position()
             self._encoder_position = deck_from_machine(
                 encoder_pos,
                 self._transforms.deck_calibration.attitude,
@@ -1341,7 +1341,7 @@ class OT3API(
                     / 2
                 )
             )
-            encoder_pos = self._backend.update_encoder_position()
+            encoder_pos = await self._backend.update_encoder_position()
             self._encoder_position = deck_from_machine(
                 encoder_pos,
                 self._transforms.deck_calibration.attitude,

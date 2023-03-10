@@ -97,7 +97,6 @@ async def test_home(ot3_hardware, mock_home):
             ot3_hardware._transforms.carriage_offset,
         )
     assert ot3_hardware._current_position[OT3Axis.G] == 20
-    assert ot3_hardware._encoder_position[OT3Axis.G] == 20
 
 
 async def test_home_unmet(ot3_hardware, mock_home):

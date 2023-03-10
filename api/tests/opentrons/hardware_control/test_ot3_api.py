@@ -1065,11 +1065,11 @@ async def test_refresh_positions(ot3_hardware: ThreadManager[OT3API]) -> None:
     ) as mock_update_status, patch.object(
         backend,
         "update_position",
-        Mock(spec=backend.update_position),
+        AsyncMock(spec=backend.update_position),
     ) as mock_pos, patch.object(
         backend,
         "update_encoder_position",
-        Mock(spec=backend.update_encoder_position),
+        AsyncMock(spec=backend.update_encoder_position),
     ) as mock_encoder:
 
         mock_pos.return_value = {ax: 100 for ax in OT3Axis}

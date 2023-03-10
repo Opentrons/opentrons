@@ -235,11 +235,11 @@ class OT3Simulator:
             for status in self._get_motor_status(axes)
         )
 
-    def update_position(self) -> OT3AxisMap[float]:
+    async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
 
-    def update_encoder_position(self) -> OT3AxisMap[float]:
+    async def update_encoder_position(self) -> OT3AxisMap[float]:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
 
