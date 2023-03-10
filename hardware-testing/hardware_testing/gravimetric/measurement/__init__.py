@@ -197,5 +197,5 @@ def calculate_change_in_volume(
     )
     # NOTE: aspirate will be negative, dispense will be positive
     liquid_grams = before.grams_average - after.grams_average
-    liquid_micro_liters = liquid_grams * z_factor
+    liquid_micro_liters = liquid_grams * z_factor * 1000.0
     return liquid_micro_liters

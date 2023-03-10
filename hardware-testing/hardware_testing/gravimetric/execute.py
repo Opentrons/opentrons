@@ -110,9 +110,9 @@ def _run_trial(
         m_tag = _tag(m_type)
         if recorder.is_simulator and not blank:
             if m_type == MeasurementType.ASPIRATE:
-                recorder.scale.add_simulation_mass(volume * -1)
+                recorder.scale.add_simulation_mass(volume * -0.001)
             elif m_type == MeasurementType.DISPENSE:
-                recorder.scale.add_simulation_mass(volume)
+                recorder.scale.add_simulation_mass(volume * 0.001)
         m_data = record_measurement_data(ctx, m_tag, recorder)
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
@@ -248,7 +248,10 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         simulate=ctx.is_simulating(),
     )
     if recorder.is_simulator:
-        recorder.scale.set_simulation_mass(max(test_volumes) * 2)
+        if cfg.low_volume:
+            recorder.scale.set_simulation_mass(200)
+        else:
+            recorder.scale.set_simulation_mass(15)
 
     # CREATE CSV TEST REPORT
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
