@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { CheckPipetteButton } from '../CheckPipetteButton'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
@@ -24,15 +23,11 @@ describe('CheckPipetteButton', () => {
       setPending: jest.fn(),
       isDisabled: false,
     }
-    when(mockUsePipettesQuery)
-      .calledWith()
-      .mockReturnValue({
-        status: 'idle',
-        refetch,
-      } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      refetch,
+    } as any)
   })
   afterEach(() => {
-    resetAllWhenMocks()
     jest.resetAllMocks()
   })
   it('clicking on the button calls refetch', () => {
