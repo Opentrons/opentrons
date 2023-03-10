@@ -43,8 +43,8 @@ import type {
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { LabwareSetupItem } from '../../../../pages/Protocols/hooks'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import type { LabwareSetupItem } from './types'
 
 const LabwareRow = styled.div`
   display: grid;

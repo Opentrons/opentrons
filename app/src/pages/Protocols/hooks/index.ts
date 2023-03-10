@@ -9,11 +9,29 @@ import {
 
 import type {
   CompletedProtocolAnalysis,
+  LabwareDefinition2,
   ModuleModel,
   PipetteName,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { LabwareSetupItem } from '../../../organisms/Devices/ProtocolRun/SetupLabware/types'
+import type {
+  LabwareLocation,
+  LoadModuleRunTimeCommand,
+  ModuleLocation,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+
+export interface LabwareSetupItem {
+  definition: LabwareDefinition2
+  nickName: string | null
+  initialLocation: LabwareLocation
+  moduleModel: ModuleModel | null
+  moduleLocation: ModuleLocation | null
+}
+
+export interface GroupedLabwareSetupItems {
+  onDeckItems: LabwareSetupItem[]
+  offDeckItems: LabwareSetupItem[]
+}
 
 interface ProtocolPipette {
   hardwareType: 'pipette'
@@ -34,51 +52,11 @@ interface ProtocolModule {
 
 export type ProtocolHardware = ProtocolPipette | ProtocolModule
 
-export const useRequiredProtocolHardware = (
-  protocolId: string
-): ProtocolHardware[] => {
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
-  const attachedModules = useAttachedModules()
-  const attachedPipettes = useAttachedPipettes()
-
-  if (
-    mostRecentAnalysis == null ||
-    mostRecentAnalysis?.status !== 'completed'
-  ) {
-    return []
-  }
-
-  const requiredModules: ProtocolModule[] = mostRecentAnalysis.modules.map(
-    ({ location, model }) => {
-      return {
-        hardwareType: 'module',
-        moduleModel: model,
-        slot: location.slotName as Slot,
-        // TODO: check module compatability using brent's changes when they're in edge
-        connected: attachedModules.some(m => m.moduleModel === model),
-      }
-    }
-  )
-
-  const requiredPipettes: ProtocolPipette[] = mostRecentAnalysis.pipettes.map(
-    ({ mount, pipetteName }) => ({
-      hardwareType: 'pipette',
-      pipetteName: pipetteName,
-      mount: mount,
-      connected: attachedPipettes[mount]?.name === pipetteName,
-    })
-  )
-
-  return [...requiredPipettes, ...requiredModules]
-}
-
-export const useRequiredProtocolLabware = (
-  protocolId: string
-): LabwareSetupItem[] => {
+export function getLabwareSetupItemGroups(
+  commands: RunTimeCommand[]
+): GroupedLabwareSetupItems {
   let beyondInitialLoadCommands = false
+
   const LABWARE_ACCESS_COMMAND_TYPES = [
     'moveToWell',
     'aspirate',
@@ -89,12 +67,6 @@ export const useRequiredProtocolLabware = (
     'touchTip',
   ]
 
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
-  const commands =
-    (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
   const [offDeckItems, onDeckItems] = partition(
     commands.reduce<LabwareSetupItem[]>((acc, c) => {
       if (
@@ -160,5 +132,59 @@ export const useRequiredProtocolLabware = (
     }, []),
     ({ initialLocation }) => initialLocation === 'offDeck'
   )
+  return { onDeckItems, offDeckItems }
+}
+
+export const useRequiredProtocolHardware = (
+  protocolId: string
+): ProtocolHardware[] => {
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const attachedModules = useAttachedModules()
+  const attachedPipettes = useAttachedPipettes()
+
+  if (
+    mostRecentAnalysis == null ||
+    mostRecentAnalysis?.status !== 'completed'
+  ) {
+    return []
+  }
+
+  const requiredModules: ProtocolModule[] = mostRecentAnalysis.modules.map(
+    ({ location, model }) => {
+      return {
+        hardwareType: 'module',
+        moduleModel: model,
+        slot: location.slotName as Slot,
+        // TODO: check module compatability using brent's changes when they're in edge
+        connected: attachedModules.some(m => m.moduleModel === model),
+      }
+    }
+  )
+
+  const requiredPipettes: ProtocolPipette[] = mostRecentAnalysis.pipettes.map(
+    ({ mount, pipetteName }) => ({
+      hardwareType: 'pipette',
+      pipetteName: pipetteName,
+      mount: mount,
+      connected: attachedPipettes[mount]?.name === pipetteName,
+    })
+  )
+
+  return [...requiredPipettes, ...requiredModules]
+}
+
+export const useRequiredProtocolLabware = (
+  protocolId: string
+): LabwareSetupItem[] => {
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const commands =
+    (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
+  const { onDeckItems, offDeckItems } = getLabwareSetupItemGroups(commands)
   return [...onDeckItems, ...offDeckItems]
 }
