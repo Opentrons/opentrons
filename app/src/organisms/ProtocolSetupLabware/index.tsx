@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -193,7 +194,7 @@ export function ProtocolSetupLabware({
             minHeight="14.375rem"
             minWidth="43.1875rem"
           >
-            <Flex alignItems={ALIGN_STRETCH} gridGap="3rem">
+            <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing7}>
               <LabwareThumbnail
                 viewBox={` 0 0 ${String(
                   selectedLabwareRef.current.dimensions.xDimension
@@ -204,7 +205,7 @@ export function ProtocolSetupLabware({
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 alignItems={ALIGN_FLEX_START}
-                gridGap="1rem"
+                gridGap={SPACING.spacing4}
               >
                 <StyledText>
                   {/* {mostRecentAnalysis != null
@@ -231,7 +232,7 @@ export function ProtocolSetupLabware({
         <BackButton onClick={() => setSetupScreen('prepare to run')}>
           {t('labware')}
         </BackButton>
-        <Flex gridGap="2.5rem">
+        <Flex gridGap={SPACING.spacingXXL}>
           <ContinueButton onClick={() => setSetupScreen('lpc')} />
         </Flex>
       </Flex>
@@ -357,13 +358,13 @@ function LabwareLatch({
       alignItems={ALIGN_FLEX_START}
       padding={SPACING.spacing4}
       gridGap="0.75rem"
-      backgroundColor="#B4D4FF"
+      backgroundColor={COLORS.foundationalBlue}
       color={
         latchStatus === 'opening' || latchStatus === 'closing'
           ? `${COLORS.darkBlack_hundred}${COLORS.opacity60HexCode}`
           : COLORS.darkBlackEnabled
       }
-      borderRadius="0.75rem"
+      borderRadius={BORDERS.size_three}
       onClick={toggleLatch}
     >
       <StyledText
@@ -447,7 +448,7 @@ function RowLabware({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light_one}
-      borderRadius="1rem"
+      borderRadius={BORDERS.size_four}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
       gridGap={SPACING.spacing6}
