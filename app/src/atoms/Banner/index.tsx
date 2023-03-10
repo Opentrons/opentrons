@@ -97,7 +97,7 @@ export function Banner(props: BannerProps): JSX.Element {
     marginLeft: iconMarginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
-  const ON_DEVICE_BANNER_STYLE = css`
+  const BANNER_STYLE = css`
     border: ${String(SPACING.spacingXXS)} ${String(BORDERS.styleSolid)}
       ${BANNER_PROPS_BY_TYPE[type].color};
     font-size: ${TYPOGRAPHY.fontSizeP};
@@ -107,16 +107,16 @@ export function Banner(props: BannerProps): JSX.Element {
     @media ${ODD_MEDIA_QUERY_SPECS} {
       font-size: 1.25rem;
       font-weight${TYPOGRAPHY.fontWeightSemiBold};
-      border: 0rem;
-      background-color: #FFE1A4;
-      border-radius: 0.75rem;
+      border: none;
+      background-color: ${COLORS.yellow_three};
+      border-radius: ${BORDERS.size_three};
       line-height: 1.5rem;
     }
   `
   return (
     <Flex
       backgroundColor={BANNER_PROPS_BY_TYPE[type].backgroundColor}
-      css={ON_DEVICE_BANNER_STYLE}
+      css={BANNER_STYLE}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}

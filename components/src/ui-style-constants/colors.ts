@@ -12,6 +12,7 @@ export const darkGrey = '#4a4a4a'
 
 // opacity hex codes to append to 6-digit color hex codes
 // taken from table: https://davidwalsh.name/hex-opacity
+export const opacity0HexCode = '00' // 0% opacity
 export const opacity10HexCode = '1a' // 10% opacity
 export const opacity12HexCode = '1f' // 12% opacity
 export const opacity15HexCode = '26' // 15% opacity

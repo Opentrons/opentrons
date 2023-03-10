@@ -42,7 +42,7 @@ describe('CheckPipetteButton', () => {
       isOnDevice: true,
     }
     const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_Default')
+    getByLabelText('SmallButton_default')
   })
   it('renders button disabled when isDisabled is true', () => {
     props = {

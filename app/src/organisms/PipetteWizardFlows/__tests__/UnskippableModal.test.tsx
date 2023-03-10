@@ -30,7 +30,7 @@ describe('UnskippableModal', () => {
     const { getByText, getByLabelText } = render(props)
     getByText('This is a critical step that cannot be skipped')
     getByText('You must detach the mounting plate before using other pipettes.')
-    getByLabelText('SmallButton_Alert').click()
+    getByLabelText('SmallButton_alert').click()
     expect(props.goBack).toHaveBeenCalled()
   })
 })

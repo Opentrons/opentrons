@@ -114,7 +114,7 @@ describe('ChoosePipette', () => {
     fireEvent.click(singleMountPipettes)
     expect(props.setSelectedPipette).toHaveBeenCalled()
 
-    const proceedBtn = getByLabelText('SmallButton_Default')
+    const proceedBtn = getByLabelText('SmallButton_default')
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })

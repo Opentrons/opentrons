@@ -63,7 +63,7 @@ describe('Carriage', () => {
       isOnDevice: true,
     }
     const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_Default')
+    getByLabelText('SmallButton_default')
   })
   it('returns the correct information, buttons work as expected when flow is detach', () => {
     props = {
