@@ -16,4 +16,4 @@ export type JsonProtocolFile =
   | Readonly<ProtocolFileV4<{}>>
   | Readonly<ProtocolFileV5<{}>>
 
-export * from './types/schemaV7'
+export * from './types/schemaV6'

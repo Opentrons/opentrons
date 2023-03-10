@@ -1,4 +1,4 @@
-const response = {
+export const instrumentsResponseFixture = {
   data: [
     {
       data: {

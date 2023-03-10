@@ -19,6 +19,8 @@ describe('MovePin', () => {
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
   const mockChainRunCommands = jest.fn()
+  const mockCreateRunCommand = jest.fn()
+  const mockSetFrontJawOffset = jest.fn()
   const mockRunId = 'fakeRunId'
 
   beforeEach(() => {
@@ -32,9 +34,11 @@ describe('MovePin', () => {
           attachedGripper={{}}
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
-          isExiting={false}
           goBack={mockGoBack}
           movement={MOVE_PIN_TO_FRONT_JAW}
+          setFrontJawOffset={mockSetFrontJawOffset}
+          frontJawOffset={{ x: 0, y: 0, z: 0 }}
+          createRunCommand={mockCreateRunCommand}
           {...props}
         />,
         { i18nInstance: i18n }

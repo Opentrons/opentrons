@@ -49,6 +49,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       }).then(() => {
         createRunCommand({
           command: {
+            // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
             commandType: 'calibration/calibrateGripper' as const,
             params: jaw === 'rear' && frontJawOffset != null ? { jaw, otherJawOffset: frontJawOffset } : { jaw },
           },
@@ -59,6 +60,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           }
           createRunCommand({
             command: {
+              // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
               commandType: 'calibration/moveToMaintenancePosition' as const,
               params: {
                 mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
