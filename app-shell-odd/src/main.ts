@@ -7,7 +7,7 @@ import { registerRobotLogs } from './robot-logs'
 import { registerUpdate, updateLatestVersion } from './update'
 import { registerRobotSystemUpdate } from './system-update'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
-import sdNotify from 'sd-notify'
+import sdNotify from './systemd'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'

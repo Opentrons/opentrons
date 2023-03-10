@@ -181,6 +181,7 @@ jobs:
         name: 'build ODD app for linux'
         timeout-minutes: 60
         run: |
+          sudo apt-get install libsystemd-dev
           make -C app-shell-odd dist-ot3
 
   build-app-ot3:

@@ -55,11 +55,13 @@
     "node-fetch": "2.6.0",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
-    "sd-notify": "2.8.0",
     "semver": "5.5.0",
     "tempy": "1.0.1",
     "uuid": "3.2.1",
     "winston": "3.1.0",
     "yargs-parser": "13.1.2"
+  },
+  "optionalDependencies": {
+    "sd-notify": "2.8.0"
   }
 }
