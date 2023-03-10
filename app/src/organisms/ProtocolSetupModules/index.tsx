@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
@@ -119,7 +120,7 @@ function SetupInstructionsButton(
     <Btn
       alignItems="center"
       backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
-      borderRadius="40px"
+      borderRadius={BORDERS.size_five}
       display="flex"
       gridGap="0.5rem"
       padding="1rem 2rem"
@@ -141,7 +142,7 @@ export function ContinueButton(
   return (
     <Btn
       backgroundColor={COLORS.blueEnabled}
-      borderRadius="40px"
+      borderRadius={BORDERS.size_five}
       color={COLORS.white}
       padding="1rem 2rem"
       onClick={props.onClick}
@@ -167,7 +168,7 @@ export function DeckMapButton(
       bottom="1.5rem"
       right="1.5rem"
       backgroundColor={COLORS.blueEnabled}
-      borderRadius="40px"
+      borderRadius={BORDERS.size_five}
       color={COLORS.white}
       padding="1rem 2rem"
       onClick={props.onClick}

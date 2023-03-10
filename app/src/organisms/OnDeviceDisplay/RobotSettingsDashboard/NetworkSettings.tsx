@@ -13,6 +13,7 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -183,7 +184,7 @@ function NetworkSettingButton({
         width="100%"
         padding={SPACING.spacing5}
         backgroundColor={buttonBackgroundColor}
-        borderRadius="0.75rem"
+        borderRadius={BORDERS.size_three}
         onClick={displayDetailsTab}
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
