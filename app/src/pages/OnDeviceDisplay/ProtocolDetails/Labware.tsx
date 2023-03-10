@@ -1,15 +1,11 @@
 import * as React from 'react'
-import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
-import { getLabwareSetupItemGroups } from '../../../organisms/Devices/ProtocolRun/SetupLabware/utils'
-
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
+import { useRequiredProtocolLabware } from '../../Protocols/hooks'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -48,31 +44,21 @@ const TableDatum = styled('td')`
 `
 
 export const Labware = (props: { protocolId: string }): JSX.Element => {
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(
-    props.protocolId,
-    {
-      staleTime: Infinity,
-    }
-  )
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
-  const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
-    (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
-  )
+  const labwareItems = useRequiredProtocolLabware(props.protocolId)
   const { t } = useTranslation('protocol_setup')
-  const labwareItems = [...onDeckItems, ...offDeckItems]
 
   return (
     <Table>
       <thead>
         <tr>
-          <TableHeader>{t('initial_location')}</TableHeader>
+          <TableHeader>{t('slot')}</TableHeader>
           <TableHeader>{t('labware_name')}</TableHeader>
           <TableHeader
             style={{
               textAlign: 'center',
             }}
           >
-            Quantity
+            {t('quantity')}
           </TableHeader>
         </tr>
       </thead>
