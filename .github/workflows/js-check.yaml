@@ -42,9 +42,6 @@ jobs:
     runs-on: 'ubuntu-22.04'
     timeout-minutes: 20
     steps:
-      - name: 'install systemd-dev'
-        run: |
-          sudo apt-get  install libsystemd-dev
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
