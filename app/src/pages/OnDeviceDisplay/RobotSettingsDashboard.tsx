@@ -49,7 +49,7 @@ const SETTING_BUTTON_STYLE = css`
   margin-bottom: ${SPACING.spacing3};
   background-color: ${COLORS.medGreyEnabled};
   padding: 1.5rem;
-  border-radius: 16px;
+  border-radius: ${BORDERS.size_four};
 `
 export type SettingOption =
   | 'RobotName'

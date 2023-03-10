@@ -3,13 +3,14 @@ import {
   TYPOGRAPHY,
   COLORS,
   SPACING,
+  BORDERS,
   NewPrimaryBtn,
   styleProps,
 } from '@opentrons/components'
 
 export const SmallButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blueEnabled};
-  border-radius: 12px;
+  border-radius: ${BORDERS.size_three};
   box-shadow: none;
   padding-left: ${SPACING.spacing4};
   padding-right: ${SPACING.spacing4};
