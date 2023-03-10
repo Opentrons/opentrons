@@ -271,7 +271,7 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
   - Motion planning has been improved to avoid certain erroneous downward movements,
     especially when using :py:meth:`.InstrumentContext.aspirate`.
 
-  - :py:attr:`.Labware.tip_length` will raise a useful error if called on labware that is not a tip rack.
+  - :py:meth:`.Labware.reset` and :py:attr:`.Labware.tip_length` will raise useful errors if called on labware that is not a tip rack.
 
 - Removals
 
