@@ -11,6 +11,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -105,7 +106,7 @@ export function LongPressModal(props: {
         <TooManyPinsModal longpress={longpress} />
       ) : (
         <ModalShell
-          borderRadius="0.75rem"
+          borderRadius={BORDERS.size_three}
           onOutsideClick={handleCloseModal}
           width="15.625rem"
         >

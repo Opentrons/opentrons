@@ -14,6 +14,7 @@ import {
   COLORS,
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -115,7 +116,7 @@ export function DeviceReset({
           alignItems={ALIGN_CENTER}
           gridGap="0.75rem"
           padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
-          borderRadius="12px"
+          borderRadius={BORDERS.size_three}
         >
           <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />
           <StyledText

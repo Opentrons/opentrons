@@ -18,6 +18,7 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   ALIGN_FLEX_END,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -239,7 +240,7 @@ const RobotSettingButton = ({
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.warningBackgroundMed}
             padding={`0.75rem ${SPACING.spacing4}`}
-            borderRadius="16px"
+            borderRadius={BORDERS.size_four}
           >
             <Icon
               name="ot-alert"
