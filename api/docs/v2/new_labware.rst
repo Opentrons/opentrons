@@ -244,7 +244,7 @@ This example uses ``load_liquid`` to label the initial well location, contents, 
         
 .. versionadded:: 2.14
 
-This information shows up in the Opentrons App (v6.3.0 or higher) after you import your protocol. A summary of liquids is available on the protocol detail page, and well-by-well detail is available in the Liquid Setup section of the protocol setup page.
+This information shows up in the Opentrons App (v6.3.0 or higher) after you import your protocol. A summary of liquids is available on the protocol detail page, and well-by-well detail is available in the Initial Liquid Setup section of the run setup page.
 
 .. note::
     ``load_liquid`` does not validate volume for your labware. For example, you could label a 40 µL well plate with ``volume=50``. It's your responsibility to ensure the labels you use accurately reflect the amount of liquid you can place into wells and reservoirs.
