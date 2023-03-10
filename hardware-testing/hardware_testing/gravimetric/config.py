@@ -21,7 +21,7 @@ class GravimetricConfig:
     return_tip: bool
 
 
-GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets"]
+GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
 
 NUM_BLANK_TRIALS: Final = 3
 NUM_MIXES_BEFORE_ASPIRATE = 5
