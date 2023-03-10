@@ -276,79 +276,29 @@ function LabwareLatch({
   latchStatus,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'heater_shaker'])
-  let buttonState: JSX.Element | null = null
+  let icon: 'latch-open' | 'latch-closed' | null = null
+  let statusText: string | null = null
   switch (latchStatus) {
     case 'idle_open':
-      buttonState = (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
-        >
-          <StyledText
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('heater_shaker:open')}
-          </StyledText>
-          <Icon name="latch-open" size="2.5rem" color="#006CFA" />
-        </Flex>
-      )
+      icon = 'latch-open'
+      statusText = 'heater_shaker:open'
       break
     case 'idle_closed':
-      buttonState = (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
-        >
-          <StyledText
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('heater_shaker:closed')}
-          </StyledText>
-          <Icon name="latch-closed" size="2.5rem" />
-        </Flex>
-      )
+      icon = 'latch-closed'
+      statusText = 'heater_shaker:closed'
       break
     case 'opening':
-      buttonState = (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
-        >
-          <StyledText
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('heater_shaker:opening')}
-          </StyledText>
-          <Icon name="latch-closed" size="2.5rem" />
-        </Flex>
-      )
+      icon = 'latch-closed'
+      statusText = 'heater_shaker:opening'
       break
     case 'closing':
-      buttonState = (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
-        >
-          <StyledText
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('heater_shaker:closing')}
-          </StyledText>
-          <Icon name="latch-open" size="2.5rem" />
-        </Flex>
-      )
+      icon = 'latch-open'
+      statusText = 'heater_shaker:closing'
       break
     default:
-      buttonState = null
+      break
   }
+
   return (
     <Flex
       minWidth="11.4375rem"
@@ -373,7 +323,27 @@ function LabwareLatch({
       >
         {t('labware_latch')}
       </StyledText>
-      {buttonState}
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+      >
+        {statusText != null && icon != null ? (
+          <>
+            <StyledText
+              fontSize="1.375rem"
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+            >
+              {t(statusText)}
+            </StyledText>
+            <Icon
+              name={icon}
+              size="2.5rem"
+              color={latchStatus === 'idle_open' ? COLORS.blueEnabled : ''}
+            />
+          </>
+        ) : null}
+      </Flex>
     </Flex>
   )
 }
