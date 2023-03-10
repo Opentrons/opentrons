@@ -1128,3 +1128,5 @@ class OT3Controller:
             raise e
         self._usb_messenger = BinaryMessenger(usb_driver)
         self._usb_messenger.start()
+        self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
+        await self.probe_network()
