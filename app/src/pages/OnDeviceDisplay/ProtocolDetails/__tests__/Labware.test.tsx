@@ -9,6 +9,8 @@ import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fix
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 jest.mock('../../../Protocols/hooks')
 
 const mockUseRequiredProtocolLabware = useRequiredProtocolLabware as jest.MockedFunction<
@@ -33,16 +35,25 @@ describe('Labware', () => {
       .calledWith(MOCK_PROTOCOL_ID)
       .mockReturnValue([
         {
-          definition: fixture_tiprack_10_ul,
+          definition: fixture_tiprack_10_ul as LabwareDefinition2,
           initialLocation: { slotName: '1' },
+          moduleLocation: null,
+          moduleModel: null,
+          nickName: null,
         },
         {
-          definition: fixture_tiprack_300_ul,
+          definition: fixture_tiprack_300_ul as LabwareDefinition2,
           initialLocation: { slotName: '3' },
+          moduleLocation: null,
+          moduleModel: null,
+          nickName: null,
         },
         {
-          definition: fixture_96_plate,
+          definition: fixture_96_plate as LabwareDefinition2,
           initialLocation: { slotName: '5' },
+          moduleLocation: null,
+          moduleModel: null,
+          nickName: null,
         },
       ])
   })

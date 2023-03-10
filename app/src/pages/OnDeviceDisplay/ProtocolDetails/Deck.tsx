@@ -4,6 +4,8 @@ import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
 export const Deck = (props: { protocolId: string }): JSX.Element => {
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(
     props.protocolId,
@@ -15,10 +17,14 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
 
   return (
     <DeckThumbnail
-      commands={mostRecentAnalysis?.commands ?? []}
-      labware={mostRecentAnalysis?.labware ?? []}
+      commands={
+        (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
+      }
+      labware={(mostRecentAnalysis as CompletedProtocolAnalysis)?.labware ?? []}
       liquids={
-        mostRecentAnalysis?.liquids != null ? mostRecentAnalysis?.liquids : []
+        (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids != null
+          ? (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids
+          : []
       }
     />
   )

@@ -7,7 +7,11 @@ import {
   useAttachedPipettes,
 } from '../../../organisms/Devices/hooks'
 
-import type { CompletedProtocolAnalysis, ModuleModel, PipetteName } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ModuleModel,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { LabwareSetupItem } from '../../../organisms/Devices/ProtocolRun/SetupLabware/types'
 
@@ -89,7 +93,8 @@ export const useRequiredProtocolLabware = (
     staleTime: Infinity,
   })
   const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
-  const commands = (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
+  const commands =
+    (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
   const [offDeckItems, onDeckItems] = partition(
     commands.reduce<LabwareSetupItem[]>((acc, c) => {
       if (
