@@ -1,3 +1,8 @@
+# TODO(mm, 2023-01-11): Port this to a Tavern test once
+# https://github.com/taverntesting/tavern/issues/833 is resolved. We need to upload
+# multiple files into the `files` field of the `POST /protocols` endpoint.
+
+
 import os
 
 import secrets
