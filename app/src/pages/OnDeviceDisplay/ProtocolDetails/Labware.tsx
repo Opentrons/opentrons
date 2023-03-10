@@ -53,13 +53,26 @@ const TableDatum = styled('td')`
 
 export const Labware = (props: { protocolId: string }): JSX.Element => {
   const labwareItems = useRequiredProtocolLabware(props.protocolId)
+  const labwareNames = labwareItems.map(li =>
+    getLabwareDisplayName(li.definition)
+  )
+
+  const countedNames = labwareNames.reduce(
+    (allNames: Record<string, number>, name: string) => {
+      const currCount: number = allNames[name] ?? 0
+      return {
+        ...allNames,
+        [name]: currCount + 1,
+      }
+    },
+    {}
+  )
   const { t } = useTranslation('protocol_setup')
 
   return (
     <Table>
       <thead>
         <tr>
-          <TableHeader>{t('slot')}</TableHeader>
           <TableHeader>{t('labware_name')}</TableHeader>
           <TableHeader
             style={{
@@ -71,27 +84,20 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         </tr>
       </thead>
       <tbody>
-        {labwareItems.map((labwareItem, id) => {
-          const definition = labwareItem.definition
-          const slotInfo: JSX.Element | null =
-            labwareItem.initialLocation === 'offDeck'
-              ? null
-              : t('slot_location', {
-                  slotName: Object.values(labwareItem.initialLocation),
-                })
+        {Object.entries(countedNames).map(([name, count]) => {
+          const definition = labwareItems.find(
+            li => getLabwareDisplayName(li.definition) === name
+          )?.definition
           return (
             <TableRow
-              key={id}
+              key={name}
               style={{
                 backgroundColor: '#d6d6d6',
               }}
             >
               <TableDatum>
-                <StyledText as="p">{slotInfo}</StyledText>
-              </TableDatum>
-              <TableDatum>
                 <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-                  {definition.namespace === 'opentrons' ? (
+                  {definition?.namespace === 'opentrons' ? (
                     <Icon
                       color={COLORS.blueEnabled}
                       name="check-decagram"
@@ -103,9 +109,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   ) : (
                     <Flex marginLeft={SPACING.spacingM} />
                   )}
-                  <StyledText as="p">
-                    {getLabwareDisplayName(definition)}
-                  </StyledText>
+                  <StyledText as="p">{name}</StyledText>
                 </Flex>
               </TableDatum>
               <TableDatum
@@ -114,7 +118,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                 }}
               >
                 <StyledText as="p" alignSelf={TYPOGRAPHY.textAlignCenter}>
-                  1
+                  {count}
                 </StyledText>
               </TableDatum>
             </TableRow>

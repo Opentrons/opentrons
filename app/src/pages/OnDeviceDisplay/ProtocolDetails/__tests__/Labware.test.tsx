@@ -55,6 +55,13 @@ describe('Labware', () => {
           moduleModel: null,
           nickName: null,
         },
+        {
+          definition: fixture_tiprack_10_ul as LabwareDefinition2,
+          initialLocation: { slotName: '7' },
+          moduleLocation: null,
+          moduleModel: null,
+          nickName: null,
+        },
       ])
   })
   afterEach(() => {
@@ -63,14 +70,13 @@ describe('Labware', () => {
 
   it('should render column headers that indicate where the labware is, what is called, and how many are required', () => {
     const { getByRole } = render(props)[0]
-    getByRole('columnheader', { name: 'Slot' })
     getByRole('columnheader', { name: 'Labware Name' })
     getByRole('columnheader', { name: 'Quantity' })
   })
   it('should render the correct location, name, and connected status in each table row', () => {
     const { getByRole } = render(props)[0]
-    getByRole('row', { name: 'Slot 1 Opentrons GEB 10uL Tiprack 1' })
-    getByRole('row', { name: 'Slot 3 300ul Tiprack FIXTURE 1' })
-    getByRole('row', { name: 'Slot 5 ANSI 96 Standard Microplate 1' })
+    getByRole('row', { name: 'Opentrons GEB 10uL Tiprack 2' })
+    getByRole('row', { name: '300ul Tiprack FIXTURE 1' })
+    getByRole('row', { name: 'ANSI 96 Standard Microplate 1' })
   })
 })
