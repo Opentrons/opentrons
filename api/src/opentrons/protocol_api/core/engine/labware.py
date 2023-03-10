@@ -108,7 +108,10 @@ class LabwareCore(AbstractLabware[WellCore]):
         return self._engine_client.state.labware.get_tip_length(self._labware_id)
 
     def reset_tips(self) -> None:
-        self._engine_client.reset_tips(labware_id=self.labware_id)
+        if self.is_tip_rack():
+            self._engine_client.reset_tips(labware_id=self.labware_id)
+        else:
+            raise TypeError(f"{self.get_display_name()} is not a tip rack.")
 
     def get_next_tip(
         self, num_tips: int, starting_tip: Optional[WellCore]
