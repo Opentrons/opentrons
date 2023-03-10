@@ -29,52 +29,25 @@ class PipettingHeights:
     end: LiquidSurfaceHeights
 
 
-def _create_pipetting_heights(
-    start_mm: float, end_mm: float, submerge: float, retract: float
-) -> PipettingHeights:
-    # Calculates the:
-    #     1) current liquid-height of the well
-    #     2) the resulting liquid-height of the well, after a specified volume is
-    #        aspirated/dispensed
-    #
-    # Then, use these 2 liquid-heights (start & end heights) to return four Locations:
-    #     1) Above the starting liquid height
-    #     2) Submerged in the starting liquid height
-    #     3) Above the ending liquid height
-    #     4) Submerged in the ending liquid height
-    return PipettingHeights(
-        start=LiquidSurfaceHeights(
-            above=max(start_mm + retract, config.LABWARE_BOTTOM_CLEARANCE),
-            below=max(start_mm - submerge, config.LABWARE_BOTTOM_CLEARANCE),
-        ),
-        end=LiquidSurfaceHeights(
-            above=max(end_mm + retract, config.LABWARE_BOTTOM_CLEARANCE),
-            below=max(end_mm - submerge, config.LABWARE_BOTTOM_CLEARANCE),
-        ),
-    )
-
-
 def _get_heights_in_well(
     height_before: float,
     height_after: float,
     submerge: float,
     retract: float,
-    blank: bool,
 ) -> Tuple[float, float, float]:
-    pipetting_heights = _create_pipetting_heights(
-        height_before, height_after, submerge, retract
+    pipetting_heights = PipettingHeights(
+        start=LiquidSurfaceHeights(
+            above=max(height_before + retract, config.LABWARE_BOTTOM_CLEARANCE),
+            below=max(height_before - submerge, config.LABWARE_BOTTOM_CLEARANCE),
+        ),
+        end=LiquidSurfaceHeights(
+            above=max(height_after + retract, config.LABWARE_BOTTOM_CLEARANCE),
+            below=max(height_after - submerge, config.LABWARE_BOTTOM_CLEARANCE),
+        ),
     )
     approach = max(pipetting_heights.start.above, pipetting_heights.end.below)
-    if not blank:
-        submerge = pipetting_heights.end.below
-        retract = pipetting_heights.end.above
-    else:
-        # when doing fake/dry pipetting, stay above the well at all times
-        # but move the same distances, to closely simulate real timing
-        s_diff = abs(approach - pipetting_heights.end.below)
-        submerge = approach + s_diff
-        r_diff = abs(pipetting_heights.end.above - pipetting_heights.end.below)
-        retract = submerge - r_diff
+    submerge = pipetting_heights.end.below
+    retract = pipetting_heights.end.above
     return approach, submerge, retract
 
 
@@ -117,6 +90,10 @@ def _pipette_with_liquid_settings(
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
+    if blank:
+        # force the pipette to move above the well
+        liquid_before = well.depth + (well.depth - liquid_before)
+        liquid_after = well.depth + (well.depth - liquid_after)
     if aspirate:
         liq_submerge = liquid_class.aspirate.submerge
         liq_retract = liquid_class.aspirate.retract
@@ -124,7 +101,7 @@ def _pipette_with_liquid_settings(
         liq_submerge = liquid_class.dispense.submerge
         liq_retract = liquid_class.dispense.retract
     approach_mm, submerge_mm, retract_mm = _get_heights_in_well(
-        liquid_before, liquid_after, liq_submerge, liq_retract, blank
+        liquid_before, liquid_after, liq_submerge, liq_retract
     )
 
     # CREATE CALLBACKS FOR EACH PHASE
