@@ -1,7 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
@@ -82,9 +90,23 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                 <StyledText as="p">{slotInfo}</StyledText>
               </TableDatum>
               <TableDatum>
-                <StyledText as="p">
-                  {getLabwareDisplayName(definition)}
-                </StyledText>
+                <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+                  {definition.namespace === 'opentrons' ? (
+                    <Icon
+                      color={COLORS.blueEnabled}
+                      name="check-decagram"
+                      height="0.75rem"
+                      minHeight="0.75rem"
+                      minWidth="0.75rem"
+                      marginRight={SPACING.spacing3}
+                    />
+                  ) : (
+                    <Flex marginLeft={SPACING.spacingM} />
+                  )}
+                  <StyledText as="p">
+                    {getLabwareDisplayName(definition)}
+                  </StyledText>
+                </Flex>
               </TableDatum>
               <TableDatum
                 style={{
