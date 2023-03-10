@@ -590,21 +590,6 @@ class OT3Controller:
             )
         return new_group
 
-    @requires_update
-    async def fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        """Fast home axes.
-
-        Args:
-            axes: List of axes to home.
-            margin: Margin
-
-        Returns:
-            New position.
-        """
-        return await self.home(axes)
-
     async def tip_action(
         self,
         axes: Sequence[OT3Axis],

@@ -303,24 +303,6 @@ class OT3Simulator:
         return axis_convert(self._position, 0.0)
 
     @ensure_yield
-    async def fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        """Fast home axes.
-
-        Args:
-            axes: List of axes to home.
-            margin: Margin
-
-        Returns:
-            New position.
-        """
-        homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
-        for h in homed:
-            self._motor_status[h] = MotorStatus(True, True)
-        return axis_convert(self._position, 0.0)
-
-    @ensure_yield
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,

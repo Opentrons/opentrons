@@ -1235,11 +1235,6 @@ class OT3API(
         res = await self._backend.get_limit_switches()
         return {ax: val for ax, val in res.items()}
 
-    async def _fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        return await self._backend.fast_home(axes, margin)
-
     @ExecutionManagerProvider.wait_for_running
     async def retract(
         self, mount: Union[top_types.Mount, OT3Mount], margin: float = 10
@@ -1249,14 +1244,7 @@ class OT3API(
         Works regardless of critical point or home status.
         """
         machine_ax = OT3Axis.by_mount(mount)
-
-        async with self._motion_lock:
-            machine_pos = await self._fast_home((machine_ax,), margin)
-            self._current_position = deck_from_machine(
-                machine_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+        await self._home((machine_ax,))
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -1655,14 +1643,8 @@ class OT3API(
                     home_flagged_axes=False,
                 )
             if move.home_after:
-                machine_pos = await self._backend.fast_home(
+                await self._home(
                     [OT3Axis.from_axis(ax) for ax in move.home_axes],
-                    move.home_after_safety_margin,
-                )
-                self._current_position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
                 )
 
         for shake in spec.shake_moves:
