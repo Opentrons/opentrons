@@ -196,9 +196,9 @@ and it will return the individual well objects in row A.
 
 .. versionadded:: 2.0
 
-**************************
-Labelling Liquids in Wells
-**************************
+*************************
+Labeling Liquids in Wells
+*************************
 
 Optionally, you can specify the liquids that should be in various wells at the beginning of your protocol. Doing so helps you identify well contents by name and volume, and adds corresponding labels to a single well, or group of wells, in well plates and reservoirs. Viewing the initial liquid setup in a Python protocol is available in the Opentrons App v6.3.0 or higher.
 
@@ -228,10 +228,10 @@ This example uses ``define_liquid`` to create two liquid objects and instantiate
         
 The ``display_color`` parameter accepts a hex color code, which adds a color to that liquid's label when you import your protocol into the Opentrons App. The ``define_liquid`` method accepts standard 3-, 4-, 6-, and 8-character hex color codes.
 
-Labelling Wells and Reservoirs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Labeling Wells and Reservoirs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µl) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate each well with a particular liquid: 
+This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate each well with a particular liquid: 
 
 .. code-block:: python
 
@@ -247,12 +247,12 @@ This example uses ``load_liquid`` to label the initial well location, contents, 
 This information shows up in the Opentrons App (v6.3.0 or higher) after you import your protocol. A summary of liquids is available on the protocol detail page, and well-by-well detail is available in the Liquid Setup section of the protocol setup page.
 
 .. note::
-    ``load_liquid`` does not validate volume for your labware. For example, you could label a 40 µL well plate with ``volume=50``. It's your responsibility to ensure the labels you use accurately reflect the amount of liquid a protocol dispenses into wells and reservoirs.
+    ``load_liquid`` does not validate volume for your labware. For example, you could label a 40 µL well plate with ``volume=50``. It's your responsibility to ensure the labels you use accurately reflect the amount of liquid you can place into wells and reservoirs.
 
-Labelling vs Loading Liquids
+Labeling vs Handling Liquids
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``load_liquid`` arguments include a volume amount (``volume=n`` in µl). This amount is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid should be in a well at the start of the protocol. You need to use a method like :py:meth:`.transfer` to physically move liquids from a source to a destination.
+The ``load_liquid`` arguments include a volume amount (``volume=n`` in µL). This amount is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid should be in a well at the start of the protocol. You need to use a method like :py:meth:`.transfer` to physically move liquids from a source to a destination.
 
 
 .. _v2-location-within-wells:
