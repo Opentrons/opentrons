@@ -8,6 +8,7 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidParams,
 )
 from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.commands.load_liquid import InvalidLoadVolumeError
 
 
 @pytest.fixture
@@ -33,6 +34,15 @@ async def test_load_liquid_implementation(
         liquidId="liquid-id",
         volumeByWell={"A1": 30, "B2": 100},
     )
+
+    decoy.when(
+        mock_state_view.labware.get_well_max_volume("labware-id", "A1")
+    ).then_return(30)
+
+    decoy.when(
+        mock_state_view.labware.get_well_max_volume("labware-id", "B2")
+    ).then_return(100)
+
     result = await subject.execute(data)
 
     assert result == LoadLiquidResult()
@@ -44,3 +54,23 @@ async def test_load_liquid_implementation(
             "labware-id", {"A1": 30.0, "B2": 100.0}
         )
     )
+
+
+async def test_load_liquid_implementation_raises_max_volume(
+    decoy: Decoy,
+    subject: LoadLiquidImplementation,
+    mock_state_view: StateView,
+) -> None:
+    """Test LoadLiquid command execution."""
+    data = LoadLiquidParams(
+        labwareId="labware-id",
+        liquidId="liquid-id",
+        volumeByWell={"A1": 30, "B2": 100},
+    )
+
+    decoy.when(
+        mock_state_view.labware.get_well_max_volume("labware-id", "A1")
+    ).then_return(20)
+
+    with pytest.raises(InvalidLoadVolumeError):
+        await subject.execute(data)

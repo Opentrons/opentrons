@@ -6,7 +6,7 @@ from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import Parameters
+from opentrons_shared_data.labware.labware_definition import Parameters, WellDefinition
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point, MountType
 
@@ -929,3 +929,31 @@ def test_get_edge_path_type(
     )
 
     assert result == expected_result
+
+
+def test_get_well_max_volume() -> None:
+    """Should get the max volume allowed in a well."""
+    labware = LoadedLabware(
+        id="tip-rack-id",
+        loadName="load-name",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        definitionUri="some-labware-uri",
+        offsetId=None,
+    )
+
+    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+        wells={
+            "A1": WellDefinition.construct(  # type: ignore[call-arg]
+                totalLiquidVolume=30
+            )
+        }
+    )
+
+    subject = get_labware_view(
+        labware_by_id={"labware-id": labware},
+        definitions_by_uri={
+            "some-labware-uri": labware_def,
+        },
+    )
+
+    assert subject.get_well_max_volume("labware-id", "A1") == 30

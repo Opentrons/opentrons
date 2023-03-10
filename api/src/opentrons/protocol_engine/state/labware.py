@@ -608,6 +608,13 @@ class LabwareView(HasState[LabwareState]):
             z=current_z_position,
         )
 
+    def get_well_max_volume(self, labware_id: str, well_name: str) -> float:
+        """Get well max volume."""
+        well_definition = self.get_well_definition(
+            labware_id=labware_id, well_name=well_name
+        )
+        return well_definition.totalLiquidVolume
+
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""
         uri = self.get_uri_from_definition(self.get_definition(labware_id))

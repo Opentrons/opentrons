@@ -5,11 +5,16 @@ from typing import Optional, Type, Dict, TYPE_CHECKING
 from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..errors import ProtocolEngineError
 
 if TYPE_CHECKING:
     from ..state import StateView
 
 LoadLiquidCommandType = Literal["loadLiquid"]
+
+
+class InvalidLoadVolumeError(ProtocolEngineError):
+    """Error raise when trying to load more than the max volume of a well."""
 
 
 class LoadLiquidParams(BaseModel):
@@ -48,6 +53,16 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
         self._state_view.labware.validate_liquid_allowed_in_labware(
             labware_id=params.labwareId, wells=params.volumeByWell
         )
+
+        for well in params.volumeByWell:
+            max_volume = self._state_view.labware.get_well_max_volume(
+                labware_id=params.labwareId, well_name=well
+            )
+
+            if params.volumeByWell[well] > max_volume:
+                raise InvalidLoadVolumeError(
+                    f"Exceeded maximum volume of well ({max_volume} µL)."
+                )
 
         return LoadLiquidResult()
 
