@@ -397,7 +397,7 @@ class UpdateProgress:
     @property
     def targets(self) -> Set[FirmwareTarget]:
         """Gets the set of update Targets queued or updating."""
-        return {target for target in set(self._tracker)}
+        return set(self._tracker)
 
     def get_progress(self) -> Set[UpdateStatus]:
         """Gets the update status and total progress"""

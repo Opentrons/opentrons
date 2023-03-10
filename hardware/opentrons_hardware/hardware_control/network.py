@@ -106,6 +106,7 @@ class NetworkInfo:
         device_info.update(
             {target: cache for (target, cache) in usb_device_info.items()}
         )
+        self._device_info_cache = device_info
         return device_info
 
 
