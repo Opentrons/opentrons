@@ -1134,6 +1134,8 @@ class OT3API(
                 MoveStopCondition.none,
             )
         elif self._backend.check_encoder_status([axis]):
+            # ensure stepper position can be updated after boot
+            await self.engage_axes([axis])
             # update stepper position using the valid encoder position
             await self._update_position_estimation([axis])
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
@@ -1146,17 +1148,18 @@ class OT3API(
                     MoveStopCondition.none,
                 )
             else:
-                # FIXME: (AA 2/15/23) This is a temporary workaround because of
-                # XY encoder inaccuracy. We should remove this and move axes directly
-                # to the home position when we fix the encoder issues.
-                # Move to 20 mm away from the home position and then home
-                target_pos[axis] += 20.00
-                moves = self._build_moves(origin, target_pos)
-                await self._backend.move(
-                    origin,
-                    moves[0],
-                    MoveStopCondition.none,
-                )
+                if origin[axis] - target_pos[axis] > 20.0:
+                    # FIXME: (AA 2/15/23) This is a temporary workaround because of
+                    # XY encoder inaccuracy. We should remove this and move axes directly
+                    # to the home position when we fix the encoder issues.
+                    # Move to 20 mm away from the home position and then home
+                    target_pos[axis] += 20.00
+                    moves = self._build_moves(origin, target_pos)
+                    await self._backend.move(
+                        origin,
+                        moves[0],
+                        MoveStopCondition.none,
+                    )
                 await self._backend.home([axis])
         else:
             # both stepper and encoder positions are invalid, must home
@@ -1174,7 +1177,7 @@ class OT3API(
                         await self._home_axis(axis)
                 except ZeroLengthMoveError:
                     self._log.info(f"{axis} already at home position, skip homing")
-                    pass
+                    continue
                 except (MoveConditionNotMet, Exception):
                     self._log.exception("Homing failed")
                     self._current_position.clear()
