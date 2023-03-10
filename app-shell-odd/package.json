@@ -55,6 +55,7 @@
     "node-fetch": "2.6.0",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
+    "sd-notify": "2.8.0",
     "semver": "5.5.0",
     "tempy": "1.0.1",
     "uuid": "3.2.1",
