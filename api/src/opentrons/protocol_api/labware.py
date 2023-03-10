@@ -874,7 +874,12 @@ class Labware:
 
     @requires_version(2, 0)
     def reset(self) -> None:
-        """Reset all tips in a tiprack."""
+        """Reset all tips in a tip rack.
+
+        .. versionchanged:: 2.14
+            This method will raise an exception if you call it on a labware that isn't
+            a tip rack. Formerly, it would do nothing.
+        """
         self._core.reset_tips()
 
 
