@@ -91,6 +91,8 @@ class NetworkInfo:
             expected: Set of FirmwareTargets to expect
             timeout: time in seconds to wait for responses
         """
+        expected_can: Set[NodeId] = {}
+        expected_usb: Set[USBTarget] = {}
         if expected is not None:
             expected_can = {NodeId(target) for target in expected if target in NodeId}
             expected_usb = {
