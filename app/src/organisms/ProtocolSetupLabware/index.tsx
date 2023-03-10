@@ -404,7 +404,9 @@ function RowLabware({
         )
       : null
   const moduleInstructions = (
-    <StyledText>{setupTextTranslator('labware_latch_instructions')}</StyledText>
+    <StyledText color={COLORS.darkBlack_seventy}>
+      {setupTextTranslator('labware_latch_instructions')}
+    </StyledText>
   )
 
   let latchCommand:
@@ -471,7 +473,7 @@ function RowLabware({
         <StyledText fontSize="1.5rem" fontWeight="500">
           {getLabwareDisplayName(definition)}
         </StyledText>
-        <StyledText>{nickName}</StyledText>
+        <StyledText color={COLORS.darkBlack_seventy}>{nickName}</StyledText>
         {isOnHeaterShaker ? moduleInstructions : null}
       </Flex>
       {isOnHeaterShaker ? (
