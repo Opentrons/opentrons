@@ -39,7 +39,7 @@ import {
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/hooks'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
