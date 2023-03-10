@@ -68,7 +68,7 @@ const SELECTED_OPTIONS_STYLE = css`
 `
 const ON_DEVICE_UNSELECTED_OPTIONS_STYLE = css`
   background-color: #cccccc;
-  border-radius: 1rem;
+  border-radius: ${BORDERS.size_four};
   padding: ${SPACING.spacing5};
   margin-bottom: ${SPACING.spacing3};
   height: 5.25rem;

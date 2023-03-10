@@ -14,6 +14,7 @@ import {
   DIRECTION_ROW,
   Box,
   JUSTIFY_CENTER,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -32,7 +33,7 @@ interface RectProps {
 const BrightnessTile = styled(Box)`
   width: 5.875rem;
   height: 8.75rem;
-  border-radius: 8px;
+  border-radius: ${BORDERS.size_two};
   background: ${(props: RectProps) => (props.isActive ? '#9c3ba4' : '#E7C3E9')};
 `
 

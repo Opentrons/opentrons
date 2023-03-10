@@ -12,6 +12,7 @@ import {
   SPACING,
   COLORS,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -34,7 +35,7 @@ const SettingButton = styled.input`
 
 const SettingButtonLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing5};
-  border-radius: 16px;
+  border-radius: ${BORDERS.size_four};
   cursor: pointer;
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.blueEnabled : '#e0e0e0'};
