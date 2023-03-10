@@ -251,8 +251,8 @@ stages:
                   liquidId: 'waterId'
                   labwareId: 'sourcePlateId'
                   volumeByWell:
-                    A1: 100
-                    B1: 100
+                    A1: 33
+                    B1: 33
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
