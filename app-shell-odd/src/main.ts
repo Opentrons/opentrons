@@ -7,10 +7,12 @@ import { registerRobotLogs } from './robot-logs'
 import { registerUpdate, updateLatestVersion } from './update'
 import { registerRobotSystemUpdate } from './system-update'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import sdNotify from 'sd-notify'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
 
+sdNotify.sendStatus('starting app')
 const config = getConfig()
 const log = createLogger('main')
 
@@ -42,6 +44,7 @@ app.once('window-all-closed', () => {
 
 function startUp(): void {
   log.info('Starting App')
+  sdNotify.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
@@ -80,6 +83,11 @@ function startUp(): void {
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })
+
+  ipcMain.once('dispatch', () => {
+    sdNotify.sendStatus('started')
+    sdNotify.ready()
+  })
 }
 
 function createRendererLogger(): Logger {
