@@ -15,9 +15,10 @@ class GravimetricConfig:
     trials: int
     labware_offsets: List[dict]
     slot_vial: int
-    slot_tiprack: int
+    slots_tiprack: List[int]
     increment: bool
     low_volume: bool
+    return_tip: bool
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets"]

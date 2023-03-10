@@ -169,11 +169,15 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     run_id, start_time = create_run_id_and_start_time()
 
     # LOAD LABWARE
-    tiprack = ctx.load_labware(
-        f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
-        location=cfg.slot_tiprack,
-    )
-    tiprack.set_calibration(get_latest_offset_for_labware(cfg.labware_offsets, tiprack))
+    tipracks = [
+        ctx.load_labware(
+            f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
+            location=slot,
+        )
+        for slot in cfg.slots_tiprack
+    ]
+    for rack in tipracks:
+        rack.set_calibration(get_latest_offset_for_labware(cfg.labware_offsets, rack))
     vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_vial)
     vial.set_calibration(get_latest_offset_for_labware(cfg.labware_offsets, vial))
 
@@ -190,6 +194,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     )
     pipette.default_speed = config.GANTRY_MAX_SPEED
     pipette_tag = get_pipette_unique_name(pipette)
+
+    def _drop_tip() -> None:
+        if cfg.return_tip:
+            pipette.return_tip(home_after=False)
+        else:
+            pipette.drop_tip(home_after=False)
 
     # GET TEST VOLUMES
     if cfg.increment:
@@ -258,7 +268,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette.pick_up_tip()
     pipette.move_to(vial["A1"].bottom(expected_height))
     get_input("Check that tip is touching liquid surface (+/-) 0.1 mm")
-    pipette.drop_tip(home_after=False)
+    _drop_tip()
 
     try:
         total = len(test_volumes) * cfg.trials + config.NUM_BLANK_TRIALS
@@ -288,7 +298,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             )
             actual_asp_list.append(evap_aspirate)
             actual_disp_list.append(evap_dispense)
-            pipette.drop_tip(home_after=False)
+            _drop_tip()
 
         # CALCULATE AVERAGE EVAPORATION
         average_aspirate_evaporation_ul = sum(actual_asp_list) / len(actual_asp_list)
@@ -331,7 +341,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 report.store_trial(
                     test_report, trial, volume, aspirate_rectified, dispense_rectified
                 )
-                pipette.drop_tip(home_after=False)
+                _drop_tip()
 
             # CALCULATE AVERAGE, %CV, %D
             aspirate_average = sum(actual_asp_list) / len(actual_asp_list)

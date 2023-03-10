@@ -24,6 +24,7 @@ def run(
     trials: int,
     increment: bool,
     low_volume: bool,
+    return_tip: bool,
 ) -> None:
     """Run."""
     execute.run(
@@ -36,9 +37,10 @@ def run(
             trials=trials,
             labware_offsets=LABWARE_OFFSETS,
             slot_vial=SLOT_VIAL,
-            slot_tiprack=SLOTS_TIPRACK[tip_volume][0],
+            slots_tiprack=SLOTS_TIPRACK[tip_volume],
             increment=increment,
             low_volume=low_volume,
+            return_tip=return_tip,
         ),
     )
 
@@ -51,6 +53,7 @@ if __name__ == "__main__":
     parser.add_argument("--trials", type=int, required=True)
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--low-volume", action="store_true")
+    parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
@@ -63,4 +66,4 @@ if __name__ == "__main__":
         is_simulating=args.simulate,
         pipette_left=f"p{args.pipette}_single_v3.3",
     )
-    run(_ctx, args.pipette, args.tip, args.trials, args.increment, args.low_volume)
+    run(_ctx, args.pipette, args.tip, args.trials, args.increment, args.low_volume, args.return_tip)
