@@ -263,6 +263,7 @@ class OT3API(
         config: Union[OT3Config, RobotConfig, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        use_usb_bus: bool = False,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -271,6 +272,10 @@ class OT3API(
         else:
             checked_config = config
         backend = await OT3Controller.build(checked_config)
+
+        if use_usb_bus:
+            await backend.connect_usb_to_rear_panel()
+
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
 
