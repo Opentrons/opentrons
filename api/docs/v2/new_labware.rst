@@ -211,7 +211,7 @@ Let's examine how these two methods work. The following examples demonstrate how
 Defining Liquids
 ^^^^^^^^^^^^^^^^
 
-This example uses ``define_liquid`` to create two liquid objects and instantiates them with the variables ``greenWater`` and ``blueWater``, respectively. The arguments for ``define_liquid`` let you name the liquid, describe it, and assign it a color. This information shows up in the Opentrons app (v6.3 or higher) if you import your protocol into that system.
+This example uses ``define_liquid`` to create two liquid objects and instantiates them with the variables ``greenWater`` and ``blueWater``, respectively. The arguments for ``define_liquid`` let you name the liquid, describe it, and assign it a color.
 
 .. code-block:: python
 
