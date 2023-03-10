@@ -20,7 +20,6 @@ export const UnmountGripper = (
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const [showGripperStillDetected, setShowGripperStillDetected] = React.useState(false)
-  console.log('AG', attachedGripper)
   const handleContinue = (): void => {
     if (attachedGripper == null) {
       chainRunCommands([{ commandType: 'home' as const, params: {} }], true).then(() => {

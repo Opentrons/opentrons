@@ -12,17 +12,17 @@ describe('UnmountGripper', () => {
 
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
-  const mockChainRunCommands = jest.fn()
+  const mockChainRunCommands = jest.fn(() => Promise.resolve())
   const mockRunId = 'fakeRunId'
 
   beforeEach(() => {
-    render = (props = {}) => {
+    render = (props) => {
       return renderWithProviders(
         <UnmountGripper
           runId={mockRunId}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
           proceed={mockProceed}
-          attachedGripper={{}}
+          attachedGripper={props?.attachedGripper ?? null}
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
           goBack={mockGoBack}
@@ -37,9 +37,10 @@ describe('UnmountGripper', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking confirm proceed calls proceed', () => {
-    const { getByRole } = render()[0]
-    getByRole('button', { name: 'continue' }).click()
+  it('clicking confirm proceed calls home and proceed if gripper attached', async () => {
+    const { getByRole } = render({ attachedGripper: null })[0]
+    await getByRole('button', { name: 'continue' }).click()
+    expect(mockChainRunCommands).toHaveBeenCalledWith([{ commandType: 'home', params: {} }], true)
     expect(mockProceed).toHaveBeenCalled()
   })
 

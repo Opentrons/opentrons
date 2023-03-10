@@ -55,6 +55,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           },
           waitUntilComplete: true
         }).then(({ data }) => {
+          console.log('FIRst THEN')
           if (jaw === 'front' && data?.result?.jawOffset != null) {
             setFrontJawOffset(data.result.jawOffset)
           }

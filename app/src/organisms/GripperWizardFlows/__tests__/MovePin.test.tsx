@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 
 import { MovePin } from '../MovePin'
@@ -10,6 +11,7 @@ import {
   REMOVE_PIN_FROM_REAR_JAW,
   SECTIONS,
 } from '../constants'
+import type { CommandData } from '@opentrons/api-client'
 
 describe('MovePin', () => {
   let render: (
@@ -19,7 +21,7 @@ describe('MovePin', () => {
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
   const mockChainRunCommands = jest.fn()
-  const mockCreateRunCommand = jest.fn()
+  const mockCreateRunCommand = jest.fn(() => Promise.resolve({ data: {} } as CommandData))
   const mockSetFrontJawOffset = jest.fn()
   const mockRunId = 'fakeRunId'
 
@@ -31,7 +33,7 @@ describe('MovePin', () => {
           section={SECTIONS.MOVE_PIN}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
           proceed={mockProceed}
-          attachedGripper={{}}
+          attachedGripper={instrumentsResponseFixture.data[0]}
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
           goBack={mockGoBack}
@@ -76,7 +78,7 @@ describe('MovePin', () => {
     getByText('Stand Back, Gripper is Calibrating')
   })
 
-  it('renders correct text for move pin from front jaw to rear', () => {
+  it('renders correct text for move pin from front jaw to rear with correct callbacks', async () => {
     const { getByRole, getByText } = render({
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
@@ -84,7 +86,26 @@ describe('MovePin', () => {
     getByText(
       'Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw'
     )
-    getByRole('button', { name: 'continue' })
+    getByRole('button', { name: 'continue' }).click()
+
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+      command: { commandType: 'home', params: { axes: [] } },
+      waitUntilComplete: true
+    })
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      command: {
+        commandType: 'calibration/calibrateGripper', params: {
+          jaw: 'rear', otherJawOffset: { x: 0, y: 0, z: 0 }
+        }
+      },
+      waitUntilComplete: true
+    })
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      command: {
+        commandType: 'calibration/moveToMaintenancePosition', params: { mount: 'left' }
+      },
+      waitUntilComplete: true
+    })
   })
 
   it('renders correct loader for move pin from front jaw to rear', () => {
@@ -103,7 +124,8 @@ describe('MovePin', () => {
     getByText(
       'Take the calibration pin from the rear gripper jaw and return it to its storage location.'
     )
-    getByRole('button', { name: 'Complete calibration' })
+    getByRole('button', { name: 'Complete calibration' }).click()
+    expect(mockProceed).toHaveBeenCalled()
   })
 
   it('renders correct loader for remove pin from rear jaw', () => {
