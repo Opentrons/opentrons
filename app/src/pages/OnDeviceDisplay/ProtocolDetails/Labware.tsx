@@ -33,21 +33,22 @@ const TableHeader = styled('th')`
 
 const TableRow = styled('tr')`
   border: 1px ${COLORS.white} solid;
-  height: 4rem;
+  height: 4.75rem;
 `
 
 const TableDatum = styled('td')`
+  font-size: ${TYPOGRAPHY.fontSize22};
+  font-weight: ${TYPOGRAPHY.lineHeight28};
   padding: ${SPACING.spacing2};
   white-space: break-spaces;
   text-overflow: wrap;
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   &:first-child {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
   }
   &:last-child {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
   }
 `
 
@@ -73,13 +74,27 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
     <Table>
       <thead>
         <tr>
-          <TableHeader>{t('labware_name')}</TableHeader>
-          <TableHeader
-            style={{
-              textAlign: 'center',
-            }}
-          >
-            {t('quantity')}
+          <TableHeader>
+            <StyledText
+              color={COLORS.darkBlack_seventy}
+              fontSize={TYPOGRAPHY.fontSize20}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              lineHeight={TYPOGRAPHY.lineHeight24}
+              paddingLeft={SPACING.spacing5}
+            >
+              {t('labware_name')}
+            </StyledText>
+          </TableHeader>
+          <TableHeader>
+            <StyledText
+              color={COLORS.darkBlack_seventy}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              fontSize={TYPOGRAPHY.fontSize20}
+              lineHeight={TYPOGRAPHY.lineHeight24}
+              textAlign={TYPOGRAPHY.textAlignCenter}
+            >
+              {t('quantity')}
+            </StyledText>
           </TableHeader>
         </tr>
       </thead>
@@ -96,20 +111,29 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               }}
             >
               <TableDatum>
-                <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+                <Flex
+                  flexDirection={DIRECTION_ROW}
+                  paddingLeft={SPACING.spacing5}
+                >
                   {definition?.namespace === 'opentrons' ? (
                     <Icon
                       color={COLORS.blueEnabled}
                       name="check-decagram"
-                      height="0.75rem"
-                      minHeight="0.75rem"
-                      minWidth="0.75rem"
+                      height="1.77125rem"
+                      minHeight="1.77125rem"
+                      minWidth="1.77125rem"
                       marginRight={SPACING.spacing3}
                     />
                   ) : (
                     <Flex marginLeft={SPACING.spacingM} />
                   )}
-                  <StyledText as="p">{name}</StyledText>
+                  <StyledText
+                    alignItems={ALIGN_CENTER}
+                    color={COLORS.darkBlack_hundred}
+                    lineHeight={TYPOGRAPHY.lineHeight28}
+                  >
+                    {name}
+                  </StyledText>
                 </Flex>
               </TableDatum>
               <TableDatum
@@ -117,7 +141,12 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   textAlign: 'center',
                 }}
               >
-                <StyledText as="p" alignSelf={TYPOGRAPHY.textAlignCenter}>
+                <StyledText
+                  alignItems={ALIGN_CENTER}
+                  color={COLORS.darkBlack_hundred}
+                  lineHeight={TYPOGRAPHY.lineHeight28}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
+                >
                   {count}
                 </StyledText>
               </TableDatum>
