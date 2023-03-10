@@ -1,11 +1,10 @@
 import asyncio
 from textwrap import dedent
-from typing import Any, Generator, AsyncGenerator
+from typing import Any, AsyncGenerator
 
 import anyio
 import pytest
 
-from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
 
@@ -16,7 +15,6 @@ SLOT = "1"
 
 RUN_POLL_INTERVAL = 0.01
 RUN_POLL_TIMEOUT = 10
-PORT = "15555"
 
 
 def generate_protocol_contents(
@@ -51,21 +49,14 @@ async def poll_until_run_succeeds(robot_client: RobotClient, run_id: str) -> Any
             await asyncio.sleep(RUN_POLL_INTERVAL)
 
 
-# TODO(mm, 2023-03-03): This unnecessarily adds 5-10 seconds to the test suite.
-# See RSS-195.
-@pytest.fixture(scope="module")
-def dev_server() -> Generator[DevServer, None, None]:
-    """Return a running dev server."""
-    with DevServer(port=PORT) as dev_server:
-        dev_server.start()
-        yield dev_server
-
-
 @pytest.fixture
-async def robot_client(dev_server: DevServer) -> AsyncGenerator[RobotClient, None]:
+async def robot_client(
+    session_server_host: str,
+    session_server_port: str,
+) -> AsyncGenerator[RobotClient, None]:
     """Return a client for a running dev server."""
     async with RobotClient.make(
-        host="http://localhost", port=dev_server.port, version="*"
+        host=session_server_host, port=session_server_port, version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_alive()

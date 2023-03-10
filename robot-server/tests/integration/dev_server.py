@@ -12,6 +12,7 @@ class DevServer:
     def __init__(
         self,
         port: str = "31950",
+        ot_api_config_dir: Optional[Path] = None,
         persistence_directory: Optional[Path] = None,
         maximum_runs: Optional[int] = None,
         maximum_unused_protocols: Optional[int] = None,
@@ -19,7 +20,11 @@ class DevServer:
         """Initialize a dev server."""
         self.port: str = port
 
-        self.server_temp_directory: str = tempfile.mkdtemp()
+        self.ot_api_config_dir: Path = (
+            ot_api_config_dir
+            if ot_api_config_dir is not None
+            else Path(tempfile.mkdtemp())
+        )
         self.persistence_directory: Path = (
             persistence_directory
             if persistence_directory is not None
@@ -46,7 +51,7 @@ class DevServer:
         # not have any side effects.
         env = {
             "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
-            "OT_API_CONFIG_DIR": self.server_temp_directory,
+            "OT_API_CONFIG_DIR": str(self.ot_api_config_dir),
             "OT_ROBOT_SERVER_persistence_directory": str(self.persistence_directory),
         }
         if self.maximum_runs is not None:
