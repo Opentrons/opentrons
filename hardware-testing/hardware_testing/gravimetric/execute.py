@@ -176,9 +176,19 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         )
         for slot in cfg.slots_tiprack
     ]
+    rack_offsets = {
+        rack: get_latest_offset_for_labware(cfg.labware_offsets, rack)
+        for rack in tipracks
+    }
+    print("Labware Offsets:")
+    for rack, offset in rack_offsets.items():
+        print(f"\t{rack.name} (slot={rack.parent}): {offset}")
+    if not ctx.is_simulating():
+        input("press ENTER to continue")
     for rack in tipracks:
-        rack.set_calibration(get_latest_offset_for_labware(cfg.labware_offsets, rack))
+        rack.set_calibration(rack_offsets[rack])
     vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_vial)
+    # FIXME: a bug in the App is blocking calibrating this labware using LPC
     vial.set_calibration(Point(x=0.0, y=-54.001, z=-40.792))
 
     # LIQUID TRACKING
@@ -239,7 +249,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     )
     if recorder.is_simulator:
         recorder.scale.set_simulation_mass(max(test_volumes) * 2)
-    recorder.record(in_thread=True)
 
     # CREATE CSV TEST REPORT
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
@@ -270,6 +279,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     get_input("Check that tip is touching liquid surface (+/-) 0.1 mm")
     _drop_tip()
 
+    recorder.record(in_thread=True)
+
     try:
         total = len(test_volumes) * cfg.trials + config.NUM_BLANK_TRIALS
         count = 0
@@ -279,6 +290,10 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         actual_disp_list: List[float] = list()
         for trial in range(config.NUM_BLANK_TRIALS):
             count += 1
+            if cfg.skip_blank:
+                actual_asp_list.append(0.0)
+                actual_disp_list.append(0.0)
+                continue
             print(
                 f"{count}/{total}: blank (trial {trial + 1}/{config.NUM_BLANK_TRIALS})"
             )

@@ -49,7 +49,7 @@ class MeasurementType(str, Enum):
 
 
 DELAY_FOR_MEASUREMENT = 10
-MIN_DURATION_STABLE_SEGMENT = 3
+MIN_DURATION_STABLE_SEGMENT = 1
 
 
 @dataclass
