@@ -12,8 +12,8 @@ import { BODY_STYLE } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
 interface MountPipetteProps extends PipetteWizardStepProps {
-  isPending: boolean
-  setPending: React.Dispatch<React.SetStateAction<boolean>>
+  isFetching: boolean
+  setFetching: React.Dispatch<React.SetStateAction<boolean>>
 }
 const BACKGROUND_SIZE = '47rem'
 
@@ -22,8 +22,8 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
     proceed,
     goBack,
     selectedPipette,
-    isPending,
-    setPending,
+    isFetching,
+    setFetching,
     isOnDevice,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
@@ -36,7 +36,7 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
     />
   )
   let bodyText: React.ReactNode = <div></div>
-  if (isPending) {
+  if (isFetching) {
     bodyText = (
       <>
         {bodyTextSkeleton}
@@ -54,7 +54,7 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   return (
     <GenericWizardTile
       header={
-        isPending ? (
+        isFetching ? (
           <Skeleton
             width="17rem"
             height="1.75rem"
@@ -69,7 +69,7 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
         )
       }
       rightHandBody={
-        isPending ? (
+        isFetching ? (
           <Skeleton
             width="10.6875rem"
             height="15.5rem"
@@ -92,15 +92,14 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
         )
       }
       bodyText={bodyText}
-      backIsDisabled={isPending}
+      backIsDisabled={isFetching}
       back={goBack}
       proceedButton={
         <CheckPipetteButton
           isOnDevice={isOnDevice}
-          isDisabled={isPending}
           proceed={proceed}
           proceedButtonText={t('continue')}
-          setPending={setPending}
+          setFetching={setFetching}
         />
       }
     />

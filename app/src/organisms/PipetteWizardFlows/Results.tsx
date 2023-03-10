@@ -17,6 +17,8 @@ interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void
   currentStepIndex: number
   totalStepCount: number
+  isFetching: boolean
+  setFetching: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
@@ -30,11 +32,11 @@ export const Results = (props: ResultsProps): JSX.Element => {
     totalStepCount,
     selectedPipette,
     isOnDevice,
+    isFetching,
+    setFetching,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
-  const [isPending, setPending] = React.useState(false)
-
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
@@ -112,7 +114,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           <SecondaryButton
             onClick={handleCleanUpAndClose}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            disabled={isPending}
+            disabled={isFetching}
             aria-label="Results_errorExit"
             marginRight={SPACING.spacing2}
           >
@@ -124,8 +126,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           proceedButtonText={t(
             flowType === FLOWS.ATTACH ? 'try_again' : 'attach_and_retry'
           )}
-          isDisabled={isPending}
-          setPending={setPending}
+          setFetching={setFetching}
           isOnDevice={isOnDevice}
         />
       </>
@@ -138,7 +139,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       header={header}
       isSuccess={isSuccess}
       subHeader={subHeader}
-      isPending={isPending}
+      isPending={isFetching}
     >
       {button}
     </SimpleWizardBody>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { act, fireEvent } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -54,6 +54,8 @@ describe('Results', () => {
       currentStepIndex: 2,
       totalStepCount: 6,
       isOnDevice: false,
+      isFetching: false,
+      setFetching: jest.fn(),
     }
     pipettePromise = Promise.resolve()
     mockRefetchPipette = jest.fn(() => pipettePromise)
@@ -127,6 +129,26 @@ describe('Results', () => {
       `color: ${String(COLORS.errorEnabled)}`
     )
     getByRole('button', { name: 'Attach and retry' })
+  })
+  it('renders the error exit as disabled when is Fetching is true', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.DETACH,
+      isFetching: true,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button', { name: 'Results_errorExit' })).toBeDisabled()
+  })
+  it('does not render error exit when is on device', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.DETACH,
+      isOnDevice: true,
+      isFetching: true,
+    }
+    expect(
+      screen.queryByRole('button', { name: 'Results_errorExit' })
+    ).not.toBeInTheDocument()
   })
   it('renders the correct information when pipette wizard is a fail for 96 channel attach flow and gantry not empty', async () => {
     props = {

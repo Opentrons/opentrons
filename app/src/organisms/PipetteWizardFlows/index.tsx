@@ -244,6 +244,8 @@ export const PipetteWizardFlows = (
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
@@ -254,8 +256,8 @@ export const PipetteWizardFlows = (
       <MountPipette
         {...currentStep}
         {...calibrateBaseProps}
-        isPending={isFetchingPipettes}
-        setPending={setIsFetchingPipettes}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
@@ -264,8 +266,8 @@ export const PipetteWizardFlows = (
       <DetachPipette
         {...currentStep}
         {...calibrateBaseProps}
-        isPending={isFetchingPipettes}
-        setPending={setIsFetchingPipettes}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
       />
     )
     if (showConfirmExit) {
