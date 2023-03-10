@@ -1,9 +1,11 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
+  Flex,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
@@ -43,12 +45,13 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
     >
       {isOnDevice ? (
         <>
-          <SmallButton
-            onClick={proceed}
-            marginRight={SPACING.spacing3}
-            buttonText={t('shared:exit')}
-            buttonType="alert"
-          />
+          <Flex marginRight={SPACING.spacing3}>
+            <SmallButton
+              onClick={proceed}
+              buttonText={capitalize(t('shared:exit'))}
+              buttonType="alert"
+            />
+          </Flex>
           <SmallButton
             buttonText={t('shared:go_back')}
             buttonType="default"

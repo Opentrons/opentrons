@@ -41,21 +41,21 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     alt: {
       defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: COLORS.foundationalBlue,
-      activeBackgroundColor: '#94b0d5',
+      activeBackgroundColor: COLORS.foundationalBlue_darkBlackEnabled_20,
       disabledBackgroundColor: `${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`,
       disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
     },
     alert: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.errorEnabled,
-      activeBackgroundColor: '#b01f22',
+      activeBackgroundColor: COLORS.errorEnabled_darkBlackEnabled_20,
       disabledBackgroundColor: `${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`,
       disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
     },
     default: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blueEnabled,
-      activeBackgroundColor: '#045dd1',
+      activeBackgroundColor: COLORS.blueEnabled_darkBlackEnabled_20,
       disabledBackgroundColor: `${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`,
       disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
     },
@@ -89,7 +89,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     ${TYPOGRAPHY.pSemiBold}
 
     ${styleProps}
-  &:focus {
+    &:focus {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
       box-shadow: none;

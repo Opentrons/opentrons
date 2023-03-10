@@ -1,4 +1,5 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
 import { AlertPrimaryButton } from '../../atoms/buttons'
@@ -23,7 +24,7 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
       {isOnDevice ? (
         <SmallButton
           onClick={goBack}
-          buttonText={t('shared:return')}
+          buttonText={capitalize(t('shared:return'))}
           buttonType="alert"
         />
       ) : (

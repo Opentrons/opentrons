@@ -139,3 +139,8 @@ export const red_one = errorText
 export const red_two = '#e31e1e'
 export const red_three = '#fbcdcd'
 // export const red_four = errorText
+
+// touchscreen overlay colors
+export const blueEnabled_darkBlackEnabled_20 = '#2160ca'
+export const foundationalBlue_darkBlackEnabled_20 = '#99b1d2'
+export const errorEnabled_darkBlackEnabled_20 = '#ab302a'
