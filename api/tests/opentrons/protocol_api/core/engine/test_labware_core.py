@@ -246,6 +246,9 @@ def test_reset_tips(
         LabwareDefinition.construct(  # type: ignore[call-arg]
             ordering=[],
             parameters=LabwareDefinitionParameters.construct(isTiprack=False),  # type: ignore[call-arg]
+            metadata=LabwareDefinitionMetadata.construct(  # type: ignore[call-arg]
+                displayName="Cool Display Name"
+            ),
         )
     ],
 )
@@ -253,7 +256,7 @@ def test_reset_tips_raises_if_not_tip_rack(
     decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
 ) -> None:
     """It should raise an exception if the labware isn't a tip rack."""
-    with pytest.raises(TypeError, match="not a tip rack"):
+    with pytest.raises(TypeError, match="Cool Display Name is not a tip rack"):
         subject.reset_tips()
 
 
