@@ -467,7 +467,7 @@ class OT3Controller:
             if ax in OT3Axis.pipette_axes()
         }
         velocities_pipette = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            ax: -1 * 20
             for ax in axes
             if ax in OT3Axis.pipette_axes()
         }
@@ -496,7 +496,7 @@ class OT3Controller:
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
         velocities_gantry = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            ax: -1 * 50
             for ax in axes
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
@@ -506,7 +506,7 @@ class OT3Controller:
             if ax in OT3Axis.mount_axes()
         }
         velocities_z = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            ax: -1 * 20
             for ax in axes
             if ax in OT3Axis.mount_axes()
         }

@@ -102,18 +102,18 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 100,
+        OT3AxisKind.X: 500,
+        OT3AxisKind.Y: 500,
+        OT3AxisKind.Z: 50,
         OT3AxisKind.P: 10,
         OT3AxisKind.Z_G: 20,
         OT3AxisKind.Q: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 100,
-        OT3AxisKind.P: 50,
+        OT3AxisKind.X: 500,
+        OT3AxisKind.Y: 500,
+        OT3AxisKind.Z: 50,
+        OT3AxisKind.P: 20,
         OT3AxisKind.Z_G: 20,
     },
 )
@@ -122,19 +122,19 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 10,
-        OT3AxisKind.P: 10,
-        OT3AxisKind.Z_G: 10,
+        OT3AxisKind.X: 1,
+        OT3AxisKind.Y: 1,
+        OT3AxisKind.Z: 1,
+        OT3AxisKind.P: 1,
+        OT3AxisKind.Z_G: 1,
         OT3AxisKind.Q: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 10,
-        OT3AxisKind.P: 10,
-        OT3AxisKind.Z_G: 10,
+        OT3AxisKind.X: 1,
+        OT3AxisKind.Y: 1,
+        OT3AxisKind.Z: 1,
+        OT3AxisKind.P: 1,
+        OT3AxisKind.Z_G: 1,
     },
 )
 
@@ -142,19 +142,19 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 5,
-        OT3AxisKind.Y: 5,
-        OT3AxisKind.Z: 5,
-        OT3AxisKind.P: 5,
-        OT3AxisKind.Q: 5,
-        OT3AxisKind.Z_G: 5,
+        OT3AxisKind.X: 1,
+        OT3AxisKind.Y: 1,
+        OT3AxisKind.Z: 1,
+        OT3AxisKind.P: 1,
+        OT3AxisKind.Q: 1,
+        OT3AxisKind.Z_G: 1,
     },
     low_throughput={
-        OT3AxisKind.X: 5,
-        OT3AxisKind.Y: 5,
-        OT3AxisKind.Z: 5,
-        OT3AxisKind.P: 5,
-        OT3AxisKind.Z_G: 5,
+        OT3AxisKind.X: 1,
+        OT3AxisKind.Y: 1,
+        OT3AxisKind.Z: 1,
+        OT3AxisKind.P: 1,
+        OT3AxisKind.Z_G: 1,
     },
 )
 
