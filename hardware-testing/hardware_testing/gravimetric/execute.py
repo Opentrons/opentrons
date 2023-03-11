@@ -5,7 +5,7 @@ from typing import Optional, Tuple, List
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
 from hardware_testing.data import create_run_id_and_start_time
-from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from . import report
@@ -124,15 +124,18 @@ def _apply_labware_offsets(cfg: config.GravimetricConfig, tip_racks: List[Labwar
 def _jog_to_find_liquid_height(ctx: ProtocolContext, pipette: InstrumentContext, well: Well) -> float:
     _well_depth = well.depth
     _liquid_height = _well_depth
+    _jog_size = -1.0
     while not ctx.is_simulating():
         pipette.move_to(well.bottom(_liquid_height))
-        inp = input(f"height={_liquid_height}: type new height, or just ENTER to save: ")
-        if not inp:
-            break
-        try:
-            _liquid_height = min(max(float(inp), _well_depth - 20), _well_depth)
-        except ValueError:
-            pass
+        inp = input(f"height={_liquid_height}: ENTER to jog {_jog_size} mm, or enter new jog size, or \"yes\" to save: ")
+        if inp:
+            if inp[0] == "y":
+                break
+            try:
+                _jog_size = min(max(float(inp), -1.0), 1.0)
+            except ValueError:
+                continue
+        _liquid_height = min(max(_liquid_height + _jog_size, _well_depth - 20), _well_depth)
     return _liquid_height
 
 
@@ -293,17 +296,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         liquid="None",
     )
 
-    # USER SETUP LIQUIDS
-    setup_str = liquid_tracker.get_setup_instructions_string()
-    print(setup_str)
-    get_input("press ENTER when ready...")
-
     # HOME
     ctx.home()
 
     # TEST VIAL LIQUID HEIGHT
     pipette.pick_up_tip()
-    get_input("Check that tip is touching liquid surface (+/-) 0.1 mm")
     _liquid_height = _jog_to_find_liquid_height(ctx, pipette, vial["A1"])
     liquid_tracker.set_start_volume_from_liquid_height(
         vial["A1"], _liquid_height, name="Water"
@@ -416,6 +413,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             )
     finally:
         recorder.stop()
+        recorder.deactivate()  # stop the server
     print("\nRESULTS:")
     for vol in test_volumes:
         print(f"  * {vol}:")

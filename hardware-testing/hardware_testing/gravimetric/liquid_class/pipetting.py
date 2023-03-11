@@ -121,10 +121,12 @@ def _pipette_with_liquid_settings(
     def _aspirate_on_submerge() -> None:
         # mix 5x times
         callbacks.on_mixing()
-        for _ in range(config.NUM_MIXES_BEFORE_ASPIRATE):
+        for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
+            print(f"mixing {i + 1}/{config.NUM_MIXES_BEFORE_ASPIRATE}")
             pipette.aspirate(aspirate)
             pipette.dispense(aspirate)
         # aspirate specified volume
+        print(f"aspirate: {aspirate}")
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
         # update liquid-height tracker
@@ -151,6 +153,8 @@ def _pipette_with_liquid_settings(
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
         callbacks.on_dispensing()
+        print(f"dispense: {dispense}")
+        print(f"blow-out: {liquid_class.aspirate.air_gap.leading_air_gap}")
         hw_api.blow_out(hw_mount, liquid_class.aspirate.air_gap.leading_air_gap)
         pipette.flow_rate.blow_out = old_blow_out_flow_rate
         # update liquid-height tracker
@@ -160,6 +164,7 @@ def _pipette_with_liquid_settings(
 
     def _dispense_on_retract() -> None:
         # blow-out any remaining air in pipette (any reason why not?)
+        print("blow-out: remaining")
         callbacks.on_blowing_out()
         pipette.blow_out()
 

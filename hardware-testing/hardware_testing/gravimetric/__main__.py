@@ -4,7 +4,7 @@ from typing import List
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.protocols.gravimetric_lpc_ot3 import (
+from hardware_testing.protocols.gravimetric_ot3 import (
     SLOTS_TIPRACK,
     SLOT_VIAL,
     metadata,
@@ -63,6 +63,9 @@ if __name__ == "__main__":
         # getting labware offsets must be done before creating the protocol context
         # because it requires the robot-server to be running
         for offset in workarounds.http_get_all_labware_offsets():
+            print(f"{offset['createdAt']}:")
+            print(f"\t{offset['definitionUri']}")
+            print(f"\t{offset['vector']}")
             LABWARE_OFFSETS.append(offset)
     _ctx = helpers.get_api_context(
         requirements["apiLevel"],

@@ -10,8 +10,8 @@ from .definition import (
 )
 
 # dispense settings are constant across volumes
-_dispense_default_submerge_mm = 1.0
-_dispense_default_retract_mm = 1.0
+_dispense_default_submerge_mm = 2.0
+_dispense_default_retract_mm = 2.0
 _dispense_defaults = {
     50: {  # P50
         50: DispenseSettings(  # T50

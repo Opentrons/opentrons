@@ -138,6 +138,9 @@ push-ot3: push-no-restart-ot3 restart-ot3
 .PHONY: push-all
 push-all: clean wheel push-no-restart push-plot-webpage
 
+.PHONY: push-all-ot3
+push-all-ot3: push-ot3 push-plot-webpage-ot3
+
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
@@ -186,7 +189,7 @@ sync-sw-ot3:
 	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../shared-data && $(MAKE) all push-no-restart-ot3 host=$(host)
-	cd ../hardware-testing && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../hardware-testing && $(MAKE) push-all-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:

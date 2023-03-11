@@ -17,6 +17,9 @@ from .scale import Scale
 SLEEP_TIME_IN_RECORD_LOOP = 0.05
 SLEEP_TIME_IN_RECORD_LOOP_SIMULATING = 0.01
 
+SERVER_PORT = 8080
+SERVER_CMD = "{0} -m hardware_testing.tools.plot --test-name gravimetric-ot3 --port {1}"
+
 
 @dataclass
 class GravimetricSample:

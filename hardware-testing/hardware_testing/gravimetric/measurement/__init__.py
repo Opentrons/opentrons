@@ -48,7 +48,7 @@ class MeasurementType(str, Enum):
     DISPENSE = "measure-dispense"
 
 
-DELAY_FOR_MEASUREMENT = 10
+DELAY_FOR_MEASUREMENT = 20
 MIN_DURATION_STABLE_SEGMENT = 1
 
 
