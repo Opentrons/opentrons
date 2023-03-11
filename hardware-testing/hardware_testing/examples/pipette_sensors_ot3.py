@@ -18,7 +18,9 @@ async def _main(is_simulating: bool) -> None:
         for mount in pip_mounts:
             pascals = await helpers_ot3.get_pressure_ot3(api, mount)
             pico_farads = await helpers_ot3.get_capacitance_ot3(api, mount)
-            celsius, humidity = await helpers_ot3.get_temperature_humidity_ot3(api, mount)
+            celsius, humidity = await helpers_ot3.get_temperature_humidity_ot3(
+                api, mount
+            )
             print(
                 f"-----\n"
                 f"{mount.name}:\n"

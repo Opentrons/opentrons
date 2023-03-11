@@ -71,6 +71,7 @@ class CSVLine:
 
     @property
     def data(self) -> List[Any]:
+        """Data."""
         return self._data
 
     @property

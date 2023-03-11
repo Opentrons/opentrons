@@ -1,14 +1,9 @@
 """Gravimetric OT3."""
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {
-    "protocolName": "gravimetric-ot3"
-}
+metadata = {"protocolName": "gravimetric-ot3"}
 # FIXME: bump to v2.14 to utilize protocol engine
-requirements = {
-    'robotType': 'OT-3',
-    'apiLevel': '2.13'
-}
+requirements = {"robotType": "OT-3", "apiLevel": "2.13"}
 
 SLOT_VIAL = 4
 SLOTS_TIPRACK = {

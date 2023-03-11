@@ -6,9 +6,16 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 
 
-async def _main(is_simulating: bool, mount: types.OT3Mount, slot: int, labware: str, tiprack_slot: int) -> None:
+async def _main(
+    is_simulating: bool,
+    mount: types.OT3Mount,
+    slot: int,
+    labware: str,
+    tiprack_slot: int,
+) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=is_simulating, pipette_left="1000_single_v3.3")
+        is_simulating=is_simulating, pipette_left="1000_single_v3.3"
+    )
     expected_pos = helpers_ot3.get_theoretical_a1_position(slot, labware)
     print(labware)
     print(f"expected A1 position in slot #{slot}: {expected_pos}")
@@ -16,7 +23,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount, slot: int, labware: 
     await api.home()
     home_pos = await api.gantry_position(mount)
     print(f"moving to tiprack in slot {tiprack_slot}")
-    tiprack_pos = helpers_ot3.get_theoretical_a1_position(tiprack_slot, "opentrons_ot3_96_tiprack_50ul")
+    tiprack_pos = helpers_ot3.get_theoretical_a1_position(
+        tiprack_slot, "opentrons_ot3_96_tiprack_50ul"
+    )
     await helpers_ot3.move_to_arched_ot3(api, mount, tiprack_pos)
     await helpers_ot3.jog_mount_ot3(api, mount)
     tiprack_pos = await api.gantry_position(mount)
@@ -43,4 +52,6 @@ if __name__ == "__main__":
         _mount = types.OT3Mount.LEFT
     else:
         _mount = types.OT3Mount.RIGHT
-    asyncio.run(_main(args.simulate, _mount, args.slot, args.labware, args.tiprack_slot))
+    asyncio.run(
+        _main(args.simulate, _mount, args.slot, args.labware, args.tiprack_slot)
+    )

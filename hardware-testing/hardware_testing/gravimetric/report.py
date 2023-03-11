@@ -189,14 +189,16 @@ def store_volume(
     report("VOLUMES", f"volume-{mode}-{vol_in_tag}-d", [round(d * 100.0, 2)])
 
 
-def get_volume_results(report: CSVReport, mode: str, volume: float) -> Tuple[float, float, float]:
+def get_volume_results(
+    report: CSVReport, mode: str, volume: float
+) -> Tuple[float, float, float]:
     """Get volume results."""
     assert mode in ["aspirate", "dispense"]
     vol_in_tag = str(round(volume, 2))
-    average = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-average"].data[0]
-    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-cv"].data[0]
-    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-d"].data[0]
-    return average, cv, d
+    average = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-average"]
+    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-cv"]
+    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-d"]
+    return average.data[0], cv.data[0], d.data[0]  # type: ignore[union-attr]
 
 
 def store_trial(

@@ -106,7 +106,9 @@ def _get_volumes(cfg: config.GravimetricConfig) -> List[float]:
     return test_volumes
 
 
-def _apply_labware_offsets(cfg: config.GravimetricConfig, tip_racks: List[Labware], vial: Labware) -> None:
+def _apply_labware_offsets(
+    cfg: config.GravimetricConfig, tip_racks: List[Labware], vial: Labware
+) -> None:
     vial_offset = get_latest_offset_for_labware(cfg.labware_offsets, vial)
     rack_offsets = {
         rack: get_latest_offset_for_labware(cfg.labware_offsets, rack)
@@ -121,13 +123,18 @@ def _apply_labware_offsets(cfg: config.GravimetricConfig, tip_racks: List[Labwar
     vial.set_calibration(vial_offset)
 
 
-def _jog_to_find_liquid_height(ctx: ProtocolContext, pipette: InstrumentContext, well: Well) -> float:
+def _jog_to_find_liquid_height(
+    ctx: ProtocolContext, pipette: InstrumentContext, well: Well
+) -> float:
     _well_depth = well.depth
     _liquid_height = _well_depth
     _jog_size = -1.0
     while not ctx.is_simulating():
         pipette.move_to(well.bottom(_liquid_height))
-        inp = input(f"height={_liquid_height}: ENTER to jog {_jog_size} mm, or enter new jog size, or \"yes\" to save: ")
+        inp = input(
+            f"height={_liquid_height}: ENTER to jog {_jog_size} mm, "
+            f'or enter new jog size, or "yes" to save: '
+        )
         if inp:
             if inp[0] == "y":
                 break
@@ -135,7 +142,9 @@ def _jog_to_find_liquid_height(ctx: ProtocolContext, pipette: InstrumentContext,
                 _jog_size = min(max(float(inp), -1.0), 1.0)
             except ValueError:
                 continue
-        _liquid_height = min(max(_liquid_height + _jog_size, _well_depth - 20), _well_depth)
+        _liquid_height = min(
+            max(_liquid_height + _jog_size, _well_depth - 20), _well_depth
+        )
     return _liquid_height
 
 
@@ -215,10 +224,6 @@ def _run_trial(
 
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
-    if ctx.is_simulating():
-        get_input = print
-    else:
-        get_input = input  # type: ignore[assignment]
     run_id, start_time = create_run_id_and_start_time()
 
     # LOAD LABWARE

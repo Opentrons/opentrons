@@ -68,12 +68,16 @@ class CalcTypeCylinder(CalcType):
 
     def height_from_volume(self, volume: float) -> float:
         """Calculate the liquid height given a volume."""
-        assert 0 <= volume <= self.max_volume(), f"Volume {volume} is out of range {self.max_volume()}"
+        assert (
+            0 <= volume <= self.max_volume()
+        ), f"Volume {volume} is out of range {self.max_volume()}"
         return (volume / self.max_volume()) * self.depth
 
     def volume_from_height(self, height: float) -> float:
         """Calculate the liquid volume given a height."""
-        assert 0 <= height <= self.depth, f"Height {height} is out of range {self.depth}"
+        assert (
+            0 <= height <= self.depth
+        ), f"Height {height} is out of range {self.depth}"
         return (height / self.depth) * self.max_volume()
 
 

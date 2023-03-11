@@ -72,4 +72,13 @@ if __name__ == "__main__":
         is_simulating=args.simulate,
         pipette_left=f"p{args.pipette}_single_v3.3",
     )
-    run(_ctx, args.pipette, args.tip, args.trials, args.increment, args.low_volume, args.return_tip, args.skip_blank)
+    run(
+        _ctx,
+        args.pipette,
+        args.tip,
+        args.trials,
+        args.increment,
+        args.low_volume,
+        args.return_tip,
+        args.skip_blank,
+    )
