@@ -1,8 +1,8 @@
-"""Gravimetric LPC OT3."""
+"""Gravimetric OT3."""
 from opentrons.protocol_api import ProtocolContext
 
 metadata = {
-    "protocolName": "gravimetric-lpc-ot3"
+    "protocolName": "gravimetric-ot3"
 }
 # FIXME: bump to v2.14 to utilize protocol engine
 requirements = {
