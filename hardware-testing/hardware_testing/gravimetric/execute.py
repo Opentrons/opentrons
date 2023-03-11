@@ -416,3 +416,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             )
     finally:
         recorder.stop()
+    print("\nRESULTS:")
+    for vol in test_volumes:
+        print(f"  * {vol}:")
+        for mode in ["aspirate", "dispense"]:
+            avg, cv, d = report.get_volume_results(test_report, mode, vol)
+            print(f"    - {mode}:")
+            print(f"        avg: {avg}ul")
+            print(f"        cv:  {cv}%")
+            print(f"        d:   {d}%")

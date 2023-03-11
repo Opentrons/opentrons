@@ -70,6 +70,10 @@ class CSVLine:
         return f"{_elapsed},{full_str}"
 
     @property
+    def data(self) -> List[Any]:
+        return self._data
+
+    @property
     def tag(self) -> str:
         """Line tag."""
         return self._tag

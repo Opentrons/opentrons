@@ -71,8 +71,12 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
+.PHONY: test-gravimetric
+test-gravimetric:
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3
+
 .PHONY: test-integration
-test-integration:
+test-integration: test-gravimetric
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3
 	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate

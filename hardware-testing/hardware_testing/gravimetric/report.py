@@ -1,7 +1,7 @@
 """Report."""
 from dataclasses import fields
 from enum import Enum
-from typing import List
+from typing import List, Tuple
 
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -184,9 +184,19 @@ def store_volume(
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
     vol_in_tag = str(round(volume, 2))
-    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-average", [average])
-    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-cv", [cv])  # convert to percentage
-    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-d", [d])
+    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-average", [round(average, 2)])
+    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-cv", [round(cv * 100.0, 2)])
+    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-d", [round(d * 100.0, 2)])
+
+
+def get_volume_results(report: CSVReport, mode: str, volume: float) -> Tuple[float, float, float]:
+    """Get volume results."""
+    assert mode in ["aspirate", "dispense"]
+    vol_in_tag = str(round(volume, 2))
+    average = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-average"].data[0]
+    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-cv"].data[0]
+    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-d"].data[0]
+    return average, cv, d
 
 
 def store_trial(
