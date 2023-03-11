@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_ROW,
   Flex,
@@ -22,7 +23,7 @@ const Table = styled('table')`
   width: 100%;
   border-spacing: 0 ${SPACING.spacing2};
   margin: ${SPACING.spacing4} 0;
-  text-align: left;
+  text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -43,12 +44,12 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: wrap;
   &:first-child {
-    border-top-left-radius: 16px;
-    border-bottom-left-radius: 16px;
+    border-top-left-radius: ${BORDERS.size_four};
+    border-bottom-left-radius: ${BORDERS.size_four};
   }
   &:last-child {
-    border-top-right-radius: 16px;
-    border-bottom-right-radius: 16px;
+    border-top-right-radius: ${BORDERS.size_four};
+    border-bottom-right-radius: ${BORDERS.size_four};
   }
 `
 
@@ -136,11 +137,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   </StyledText>
                 </Flex>
               </TableDatum>
-              <TableDatum
-                style={{
-                  textAlign: 'center',
-                }}
-              >
+              <TableDatum>
                 <StyledText
                   alignItems={ALIGN_CENTER}
                   color={COLORS.darkBlack_hundred}
