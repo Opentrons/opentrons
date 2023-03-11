@@ -2,7 +2,7 @@
 from statistics import stdev
 from typing import Optional, Tuple, List
 
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well
+from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
 from hardware_testing.data import create_run_id_and_start_time
 from hardware_testing.opentrons_api.types import OT3Mount, Point
@@ -89,6 +89,53 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     )
 
 
+def _get_volumes(cfg: config.GravimetricConfig) -> List[float]:
+    if cfg.increment:
+        test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
+    else:
+        test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
+    # anything volumes < 2uL must be done on the super-high-precision scale
+    if cfg.low_volume:
+        test_volumes = [v for v in test_volumes if v < config.LOW_VOLUME_UPPER_LIMIT_UL]
+    else:
+        test_volumes = [
+            v for v in test_volumes if v >= config.LOW_VOLUME_UPPER_LIMIT_UL
+        ]
+    if not test_volumes:
+        raise ValueError("no volumes to test, check the configuration")
+    return test_volumes
+
+
+def _apply_labware_offsets(cfg: config.GravimetricConfig, tip_racks: List[Labware], vial: Labware) -> None:
+    vial_offset = get_latest_offset_for_labware(cfg.labware_offsets, vial)
+    rack_offsets = {
+        rack: get_latest_offset_for_labware(cfg.labware_offsets, rack)
+        for rack in tip_racks
+    }
+    print("Labware Offsets:")
+    print(f"\t{vial.name} (slot={vial.parent}): {vial_offset}")
+    for rack, offset in rack_offsets.items():
+        print(f"\t{rack.name} (slot={rack.parent}): {offset}")
+    for rack in tip_racks:
+        rack.set_calibration(rack_offsets[rack])
+    vial.set_calibration(vial_offset)
+
+
+def _jog_to_find_liquid_height(ctx: ProtocolContext, pipette: InstrumentContext, well: Well) -> float:
+    _well_depth = well.depth
+    _liquid_height = _well_depth
+    while not ctx.is_simulating():
+        pipette.move_to(well.bottom(_liquid_height))
+        inp = input(f"height={_liquid_height}: type new height, or just ENTER to save: ")
+        if not inp:
+            break
+        try:
+            _liquid_height = min(max(float(inp), _well_depth - 20), _well_depth)
+        except ValueError:
+            pass
+    return _liquid_height
+
+
 def _run_trial(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -127,6 +174,7 @@ def _run_trial(
     # RUN INIT
     pipette.move_to(well.top())
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
+    print(f"\tINIT: grams-average={m_data_init.grams_average}")
 
     # RUN ASPIRATE
     aspirate_with_liquid_class(
@@ -140,6 +188,7 @@ def _run_trial(
         blank=blank,
     )
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
+    print(f"\tASPIRATE: grams-average={m_data_aspirate.grams_average}")
 
     # RUN DISPENSE
     dispense_with_liquid_class(
@@ -153,6 +202,7 @@ def _run_trial(
         blank=blank,
     )
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
+    print(f"\tDISPENSE: grams-average={m_data_dispense.grams_average}")
 
     # calculate volumes
     volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
@@ -169,6 +219,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     run_id, start_time = create_run_id_and_start_time()
 
     # LOAD LABWARE
+    vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_vial)
     tipracks = [
         ctx.load_labware(
             f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
@@ -176,27 +227,13 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         )
         for slot in cfg.slots_tiprack
     ]
-    rack_offsets = {
-        rack: get_latest_offset_for_labware(cfg.labware_offsets, rack)
-        for rack in tipracks
-    }
-    print("Labware Offsets:")
-    for rack, offset in rack_offsets.items():
-        print(f"\t{rack.name} (slot={rack.parent}): {offset}")
+    _apply_labware_offsets(cfg, tipracks, vial)
     if not ctx.is_simulating():
-        input("press ENTER to continue")
-    for rack in tipracks:
-        rack.set_calibration(rack_offsets[rack])
-    vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_vial)
-    # FIXME: a bug in the App is blocking calibrating this labware using LPC
-    vial.set_calibration(Point(x=0.0, y=-54.001, z=-40.792))
+        input("check offsets, press ENTER to continue")
 
     # LIQUID TRACKING
     liquid_tracker = LiquidTracker()
     initialize_liquid_from_deck(ctx, liquid_tracker)
-    liquid_tracker.set_start_volume_from_liquid_height(
-        vial["A1"], vial["A1"].depth - config.VIAL_SAFE_Z_OFFSET, name="Water"
-    )
 
     # PIPETTE
     pipette = ctx.load_instrument(
@@ -204,6 +241,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     )
     pipette.default_speed = config.GANTRY_MAX_SPEED
     pipette_tag = get_pipette_unique_name(pipette)
+    if cfg.increment:
+        clear_pipette_ul_per_mm(
+            get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
+            OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
+        )
 
     def _drop_tip() -> None:
         if cfg.return_tip:
@@ -212,23 +254,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             pipette.drop_tip(home_after=False)
 
     # GET TEST VOLUMES
-    if cfg.increment:
-        test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
-        clear_pipette_ul_per_mm(
-            get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
-            OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
-        )
-    else:
-        test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
-    # anything volumes < 2uL must be done on the super-high-precision scale
-    if cfg.low_volume:
-        test_volumes = [v for v in test_volumes if v < config.LOW_VOLUME_UPPER_LIMIT_UL]
-    else:
-        test_volumes = [
-            v for v in test_volumes if v >= config.LOW_VOLUME_UPPER_LIMIT_UL
-        ]
-    if not test_volumes:
-        raise ValueError("no volumes to test, check the configuration")
+    test_volumes = _get_volumes(cfg)
 
     # SCALE
     # Some Radwag settings cannot be controlled remotely.
@@ -276,10 +302,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     ctx.home()
 
     # TEST VIAL LIQUID HEIGHT
-    expected_height = liquid_tracker.get_liquid_height(vial["A1"])
     pipette.pick_up_tip()
-    pipette.move_to(vial["A1"].bottom(expected_height))
     get_input("Check that tip is touching liquid surface (+/-) 0.1 mm")
+    _liquid_height = _jog_to_find_liquid_height(ctx, pipette, vial["A1"])
+    liquid_tracker.set_start_volume_from_liquid_height(
+        vial["A1"], _liquid_height, name="Water"
+    )
     _drop_tip()
 
     recorder.record(in_thread=True)
@@ -354,6 +382,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 # convert volumes to positive amounts
                 aspirate_rectified = abs(asp_with_evap)
                 dispense_rectified = abs(disp_with_evap)
+                print(f"\tASPIRATE: micro-liters={aspirate_rectified}")
+                print(f"\tDISPENSE: micro-liters={dispense_rectified}")
                 actual_asp_list.append(aspirate_rectified)
                 actual_disp_list.append(dispense_rectified)
                 report.store_trial(

@@ -87,6 +87,7 @@ def _pipette_with_liquid_settings(
     #  3. RETRACT
 
     # CALCULATE TIP HEIGHTS FOR EACH PHASE
+
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
@@ -189,6 +190,13 @@ def _pipette_with_liquid_settings(
     pipette.move_to(well.top(), force_direct=True)
 
 
+def _fix_me_reduce_max_volume_to_allow_air_gaps(tip_volume: float, volume: float) -> float:
+    vol_max = tip_volume * 0.9
+    if volume > vol_max:
+        volume = vol_max
+    return volume
+
+
 def aspirate_with_liquid_class(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -204,10 +212,7 @@ def aspirate_with_liquid_class(
         int(pipette.max_volume), tip_volume, int(aspirate_volume)
     )
     # FIXME: change API to allow going beyond tip max volume
-    artificial_aspirate_max = tip_volume * 0.9
-    if aspirate_volume > artificial_aspirate_max:
-        aspirate_volume = artificial_aspirate_max
-        print(f"FIXME: using workaround volume: {aspirate_volume}")
+    aspirate_volume = _fix_me_reduce_max_volume_to_allow_air_gaps(tip_volume, aspirate_volume)
     _pipette_with_liquid_settings(
         ctx,
         pipette,
@@ -234,6 +239,8 @@ def dispense_with_liquid_class(
     liquid_class = get_liquid_class(
         int(pipette.max_volume), tip_volume, int(dispense_volume)
     )
+    # FIXME: change API to allow going beyond tip max volume
+    dispense_volume = _fix_me_reduce_max_volume_to_allow_air_gaps(tip_volume, dispense_volume)
     _pipette_with_liquid_settings(
         ctx,
         pipette,
