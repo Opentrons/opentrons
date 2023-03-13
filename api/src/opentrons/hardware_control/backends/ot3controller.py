@@ -201,7 +201,7 @@ class OT3Controller:
                 "Failed to initiate aionotify, cannot watch modules "
                 "or door, likely because not running on linux"
             )
-        self._present_nodes: Set[FirmwareTarget] = set()
+        self._present_devices: Set[FirmwareTarget] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
     @property
@@ -241,7 +241,21 @@ class OT3Controller:
         return pipette_nodes
 
     def _motor_nodes(self) -> Set[NodeId]:
-        return {NodeId(target) for target in self._present_nodes if target in NodeId}
+        # do the replacement of head and gripper devices
+        motor_nodes = self._replace_gripper_node(self._present_devices)
+        motor_nodes = self._replace_head_node(motor_nodes)
+        bootloader_nodes = {
+            NodeId.pipette_left_bootloader,
+            NodeId.pipette_right_bootloader,
+            NodeId.gantry_x_bootloader,
+            NodeId.gantry_y_bootloader,
+            NodeId.head_bootloader,
+            NodeId.gripper_bootloader,
+        }
+        # remove any bootloader nodes
+        motor_nodes -= bootloader_nodes
+        # filter out usb nodes
+        return {NodeId(target) for target in motor_nodes if target in NodeId}
 
     def get_instrument_update(
         self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
@@ -739,11 +753,15 @@ class OT3Controller:
         attached = await self._tool_detector.detect()
 
         current_tools = dict(OT3Controller._generate_attached_instrs(attached))
-        self._present_nodes -= set(
+        # remove pipette_left, pipetter_right and gripper
+        self._present_devices -= set(
             axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )
+        # add pipette_left, pipeette_right and gripper if present
         for mount in current_tools.keys():
-            self._motor_nodes().add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
+            self._present_devices.add(
+                axis_to_node(OT3Axis.of_main_tool_actuator(mount))
+            )
         return current_tools
 
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
@@ -999,9 +1017,7 @@ class OT3Controller:
         if self._usb_messenger is not None:
             core_nodes.add(USBTarget.rear_panel)
         core_present = set(await self._network_info.probe(core_nodes, timeout))
-        self._present_nodes = self._filter_probed_core_nodes(
-            self._present_nodes, core_present
-        )
+        self._present_devices |= core_present
 
     async def probe_network(self, timeout: float = 5.0) -> None:
         """Update the list of nodes present on the network.
@@ -1030,14 +1046,12 @@ class OT3Controller:
         ):
             expected.add(NodeId.gripper)
         core_present = set(await self._network_info.probe(expected, timeout))
-        self._present_nodes = self._replace_gripper_node(
-            self._replace_head_node(core_present)
-        )
-        log.info(f"The present nodes are now {self._present_nodes}")
+        self._present_devices = core_present
+        log.info(f"The present devices are now {self._present_devices}")
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:
-            return axis_to_node(axis) in self._present_nodes
+            return axis_to_node(axis) in self._motor_nodes()
         except KeyError:
             # Currently unhandled axis
             return False
@@ -1046,7 +1060,7 @@ class OT3Controller:
         self, to_xform: OT3AxisMap[MapPayload]
     ) -> NodeMap[MapPayload]:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
-        return {k: v for k, v in by_node.items() if k in self._present_nodes}
+        return {k: v for k, v in by_node.items() if k in self._motor_nodes()}
 
     async def liquid_probe(
         self,
