@@ -319,5 +319,8 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
   - :py:meth:`.Labware.set_offset` is not yet supported on this API version.
     Run protocols via the Opentrons App, instead.
 
+  - :py:meth:`.Labware.set_calibration` is not supported on this API version.
+    Setting a labware's calibration after it's been loaded is not supported.
+
   - :py:attr:`.ProtocolContext.max_speeds` is not yet supported on the API version.
     Use :py:attr:`.InstrumentContext.default_speed` or the per-method `speed` argument, instead.
