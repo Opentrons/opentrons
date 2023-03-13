@@ -19,6 +19,9 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_START,
   ALIGN_FLEX_END,
+  TEXT_ALIGN_LEFT,
+  JUSTIFY_FLEX_START,
+  ALIGN_STRETCH,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -67,7 +70,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
       },
     ],
     title: 'Z-axis',
-    subtitle: 'Shift + Arrow keys',
+    subtitle: 'Shift + Arrow Keys',
   },
   [HORIZONTAL_PLANE]: {
     controls: [
@@ -114,6 +117,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
 }
 
 const DIRECTION_CONTROL_LAYOUT = css`
+  flex: 1;
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   grid-gap: ${SPACING.spacing4};
@@ -136,12 +140,18 @@ const PLANE_BUTTONS_STYLE = css`
 `
 
 const DEFAULT_BUTTON_STYLE = css`
+  min-width: 10rem;
   display: flex;
   border: 1px ${COLORS.white} solid;
-  justify-content: ${JUSTIFY_CENTER};
+  justify-content: ${JUSTIFY_FLEX_START};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
+  grid-gap: ${SPACING.spacing3};
+
+  &:focus {
+    background-color: ${COLORS.white};
+  }
 
   &:hover {
     background-color: ${COLORS.white};
@@ -157,7 +167,7 @@ const DEFAULT_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: inherit;
+    background-color: ${COLORS.white};
     color: ${COLORS.errorDisabled};
   }
 `
@@ -215,12 +225,18 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   name={
                     plane === 'vertical' ? 'vertical-plane' : 'horizontal-plane'
                   }
-                  width="1.2rem"
-                  marginRight={SPACING.spacing3}
+                  width="1.5rem"
+                  flex="1 0 auto"
                 />
-                <Flex flexDirection={DIRECTION_COLUMN}>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  flex="1 1 auto"
+                >
                   {title}
                   <StyledText
+                    textAlign={TEXT_ALIGN_LEFT}
+                    alignSelf={ALIGN_STRETCH}
                     color={COLORS.darkGreyEnabled}
                     css={TYPOGRAPHY.labelRegular}
                   >
@@ -302,7 +318,7 @@ const ARROW_BUTTON_STYLES = css`
   }
 
   &:disabled {
-    background-color: inherit;
+    background-color: ${COLORS.white};
     color: ${COLORS.darkGreyDisabled};
   }
 

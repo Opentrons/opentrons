@@ -77,6 +77,10 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     height: 3.62rem;
     color: ${COLORS.black};
 
+    &:focus {
+      background-color: ${COLORS.white};
+    }
+
     &:hover {
       background-color: ${COLORS.white};
       color: ${COLORS.black};
