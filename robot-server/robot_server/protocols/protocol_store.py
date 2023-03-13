@@ -276,6 +276,21 @@ class ProtocolStore:
 
         return usage_info
 
+    def get_linked_run_ids(self, protocol_id: str) -> List[str]:
+        """Return a list of run ids that reference a particular protocol.
+
+        See the `runs` module for information about runs.
+        """
+        select_referenced_run_ids = sqlalchemy.select(run_table.c.id).where(
+            run_table.c.protocol_id == protocol_id
+        )
+
+        with self._sql_engine.begin() as transaction:
+            referenced_run_ids = (
+                transaction.execute(select_referenced_run_ids).scalars().all()
+            )
+        return referenced_run_ids
+
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(
             _convert_dataclass_to_sql_values(resource=resource)
