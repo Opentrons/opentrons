@@ -201,11 +201,11 @@ class ProtocolStore:
 
     def get_id_by_hash(self, hash: str) -> Optional[str]:
         """Get all protocol hashes keyed by protocol id."""
-        try:
-            p_source = next(p for p in self.get_all() if p.source.content_hash == hash)
-            return p_source.protocol_id
-        except StopIteration:
-            return None
+        for p in self.get_all():
+            if p.source.content_hash == hash:
+                return p.protocol_id
+        return None
+
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, protocol_id: str) -> bool:
