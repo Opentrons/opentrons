@@ -125,7 +125,7 @@ class GeometryView:
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
         slot_pos = self.get_labware_parent_position(labware_id)
-        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
+        origin_offset = self._labware.get_corner_offset_from_slot(labware_id)
 
         return Point(
             x=slot_pos.x + origin_offset.x,

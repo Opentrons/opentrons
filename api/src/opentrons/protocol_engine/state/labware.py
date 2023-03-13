@@ -17,6 +17,7 @@ from typing import (
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.labware.labware_definition import CornerOffsetFromSlot
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point, MountType
@@ -472,6 +473,14 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware's load name."""
         definition = self.get_definition(labware_id)
         return definition.parameters.loadName
+
+    def get_corner_offset_from_slot(self, labware_id: str) -> CornerOffsetFromSlot:
+        """Return the labware's cornerOffsetFromSlot.
+
+        See the labware definition schema for details.
+        """
+        definition = self.get_definition(labware_id)
+        return definition.cornerOffsetFromSlot
 
     def get_dimensions(self, labware_id: str) -> Dimensions:
         """Get the labware's dimensions."""
