@@ -19,7 +19,10 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { getGripperDisplayName, getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import OT3_PNG from '../../assets/images/OT3.png'
@@ -28,7 +31,7 @@ import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { useAttachedModules, useAttachedPipettes, useIsOT3 } from './hooks'
+import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
@@ -139,11 +142,17 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
   const { data: attachedInstruments } = useInstrumentsQuery({}, true)
-  const extensionInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
+  const extensionInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const leftPipetteDisplayName = attachedPipettes?.left?.modelSpecs.displayName
-  const rightPipetteDisplayName = attachedPipettes?.right?.modelSpecs.displayName
-  const extensionMountDisplayName = extensionInstrument != null && extensionInstrument.instrumentModel === 'gripperV1' ? getGripperDisplayName(extensionInstrument.instrumentModel) : null
+  const rightPipetteDisplayName =
+    attachedPipettes?.right?.modelSpecs.displayName
+  const extensionMountDisplayName =
+    extensionInstrument != null &&
+    extensionInstrument.instrumentModel === 'gripperV1'
+      ? getGripperDisplayName(extensionInstrument.instrumentModel)
+      : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data
   // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
@@ -161,7 +170,9 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       </StyledText>
       <Flex flexWrap={WRAP} gridGap={SPACING.spacing2}>
         {leftAndRightMountsPipetteDisplayName != null ? (
-          <InstrumentContainer displayName={leftAndRightMountsPipetteDisplayName} />
+          <InstrumentContainer
+            displayName={leftAndRightMountsPipetteDisplayName}
+          />
         ) : null}
         {leftPipetteDisplayName != null ? (
           <InstrumentContainer displayName={leftPipetteDisplayName} />

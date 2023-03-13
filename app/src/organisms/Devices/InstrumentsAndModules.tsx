@@ -51,10 +51,14 @@ export function InstrumentsAndModules({
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
 
-  const { data: attachedInstruments } = useInstrumentsQuery({
-    refetchInterval: EQUIPMENT_POLL_MS,
-  }, true)
-  const extensionInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
+  const { data: attachedInstruments } = useInstrumentsQuery(
+    {
+      refetchInterval: EQUIPMENT_POLL_MS,
+    },
+    true
+  )
+  const extensionInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
@@ -141,7 +145,9 @@ export function InstrumentsAndModules({
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
               />
-              {isOT3 ? <GripperCard attachedGripper={extensionInstrument} /> : null}
+              {isOT3 ? (
+                <GripperCard attachedGripper={extensionInstrument} />
+              ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
                   key={`moduleCard_${String(module.moduleType)}_${String(
@@ -164,7 +170,7 @@ export function InstrumentsAndModules({
                   pipetteInfo={
                     attachedPipettes.right?.model != null
                       ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                      null
+                        null
                       : null
                   }
                   pipetteOffsetCalibration={rightMountOffsetCalibration}

@@ -1,4 +1,10 @@
-import { Flex, TYPOGRAPHY, COLOR_ERROR, JUSTIFY_SPACE_BETWEEN, Link } from '@opentrons/components'
+import {
+  Flex,
+  TYPOGRAPHY,
+  COLOR_ERROR,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+} from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -11,18 +17,11 @@ import type { GripperWizardStepProps } from './types'
 export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
-  const {
-    proceed,
-    attachedGripper,
-    isRobotMoving,
-    goBack,
-  } = props
+  const { proceed, attachedGripper, isRobotMoving, goBack } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
   const handleOnClick = (): void => {
-    attachedGripper == null
-      ? setShowUnableToDetect(true)
-      : proceed()
+    attachedGripper == null ? setShowUnableToDetect(true) : proceed()
   }
 
   if (isRobotMoving)
@@ -39,13 +38,16 @@ export const MountGripper = (
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Link
-            role="button"
-            css={TYPOGRAPHY.darkLinkH4SemiBold}
-            onClick={goBack}>
-            {t('shared:go_back')}
-          </Link>
-        <PrimaryButton onClick={() => setShowUnableToDetect(false)}>{t('shared:try_again')}</PrimaryButton>
-      </Flex> 
+          role="button"
+          css={TYPOGRAPHY.darkLinkH4SemiBold}
+          onClick={goBack}
+        >
+          {t('shared:go_back')}
+        </Link>
+        <PrimaryButton onClick={() => setShowUnableToDetect(false)}>
+          {t('shared:try_again')}
+        </PrimaryButton>
+      </Flex>
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile

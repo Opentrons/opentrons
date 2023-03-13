@@ -11,7 +11,10 @@ export function useInstrumentsQuery(
   const host = useHost()
   const query = useQuery<Instruments>(
     [host, 'instruments'],
-    () => getInstruments(host as HostConfig, { refresh }).then(response => response.data),
+    () =>
+      getInstruments(host as HostConfig, { refresh }).then(
+        response => response.data
+      ),
     { enabled: host !== null, ...options }
   )
 

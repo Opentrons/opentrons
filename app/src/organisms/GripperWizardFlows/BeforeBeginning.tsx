@@ -71,14 +71,22 @@ export const BeforeBeginning = (
       },
     },
   ]
-  if (flowType === GRIPPER_FLOW_TYPES.ATTACH || flowType === GRIPPER_FLOW_TYPES.RECALIBRATE) {
-    commandsOnProceed = [{ commandType: 'home' as const, params: {} }, ...commandsOnProceed]
+  if (
+    flowType === GRIPPER_FLOW_TYPES.ATTACH ||
+    flowType === GRIPPER_FLOW_TYPES.RECALIBRATE
+  ) {
+    commandsOnProceed = [
+      { commandType: 'home' as const, params: {} },
+      ...commandsOnProceed,
+    ]
   }
 
   const handleOnClick = (): void => {
-    chainRunCommands(commandsOnProceed, true).then(() => {
-      proceed()
-    }).catch(() => {})
+    chainRunCommands(commandsOnProceed, true)
+      .then(() => {
+        proceed()
+      })
+      .catch(() => {})
   }
 
   const equipmentInfoByLoadName: {

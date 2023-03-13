@@ -1,5 +1,9 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
-import type { PipetteMount, LabwareOffset, Coordinates } from '../../../../js/types'
+import type {
+  PipetteMount,
+  LabwareOffset,
+  Coordinates,
+} from '../../../../js/types'
 // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
 export interface CalibratePipetteCreateCommand extends CommonCommandCreateInfo {
   commandType: 'calibration/calibratePipette'
@@ -52,7 +56,7 @@ interface CalibratePipetteResult {
   pipetteOffset: LabwareOffset
 }
 interface CalibrateGripperResult {
-  jawOffset: Coordinates 
+  jawOffset: Coordinates
 }
 interface MoveToMaintenancePositionParams {
   mount: PipetteMount

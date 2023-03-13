@@ -1,16 +1,20 @@
 export interface InstrumentData {
   data: {
-    jawState: string,
+    jawState: string
     calibratedOffset: {
-      last_modified: string, 
-      offset: [number, number, number],
-      source: string,
-      status: { markedBad: boolean, source: string | null, markedAt: string | null}
+      last_modified: string
+      offset: [number, number, number]
+      source: string
+      status: {
+        markedBad: boolean
+        source: string | null
+        markedAt: string | null
+      }
     }
-  },
+  }
   instrumentModel: string
-  instrumentType: string,
-  mount: string,
+  instrumentType: string
+  mount: string
   serialNumber: string
 }
 

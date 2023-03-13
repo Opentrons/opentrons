@@ -8,9 +8,9 @@ export default {
   component: GripperWizardFlows,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof GripperWizardFlows>> = args => (
-  <GripperWizardFlows {...args} />
-)
+const Template: Story<
+  React.ComponentProps<typeof GripperWizardFlows>
+> = args => <GripperWizardFlows {...args} />
 
 export const Attach = Template.bind({})
 Attach.args = {
@@ -29,4 +29,3 @@ Recalibrate.args = {
   flowType: 'RECALIBRATE',
   closeFlow: () => {},
 }
-

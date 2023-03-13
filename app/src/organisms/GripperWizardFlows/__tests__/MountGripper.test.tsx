@@ -39,7 +39,9 @@ describe('MountGripper', () => {
   })
 
   it('clicking confirm calls proceed if attached gripper', () => {
-    const { getByRole } = render({ attachedGripper: instrumentsResponseFixture.data[0] })[0]
+    const { getByRole } = render({
+      attachedGripper: instrumentsResponseFixture.data[0],
+    })[0]
     getByRole('button', { name: 'continue' }).click()
     expect(mockProceed).toHaveBeenCalled()
   })

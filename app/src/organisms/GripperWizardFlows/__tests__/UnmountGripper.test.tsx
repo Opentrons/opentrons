@@ -16,7 +16,7 @@ describe('UnmountGripper', () => {
   const mockRunId = 'fakeRunId'
 
   beforeEach(() => {
-    render = (props) => {
+    render = props => {
       return renderWithProviders(
         <UnmountGripper
           runId={mockRunId}
@@ -40,7 +40,10 @@ describe('UnmountGripper', () => {
   it('clicking confirm proceed calls home and proceed if gripper attached', async () => {
     const { getByRole } = render({ attachedGripper: null })[0]
     await getByRole('button', { name: 'continue' }).click()
-    expect(mockChainRunCommands).toHaveBeenCalledWith([{ commandType: 'home', params: {} }], true)
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [{ commandType: 'home', params: {} }],
+      true
+    )
     expect(mockProceed).toHaveBeenCalled()
   })
 

@@ -145,7 +145,9 @@ describe('InstrumentsAndModules', () => {
     mockUseIsOT3.mockReturnValue(true)
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({ data: { data: [] } } as any)
-    mockUsePipettesQuery.mockReturnValue({ data: { left: null, right: null } } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      data: { left: null, right: null },
+    } as any)
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [instrumentsResponseFixture.data[0]] },
     } as any)
@@ -200,6 +202,9 @@ describe('InstrumentsAndModules', () => {
     })
     expect(mockUsePipettesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
     expect(mockUseModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
-    expect(mockUseInstrumentsQuery).toHaveBeenCalledWith({ refetchInterval: 5000 }, true)
+    expect(mockUseInstrumentsQuery).toHaveBeenCalledWith(
+      { refetchInterval: 5000 },
+      true
+    )
   })
 })

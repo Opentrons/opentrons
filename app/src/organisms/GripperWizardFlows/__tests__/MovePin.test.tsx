@@ -17,15 +17,18 @@ describe('MovePin', () => {
   let render: (
     props?: Partial<React.ComponentProps<typeof MovePin>>
   ) => ReturnType<typeof renderWithProviders>
+  let mockCreateRunCommand: jest.Mock
 
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
   const mockChainRunCommands = jest.fn()
-  const mockCreateRunCommand = jest.fn(() => Promise.resolve({ data: {} } as CommandData))
   const mockSetFrontJawOffset = jest.fn()
   const mockRunId = 'fakeRunId'
 
   beforeEach(() => {
+    mockCreateRunCommand = jest.fn(() => {
+      return Promise.resolve({ data: {} } as CommandData)
+    })
     render = (props = {}) => {
       return renderWithProviders(
         <MovePin
@@ -52,10 +55,28 @@ describe('MovePin', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking confirm proceed calls proceed', () => {
+  it('clicking confirm proceed calls proceed with correct callbacks', async () => {
     const { getByRole } = render()[0]
-    getByRole('button', { name: 'Begin calibration' }).click()
-    expect(mockProceed).toHaveBeenCalled()
+    await getByRole('button', { name: 'Begin calibration' }).click()
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+      command: { commandType: 'home', params: { axes: [] } },
+      waitUntilComplete: true,
+    })
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      command: {
+        commandType: 'calibration/calibrateGripper',
+        params: { jaw: 'front' },
+      },
+      waitUntilComplete: true,
+    })
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      command: {
+        commandType: 'calibration/moveToMaintenancePosition',
+        params: { mount: 'left' },
+      },
+      waitUntilComplete: true,
+    })
+    await expect(mockProceed).toHaveBeenCalled()
   })
 
   it('clicking go back calls back', () => {
@@ -86,26 +107,30 @@ describe('MovePin', () => {
     getByText(
       'Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw'
     )
-    getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'continue' }).click()
 
-    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       command: { commandType: 'home', params: { axes: [] } },
-      waitUntilComplete: true
+      waitUntilComplete: true,
     })
-    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
       command: {
-        commandType: 'calibration/calibrateGripper', params: {
-          jaw: 'rear', otherJawOffset: { x: 0, y: 0, z: 0 }
-        }
+        commandType: 'calibration/calibrateGripper',
+        params: {
+          jaw: 'rear',
+          otherJawOffset: { x: 0, y: 0, z: 0 },
+        },
       },
-      waitUntilComplete: true
+      waitUntilComplete: true,
     })
-    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
       command: {
-        commandType: 'calibration/moveToMaintenancePosition', params: { mount: 'left' }
+        commandType: 'calibration/moveToMaintenancePosition',
+        params: { mount: 'left' },
       },
-      waitUntilComplete: true
+      waitUntilComplete: true,
     })
+    await expect(mockProceed).toHaveBeenCalled()
   })
 
   it('renders correct loader for move pin from front jaw to rear', () => {

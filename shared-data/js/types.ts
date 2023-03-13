@@ -125,14 +125,14 @@ export interface LabwareBrand {
 
 export type LabwareWellShapeProperties =
   | {
-    shape: 'circular'
-    diameter: number
-  }
+      shape: 'circular'
+      diameter: number
+    }
   | {
-    shape: 'rectangular'
-    xDimension: number
-    yDimension: number
-  }
+      shape: 'rectangular'
+      xDimension: number
+      yDimension: number
+    }
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -469,24 +469,24 @@ export type ThermalAdapterName =
 
 // gripper definition that adheres to the v1 gripper json schema
 export interface GripperDefinition {
-  $otSharedSchema: string, 
+  $otSharedSchema: string
   model: GripperModel
   schemaVersion: number
   displayName: string
-  zMotorConfigurations: { idle: number, run: number }
+  zMotorConfigurations: { idle: number; run: number }
   jawMotorConfigurations: { vref: number }
   gripForceProfile: {
-    polynomial: [[number, number], [number, number]],
-    defaultGripForce: number,
-    defaultHomeForce: number,
-    min: number,
-    max: number,
+    polynomial: [[number, number], [number, number]]
+    defaultGripForce: number
+    defaultHomeForce: number
+    min: number
+    max: number
   }
   geometry: {
-    baseOffsetFromMount: [number, number, number],
-    jawCenterOffsetFromBase: [number, number, number],
-    pinOneOffsetFromBase: [number, number, number],
-    pinTwoOffsetFromBase: [number, number, number],
-    jawWidth: { min: number, max: number },
+    baseOffsetFromMount: [number, number, number]
+    jawCenterOffsetFromBase: [number, number, number]
+    pinOneOffsetFromBase: [number, number, number]
+    pinTwoOffsetFromBase: [number, number, number]
+    jawWidth: { min: number; max: number }
   }
 }

@@ -57,7 +57,11 @@ export function GripperCard({
     <>
       <InstrumentCard
         description={
-          attachedGripper != null ? getGripperDisplayName(attachedGripper.instrumentModel as GripperModel) : t('shared:empty')
+          attachedGripper != null
+            ? getGripperDisplayName(
+                attachedGripper.instrumentModel as GripperModel
+              )
+            : t('shared:empty')
         }
         isGripperAttached={attachedGripper != null}
         label={t('shared:extension_mount')}
