@@ -73,6 +73,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
 
   const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
+    border: 1px ${COLORS.white} solid;
     height: 3.62rem;
     color: ${COLORS.black};
 
@@ -80,13 +81,13 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
       background-color: ${COLORS.white};
       color: ${COLORS.black};
       box-shadow: 0 0 0;
-      outline: 1px ${COLORS.lightGreyHover} solid;
+      border: 1px ${COLORS.lightGreyHover} solid;
     }
 
     &:active {
       background-color: ${COLORS.white};
       color: ${COLORS.blueEnabled};
-      outline: 1px ${COLORS.blueEnabled} solid;
+      border: 1px ${COLORS.blueEnabled} solid;
     }
 
     &:disabled {
@@ -97,11 +98,11 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const ACTIVE_BUTTON_STYLE = css`
     ${DEFAULT_BUTTON_STYLE}
     color: ${COLORS.blueEnabled};
-    outline: 1px ${COLORS.blueEnabled} solid;
+    border: 1px ${COLORS.blueEnabled} solid;
 
     &:hover {
       color: ${COLORS.blueHover};
-      outline: 1px ${COLORS.blueHover} solid;
+      border: 1px ${COLORS.blueHover} solid;
     }
   `
   return (

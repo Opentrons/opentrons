@@ -137,6 +137,7 @@ const PLANE_BUTTONS_STYLE = css`
 
 const DEFAULT_BUTTON_STYLE = css`
   display: flex;
+  border: 1px ${COLORS.white} solid;
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
@@ -146,13 +147,13 @@ const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
     color: ${COLORS.black};
     box-shadow: 0 0 0;
-    outline: 1px ${COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.lightGreyHover} solid;
   }
 
   &:active {
     background-color: ${COLORS.white};
     color: ${COLORS.blueEnabled};
-    outline: 1px ${COLORS.blueEnabled} solid;
+    border: 1px ${COLORS.blueEnabled} solid;
   }
 
   &:disabled {
@@ -164,11 +165,11 @@ const DEFAULT_BUTTON_STYLE = css`
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
   color: ${COLORS.blueEnabled};
-  outline: 1px ${COLORS.blueEnabled} solid;
+  border: 1px ${COLORS.blueEnabled} solid;
 
   &:hover {
     color: ${COLORS.blueHover};
-    outline: 1px ${COLORS.blueHover} solid;
+    border: 1px ${COLORS.blueHover} solid;
   }
 `
 
