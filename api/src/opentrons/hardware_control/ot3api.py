@@ -722,21 +722,33 @@ class OT3API(
         await self._ungrip(duty_cycle=dc)
         gripper.state = GripperJawState.HOMED_READY
 
-    async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
+    async def home_plunger(
+        self, mount: Union[top_types.Mount, OT3Mount], speed: Optional[float] = None
+    ) -> None:
         """
-        Home the plunger motor for a mount, and then return it to the 'bottom'
-        position.
+        Return a plunger to the 'bottom' position.
+
+        If the motor status of the plunger is valid, the plunger axis can move directly
+        to the bottom position without having to home.
         """
 
         checked_mount = OT3Mount.from_mount(mount)
-        await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
+            plunger_ax = OT3Axis.of_main_tool_actuator(checked_mount)
+            await self.refresh_positions()
+            # home plunger if the motor position is not correct
+            if not self._backend.check_motor_status([plunger_ax]):
+                await self.home([plunger_ax])
+
             target_pos = target_position_from_plunger(
                 checked_mount, instr.plunger_positions.bottom, self._current_position
             )
+
             self._log.info("Attempting to move the plunger to bottom.")
-            await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
+            await self._move(
+                target_pos, speed=speed, acquire_lock=False, home_flagged_axes=False
+            )
             await self.current_position_ot3(mount=checked_mount, refresh=True)
 
     @lru_cache(1)
@@ -1395,15 +1407,7 @@ class OT3API(
             speed = self._pipette_handler.plunger_speed(
                 instrument, instrument.blow_out_flow_rate, "aspirate"
             )
-            bottom = instrument.plunger_positions.bottom
-            target_pos = target_position_from_plunger(
-                OT3Mount.from_mount(mount), bottom, self._current_position
-            )
-            await self._move(
-                target_pos,
-                speed=(speed * rate),
-                home_flagged_axes=False,
-            )
+            await self.home_plunger(checked_mount, speed=(speed * rate))
             instrument.ready_to_aspirate = True
 
     async def aspirate(
