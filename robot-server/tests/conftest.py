@@ -1,3 +1,4 @@
+import asyncio
 import signal
 import subprocess
 import time
@@ -149,8 +150,25 @@ def server_temp_directory() -> Iterator[str]:
     yield new_dir
 
 
+@pytest.fixture()
+def clean_server_state() -> Iterator[None]:
+    # async fn that does the things below
+    # make a robot client
+    # delete protocols
+    async def _clean_server_state() -> None:
+        port = "31950"
+        async with RobotClient.make(
+            host="http://localhost", port=port, version="*"
+        ) as robot_client:
+            await _delete_all_runs(robot_client)
+            await _delete_all_protocols(robot_client)
+
+    yield
+    asyncio.run(_clean_server_state())
+
+
 @pytest.fixture(scope="session")
-async def run_server(
+def run_server(
     request_session: requests.Session, server_temp_directory: str
 ) -> Iterator["subprocess.Popen[Any]"]:
     """Run the robot server in a background process."""
@@ -201,23 +219,6 @@ async def run_server(
         yield proc
         proc.send_signal(signal.SIGTERM)
         proc.wait()
-        # # clean up server state
-        # port = "31950"
-        # async with RobotClient.make(
-        #     host="http://localhost", port=port, version="*"
-        # ) as robot_client:
-        #     assert (
-        #         await robot_client.wait_until_dead()
-        #     ), "Dev Robot is running and must not be."
-        #     assert (
-        #         await robot_client.wait_until_alive()
-        #     ), "Dev Robot never became available."
-
-        #     await _delete_all_runs(robot_client)
-        #     await _delete_all_protocols(robot_client)
-
-        # proc.send_signal(signal.SIGTERM)
-        # proc.wait()
 
 
 async def _delete_all_runs(robot_client: RobotClient) -> None:

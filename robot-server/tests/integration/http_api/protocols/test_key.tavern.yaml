@@ -3,6 +3,7 @@ test_name: Verify protocol key.
 marks:
   - usefixtures:
       - run_server
+      - clean_server_state
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
@@ -60,12 +61,6 @@ stages:
         data:
           id: '{protocol_id}'
           key: protocol_key
-  - name: Delete the protocol
-    request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
-      method: DELETE
-    response:
-      status_code: 200
 
 ---
 test_name: Protocols may have a duplicate key.
@@ -73,6 +68,7 @@ test_name: Protocols may have a duplicate key.
 marks:
   - usefixtures:
       - run_server
+      - clean_server_state
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
@@ -139,19 +135,6 @@ stages:
             key: duplicate_key
           - id: '{protocol_id2}'
             key: duplicate_key
-  - name: Delete the protocol 1
-    request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id1}'
-      method: DELETE
-    response:
-      status_code: 200
-  - name: Delete the protocol 2
-    request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id2}'
-      method: DELETE
-    response:
-      status_code: 200
-    
 
 ---
 test_name: Protocols sources not get duplicated.
@@ -159,6 +142,7 @@ test_name: Protocols sources not get duplicated.
 marks:
   - usefixtures:
       - run_server
+      - clean_server_state
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
@@ -224,9 +208,3 @@ stages:
         data:
           - id: '{protocol_id1}'
             key: duplicate_key
-  - name: Delete the protocol
-    request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id1}'
-      method: DELETE
-    response:
-      status_code: 200
