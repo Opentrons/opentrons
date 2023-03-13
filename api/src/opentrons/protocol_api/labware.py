@@ -216,7 +216,7 @@ class Well:
         Load a liquid into a well.
 
         :param Liquid liquid: The liquid to load into the well.
-        :param str volume: The volume of liquid to load, in µL.
+        :param float volume: The volume of liquid to load, in µL.
         """
         self._core.load_liquid(
             liquid=liquid,
