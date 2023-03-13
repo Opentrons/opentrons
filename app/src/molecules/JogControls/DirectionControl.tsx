@@ -127,7 +127,7 @@ const PLANE_BUTTONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing3};
-  width: 9.75rem;
+  width: 9.25rem;
 
   @media (max-width: 750px) {
     flex-direction: ${DIRECTION_ROW};
@@ -146,13 +146,13 @@ const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
     color: ${COLORS.black};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.lightGreyHover} solid;
+    outline: 1px ${COLORS.lightGreyHover} solid;
   }
 
   &:active {
     background-color: ${COLORS.white};
     color: ${COLORS.blueEnabled};
-    border: 1px ${COLORS.blueEnabled} solid;
+    outline: 1px ${COLORS.blueEnabled} solid;
   }
 
   &:disabled {
@@ -164,7 +164,7 @@ const DEFAULT_BUTTON_STYLE = css`
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
   color: ${COLORS.blueEnabled};
-  border: 1px ${COLORS.blueEnabled} solid;
+  outline: 1px ${COLORS.blueEnabled} solid;
 `
 
 interface DirectionControlProps {
