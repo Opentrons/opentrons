@@ -5,17 +5,17 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 
-import { DisplayTextSize } from '../DisplayTextSize'
+import { TextSize } from '../TextSize'
 
 const mockFunc = jest.fn()
-const render = (props: React.ComponentProps<typeof DisplayTextSize>) => {
-  return renderWithProviders(<DisplayTextSize {...props} />, {
+const render = (props: React.ComponentProps<typeof TextSize>) => {
+  return renderWithProviders(<TextSize {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('DisplayTextSize', () => {
-  let props: React.ComponentProps<typeof DisplayTextSize>
+describe('TextSize', () => {
+  let props: React.ComponentProps<typeof TextSize>
 
   beforeEach(() => {
     props = {

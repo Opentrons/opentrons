@@ -13,7 +13,7 @@ import {
   TouchScreenSleep,
   NetworkSettings,
   RobotSystemVersion,
-  DisplayTextSize,
+  TextSize,
 } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
 import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
@@ -34,9 +34,7 @@ jest.mock(
 jest.mock(
   '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/RobotSystemVersion'
 )
-jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DisplayTextSize'
-)
+jest.mock('../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TextSize')
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
@@ -52,9 +50,7 @@ const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
 const mockRobotSystemVersion = RobotSystemVersion as jest.MockedFunction<
   typeof RobotSystemVersion
 >
-const mockDisplayTextSize = DisplayTextSize as jest.MockedFunction<
-  typeof DisplayTextSize
->
+const mockTextSize = TextSize as jest.MockedFunction<typeof TextSize>
 
 const render = () => {
   return renderWithProviders(
@@ -76,7 +72,7 @@ describe('RobotSettingsDashboard', () => {
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
-    mockDisplayTextSize.mockReturnValue(<div>Mock Display Text Size</div>)
+    mockTextSize.mockReturnValue(<div>Mock Text Size</div>)
   })
 
   it('should render Navigation', () => {
@@ -137,7 +133,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Text Size')
     fireEvent.click(button)
-    getByText('Text Size')
+    getByText('Mock Text Size')
   })
 
   it('should render component when tapping device rest', () => {
