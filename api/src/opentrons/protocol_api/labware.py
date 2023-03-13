@@ -432,7 +432,9 @@ class Labware:
 
     def set_calibration(self, delta: Point) -> None:
         """
-        Called by save calibration in order to update the offset on the object.
+        An internal, deprecated method Called by set_offset in order to update the offset on the object.
+
+        .. deprecated:: 2.14
         """
         self._core.set_calibration(delta)
 
