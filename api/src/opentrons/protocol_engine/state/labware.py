@@ -487,10 +487,14 @@ class LabwareView(HasState[LabwareState]):
         definition = self.get_definition(labware_id)
         dims = definition.dimensions
 
+        well_tops = (well.z + well.depth for well in definition.wells.values())
+
         return Dimensions(
             x=dims.xDimension,
             y=dims.yDimension,
-            z=dims.zDimension,
+            # Work around buggy labware definitions where the labware's zDimension is
+            # lower than the tops of the wells. See Jira RSS-197.
+            z=max(dims.zDimension, max(well_tops)),
         )
 
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:

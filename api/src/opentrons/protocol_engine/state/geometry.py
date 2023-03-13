@@ -195,13 +195,15 @@ class GeometryView:
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         labware_pos = self.get_labware_position(lw_data.id)
-        definition = self._labware.get_definition(lw_data.id)
-        z_dim = definition.dimensions.zDimension
+
+        dimensions = self._labware.get_dimensions(lw_data.id)
+
         height_over_labware: float = 0
         if isinstance(lw_data.location, ModuleLocation):
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
-        return labware_pos.z + z_dim + height_over_labware
+
+        return labware_pos.z + dimensions.z + height_over_labware
 
     def get_nominal_effective_tip_length(
         self,
