@@ -1,6 +1,6 @@
 """File hashing utiliy class."""
 
-from typing import List
+from typing import Sequence
 import anyio
 import unicodedata
 from hashlib import md5
@@ -11,12 +11,12 @@ class FileHasher:
     """Hashing utility class that hashes a combination of protocol and labware files."""
 
     @staticmethod
-    async def hash(files: List[BufferedFile]) -> str:
-        """Sort and hash a list of protocol and labware files."""
+    async def hash(files: Sequence[BufferedFile]) -> str:
+        """Sort and hash a sequence of protocol and labware files."""
         return await anyio.to_thread.run_sync(_hash_sync, files)
 
 
-def _hash_sync(files: List[BufferedFile]) -> str:
+def _hash_sync(files: Sequence[BufferedFile]) -> str:
     sorted_files = sorted(files, key=lambda x: unicodedata.normalize("NFC", x.name))
     for file in sorted_files:
         name_hash = md5(file.name.encode("utf-8")).digest()

@@ -1,6 +1,6 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import Optional, Sequence, List
+from typing import Optional, Sequence
 
 from .file_identifier import (
     FileIdentifier,
@@ -51,7 +51,7 @@ class ProtocolReader:
         self._file_hasher = file_hasher or FileHasher()
 
     async def save(
-        self, files: List[BufferedFile], directory: Path, content_hash: str
+        self, files: Sequence[BufferedFile], directory: Path, content_hash: str
     ) -> ProtocolSource:
         """Compute a `ProtocolSource` from buffered files and save them as files.
 
