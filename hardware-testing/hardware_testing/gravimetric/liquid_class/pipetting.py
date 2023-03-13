@@ -83,9 +83,9 @@ def _pipette_with_liquid_settings(
     if aspirate and dispense:
         raise ValueError("both aspirate and dispense volumes cannot be set together")
 
-    def _inspect() -> None:
+    def _inspect(msg: str = "") -> None:
         if not ctx.is_simulating() and inspect:
-            input("ENTER to continue")
+            input(f"{msg}, ENTER to continue")
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -122,7 +122,6 @@ def _pipette_with_liquid_settings(
         #       method to accept a microliter amount as an optional argument.
         # Advantage: guarantee all aspirations begin at same position, helping low-volume accuracy.
         # Disadvantage: limit our max leading-air-gap volume, potentially leaving droplets behind.
-        return
 
     def _aspirate_on_submerge() -> None:
         # mix 5x times
@@ -138,18 +137,15 @@ def _pipette_with_liquid_settings(
         liquid_tracker.update_affected_wells(pipette, well, aspirate=aspirate)
         # delay
         ctx.delay(liquid_class.aspirate.delay)
-        _inspect()
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        _inspect()
         pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
-        _inspect()
 
     def _dispense_on_approach() -> None:
+        _inspect("about to dispense")
         # remove trailing-air-gap
         pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
-        _inspect()
 
     def _dispense_on_submerge() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
@@ -168,13 +164,13 @@ def _pipette_with_liquid_settings(
         liquid_tracker.update_affected_wells(pipette, well, dispense=dispense)
         # delay
         ctx.delay(liquid_class.dispense.delay)
-        _inspect()
+        _inspect("about to retract")
 
     def _dispense_on_retract() -> None:
         # blow-out any remaining air in pipette (any reason why not?)
         callbacks.on_blowing_out()
+        _inspect("about to blow-out")
         pipette.blow_out()
-        _inspect()
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm))

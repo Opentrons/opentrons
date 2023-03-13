@@ -93,35 +93,41 @@ class UnstableMeasurementError(Exception):
 
 
 def _build_measurement_data(
-    recorder: GravimetricRecorder, tag: str, e_data: EnvironmentData
+    recorder: GravimetricRecorder,
+    tag: str,
+    e_data: EnvironmentData,
+    stable: bool = True,
 ) -> MeasurementData:
     # gather only samples of the specified tag
     tagged_segment = GravimetricRecording(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
-    # split into sequences of stable samples
-    stable_segments: List[GravimetricRecording] = list()
-    tmp_list_of_samples: List[GravimetricSample] = list()
+    if stable:
+        # split into sequences of stable samples
+        stable_segments: List[GravimetricRecording] = list()
+        tmp_list_of_samples: List[GravimetricSample] = list()
 
-    def _store_new_stable_segment() -> None:
-        nonlocal tmp_list_of_samples
-        _seg = GravimetricRecording(tmp_list_of_samples)
-        tmp_list_of_samples = list()
-        if recorder.is_simulator or _seg.duration >= MIN_DURATION_STABLE_SEGMENT:
-            stable_segments.append(_seg)
+        def _store_new_stable_segment() -> None:
+            nonlocal tmp_list_of_samples
+            _seg = GravimetricRecording(tmp_list_of_samples)
+            tmp_list_of_samples = list()
+            if recorder.is_simulator or _seg.duration >= MIN_DURATION_STABLE_SEGMENT:
+                stable_segments.append(_seg)
 
-    for sample in tagged_segment:
-        if sample.stable:
-            tmp_list_of_samples.append(sample)
-        elif len(tmp_list_of_samples):
+        for sample in tagged_segment:
+            if sample.stable:
+                tmp_list_of_samples.append(sample)
+            elif len(tmp_list_of_samples):
+                _store_new_stable_segment()
+        if len(tmp_list_of_samples):
             _store_new_stable_segment()
-    if len(tmp_list_of_samples):
-        _store_new_stable_segment()
-    if not stable_segments:
-        raise UnstableMeasurementError()
+        if not stable_segments:
+            raise UnstableMeasurementError()
+        # default to using the final stable segment
+        segment = stable_segments[-1]
+    else:
+        segment = tagged_segment
 
-    # default to using the final stable segment
-    segment = stable_segments[-1]
     recording_grams_as_list = segment.grams_as_list
     return MeasurementData(
         celsius_pipette=e_data.celsius_pipette,
@@ -145,6 +151,7 @@ def record_measurement_data(
     pipette_mount: str,
     tag: str,
     recorder: GravimetricRecorder,
+    shorten: bool = False,
 ) -> MeasurementData:
     """Record measurement data."""
     env_data = read_environment_data(ctx, pipette_mount)
@@ -153,11 +160,13 @@ def record_measurement_data(
         if ctx.is_simulating():
             # NOTE: give a bit of time during simulation, so some fake data can be stored
             sleep(0.1)
+        elif shorten:
+            ctx.delay(1)
         else:
             for i in range(int(DELAY_FOR_MEASUREMENT)):
                 print(f"[delay] {tag}: {i + 1}/{DELAY_FOR_MEASUREMENT} seconds")
                 ctx.delay(1)
-    return _build_measurement_data(recorder, tag, env_data)
+    return _build_measurement_data(recorder, tag, env_data, stable=not shorten)
 
 
 def calculate_change_in_volume(

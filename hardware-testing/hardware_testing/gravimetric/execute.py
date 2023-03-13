@@ -207,7 +207,9 @@ def _run_trial(
                 recorder.scale.add_simulation_mass(volume * -0.001)
             elif m_type == MeasurementType.DISPENSE:
                 recorder.scale.add_simulation_mass(volume * 0.001)
-        m_data = record_measurement_data(ctx, pipette.mount, m_tag, recorder)
+        m_data = record_measurement_data(
+            ctx, pipette.mount, m_tag, recorder, shorten=inspect
+        )
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
             (
@@ -354,7 +356,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     _drop_tip()
 
     try:
-        if cfg.skip_blank:
+        if cfg.skip_blank or cfg.inspect:
             average_aspirate_evaporation_ul = 0.0
             average_dispense_evaporation_ul = 0.0
         else:
