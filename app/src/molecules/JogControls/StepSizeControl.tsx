@@ -73,8 +73,13 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
 
   const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
+    border: 1px ${COLORS.white} solid;
     height: 3.62rem;
     color: ${COLORS.black};
+
+    &:focus {
+      background-color: ${COLORS.white};
+    }
 
     &:hover {
       background-color: ${COLORS.white};
@@ -98,6 +103,11 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     ${DEFAULT_BUTTON_STYLE}
     color: ${COLORS.blueEnabled};
     border: 1px ${COLORS.blueEnabled} solid;
+
+    &:hover {
+      color: ${COLORS.blueHover};
+      border: 1px ${COLORS.blueHover} solid;
+    }
   `
   return (
     <ControlContainer title={STEP_SIZE_TITLE}>
