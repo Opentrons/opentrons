@@ -14,6 +14,7 @@ import {
   DIRECTION_ROW,
   Box,
   JUSTIFY_CENTER,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -32,7 +33,7 @@ interface RectProps {
 const BrightnessTile = styled(Box)`
   width: 5.875rem;
   height: 8.75rem;
-  border-radius: 8px;
+  border-radius: ${BORDERS.size_two};
   background: ${(props: RectProps) => (props.isActive ? '#9c3ba4' : '#E7C3E9')};
 `
 
@@ -42,13 +43,13 @@ const BrightnessTile = styled(Box)`
 const LOWEST_BRIGHTNESS = 6
 const HIGHEST_BRIGHTNESS = 1
 
-interface DisplayBrightnessProps {
+interface TouchscreenBrightnessProps {
   setCurrentOption: (currentOption: SettingOption | null) => void
 }
 
-export function DisplayBrightness({
+export function TouchscreenBrightness({
   setCurrentOption,
-}: DisplayBrightnessProps): JSX.Element {
+}: TouchscreenBrightnessProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
   const dispatch = useDispatch<Dispatch>()
   const initialBrightness = useSelector(getOnDeviceDisplaySettings).brightness
@@ -72,12 +73,12 @@ export function DisplayBrightness({
       <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
         <Btn
           onClick={() => setCurrentOption(null)}
-          data-testid="DisplayBrightness_back_button"
+          data-testid="TouchscreenBrightness_back_button"
         >
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
         <StyledText fontSize="2rem" textAlign="center">
-          {t('display_brightness')}
+          {t('touchscreen_brightness')}
         </StyledText>
       </Flex>
       <Flex
@@ -91,7 +92,7 @@ export function DisplayBrightness({
         <Btn
           disabled={brightness === LOWEST_BRIGHTNESS}
           onClick={() => handleClick('down')}
-          data-testid="DisplayBrightness_decrease"
+          data-testid="TouchscreenBrightness_decrease"
         >
           <Icon size="5rem" name="minus" />
         </Btn>
@@ -107,7 +108,7 @@ export function DisplayBrightness({
         <Btn
           disabled={brightness === HIGHEST_BRIGHTNESS}
           onClick={() => handleClick('up')}
-          data-testid="DisplayBrightness_increase"
+          data-testid="TouchscreenBrightness_increase"
         >
           <Icon size="5rem" name="plus" />
         </Btn>

@@ -16,6 +16,7 @@ describe('ExitModal', () => {
       back: jest.fn(),
       exit: jest.fn(),
       direction: 'attach',
+      isDisabled: false,
     }
   })
   it('renders the correct information and buttons for attach when no pipette is attached', () => {
@@ -37,5 +38,15 @@ describe('ExitModal', () => {
     }
     const { getByText } = render(props)
     getByText('Are you sure you want to exit before detaching your pipette?')
+  })
+
+  it('renders buttons disabled when isDisbaled is true', () => {
+    props = {
+      ...props,
+      isDisabled: true,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button', { name: 'Go back' })).toBeDisabled()
+    expect(getByRole('button', { name: 'exit' })).toBeDisabled()
   })
 })

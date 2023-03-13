@@ -2,16 +2,16 @@ import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { DisplaySleepSettings } from '../DisplaySleepSettings'
+import { TouchScreenSleep } from '../TouchScreenSleep'
 
-const render = (props: React.ComponentProps<typeof DisplaySleepSettings>) => {
-  return renderWithProviders(<DisplaySleepSettings {...props} />, {
+const render = (props: React.ComponentProps<typeof TouchScreenSleep>) => {
+  return renderWithProviders(<TouchScreenSleep {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('DisplaySleepSettings', () => {
-  let props: React.ComponentProps<typeof DisplaySleepSettings>
+describe('TouchScreenSleep', () => {
+  let props: React.ComponentProps<typeof TouchScreenSleep>
 
   beforeEach(() => {
     props = {
@@ -21,6 +21,7 @@ describe('DisplaySleepSettings', () => {
 
   it('should render text and buttons', () => {
     const [{ getByText }] = render(props)
+    getByText('Touchscreen Sleep')
     getByText('Never')
     getByText('3 minutes')
     getByText('15 minutes')

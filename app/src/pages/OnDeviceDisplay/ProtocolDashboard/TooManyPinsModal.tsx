@@ -6,6 +6,7 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -25,7 +26,7 @@ export function TooManyPinsModal(props: {
 
   return (
     <ModalShell
-      borderRadius="0.75rem"
+      borderRadius={BORDERS.size_three}
       height="26rem"
       onOutsideClick={handleCloseMaxPinsAlert}
       width="32.375rem"
@@ -52,7 +53,7 @@ export function TooManyPinsModal(props: {
         </StyledText>
         <Flex
           backgroundColor={COLORS.blueEnabled}
-          borderRadius="0.75rem"
+          borderRadius={BORDERS.size_three}
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing6}
           onClick={handleCloseMaxPinsAlert}

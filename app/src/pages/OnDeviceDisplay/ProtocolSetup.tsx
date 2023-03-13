@@ -16,6 +16,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import {
@@ -70,7 +71,7 @@ function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius="1rem"
+        borderRadius={BORDERS.size_four}
         gridGap="1.5rem"
         padding="1.5rem 1rem"
       >

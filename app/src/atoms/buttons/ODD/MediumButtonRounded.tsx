@@ -8,15 +8,17 @@ import {
   styleProps,
 } from '@opentrons/components'
 
-export const SmallButton = styled(NewPrimaryBtn)`
+export const MediumButtonRounded = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blueEnabled};
-  border-radius: ${BORDERS.size_three};
+  border-radius: ${BORDERS.size_six};
   box-shadow: none;
-  padding-left: ${SPACING.spacing4};
-  padding-right: ${SPACING.spacing4};
-  line-height: ${TYPOGRAPHY.lineHeight20};
+  height: '4.25rem';
+  font-size: ${TYPOGRAPHY.fontSize28};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight36};
+  padding: ${SPACING.spacing4} ${SPACING.spacing6};
   text-transform: ${TYPOGRAPHY.textTransformNone};
-  ${TYPOGRAPHY.pSemiBold}
+  width: '13.375rem';
 
   ${styleProps}
 
@@ -29,7 +31,7 @@ export const SmallButton = styled(NewPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode};
-    color: ${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode};
+    background-color: ${COLORS.darkBlack_twenty};
+    color: ${COLORS.darkBlack_sixty};
   }
 `
