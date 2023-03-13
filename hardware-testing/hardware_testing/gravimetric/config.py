@@ -13,6 +13,7 @@ class GravimetricConfig:
     pipette_mount: str
     tip_volume: int
     trials: int
+    starting_tip: str
     labware_offsets: List[dict]
     slot_vial: int
     slots_tiprack: List[int]

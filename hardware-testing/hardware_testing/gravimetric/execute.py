@@ -278,6 +278,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette = _load_pipette(ctx, cfg, tipracks)
     pipette_tag = get_pipette_unique_name(pipette)
     print(f'found pipette "{pipette_tag}"')
+    pipette.starting_tip = tipracks[0][cfg.starting_tip]
+    print(f"starting on tip {cfg.starting_tip}")
 
     def _drop_tip() -> None:
         if cfg.return_tip:

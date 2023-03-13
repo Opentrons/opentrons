@@ -23,6 +23,7 @@ def run(
     pipette_volume: int,
     tip_volume: int,
     trials: int,
+    starting_tip: str,
     increment: bool,
     low_volume: bool,
     return_tip: bool,
@@ -39,6 +40,7 @@ def run(
             pipette_volume=pipette_volume,
             tip_volume=tip_volume,
             trials=trials,
+            starting_tip=starting_tip,
             labware_offsets=LABWARE_OFFSETS,
             slot_vial=SLOT_VIAL,
             slots_tiprack=SLOTS_TIPRACK[tip_volume],
@@ -58,6 +60,12 @@ if __name__ == "__main__":
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--trials", type=int, required=True)
+    starting_tip_choices = [
+        f"{row}{col + 1}" for row in "ABCDEFG" for col in list(range(12))
+    ]
+    parser.add_argument(
+        "--starting-tip", type=str, choices=starting_tip_choices, required=True
+    )
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--low-volume", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
@@ -88,6 +96,7 @@ if __name__ == "__main__":
         args.pipette,
         args.tip,
         args.trials,
+        args.starting_tip,
         args.increment,
         args.low_volume,
         args.return_tip,
