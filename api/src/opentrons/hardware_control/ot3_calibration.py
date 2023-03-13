@@ -9,6 +9,8 @@ from enum import Enum
 from math import floor, copysign
 from logging import getLogger
 
+from opentrons.hardware_control.modules.types import ModuleType
+
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
@@ -673,6 +675,26 @@ async def find_slot_center_noncontact(
     return Point(x_center, y_center, estimated_center.z)
 
 
+async def find_slot_center(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    nominal_center: Point,
+    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+) -> Point:
+
+    # Perform xy offset search
+    if method == CalibrationMethod.LINEAR_SEARCH:
+        found_center = await find_slot_center_linear(hcapi, mount, nominal_center)
+    elif method == CalibrationMethod.BINARY_SEARCH:
+        found_center = await find_slot_center_binary(hcapi, mount, nominal_center)
+    elif method == CalibrationMethod.NONCONTACT_PASS:
+        # FIXME: use slot to find ideal position
+        found_center = await find_slot_center_noncontact(hcapi, mount, nominal_center)
+    else:
+        raise RuntimeError("Unknown calibration method")
+    return found_center
+
+
 async def _calibrate_mount(
     hcapi: OT3API,
     mount: OT3Mount,
@@ -710,21 +732,7 @@ async def _calibrate_mount(
         LOG.info(f"Found deck at {z_height}mm")
 
         # Perform xy offset search
-        if method == CalibrationMethod.LINEAR_SEARCH:
-            found_center = await find_slot_center_linear(
-                hcapi, mount, nominal_center._replace(z=z_height)
-            )
-        elif method == CalibrationMethod.BINARY_SEARCH:
-            found_center = await find_slot_center_binary(
-                hcapi, mount, nominal_center._replace(z=z_height)
-            )
-        elif method == CalibrationMethod.NONCONTACT_PASS:
-            # FIXME: use slot to find ideal position
-            found_center = await find_slot_center_noncontact(
-                hcapi, mount, nominal_center._replace(z=z_height)
-            )
-        else:
-            raise RuntimeError("Unknown calibration method")
+        found_center = await find_slot_center(hcapi, mount, nominal_center, method)
 
         offset = nominal_center - found_center
         # update center with values obtained during calibration
@@ -738,6 +746,46 @@ async def _calibrate_mount(
         await hcapi.reset_instrument_offset(mount, to_default=False)
         # re-raise exception after resetting instrument offset
         raise
+
+
+# FIXME (ba, 2023-03-11): This should be loaded from definitions
+def _get_module_calibration_offset(module: ModuleType) -> Point:
+    calibration_definitions = {
+        ModuleType.THERMOCYCLER: Point(),
+        # NOTE: manual measured value for for TEMPERATURE module on slot 3
+        ModuleType.TEMPERATURE: Point(-3, -1, 27.5),
+        ModuleType.MAGNETIC: Point(),
+        ModuleType.HEATER_SHAKER: Point(),
+    }
+    return calibration_definitions[module]
+
+
+async def _calibrate_module(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    module: ModuleType,
+    slot: int,
+    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+) -> Point:
+    """This will find the position of the calibration square for a given module."""
+    # Find the nominal center of the given slot
+    nominal_center = _get_calibration_square_position_in_slot(slot)
+
+    # Find the module calibration offsets
+    module_calibration_offset = _get_module_calibration_offset(module)
+    nominal_center += module_calibration_offset
+    LOG.info(f"Found nominal center {nominal_center}mm")
+
+    # Find the estimated deck height. This will be used to baseline the edge detection points.
+    z_height = await find_deck_height(hcapi, mount, nominal_center)
+    nominal_center = nominal_center._replace(z=z_height)
+    LOG.info(f"Found deck at {z_height}mm")
+
+    # Find the module square center using the given method
+    found_center = await find_slot_center(hcapi, mount, nominal_center, method)
+    offset = nominal_center - found_center
+    LOG.info(f"Found calibration value {offset} for module {module.name}")
+    return offset
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
@@ -821,3 +869,42 @@ async def calibrate_pipette(
         return offset
     finally:
         await hcapi.remove_tip(mount)
+
+
+async def calibrate_module(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    slot: int,
+    module: ModuleType,
+) -> Point:
+    """
+    Run automatic calibration for a module.
+
+    Before running this function, make sure that the appropriate probe
+    has been attached or prepped on the tool (for instance, a capacitive
+    tip has been attached, or the conductive probe has been attached,
+    or the probe has been lowered). We also need to have the module
+    prepped for calibration (for example, not heating, lid closed,
+    not shaking, etc) and the corresponding module calibration
+    block placed in the module slot. The robot should be homed.
+    """
+
+    try:
+        await hcapi.reset_instrument_offset(mount)
+        # add the probe depending on the mount
+        if mount == OT3Mount.GRIPPER:
+            hcapi.add_gripper_probe(GripperProbe.FRONT)
+        else:
+            await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+
+        # find the offset
+        offset = await _calibrate_module(hcapi, mount, module, slot)
+        # TODO (ba, 2023-03-09): save module calibration here
+        return offset
+    finally:
+        # remove probe
+        if mount == OT3Mount.GRIPPER:
+            hcapi.remove_gripper_probe()
+            await hcapi.ungrip()
+        else:
+            await hcapi.remove_tip(mount)
