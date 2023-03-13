@@ -34,13 +34,12 @@ def rename_file(path, target_file):
             shutil.copyfile( source,
                              path +'liquid_sense/pressure_data_{}.csv'.format(time.time()))
 
-def file_setup(test_data, details):
+def file_setup(test_data, details, pipette_model):
     today = datetime.date.today()
-    pipette_model = 'P1KS'
-    test_name = "{}-LSD-Z-{}-P-{}-Threshold-{}".format(pipette_model,
-                                            details[0], # mount_speed
-                                            details[1], # plunger_speed
-                                            details[2]) # sensor threshold
+    test_name = "{}-LSD-Z-{}-P-{}-Threshold-{}".format( details[0], # Pipette model
+                                            details[1], # mount_speed
+                                            details[2], # plunger_speed
+                                            details[3]) # sensor threshold
     test_header = dict_keys_to_line(test_data)
     test_tag = "-{}".format(today.strftime("%b-%d-%Y"))
     test_id = data.create_run_id()
@@ -193,6 +192,36 @@ async def _main() -> None:
     today = datetime.date.today()
     hw_api = await build_async_ot3_hardware_api(is_simulating=args.simulate,
                                     use_defaults=True)
+    pipette_model = hw_api._pipette_handler.hardware_instruments[args.mount].name
+    if args.dial_indicator:
+        test_data ={
+                    "Time_D": None,
+                    "Pipette Pos(mm)": None,
+                    "Type": None,
+                    "Triggered_z_pos": None,
+                    "Triggered_zenc_pos": None,
+                    "init_Time_L": None,
+                    "end_Time_L": None,
+                    "init_z_pos(mm)": None,
+                    "init_zenc_pos(mm)": None,
+                    "init_pmotor_pos(mm)": None,
+                    "init_penc_pos(mm)": None,
+                    "end_z_pos(mm)": None,
+                    "end_zenc_pos(mm)": None,
+                    "end_pmotor_pos(mm)": None,
+                    "end_penc_pos(mm)": None,
+                    "tip": None,
+                    "true_liquid_height": None,
+                    "mount_speed(mm/s)": None,
+                    "plunger_speed(mm/s)": None,
+                    "sensor_threshold(Pa)": None
+                }
+        gauge = dial_indicator_setup()
+        details = [ pipette_model,
+                    args.mount_speed,
+                    args.plunger_speed,
+                    args.sensor_threshold]
+        test_n , test_f  = file_setup(test_data, details)
     # Some Constants
     tip_column = 0
     columns_to_use = 12
@@ -200,9 +229,10 @@ async def _main() -> None:
                     "B1": (13.42, 288.42 , 110), "B2": (177.32 , 288.92 ,110), "B3": (341.03, 288.92,110),
                     "C1": (13.42, 181.92, 110), "C2": (177.32, 181.92,110), "C3": (341.03, 181.92,110),
                     "D1": (13.42, 75.5, 110), "D2": (177.32, 75.5,110), "D3": (341.03, 75.5,110)}
-    lp_file_name = '/var/pressure_sensor_data_P-{}_Z-{}-{}.csv'.format(args.plunger_speed,
-                                                                    args.mount_speed,
-                                                                    today.strftime("%b-%d-%Y"))
+    lp_file_name = '/var/{}-P-{}_Z-{}-{}.csv'.format( pipette_model,
+                                                    args.plunger_speed,
+                                                    args.mount_speed,
+                                                    today.strftime("%b-%d-%Y"))
     liquid_probe_settings = LiquidProbeSettings(
                                                 max_z_distance = args.max_z_distance,
                                                 min_z_distance = args.min_z_distance,
@@ -473,8 +503,8 @@ if __name__ == "__main__":
     parser.add_argument("--tips", type=int, default = 40)
     parser.add_argument("--max_z_distance", type=float, default = 40)
     parser.add_argument("--min_z_distance", type=float, default = 5)
-    parser.add_argument("--mount_speed", type=float, default = 5)
-    parser.add_argument("--plunger_speed", type=float, default = 11)
+    parser.add_argument("--mount_speed", type=float, default = 10)
+    parser.add_argument("--plunger_speed", type=float, default = 20)
     parser.add_argument("--sensor_threshold", type=float, default = 180, help = "Threshold in Pascals")
     parser.add_argument("--expected_liquid_height", type=int, default = 0)
     parser.add_argument("--log_pressure", action="store_true")
@@ -494,32 +524,5 @@ if __name__ == "__main__":
         lp_method = True
     else:
         lp_method = False
-    if args.dial_indicator:
-        test_data ={
-                    "Time_D": None,
-                    "Pipette Pos(mm)": None,
-                    "Type": None,
-                    "Triggered_z_pos": None,
-                    "Triggered_zenc_pos": None,
-                    "init_Time_L": None,
-                    "end_Time_L": None,
-                    "init_z_pos(mm)": None,
-                    "init_zenc_pos(mm)": None,
-                    "init_pmotor_pos(mm)": None,
-                    "init_penc_pos(mm)": None,
-                    "end_z_pos(mm)": None,
-                    "end_zenc_pos(mm)": None,
-                    "end_pmotor_pos(mm)": None,
-                    "end_penc_pos(mm)": None,
-                    "tip": None,
-                    "true_liquid_height": None,
-                    "mount_speed(mm/s)": None,
-                    "plunger_speed(mm/s)": None,
-                    "sensor_threshold(Pa)": None
-                }
-        gauge = dial_indicator_setup()
-        details = [ args.mount_speed,
-                    args.plunger_speed,
-                    args.sensor_threshold]
-        test_n , test_f  = file_setup(test_data, details)
+
     asyncio.run(_main())
