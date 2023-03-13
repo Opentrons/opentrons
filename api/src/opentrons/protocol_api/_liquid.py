@@ -10,6 +10,8 @@ class Liquid:
         name: A human-readable name for the liquid.
         description: An optional description.
         display_color: An optional display color for the liquid.
+
+    New in version 2.14.
     """
 
     _id: str
