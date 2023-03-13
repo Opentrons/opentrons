@@ -131,7 +131,7 @@ const PLANE_BUTTONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing3};
-  width: 9.25rem;
+  min-width: 9.8125rem;
 
   @media (max-width: 750px) {
     flex-direction: ${DIRECTION_ROW};
@@ -140,7 +140,6 @@ const PLANE_BUTTONS_STYLE = css`
 `
 
 const DEFAULT_BUTTON_STYLE = css`
-  min-width: 10rem;
   display: flex;
   border: 1px ${COLORS.white} solid;
   justify-content: ${JUSTIFY_FLEX_START};
@@ -148,6 +147,7 @@ const DEFAULT_BUTTON_STYLE = css`
   background-color: ${COLORS.white};
   color: ${COLORS.black};
   grid-gap: ${SPACING.spacing3};
+  padding: ${SPACING.spacing3};
 
   &:focus {
     background-color: ${COLORS.white};
@@ -225,7 +225,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   name={
                     plane === 'vertical' ? 'vertical-plane' : 'horizontal-plane'
                   }
-                  width="1.5rem"
+                  height="1.375rem"
                   flex="1 0 auto"
                 />
                 <Flex
