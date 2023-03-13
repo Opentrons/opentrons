@@ -165,6 +165,11 @@ const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
   color: ${COLORS.blueEnabled};
   outline: 1px ${COLORS.blueEnabled} solid;
+
+  &:hover {
+    color: ${COLORS.blueHover};
+    outline: 1px ${COLORS.blueHover} solid;
+  }
 `
 
 interface DirectionControlProps {

@@ -98,6 +98,11 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     ${DEFAULT_BUTTON_STYLE}
     color: ${COLORS.blueEnabled};
     outline: 1px ${COLORS.blueEnabled} solid;
+
+    &:hover {
+      color: ${COLORS.blueHover};
+      outline: 1px ${COLORS.blueHover} solid;
+    }
   `
   return (
     <ControlContainer title={STEP_SIZE_TITLE}>
