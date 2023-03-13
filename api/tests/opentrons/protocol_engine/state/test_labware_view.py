@@ -6,8 +6,12 @@ from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import Parameters
-from opentrons.protocols.models import LabwareDefinition
+from opentrons_shared_data.labware import load_definition
+from opentrons_shared_data.labware.labware_definition import (
+    CornerOffsetFromSlot,
+    LabwareDefinition,
+    Parameters,
+)
 from opentrons.types import DeckSlotName, Point, MountType
 
 from opentrons.protocol_engine import errors
@@ -453,20 +457,60 @@ def test_get_load_name(reservoir_def: LabwareDefinition) -> None:
     assert result == reservoir_def.parameters.loadName
 
 
-def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
-    """It should compute the dimensions of a labware."""
+def test_get_corner_offset_from_slot(well_plate_def: LabwareDefinition) -> None:
+    """It should return the definition's cornerOffsetFromSlot."""
     subject = get_labware_view(
         labware_by_id={"plate-id": plate},
         definitions_by_uri={"some-plate-uri": well_plate_def},
     )
-
-    result = subject.get_dimensions(labware_id="plate-id")
-
-    assert result == Dimensions(
-        x=well_plate_def.dimensions.xDimension,
-        y=well_plate_def.dimensions.yDimension,
-        z=well_plate_def.dimensions.zDimension,
+    assert subject.get_corner_offset_from_slot("plate-id") == CornerOffsetFromSlot(
+        x=0, y=0, z=0
     )
+
+
+@pytest.mark.parametrize(
+    ("load_name", "expected_dimensions"),
+    [
+        # Normal labware definition:
+        ("corning_96_wellplate_360ul_flat", Dimensions(x=127.76, y=85.47, z=14.22)),
+        # Buggy labware definition:
+        # dimensions.zDimension is lower than the well tops.
+        # The subject should tolerate this by taking the maximum.
+        # See Jira RSS-197.
+        (
+            "opentrons_96_aluminumblock_generic_pcr_strip_200ul",
+            Dimensions(x=127.75, y=85.5, z=25.61),
+        ),
+        # Possibly buggy labware definition:
+        # dimensions.zDimension is higher than the well tops.
+        # The subject should tolerate this by taking the maximum.
+        # See Jira RSS-197.
+        (
+            "opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt",
+            Dimensions(x=127.76, y=85.48, z=19.35),
+        ),
+    ],
+)
+def test_get_dimensions(load_name: str, expected_dimensions: Dimensions) -> None:
+    """It should compute the dimensions of a labware."""
+    definition = LabwareDefinition.parse_obj(load_definition(load_name, 1))
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="labware-load-name",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                definitionUri="some-labware-uri",
+                offsetId=None,
+                displayName=None,
+            )
+        },
+        definitions_by_uri={"some-labware-uri": definition},
+    )
+
+    result = subject.get_dimensions(labware_id="labware-id")
+
+    assert result == expected_dimensions
 
 
 def test_get_default_magnet_height(
