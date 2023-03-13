@@ -215,9 +215,8 @@ class Well:
         """
         Load a liquid into a well.
 
-        :param liquid: a :py:class:`opentrons.types.Liquid`. The return type when defining a liquid in protocol_context.define_liquid.
-            The liquid to load into the well.
-        :param volume: a float that represents the volume of liquid to load, in µL.
+        :param Liquid liquid: The liquid to load into the well.
+        :param str volume: The volume of liquid to load, in µL.
         """
         self._core.load_liquid(
             liquid=liquid,
