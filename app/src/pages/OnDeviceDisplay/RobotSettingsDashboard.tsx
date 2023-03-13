@@ -31,12 +31,15 @@ import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from './hooks'
 import {
   DeviceReset,
-  DisplayBrightness,
-  DisplaySleepSettings,
-  DisplayTextSize,
+  DisplayLEDLights,
+  EnableDeveloperTools,
+  TouchscreenBrightness,
+  TouchScreenSleep,
+  TextSize,
   NetworkSettings,
   RobotName,
   RobotSystemVersion,
+  UpdateChannel,
 } from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
 import type { IconName } from '@opentrons/components'
@@ -52,13 +55,16 @@ const SETTING_BUTTON_STYLE = css`
   border-radius: ${BORDERS.size_four};
 `
 export type SettingOption =
+  | 'NetworkSettings'
   | 'RobotName'
   | 'RobotSystemVersion'
-  | 'NetworkSettings'
-  | 'DisplaySleepSettings'
-  | 'DisplayBrightness'
-  | 'DisplayTextSize'
+  | 'DisplayLEDLights'
+  | 'TouchscreenSleep'
+  | 'TouchscreenBrightness'
+  | 'TextSize'
   | 'DeviceReset'
+  | 'UpdateChannel'
+  | 'EnableDeveloperTools'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -97,6 +103,16 @@ export function RobotSettingsDashboard(): JSX.Element {
       ) : (
         <>
           <Navigation routes={onDeviceDisplayRoutes} />
+
+          {/* Network Settings */}
+          <RobotSettingButton
+            settingName={t('network_settings')}
+            settingInfo={networkConnection?.connectionStatus}
+            currentOption="NetworkSettings"
+            setCurrentOption={setCurrentOption}
+            iconName="wifi"
+          />
+
           {/* Robot Name */}
           <RobotSettingButton
             settingName={t('robot_name')}
@@ -119,35 +135,35 @@ export function RobotSettingsDashboard(): JSX.Element {
             isUpdateAvailable={isUpdateAvailable}
             iconName="update"
           />
-          {/* Network Settings */}
+
+          {/* Display LED Lights */}
           <RobotSettingButton
-            settingName={t('network_settings')}
-            settingInfo={networkConnection?.connectionStatus}
-            currentOption="NetworkSettings"
+            settingName={t('display_led_lights')}
+            currentOption="DisplayLEDLights"
             setCurrentOption={setCurrentOption}
-            iconName="wifi"
+            iconName="light"
           />
 
-          {/* Display Sleep Settings */}
+          {/* Touchscreen Sleep */}
           <RobotSettingButton
-            settingName={t('display_sleep_settings')}
-            currentOption="DisplaySleepSettings"
+            settingName={t('touchscreen_sleep')}
+            currentOption="TouchscreenSleep"
             setCurrentOption={setCurrentOption}
             iconName="sleep"
           />
 
-          {/* Display Brightness */}
+          {/* Touchscreen Brightness */}
           <RobotSettingButton
-            settingName={t('display_brightness')}
-            currentOption="DisplayBrightness"
+            settingName={t('touchscreen_brightness')}
+            currentOption="TouchscreenBrightness"
             setCurrentOption={setCurrentOption}
             iconName="brightness"
           />
 
-          {/* Display Text Size */}
+          {/* Text Size */}
           <RobotSettingButton
-            settingName={t('display_text_size')}
-            currentOption="DisplayTextSize"
+            settingName={t('text_size')}
+            currentOption="TextSize"
             setCurrentOption={setCurrentOption}
             iconName="text-size"
           />
@@ -158,6 +174,20 @@ export function RobotSettingsDashboard(): JSX.Element {
             currentOption="DeviceReset"
             setCurrentOption={setCurrentOption}
             iconName="reset"
+          />
+          {/* Update Channel */}
+          <RobotSettingButton
+            settingName={t('update_channel')}
+            currentOption="UpdateChannel"
+            setCurrentOption={setCurrentOption}
+            iconName="wifi"
+          />
+          {/* Enable Developer Tools */}
+          <RobotSettingButton
+            settingName={t('enable_developer_tools')}
+            currentOption="EnableDeveloperTools"
+            setCurrentOption={setCurrentOption}
+            iconName="build"
           />
         </>
       )}
@@ -296,12 +326,14 @@ const SettingsContent = ({
           setCurrentOption={setCurrentOption}
         />
       )
-    case 'DisplaySleepSettings':
-      return <DisplaySleepSettings setCurrentOption={setCurrentOption} />
-    case 'DisplayBrightness':
-      return <DisplayBrightness setCurrentOption={setCurrentOption} />
-    case 'DisplayTextSize':
-      return <DisplayTextSize setCurrentOption={setCurrentOption} />
+    case 'DisplayLEDLights':
+      return <DisplayLEDLights setCurrentOption={setCurrentOption} />
+    case 'TouchscreenSleep':
+      return <TouchScreenSleep setCurrentOption={setCurrentOption} />
+    case 'TouchscreenBrightness':
+      return <TouchscreenBrightness setCurrentOption={setCurrentOption} />
+    case 'TextSize':
+      return <TextSize setCurrentOption={setCurrentOption} />
     case 'DeviceReset':
       return (
         <DeviceReset
@@ -309,5 +341,9 @@ const SettingsContent = ({
           setCurrentOption={setCurrentOption}
         />
       )
+    case 'UpdateChannel':
+      return <UpdateChannel setCurrentOption={setCurrentOption} />
+    case 'EnableDeveloperTools':
+      return <EnableDeveloperTools setCurrentOption={setCurrentOption} />
   }
 }

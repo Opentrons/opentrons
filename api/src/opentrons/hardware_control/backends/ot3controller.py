@@ -395,13 +395,22 @@ class OT3Controller:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        get_stat: Callable[
-            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
-        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+    def _get_motor_status(
+        self, ax: Sequence[OT3Axis]
+    ) -> Iterator[Optional[MotorStatus]]:
+        return (self._motor_status.get(axis_to_node(a)) for a in ax)
+
+    def check_motor_status(self, axes: Sequence[OT3Axis]) -> bool:
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
-            for status in get_stat(axes)
+            for status in self._get_motor_status(axes)
+        )
+
+    def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
+        """If any of the encoder statuses is ok, parking can proceed."""
+        return any(
+            isinstance(status, MotorStatus) and status.encoder_ok
+            for status in self._get_motor_status(axes)
         )
 
     async def update_position(self) -> OT3AxisMap[float]:
@@ -580,21 +589,6 @@ class OT3Controller:
                 }
             )
         return new_group
-
-    @requires_update
-    async def fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        """Fast home axes.
-
-        Args:
-            axes: List of axes to home.
-            margin: Margin
-
-        Returns:
-            New position.
-        """
-        return await self.home(axes)
 
     async def tip_action(
         self,
