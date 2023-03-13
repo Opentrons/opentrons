@@ -776,10 +776,10 @@ async def _calibrate_module(
     nominal_center += module_calibration_offset
     LOG.info(f"Found nominal center {nominal_center}mm")
 
-    # Find the estimated deck height. This will be used to baseline the edge detection points.
+    # Find the estimated module plate height. This will be used to baseline the edge detection points.
     z_height = await find_deck_height(hcapi, mount, nominal_center)
     nominal_center = nominal_center._replace(z=z_height)
-    LOG.info(f"Found deck at {z_height}mm")
+    LOG.info(f"Found module plate at {z_height}mm")
 
     # Find the module square center using the given method
     found_center = await find_slot_center(hcapi, mount, nominal_center, method)
@@ -890,7 +890,6 @@ async def calibrate_module(
     """
 
     try:
-        await hcapi.reset_instrument_offset(mount)
         # add the probe depending on the mount
         if mount == OT3Mount.GRIPPER:
             hcapi.add_gripper_probe(GripperProbe.FRONT)
