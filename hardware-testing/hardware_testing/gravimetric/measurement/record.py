@@ -271,6 +271,7 @@ class GravimetricRecorder:
     def __init__(self, cfg: GravimetricRecorderConfig, simulate: bool = False) -> None:
         """Gravimetric Recorder."""
         self._cfg = cfg
+        self._file_name: Optional[str] = None
         self._scale: Scale = Scale.build(simulate=simulate)
         self._recording = GravimetricRecording()
         self._is_recording = Event()
@@ -284,6 +285,11 @@ class GravimetricRecorder:
     def tag(self) -> str:
         """Tag."""
         return f"{self.__class__.__name__}-{self._cfg.tag}"
+
+    @property
+    def file_name(self) -> Optional[str]:
+        """File name."""
+        return self._file_name
 
     @property
     def config(self) -> GravimetricRecorderConfig:
@@ -462,18 +468,25 @@ class GravimetricRecorder:
         assert self._cfg.tag, "A tag is required to record samples"
         assert self._cfg.start_time
         assert self._cfg.run_id
-        _file_name = create_file_name(self._cfg.test_name, self._cfg.run_id, self.tag)
+        self._file_name = create_file_name(
+            self._cfg.test_name, self._cfg.run_id, self.tag
+        )
+        assert self.file_name
+        _start_time = self._cfg.start_time
+        _file_name = self.file_name
 
         def _on_new_sample(recording: GravimetricRecording) -> None:
             new_sample = recording[-1]
-            csv_line = new_sample.as_csv(self._cfg.start_time)
-            append_data_to_file(str(self._cfg.test_name), _file_name, csv_line + "\n")
+            csv_line = new_sample.as_csv(_start_time)
+            append_data_to_file(
+                str(self._cfg.test_name), _file_name, csv_line + "\n"
+            )  # type: ignore[arg-type]
 
         # add the header to the CSV file
         dump_data_to_file(
-            self._cfg.test_name, _file_name, GravimetricSample.csv_header() + "\n"
+            self._cfg.test_name, self._file_name, GravimetricSample.csv_header() + "\n"
         )
         _rec = self._record_samples(timeout=timeout, on_new_sample=_on_new_sample)
         # add a final newline character to the CSV file
-        append_data_to_file(self._cfg.test_name, _file_name, "\n")
+        append_data_to_file(self._cfg.test_name, self._file_name, "\n")
         return _rec

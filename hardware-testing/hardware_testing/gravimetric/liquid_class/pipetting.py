@@ -83,6 +83,10 @@ def _pipette_with_liquid_settings(
     if aspirate and dispense:
         raise ValueError("both aspirate and dispense volumes cannot be set together")
 
+    def _inspect() -> None:
+        if not ctx.is_simulating() and inspect:
+            input("ENTER to continue")
+
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
     #  2. SUBMERGE
@@ -125,33 +129,27 @@ def _pipette_with_liquid_settings(
         callbacks.on_mixing()
         if not skip_mix:
             for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
-                print(f"mixing {i + 1}/{config.NUM_MIXES_BEFORE_ASPIRATE}")
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
         # aspirate specified volume
-        print(f"aspirate: {aspirate}")
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(pipette, well, aspirate=aspirate)
         # delay
         ctx.delay(liquid_class.aspirate.delay)
-        if not ctx.is_simulating() and inspect:
-            input("ENTER to continue")
+        _inspect()
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        if not ctx.is_simulating() and inspect:
-            input("ENTER to continue")
+        _inspect()
         pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
-        if not ctx.is_simulating() and inspect:
-            input("ENTER to continue")
+        _inspect()
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
         pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
-        if not ctx.is_simulating() and inspect:
-            input("ENTER to continue")
+        _inspect()
 
     def _dispense_on_submerge() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
@@ -164,24 +162,19 @@ def _pipette_with_liquid_settings(
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
         callbacks.on_dispensing()
-        print(f"dispense: {dispense}")
-        print(f"blow-out: {liquid_class.aspirate.air_gap.leading_air_gap}")
         hw_api.blow_out(hw_mount, liquid_class.aspirate.air_gap.leading_air_gap)
         pipette.flow_rate.blow_out = old_blow_out_flow_rate
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(pipette, well, dispense=dispense)
         # delay
         ctx.delay(liquid_class.dispense.delay)
-        if not ctx.is_simulating() and inspect:
-            input("ENTER to continue")
+        _inspect()
 
     def _dispense_on_retract() -> None:
         # blow-out any remaining air in pipette (any reason why not?)
-        print("blow-out: remaining")
         callbacks.on_blowing_out()
         pipette.blow_out()
-        if not ctx.is_simulating() and inspect:
-            input("ENTER to continue")
+        _inspect()
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm))
