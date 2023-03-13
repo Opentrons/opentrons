@@ -15,6 +15,7 @@ from typing import (
     NamedTuple,
     cast,
 )
+from functools import lru_cache
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import CornerOffsetFromSlot
@@ -482,6 +483,12 @@ class LabwareView(HasState[LabwareState]):
         definition = self.get_definition(labware_id)
         return definition.cornerOffsetFromSlot
 
+    @lru_cache(
+        # Let the cache per LabwareView grow without bound.
+        # This is okay because the set of loaded labware already grows without bound,
+        # so this only makes that worse by a small constant factor.
+        maxsize=None
+    )
     def get_dimensions(self, labware_id: str) -> Dimensions:
         """Get the labware's dimensions."""
         definition = self.get_definition(labware_id)
