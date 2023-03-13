@@ -27,6 +27,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   inferModuleOrientationFromXCoordinate,
   LabwareDefinition2,
+  LabwareLocation,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -78,13 +79,15 @@ export function ProtocolSetupLabware({
   setSetupScreen,
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  // const { t: commandTextTranslator } = useTranslation('protocol_command_text')
+  const { t: commandTextTranslator } = useTranslation('protocol_command_text')
   const [showDeckMapModal, setShowDeckMapModal] = React.useState<boolean>(false)
   const [
     showLabwareDetailsModal,
     setShowLabwareDetailsModal,
   ] = React.useState<boolean>(false)
-  const selectedLabwareRef = React.useRef<LabwareDefinition2 | null>(null)
+  const selectedLabwareRef = React.useRef<
+    (LabwareDefinition2 & { location: LabwareLocation }) | null
+  >(null)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
@@ -106,10 +109,22 @@ export function ProtocolSetupLabware({
     protocolModulesInfo
   )
 
-  const handleLabwareClick = (labware: LabwareDefinition2): void => {
-    setShowLabwareDetailsModal(true)
-    selectedLabwareRef.current = labware
+  const handleLabwareClick = (
+    labwareDef: LabwareDefinition2,
+    labwareId: string
+  ): void => {
+    const foundLabwareLocation = mostRecentAnalysis?.labware.find(
+      labware => labware.id === labwareId
+    )?.location
+    if (foundLabwareLocation != null) {
+      selectedLabwareRef.current = {
+        ...labwareDef,
+        location: foundLabwareLocation,
+      }
+      setShowLabwareDetailsModal(true)
+    }
   }
+
   return (
     <>
       <Portal level="top">
@@ -157,14 +172,19 @@ export function ProtocolSetupLabware({
                           >
                             <LabwareRender
                               definition={nestedLabwareDef}
-                              onLabwareClick={handleLabwareClick}
+                              onLabwareClick={() =>
+                                handleLabwareClick(
+                                  nestedLabwareDef,
+                                  nestedLabwareId
+                                )
+                              }
                             />
                           </React.Fragment>
                         ) : null}
                       </Module>
                     )
                   )}
-                  {map(labwareRenderInfo, ({ x, y, labwareDef }) => {
+                  {map(labwareRenderInfo, ({ x, y, labwareDef }, labwareId) => {
                     return (
                       <React.Fragment
                         key={`LabwareSetup_Labware_${String(
@@ -174,7 +194,9 @@ export function ProtocolSetupLabware({
                         <g transform={`translate(${x},${y})`}>
                           <LabwareRender
                             definition={labwareDef}
-                            onLabwareClick={handleLabwareClick}
+                            onLabwareClick={() =>
+                              handleLabwareClick(labwareDef, labwareId)
+                            }
                           />
                         </g>
                       </React.Fragment>
@@ -208,14 +230,13 @@ export function ProtocolSetupLabware({
                 gridGap={SPACING.spacing4}
               >
                 <StyledText>
-                  {/* {mostRecentAnalysis != null
+                  {mostRecentAnalysis != null
                     ? getLabwareDisplayLocation(
                         mostRecentAnalysis,
-                        selectedLabwareRef.current.initialLocation <- no location on labware def
+                        selectedLabwareRef.current.location,
                         commandTextTranslator
                       )
-                    : null} */}
-                  PLACEHOLDER SLOT
+                    : null}
                 </StyledText>
                 <StyledText
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}

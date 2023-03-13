@@ -16,7 +16,7 @@ export interface StaticLabwareProps {
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   hover?: boolean
-  onLabwareClick?: (labware: LabwareDefinition2) => void
+  onLabwareClick?: () => void
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -39,7 +39,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const { isTiprack } = props.definition.parameters
   const handleLabwareClick = (): void => {
     if (props.onLabwareClick != null) {
-      props.onLabwareClick(props.definition)
+      props.onLabwareClick()
     }
   }
   return (
