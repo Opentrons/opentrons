@@ -271,10 +271,7 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
-        backend = await OT3Controller.build(checked_config)
-
-        if use_usb_bus:
-            await backend.connect_usb_to_rear_panel()
+        backend = await OT3Controller.build(checked_config, use_usb_bus)
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
@@ -502,9 +499,6 @@ class OT3API(
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
-
-    async def connect_usb_to_rear_panel(self) -> None:
-        await self._backend.connect_usb_to_rear_panel()
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""

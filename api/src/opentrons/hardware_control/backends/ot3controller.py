@@ -54,6 +54,7 @@ from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.binary_usb import (
     BinaryMessenger,
+    SerialUsbDriver,
     build_rear_panel_driver,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -161,7 +162,7 @@ class OT3Controller:
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod
-    async def build(cls, config: OT3Config) -> OT3Controller:
+    async def build(cls, config: OT3Config, use_usb_bus: bool = False) -> OT3Controller:
         """Create the OT3Controller instance.
 
         Args:
@@ -171,9 +172,23 @@ class OT3Controller:
             Instance.
         """
         driver = await build_driver(DriverSettings())
-        return cls(config, driver=driver)
+        usb_driver = None
+        if use_usb_bus:
+            try:
+                usb_driver = await build_rear_panel_driver()
+            except IOError as e:
+                log.error(
+                    "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
+                )
+                raise e
+        return cls(config, driver=driver, usb_driver=usb_driver)
 
-    def __init__(self, config: OT3Config, driver: AbstractCanDriver) -> None:
+    def __init__(
+        self,
+        config: OT3Config,
+        driver: AbstractCanDriver,
+        usb_driver: Optional[SerialUsbDriver] = None,
+    ) -> None:
         """Construct.
 
         Args:
@@ -186,8 +201,11 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._usb_messenger = None
+        if usb_driver is not None:
+            self._usb_messenger = BinaryMessenger(usb_driver)
+            self._usb_messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
-        self._network_info = NetworkInfo(self._messenger)
+        self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
@@ -1130,17 +1148,3 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
-
-    async def connect_usb_to_rear_panel(self) -> None:
-        usb_driver = None
-        try:
-            usb_driver = await build_rear_panel_driver()
-        except IOError as e:
-            log.error(
-                "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
-            )
-            raise e
-        self._usb_messenger = BinaryMessenger(usb_driver)
-        self._usb_messenger.start()
-        self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
-        await self.probe_network()
