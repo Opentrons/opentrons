@@ -11,7 +11,7 @@ class Liquid:
         description: An optional description.
         display_color: An optional display color for the liquid.
 
-    New in version 2.14.
+    .. versionadded:: 2.14
     """
 
     _id: str
