@@ -1578,9 +1578,11 @@ class OT3API(
         # This extra shake ensures those tips are removed
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
-        # Here we add in the debounce distance for the switch as
-        # a safety precaution
-        await self.retract(realmount, spec.retract_target)
+
+        if not self._backend.check_motor_status([OT3Axis.by_mount(realmount)]):
+            # Here we add in the debounce distance for the switch as
+            # a safety precaution
+            await self.retract(realmount, spec.retract_target)
 
         _add_tip_to_instrs()
 
@@ -1608,7 +1610,7 @@ class OT3API(
         instrument.working_volume = tip_volume
 
     async def drop_tip(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = True
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
     ) -> None:
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
@@ -1645,7 +1647,9 @@ class OT3API(
                     speed=move.speed,
                     home_flagged_axes=False,
                 )
-            if move.home_after:
+            if move.home_after or not self._backend.check_motor_status(
+                [OT3Axis.from_axis(ax) for ax in move.home_axes]
+            ):
                 await self._home(
                     [OT3Axis.from_axis(ax) for ax in move.home_axes],
                 )
