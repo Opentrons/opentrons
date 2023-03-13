@@ -345,12 +345,16 @@ class MagneticModuleContext(ModuleContext):
         .. deprecated:: 2.14
             This method is unnecessary; remove any usage.
         """
-        _log.warning(
-            "`MagneticModuleContext.calibrate` doesn't do anything useful"
-            " and will no-op in Protocol API version 2.14 and higher."
-        )
         if self._api_version < ENGINE_CORE_API_VERSION:
+            _log.warning(
+                "`MagneticModuleContext.calibrate` doesn't do anything useful"
+                " and will no-op in Protocol API version 2.14 and higher."
+            )
             self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
+        else:
+            raise APIVersionError(
+                "`MagneticModuleContext.calibrate` has been deprecated."
+            )
 
     @publish(command=cmds.magdeck_engage)
     @requires_version(2, 0)
