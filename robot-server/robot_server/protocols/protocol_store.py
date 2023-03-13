@@ -206,7 +206,6 @@ class ProtocolStore:
                 return p.protocol_id
         return None
 
-
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, protocol_id: str) -> bool:
         """Check for the presence of a protocol ID in the store."""
