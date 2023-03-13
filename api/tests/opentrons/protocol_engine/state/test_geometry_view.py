@@ -7,6 +7,7 @@ from typing import cast, List, Tuple, Union, Optional
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.labware_definition import CornerOffsetFromSlot
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Point, DeckSlotName
@@ -150,7 +151,6 @@ def test_get_labware_parent_position_on_module(
 
 def test_get_labware_origin_position(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -164,18 +164,14 @@ def test_get_labware_origin_position(
     )
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        CornerOffsetFromSlot(x=1.1, y=1.2, z=1.3)
+    )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(1, 2, 3)
+        Point(2.1, 2.2, 2.3)
     )
 
-    expected_parent = Point(1, 2, 3)
-    expected_offset = Point(
-        x=well_plate_def.cornerOffsetFromSlot.x,
-        y=well_plate_def.cornerOffsetFromSlot.y,
-        z=well_plate_def.cornerOffsetFromSlot.z,
-    )
-    expected_point = expected_parent + expected_offset
+    expected_point = Point(x=1.1 + 2.1, y=1.2 + 2.2, z=1.3 + 2.3)
 
     result = subject.get_labware_origin_position("labware-id")
 
@@ -184,7 +180,6 @@ def test_get_labware_origin_position(
 
 def test_get_labware_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -196,26 +191,30 @@ def test_get_labware_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         offsetId="offset-id",
     )
-    slot_pos = Point(1, 2, 3)
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(1.1, 1.2, 1.3)
+    corner_offset_from_slot = CornerOffsetFromSlot(x=2.1, y=2.2, z=2.3)
+    calibration_offset = LabwareOffsetVector(x=3.1, y=3.2, z=3.3)
+    dimensions = Dimensions(x=4.1, y=4.2, z=4.3)
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
         slot_pos
     )
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        corner_offset_from_slot
+    )
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_dimensions("labware-id")).then_return(dimensions)
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
-    assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3)
+    assert highest_z == 1.3 + 2.3 + 3.3 + 4.3
 
 
 def test_get_module_labware_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
     standard_deck_def: DeckDefinitionV3,
@@ -229,19 +228,25 @@ def test_get_module_labware_highest_z(
         location=ModuleLocation(moduleId="module-id"),
         offsetId="offset-id",
     )
-    slot_pos = Point(1, 2, 3)
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(1.1, 1.2, 1.3)
+    corner_offset_from_slot = CornerOffsetFromSlot(x=2.1, y=2.2, z=2.3)
+    calibration_offset = LabwareOffsetVector(x=3.1, y=3.2, z=3.3)
+    dimensions = Dimensions(x=4.1, y=4.2, z=4.3)
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        corner_offset_from_slot
+    )
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        slot_pos
-    )
+    decoy.when(labware_view.get_dimensions("labware-id")).then_return(dimensions)
+
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        slot_pos
     )
     decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
     decoy.when(
@@ -249,11 +254,12 @@ def test_get_module_labware_highest_z(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
+
     decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
-    assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
+    assert highest_z == 1.3 + 2.3 + 3.3 + 4.3 + 6 + 0.5
 
 
 def test_get_all_labware_highest_z_no_equipment(
@@ -273,19 +279,19 @@ def test_get_all_labware_highest_z_no_equipment(
 
 def test_get_all_labware_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    reservoir_def: LabwareDefinition,
-    falcon_tuberack_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z amongst all labware."""
+    plate_slot = DeckSlotName.SLOT_3
+    reservoir_slot = DeckSlotName.SLOT_4
+
     plate = LoadedLabware(
         id="plate-id",
         loadName="plate-load-name",
         definitionUri="plate-definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slotName=plate_slot),
         offsetId="plate-offset-id",
     )
     off_deck_lw = LoadedLabware(
@@ -299,26 +305,49 @@ def test_get_all_labware_highest_z(
         id="reservoir-id",
         loadName="reservoir-load-name",
         definitionUri="reservoir-definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        location=DeckSlotLocation(slotName=reservoir_slot),
         offsetId="reservoir-offset-id",
     )
+
+    plate_corner_offset_from_slot = CornerOffsetFromSlot(x=1, y=2, z=3)
+    off_deck_lw_corner_offset_from_slot = CornerOffsetFromSlot(x=1, y=2, z=3)
+    reservoir_corner_offset_from_slot = CornerOffsetFromSlot(x=1, y=2, z=3)
 
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     off_deck_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
-    decoy.when(module_view.get_all()).then_return([])
+    plate_slot_position = Point(1, 2, 3)
+    reservoir_slot_position = Point(4, 5, 6)
 
+    plate_dimensions = Dimensions(1, 1, 100)
+    off_deck_lw_dimensions = Dimensions(1, 1, 500)  # Taller than the other labware.
+    reservoir_dimensions = Dimensions(1, 1, 200)
+
+    decoy.when(module_view.get_all()).then_return([])
     decoy.when(labware_view.get_all()).then_return([plate, off_deck_lw, reservoir])
+
     decoy.when(labware_view.get("plate-id")).then_return(plate)
     decoy.when(labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
     decoy.when(labware_view.get("reservoir-id")).then_return(reservoir)
 
-    decoy.when(labware_view.get_definition("plate-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_definition("off-deck-plate-id")).then_return(
-        falcon_tuberack_def  # Something tall.
+    decoy.when(labware_view.get_corner_offset_from_slot("plate-id")).then_return(
+        plate_corner_offset_from_slot
     )
-    decoy.when(labware_view.get_definition("reservoir-id")).then_return(reservoir_def)
+    decoy.when(
+        labware_view.get_corner_offset_from_slot("off-deck-plate-id")
+    ).then_return(off_deck_lw_corner_offset_from_slot)
+    decoy.when(labware_view.get_corner_offset_from_slot("reservoir-id")).then_return(
+        reservoir_corner_offset_from_slot
+    )
+
+    decoy.when(labware_view.get_dimensions("plate-id")).then_return(plate_dimensions)
+    decoy.when(labware_view.get_dimensions("off-deck-plate-id")).then_return(
+        off_deck_lw_dimensions
+    )
+    decoy.when(labware_view.get_dimensions("reservoir-id")).then_return(
+        reservoir_dimensions
+    )
 
     decoy.when(labware_view.get_labware_offset_vector("plate-id")).then_return(
         plate_offset
@@ -330,11 +359,11 @@ def test_get_all_labware_highest_z(
         reservoir_offset
     )
 
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(1, 2, 3)
+    decoy.when(labware_view.get_slot_position(plate_slot)).then_return(
+        plate_slot_position
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        Point(4, 5, 6)
+    decoy.when(labware_view.get_slot_position(reservoir_slot)).then_return(
+        reservoir_slot_position
     )
 
     plate_z = subject.get_labware_highest_z("plate-id")
@@ -379,7 +408,6 @@ def test_get_all_labware_highest_z_with_modules(
 )
 def test_get_min_travel_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
     location: Optional[CurrentWell],
@@ -397,12 +425,17 @@ def test_get_min_travel_z(
     )
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
-        LabwareOffsetVector(x=0, y=0, z=3)
-    )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
         Point(0, 0, 3)
+    )
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        CornerOffsetFromSlot(x=0, y=0, z=0)
+    )
+    decoy.when(labware_view.get_dimensions("labware-id")).then_return(
+        Dimensions(x=0, y=0, z=14.22)
+    )
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        LabwareOffsetVector(x=0, y=0, z=3)
     )
 
     decoy.when(module_view.get_all()).then_return([])
@@ -417,7 +450,6 @@ def test_get_min_travel_z(
 
 def test_get_labware_position(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
@@ -429,11 +461,14 @@ def test_get_labware_position(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         offsetId="reservoir-offset-id",
     )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
+    slot_pos = Point(1.1, 1.2, 1.3)
+    corner_offset_from_slot = CornerOffsetFromSlot(x=2.1, y=2.2, z=2.3)
+    calibration_offset = LabwareOffsetVector(x=3.1, y=3.2, z=3.3)
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        corner_offset_from_slot
+    )
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
@@ -444,9 +479,9 @@ def test_get_labware_position(
     position = subject.get_labware_position(labware_id="labware-id")
 
     assert position == Point(
-        x=slot_pos[0] + well_plate_def.cornerOffsetFromSlot.x + 1,
-        y=slot_pos[1] + well_plate_def.cornerOffsetFromSlot.y - 2,
-        z=slot_pos[2] + well_plate_def.cornerOffsetFromSlot.z + 3,
+        x=slot_pos[0] + corner_offset_from_slot.x + calibration_offset.x,
+        y=slot_pos[1] + corner_offset_from_slot.y + calibration_offset.y,
+        z=slot_pos[2] + corner_offset_from_slot.z + calibration_offset.z,
     )
 
 
@@ -469,7 +504,9 @@ def test_get_well_position(
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        CornerOffsetFromSlot(x=0, y=0, z=0)
+    )
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
@@ -524,7 +561,9 @@ def test_get_module_labware_well_position(
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        CornerOffsetFromSlot(x=0, y=0, z=0)
+    )
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
@@ -572,7 +611,9 @@ def test_get_well_position_with_top_offset(
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        CornerOffsetFromSlot(x=0, y=0, z=0)
+    )
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
@@ -618,7 +659,9 @@ def test_get_well_position_with_bottom_offset(
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        CornerOffsetFromSlot(x=0, y=0, z=0)
+    )
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
@@ -664,7 +707,9 @@ def test_get_well_position_with_center_offset(
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        CornerOffsetFromSlot(x=0, y=0, z=0)
+    )
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
@@ -710,7 +755,9 @@ def test_get_relative_well_location(
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_corner_offset_from_slot("labware-id")).then_return(
+        CornerOffsetFromSlot(x=0, y=0, z=0)
+    )
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
