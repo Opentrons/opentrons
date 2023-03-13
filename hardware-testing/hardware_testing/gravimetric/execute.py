@@ -75,18 +75,16 @@ def _generate_callbacks_for_trial(
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
     # update this regularly, because the script may exit early
     env_data_list = [m.environment for tag, m in _MEASUREMENTS]
+    first_data = env_data_list[0]
+    last_data = env_data_list[-1]
+    min_data = get_min_reading(env_data_list)
+    max_data = get_max_reading(env_data_list)
     report.store_environment(
-        test_report, report.EnvironmentReportState.FIRST, env_data_list[0]
+        test_report, report.EnvironmentReportState.FIRST, first_data
     )
-    report.store_environment(
-        test_report, report.EnvironmentReportState.LAST, env_data_list[-1]
-    )
-    report.store_environment(
-        test_report, report.EnvironmentReportState.MIN, get_min_reading(env_data_list)
-    )
-    report.store_environment(
-        test_report, report.EnvironmentReportState.MAX, get_max_reading(env_data_list)
-    )
+    report.store_environment(test_report, report.EnvironmentReportState.LAST, last_data)
+    report.store_environment(test_report, report.EnvironmentReportState.MIN, min_data)
+    report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
 def _get_volumes(cfg: config.GravimetricConfig) -> List[float]:
@@ -125,11 +123,12 @@ def _load_pipette(
 def _apply_labware_offsets(
     cfg: config.GravimetricConfig, tip_racks: List[Labware], vial: Labware
 ) -> None:
-
     def _apply(labware: Labware) -> None:
         o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
-        print(f"Apply labware offset to \"{labware.name}\" (slot={labware.parent}): "
-              f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}")
+        print(
+            f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
+            f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
+        )
         labware.set_calibration(o)
 
     _apply(vial)
@@ -208,7 +207,7 @@ def _run_trial(
                 recorder.scale.add_simulation_mass(volume * -0.001)
             elif m_type == MeasurementType.DISPENSE:
                 recorder.scale.add_simulation_mass(volume * 0.001)
-        m_data = record_measurement_data(ctx, m_tag, recorder)
+        m_data = record_measurement_data(ctx, pipette.mount, m_tag, recorder)
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
             (
@@ -241,6 +240,7 @@ def _run_trial(
     )
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     print(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
+    print(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
 
     # RUN DISPENSE
     dispense_with_liquid_class(

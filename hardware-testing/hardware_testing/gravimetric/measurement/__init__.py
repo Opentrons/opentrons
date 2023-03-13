@@ -69,6 +69,7 @@ class MeasurementData(EnvironmentData):
         """Environment."""
         return EnvironmentData(
             celsius_pipette=self.celsius_pipette,
+            humidity_pipette=self.humidity_pipette,
             celsius_air=self.celsius_air,
             humidity_air=self.humidity_air,
             pascals_air=self.pascals_air,
@@ -124,6 +125,7 @@ def _build_measurement_data(
     recording_grams_as_list = segment.grams_as_list
     return MeasurementData(
         celsius_pipette=e_data.celsius_pipette,
+        humidity_pipette=e_data.humidity_pipette,
         celsius_air=e_data.celsius_air,
         humidity_air=e_data.humidity_air,
         pascals_air=e_data.pascals_air,
@@ -140,11 +142,12 @@ def _build_measurement_data(
 
 def record_measurement_data(
     ctx: ProtocolContext,
+    pipette_mount: str,
     tag: str,
     recorder: GravimetricRecorder,
 ) -> MeasurementData:
     """Record measurement data."""
-    env_data = read_environment_data()
+    env_data = read_environment_data(ctx, pipette_mount)
     # NOTE: we need to delay some amount, to give the scale time to accumulate samples
     with recorder.samples_of_tag(tag):
         if ctx.is_simulating():
