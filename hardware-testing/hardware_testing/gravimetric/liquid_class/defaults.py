@@ -9,16 +9,18 @@ from .definition import (
     interpolate,
 )
 
+# submerge/retract Z distances
+_default_submerge_mm = 1.0
+_default_retract_mm = 2.0
+
 # dispense settings are constant across volumes
-_dispense_default_submerge_mm = 2.0
-_dispense_default_retract_mm = 2.0
 _dispense_defaults = {
     50: {  # P50
         50: DispenseSettings(  # T50
             flow_rate=600,
             delay=0.4,
-            submerge=_dispense_default_submerge_mm,
-            retract=_dispense_default_retract_mm,
+            submerge=_default_submerge_mm,
+            retract=_default_retract_mm,
             acceleration=40000,
             deceleration=40000,
         ),
@@ -27,32 +29,30 @@ _dispense_defaults = {
         50: DispenseSettings(  # T50
             flow_rate=600,
             delay=0.4,
-            submerge=_dispense_default_submerge_mm,
-            retract=_dispense_default_retract_mm,
+            submerge=_default_submerge_mm,
+            retract=_default_retract_mm,
             acceleration=10000,
             deceleration=20000,
         ),
         200: DispenseSettings(  # T200
             flow_rate=600,
             delay=0,
-            submerge=_dispense_default_submerge_mm,
-            retract=_dispense_default_retract_mm,
+            submerge=_default_submerge_mm,
+            retract=_default_retract_mm,
             acceleration=10000,
             deceleration=20000,
         ),
         1000: DispenseSettings(  # T1000
             flow_rate=600,
             delay=0,
-            submerge=_dispense_default_submerge_mm,
-            retract=_dispense_default_retract_mm,
+            submerge=_default_submerge_mm,
+            retract=_default_retract_mm,
             acceleration=10000,
             deceleration=20000,
         ),
     },
 }
 
-_aspirate_default_submerge_mm = 1.0
-_aspirate_default_retract_mm = 1.0
 OT3_LIQUID_CLASS = {
     50: {  # P50
         50: {  # T50
@@ -60,8 +60,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=20,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=2,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=2,
@@ -73,8 +73,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=5.7,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=2,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=0.1,
@@ -86,8 +86,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=44.2,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=2,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=0.1,
@@ -103,8 +103,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=20,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=2,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=2,
@@ -116,8 +116,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=5.7,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=2,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=0.1,
@@ -129,8 +129,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=44.2,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=2,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=0.1,
@@ -144,8 +144,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=20,
                     delay=0.5,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=10,
                         trailing_air_gap=5,
@@ -157,8 +157,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=37.5,
                     delay=0.5,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=10,
                         trailing_air_gap=3.5,
@@ -170,8 +170,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=149,
                     delay=0.5,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=7.7,
                         trailing_air_gap=2,
@@ -185,8 +185,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=12.6,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=10,
                         trailing_air_gap=10,
@@ -198,8 +198,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=106,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=9.8,
                         trailing_air_gap=10,
@@ -211,8 +211,8 @@ OT3_LIQUID_CLASS = {
                 aspirate=AspirateSettings(
                     flow_rate=150,
                     delay=0.2,
-                    submerge=_aspirate_default_submerge_mm,
-                    retract=_aspirate_default_retract_mm,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=2,
                         trailing_air_gap=10,

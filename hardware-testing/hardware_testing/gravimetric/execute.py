@@ -125,17 +125,16 @@ def _load_pipette(
 def _apply_labware_offsets(
     cfg: config.GravimetricConfig, tip_racks: List[Labware], vial: Labware
 ) -> None:
-    vial_offset = get_latest_offset_for_labware(cfg.labware_offsets, vial)
-    rack_offsets = {
-        rack: get_latest_offset_for_labware(cfg.labware_offsets, rack)
-        for rack in tip_racks
-    }
-    print(f"\t{vial.name} (slot={vial.parent}): {vial_offset}")
-    for rack, offset in rack_offsets.items():
-        print(f"\t{rack.name} (slot={rack.parent}): {offset}")
+
+    def _apply(labware: Labware) -> None:
+        o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
+        print(f"Apply labware offset to \"{labware.name}\" (slot={labware.parent}): "
+              f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}")
+        labware.set_calibration(o)
+
+    _apply(vial)
     for rack in tip_racks:
-        rack.set_calibration(rack_offsets[rack])
-    vial.set_calibration(vial_offset)
+        _apply(rack)
 
 
 def _load_labware(
