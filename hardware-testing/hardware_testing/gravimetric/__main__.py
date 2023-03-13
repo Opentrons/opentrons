@@ -26,6 +26,8 @@ def run(
     low_volume: bool,
     return_tip: bool,
     skip_blank: bool,
+    skip_mix: bool,
+    inspect: bool,
 ) -> None:
     """Run."""
     execute.run(
@@ -43,6 +45,8 @@ def run(
             low_volume=low_volume,
             return_tip=return_tip,
             skip_blank=skip_blank,
+            skip_mix=skip_mix,
+            inspect=inspect,
         ),
     )
 
@@ -58,6 +62,8 @@ if __name__ == "__main__":
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--skip-blank", action="store_true")
+    parser.add_argument("--skip-mix", action="store_true")
+    parser.add_argument("--inspect", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -81,4 +87,6 @@ if __name__ == "__main__":
         args.low_volume,
         args.return_tip,
         args.skip_blank,
+        args.skip_mix,
+        args.inspect,
     )

@@ -74,6 +74,8 @@ def _pipette_with_liquid_settings(
     aspirate: Optional[float] = None,
     dispense: Optional[float] = None,
     blank: bool = True,
+    inspect: bool = False,
+    skip_mix: bool = False,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     if aspirate is None and dispense is None:
@@ -121,10 +123,11 @@ def _pipette_with_liquid_settings(
     def _aspirate_on_submerge() -> None:
         # mix 5x times
         callbacks.on_mixing()
-        for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
-            print(f"mixing {i + 1}/{config.NUM_MIXES_BEFORE_ASPIRATE}")
-            pipette.aspirate(aspirate)
-            pipette.dispense(aspirate)
+        if not skip_mix:
+            for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
+                print(f"mixing {i + 1}/{config.NUM_MIXES_BEFORE_ASPIRATE}")
+                pipette.aspirate(aspirate)
+                pipette.dispense(aspirate)
         # aspirate specified volume
         print(f"aspirate: {aspirate}")
         callbacks.on_aspirating()
@@ -133,14 +136,22 @@ def _pipette_with_liquid_settings(
         liquid_tracker.update_affected_wells(pipette, well, aspirate=aspirate)
         # delay
         ctx.delay(liquid_class.aspirate.delay)
+        if not ctx.is_simulating() and inspect:
+            input("ENTER to continue")
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
+        if not ctx.is_simulating() and inspect:
+            input("ENTER to continue")
         pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
+        if not ctx.is_simulating() and inspect:
+            input("ENTER to continue")
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
         pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
+        if not ctx.is_simulating() and inspect:
+            input("ENTER to continue")
 
     def _dispense_on_submerge() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
@@ -161,12 +172,16 @@ def _pipette_with_liquid_settings(
         liquid_tracker.update_affected_wells(pipette, well, dispense=dispense)
         # delay
         ctx.delay(liquid_class.dispense.delay)
+        if not ctx.is_simulating() and inspect:
+            input("ENTER to continue")
 
     def _dispense_on_retract() -> None:
         # blow-out any remaining air in pipette (any reason why not?)
         print("blow-out: remaining")
         callbacks.on_blowing_out()
         pipette.blow_out()
+        if not ctx.is_simulating() and inspect:
+            input("ENTER to continue")
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm))
@@ -213,6 +228,8 @@ def aspirate_with_liquid_class(
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = True,
+    inspect: bool = False,
+    skip_mix: bool = False,
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
@@ -231,6 +248,8 @@ def aspirate_with_liquid_class(
         callbacks,
         aspirate=aspirate_volume,
         blank=blank,
+        inspect=inspect,
+        skip_mix=skip_mix,
     )
 
 
@@ -243,6 +262,8 @@ def dispense_with_liquid_class(
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = True,
+    inspect: bool = False,
+    skip_mix: bool = False,
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
@@ -261,4 +282,6 @@ def dispense_with_liquid_class(
         callbacks,
         dispense=dispense_volume,
         blank=blank,
+        inspect=inspect,
+        skip_mix=skip_mix,
     )

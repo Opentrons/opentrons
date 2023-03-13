@@ -20,6 +20,8 @@ class GravimetricConfig:
     low_volume: bool
     return_tip: bool
     skip_blank: bool
+    skip_mix: bool
+    inspect: bool
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]

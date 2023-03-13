@@ -59,11 +59,11 @@ def _generate_callbacks_for_trial(
         on_aspirating=lambda: recorder.set_sample_tag(
             create_measurement_tag("aspirate", volume, trial)
         ),
-        on_dispensing=lambda: recorder.set_sample_tag(
-            create_measurement_tag("dispense", volume, trial)
-        ),
         on_retracting=lambda: recorder.set_sample_tag(
             create_measurement_tag("retract", volume, trial)
+        ),
+        on_dispensing=lambda: recorder.set_sample_tag(
+            create_measurement_tag("dispense", volume, trial)
         ),
         on_blowing_out=lambda: recorder.set_sample_tag(
             create_measurement_tag("blowout", volume, trial)
@@ -159,6 +159,8 @@ def _run_trial(
     test_report: report.CSVReport,
     liquid_tracker: LiquidTracker,
     blank: bool,
+    inspect: bool,
+    skip_mix: bool = False,
 ) -> Tuple[float, float]:
     pipetting_callbacks = _generate_callbacks_for_trial(recorder, volume, trial, blank)
 
@@ -198,6 +200,8 @@ def _run_trial(
         liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=blank,
+        inspect=inspect,
+        skip_mix=skip_mix,
     )
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     print(f"\tASPIRATE: grams-average={m_data_aspirate.grams_average}")
@@ -212,6 +216,8 @@ def _run_trial(
         liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=blank,
+        inspect=inspect,
+        skip_mix=skip_mix,
     )
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     print(f"\tDISPENSE: grams-average={m_data_dispense.grams_average}")
@@ -343,6 +349,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 test_report,
                 liquid_tracker,
                 blank=True,  # stay away from the liquid
+                inspect=cfg.inspect,
+                skip_mix=cfg.skip_mix,
             )
             actual_asp_list.append(evap_aspirate)
             actual_disp_list.append(evap_dispense)
@@ -377,6 +385,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     test_report,
                     liquid_tracker,
                     blank=False,
+                    inspect=cfg.inspect,
+                    skip_mix=cfg.skip_mix,
                 )
                 # factor in average evaporation (which should each be negative uL amounts)
                 asp_with_evap = actual_aspirate - average_aspirate_evaporation_ul
