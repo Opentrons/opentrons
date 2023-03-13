@@ -281,9 +281,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           handleConfirmPosition={handleConfirmPosition}
           handleGoBack={handleGoBack}
           handleJog={handleJog}
-          initialPosition={IDENTITY_VECTOR}
+          initialPosition={initialPosition}
           existingOffset={existingOffset}
-          showLiveOffset={false}
         />
       ) : (
         <PrepareSpace
