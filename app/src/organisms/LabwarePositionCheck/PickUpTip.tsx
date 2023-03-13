@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { RobotMotionLoader } from './RobotMotionLoader'
@@ -30,7 +31,7 @@ import type {
   CreateRunCommand,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset, VectorOffset } from '@opentrons/api-client'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -55,12 +56,9 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     handleJog,
     isRobotMoving,
     existingOffsets,
+    workingOffsets
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
-  const [
-    initialPosition,
-    setInitialPosition,
-  ] = React.useState<VectorOffset | null>(null)
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipetteName =
@@ -83,6 +81,13 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       }}
     />,
   ]
+
+  const initialPosition = workingOffsets.find(
+    o =>
+      o.labwareId === labwareId &&
+      isEqual(o.location, location) &&
+      o.initialPosition != null
+  )?.initialPosition
 
   const handleConfirmPlacement = (): void => {
     const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>(
@@ -130,7 +135,13 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
           {
             onSuccess: response => {
-              setInitialPosition(response.data.result?.position)
+              const { position } = response.data.result
+              registerPosition({
+                type: 'initialPosition',
+                labwareId,
+                location,
+                position,
+              })
             },
           }
         )
@@ -150,6 +161,12 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             initialPosition != null
               ? getVectorDifference(position, initialPosition)
               : position
+          registerPosition({
+            type: 'finalPosition',
+            labwareId,
+            location,
+            position,
+          })
           registerPosition({ type: 'tipPickUpOffset', offset })
           createRunCommand(
             {
@@ -216,12 +233,26 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       {
         onSuccess: () => {
           registerPosition({ type: 'tipPickUpOffset', offset: null })
+          registerPosition({
+            type: 'finalPosition',
+            labwareId,
+            location,
+            position: null,
+          })
           setShowTipConfirmation(false)
-          setInitialPosition(null)
         },
       }
     )
   }
+  const handleGoBack  = (): void => {
+    registerPosition({
+      type: 'initialPosition',
+      labwareId,
+      location,
+      position: null,
+    })
+  }
+
   const existingOffset =
     getCurrentOffsetForLabwareInLocation(
       existingOffsets,
@@ -248,7 +279,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           labwareDef={labwareDef}
           pipetteName={pipetteName}
           handleConfirmPosition={handleConfirmPosition}
-          handleGoBack={() => setInitialPosition(null)}
+          handleGoBack={handleGoBack}
           handleJog={handleJog}
           initialPosition={IDENTITY_VECTOR}
           existingOffset={existingOffset}
