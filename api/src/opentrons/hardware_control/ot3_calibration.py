@@ -8,6 +8,7 @@ import numpy as np
 from enum import Enum
 from math import floor, copysign
 from logging import getLogger
+from opentrons.util.linal import solve_attitude
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
@@ -15,6 +16,7 @@ from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
 import json
 
 from opentrons_shared_data.deck import load as load_deck
+from opentrons.calibration_storage.types import AttitudeMatrix
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -854,9 +856,9 @@ async def find_slot_center_binary_from_nominal_center(
 async def calibrate_belts(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> Tuple[Tuple[float, float], Tuple[float, float]]:
+) -> AttitudeMatrix:
     """
-    Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the 
+    Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
     actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
 
     Params
@@ -866,7 +868,7 @@ async def calibrate_belts(
 
     Returns
     -------
-    A matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
+    A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
     slot_a, slot_b, slot_c = 9, 3, 7
     point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
@@ -879,10 +881,15 @@ async def calibrate_belts(
         hcapi, mount, slot_c
     )
 
-    nominal_x = nominal_point_c.x - nominal_point_a.x
-    nominal_y = nominal_point_b.y - nominal_point_a.y
+    expected = (
+        (nominal_point_a.x, nominal_point_a.y, nominal_point_a.z),
+        (nominal_point_b.x, nominal_point_b.y, nominal_point_b.z),
+        (nominal_point_c.x, nominal_point_c.y, nominal_point_c.z),
+    )
+    actual = (
+        (point_a.x, point_a.y, point_a.z),
+        (point_b.x, point_b.y, point_b.z),
+        (point_c.x, point_c.y, point_c.z),
+    )
 
-    return (
-        ((point_c.x - point_a.x) / nominal_x),
-        ((point_b.x - point_a.x) / nominal_y),
-    ), (((point_c.y - point_a.y) / nominal_x), ((point_b.y - point_a.y) / nominal_y))
+    return solve_attitude(expected, actual)
