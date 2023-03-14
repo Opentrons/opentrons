@@ -652,29 +652,30 @@ class PipetteHandlerProvider:
                 backup_dist = -press_dist
                 yield (press_dist, backup_dist)
 
-        if instrument.channels.value == 96:
-            return (
-                PickUpTipSpec(
-                    plunger_prep_pos=instrument.plunger_positions.bottom,
-                    plunger_currents={
-                        OT3Axis.of_main_tool_actuator(
-                            mount
-                        ): instrument.plunger_motor_current.run,
-                    },
-                    presses=[],
-                    shake_off_list=[],
-                    retract_target=instrument.pick_up_configurations.distance,
-                    pick_up_motor_actions=TipMotorPickUpTipSpec(
-                        # Move onto the posts
-                        tiprack_down=top_types.Point(0, 0, -7),
-                        tiprack_up=top_types.Point(0, 0, 2),
-                        pick_up_distance=instrument.pick_up_configurations.distance,
-                        speed=instrument.pick_up_configurations.speed,
-                        currents={OT3Axis.Q: instrument.pick_up_configurations.current},
-                    ),
-                ),
-                add_tip_to_instr,
-            )
+        ### COMMENTED FOR PARTIAL TIP PICK UP
+        # if instrument.channels.value == 96:
+        #     return (
+        #         PickUpTipSpec(
+        #             plunger_prep_pos=instrument.plunger_positions.bottom,
+        #             plunger_currents={
+        #                 OT3Axis.of_main_tool_actuator(
+        #                     mount
+        #                 ): instrument.plunger_motor_current.run,
+        #             },
+        #             presses=[],
+        #             shake_off_list=[],
+        #             retract_target=instrument.pick_up_configurations.distance,
+        #             pick_up_motor_actions=TipMotorPickUpTipSpec(
+        #                 # Move onto the posts
+        #                 tiprack_down=top_types.Point(0, 0, -7),
+        #                 tiprack_up=top_types.Point(0, 0, 2),
+        #                 pick_up_distance=instrument.pick_up_configurations.distance,
+        #                 speed=instrument.pick_up_configurations.speed,
+        #                 currents={OT3Axis.Q: instrument.pick_up_configurations.current},
+        #             ),
+        #         ),
+        #         add_tip_to_instr,
+        #     )
         return (
             PickUpTipSpec(
                 plunger_prep_pos=instrument.plunger_positions.bottom,
