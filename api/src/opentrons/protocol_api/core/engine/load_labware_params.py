@@ -40,18 +40,45 @@ def resolve(
         params for params in custom_load_labware_params if matches_params(params)
     ]
 
-    # If there is no custom labware for the load name provided earlier, default anything not chosen to
-    # the opentrons defaults. If the provided namespace was OPENTRONS_NAMESPACE, there will be no custom labware
-    # associated with that namespace, meaning `custom_labware_params` will be empty and version will always
-    # default to 1 here
     if not filtered_custom_params:
+        # No custom labware matches the input, but some standard labware might.
+        # Use the Opentrons defaults for anything not explicitly provided.
+        #
+        # If the provided namespace was OPENTRONS_NAMESPACE, there would have been no
+        # custom labware matching that namespace, so we will always take this path in
+        # that case.
         resolved_namespace = namespace if namespace is not None else OPENTRONS_NAMESPACE
-        resolved_version = version if version is not None else 1
+        resolved_version = (
+            version
+            if version is not None
+            else _get_default_version_for_standard_labware(load_name=load_name)
+        )
+
     elif len(filtered_custom_params) > 1:
+        # Multiple custom labware match the input.
         raise AmbiguousLoadLabwareParamsError(
             f"Multiple custom labware associated with load name {load_name}."
         )
+
     else:
+        # Exactly one custom labware matches the input. Return it.
         resolved_namespace = filtered_custom_params[0].namespace
         resolved_version = filtered_custom_params[0].version
+
     return resolved_namespace, resolved_version
+
+
+def _get_default_version_for_standard_labware(load_name: str) -> int:
+    # v1 of many labware definitions have wrong `zDimension`s. (Jira RSS-202.)
+    #
+    # For "opentrons_96_aluminumblock_generic_pcr_strip_200ul" and
+    # "opentrons_24_aluminumblock_generic_2ml_screwcap", they're wrong enough to
+    # easily cause collisions. (Jira RSS-197.)
+    if load_name in {
+        "opentrons_24_aluminumblock_generic_2ml_screwcap",
+        "opentrons_96_aluminumblock_generic_pcr_strip_200ul",
+    }:
+        return 2
+
+    else:
+        return 1
