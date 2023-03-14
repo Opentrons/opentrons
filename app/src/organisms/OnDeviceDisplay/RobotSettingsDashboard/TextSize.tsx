@@ -13,13 +13,11 @@ import { StyledText } from '../../../atoms/text'
 
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
-interface DisplayBrightnessProps {
+interface TextSizeProps {
   setCurrentOption: (currentOption: SettingOption | null) => void
 }
 
-export function DisplayBrightness({
-  setCurrentOption,
-}: DisplayBrightnessProps): JSX.Element {
+export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -29,7 +27,7 @@ export function DisplayBrightness({
         </Btn>
       </Flex>
       <StyledText fontSize="2rem" textAlign="center">
-        {t('display_brightness')}
+        {t('text_size')}
       </StyledText>
     </Flex>
   )

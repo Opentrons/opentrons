@@ -1,9 +1,20 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import NamedTuple, cast, Tuple, Union, List, Callable, Dict, TypeVar
+from typing import (
+    NamedTuple,
+    Optional,
+    cast,
+    Tuple,
+    Union,
+    List,
+    Callable,
+    Dict,
+    TypeVar,
+)
 from typing_extensions import Literal
 from opentrons import types as top_types
+from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -227,6 +238,22 @@ class OT3Axis(enum.Enum):
             cls.G: OT3Mount.GRIPPER,
         }[inst]
 
+    @classmethod
+    def home_order(
+        cls,
+    ) -> Tuple[
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+    ]:
+        return (*cls.mount_axes(), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
+
     def __str__(self) -> str:
         return self.name
 
@@ -279,6 +306,15 @@ class PipetteSubType(enum.Enum):
     def __str__(self) -> str:
         return self.name
 
+    @classmethod
+    def from_channels(cls, channels: PipetteChannelType) -> "PipetteSubType":
+        pipette_subtype_lookup = {
+            PipetteChannelType.SINGLE_CHANNEL: cls.pipette_single,
+            PipetteChannelType.EIGHT_CHANNEL: cls.pipette_multi,
+            PipetteChannelType.NINETY_SIX_CHANNEL: cls.pipette_96,
+        }
+        return pipette_subtype_lookup[channels]
+
 
 class UpdateState(enum.Enum):
     """Update state to map from lower level FirmwareUpdateStatus"""
@@ -297,7 +333,29 @@ class UpdateStatus(NamedTuple):
     progress: int
 
 
-_subsystem_lookup = {
+@dataclass
+class InstrumentUpdateStatus:
+    mount: OT3Mount
+    status: UpdateState
+    progress: int
+
+    def update(self, status: UpdateState, progress: int) -> None:
+        self.status = status
+        self.progress = progress
+
+
+@dataclass
+class InstrumentFWInfo:
+    mount: OT3Mount
+    update_required: bool
+    current_version: int
+    next_version: Optional[int]
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: mount={self.mount} needs_update={self.update_required} version={self.current_version} -> {self.next_version}>"
+
+
+_subsystem_mount_lookup = {
     OT3Mount.LEFT: OT3SubSystem.pipette_left,
     OT3Mount.RIGHT: OT3SubSystem.pipette_right,
     OT3Mount.GRIPPER: OT3SubSystem.gripper,
@@ -305,11 +363,13 @@ _subsystem_lookup = {
 
 
 def mount_to_subsystem(mount: OT3Mount) -> OT3SubSystem:
-    return _subsystem_lookup[mount]
+    return _subsystem_mount_lookup[mount]
 
 
 def subsystem_to_mount(subsystem: OT3SubSystem) -> OT3Mount:
-    mount_lookup = {subsystem: mount for mount, subsystem in _subsystem_lookup.items()}
+    mount_lookup = {
+        subsystem: mount for mount, subsystem in _subsystem_mount_lookup.items()
+    }
     return mount_lookup[subsystem]
 
 

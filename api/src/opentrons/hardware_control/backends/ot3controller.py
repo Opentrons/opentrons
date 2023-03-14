@@ -53,8 +53,8 @@ from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.binary_usb import (
-    SerialUsbDriver,
     BinaryMessenger,
+    SerialUsbDriver,
     build_rear_panel_driver,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -83,6 +83,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
     SensorId,
     PipetteType,
+    USBTarget,
+    FirmwareTarget,
 )
 from opentrons_hardware import firmware_update
 
@@ -90,6 +92,7 @@ from opentrons_hardware import firmware_update
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
+    InstrumentFWInfo,
     OT3Axis,
     AionotifyEvent,
     OT3Mount,
@@ -141,7 +144,7 @@ def requires_update(func: Wrapped) -> Wrapped:
 
     @wraps(func)
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
-        if self.update_required:
+        if self.update_required and self.initialized:
             raise FirmwareUpdateRequired()
         return await func(self, *args, **kwargs)
 
@@ -159,7 +162,7 @@ class OT3Controller:
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod
-    async def build(cls, config: OT3Config) -> OT3Controller:
+    async def build(cls, config: OT3Config, use_usb_bus: bool = False) -> OT3Controller:
         """Create the OT3Controller instance.
 
         Args:
@@ -170,17 +173,21 @@ class OT3Controller:
         """
         driver = await build_driver(DriverSettings())
         usb_driver = None
-        try:
-            usb_driver = await build_rear_panel_driver()
-        except IOError:
-            log.error("No rear panel device found, probably an EVT bot")
+        if use_usb_bus:
+            try:
+                usb_driver = await build_rear_panel_driver()
+            except IOError as e:
+                log.error(
+                    "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
+                )
+                raise e
         return cls(config, driver=driver, usb_driver=usb_driver)
 
     def __init__(
         self,
         config: OT3Config,
         driver: AbstractCanDriver,
-        usb_driver: Optional[SerialUsbDriver],
+        usb_driver: Optional[SerialUsbDriver] = None,
     ) -> None:
         """Construct.
 
@@ -193,17 +200,17 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
+        self._usb_messenger = None
         if usb_driver is not None:
             self._usb_messenger = BinaryMessenger(usb_driver)
             self._usb_messenger.start()
-        else:
-            self._usb_messenger = None
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
-        self._network_info = NetworkInfo(self._messenger)
+        self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._update_required = False
+        self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
         try:
             self._event_watcher = self._build_event_watcher()
@@ -212,8 +219,17 @@ class OT3Controller:
                 "Failed to initiate aionotify, cannot watch modules "
                 "or door, likely because not running on linux"
             )
-        self._present_nodes: Set[NodeId] = set()
+        self._present_devices: Set[FirmwareTarget] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+
+    @property
+    def initialized(self) -> bool:
+        """True when the hardware controller has initialized and is ready."""
+        return self._initialized
+
+    @initialized.setter
+    def initialized(self, value: bool) -> None:
+        self._initialized = value
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -230,14 +246,6 @@ class OT3Controller:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    def get_update_progress(self) -> Tuple[Set[UpdateStatus], int]:
-        """Returns a tuple of UpdateStatus and total progress of the updates."""
-        updates: Set[UpdateStatus] = set()
-        total_progress: int = 0
-        if self._update_tracker:
-            updates, total_progress = self._update_tracker.get_progress()
-        return updates, total_progress
-
     @staticmethod
     def _attached_pipettes_to_nodes(
         attached_pipettes: Dict[OT3Mount, PipetteSubType]
@@ -250,17 +258,80 @@ class OT3Controller:
             pipette_nodes[node_id] = pipette_type
         return pipette_nodes
 
+    def _motor_nodes(self) -> Set[NodeId]:
+        # do the replacement of head and gripper devices
+        motor_nodes = self._replace_gripper_node(self._present_devices)
+        motor_nodes = self._replace_head_node(motor_nodes)
+        bootloader_nodes = {
+            NodeId.pipette_left_bootloader,
+            NodeId.pipette_right_bootloader,
+            NodeId.gantry_x_bootloader,
+            NodeId.gantry_y_bootloader,
+            NodeId.head_bootloader,
+            NodeId.gripper_bootloader,
+        }
+        # remove any bootloader nodes
+        motor_nodes -= bootloader_nodes
+        # filter out usb nodes
+        return {NodeId(target) for target in motor_nodes if target in NodeId}
+
+    def get_instrument_update(
+        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
+    ) -> InstrumentFWInfo:
+        """Check whether the given instrument requires an update."""
+        subsystem = mount_to_subsystem(mount)
+        node_id = sub_system_to_node_id(subsystem)
+        # get the pipette_type if this is a pipette
+        attached_pipettes: Dict[NodeId, PipetteType] = dict()
+        if mount in [OT3Mount.LEFT, OT3Mount.RIGHT] and pipette_subtype:
+            attached_pipettes[node_id] = pipette_type_for_subtype(pipette_subtype)
+
+        # check if this instrument requires an update
+        firmware_updates = firmware_update.check_firmware_updates(
+            self._network_info.device_info, attached_pipettes, targets={node_id}
+        )
+        device_info = self._network_info.device_info.get(node_id)
+        current_fw_version = device_info.version if device_info else 0
+        update_info = firmware_updates.get(node_id)
+        update_required = bool(update_info)
+        next_version = update_info[0] if update_info else None
+        # set our global firmware update state if any updates are available
+        self.update_required |= bool(firmware_updates)
+        return InstrumentFWInfo(
+            mount, update_required, current_fw_version, next_version
+        )
+
+    def get_update_progress(self) -> Set[UpdateStatus]:
+        """Returns a set of UpdateStatus of the updates."""
+        updates: Set[UpdateStatus] = set()
+        if self._update_tracker:
+            updates = self._update_tracker.get_progress()
+        return updates
+
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
-        nodes: Optional[Set[NodeId]] = None,
-    ) -> AsyncIterator[Tuple[Set[UpdateStatus], int]]:
+        targets: Optional[Set[FirmwareTarget]] = None,
+        force: bool = False,
+    ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        nodes = nodes or set()
+        # Check that there arent updates already running for given nodes
+        targets = targets or set(self._network_info.device_info)
+        targets_updating = (
+            self._update_tracker.targets if self._update_tracker else set()
+        )
+        targets_to_update = targets - targets_updating
+        if not targets_to_update:
+            log.info("No viable subsystem to update.")
+            return
+
         attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
-        # Check if devices need an update, force update if nodes are specified
+        # Check if devices need an update, only checks nodes if given
         firmware_updates = firmware_update.check_firmware_updates(
-            self._network_info.device_info, attached_pipette_nodes, nodes=nodes
+            self._network_info.device_info,
+            attached_pipette_nodes,
+            targets=targets_to_update,
+            force=force,
         )
         if not firmware_updates:
             log.info("No firmware updates required.")
@@ -271,21 +342,22 @@ class OT3Controller:
         self._update_tracker = UpdateProgress(set(firmware_updates))
         self.update_required = True
 
+        update_details = {
+            target: update_info[1] for target, update_info in firmware_updates.items()
+        }
         updater = firmware_update.RunUpdate(
             can_messenger=self._messenger,
             usb_messenger=self._usb_messenger,
-            update_details=firmware_updates,
+            update_details=update_details,
             retry_count=3,
             timeout_seconds=20,
             erase=True,
         )
 
         # start the updates and yield progress to caller
-        async for node_id, status_element in updater.run_updates():
-            updates, total_progress = self._update_tracker.update(
-                node_id, status_element
-            )
-            yield updates, total_progress
+        async for target, status_element in updater.run_updates():
+            progress = self._update_tracker.update(target, status_element)
+            yield progress
 
         # refresh the device_info cache and reset internal states
         await self._network_info.probe()
@@ -298,14 +370,13 @@ class OT3Controller:
         )
         await self.set_default_currents()
 
-    @requires_update
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
-        assert len(self._present_nodes)
-        response = await get_motor_position(self._messenger, self._present_nodes)
+        motor_nodes = self._motor_nodes()
+        assert len(motor_nodes)
+        response = await get_motor_position(self._messenger, motor_nodes)
         self._handle_motor_status_response(response)
 
-    @requires_update
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
@@ -364,13 +435,22 @@ class OT3Controller:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        get_stat: Callable[
-            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
-        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+    def _get_motor_status(
+        self, ax: Sequence[OT3Axis]
+    ) -> Iterator[Optional[MotorStatus]]:
+        return (self._motor_status.get(axis_to_node(a)) for a in ax)
+
+    def check_motor_status(self, axes: Sequence[OT3Axis]) -> bool:
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
-            for status in get_stat(axes)
+            for status in self._get_motor_status(axes)
+        )
+
+    def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
+        """If any of the encoder statuses is ok, parking can proceed."""
+        return any(
+            isinstance(status, MotorStatus) and status.encoder_ok
+            for status in self._get_motor_status(axes)
         )
 
     async def update_position(self) -> OT3AxisMap[float]:
@@ -417,7 +497,7 @@ class OT3Controller:
         Returns:
             None
         """
-        group = create_move_group(origin, moves, self._present_nodes, stop_condition)
+        group = create_move_group(origin, moves, self._motor_nodes(), stop_condition)
         move_group, _ = group
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
@@ -545,25 +625,10 @@ class OT3Controller:
                 {
                     node: axis_step
                     for node, axis_step in step.items()
-                    if node in self._present_nodes
+                    if node in self._motor_nodes()
                 }
             )
         return new_group
-
-    @requires_update
-    async def fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        """Fast home axes.
-
-        Args:
-            axes: List of axes to home.
-            margin: Margin
-
-        Returns:
-            New position.
-        """
-        return await self.home(axes)
 
     async def tip_action(
         self,
@@ -701,27 +766,28 @@ class OT3Controller:
         attached = await self._tool_detector.detect()
 
         current_tools = dict(OT3Controller._generate_attached_instrs(attached))
-        self._present_nodes -= set(
+        # remove pipette_left, pipette_right and gripper
+        self._present_devices -= set(
             axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )
+        # add pipette_left, pipette_right and gripper if present
         for mount in current_tools.keys():
-            self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
+            self._present_devices.add(
+                axis_to_node(OT3Axis.of_main_tool_actuator(mount))
+            )
         return current_tools
 
-    @requires_update
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
-        assert (
-            self._present_nodes
-        ), "No nodes available to read limit switch status from"
-        res = await get_limit_switches(self._messenger, self._present_nodes)
+        motor_nodes = self._motor_nodes()
+        assert motor_nodes, "No nodes available to read limit switch status from"
+        res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
         return [axis_to_node(OT3Axis.Q)] if OT3Axis.Q in axis_current_keys else []
 
-    @requires_update
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
@@ -905,7 +971,7 @@ class OT3Controller:
         }
 
     @staticmethod
-    def _replace_head_node(nodes: Set[NodeId]) -> Set[NodeId]:
+    def _replace_head_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
         """Replace the head core node with its two sides.
 
         The node ID for the head central controller is what shows up in a network probe,
@@ -913,36 +979,35 @@ class OT3Controller:
         the head_l and head_r synthetic node IDs, and those are what we want in the
         network map.
         """
-        if NodeId.head in nodes:
-            nodes.remove(NodeId.head)
-            nodes.add(NodeId.head_r)
-            nodes.add(NodeId.head_l)
-        return nodes
+        if NodeId.head in targets:
+            targets.remove(NodeId.head)
+            targets.add(NodeId.head_r)
+            targets.add(NodeId.head_l)
+        return targets
 
     @staticmethod
-    def _replace_gripper_node(nodes: Set[NodeId]) -> Set[NodeId]:
+    def _replace_gripper_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
         """Replace the gripper core node with its two axes.
 
         The node ID for the gripper controller is what shows up in a network probe,
         but what we actually send most commands to is the gripper_z and gripper_g
         synthetic nodes, so we should have them in the network map instead.
         """
-        if NodeId.gripper in nodes:
-            nodes.remove(NodeId.gripper)
-            nodes.add(NodeId.gripper_z)
-            nodes.add(NodeId.gripper_g)
-        return nodes
+        if NodeId.gripper in targets:
+            targets.remove(NodeId.gripper)
+            targets.add(NodeId.gripper_z)
+            targets.add(NodeId.gripper_g)
+        return targets
 
     @staticmethod
     def _filter_probed_core_nodes(
-        current_set: Set[NodeId], probed_set: Set[NodeId]
-    ) -> Set[NodeId]:
-        probed_set = OT3Controller._replace_head_node(probed_set)
-        core_replaced: Set[NodeId] = {
+        current_set: Set[FirmwareTarget], probed_set: Set[FirmwareTarget]
+    ) -> Set[FirmwareTarget]:
+        core_replaced: Set[FirmwareTarget] = {
             NodeId.gantry_x,
             NodeId.gantry_y,
-            NodeId.head_l,
-            NodeId.head_r,
+            NodeId.head,
+            USBTarget.rear_panel,
         }
         current_set -= core_replaced
         current_set |= probed_set
@@ -954,10 +1019,16 @@ class OT3Controller:
         Unlike probe_network, this always waits for the nodes that must be present for
         a working machine, and no more.
         """
-        core_nodes = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
+        core_nodes: Set[FirmwareTarget] = {
+            NodeId.gantry_x,
+            NodeId.gantry_y,
+            NodeId.head,
+        }
+        if self._usb_messenger is not None:
+            core_nodes.add(USBTarget.rear_panel)
         core_present = set(await self._network_info.probe(core_nodes, timeout))
-        self._present_nodes = self._filter_probed_core_nodes(
-            self._present_nodes, core_present
+        self._present_devices = self._filter_probed_core_nodes(
+            self._present_devices, core_present
         )
 
     async def probe_network(self, timeout: float = 5.0) -> None:
@@ -971,7 +1042,9 @@ class OT3Controller:
         # see if we should expect instruments to be present, which should be removed
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
-        expected = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
+        expected: Set[FirmwareTarget] = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
+        if self._usb_messenger:
+            expected.add(USBTarget.rear_panel)
         if instrs.get(OT3Mount.LEFT, cast("OT3AttachedPipette", {})).get(
             "config", None
         ):
@@ -985,14 +1058,12 @@ class OT3Controller:
         ):
             expected.add(NodeId.gripper)
         core_present = set(await self._network_info.probe(expected, timeout))
-        self._present_nodes = self._replace_gripper_node(
-            self._replace_head_node(core_present)
-        )
-        log.info(f"The present nodes are now {self._present_nodes}")
+        self._present_devices = core_present
+        log.info(f"The present devices are now {self._present_devices}")
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:
-            return axis_to_node(axis) in self._present_nodes
+            return axis_to_node(axis) in self._motor_nodes()
         except KeyError:
             # Currently unhandled axis
             return False
@@ -1001,7 +1072,7 @@ class OT3Controller:
         self, to_xform: OT3AxisMap[MapPayload]
     ) -> NodeMap[MapPayload]:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
-        return {k: v for k, v in by_node.items() if k in self._present_nodes}
+        return {k: v for k, v in by_node.items() if k in self._motor_nodes()}
 
     async def liquid_probe(
         self,

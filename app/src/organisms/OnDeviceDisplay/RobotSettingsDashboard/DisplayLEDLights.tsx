@@ -13,13 +13,13 @@ import { StyledText } from '../../../atoms/text'
 
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
-interface DisplaySleepSettingsProps {
+interface DisplayLEDLightsProps {
   setCurrentOption: (currentOption: SettingOption | null) => void
 }
 
-export function DisplaySleepSettings({
+export function DisplayLEDLights({
   setCurrentOption,
-}: DisplaySleepSettingsProps): JSX.Element {
+}: DisplayLEDLightsProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -29,7 +29,7 @@ export function DisplaySleepSettings({
         </Btn>
       </Flex>
       <StyledText fontSize="2rem" textAlign="center">
-        {t('display_sleep_settings')}
+        {t('display_led_lights')}
       </StyledText>
     </Flex>
   )

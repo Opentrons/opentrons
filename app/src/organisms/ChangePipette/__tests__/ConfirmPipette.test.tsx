@@ -101,6 +101,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -128,6 +129,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -163,6 +165,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -198,6 +201,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: MOCK_ACTUAL_PIPETTE,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -229,6 +233,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -264,6 +269,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -294,6 +300,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: true,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -326,6 +333,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -361,6 +369,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -389,6 +398,7 @@ describe('ConfirmPipette', () => {
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
+      isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
@@ -401,5 +411,15 @@ describe('ConfirmPipette', () => {
     const pocBtn = getByRole('button', { name: 'Calibrate pipette offset' })
     fireEvent.click(pocBtn)
     expect(props.toCalibrationDashboard).toBeCalled()
+  })
+  it('should render buttons as disabled when robot is in motion/isDisabled is true', () => {
+    props = {
+      ...props,
+      success: false,
+      isDisabled: true,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button', { name: 'Leave attached' })).toBeDisabled()
+    expect(getByRole('button', { name: 'try again' })).toBeDisabled()
   })
 })
