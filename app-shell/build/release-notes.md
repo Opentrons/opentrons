@@ -10,13 +10,19 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v6.3.0 release of the Opentrons App!
 
-### Bug Fixes
+### New Features
 
-TODO
+- Liquid Setup
+  - See a summary of the initial locations of liquids in a list or deck map view.
+  - Drill down to view exact volumes for individual wells when setting up a protocol run.
+  - Works for all protocols created with Protocol Designer, and for Python protocols that use the liquid setup methods introduced in v2.14 of the Python API.
+- Run Progress Monitor: The Run Log screen has been redesigned to give you a better sense of the progress of your protocol and to make way for future improvements.
+- The Protocols page will remember your sorting preference when you navigate away from the page.
 
 ### Improved Features
 
-TODO
+- The pipette attachment and calibration wizards have been redesigned to better match the rest of the app.
+- Labware Offset data is now available in more places, including when choosing which robot to run a protocol on.
 
 ---
 
