@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--trials", type=int, required=True)
     starting_tip_choices = [
-        f"{row}{col + 1}" for row in "ABCDEFG" for col in list(range(12))
+        f"{row}{col + 1}" for row in "ABCDEFGH" for col in list(range(12))
     ]
     parser.add_argument(
         "--starting-tip", type=str, choices=starting_tip_choices, required=True
