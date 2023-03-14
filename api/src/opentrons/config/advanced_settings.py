@@ -177,12 +177,9 @@ settings = [
         restart_required=True,
     ),
     SettingDefinition(
-        _id="enableOT3FirmwareUpdates",
-        title="Enable experimental OT-3 firmware updates",
-        description=(
-            "This is an Opentrons-internal setting to test new firmware updates."
-        ),
-        restart_required=True,
+        _id="rearPanelIntegration",
+        title="Enable robots with the new usb connected rear-panel board.",
+        description="This is an Opentrons-internal setting to test new rear-panel.",
     ),
 ]
 
@@ -520,6 +517,26 @@ def _migrate20to21(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate21to22(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 22 of the feature flags file.
+
+    - Removes deprecated enableOT3FirmwareUpdates option
+    """
+    removals = ["enableOT3FirmwareUpdates"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate22to23(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 23 of the feature flags file.
+
+    - Adds the rearPanelIntegration config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["rearPanelIntegration"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -542,6 +559,8 @@ _MIGRATIONS = [
     _migrate18to19,
     _migrate19to20,
     _migrate20to21,
+    _migrate21to22,
+    _migrate22to23,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

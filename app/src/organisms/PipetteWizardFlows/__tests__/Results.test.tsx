@@ -97,57 +97,9 @@ describe('Results', () => {
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    getByRole('button', { name: 'Results_tryAgain' }).click()
+    getByRole('button', { name: 'Detach and retry' }).click()
     await act(() => pipettePromise)
     expect(mockRefetchPipette).toHaveBeenCalled()
-  })
-  it('renders the try again button when fail to attach and clicking on buton several times renders the warning subheader', async () => {
-    props = {
-      ...props,
-      attachedPipettes: { left: null, right: null },
-      flowType: FLOWS.ATTACH,
-    }
-    const { getByText, getByRole } = render(props)
-    getByText('exit')
-    getByText('Detach and retry')
-    getByRole('button', { name: 'Results_tryAgain' }).click()
-    await act(() => pipettePromise)
-    expect(mockRefetchPipette).toHaveBeenCalled()
-    getByRole('button', { name: 'Results_tryAgain' }).click()
-    await act(() => pipettePromise)
-    expect(mockRefetchPipette).toHaveBeenCalled()
-    getByRole('button', { name: 'Results_tryAgain' }).click()
-    await act(() => pipettePromise)
-    //  warning subheader after clicking on try again 3 times
-    getByText(
-      'There may be a problem with your pipette. Exit setup and contact Opentrons Support for assistance.'
-    )
-    getByRole('button', { name: 'Results_errorExit' }).click()
-    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
-  })
-  it('renders the try again button when fail to detach and clicking on buton several times renders the warning subheader', async () => {
-    props = {
-      ...props,
-      attachedPipettes: { left: mockPipette, right: null },
-      flowType: FLOWS.DETACH,
-    }
-    const { getByText, getByRole } = render(props)
-    getByText('exit')
-    getByText('Attach and retry')
-    getByRole('button', { name: 'Results_tryAgain' }).click()
-    await act(() => pipettePromise)
-    expect(mockRefetchPipette).toHaveBeenCalled()
-    getByRole('button', { name: 'Results_tryAgain' }).click()
-    await act(() => pipettePromise)
-    expect(mockRefetchPipette).toHaveBeenCalled()
-    getByRole('button', { name: 'Results_tryAgain' }).click()
-    await act(() => pipettePromise)
-    //  warning subheader after clicking on try again 3 times
-    getByText(
-      'There may be a problem with your pipette. Exit setup and contact Opentrons Support for assistance.'
-    )
-    getByRole('button', { name: 'Results_errorExit' }).click()
-    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a success for detach flow', () => {
     props = {
@@ -175,7 +127,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    getByRole('button', { name: 'Results_tryAgain' })
+    getByRole('button', { name: 'Attach and retry' })
   })
   it('renders the correct information when pipette wizard is a fail for 96 channel attach flow and gantry not empty', async () => {
     props = {
@@ -188,7 +140,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    getByRole('button', { name: 'Results_tryAgain' }).click()
+    getByRole('button', { name: 'Attach and retry' }).click()
     await act(() => pipettePromise)
   })
   it('renders the correct information when pipette wizard is a success for 96 channel attach flow and gantry not empty', () => {

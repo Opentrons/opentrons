@@ -51,9 +51,8 @@ export function Tick(props: TickProps): JSX.Element {
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isAggregatedTick = count > 1
-  const percent = (index / (total - 1)) * 100
   const stepNumber = index + 1
-
+  const percent = (stepNumber / total) * 100
   const commandTKey =
     firstCommandType in TRANSLATION_KEY_BY_COMMAND_TYPE &&
     TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] != null

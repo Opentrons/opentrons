@@ -59,7 +59,9 @@ describe('usePipettesQuery hook', () => {
 
   it('should return no data if the getPipettes request fails', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetPipettes).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    when(mockGetPipettes)
+      .calledWith(HOST_CONFIG, { refresh: false })
+      .mockRejectedValue('oh no')
 
     const { result } = renderHook(usePipettesQuery, { wrapper })
     expect(result.current.data).toBeUndefined()
@@ -68,7 +70,7 @@ describe('usePipettesQuery hook', () => {
   it('should return all current attached pipettes', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetPipettes)
-      .calledWith(HOST_CONFIG)
+      .calledWith(HOST_CONFIG, { refresh: false })
       .mockResolvedValue({ data: PIPETTES_RESPONSE } as Response<Pipettes>)
 
     const { result, waitFor } = renderHook(usePipettesQuery, {
