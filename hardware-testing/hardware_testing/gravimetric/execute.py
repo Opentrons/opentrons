@@ -87,9 +87,12 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
-def _get_volumes(cfg: config.GravimetricConfig) -> List[float]:
+def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[float]:
     if cfg.increment:
         test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
+    elif cfg.user_volumes and not ctx.is_simulating():
+        _inp = input("Enter desired volumes, comma separated (eg: \"10,100,1000\") :")
+        test_volumes = [float(vol_str) for vol_str in _inp.strip().split(",") if vol_str]
     else:
         test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
     # anything volumes < 2uL must be done on the super-high-precision scale
@@ -289,7 +292,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             pipette.drop_tip(home_after=False)
 
     # GET TEST VOLUMES
-    test_volumes = _get_volumes(cfg)
+    test_volumes = _get_volumes(ctx, cfg)
     print("test volumes:")
     for v in test_volumes:
         print(f"\t{v} uL")
