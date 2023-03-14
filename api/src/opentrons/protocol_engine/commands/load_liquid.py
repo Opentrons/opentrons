@@ -54,14 +54,15 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
             labware_id=params.labwareId, wells=params.volumeByWell
         )
 
-        for well_name in params.volumeByWell:
+        for well_name, volume in params.volumeByWell:
             max_volume = self._state_view.labware.get_well_max_volume(
                 labware_id=params.labwareId, well_name=well_name
             )
 
-            if params.volumeByWell[well_name] > max_volume:
+            if volume > max_volume:
                 raise InvalidLoadVolumeError(
-                    f"Exceeded maximum volume of well ({max_volume} µL)."
+                    f"Well {well_name} allows max volume of {max_volume}µL"
+                    f" but {volume}µL was loaded."
                 )
 
         return LoadLiquidResult()
