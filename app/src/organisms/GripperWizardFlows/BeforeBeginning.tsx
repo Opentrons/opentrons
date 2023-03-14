@@ -86,7 +86,7 @@ export const BeforeBeginning = (
       .then(() => {
         proceed()
       })
-      .catch(() => {})
+      .catch(() => { })
   }
 
   const equipmentInfoByLoadName: {
@@ -112,6 +112,7 @@ export const BeforeBeginning = (
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
+  console.log('IS CREATE LOADING', isCreateLoading)
   return (
     <GenericWizardTile
       header={t('before_you_begin')}

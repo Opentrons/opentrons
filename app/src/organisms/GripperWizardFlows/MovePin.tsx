@@ -10,8 +10,12 @@ import {
   REMOVE_PIN_FROM_REAR_JAW,
 } from './constants'
 import { useCreateRunCommandMutation } from '../../resources/runs/hooks'
+import movePinStorageToFront from '../../assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
+import movePineFrontToRear from '../../assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
+
 import type { GripperWizardStepProps, MovePinStep } from './types'
 import type { Coordinates } from '@opentrons/shared-data'
+import { css } from 'styled-components'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Coordinates) => void
@@ -100,9 +104,15 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       body: t('move_pin_from_storage_to_front_jaw'),
       buttonText: t('begin_calibration'),
       image: (
-        <StyledText>
-          TODO image of moving pin from storage to front jaw
-        </StyledText>
+        <video
+          css={css`max-width: 100%; max-height: 15rem;`}
+          autoPlay={true}
+          loop={true}
+          controls={false}
+          aria-label='move calibration pin from storage location to front jaw'
+        >
+          <source src={movePinStorageToFront} />
+        </video>
       ),
     },
     [MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW]: {
@@ -111,7 +121,15 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       body: t('move_pin_from_front_to_rear_jaw'),
       buttonText: t('shared:continue'),
       image: (
-        <StyledText>TODO image of moving pin from front to rear jaw</StyledText>
+        <video
+          css={css`max-width: 100%; max-height: 15rem;`}
+          autoPlay={true}
+          loop={true}
+          controls={false}
+          aria-label='move calibration pin from front jaw to rear jaw'
+        >
+          <source src={movePineFrontToRear} />
+        </video>
       ),
     },
     [REMOVE_PIN_FROM_REAR_JAW]: {
