@@ -63,7 +63,7 @@ OT3_LIQUID_CLASS = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2,  # NOTE: reduced from ideal values of 15
+                        leading_air_gap=3.92,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=2,
                     ),
                 ),
@@ -76,7 +76,7 @@ OT3_LIQUID_CLASS = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2,  # NOTE: reduced from ideal values of 15
+                        leading_air_gap=3.92,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=0.1,
                     ),
                 ),
@@ -89,7 +89,7 @@ OT3_LIQUID_CLASS = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2,  # NOTE: reduced from ideal values of 15
+                        leading_air_gap=3.92,  # NOTE: reduced from ideal values of 15
                         trailing_air_gap=0.1,
                     ),
                 ),
@@ -106,7 +106,7 @@ OT3_LIQUID_CLASS = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2,  # NOTE: reduced from ideal values of 15
+                        leading_air_gap=15,
                         trailing_air_gap=2,
                     ),
                 ),
@@ -119,7 +119,7 @@ OT3_LIQUID_CLASS = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2,  # NOTE: reduced from ideal values of 15
+                        leading_air_gap=15,
                         trailing_air_gap=0.1,
                     ),
                 ),
@@ -132,7 +132,7 @@ OT3_LIQUID_CLASS = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2,  # NOTE: reduced from ideal values of 15
+                        leading_air_gap=15,
                         trailing_air_gap=0.1,
                     ),
                 ),
