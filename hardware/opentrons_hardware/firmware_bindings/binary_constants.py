@@ -18,3 +18,7 @@ class BinaryMessageId(int, Enum):
     device_info_response = 0x04
     enter_bootloader_request = 0x05
     enter_bootloader_response = 0x06
+    enable_estop = 0x07
+    disable_estop = 0x08
+    enable_nsync_out = 0x09
+    disable_nsync_out = 0x0A
