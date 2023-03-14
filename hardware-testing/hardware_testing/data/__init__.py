@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 from time import time
-from typing import Tuple
+from typing import Tuple, List, Any
 
 from opentrons.config import infer_config_base_dir
 
@@ -84,3 +84,7 @@ def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) ->
     contents.insert(line, data)
     with open(data_path, "w") as f:
         f.write("".join(contents))
+
+def convert_list_to_csv_line(data: List[Any]) -> str:
+    """Convert list to csv line."""
+    return ",".join([str(n) for n in data]) + '\n'
