@@ -176,7 +176,7 @@ def _jog_to_find_liquid_height(
             except ValueError:
                 continue
         _liquid_height = min(
-            max(_liquid_height + _jog_size, _well_depth - 20), _well_depth
+            max(_liquid_height + _jog_size, 0), _well_depth
         )
     return _liquid_height
 
