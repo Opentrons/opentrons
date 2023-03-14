@@ -116,6 +116,7 @@ export const light_one = '#d0d0d0'
 export const light_two = '#e0e0e0'
 
 export const highlightPurple_one = '#9c3ba4'
+export const highlightPurple_one_opacity20 = '#af62b6'
 export const highlightPurple_two = '#e7c3e9'
 
 // touchscreen foundational color
