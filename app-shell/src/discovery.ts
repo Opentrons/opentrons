@@ -1,8 +1,9 @@
 // app shell discovery module
-import { app } from 'electron'
+import { app, ipcMain, IpcMainInvokeEvent } from 'electron'
 import Store from 'electron-store'
 import groupBy from 'lodash/groupBy'
 import throttle from 'lodash/throttle'
+import axios, { AxiosRequestConfig } from 'axios'
 
 import {
   createDiscoveryClient,
@@ -138,6 +139,25 @@ export function registerDiscovery(
 
   app.once('will-quit', () => {
     client.stop()
+  })
+
+  async function usbListener(
+    _event: IpcMainInvokeEvent,
+    config: AxiosRequestConfig
+  ): Promise<unknown> {
+    const response = await axios.request({
+      httpAgent: client.httpAgent,
+      ...config,
+    })
+
+    const responseData = response.data
+
+    return responseData
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  app.whenReady().then(() => {
+    ipcMain.handle('usb:request', usbListener)
   })
 
   return function handleIncomingAction(action: Action) {
