@@ -57,11 +57,10 @@ export function UpdateChannel({
   const channel = useSelector(getUpdateChannel)
   const channelOptions = useSelector(getUpdateChannelOptions)
 
-  const modifiedChannelOptions = devToolsOn
+  const modifiedChannelOptions = !Boolean(devToolsOn)
     ? channelOptions.filter(option => option.value !== 'alpha')
     : channelOptions
 
-  // update channel
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     dispatch(updateConfigValue('update.channel', event.target.value))
   }

@@ -25,8 +25,7 @@ import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
 import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
-import * as Config from '../../redux/config'
-// import { getDevtoolsEnabled, updateConfigValue } from '../../redux/config'
+import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
@@ -84,7 +83,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       : null
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
-  const devToolsOn = useSelector(Config.getDevtoolsEnabled)
+  const devToolsOn = useSelector(getDevtoolsEnabled)
 
   return (
     <Flex
@@ -190,6 +189,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingInfo={t('dev_tools_description')}
             iconName="build"
             enabledDevTools
+            devToolsOn={devToolsOn}
           />
         </>
       )}
@@ -237,9 +237,7 @@ const RobotSettingButton = ({
     if (currentOption != null && setCurrentOption != null) {
       setCurrentOption(currentOption)
     } else {
-      console.log('devToolsOn', devToolsOn)
-      dispatch(Config.updateConfigValue('devtools', !devToolsOn))
-      console.log(devToolsOn)
+      dispatch(toggleDevtools())
     }
   }
 
@@ -316,7 +314,7 @@ const RobotSettingButton = ({
               lineHeight="2.25rem"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
             >
-              {devToolsOn != null ? t('shared:on') : t('shared:off')}
+              {Boolean(devToolsOn) ? t('shared:on') : t('shared:off')}
             </StyledText>
           </Flex>
         ) : null}
