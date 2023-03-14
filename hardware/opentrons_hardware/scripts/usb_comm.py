@@ -16,10 +16,6 @@ from opentrons_hardware.firmware_bindings.messages import (
     BinaryMessageDefinition,
 )
 
-from opentrons_hardware.firmware_bindings.utils import (
-    BinarySerializable,
-)
-
 log = logging.getLogger(__name__)
 
 
@@ -41,7 +37,9 @@ async def listen_task(usb_driver: SerialUsbDriver) -> None:
     Returns: Nothing.
     """
     async for message in usb_driver:
-        log.info(f"Received <-- \traw: {message}")
+        if message is not None:
+            log.info(f"Received <-- \traw: {message}")
+            print(f"Received <-- \traw: {message}")
 
 
 def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
@@ -112,8 +110,8 @@ def prompt_enum(  # noqa: C901
 
 
 def prompt_payload(
-    payload_type: Type[BinarySerializable], get_user_input: GetInputFunc
-) -> BinarySerializable:
+    payload_type: Type[BinaryMessageDefinition], get_user_input: GetInputFunc
+) -> BinaryMessageDefinition:
     """Prompt to get payload.
 
     Args:
@@ -128,11 +126,16 @@ def prompt_payload(
     i = {}
     for f in payload_fields:
         try:
-            i[f.name] = f.type.from_string(get_user_input(f"enter {f.name}: ").strip())
+            if not f.name == "message_id":
+                i[f.name] = f.type.from_string(
+                    get_user_input(f"enter {f.name}: ").strip()
+                )
+            else:
+                i[f.name] = payload_type.message_id
         except ValueError as e:
             raise InvalidInput(str(e))
     # Mypy is not liking constructing the derived types.
-    ret_instance = payload_type(**i)  # type: ignore[call-arg]
+    ret_instance = payload_type(**i)
     return ret_instance
 
 
