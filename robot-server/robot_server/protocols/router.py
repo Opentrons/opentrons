@@ -187,12 +187,18 @@ async def create_protocol(
         analysis_id=analysis_id,
     )
 
+    referenced_run_ids = protocol_store.get_linked_run_ids(protocol_id)
+
+    metadata = Metadata.parse_obj(
+        {**source.metadata, "referenced_run_ids": referenced_run_ids}
+    )
+
     data = Protocol(
         id=protocol_id,
         createdAt=created_at,
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
-        metadata=Metadata.parse_obj(source.metadata),
+        metadata=metadata,
         analysisSummaries=[pending_analysis],
         key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
