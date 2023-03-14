@@ -290,6 +290,10 @@ async def  run(args: argparse.Namespace) -> None:
         node = NodeId.pipette_left
     elif args.node == "pipette_right":
         node = NodeId.pipette_right   
+    elif args.node == "gripper_z":
+        node = NodeId.gripper_z   
+    elif args.node == "gripper_g":
+        node = NodeId.gripper_g   
 
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
