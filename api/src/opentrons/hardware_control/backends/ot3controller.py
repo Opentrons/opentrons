@@ -22,6 +22,7 @@ from typing import (
     TypeVar,
     Iterator,
     KeysView,
+    Union,
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
@@ -122,7 +123,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
 )
-from opentrons_hardware.drivers.gpio import OT3GPIO
+from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 
@@ -196,14 +197,15 @@ class OT3Controller:
             driver: The Can Driver
         """
         self._configuration = config
-        self._gpio_dev = OT3GPIO("hardware_control")
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._usb_messenger = None
+        self._gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = OT3GPIO("hardware_control")
         if usb_driver is not None:
             self._usb_messenger = BinaryMessenger(usb_driver)
             self._usb_messenger.start()
+            self._gpio_dev = RemoteOT3GPIO(self._usb_messenger)
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
         self._position = self._get_home_position()
@@ -414,7 +416,7 @@ class OT3Controller:
         return hold_currents
 
     @property
-    def gpio_chardev(self) -> OT3GPIO:
+    def gpio_chardev(self) -> Union[OT3GPIO, RemoteOT3GPIO]:
         """Get the GPIO device."""
         return self._gpio_dev
 
@@ -1142,3 +1144,39 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
+
+    async def disengage_estop(self) -> None:
+        if self._gpio_dev is None:
+            log.error("no gpio control available")
+            raise IOError("no gpio control")
+        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
+            await self._gpio_dev.deactivate_estop()
+        else:
+            self._gpio_dev.deactivate_estop()
+
+    async def engage_estop(self) -> None:
+        if self._gpio_dev is None:
+            log.error("no gpio control available")
+            raise IOError("no gpio control")
+        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
+            await self._gpio_dev.activate_estop()
+        else:
+            self._gpio_dev.activate_estop()
+
+    async def disengage_sync(self) -> None:
+        if self._gpio_dev is None:
+            log.error("no gpio control available")
+            raise IOError("no gpio control")
+        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
+            await self._gpio_dev.deactivate_nsync_out()
+        else:
+            self._gpio_dev.deactivate_nsync_out()
+
+    async def engage_sync(self) -> None:
+        if self._gpio_dev is None:
+            log.error("no gpio control available")
+            raise IOError("no gpio control")
+        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
+            await self._gpio_dev.activate_nsync_out()
+        else:
+            self._gpio_dev.activate_nsync_out()
