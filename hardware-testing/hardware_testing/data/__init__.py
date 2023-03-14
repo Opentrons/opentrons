@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 from time import time
-from typing import Tuple
+from typing import Tuple, Dict
 
 from opentrons.config import infer_config_base_dir
 
@@ -84,3 +84,37 @@ def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) ->
     contents.insert(line, data)
     with open(data_path, "w") as f:
         f.write("".join(contents))
+
+
+def load_config_(filename: str) -> Dict:
+    """This function loads a given config file"""
+    dir = os.getcwd()
+    filename = r"{}\{}".format(dir, filename)
+    # print(filename)
+    try:
+        with open(filename, "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        print("Warning: {0} not found".format(filename))
+        data = {}
+    except json.decoder.JSONDecodeError:
+        print("Error: {0} is corrupt".format(filename))
+        data = {}
+    return data
+
+
+def save_config_(filename: str, data: str) -> Dict:
+    """This function saves a given config file with data"""
+    dir = os.getcwd()
+    filename = r"{}\{}".format(dir, filename)
+    # print(filename)
+    try:
+        with open(filename, "w") as file:
+            json.dump(data, file, sort_keys=False, indent=4, separators=(",", ": "))
+    except FileNotFoundError:
+        print("Warning: {0} not found".format(filename))
+        data = {}
+    except json.decoder.JSONDecodeError:
+        print("Error: {0} is corrupt".format(filename))
+        data = {}
+    return data
