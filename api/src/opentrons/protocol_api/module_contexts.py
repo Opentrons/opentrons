@@ -124,14 +124,17 @@ class ModuleContext(CommandPublisher):
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
-        :param name: The name of the labware object.
-        :param str label: An optional display name to give the labware.
-                          If specified, this is the name the labware will use
-                          in the run log and the calibration view in the Opentrons App.
-        :param str namespace: The namespace the labware definition belongs to.
-                              If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition.
-                            If unspecified, will use version 1.
+        :param str name: See the ``load_name`` parameter of
+            :py:obj:`ProtocolContext.load_labware`.
+
+        :param str label: See the ``label`` parameter of
+            :py:obj:`ProtocolContext.load_labware`.
+
+        :param str namespace: See the ``namespace`` parameter  of
+            :py:obj:`ProtocolContext.load_labware`.
+
+        :param int version: See the ``version`` parameter  of
+            :py:obj:`ProtocolContext.load_labware`.
 
         :returns: The initialized and loaded labware object.
 
