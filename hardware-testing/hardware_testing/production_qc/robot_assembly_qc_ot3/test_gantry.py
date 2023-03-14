@@ -62,10 +62,10 @@ class AxisStatus:
 async def _read_gantry_position_and_check_alignment(
     api: OT3API, aligned_axis: Optional[OT3Axis]
 ) -> AxisStatus:
-    await api.refresh_current_position_ot3()
+    await api.refresh_positions()
     if not api.is_simulator:
         estimate = {ax: api._current_position[ax] for ax in GANTRY_AXES}
-        encoder = {ax: api._encoder_current_position[ax] for ax in GANTRY_AXES}
+        encoder = {ax: api._encoder_position[ax] for ax in GANTRY_AXES}
     else:
         estimate = {ax: 200.0 for ax in GANTRY_AXES}
         encoder = {ax: 200.0 for ax in GANTRY_AXES}

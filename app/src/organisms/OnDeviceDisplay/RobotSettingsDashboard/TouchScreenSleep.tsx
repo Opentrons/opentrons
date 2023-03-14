@@ -12,6 +12,7 @@ import {
   SPACING,
   COLORS,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -34,7 +35,7 @@ const SettingButton = styled.input`
 
 const SettingButtonLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing5};
-  border-radius: 16px;
+  border-radius: ${BORDERS.size_four};
   cursor: pointer;
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.blueEnabled : '#e0e0e0'};
@@ -43,13 +44,13 @@ const SettingButtonLabel = styled.label<LabelProps>`
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 
-interface DisplaySleepSettingsProps {
+interface TouchScreenSleepProps {
   setCurrentOption: (currentOption: SettingOption | null) => void
 }
 
-export function DisplaySleepSettings({
+export function TouchScreenSleep({
   setCurrentOption,
-}: DisplaySleepSettingsProps): JSX.Element {
+}: TouchScreenSleepProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
   // ToDo (kj:02/06/2023) This will be replaced config value via redux
   const { sleepMs } = useSelector(getOnDeviceDisplaySettings) ?? SLEEP_NEVER_MS
@@ -80,7 +81,7 @@ export function DisplaySleepSettings({
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
         <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
-          {t('sleep_settings')}
+          {t('touchscreen_sleep')}
         </StyledText>
       </Flex>
       <Flex marginTop={SPACING.spacingXXL}>
