@@ -308,7 +308,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             tag=pipette_tag,
             start_time=start_time,
             duration=0,
-            frequency=50 if ctx.is_simulating() else 5,
+            frequency=100 if ctx.is_simulating() else 5,
             stable=False,
         ),
         simulate=ctx.is_simulating(),
@@ -465,14 +465,31 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 _drop_tip()
 
             ui.print_header(f"{volume} uL CALCULATIONS")
+            # AVERAGE
+            dispense_average = sum(actual_disp_list) / len(actual_disp_list)
             aspirate_average = sum(actual_asp_list) / len(actual_asp_list)
-            aspirate_cv = stdev(actual_asp_list) / aspirate_average
+            # %CV
+            if len(actual_asp_list) <= 1:
+                print("skipping CV, only 1x trial per volume")
+                aspirate_cv = -0.01  # negative number is impossible
+                dispense_cv = -0.01
+            else:
+                aspirate_cv = stdev(actual_asp_list) / aspirate_average
+                dispense_cv = stdev(actual_disp_list) / dispense_average
+            # %D
             aspirate_d = (aspirate_average - volume) / volume
+            dispense_d = (dispense_average - volume) / volume
             print(
                 "aspirate:\n"
                 f"\tavg: {round(aspirate_average, 2)} uL\n"
                 f"\tcv: {round(aspirate_cv * 100.0, 2)}%\n"
                 f"\td: {round(aspirate_d * 100.0, 2)}%"
+            )
+            print(
+                "dispense:\n"
+                f"\tavg: {round(dispense_average, 2)} uL\n"
+                f"\tcv: {round(dispense_cv * 100.0, 2)}%\n"
+                f"\td: {round(dispense_d * 100.0, 2)}%"
             )
             report.store_volume(
                 test_report,
@@ -481,15 +498,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 aspirate_average,
                 aspirate_cv,
                 aspirate_d,
-            )
-            dispense_average = sum(actual_disp_list) / len(actual_disp_list)
-            dispense_cv = stdev(actual_disp_list) / dispense_average
-            dispense_d = (dispense_average - volume) / volume
-            print(
-                "dispense:\n"
-                f"\tavg: {round(dispense_average, 2)} uL\n"
-                f"\tcv: {round(dispense_cv * 100.0, 2)}%\n"
-                f"\td: {round(dispense_d * 100.0, 2)}%"
             )
             report.store_volume(
                 test_report,
