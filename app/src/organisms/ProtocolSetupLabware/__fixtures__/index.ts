@@ -3751,6 +3751,23 @@ export const mockUseModulesQueryClosing = {
   },
 }
 
+export const mockUseModulesQueryUnknown = {
+  data: {
+    data: [
+      {
+        id: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
+        serialNumber: 'dummySerialHS',
+        moduleType: 'heaterShakerModuleType',
+        moduleModel: 'heaterShakerModuleV1',
+        data: {
+          status: 'idle',
+          labwareLatchStatus: 'idle_unknown',
+        },
+      },
+    ],
+  },
+}
+
 export const mockProtocolModuleInfo = [
   {
     moduleId: 'ebdc5f07-57de-4b3f-a946-583f78f65675:heaterShakerModuleType',

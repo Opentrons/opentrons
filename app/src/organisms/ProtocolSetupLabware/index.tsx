@@ -318,6 +318,10 @@ function LabwareLatch({
       icon = 'latch-open'
       statusText = 'heater_shaker:closing'
       break
+    default:
+      icon = 'latch-open'
+      statusText = 'heater_shaker:open'
+      break
   }
 
   return (

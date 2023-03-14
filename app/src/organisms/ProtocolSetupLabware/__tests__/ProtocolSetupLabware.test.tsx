@@ -21,6 +21,7 @@ import {
   mockUseModulesQueryClosing,
   mockUseModulesQueryOpen,
   mockUseModulesQueryOpening,
+  mockUseModulesQueryUnknown,
 } from '../__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
@@ -158,5 +159,12 @@ describe('ProtocolSetupLabware', () => {
 
     const [{ getByText }] = render()
     getByText('Closing...')
+  })
+
+  it('defaults to open when latch status is unknown', () => {
+    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryUnknown as any)
+
+    const [{ getByText }] = render()
+    getByText('Open')
   })
 })
