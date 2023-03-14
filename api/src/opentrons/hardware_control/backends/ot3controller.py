@@ -372,8 +372,9 @@ class OT3Controller:
 
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
-        assert len(self._motor_nodes())
-        response = await get_motor_position(self._messenger, self._motor_nodes())
+        motor_nodes = self._motor_nodes()
+        assert len(motor_nodes)
+        response = await get_motor_position(self._messenger, motor_nodes)
         self._handle_motor_status_response(response)
 
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
@@ -771,11 +772,11 @@ class OT3Controller:
         attached = await self._tool_detector.detect()
 
         current_tools = dict(OT3Controller._generate_attached_instrs(attached))
-        # remove pipette_left, pipetter_right and gripper
+        # remove pipette_left, pipette_right and gripper
         self._present_devices -= set(
             axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )
-        # add pipette_left, pipeette_right and gripper if present
+        # add pipette_left, pipette_right and gripper if present
         for mount in current_tools.keys():
             self._present_devices.add(
                 axis_to_node(OT3Axis.of_main_tool_actuator(mount))
@@ -784,10 +785,9 @@ class OT3Controller:
 
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
-        assert (
-            self._motor_nodes()
-        ), "No nodes available to read limit switch status from"
-        res = await get_limit_switches(self._messenger, self._motor_nodes())
+        motor_nodes = self._motor_nodes()
+        assert motor_nodes, "No nodes available to read limit switch status from"
+        res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
     @staticmethod
@@ -1009,12 +1009,10 @@ class OT3Controller:
     def _filter_probed_core_nodes(
         current_set: Set[FirmwareTarget], probed_set: Set[FirmwareTarget]
     ) -> Set[FirmwareTarget]:
-        probed_set = OT3Controller._replace_head_node(probed_set)
         core_replaced: Set[FirmwareTarget] = {
             NodeId.gantry_x,
             NodeId.gantry_y,
-            NodeId.head_l,
-            NodeId.head_r,
+            NodeId.head,
             USBTarget.rear_panel,
         }
         current_set -= core_replaced
@@ -1035,7 +1033,9 @@ class OT3Controller:
         if self._usb_messenger is not None:
             core_nodes.add(USBTarget.rear_panel)
         core_present = set(await self._network_info.probe(core_nodes, timeout))
-        self._present_devices |= core_present
+        self._present_devices = self._filter_probed_core_nodes(
+            self._present_devices, core_present
+        )
 
     async def probe_network(self, timeout: float = 5.0) -> None:
         """Update the list of nodes present on the network.
