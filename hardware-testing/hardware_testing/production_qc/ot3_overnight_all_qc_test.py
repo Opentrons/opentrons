@@ -112,6 +112,15 @@ def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Poi
     ]
     return mounts_up_down_points
 
+def _create_mounts_up_down_points_(homed_position: types.Point) -> List[types.Point]:
+    pos_max = homed_position - types.Point(x=1, y=1, z=1)
+    pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
+    mounts_up_down_points = [
+        pos_max._replace(z=pos_max.z - 37),  # down
+        pos_max,  # up
+    ]
+    return mounts_up_down_points
+
 async def _move_and_check(api: OT3API, is_simulating: bool, mount: types.OT3Mount, position: types.Point) -> None:
     if not is_simulating:
         await api.move_to(mount,position)
@@ -158,6 +167,39 @@ async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Moun
         _record_axis_data('Hour_glass',write_cb,es,en,al)
         print(f'hour glass results: {al}')
 
+async def _run_gripper(api: OT3API,delta: float) -> None:
+    try:
+        #print(types.Point)
+        mount = types.OT3Mount.GRIPPER
+        current_pos = await api.gantry_position(mount)
+        #print("1",current_pos)
+        travel_height = max(1, 37)
+        #print("2",current_pos._replace(z=travel_height))
+        await api.move_to(mount, current_pos._replace(z=travel_height))
+        await api.grip(20)
+        await api.ungrip()
+        current_pos = await api.gantry_position(mount)
+        #print("3",current_pos)
+        await api.move_to(mount, current_pos._replace(z=1))
+        current_pos = await api.gantry_position(mount)
+        # print("4",current_pos)
+        # print(types.Point)
+        await api.move_rel(mount, types.Point(z=164))
+        
+        
+    except Exception as err:
+        print("gripper err",err)
+
+async def _run_pipper(api: OT3API,tpye="left"):
+    if tpye == "left":
+        mount = types.OT3Mount.LEFT
+    elif tpye == "right":
+        mount = types.OT3Mount.RIGHT
+    plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    top, bottom, blowout, drop_tip = plunger_poses
+    await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
+    await helpers_ot3.move_plunger_absolute_ot3(api, mount, top)
+
 async def _main(arguments: argparse.Namespace) -> None:
     # callback function for writing new data to CSV file
     csv_props, csv_cb = _create_csv_and_get_callbacks(arguments.sn)
@@ -177,6 +219,11 @@ async def _main(arguments: argparse.Namespace) -> None:
     ui.print_title(test_name.replace("_", " ").upper())
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=arguments.simulate)
     await helpers_ot3.home_ot3(api)
+    await _run_gripper(api,10)
+    await _run_pipper(api)
+    time.sleep(1)
+    await _run_pipper(api,"right")
+    time.sleep(100000)
     ui.get_user_ready("Is the deck totally empty?")
     encoder = {ax: api._encoder_current_position[ax] for ax in GANTRY_AXES}
     mount = types.OT3Mount.LEFT
@@ -192,7 +239,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                 await _run_hour_glass(api,arguments.simulate,mount,csv_cb.write)
                 if not arguments.skip_mount:
                     await _run_mount_up_down(api,arguments.simulate,csv_cb.write)
-        
+            
     await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
     ui.print_title('Test Done')
 
