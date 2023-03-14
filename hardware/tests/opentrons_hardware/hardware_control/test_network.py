@@ -30,6 +30,7 @@ def mock_can_messenger() -> AsyncMock:
     """Mock communication."""
     return AsyncMock(spec=CanMessenger)
 
+
 @pytest.fixture
 def mock_usb_messenger() -> AsyncMock:
     """Mock communication."""
@@ -81,6 +82,7 @@ class MockCanStatusResponder:
                     ),
                 )
 
+
 class MockUSBStatusResponder:
     """A harness that will automatically send status responses."""
 
@@ -94,9 +96,7 @@ class MockUSBStatusResponder:
         self._mock_messenger.send.side_effect = self.send
         self._respond_with_nodes = respond_with_nodes
 
-    def add_callback(
-        self, callback: Callable[[BinaryMessageDefinition], None]
-    ) -> None:
+    def add_callback(self, callback: Callable[[BinaryMessageDefinition], None]) -> None:
         """Wrap the add_callback mock method."""
         self._callbacks.append(callback)
 
@@ -106,10 +106,10 @@ class MockUSBStatusResponder:
         for callback in self._callbacks:
             for node in self._respond_with_nodes:
                 response = binary_message_definitions.DeviceInfoResponse(
-                        version=utils.UInt32Field(0),
-                        flags=fields.VersionFlagsField(0),
-                        shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
-                        revision=fields.OptionalRevisionField.build(b""),
+                    version=utils.UInt32Field(0),
+                    flags=fields.VersionFlagsField(0),
+                    shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
+                    revision=fields.OptionalRevisionField.build(b""),
                 )
                 asyncio.get_running_loop().call_soon(
                     callback,
@@ -181,9 +181,14 @@ async def test_handles_bad_node_ids(mock_can_messenger: AsyncMock) -> None:
     # we should get everything we prepped the network with and ignore the bad values
     assert probed == {NodeId.gantry_x}
 
-async def test_handles_usb_target(mock_can_messenger: AsyncMock, mock_usb_messenger: AsyncMock) -> None:
+
+async def test_handles_usb_target(
+    mock_can_messenger: AsyncMock, mock_usb_messenger: AsyncMock
+) -> None:
     """Test that network probe handles rear-panel usb target."""
     _ = MockUSBStatusResponder(mock_usb_messenger, [USBTarget.rear_panel])
     network_info = NetworkInfo(mock_can_messenger, mock_usb_messenger)
-    probed = set(await asyncio.wait_for(network_info.probe({USBTarget.rear_panel}), 2.0))
+    probed = set(
+        await asyncio.wait_for(network_info.probe({USBTarget.rear_panel}), 2.0)
+    )
     assert probed == {USBTarget.rear_panel}
