@@ -3,7 +3,7 @@ import { MediumButtonRounded } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Atoms/MediumButtonRounded',
+  title: 'ODD/Atoms/Buttons/MediumButtonRounded',
   argTypes: { onClick: { action: 'clicked' } },
 } as Meta
 

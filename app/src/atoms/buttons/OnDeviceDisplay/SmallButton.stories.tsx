@@ -5,7 +5,7 @@ import { SmallButton } from './SmallButton'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Atoms/SmallButton',
+  title: 'ODD/Atoms/Buttons/SmallButton',
   component: SmallButton,
 } as Meta
 
@@ -17,35 +17,35 @@ export const Default = Template.bind({})
 Default.args = {
   onClick: () => console.log('click'),
   buttonType: 'default',
-  buttonText: 'text',
+  buttonText: 'Button text',
 }
 
 export const Alert = Template.bind({})
 Alert.args = {
   onClick: () => console.log('click'),
   buttonType: 'alert',
-  buttonText: 'text',
+  buttonText: 'Button text',
 }
 
 export const Alt = Template.bind({})
 Alt.args = {
   onClick: () => console.log('click'),
   buttonType: 'alt',
-  buttonText: 'text',
+  buttonText: 'Button text',
 }
 
 export const GhostLow = Template.bind({})
 GhostLow.args = {
   onClick: () => console.log('click'),
   buttonType: 'ghostLow',
-  buttonText: 'text',
+  buttonText: 'Button text',
 }
 
 export const GhostHighBlack = Template.bind({})
 GhostHighBlack.args = {
   onClick: () => console.log('click'),
   buttonType: 'ghostHigh',
-  buttonText: 'text',
+  buttonText: 'Button text',
   textColor: COLORS.darkBlackEnabled,
 }
 
@@ -53,6 +53,6 @@ export const GhostHighBlue = Template.bind({})
 GhostHighBlue.args = {
   onClick: () => console.log('click'),
   buttonType: 'ghostHigh',
-  buttonText: 'text',
+  buttonText: 'Button text',
   textColor: COLORS.blueEnabled,
 }

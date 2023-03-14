@@ -106,7 +106,7 @@ export function Banner(props: BannerProps): JSX.Element {
 
     @media ${ODD_MEDIA_QUERY_SPECS} {
       font-size: 1.25rem;
-      font-weight${TYPOGRAPHY.fontWeightSemiBold};
+      font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       border: none;
       background-color: ${COLORS.yellow_three};
       border-radius: ${BORDERS.size_three};

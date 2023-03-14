@@ -69,7 +69,7 @@ export const BeforeBeginning = (
     return null
 
   let equipmentList = [CALIBRATION_PROBE]
-  const proceedButtonText: string = t('move_gantry_to_front')
+  const proceedButtonText = t('move_gantry_to_front')
   let bodyTranslationKey: string = ''
 
   switch (flowType) {

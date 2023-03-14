@@ -1,13 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  Flex,
-  TEXT_ALIGN_CENTER,
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
-} from '@opentrons/components'
+import { Flex, TYPOGRAPHY, COLORS, SPACING } from '@opentrons/components'
 import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -24,7 +18,7 @@ interface AttachProbeProps extends PipetteWizardStepProps {
 
 const IN_PROGRESS_STYLE = css`
   ${TYPOGRAPHY.pRegular};
-  text-align: ${TEXT_ALIGN_CENTER};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
 
   @media ${ODD_MEDIA_QUERY_SPECS} {
     font-size: 1.75rem;

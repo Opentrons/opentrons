@@ -9,7 +9,6 @@ import {
   SPACING,
   Flex,
   Icon,
-  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
@@ -34,7 +33,7 @@ const DESCRIPTION_STYLE = css`
     margin-bottom: ${SPACING.spacing2};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
-    text-align: ${TEXT_ALIGN_CENTER};
+    text-align: ${TYPOGRAPHY.textAlignCenter};
     line-height: 2.625rem;
   }
 `

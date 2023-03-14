@@ -47,8 +47,7 @@ const GO_BACK_BUTTON_STYLE = css`
 `
 const GO_BACK_BUTTON_DISABLED_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
-  opacity: 70%;
+  color: ${COLORS.darkBlack_seventy};
 `
 const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
@@ -107,7 +106,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      height={isOnDevice ? '30rem' : '24.625rem'}
+      height={Boolean(isOnDevice) ? '30rem' : '24.625rem'}
       padding={SPACING.spacing6}
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
@@ -144,11 +143,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (
           isOnDevice ? (
-            <SmallButton
-              buttonText={proceedButtonText}
-              buttonType="default"
-              onClick={proceed}
-            />
+            <SmallButton buttonText={proceedButtonText} onClick={proceed} />
           ) : (
             <PrimaryButton
               disabled={proceedIsDisabled}

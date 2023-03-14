@@ -12,11 +12,9 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
-  TEXT_ALIGN_CENTER,
   POSITION_ABSOLUTE,
   JUSTIFY_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -162,7 +160,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             <StyledText
               fontSize="1.75rem"
               fontWeight={700}
-              alignSelf={ALIGN_CENTER}
+              alignSelf={TYPOGRAPHY.textAlignCenter}
             >
               {singleMount}
             </StyledText>
@@ -175,7 +173,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             <StyledText
               fontSize="1.75rem"
               fontWeight={700}
-              alignSelf={ALIGN_CENTER}
+              alignSelf={TYPOGRAPHY.textAlignCenter}
             >
               {ninetySix}
             </StyledText>
@@ -243,7 +241,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 </Flex>
                 <StyledText
                   css={TYPOGRAPHY.h3SemiBold}
-                  textAlign={TEXT_ALIGN_CENTER}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {ninetySix}
                 </StyledText>
@@ -269,7 +267,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 </Flex>
                 <StyledText
                   css={TYPOGRAPHY.h3SemiBold}
-                  textAlign={TEXT_ALIGN_CENTER}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {singleMount}
                 </StyledText>

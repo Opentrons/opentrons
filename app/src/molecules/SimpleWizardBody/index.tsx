@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -40,7 +39,7 @@ const SUBHEADER_STYLE = css`
   ${TYPOGRAPHY.pRegular};
   margin-left: 6.25rem;
   margin-right: 6.25rem;
-  text-align: ${ALIGN_CENTER};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
   height: 1.75rem;
 
   @media ${ODD_MEDIA_QUERY_SPECS} {
@@ -56,7 +55,7 @@ const BUTTON_STYLE = css`
   padding-bottom: ${SPACING.spacing6};
 
   @media ${ODD_MEDIA_QUERY_SPECS} {
-    padding-bottom: 2rem;
+    padding-bottom: ${SPACING.spacing6};
   }
 `
 
@@ -67,7 +66,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex
-        alignItems={ALIGN_CENTER}
+        alignItems={TYPOGRAPHY.textAlignCenter}
         flexDirection={DIRECTION_COLUMN}
         height="100%"
         marginBottom={isOnDevice ? '3.9365rem' : '5.6875rem'}
