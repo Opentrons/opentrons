@@ -452,7 +452,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 "dispense) must previously have been called so the robot "
                 "knows where it is."
             ) from e
-        print(f"what is target: {target}, {type(target)}")
+
         if isinstance(target, validation.WellTarget):
             if target.well.parent.is_tiprack:
                 _log.warning(
