@@ -66,7 +66,6 @@ class ModuleGeometry:
     def separate_calibration(self) -> bool:
         raise APIVersionError(
             "ModuleGeometry.separate_calibrations is a deprecated internal property."
-            " It has no longer has meaning, but will always return `True`"
         )
 
     def __init__(
