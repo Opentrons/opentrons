@@ -1139,15 +1139,17 @@ async def test_home_axis(
 
         await ot3_hardware._home_axis(axis)
 
-        if stepper_ok:
-            """Move to home position"""
-            # move is called
-            mock_backend_move.assert_awaited_once()
-            move = mock_backend_move.call_args_list[0][0][1][0]
-            assert move.distance == 100.0
-            # home is NOT called
-            mock_backend_home.assert_not_awaited()
-        elif encoder_ok:
+        # FIXME: uncomment the following when stall detection
+        # is fully re-enable
+        # if stepper_ok:
+        #     """Move to home position"""
+        #     # move is called
+        #     mock_backend_move.assert_awaited_once()
+        #     move = mock_backend_move.call_args_list[0][0][1][0]
+        #     assert move.distance == 100.0
+        #     # home is NOT called
+        #     mock_backend_home.assert_not_awaited()
+        if encoder_ok:
             """Copy encoder position to stepper pos"""
             mock_estimate.assert_awaited_once()
             # for accurate axis, we just move to home pos:
