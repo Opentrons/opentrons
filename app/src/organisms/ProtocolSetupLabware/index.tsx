@@ -19,15 +19,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
   getDeckDefFromRobotType,
   getLabwareDisplayName,
-  HeaterShakerCloseLatchCreateCommand,
-  HeaterShakerOpenLatchCreateCommand,
   HEATERSHAKER_MODULE_TYPE,
   inferModuleOrientationFromXCoordinate,
-  LabwareDefinition2,
-  LabwareLocation,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -49,6 +44,13 @@ import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
+import type {
+  CompletedProtocolAnalysis,
+  HeaterShakerCloseLatchCreateCommand,
+  HeaterShakerOpenLatchCreateCommand,
+  LabwareDefinition2,
+  LabwareLocation,
+} from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../Devices/ProtocolRun/SetupLabware/types'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
