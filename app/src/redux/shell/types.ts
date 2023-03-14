@@ -2,7 +2,10 @@ import type { Error } from '../types'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 
 export interface Remote {
-  ipcRenderer: { send: (s: string, ...args: unknown[]) => void }
+  ipcRenderer: {
+    invoke: (channel: string, ...args: unknown[]) => Promise<any>
+    send: (channel: string, ...args: unknown[]) => void
+  }
 }
 
 interface File {
