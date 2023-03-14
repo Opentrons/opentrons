@@ -14,6 +14,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
 )
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
+from opentrons_hardware.sensors.sensor_types import EnvironmentSensor
 from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
@@ -187,3 +188,15 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
+
+
+async def get_temperature_humidity(can_messenger: CanMessenger, node: NodeId) -> Tuple[float, float]:
+    """Get celsius and relative humidity of tool."""
+    environment = EnvironmentSensor.build(SensorId.S0, node)
+    s_driver = SensorDriver()
+    data = await s_driver.read(can_messenger, environment, offset=False, timeout=1)
+    if data is None:
+        raise RuntimeError("no response from enironmental sensor")
+    celsius = data.temperature.to_float()
+    rel_humidity = data.humidity.to_float()
+    return celsius, rel_humidity

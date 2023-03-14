@@ -73,7 +73,12 @@ test-cov:
 
 .PHONY: test-gravimetric
 test-gravimetric:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 200 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 50 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --tip 50 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1 --inspect
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1 --increment
 
 .PHONY: test-integration
 test-integration: test-gravimetric

@@ -1259,6 +1259,16 @@ class OT3API(
         res = await self._backend.get_limit_switches()
         return {ax: val for ax, val in res.items()}
 
+    async def get_pipette_temperature_humidity(self, mount: OT3Mount) -> Tuple[float, float]:
+        assert mount in [OT3Mount.LEFT, OT3Mount.RIGHT], f"unexpected mount: {mount}"
+        assert self.hardware_pipettes[mount.to_mount()], f"no pipette on mount {mount}"
+        return await self._backend.get_temperature_humidity(mount)
+
+    async def _fast_home(
+        self, axes: Sequence[OT3Axis], margin: float
+    ) -> OT3AxisMap[float]:
+        return await self._backend.fast_home(axes, margin)
+
     @ExecutionManagerProvider.wait_for_running
     async def retract(
         self, mount: Union[top_types.Mount, OT3Mount], margin: float = 10

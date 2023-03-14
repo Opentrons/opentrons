@@ -103,7 +103,7 @@ function parseGravimetricCSV(CSVData, retData) {
 }
 
 window.addEventListener('load', function (evt) {
-  const _updateIntervalMillis = 1000
+  const _updateIntervalMillis = 5000
   let _interval
   const layout = {
     title: 'Untitled',
