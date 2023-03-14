@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { Link } from 'react-router-dom'
@@ -25,6 +25,8 @@ import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
 import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
+import * as Config from '../../redux/config'
+// import { getDevtoolsEnabled, updateConfigValue } from '../../redux/config'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
@@ -32,7 +34,6 @@ import { useNetworkConnection } from './hooks'
 import {
   DeviceReset,
   DisplayLEDLights,
-  EnableDeveloperTools,
   TouchscreenBrightness,
   TouchScreenSleep,
   TextSize,
@@ -44,7 +45,7 @@ import {
 
 import type { IconName } from '@opentrons/components'
 import type { NetworkConnection } from './hooks'
-import type { State } from '../../redux/types'
+import type { Dispatch, State } from '../../redux/types'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -64,10 +65,9 @@ export type SettingOption =
   | 'TextSize'
   | 'DeviceReset'
   | 'UpdateChannel'
-  | 'EnableDeveloperTools'
 
 export function RobotSettingsDashboard(): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'app_settings'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
@@ -84,6 +84,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       : null
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
+  const devToolsOn = useSelector(Config.getDevtoolsEnabled)
 
   return (
     <Flex
@@ -99,6 +100,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           robotName={robotName}
           robotServerVersion={robotServerVersion ?? 'Unknown'}
           isUpdateAvailable={isUpdateAvailable}
+          devToolsOn={devToolsOn}
         />
       ) : (
         <>
@@ -177,17 +179,17 @@ export function RobotSettingsDashboard(): JSX.Element {
           />
           {/* Update Channel */}
           <RobotSettingButton
-            settingName={t('update_channel')}
+            settingName={t('app_settings:update_channel')}
             currentOption="UpdateChannel"
             setCurrentOption={setCurrentOption}
             iconName="wifi"
           />
           {/* Enable Developer Tools */}
           <RobotSettingButton
-            settingName={t('enable_developer_tools')}
-            currentOption="EnableDeveloperTools"
-            setCurrentOption={setCurrentOption}
+            settingName={t('app_settings:enable_dev_tools')}
+            settingInfo={t('dev_tools_description')}
             iconName="build"
+            enabledDevTools
           />
         </>
       )}
@@ -208,11 +210,13 @@ export function RobotSettingsDashboard(): JSX.Element {
 interface RobotSettingButtonProps {
   settingName: string
   settingInfo?: string
-  currentOption: SettingOption
-  setCurrentOption: (currentOption: SettingOption) => void
+  currentOption?: SettingOption
+  setCurrentOption?: (currentOption: SettingOption) => void
   robotName?: string
   isUpdateAvailable?: boolean
   iconName: IconName
+  enabledDevTools?: boolean
+  devToolsOn?: boolean
 }
 
 const RobotSettingButton = ({
@@ -223,13 +227,24 @@ const RobotSettingButton = ({
   robotName,
   isUpdateAvailable,
   iconName,
+  enabledDevTools,
+  devToolsOn,
 }: RobotSettingButtonProps): JSX.Element => {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'shared'])
+  const dispatch = useDispatch<Dispatch>()
+
+  const handleClick = (): void => {
+    if (currentOption != null && setCurrentOption != null) {
+      setCurrentOption(currentOption)
+    } else {
+      console.log('devToolsOn', devToolsOn)
+      dispatch(Config.updateConfigValue('devtools', !devToolsOn))
+      console.log(devToolsOn)
+    }
+  }
+
   return (
-    <Btn
-      css={SETTING_BUTTON_STYLE}
-      onClick={() => setCurrentOption(currentOption)}
-    >
+    <Btn css={SETTING_BUTTON_STYLE} onClick={handleClick}>
       <Flex
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing5}
@@ -286,7 +301,28 @@ const RobotSettingButton = ({
             </StyledText>
           </Flex>
         ) : null}
-        <Icon name="chevron-right" size="3rem" />
+
+        {enabledDevTools != null ? (
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gridGap="0.75rem"
+            alignItems={ALIGN_CENTER}
+            backgroundColor={COLORS.transparent}
+            padding={`0.75rem ${SPACING.spacing4}`}
+            borderRadius={BORDERS.size_four}
+          >
+            <StyledText
+              fontSize="1.75rem"
+              lineHeight="2.25rem"
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+            >
+              {devToolsOn != null ? t('shared:on') : t('shared:off')}
+            </StyledText>
+          </Flex>
+        ) : null}
+        {enabledDevTools == null ? (
+          <Icon name="chevron-right" size="3rem" />
+        ) : null}
       </Flex>
     </Btn>
   )
@@ -299,6 +335,7 @@ interface SettingsContentProps {
   robotName: string
   robotServerVersion: string
   isUpdateAvailable: boolean
+  devToolsOn: boolean
 }
 const SettingsContent = ({
   currentOption,
@@ -307,6 +344,7 @@ const SettingsContent = ({
   robotName,
   robotServerVersion,
   isUpdateAvailable,
+  devToolsOn,
 }: SettingsContentProps): JSX.Element => {
   switch (currentOption) {
     case 'RobotName':
@@ -342,8 +380,11 @@ const SettingsContent = ({
         />
       )
     case 'UpdateChannel':
-      return <UpdateChannel setCurrentOption={setCurrentOption} />
-    case 'EnableDeveloperTools':
-      return <EnableDeveloperTools setCurrentOption={setCurrentOption} />
+      return (
+        <UpdateChannel
+          setCurrentOption={setCurrentOption}
+          devToolsOn={devToolsOn}
+        />
+      )
   }
 }
