@@ -136,6 +136,8 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
 
+from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, USBTarget
+
 mod_log = logging.getLogger(__name__)
 
 
@@ -273,6 +275,7 @@ class OT3API(
         config: Union[OT3Config, RobotConfig, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        use_usb_bus: bool = False,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -280,7 +283,8 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
-        backend = await OT3Controller.build(checked_config)
+        backend = await OT3Controller.build(checked_config, use_usb_bus)
+
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
 
@@ -439,12 +443,17 @@ class OT3API(
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
-        nodes = {sub_system_to_node_id(subsystem) for subsystem in subsystems}
+        targets: Set[FirmwareTarget] = set()
+        for subsystem in subsystems:
+            if subsystem is OT3SubSystem.rear_panel:
+                targets.add(USBTarget.rear_panel)
+            else:
+                targets.add(sub_system_to_node_id(subsystem))
         # get the attached pipette subtypes so we can determine which binary to install for pipettes
         pipettes = self._get_pipette_subtypes()
         # start the updates and yield the progress
         async for update_status in self._backend.update_firmware(
-            pipettes, nodes, force
+            pipettes, targets, force
         ):
             yield update_status
         # refresh Instrument cache
@@ -502,9 +511,6 @@ class OT3API(
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
-
-    async def connect_usb_to_rear_panel(self) -> None:
-        await self._backend.connect_usb_to_rear_panel()
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""

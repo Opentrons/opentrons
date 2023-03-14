@@ -116,6 +116,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
 
         thread_manager = ThreadManager(
             OT3API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
             threadmanager_nonblocking=True,
         )
     else:
@@ -158,9 +159,6 @@ async def initialize() -> ThreadManagedHardware:
     # front button light. But that blinking stops when the completed hardware object
     # is returned. Do our own blinking here to keep it going while we home the robot.
     blink_task = asyncio.create_task(_blink())
-
-    if should_use_ot3() and ff.rear_panel_integration():
-        hardware.connect_usb_to_rear_panel()
 
     try:
 
