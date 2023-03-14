@@ -20,6 +20,9 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
+  "devDependencies": {
+    "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client"
+  },
   "dependencies": {
     "@types/lodash": "^4.14.191",
     "@types/node-fetch": "^2.5.8",
