@@ -432,10 +432,16 @@ class Labware:
 
     def set_calibration(self, delta: Point) -> None:
         """
-        An internal, deprecated method Called by set_offset in order to update the offset on the object.
+        An internal, deprecated method used for updating the offset on the object.
 
         .. deprecated:: 2.14
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.set_calibration() is not supported when apiLevel is 2.14 or higher."
+                " Use a lower apiLevel"
+                " or use the Opentrons App's Labware Position Check."
+            )
         self._core.set_calibration(delta)
 
     @requires_version(2, 12)
