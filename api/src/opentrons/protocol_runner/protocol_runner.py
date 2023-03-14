@@ -2,6 +2,8 @@
 import asyncio
 from typing import Iterable, List, NamedTuple, Optional
 
+from typing_extensions import Protocol as TypingProtocol
+
 import anyio
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -34,9 +36,7 @@ class ProtocolRunResult(NamedTuple):
     state_summary: StateSummary
 
 
-# TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
-# interfaces and several concrete implementations per protocol type
-class ProtocolRunner:
+class ProtocolRunner(TypingProtocol):
     """An interface to manage and control a protocol run.
 
     The ProtocolRunner is primarily responsible for feeding a ProtocolEngine
@@ -48,6 +48,30 @@ class ProtocolRunner:
     you will need a new ProtocolRunner to do another run.
     """
 
+    def was_started(self) -> bool:
+        """Whether the runner has been started.
+
+        This value is latched; once it is True, it will never become False.
+        """
+
+    async def load(self, protocol_source: ProtocolSource) -> None:
+        """Load a ProtocolSource into managed ProtocolEngine.
+
+        Calling this method is only necessary if the runner will be used
+        to control the run of a file-based protocol.
+        """
+
+    async def stop(self) -> None:
+        """Stop (cancel) the run."""
+
+    async def run(
+        self,
+        protocol_source: Optional[ProtocolSource] = None,
+    ) -> ProtocolRunResult:
+        """Run a given protocol to completion."""
+
+
+class JsonRunner(ProtocolRunner):
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
