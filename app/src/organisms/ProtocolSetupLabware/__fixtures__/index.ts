@@ -3700,6 +3700,23 @@ export const mockUseModulesQueryOpen = {
   },
 }
 
+export const mockUseModulesQueryOpening = {
+  data: {
+    data: [
+      {
+        id: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
+        serialNumber: 'dummySerialHS',
+        moduleType: 'heaterShakerModuleType',
+        moduleModel: 'heaterShakerModuleV1',
+        data: {
+          status: 'idle',
+          labwareLatchStatus: 'opening',
+        },
+      },
+    ],
+  },
+}
+
 export const mockUseModulesQueryClosed = {
   data: {
     data: [
@@ -3711,6 +3728,23 @@ export const mockUseModulesQueryClosed = {
         data: {
           status: 'idle',
           labwareLatchStatus: 'idle_closed',
+        },
+      },
+    ],
+  },
+}
+
+export const mockUseModulesQueryClosing = {
+  data: {
+    data: [
+      {
+        id: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
+        serialNumber: 'dummySerialHS',
+        moduleType: 'heaterShakerModuleType',
+        moduleModel: 'heaterShakerModuleV1',
+        data: {
+          status: 'idle',
+          labwareLatchStatus: 'closing',
         },
       },
     ],

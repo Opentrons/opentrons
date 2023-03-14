@@ -18,7 +18,9 @@ import {
   mockProtocolModuleInfo,
   mockRecentAnalysis,
   mockUseModulesQueryClosed,
+  mockUseModulesQueryClosing,
   mockUseModulesQueryOpen,
+  mockUseModulesQueryOpening,
 } from '../__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
@@ -97,6 +99,14 @@ describe('ProtocolSetupLabware', () => {
     getByRole('button', { name: 'Deck Map' })
   })
 
+  it('correctly navigates with the nav buttons', () => {
+    const [{ getByRole, getAllByRole }] = render()
+    getByRole('button', { name: 'continue' }).click()
+    expect(mockSetSetupScreen).toHaveBeenCalledWith('lpc')
+    getAllByRole('button')[0].click()
+    expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
+  })
+
   it('should launch and close the deck map', () => {
     const [{ getByRole, getByText, getByTestId }] = render()
 
@@ -134,5 +144,19 @@ describe('ProtocolSetupLabware', () => {
         },
       },
     })
+  })
+
+  it('shows opening transition states of the labware latch button', () => {
+    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryOpening as any)
+
+    const [{ getByText }] = render()
+    getByText('Opening...')
+  })
+
+  it('shows closing transition state of the labware latch button', () => {
+    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryClosing as any)
+
+    const [{ getByText }] = render()
+    getByText('Closing...')
   })
 })
