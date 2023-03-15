@@ -103,6 +103,10 @@ async def _wait_for_pipette(api: OT3API, mount: OT3Mount, present: bool) -> None
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
+    if not api.is_simulator:
+        if not ui.get_user_answer("use a pipette to probe the deck to test alignment"):
+            return
+
     _assert_deck_transform_is_default(api)
     print("homing")
     await api.home()
