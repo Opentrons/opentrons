@@ -67,7 +67,7 @@ describe('ReturnTip', () => {
     getByText('Clear all deck slots of labware')
     getByText(
       matchTextWithSpans(
-        'Place Mock TipRack Definition with tip removed into slot 1'
+        'Place the Mock TipRack Definition that you used before back into slot 1. The pipette will return tips to their original location in the rack.'
       )
     )
     getByRole('link', { name: 'Need help?' })
