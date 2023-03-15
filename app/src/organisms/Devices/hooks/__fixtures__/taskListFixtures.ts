@@ -71,11 +71,13 @@ export const mockCompleteDeckCalibration = {
 }
 
 export const mockIncompleteDeckCalibration = {
-  status: 'IDENTITY',
-  data: {
-    lastModified: null,
-    status: {
-      markedBad: false,
+  deckCalibration: {
+    status: 'IDENTITY',
+    data: {
+      lastModified: null,
+      status: {
+        markedBad: false,
+      },
     },
   },
 }

@@ -512,7 +512,7 @@ describe('useCalibrationTaskList hook', () => {
       .mockReturnValue(mockAttachedPipettesResponse)
     when(mockUseCalibrationStatusQuery)
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockIncompleteDeckCalibration } as any)
+      .mockReturnValue({ data: null } as any) // null deck response
     when(mockUseAllTipLengthCalibrationsQuery)
       .calledWith({ refetchInterval: 5000 })
       .mockReturnValue({
