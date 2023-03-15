@@ -11,7 +11,7 @@ from pathlib import Path
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
-from hardware_testing.opentrons_api.types import OT3Axis
+from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 from hardware_testing.data import ui
@@ -104,7 +104,7 @@ def _create_hour_glass_points(homed_position: types.Point) -> List[types.Point]:
     return hour_glass_points
 
 def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Point]:
-    pos_max = homed_position - types.Point(x=1, y=1, z=1)
+    pos_max = homed_position - types.Point(x=1, y=1, z=5)
     pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     mounts_up_down_points = [
         pos_max._replace(z=pos_max.z - 200),  # down
@@ -116,7 +116,7 @@ async def _move_and_check(api: OT3API, is_simulating: bool, mount: types.OT3Moun
     if not is_simulating:
         await api.move_to(mount,position)
         estimate = {ax: api._current_position[ax] for ax in GANTRY_AXES}
-        encoder = {ax: api._encoder_current_position[ax] for ax in GANTRY_AXES}
+        encoder = {ax: api._encoder_position[ax] for ax in GANTRY_AXES}
     else:
         pass
 
@@ -148,6 +148,11 @@ async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, w
         es,en,al = await _move_and_check(api,is_simulating,mount,p)
         _record_axis_data('Bowtie',write_cb,es,en,al)
         print(f'bowtie results: {al}')
+        ###### for EMC Test #######
+        await _run_mount_up_down(api,is_simulating,write_cb)
+        await _run_pipper(api)
+        await _run_gripper(api)
+        ###########################
 
 
 async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Mount, write_cb: Callable) -> None:
@@ -157,8 +162,14 @@ async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Moun
         es,en,al = await _move_and_check(api,is_simulating,mount,q)
         _record_axis_data('Hour_glass',write_cb,es,en,al)
         print(f'hour glass results: {al}')
+        ###### for EMC Test #######
+        await _run_mount_up_down(api,is_simulating,write_cb)
+        await _run_pipper(api)
+        await _run_gripper(api)
+        ###########################
 
 async def _run_gripper(api: OT3API) -> None:
+    ui.print_header('Run gripper')
     try:
         mount = types.OT3Mount.GRIPPER
         current_pos = await api.gantry_position(mount)
@@ -171,11 +182,18 @@ async def _run_gripper(api: OT3API) -> None:
         print("gripper err",err)
 
 async def _run_pipper(api: OT3API):
+    ui.print_header('Run plunger')
     for mount in MOUNT_AXES:
-        plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
-        top, bottom, blowout, drop_tip = plunger_poses
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top)
+        await api.cache_instruments()
+        pip = api.hardware_pipettes[mount.to_mount()]
+        if not pip:
+            ui.print_error(f"no pipette found on {mount.value} mount")
+            return
+        pip_ax = OT3Axis.of_main_tool_actuator(mount)
+        top, bottom, blowout, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
+        await api.home([pip_ax])
+        await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip-1)
+        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top+1)
 
 async def _main(arguments: argparse.Namespace) -> None:
     # callback function for writing new data to CSV file
