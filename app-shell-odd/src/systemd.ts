@@ -7,7 +7,9 @@ function promisifyProcess(command: string): Promise<string> {
   return new Promise((resolve, reject) => {
     exec(command, (err, stdout, stderr) => {
       if (err) {
-        console.warn(`${command} failed: ${err}: ${stderr}`)
+        console.warn(
+          `${command} failed: ${err.code}: ${err.message}: ${stderr}`
+        )
         reject(stderr)
       }
       resolve(stdout ?? stderr)
