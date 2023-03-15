@@ -728,7 +728,9 @@ async def _calibrate_mount(
     nominal_center = _get_calibration_square_position_in_slot(slot)
     try:
         # find the center of the calibration sqaure
-        offset = await find_calibration_structure_position(hcapi, mount, nominal_center, method)
+        offset = await find_calibration_structure_position(
+            hcapi, mount, nominal_center, method
+        )
         # update center with values obtained during calibration
         LOG.info(f"Found calibration value {offset} for mount {mount.name}")
         return offset
@@ -755,7 +757,9 @@ async def find_calibration_structure_position(
     LOG.info(f"Found structure plate at {z_height}mm")
 
     # Find the calibration square center using the given method
-    found_center = await find_calibration_structure_center(hcapi, mount, test_center, method)
+    found_center = await find_calibration_structure_center(
+        hcapi, mount, test_center, method
+    )
     return nominal_center - found_center
 
 
@@ -770,7 +774,9 @@ async def _calibrate_module(
     # TODO (ba, 2023-03-14): the nominal_center will be passed in from protocol engine in the future,
     # where it would have the module + module calibration geometric offsets applied.
     nominal_center = _get_calibration_square_position_in_slot(slot)
-    offset = await find_calibration_structure_position(hcapi, mount, nominal_center, method)
+    offset = await find_calibration_structure_position(
+        hcapi, mount, nominal_center, method
+    )
     return offset
 
 
