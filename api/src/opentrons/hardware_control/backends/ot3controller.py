@@ -200,12 +200,7 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._usb_messenger = None
-        self._gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = OT3GPIO("hardware_control")
-        if usb_driver is not None:
-            self._usb_messenger = BinaryMessenger(usb_driver)
-            self._usb_messenger.start()
-            self._gpio_dev = RemoteOT3GPIO(self._usb_messenger)
+        self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
         self._position = self._get_home_position()
@@ -247,6 +242,17 @@ class OT3Controller:
         if self._update_required != value:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
+
+    @staticmethod
+    def _build_system_hardware(
+        usb_driver: Optional[SerialUsbDriver],
+    ) -> Tuple[Union[OT3GPIO, RemoteOT3GPIO], Optional[BinaryMessenger]]:
+        if usb_driver is None:
+            return OT3GPIO("hardware_control"), None
+        else:
+            usb_messenger = BinaryMessenger(usb_driver)
+            usb_messenger.start()
+            return RemoteOT3GPIO(usb_messenger), usb_messenger
 
     @staticmethod
     def _attached_pipettes_to_nodes(
