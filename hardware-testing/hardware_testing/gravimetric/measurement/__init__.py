@@ -163,9 +163,8 @@ def record_measurement_data(
         elif shorten:
             ctx.delay(1)
         else:
-            for i in range(int(DELAY_FOR_MEASUREMENT)):
-                print(f"[delay] {tag}: {i + 1}/{DELAY_FOR_MEASUREMENT} seconds")
-                ctx.delay(1)
+            print(f"delaying {DELAY_FOR_MEASUREMENT} seconds for measurement, please wait...")
+            ctx.delay(DELAY_FOR_MEASUREMENT)
     return _build_measurement_data(recorder, tag, env_data, stable=not shorten)
 
 

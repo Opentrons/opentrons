@@ -181,7 +181,7 @@ OT3_LIQUID_CLASS = {
             ),
         },
         1000: {  # T1000
-            10: LiquidClassSettings(  # 5uL
+            10: LiquidClassSettings(  # 10uL
                 aspirate=AspirateSettings(
                     flow_rate=160,
                     delay=1.0,
