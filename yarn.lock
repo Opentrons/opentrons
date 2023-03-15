@@ -5434,7 +5434,7 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
 
-bindings@^1.5.0:
+bindings@1.5.0, bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
@@ -18736,6 +18736,13 @@ scrollbar-width@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/scrollbar-width/-/scrollbar-width-3.1.1.tgz#c62e63efa5934dac37b43da34f7550caca8444a2"
   integrity sha1-xi5j76WTTaw3tD2jT3VQysqERKI=
+
+sd-notify@2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/sd-notify/-/sd-notify-2.8.0.tgz#a8e4477efac8426084e235d5d6a89f2af75571fd"
+  integrity sha512-e+D1v0Y6UzmqXcPlaTkHk1QMdqk36mF/jIYv5gwry/N2Tb8/UNnpfG6ktGLpeBOR6TCC5hPKgqA+0hTl9sm2tA==
+  dependencies:
+    bindings "1.5.0"
 
 seek-bzip@^1.0.5:
   version "1.0.6"

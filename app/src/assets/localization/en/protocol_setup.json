@@ -123,6 +123,7 @@
   "on-deck_labware": "{{count}} on-deck labware",
   "optional": "optional",
   "prepare_to_run": "Prepare to Run",
+  "quantity": "Quantity",
   "run": "Run",
   "status": "Status",
   "tip_length_calibration": "tip length calibration",

@@ -30,7 +30,6 @@ import {
   useAttachedModules,
   useRunCreatedAtTimestamp,
 } from '../../organisms/Devices/hooks'
-import { getLabwareSetupItemGroups } from '../../organisms/Devices/ProtocolRun/SetupLabware/utils'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
@@ -41,6 +40,7 @@ import {
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
