@@ -105,20 +105,9 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   } else if (analysis == null) {
     countOfTotalText = ''
   }
-  const displayRunNotStarted =
-    (runStatus === RUN_STATUS_IDLE &&
-      analysisCommands[lastRunCommandIndex] == null) ||
-    runStatus === RUN_STATUS_IDLE
 
   let currentStepContents: React.ReactNode = null
-  if (displayRunNotStarted) {
-    currentStepContents = (
-      <StyledText as="h2">{t('not_started_yet')}</StyledText>
-    )
-  } else if (
-    analysis != null &&
-    analysisCommands[lastRunCommandIndex] != null
-  ) {
+  if (analysis != null && analysisCommands[lastRunCommandIndex] != null) {
     currentStepContents = (
       <CommandText
         robotSideAnalysis={analysis}
@@ -135,6 +124,10 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         robotSideAnalysis={analysis}
         command={runCommandDetails.data}
       />
+    )
+  } else if (runStatus === RUN_STATUS_IDLE) {
+    currentStepContents = (
+      <StyledText as="h2">{t('not_started_yet')}</StyledText>
     )
   } else if (runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)) {
     currentStepContents = (
@@ -161,7 +154,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
           )}${
-            displayRunNotStarted
+            runStatus === RUN_STATUS_IDLE
               ? ':'
               : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''}`
           }`}</StyledText>
