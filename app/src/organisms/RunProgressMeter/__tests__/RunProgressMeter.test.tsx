@@ -5,8 +5,10 @@ import {
   useAllCommandsQuery,
   useCommandQuery,
 } from '@opentrons/react-api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
+import { ProgressBar } from '../../../atoms/ProgressBar'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../Devices/hooks/useLastRunCommandKey'
@@ -17,9 +19,7 @@ import {
   NON_DETERMINISTIC_COMMAND_ID,
   NON_DETERMINISTIC_COMMAND_KEY,
 } from '../__fixtures__'
-
 import { RunProgressMeter } from '..'
-import { ProgressBar } from '../../../atoms/ProgressBar'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../RunTimeControl/hooks')
@@ -61,7 +61,7 @@ describe('RunProgressMeter', () => {
   let props: React.ComponentProps<typeof RunProgressMeter>
   beforeEach(() => {
     mockProgressBar.mockReturnValue(<div>MOCK PROGRESS BAR</div>)
-    mockUseRunStatus.mockReturnValue('running')
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(NON_DETERMINISTIC_RUN_ID)
       .mockReturnValue(null)
@@ -95,5 +95,12 @@ describe('RunProgressMeter', () => {
     const { getByText, queryByText } = render(props)
     expect(getByText('Current Step 42/?')).toBeTruthy()
     expect(queryByText('MOCK PROGRESS BAR')).toBeFalsy()
+  })
+  it('should give the correct info when run status is idle', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    const { getByText } = render(props)
+    getByText('Current Step:')
+    getByText('Not started yet')
+    getByText('Download run log')
   })
 })

@@ -13,6 +13,8 @@ import {
   SIZE_1,
   Link,
   ALIGN_CENTER,
+  useHoverTooltip,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -28,6 +30,7 @@ import {
 } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { StyledText } from '../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ProgressBar } from '../../atoms/ProgressBar'
@@ -53,6 +56,9 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
   const analysis = useMostRecentCompletedAnalysis(runId)
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId)
   const analysisCommands = analysis?.commands ?? []
@@ -119,10 +125,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         command={runCommandDetails.data}
       />
     )
-  } else if (
-    runStatus === RUN_STATUS_IDLE &&
-    analysisCommands[lastRunCommandIndex] == null
-  ) {
+  } else if (runStatus === RUN_STATUS_IDLE) {
     currentStepContents = (
       <StyledText as="h2">{t('not_started_yet')}</StyledText>
     )
@@ -139,7 +142,10 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     downloadRunLog()
   }
 
-  const downloadIsDisabled = runStatus === RUN_STATUS_RUNNING
+  const downloadIsDisabled =
+    runStatus === RUN_STATUS_RUNNING ||
+    runStatus === RUN_STATUS_IDLE ||
+    runStatus === RUN_STATUS_FINISHING
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -147,12 +153,16 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         <Flex gridGap={SPACING.spacing3}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
-          )} ${countOfTotalText}${
-            currentStepContents != null ? ': ' : ''
+          )}${
+            runStatus === RUN_STATUS_IDLE
+              ? ':'
+              : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''}`
           }`}</StyledText>
+
           {currentStepContents}
         </Flex>
         <Link
+          {...targetProps}
           role="button"
           css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
@@ -174,6 +184,11 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             {t('download_run_log')}
           </Flex>
         </Link>
+        {downloadIsDisabled ? (
+          <Tooltip tooltipProps={tooltipProps}>
+            {t('complete_protocol_to_download')}
+          </Tooltip>
+        ) : null}
       </Flex>
       {analysis != null && lastRunCommandIndex >= 0 ? (
         <ProgressBar
