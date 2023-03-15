@@ -135,7 +135,7 @@ function SetupInstructionsButton(
   )
 }
 
-function ContinueButton(
+export function ContinueButton(
   props: React.HTMLProps<HTMLButtonElement>
 ): JSX.Element {
   const { t } = useTranslation('shared')
@@ -158,7 +158,9 @@ function ContinueButton(
   )
 }
 
-function DeckMapButton(props: React.HTMLProps<HTMLButtonElement>): JSX.Element {
+export function DeckMapButton(
+  props: React.HTMLProps<HTMLButtonElement>
+): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   return (
     <Btn
