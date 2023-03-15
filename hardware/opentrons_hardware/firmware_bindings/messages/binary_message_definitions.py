@@ -127,34 +127,34 @@ class EnterBootloaderResponse(utils.BinarySerializable):
 
 
 @dataclass
-class EnableEstop(utils.BinarySerializable):
+class EngageEstop(utils.BinarySerializable):
     """Send a request to enable the estop line."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.enable_estop)
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.engage_estop)
     lenght: utils.UInt16Field = utils.UInt16Field(0)
 
 
 @dataclass
-class DisableEstop(utils.BinarySerializable):
+class ReleaseEstop(utils.BinarySerializable):
     """Send a request to disable the estop line."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.disable_estop)
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.release_estop)
     lenght: utils.UInt16Field = utils.UInt16Field(0)
 
 
 @dataclass
-class EnableSyncOut(utils.BinarySerializable):
+class EngageSyncOut(utils.BinarySerializable):
     """Send a request to enable the sync line."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.enable_nsync_out)
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.engage_nsync_out)
     lenght: utils.UInt16Field = utils.UInt16Field(0)
 
 
 @dataclass
-class DisableSyncOut(utils.BinarySerializable):
+class ReleaseSyncOut(utils.BinarySerializable):
     """Send a request to disable the sync line."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.disable_nsync_out)
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.release_nsync_out)
     lenght: utils.UInt16Field = utils.UInt16Field(0)
 
 
@@ -166,10 +166,10 @@ BinaryMessageDefinition = Union[
     DeviceInfoResponse,
     EnterBootloaderRequest,
     EnterBootloaderResponse,
-    EnableEstop,
-    DisableEstop,
-    EnableSyncOut,
-    DisableSyncOut,
+    EngageEstop,
+    ReleaseEstop,
+    EngageSyncOut,
+    ReleaseSyncOut,
 ]
 
 

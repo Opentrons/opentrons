@@ -1145,7 +1145,7 @@ class OT3Controller:
         self._position[axis_to_node(moving)] += distance_mm
         return data
 
-    async def disengage_estop(self) -> None:
+    async def release_estop(self) -> None:
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
@@ -1163,7 +1163,7 @@ class OT3Controller:
         else:
             self._gpio_dev.activate_estop()
 
-    async def disengage_sync(self) -> None:
+    async def release_sync(self) -> None:
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")

@@ -6,10 +6,10 @@ from logging import getLogger
 from time import sleep
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    EnableEstop,
-    DisableEstop,
-    EnableSyncOut,
-    DisableSyncOut,
+    EngageEstop,
+    ReleaseEstop,
+    EngageSyncOut,
+    ReleaseSyncOut,
 )
 
 CONSUMER_NAME_DEFAULT: Final[str] = "opentrons"
@@ -94,7 +94,7 @@ class RemoteOT3GPIO:
 
     async def activate_estop(self) -> None:
         """Assert the emergency stop, which will disable all motors."""
-        await self._get_usb_messenger().send(EnableEstop())
+        await self._get_usb_messenger().send(EngageEstop())
 
     async def deactivate_estop(self) -> None:
         """Stop asserting the emergency stop.
@@ -102,12 +102,12 @@ class RemoteOT3GPIO:
         If no other node is asserting estop, then motors can be enabled
         again.
         """
-        await self._get_usb_messenger().send(DisableEstop())
+        await self._get_usb_messenger().send(ReleaseEstop())
 
     async def activate_nsync_out(self) -> None:
         """Assert the nsync out line."""
-        await self._get_usb_messenger().send(EnableSyncOut())
+        await self._get_usb_messenger().send(EngageSyncOut())
 
     async def deactivate_nsync_out(self) -> None:
         """Stop asserting the nsync out line."""
-        await self._get_usb_messenger().send(DisableSyncOut())
+        await self._get_usb_messenger().send(ReleaseSyncOut())
