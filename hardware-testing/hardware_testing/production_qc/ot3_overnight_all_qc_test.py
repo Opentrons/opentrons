@@ -169,24 +169,13 @@ async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Moun
 
 async def _run_gripper(api: OT3API,delta: float) -> None:
     try:
-        #print(types.Point)
         mount = types.OT3Mount.GRIPPER
         current_pos = await api.gantry_position(mount)
-        #print("1",current_pos)
         travel_height = max(1, 37)
-        #print("2",current_pos._replace(z=travel_height))
         await api.move_to(mount, current_pos._replace(z=travel_height))
         await api.grip(20)
         await api.ungrip()
-        current_pos = await api.gantry_position(mount)
-        #print("3",current_pos)
-        await api.move_to(mount, current_pos._replace(z=1))
-        current_pos = await api.gantry_position(mount)
-        # print("4",current_pos)
-        # print(types.Point)
         await api.move_rel(mount, types.Point(z=164))
-        
-        
     except Exception as err:
         print("gripper err",err)
 
