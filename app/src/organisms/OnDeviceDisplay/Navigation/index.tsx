@@ -72,23 +72,19 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         gridGap="0.5rem"
       >
         <NavigationLink to="/dashboard">
-          <StyledText
-            fontSize="1.625rem"
-            fontWeight="700"
-            lineHeight="1.9375rem"
-          >
+          <StyledText fontSize="2rem" fontWeight="700" lineHeight="2.625rem">
             {robotName}
           </StyledText>
         </NavigationLink>
-        <Icon name="wifi" size="2rem" />
+        {/* <Icon name="wifi" size="2rem" /> */}
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavigationLink key={name} to={navLinkTo as string}>
             <StyledText
-              fontSize="1.625rem"
-              fontWeight="600"
-              lineHeight="1.9375rem"
+              fontSize="2rem"
+              fontWeight="700"
+              lineHeight="2.625rem"
               marginRight="2.75rem"
             >
               {name}
@@ -101,7 +97,6 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         <OverflowBtn
           alignSelf={ALIGN_FLEX_END}
           onClick={handleOverflowClick}
-          height="3.75rem"
           data-testid="Navigation_overflowBtn"
         />
       </Flex>
