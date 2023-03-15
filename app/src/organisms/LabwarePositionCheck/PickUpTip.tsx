@@ -17,10 +17,11 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import { getLabwareDef } from './utils/labware'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
+import { getLabwareDef } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { chainRunCommands } from './utils/chainRunCommands'
 
@@ -38,13 +39,14 @@ interface PickUpTipProps extends PickUpTipStep {
   proceed: () => void
   registerPosition: React.Dispatch<RegisterPositionAction>
   createRunCommand: CreateRunCommand
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
-  const { t } = useTranslation('labware_position_check')
+  const { t } = useTranslation(['labware_position_check', 'shared'])
   const {
     labwareId,
     pipetteId,
@@ -52,6 +54,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     protocolData,
     proceed,
     createRunCommand,
+    chainRunCommands,
     registerPosition,
     handleJog,
     isRobotMoving,
@@ -126,70 +129,61 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
       ],
-      createRunCommand,
-      () => {
-        createRunCommand(
-          {
-            command: { commandType: 'savePosition', params: { pipetteId } },
-            waitUntilComplete: true,
-          },
-          {
-            onSuccess: response => {
-              const { position } = response.data.result
-              registerPosition({
-                type: 'initialPosition',
-                labwareId,
-                location,
-                position,
-              })
-            },
-          }
-        )
-      }
+      true
     )
+      .then(() => {
+        createRunCommand({
+          command: { commandType: 'savePosition', params: { pipetteId } },
+          waitUntilComplete: true,
+        })
+          .then(response => {
+            const { position } = response.data.result
+            registerPosition({
+              type: 'initialPosition',
+              labwareId,
+              location,
+              position,
+            })
+          })
+          .then(() => {})
+          .catch(() => {})
+      })
+      .catch(() => {})
   }
   const handleConfirmPosition = (): void => {
-    createRunCommand(
-      {
-        command: { commandType: 'savePosition', params: { pipetteId } },
-        waitUntilComplete: true,
-      },
-      {
-        onSuccess: response => {
-          const { position } = response.data.result
-          const offset =
-            initialPosition != null
-              ? getVectorDifference(position, initialPosition)
-              : position
-          registerPosition({
-            type: 'finalPosition',
-            labwareId,
-            location,
-            position,
-          })
-          registerPosition({ type: 'tipPickUpOffset', offset })
-          createRunCommand(
-            {
-              command: {
-                commandType: 'pickUpTip',
-                params: {
-                  pipetteId,
-                  labwareId,
-                  wellName: 'A1',
-                  wellLocation: { origin: 'top', offset },
-                },
-              },
-              waitUntilComplete: true,
+    createRunCommand({
+      command: { commandType: 'savePosition', params: { pipetteId } },
+      waitUntilComplete: true,
+    })
+      .then(response => {
+        const { position } = response.data.result
+        const offset =
+          initialPosition != null
+            ? getVectorDifference(position, initialPosition)
+            : position
+        registerPosition({
+          type: 'finalPosition',
+          labwareId,
+          location,
+          position,
+        })
+        registerPosition({ type: 'tipPickUpOffset', offset })
+        createRunCommand({
+          command: {
+            commandType: 'pickUpTip',
+            params: {
+              pipetteId,
+              labwareId,
+              wellName: 'A1',
+              wellLocation: { origin: 'top', offset },
             },
-            {
-              onSuccess: () => {
-                setShowTipConfirmation(true)
-              },
-            }
-          )
-        },
-      }
-    )
+          },
+          waitUntilComplete: true,
+        })
+          .then(() => setShowTipConfirmation(true))
+          .catch(() => {})
+      })
+      .catch(() => {})
   }
 
   const handleConfirmTipAttached = (): void => {
@@ -213,36 +207,34 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
       ],
-      createRunCommand,
-      proceed
+      true
     )
+      .then(() => proceed())
+      .catch(() => {})
   }
   const handleInvalidateTip = (): void => {
-    createRunCommand(
-      {
-        command: {
-          commandType: 'dropTip',
-          params: {
-            pipetteId,
-            labwareId,
-            wellName: 'A1',
-          },
+    createRunCommand({
+      command: {
+        commandType: 'dropTip',
+        params: {
+          pipetteId,
+          labwareId,
+          wellName: 'A1',
         },
-        waitUntilComplete: true,
       },
-      {
-        onSuccess: () => {
-          registerPosition({ type: 'tipPickUpOffset', offset: null })
-          registerPosition({
-            type: 'finalPosition',
-            labwareId,
-            location,
-            position: null,
-          })
-          setShowTipConfirmation(false)
-        },
-      }
-    )
+      waitUntilComplete: true,
+    })
+      .then(() => {
+        registerPosition({ type: 'tipPickUpOffset', offset: null })
+        registerPosition({
+          type: 'finalPosition',
+          labwareId,
+          location,
+          position: null,
+        })
+        setShowTipConfirmation(false)
+      })
+      .catch(() => {})
   }
   const handleGoBack = (): void => {
     registerPosition({
@@ -260,7 +252,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       location
     )?.vector ?? IDENTITY_VECTOR
 
-  if (isRobotMoving) return <RobotMotionLoader />
+  if (isRobotMoving)
+    return (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
   return showTipConfirmation ? (
     <TipConfirmation
       invalidateTip={handleInvalidateTip}

@@ -19,6 +19,9 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { useChainRunCommands } from '../../resources/runs/hooks'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -29,14 +32,13 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { chainRunCommands } from './utils/chainRunCommands'
+
 interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   createRunCommand: CreateRunCommand
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   registerPosition: React.Dispatch<RegisterPositionAction>
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
@@ -51,6 +53,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     location,
     protocolData,
     createRunCommand,
+    chainRunCommands,
     registerPosition,
     workingOffsets,
     proceed,
@@ -58,7 +61,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     isRobotMoving,
     existingOffsets,
   } = props
-  const { t } = useTranslation('labware_position_check')
+  const { t } = useTranslation(['labware_position_check', 'shared'])
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipetteName =
     protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
@@ -90,7 +93,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   }
 
   React.useEffect(() => {
-    chainRunCommands(modulePrepCommands, createRunCommand)
+    chainRunCommands(modulePrepCommands, true)
+      .then(() => {})
+      .catch(() => {})
   }, [moduleId])
 
   if (pipetteName == null || labwareDef == null) return null
@@ -157,14 +162,13 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   }
 
   const handleConfirmPlacement = (): void => {
-    chainRunCommands(confirmPlacementCommands, createRunCommand, () => {
-      createRunCommand(
-        {
+    chainRunCommands(confirmPlacementCommands, true)
+      .then(() => {
+        createRunCommand({
           command: { commandType: 'savePosition', params: { pipetteId } },
           waitUntilComplete: true,
-        },
-        {
-          onSuccess: response => {
+        })
+          .then(response => {
             const { position } = response.data.result
             registerPosition({
               type: 'initialPosition',
@@ -172,78 +176,78 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               location,
               position,
             })
-          },
-        }
-      )
-    })
+          })
+          .catch(() => {})
+      })
+      .catch(() => {})
   }
 
   const handleConfirmPosition = (): void => {
-    createRunCommand(
-      {
-        command: { commandType: 'savePosition', params: { pipetteId } },
-        waitUntilComplete: true,
-      },
-      {
-        onSuccess: response => {
-          const { position } = response.data.result
-          registerPosition({
-            type: 'finalPosition',
-            labwareId,
-            location,
-            position,
-          })
-          let confirmPositionCommands: CreateCommand[] = [
-            {
-              commandType: 'moveToWell' as const,
-              params: {
-                pipetteId: pipetteId,
-                labwareId: FIXED_TRASH_ID,
-                wellName: 'A1',
-                wellLocation: { origin: 'top' as const },
-              },
+    createRunCommand({
+      command: { commandType: 'savePosition', params: { pipetteId } },
+      waitUntilComplete: true,
+    })
+      .then(response => {
+        const { position } = response.data.result
+        registerPosition({
+          type: 'finalPosition',
+          labwareId,
+          location,
+          position,
+        })
+        let confirmPositionCommands: CreateCommand[] = [
+          {
+            commandType: 'moveToWell' as const,
+            params: {
+              pipetteId: pipetteId,
+              labwareId: FIXED_TRASH_ID,
+              wellName: 'A1',
+              wellLocation: { origin: 'top' as const },
             },
-            {
-              commandType: 'moveLabware' as const,
-              params: {
-                labwareId: labwareId,
-                newLocation: 'offDeck',
-                strategy: 'manualMoveWithoutPause',
-              },
+          },
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
             },
+          },
+        ]
+        if (
+          moduleId != null &&
+          moduleType != null &&
+          moduleType === HEATERSHAKER_MODULE_TYPE
+        ) {
+          confirmPositionCommands = [
+            confirmPositionCommands[0],
+            {
+              commandType: 'heaterShaker/openLabwareLatch',
+              params: { moduleId },
+            },
+            confirmPositionCommands[1],
           ]
-          if (
-            moduleId != null &&
-            moduleType != null &&
-            moduleType === HEATERSHAKER_MODULE_TYPE
-          ) {
-            confirmPositionCommands = [
-              confirmPositionCommands[0],
-              {
-                commandType: 'heaterShaker/openLabwareLatch',
-                params: { moduleId },
-              },
-              confirmPositionCommands[1],
-            ]
-          }
-          chainRunCommands(confirmPositionCommands, createRunCommand, proceed)
-        },
-      }
-    )
+        }
+        chainRunCommands(confirmPositionCommands, true)
+          .then(() => proceed())
+          .catch(() => {})
+      })
+      .catch(() => {})
   }
   const handleGoBack = (): void => {
     chainRunCommands(
       [...modulePrepCommands, { commandType: 'home', params: {} }],
-      createRunCommand,
-      () => {
+      true
+    )
+      .then(() => {
         registerPosition({
           type: 'initialPosition',
           labwareId,
           location,
           position: null,
         })
-      }
-    )
+      })
+      .catch(() => {})
   }
 
   const initialPosition = workingOffsets.find(
@@ -259,7 +263,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       location
     )?.vector ?? IDENTITY_VECTOR
 
-  if (isRobotMoving) return <RobotMotionLoader />
+  if (isRobotMoving)
+    return (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
   return (
     <Flex flexDirection={DIRECTION_COLUMN} minHeight="25rem">
       {initialPosition != null ? (

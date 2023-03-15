@@ -8,15 +8,15 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { NeedHelpLink } from '../../CalibrationPanels'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { useChainRunCommands } from '../../../resources/runs/hooks'
 import type { CreateRunCommand, RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
-import { chainRunCommands } from '../utils/chainRunCommands'
 
 export const INTERVAL_MS = 3000
 
@@ -25,15 +25,18 @@ export const IntroScreen = (props: {
   protocolData: CompletedProtocolAnalysis
   registerPosition: React.Dispatch<RegisterPositionAction>
   createRunCommand: CreateRunCommand
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   handleJog: Jog
   isRobotMoving: boolean
 }): JSX.Element | null => {
-  const { proceed, protocolData, createRunCommand, isRobotMoving } = props
+  const { proceed, protocolData, chainRunCommands, isRobotMoving } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
-    chainRunCommands(prepCommands, createRunCommand, proceed)
+    chainRunCommands(prepCommands, true)
+      .then(() => proceed())
+      .catch(() => {})
   }
 
   if (isRobotMoving) {

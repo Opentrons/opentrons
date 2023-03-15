@@ -31,8 +31,8 @@ import type {
 } from './types'
 import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
-import { chainRunCommands } from './utils/chainRunCommands'
 import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
@@ -120,8 +120,15 @@ export const LabwarePositionCheckInner = (
     },
     { workingOffsets: [], tipPickUpOffset: null }
   )
-  const { createCommand, isLoading: isRobotMoving } = useCreateCommandMutation()
+  const {
+    createCommand,
+    isLoading: isCommandMutationLoading,
+  } = useCreateCommandMutation()
   const { createCommand: createSilentCommand } = useCreateCommandMutation()
+  const {
+    chainRunCommands,
+    isCommandMutationLoading: isCommandChainLoading,
+  } = useChainRunCommands(runId)
   const createRunCommand: CreateRunCommand = (variables, ...options) => {
     return createCommand({ ...variables, runId }, ...options)
   }
@@ -144,9 +151,10 @@ export const LabwarePositionCheckInner = (
         ...dropTipToBeSafeCommands,
         { commandType: 'home' as const, params: {} },
       ],
-      createRunCommand,
-      props.onCloseClick
+      true
     )
+      .then(() => props.onCloseClick)
+      .catch(() => {})
   }
   const {
     confirm: confirmExitLPC,
@@ -198,9 +206,10 @@ export const LabwarePositionCheckInner = (
     proceed,
     protocolData,
     createRunCommand,
+    chainRunCommands,
     registerPosition,
     handleJog,
-    isRobotMoving,
+    isRobotMoving: isCommandMutationLoading || isCommandChainLoading,
     workingOffsets,
     existingOffsets,
   }
