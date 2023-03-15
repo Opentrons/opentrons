@@ -66,7 +66,6 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const [joggedPosition, setJoggedPosition] = React.useState<VectorOffset>(
     initialPosition
   )
-  console.table({ initialPosition, joggedPosition })
 
   let wellsToHighlight: string[] = []
   if (getPipetteNameSpecs(pipetteName)?.channels === 8) {

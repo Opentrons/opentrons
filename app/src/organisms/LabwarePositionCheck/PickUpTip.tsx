@@ -23,7 +23,6 @@ import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/uti
 import { TipConfirmation } from './TipConfirmation'
 import { getLabwareDef } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
-import { chainRunCommands } from './utils/chainRunCommands'
 
 import type { Jog } from '../../molecules/JogControls/types'
 import type {
@@ -145,7 +144,6 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
               position,
             })
           })
-          .then(() => {})
           .catch(() => {})
       })
       .catch(() => {})
