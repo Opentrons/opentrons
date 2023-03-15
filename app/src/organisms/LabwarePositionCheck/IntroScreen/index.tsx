@@ -31,12 +31,14 @@ export const IntroScreen = (props: {
 }): JSX.Element | null => {
   const { proceed, protocolData, chainRunCommands, isRobotMoving } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
-
+  console.error('eouerjfo', { some: 'thing' })
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
     chainRunCommands(prepCommands, true)
       .then(() => proceed())
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
 
   if (isRobotMoving) {

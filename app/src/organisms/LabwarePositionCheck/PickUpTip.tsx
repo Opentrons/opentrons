@@ -144,9 +144,13 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
               position,
             })
           })
-          .catch(() => {})
+          .catch(e => {
+            console.error('Unexpected command failure: ', e)
+          })
       })
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
   const handleConfirmPosition = (): void => {
     createRunCommand({
@@ -179,9 +183,13 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           waitUntilComplete: true,
         })
           .then(() => setShowTipConfirmation(true))
-          .catch(() => {})
+          .catch(e => {
+            console.error('Unexpected command failure: ', e)
+          })
       })
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
 
   const handleConfirmTipAttached = (): void => {
@@ -208,7 +216,9 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       true
     )
       .then(() => proceed())
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
   const handleInvalidateTip = (): void => {
     createRunCommand({
@@ -232,7 +242,9 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         })
         setShowTipConfirmation(false)
       })
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
   const handleGoBack = (): void => {
     registerPosition({

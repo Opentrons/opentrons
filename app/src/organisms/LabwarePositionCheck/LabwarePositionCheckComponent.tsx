@@ -120,6 +120,7 @@ export const LabwarePositionCheckInner = (
     },
     { workingOffsets: [], tipPickUpOffset: null }
   )
+  const [isExiting, setIsExiting] = React.useState(false)
   const {
     createCommand,
     isLoading: isCommandMutationLoading,
@@ -135,6 +136,7 @@ export const LabwarePositionCheckInner = (
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
+    setIsExiting(true)
     const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
       protocolData?.pipettes ?? []
     ).map(pip => ({
@@ -153,8 +155,10 @@ export const LabwarePositionCheckInner = (
       ],
       true
     )
-      .then(() => props.onCloseClick)
-      .catch(() => {})
+      .then(() => props.onCloseClick())
+      .catch(() => {
+        setIsExiting(false)
+      })
   }
   const {
     confirm: confirmExitLPC,
@@ -269,7 +273,7 @@ export const LabwarePositionCheckInner = (
             title={t('labware_position_check_title')}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
-            onExit={showConfirmation ? null : confirmExitLPC}
+            onExit={showConfirmation || isExiting ? null : confirmExitLPC}
           />
         }
       >

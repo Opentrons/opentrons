@@ -95,7 +95,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   React.useEffect(() => {
     chainRunCommands(modulePrepCommands, true)
       .then(() => {})
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }, [moduleId])
 
   if (pipetteName == null || labwareDef == null) return null
@@ -177,9 +179,13 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               position,
             })
           })
-          .catch(() => {})
+          .catch(e => {
+            console.error('Unexpected command failure: ', e)
+          })
       })
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
 
   const handleConfirmPosition = (): void => {
@@ -230,9 +236,13 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         }
         chainRunCommands(confirmPositionCommands, true)
           .then(() => proceed())
-          .catch(() => {})
+          .catch(e => {
+            console.error('Unexpected command failure: ', e)
+          })
       })
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
   const handleGoBack = (): void => {
     chainRunCommands(
@@ -247,7 +257,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           position: null,
         })
       })
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
 
   const initialPosition = workingOffsets.find(

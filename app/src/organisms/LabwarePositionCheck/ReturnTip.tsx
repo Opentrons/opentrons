@@ -127,7 +127,9 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
       .then(() => {
         proceed()
       })
-      .catch(() => {})
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
 
   if (isRobotMoving)
