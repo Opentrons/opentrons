@@ -37,7 +37,7 @@ const TipDecoration = React.memo(function TipDecoration(props: {
 
 export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const { isTiprack } = props.definition.parameters
-  
+
   return (
     <g onClick={props.onLabwareClick}>
       <g className={styles.labware_detail_group}>
