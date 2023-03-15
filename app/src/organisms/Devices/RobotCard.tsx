@@ -142,7 +142,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
   const isOT3 = useIsOT3(props.robotName)
-  const { data: attachedInstruments } = useInstrumentsQuery({enabled: isOT3}, true)
+  const { data: attachedInstruments } = useInstrumentsQuery({enabled: isOT3})
   const extensionInstrument =
     (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
