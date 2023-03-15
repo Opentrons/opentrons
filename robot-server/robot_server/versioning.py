@@ -5,7 +5,7 @@ from typing_extensions import Literal, Final
 
 from robot_server.errors import ErrorDetails
 
-API_VERSION: Final[int] = 4
+API_VERSION: Final[int] = 5
 """The current version of the HTTP API used by the server.
 
 This value will be incremented any time the schema of a request or response
@@ -20,6 +20,8 @@ Version history:
     - Reformatted the `GET /modules` response and removed unused endpoints
 4. Introduced in v6.3 of the Opentrons software
     - Deprecated and removed the `/labware/calibrations` endpoints
+5. Introduced in v6.4 (???) of the Opentrons software
+    - Added `authenticationBearer` header to accept auth tokens for requests
 """
 
 MIN_API_VERSION: Final[int] = 2
