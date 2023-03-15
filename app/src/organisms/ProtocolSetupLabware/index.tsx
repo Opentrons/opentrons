@@ -38,7 +38,7 @@ import { Modal } from '../../molecules/Modal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareDisplayLocation } from '../CommandText/utils'
-import { getLabwareSetupItemGroups } from '../Devices/ProtocolRun/SetupLabware/utils'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
@@ -51,7 +51,7 @@ import type {
   LabwareDefinition2,
   LabwareLocation,
 } from '@opentrons/shared-data'
-import type { LabwareSetupItem } from '../Devices/ProtocolRun/SetupLabware/types'
+import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
 import type { LatchStatus } from '../../redux/modules/api-types'
