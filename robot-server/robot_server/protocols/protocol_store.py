@@ -286,6 +286,7 @@ class ProtocolStore:
         select_referenced_run_ids = sqlalchemy.select(run_table.c.id).where(
             run_table.c.protocol_id == protocol_id
         )
+        referenced_run_ids = []
 
         with self._sql_engine.begin() as transaction:
             referenced_run_ids = (
