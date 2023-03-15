@@ -42,6 +42,7 @@ async def build(
     hw_control_loop: asyncio.AbstractEventLoop,
     execution_manager: ExecutionManager,
     sim_model: Optional[str] = None,
+    module_id: Optional[str] = None,
 ) -> AbstractModule:
     return await _MODULE_CLS_BY_TYPE[type].build(
         port=port,
@@ -50,4 +51,5 @@ async def build(
         hw_control_loop=hw_control_loop,
         execution_manager=execution_manager,
         sim_model=sim_model,
+        module_id=module_id,
     )

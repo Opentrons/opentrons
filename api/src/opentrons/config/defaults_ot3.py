@@ -18,6 +18,7 @@ from .types import (
 )
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
+DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     starting_mount_height=100,

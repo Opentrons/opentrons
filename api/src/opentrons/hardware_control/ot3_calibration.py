@@ -876,6 +876,7 @@ async def calibrate_module(
     mount: OT3Mount,
     slot: int,
     module: ModuleType,
+    module_id: str,
 ) -> Point:
     """
     Run automatic calibration for a module.
@@ -898,7 +899,7 @@ async def calibrate_module(
 
         # find the offset
         offset = await _calibrate_module(hcapi, mount, module, slot)
-        # TODO (ba, 2023-03-09): save module calibration here
+        await hcapi.save_module_offset(module_id, mount, slot, offset)
         return offset
     finally:
         # remove probe

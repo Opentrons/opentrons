@@ -17,6 +17,7 @@ from typing import (
     Any,
     TypeVar,
 )
+from opentrons.hardware_control.modules.module_calibration import ModuleCalibrationOffset
 
 
 from opentrons_shared_data.pipette.dev_types import (
@@ -1661,6 +1662,18 @@ class OT3API(
             return self._gripper_handler.save_instrument_offset(delta)
         else:
             return self._pipette_handler.save_instrument_offset(checked_mount, delta)
+
+    async def save_module_offset(
+            self, module_id: str, mount: OT3Mount, slot: int, offset: top_types.Point
+            ) -> ModuleCalibrationOffset:
+        """Save a new offset for a given module."""
+        module = self._backend.module_controls.get_module_by_module_id(module_id)
+        if not module:
+            self._log.warning(f"Could not save calibration for unknown module {module_id}")
+            return
+        self._log.info(f"Saving module offset: {offset} for module {module.MODULE_TYPE} {module_id}.")
+        offset = self._backend.module_controls.save_module_offset(module.MODULE_TYPE, module_id, mount, slot, offset)
+        return offset
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
