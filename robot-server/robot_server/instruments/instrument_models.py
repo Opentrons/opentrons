@@ -32,9 +32,9 @@ InstrumentType = Literal["pipette", "gripper"]
 class MountType(enum.Enum):
     """Available mount types."""
 
-    LEFT = enum.auto()
-    RIGHT = enum.auto()
-    EXTENSION = enum.auto()
+    LEFT = "left"
+    RIGHT = "right"
+    EXTENSION = "extension"
 
     @staticmethod
     def from_hw_mount(mount: Mount) -> MountType:
@@ -42,9 +42,9 @@ class MountType(enum.Enum):
         mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
         return mount_map[mount]
 
-    def as_string(self) -> str:
-        """Get MountType as a string."""
-        return self.name.lower()
+    def __str__(self) -> str:
+        """Return the value string."""
+        return self.value
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):

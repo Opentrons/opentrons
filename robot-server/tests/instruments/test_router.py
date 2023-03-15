@@ -126,6 +126,12 @@ async def test_get_all_attached_instruments(
         }
     )
     result = await get_attached_instruments(hardware=ot3_hardware_api)
+    # Ideally we would like to verify that cache_instruments was called before
+    # fetching pipettes and gripper. But decoy doesn't allow verifying getters so,
+    # we will have to rely on manual testing for this.
+    decoy.verify(
+        await ot3_hardware_api.cache_instruments(),
+    )
     assert result.content.data == [
         Pipette.construct(
             mount="left",
@@ -191,6 +197,7 @@ async def test_get_ot2_instruments(
         }
     )
     result2 = await get_attached_instruments(hardware=hardware_api)
+    decoy.verify(await hardware_api.cache_instruments(), times=0)
     assert result2.status_code == 200
     assert result2.content.data == [
         Pipette.construct(
