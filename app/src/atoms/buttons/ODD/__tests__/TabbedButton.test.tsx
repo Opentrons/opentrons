@@ -46,15 +46,6 @@ describe('Background TabbedButton', () => {
     expect(button).toHaveStyle(`color: ${String(COLORS.darkBlack_hundred)}`)
   })
 
-  it('renders background tabbed button with text and disabled', () => {
-    props.disabled = true
-    const { getByText } = render(props)
-    const button = getByText('tabbed button')
-    expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: #16212d33`)
-    expect(button).toHaveStyle(`color: #16212d99`)
-  })
-
   it('applies the correct states to the background tabbed button - active', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
@@ -63,18 +54,6 @@ describe('Background TabbedButton', () => {
       `${String(COLORS.highlightPurple_two)}`,
       {
         modifier: ':active',
-      }
-    )
-  })
-
-  it('applies the correct states to the background tabbed button - focus-visible', () => {
-    const { getByText } = render(props)
-    const button = getByText('tabbed button')
-    expect(button).toHaveStyleRule(
-      'box-shadow',
-      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
-      {
-        modifier: ':focus-visible',
       }
     )
   })
@@ -114,35 +93,14 @@ describe('Foreground TabbedButton', () => {
     expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
   })
 
-  it('renders foreground tabbed button with text and disabled', () => {
-    props.disabled = true
-    const { getByText } = render(props)
-    const button = getByText('tabbed button')
-    expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: #16212d33`)
-    expect(button).toHaveStyle(`color: #16212d99`)
-  })
-
   it('applies the correct states to the foreground tabbed button - active', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.highlightPurple_one_opacity20)}`,
+      `${String(COLORS.highlightPurple_one)}`,
       {
         modifier: ':active',
-      }
-    )
-  })
-
-  it('applies the correct states to the foreground tabbed button - focus-visible', () => {
-    const { getByText } = render(props)
-    const button = getByText('tabbed button')
-    expect(button).toHaveStyleRule(
-      'box-shadow',
-      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
-      {
-        modifier: ':focus-visible',
       }
     )
   })

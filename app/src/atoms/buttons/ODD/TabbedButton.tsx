@@ -10,13 +10,10 @@ import {
 } from '@opentrons/components'
 
 const FOREGROUND_STYLES = css`
+  &:active,
   &:hover,
   &:focus {
     background-color: ${COLORS.highlightPurple_one};
-  }
-
-  &:active {
-    background-color: ${COLORS.highlightPurple_one_opacity20};
   }
 `
 
@@ -41,25 +38,14 @@ export const TabbedButton = styled(NewPrimaryBtn)<TabbedButtonProps>`
       background-color: ${COLORS.highlightPurple_one};
       border-radius: ${BORDERS.size_four};
       box-shadow: none;
-      height: '3.75rem';
       font-size: ${TYPOGRAPHY.fontSize22};
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       line-height: ${TYPOGRAPHY.lineHeight28};
       padding: ${SPACING.spacing4} ${SPACING.spacing5};
       text-transform: ${TYPOGRAPHY.textTransformNone};
-      width: '10.375rem';
 
       ${props.foreground === true ? FOREGROUND_STYLES : BACKGROUND_STYLES}
 
       ${styleProps}
-
-    &:focus-visible {
-        box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
-      }
-
-      &:disabled {
-        background-color: ${COLORS.darkBlack_twenty};
-        color: ${COLORS.darkBlack_sixty};
-      }
     `}
 `
