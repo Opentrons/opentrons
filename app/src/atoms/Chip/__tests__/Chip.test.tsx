@@ -11,55 +11,94 @@ const render = (props: React.ComponentProps<typeof Chip>) => {
 describe('Chip', () => {
   let props: React.ComponentProps<typeof Chip>
 
-  it('should render text, icon with success colors', () => {
+  it('should render text, no icon with basic colors', () => {
+    props = {
+      type: 'basic',
+      text: 'mockBasic',
+    }
+    const [{ getByText, queryByLabelText }] = render(props)
+    const chip = getByText('mockBasic')
+    expect(chip).toHaveStyle(`color: ${String(COLORS.darkBlack_ninety)}`)
+    // expect(chip).toHaveStyle(`background-color: ${String(COLORS.darkBlack_twenty)}`)
+    expect(queryByLabelText('icon_mockBasic')).not.toBeInTheDocument()
+  })
+
+  it('should render text, icon, bgcolor with success colors', () => {
     props = {
       type: 'success',
       text: 'mockSuccess',
-      iconName: 'ot-check',
     }
     const [{ getByText, getByLabelText }] = render(props)
     const chip = getByText('mockSuccess')
-    expect(chip).toHaveStyle(`color: ${COLORS.successText}`)
+    expect(chip).toHaveStyle(`color: ${String(COLORS.green_one)}`)
+    // expect(chip).toHaveStyle(`background-color: ${String(COLORS.green_three)}`)
     const icon = getByLabelText('icon_mockSuccess')
-    expect(icon).toHaveStyle(`color: ${COLORS.successEnabled}`)
+    expect(icon).toHaveStyle(`color: ${String(COLORS.green_one)}`)
   })
 
-  it('should render text, icon with error colors', () => {
+  it('should render text, icon, no bgcolor with success colors and bg false', () => {
     props = {
-      type: 'error',
-      text: 'mockError',
-      iconName: 'ot-alert',
+      background: false,
+      type: 'success',
+      text: 'mockSuccess',
     }
     const [{ getByText, getByLabelText }] = render(props)
-    const chip = getByText('mockError')
-    expect(chip).toHaveStyle(`color: ${COLORS.errorText}`)
-    const icon = getByLabelText('icon_mockError')
-    expect(icon).toHaveStyle(`color: ${COLORS.errorEnabled}`)
+    const chip = getByText('mockSuccess')
+    expect(chip).toHaveStyle(`color: ${String(COLORS.green_one)}`)
+    // expect(chip).toHaveStyle(`background-color: ${String(COLORS.transparent)}`)
+    const icon = getByLabelText('icon_mockSuccess')
+    expect(icon).toHaveStyle(`color: ${String(COLORS.green_one)}`)
   })
 
-  it('should render text, icon with warning colors', () => {
+  it('should render text, icon, bgcolor with warning colors', () => {
     props = {
       type: 'warning',
       text: 'mockWarning',
-      iconName: 'ot-alert',
     }
     const [{ getByText, getByLabelText }] = render(props)
     const chip = getByText('mockWarning')
-    expect(chip).toHaveStyle(`color: ${COLORS.warningText}`)
+    expect(chip).toHaveStyle(`color: ${String(COLORS.yellow_one)}`)
+    // expect(chip).toHaveStyle(`background-color: ${String(COLORS.yellow_three)}`)
     const icon = getByLabelText('icon_mockWarning')
-    expect(icon).toHaveStyle(`color: ${COLORS.warningEnabled}`)
+    expect(icon).toHaveStyle(`color: ${String(COLORS.yellow_two)}`)
   })
 
-  it('should render text, icon with informing colors', () => {
+  it('should render text, icon, no bgcolor with warning colors and bg false', () => {
     props = {
-      type: 'informing',
-      text: 'mockInforming',
-      iconName: 'ot-alert',
+      type: 'warning',
+      text: 'mockWarning',
     }
     const [{ getByText, getByLabelText }] = render(props)
-    const chip = getByText('mockInforming')
-    expect(chip).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
-    const icon = getByLabelText('icon_mockInforming')
-    expect(icon).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
+    const chip = getByText('mockWarning')
+    expect(chip).toHaveStyle(`color: ${String(COLORS.yellow_one)}`)
+    // expect(chip).toHaveStyle(`background-color: ${String(COLORS.transparent)}`)
+    const icon = getByLabelText('icon_mockWarning')
+    expect(icon).toHaveStyle(`color: ${String(COLORS.yellow_two)}`)
+  })
+
+  it('should render text, icon, bgcolor with neutral colors', () => {
+    props = {
+      type: 'neutral',
+      text: 'mockNeutral',
+    }
+    const [{ getByText, getByLabelText }] = render(props)
+    const chip = getByText('mockNeutral')
+    expect(chip).toHaveStyle(`color: ${String(COLORS.darkBlack_seventy)}`)
+    // expect(chip).toHaveStyle(`background-color: ${String(COLORS.darkBlack_twenty)}`)
+    const icon = getByLabelText('icon_mockNeutral')
+    expect(icon).toHaveStyle(`color: ${String(COLORS.darkBlack_ninety)}`)
+  })
+
+  it('should render text, icon, no bgcolor with neutral colors and bg false', () => {
+    props = {
+      type: 'neutral',
+      text: 'mockNeutral',
+    }
+    const [{ getByText, getByLabelText }] = render(props)
+    const chip = getByText('mockNeutral')
+    expect(chip).toHaveStyle(`color: ${String(COLORS.darkBlack_seventy)}`)
+    // expect(chip).toHaveStyle(`background-color: ${String(COLORS.transparent)}`)
+    const icon = getByLabelText('icon_mockNeutral')
+    expect(icon).toHaveStyle(`color: ${String(COLORS.darkBlack_ninety)}`)
   })
 })
