@@ -56,7 +56,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     handleJog,
     isRobotMoving,
     existingOffsets,
-    workingOffsets
+    workingOffsets,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
 
@@ -244,7 +244,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       }
     )
   }
-  const handleGoBack  = (): void => {
+  const handleGoBack = (): void => {
     registerPosition({
       type: 'initialPosition',
       labwareId,

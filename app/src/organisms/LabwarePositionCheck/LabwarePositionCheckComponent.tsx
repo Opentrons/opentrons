@@ -120,25 +120,12 @@ export const LabwarePositionCheckInner = (
     },
     { workingOffsets: [], tipPickUpOffset: null }
   )
-  const {
-    createCommand,
-    isLoading: isCommandMutationLoading,
-  } = useCreateCommandMutation()
+  const { createCommand, isLoading: isRobotMoving } = useCreateCommandMutation()
   const { createCommand: createSilentCommand } = useCreateCommandMutation()
   const createRunCommand: CreateRunCommand = (variables, ...options) => {
     return createCommand({ ...variables, runId }, ...options)
   }
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
-  const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
-  React.useEffect(() => {
-    if (isCommandMutationLoading) {
-      const timer = setTimeout(() => setIsRobotMoving(true), 700)
-      return () => clearTimeout(timer)
-    } else {
-      setIsRobotMoving(false)
-    }
-  }, [isCommandMutationLoading])
-
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
@@ -168,13 +155,11 @@ export const LabwarePositionCheckInner = (
   } = useConditionalConfirm(handleCleanUpAndClose, true)
 
   const proceed = (): void => {
-    if (!isCommandMutationLoading) {
-      setCurrentStepIndex(
-        currentStepIndex !== LPCSteps.length - 1
-          ? currentStepIndex + 1
-          : currentStepIndex
-      )
-    }
+    setCurrentStepIndex(
+      currentStepIndex !== LPCSteps.length - 1
+        ? currentStepIndex + 1
+        : currentStepIndex
+    )
   }
   if (protocolData == null) return null
   const LPCSteps = getLabwarePositionCheckSteps(protocolData)

@@ -35,8 +35,12 @@ const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)
   if (checkTipRacksSectionSteps.length < 1) return []
-  const allButLastTiprackCheckSteps = checkTipRacksSectionSteps.slice(0, checkTipRacksSectionSteps.length - 1)
-  const lastTiprackCheckStep = checkTipRacksSectionSteps[checkTipRacksSectionSteps.length - 1]
+  const allButLastTiprackCheckSteps = checkTipRacksSectionSteps.slice(
+    0,
+    checkTipRacksSectionSteps.length - 1
+  )
+  const lastTiprackCheckStep =
+    checkTipRacksSectionSteps[checkTipRacksSectionSteps.length - 1]
 
   const pickUpTipSectionStep: PickUpTipStep = {
     section: SECTIONS.PICK_UP_TIP,
