@@ -16,7 +16,7 @@ from opentrons.hardware_control.ot3_calibration import (
     find_edge_binary,
     find_axis_center,
     EarlyCapacitiveSenseTrigger,
-    find_deck_height,
+    find_calibration_structure_height,
     find_slot_center_linear,
     find_slot_center_noncontact,
     calibrate_pipette,
@@ -409,7 +409,7 @@ async def test_deck_not_found(
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = (-3,)
     with pytest.raises(DeckNotFoundError):
-        await find_deck_height(
+        await find_calibration_structure_height(
             ot3_hardware,
             OT3Mount.RIGHT,
             Point(0.0, 0.0, 0.0),
@@ -429,7 +429,7 @@ async def test_find_deck_checks_z_only(
 ) -> None:
     await ot3_hardware.home()
     here = await ot3_hardware.gantry_position(mount)
-    await find_deck_height(ot3_hardware, mount, target)
+    await find_calibration_structure_height(ot3_hardware, mount, target)
 
     z_prep_loc = target + Z_PREP_OFFSET
 
@@ -464,8 +464,8 @@ async def test_method_enum(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
         AsyncMock(spec=find_slot_center_noncontact),
     ) as noncontact, patch(
-        "opentrons.hardware_control.ot3_calibration.find_deck_height",
-        AsyncMock(spec=find_deck_height),
+        "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
+        AsyncMock(spec=find_calibration_structure_height),
     ) as find_deck, patch.object(
         ot3_hardware.managed_obj, "reset_instrument_offset", AsyncMock()
     ) as reset_instrument_offset, patch.object(

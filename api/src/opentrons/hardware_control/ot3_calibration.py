@@ -252,7 +252,7 @@ def _get_calibration_square_position_in_slot(slot: int) -> Point:
     return bottom_left + relative_center + Point(z=CALIBRATION_SQUARE_DEPTH)
 
 
-async def find_deck_height(
+async def find_calibration_structure_height(
     hcapi: OT3API, mount: OT3Mount, nominal_center: Point
 ) -> float:
     """
@@ -675,7 +675,7 @@ async def find_slot_center_noncontact(
     return Point(x_center, y_center, estimated_center.z)
 
 
-async def find_slot_center(
+async def find_calibration_structure_center(
     hcapi: OT3API,
     mount: OT3Mount,
     nominal_center: Point,
@@ -727,14 +727,10 @@ async def _calibrate_mount(
     """
     nominal_center = _get_calibration_square_position_in_slot(slot)
     try:
-        # First, find the estimated deck height. This will be used to baseline the edge detection points.
-        z_height = await find_deck_height(hcapi, mount, nominal_center)
-        LOG.info(f"Found deck at {z_height}mm")
-
-        # Perform xy offset search
-        found_center = await find_slot_center(hcapi, mount, nominal_center, method)
-
-        offset = nominal_center - found_center
+        # find the center of the calibration sqaure
+        offset = await find_calibration_structure_position(
+            hcapi, mount, nominal_center, method
+        )
         # update center with values obtained during calibration
         LOG.info(f"Found calibration value {offset} for mount {mount.name}")
         return offset
@@ -748,43 +744,39 @@ async def _calibrate_mount(
         raise
 
 
-# FIXME (ba, 2023-03-11): This should be loaded from definitions
-def _get_module_calibration_offset(module: ModuleType) -> Point:
-    calibration_definitions = {
-        ModuleType.THERMOCYCLER: Point(),
-        # NOTE: manual measured value for for TEMPERATURE module on slot 3
-        ModuleType.TEMPERATURE: Point(-3, -1, 27.5),
-        ModuleType.MAGNETIC: Point(),
-        ModuleType.HEATER_SHAKER: Point(),
-    }
-    return calibration_definitions[module]
+async def find_calibration_structure_position(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    nominal_center: Point,
+    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+) -> Point:
+    """Find the calibration square offset given an arbitry postition on the deck."""
+    # Find the estimated structure plate height. This will be used to baseline the edge detection points.
+    z_height = await find_calibration_structure_height(hcapi, mount, nominal_center)
+    test_center = nominal_center._replace(z=z_height)
+    LOG.info(f"Found structure plate at {z_height}mm")
+
+    # Find the calibration square center using the given method
+    found_center = await find_calibration_structure_center(
+        hcapi, mount, test_center, method
+    )
+    return nominal_center - found_center
 
 
 async def _calibrate_module(
     hcapi: OT3API,
     mount: OT3Mount,
-    module: ModuleType,
     slot: int,
     method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
 ) -> Point:
     """This will find the position of the calibration square for a given module."""
-    # Find the nominal center of the given slot
-    nominal_center = _get_calibration_square_position_in_slot(slot)
-
     # Find the module calibration offsets
-    module_calibration_offset = _get_module_calibration_offset(module)
-    nominal_center += module_calibration_offset
-    LOG.info(f"Found nominal center {nominal_center}mm")
-
-    # Find the estimated module plate height. This will be used to baseline the edge detection points.
-    z_height = await find_deck_height(hcapi, mount, nominal_center)
-    nominal_center = nominal_center._replace(z=z_height)
-    LOG.info(f"Found module plate at {z_height}mm")
-
-    # Find the module square center using the given method
-    found_center = await find_slot_center(hcapi, mount, nominal_center, method)
-    offset = nominal_center - found_center
-    LOG.info(f"Found calibration value {offset} for module {module.name}")
+    # TODO (ba, 2023-03-14): the nominal_center will be passed in from protocol engine in the future,
+    # where it would have the module + module calibration geometric offsets applied.
+    nominal_center = _get_calibration_square_position_in_slot(slot)
+    offset = await find_calibration_structure_position(
+        hcapi, mount, nominal_center, method
+    )
     return offset
 
 
@@ -877,6 +869,7 @@ async def calibrate_module(
     slot: int,
     module: ModuleType,
     module_id: str,
+    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
 ) -> Point:
     """
     Run automatic calibration for a module.
@@ -898,7 +891,7 @@ async def calibrate_module(
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
 
         # find the offset
-        offset = await _calibrate_module(hcapi, mount, module, slot)
+        offset = await _calibrate_module(hcapi, mount, module, slot, method)
         await hcapi.save_module_offset(module_id, mount, slot, offset)
         return offset
     finally:
