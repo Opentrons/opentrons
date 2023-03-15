@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import {
   Flex,
-  Icon,
+  // Icon,
   COLORS,
   SPACING,
   DIRECTION_ROW,
@@ -76,7 +76,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
             {robotName}
           </StyledText>
         </NavigationLink>
-        {/* <Icon name="wifi" size="2rem" /> */}
+        {/* <Icon name="wifi" size="2.5rem" /> */}
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
