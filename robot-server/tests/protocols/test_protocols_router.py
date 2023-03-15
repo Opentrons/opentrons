@@ -211,6 +211,9 @@ async def test_get_protocol_by_id(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return([analysis_summary])
+    decoy.when(
+        protocol_store.get_referenced_run_ids(protocol_id="protocol-id")
+    ).then_return([])
 
     result = await get_protocol_by_id(
         "protocol-id",
@@ -222,7 +225,7 @@ async def test_get_protocol_by_id(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.PYTHON,
-        metadata=Metadata(),
+        metadata=Metadata().parse_obj({"referencedRunIds": []}),
         robotType="OT-2 Standard",
         analysisSummaries=[analysis_summary],
         files=[],
