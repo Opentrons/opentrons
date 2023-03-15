@@ -16,10 +16,9 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 FAILURE_THRESHOLD_MM = 3
-GRIP_HEIGHT = 30
-
-WIDTHS: List[float] = [60, 80]
-GRIP_FORCES: List[float] = [5, 15, 20]
+GRIP_HEIGHT_MM = 30
+TEST_WIDTHS_MM: List[float] = [60, 80]
+GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
 
 def _get_test_tag(width: float, force: float):
     return f"{width}mm-{force}N"
@@ -28,8 +27,8 @@ def _get_test_tag(width: float, force: float):
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
-    for width in WIDTHS:
-        for force in GRIP_FORCES:
+    for width in TEST_WIDTHS_MM:
+        for force in GRIP_FORCES_NEWTON:
             tag = _get_test_tag(width, force)
             lines.append(CSVLine(tag, [float, float, CSVResult]))
     return lines
@@ -49,13 +48,13 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         result = CSVResult.from_bool(abs(expected - actual) < FAILURE_THRESHOLD_MM)
         report(section, tag, [expected, actual, result])
 
-    for width in WIDTHS:
-        for force in GRIP_FORCES:
+    for width in TEST_WIDTHS_MM:
+        for force in GRIP_FORCES_NEWTON:
             ui.print_header(f"Width(mm): {width}, Force(N): {force}")
-            print("homing z and g...")
+            print("homing Z and G...")
             await api.home([z_ax, g_ax])
-            print("moving down")
-            await api.move_rel(mount, Point(z=GRIP_HEIGHT))
+            print(f"moving down to grip height: {GRIP_HEIGHT_MM} mm")
+            await api.move_rel(mount, Point(z=GRIP_HEIGHT_MM))
             print("gripping at {force}N")
             await api.grip(force)
             await _save_result(_get_test_tag(width, force), width)

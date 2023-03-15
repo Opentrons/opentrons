@@ -58,5 +58,11 @@ def build_report(script_path: str) -> CSVReport:
             CSVSection(
                 title=TestSection.MOUNT.value, lines=test_mount.build_csv_lines()
             ),
+            CSVSection(
+                title=TestSection.FORCE.value, lines=test_force.build_csv_lines()
+            ),
+            CSVSection(
+                title=TestSection.WIDTH.value, lines=test_width.build_csv_lines()
+            ),
         ],
     )
