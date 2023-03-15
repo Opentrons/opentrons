@@ -54,6 +54,13 @@ class CalibrationStructureNotFoundError(RuntimeError):
         )
 
 
+class EdgeNotFoundError(RuntimeError):
+    def __init__(self, nominal: Point, limit: float) -> None:
+        super().__init__(
+            f"Edge nominal {nominal} not found within search tolerance limit: {limit}."
+        )
+
+
 class EarlyCapacitiveSenseTrigger(RuntimeError):
     def __init__(self, triggered_at: float, nominal_point: float) -> None:
         super().__init__(
@@ -157,6 +164,11 @@ async def find_edge_binary(
                 # so we want to switch back to narrow things down
                 stride = -stride / 2
         checking_pos += search_axis.set_in_point(Point(0, 0, 0), stride)
+        to_travel = abs(search_axis.of_point(checking_pos - slot_edge_nominal))
+        if to_travel > edge_settings.search_initial_tolerance_mm:
+            raise EdgeNotFoundError(
+                slot_edge_nominal, edge_settings.search_initial_tolerance_mm
+            )
 
     LOG.debug(
         f"Found edge {search_axis} direction {search_direction} at {checking_pos}"
@@ -494,7 +506,12 @@ async def _calibrate_mount(
         LOG.info(f"Found calibration value {offset} for mount {mount.name}")
         return offset
 
-    except (InaccurateNonContactSweepError, EarlyCapacitiveSenseTrigger):
+    except (
+        InaccurateNonContactSweepError,
+        EarlyCapacitiveSenseTrigger,
+        DeckNotFoundError,
+        EdgeNotFoundError,
+    ):
         LOG.info(
             "Error occurred during calibration. Resetting to current saved calibration value."
         )
