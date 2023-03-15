@@ -27,6 +27,7 @@ CAL_TRANSIT_HEIGHT: Final[float] = 10
 LINEAR_TRANSIT_HEIGHT: Final[float] = 1
 SEARCH_TRANSIT_HEIGHT: Final[float] = 5
 GRIPPER_GRIP_FORCE: Final[float] = 20
+BELT_CAL_TRANSIT_HEIGHT: Final[float] = 50
 
 # FIXME: add these to shared-data
 Z_PREP_OFFSET = Point(x=13, y=13, z=0)
@@ -870,13 +871,17 @@ async def calibrate_belts(
     -------
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
-    slot_a, slot_b, slot_c = 9, 3, 7
+    slot_a, slot_b, slot_c = 12, 3, 10
     point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
         hcapi, mount, slot_a
     )
+    here = await hcapi.gantry_position(mount)
+    await hcapi.move_to(mount, here._replace(z=BELT_CAL_TRANSIT_HEIGHT))
     point_b, nominal_point_b = await find_slot_center_binary_from_nominal_center(
         hcapi, mount, slot_b
     )
+    here = await hcapi.gantry_position(mount)
+    await hcapi.move_to(mount, here._replace(z=BELT_CAL_TRANSIT_HEIGHT))
     point_c, nominal_point_c = await find_slot_center_binary_from_nominal_center(
         hcapi, mount, slot_c
     )
