@@ -22,6 +22,10 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
+import {
+  useAllCommandsQuery,
+  useCommandQuery,
+} from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { StyledText } from '../../atoms/text'
 import { CommandText } from '../CommandText'
@@ -50,7 +54,10 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
   const analysis = useMostRecentCompletedAnalysis(runId)
+  const { data: allCommandsQueryData } = useAllCommandsQuery(runId)
   const analysisCommands = analysis?.commands ?? []
+  const runCommands = allCommandsQueryData?.data ?? []
+  const runCommandsLength = allCommandsQueryData?.meta.totalLength
 
   // todo (jb 2-16-23) This should be switched out soon for something more performant, see https://opentrons.atlassian.net/browse/RLAB-298
   const { downloadRunLog } = useDownloadRunLog(
@@ -62,20 +69,35 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   /**
    * find the analysis command within the analysis
    * that has the same commandKey as the most recent
-   * command from the run record. NOTE: the most recent
+   * command from the run record.
+   * Or in the case of a non-deterministic protocol
+   * source from the run rather than the analysis
+   * NOTE: the most recent
    * command may not always be "current", for instance if
    * the run has completed/failed */
   const lastRunCommandKey = useLastRunCommandKey(runId)
   const lastRunCommandIndex =
     analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
+  const lastRunCommandIndexFromRunCommands =
+    runCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
+  const { data: runCommandDetails } = useCommandQuery(
+    runId,
+    runCommands[lastRunCommandIndexFromRunCommands]?.id
+  )
   let countOfTotalText = ''
   if (
     lastRunCommandIndex >= 0 &&
     lastRunCommandIndex <= analysisCommands.length - 1
   ) {
     countOfTotalText = ` ${lastRunCommandIndex + 1}/${analysisCommands.length}`
+  } else if (
+    lastRunCommandIndex === -1 &&
+    lastRunCommandKey != null &&
+    runCommandsLength != null
+  ) {
+    countOfTotalText = `${runCommandsLength}/?`
   } else if (analysis == null) {
-    countOfTotalText = '?/?'
+    countOfTotalText = ''
   }
 
   let currentStepContents: React.ReactNode = null
@@ -84,6 +106,17 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <CommandText
         robotSideAnalysis={analysis}
         command={analysisCommands[lastRunCommandIndex]}
+      />
+    )
+  } else if (
+    analysis != null &&
+    lastRunCommandIndex === -1 &&
+    runCommandDetails != null
+  ) {
+    currentStepContents = (
+      <CommandText
+        robotSideAnalysis={analysis}
+        command={runCommandDetails.data}
       />
     )
   } else if (
@@ -142,7 +175,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           </Flex>
         </Link>
       </Flex>
-      {analysis != null ? (
+      {analysis != null && lastRunCommandIndex >= 0 ? (
         <ProgressBar
           percentComplete={
             lastRunCommandIndex > 0
@@ -158,7 +191,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           `}
           innerStyles={css`
             height: 0.375rem;
-            background-color: ${COLORS.darkBlackEnabled};
+            background-color: ${COLORS.darkGreyEnabled};
             border-radius: ${BORDERS.radiusSoftCorners};
           `}
         >

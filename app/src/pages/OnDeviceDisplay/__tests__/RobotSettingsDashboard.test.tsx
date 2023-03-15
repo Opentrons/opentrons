@@ -9,8 +9,9 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import {
-  NetworkSettings,
   DeviceReset,
+  TouchScreenSleep,
+  NetworkSettings,
   RobotSystemVersion,
 } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
@@ -18,8 +19,11 @@ import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')
-jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
 jest.mock('../hooks/useNetworkConnection')
+jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchScreenSleep'
+)
 jest.mock(
   '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
 )
@@ -34,6 +38,9 @@ const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
+const mockTouchScreenSleep = TouchScreenSleep as jest.MockedFunction<
+  typeof TouchScreenSleep
+>
 const mockNetworkSettings = NetworkSettings as jest.MockedFunction<
   typeof NetworkSettings
 >
@@ -58,6 +65,7 @@ describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
+    mockTouchScreenSleep.mockReturnValue(<div>Mock Touchscreen Sleep</div>)
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
@@ -74,9 +82,10 @@ describe('RobotSettingsDashboard', () => {
     getByText('opentrons-robot-name')
     getByText('Robot System Version')
     getByText('Network Settings')
-    getByText('Display Sleep Settings')
-    getByText('Display Brightness')
-    getByText('Display Text Size')
+    getByText('Display LED Lights')
+    getByText('Touchscreen Sleep')
+    getByText('Touchscreen Brightness')
+    getByText('Text Size')
     getByText('Device Reset')
   })
 
@@ -102,25 +111,25 @@ describe('RobotSettingsDashboard', () => {
     getByText('Mock Network Settings')
   })
 
-  it('should render component when tapping display sleep settings', () => {
+  it('should render component when tapping display touchscreen sleep', () => {
     const [{ getByText }] = render()
-    const button = getByText('Display Sleep Settings')
+    const button = getByText('Touchscreen Sleep')
     fireEvent.click(button)
-    getByText('Display Sleep Settings')
+    getByText('Mock Touchscreen Sleep')
   })
 
-  it('should render component when tapping display brightness', () => {
+  it('should render component when tapping touchscreen brightness', () => {
     const [{ getByText }] = render()
-    const button = getByText('Display Brightness')
+    const button = getByText('Touchscreen Brightness')
     fireEvent.click(button)
-    getByText('Display Brightness')
+    getByText('Touchscreen Brightness')
   })
 
-  it('should render component when tapping display text size', () => {
+  it('should render component when tapping text size', () => {
     const [{ getByText }] = render()
-    const button = getByText('Display Text Size')
+    const button = getByText('Text Size')
     fireEvent.click(button)
-    getByText('Display Text Size')
+    getByText('Text Size')
   })
 
   it('should render component when tapping device rest', () => {

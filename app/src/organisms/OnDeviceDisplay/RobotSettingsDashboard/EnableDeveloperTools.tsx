@@ -13,13 +13,13 @@ import { StyledText } from '../../../atoms/text'
 
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
-interface DisplayTextSizeProps {
+interface EnableDeveloperToolsProps {
   setCurrentOption: (currentOption: SettingOption | null) => void
 }
 
-export function DisplayTextSize({
+export function EnableDeveloperTools({
   setCurrentOption,
-}: DisplayTextSizeProps): JSX.Element {
+}: EnableDeveloperToolsProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -29,7 +29,7 @@ export function DisplayTextSize({
         </Btn>
       </Flex>
       <StyledText fontSize="2rem" textAlign="center">
-        {t('display_text_size')}
+        {t('enable_developer_tools')}
       </StyledText>
     </Flex>
   )

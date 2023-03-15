@@ -116,6 +116,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
 
         thread_manager = ThreadManager(
             OT3API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
             threadmanager_nonblocking=True,
         )
     else:
@@ -158,14 +159,6 @@ async def initialize() -> ThreadManagedHardware:
     # front button light. But that blinking stops when the completed hardware object
     # is returned. Do our own blinking here to keep it going while we home the robot.
     blink_task = asyncio.create_task(_blink())
-
-    # check for and start firmware updates if OT3
-    async def _do_updates() -> None:
-        if should_use_ot3() and ff.enable_ot3_firmware_updates():
-            log.info("Checking firmware updates")
-            await hardware.start_firmware_updates()
-
-    await asyncio.create_task(_do_updates())
 
     try:
 

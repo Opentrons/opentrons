@@ -35,7 +35,7 @@ describe('useAttachedPipettes hook', () => {
 
   it('returns attached pipettes', () => {
     when(mockUsePipettesQuery)
-      .calledWith({})
+      .calledWith({}, {})
       .mockReturnValue({
         data: {
           left: pipetteResponseFixtureLeft,
@@ -58,7 +58,7 @@ describe('useAttachedPipettes hook', () => {
 
   it('returns attached pipettes polled every 5 seconds if poll true', () => {
     when(mockUsePipettesQuery)
-      .calledWith({ refetchInterval: 5000 })
+      .calledWith({}, { refetchInterval: 5000 })
       .mockReturnValue({
         data: {
           left: pipetteResponseFixtureLeft,

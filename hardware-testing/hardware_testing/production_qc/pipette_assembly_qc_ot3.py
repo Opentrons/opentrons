@@ -3,7 +3,7 @@ import argparse
 import asyncio
 from dataclasses import dataclass, fields
 import os
-import time
+from time import time
 from typing import Optional, Callable, List, Any, Tuple
 from typing_extensions import Final
 
@@ -44,6 +44,8 @@ PRESSURE_DATA_HEADER = ["PHASE", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7"
 
 SPEED_REDUCTION_PERCENTAGE = 0.3
 
+MULTI_CHANNEL_1_OFFSET = Point(y=9 * 7 * 0.5)
+
 # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
 #       so here we cache these readings, and append them to the CSV in the end
 PRESSURE_DATA_CACHE = []
@@ -57,7 +59,6 @@ class TestConfig:
 
     operator_name: str
     skip_liquid: bool
-    skip_pipette_pressure: bool
     skip_fixture: bool
     skip_diagnostics: bool
     skip_plunger: bool
@@ -141,8 +142,19 @@ def _get_operator_answer_to_question(question: str) -> bool:
     return "y" in user_inp
 
 
+def _get_tips_used_for_droplet_test(
+    pipette_channels: int, num_trials: int
+) -> List[str]:
+    if pipette_channels == 1:
+        tip_columns = COLUMNS[:num_trials]
+        return [f"{c}1" for c in tip_columns]
+    elif pipette_channels == 8:
+        return [f"A{r}" for r in range(num_trials)]
+    raise RuntimeError(f"unexpected number of channels: {pipette_channels}")
+
+
 def _get_ideal_labware_locations(
-    test_config: TestConfig, pipette_volume: int
+    test_config: TestConfig, pipette_volume: int, pipette_channels: int
 ) -> LabwareLocations:
     tip_rack_liquid_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack_liquid,
@@ -167,6 +179,9 @@ def _get_ideal_labware_locations(
     fixture_loc_ideal = fixture_slot_pos + pressure_fixture_a1_location(
         test_config.fixture_side
     )
+    if pipette_channels == 8:
+        reservoir_loc_ideal += MULTI_CHANNEL_1_OFFSET
+        trash_loc_ideal += MULTI_CHANNEL_1_OFFSET
     return LabwareLocations(
         tip_rack_liquid=tip_rack_liquid_loc_ideal,
         tip_rack_fixture=tip_rack_fixture_loc_ideal,
@@ -326,12 +341,12 @@ async def _read_pressure_and_check_results(
     _samples = []
     for i in range(pressure_event_config.sample_count):
         _samples.append(fixture.read_all_pressure_channel())
-        next_sample_time = time.time() + pressure_event_config.sample_delay
+        next_sample_time = time() + pressure_event_config.sample_delay
         _sample_as_strings = [str(round(p, 2)) for p in _samples[-1]]
         csv_data_sample = [tag.value] + _sample_as_strings
         print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
         accumulate_raw_data_cb(csv_data_sample)
-        delay_time = next_sample_time - time.time()
+        delay_time = next_sample_time - time()
         if (
             not api.is_simulator
             and i < pressure_event_config.sample_count - 1
@@ -656,49 +671,6 @@ async def _test_diagnostics_capacitive(
         and capacitive_probing_pass
     )
 
-async def _test_pipette_pre_ressure(
-    api: OT3API, mount: OT3Mount, write_cb: Callable):
-    droplet_wait_seconds = 10
-    print("homing Z axis")
-    await api.home([OT3Axis.by_mount(mount)])
-    async def _read_pressure() -> float:
-        return await _read_pipette_sensor_repeatedly_and_average(
-            api, mount, SensorType.pressure, 10
-        )
-    print('Test pressure before aspirate')
-    for t in range(droplet_wait_seconds):
-        print(f"waiting for leaking tips ({t + 1}/{droplet_wait_seconds})")
-        pressure = await _read_pressure()
-        write_cb(['pre-Aspirate',pressure])
-        print(f'pre-Aspirate: {pressure}')
-        await asyncio.sleep(1)
-    
-async def _test_pipette_pressure(
-    api: OT3API, mount: OT3Mount, volume: float, tip: str, write_cb: Callable):
-    droplet_wait_seconds = 200
-    print("homing Z axis")
-    await api.home([OT3Axis.by_mount(mount)])
-    async def _read_pressure() -> float:
-        return await _read_pipette_sensor_repeatedly_and_average(
-            api, mount, SensorType.pressure, 10
-        )
-    await _pick_up_tip_for_liquid(api, mount, tip)
-    await _move_to_liquid(api, mount)
-    
-    await api.aspirate(mount, volume)
-    await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
-    print(f'---Start test volume: {volume}')
-    for t in range(droplet_wait_seconds):
-        print(f"waiting for leaking tips ({t + 1}/{droplet_wait_seconds})")
-        pressure = await _read_pressure()
-        write_cb(['Aspirate',volume,pressure])
-        print(f'Aspirate: {pressure}')
-        await asyncio.sleep(1)
-    print("dispensing back into reservoir")
-    await api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
-    await api.dispense(mount, volume)
-    await api.blow_out(mount)
-    await _drop_tip_in_trash(api, mount)
 
 async def _test_diagnostics_pressure(
     api: OT3API, mount: OT3Mount, write_cb: Callable
@@ -865,7 +837,7 @@ def _create_csv_and_get_callbacks(
     file_name = data.create_file_name(test_name, run_id, pipette_sn)
     csv_display_name = os.path.join(folder_path, file_name)
     print(f"CSV: {csv_display_name}")
-    start_time = time.time()
+    start_time = time()
 
     def _append_csv_data(
         data_list: List[Any],
@@ -876,7 +848,7 @@ def _create_csv_and_get_callbacks(
         # every line in the CSV file begins with the elapsed seconds
         if not first_row_value_included:
             if first_row_value is None:
-                first_row_value = str(round(time.time() - start_time, 2))
+                first_row_value = str(round(time() - start_time, 2))
             data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
@@ -888,7 +860,7 @@ def _create_csv_and_get_callbacks(
         d: List[Any], first_row_value: Optional[str] = None
     ) -> None:
         if first_row_value is None:
-            first_row_value = str(round(time.time() - start_time, 2))
+            first_row_value = str(round(time() - start_time, 2))
         data_list = [first_row_value] + d
         PRESSURE_DATA_CACHE.append(data_list)
 
@@ -921,7 +893,7 @@ async def _main(test_config: TestConfig) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=test_config.simulate,
         pipette_left="p1000_single_v3.4",
-        pipette_right="p1000_single_v3.4",
+        pipette_right="p1000_multi_v3.4",
     )
     # FIXME: remove reducing speeds/accelerations once stall detection bug is fixed
     await _reduce_speeds_and_accelerations(
@@ -939,8 +911,9 @@ async def _main(test_config: TestConfig) -> None:
 
         # setup our labware locations
         pipette_volume = int(pipette.working_volume)
+        pipette_channels = int(pipette.channels.as_int)
         IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(
-            test_config, pipette_volume
+            test_config, pipette_volume, pipette_channels
         )
         CALIBRATED_LABWARE_LOCATIONS = LabwareLocations(
             trash=None,
@@ -995,8 +968,9 @@ async def _main(test_config: TestConfig) -> None:
             for f in fields(config):
                 csv_cb.write([t.value, f.name, getattr(config, f.name)])
 
-        tip_columns = COLUMNS[: test_config.num_trials]
-        tips_used = [f"{c}1" for c in tip_columns]
+        tips_used = _get_tips_used_for_droplet_test(
+            pipette_channels, test_config.num_trials
+        )
 
         # run the test
         csv_cb.write(["----"])
@@ -1024,21 +998,6 @@ async def _main(test_config: TestConfig) -> None:
                     api, mount, test_config, tip, droplet_wait_seconds
                 )
                 csv_cb.results("droplets", test_passed)
-
-        if not test_config.skip_pipette_pressure:
-            input('Please layout tips from A1 to A4 then pressure Enter.')
-            csv_cb.write(["-------------"])
-            csv_cb.write(["PIPETTE-PRESSURE-DATA"])
-            volumes = [100,200,500,1000]
-            await _test_pipette_pre_ressure(api,mount,csv_cb.write)
-            count = 1
-            for volume in volumes:
-                tip = f'A{count}'
-                print(f'tip ----- {tip}')
-                await _test_pipette_pressure(api,mount,volume,tip,csv_cb.write)
-                count += 1
-            csv_cb.write(["-------------"])
-                
 
         if not test_config.skip_fixture:
             test_passed = await _test_for_leak(
@@ -1087,7 +1046,6 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(description="OT-3 Pipette Assembly QC Test")
     arg_parser.add_argument("--operator", type=str, required=True)
     arg_parser.add_argument("--skip-liquid", action="store_true")
-    arg_parser.add_argument("--skip-pipette", action="store_true")
     arg_parser.add_argument("--skip-fixture", action="store_true")
     arg_parser.add_argument("--skip-diagnostics", action="store_true")
     arg_parser.add_argument("--skip-plunger", action="store_true")
@@ -1111,7 +1069,6 @@ if __name__ == "__main__":
     _cfg = TestConfig(
         operator_name=args.operator,
         skip_liquid=args.skip_liquid,
-        skip_pipette_pressure=args.skip_pipette,
         skip_fixture=args.skip_fixture,
         skip_diagnostics=args.skip_diagnostics,
         skip_plunger=args.skip_plunger,
