@@ -380,13 +380,16 @@ class OT3Controller:
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
+        to_update = []
         for node in nodes:
             if not (
                 node in self._motor_status.keys()
                 and self._motor_status[node].encoder_ok
             ):
-                raise MustHomeError(f"Axis {node} has invalid encoder position")
-        response = await update_motor_position_estimation(self._messenger, nodes)
+                log.warning(f"Axis {node} has invalid encoder position")
+            else:
+                to_update.append(node)
+        response = await update_motor_position_estimation(self._messenger, to_update)
         self._handle_motor_status_response(response)
 
     @property
