@@ -37,13 +37,9 @@ const TipDecoration = React.memo(function TipDecoration(props: {
 
 export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const { isTiprack } = props.definition.parameters
-  const handleLabwareClick = (): void => {
-    if (props.onLabwareClick != null) {
-      props.onLabwareClick()
-    }
-  }
+  
   return (
-    <g onClick={handleLabwareClick}>
+    <g onClick={props.onLabwareClick}>
       <g className={styles.labware_detail_group}>
         <LabwareOutline definition={props.definition} hover={props.hover} />
       </g>

@@ -87,7 +87,7 @@ export function ProtocolSetupLabware({
     showLabwareDetailsModal,
     setShowLabwareDetailsModal,
   ] = React.useState<boolean>(false)
-  const selectedLabwareRef = React.useRef<
+  const [selectedLabware, setSelectedLabware] = React.useState<
     (LabwareDefinition2 & { location: LabwareLocation }) | null
   >(null)
 
@@ -119,10 +119,10 @@ export function ProtocolSetupLabware({
       labware => labware.id === labwareId
     )?.location
     if (foundLabwareLocation != null) {
-      selectedLabwareRef.current = {
+      setSelectedLabware({
         ...labwareDef,
         location: foundLabwareLocation,
-      }
+      })
       setShowLabwareDetailsModal(true)
     }
   }
@@ -209,11 +209,11 @@ export function ProtocolSetupLabware({
             </RobotWorkSpace>
           </Modal>
         ) : null}
-        {showLabwareDetailsModal && selectedLabwareRef.current != null ? (
+        {showLabwareDetailsModal && selectedLabware != null ? (
           <Modal
             onClose={() => {
               setShowLabwareDetailsModal(false)
-              selectedLabwareRef.current = null
+              setSelectedLabware(null)
             }}
             minHeight="14.375rem"
             minWidth="43.1875rem"
@@ -221,10 +221,10 @@ export function ProtocolSetupLabware({
             <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing7}>
               <LabwareThumbnail
                 viewBox={` 0 0 ${String(
-                  selectedLabwareRef.current.dimensions.xDimension
-                )} ${String(selectedLabwareRef.current.dimensions.yDimension)}`}
+                  selectedLabware.dimensions.xDimension
+                )} ${String(selectedLabware.dimensions.yDimension)}`}
               >
-                <LabwareRender definition={selectedLabwareRef.current} />
+                <LabwareRender definition={selectedLabware} />
               </LabwareThumbnail>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -235,7 +235,7 @@ export function ProtocolSetupLabware({
                   {mostRecentAnalysis != null
                     ? getLabwareDisplayLocation(
                         mostRecentAnalysis,
-                        selectedLabwareRef.current.location,
+                        selectedLabware.location,
                         commandTextTranslator
                       )
                     : null}
@@ -244,7 +244,7 @@ export function ProtocolSetupLabware({
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize="1.5rem"
                 >
-                  {getLabwareDisplayName(selectedLabwareRef.current)}
+                  {getLabwareDisplayName(selectedLabware)}
                 </StyledText>
               </Flex>
             </Flex>
