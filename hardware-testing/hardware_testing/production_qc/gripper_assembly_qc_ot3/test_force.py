@@ -69,12 +69,3 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.ungrip()
         print("homing...")
         await api.home([z_ax])
-
-
-
-    
-
-
-
-
-    

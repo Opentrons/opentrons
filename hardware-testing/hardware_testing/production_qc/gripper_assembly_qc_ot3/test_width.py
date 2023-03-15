@@ -20,6 +20,7 @@ GRIP_HEIGHT_MM = 30
 TEST_WIDTHS_MM: List[float] = [60, 80]
 GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
 
+
 def _get_test_tag(width: float, force: float):
     return f"{width}mm-{force}N"
 
@@ -44,7 +45,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     async def _save_result(tag: str, expected: float) -> None:
         await api.refresh_positions()
         jaw_disp = api._encoder_position[g_ax]
-        actual =  jaw_width - jaw_disp * 2
+        actual = jaw_width - jaw_disp * 2
         result = CSVResult.from_bool(abs(expected - actual) < FAILURE_THRESHOLD_MM)
         report(section, tag, [expected, actual, result])
 
