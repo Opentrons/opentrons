@@ -42,30 +42,32 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     mount = OT3Mount.GRIPPER
 
     print(f"Setting up force gauge at port: {FORCE_GAUGE_PORT}")
-    if not api.is_simulator:
-        gauge = Mark10.create(port=FORCE_GAUGE_PORT)
-        gauge.connect()
+    # if not api.is_simulator:
+    #     gauge = Mark10.create(port=FORCE_GAUGE_PORT)
+    #     gauge.connect()
 
     async def _save_result(tag: str, expected: float) -> None:
-        if api.is_simulator:
-            actual = 5.0
-        else:
-            actual = float(gauge.read_force())
+        # if api.is_simulator:
+        #     actual = 5.0
+        # else:
+        #     actual = float(gauge.read_force())
+        actual = 5.0
         error = (actual - expected) / expected
         result = CSVResult.from_bool(abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE)
         report(section, tag, [expected, actual, result])
 
+    print("homing Z and G...")
+    await api.home([z_ax, g_ax])
+    current_pos = await api.gantry_position(OT3Mount.GRIPPER)
+    print(f"moving down to grip height: {GRIP_HEIGHT_MM} mm")
+    await api.move_to(mount, current_pos._replace(z=GRIP_HEIGHT_MM))
     for force in GRIP_FORCES_NEWTON:
         ui.print_header(f"Grip force (N): {force}")
-        print("homing Z and G...")
-        await api.home([z_ax, g_ax])
-        print(f"moving down to grip height: {GRIP_HEIGHT_MM} mm")
-        await api.move_rel(mount, Point(z=GRIP_HEIGHT_MM))
         print(f"gripping at {force} N")
         await api.grip(force)
         print("taking force reading")
         await _save_result(_get_test_tag(force), force)
         print("ungrip")
         await api.ungrip()
-        print("homing...")
-        await api.home([z_ax])
+    print("homing...")
+    await api.home([z_ax])

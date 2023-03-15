@@ -14,7 +14,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 RETRACT_AFTER_HOME_MM = 0.5
-Z_AXIS_TRAVEL_DISTANCE = 185.0
+Z_AXIS_TRAVEL_DISTANCE = 150.0
 Z_MAX_SKIP_MM = 0.25
 
 CURRENTS_SPEEDS: List[Tuple[float, float]] = [
@@ -106,7 +106,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         print("homing...")
         await api.home([z_ax])
         print("retracting 0.5 mm from endstop")
-        await api.move_rel(mount, Point(z=RETRACT_AFTER_HOME_MM))
+        await api.move_rel(mount, Point(z=-RETRACT_AFTER_HOME_MM))
         print(f"lowering run-current to {current} amps")
         helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
             api, z_ax, run_current=current

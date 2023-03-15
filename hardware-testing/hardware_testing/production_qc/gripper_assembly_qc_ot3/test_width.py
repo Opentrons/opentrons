@@ -16,7 +16,7 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 FAILURE_THRESHOLD_MM = 3
-GRIP_HEIGHT_MM = 30
+GRIP_HEIGHT_MM = 50
 TEST_WIDTHS_MM: List[float] = [60, 80]
 GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
 
@@ -54,9 +54,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             ui.print_header(f"Width(mm): {width}, Force(N): {force}")
             print("homing Z and G...")
             await api.home([z_ax, g_ax])
+            current_pos = await api.gantry_position(OT3Mount.GRIPPER)
             print(f"moving down to grip height: {GRIP_HEIGHT_MM} mm")
-            await api.move_rel(mount, Point(z=GRIP_HEIGHT_MM))
-            print("gripping at {force}N")
+            await api.move_to(mount, current_pos._replace(z=GRIP_HEIGHT_MM))
+            print(f"gripping at {force} N")
             await api.grip(force)
             await _save_result(_get_test_tag(width, force), width)
             print("ungrip")
