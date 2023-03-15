@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
-  SPACING,
-} from '@opentrons/components'
+import { COLORS, TYPOGRAPHY, SPACING } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -91,14 +87,14 @@ export const Results = (props: ResultsProps): JSX.Element => {
   }
   let button: JSX.Element = isOnDevice ? (
     <SmallButton
-      textTransform={TEXT_TRANSFORM_CAPITALIZE}
+      textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
       buttonText={buttonText}
       buttonType="default"
     />
   ) : (
     <PrimaryButton
-      textTransform={TEXT_TRANSFORM_CAPITALIZE}
+      textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
       aria-label="Results_exit"
     >
@@ -113,7 +109,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         {isOnDevice ? null : (
           <SecondaryButton
             onClick={handleCleanUpAndClose}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             disabled={isFetching}
             aria-label="Results_errorExit"
             marginRight={SPACING.spacing2}

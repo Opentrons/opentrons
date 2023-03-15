@@ -14,7 +14,6 @@ import {
   JUSTIFY_CENTER,
   POSITION_ABSOLUTE,
   JUSTIFY_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -189,7 +188,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
       >
         <SmallButton
           onClick={proceed}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           buttonText={t('continue')}
           buttonType="default"
         />

@@ -25,7 +25,7 @@ import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
-    text-transform: uppercase;
+    text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   }
 `
 const GO_BACK_BUTTON_STYLE = css`

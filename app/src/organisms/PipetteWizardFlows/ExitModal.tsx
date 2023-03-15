@@ -1,12 +1,7 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
-import {
-  COLORS,
-  SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
-  Flex,
-} from '@opentrons/components'
+import { COLORS, SPACING, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -64,7 +59,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
             {t('shared:go_back')}
           </SecondaryButton>
           <AlertPrimaryButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={proceed}
           >
             {t('shared:exit')}

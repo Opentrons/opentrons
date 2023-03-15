@@ -30,7 +30,7 @@ export const CheckPipetteButton = (
     setFetching(isFetching)
   }, [isFetching, setFetching])
 
-  return isOnDevice != null && isOnDevice ? (
+  return isOnDevice ? (
     <SmallButton
       disabled={isFetching}
       buttonText={proceedButtonText}

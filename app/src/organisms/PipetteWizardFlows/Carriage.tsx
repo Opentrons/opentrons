@@ -1,11 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import {
-  COLORS,
-  SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
-} from '@opentrons/components'
+import { COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
@@ -68,7 +64,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         {t('cancel_attachment')}
       </SecondaryButton>
       <PrimaryButton
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
         onClick={handleCheckZAxis}
       >
         {t('shared:try_again')}

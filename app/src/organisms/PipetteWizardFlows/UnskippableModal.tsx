@@ -1,7 +1,7 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
-import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
+import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { AlertPrimaryButton } from '../../atoms/buttons'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -30,7 +30,7 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
       ) : (
         <AlertPrimaryButton
           onClick={goBack}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
         >
           {t('shared:return')}
         </AlertPrimaryButton>
