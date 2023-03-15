@@ -6,8 +6,9 @@ import {
   useDeleteCalibrationMutation,
 } from '@opentrons/react-api-client'
 
-import { useAttachedPipettes, useDeckCalibrationData } from '.'
+import { useAttachedPipettes } from '.'
 import { getDefaultTiprackDefForPipetteName } from '../constants'
+import { DECK_CAL_STATUS_OK } from '../../../redux/calibration/constants'
 import { formatTimestamp } from '../utils'
 
 import type {
@@ -39,17 +40,20 @@ export function useCalibrationTaskList(
     taskListStatus: 'incomplete',
     taskList: [],
   }
-  // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
-  const {
-    isDeckCalibrated,
-    deckCalibrationData,
-    markedBad,
-  } = useDeckCalibrationData(robotName)
   const attachedPipettes = useAttachedPipettes()
+
+  // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
+  const deckCalibrations =
+    useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
+      ?.data?.deckCalibration ?? null
+
+  const isDeckCalibrated =
+    deckCalibrations?.status != null &&
+    deckCalibrations?.status === DECK_CAL_STATUS_OK
+
+  const deckCalibrationData = deckCalibrations?.data
+
   // get calibration data for mounted pipette subtasks
-
-  useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
-
   const offsetCalibrations =
     useAllPipetteOffsetCalibrationsQuery({
       refetchInterval: CALIBRATION_DATA_POLL_MS,
@@ -86,7 +90,7 @@ export function useCalibrationTaskList(
     activeTaskIndices = [0, 0]
     deckTask.description = t('start_with_deck_calibration')
     deckTask.cta = { label: t('calibrate'), onClick: deckCalLauncher }
-    if (markedBad === true) {
+    if (deckCalibrationData?.status?.markedBad === true) {
       deckTask.markedBad = true
     }
   }

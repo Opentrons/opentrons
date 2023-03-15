@@ -6,7 +6,6 @@ import type {
 } from '../../../../redux/calibration/api-types'
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 import type { TaskListProps } from '../../../TaskList/types'
-import type { DeckCalibrationData } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 export const TASK_COUNT = 3
@@ -52,23 +51,35 @@ export const mockSingleAttachedPipetteResponse: AttachedPipettesByMount = {
 }
 
 export const mockBadDeckCalibration = {
-  isDeckCalibrated: false,
-  deckCalibrationData: {
-    lastModified: '2022-01-01T12:00:00.000000+00:00',
-  } as DeckCalibrationData,
-  markedBad: true,
+  deckCalibration: {
+    status: 'BAD_CALIBRATION',
+    data: {
+      lastModified: '2022-01-01T12:00:00.000000+00:00',
+      status: { markedBad: true },
+    },
+  },
 }
 
 export const mockCompleteDeckCalibration = {
-  isDeckCalibrated: true,
-  deckCalibrationData: {
-    lastModified: '2022-01-01T12:00:00.000000+00:00',
-  } as DeckCalibrationData,
+  deckCalibration: {
+    status: 'OK',
+    data: {
+      lastModified: '2022-01-01T12:00:00.000000+00:00',
+      status: { markedBad: false },
+    },
+  },
 }
 
 export const mockIncompleteDeckCalibration = {
-  isDeckCalibrated: false,
-  deckCalibrationData: null,
+  deckCalibration: {
+    status: 'IDENTITY',
+    data: {
+      lastModified: null,
+      status: {
+        markedBad: false,
+      },
+    },
+  },
 }
 
 export const mockBadTipLengthCalibrations: TipLengthCalibration[] = [
@@ -216,7 +227,7 @@ export const expectedTaskList: TaskListProps = {
       title: 'Deck Calibration',
       footer: `Last completed ${formatTimestamp(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        mockCompleteDeckCalibration.deckCalibrationData.lastModified!
+        mockCompleteDeckCalibration.deckCalibration.data.lastModified!
       )}`,
       cta: { label: 'Recalibrate', onClick: mockDeckCalLauncher },
       isComplete: true,
@@ -668,7 +679,7 @@ export const expectedBadTipLengthTaskList: TaskListProps = {
       title: 'Deck Calibration',
       footer: `Last completed ${formatTimestamp(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        mockCompleteDeckCalibration.deckCalibrationData.lastModified!
+        mockCompleteDeckCalibration.deckCalibration.data.lastModified!
       )}`,
       cta: { label: 'Recalibrate', onClick: () => {} },
       isComplete: true,
@@ -760,7 +771,7 @@ export const expectedBadTipLengthAndOffsetTaskList: TaskListProps = {
       title: 'Deck Calibration',
       footer: `Last completed ${formatTimestamp(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        mockCompleteDeckCalibration.deckCalibrationData.lastModified!
+        mockCompleteDeckCalibration.deckCalibration.data.lastModified!
       )}`,
       cta: { label: 'Recalibrate', onClick: () => {} },
       isComplete: true,
@@ -940,7 +951,7 @@ export const expectedIncompleteLeftMountTaskList: TaskListProps = {
       title: 'Deck Calibration',
       footer: `Last completed ${formatTimestamp(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        mockCompleteDeckCalibration.deckCalibrationData.lastModified!
+        mockCompleteDeckCalibration.deckCalibration.data.lastModified!
       )}`,
       cta: { label: 'Recalibrate', onClick: mockDeckCalLauncher },
       isComplete: true,
@@ -1028,7 +1039,7 @@ export const expectedIncompleteRightMountTaskList: TaskListProps = {
       title: 'Deck Calibration',
       footer: `Last completed ${formatTimestamp(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        mockCompleteDeckCalibration.deckCalibrationData.lastModified!
+        mockCompleteDeckCalibration.deckCalibration.data.lastModified!
       )}`,
       cta: { label: 'Recalibrate', onClick: mockDeckCalLauncher },
       isComplete: true,
