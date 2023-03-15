@@ -344,8 +344,6 @@ def test_get_referenced_run_ids(
     # Still no runs, so we should still get back an empty list
     assert subject.get_referenced_run_ids("protocol-id-1") == []
 
-    # When a run is added that uses a protocol,
-    # that protocol's is_used_by_run should become True.
     run_store.insert(
         run_id="run-id-1",
         protocol_id="protocol-id-1",
