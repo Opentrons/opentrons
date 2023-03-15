@@ -1,4 +1,4 @@
-import * as http from 'http'
+import type { Agent } from 'http'
 
 import type {
   RobotState,
@@ -174,7 +174,7 @@ export interface DiscoveryClient {
   removeRobot: (robotName: string) => void
   start: (config: DiscoveryClientConfig) => void
   stop: () => void
-  httpAgent: http.Agent
+  createHttpAgent: () => Agent
 }
 
 /**

@@ -145,8 +145,9 @@ export function registerDiscovery(
     _event: IpcMainInvokeEvent,
     config: AxiosRequestConfig
   ): Promise<unknown> {
+    const httpAgent = client.createHttpAgent()
     const response = await axios.request({
-      httpAgent: client.httpAgent,
+      httpAgent,
       ...config,
     })
 

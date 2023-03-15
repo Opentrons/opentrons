@@ -45,6 +45,7 @@ export function registerSystemInfo(
 
   const handleDeviceAdd = (device: Device): void => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    log.info('usbdeviceadd', device)
     addDriverVersion(device).then(d => dispatch(SystemInfo.usbDeviceAdded(d)))
   }
 

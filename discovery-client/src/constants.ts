@@ -16,3 +16,6 @@ export const RE_HOSTNAME_IPV6_LL: RegExp = /^\[?(?:fd00|fe80)/
 export const RE_HOSTNAME_IPV4_LL: RegExp = /^169\.254\.\d+\.\d+$/
 export const RE_HOSTNAME_LOCALHOST: RegExp = /^localhost$/
 export const RE_HOSTNAME_LOOPBACK: RegExp = /^127\.0\.0\.1$/
+
+// OT-3 usb connection
+export const DEFAULT_SERIAL: '01121997' = '01121997'
