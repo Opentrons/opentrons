@@ -187,18 +187,12 @@ async def create_protocol(
         analysis_id=analysis_id,
     )
 
-    referenced_run_ids = protocol_store.get_linked_run_ids(protocol_id)
-
-    metadata = Metadata.parse_obj(
-        {**source.metadata, "referenced_run_ids": referenced_run_ids}
-    )
-
     data = Protocol(
         id=protocol_id,
         createdAt=created_at,
         protocolType=source.config.protocol_type,
         robotType=source.robot_type,
-        metadata=metadata,
+        metadata=Metadata.parse_obj(source.metadata),
         analysisSummaries=[pending_analysis],
         key=key,
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
@@ -275,13 +269,19 @@ async def get_protocol_by_id(
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
+    metadata = Metadata.parse_obj(
+        {
+            **resource.source.metadata,
+            "referencedRunIds": protocol_store.get_referenced_run_ids(protocolId),
+        }
+    )
 
     data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
         protocolType=resource.source.config.protocol_type,
         robotType=resource.source.robot_type,
-        metadata=Metadata.parse_obj(resource.source.metadata),
+        metadata=metadata,
         analysisSummaries=analyses,
         key=resource.protocol_key,
         files=[

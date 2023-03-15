@@ -142,8 +142,6 @@ class ProtocolReader:
             for f in role_analysis.all_files
         ]
 
-        metadata = {**role_analysis.main_file.metadata, "referenced_run_ids": []}
-
         return ProtocolSource(
             directory=directory,
             main_file=main_file,

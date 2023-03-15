@@ -276,10 +276,12 @@ class ProtocolStore:
 
         return usage_info
 
-    def get_linked_run_ids(self, protocol_id: str) -> List[str]:
+    def get_referenced_run_ids(self, protocol_id: str) -> List[str]:
         """Return a list of run ids that reference a particular protocol.
 
         See the `runs` module for information about runs.
+
+        Results are ordered with the oldest-added (NOT created) run first.
         """
         select_referenced_run_ids = sqlalchemy.select(run_table.c.id).where(
             run_table.c.protocol_id == protocol_id
