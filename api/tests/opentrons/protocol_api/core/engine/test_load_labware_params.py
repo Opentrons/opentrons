@@ -88,12 +88,13 @@ def test_resolve_load_labware_params(
         (123456, 123456),
     ],
 )
-def test_aluminumblock_bad_zdimension_versioning(
+def test_aluminumblock_generic_screwcap_or_pcr_strip_versioning(
     load_name: str,
     namespace: Optional[str],
     version: Optional[int],
     expected_version: int,
 ) -> None:
+    """It should default to version 2 for these labware."""
     result = subject.resolve(
         load_name=load_name,
         namespace=namespace,
