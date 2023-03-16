@@ -20,7 +20,7 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner import ProtocolRunner
+from opentrons.protocol_runner import ProtocolRunner, create_protocol_runner, JsonRunner
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_translator import JsonTranslator
@@ -97,7 +97,24 @@ def use_mock_extract_labware_definitions(
 
 
 @pytest.fixture
-def subject(
+def json_subject(
+    protocol_engine: ProtocolEngine,
+    hardware_api: HardwareAPI,
+    task_queue: TaskQueue,
+    json_file_reader: JsonFileReader,
+    json_translator: JsonTranslator,
+) -> JsonRunner:
+    """Get a JsonRunner test subject with mocked dependencies."""
+    return JsonRunner(
+        protocol_engine=protocol_engine,
+        hardware_api=hardware_api,
+        task_queue=task_queue,
+        json_file_reader=json_file_reader,
+        json_translator=json_translator,
+    )
+
+
+async def test_create_protocol_runner(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
@@ -106,17 +123,26 @@ def subject(
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
-) -> ProtocolRunner:
-    """Get a ProtocolRunner test subject with mocked dependencies."""
-    return ProtocolRunner(
-        protocol_engine=protocol_engine,
-        hardware_api=hardware_api,
-        task_queue=task_queue,
-        json_file_reader=json_file_reader,
-        json_translator=json_translator,
-        legacy_file_reader=legacy_file_reader,
-        legacy_context_creator=legacy_context_creator,
-        legacy_executor=legacy_executor,
+) -> None:
+    """It should return protocol runner type depending on the config."""
+    json_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=6),
+    )
+
+    assert isinstance(
+        create_protocol_runner(
+            protocol_source=json_protocol_source,
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            task_queue=task_queue,
+            json_file_reader=json_file_reader,
+            json_translator=json_translator),
+        JsonRunner,
     )
 
 

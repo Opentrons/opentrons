@@ -79,21 +79,18 @@ class JsonRunner(ProtocolRunner):
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_translator: Optional[JsonTranslator] = None,
-        legacy_file_reader: Optional[LegacyFileReader] = None,
-        legacy_context_creator: Optional[LegacyContextCreator] = None,
-        legacy_executor: Optional[LegacyExecutor] = None,
     ) -> None:
-        """Initialize the ProtocolRunner with its dependencies."""
+        """Initialize the JsonRunner with its dependencies."""
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_translator = json_translator or JsonTranslator()
-        self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
-        self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
-            hardware_api=hardware_api,
-            protocol_engine=protocol_engine,
-        )
-        self._legacy_executor = legacy_executor or LegacyExecutor()
+        # self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
+        # self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
+        #     hardware_api=hardware_api,
+        #     protocol_engine=protocol_engine,
+        # )
+        # self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
@@ -203,36 +200,68 @@ class JsonRunner(ProtocolRunner):
 
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
-    def _load_python_or_legacy_json(
-        self,
-        protocol_source: ProtocolSource,
-        labware_definitions: Iterable[LabwareDefinition],
-    ) -> None:
-        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
-        # the event loop. Jira RSS-165.
-        protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
-        broker = None
-        equipment_broker = None
+    # def _load_python_or_legacy_json(
+    #     self,
+    #     protocol_source: ProtocolSource,
+    #     labware_definitions: Iterable[LabwareDefinition],
+    # ) -> None:
+    #     # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+    #     # the event loop. Jira RSS-165.
+    #     protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
+    #     broker = None
+    #     equipment_broker = None
+    #
+    #     if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
+    #         broker = Broker()
+    #         equipment_broker = EquipmentBroker[LegacyLoadInfo]()
+    #
+    #         self._protocol_engine.add_plugin(
+    #             LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
+    #         )
+    #
+    #     context = self._legacy_context_creator.create(
+    #         protocol=protocol,
+    #         broker=broker,
+    #         equipment_broker=equipment_broker,
+    #     )
+    #
+    #     self._task_queue.set_run_func(
+    #         func=self._legacy_executor.execute,
+    #         protocol=protocol,
+    #         context=context,
+    #     )
 
-        if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            broker = Broker()
-            equipment_broker = EquipmentBroker[LegacyLoadInfo]()
 
-            self._protocol_engine.add_plugin(
-                LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
-            )
-
-        context = self._legacy_context_creator.create(
-            protocol=protocol,
-            broker=broker,
-            equipment_broker=equipment_broker,
+def create_protocol_runner(
+    protocol_source: ProtocolSource,
+    protocol_engine: ProtocolEngine,
+    hardware_api: HardwareControlAPI,
+    task_queue: Optional[TaskQueue] = None,
+    json_file_reader: Optional[JsonFileReader] = None,
+    json_translator: Optional[JsonTranslator] = None,
+    legacy_file_reader: Optional[LegacyFileReader] = None,
+    legacy_context_creator: Optional[LegacyContextCreator] = None,
+    legacy_executor: Optional[LegacyExecutor] = None,
+) -> ProtocolRunner:
+    """Create a protocol runner."""
+    config = protocol_source.config
+    if (
+        isinstance(config, JsonProtocolConfig)
+        and config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
+    ):
+        return JsonRunner(
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            json_file_reader=json_file_reader,
+            json_translator=json_translator,
         )
-
-        self._task_queue.set_run_func(
-            func=self._legacy_executor.execute,
-            protocol=protocol,
-            context=context,
-        )
+    # else:
+    #     self._load_python_or_legacy_json(protocol_source, labware_definitions)
+    # return (
+    #     HardwarePipettingHandler(state_view=state_view, hardware_api=hardware_api)
+    #     if state_view.config.use_virtual_pipettes is False
+    #     else VirtualPipettingHandler(state_view=state_view)
+    # )
 
 
 async def _yield() -> None:
