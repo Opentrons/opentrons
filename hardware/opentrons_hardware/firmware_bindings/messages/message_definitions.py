@@ -508,6 +508,17 @@ class BaselineSensorRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class BaselineSensorResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BaselineSensorResponsePayload
+    payload_type: Type[
+        payloads.BaselineSensorResponsePayload
+    ] = payloads.BaselineSensorResponsePayload
+    message_id: Literal[
+        MessageId.baseline_sensor_response
+    ] = MessageId.baseline_sensor_response
+
+
+@dataclass
 class ReadFromSensorResponse(BaseMessage):  # noqa: D101
     payload: payloads.ReadFromSensorResponsePayload
     payload_type: Type[
