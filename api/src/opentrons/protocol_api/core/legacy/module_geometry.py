@@ -17,7 +17,6 @@ import numpy as np
 from opentrons_shared_data import module
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
-from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_north_south_slots,
@@ -64,9 +63,11 @@ class ModuleGeometry:
 
     @property
     def separate_calibration(self) -> bool:
-        raise APIVersionError(
+        _log.warning(
             "ModuleGeometry.separate_calibrations is a deprecated internal property."
+            " It has no longer has meaning, but will always return `True`"
         )
+        return True
 
     def __init__(
         self,

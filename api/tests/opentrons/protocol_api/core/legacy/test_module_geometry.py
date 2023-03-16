@@ -22,8 +22,6 @@ from opentrons_shared_data.module.dev_types import (
     ModuleDefinitionV1,
 )
 
-from opentrons.protocols.api_support.util import APIVersionError
-
 
 @pytest.fixture
 def v1_mag_module_schema_v3_definition() -> ModuleDefinitionV3:
@@ -435,17 +433,3 @@ def test_pipette_is_blocking_shake_and_latch_movements_with_no_pipette_slot(
         )
         is True
     )
-
-
-def test_geometry_seperate_calibration_raises(
-    v1_mag_module_schema_v3_definition: ModuleDefinitionV3,
-) -> None:
-    """It raises using separate_calibration."""
-    subject = create_geometry(
-        definition=v1_mag_module_schema_v3_definition,
-        parent=Location(point=Point(0, 0, 0), labware=None),
-        configuration=None,
-    )
-
-    with pytest.raises(APIVersionError):
-        subject.separate_calibration
