@@ -1179,7 +1179,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
-            max_volume = self.hw_pipette["working_volume"]
+            max_volume = self._core.get_working_volume()
 
         touch_tip = None
         if kwargs.get("touch_tip"):

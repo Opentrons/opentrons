@@ -293,6 +293,9 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def get_max_volume(self) -> float:
         return self._pipette_dict["max_volume"]
 
+    def get_working_volume(self) -> float:
+        return self._pipette_dict["working_volume"]
+
     def get_current_volume(self) -> float:
         return self._pipette_dict["current_volume"]
 

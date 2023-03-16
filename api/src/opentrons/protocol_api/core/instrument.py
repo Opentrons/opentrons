@@ -171,6 +171,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_working_volume(self) -> float:
+        ...
+
+    @abstractmethod
     def get_current_volume(self) -> float:
         ...
 
