@@ -1,6 +1,9 @@
 """Pipette motions."""
 from dataclasses import dataclass
+from math import pi
 from typing import Optional, Callable, Tuple
+
+from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
@@ -142,14 +145,26 @@ def _pipette_with_liquid_settings(
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
         # TODO: if P50 has droplets inside the tip after dispense with a full blow-out,
         #       try increasing the blow-out volume by raising the "bottom" plunger position
-        # temporarily set blow-out flow-rate to be same as dispense
-        old_blow_out_flow_rate = pipette.flow_rate.blow_out
-        pipette.flow_rate.blow_out = pipette.flow_rate.dispense
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.blow_out(hw_mount, liquid_class.aspirate.air_gap.leading_air_gap)
-        pipette.flow_rate.blow_out = old_blow_out_flow_rate
+        pip = hw_api.hardware_pipettes[hw_mount.to_mount()]
+        assert pip is not None
+        shaft_diameter = 4.5 if pipette.max_volume >= 1000 else 1
+        ul_per_mm = pi * pow(shaft_diameter / 2, 2)
+        dist_mm = liquid_class.aspirate.air_gap.leading_air_gap / ul_per_mm
+        target_pos = target_position_from_plunger(
+            hw_mount,
+            pip.plunger_positions.bottom + dist_mm,
+            hw_api._current_position
+        )
+        hw_api._move(
+            target_pos,
+            speed=pipette.flow_rate.dispense / ul_per_mm,
+            home_flagged_axes=False,
+        )
+        pip.set_current_volume(0)
+        pip.ready_to_aspirate = False
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
