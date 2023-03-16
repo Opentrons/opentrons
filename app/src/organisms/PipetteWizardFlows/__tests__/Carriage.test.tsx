@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
@@ -15,7 +16,6 @@ import { FLOWS } from '../constants'
 import { Carriage } from '../Carriage'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
-import { fireEvent, waitFor } from '@testing-library/react'
 
 const render = (props: React.ComponentProps<typeof Carriage>) => {
   return renderWithProviders(<Carriage {...props} />, {
@@ -30,7 +30,6 @@ describe('Carriage', () => {
   let props: React.ComponentProps<typeof Carriage>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),

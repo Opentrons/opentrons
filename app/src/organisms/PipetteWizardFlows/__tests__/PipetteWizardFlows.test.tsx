@@ -11,7 +11,6 @@ import {
   useCreateRunMutation,
   useStopRunMutation,
   usePipettesQuery,
-  // useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useChainRunCommands } from '../../../resources/runs/hooks'
@@ -58,9 +57,6 @@ const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
 const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
   typeof useStopRunMutation
 >
-// const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
-//   typeof useDeleteRunMutation
-// >
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
 >
@@ -86,7 +82,6 @@ const mockPipette: AttachedPipette = {
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
   let mockCreateRun: jest.Mock
-  // let mockDeleteRun = jest.fn()
   let mockStopRun: jest.Mock
   let mockCloseCurrentRun: jest.Mock
   let refetchPromise: Promise<void>
@@ -97,11 +92,10 @@ describe('PipetteWizardFlows', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       flowType: FLOWS.CALIBRATE,
       mount: LEFT,
-      robotName: 'otie',
       closeFlow: jest.fn(),
+      setSelectedPipette: jest.fn(),
     }
     mockCreateRun = jest.fn()
-    // mockDeleteRun = jest.fn()
     mockStopRun = jest.fn()
     mockCloseCurrentRun = jest.fn()
     refetchPromise = Promise.resolve()

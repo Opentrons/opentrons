@@ -25,7 +25,6 @@ describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),

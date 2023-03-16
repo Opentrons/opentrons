@@ -16,8 +16,8 @@ export const CheckPipetteButton = (
     { refresh: true },
     {
       enabled: false,
-      onSuccess: () => {
-        proceed()
+      onSettled: () => {
+        setPending(false)
       },
     }
   )
@@ -31,7 +31,9 @@ export const CheckPipetteButton = (
       disabled={isDisabled}
       onClick={() => {
         refetch()
-          .then(() => {})
+          .then(() => {
+            proceed()
+          })
           .catch(() => {})
       }}
     >
