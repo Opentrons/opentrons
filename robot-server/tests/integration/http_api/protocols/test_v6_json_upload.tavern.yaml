@@ -63,6 +63,7 @@ stages:
             created: !anyint
             description: A short test protocol
             author: engineering <engineering@opentrons.com>
+            referencedRunIds: []
             protocolName: Simple test protocol
           analyses: []
           analysisSummaries:
