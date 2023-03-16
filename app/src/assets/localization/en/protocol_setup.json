@@ -161,5 +161,7 @@
   "view_current_offsets": "View current offsets",
   "view_module_setup_instructions": "View module setup instructions",
   "deck_map": "Deck Map",
-  "setup_instructions": "Setup Instructions"
+  "setup_instructions": "Setup Instructions",
+  "opening": "Opening...",
+  "closing": "Closing..."
 }
