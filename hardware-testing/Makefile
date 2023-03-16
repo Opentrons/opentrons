@@ -80,18 +80,26 @@ test-gravimetric:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1 --inspect
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1 --increment
 
-.PHONY: test-integration
-test-integration: test-gravimetric
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3
+.PHONY: test-production-qc
+test-production-qc:
 	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
+
+.PHONY: test-examples
+test-examples:
 	$(python) -m hardware_testing.examples.test_report
 	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
 	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
 	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
 	$(python) -m hardware_testing.examples.plunger_ot3 --simulate
 	$(python) -m hardware_testing.examples.capacitive_probe_ot3 --simulate
+
+.PHONY: test-scripts
+test-scripts:
 	$(python) -m hardware_testing.scripts.bowtie_ot3 --simulate
+
+.PHONY: test-integration
+test-integration: test-gravimetric test-production-qc test-examples test-scripts
 
 .PHONY: lint
 lint:
