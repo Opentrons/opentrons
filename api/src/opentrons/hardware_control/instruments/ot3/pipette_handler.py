@@ -1,7 +1,6 @@
 """Shared code for managing pipette configuration and storage."""
 from dataclasses import dataclass
 import logging
-from math import pi
 from typing import (
     Callable,
     Dict,
@@ -574,26 +573,18 @@ class PipetteHandlerProvider:
             current=instrument.plunger_motor_current.run,
         )
 
-    def plan_check_blow_out(self, mount: OT3Mount, volume: Optional[float]) -> LiquidActionSpec:
+    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
-        if volume is not None:
-            shaft_diameter = 1 if instrument.working_volume == 50 else 4.5
-            ul_per_mm = pi * pow(shaft_diameter / 2, 2)
-            dist_mm = volume / ul_per_mm
-            bottom = instrument.plunger_positions.bottom
-            target_plunger_pos = bottom + dist_mm
-        else:
-            target_plunger_pos = instrument.plunger_positions.blow_out
 
         return LiquidActionSpec(
             axis=OT3Axis.of_main_tool_actuator(mount),
             volume=0,
-            plunger_distance=target_plunger_pos,
+            plunger_distance=instrument.plunger_positions.blow_out,
             speed=speed,
             instr=instrument,
             current=instrument.plunger_motor_current.run,
