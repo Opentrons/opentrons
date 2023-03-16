@@ -450,6 +450,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_max_volume(self) -> float:
         return self._engine_client.state.pipettes.get_maximum_volume(self._pipette_id)
 
+    def get_working_volume(self) -> float:
+        return self._engine_client.state.pipettes.get_working_volume(self._pipette_id)
+
     def get_current_volume(self) -> float:
         try:
             current_volume = self._engine_client.state.pipettes.get_aspirated_volume(
