@@ -73,11 +73,11 @@ def _format_sensor_response(response: MessageDefinition) -> SensorDataType:
         return SensorDataType.build(
             response.payload.offset_average, response.payload.sensor
         )
-    elif isinstance(response, ReadFromSensorResponse):
+    else:
+        assert isinstance(response, ReadFromSensorResponse)
         return SensorDataType.build(
             response.payload.sensor_data, response.payload.sensor
         )
-    return None
 
 
 class SensorScheduler:
@@ -125,7 +125,7 @@ class SensorScheduler:
                     payload=BaselineSensorRequestPayload(
                         sensor=SensorTypeField(sensor_info.sensor_type),
                         sensor_id=SensorIdField(sensor_info.sensor_id),
-                        number_of_reads=UInt16Field(sensor.number_of_reads)
+                        number_of_reads=UInt16Field(sensor.number_of_reads),
                     )
                 ),
             )

@@ -26,7 +26,7 @@ from opentrons_hardware.sensors.types import (
 )
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
-    PollSensorInformation,
+    BaselineSensorInformation,
     WriteSensorInformation,
     SensorThresholdInformation,
 )
@@ -89,7 +89,7 @@ class SensorDriver(AbstractSensorDriver):
         timeout: int = 1,
     ) -> Optional[SensorReturnType]:
         """Poll the given sensor."""
-        poll = PollSensorInformation(sensor.sensor, number_of_reads)
+        poll = BaselineSensorInformation(sensor.sensor, number_of_reads)
         sensor_data = await self._scheduler.run_baseline(
             poll, can_messenger, timeout, sensor.expected_responses
         )
