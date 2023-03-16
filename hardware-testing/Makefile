@@ -87,9 +87,8 @@ test-production-qc:
 
 .PHONY: test-examples
 test-examples:
-	$(python) -m hardware_testing.examples.test_report
+	$(python) -m hardware_testing.examples.csv_report
 	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
-	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
 	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
 	$(python) -m hardware_testing.examples.plunger_ot3 --simulate
 	$(python) -m hardware_testing.examples.capacitive_probe_ot3 --simulate
