@@ -60,8 +60,5 @@
     "uuid": "3.2.1",
     "winston": "3.1.0",
     "yargs-parser": "13.1.2"
-  },
-  "optionalDependencies": {
-    "sd-notify": "2.8.0"
   }
 }
