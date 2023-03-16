@@ -164,7 +164,15 @@ async def initialize() -> ThreadManagedHardware:
 
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
-            await hardware.home_z()
+            try:
+                await hardware.home_z()
+            except Exception:
+                # If this is a flex, and the estop is asserted, we'll get an error
+                # here; make sure that it doesn't prevent things from actually
+                # starting.
+                log.error(
+                    "Exception homing z on startup, ignoring to allow server to start"
+                )
 
         await hardware.set_lights(button=True)
         return hardware
