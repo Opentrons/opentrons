@@ -10,10 +10,13 @@ import {
 } from '@opentrons/components'
 
 const FOREGROUND_STYLES = css`
-  &:active,
-  &:hover,
-  &:focus {
+  &:focus,
+  &:hover {
     background-color: ${COLORS.highlightPurple_one};
+  }
+
+  &:active {
+    background-color: ${COLORS.highlightPurple_one_pressed};
   }
 `
 
@@ -21,10 +24,13 @@ const BACKGROUND_STYLES = css`
   background-color: ${COLORS.highlightPurple_two};
   color: ${COLORS.darkBlack_hundred};
 
-  &:active,
-  &:hover,
-  &:focus {
+  &:focus,
+  &:hover {
     background-color: ${COLORS.highlightPurple_two};
+  }
+
+  &:active {
+    background-color: ${COLORS.highlightPurple_two_pressed};
   }
 `
 
@@ -47,5 +53,14 @@ export const TabbedButton = styled(NewPrimaryBtn)<TabbedButtonProps>`
       ${props.foreground === true ? FOREGROUND_STYLES : BACKGROUND_STYLES}
 
       ${styleProps}
+
+      &:focus,
+      &:focus-visible {
+        box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+      }
+      &:disabled {
+        background-color: ${COLORS.darkBlack_twenty};
+        color: ${COLORS.darkBlack_sixty};
+      }
     `}
 `
