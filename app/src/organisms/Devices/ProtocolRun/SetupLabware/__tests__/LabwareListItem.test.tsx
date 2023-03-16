@@ -218,7 +218,7 @@ describe('LabwareListItem', () => {
     getByText('nickName')
     getByText('To add labware, use the toggle to control the latch')
     getByText('Labware Latch')
-    getByText('Close')
+    getByText('Secure')
     const button = getByLabelText('heater_shaker_7_latch_toggle')
     fireEvent.click(button)
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({

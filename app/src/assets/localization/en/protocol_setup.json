@@ -163,7 +163,5 @@
   "deck_map": "Deck Map",
   "setup_instructions": "Setup Instructions",
   "opening": "Opening...",
-  "open": "Open",
-  "closing": "Closing...",
-  "close": "Close"
+  "closing": "Closing..."
 }
