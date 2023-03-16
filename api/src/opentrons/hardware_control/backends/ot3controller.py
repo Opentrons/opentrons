@@ -517,7 +517,7 @@ class OT3Controller:
             if ax in OT3Axis.pipette_axes()
         }
         velocities_pipette = {
-            ax: -1 * 20
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
             for ax in axes
             if ax in OT3Axis.pipette_axes()
         }
@@ -546,7 +546,7 @@ class OT3Controller:
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
         velocities_gantry = {
-            ax: -1 * 50
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
             for ax in axes
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
@@ -556,7 +556,7 @@ class OT3Controller:
             if ax in OT3Axis.mount_axes()
         }
         velocities_z = {
-            ax: -1 * 20
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
             for ax in axes
             if ax in OT3Axis.mount_axes()
         }
@@ -1152,15 +1152,3 @@ class OT3Controller:
             self._messenger,
             sensor_node_for_mount(mount)
         )
-
-    async def connect_usb_to_rear_panel(self) -> None:
-        usb_driver = None
-        try:
-            usb_driver = await build_rear_panel_driver()
-        except IOError as e:
-            log.error(
-                "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
-            )
-            raise e
-        self._usb_messenger = BinaryMessenger(usb_driver)
-        self._usb_messenger.start()

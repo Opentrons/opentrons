@@ -1264,11 +1264,6 @@ class OT3API(
         assert self.hardware_pipettes[mount.to_mount()], f"no pipette on mount {mount}"
         return await self._backend.get_temperature_humidity(mount)
 
-    async def _fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        return await self._backend.fast_home(axes, margin)
-
     @ExecutionManagerProvider.wait_for_running
     async def retract(
         self, mount: Union[top_types.Mount, OT3Mount], margin: float = 10

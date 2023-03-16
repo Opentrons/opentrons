@@ -49,7 +49,7 @@ def tip_lengths_for_pipette(
                 pass
         return tip_lengths
     except FileNotFoundError:
-        log.info(f"Tip length calibrations not found for {pipette_id}")
+        log.warning(f"Tip length calibrations not found for {pipette_id}")
         return tip_lengths
 
 
