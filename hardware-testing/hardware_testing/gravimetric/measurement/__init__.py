@@ -48,7 +48,7 @@ class MeasurementType(str, Enum):
     DISPENSE = "measure-dispense"
 
 
-DELAY_FOR_MEASUREMENT = 20
+DELAY_FOR_MEASUREMENT = 10
 MIN_DURATION_STABLE_SEGMENT = 1
 
 
@@ -99,34 +99,16 @@ def _build_measurement_data(
     stable: bool = True,
 ) -> MeasurementData:
     # gather only samples of the specified tag
-    tagged_segment = GravimetricRecording(
+    segment = GravimetricRecording(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
     if stable:
-        # split into sequences of stable samples
-        stable_segments: List[GravimetricRecording] = list()
-        tmp_list_of_samples: List[GravimetricSample] = list()
-
-        def _store_new_stable_segment() -> None:
-            nonlocal tmp_list_of_samples
-            _seg = GravimetricRecording(tmp_list_of_samples)
-            tmp_list_of_samples = list()
-            if recorder.is_simulator or _seg.duration >= MIN_DURATION_STABLE_SEGMENT:
-                stable_segments.append(_seg)
-
-        for sample in tagged_segment:
-            if sample.stable:
-                tmp_list_of_samples.append(sample)
-            elif len(tmp_list_of_samples):
-                _store_new_stable_segment()
-        if len(tmp_list_of_samples):
-            _store_new_stable_segment()
-        if not stable_segments:
+        # isolate "stable" scale measurements
+        segment = GravimetricRecording(
+            [sample for sample in segment if sample.stable]
+        )
+        if segment.duration < MIN_DURATION_STABLE_SEGMENT:
             raise UnstableMeasurementError()
-        # default to using the final stable segment
-        segment = stable_segments[-1]
-    else:
-        segment = tagged_segment
 
     recording_grams_as_list = segment.grams_as_list
     return MeasurementData(
