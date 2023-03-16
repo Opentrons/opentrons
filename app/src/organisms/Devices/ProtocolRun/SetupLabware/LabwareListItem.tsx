@@ -208,7 +208,7 @@ export function LabwareListItem(
     : 'heaterShaker/closeLabwareLatch'
   let hsLatchText: string = t('secure')
   if (commandType === 'heaterShaker/closeLabwareLatch' && isLatchLoading) {
-    hsLatchText = t('securing')
+    hsLatchText = t('closing')
   } else if (
     commandType === 'heaterShaker/openLabwareLatch' &&
     isLatchLoading
