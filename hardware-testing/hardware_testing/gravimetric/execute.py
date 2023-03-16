@@ -156,8 +156,6 @@ def _load_labware(
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     tipracks = [ctx.load_labware(ls[1], location=ls[0]) for ls in tiprack_load_settings]
     _apply_labware_offsets(cfg, tipracks, vial)
-    if not ctx.is_simulating():
-        input("check offsets, press ENTER to continue")
     return vial, tipracks
 
 
