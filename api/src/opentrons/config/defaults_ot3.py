@@ -46,7 +46,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
     ),
     edge_sense=EdgeSenseSettings(
         overrun_tolerance_mm=0.5,
-        early_sense_tolerance_mm=0.3,
+        early_sense_tolerance_mm=0.5,
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=1,
             max_overrun_distance_mm=1,
