@@ -121,6 +121,7 @@ const DIRECTION_CONTROL_LAYOUT = css`
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   grid-gap: ${SPACING.spacing4};
+  min-width: 313px;
 
   @media (max-width: 750px) {
     flex-direction: ${DIRECTION_COLUMN};
@@ -178,8 +179,8 @@ const ACTIVE_BUTTON_STYLE = css`
   border: 1px ${COLORS.blueEnabled} solid;
 
   &:hover {
-    color: ${COLORS.blueHover};
-    border: 1px ${COLORS.blueHover} solid;
+    color: ${COLORS.bluePressed};
+    border: 1px ${COLORS.bluePressed} solid;
   }
 `
 
