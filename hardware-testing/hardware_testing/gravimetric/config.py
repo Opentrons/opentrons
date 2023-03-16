@@ -20,8 +20,8 @@ class GravimetricConfig:
     increment: bool
     low_volume: bool
     return_tip: bool
-    skip_blank: bool
-    skip_mix: bool
+    blank: bool
+    mix: bool
     inspect: bool
     user_volumes: bool
 

@@ -75,7 +75,7 @@ def _pipette_with_liquid_settings(
     dispense: Optional[float] = None,
     blank: bool = True,
     inspect: bool = False,
-    skip_mix: bool = False,
+    mix: bool = False,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     if aspirate is None and dispense is None:
@@ -163,7 +163,7 @@ def _pipette_with_liquid_settings(
     def _aspirate_on_submerge() -> None:
         # mix 5x times
         callbacks.on_mixing()
-        if not skip_mix:
+        if mix:
             for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
@@ -231,7 +231,7 @@ def aspirate_with_liquid_class(
     callbacks: PipettingCallbacks,
     blank: bool = False,
     inspect: bool = False,
-    skip_mix: bool = False,
+    mix: bool = False,
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
@@ -251,7 +251,7 @@ def aspirate_with_liquid_class(
         aspirate=aspirate_volume,
         blank=blank,
         inspect=inspect,
-        skip_mix=skip_mix,
+        mix=mix,
     )
 
 
@@ -265,7 +265,7 @@ def dispense_with_liquid_class(
     callbacks: PipettingCallbacks,
     blank: bool = False,
     inspect: bool = False,
-    skip_mix: bool = False,
+    mix: bool = False,
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
@@ -285,5 +285,5 @@ def dispense_with_liquid_class(
         dispense=dispense_volume,
         blank=blank,
         inspect=inspect,
-        skip_mix=skip_mix,
+        mix=mix,
     )

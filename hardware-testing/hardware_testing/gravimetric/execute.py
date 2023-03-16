@@ -91,8 +91,10 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
     if cfg.increment:
         test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
     elif cfg.user_volumes and not ctx.is_simulating():
-        _inp = input("Enter desired volumes, comma separated (eg: \"10,100,1000\") :")
-        test_volumes = [float(vol_str) for vol_str in _inp.strip().split(",") if vol_str]
+        _inp = input('Enter desired volumes, comma separated (eg: "10,100,1000") :')
+        test_volumes = [
+            float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
+        ]
     else:
         test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
     # anything volumes < 2uL must be done on the super-high-precision scale
@@ -178,9 +180,7 @@ def _jog_to_find_liquid_height(
                 _jog_size = min(max(float(inp), -1.0), 1.0)
             except ValueError:
                 continue
-        _liquid_height = min(
-            max(_liquid_height + _jog_size, 0), _well_depth
-        )
+        _liquid_height = min(max(_liquid_height + _jog_size, 0), _well_depth)
     return _liquid_height
 
 
@@ -196,7 +196,7 @@ def _run_trial(
     liquid_tracker: LiquidTracker,
     blank: bool,
     inspect: bool,
-    skip_mix: bool = False,
+    mix: bool = False,
 ) -> Tuple[float, float]:
     pipetting_callbacks = _generate_callbacks_for_trial(recorder, volume, trial, blank)
 
@@ -241,7 +241,7 @@ def _run_trial(
         callbacks=pipetting_callbacks,
         blank=blank,
         inspect=inspect,
-        skip_mix=skip_mix,
+        mix=mix,
     )
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     print(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
@@ -258,7 +258,7 @@ def _run_trial(
         callbacks=pipetting_callbacks,
         blank=blank,
         inspect=inspect,
-        skip_mix=skip_mix,
+        mix=mix,
     )
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     print(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
@@ -311,7 +311,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             tag=pipette_tag,
             start_time=start_time,
             duration=0,
-            frequency=100 if ctx.is_simulating() else 5,
+            frequency=1000 if ctx.is_simulating() else 5,
             stable=False,
         ),
         simulate=ctx.is_simulating(),
@@ -359,7 +359,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     _drop_tip()
 
     try:
-        if cfg.skip_blank or cfg.inspect:
+        if not cfg.blank or cfg.inspect:
             average_aspirate_evaporation_ul = 0.0
             average_dispense_evaporation_ul = 0.0
         else:
@@ -383,7 +383,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     liquid_tracker,
                     blank=True,  # stay away from the liquid
                     inspect=cfg.inspect,
-                    skip_mix=cfg.skip_mix,
+                    mix=cfg.mix,
                 )
                 print(
                     f"blank {trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
@@ -436,7 +436,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     liquid_tracker,
                     blank=False,
                     inspect=cfg.inspect,
-                    skip_mix=cfg.skip_mix,
+                    mix=cfg.mix,
                 )
                 print(
                     "measured volumes:\n"

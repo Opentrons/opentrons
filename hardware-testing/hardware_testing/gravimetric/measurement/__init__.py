@@ -2,12 +2,12 @@
 from dataclasses import dataclass
 from enum import Enum
 from time import sleep
-from typing import Optional, List
+from typing import Optional
 from typing_extensions import Final
 
 from opentrons.protocol_api import ProtocolContext
 
-from .record import GravimetricRecorder, GravimetricRecording, GravimetricSample
+from .record import GravimetricRecorder, GravimetricRecording
 from .environment import read_environment_data, EnvironmentData, get_average_reading
 
 
@@ -97,18 +97,17 @@ def _build_measurement_data(
     tag: str,
     e_data: EnvironmentData,
     stable: bool = True,
+    simulating: bool = False,
 ) -> MeasurementData:
     # gather only samples of the specified tag
     segment = GravimetricRecording(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
-    if stable:
+    if stable and not simulating:
         # isolate "stable" scale measurements
-        segment = GravimetricRecording(
-            [sample for sample in segment if sample.stable]
-        )
+        segment = GravimetricRecording([sample for sample in segment if sample.stable])
         if segment.duration < MIN_DURATION_STABLE_SEGMENT:
-            raise UnstableMeasurementError()
+            raise UnstableMeasurementError(f"duration is {segment.duration} seconds")
 
     recording_grams_as_list = segment.grams_as_list
     return MeasurementData(
@@ -145,9 +144,13 @@ def record_measurement_data(
         elif shorten:
             ctx.delay(1)
         else:
-            print(f"delaying {DELAY_FOR_MEASUREMENT} seconds for measurement, please wait...")
+            print(
+                f"delaying {DELAY_FOR_MEASUREMENT} seconds for measurement, please wait..."
+            )
             ctx.delay(DELAY_FOR_MEASUREMENT)
-    return _build_measurement_data(recorder, tag, env_data, stable=not shorten)
+    return _build_measurement_data(
+        recorder, tag, env_data, stable=not shorten, simulating=ctx.is_simulating()
+    )
 
 
 def calculate_change_in_volume(
