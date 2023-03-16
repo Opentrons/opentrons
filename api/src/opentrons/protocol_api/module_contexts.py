@@ -353,7 +353,7 @@ class MagneticModuleContext(ModuleContext):
             self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
         else:
             raise APIVersionError(
-                "`MagneticModuleContext.calibrate` has been deprecated."
+                "`MagneticModuleContext.calibrate` has been removed."
             )
 
     @publish(command=cmds.magdeck_engage)
