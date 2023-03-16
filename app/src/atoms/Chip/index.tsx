@@ -45,20 +45,20 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
   neutral: {
     backgroundColor: COLORS.darkBlack_twenty,
-    borderRadius: BORDERS.radius24,
+    borderRadius: BORDERS.size_six,
     iconColor: COLORS.darkBlack_ninety,
     textColor: COLORS.darkBlack_seventy,
   },
   success: {
     backgroundColor: COLORS.green_three,
-    borderRadius: BORDERS.radius24,
+    borderRadius: BORDERS.size_six,
     iconColor: COLORS.green_one,
     iconName: 'ot-check',
     textColor: COLORS.green_one,
   },
   warning: {
     backgroundColor: COLORS.yellow_three,
-    borderRadius: BORDERS.radius24,
+    borderRadius: BORDERS.size_six,
     iconColor: COLORS.yellow_two,
     textColor: COLORS.yellow_one,
   },

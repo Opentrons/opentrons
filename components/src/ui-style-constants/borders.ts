@@ -19,15 +19,6 @@ export const size_four = '16px'
 export const size_five = '40px'
 export const size_six = '60px'
 
-// semantic naming
-export const radius60 = '3.75rem' // 60px
-export const radius40 = '2.5rem' // 40px
-export const radius24 = '1.5rem' // 24px
-export const radius16 = '1rem' // 16px
-export const radius12 = '0.75rem' // 12px
-export const radius8 = '0.5rem' // 8px
-export const radius4 = '0.25rem' // 4px
-
 export const tabBorder = css`
   border-bottom-style: ${styleSolid};
   border-bottom-width: ${spacing1};
