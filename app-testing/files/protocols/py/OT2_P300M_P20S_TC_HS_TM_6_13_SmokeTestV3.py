@@ -3,7 +3,7 @@
 from opentrons import protocol_api
 
 metadata = {
-    "protocolName": "🛠 Logo-Modules-CustomLabware 🛠",
+    "protocolName": "🛠️ 2.13 Smoke Test V3 🪄",
     "author": "Opentrons Engineering <engineering@opentrons.com>",
     "source": "Software Testing Team",
     "description": ("Description of the protocol that is longish \n has \n returns and \n emoji 😊 ⬆️ "),
@@ -13,6 +13,11 @@ metadata = {
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """This method is run by the protocol engine."""
+
+    ctx.set_rail_lights(True)
+    ctx.comment(f"Let there be light! {ctx.rail_lights_on} 🌠🌠🌠")
+    ctx.comment(f"Is the door is closed? {ctx.door_closed} 🚪🚪🚪")
+    ctx.comment(f"Is this a simulation? {ctx.is_simulating()} 🔮🔮🔮")
 
     # deck positions
     tips_300ul_position = "5"
@@ -105,6 +110,55 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         new_tip="never",
     )
     pipette_right.drop_tip()
+
+    # transfer
+    transfer_destinations = [
+        logo_destination_plate.wells_by_name()["A11"],
+        logo_destination_plate.wells_by_name()["B11"],
+        logo_destination_plate.wells_by_name()["C11"],
+    ]
+    pipette_right.pick_up_tip()
+    pipette_right.transfer(
+        volume=60,
+        source=dye_container.wells_by_name()["A2"],
+        dest=transfer_destinations,
+        new_tip="never",
+        touch_tip=True,
+        blow_out=True,
+        blowout_location="destination well",
+        mix_before=(3, 20),
+        mix_after=(1, 20),
+        mix_touch_tip=True,
+    )
+
+    # consolidate
+    pipette_right.consolidate(
+        volume=20,
+        source=transfer_destinations,
+        dest=dye_container.wells_by_name()["A5"],
+        new_tip="never",
+        touch_tip=False,
+        blow_out=True,
+        blowout_location="destination well",
+        mix_before=(3, 20),
+    )
+
+    # well to well
+    pipette_right.return_tip()
+    pipette_right.pick_up_tip()
+    pipette_right.aspirate(volume=5, location=logo_destination_plate.wells_by_name()["A11"])
+    pipette_right.air_gap(volume=10)
+    ctx.delay(seconds=3)
+    pipette_right.dispense(volume=5, location=logo_destination_plate.wells_by_name()["H11"])
+
+    # move to
+    pipette_right.move_to(logo_destination_plate.wells_by_name()["E12"].top())
+    pipette_right.move_to(logo_destination_plate.wells_by_name()["E11"].bottom())
+    pipette_right.blow_out()
+    # touch tip
+    # pipette ends in the middle of the well as of 6.3.0 in all touch_tip
+    pipette_right.touch_tip(location=logo_destination_plate.wells_by_name()["H1"])
+    pipette_right.return_tip()
 
     # Play with the modules
     temperature_module.await_temperature(25)

@@ -27,4 +27,6 @@ names = Literal[
     "OT2_P300S_Thermocycler_Moam_Error",
     "OT2_P300S_Twinning_Error",
     "OT2_P300M_P20S_TC_HS_TM_6_3_SmokeV3",
+    "OT2_P300M_P20S_TC_HS_TM_6_13_SmokeTestV3",
+    "OT2_P300M_P20S_TC_HS_TM_6_14_SmokeTestV3",
 ]
