@@ -131,21 +131,21 @@ def _pipette_with_liquid_settings(
         pipette.move_to(
             well.bottom(submerge_mm),
             force_direct=True,
-            speed=config.TIP_SPEED_WHILE_SUBMERGED,
+            speed=config.TIP_SPEED_WHILE_SUBMERGING,
         )
 
     def _retract_during_mix() -> None:
         pipette.move_to(
             well.bottom(approach_mm),
             force_direct=True,
-            speed=config.TIP_SPEED_WHILE_SUBMERGED,
+            speed=config.TIP_SPEED_WHILE_RETRACTING,
         )
 
     def _retract() -> None:
         pipette.move_to(
             well.bottom(retract_mm),
             force_direct=True,
-            speed=config.TIP_SPEED_WHILE_SUBMERGED,
+            speed=config.TIP_SPEED_WHILE_RETRACTING,
         )
 
     # CREATE CALLBACKS FOR EACH PHASE
