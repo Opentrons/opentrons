@@ -136,6 +136,7 @@ export const PipetteWizardFlows = (
     ).then(() => {
       if (runId !== '') stopRun(runId)
       setIsExiting(false)
+      closeFlow()
     })
   }
   const {
