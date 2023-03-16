@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   DIRECTION_ROW,
@@ -29,7 +25,6 @@ import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
-import { useRunStatuses } from '../Devices/hooks'
 
 import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../redux/modules/types'
@@ -67,28 +62,17 @@ interface MagneticModuleSlideoutProps {
   module: MagneticModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  isLoadedInRun: boolean
-  currentRunId?: string
 }
 
 export const MagneticModuleSlideout = (
   props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const {
-    module,
-    isExpanded,
-    onCloseClick,
-    isLoadedInRun,
-    currentRunId,
-  } = props
+  const { module, isExpanded, onCloseClick } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
-  const { isRunTerminal, isRunIdle } = useRunStatuses()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
-  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
 
   const moduleName = getModuleDisplayName(module.moduleModel)
   const info = getInfoByModel(module.moduleModel)
@@ -123,25 +107,15 @@ export const MagneticModuleSlideout = (
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
         commandType: 'magneticModule/engage',
         params: {
-          moduleId: isRunIdle ? moduleIdFromRun : module.id,
+          moduleId: module.id,
           height: parseInt(engageHeightValue),
         },
       }
-      if (isRunIdle && currentRunId != null && isLoadedInRun) {
-        createCommand({ runId: currentRunId, command: setEngageCommand }).catch(
-          (e: Error) => {
-            console.error(
-              `error setting module status with command type ${setEngageCommand.commandType} and run id ${currentRunId}: ${e.message}`
-            )
-          }
+      createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`
         )
-      } else if (isRunTerminal || currentRunId == null) {
-        createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`
-          )
-        })
-      }
+      })
     }
     setEngageHeightValue(null)
     onCloseClick()

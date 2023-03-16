@@ -16,16 +16,11 @@ import {
 } from '../../Devices/hooks'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
-import { useModuleIdFromRun } from '../useModuleIdFromRun'
 
-jest.mock('../useModuleIdFromRun')
 jest.mock('../../Devices/hooks')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks')
 
-const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
-  typeof useModuleIdFromRun
->
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
@@ -177,7 +172,6 @@ const mockThermocyclerGen2LidClosed = {
 describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
   beforeEach(() => {
-    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     mockUseIsLegacySessionsInProgress.mockReturnValue(false)
     mockUseRunStatuses.mockReturnValue({
       isRunRunning: false,
