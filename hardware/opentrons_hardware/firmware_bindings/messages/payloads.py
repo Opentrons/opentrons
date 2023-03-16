@@ -511,6 +511,13 @@ class GripperErrorTolerancePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class PushTipPresenceNotificationPayload(EmptyPayload):
+    """A notification that the ejector flag status has changed."""
+
+    ejector_flag_status: utils.UInt8Field
+
+
+@dataclass(eq=False)
 class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 

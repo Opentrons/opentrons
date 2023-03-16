@@ -30,6 +30,7 @@ async def _main(cfg: TestConfig) -> None:
 
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
+        use_defaults=True,  # includes default XY calibration matrix
         is_simulating=cfg.simulate,
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",

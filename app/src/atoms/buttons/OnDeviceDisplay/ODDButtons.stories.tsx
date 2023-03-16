@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MediumButtonRounded, SmallButton } from '.'
+import { MediumButtonRounded, SmallButton, TabbedButton } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
@@ -23,4 +23,14 @@ export const Small = SmallButtonTemplate.bind({})
 Small.args = {
   children: 'Button text',
   title: 'small button',
+}
+
+const TabbedButtonTemplate: Story<
+  React.ComponentProps<typeof TabbedButton>
+> = args => <TabbedButton {...args} />
+export const Tabbed = TabbedButtonTemplate.bind({})
+Tabbed.args = {
+  foreground: true,
+  children: 'Button text',
+  title: 'tabbed button',
 }
