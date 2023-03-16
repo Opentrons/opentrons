@@ -795,6 +795,8 @@ class ProtocolContext(CommandPublisher):
         :param str name: A human-readable name for the liquid.
         :param str description: An optional description of the liquid.
         :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+
+        :return: A :py:class:`~opentrons.protocol_api.Liquid` object representing the specified liquid.
         """
         return self._core.define_liquid(
             name=name,

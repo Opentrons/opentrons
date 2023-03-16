@@ -13,21 +13,22 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
-
-import type { CreateRunCommand, ReturnTipStep } from './types'
-import { VectorOffset } from '@opentrons/api-client'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getDisplayLocation } from './utils/getDisplayLocation'
-import { chainRunCommands } from './utils/chainRunCommands'
+
+import type { VectorOffset } from '@opentrons/api-client'
+import type { CreateRunCommand, ReturnTipStep } from './types'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   createRunCommand: CreateRunCommand
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   tipPickUpOffset: VectorOffset | null
   isRobotMoving: boolean
 }
 export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
-  const { t } = useTranslation('labware_position_check')
+  const { t } = useTranslation(['labware_position_check', 'shared'])
   const {
     pipetteId,
     labwareId,
@@ -36,7 +37,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     proceed,
     tipPickUpOffset,
     isRobotMoving,
-    createRunCommand,
+    chainRunCommands,
   } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
@@ -121,12 +122,20 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         },
         { commandType: 'home' as const, params: {} },
       ],
-      createRunCommand,
-      proceed
+      true
     )
+      .then(() => {
+        proceed()
+      })
+      .catch(e => {
+        console.error('Unexpected command failure: ', e)
+      })
   }
 
-  if (isRobotMoving) return <RobotMotionLoader />
+  if (isRobotMoving)
+    return (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <PrepareSpace

@@ -295,9 +295,9 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
 
   - The ``height`` parameter of :py:meth:`.MagneticModuleContext.engage` was removed.
     Use ``offset`` or ``height_from_base`` instead.
-
-  - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed,
-    since they were holdovers from a calibration system that no longer exists.
+    
+  - ``Labware.separate_calibration`` was removed,
+    since it was a holdover from a calibration system that no longer exists.
     :py:meth:`.Labware.set_calibration` was removed.
     Setting a labware's calibration after it's been loaded is not supported.
 

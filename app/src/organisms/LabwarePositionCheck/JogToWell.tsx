@@ -48,7 +48,6 @@ interface JogToWellProps {
   body: React.ReactNode
   initialPosition: VectorOffset
   existingOffset: VectorOffset
-  showLiveOffset?: boolean
 }
 export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
@@ -62,7 +61,6 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     handleJog,
     initialPosition,
     existingOffset,
-    showLiveOffset = true,
   } = props
 
   const [joggedPosition, setJoggedPosition] = React.useState<VectorOffset>(
@@ -102,7 +100,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         >
           <StyledText as="h1">{header}</StyledText>
           {body}
-          {showLiveOffset ? <LiveOffsetValue {...liveOffset} /> : null}
+          <LiveOffsetValue {...liveOffset} />
         </Flex>
         <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacingM}>
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>

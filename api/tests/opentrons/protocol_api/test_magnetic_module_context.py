@@ -123,6 +123,17 @@ def test_engage_height_from_home_raises_on_high_version(
         subject.engage(42.0)
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_calibrate_raises_on_high_version(
+    decoy: Decoy,
+    mock_core: MagneticModuleCore,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should raise a deprecation error."""
+    with pytest.raises(APIVersionError):
+        subject.calibrate()
+
+
 def test_engage_height_from_base(
     decoy: Decoy,
     mock_broker: Broker,

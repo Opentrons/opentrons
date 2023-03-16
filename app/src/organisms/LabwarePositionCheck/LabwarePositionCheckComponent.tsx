@@ -31,8 +31,8 @@ import type {
 } from './types'
 import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
-import { chainRunCommands } from './utils/chainRunCommands'
 import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
@@ -120,27 +120,23 @@ export const LabwarePositionCheckInner = (
     },
     { workingOffsets: [], tipPickUpOffset: null }
   )
+  const [isExiting, setIsExiting] = React.useState(false)
   const {
     createCommand,
     isLoading: isCommandMutationLoading,
   } = useCreateCommandMutation()
   const { createCommand: createSilentCommand } = useCreateCommandMutation()
+  const {
+    chainRunCommands,
+    isCommandMutationLoading: isCommandChainLoading,
+  } = useChainRunCommands(runId)
   const createRunCommand: CreateRunCommand = (variables, ...options) => {
     return createCommand({ ...variables, runId }, ...options)
   }
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
-  const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
-  React.useEffect(() => {
-    if (isCommandMutationLoading) {
-      const timer = setTimeout(() => setIsRobotMoving(true), 700)
-      return () => clearTimeout(timer)
-    } else {
-      setIsRobotMoving(false)
-    }
-  }, [isCommandMutationLoading])
-
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
+    setIsExiting(true)
     const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
       protocolData?.pipettes ?? []
     ).map(pip => ({
@@ -157,9 +153,12 @@ export const LabwarePositionCheckInner = (
         ...dropTipToBeSafeCommands,
         { commandType: 'home' as const, params: {} },
       ],
-      createRunCommand,
-      props.onCloseClick
+      true
     )
+      .then(() => props.onCloseClick())
+      .catch(() => {
+        setIsExiting(false)
+      })
   }
   const {
     confirm: confirmExitLPC,
@@ -168,13 +167,11 @@ export const LabwarePositionCheckInner = (
   } = useConditionalConfirm(handleCleanUpAndClose, true)
 
   const proceed = (): void => {
-    if (!isCommandMutationLoading) {
-      setCurrentStepIndex(
-        currentStepIndex !== LPCSteps.length - 1
-          ? currentStepIndex + 1
-          : currentStepIndex
-      )
-    }
+    setCurrentStepIndex(
+      currentStepIndex !== LPCSteps.length - 1
+        ? currentStepIndex + 1
+        : currentStepIndex
+    )
   }
   if (protocolData == null) return null
   const LPCSteps = getLabwarePositionCheckSteps(protocolData)
@@ -213,9 +210,10 @@ export const LabwarePositionCheckInner = (
     proceed,
     protocolData,
     createRunCommand,
+    chainRunCommands,
     registerPosition,
     handleJog,
-    isRobotMoving,
+    isRobotMoving: isCommandMutationLoading || isCommandChainLoading,
     workingOffsets,
     existingOffsets,
   }
@@ -275,7 +273,7 @@ export const LabwarePositionCheckInner = (
             title={t('labware_position_check_title')}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
-            onExit={showConfirmation ? null : confirmExitLPC}
+            onExit={showConfirmation || isExiting ? null : confirmExitLPC}
           />
         }
       >

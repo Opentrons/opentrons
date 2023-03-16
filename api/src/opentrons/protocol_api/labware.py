@@ -215,8 +215,8 @@ class Well:
         """
         Load a liquid into a well.
 
-        :param liquid: The type of liquid to load into the well.
-        :param volume: The volume of liquid to load, in µL.
+        :param Liquid liquid: The liquid to load into the well.
+        :param float volume: The volume of liquid to load, in µL.
         """
         self._core.load_liquid(
             liquid=liquid,
@@ -313,6 +313,9 @@ class Labware:
 
     @property
     def separate_calibration(self) -> bool:
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError("Labware.separate_calibration has been removed")
+
         _log.warning(
             "Labware.separate_calibrations is a deprecated internal property."
             " It no longer has meaning, but will always return `False`"
