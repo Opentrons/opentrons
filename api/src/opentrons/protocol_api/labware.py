@@ -314,7 +314,7 @@ class Labware:
     @property
     def separate_calibration(self) -> bool:
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError("Labware.separate_calibration has been deprecated")
+            raise APIVersionError("Labware.separate_calibration has been removed")
 
         _log.warning(
             "Labware.separate_calibrations is a deprecated internal property."
