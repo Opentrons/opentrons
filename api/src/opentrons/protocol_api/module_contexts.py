@@ -124,17 +124,10 @@ class ModuleContext(CommandPublisher):
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
-        :param str name: See the ``load_name`` parameter of
-            :py:obj:`ProtocolContext.load_labware`.
-
-        :param str label: See the ``label`` parameter of
-            :py:obj:`ProtocolContext.load_labware`.
-
-        :param str namespace: See the ``namespace`` parameter  of
-            :py:obj:`ProtocolContext.load_labware`.
-
-        :param int version: See the ``version`` parameter  of
-            :py:obj:`ProtocolContext.load_labware`.
+        The parameters of this function behave like those of
+        :py:obj:`ProtocolContext.load_labware` (which loads labware directly
+        onto the deck). Note that the parameter ``name`` here corresponds to
+        ``load_name`` on the ``ProtocolContext`` function.
 
         :returns: The initialized and loaded labware object.
 
