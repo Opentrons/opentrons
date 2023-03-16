@@ -35,7 +35,7 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
     """Convert PipetteDict to Pipette response model."""
     if pipette_dict:
         return Pipette.construct(
-            mount=str(MountType.from_hw_mount(mount)),
+            mount=MountType.from_hw_mount(mount).value,
             instrumentName=pipette_dict["name"],
             instrumentModel=pipette_dict["model"],
             serialNumber=pipette_dict["pipette_id"],
@@ -51,7 +51,7 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     calibration_data = gripper_dict["calibration_offset"]
     return Gripper.construct(
-        mount=str(MountType.EXTENSION),
+        mount=MountType.EXTENSION.value,
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
         serialNumber=gripper_dict["gripper_id"],
         data=GripperData(

@@ -42,10 +42,6 @@ class MountType(enum.Enum):
         mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
         return mount_map[mount]
 
-    def __str__(self) -> str:
-        """Return the value string."""
-        return self.value
-
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
     """Base instrument response."""
