@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import isEqual from 'lodash/isEqual'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -221,7 +222,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 <StyledText as="p">{labwareDisplayName}</StyledText>
               </TableDatum>
               <TableDatum>
-                {index === 0 ? (
+                {isEqual(vector, IDENTITY_VECTOR) ? (
                   <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
                   <Flex>
