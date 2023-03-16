@@ -217,3 +217,14 @@ def test_set_offset_raises_on_high_api_version(
     """It should raise an error, on high API versions."""
     with pytest.raises(APIVersionError):
         subject.set_offset(1, 2, 3)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_separate_calibration_raises_on_high_api_version(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should raise an error, on high API versions."""
+    with pytest.raises(APIVersionError):
+        subject.separate_calibration
