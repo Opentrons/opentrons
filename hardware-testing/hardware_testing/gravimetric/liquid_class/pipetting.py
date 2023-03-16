@@ -64,6 +64,64 @@ class PipettingCallbacks:
     on_exiting: Callable
 
 
+def _do_user_pause(ctx: ProtocolContext, inspect: bool, msg: str = "") -> None:
+    if not ctx.is_simulating() and inspect:
+        input(f"{msg}, ENTER to continue")
+
+
+def _check_aspirate_dispense_args(
+    aspirate: Optional[float], dispense: Optional[float]
+) -> None:
+    if aspirate is None and dispense is None:
+        raise ValueError("either a aspirate or dispense volume must be set")
+    if aspirate and dispense:
+        raise ValueError("both aspirate and dispense volumes cannot be set together")
+
+
+def _get_approach_submerge_retract_heights(
+    pipette: InstrumentContext,
+    well: Well,
+    liquid_tracker: LiquidTracker,
+    liquid_class: LiquidClassSettings,
+    aspirate: Optional[float],
+    dispense: Optional[float],
+    blank: bool,
+) -> Tuple[float, float, float]:
+    liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
+        pipette, well, aspirate=aspirate, dispense=dispense
+    )
+    if blank:
+        # force the pipette to move above the well
+        liquid_before = well.depth + (well.depth - liquid_before)
+        liquid_after = well.depth + (well.depth - liquid_after)
+    if aspirate:
+        liq_submerge = liquid_class.aspirate.submerge
+        liq_retract = liquid_class.aspirate.retract
+    else:
+        liq_submerge = liquid_class.dispense.submerge
+        liq_retract = liquid_class.dispense.retract
+    approach_mm, submerge_mm, retract_mm = _get_heights_in_well(
+        liquid_before, liquid_after, liq_submerge, liq_retract
+    )
+    return approach_mm, submerge_mm, retract_mm
+
+
+def _submerge(pipette: InstrumentContext, well: Well, height: float) -> None:
+    pipette.move_to(
+        well.bottom(height),
+        force_direct=True,
+        speed=config.TIP_SPEED_WHILE_SUBMERGING,
+    )
+
+
+def _retract(pipette: InstrumentContext, well: Well, height: float) -> None:
+    pipette.move_to(
+        well.bottom(height),
+        force_direct=True,
+        speed=config.TIP_SPEED_WHILE_RETRACTING,
+    )
+
+
 def _pipette_with_liquid_settings(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -78,14 +136,7 @@ def _pipette_with_liquid_settings(
     mix: bool = False,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
-    if aspirate is None and dispense is None:
-        raise ValueError("either a aspirate or dispense volume must be set")
-    if aspirate and dispense:
-        raise ValueError("both aspirate and dispense volumes cannot be set together")
-
-    def _inspect(msg: str = "") -> None:
-        if not ctx.is_simulating() and inspect:
-            input(f"{msg}, ENTER to continue")
+    _check_aspirate_dispense_args(aspirate, dispense)
 
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
@@ -106,47 +157,9 @@ def _pipette_with_liquid_settings(
     #  3. RETRACT
 
     # CALCULATE TIP HEIGHTS FOR EACH PHASE
-
-    liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
-        pipette, well, aspirate=aspirate, dispense=dispense
+    approach_mm, submerge_mm, retract_mm = _get_approach_submerge_retract_heights(
+        pipette, well, liquid_tracker, liquid_class, aspirate, dispense, blank
     )
-    if blank:
-        # force the pipette to move above the well
-        liquid_before = well.depth + (well.depth - liquid_before)
-        liquid_after = well.depth + (well.depth - liquid_after)
-    if aspirate:
-        liq_submerge = liquid_class.aspirate.submerge
-        liq_retract = liquid_class.aspirate.retract
-    else:
-        liq_submerge = liquid_class.dispense.submerge
-        liq_retract = liquid_class.dispense.retract
-    approach_mm, submerge_mm, retract_mm = _get_heights_in_well(
-        liquid_before, liquid_after, liq_submerge, liq_retract
-    )
-
-    def _approach() -> None:
-        pipette.move_to(well.bottom(approach_mm))
-
-    def _submerge() -> None:
-        pipette.move_to(
-            well.bottom(submerge_mm),
-            force_direct=True,
-            speed=config.TIP_SPEED_WHILE_SUBMERGING,
-        )
-
-    def _retract_during_mix() -> None:
-        pipette.move_to(
-            well.bottom(approach_mm),
-            force_direct=True,
-            speed=config.TIP_SPEED_WHILE_RETRACTING,
-        )
-
-    def _retract() -> None:
-        pipette.move_to(
-            well.bottom(retract_mm),
-            force_direct=True,
-            speed=config.TIP_SPEED_WHILE_RETRACTING,
-        )
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
@@ -167,9 +180,9 @@ def _pipette_with_liquid_settings(
             for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
-                _retract_during_mix()
+                _retract(pipette, well, approach_mm)  # retract to the approach height
                 pipette.blow_out().aspirate(pipette.min_volume).dispense()
-                _submerge()
+                _submerge(pipette, well, submerge_mm)
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
@@ -183,7 +196,7 @@ def _pipette_with_liquid_settings(
         pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
 
     def _dispense_on_approach() -> None:
-        _inspect("about to dispense")
+        _do_user_pause(ctx, inspect, "about to dispense")
         # remove trailing-air-gap
         pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
 
@@ -194,26 +207,26 @@ def _pipette_with_liquid_settings(
         liquid_tracker.update_affected_wells(pipette, well, dispense=dispense)
         # delay
         ctx.delay(liquid_class.dispense.delay)
-        _inspect("about to retract")
+        _do_user_pause(ctx, inspect, "about to retract")
 
     def _dispense_on_retract() -> None:
         # blow-out any remaining air in pipette (any reason why not?)
         callbacks.on_blowing_out()
-        _inspect("about to blow-out")
+        _do_user_pause(ctx, inspect, "about to blow-out")
         pipette.blow_out()
 
     # PHASE 1: APPROACH
-    _approach()
+    pipette.move_to(well.bottom(approach_mm))
     _aspirate_on_approach() if aspirate else _dispense_on_approach()
 
     # PHASE 2: SUBMERGE
     callbacks.on_submerging()
-    _submerge()
+    _submerge(pipette, well, submerge_mm)
     _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
     # PHASE 3: RETRACT
     callbacks.on_retracting()
-    _retract()
+    _retract(pipette, well, retract_mm)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
