@@ -2,10 +2,6 @@
 from dataclasses import dataclass, fields
 from typing import Callable, List
 
-from opentrons.protocol_api import ProtocolContext
-
-from opentrons.hardware_control.types import OT3Mount
-
 
 @dataclass
 class EnvironmentData:

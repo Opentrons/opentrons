@@ -14,7 +14,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
 )
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
-from opentrons_hardware.sensors.sensor_types import EnvironmentSensor
 from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,

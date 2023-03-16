@@ -154,9 +154,7 @@ def _pipette_with_liquid_settings(
         ul_per_mm = pi * pow(shaft_diameter / 2, 2)
         dist_mm = liquid_class.aspirate.air_gap.leading_air_gap / ul_per_mm
         target_pos = target_position_from_plunger(
-            hw_mount,
-            pip.plunger_positions.bottom + dist_mm,
-            hw_api._current_position
+            hw_mount, pip.plunger_positions.bottom + dist_mm, hw_api._current_position
         )
         hw_api._move(
             target_pos,
