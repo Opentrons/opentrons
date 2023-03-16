@@ -19,9 +19,9 @@ import {
 import { ProtocolMetadata } from '@opentrons/shared-data'
 import {
   BackButton,
-  QuaternaryButton,
   TertiaryButton,
 } from '../../../atoms/buttons'
+import { TabbedButton } from '../../../atoms/buttons/OnDeviceDisplay'
 import { StyledText } from '../../../atoms/text'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
@@ -83,12 +83,10 @@ const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
   return (
     <Flex gridGap={SPACING.spacing3} margin={SPACING.spacing4}>
       {protocolSectionTabOptions.map(option => {
-        const Button =
-          option === props.currentOption ? TertiaryButton : QuaternaryButton
         return (
-          <Button key={option} onClick={() => props.setCurrentOption(option)}>
+          <TabbedButton foreground={option === props.currentOption} key={option} onClick={() => props.setCurrentOption(option)}>
             {option}
-          </Button>
+          </TabbedButton>
         )
       })}
     </Flex>
