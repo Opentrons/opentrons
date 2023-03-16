@@ -299,7 +299,7 @@ class ProtocolContext(CommandPublisher):
         later in the protocol.
 
         :param str load_name: A string to use for looking up a labware definition.
-            You can find the ``load_name``\\s for standard labware on the Opentrons
+            You can find the ``load_name`` for any standard labware on the Opentrons
             `Labware Library <https://labware.opentrons.com>`_.
 
         :param location: The slot into which to load the labware,
