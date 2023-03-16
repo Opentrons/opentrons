@@ -1665,15 +1665,14 @@ class OT3API(
 
     async def save_module_offset(
             self, module_id: str, mount: OT3Mount, slot: int, offset: top_types.Point
-            ) -> ModuleCalibrationOffset:
+            ) -> Optional[ModuleCalibrationOffset]:
         """Save a new offset for a given module."""
         module = self._backend.module_controls.get_module_by_module_id(module_id)
         if not module:
             self._log.warning(f"Could not save calibration for unknown module {module_id}")
-            return
+            return None
         self._log.info(f"Saving module offset: {offset} for module {module.MODULE_TYPE} {module_id}.")
-        offset = self._backend.module_controls.save_module_offset(module.MODULE_TYPE, module_id, mount, slot, offset)
-        return offset
+        return self._backend.module_controls.save_module_offset(module.MODULE_TYPE, module_id, mount, slot, offset)
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]

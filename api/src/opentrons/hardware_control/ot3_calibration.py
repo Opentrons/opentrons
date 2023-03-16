@@ -2,7 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing_extensions import Final, Literal, TYPE_CHECKING
-from typing import Union, Tuple, List, Dict, Any, Optional
+from typing import Tuple, List, Dict, Any, Optional
 import datetime
 import numpy as np
 from enum import Enum
@@ -16,7 +16,12 @@ from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
 import json
 
-from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck import (
+    get_calibration_square_position_in_slot,
+    Z_PREP_OFFSET,
+    CALIBRATION_PROBE_DIAMETER,
+    CALIBRATION_SQUARE_EDGES as SQUARE_EDGES,
+)
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -28,20 +33,17 @@ LINEAR_TRANSIT_HEIGHT: Final[float] = 1
 SEARCH_TRANSIT_HEIGHT: Final[float] = 5
 GRIPPER_GRIP_FORCE: Final[float] = 20
 
-# FIXME: add these to shared-data
-Z_PREP_OFFSET = Point(x=13, y=13, z=0)
-CALIBRATION_MIN_VALID_STRIDE: Final[float] = 0.1
-CALIBRATION_PROBE_DIAMETER: Final[float] = 4
-CALIBRATION_SQUARE_DEPTH: Final[float] = -0.25
-CALIBRATION_SQUARE_SIZE: Final[float] = 20
+PREP_OFFSET_DEPTH = Point(*Z_PREP_OFFSET)
 EDGES = {
-    "left": Point(x=-CALIBRATION_SQUARE_SIZE * 0.5),
-    "right": Point(x=CALIBRATION_SQUARE_SIZE * 0.5),
-    "top": Point(y=CALIBRATION_SQUARE_SIZE * 0.5),
-    "bottom": Point(y=-CALIBRATION_SQUARE_SIZE * 0.5),
+    "left": Point(*SQUARE_EDGES["left"]),
+    "right": Point(*SQUARE_EDGES["right"]),
+    "top": Point(*SQUARE_EDGES["top"]),
+    "bottom": Point(*SQUARE_EDGES["bottom"]),
 }
+CALIBRATION_MIN_VALID_STRIDE: Final[float] = 0.1
 NON_REPEATABLE_STRIDES: List[float] = [0.0, 3.0]
 REPEATABLE_STRIDES: List[float] = [1.0, 0.25, 0.1, 0.025]
+
 
 
 @dataclass
@@ -99,7 +101,7 @@ async def find_edge_binary(
     hcapi: OT3API,
     mount: OT3Mount,
     slot_edge_nominal: Point,
-    search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
+    search_axis: Literal[OT3Axis.X, OT3Axis.Y],
     search_direction: Literal[1, -1],
 ) -> float:
     """
@@ -238,20 +240,6 @@ async def find_slot_center_binary(
 
 # LINEAR SEARCH METHODS
 
-# FIXME: this should live in shared-data deck definition
-def _get_calibration_square_position_in_slot(slot: int) -> Point:
-    """Get slot top-left position."""
-    deck = load_deck("ot3_standard", version=3)
-    slots = deck["locations"]["orderedSlots"]
-    s = slots[slot - 1]
-    assert s["id"] == str(slot)
-    bottom_left = Point(*s["position"])
-    slot_size_x = s["boundingBox"]["xDimension"]
-    slot_size_y = s["boundingBox"]["yDimension"]
-    relative_center = Point(x=float(slot_size_x), y=float(slot_size_y)) * 0.5
-    return bottom_left + relative_center + Point(z=CALIBRATION_SQUARE_DEPTH)
-
-
 async def find_calibration_structure_height(
     hcapi: OT3API, mount: OT3Mount, nominal_center: Point
 ) -> float:
@@ -264,7 +252,7 @@ async def find_calibration_structure_height(
     will cause a collision is not 0. This routine finds that value.
     """
     z_pass_settings = hcapi.config.calibration.z_offset.pass_settings
-    z_prep_point = nominal_center + Z_PREP_OFFSET
+    z_prep_point = nominal_center + PREP_OFFSET_DEPTH
     deck_z = await _probe_deck_at(hcapi, mount, z_prep_point, z_pass_settings)
     z_limit = nominal_center.z - z_pass_settings.max_overrun_distance_mm
     if deck_z < z_limit:
@@ -380,7 +368,7 @@ async def find_edge_linear(
     hcapi: OT3API,
     mount: OT3Mount,
     slot_edge_nominal: Point,
-    search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
+    search_axis: Literal[OT3Axis.X, OT3Axis.Y],
     search_direction: Literal[1, -1],
 ) -> Point:
     """
@@ -518,7 +506,7 @@ async def find_axis_center(
     mount: OT3Mount,
     minus_edge_nominal: Point,
     plus_edge_nominal: Point,
-    axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
+    axis: Literal[OT3Axis.X, OT3Axis.Y],
 ) -> float:
     """Find the center of the calibration slot on the specified axis.
 
@@ -695,6 +683,25 @@ async def find_calibration_structure_center(
     return found_center
 
 
+async def find_calibration_structure_position(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    nominal_center: Point,
+    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+) -> Point:
+    """Find the calibration square offset given an arbitry postition on the deck."""
+    # Find the estimated structure plate height. This will be used to baseline the edge detection points.
+    z_height = await find_calibration_structure_height(hcapi, mount, nominal_center)
+    test_center = nominal_center._replace(z=z_height)
+    LOG.info(f"Found structure plate at {z_height}mm")
+
+    # Find the calibration square center using the given method
+    found_center = await find_calibration_structure_center(
+        hcapi, mount, test_center, method
+    )
+    return nominal_center - found_center
+
+
 async def _calibrate_mount(
     hcapi: OT3API,
     mount: OT3Mount,
@@ -725,7 +732,7 @@ async def _calibrate_mount(
     the plane of the deck. This value is suitable for vector-subtracting
     from the current instrument offset to set a new instrument offset.
     """
-    nominal_center = _get_calibration_square_position_in_slot(slot)
+    nominal_center = Point(*get_calibration_square_position_in_slot(slot))
     try:
         # find the center of the calibration sqaure
         offset = await find_calibration_structure_position(
@@ -742,42 +749,6 @@ async def _calibrate_mount(
         await hcapi.reset_instrument_offset(mount, to_default=False)
         # re-raise exception after resetting instrument offset
         raise
-
-
-async def find_calibration_structure_position(
-    hcapi: OT3API,
-    mount: OT3Mount,
-    nominal_center: Point,
-    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
-) -> Point:
-    """Find the calibration square offset given an arbitry postition on the deck."""
-    # Find the estimated structure plate height. This will be used to baseline the edge detection points.
-    z_height = await find_calibration_structure_height(hcapi, mount, nominal_center)
-    test_center = nominal_center._replace(z=z_height)
-    LOG.info(f"Found structure plate at {z_height}mm")
-
-    # Find the calibration square center using the given method
-    found_center = await find_calibration_structure_center(
-        hcapi, mount, test_center, method
-    )
-    return nominal_center - found_center
-
-
-async def _calibrate_module(
-    hcapi: OT3API,
-    mount: OT3Mount,
-    slot: int,
-    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
-) -> Point:
-    """This will find the position of the calibration square for a given module."""
-    # Find the module calibration offsets
-    # TODO (ba, 2023-03-14): the nominal_center will be passed in from protocol engine in the future,
-    # where it would have the module + module calibration geometric offsets applied.
-    nominal_center = _get_calibration_square_position_in_slot(slot)
-    offset = await find_calibration_structure_position(
-        hcapi, mount, nominal_center, method
-    )
-    return offset
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
@@ -869,6 +840,7 @@ async def calibrate_module(
     slot: int,
     module: ModuleType,
     module_id: str,
+    nominal_position: Point,
     method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
 ) -> Point:
     """
@@ -891,7 +863,9 @@ async def calibrate_module(
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
 
         # find the offset
-        offset = await _calibrate_module(hcapi, mount, module, slot, method)
+        offset = await  find_calibration_structure_position(
+            hcapi, mount, nominal_position, method
+        )
         await hcapi.save_module_offset(module_id, mount, slot, offset)
         return offset
     finally:

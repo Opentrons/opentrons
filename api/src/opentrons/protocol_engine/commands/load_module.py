@@ -34,7 +34,7 @@ class LoadModuleParams(BaseModel):
     location: DeckSlotLocation = Field(
         ...,
         description=(
-            "The location into which this module should be loaded."
+            ""
             "\n\n"
             "For the Thermocycler Module, which occupies multiple deck slots,"
             " this should be the front-most occupied slot (normally slot 7)."
