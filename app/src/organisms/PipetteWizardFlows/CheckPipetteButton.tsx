@@ -17,8 +17,8 @@ export const CheckPipetteButton = (
     { refresh: true },
     {
       enabled: false,
-      onSettled: () => {
-        setPending(false)
+      onSuccess: () => {
+        proceed()
       },
       onSettled: () => {
         setFetching(false)
