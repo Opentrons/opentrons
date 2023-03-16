@@ -129,13 +129,12 @@ def _build_measurement_data(
 
 def record_measurement_data(
     ctx: ProtocolContext,
-    pipette_mount: str,
     tag: str,
     recorder: GravimetricRecorder,
     shorten: bool = False,
 ) -> MeasurementData:
     """Record measurement data."""
-    env_data = read_environment_data(ctx, pipette_mount)
+    env_data = read_environment_data()
     # NOTE: we need to delay some amount, to give the scale time to accumulate samples
     with recorder.samples_of_tag(tag):
         if ctx.is_simulating():

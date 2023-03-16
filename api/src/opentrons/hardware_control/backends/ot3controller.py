@@ -121,7 +121,6 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
-    get_temperature_humidity,
 )
 from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -1143,12 +1142,3 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
-
-    async def get_temperature_humidity(
-        self,
-        mount: OT3Mount,
-    ) -> Tuple[float, float]:
-        return await get_temperature_humidity(
-            self._messenger,
-            sensor_node_for_mount(mount)
-        )

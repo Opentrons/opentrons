@@ -623,13 +623,6 @@ class OT3Simulator:
         return []
 
     @ensure_yield
-    async def get_temperature_humidity(
-        self,
-        mount: OT3Mount,
-    ) -> Tuple[float, float]:
-        return 25.0, 50.0
-
-    @ensure_yield
     async def connect_usb_to_rear_panel(self) -> None:
         """Connect to rear panel over usb."""
         return None

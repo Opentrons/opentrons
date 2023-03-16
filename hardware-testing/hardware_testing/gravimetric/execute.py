@@ -209,7 +209,7 @@ def _run_trial(
             elif m_type == MeasurementType.DISPENSE:
                 recorder.scale.add_simulation_mass(volume * 0.001)
         m_data = record_measurement_data(
-            ctx, pipette.mount, m_tag, recorder, shorten=inspect
+            ctx, m_tag, recorder, shorten=inspect
         )
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(

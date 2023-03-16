@@ -19,18 +19,12 @@ class EnvironmentData:
     celsius_liquid: float
 
 
-def read_environment_data(ctx: ProtocolContext, mount: str) -> EnvironmentData:
+def read_environment_data() -> EnvironmentData:
     """Read blank environment data."""
-    assert mount in ["left", "right"], f"unexpected mount: {mount}"
-    hw_api = ctx._core.get_hardware()
-    hw_mount = OT3Mount.LEFT if mount == "left" else OT3Mount.RIGHT
-    celsius_pipette, humidity_pipette = hw_api.get_pipette_temperature_humidity(
-        hw_mount
-    )
     # TODO: implement USB environmental sensors
     d = EnvironmentData(
-        celsius_pipette=celsius_pipette,
-        humidity_pipette=humidity_pipette,
+        celsius_pipette=25.0,
+        humidity_pipette=50.0,
         celsius_air=25.0,
         humidity_air=50.0,
         pascals_air=1000,

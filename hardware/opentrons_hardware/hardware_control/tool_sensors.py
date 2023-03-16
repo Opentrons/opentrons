@@ -188,15 +188,3 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
-
-
-async def get_temperature_humidity(can_messenger: CanMessenger, node: NodeId) -> Tuple[float, float]:
-    """Get celsius and relative humidity of tool."""
-    environment = EnvironmentSensor.build(SensorId.S0, node)
-    s_driver = SensorDriver()
-    data = await s_driver.read(can_messenger, environment, offset=False, timeout=1)
-    if data is None:
-        raise RuntimeError("no response from enironmental sensor")
-    celsius = data.temperature.to_float()
-    rel_humidity = data.humidity.to_float()
-    return celsius, rel_humidity
