@@ -162,6 +162,8 @@
   "view_module_setup_instructions": "View module setup instructions",
   "deck_map": "Deck Map",
   "setup_instructions": "Setup Instructions",
-  "opening": "opening...",
-  "closing": "closing..."
+  "opening": "Opening...",
+  "open": "Open",
+  "closing": "Closing...",
+  "close": "Close"
 }

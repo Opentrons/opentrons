@@ -83,6 +83,7 @@ export function LabwareListItem(
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
+  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
   let slotInfo: JSX.Element | null =
     initialLocation === 'offDeck'
       ? null
@@ -92,7 +93,6 @@ export function LabwareListItem(
   let extraAttentionText: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
   let isHeaterShakerInProtocol: boolean = false
-  let isLatchClosed: boolean = false
   let latchCommand:
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand
@@ -169,10 +169,20 @@ export function LabwareListItem(
           matchingHeaterShaker != null &&
           matchingHeaterShaker.moduleType === HEATERSHAKER_MODULE_TYPE
         ) {
-          isLatchClosed =
-            matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
-            matchingHeaterShaker.data.labwareLatchStatus === 'closing'
-
+          if (
+            (!isLatchClosed &&
+              (matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'closing')) ||
+            (isLatchClosed &&
+              (matchingHeaterShaker.data.labwareLatchStatus === 'idle_open' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'opening'))
+          ) {
+            setIsLatchClosed(
+              matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'closing'
+            )
+            setIsLatchLoading(false)
+          }
           latchCommand = {
             commandType: isLatchClosed
               ? 'heaterShaker/openLabwareLatch'
@@ -187,17 +197,9 @@ export function LabwareListItem(
   }
   const toggleLatch = (): void => {
     setIsLatchLoading(true)
-    createLiveCommand(
-      {
-        command: latchCommand,
-        waitUntilComplete: true,
-      },
-      {
-        onSuccess: () => {
-          setIsLatchLoading(false)
-        },
-      }
-    ).catch((e: Error) => {
+    createLiveCommand({
+      command: latchCommand,
+    }).catch((e: Error) => {
       console.error(
         `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
       )
@@ -206,7 +208,7 @@ export function LabwareListItem(
   const commandType = isLatchClosed
     ? 'heaterShaker/openLabwareLatch'
     : 'heaterShaker/closeLabwareLatch'
-  let hsLatchText: string = t('secure')
+  let hsLatchText: string = isLatchClosed ? t('open') : t('close')
   if (commandType === 'heaterShaker/closeLabwareLatch' && isLatchLoading) {
     hsLatchText = t('closing')
   } else if (

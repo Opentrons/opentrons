@@ -218,21 +218,17 @@ describe('LabwareListItem', () => {
     getByText('nickName')
     getByText('To add labware, use the toggle to control the latch')
     getByText('Labware Latch')
-    getByText('Secure')
+    getByText('Close')
     const button = getByLabelText('heater_shaker_7_latch_toggle')
     fireEvent.click(button)
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith(
-      {
-        command: {
-          commandType: 'heaterShaker/closeLabwareLatch',
-          params: {
-            moduleId: mockHeaterShaker.id,
-          },
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: {
+          moduleId: mockHeaterShaker.id,
         },
-        waitUntilComplete: true,
       },
-      { onSuccess: expect.any(Function) }
-    )
+    })
   })
 
   it('renders the correct info for an off deck labware', () => {
