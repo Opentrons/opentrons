@@ -32,6 +32,7 @@ const CHIP_PROPS_BY_TYPE: Record<
   ChipType,
   {
     backgroundColor: string
+    borderRadius: string
     iconColor?: string
     iconName?: IconName
     textColor: string
@@ -39,21 +40,25 @@ const CHIP_PROPS_BY_TYPE: Record<
 > = {
   basic: {
     backgroundColor: COLORS.darkBlack_twenty,
+    borderRadius: BORDERS.size_one,
     textColor: COLORS.darkBlack_ninety,
   },
   neutral: {
     backgroundColor: COLORS.darkBlack_twenty,
+    borderRadius: BORDERS.radius24,
     iconColor: COLORS.darkBlack_ninety,
     textColor: COLORS.darkBlack_seventy,
   },
   success: {
     backgroundColor: COLORS.green_three,
+    borderRadius: BORDERS.radius24,
     iconColor: COLORS.green_one,
     iconName: 'ot-check',
     textColor: COLORS.green_one,
   },
   warning: {
     backgroundColor: COLORS.yellow_three,
+    borderRadius: BORDERS.radius24,
     iconColor: COLORS.yellow_two,
     textColor: COLORS.yellow_one,
   },
@@ -71,35 +76,17 @@ export function Chip({
       ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
-  if (type === 'basic') {
-    return (
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={backgroundColor}
-        borderRadius={BORDERS.size_one}
-        flexDirection={DIRECTION_ROW}
-        padding={`${SPACING.spacing3} 0.75rem`}
-      >
-        <StyledText
-          color={CHIP_PROPS_BY_TYPE[type].textColor}
-          fontSize={TYPOGRAPHY.lineHeight20}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.fontSize28}
-        >
-          {text}
-        </StyledText>
-      </Flex>
-    )
-  } else {
-    return (
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
-        backgroundColor={backgroundColor}
-        borderRadius={BORDERS.radius24}
-        alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing3}
-      >
+  return (
+    <Flex
+      alignItems={ALIGN_CENTER}
+      backgroundColor={backgroundColor}
+      borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
+      flexDirection={DIRECTION_ROW}
+      padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
+      gridGap={SPACING.spacing3}
+      data-testid={`Chip_${type}`}
+    >
+      {type !== 'basic' && (
         <Icon
           name={icon}
           color={CHIP_PROPS_BY_TYPE[type].iconColor}
@@ -107,15 +94,15 @@ export function Chip({
           size="1.5rem"
           data-testid="RenderResult_icon"
         />
-        <StyledText
-          fontSize="1.25rem"
-          lineHeight="1.6875rem"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={CHIP_PROPS_BY_TYPE[type].textColor}
-        >
-          {text}
-        </StyledText>
-      </Flex>
-    )
-  }
+      )}
+      <StyledText
+        fontSize="1.25rem"
+        lineHeight="1.6875rem"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        color={CHIP_PROPS_BY_TYPE[type].textColor}
+      >
+        {text}
+      </StyledText>
+    </Flex>
+  )
 }
