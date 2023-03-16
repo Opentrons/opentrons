@@ -352,9 +352,7 @@ class MagneticModuleContext(ModuleContext):
             )
             self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
         else:
-            raise APIVersionError(
-                "`MagneticModuleContext.calibrate` has been removed."
-            )
+            raise APIVersionError("`MagneticModuleContext.calibrate` has been removed.")
 
     @publish(command=cmds.magdeck_engage)
     @requires_version(2, 0)
