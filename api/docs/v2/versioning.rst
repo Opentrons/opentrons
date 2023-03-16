@@ -298,6 +298,8 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
 
   - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed,
     since they were holdovers from a calibration system that no longer exists.
+    :py:meth:`.Labware.set_calibration` was removed.
+    Setting a labware's calibration after it's been loaded is not supported.
 
   - Various methods and setters were removed that could modify tip state outside of
     calls to :py:meth:`.InstrumentContext.pick_up_tip` and :py:meth:`.InstrumentContext.drop_tip`.
@@ -313,9 +315,6 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
   - The ``configuration`` argument of :py:meth:`.ProtocolContext.load_module` was removed
     because it made unsafe modifications to the protocol's geometry system,
     and the Thermocycler's "semi" configuration is not officially supported.
-
-  - :py:meth:`.Labware.set_calibration` is not supported on this API version.
-    Setting a labware's calibration after it's been loaded is not supported.
 
 - Known limitations
 
