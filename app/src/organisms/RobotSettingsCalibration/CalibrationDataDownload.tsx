@@ -51,7 +51,7 @@ export function CalibrationDataDownload({
   // wait for robot request to resolve instead of using name directly from params
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
-  const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
+  const tipLengthCalibrations = useTipLengthCalibrations()
 
   const downloadIsPossible =
     deckCalibrationData.isDeckCalibrated &&
