@@ -125,7 +125,7 @@ dist-win: package-deps
 
 .PHONY: dist-ot3
 dist-ot3: package-deps
-	NO_PYTHON=true NO_USB_DETECTION=true $(builder) --linux --arm64 --dir
+	NO_PYTHON=true $(builder) --linux --arm64 --dir
 	cd dist/linux-arm64-unpacked
 
 # Aliases matching github actions OS names for easier calling in
