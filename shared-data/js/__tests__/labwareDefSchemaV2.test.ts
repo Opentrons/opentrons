@@ -7,13 +7,18 @@ import type { LabwareDefinition2 } from '../types'
 
 import 'regenerator-runtime/runtime'
 
-const definitionsPath = path.join(__dirname, '../../labware/definitions/2')
+const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
+const fixturesDir = path.join(__dirname, '../../labware/fixtures/2')
+const globPattern = '**/*.json'
 
-const definitionsGlobPath = path.join(definitionsPath, '**/*.json')
+// JSON Schema defintion & setup
+const ajv = new Ajv({ allErrors: true, jsonPointers: true })
+const validate = ajv.compile(schema)
 
-const fixturesGlobPath = path.join(__dirname, '../../labware/fixtures/2/*.json')
-
-const generateStandardWellNames = (rowCount: number, columnCount: number): Set<string> => {
+const generateStandardWellNames = (
+  rowCount: number,
+  columnCount: number
+): Set<string> => {
   function* generateWelllNames() {
     for (let column = 0; column < columnCount; column++) {
       for (let row = 0; row < rowCount; row++) {
@@ -30,10 +35,15 @@ const standard24WellNames = generateStandardWellNames(4, 6)
 const standard96WellNames = generateStandardWellNames(8, 12)
 const standard384WellNames = generateStandardWellNames(16, 24)
 
-const definitionsWithWellsNotMatchingZDimension: Record<string, Set<string>> = {
-  // TODO: Explain all of these with references to RSS-202.
-  'geb_96_tiprack_10ul/1.json': standard96WellNames,
-  'nest_1_reservoir_195ml/1.json': new Set(['A1']),
+// Wells whose tops do not exactly match the labware's zDimension.
+//
+// There are legitimate reasons for this to happen, but it can also be a dangerous bug
+// in the labware definition. So if it happens, it needs to be justified here.
+const expectedHeightMismatchesPerLabware: Record<string, Set<string>> = {
+  // These height mismatches are legitimate.
+  // These tube racks simultaneously hold tubes of different heights.
+  // The labware's zDimension should match the height of the taller tubes,
+  // not the shorter tubes listed here.
   'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical/1.json': new Set([
     'A3',
     'B3',
@@ -52,8 +62,18 @@ const definitionsWithWellsNotMatchingZDimension: Record<string, Set<string>> = {
     'A4',
     'B4',
   ]),
+
+  // These height mismatches are legitimate. The zDimension should match the taller side.
+  'opentrons_calibrationblock_short_side_left/1.json': new Set(['A1']),
+  'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
+
+  // These height mismatches are known, confirmed bugs in the labware definition.
   'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json': standard24WellNames,
-  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json': standard24WellNames,
+  'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json': standard96WellNames,
+
+  // These height mismatches need to be investigated. See Jira RSS-202.
+  // Each one should either be explained here or marked as a known bug.
+  'nest_1_reservoir_195ml/1.json': new Set(['A1']),
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip/1.json': new Set(
     [
       'A3',
@@ -82,28 +102,27 @@ const definitionsWithWellsNotMatchingZDimension: Record<string, Set<string>> = {
       'D8',
     ]
   ),
-  'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json': standard96WellNames,
-  'opentrons_96_filtertiprack_200ul/1.json': standard96WellNames,
   'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json': standard96WellNames,
   'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json': standard96WellNames,
-  'opentrons_96_tiprack_300ul/1.json': standard96WellNames,
-  'opentrons_calibrationblock_short_side_left/1.json': new Set(['A1']),
-  'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
   'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json': standard384WellNames,
+
+  // These are in expectedLabwareWithOverlyHighWells. These are probably bugs. See Jira RSS-202.
+  'geb_96_tiprack_10ul/1.json': standard96WellNames,
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json': standard24WellNames,
+  'opentrons_96_filtertiprack_200ul/1.json': standard96WellNames,
+  'opentrons_96_tiprack_300ul/1.json': standard96WellNames,
 }
 
-const definitionsWithWellsHigherThanZDimension: Set<string> = new Set([
+// Labware with wells that extend above the labware's zDimension.
+// This is a bug in the labware definition. See Jira RSS-202.
+const expectedLabwareWithOverlyHighWells: Set<string> = new Set([
   'geb_96_tiprack_10ul/1.json',
   'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json',
   'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json',
   'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json',
-  'opentrons_96_tiprack_300ul/1.json',
   'opentrons_96_filtertiprack_200ul/1.json',
+  'opentrons_96_tiprack_300ul/1.json',
 ])
-
-// JSON Schema defintion & setup
-const ajv = new Ajv({ allErrors: true, jsonPointers: true })
-const validate = ajv.compile(schema)
 
 const expectGroupsFollowConvention = (
   labwareDef: LabwareDefinition2,
@@ -178,7 +197,7 @@ test('fail on bad labware', () => {
 })
 
 describe('test schemas of all opentrons definitions', () => {
-  const labwarePaths = glob.sync(definitionsGlobPath)
+  const labwarePaths = glob.sync(globPattern, { cwd: definitionsDir })
 
   beforeAll(() => {
     // Make sure definitions path didn't break, which would give you false positives
@@ -217,35 +236,41 @@ describe('test schemas of all opentrons definitions', () => {
   })
 })
 
-describe('test dimensional consistency of all opentrons definitions', () => {
-  const labwarePaths = glob.sync("**/*.json", {cwd: definitionsPath})
+describe('test that the dimensions in all opentrons definitions make sense', () => {
+  const labwarePaths = glob.sync('**/*.json', { cwd: definitionsDir })
 
   beforeAll(() => {
     // Make sure definitions path didn't break, which would give you false positives
     expect(labwarePaths.length).toBeGreaterThan(0)
   })
 
-  describe.each(labwarePaths)('%s', (labwarePath) => {
-    const fullLabwarePath = path.join(definitionsPath, labwarePath)
+  describe.each(labwarePaths)('%s', labwarePath => {
+    const fullLabwarePath = path.join(definitionsDir, labwarePath)
     const labwareDef = require(fullLabwarePath) as LabwareDefinition2
 
-    // TODO: "bad" is the wrong word here
-    const expectedBadWells = definitionsWithWellsNotMatchingZDimension[labwarePath] ?? new Set()
-    it(`has the expected ${expectedBadWells.size} bad wells`, () => {
-      const actualBadWells = new Set(wellsNotMatchingZDimension(labwareDef))
-      expect(actualBadWells).toEqual(expectedBadWells)
+    const expectedHeightMismatches =
+      expectedHeightMismatchesPerLabware[labwarePath] ?? new Set()
+    it(`has the expected ${expectedHeightMismatches.size} wells not matching the labware's zDimension`, () => {
+      const actualHeightMismatches = new Set(
+        wellsNotMatchingZDimension(labwareDef)
+      )
+      expect(actualHeightMismatches).toEqual(expectedHeightMismatches)
     })
 
-    const tooHighWellsAreExpected = definitionsWithWellsHigherThanZDimension.has(labwarePath)
-    it(`${tooHighWellsAreExpected? "has" : "does not have"} wells whose heights are above the labware's zDimension`, () => {
+    const expectingOverlyHighWells = expectedLabwareWithOverlyHighWells.has(
+      labwarePath
+    )
+    it(`${
+      expectingOverlyHighWells ? 'has' : 'does not have'
+    } wells whose heights are above the labware's zDimension`, () => {
       const hasTooHighWells = wellsHigherThanZDimension(labwareDef).length > 0
-      expect(hasTooHighWells).toEqual(tooHighWellsAreExpected)
+      expect(hasTooHighWells).toEqual(expectingOverlyHighWells)
     })
   })
 })
 
 describe('test schemas of all v2 labware fixtures', () => {
-  const labwarePaths = glob.sync(fixturesGlobPath)
+  const labwarePaths = glob.sync(globPattern, { cwd: fixturesDir })
 
   beforeAll(() => {
     // Make sure fixtures path didn't break, which would give you false positives
