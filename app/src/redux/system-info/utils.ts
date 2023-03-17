@@ -20,14 +20,16 @@ const REALTEK_UP_TO_DATE_VERSION = [10, 38]
 const REALTEK_VID = parseInt('0BDA', 16)
 const RE_REALTEK_PID = /^8[0|1]5[0-9]$/
 
-export const isRealtekU2EAdapter = (device: UsbDevice): boolean => {
+export const isRealtekU2EAdapter = (device: Partial<UsbDevice>): boolean => {
   return (
     device.vendorId === REALTEK_VID &&
-    RE_REALTEK_PID.test(device.productId.toString(16))
+    RE_REALTEK_PID.test(
+      device.productId != null ? device.productId.toString(16) : ''
+    )
   )
 }
 
-export const getDriverStatus = (device: UsbDevice): DriverStatus => {
+export const getDriverStatus = (device: Partial<UsbDevice>): DriverStatus => {
   const { windowsDriverVersion } = device
   if (
     !isRealtekU2EAdapter(device) ||

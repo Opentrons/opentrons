@@ -10,9 +10,8 @@ import {
   getActiveInterfaces,
 } from './network-interfaces'
 
-import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { Action, Dispatch } from '../types'
-import type { UsbDeviceMonitor, Device } from './usb-devices'
+import type { UsbDeviceMonitor } from './usb-devices'
 import type {
   NetworkInterface,
   NetworkInterfaceMonitor,
@@ -26,8 +25,10 @@ const IFACE_POLL_INTERVAL_MS = 30000
 
 const log = createLogger('system-info')
 
-const addDriverVersion = (device: Device): Promise<UsbDevice> => {
-  if (isWindows() && RE_REALTEK.test(device.manufacturer)) {
+const addDriverVersion = (
+  device: USBDevice
+): Promise<Partial<USBDevice> & { windowsDriverVersion?: string | null }> => {
+  if (isWindows() && RE_REALTEK.test(device.manufacturerName ?? '')) {
     return getWindowsDriverVersion(device).then(windowsDriverVersion => ({
       ...device,
       windowsDriverVersion,
@@ -43,13 +44,13 @@ export function registerSystemInfo(
   let usbMonitorPromise: Promise<UsbDeviceMonitor>
   let ifaceMonitor: NetworkInterfaceMonitor
 
-  const handleDeviceAdd = (device: Device): void => {
+  const handleDeviceAdd = ({ device }: USBConnectionEvent): void => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     addDriverVersion(device).then(d => dispatch(SystemInfo.usbDeviceAdded(d)))
   }
 
-  const handleDeviceRemove = (d: Device): void => {
-    dispatch(SystemInfo.usbDeviceRemoved({ ...d }))
+  const handleDeviceRemove = ({ device }: USBConnectionEvent): void => {
+    dispatch(SystemInfo.usbDeviceRemoved({ ...device }))
   }
 
   const handleIfacesChanged = (interfaces: NetworkInterface[]): void => {

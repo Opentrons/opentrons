@@ -1,20 +1,16 @@
 import assert from 'assert'
 import execa from 'execa'
-import { usb } from 'usb'
+import { WebUSB } from 'usb'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
 
-import type { Device } from 'usb'
-
-export type { Device }
-
 export type UsbDeviceMonitorOptions = Partial<{
-  onDeviceAdd?: (device: unknown) => unknown
-  onDeviceRemove?: (device: unknown) => unknown
+  onDeviceAdd?: (e: USBConnectionEvent) => void
+  onDeviceRemove?: (e: USBConnectionEvent) => void
 }>
 
 export interface UsbDeviceMonitor {
-  getAllDevices: () => unknown[]
+  getAllDevices: () => Promise<USBDevice[]>
   stop: () => void
 }
 
@@ -25,22 +21,28 @@ export async function createUsbDeviceMonitor(
 ): Promise<UsbDeviceMonitor> {
   const { onDeviceAdd, onDeviceRemove } = options
 
+  // from usb package docs
+  const customWebUSB = new WebUSB({
+    // Bypass checking for authorized devices
+    allowAllDevices: true,
+  })
+
   if (typeof onDeviceAdd === 'function') {
-    usb.on('attach', onDeviceAdd)
+    customWebUSB.addEventListener('connect', onDeviceAdd)
   }
 
   if (typeof onDeviceRemove === 'function') {
-    usb.on('detach', onDeviceRemove)
+    customWebUSB.addEventListener('disconnect', onDeviceRemove)
   }
 
   return {
-    getAllDevices: () => usb.getDeviceList(),
+    getAllDevices: () => customWebUSB.getDevices(),
     stop: () => {
       if (typeof onDeviceAdd === 'function') {
-        usb.off('attach', onDeviceAdd)
+        customWebUSB.removeEventListener('connect', onDeviceAdd)
       }
       if (typeof onDeviceRemove === 'function') {
-        usb.off('detach', onDeviceRemove)
+        customWebUSB.removeEventListener('disconnect', onDeviceRemove)
       }
 
       log.debug('usb detection monitoring stopped')
@@ -52,7 +54,7 @@ const decToHex = (number: number): string =>
   number.toString(16).toUpperCase().padStart(4, '0')
 
 export function getWindowsDriverVersion(
-  device: Device
+  device: USBDevice
 ): Promise<string | null> {
   const { vendorId: vidDecimal, productId: pidDecimal, serialNumber } = device
   const [vid, pid] = [decToHex(vidDecimal), decToHex(pidDecimal)]

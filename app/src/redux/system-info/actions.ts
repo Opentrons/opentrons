@@ -4,7 +4,7 @@ import * as Constants from './constants'
 import * as Types from './types'
 
 export const initialized = (
-  usbDevices: Types.UsbDevice[],
+  usbDevices: Array<Partial<Types.UsbDevice>>,
   networkInterfaces: Types.NetworkInterface[]
 ): Types.InitializedAction => ({
   type: Constants.INITIALIZED,
@@ -12,14 +12,14 @@ export const initialized = (
 })
 
 export const usbDeviceAdded = (
-  usbDevice: Types.UsbDevice
+  usbDevice: Partial<Types.UsbDevice>
 ): Types.UsbDeviceAddedAction => ({
   type: Constants.USB_DEVICE_ADDED,
   payload: { usbDevice },
 })
 
 export const usbDeviceRemoved = (
-  usbDevice: Types.UsbDevice
+  usbDevice: Partial<Types.UsbDevice>
 ): Types.UsbDeviceRemovedAction => ({
   type: Constants.USB_DEVICE_REMOVED,
   payload: { usbDevice },

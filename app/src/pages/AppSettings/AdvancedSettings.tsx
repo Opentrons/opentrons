@@ -472,7 +472,7 @@ export function AdvancedSettings(): JSX.Element {
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('usb_to_ethernet_adapter_description')}
                   </StyledText>
-                  <StyledText as="p">{device?.deviceName}</StyledText>
+                  <StyledText as="p">{device?.productName}</StyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
@@ -481,7 +481,7 @@ export function AdvancedSettings(): JSX.Element {
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('usb_to_ethernet_adapter_manufacturer')}
                   </StyledText>
-                  <StyledText as="p">{device?.manufacturer}</StyledText>
+                  <StyledText as="p">{device?.manufacturerName}</StyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
