@@ -462,6 +462,8 @@ async def test_liquid_probe(
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.log_pressure,
+            fake_settings_aspirate.auto_zero_sensor,
+            fake_settings_aspirate.num_baseline_reads,
         )
 
         return_dict[head_node], return_dict[pipette_node] = 142, 142
