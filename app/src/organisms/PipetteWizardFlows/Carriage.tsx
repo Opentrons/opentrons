@@ -102,7 +102,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       proceedButton={
         isOnDevice ? (
           <SmallButton
-            onClick={proceed}
+            onClick={handleCheckZAxis}
             buttonText={capitalize(t('shared:continue'))}
             buttonType="default"
           />
