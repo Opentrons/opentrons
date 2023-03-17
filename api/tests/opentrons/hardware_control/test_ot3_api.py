@@ -75,9 +75,9 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         sensor_threshold_pascals=15,
         expected_liquid_height=109,
         log_pressure=False,
+        aspirate_while_sensing=False,
         auto_zero_sensor=False,
         num_baseline_reads=10,
-        aspirate_while_sensing=False,
         data_file="fake_file_name",
     )
 
@@ -449,6 +449,8 @@ async def test_liquid_probe(
             expected_liquid_height=109,
             log_pressure=False,
             aspirate_while_sensing=True,
+            auto_zero_sensor=False,
+            num_baseline_reads=10,
             data_file="fake_file_name",
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
