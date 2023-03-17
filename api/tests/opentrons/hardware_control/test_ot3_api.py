@@ -75,6 +75,8 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         sensor_threshold_pascals=15,
         expected_liquid_height=109,
         log_pressure=False,
+        auto_zero_sensor=False,
+        num_baseline_reads=10,
         aspirate_while_sensing=False,
         data_file="fake_file_name",
     )

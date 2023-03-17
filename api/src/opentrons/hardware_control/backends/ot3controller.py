@@ -1091,7 +1091,7 @@ class OT3Controller:
         threshold_pascals: float,
         log_pressure: bool = True,
         auto_zero_sensor: bool = True,
-        num_baseline_reads: int = 8,
+        num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(OT3Axis.by_mount(mount))

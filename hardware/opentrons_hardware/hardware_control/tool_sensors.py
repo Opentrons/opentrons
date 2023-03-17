@@ -63,7 +63,7 @@ async def liquid_probe(
     threshold_pascals: float,
     log_pressure: bool = True,
     auto_zero_sensor: bool = True,
-    num_baseline_reads: int = 8,
+    num_baseline_reads: int = 10,
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
