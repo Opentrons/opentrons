@@ -1090,6 +1090,7 @@ class OT3Controller:
         plunger_speed: float,
         threshold_pascals: float,
         log_pressure: bool = True,
+        get_pressure_baseline: bool = True,
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
@@ -1103,6 +1104,7 @@ class OT3Controller:
             mount_speed,
             threshold_pascals,
             log_pressure,
+            get_pressure_baseline,
             sensor_id,
         )
         for node, point in positions.items():

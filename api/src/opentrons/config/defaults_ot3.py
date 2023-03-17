@@ -29,6 +29,7 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     expected_liquid_height=110,
     log_pressure=True,
     aspirate_while_sensing=False,
+    get_pressure_baseline=True,
     data_file="/var/pressure_sensor_data.csv",
 )
 
@@ -298,6 +299,9 @@ def _build_default_liquid_probe(
         log_pressure=from_conf.get("log_pressure", default.log_pressure),
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
+        ),
+        get_pressure_baseline=from_conf.get(
+            "get_pressure_baseline", default.get_pressure_baseline
         ),
         data_file=from_conf.get("data_file", default.data_file),
     )

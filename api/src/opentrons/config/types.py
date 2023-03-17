@@ -127,6 +127,7 @@ class LiquidProbeSettings:
     expected_liquid_height: float
     log_pressure: bool
     aspirate_while_sensing: bool
+    get_pressure_baseline: bool
     data_file: str
 
 
