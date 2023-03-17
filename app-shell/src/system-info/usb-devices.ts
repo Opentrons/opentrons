@@ -1,19 +1,20 @@
 import assert from 'assert'
 import execa from 'execa'
+import { usb } from 'usb'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
 
-import type { Device } from 'usb-detection'
+import type { Device } from 'usb'
 
 export type { Device }
 
 export type UsbDeviceMonitorOptions = Partial<{
-  onDeviceAdd?: (device: Device) => unknown
-  onDeviceRemove?: (device: Device) => unknown
+  onDeviceAdd?: (device: unknown) => unknown
+  onDeviceRemove?: (device: unknown) => unknown
 }>
 
 export interface UsbDeviceMonitor {
-  getAllDevices: () => Promise<Device[]>
+  getAllDevices: () => unknown[]
   stop: () => void
 }
 
@@ -22,30 +23,26 @@ const log = createLogger('usb-devices')
 export async function createUsbDeviceMonitor(
   options: UsbDeviceMonitorOptions = {}
 ): Promise<UsbDeviceMonitor> {
-  const { default: usbDetection } = await import('usb-detection')
-
   const { onDeviceAdd, onDeviceRemove } = options
-  usbDetection.startMonitoring()
 
   if (typeof onDeviceAdd === 'function') {
-    usbDetection.on('add', onDeviceAdd)
+    usb.on('attach', onDeviceAdd)
   }
 
   if (typeof onDeviceRemove === 'function') {
-    usbDetection.on('remove', onDeviceRemove)
+    usb.on('detach', onDeviceRemove)
   }
 
   return {
-    getAllDevices: () => usbDetection.find(),
+    getAllDevices: () => usb.getDeviceList(),
     stop: () => {
       if (typeof onDeviceAdd === 'function') {
-        usbDetection.off('add', onDeviceAdd)
+        usb.off('attach', onDeviceAdd)
       }
       if (typeof onDeviceRemove === 'function') {
-        usbDetection.off('remove', onDeviceRemove)
+        usb.off('detach', onDeviceRemove)
       }
 
-      usbDetection.stopMonitoring()
       log.debug('usb detection monitoring stopped')
     },
   }
