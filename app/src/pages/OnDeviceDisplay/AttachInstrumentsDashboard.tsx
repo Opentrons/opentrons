@@ -1,20 +1,24 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { Btn, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import {
+  ALIGN_FLEX_END,
+  Btn,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+} from '@opentrons/components'
 import { useAttachedPipettes } from '../../organisms/Devices/hooks'
+import { TertiaryButton } from '../../atoms/buttons'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { ChoosePipette } from '../../organisms/PipetteWizardFlows/ChoosePipette'
 import { getIs96ChannelPipetteAttached } from '../../organisms/Devices/utils'
-import { getLocalRobot } from '../../redux/discovery'
 
 import type {
   PipetteWizardFlow,
@@ -27,8 +31,6 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
     pipetteWizardFlow,
     setPipetteWizardFlow,
   ] = React.useState<PipetteWizardFlow | null>(null)
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const [mount, setMount] = React.useState<Mount>(LEFT)
   const [
     selectedPipette,
@@ -69,20 +71,24 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
     setPipetteWizardFlow(FLOWS.ATTACH)
   }
   return (
-    <Flex
-      padding={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
-      flexDirection={DIRECTION_COLUMN}
-    >
-      <Navigation routes={onDeviceDisplayRoutes} />
-
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
+        paddingRight={SPACING.spacing6}
+      >
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
+      </Flex>
       {showAttachPipette ? (
         <ChoosePipette
           proceed={handleAttachPipette}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
           exit={() => setShowAttachPipette(false)}
+          mount={mount}
         />
       ) : null}
       {pipetteWizardFlow != null ? (
@@ -96,29 +102,37 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
           selectedPipette={
             isNinetySixChannelAttached ? NINETY_SIX_CHANNEL : selectedPipette
           }
-          robotName={robotName}
+          setSelectedPipette={setSelectedPipette}
         />
       ) : null}
-      <Btn onClick={() => handlePipette(LEFT)}>
-        {attachedPipettes.left != null
-          ? 'detach left pipette'
-          : 'attach left pipette'}
-      </Btn>
-      {attachedPipettes.left != null ? (
-        <Btn onClick={() => handleCalibrate(LEFT)}>
-          {'calibrate left pipette'}
-        </Btn>
-      ) : null}
-      <Btn onClick={() => handlePipette(RIGHT)}>
-        {attachedPipettes.right != null
-          ? 'detach right pipette'
-          : 'attach right pipette'}
-      </Btn>
-      {attachedPipettes.right != null ? (
-        <Btn onClick={() => handleCalibrate(RIGHT)}>
-          {'calibrate right pipette'}
-        </Btn>
-      ) : null}
+      {showAttachPipette || pipetteWizardFlow != null ? null : (
+        <Flex
+          gridGap={SPACING.spacing6}
+          marginTop={SPACING.spacing6}
+          flexDirection={DIRECTION_COLUMN}
+        >
+          <Btn onClick={() => handlePipette(LEFT)}>
+            {attachedPipettes.left != null
+              ? 'detach left pipette'
+              : 'attach left pipette'}
+          </Btn>
+          {attachedPipettes.left != null ? (
+            <Btn onClick={() => handleCalibrate(LEFT)}>
+              {'calibrate left pipette'}
+            </Btn>
+          ) : null}
+          <Btn onClick={() => handlePipette(RIGHT)}>
+            {attachedPipettes.right != null
+              ? 'detach right pipette'
+              : 'attach right pipette'}
+          </Btn>
+          {attachedPipettes.right != null ? (
+            <Btn onClick={() => handleCalibrate(RIGHT)}>
+              {'calibrate right pipette'}
+            </Btn>
+          ) : null}
+        </Flex>
+      )}
     </Flex>
   )
 }

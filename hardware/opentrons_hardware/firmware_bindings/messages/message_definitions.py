@@ -508,6 +508,17 @@ class BaselineSensorRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class BaselineSensorResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BaselineSensorResponsePayload
+    payload_type: Type[
+        payloads.BaselineSensorResponsePayload
+    ] = payloads.BaselineSensorResponsePayload
+    message_id: Literal[
+        MessageId.baseline_sensor_response
+    ] = MessageId.baseline_sensor_response
+
+
+@dataclass
 class ReadFromSensorResponse(BaseMessage):  # noqa: D101
     payload: payloads.ReadFromSensorResponsePayload
     payload_type: Type[
@@ -778,3 +789,31 @@ class InstrumentInfoRequest(EmptyPayloadMessage):
     message_id: Literal[
         MessageId.instrument_info_request
     ] = MessageId.instrument_info_request
+
+
+@dataclass
+class SetGripperErrorTolerance(BaseMessage):  # noqa: D101
+    payload: payloads.GripperErrorTolerancePayload
+    payload_type: Type[
+        payloads.GripperErrorTolerancePayload
+    ] = payloads.GripperErrorTolerancePayload
+    message_id: Literal[
+        MessageId.set_gripper_error_tolerance
+    ] = MessageId.set_gripper_error_tolerance
+
+
+@dataclass
+class PushTipPresenceNotification(BaseMessage):
+    """Hardware triggered notification of ejector flag status.
+
+    The response should be a boolean of the ejector flag
+    either being occluded or not.
+    """
+
+    payload: payloads.PushTipPresenceNotificationPayload
+    payload_type: Type[
+        payloads.PushTipPresenceNotificationPayload
+    ] = payloads.PushTipPresenceNotificationPayload
+    message_id: Literal[
+        MessageId.tip_presence_notification
+    ] = MessageId.tip_presence_notification

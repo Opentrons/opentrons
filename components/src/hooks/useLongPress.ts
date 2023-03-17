@@ -14,7 +14,7 @@ const HOLD_DURATION_MS = 1000
 // ODD needs setIsLongPressed since when a user use long press, ODD app needs to show overflow menu.
 // Then if a user takes clicking outside action, the ODD app needs to reset the isLongPressed.
 // In terms of setIsTapped, if the ODD app doesn't need it, it will be removed.
-interface UseLongPressResult {
+export interface UseLongPressResult {
   ref: MutableRefObject<null>
   style: CSSProperties
   isEnabled: boolean

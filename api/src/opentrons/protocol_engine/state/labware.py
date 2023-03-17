@@ -59,7 +59,7 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
-_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_2
+_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_1
 
 
 class LabwareLoadParams(NamedTuple):
@@ -448,9 +448,9 @@ class LabwareView(HasState[LabwareState]):
         tip_length = self.get_tip_length(labware_id)
         return -tip_length * length_scale + additional_offset
 
-    def get_definition_uri(self, labware_id: str) -> str:
+    def get_definition_uri(self, labware_id: str) -> LabwareUri:
         """Get a labware's definition URI."""
-        return self.get(labware_id).definitionUri
+        return LabwareUri(self.get(labware_id).definitionUri)
 
     def get_uri_from_definition(
         self,
@@ -596,7 +596,7 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def get_calibration_coordinates(self, current_z_position: float) -> Point:
+    def get_calibration_coordinates(self, offset: Point) -> Point:
         """Get calibration critical point and target position."""
         target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
         # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
@@ -604,8 +604,8 @@ class LabwareView(HasState[LabwareState]):
 
         return Point(
             x=target_center.x,
-            y=target_center.y,
-            z=current_z_position,
+            y=target_center.y + offset.y,
+            z=offset.z,
         )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:

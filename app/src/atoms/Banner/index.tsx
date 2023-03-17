@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { css } from 'styled-components'
+import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -88,7 +90,6 @@ export function Banner(props: BannerProps): JSX.Element {
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
-
   const iconProps = {
     ...(icon ?? bannerProps.icon),
     size: size ?? SIZE_1,
@@ -96,15 +97,26 @@ export function Banner(props: BannerProps): JSX.Element {
     marginLeft: iconMarginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
+  const BANNER_STYLE = css`
+    border: ${String(SPACING.spacingXXS)} ${String(BORDERS.styleSolid)}
+      ${BANNER_PROPS_BY_TYPE[type].color};
+    font-size: ${TYPOGRAPHY.fontSizeP};
+    font-weight: ${TYPOGRAPHY.fontWeightRegular};
+    border-radius: ${SPACING.spacing2};
+
+    @media ${ODD_MEDIA_QUERY_SPECS} {
+      font-size: 1.25rem;
+      font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+      border: none;
+      background-color: ${COLORS.yellow_three};
+      border-radius: ${BORDERS.size_three};
+      line-height: 1.5rem;
+    }
+  `
   return (
     <Flex
-      fontSize={TYPOGRAPHY.fontSizeP}
-      fontWeight={TYPOGRAPHY.fontWeightRegular}
-      borderRadius={SPACING.spacing2}
       backgroundColor={BANNER_PROPS_BY_TYPE[type].backgroundColor}
-      border={`${String(SPACING.spacingXXS)} ${String(BORDERS.styleSolid)} ${
-        BANNER_PROPS_BY_TYPE[type].color
-      }`}
+      css={BANNER_STYLE}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}

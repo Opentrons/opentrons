@@ -1,5 +1,6 @@
 """Simulating ProtocolRunner factory."""
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import API as OT2API, HardwareControlAPI
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
@@ -49,6 +50,10 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
             ignore_pause=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
+            use_virtual_pipettes=(
+                robot_type != "OT-3 Standard"
+                and not feature_flags.disable_fast_protocol_upload()
+            ),
         ),
     )
 

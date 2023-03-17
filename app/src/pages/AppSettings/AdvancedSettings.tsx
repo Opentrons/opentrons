@@ -529,10 +529,10 @@ export function AdvancedSettings(): JSX.Element {
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_showLink"
             >
-              {t('show_link_labware_data')}
+              {t('show_labware_offset_snippets')}
             </StyledText>
             <StyledText as="p">
-              {t('show_link_labware_data_description')}
+              {t('show_labware_offset_snippets_description')}
             </StyledText>
           </Box>
           <ToggleButton

@@ -56,6 +56,7 @@ export interface LabwareRenderProps {
   gRef?: React.RefObject<SVGGElement>
   // adds blue border with drop shadow to labware
   hover?: boolean
+  onLabwareClick?: () => void
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -73,6 +74,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         onMouseLeaveWell={props.onMouseLeaveWell}
         selectableWellClass={props.selectableWellClass}
         hover={props.hover}
+        onLabwareClick={props.onLabwareClick}
       />
       {props.wellStroke && (
         <StrokedWells

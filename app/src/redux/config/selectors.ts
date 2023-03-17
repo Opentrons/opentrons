@@ -1,10 +1,12 @@
 import { createSelector } from 'reselect'
+import { SLEEP_NEVER_MS } from '../../App/constants'
 import type { State } from '../types'
 import type {
   Config,
   FeatureFlags,
   UpdateChannel,
   ProtocolsOnDeviceSortKey,
+  OnDeviceDisplaySettings,
 } from './types'
 import type { SelectOption } from '../../atoms/SelectField/Select'
 import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
@@ -94,4 +96,16 @@ export const getPinnedProtocolIds: (
 ) => string[] | undefined = createSelector(
   getConfig,
   config => config?.protocols.pinnedProtocolIds
+)
+
+export const getOnDeviceDisplaySettings: (
+  state: State
+) => OnDeviceDisplaySettings = createSelector(
+  getConfig,
+  config =>
+    config?.onDeviceDisplaySettings ?? {
+      sleepMs: config?.onDeviceDisplaySettings?.sleepMs ?? SLEEP_NEVER_MS,
+      brightness: config?.onDeviceDisplaySettings?.brightness ?? 4,
+      textSize: config?.onDeviceDisplaySettings?.textSize ?? 1,
+    }
 )

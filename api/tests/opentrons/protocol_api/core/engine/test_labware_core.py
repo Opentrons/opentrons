@@ -7,6 +7,7 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
     LabwareParameters as LabwareParamsDict,
+    LabwareUri,
 )
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -195,7 +196,7 @@ def test_get_uri(
     """It should get a labware's URI from the core."""
     decoy.when(
         mock_engine_client.state.labware.get_definition_uri("cool-labware")
-    ).then_return("great/uri/42")
+    ).then_return(LabwareUri("great/uri/42"))
 
     result = subject.get_uri()
 

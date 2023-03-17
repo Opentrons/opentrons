@@ -5,6 +5,7 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     Axis,
     CriticalPoint,
+    OT3AxisKind,
     GripperProbe,
 )
 from opentrons.types import Point, Mount
@@ -18,5 +19,6 @@ __all__ = [
     "Axis",
     "Mount",
     "CriticalPoint",
+    "OT3AxisKind",
     "GripperProbe",
 ]

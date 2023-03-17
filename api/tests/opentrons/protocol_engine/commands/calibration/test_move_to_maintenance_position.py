@@ -32,12 +32,8 @@ async def test_calibration_move_to_location_implementation(
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(mount=MountType.LEFT)
 
-    decoy.when(await hardware_api.gantry_position(mount=Mount.LEFT)).then_return(
-        Point(x=1, y=2, z=3)
-    )
-
     decoy.when(
-        state_view.labware.get_calibration_coordinates(current_z_position=3.0)
+        state_view.labware.get_calibration_coordinates(offset=Point(y=10, z=400))
     ).then_return(Point(x=1, y=2, z=3))
 
     result = await subject.execute(params=params)

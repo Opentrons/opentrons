@@ -1,13 +1,13 @@
 """Tests for run module."""
 import os
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Dict
 
 import mock
 import pytest
 from mock import AsyncMock, MagicMock
 
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings import NodeId, FirmwareTarget
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateStartApp,
 )
@@ -75,17 +75,19 @@ async def test_run_update(
     hex_file_path: str,
 ) -> None:
     """It should call all the functions."""
-    mock_messenger = AsyncMock()
+    mock_can_messenger = AsyncMock()
+    mock_usb_messenger = AsyncMock()
 
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
 
     target = Target(system_node=NodeId.head)
-    update_details = {
+    update_details: Dict[FirmwareTarget, str] = {
         target.system_node: hex_file_path,
     }
     updater = RunUpdate(
-        messenger=mock_messenger,
+        can_messenger=mock_can_messenger,
+        usb_messenger=mock_usb_messenger,
         update_details=update_details,
         retry_count=12,
         timeout_seconds=11,
@@ -93,8 +95,8 @@ async def test_run_update(
     )
 
     with mock.patch("os.path.exists"), mock.patch("builtins.open"):
-        await updater._run_update(
-            messenger=mock_messenger,
+        await updater._run_can_update(
+            messenger=mock_can_messenger,
             node_id=target.system_node,
             filepath=hex_file_path,
             retry_count=12,
@@ -115,7 +117,7 @@ async def test_run_update(
         hex_processor=mock_hex_record_processor,
         ack_wait_seconds=11,
     )
-    mock_messenger.send.assert_called_once_with(
+    mock_can_messenger.send.assert_called_once_with(
         node_id=target.bootloader_node, message=FirmwareUpdateStartApp()
     )
 
@@ -129,20 +131,22 @@ async def test_run_updates(
     should_erase: bool,
 ) -> None:
     """It should call all the functions."""
-    mock_messenger = AsyncMock()
+    mock_can_messenger = AsyncMock()
+    mock_usb_messenger = AsyncMock()
     hex_file_1 = str()
     hex_file_2 = str()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
     target_1 = Target(system_node=NodeId.gantry_x)
     target_2 = Target(system_node=NodeId.gantry_y)
-    update_details = {
+    update_details: Dict[FirmwareTarget, str] = {
         target_1.system_node: hex_file_1,
         target_2.system_node: hex_file_2,
     }
     with mock.patch("os.path.exists"), mock.patch("builtins.open"):
         updater = RunUpdate(
-            messenger=mock_messenger,
+            can_messenger=mock_can_messenger,
+            usb_messenger=mock_usb_messenger,
             update_details=update_details,
             retry_count=12,
             timeout_seconds=11,
@@ -185,7 +189,7 @@ async def test_run_updates(
         ]
     )
 
-    mock_messenger.send.assert_has_calls(
+    mock_can_messenger.send.assert_has_calls(
         [
             mock.call(
                 node_id=target_1.bootloader_node, message=FirmwareUpdateStartApp()

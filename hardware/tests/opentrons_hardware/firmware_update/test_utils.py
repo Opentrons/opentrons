@@ -7,7 +7,12 @@ import secrets
 from typing import Any, Dict, Optional
 import mock
 import pytest
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    PipetteType,
+    FirmwareTarget,
+    USBTarget,
+)
 from opentrons_hardware.hardware_control.types import PCBARevision
 
 from opentrons_hardware.firmware_update.utils import (
@@ -38,6 +43,13 @@ def mock_manifest() -> Dict[str, Any]:
                 "files_by_revision": {"c1": "head-c1.hex"},
             }
         },
+        "usb_subsystems": {
+            "rear-panel": {
+                "version": 2,
+                "shortsha": "9d6b5248",
+                "files_by_revision": {"c1": "rear-panel-b1.bin"},
+            }
+        },
     }
 
 
@@ -45,9 +57,9 @@ def generate_device_info(
     manifest: Dict[str, Any],
     random_sha: Optional[bool] = False,
     revision: Optional[str] = "c1",
-) -> Dict[NodeId, DeviceInfoCache]:
+) -> Dict[FirmwareTarget, DeviceInfoCache]:
     """Helper function to generate device info."""
-    device_info_cache: Dict[NodeId, DeviceInfoCache] = {}
+    device_info_cache: Dict[FirmwareTarget, DeviceInfoCache] = {}
     for subsystem, info in manifest["subsystems"].items():
         node_id = NodeId.__members__[subsystem.replace("-", "_")]
         version = info["version"]
@@ -56,6 +68,17 @@ def generate_device_info(
             {
                 node_id: DeviceInfoCache(
                     node_id, version, shortsha, None, PCBARevision(revision, None)
+                )
+            }
+        )
+    for subsystem, info in manifest.get("usb_subsystems", {}).items():
+        target = USBTarget.__members__[subsystem.replace("-", "_")]
+        version = info["version"]
+        shortsha = secrets.token_hex(4) if random_sha else info["shortsha"]
+        device_info_cache.update(
+            {
+                target: DeviceInfoCache(
+                    target, version, shortsha, None, PCBARevision(revision, None)
                 )
             }
         )
@@ -69,6 +92,14 @@ def generate_update_info(
     update_info: Dict[FirmwareUpdateType, UpdateInfo] = {}
     for subsystem, info in manifest["subsystems"].items():
         update_type = FirmwareUpdateType.from_name(subsystem)
+        version = info["version"]
+        shortsha = secrets.token_hex(4) if random_sha else info["shortsha"]
+        files_by_revision = info["files_by_revision"]
+        update_info.update(
+            {update_type: UpdateInfo(update_type, version, shortsha, files_by_revision)}
+        )
+    for usbsubsystem, info in manifest.get("usb_subsystems", {}).items():
+        update_type = FirmwareUpdateType.from_name(usbsubsystem)
         version = info["version"]
         shortsha = secrets.token_hex(4) if random_sha else info["shortsha"]
         files_by_revision = info["files_by_revision"]
@@ -147,14 +178,14 @@ def test_firmware_file_selected_for_revision() -> None:
     """Given a device and revision, the right firmware file should be selected."""
     stimulus = [
         # a matching rev should be found
-        (NodeId.head, {"a1": "test-head.hex", "b1": "test-head-wrong.hex"}, "a1"),
+        (NodeId.head, 0, {"a1": "test-head.hex", "b1": "test-head-wrong.hex"}, "a1"),
         # an empty revs dict should be ignored
-        (NodeId.gantry_x, {"": ""}, "a1"),
+        (NodeId.gantry_x, 2, {"": ""}, "a1"),
         # a present but non matching revs dict should be ignored
-        (NodeId.gantry_y, {"b1": "test-gantry-y.hex"}, "c1"),
+        (NodeId.gantry_y, 1, {"b1": "test-gantry-y.hex"}, "c1"),
     ]
     response = list(_update_files_from_types(stimulus))
-    assert response == [(NodeId.head, "test-head.hex")]
+    assert response == [(NodeId.head, 0, "test-head.hex")]
 
 
 def test_load_firmware_manifest_success(mock_manifest: Dict[str, Any]) -> None:
@@ -209,9 +240,9 @@ def test_load_firmware_manifest_unknown_update_type(
         json.dump(manifest, fp)
     with mock.patch("os.path.exists"):
         updates = load_firmware_manifest(manifest_filename)
-        # only one update is valid 'head', invalid update types are ignored
+        # only two updates are valid 'head' and 'rear-panel', invalid update types are ignored
         assert FirmwareUpdateType.head in updates
-        assert len(updates) == 1
+        assert len(updates) == 2
         os.unlink(manifest_filename)
 
 
@@ -239,9 +270,9 @@ def test_load_firmware_manifest_invalid_update_info(
         json.dump(manifest, fp)
     with mock.patch("os.path.exists"):
         updates = load_firmware_manifest(manifest_filename)
-        # only one update is valid 'head', invalid update types are ignored
+        # only two updates are valid 'head' and 'rear-panel', invalid update types are ignored
         assert FirmwareUpdateType.head in updates
-        assert len(updates) == 1
+        assert len(updates) == 2
         os.unlink(manifest_filename)
 
 
@@ -299,7 +330,44 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
 def test_check_firmware_updates_available_nodes_specified(
     mock_manifest: Dict[str, Any]
 ) -> None:
-    """Test updates when nodes are specified, which updates the device regardless of the shortsha."""
+    """Test that only specified devices are updated if given."""
+    manifest = mock_manifest.copy()
+    manifest["subsystems"].update(
+        {
+            "gantry-x": {
+                "version": 2,
+                "shortsha": "25755efd",
+                "files_by_revision": {"c1": "gantry-x-rev1.hex"},
+            },
+            "gantry-y": {
+                "version": 2,
+                "shortsha": "25755efd",
+                "files_by_revision": {"c1": "gantry-y-rev1.hex"},
+            },
+            "gripper": {
+                "version": 2,
+                "shortsha": "25755efd",
+                "files_by_revision": {"c1": "gripper-rev1.hex"},
+            },
+        }
+    )
+    device_info_cache = generate_device_info(manifest)
+    # change the shortsha so they all require an update
+    known_firmware_updates = generate_update_info(manifest, random_sha=True)
+    with mock.patch(
+        "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
+        mock.Mock(return_value=known_firmware_updates),
+    ):
+        firmware_updates = check_firmware_updates(
+            device_info_cache, attached_pipettes={}, targets={NodeId.gripper}
+        )
+        # only the gripper needs an update
+        assert len(firmware_updates) == 1
+        assert NodeId.gripper in firmware_updates
+
+
+def test_check_firmware_updates_available_forced(mock_manifest: Dict[str, Any]) -> None:
+    """Test updates when force flag is set devices are updated regardless of the shortsha."""
     device_info_cache = generate_device_info(mock_manifest)
     known_firmware_updates = generate_update_info(mock_manifest)
     with mock.patch(
@@ -307,7 +375,7 @@ def test_check_firmware_updates_available_nodes_specified(
         mock.Mock(return_value=known_firmware_updates),
     ):
         firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}, nodes=set(device_info_cache)
+            device_info_cache, attached_pipettes={}, force=True
         )
         assert firmware_updates
         assert len(firmware_updates) == len(device_info_cache)
@@ -330,7 +398,7 @@ def test_load_firmware_manifest_is_empty(mock_manifest: Dict[str, Any]) -> None:
 
 def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
     """Don't do updates if the FirmwareUpdateType is unknown."""
-    device_info = {
+    device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
         NodeId.head: DeviceInfoCache(
             NodeId.head, 2, "12345678", None, PCBARevision(None)
         )
