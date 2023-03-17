@@ -27,44 +27,44 @@ CYCLES = 1
 TEST_LIST = {}
 
 TEST_PARAMETERS = {
-    GantryLoad.NONE: {
-        'X': {
-            'SPEED': {
-                'MIN': 450,
-                'MAX': 550,
-                'INC': 50},
-            'ACCEL': {
-                'MIN': 900,
-                'MAX': 1100,
-                'INC': 50}},
-        'Y': {
-            'SPEED': {
-                'MIN': 425,
-                'MAX': 475,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 900,
-                'MAX': 1100,
-                'INC': 50}},
-        'L': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}},
-        'R': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}}
-    },
+    # GantryLoad.NONE: {
+    #     'X': {
+    #         'SPEED': {
+    #             'MIN': 450,
+    #             'MAX': 550,
+    #             'INC': 50},
+    #         'ACCEL': {
+    #             'MIN': 900,
+    #             'MAX': 1100,
+    #             'INC': 50}},
+    #     'Y': {
+    #         'SPEED': {
+    #             'MIN': 425,
+    #             'MAX': 475,
+    #             'INC': 25},
+    #         'ACCEL': {
+    #             'MIN': 900,
+    #             'MAX': 1100,
+    #             'INC': 50}},
+    #     'L': {
+    #         'SPEED': {
+    #             'MIN': 40,
+    #             'MAX': 140,
+    #             'INC': 10},
+    #         'ACCEL': {
+    #             'MIN': 800,
+    #             'MAX': 2000,
+    #             'INC': 200}},
+    #     'R': {
+    #         'SPEED': {
+    #             'MIN': 40,
+    #             'MAX': 140,
+    #             'INC': 10},
+    #         'ACCEL': {
+    #             'MIN': 800,
+    #             'MAX': 2000,
+    #             'INC': 200}}
+    # },
     GantryLoad.LOW_THROUGHPUT: {
         'X': {
             'SPEED': {
@@ -77,46 +77,8 @@ TEST_PARAMETERS = {
                 'INC': 50}},
         'Y': {
             'SPEED': {
-                'MIN': 375,
-                'MAX': 425,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 750,
-                'MAX': 850,
-                'INC': 50}},
-        'L': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}},
-        'R': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 10},
-            'ACCEL': {
-                'MIN': 800,
-                'MAX': 2000,
-                'INC': 200}}
-    },
-    GantryLoad.TWO_LOW_THROUGHPUT: {
-        'X': {
-            'SPEED': {
-                'MIN': 575,
-                'MAX': 625,
-                'INC': 25},
-            'ACCEL': {
-                'MIN': 1550,
-                'MAX': 1650,
-                'INC': 50}},
-        'Y': {
-            'SPEED': {
-                'MIN': 475,
-                'MAX': 525,
+                'MIN': 275,
+                'MAX': 350,
                 'INC': 25},
             'ACCEL': {
                 'MIN': 950,
@@ -124,23 +86,61 @@ TEST_PARAMETERS = {
                 'INC': 50}},
         'L': {
             'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
+                'MIN': 90,
+                'MAX': 110,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 100,
-                'MAX': 900,
-                'INC': 200}},
+                'MIN': 250,
+                'MAX': 350,
+                'INC': 50}},
         'R': {
             'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 20},
+                'MIN': 90,
+                'MAX': 110,
+                'INC': 10},
             'ACCEL': {
-                'MIN': 100,
-                'MAX': 900,
-                'INC': 200}}
+                'MIN': 250,
+                'MAX': 350,
+                'INC': 50}}
     },
+    # GantryLoad.TWO_LOW_THROUGHPUT: {
+    #     'X': {
+    #         'SPEED': {
+    #             'MIN': 450,
+    #             'MAX': 800,
+    #             'INC': 50},
+    #         'ACCEL': {
+    #             'MIN': 800,
+    #             'MAX': 3000,
+    #             'INC': 200}},
+    #     'Y': {
+    #         'SPEED': {
+    #             'MIN': 450,
+    #             'MAX': 800,
+    #             'INC': 50},
+    #         'ACCEL': {
+    #             'MIN': 800,
+    #             'MAX': 3000,
+    #             'INC': 200}},
+    #     'L': {
+    #         'SPEED': {
+    #             'MIN': 90,
+    #             'MAX': 110,
+    #             'INC': 10},
+    #         'ACCEL': {
+    #             'MIN': 250,
+    #             'MAX': 350,
+    #             'INC': 50}},
+    #     'R': {
+    #         'SPEED': {
+    #             'MIN': 90,
+    #             'MAX': 110,
+    #             'INC': 10},
+    #         'ACCEL': {
+    #             'MIN': 250,
+    #             'MAX': 350,
+    #             'INC': 50}}
+    # },
     GantryLoad.HIGH_THROUGHPUT: {
         'X': {
             'SPEED': {
@@ -153,31 +153,31 @@ TEST_PARAMETERS = {
                 'INC': 50}},
         'Y': {
             'SPEED': {
-                'MIN': 375,
-                'MAX': 425,
+                'MIN': 275,
+                'MAX': 350,
                 'INC': 25},
             'ACCEL': {
-                'MIN': 750,
-                'MAX': 850,
+                'MIN': 950,
+                'MAX': 1050,
                 'INC': 50}},
         'L': {
             'SPEED': {
-                'MIN': 10,
+                'MIN': 30,
                 'MAX': 40,
-                'INC': 10},
+                'INC': 5},
             'ACCEL': {
-                'MIN': 50,
-                'MAX': 200,
-                'INC': 50}},
+                'MIN': 140,
+                'MAX': 140,
+                'INC': 20}},
         'R': {
             'SPEED': {
-                'MIN': 40,
-                'MAX': 60,
-                'INC': 10},
+                'MIN': 30,
+                'MAX': 40,
+                'INC': 5},
             'ACCEL': {
-                'MIN': 500,
-                'MAX': 800,
-                'INC': 100}}
+                'MIN': 80,
+                'MAX': 120,
+                'INC': 20}},
     }
 }
 
@@ -226,12 +226,13 @@ AXIS_MAP = {'Y': OT3Axis.Y,
                 'P': OT3Axis.P_L,
                 'O': OT3Axis.P_R}
 
-LOAD = GantryLoad.NONE
-GANTRY_LOAD_MAP = {'NONE': GantryLoad.NONE,
-                   'LOW': GantryLoad.LOW_THROUGHPUT,
-                   'TWO_LOW': GantryLoad.TWO_LOW_THROUGHPUT,
-                   'HIGH': GantryLoad.HIGH_THROUGHPUT
-}
+LOAD = GantryLoad.LOW_THROUGHPUT
+# GANTRY_LOAD_MAP = {'NONE': GantryLoad.NONE,
+#                    'LOW': GantryLoad.LOW_THROUGHPUT,
+#                    'TWO_LOW': GantryLoad.TWO_LOW_THROUGHPUT,
+#                    'HIGH': GantryLoad.HIGH_THROUGHPUT}
+GANTRY_LOAD_MAP = {'LOW': GantryLoad.LOW_THROUGHPUT,
+                   'HIGH': GantryLoad.HIGH_THROUGHPUT}
 
 DELAY = 0
 
@@ -323,7 +324,14 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
                                                         axis,
                                                         -1)
             print('ERROR IN NEG MOVE, CORRECTING: ' + str(move_error_correction))
-            await api.move_rel(mount=MOUNT, delta=move_error_correction, speed=100)
+            if(axis == 'X' or axis == 'Y'):
+                await api.move_rel(mount=MOUNT,
+                                   delta=move_error_correction,
+                                   speed=100)
+            else:
+                await api.move_rel(mount=MOUNT,
+                                   delta=move_error_correction,
+                                   speed=35)
             if(DELAY > 0):
                 time.sleep(DELAY)
             return (move_error, c+1)
@@ -482,7 +490,7 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--axis", type=str, default='Y')
     parser.add_argument("--cycles", type=int, default=CYCLES)
-    parser.add_argument("--load", type=str, default='NONE')
+    parser.add_argument("--load", type=str, default='LOW')
     parser.add_argument("--delay", type=int, default=0)
 
     args = parser.parse_args()

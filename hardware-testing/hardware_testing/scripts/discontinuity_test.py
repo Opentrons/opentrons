@@ -25,7 +25,15 @@ SAVE_NAME = 'discontinuity_test_output_'
 CYCLES = 1
 
 TEST_LIST = {}
-DISCONTINUITY_TEST_LIST = [0, 1, 5, 10, 15, 30, 50, 100];
+#DISCONTINUITY_TEST_LIST = [1, 5, 10, 15, 30, 50, 100]
+DISCONTINUITY_TEST_LIST = np.arange(1, 31, 1)
+
+# The two discontinuity types
+# 0 = DEFAULT_MAX_SPEED_DISCONTINUITY = max_start_stop_speed
+# 1 = DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY = max_change_dir_speed
+TYPE_MAX_SPEED_DISCONTINUITY = 0
+TYPE_DIRECTION_DISCONTINUITY = 1
+DISCONTINUITY_TYPE = TYPE_MAX_SPEED_DISCONTINUITY
 
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
@@ -80,7 +88,7 @@ GANTRY_LOAD_MAP = {'NONE': GantryLoad.NONE,
 
 DELAY = 0
 
-step_x = 500
+step_x = 300
 step_y = 300
 xy_home_offset = 5
 step_z = 200
@@ -148,7 +156,8 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
         print('Executing Move: ' + str(c))
-        print(' Discontinuity - ' + str(SETTINGS[AXIS_MAP[axis]].max_start_stop_speed))
+        print(' Speed Discontinuity - ' + str(SETTINGS[AXIS_MAP[axis]].max_start_stop_speed))
+        print(' Direction Discontinuity - ' + str(SETTINGS[AXIS_MAP[axis]].max_change_dir_speed))
 
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[axis], speed=cur_speed)
 
@@ -205,8 +214,13 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
 
 async def match_z_settings(axis, discon):
     if(axis == 'L' or axis == 'R'):
-        SETTINGS[AXIS_MAP['L']].max_start_stop_speed = discon
-        SETTINGS[AXIS_MAP['R']].max_start_stop_speed = discon
+
+        if(DISCONTINUITY_TYPE == TYPE_DIRECTION_DISCONTINUITY):
+            SETTINGS[AXIS_MAP['L']].max_change_dir_speed = discon
+            SETTINGS[AXIS_MAP['R']].max_change_dir_speed = discon
+        else:
+            SETTINGS[AXIS_MAP['L']].max_start_stop_speed = discon
+            SETTINGS[AXIS_MAP['R']].max_start_stop_speed = discon
 
     return True
 
@@ -230,17 +244,25 @@ async def _main(is_simulating: bool) -> None:
                 for p in axis_parameters:
                     print("Testing Parameters:")
                     print(p)
-                    SETTINGS[AXIS_MAP[test_axis]].max_start_stop_speed = p['DISCON']
                     print(test_axis)
                     print(LOAD)
                     #update the robot settings to use test speed/accel
-                    await match_z_settings(test_axis,
-                                     SETTINGS[AXIS_MAP[test_axis]].max_start_stop_speed)
-
+                    if(DISCONTINUITY_TYPE == TYPE_DIRECTION_DISCONTINUITY):
+                        SETTINGS[AXIS_MAP[test_axis]].max_change_dir_speed = p['DISCON']
+                        await match_z_settings(test_axis,
+                                         SETTINGS[AXIS_MAP[test_axis]].max_change_dir_speed)
+                    else:
+                        SETTINGS[AXIS_MAP[test_axis]].max_start_stop_speed = p['DISCON']
+                        await match_z_settings(test_axis,
+                                         SETTINGS[AXIS_MAP[test_axis]].max_start_stop_speed)
+                    print(SETTINGS)
                     await set_gantry_load_per_axis_settings_ot3(api,
                                                     SETTINGS,
                                                     load=LOAD)
+                    print("MAX_SPEED_DISCONTINUITY:")
                     print(api.config.motion_settings.max_speed_discontinuity)
+                    print("DIRECTION_CHANGE_SPEED_DISCONTINUITY:")
+                    print(api.config.motion_settings.direction_change_speed_discontinuity)
 
                     #attempt to cycle with the test settings
                     # await api.home([AXIS_MAP[test_axis]])
@@ -321,6 +343,7 @@ if __name__ == "__main__":
     parser.add_argument("--axis", type=str, default='Y')
     parser.add_argument("--cycles", type=int, default=CYCLES)
     parser.add_argument("--load", type=str, default='NONE')
+    parser.add_argument("--type", type=str, default='SPEED')
     parser.add_argument("--delay", type=int, default=0)
 
     args = parser.parse_args()
@@ -329,6 +352,10 @@ if __name__ == "__main__":
     AXIS = args.axis
     LOAD = GANTRY_LOAD_MAP[args.load]
     DELAY = args.delay
+    if(args.type == 'DIRECTION'):
+        DISCONTINUITY_TYPE = TYPE_DIRECTION_DISCONTINUITY
+    else:
+        DISCONTINUITY_TYPE = TYPE_MAX_SPEED_DISCONTINUITY
     TEST_LIST = make_test_list(AXIS, LOAD)
 
     asyncio.run(_main(args.simulate))
