@@ -854,7 +854,7 @@ async def find_slot_center_binary_from_nominal_center(
     )
 
 
-async def calibrate_belts(
+async def determine_transform_matrix(
     hcapi: OT3API,
     mount: OT3Mount,
 ) -> AttitudeMatrix:
@@ -871,33 +871,51 @@ async def calibrate_belts(
     -------
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
+    slot_a, slot_b, slot_c = 12, 3, 10
+    point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_a
+    )
+    await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
+    point_b, nominal_point_b = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_b
+    )
+    await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
+    point_c, nominal_point_c = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_c
+    )
+    expected = (
+        (nominal_point_a.x, nominal_point_a.y, nominal_point_a.z),
+        (nominal_point_b.x, nominal_point_b.y, nominal_point_b.z),
+        (nominal_point_c.x, nominal_point_c.y, nominal_point_c.z),
+    )
+    actual = (
+        (point_a.x, point_a.y, point_a.z),
+        (point_b.x, point_b.y, point_b.z),
+        (point_c.x, point_c.y, point_c.z),
+    )
+    return solve_attitude(expected, actual)
+
+
+async def calibrate_belts(
+    hcapi: OT3API,
+    mount: OT3Mount,
+) -> AttitudeMatrix:
+    """
+    Run automatic calibration for the gantry x and y belts attached to the specified mount.
+
+    Params
+    ------
+    hcapi: a hardware control api to run commands against
+    mount: the mount to calibration
+
+    Returns
+    -------
+    A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
+    """
     if mount == OT3Mount.GRIPPER:
         raise RuntimeError("Must use pipette mount, not gripper")
     try:
-        await hcapi.reset_instrument_offset(mount)
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        slot_a, slot_b, slot_c = 12, 3, 10
-        point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
-            hcapi, mount, slot_a
-        )
-        await hcapi.move_rel(mount, Point[0, 0, BELT_CAL_TRANSIT_HEIGHT])
-        point_b, nominal_point_b = await find_slot_center_binary_from_nominal_center(
-            hcapi, mount, slot_b
-        )
-        await hcapi.move_rel(mount, Point[0, 0, BELT_CAL_TRANSIT_HEIGHT])
-        point_c, nominal_point_c = await find_slot_center_binary_from_nominal_center(
-            hcapi, mount, slot_c
-        )
-        expected = (
-            (nominal_point_a.x, nominal_point_a.y, nominal_point_a.z),
-            (nominal_point_b.x, nominal_point_b.y, nominal_point_b.z),
-            (nominal_point_c.x, nominal_point_c.y, nominal_point_c.z),
-        )
-        actual = (
-            (point_a.x, point_a.y, point_a.z),
-            (point_b.x, point_b.y, point_b.z),
-            (point_c.x, point_c.y, point_c.z),
-        )
-        return solve_attitude(expected, actual)
+        return await determine_transform_matrix(hcapi, mount)
     finally:
         await hcapi.remove_tip(mount)
