@@ -20,7 +20,12 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner import ProtocolRunner, create_protocol_runner, JsonRunner
+from opentrons.protocol_runner import (
+    ProtocolRunner,
+    create_protocol_runner,
+    JsonRunner,
+    PythonAndLegacyRunner,
+)
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_translator import JsonTranslator
@@ -114,6 +119,26 @@ def json_subject(
     )
 
 
+@pytest.fixture
+def legacy_subject(
+    protocol_engine: ProtocolEngine,
+    hardware_api: HardwareAPI,
+    task_queue: TaskQueue,
+    legacy_file_reader: LegacyFileReader,
+    legacy_context_creator: LegacyContextCreator,
+    legacy_executor: LegacyExecutor,
+) -> PythonAndLegacyRunner:
+    """Get a JsonRunner test subject with mocked dependencies."""
+    return PythonAndLegacyRunner(
+        protocol_engine=protocol_engine,
+        hardware_api=hardware_api,
+        task_queue=task_queue,
+        legacy_file_reader=legacy_file_reader,
+        legacy_context_creator=legacy_context_creator,
+        legacy_executor=legacy_executor,
+    )
+
+
 async def test_create_protocol_runner(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
@@ -125,18 +150,9 @@ async def test_create_protocol_runner(
     legacy_executor: LegacyExecutor,
 ) -> None:
     """It should return protocol runner type depending on the config."""
-    json_protocol_source = ProtocolSource(
-        directory=Path("/dev/null"),
-        main_file=Path("/dev/null/abc.json"),
-        files=[],
-        metadata={},
-        robot_type="OT-2 Standard",
-        config=JsonProtocolConfig(schema_version=6),
-    )
-
     assert isinstance(
         create_protocol_runner(
-            protocol_source=json_protocol_source,
+            protocol_config=JsonProtocolConfig(schema_version=6),
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
             task_queue=task_queue,
@@ -144,6 +160,51 @@ async def test_create_protocol_runner(
             json_translator=json_translator,
         ),
         JsonRunner,
+    )
+
+    assert isinstance(
+        create_protocol_runner(
+            protocol_config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            task_queue=task_queue,
+            json_file_reader=json_file_reader,
+            json_translator=json_translator,
+            legacy_file_reader=legacy_file_reader,
+            legacy_context_creator=legacy_context_creator,
+            legacy_executor=legacy_executor,
+        ),
+        PythonAndLegacyRunner,
+    )
+
+    assert isinstance(
+        create_protocol_runner(
+            protocol_config=JsonProtocolConfig(schema_version=5),
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            task_queue=task_queue,
+            json_file_reader=json_file_reader,
+            json_translator=json_translator,
+            legacy_file_reader=legacy_file_reader,
+            legacy_context_creator=legacy_context_creator,
+            legacy_executor=legacy_executor,
+        ),
+        PythonAndLegacyRunner,
+    )
+
+    assert isinstance(
+        create_protocol_runner(
+            protocol_config=JsonProtocolConfig(schema_version=5),
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            task_queue=task_queue,
+            json_file_reader=json_file_reader,
+            json_translator=json_translator,
+            legacy_file_reader=legacy_file_reader,
+            legacy_context_creator=legacy_context_creator,
+            legacy_executor=legacy_executor,
+        ),
+        PythonAndLegacyRunner,
     )
 
 

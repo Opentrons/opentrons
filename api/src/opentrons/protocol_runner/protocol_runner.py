@@ -1,6 +1,6 @@
 """Protocol run control and management."""
 import asyncio
-from typing import Iterable, List, NamedTuple, Optional
+from typing import Iterable, List, NamedTuple, Optional, Union
 
 from typing_extensions import Protocol as TypingProtocol
 
@@ -12,7 +12,11 @@ from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
-from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
+from opentrons.protocol_reader import (
+    ProtocolSource,
+    JsonProtocolConfig,
+    PythonProtocolConfig,
+)
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
 
 from .task_queue import TaskQueue
@@ -71,6 +75,30 @@ class ProtocolRunner(TypingProtocol):
         """Run a given protocol to completion."""
 
 
+class PythonAndLegacyRunner(ProtocolRunner):
+    def __init__(
+        self,
+        protocol_engine: ProtocolEngine,
+        hardware_api: HardwareControlAPI,
+        task_queue: Optional[TaskQueue] = None,
+        legacy_file_reader: Optional[LegacyFileReader] = None,
+        legacy_context_creator: Optional[LegacyContextCreator] = None,
+        legacy_executor: Optional[LegacyExecutor] = None,
+    ) -> None:
+        """Initialize the JsonRunner with its dependencies."""
+        self._protocol_engine = protocol_engine
+        self._hardware_api = hardware_api
+        self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
+        self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
+            hardware_api=hardware_api,
+            protocol_engine=protocol_engine,
+        )
+        self._legacy_executor = legacy_executor or LegacyExecutor()
+        # TODO(mc, 2022-01-11): replace task queue with specific implementations
+        # of runner interface
+        self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+
+
 class JsonRunner(ProtocolRunner):
     def __init__(
         self,
@@ -108,8 +136,6 @@ class JsonRunner(ProtocolRunner):
         Calling this method is only necessary if the runner will be used
         to control the run of a file-based protocol.
         """
-        config = protocol_source.config
-
         labware_definitions = await protocol_reader.extract_labware_definitions(
             protocol_source=protocol_source
         )
@@ -153,14 +179,6 @@ class JsonRunner(ProtocolRunner):
             await _yield()
 
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
-
-        # if (
-        #     isinstance(config, JsonProtocolConfig)
-        #     and config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
-        # ):
-        #     await self._load_json(protocol_source)
-        # else:
-        #     self._load_python_or_legacy_json(protocol_source, labware_definitions)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -232,7 +250,7 @@ class JsonRunner(ProtocolRunner):
 
 
 def create_protocol_runner(
-    protocol_source: ProtocolSource,
+    protocol_config: Union[JsonProtocolConfig, PythonProtocolConfig],
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareControlAPI,
     task_queue: Optional[TaskQueue] = None,
@@ -243,24 +261,26 @@ def create_protocol_runner(
     legacy_executor: Optional[LegacyExecutor] = None,
 ) -> ProtocolRunner:
     """Create a protocol runner."""
-    config = protocol_source.config
     if (
-        isinstance(config, JsonProtocolConfig)
-        and config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
+        isinstance(protocol_config, JsonProtocolConfig)
+        and protocol_config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
     ):
         return JsonRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
             json_file_reader=json_file_reader,
             json_translator=json_translator,
+            task_queue=task_queue,
         )
-    # else:
-    #     self._load_python_or_legacy_json(protocol_source, labware_definitions)
-    # return (
-    #     HardwarePipettingHandler(state_view=state_view, hardware_api=hardware_api)
-    #     if state_view.config.use_virtual_pipettes is False
-    #     else VirtualPipettingHandler(state_view=state_view)
-    # )
+    else:
+        return PythonAndLegacyRunner(
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            task_queue=task_queue,
+            legacy_file_reader=legacy_file_reader,
+            legacy_context_creator=legacy_context_creator,
+            legacy_executor=legacy_executor,
+        )
 
 
 async def _yield() -> None:

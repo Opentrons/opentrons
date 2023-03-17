@@ -8,6 +8,7 @@ from .protocol_runner import (
     ProtocolRunResult,
     create_protocol_runner,
     JsonRunner,
+    PythonAndLegacyRunner,
 )
 from .create_simulating_runner import create_simulating_runner
 
@@ -17,4 +18,5 @@ __all__ = [
     "create_simulating_runner",
     "create_protocol_runner",
     "JsonRunner",
+    "PythonAndLegacyRunner",
 ]
