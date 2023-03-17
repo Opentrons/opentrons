@@ -18,7 +18,7 @@ const generateStandardWellNames = (rowCount: number, columnCount: number): Set<s
     for (let column = 0; column < columnCount; column++) {
       for (let row = 0; row < rowCount; row++) {
         const columnName = (column + 1).toString()
-        const rowName = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[row]
+        const rowName = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[row]
         yield rowName + columnName
       }
     }
@@ -26,39 +26,79 @@ const generateStandardWellNames = (rowCount: number, columnCount: number): Set<s
   return new Set(generateWelllNames())
 }
 
-const standard24WellNames = generateStandardWellNames(4, 6);
-const standard96WellNames = generateStandardWellNames(8, 12);
-const standard384WellNames = generateStandardWellNames(16, 24);
+const standard24WellNames = generateStandardWellNames(4, 6)
+const standard96WellNames = generateStandardWellNames(8, 12)
+const standard384WellNames = generateStandardWellNames(16, 24)
 
 const definitionsWithWellsNotMatchingZDimension: Record<string, Set<string>> = {
   // TODO: Explain all of these with references to RSS-202.
-  "geb_96_tiprack_10ul/1.json": standard96WellNames,
-  "nest_1_reservoir_195ml/1.json": new Set(["A1"]),
-  "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical/1.json": new Set(["A3", "B3", "A4", "B4"]),
-  "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic/1.json": new Set(["A3", "B3", "A4", "B4"]),
-  "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical/1.json": new Set(["A3", "B3", "A4", "B4"]),
-  "opentrons_24_aluminumblock_generic_2ml_screwcap/1.json": standard24WellNames,
-  "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json": standard24WellNames,
-  "opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip/1.json": new Set(
-    ['A3', 'B3', 'C3', 'D3', 'A4', 'B4', 'C4', 'D4', 'A5', 'B5', 'C5', 'D5', 'A6', 'B6', 'C6', 'D6', 'A7', 'B7', 'C7', 'D7', 'A8', 'B8', 'C8', 'D8']
+  'geb_96_tiprack_10ul/1.json': standard96WellNames,
+  'nest_1_reservoir_195ml/1.json': new Set(['A1']),
+  'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical/1.json': new Set([
+    'A3',
+    'B3',
+    'A4',
+    'B4',
+  ]),
+  'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic/1.json': new Set([
+    'A3',
+    'B3',
+    'A4',
+    'B4',
+  ]),
+  'opentrons_10_tuberack_nest_4x50ml_6x15ml_conical/1.json': new Set([
+    'A3',
+    'B3',
+    'A4',
+    'B4',
+  ]),
+  'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json': standard24WellNames,
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json': standard24WellNames,
+  'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip/1.json': new Set(
+    [
+      'A3',
+      'B3',
+      'C3',
+      'D3',
+      'A4',
+      'B4',
+      'C4',
+      'D4',
+      'A5',
+      'B5',
+      'C5',
+      'D5',
+      'A6',
+      'B6',
+      'C6',
+      'D6',
+      'A7',
+      'B7',
+      'C7',
+      'D7',
+      'A8',
+      'B8',
+      'C8',
+      'D8',
+    ]
   ),
-  "opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json": standard96WellNames,
-  "opentrons_96_filtertiprack_200ul/1.json": standard96WellNames,
-  "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json": standard96WellNames,
-  "opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json": standard96WellNames,
-  "opentrons_96_tiprack_300ul/1.json": standard96WellNames,
-  "opentrons_calibrationblock_short_side_left/1.json": new Set(["A1"]),
-  "opentrons_calibrationblock_short_side_right/1.json": new Set(["A2"]),
-  "opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json": standard384WellNames,
+  'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json': standard96WellNames,
+  'opentrons_96_filtertiprack_200ul/1.json': standard96WellNames,
+  'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json': standard96WellNames,
+  'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json': standard96WellNames,
+  'opentrons_96_tiprack_300ul/1.json': standard96WellNames,
+  'opentrons_calibrationblock_short_side_left/1.json': new Set(['A1']),
+  'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
+  'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json': standard384WellNames,
 }
 
 const definitionsWithWellsHigherThanZDimension: Set<string> = new Set([
-  "geb_96_tiprack_10ul/1.json",
-  "opentrons_24_aluminumblock_generic_2ml_screwcap/1.json",
-  "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json",
-  "opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json",
-  "opentrons_96_tiprack_300ul/1.json",
-  "opentrons_96_filtertiprack_200ul/1.json",
+  'geb_96_tiprack_10ul/1.json',
+  'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json',
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json',
+  'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json',
+  'opentrons_96_tiprack_300ul/1.json',
+  'opentrons_96_filtertiprack_200ul/1.json',
 ])
 
 // JSON Schema defintion & setup
@@ -97,27 +137,26 @@ const expectGroupsFollowConvention = (
 const wellsNotMatchingZDimension = (
   labwareDef: LabwareDefinition2
 ): string[] => {
-  return Object.entries(labwareDef.wells).filter(
-    ([wellName, wellDef]) => {
-      const absDifference = Math.abs(labwareDef.dimensions.zDimension - (wellDef.depth + wellDef.z))
+  return Object.entries(labwareDef.wells)
+    .filter(([wellName, wellDef]) => {
+      const absDifference = Math.abs(
+        labwareDef.dimensions.zDimension - (wellDef.depth + wellDef.z)
+      )
       return absDifference > 0.000001 // Tolerate floating point rounding errors.
-    }
-  ).map(
-    ([wellName, wellDef]) => wellName
-  )
+    })
+    .map(([wellName, wellDef]) => wellName)
 }
 
 const wellsHigherThanZDimension = (
   labwareDef: LabwareDefinition2
 ): string[] => {
-  return Object.entries(labwareDef.wells).filter(
-    ([wellName, wellDef]) => {
-      const difference = (wellDef.depth + wellDef.z) - labwareDef.dimensions.zDimension
+  return Object.entries(labwareDef.wells)
+    .filter(([wellName, wellDef]) => {
+      const difference =
+        wellDef.depth + wellDef.z - labwareDef.dimensions.zDimension
       return difference > 0.000001 // Tolerate floating point rounding errors.
-    }
-  ).map(
-    ([wellName, wellDef]) => wellName
-  )
+    })
+    .map(([wellName, wellDef]) => wellName)
 }
 
 test('fail on bad labware', () => {
