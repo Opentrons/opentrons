@@ -30,9 +30,9 @@ import {
   useAttachedModules,
   useRunCreatedAtTimestamp,
 } from '../../organisms/Devices/hooks'
-import { getLabwareSetupItemGroups } from '../../organisms/Devices/ProtocolRun/SetupLabware/utils'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelModal } from '../../organisms/RunDetails/ConfirmCancelModal'
@@ -40,6 +40,7 @@ import {
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -376,10 +377,7 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupModules runId={runId} setSetupScreen={setSetupScreen} />
     ),
     labware: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Labware
-      </>
+      <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
     ),
     lpc: (
       <>

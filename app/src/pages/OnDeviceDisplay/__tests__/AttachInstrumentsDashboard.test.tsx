@@ -8,14 +8,11 @@ import {
   mockAttachedGen3Pipette,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
-import { getLocalRobot } from '../../../redux/discovery'
 import { AttachInstrumentsDashboard } from '../AttachInstrumentsDashboard'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../../../redux/discovery')
 jest.mock('../../../organisms/PipetteWizardFlows')
 jest.mock('../../../organisms/Devices/utils')
 jest.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
@@ -23,9 +20,6 @@ jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
 
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
 >
 const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
   typeof PipetteWizardFlows
@@ -54,7 +48,6 @@ describe('AttachInstrumentsDashboard', () => {
   beforeEach(() => {
     mockChoosePipette.mockReturnValue(<div>mock choose pipette</div>)
     mockGetIs96ChannelPipetteAttached.mockReturnValue(false)
-    mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
     mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
     mockPipetteWizardFlows.mockReturnValue(<div>mock pipette wizard flows</div>)
   })

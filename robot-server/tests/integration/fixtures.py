@@ -46,6 +46,22 @@ def delete_all_runs(response: Response, host: str, port: str) -> None:
         )
 
 
+def delete_all_protocols(response: Response, host: str, port: str) -> None:
+    """Intake the response of a GET /protocols and delete all protocols if any exist."""
+    headers = {"Opentrons-Version": "*"}
+    base_url = f"{host}:{port}"
+    protocols = response.json()["data"]
+    protocol_ids = [protocol["id"] for protocol in protocols]
+    for protocol_id in protocol_ids:
+        delete_response = requests.delete(
+            f"{base_url}/protocols/{protocol_id}", headers=headers
+        )
+        print(
+            f"Deleted protocol {protocol_id},"
+            f" response status code = {delete_response.status_code}"
+        )
+
+
 def get_module_id(response: Response, module_model: ModuleModel) -> Box:
     """Get the first module id that matches module_model."""
     modules = response.json()["data"]

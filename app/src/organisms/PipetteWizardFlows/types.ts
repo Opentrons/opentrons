@@ -83,7 +83,6 @@ export interface PipetteWizardStepProps {
   attachedPipettes: AttachedPipettesByMount
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
-  robotName: string
   selectedPipette: SelectablePipettes
   isOnDevice: boolean | null
 }

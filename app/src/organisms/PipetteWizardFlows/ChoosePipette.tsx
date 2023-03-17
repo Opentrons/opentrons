@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import startCase from 'lodash/startCase'
 import {
   ALIGN_FLEX_END,
   BORDERS,
@@ -11,11 +12,8 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
-  TEXT_ALIGN_CENTER,
   POSITION_ABSOLUTE,
   JUSTIFY_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -25,7 +23,7 @@ import {
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Portal } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons/ODD'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -35,6 +33,7 @@ import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
 import { getIsGantryEmpty } from './utils'
 
+import type { PipetteMount } from '@opentrons/shared-data'
 import type { SelectablePipettes } from './types'
 
 interface ChoosePipetteProps {
@@ -42,6 +41,7 @@ interface ChoosePipetteProps {
   selectedPipette: SelectablePipettes
   setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
   exit: () => void
+  mount: PipetteMount
 }
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
@@ -80,7 +80,7 @@ const ON_DEVICE_SELECTED_OPTIONS_STYLE = css`
   color: ${COLORS.white};
 `
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
-  const { selectedPipette, setSelectedPipette, proceed, exit } = props
+  const { selectedPipette, setSelectedPipette, proceed, exit, mount } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettesByMount = useAttachedPipettes()
@@ -126,7 +126,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
       position={POSITION_ABSOLUTE}
     >
       <WizardHeader
-        title={t('attach_pipette')}
+        title={startCase(t('attach_pipette', { mount: mount }))}
         currentStep={0}
         totalSteps={3}
         onExit={setShowExit ? exit : () => showExit(true)}
@@ -136,6 +136,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           goBack={() => showExit(false)}
           proceed={exit}
           flowType={FLOWS.ATTACH}
+          isOnDevice={isOnDevice}
         />
       ) : (
         <Flex
@@ -158,7 +159,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             <StyledText
               fontSize="1.75rem"
               fontWeight={700}
-              alignSelf={ALIGN_CENTER}
+              alignSelf={TYPOGRAPHY.textAlignCenter}
             >
               {singleMount}
             </StyledText>
@@ -171,7 +172,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             <StyledText
               fontSize="1.75rem"
               fontWeight={700}
-              alignSelf={ALIGN_CENTER}
+              alignSelf={TYPOGRAPHY.textAlignCenter}
             >
               {ninetySix}
             </StyledText>
@@ -187,16 +188,10 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
       >
         <SmallButton
           onClick={proceed}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        >
-          <StyledText
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            padding={SPACING.spacing4}
-          >
-            {t('continue')}
-          </StyledText>
-        </SmallButton>
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          buttonText={t('continue')}
+          buttonType="default"
+        />
       </Flex>
     </Flex>
   ) : (
@@ -206,7 +201,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         height="30rem"
         header={
           <WizardHeader
-            title={t('attach_pipette')}
+            title={startCase(t('attach_pipette', { mount: mount }))}
             currentStep={0}
             totalSteps={3}
             onExit={setShowExit ? exit : () => showExit(true)}
@@ -218,6 +213,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             goBack={() => showExit(false)}
             proceed={exit}
             flowType={FLOWS.ATTACH}
+            isOnDevice={null}
           />
         ) : (
           <GenericWizardTile
@@ -244,7 +240,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 </Flex>
                 <StyledText
                   css={TYPOGRAPHY.h3SemiBold}
-                  textAlign={TEXT_ALIGN_CENTER}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {ninetySix}
                 </StyledText>
@@ -270,7 +266,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 </Flex>
                 <StyledText
                   css={TYPOGRAPHY.h3SemiBold}
-                  textAlign={TEXT_ALIGN_CENTER}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {singleMount}
                 </StyledText>

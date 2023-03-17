@@ -129,6 +129,7 @@ Since the pipette is so fundamental to the protocol, it might seem like you shou
 
     You may notice that the value of ``tip_racks`` is in brackets, indicating that it’s a list. This serial dilution protocol only uses one tip rack, but some protocols require more tips, so you can assign them to a pipette all at once, like ``tip_racks=[tips1, tips2]``.
 
+.. _tutorial-commands:
 Commands
 --------
 

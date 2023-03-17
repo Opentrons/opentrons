@@ -23,12 +23,28 @@ class Registrant:
     agent_id: str
 
 
+def registrant_from_jwt(token: str, signing_key: str) -> Registrant:
+    """Decode a registrant from a JWT."""
+    decoded = jwt.decode(
+        jwt=token,
+        key=signing_key,
+        algorithms=[_JWT_ALGORITHM],
+        options={"verify_aud": False},
+    )
+    return Registrant(
+        subject=decoded["sub"],
+        agent=decoded["ot_agent"],
+        agent_id=decoded["ot_aid"],
+    )
+
+
 def create_jwt(
     signing_key: str,
     duration: timedelta,
     registrant: Registrant,
     audience: str,
     now: Optional[datetime] = None,
+    id: Optional[str] = None,
 ) -> str:
     """Generate a signed JWT with the specified parameters.
 
@@ -43,6 +59,8 @@ def create_jwt(
 
         now: The time to use as the `iat` (issued at) claim. If `None`, the current time is used.
 
+        id: If provided, this should be a unique-ish ID for this token instance
+
     Returns:
         An encoded JWT
     """
@@ -56,6 +74,8 @@ def create_jwt(
         "ot_aid": registrant.agent_id,
         "aud": audience,
     }
+    if id is not None:
+        claims["jti"] = id
     return jwt.encode(payload=claims, key=signing_key, algorithm=_JWT_ALGORITHM)
 
 
