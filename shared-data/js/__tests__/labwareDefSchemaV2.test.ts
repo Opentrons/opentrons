@@ -52,6 +52,15 @@ const definitionsWithWellsNotMatchingZDimension: Record<string, Set<string>> = {
   "opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json": standard384WellNames,
 }
 
+const definitionsWithWellsHigherThanZDimension: Set<string> = new Set([
+  "geb_96_tiprack_10ul/1.json",
+  "opentrons_24_aluminumblock_generic_2ml_screwcap/1.json",
+  "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json",
+  "opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json",
+  "opentrons_96_tiprack_300ul/1.json",
+  "opentrons_96_filtertiprack_200ul/1.json",
+])
+
 // JSON Schema defintion & setup
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(schema)
@@ -90,8 +99,8 @@ const wellsNotMatchingZDimension = (
 ): string[] => {
   return Object.entries(labwareDef.wells).filter(
     ([wellName, wellDef]) => {
-      const difference = Math.abs(labwareDef.dimensions.zDimension - (wellDef.depth + wellDef.z))
-      return difference > 0.000001 // Tolerate floating point rounding errors.
+      const absDifference = Math.abs(labwareDef.dimensions.zDimension - (wellDef.depth + wellDef.z))
+      return absDifference > 0.000001 // Tolerate floating point rounding errors.
     }
   ).map(
     ([wellName, wellDef]) => wellName
@@ -102,7 +111,10 @@ const wellsHigherThanZDimension = (
   labwareDef: LabwareDefinition2
 ): string[] => {
   return Object.entries(labwareDef.wells).filter(
-    ([wellName, wellDef]) => wellDef.z + wellDef.depth > labwareDef.dimensions.zDimension
+    ([wellName, wellDef]) => {
+      const difference = (wellDef.depth + wellDef.z) - labwareDef.dimensions.zDimension
+      return difference > 0.000001 // Tolerate floating point rounding errors.
+    }
   ).map(
     ([wellName, wellDef]) => wellName
   )
@@ -166,28 +178,31 @@ describe('test schemas of all opentrons definitions', () => {
   })
 })
 
-describe('test dimensional consistency of all opentrons definitions', ()=> {
-  // TODO: "bad" is the wrong word here
-  const knownBadLabware = Object.keys(definitionsWithWellsNotMatchingZDimension)
+describe('test dimensional consistency of all opentrons definitions', () => {
+  const labwarePaths = glob.sync("**/*.json", {cwd: definitionsPath})
 
-  knownBadLabware.forEach(labwarePath => {
+  beforeAll(() => {
+    // Make sure definitions path didn't break, which would give you false positives
+    expect(labwarePaths.length).toBeGreaterThan(0)
+  })
+
+  describe.each(labwarePaths)('%s', (labwarePath) => {
     const fullLabwarePath = path.join(definitionsPath, labwarePath)
     const labwareDef = require(fullLabwarePath) as LabwareDefinition2
 
-    const expectedBadWells = definitionsWithWellsNotMatchingZDimension[labwarePath]
-    test(`${labwarePath} has the expected bad wells`, () => {
+    // TODO: "bad" is the wrong word here
+    const expectedBadWells = definitionsWithWellsNotMatchingZDimension[labwarePath] ?? new Set()
+    it(`has the expected ${expectedBadWells.size} bad wells`, () => {
       const actualBadWells = new Set(wellsNotMatchingZDimension(labwareDef))
       expect(actualBadWells).toEqual(expectedBadWells)
     })
-  })
-    //   it(`has no wells whose tops are different from its zDimension: ${labwarePath}`, () => {
-    //   if
-    //   expect(wellsNotMatchingZDimension(labwareDef)).toEqual([])
-    // })
 
-    // it(`has no wells whose tops are higher than its zDimension: ${labwarePath}`, () => {
-    //   expect(wellsHigherThanZDimension(labwareDef)).toEqual([])
-    // })
+    const tooHighWellsAreExpected = definitionsWithWellsHigherThanZDimension.has(labwarePath)
+    it(`${tooHighWellsAreExpected? "has" : "does not have"} wells whose heights are above the labware's zDimension`, () => {
+      const hasTooHighWells = wellsHigherThanZDimension(labwareDef).length > 0
+      expect(hasTooHighWells).toEqual(tooHighWellsAreExpected)
+    })
+  })
 })
 
 describe('test schemas of all v2 labware fixtures', () => {
