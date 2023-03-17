@@ -318,27 +318,27 @@ def test_get_module_offset_for_ot2_standard(
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=2.17, y=0, z=9),
+            LabwareOffsetVector(x=0, y=0, z=9),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=-2.17, y=0, z=9),
+            LabwareOffsetVector(x=0, y=0, z=9),
         ),
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7,
-            LabwareOffsetVector(x=-19.88, y=67.76, z=-0.04),
+            LabwareOffsetVector(x=-20.005, y=67.96, z=0.26),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=3, y=1, z=19),
+            LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=-3, y=-1, z=19),
+            LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
     ],
 )
