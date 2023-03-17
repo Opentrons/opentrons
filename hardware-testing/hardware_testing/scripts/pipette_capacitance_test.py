@@ -22,22 +22,23 @@ from opentrons.config.types import (
     CapacitivePassSettings,
 )
 from opentrons_hardware.firmware_bindings.constants import SensorId
+from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Pipette Capacitance Test')
     arg_parser.add_argument('-m', '--mount', choices=['l','r'], required=False, help='The pipette mount to be tested', default='l')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
-    arg_parser.add_argument('-x', '--x_increment', type=float, required=False, help='Probe increment size for X-Axis', default=0.1)
+    arg_parser.add_argument('-x', '--x_increment', type=float, required=False, help='Probe increment size for X-Axis', default=0.5)
     arg_parser.add_argument('-z', '--z_increment', type=float, required=False, help='Probe increment size for Z-Axis', default=0.01)
-    arg_parser.add_argument('-d', '--x_steps', type=int, required=False, help='Number of steps for X-Axis', default=50)
+    arg_parser.add_argument('-d', '--x_steps', type=int, required=False, help='Number of steps for X-Axis', default=10)
     arg_parser.add_argument('-t', '--z_steps', type=int, required=False, help='Number of steps for Z-Axis', default=200)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Pipette_Capacitance_Test:
     def __init__(
-        self, simulate: bool, cycles: int, slot: int, x_increment: float, z_increment: float, x_steps: int, z_steps: int
+        self, simulate: bool, cycles: int, slot: int, x_increment: float, z_increment: float, x_steps: int, z_steps: int, probe_type: int, edge_mode: int
     ) -> None:
         self.simulate = simulate
         self.cycles = cycles
@@ -46,15 +47,19 @@ class Pipette_Capacitance_Test:
         self.z_increment = z_increment
         self.x_steps = x_steps
         self.z_steps = z_steps
+        self.probe_type = probe_type
+        self.edge_mode = edge_mode
         self.api = None
         self.mount = None
         self.home = None
         self.pipette_id = None
         self.deck_definition = None
         self.deck_height = None
-        self.slot_center = None
         self.edge = None
         self.sensor_id = SensorId.S0
+        self.jog_step_forward = 0.1
+        self.jog_step_backward = -0.01
+        self.jog_speed = 10 # mm/s
         self.START_HEIGHT = 3 # mm
         self.PROBE_DIA = 4 # mm
         self.CUTOUT_SIZE = 20 # mm
@@ -79,16 +84,40 @@ class Pipette_Capacitance_Test:
             "Z Step":"None",
             "Slot":"None",
             "Pipette":"None",
+            "X Gauge":"None",
+            "X Zero":"None",
             "Deck Height":"None",
             "Edge Position":"None",
             "Capacitance":"None",
             "Current Position":"None",
         }
+        self.gauges = {}
+        self.gauge_ports = {
+            "X":"/dev/ttyUSB0",
+            # "Y":"/dev/ttyUSB1",
+            # "Z":"/dev/ttyUSB2",
+        }
+        self.gauge_offsets = {
+            "X":Point(x=5, y=-5, z=9),
+            "Y":Point(x=-5, y=-5, z=9),
+            "Z":Point(x=0, y=0, z=9),
+        }
+        self.probe_tag = {
+            "1":"solid",
+            "2":"hole",
+        }
+        self.edge_tag = {
+            "1":"cali",
+            "2":"dial",
+        }
 
     async def test_setup(self):
         self.file_setup()
+        if self.edge_mode == 2:
+            self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
+        self.nominal_center = _get_calibration_square_position_in_slot(self.slot)
         if self.simulate:
             self.pipette_id = "SIMULATION"
         else:
@@ -101,8 +130,10 @@ class Pipette_Capacitance_Test:
 
     def file_setup(self):
         class_name = self.__class__.__name__
+        probe_tag = self.probe_tag[str(self.probe_type)]
+        edge_tag = self.edge_tag[str(self.edge_mode)]
         self.test_name = class_name.lower()
-        self.test_tag = f"slot{self.slot}"
+        self.test_tag = f"slot{self.slot}_{probe_tag}_{edge_tag}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -111,11 +142,50 @@ class Pipette_Capacitance_Test:
         print("FILE PATH = ", self.test_path)
         print("FILE NAME = ", self.test_file)
 
+    def gauge_setup(self):
+        for key, value in self.gauge_ports.items():
+            self.gauges[key] = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=value)
+            self.gauges[key].connect()
+
     def dict_keys_to_line(self, dict):
         return str.join(",", list(dict.keys()))+"\n"
 
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
+
+    def _zero_gauges(self):
+        print(f"\nPlace Gauge Block on Deck Slot #{self.slot}")
+        for axis in self.gauges:
+            gauge_zero = "{} Zero".format(axis)
+            input(f"\nPush block against {axis}-axis Gauge and Press ENTER\n")
+            _reading = True
+            while _reading:
+                zeros = []
+                for i in range(5):
+                    gauge = self.gauges[axis].read_stable(timeout=20)
+                    zeros.append(gauge)
+                _variance = abs(max(zeros) - min(zeros))
+                print(f"Variance = {_variance}")
+                if _variance < 0.1:
+                    _reading = False
+            zero = sum(zeros) / len(zeros)
+            self.test_data[gauge_zero] = str(zero)
+            print(f"{axis} Gauge Zero = {zero}mm")
+        input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
+
+    async def _read_gauge(self, axis, step):
+        current_position = await self.api.gantry_position(self.mount)
+        if axis == "X":
+            jog_position = current_position._replace(x=current_position.x + step)
+        elif axis == "Y":
+            jog_position = current_position._replace(y=current_position.y - step)
+        elif axis == "Z":
+            jog_position = self.nominal_center
+        # Move to jog position
+        await self.api.move_to(self.mount, jog_position, speed=self.jog_speed)
+        # Read gauge
+        gauge = self.gauges[axis].read_stable(timeout=20)
+        return gauge
 
     async def _probe_axis(
         self, axis: OT3Axis, target: float
@@ -207,11 +277,11 @@ class Pipette_Capacitance_Test:
         await api.move_to(mount, home_z)
         await api.remove_tip(mount)
 
-    async def _get_edge(
+    async def _calibrate_edge(
         self, api: OT3API, mount: OT3Mount, nominal_center: Point, deck_height: float
     ) -> None:
         # Move inside the cutout
-        nominal_center = nominal_center._replace(y=nominal_center.y-5)
+        nominal_center = nominal_center._replace(y=nominal_center.y - 5)
         below_z = deck_height - 2
         current_position = await api.gantry_position(mount)
         slot_center_above = nominal_center._replace(z=current_position.z)
@@ -224,20 +294,54 @@ class Pipette_Capacitance_Test:
 
         # Return edge position
         current_position = await api.gantry_position(mount)
-        edge_position = current_position._replace(x=x_right)
+        edge_position = current_position._replace(x=x_right,y=current_position.y + 5)
+        return edge_position
+
+    async def _measure_edge(
+        self, api: OT3API, mount: OT3Mount, nominal_center: Point, axis: str
+    ) -> None:
+        # Move up
+        current_pos = await api.gantry_position(mount)
+        z_offset = current_pos + self.gauge_offsets["Z"]
+        await api.move_to(mount, z_offset, speed=10)
+        # Move above slot center
+        above_slot_center = nominal_center + self.gauge_offsets["Z"]
+        await api.move_to(mount, above_slot_center, speed=10)
+        # Move to gauge position
+        gauge_position = self.nominal_center + self.gauge_offsets[axis]
+        await self.api.move_to(self.mount, gauge_position, speed=10)
+        print("Measuring X Gauge...")
+        # Read gauge
+        gauge_value = 0
+        while gauge_value < float(self.test_data[f"{axis} Zero"]):
+            gauge_value = await self._read_gauge(axis, self.jog_step_forward)
+        while gauge_value > float(self.test_data[f"{axis} Zero"]):
+            gauge_value = await self._read_gauge(axis, self.jog_step_backward)
+        self.test_data[f"{axis} Gauge"] = str(gauge_value)
+        print(f"{axis} Gauge = ", self.test_data[f"{axis} Gauge"])
+        # Get edge position
+        current_position = await api.gantry_position(mount)
+        edge_position = current_position._replace(y=current_position.y + 7, z=self.deck_height)
+        # Move above slot center
+        await self.api.move_to(self.mount, above_slot_center, speed=10)
+        # Move to edge position
+        await self.api.move_to(self.mount, edge_position, speed=10)
+        input("PAUSE")
         return edge_position
 
     async def _calibrate_probe(
-        self, api: OT3API, mount: OT3Mount, slot: int
+        self, api: OT3API, mount: OT3Mount, slot: int, nominal_center: Point
     ) -> None:
         # Calibrate pipette
         await api.add_tip(mount, api.config.calibration.probe_length)
         home = await api.gantry_position(mount)
-        nominal_center = _get_calibration_square_position_in_slot(slot)
         self.deck_height = await find_deck_height(api, mount, nominal_center)
         self.test_data["Deck Height"] = str(self.deck_height)
         print(f"Deck Height: {self.deck_height}")
-        self.edge = await self._get_edge(api, mount, nominal_center, self.deck_height)
+        if self.edge_mode == 1:
+            self.edge = await self._calibrate_edge(api, mount, nominal_center, self.deck_height)
+        elif self.edge_mode == 2:
+            self.edge = await self._measure_edge(api, mount, nominal_center, "X")
         self.test_data[f"Edge Position"] = str(self.edge).replace(", ",";")
         print(f"Edge Position: {self.edge}")
         current_position = await api.gantry_position(mount)
@@ -270,12 +374,15 @@ class Pipette_Capacitance_Test:
         try:
             await self.test_setup()
             if self.api and self.mount:
+                if self.edge_mode == 2:
+                    if len(self.gauges) > 0:
+                        self._zero_gauges()
                 input(f"Add Calibration Tip to pipette, then press ENTER: ")
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     await self._home(self.api, self.mount)
-                    await self._calibrate_probe(self.api, self.mount, self.slot)
+                    await self._calibrate_probe(self.api, self.mount, self.slot, self.nominal_center)
                     await self._measure_capacitance(self.api, self.mount, self.slot, cycle)
                     await self._reset(self.api, self.mount)
         except Exception as e:
@@ -292,5 +399,15 @@ if __name__ == '__main__':
     print("\nOT-3 Pipette Capacitance Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Pipette_Capacitance_Test(args.simulate, args.cycles, args.slot, args.x_increment, args.z_increment, args.x_steps, args.z_steps)
+    probe_type = int(input("Choose Probe Type: [Default = 1]\n 1. Solid\n 2. Hole\n") or "1")
+    if probe_type == 1:
+        print("Probe Type = Solid")
+    elif probe_type == 2:
+        print("Probe Type = Hole")
+    edge_mode = int(input("Choose Find Edge Mode: [Default = 1]\n 1. Calibration\n 2. Dial Indicator\n") or "1")
+    if edge_mode == 1:
+        print("Find Edge = Calibration")
+    elif edge_mode == 2:
+        print("Find Edge = Dial Indicator")
+    test = Pipette_Capacitance_Test(args.simulate, args.cycles, args.slot, args.x_increment, args.z_increment, args.x_steps, args.z_steps, probe_type, edge_mode)
     asyncio.run(test.run())
