@@ -118,13 +118,49 @@ class JsonRunner(ProtocolRunner):
             # definitions, so we don't need to yield here.
             self._protocol_engine.add_labware_definition(definition)
 
-        if (
-            isinstance(config, JsonProtocolConfig)
-            and config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
-        ):
-            await self._load_json(protocol_source)
-        else:
-            self._load_python_or_legacy_json(protocol_source, labware_definitions)
+        protocol = await anyio.to_thread.run_sync(
+            self._json_file_reader.read,
+            protocol_source,
+        )
+
+        commands = await anyio.to_thread.run_sync(
+            self._json_translator.translate_commands,
+            protocol,
+        )
+
+        # Add commands and liquids to the ProtocolEngine.
+        #
+        # We yield on every iteration so that loading large protocols doesn't block the
+        # event loop. With a 24-step 10k-command protocol (See RQA-443), adding all the
+        # commands can take 3 to 7 seconds.
+        #
+        # It wouldn't be safe to do this in a worker thread because each addition
+        # invokes the ProtocolEngine's ChangeNotifier machinery, which is not
+        # thread-safe.
+        liquids = await anyio.to_thread.run_sync(
+            self._json_translator.translate_liquids, protocol
+        )
+        for liquid in liquids:
+            self._protocol_engine.add_liquid(
+                id=liquid.id,
+                name=liquid.displayName,
+                description=liquid.description,
+                color=liquid.displayColor,
+            )
+            await _yield()
+        for command in commands:
+            self._protocol_engine.add_command(request=command)
+            await _yield()
+
+        self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
+
+        # if (
+        #     isinstance(config, JsonProtocolConfig)
+        #     and config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
+        # ):
+        #     await self._load_json(protocol_source)
+        # else:
+        #     self._load_python_or_legacy_json(protocol_source, labware_definitions)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -162,43 +198,6 @@ class JsonRunner(ProtocolRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         return ProtocolRunResult(commands=commands, state_summary=run_data)
-
-    async def _load_json(self, protocol_source: ProtocolSource) -> None:
-        protocol = await anyio.to_thread.run_sync(
-            self._json_file_reader.read,
-            protocol_source,
-        )
-
-        commands = await anyio.to_thread.run_sync(
-            self._json_translator.translate_commands,
-            protocol,
-        )
-
-        # Add commands and liquids to the ProtocolEngine.
-        #
-        # We yield on every iteration so that loading large protocols doesn't block the
-        # event loop. With a 24-step 10k-command protocol (See RQA-443), adding all the
-        # commands can take 3 to 7 seconds.
-        #
-        # It wouldn't be safe to do this in a worker thread because each addition
-        # invokes the ProtocolEngine's ChangeNotifier machinery, which is not
-        # thread-safe.
-        liquids = await anyio.to_thread.run_sync(
-            self._json_translator.translate_liquids, protocol
-        )
-        for liquid in liquids:
-            self._protocol_engine.add_liquid(
-                id=liquid.id,
-                name=liquid.displayName,
-                description=liquid.description,
-                color=liquid.displayColor,
-            )
-            await _yield()
-        for command in commands:
-            self._protocol_engine.add_command(request=command)
-            await _yield()
-
-        self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
     # def _load_python_or_legacy_json(
     #     self,
