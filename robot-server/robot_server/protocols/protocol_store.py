@@ -199,6 +199,13 @@ class ProtocolStore:
             for r in all_sql_resources
         ]
 
+    def get_id_by_hash(self, hash: str) -> Optional[str]:
+        """Get all protocol hashes keyed by protocol id."""
+        for p in self.get_all():
+            if p.source.content_hash == hash:
+                return p.protocol_id
+        return None
+
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, protocol_id: str) -> bool:
         """Check for the presence of a protocol ID in the store."""

@@ -8,7 +8,12 @@ from fastapi import APIRouter, Depends, File, UploadFile, status, Form
 from typing import List, Optional, Union
 from typing_extensions import Literal
 
-from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
+from opentrons.protocol_reader import (
+    ProtocolReader,
+    ProtocolFilesInvalidError,
+    FileReaderWriter,
+    FileHasher,
+)
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.errors import ErrorDetails, ErrorBody
@@ -41,6 +46,8 @@ from .dependencies import (
     get_analysis_store,
     get_protocol_analyzer,
     get_protocol_directory,
+    get_file_reader_writer,
+    get_file_hasher,
 )
 
 
@@ -120,7 +127,9 @@ async def create_protocol(
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
+    file_reader_writer: FileReaderWriter = Depends(get_file_reader_writer),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
+    file_hasher: FileHasher = Depends(get_file_hasher),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(get_task_runner),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
@@ -137,6 +146,8 @@ async def create_protocol(
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
+        file_hasher: File hashing interface.
+        file_reader_writer: Input file reader/writer.
         protocol_reader: Protocol file reading interface.
         protocol_analyzer: Protocol analysis interface.
         task_runner: Background task runner.
@@ -148,10 +159,44 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
+    buffered_files = await file_reader_writer.read(files=files)
+    content_hash = await file_hasher.hash(buffered_files)
+    cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
+
+    if cached_protocol_id is not None:
+        resource = protocol_store.get(protocol_id=cached_protocol_id)
+        analyses = analysis_store.get_summaries_by_protocol(
+            protocol_id=cached_protocol_id
+        )
+        data = Protocol.construct(
+            id=cached_protocol_id,
+            createdAt=resource.created_at,
+            protocolType=resource.source.config.protocol_type,
+            robotType=resource.source.robot_type,
+            metadata=Metadata.parse_obj(resource.source.metadata),
+            analysisSummaries=analyses,
+            key=resource.protocol_key,
+            files=[
+                ProtocolFile(name=f.path.name, role=f.role)
+                for f in resource.source.files
+            ],
+        )
+
+        log.info(
+            f'Protocol with id "{cached_protocol_id}" with same contents already exists. returning existing protocol data in response payload'
+        )
+
+        return await PydanticResponse.create(
+            content=SimpleBody.construct(data=data),
+            # not returning a 201 because we're not actually creating a new resource
+            status_code=status.HTTP_200_OK,
+        )
+
     try:
-        source = await protocol_reader.read_and_save(
-            files=files,
+        source = await protocol_reader.save(
+            files=buffered_files,
             directory=protocol_directory / protocol_id,
+            content_hash=content_hash,
         )
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
