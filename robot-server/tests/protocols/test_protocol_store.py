@@ -344,6 +344,7 @@ def test_get_referenced_run_ids(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key=None,
     )
