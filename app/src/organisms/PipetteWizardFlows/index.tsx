@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import startCase from 'lodash/startCase'
 import {
   Flex,
   useConditionalConfirm,
@@ -172,6 +173,7 @@ export const PipetteWizardFlows = (
       goBack={cancelExit}
       proceed={handleCleanUpAndClose}
       flowType={flowType}
+      isOnDevice={isOnDevice}
     />
   )
   const [
@@ -179,7 +181,10 @@ export const PipetteWizardFlows = (
     setIsUnskippableStep,
   ] = React.useState<boolean>(false)
   const unskippableModal = (
-    <UnskippableModal goBack={() => setIsUnskippableStep(false)} />
+    <UnskippableModal
+      goBack={() => setIsUnskippableStep(false)}
+      isOnDevice={isOnDevice}
+    />
   )
   let onExit
   if (currentStep == null) return null
@@ -239,6 +244,8 @@ export const PipetteWizardFlows = (
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
@@ -249,8 +256,8 @@ export const PipetteWizardFlows = (
       <MountPipette
         {...currentStep}
         {...calibrateBaseProps}
-        isPending={isFetchingPipettes}
-        setPending={setIsFetchingPipettes}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
@@ -259,8 +266,8 @@ export const PipetteWizardFlows = (
       <DetachPipette
         {...currentStep}
         {...calibrateBaseProps}
-        isPending={isFetchingPipettes}
-        setPending={setIsFetchingPipettes}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
       />
     )
     if (showConfirmExit) {
@@ -287,7 +294,7 @@ export const PipetteWizardFlows = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = t('calibrate_pipette')
+        wizardTitle = startCase(t('recalibrate_pipette', { mount: mount }))
       } else {
         wizardTitle = t('calibrate_96_channel')
       }
@@ -295,7 +302,7 @@ export const PipetteWizardFlows = (
     }
     case FLOWS.ATTACH: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = t('attach_pipette')
+        wizardTitle = startCase(t('attach_pipette', { mount: mount }))
       } else {
         wizardTitle = isGantryEmpty
           ? t('attach_96_channel')
@@ -309,7 +316,7 @@ export const PipetteWizardFlows = (
     }
     case FLOWS.DETACH: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = t('detach_pipette')
+        wizardTitle = startCase(t('detach_pipette', { mount: mount }))
       } else {
         wizardTitle = t('detach_96_channel')
       }
