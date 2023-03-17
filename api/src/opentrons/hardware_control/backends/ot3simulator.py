@@ -256,7 +256,8 @@ class OT3Simulator:
         plunger_speed: float,
         threshold_pascals: float,
         log_pressure: bool = True,
-        get_pressure_baseline: bool = True,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 8,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
 
