@@ -14,6 +14,7 @@ from opentrons.protocol_reader import (
     ProtocolSourceFile,
     ProtocolFileRole,
     PythonProtocolConfig,
+    FileHasher,
 )
 from opentrons.protocol_reader.file_reader_writer import (
     FileReaderWriter,
@@ -30,8 +31,6 @@ from opentrons.protocol_reader.file_identifier import (
     IdentifiedData,
 )
 from opentrons.protocol_reader.file_format_validator import FileFormatValidator
-
-from ._input_file import InputFile
 
 
 @pytest.fixture
@@ -59,11 +58,18 @@ def file_format_validator(decoy: Decoy) -> FileFormatValidator:
 
 
 @pytest.fixture
+def file_hasher(decoy: Decoy) -> FileHasher:
+    """Get a mocked out FileHasher."""
+    return decoy.mock(cls=FileHasher)
+
+
+@pytest.fixture
 def subject(
     file_reader_writer: FileReaderWriter,
     role_analyzer: RoleAnalyzer,
     file_identifier: FileIdentifier,
     file_format_validator: FileFormatValidator,
+    file_hasher: FileHasher,
 ) -> ProtocolReader:
     """Create a ProtocolReader test subject."""
     return ProtocolReader(
@@ -71,10 +77,11 @@ def subject(
         role_analyzer=role_analyzer,
         file_identifier=file_identifier,
         file_format_validator=file_format_validator,
+        file_hasher=file_hasher,
     )
 
 
-async def test_read_and_save(
+async def test_save(
     decoy: Decoy,
     tmp_path: Path,
     file_reader_writer: FileReaderWriter,
@@ -83,20 +90,7 @@ async def test_read_and_save(
     file_format_validator: FileFormatValidator,
     subject: ProtocolReader,
 ) -> None:
-    """It should read a single file protocol source."""
-    input_main_file = InputFile.make(
-        filename="protocol.py",
-        contents=b"# hello world",
-    )
-    input_labware_file = InputFile.make(
-        filename="labware.json",
-        contents=b"wow",
-    )
-    input_data_file = InputFile.make(
-        filename="data.txt",
-        contents=b"beep boop",
-    )
-
+    """It should compute a single file protocol source."""
     buffered_main_file = BufferedFile(
         name="protocol.py",
         contents=b"# hello world",
@@ -130,11 +124,6 @@ async def test_read_and_save(
     )
 
     decoy.when(
-        await file_reader_writer.read(
-            [input_main_file, input_labware_file, input_data_file]
-        )
-    ).then_return([buffered_main_file, buffered_labware_file, buffered_data_file])
-    decoy.when(
         await file_identifier.identify(
             [buffered_main_file, buffered_labware_file, buffered_data_file]
         )
@@ -143,8 +132,10 @@ async def test_read_and_save(
         role_analysis
     )
 
-    result = await subject.read_and_save(
-        files=[input_main_file, input_labware_file, input_data_file], directory=tmp_path
+    result = await subject.save(
+        files=[buffered_main_file, buffered_labware_file, buffered_data_file],
+        directory=tmp_path,
+        content_hash="abc123",
     )
 
     assert result == ProtocolSource(
@@ -167,6 +158,7 @@ async def test_read_and_save(
         metadata={"hey": "there"},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
+        content_hash="abc123",
     )
 
     decoy.verify(
@@ -191,6 +183,7 @@ async def test_read_saved(
     file_identifier: FileIdentifier,
     role_analyzer: RoleAnalyzer,
     file_format_validator: FileFormatValidator,
+    file_hasher: FileHasher,
     subject: ProtocolReader,
 ) -> None:
     """It should read a single file protocol source without copying elsewhere."""
@@ -245,6 +238,11 @@ async def test_read_saved(
     decoy.when(role_analyzer.analyze([main_file, labware_file, data_file])).then_return(
         role_analysis
     )
+    decoy.when(
+        await file_hasher.hash(
+            [buffered_main_file, buffered_labware_file, buffered_data_file]
+        )
+    ).then_return("abc123")
 
     result = await subject.read_saved(
         files=[input_main_file, input_labware_file, input_data_file],
@@ -272,6 +270,7 @@ async def test_read_saved(
         metadata={"hey": "there"},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
+        content_hash="abc123",
     )
 
     decoy.verify(

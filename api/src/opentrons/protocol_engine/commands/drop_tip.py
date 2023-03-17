@@ -4,7 +4,7 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import DropTipWellLocation
+from ..types import DropTipWellLocation, DeckPoint
 from .pipetting_common import PipetteIdMixin, DestinationPositionResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -78,7 +78,9 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
 
         await self._tip_handler.drop_tip(pipette_id=pipette_id, home_after=home_after)
 
-        return DropTipResult(position=position)
+        return DropTipResult(
+            position=DeckPoint(x=position.x, y=position.y, z=position.z)
+        )
 
 
 class DropTip(BaseCommand[DropTipParams, DropTipResult]):

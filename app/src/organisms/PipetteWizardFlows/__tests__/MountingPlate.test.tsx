@@ -31,7 +31,6 @@ describe('MountingPlate', () => {
   let props: React.ComponentProps<typeof MountingPlate>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -45,6 +44,7 @@ describe('MountingPlate', () => {
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected for attach flow', () => {

@@ -6,10 +6,11 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from ..types import DeckPoint
+from ..resources import ModelUtils
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
-    from ..execution import MovementHandler
+    from ..execution import GantryMover
 
 SavePositionCommandType = Literal["savePosition"]
 
@@ -45,18 +46,25 @@ class SavePositionImplementation(
 ):
     """Save position command implementation."""
 
-    def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
-        self._movement = movement
+    def __init__(
+        self,
+        gantry_mover: GantryMover,
+        model_utils: Optional[ModelUtils] = None,
+        **kwargs: object,
+    ) -> None:
+        self._gantry_mover = gantry_mover
+        self._model_utils = model_utils or ModelUtils()
 
     async def execute(self, params: SavePositionParams) -> SavePositionResult:
         """Check the requested pipette's current position."""
-        result = await self._movement.save_position(
-            pipette_id=params.pipetteId,
-            position_id=params.positionId,
+        position_id = self._model_utils.ensure_id(params.positionId)
+        x, y, z = await self._gantry_mover.get_position(
+            pipette_id=params.pipetteId, fail_on_not_homed=True
         )
+
         return SavePositionResult(
-            positionId=result.positionId,
-            position=result.position,
+            positionId=position_id,
+            position=DeckPoint(x=x, y=y, z=z),
         )
 
 

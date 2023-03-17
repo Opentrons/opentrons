@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 
@@ -17,25 +16,32 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getDeckDefFromRobotType,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import { BackButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
   useAttachedModules,
   useRunCreatedAtTimestamp,
-  useUnmatchedModulesForProtocol,
 } from '../../organisms/Devices/hooks'
-import { getLabwareSetupItemGroups } from '../../organisms/Devices/ProtocolRun/SetupLabware/utils'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
+import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
+import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelModal } from '../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
-import { getLocalRobot } from '../../redux/discovery'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -59,14 +65,14 @@ function ProtocolSetupStep({
   const backgroundColorByStepStatus = {
     ready: `${COLORS.successEnabled}${COLORS.opacity20HexCode}`,
     'not ready': COLORS.warningBackgroundMed,
-    general: COLORS.greyDisabled,
+    general: COLORS.light_two,
   }
   return (
     <Btn onClick={onClickSetupStep} width="100%">
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius="1rem"
+        borderRadius={BORDERS.size_four}
         gridGap="1.5rem"
         padding="1.5rem 1rem"
       >
@@ -140,12 +146,15 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
 }
 
 interface PrepareToRunProps {
+  runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
 }
 
-function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
+function PrepareToRun({
+  runId,
+  setSetupScreen,
+}: PrepareToRunProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const { runId } = useParams<OnDeviceRouteParams>()
   const history = useHistory()
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
@@ -156,7 +165,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const protocolData = useMostRecentCompletedAnalysis(runId)
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   // TODO(bh, 2023-01-25): remove the hardcode when data exists for all start run blockers
   const isReadyToRun = true
@@ -182,8 +191,6 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  const robotName = useSelector(getLocalRobot)?.name ?? ''
-
   // Instruments information
   // TODO(bh, 2023-01-25): implement when instruments endpoints available
   const instrumentsDetail = t('instruments_connected', {
@@ -193,18 +200,23 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
 
   // Modules infomation
   const protocolHasModules =
-    protocolData?.modules != null && protocolData?.modules.length > 0
+    mostRecentAnalysis?.modules != null &&
+    mostRecentAnalysis?.modules.length > 0
+
   // get missing/unmatched modules and derive status
   const attachedModules = useAttachedModules()
-  /**
-   * TODO(bh, 2023-01-24): for convenience, reusing hooks written for desktop app
-   * useUnmatchedModulesForProtocol is indirect for the local robot case and calls other hooks that aren't relevant here
-   * consider refactoring, extracting relevant internals of those hooks
-   * */
+
+  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+
+  const protocolModulesInfo =
+    mostRecentAnalysis != null
+      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+      : []
+
   const {
     missingModuleIds,
     remainingAttachedModules,
-  } = useUnmatchedModulesForProtocol(robotName, runId)
+  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
 
   const isMissingModules = missingModuleIds.length > 0
   const isUnmatchedModules =
@@ -213,7 +225,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
 
   // get display name of first missing module
   const firstMissingModuleId = first(missingModuleIds)
-  const firstMissingModuleModel = protocolData?.modules.find(
+  const firstMissingModuleModel = mostRecentAnalysis?.modules.find(
     module => module.id === firstMissingModuleId
   )?.model
   const firstMissingModuleDisplayName: string =
@@ -238,7 +250,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
-    protocolData?.commands ?? []
+    mostRecentAnalysis?.commands ?? []
   )
   const onDeckLabwareCount = onDeckItems.length
   const additionalLabwareCount = offDeckItems.length
@@ -334,7 +346,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
   )
 }
 
-type SetupScreens =
+export type SetupScreens =
   | 'prepare to run'
   | 'instruments'
   | 'modules'
@@ -343,13 +355,17 @@ type SetupScreens =
   | 'liquids'
 
 export function ProtocolSetup(): JSX.Element {
+  const { runId } = useParams<OnDeviceRouteParams>()
+
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
     'prepare to run'
   )
 
   const setupComponentByScreen = {
-    'prepare to run': <PrepareToRun setSetupScreen={setSetupScreen} />,
+    'prepare to run': (
+      <PrepareToRun runId={runId} setSetupScreen={setSetupScreen} />
+    ),
     // TODO: insert setup screen components below:
     instruments: (
       <>
@@ -358,16 +374,10 @@ export function ProtocolSetup(): JSX.Element {
       </>
     ),
     modules: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Modules
-      </>
+      <ProtocolSetupModules runId={runId} setSetupScreen={setSetupScreen} />
     ),
     labware: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Labware
-      </>
+      <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
     ),
     lpc: (
       <>

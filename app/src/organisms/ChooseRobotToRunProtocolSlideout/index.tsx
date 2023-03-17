@@ -135,6 +135,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
             offsetCandidates={offsetCandidates}
             shouldApplyOffsets={shouldApplyOffsets}
             setShouldApplyOffsets={setShouldApplyOffsets}
+            commands={mostRecentAnalysis?.commands ?? []}
+            labware={mostRecentAnalysis?.labware ?? []}
+            modules={mostRecentAnalysis?.modules ?? []}
           />
           <PrimaryButton
             onClick={handleProceed}

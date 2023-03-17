@@ -44,11 +44,8 @@ def apply_additional_offset_to_labware(
     """Apply additional offset to labware."""
     # NOTE: this will re-instantiate all the labware's WELLs
     #       so this must be ran before rest of protocol
-    labware_imp = labware._core
-    labware_delta = labware.calibrated_offset - labware_imp.get_geometry().offset
-    labware.set_offset(
-        x=labware_delta.x + x, y=labware_delta.y + y, z=labware_delta.z + z
-    )
+    # FIXME: remove dependency on this feature, b/c it isn't supported in engine
+    return
 
 
 def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:

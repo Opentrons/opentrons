@@ -88,8 +88,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     def set_calibration(self, delta: Point) -> None:
         raise NotImplementedError(
-            "Setting a labware's calibration after it's been loaded"
-            " is not supported by Protocol Engine."
+            "Setting a labware's calibration after it's been loaded is not supported."
         )
 
     def get_calibrated_offset(self) -> Point:

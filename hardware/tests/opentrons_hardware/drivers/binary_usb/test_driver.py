@@ -13,7 +13,11 @@ from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
 from typing import AsyncGenerator, List
 import pytest
 import asyncio
-from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import Ack
+from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
+    Ack,
+    AckFailed,
+    EnterBootloaderRequest,
+)
 
 
 def run(primary_files_fd: List[int], primary_files_obj: List[io.FileIO]) -> None:
@@ -127,6 +131,7 @@ async def test_send(subject: SerialUsbDriver, test_port_host: SerialEmulator) ->
     m = Ack()
     length = await subject.write(m)
     assert length == 4
+    await asyncio.sleep(0.5)
 
     recieved = test_port_host.read()
 
@@ -141,3 +146,30 @@ async def test_recv(subject: SerialUsbDriver, test_port_host: SerialEmulator) ->
     assert type(message) == Ack
 
     assert message == Ack()
+
+
+async def test_recv_iterator(
+    subject: SerialUsbDriver, test_port_host: SerialEmulator
+) -> None:
+    """Test receiving and parsing data from the USB driver."""
+    m = [b"\x00\x01\x00\x00", b"\x00\x02\x00\x00", b"\x00\x05\x00\x00"]
+
+    for msg_s in m:
+        length = test_port_host.write(msg_s)
+        assert length == 4
+
+    messages = []
+    async for msg_r in subject:
+        messages.append(msg_r)
+        if len(messages) == len(m):
+            break
+
+    assert len(messages) == 3
+    assert type(messages[0]) == Ack
+    assert messages[0] == Ack()
+
+    assert type(messages[1]) == AckFailed
+    assert messages[1] == AckFailed()
+
+    assert type(messages[2]) == EnterBootloaderRequest
+    assert messages[2] == EnterBootloaderRequest()
