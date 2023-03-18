@@ -65,7 +65,7 @@ export function FactoryResetSlideout({
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
+  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const tipLengthCalibrations = useTipLengthCalibrations(robotName)
   const options = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)

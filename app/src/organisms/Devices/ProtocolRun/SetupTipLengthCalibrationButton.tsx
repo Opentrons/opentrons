@@ -57,7 +57,7 @@ export function SetupTipLengthCalibrationButton({
   ] = useDashboardCalibrateTipLength(robotName)
   const { deleteCalibration } = useDeleteCalibrationMutation()
   const attachedPipettes = useAttachedPipettes()
-  const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
+  const offsetCalibrations = usePipetteOffsetCalibrations()
 
   const offsetCalsToDelete = offsetCalibrations?.filter(
     cal =>
