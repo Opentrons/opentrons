@@ -25,7 +25,6 @@ export function SetupTipLengthCalibration({
 }: SetupTipLengthCalibrationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
-  console.log({ runPipetteInfoByMount })
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
@@ -38,7 +37,6 @@ export function SetupTipLengthCalibration({
       </StyledText>
       {PipetteConstants.PIPETTE_MOUNTS.map(mount => {
         const pipetteInfo = runPipetteInfoByMount[mount]
-        console.log({ pipetteInfo })
         if (pipetteInfo == null) {
           return null
         } else {
