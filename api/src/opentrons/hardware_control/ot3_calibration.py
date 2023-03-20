@@ -115,17 +115,13 @@ async def find_edge_binary(
     here = await hcapi.gantry_position(mount)
     await hcapi.move_to(mount, here._replace(z=CAL_TRANSIT_HEIGHT))
     edge_settings = hcapi.config.calibration.edge_sense
-    # Our first search position is at the nominal offset by our stride
-    # against the search direction. That way we always start on the deck
-    stride = edge_settings.search_initial_tolerance_mm * search_direction
-    checking_pos = slot_edge_nominal + search_axis.set_in_point(Point(0, 0, 0), -stride)
+    # Our first search position is at the slot edge nominal
+    checking_pos = slot_edge_nominal
 
-    # The first time we take a stride, we actually want it to be the full
-    # specified initial tolerance. Since the way our loop works, we halve
-    # the stride before we adjust the offset, we'll initially double our
-    # stride (if we don't do that, we Zeno's Paradox ourselves)
-    stride += edge_settings.search_initial_tolerance_mm * search_direction
-    for _ in range(edge_settings.search_iteration_limit):
+    # Since the way our loop works, we halve the stride before we adjust
+    # the offset, we'll initially double our stride (if we don't do that, we Zeno's Paradox ourselves)
+    stride = edge_settings.search_initial_tolerance_mm * search_direction * 2
+    for i in range(edge_settings.search_iteration_limit):
         LOG.info(f"Checking position {checking_pos}")
         check_prep = checking_pos._replace(z=CAL_TRANSIT_HEIGHT)
         await hcapi.move_to(mount, check_prep)
