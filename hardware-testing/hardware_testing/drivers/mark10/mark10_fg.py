@@ -100,7 +100,9 @@ class Mark10(Mark10Base):
         self._force_guage.write("?\r\n".encode("utf-8"))
         start_time = time()
         while time() < start_time + timeout:
-            force_val, units = self._force_guage.readline().strip().split()
+            line = self._force_guage.readline().decode("utf-8").strip()
+            print(f"line: {line}")
+            force_val, units = line.split()
             if not force_val:
                 continue
             unit_str = str(units, "utf-8")
