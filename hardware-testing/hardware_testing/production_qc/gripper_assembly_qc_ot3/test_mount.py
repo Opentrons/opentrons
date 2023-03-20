@@ -109,11 +109,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.home([z_ax])
         # RETRACT AND LOWER CURRENT
         print("retracting 0.5 mm from endstop")
-        await api.move_rel(mount, Point(z=-RETRACT_AFTER_HOME_MM))
+        await api.move_rel(mount, Point(z=-RETRACT_AFTER_HOME_MM), speed=speed)
         print(f"lowering run-current to {current} amps")
-        helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-            api, z_ax, run_current=current
-        )
+        # helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+        #     api, z_ax, run_current=current
+        # )
+        await api._backend.set_active_current({z_ax: current})
         # MOVE DOWN
         print(f"moving down {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
         await _save_result(_get_test_tag(current, speed, "down", "start"))
@@ -126,7 +127,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await _save_result(_get_test_tag(current, speed, "up", "end"))
         # RESET CURRENTS AND HOME
         print("homing...")
-        helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-            api, z_ax, run_current=default_z_current
-        )
+
+        await api._backend.set_active_current({z_ax: default_z_current})
         await api.home([z_ax])
