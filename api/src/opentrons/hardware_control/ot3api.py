@@ -1646,10 +1646,6 @@ class OT3API(
                     speed=move.speed,
                     home_flagged_axes=False,
                 )
-        # we expect a stall happened here
-        await self._update_position_estimation(
-            [OT3Axis.from_axis(ax) for ax in move.home_axes]
-        )
         if move.home_after:
             await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
 
