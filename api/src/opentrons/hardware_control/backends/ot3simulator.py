@@ -327,6 +327,7 @@ class OT3Simulator:
         encoder_position_um: int,
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
+        self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
     @ensure_yield
     async def tip_action(

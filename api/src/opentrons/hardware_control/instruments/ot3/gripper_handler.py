@@ -147,6 +147,12 @@ class GripperHandler:
         gripper = self.get_gripper()
         gripper.current_jaw_displacement = mm
 
+    def get_jaw_width(self) -> float:
+        gripper = self.get_gripper()
+        conf = self.get_gripper().geometry
+        jaw_max = conf.jaw_width["max"]
+        return jaw_max - (gripper.current_jaw_displacement * 2)
+
     def is_valid_jaw_width(self, mm: float) -> bool:
         conf = self.get_gripper().geometry
         return conf.jaw_width["min"] <= mm <= conf.jaw_width["max"]
