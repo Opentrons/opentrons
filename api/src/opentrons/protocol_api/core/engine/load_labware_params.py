@@ -1,7 +1,21 @@
-from typing import Tuple, List, Optional
+from typing import Dict, Tuple, List, Optional
 
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
+
+
+# Default versions of Opentrons standard labware definitions in Python Protocol API
+# v2.14 and above. Labware not explicitly listed here default to 1.
+#
+# This will need to be extended t
+_APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
+    # v1 of many labware definitions have wrong `zDimension`s. (Jira RSS-202.)
+    # For "opentrons_96_aluminumblock_generic_pcr_strip_200ul" and
+    # "opentrons_24_aluminumblock_generic_2ml_screwcap", they're wrong enough to
+    # easily cause collisions. (Jira RSS-197.)
+    "opentrons_24_aluminumblock_generic_2ml_screwcap": 2,
+    "opentrons_96_aluminumblock_generic_pcr_strip_200ul": 2,
+}
 
 
 class AmbiguousLoadLabwareParamsError(RuntimeError):
@@ -69,16 +83,6 @@ def resolve(
 
 
 def _get_default_version_for_standard_labware(load_name: str) -> int:
-    # v1 of many labware definitions have wrong `zDimension`s. (Jira RSS-202.)
-    #
-    # For "opentrons_96_aluminumblock_generic_pcr_strip_200ul" and
-    # "opentrons_24_aluminumblock_generic_2ml_screwcap", they're wrong enough to
-    # easily cause collisions. (Jira RSS-197.)
-    if load_name in {
-        "opentrons_24_aluminumblock_generic_2ml_screwcap",
-        "opentrons_96_aluminumblock_generic_pcr_strip_200ul",
-    }:
-        return 2
-
-    else:
-        return 1
+    # We know the protocol is running at least apiLevel 2.14 by this point because
+    # apiLevel 2.13 and below has its own separate code path for resolving labware.
+    return _APILEVEL_2_14_OT_DEFAULT_VERSIONS.get(load_name, 1)
