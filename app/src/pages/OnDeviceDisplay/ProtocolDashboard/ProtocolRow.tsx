@@ -87,7 +87,7 @@ export function ProtocolRow(props: {
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
         {longpress.isLongPressed && (
-          <LongPressModal longpress={longpress} protocol={protocol} />
+          <LongPressModal longpress={longpress} protocolId={protocol.id} />
         )}
       </TableDatum>
     </TableRow>

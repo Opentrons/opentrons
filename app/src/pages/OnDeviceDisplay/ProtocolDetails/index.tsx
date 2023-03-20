@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
-  useDeleteProtocolMutation,
+  useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { ProtocolMetadata } from '@opentrons/shared-data'
@@ -28,6 +28,7 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 
 import type { OnDeviceRouteParams } from '../../../App/types'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 type ProtocolType = 'json' | 'python'
 type CreationMethod = 'Protocol Designer' | 'Python'
@@ -151,6 +152,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const { t } = useTranslation('protocol_details')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const history = useHistory()
+  const host = useHost()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     protocolSectionTabOptions[0]
   )
@@ -168,7 +170,28 @@ export function ProtocolDetails(): JSX.Element | null {
     createRun({ protocolId })
   }
 
-  const { deleteProtocol } = useDeleteProtocolMutation(protocolId)
+  const handleDeleteClick = (): void => {
+    if (host != null) {
+      getProtocol(host, protocolId)
+        .then(response => response.data.data)
+        .then(protocol => {
+          const referencedRunIds = protocol.metadata.referencedRunIds
+          return referencedRunIds ?? []
+        })
+        .then(referencedRunIds =>
+          Promise.all(referencedRunIds?.map(runId => deleteRun(host, runId)))
+        )
+        .then(() => deleteProtocol(host, protocolId))
+        .then(() => history.goBack())
+        .catch((e: Error) => {
+          console.error(`error deleting resources: ${e.message}`)
+        })
+    } else {
+      console.error(
+        'could not delete resources because the robot host is unknown'
+      )
+    }
+  }
 
   if (protocolRecord == null) return null
 
@@ -195,13 +218,7 @@ export function ProtocolDetails(): JSX.Element | null {
         currentOption={currentOption}
       />
       <Flex margin={SPACING.spacing4}>
-        <Flex
-          cursor={'default'}
-          onClick={() => {
-            deleteProtocol()
-            history.goBack()
-          }}
-        >
+        <Flex cursor={'default'} onClick={handleDeleteClick}>
           <Icon
             size={SIZE_2}
             color={COLORS.errorEnabled}
