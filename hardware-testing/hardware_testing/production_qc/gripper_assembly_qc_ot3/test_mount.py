@@ -1,5 +1,5 @@
 """Test Mount."""
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -17,48 +17,12 @@ RETRACT_AFTER_HOME_MM = 0.5
 Z_AXIS_TRAVEL_DISTANCE = 150.0
 Z_MAX_SKIP_MM = 0.25
 
-CURRENTS_SPEEDS: List[Tuple[float, float]] = [
-    (
-        0.1,
-        50,
-    ),  # 0.1 amps
-    (
-        0.1,
-        150,
-    ),
-    (
-        0.1,
-        200,
-    ),
-    (
-        0.1,
-        250,
-    ),
-    (
-        0.2,
-        150,
-    ),  # 0.2 amps
-    (
-        0.2,
-        200,
-    ),
-    (
-        0.2,
-        250,
-    ),
-    (
-        0.3,
-        200,
-    ),  # 0.3 amps
-    (
-        0.3,
-        250,
-    ),
-    (
-        0.67,
-        250,
-    ),  # 0.67 amps
-]
+CURRENTS_SPEEDS: Dict[float, List[float]] = {
+    0.1: [50, 150, 200, 250],
+    0.2: [150, 200, 250],
+    0.3: [200, 250],
+    0.67: [250],
+}
 
 
 def _get_test_tag(
@@ -70,11 +34,14 @@ def _get_test_tag(
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
-    for current, speed in CURRENTS_SPEEDS:
-        for dir in ["down", "up"]:
-            for step in ["start", "end"]:
-                tag = _get_test_tag(current, speed, dir, step)
-                lines.append(CSVLine(tag, [float, float, CSVResult]))
+    currents = list(CURRENTS_SPEEDS.keys())
+    for current in sorted(currents):
+        speeds = CURRENTS_SPEEDS[current]
+        for speed in sorted(speeds):
+            for dir in ["down", "up"]:
+                for step in ["start", "end"]:
+                    tag = _get_test_tag(current, speed, dir, step)
+                    lines.append(CSVLine(tag, [float, float, CSVResult]))
     return lines
 
 
@@ -96,37 +63,49 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, z_ax)
     default_z_current = settings.run_current
 
-    async def _save_result(tag: str) -> None:
+    async def _save_result(tag: str) -> bool:
         z_est, z_enc, z_aligned = await _is_z_axis_still_aligned_with_encoder(api)
         result = CSVResult.from_bool(z_aligned)
         report(section, tag, [z_est, z_enc, result])
+        return z_aligned
 
     # LOOP THROUGH CURRENTS + SPEEDS
-    for current, speed in CURRENTS_SPEEDS:
-        ui.print_header(f"CURRENT: {current}, SPEED: {speed}")
-        # HOME
-        print("homing...")
-        await api.home([z_ax])
-        # RETRACT AND LOWER CURRENT
-        print("retracting 0.5 mm from endstop")
-        await api.move_rel(mount, Point(z=-RETRACT_AFTER_HOME_MM), speed=speed)
-        print(f"lowering run-current to {current} amps")
-        # helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-        #     api, z_ax, run_current=current
-        # )
-        await api._backend.set_active_current({z_ax: current})
-        # MOVE DOWN
-        print(f"moving down {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
-        await _save_result(_get_test_tag(current, speed, "down", "start"))
-        await api.move_rel(mount, Point(z=-Z_AXIS_TRAVEL_DISTANCE), speed=speed)
-        await _save_result(_get_test_tag(current, speed, "down", "end"))
-        # MOVE UP
-        print(f"moving up {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
-        await _save_result(_get_test_tag(current, speed, "up", "start"))
-        await api.move_rel(mount, Point(z=Z_AXIS_TRAVEL_DISTANCE), speed=speed)
-        await _save_result(_get_test_tag(current, speed, "up", "end"))
-        # RESET CURRENTS AND HOME
-        print("homing...")
-
-        await api._backend.set_active_current({z_ax: default_z_current})
-        await api.home([z_ax])
+    currents = list(CURRENTS_SPEEDS.keys())
+    for current in sorted(currents):
+        speeds = CURRENTS_SPEEDS[current]
+        for speed in sorted(speeds):
+            ui.print_header(f"CURRENT: {current}, SPEED: {speed}")
+            # HOME
+            print("homing...")
+            await api.home([z_ax])
+            # RETRACT AND LOWER CURRENT
+            print("retracting 0.5 mm from endstop")
+            await api.move_rel(mount, Point(z=-RETRACT_AFTER_HOME_MM), speed=speed)
+            print(f"lowering run-current to {current} amps")
+            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                api, z_ax, run_current=current
+            )
+            # await api._backend.set_active_current({z_ax: current})
+            # MOVE DOWN
+            print(f"moving down {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
+            await _save_result(_get_test_tag(current, speed, "down", "start"))
+            await api.move_rel(mount, Point(z=-Z_AXIS_TRAVEL_DISTANCE), speed=speed)
+            down_passed = await _save_result(_get_test_tag(current, speed, "down", "end"))
+            # MOVE UP
+            print(f"moving up {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
+            await _save_result(_get_test_tag(current, speed, "up", "start"))
+            await api.move_rel(mount, Point(z=Z_AXIS_TRAVEL_DISTANCE), speed=speed)
+            up_passed = await _save_result(_get_test_tag(current, speed, "up", "end"))
+            # RESET CURRENTS AND HOME
+            print("homing...")
+            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                api, z_ax, run_current=default_z_current
+            )
+            # await api._backend.set_active_current({z_ax: default_z_current})
+            await api.home([z_ax])
+            if not down_passed or not up_passed and not api.is_simulator:
+                keep_testing = ui.get_user_answer(f"current {current} failed, "
+                                                  f"test remaining speeds for this current")
+                if not keep_testing:
+                    print("skipping any remaining speeds at this current")
+                    break

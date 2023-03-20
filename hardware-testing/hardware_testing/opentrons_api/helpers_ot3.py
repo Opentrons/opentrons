@@ -168,7 +168,7 @@ def get_gantry_per_axis_setting_ot3(
     return settings.low_throughput[axis_kind]
 
 
-def set_gantry_load_per_axis_current_settings_ot3(
+async def set_gantry_load_per_axis_current_settings_ot3(
     api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
@@ -192,6 +192,8 @@ def set_gantry_load_per_axis_current_settings_ot3(
             load=load,
             value=run_current,
         )
+    # make sure new currents are sent to hardware controller
+    await api.set_gantry_load(load)
 
 
 def set_gantry_load_per_axis_motion_settings_ot3(
@@ -300,7 +302,7 @@ async def set_gantry_load_per_axis_settings_ot3(
             max_speed_discontinuity=stg.max_start_stop_speed,
             direction_change_speed_discontinuity=stg.max_change_dir_speed,
         )
-        set_gantry_load_per_axis_current_settings_ot3(
+        await set_gantry_load_per_axis_current_settings_ot3(
             api, ax, load, hold_current=stg.hold_current, run_current=stg.run_current
         )
     if load == api.gantry_load:
