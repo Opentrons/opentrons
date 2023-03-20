@@ -14,6 +14,7 @@ import {
   COLORS,
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -42,7 +43,7 @@ const OptionLabel = styled.label<LabelProps>`
   border: 2px solid
     ${({ isSelected }) =>
       isSelected === true ? COLORS.blueEnabled : COLORS.light_two};
-  border-radius: 16px;
+  border-radius: ${BORDERS.size_four};
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.medBlue : COLORS.white};
 `
@@ -115,7 +116,7 @@ export function DeviceReset({
           alignItems={ALIGN_CENTER}
           gridGap="0.75rem"
           padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
-          borderRadius="12px"
+          borderRadius={BORDERS.size_three}
         >
           <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />
           <StyledText

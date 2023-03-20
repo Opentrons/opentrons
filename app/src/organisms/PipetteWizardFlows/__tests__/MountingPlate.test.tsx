@@ -31,7 +31,6 @@ describe('MountingPlate', () => {
   let props: React.ComponentProps<typeof MountingPlate>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),

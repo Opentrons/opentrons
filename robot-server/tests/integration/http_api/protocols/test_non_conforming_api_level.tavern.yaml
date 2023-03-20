@@ -3,6 +3,7 @@ test_name: Upload, analyze, and validate protocol analysis failure for api level
 marks:
   - usefixtures:
       - run_server
+      - clean_server_state
 stages:
   - name: Upload a python protocol with non-conforming api level 
     request:

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
@@ -37,18 +36,15 @@ describe('CheckPipettesButton', () => {
     }
   })
   afterEach(() => {
-    resetAllWhenMocks()
     jest.resetAllMocks()
   })
 
   it('renders the confirm attachment btn and clicking on it calls fetchPipettes', () => {
     const refetch = jest.fn(() => Promise.resolve())
-    when(mockUsePipettesQuery)
-      .calledWith()
-      .mockReturnValue({
-        status: 'idle',
-        refetch,
-      } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      refetch,
+      isFetching: false,
+    } as any)
     props = {
       robotName: 'otie',
       onDone: jest.fn(),
@@ -62,12 +58,10 @@ describe('CheckPipettesButton', () => {
 
   it('renders the confirm detachment btn and clicking on it calls fetchPipettes', () => {
     const refetch = jest.fn(() => Promise.resolve())
-    when(mockUsePipettesQuery)
-      .calledWith()
-      .mockReturnValue({
-        status: 'idle',
-        refetch,
-      } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      refetch,
+      isFetching: false,
+    } as any)
     props = {
       robotName: 'otie',
       onDone: jest.fn(),
@@ -80,14 +74,27 @@ describe('CheckPipettesButton', () => {
     expect(refetch).toHaveBeenCalled()
   })
 
+  it('renders button disabled when pipettes query status is loading', () => {
+    const refetch = jest.fn(() => Promise.resolve())
+    mockUsePipettesQuery.mockReturnValue({
+      refetch,
+      isFetching: true,
+    } as any)
+    props = {
+      robotName: 'otie',
+      onDone: jest.fn(),
+      actualPipette: MOCK_ACTUAL_PIPETTE,
+    }
+    const { getByLabelText } = render(props)
+    expect(getByLabelText('Confirm')).toBeDisabled()
+  })
+
   it('renders the confirm detachment btn and with children and clicking on it calls fetchPipettes', () => {
     const refetch = jest.fn(() => Promise.resolve())
-    when(mockUsePipettesQuery)
-      .calledWith()
-      .mockReturnValue({
-        status: 'idle',
-        refetch,
-      } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      refetch,
+      isFetching: false,
+    } as any)
     props = {
       ...props,
       actualPipette: MOCK_ACTUAL_PIPETTE,

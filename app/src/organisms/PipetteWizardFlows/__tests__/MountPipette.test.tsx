@@ -36,7 +36,6 @@ describe('MountPipette', () => {
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -47,8 +46,8 @@ describe('MountPipette', () => {
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
-      isPending: false,
-      setPending: jest.fn(),
+      isFetching: false,
+      setFetching: jest.fn(),
       isOnDevice: false,
     }
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
@@ -57,11 +56,9 @@ describe('MountPipette', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Connect and screw in pipette')
     getByText(
-      'Hold onto the pipette so it does not fall. Attach the pipette to the robot by alinging the pins and ensuring a secure connection with the pins.'
+      'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
     )
-    getByText(
-      'Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
-    )
+
     getByAltText('Screw pattern')
 
     const backBtn = getByLabelText('back')
@@ -78,7 +75,7 @@ describe('MountPipette', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
     getByText('Connect and Attach 96 Channel Pipette')
     getByText(
-      'Hold onto the pipette so it does not fall. Attach the 96 channel to thegantry by alinging the 2 protruding rods on the mounting plate and ensuring a secure connection by screwing in the 4 front screws with the provided screw driver.'
+      'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
     )
     getByAltText('Attach 96 channel pipette')
     const backBtn = getByLabelText('back')
@@ -86,10 +83,10 @@ describe('MountPipette', () => {
     expect(props.goBack).toHaveBeenCalled()
     getByText('mock check pipette button')
   })
-  it('returns skeletons and disabled buttons when isPending is true', () => {
+  it('returns skeletons and disabled buttons when isFetching is true', () => {
     props = {
       ...props,
-      isPending: true,
+      isFetching: true,
     }
     const { getAllByTestId, getByLabelText } = render(props)
     getAllByTestId('Skeleton')
