@@ -147,11 +147,14 @@ export function registerDiscovery(
     client.stop()
   })
 
+  let destroyHttpAgent: () => void
+
   async function usbListener(
     _event: IpcMainInvokeEvent,
     config: AxiosRequestConfig
   ): Promise<unknown> {
     const httpAgent = client.createHttpAgent()
+    destroyHttpAgent = httpAgent.destroy
     const response = await axios.request({
       httpAgent,
       ...config,
@@ -197,6 +200,7 @@ export function registerDiscovery(
         break
       case USB_DEVICE_REMOVED:
         if (action.payload.usbDevice.serialNumber === DEFAULT_SERIAL) {
+          destroyHttpAgent?.()
           ipcMain.removeHandler('usb:request')
         }
         break
