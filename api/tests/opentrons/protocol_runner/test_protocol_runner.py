@@ -330,7 +330,7 @@ async def test_load_json_runner(
     ]
 
     liquids: List[Liquid] = [
-        Liquid(id="water-id", displayName="water", description=" water desc")
+        Liquid(id="water-id", displayName="water", description="water desc")
     ]
 
     decoy.when(
@@ -344,6 +344,9 @@ async def test_load_json_runner(
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
+        protocol_engine.add_liquid(
+            id="water-id", name="water", description="water desc", color=None
+        ),
         protocol_engine.add_command(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="hello")
@@ -365,239 +368,180 @@ async def test_load_json_runner(
     )
 
 
-async def test_load_json_liquids_ff_on(
+async def test_load_legacy_python(
     decoy: Decoy,
-    json_file_reader: JsonFileReader,
-    json_translator: JsonTranslator,
-    protocol_engine: ProtocolEngine,
+    legacy_file_reader: LegacyFileReader,
+    legacy_context_creator: LegacyContextCreator,
+    legacy_executor: LegacyExecutor,
     task_queue: TaskQueue,
-    json_subject: ProtocolRunner,
+    protocol_engine: ProtocolEngine,
+    legacy_subject: ProtocolRunner,
 ) -> None:
-    """It should load a JSON protocol file."""
+    """It should load a legacy context-based Python protocol."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
 
-    json_protocol_source = ProtocolSource(
+    legacy_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.py"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
+    )
+
+    extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
+
+    legacy_protocol = LegacyPythonProtocol(
+        text="",
+        contents="",
+        filename="protocol.py",
+        api_level=APIVersion(2, 11),
+        metadata={"foo": "bar"},
+        bundled_labware=None,
+        bundled_data=None,
+        bundled_python=None,
+        extra_labware=extra_labware,
+    )
+
+    legacy_context = decoy.mock(cls=LegacyProtocolContext)
+
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(legacy_protocol_source)
+    ).then_return([labware_definition])
+    decoy.when(
+        legacy_file_reader.read(
+            protocol_source=legacy_protocol_source,
+            labware_definitions=[labware_definition],
+        )
+    ).then_return(legacy_protocol)
+    decoy.when(
+        legacy_context_creator.create(
+            protocol=legacy_protocol,
+            broker=matchers.IsA(Broker),
+            equipment_broker=matchers.IsA(EquipmentBroker),
+        )
+    ).then_return(legacy_context)
+
+    await legacy_subject.load(legacy_protocol_source)
+
+    decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
+        protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
+        task_queue.set_run_func(
+            func=legacy_executor.execute,
+            protocol=legacy_protocol,
+            context=legacy_context,
+        ),
+    )
+
+
+async def test_load_python_with_pe_papi_core(
+    decoy: Decoy,
+    legacy_file_reader: LegacyFileReader,
+    legacy_context_creator: LegacyContextCreator,
+    protocol_engine: ProtocolEngine,
+    legacy_subject: ProtocolRunner,
+) -> None:
+    """It should load a legacy context-based Python protocol."""
+    legacy_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.py"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
+    )
+
+    legacy_protocol = LegacyPythonProtocol(
+        text="",
+        contents="",
+        filename="protocol.py",
+        api_level=APIVersion(2, 14),
+        metadata={"foo": "bar"},
+        bundled_labware=None,
+        bundled_data=None,
+        bundled_python=None,
+        extra_labware=None,
+    )
+
+    legacy_context = decoy.mock(cls=LegacyProtocolContext)
+
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(legacy_protocol_source)
+    ).then_return([])
+    decoy.when(
+        legacy_file_reader.read(
+            protocol_source=legacy_protocol_source, labware_definitions=[]
+        )
+    ).then_return(legacy_protocol)
+    decoy.when(
+        legacy_context_creator.create(
+            protocol=legacy_protocol, broker=None, equipment_broker=None
+        )
+    ).then_return(legacy_context)
+
+    await legacy_subject.load(legacy_protocol_source)
+
+    decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
+
+
+async def test_load_legacy_json(
+    decoy: Decoy,
+    legacy_file_reader: LegacyFileReader,
+    legacy_context_creator: LegacyContextCreator,
+    legacy_executor: LegacyExecutor,
+    task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
+    legacy_subject: ProtocolRunner,
+) -> None:
+    """It should load a legacy context-based JSON protocol."""
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+
+    legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
         files=[],
         metadata={},
         robot_type="OT-2 Standard",
-        config=JsonProtocolConfig(schema_version=6),
+        config=JsonProtocolConfig(schema_version=5),
     )
 
-    json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
+    legacy_protocol = LegacyJsonProtocol(
+        text="{}",
+        contents=cast(LegacyJsonProtocolDict, {}),
+        filename="protocol.json",
+        api_level=APIVersion(2, 11),
+        schema_version=5,
+        metadata={"protocolName": "A Very Impressive Protocol"},
+    )
 
-    commands: List[pe_commands.CommandCreate] = [
-        pe_commands.LoadLiquidCreate(
-            params=pe_commands.LoadLiquidParams(
-                liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
-            )
-        ),
-    ]
-
-    liquids: List[Liquid] = [
-        Liquid(id="water-id", displayName="water", description="water desc")
-    ]
+    legacy_context = decoy.mock(cls=LegacyProtocolContext)
 
     decoy.when(
-        await protocol_reader.extract_labware_definitions(json_protocol_source)
+        await protocol_reader.extract_labware_definitions(legacy_protocol_source)
     ).then_return([labware_definition])
-    decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
-    decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
+    decoy.when(
+        legacy_file_reader.read(
+            protocol_source=legacy_protocol_source,
+            labware_definitions=[labware_definition],
+        )
+    ).then_return(legacy_protocol)
+    decoy.when(
+        legacy_context_creator.create(
+            legacy_protocol,
+            broker=matchers.IsA(Broker),
+            equipment_broker=matchers.IsA(EquipmentBroker),
+        )
+    ).then_return(legacy_context)
 
-    await json_subject.load(json_protocol_source)
+    await legacy_subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
-        protocol_engine.add_liquid(
-            id="water-id", name="water", description="water desc", color=None
+        protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
+        task_queue.set_run_func(
+            func=legacy_executor.execute,
+            protocol=legacy_protocol,
+            context=legacy_context,
         ),
-        protocol_engine.add_command(
-            request=pe_commands.LoadLiquidCreate(
-                params=pe_commands.LoadLiquidParams(
-                    liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
-                )
-            ),
-        ),
-        task_queue.set_run_func(func=protocol_engine.wait_until_complete),
     )
-
-
-# async def test_load_legacy_python(
-#     decoy: Decoy,
-#     legacy_file_reader: LegacyFileReader,
-#     legacy_context_creator: LegacyContextCreator,
-#     legacy_executor: LegacyExecutor,
-#     task_queue: TaskQueue,
-#     protocol_engine: ProtocolEngine,
-#     subject: ProtocolRunner,
-# ) -> None:
-#     """It should load a legacy context-based Python protocol."""
-#     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
-#
-#     legacy_protocol_source = ProtocolSource(
-#         directory=Path("/dev/null"),
-#         main_file=Path("/dev/null/abc.py"),
-#         files=[],
-#         metadata={},
-#         robot_type="OT-2 Standard",
-#         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
-#     )
-#
-#     extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
-#
-#     legacy_protocol = LegacyPythonProtocol(
-#         text="",
-#         contents="",
-#         filename="protocol.py",
-#         api_level=APIVersion(2, 11),
-#         metadata={"foo": "bar"},
-#         bundled_labware=None,
-#         bundled_data=None,
-#         bundled_python=None,
-#         extra_labware=extra_labware,
-#     )
-#
-#     legacy_context = decoy.mock(cls=LegacyProtocolContext)
-#
-#     decoy.when(
-#         await protocol_reader.extract_labware_definitions(legacy_protocol_source)
-#     ).then_return([labware_definition])
-#     decoy.when(
-#         legacy_file_reader.read(
-#             protocol_source=legacy_protocol_source,
-#             labware_definitions=[labware_definition],
-#         )
-#     ).then_return(legacy_protocol)
-#     decoy.when(
-#         legacy_context_creator.create(
-#             protocol=legacy_protocol,
-#             broker=matchers.IsA(Broker),
-#             equipment_broker=matchers.IsA(EquipmentBroker),
-#         )
-#     ).then_return(legacy_context)
-#
-#     await subject.load(legacy_protocol_source)
-#
-#     decoy.verify(
-#         protocol_engine.add_labware_definition(labware_definition),
-#         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-#         task_queue.set_run_func(
-#             func=legacy_executor.execute,
-#             protocol=legacy_protocol,
-#             context=legacy_context,
-#         ),
-#     )
-#
-#
-# async def test_load_python_with_pe_papi_core(
-#     decoy: Decoy,
-#     legacy_file_reader: LegacyFileReader,
-#     legacy_context_creator: LegacyContextCreator,
-#     protocol_engine: ProtocolEngine,
-#     subject: ProtocolRunner,
-# ) -> None:
-#     """It should load a legacy context-based Python protocol."""
-#     legacy_protocol_source = ProtocolSource(
-#         directory=Path("/dev/null"),
-#         main_file=Path("/dev/null/abc.py"),
-#         files=[],
-#         metadata={},
-#         robot_type="OT-2 Standard",
-#         config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
-#     )
-#
-#     legacy_protocol = LegacyPythonProtocol(
-#         text="",
-#         contents="",
-#         filename="protocol.py",
-#         api_level=APIVersion(2, 14),
-#         metadata={"foo": "bar"},
-#         bundled_labware=None,
-#         bundled_data=None,
-#         bundled_python=None,
-#         extra_labware=None,
-#     )
-#
-#     legacy_context = decoy.mock(cls=LegacyProtocolContext)
-#
-#     decoy.when(
-#         await protocol_reader.extract_labware_definitions(legacy_protocol_source)
-#     ).then_return([])
-#     decoy.when(
-#         legacy_file_reader.read(
-#             protocol_source=legacy_protocol_source, labware_definitions=[]
-#         )
-#     ).then_return(legacy_protocol)
-#     decoy.when(
-#         legacy_context_creator.create(
-#             protocol=legacy_protocol, broker=None, equipment_broker=None
-#         )
-#     ).then_return(legacy_context)
-#
-#     await subject.load(legacy_protocol_source)
-#
-#     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
-#
-#
-# async def test_load_legacy_json(
-#     decoy: Decoy,
-#     legacy_file_reader: LegacyFileReader,
-#     legacy_context_creator: LegacyContextCreator,
-#     legacy_executor: LegacyExecutor,
-#     task_queue: TaskQueue,
-#     protocol_engine: ProtocolEngine,
-#     subject: ProtocolRunner,
-# ) -> None:
-#     """It should load a legacy context-based JSON protocol."""
-#     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
-#
-#     legacy_protocol_source = ProtocolSource(
-#         directory=Path("/dev/null"),
-#         main_file=Path("/dev/null/abc.json"),
-#         files=[],
-#         metadata={},
-#         robot_type="OT-2 Standard",
-#         config=JsonProtocolConfig(schema_version=5),
-#     )
-#
-#     legacy_protocol = LegacyJsonProtocol(
-#         text="{}",
-#         contents=cast(LegacyJsonProtocolDict, {}),
-#         filename="protocol.json",
-#         api_level=APIVersion(2, 11),
-#         schema_version=5,
-#         metadata={"protocolName": "A Very Impressive Protocol"},
-#     )
-#
-#     legacy_context = decoy.mock(cls=LegacyProtocolContext)
-#
-#     decoy.when(
-#         await protocol_reader.extract_labware_definitions(legacy_protocol_source)
-#     ).then_return([labware_definition])
-#     decoy.when(
-#         legacy_file_reader.read(
-#             protocol_source=legacy_protocol_source,
-#             labware_definitions=[labware_definition],
-#         )
-#     ).then_return(legacy_protocol)
-#     decoy.when(
-#         legacy_context_creator.create(
-#             legacy_protocol,
-#             broker=matchers.IsA(Broker),
-#             equipment_broker=matchers.IsA(EquipmentBroker),
-#         )
-#     ).then_return(legacy_context)
-#
-#     await subject.load(legacy_protocol_source)
-#
-#     decoy.verify(
-#         protocol_engine.add_labware_definition(labware_definition),
-#         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-#         task_queue.set_run_func(
-#             func=legacy_executor.execute,
-#             protocol=legacy_protocol,
-#             context=legacy_context,
-#         ),
-#     )

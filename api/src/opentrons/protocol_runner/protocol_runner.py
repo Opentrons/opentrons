@@ -98,6 +98,90 @@ class PythonAndLegacyRunner(ProtocolRunner):
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
+    def was_started(self) -> bool:
+        """Whether the runner has been started.
+
+        This value is latched; once it is True, it will never become False.
+        """
+        return self._protocol_engine.state_view.commands.has_been_played()
+
+    async def load(self, protocol_source: ProtocolSource) -> None:
+        """Load a ProtocolSource into managed ProtocolEngine.
+
+        Calling this method is only necessary if the runner will be used
+        to control the run of a file-based protocol.
+        """
+        labware_definitions = await protocol_reader.extract_labware_definitions(
+            protocol_source=protocol_source
+        )
+        for definition in labware_definitions:
+            # Assume adding a labware definition is fast and there are not many labware
+            # definitions, so we don't need to yield here.
+            self._protocol_engine.add_labware_definition(definition)
+
+        # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
+        # the event loop. Jira RSS-165.
+        protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
+        broker = None
+        equipment_broker = None
+
+        if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
+            broker = Broker()
+            equipment_broker = EquipmentBroker[LegacyLoadInfo]()
+
+            self._protocol_engine.add_plugin(
+                LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
+            )
+
+        context = self._legacy_context_creator.create(
+            protocol=protocol,
+            broker=broker,
+            equipment_broker=equipment_broker,
+        )
+
+        self._task_queue.set_run_func(
+            func=self._legacy_executor.execute,
+            protocol=protocol,
+            context=context,
+        )
+
+    def play(self) -> None:
+        """Start or resume the run."""
+        self._protocol_engine.play()
+
+    def pause(self) -> None:
+        """Pause the run."""
+        self._protocol_engine.pause()
+
+    async def stop(self) -> None:
+        """Stop (cancel) the run."""
+        if self.was_started():
+            await self._protocol_engine.stop()
+        else:
+            await self._protocol_engine.finish(
+                drop_tips_and_home=False,
+                set_run_status=False,
+            )
+
+    async def run(
+        self,
+        protocol_source: Optional[ProtocolSource] = None,
+    ) -> ProtocolRunResult:
+        """Run a given protocol to completion."""
+        # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
+        # currently `protocol_source` arg is only used by tests
+        if protocol_source:
+            await self.load(protocol_source)
+
+        await self._hardware_api.home()
+        self.play()
+        self._task_queue.start()
+        await self._task_queue.join()
+
+        run_data = self._protocol_engine.state_view.get_summary()
+        commands = self._protocol_engine.state_view.commands.get_all()
+        return ProtocolRunResult(commands=commands, state_summary=run_data)
+
 
 class JsonRunner(ProtocolRunner):
     def __init__(
