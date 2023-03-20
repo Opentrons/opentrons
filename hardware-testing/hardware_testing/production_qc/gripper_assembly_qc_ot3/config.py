@@ -50,10 +50,10 @@ TESTS = [
 ]
 
 
-def build_report(script_path: str) -> CSVReport:
+def build_report(test_name: str) -> CSVReport:
     """Build report."""
     return CSVReport(
-        script_path=script_path,
+        test_name=test_name,
         sections=[
             CSVSection(
                 title=TestSection.MOUNT.value, lines=test_mount.build_csv_lines()

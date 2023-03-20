@@ -34,7 +34,7 @@ async def _main(cfg: TestConfig) -> None:
     # BUILD REPORT
     test_name = Path(__file__).parent.name
     ui.print_title(test_name.replace("_", " ").upper())
-    report = build_report(test_name)
+    report = build_report(test_name.replace("_", "-"))
     report.set_tag(gripper_id)
     if not cfg.simulate:
         report.set_operator(input("enter operator name: "))
