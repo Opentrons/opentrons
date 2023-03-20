@@ -71,10 +71,10 @@ describe('useOffsetCandidatesForAnalysis', () => {
     when(mockUseAllHistoricOffsets)
       .calledWith({ hostname: mockRobotIp })
       .mockReturnValue([
-        mockFirstCandidate,
         mockFirstDupCandidate,
-        mockSecondCandidate,
         mockThirdCandidate,
+        mockSecondCandidate,
+        mockFirstCandidate,
       ])
     when(mockUseAllHistoricOffsets).calledWith(null).mockReturnValue([])
     when(mockGetLabwareLocationCombos)
@@ -152,7 +152,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
     await waitFor(() => result.current != null)
     expect(result.current).toEqual([
       {
-        ...mockThirdCandidate,
+        ...mockFirstDupCandidate,
         labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
       },
       {
@@ -160,7 +160,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
         labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
       },
       {
-        ...mockFirstCandidate,
+        ...mockThirdCandidate,
         labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
       },
     ])
