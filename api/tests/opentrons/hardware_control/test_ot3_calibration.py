@@ -10,7 +10,7 @@ from mock import patch, AsyncMock, Mock, call as mock_call
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
-from opentrons.config.types import OT3CalibrationSettings, Offset
+from opentrons.config.types import OT3CalibrationSettings
 from opentrons.hardware_control.ot3_calibration import (
     find_edge_binary,
     find_axis_center,
