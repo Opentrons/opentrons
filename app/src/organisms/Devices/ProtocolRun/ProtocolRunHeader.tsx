@@ -83,6 +83,7 @@ import type { Run } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { RunProgressMeter } from '../../RunProgressMeter'
+import { CSSProp } from 'styled-components'
 
 const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
@@ -100,16 +101,18 @@ interface ProtocolRunHeaderProps {
   makeHandleJumpToStep: (index: number) => () => void
 }
 
-function RunTimer({
+export function RunTimer({
   runStatus,
   startedAt,
   stoppedAt,
   completedAt,
+  onDeviceStyle,
 }: {
   runStatus: string | null
   startedAt: string | null
   stoppedAt: string | null
   completedAt: string | null
+  onDeviceStyle?: CSSProp
 }): JSX.Element {
   const [now, setNow] = React.useState(Date())
   useInterval(() => setNow(Date()), 500, true)
@@ -122,7 +125,13 @@ function RunTimer({
   const runTime =
     startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
 
-  return <StyledText css={TYPOGRAPHY.pRegular}>{runTime}</StyledText>
+  return (
+    <StyledText
+      css={onDeviceStyle != null ? onDeviceStyle : TYPOGRAPHY.pRegular}
+    >
+      {runTime}
+    </StyledText>
+  )
 }
 
 export function ProtocolRunHeader({

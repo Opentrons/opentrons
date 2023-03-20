@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { ViewportList, ViewportListRef } from 'react-viewport-list'
 import {
   Flex,
   ALIGN_CENTER,
@@ -13,7 +14,6 @@ import {
   COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'

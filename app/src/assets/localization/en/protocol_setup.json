@@ -105,7 +105,7 @@
   "lpc_disabled_no_tipracks_loaded": "Labware Position Check requires that the protocol loads a tip rack",
   "lpc_disabled_no_tipracks_used": "Labware Position Check requires that the protocol has at least one pipette that picks up a tip",
   "get_labware_offset_data": "Get Labware Offset Data",
-  "additional_labware": "{{count}} additonal labware",
+  "additional_labware": "{{count}} additional labware",
   "instruments": "Instruments",
   "instruments_connected": "{{count}} instrument connected",
   "instruments_connected_plural": "{{count}} instruments connected",

@@ -16,6 +16,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
+  SPACING,
 } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import {
@@ -196,7 +197,7 @@ function PrepareToRun({
   })
   const instrumentsStatus = 'ready'
 
-  // Modules infomation
+  // Modules information
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
@@ -267,8 +268,8 @@ function PrepareToRun({
       {/* Protocol Setup Header */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap="1.5rem"
-        marginBottom="2.5rem"
+        gridGap={SPACING.spacing5}
+        marginBottom={SPACING.spacingXXL}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
@@ -277,12 +278,12 @@ function PrepareToRun({
               {protocolName}
             </StyledText>
           </Flex>
-          <Flex gridGap="1.5rem">
+          <Flex gridGap={SPACING.spacing5}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
             <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
           </Flex>
         </Flex>
-        <Flex gridGap="1rem">
+        <Flex gridGap={SPACING.spacing4}>
           <Flex
             backgroundColor={COLORS.fundamentalsBackgroundShade}
             padding="0.25rem 0.5rem"
@@ -301,7 +302,7 @@ function PrepareToRun({
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        gridGap="0.5rem"
+        gridGap={SPACING.spacing3}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}

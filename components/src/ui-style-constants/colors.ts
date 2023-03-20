@@ -72,7 +72,7 @@ export const warningDisabled = '#8f8f8f'
 // colors error
 export const errorBackgroundLight = '#fff3f3'
 export const errorBackgroundMed = '#f7e0e0'
-export const errorEnabled = '#bf0000'
+export const errorEnabled = '#bf0000' as const
 export const errorHover = '#a30000'
 export const errorText = '#850000'
 export const errorDisabled = '#8f8f8f'
