@@ -230,7 +230,7 @@ async def test_get_protocol_by_id(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return([analysis_summary])
     decoy.when(
-        protocol_store.get_referenced_run_ids(protocol_id="protocol-id")
+        protocol_store.get_referencing_run_ids(protocol_id="protocol-id")
     ).then_return([])
 
     result = await get_protocol_by_id(

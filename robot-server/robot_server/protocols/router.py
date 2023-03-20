@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, UploadFile, status, Form
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import (
@@ -21,6 +21,7 @@ from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
+    Body,
     SimpleBody,
     SimpleMultiBody,
     SimpleEmptyBody,
@@ -300,7 +301,7 @@ async def get_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> PydanticResponse[SimpleBody[Protocol]]:
+) -> PydanticResponse[Body[Protocol, Dict[str, List[str]]]]:
     """Get an uploaded protocol by ID.
 
     Args:
@@ -314,19 +315,14 @@ async def get_protocol_by_id(
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
-    metadata = Metadata.parse_obj(
-        {
-            **resource.source.metadata,
-            "referencedRunIds": protocol_store.get_referenced_run_ids(protocolId),
-        }
-    )
+    referencingRunIds = protocol_store.get_referencing_run_ids(protocolId)
 
     data = Protocol.construct(
         id=protocolId,
         createdAt=resource.created_at,
         protocolType=resource.source.config.protocol_type,
         robotType=resource.source.robot_type,
-        metadata=metadata,
+        metadata=Metadata.parse_obj(resource.source.metadata),
         analysisSummaries=analyses,
         key=resource.protocol_key,
         files=[
@@ -335,7 +331,9 @@ async def get_protocol_by_id(
     )
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=data),
+        content=Body.construct(
+            data=data, links={"referencingRunIds": referencingRunIds}
+        ),
         status_code=status.HTTP_200_OK,
     )
 
