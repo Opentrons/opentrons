@@ -761,6 +761,8 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     nominal_center = _get_calibration_square_position_in_slot(slot)
+    # nominal_center = nominal_center._replace(y=nominal_center.y + 0) # single-channel
+    nominal_center = nominal_center._replace(y=nominal_center.y - 4) # multi-channel
     await hcapi.reset_instrument_offset(mount)
     try:
         # First, find the estimated deck height. This will be used to baseline the edge detection points.
