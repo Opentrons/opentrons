@@ -1,16 +1,19 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
+  ALIGN_CENTER,
   BORDERS,
-  NewPrimaryBtn,
-  styleProps,
+  COLORS,
   DIRECTION_ROW,
+  Flex,
+  Icon,
+  NewPrimaryBtn,
+  SPACING,
+  styleProps,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
-import type { StyleProps } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 
 type MediumButtonTypes =
   | 'primary'
@@ -20,56 +23,70 @@ type MediumButtonTypes =
   | 'tertiary'
   | 'tertiaryLight'
 interface MediumButtonProps extends StyleProps {
-  onClick: () => void
-  buttonType?: MediumButtonTypes
   buttonText: React.ReactNode
+  buttonType?: MediumButtonTypes
   disabled?: boolean
+  iconName?: IconName
+  onClick: () => void
 }
 
 export function MediumButton(props: MediumButtonProps): JSX.Element {
-  const { onClick, buttonType = 'primary', buttonText, disabled = false } = props
-  const buttonProps = {
+  const {
+    buttonText,
+    buttonType = 'primary',
+    disabled = false,
+    iconName,
     onClick,
+  } = props
+  const buttonProps = {
     disabled,
+    onClick,
   }
 
   const MEDIUM_BUTTON_PROPS_BY_TYPE: Record<
     MediumButtonTypes,
     {
-      defaultBackgroundColor: string
       activeBackgroundColor: string
+      defaultBackgroundColor: string
       defaultColor: string
+      iconColor: string
     }
   > = {
     alert: {
-      defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.red_two,
       activeBackgroundColor: '#b91f20',
+      defaultBackgroundColor: COLORS.red_two,
+      defaultColor: COLORS.white,
+      iconColor: COLORS.white,
     },
     alertSecondary: {
-      defaultColor: COLORS.red_one,
-      defaultBackgroundColor: COLORS.red_three,
       activeBackgroundColor: '#ccabac',
+      defaultBackgroundColor: COLORS.red_three,
+      defaultColor: COLORS.red_one,
+      iconColor: COLORS.red_one,
     },
     primary: {
-      defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.blueEnabled,
       activeBackgroundColor: '#045dd0',
+      defaultBackgroundColor: COLORS.blueEnabled,
+      defaultColor: COLORS.white,
+      iconColor: COLORS.white,
     },
     secondary: {
-      defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.foundationalBlue,
       activeBackgroundColor: '#94afd4',
+      defaultBackgroundColor: COLORS.foundationalBlue,
+      defaultColor: COLORS.darkBlackEnabled,
+      iconColor: COLORS.blueEnabled,
     },
     tertiary: {
-      defaultColor: COLORS.darkBlack_hundred,
-      defaultBackgroundColor: COLORS.white,
       activeBackgroundColor: COLORS.darkBlack_twenty,
+      defaultBackgroundColor: COLORS.white,
+      defaultColor: COLORS.darkBlack_hundred,
+      iconColor: COLORS.darkBlack_hundred,
     },
     tertiaryLight: {
-      defaultColor: COLORS.darkBlack_seventy,
-      defaultBackgroundColor: COLORS.white,
       activeBackgroundColor: COLORS.darkBlack_twenty,
+      defaultBackgroundColor: COLORS.white,
+      defaultColor: COLORS.darkBlack_seventy,
+      iconColor: COLORS.darkBlack_seventy,
     },
   }
 
@@ -92,10 +109,10 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       box-shadow: none;
     }
     &:hover {
-      border: none;
-      box-shadow: none;
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
         .defaultBackgroundColor};
+      border: none;
+      box-shadow: none;
       color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
@@ -119,13 +136,32 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       aria-label={`MediumButton_${buttonType}`}
       flexDirection={DIRECTION_ROW}
     >
-      <StyledText
-        fontSize={TYPOGRAPHY.fontSize28}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        lineHeight={TYPOGRAPHY.lineHeight36}
+      <Flex
+        alignItems={ALIGN_CENTER}
+        flexDirection={DIRECTION_ROW}
+        gridGap={SPACING.spacingSM}
       >
-        {buttonText}
-      </StyledText>
+        {iconName !== null && (
+          <Icon
+            name={iconName ?? 'play'}
+            aria-label={`MediumButton_${iconName ?? 'play'}`}
+            color={
+              disabled
+                ? COLORS.darkBlack_sixty
+                : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+            }
+            width="1.875rem"
+            height="1.875rem"
+          />
+        )}
+        <StyledText
+          fontSize={TYPOGRAPHY.fontSize28}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          lineHeight={TYPOGRAPHY.lineHeight36}
+        >
+          {buttonText}
+        </StyledText>
+      </Flex>
     </NewPrimaryBtn>
   )
 }

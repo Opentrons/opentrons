@@ -47,3 +47,9 @@ TertiaryLightMediumButton.args = {
   buttonType: 'tertiaryLight',
   disabled: false,
 }
+export const CustomIconMediumButton = MediumButtonTemplate.bind({})
+CustomIconMediumButton.args = {
+  buttonText: 'Button text',
+  buttonType: 'primary',
+  iconName: 'restart',
+}
