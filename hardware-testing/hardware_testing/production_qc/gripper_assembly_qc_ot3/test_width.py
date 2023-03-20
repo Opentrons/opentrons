@@ -2,6 +2,7 @@
 from typing import List, Union, Tuple
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
@@ -23,7 +24,7 @@ TEST_WIDTHS_MM: List[float] = [60, 80]
 GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
 
 
-def _get_test_tag(width: float, force: float):
+def _get_test_tag(width: float, force: float) -> str:
     return f"{width}mm-{force}N"
 
 
@@ -49,11 +50,21 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     z_ax = OT3Axis.Z_G
     g_ax = OT3Axis.G
     mount = OT3Mount.GRIPPER
+    gripper = api._gripper_handler.get_gripper()
+    max_width = gripper.config.geometry.jaw_width["max"]
 
     async def _save_result(_width: float, _force: float) -> None:
+        # fake the encoder to be in the right place, during simulation
+        if api.is_simulator:
+            sim_enc_pox = (max_width - width) / 2.0
+            api._backend._encoder_position[NodeId.gripper_g] = sim_enc_pox
+            await api.refresh_positions()
         _width_actual = api.jaw_width
+        assert _width_actual is not None
         print(f"actual width: {_width_actual}")
-        result = CSVResult.from_bool(abs(_width - _width_actual) <= FAILURE_THRESHOLD_MM)
+        result = CSVResult.from_bool(
+            abs(_width - _width_actual) <= FAILURE_THRESHOLD_MM
+        )
         tag = _get_test_tag(_width, _force)
         report(section, tag, [_force, _width, _width_actual, result])
 
@@ -78,10 +89,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         for force in GRIP_FORCES_NEWTON:
             # GRIP AND MEASURE WIDTH
             print(f"width(mm): {width}, force(N): {force}")
-            # await api.grip(force)
-            await api.hold_jaw_width(width)
+            await api.grip(force)
             await _save_result(width, force)
             await api.ungrip()
         # RETRACT
-        print(f"done")
+        print("done")
         await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)

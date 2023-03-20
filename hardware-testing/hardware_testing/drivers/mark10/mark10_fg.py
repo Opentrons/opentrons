@@ -39,10 +39,12 @@ class SimMark10(Mark10Base):
     """Simulating Mark 10 Driver."""
 
     def __init__(self) -> None:
+        """Simulating Mark 10 Driver."""
         self._sim_force = 0.0
         super().__init__()
 
     def is_simulator(self) -> bool:
+        """Is a simulator."""
         return True
 
     def connect(self) -> None:
@@ -58,6 +60,7 @@ class SimMark10(Mark10Base):
         return self._sim_force
 
     def set_simulation_force(self, force: float) -> None:
+        """Set simulation force."""
         self._sim_force = force
 
 
@@ -79,6 +82,7 @@ class Mark10(Mark10Base):
         return Mark10(connection=conn)
 
     def is_simulator(self) -> bool:
+        """Is simulator."""
         return False
 
     def connect(self) -> None:
@@ -102,7 +106,7 @@ class Mark10(Mark10Base):
             unit_str = str(units, "utf-8")
             if unit_str != "N":
                 self._force_guage.write("N\r\n")  # Set force gauge units to Newtons
-                print(f"Setting gauge units from {unit_str} to \"N\" (newtons)")
+                print(f'Setting gauge units from {unit_str} to "N" (newtons)')
                 continue
             try:
                 force_str = str(force_val, "utf-8")

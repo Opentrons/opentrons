@@ -25,7 +25,7 @@ FAILURE_THRESHOLD_PERCENTAGE = 10
 FORCE_GAUGE_PORT = "/dev/ttyUSB0"
 
 
-def _get_test_tag(force: float):
+def _get_test_tag(force: float) -> str:
     return f"{force}N"
 
 
@@ -64,7 +64,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     mount = OT3Mount.GRIPPER
 
     # OPERATOR SETS UP GAUGE
-    ui.print_header(f"SETUP FORCE GAUGE")
+    ui.print_header("SETUP FORCE GAUGE")
     if not api.is_simulator:
         ui.get_user_ready(f"add gauge to slot {SLOT_FORCE_GAUGE}")
         ui.get_user_ready("plug gauge into USB port on OT3")
@@ -73,14 +73,14 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     async def _save_result(tag: str, expected: float) -> None:
         if gauge.is_simulator():
-            gauge.set_simulation_force(expected)
+            gauge.set_simulation_force(expected)  # type: ignore[union-attr]
         actual = float(gauge.read_force())
         print(f"reading: {actual} N")
         error = (actual - expected) / expected
         result = CSVResult.from_bool(abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE)
         report(section, tag, [expected, actual, result])
 
-    ui.print_header(f"TEST FORCE")
+    ui.print_header("TEST FORCE")
     # HOME
     print("homing Z and G...")
     await api.home([z_ax, g_ax])

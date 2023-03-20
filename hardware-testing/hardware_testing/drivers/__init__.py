@@ -14,7 +14,9 @@ def list_ports_and_select(device_name: str = "") -> str:
         print(f"\t{i + 1}) {p.device}")
     if not device_name:
         device_name = "desired"
-    idx_str = input(f"\nenter number next to {device_name} port (or ENTER to re-scan): ")
+    idx_str = input(
+        f"\nenter number next to {device_name} port (or ENTER to re-scan): "
+    )
     if not idx_str:
         return list_ports_and_select(device_name)
     try:
