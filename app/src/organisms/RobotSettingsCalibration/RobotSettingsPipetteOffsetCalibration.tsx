@@ -12,7 +12,6 @@ import { StyledText } from '../../atoms/text'
 import {
   useIsOT3,
   usePipetteOffsetCalibrations,
-  useRobot,
 } from '../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
@@ -31,11 +30,9 @@ export function RobotSettingsPipetteOffsetCalibration({
 }: RobotSettingsPipetteOffsetCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
-  const robot = useRobot(robotName)
   const isOT3 = useIsOT3(robotName)
 
-  // wait for robot request to resolve instead of using name directly from params
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
+  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
 
   return (
     <Flex
