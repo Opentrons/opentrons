@@ -67,7 +67,7 @@ export function PinnedProtocol(props: {
         {format(new Date(protocol.createdAt), 'MMM Io, p')}
       </StyledText>
       {longpress.isLongPressed && (
-        <LongPressModal longpress={longpress} protocol={protocol} />
+        <LongPressModal longpress={longpress} protocolId={protocol.id} />
       )}
     </Flex>
   )

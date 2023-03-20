@@ -10,7 +10,6 @@ import { i18n } from '../../../../i18n'
 import { LongPressModal } from '../LongPressModal'
 
 import type { UseLongPressResult } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
 
 const mockCreateRun = jest.fn((id: string) => {})
 const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
@@ -25,26 +24,10 @@ jest.mock('react-router-dom', () => {
 })
 jest.mock('@opentrons/react-api-client')
 
-const mockProtocol: ProtocolResource = {
-  id: 'mockProtocol1',
-  createdAt: '2022-05-03T21:36:12.494778+00:00',
-  protocolType: 'json',
-  metadata: {
-    protocolName: 'yay mock protocol',
-    author: 'engineering',
-    description: 'A short mock protocol',
-    created: 1606853851893,
-    tags: ['unitTest'],
-  },
-  analysisSummaries: [],
-  files: [],
-  key: '26ed5a82-502f-4074-8981-57cdda1d066d',
-}
-
 const render = (longPress: UseLongPressResult) => {
   return renderWithProviders(
     <MemoryRouter>
-      <LongPressModal longpress={longPress} protocol={mockProtocol} />
+      <LongPressModal longpress={longPress} protocolId={'mockProtocol1'} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
