@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "custom_beta",
+  "ordering": [["A1"]],
+  "metadata": {
+    "displayName": "Radwag Pipette Calibration Vial",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 128,
+    "yDimension": 86,
+    "zDimension": 86
+  },
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "radwag_pipette_calibration_vial"
+  },
+  "wells": {
+    "A1": {
+      "depth": 40,
+      "totalLiquidVolume": 2152.38,
+      "shape": "circular",
+      "diameter": 14.5,
+      "x": 64,
+      "y": 43,
+      "z": 46
+    }
+  },
+  "brand": {
+    "brand": "Radwag",
+    "brandId": ["AXA11"]
+  },
+  "groups": [
+    {
+      "brand": {
+        "brand": "Radwag",
+        "brandId": ["AXA11"]
+      },
+      "metadata": {
+        "wellBottomShape": "flat",
+        "displayCategory": "tubeRack"
+      },
+      "wells": ["A1"]
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}

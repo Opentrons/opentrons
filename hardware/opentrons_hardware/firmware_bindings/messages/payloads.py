@@ -398,9 +398,16 @@ class WriteToSensorRequestPayload(SensorPayload):
 
 @dataclass(eq=False)
 class BaselineSensorRequestPayload(SensorPayload):
-    """Take a specified amount of readings from a sensor request payload."""
+    """Provide a specified amount of readings to take the average of the current sensor."""
 
-    sample_rate: utils.UInt16Field
+    number_of_reads: utils.UInt16Field
+
+
+@dataclass(eq=False)
+class BaselineSensorResponsePayload(SensorPayload):
+    """A response containing an averaged offset reading from a sensor."""
+
+    offset_average: utils.Int32Field
 
 
 @dataclass(eq=False)
@@ -508,6 +515,13 @@ class GripperErrorTolerancePayload(EmptyPayload):
 
     max_pos_error_mm: utils.UInt32Field
     max_unwanted_movement_mm: utils.UInt32Field
+
+
+@dataclass(eq=False)
+class PushTipPresenceNotificationPayload(EmptyPayload):
+    """A notification that the ejector flag status has changed."""
+
+    ejector_flag_status: utils.UInt8Field
 
 
 @dataclass(eq=False)

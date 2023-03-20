@@ -254,7 +254,9 @@ async def _do_test(
             "one responder"
         )
 
-    target, message, response_size = _test_details_for_mode(mode, present)
+    target, message, response_size = _test_details_for_mode(
+        mode, {NodeId(node) for node in present if node in NodeId}
+    )
 
     message_size = _canbus_message_length_bits(message)
     transaction_size = message_size + response_size

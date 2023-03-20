@@ -12,6 +12,7 @@ export const darkGrey = '#4a4a4a'
 
 // opacity hex codes to append to 6-digit color hex codes
 // taken from table: https://davidwalsh.name/hex-opacity
+export const opacity0HexCode = '00' // 0% opacity
 export const opacity10HexCode = '1a' // 10% opacity
 export const opacity12HexCode = '1f' // 12% opacity
 export const opacity15HexCode = '26' // 15% opacity
@@ -116,7 +117,9 @@ export const light_one = '#d0d0d0'
 export const light_two = '#e0e0e0'
 
 export const highlightPurple_one = '#9c3ba4'
+export const highlightPurple_one_pressed = '#af62b6'
 export const highlightPurple_two = '#e7c3e9'
+export const highlightPurple_two_pressed = '#bda3c3'
 
 // touchscreen foundational color
 export const foundationalBlue = '#b4d4ff'
