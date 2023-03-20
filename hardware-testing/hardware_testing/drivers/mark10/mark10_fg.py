@@ -95,24 +95,20 @@ class Mark10(Mark10Base):
 
     def read_force(self, timeout: float = 1.0) -> float:
         """Get Force in Newtons."""
-        self._force_guage.flushInput()
-        self._force_guage.flushOutput()
         self._force_guage.write("?\r\n".encode("utf-8"))
         start_time = time()
         while time() < start_time + timeout:
+            # return "12.3 N"
             line = self._force_guage.readline().decode("utf-8").strip()
-            print(f"line: {line}")
-            force_val, units = line.split()
+            force_val, units = line.split(" ")
             if not force_val:
                 continue
-            unit_str = str(units, "utf-8")
-            if unit_str != "N":
+            if units != "N":
                 self._force_guage.write("N\r\n")  # Set force gauge units to Newtons
-                print(f'Setting gauge units from {unit_str} to "N" (newtons)')
+                print(f'Setting gauge units from {units} to "N" (newtons)')
                 continue
             try:
-                force_str = str(force_val, "utf-8")
-                return float(force_str)
+                return float(force_val)
             except ValueError as e:
                 print(e)
                 continue
