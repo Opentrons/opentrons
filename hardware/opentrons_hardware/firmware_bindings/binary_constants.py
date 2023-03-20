@@ -22,3 +22,5 @@ class BinaryMessageId(int, Enum):
     release_estop = 0x08
     engage_nsync_out = 0x09
     release_nsync_out = 0x0A
+    estop_state_change = 0x0B
+    estop_button_detection_change = 0x0C

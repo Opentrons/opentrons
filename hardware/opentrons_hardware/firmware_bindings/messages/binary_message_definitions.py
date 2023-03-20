@@ -122,8 +122,8 @@ class EnterBootloaderResponse(utils.BinarySerializable):
     message_id: utils.UInt16Field = utils.UInt16Field(
         BinaryMessageId.enter_bootloader_response
     )
-    success: utils.UInt8Field = utils.UInt8Field(0)
     length: utils.UInt16Field = utils.UInt16Field(1)
+    success: utils.UInt8Field = utils.UInt8Field(0)
 
 
 @dataclass
@@ -158,6 +158,29 @@ class ReleaseSyncOut(utils.BinarySerializable):
     lenght: utils.UInt16Field = utils.UInt16Field(0)
 
 
+@dataclass
+class EstopStateChange(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.estop_state_change
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    engaged: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class EstopButtonDetectionChange(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.estop_button_detection_change
+    )
+    length: utils.UInt16Field = utils.UInt16Field(2)
+    aux1_detected: utils.UInt8Field = utils.UInt8Field(0)
+    aux2_detected: utils.UInt8Field = utils.UInt8Field(0)
+
+
 BinaryMessageDefinition = Union[
     Echo,
     Ack,
@@ -170,6 +193,8 @@ BinaryMessageDefinition = Union[
     ReleaseEstop,
     EngageSyncOut,
     ReleaseSyncOut,
+    EstopStateChange,
+    EstopButtonDetectionChange,
 ]
 
 
