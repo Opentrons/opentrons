@@ -8,8 +8,12 @@ from pathlib import Path
 
 from opentrons.protocol_engine import ModuleModel, commands
 
-from opentrons.protocol_reader import ProtocolReader
+from opentrons.protocol_reader import (
+    ProtocolReader,
+    PythonProtocolConfig,
+)
 from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture()
@@ -60,7 +64,10 @@ async def test_runner_with_modules_in_legacy_python(
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=PythonProtocolConfig(api_version=APIVersion(2, 13)),
+    )
     result = await subject.run(protocol_source)
     commands_result = result.commands
 

@@ -1,12 +1,10 @@
 """Protocol run control and management."""
 import asyncio
-from typing import Iterable, List, NamedTuple, Optional, Union
+from typing import List, NamedTuple, Optional, Union
 
 from typing_extensions import Protocol as TypingProtocol
 
 import anyio
-
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
@@ -76,6 +74,8 @@ class ProtocolRunner(TypingProtocol):
 
 
 class PythonAndLegacyRunner(ProtocolRunner):
+    """Protocol runner implementation for python protocols and legacy protocols."""
+
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
@@ -184,6 +184,8 @@ class PythonAndLegacyRunner(ProtocolRunner):
 
 
 class JsonRunner(ProtocolRunner):
+    """Protocol runner implementation for python protocols and legacy protocols."""
+
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
@@ -300,37 +302,6 @@ class JsonRunner(ProtocolRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         return ProtocolRunResult(commands=commands, state_summary=run_data)
-
-    # def _load_python_or_legacy_json(
-    #     self,
-    #     protocol_source: ProtocolSource,
-    #     labware_definitions: Iterable[LabwareDefinition],
-    # ) -> None:
-    #     # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
-    #     # the event loop. Jira RSS-165.
-    #     protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
-    #     broker = None
-    #     equipment_broker = None
-    #
-    #     if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-    #         broker = Broker()
-    #         equipment_broker = EquipmentBroker[LegacyLoadInfo]()
-    #
-    #         self._protocol_engine.add_plugin(
-    #             LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
-    #         )
-    #
-    #     context = self._legacy_context_creator.create(
-    #         protocol=protocol,
-    #         broker=broker,
-    #         equipment_broker=equipment_broker,
-    #     )
-    #
-    #     self._task_queue.set_run_func(
-    #         func=self._legacy_executor.execute,
-    #         protocol=protocol,
-    #         context=context,
-    #     )
 
 
 def create_protocol_runner(

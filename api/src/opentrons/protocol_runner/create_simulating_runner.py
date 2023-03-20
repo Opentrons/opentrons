@@ -6,14 +6,17 @@ from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
     create_protocol_engine,
 )
+from opentrons.protocol_reader.protocol_source import ProtocolConfig
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from .legacy_wrappers import LegacySimulatingContextCreator
-from .protocol_runner import ProtocolRunner
+from .protocol_runner import create_protocol_runner, ProtocolRunner
 
 
-async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
+async def create_simulating_runner(
+    robot_type: RobotType, protocol_config: ProtocolConfig
+) -> ProtocolRunner:
     """Create a ProtocolRunner wired to a simulating HardwareControlAPI.
 
     Example:
@@ -62,7 +65,8 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
         protocol_engine=protocol_engine,
     )
 
-    return ProtocolRunner(
+    return create_protocol_runner(
+        protocol_config=protocol_config,
         protocol_engine=protocol_engine,
         hardware_api=simulating_hardware_api,
         legacy_context_creator=simulating_legacy_context_creator,

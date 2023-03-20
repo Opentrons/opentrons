@@ -27,8 +27,13 @@ from opentrons.protocol_engine import (
     commands,
     DeckPoint,
 )
-from opentrons.protocol_reader import ProtocolReader
+from opentrons.protocol_reader import (
+    ProtocolReader,
+    JsonProtocolConfig,
+    PythonProtocolConfig,
+)
 from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocols.api_support.types import APIVersion
 
 
 # TODO (tz, 6-17-22): API version 3.x in-development.
@@ -45,7 +50,10 @@ async def test_runner_with_python(
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
+    )
     result = await subject.run(protocol_source)
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
@@ -111,7 +119,9 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard", protocol_config=JsonProtocolConfig(schema_version=6)
+    )
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
@@ -170,7 +180,10 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=PythonProtocolConfig(api_version=APIVersion(2, 13)),
+    )
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
@@ -227,7 +240,9 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard", protocol_config=JsonProtocolConfig(schema_version=5)
+    )
     result = await subject.run(protocol_source)
 
     commands_result = result.commands

@@ -76,7 +76,9 @@ async def _analyze(
     except ProtocolFilesInvalidError as error:
         raise click.ClickException(str(error))
 
-    runner = await create_simulating_runner(robot_type=protocol_source.robot_type)
+    runner = await create_simulating_runner(
+        robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
+    )
     analysis = await runner.run(protocol_source)
 
     if json_output:
