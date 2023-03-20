@@ -14,10 +14,6 @@ import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useRunPipetteInfoByMount } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
-
-import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-
-const CALIBRATIONS_FETCH_MS = 5000
 interface SetupTipLengthCalibrationProps {
   robotName: string
   runId: string
@@ -29,8 +25,6 @@ export function SetupTipLengthCalibration({
 }: SetupTipLengthCalibrationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
-
-  useAllTipLengthCalibrationsQuery({ refetchInterval: CALIBRATIONS_FETCH_MS })
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
