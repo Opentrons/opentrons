@@ -321,7 +321,7 @@ class Pipette_Capacitance_Test:
         print(f"{axis} Gauge = ", self.test_data[f"{axis} Gauge"])
         # Get edge position
         current_position = await api.gantry_position(mount)
-        edge_position = current_position._replace(y=current_position.y + 7, z=self.deck_height)
+        edge_position = current_position._replace(y=current_position.y + 9, z=self.deck_height)
         # Move above slot center
         await self.api.move_to(self.mount, above_slot_center, speed=10)
         # Move to edge position
