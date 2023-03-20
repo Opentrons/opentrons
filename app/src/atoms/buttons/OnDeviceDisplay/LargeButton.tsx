@@ -11,18 +11,19 @@ import {
   Icon,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
-import type { StyleProps } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 
 type LargeButtonTypes = 'primary' | 'secondary' | 'alert'
 interface LargeButtonProps extends StyleProps {
   onClick: () => void
   buttonType: LargeButtonTypes
   buttonText: React.ReactNode
+  iconName?: IconName
   disabled?: boolean
 }
 
 export function LargeButton(props: LargeButtonProps): JSX.Element {
-  const { onClick, buttonType, buttonText, disabled } = props
+  const { onClick, buttonType, buttonText, iconName, disabled } = props
   const buttonProps = {
     onClick,
     disabled,
@@ -66,8 +67,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     cursor: default;
     border-radius: ${BORDERS.size_four};
     box-shadow: none;
-    padding: ${SPACING.spacing5} ${SPACING.spacing5} 2.4375rem
-      ${SPACING.spacing5};
+    padding: ${SPACING.spacing5} ${SPACING.spacing5} 2.4375rem;
     line-height: ${TYPOGRAPHY.lineHeight20};
     text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
@@ -110,11 +110,13 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         fontSize="2rem"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         paddingBottom="4.6875rem"
+        lineHeight="2.625rem"
       >
         {buttonText}
       </StyledText>
       <Icon
-        name="play"
+        name={iconName ?? 'play'}
+        aria-label={`LargeButton_${iconName ?? 'play'}`}
         color={
           disabled
             ? COLORS.darkBlack_sixty

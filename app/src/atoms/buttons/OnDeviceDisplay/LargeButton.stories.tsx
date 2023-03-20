@@ -29,3 +29,9 @@ AlertLargeButton.args = {
   buttonType: 'alert',
   disabled: false,
 }
+export const CustomIconLargeButton = LargeButtonTemplate.bind({})
+CustomIconLargeButton.args = {
+  buttonText: 'Button text',
+  buttonType: 'primary',
+  iconName: 'restart',
+}
