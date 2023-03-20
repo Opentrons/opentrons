@@ -9,6 +9,7 @@ export const initialized = (
 ): Types.InitializedAction => ({
   type: Constants.INITIALIZED,
   payload: { usbDevices, networkInterfaces },
+  meta: { shell: true },
 })
 
 export const usbDeviceAdded = (
@@ -16,6 +17,7 @@ export const usbDeviceAdded = (
 ): Types.UsbDeviceAddedAction => ({
   type: Constants.USB_DEVICE_ADDED,
   payload: { usbDevice },
+  meta: { shell: true },
 })
 
 export const usbDeviceRemoved = (
@@ -23,6 +25,7 @@ export const usbDeviceRemoved = (
 ): Types.UsbDeviceRemovedAction => ({
   type: Constants.USB_DEVICE_REMOVED,
   payload: { usbDevice },
+  meta: { shell: true },
 })
 
 export const networkInterfacesChanged = (

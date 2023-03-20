@@ -8,6 +8,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import {
   createDiscoveryClient,
   DEFAULT_PORT,
+  DEFAULT_SERIAL,
 } from '@opentrons/discovery-client'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
@@ -17,6 +18,11 @@ import {
   DISCOVERY_REMOVE,
   CLEAR_CACHE,
 } from '@opentrons/app/src/redux/discovery/actions'
+import {
+  INITIALIZED as SYSTEM_INFO_INITIALIZED,
+  USB_DEVICE_ADDED,
+  USB_DEVICE_REMOVED,
+} from '@opentrons/app/src/redux/system-info/constants'
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
@@ -156,11 +162,6 @@ export function registerDiscovery(
     return responseData
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  app.whenReady().then(() => {
-    ipcMain.handle('usb:request', usbListener)
-  })
-
   return function handleIncomingAction(action: Action) {
     log.debug('handling action in discovery', { action })
 
@@ -180,6 +181,25 @@ export function registerDiscovery(
 
       case CLEAR_CACHE:
         return clearCache()
+      case SYSTEM_INFO_INITIALIZED:
+        if (
+          action.payload.usbDevices.find(
+            device => device.serialNumber === DEFAULT_SERIAL
+          ) != null
+        ) {
+          ipcMain.handle('usb:request', usbListener)
+        }
+        break
+      case USB_DEVICE_ADDED:
+        if (action.payload.usbDevice.serialNumber === DEFAULT_SERIAL) {
+          ipcMain.handle('usb:request', usbListener)
+        }
+        break
+      case USB_DEVICE_REMOVED:
+        if (action.payload.usbDevice.serialNumber === DEFAULT_SERIAL) {
+          ipcMain.removeHandler('usb:request')
+        }
+        break
     }
   }
 
