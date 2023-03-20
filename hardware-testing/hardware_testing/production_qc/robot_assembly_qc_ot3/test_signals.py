@@ -111,7 +111,7 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
         stop_coro = _sleep_then_active_stop_signal()
         print(f"moving {MOVING_DISTANCE} at speed {MOVING_SPEED}")
         await asyncio.gather(stop_coro, move_coro)
-    await api.refresh_current_position_ot3()
+    await api.refresh_positions()
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
@@ -140,7 +140,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             [float(target_pos.x), float(target_pos.y), float(target_pos.z)],
         )
         if sig_name == "nsync" or sig_name == "estop":
-            # TODO: enable once implemented in firmware
+            print("FIXME: enable once implemented in firmware")
             report(section, f"{sig_name}-result", [CSVResult.PASS])
             continue
         # External E-Stop

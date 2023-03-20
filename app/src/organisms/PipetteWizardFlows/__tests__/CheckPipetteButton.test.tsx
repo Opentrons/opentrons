@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { CheckPipetteButton } from '../CheckPipetteButton'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
@@ -21,32 +20,28 @@ describe('CheckPipetteButton', () => {
     props = {
       proceed: jest.fn(),
       proceedButtonText: 'continue',
-      setPending: jest.fn(),
-      isDisabled: false,
+      setFetching: jest.fn(),
+      isOnDevice: false,
     }
-    when(mockUsePipettesQuery)
-      .calledWith()
-      .mockReturnValue({
-        status: 'idle',
-        refetch,
-      } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      refetch,
+    } as any)
   })
   afterEach(() => {
-    resetAllWhenMocks()
     jest.resetAllMocks()
   })
   it('clicking on the button calls refetch', () => {
     const { getByRole } = render(props)
     getByRole('button', { name: 'continue' }).click()
     expect(refetch).toHaveBeenCalled()
+    expect(props.setFetching).toHaveBeenCalled()
   })
-  it('renders button disabled when isDisabled is true', () => {
+  it('renders button for on device display', () => {
     props = {
       ...props,
-      isDisabled: true,
+      isOnDevice: true,
     }
-    const { getByRole } = render(props)
-    const proceedBtn = getByRole('button', { name: 'continue' })
-    expect(proceedBtn).toBeDisabled()
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_default')
   })
 })

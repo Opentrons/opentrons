@@ -1,3 +1,4 @@
+import asyncio
 import signal
 import subprocess
 import time
@@ -37,6 +38,7 @@ from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
 from robot_server.persistence import get_sql_engine, create_sql_engine
+from .integration.robot_client import RobotClient
 
 test_router = routing.APIRouter()
 
@@ -148,6 +150,23 @@ def server_temp_directory() -> Iterator[str]:
     yield new_dir
 
 
+@pytest.fixture()
+def clean_server_state() -> Iterator[None]:
+    # async fn that does the things below
+    # make a robot client
+    # delete protocols
+    async def _clean_server_state() -> None:
+        port = "31950"
+        async with RobotClient.make(
+            host="http://localhost", port=port, version="*"
+        ) as robot_client:
+            await _delete_all_runs(robot_client)
+            await _delete_all_protocols(robot_client)
+
+    yield
+    asyncio.run(_clean_server_state())
+
+
 @pytest.fixture(scope="session")
 def run_server(
     request_session: requests.Session, server_temp_directory: str
@@ -200,6 +219,22 @@ def run_server(
         yield proc
         proc.send_signal(signal.SIGTERM)
         proc.wait()
+
+
+async def _delete_all_runs(robot_client: RobotClient) -> None:
+    """Delete all runs on the robot server."""
+    response = await robot_client.get_runs()
+    run_ids = [r["id"] for r in response.json()["data"]]
+    for run_id in run_ids:
+        await robot_client.delete_run(run_id)
+
+
+async def _delete_all_protocols(robot_client: RobotClient) -> None:
+    """Delete all protocols on the robot server"""
+    response = await robot_client.get_protocols()
+    protocol_ids = [p["id"] for p in response.json()["data"]]
+    for protocol_id in protocol_ids:
+        await robot_client.delete_protocol(protocol_id)
 
 
 @pytest.fixture

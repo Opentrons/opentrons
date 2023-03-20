@@ -1,6 +1,8 @@
 """Opentrons helper methods."""
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
+from math import pi
 from subprocess import run
 from time import time
 from typing import List, Optional, Dict, Tuple, Union
@@ -67,6 +69,12 @@ def stop_server_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
+def start_server_ot3() -> None:
+    """Start opentrons-robot-server on the OT3."""
+    print('Starting "opentrons-robot-server"...')
+    run(["systemctl", "start", "opentrons-robot-server"])
+
+
 def restart_canbus_ot3() -> None:
     """Restart opentrons-ot3-canbus on the OT3."""
     print('Restarting "opentrons-ot3-canbus"...')
@@ -117,6 +125,7 @@ async def build_async_ot3_hardware_api(
     pipette_left: Optional[str] = None,
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
+    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
@@ -135,7 +144,7 @@ async def build_async_ot3_hardware_api(
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
         restart_canbus_ot3()
-    return await builder(**kwargs)  # type: ignore[arg-type]
+    return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -794,3 +803,40 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     else:
         id = pipette.pipette_id
     return f"P{volume}{channels}V{version}{id}"
+
+
+def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:
+    """Clear pipette ul-per-mm."""
+
+    def _ul_per_mm_of_shaft_diameter(diameter: float) -> float:
+        return pi * pow(diameter / 2, 2)
+
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    if "p50" in pip.model.lower():
+        pip_nominal_ul_per_mm = _ul_per_mm_of_shaft_diameter(1)
+    elif "p1000" in pip.model.lower():
+        pip_nominal_ul_per_mm = _ul_per_mm_of_shaft_diameter(4.5)
+    else:
+        raise RuntimeError(f"unexpected pipette model: {pip.model}")
+    # 10000 is an arbitrarily large volume that none of our pipettes can reach
+    # so, it is guaranteed that all test volumes will be less than this
+    ul_per_mm = [
+        (
+            0,
+            0.0,
+            pip_nominal_ul_per_mm,
+        ),
+        (
+            10000,
+            0.0,
+            pip_nominal_ul_per_mm,
+        ),
+    ]
+    pip._active_tip_settings.aspirate["default"] = ul_per_mm  # type: ignore[assignment]
+    pip._active_tip_settings.dispense["default"] = ul_per_mm  # type: ignore[assignment]
+    pip.ul_per_mm.cache_clear()
+    assert pip.ul_per_mm(1, "aspirate") == pip_nominal_ul_per_mm
+    assert pip.ul_per_mm(pip.working_volume, "aspirate") == pip_nominal_ul_per_mm
+    assert pip.ul_per_mm(1, "dispense") == pip_nominal_ul_per_mm
+    assert pip.ul_per_mm(pip.working_volume, "dispense") == pip_nominal_ul_per_mm

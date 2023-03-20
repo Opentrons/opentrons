@@ -1,18 +1,24 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { Btn, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  ALIGN_FLEX_END,
+  Btn,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+} from '@opentrons/components'
 import { useAttachedPipettes } from '../../organisms/Devices/hooks'
+import { TertiaryButton } from '../../atoms/buttons'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { ChoosePipette } from '../../organisms/PipetteWizardFlows/ChoosePipette'
 import { getIs96ChannelPipetteAttached } from '../../organisms/Devices/utils'
-import { getLocalRobot } from '../../redux/discovery'
 
 import type {
   PipetteWizardFlow,
@@ -25,8 +31,6 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
     pipetteWizardFlow,
     setPipetteWizardFlow,
   ] = React.useState<PipetteWizardFlow | null>(null)
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const [mount, setMount] = React.useState<Mount>(LEFT)
   const [
     selectedPipette,
@@ -68,12 +72,23 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
   }
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
+        paddingRight={SPACING.spacing6}
+      >
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
+      </Flex>
       {showAttachPipette ? (
         <ChoosePipette
           proceed={handleAttachPipette}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
           exit={() => setShowAttachPipette(false)}
+          mount={mount}
         />
       ) : null}
       {pipetteWizardFlow != null ? (
@@ -87,7 +102,7 @@ export const AttachInstrumentsDashboard = (): JSX.Element => {
           selectedPipette={
             isNinetySixChannelAttached ? NINETY_SIX_CHANNEL : selectedPipette
           }
-          robotName={robotName}
+          setSelectedPipette={setSelectedPipette}
         />
       ) : null}
       {showAttachPipette || pipetteWizardFlow != null ? null : (

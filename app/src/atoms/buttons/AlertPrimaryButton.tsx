@@ -22,4 +22,9 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   &:hover {
     box-shadow: 0 0 0;
   }
+
+  &:disabled {
+    background-color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.errorDisabled};
+  }
 `

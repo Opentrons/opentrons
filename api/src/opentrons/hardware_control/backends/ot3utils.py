@@ -395,10 +395,9 @@ class UpdateProgress:
             self._tracker[target] = UpdateStatus(subsystem, UpdateState.queued, 0)
 
     @property
-    def nodes(self) -> Set[NodeId]:
+    def targets(self) -> Set[FirmwareTarget]:
         """Gets the set of update Targets queued or updating."""
-        # NOTE: (ba, 2023-03-08) ignore rear panel for now
-        return {target for target in set(self._tracker) if isinstance(target, NodeId)}
+        return set(self._tracker)
 
     def get_progress(self) -> Set[UpdateStatus]:
         """Gets the update status and total progress"""

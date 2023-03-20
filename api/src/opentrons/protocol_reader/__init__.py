@@ -11,6 +11,8 @@ from .protocol_source import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
+from .file_reader_writer import FileReaderWriter, BufferedFile
+from .file_hasher import FileHasher
 from .extract_labware_definitions import extract_labware_definitions
 
 __all__ = [
@@ -28,4 +30,8 @@ __all__ = [
     "ProtocolType",
     "JsonProtocolConfig",
     "PythonProtocolConfig",
+    "BufferedFile",
+    # helpers
+    "FileReaderWriter",
+    "FileHasher",
 ]
