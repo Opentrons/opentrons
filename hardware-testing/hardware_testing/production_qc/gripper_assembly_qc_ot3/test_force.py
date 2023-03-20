@@ -1,9 +1,10 @@
 """Test Force."""
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.drivers.mark10 import Mark10
+from hardware_testing.drivers import find_port, list_ports_and_select
+from hardware_testing.drivers.mark10 import Mark10, SimMark10
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVLine,
@@ -12,9 +13,11 @@ from hardware_testing.data.csv_report import (
 )
 
 from hardware_testing.data import ui
+from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
+SLOT_FORCE_GAUGE = 2
 GRIP_FORCES_NEWTON = [5, 8, 12, 15, 18, 20]
 GRIP_HEIGHT_MM = 30
 
@@ -24,6 +27,25 @@ FORCE_GAUGE_PORT = "/dev/ttyUSB0"
 
 def _get_test_tag(force: float):
     return f"{force}N"
+
+
+def _get_gauge(is_simulating: bool) -> Union[Mark10, SimMark10]:
+    if is_simulating:
+        return SimMark10()
+    else:
+        try:
+            port = find_port(*Mark10.vid_pid())
+        except RuntimeError:
+            port = list_ports_and_select("Mark10 Force Gauge")
+        print(f"Setting up force gauge at port: {FORCE_GAUGE_PORT}")
+        return Mark10.create(port=port)
+
+
+def _get_force_gauge_hover_and_grip_positions(api: OT3API) -> Tuple[Point, Point]:
+    grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(SLOT_FORCE_GAUGE)
+    grip_pos += Point(z=GRIP_HEIGHT_MM)
+    hover_pos = grip_pos._replace(z=api.get_instrument_max_height(OT3Mount.GRIPPER))
+    return hover_pos, grip_pos
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -41,33 +63,42 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     g_ax = OT3Axis.G
     mount = OT3Mount.GRIPPER
 
-    print(f"Setting up force gauge at port: {FORCE_GAUGE_PORT}")
-    # if not api.is_simulator:
-    #     gauge = Mark10.create(port=FORCE_GAUGE_PORT)
-    #     gauge.connect()
+    # OPERATOR SETS UP GAUGE
+    ui.print_header(f"SETUP FORCE GAUGE")
+    if not api.is_simulator:
+        ui.get_user_ready(f"add gauge to slot {SLOT_FORCE_GAUGE}")
+        ui.get_user_ready("plug gauge into USB port on OT3")
+    gauge = _get_gauge(api.is_simulator)
+    gauge.connect()
 
     async def _save_result(tag: str, expected: float) -> None:
-        # if api.is_simulator:
-        #     actual = 5.0
-        # else:
-        #     actual = float(gauge.read_force())
-        actual = 5.0
+        if gauge.is_simulator():
+            gauge.set_simulation_force(expected)
+        actual = float(gauge.read_force())
+        print(f"reading: {actual} N")
         error = (actual - expected) / expected
         result = CSVResult.from_bool(abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE)
         report(section, tag, [expected, actual, result])
 
+    ui.print_header(f"TEST FORCE")
+    # HOME
     print("homing Z and G...")
     await api.home([z_ax, g_ax])
-    current_pos = await api.gantry_position(OT3Mount.GRIPPER)
-    print(f"moving down to grip height: {GRIP_HEIGHT_MM} mm")
-    await api.move_to(mount, current_pos._replace(z=GRIP_HEIGHT_MM))
+    # MOVE TO GAUGE
+    await api.ungrip()
+    hover_pos, target_pos = _get_force_gauge_hover_and_grip_positions(api)
+    await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+    await api.move_to(mount, target_pos)
+    if not api.is_simulator:
+        ui.get_user_ready("prepare to grip")
+    # LOOP THROUGH FORCES
     for force in GRIP_FORCES_NEWTON:
-        ui.print_header(f"Grip force (N): {force}")
+        # GRIP AND MEASURE FORCE
         print(f"gripping at {force} N")
         await api.grip(force)
-        print("taking force reading")
         await _save_result(_get_test_tag(force), force)
         print("ungrip")
         await api.ungrip()
-    print("homing...")
-    await api.home([z_ax])
+    # RETRACT
+    print("done")
+    await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
