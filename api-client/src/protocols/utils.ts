@@ -256,7 +256,6 @@ export function parseLabwareInfoByLiquidId(
             command.commandType === 'loadLiquid'
         )
       : []
-console.log(loadLiquidCommands)
   return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
     loadLiquidCommands,
     (acc, command) => {
