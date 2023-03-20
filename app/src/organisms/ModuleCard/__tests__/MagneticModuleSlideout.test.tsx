@@ -2,12 +2,7 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
-import { useRunStatuses } from '../../Devices/hooks'
-import { useModuleIdFromRun } from '../useModuleIdFromRun'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
 import {
@@ -16,20 +11,9 @@ import {
 } from '../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../useModuleIdFromRun')
-jest.mock('../../Devices/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
->
-const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
-  typeof useCreateCommandMutation
->
-const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
-  typeof useModuleIdFromRun
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
 >
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
@@ -40,32 +24,17 @@ const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
 describe('MagneticModuleSlideout', () => {
   let props: React.ComponentProps<typeof MagneticModuleSlideout>
   let mockCreateLiveCommand = jest.fn()
-  let mockCreateCommand = jest.fn()
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseRunStatuses.mockReturnValue({
-      isRunRunning: false,
-      isRunStill: false,
-      isRunTerminal: true,
-      isRunIdle: false,
-    })
     props = {
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      isLoadedInRun: false,
     }
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
-    } as any)
-    mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -94,7 +63,6 @@ describe('MagneticModuleSlideout', () => {
       module: mockMagneticModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -121,40 +89,6 @@ describe('MagneticModuleSlideout', () => {
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'magneticModule/engage',
-        params: {
-          moduleId: 'magdeck_id',
-          height: 10,
-        },
-      },
-    })
-    expect(button).not.toBeEnabled()
-  })
-
-  it('renders the button and it is not clickable until there is something in form field when there is a runId', () => {
-    mockUseRunStatuses.mockReturnValue({
-      isRunRunning: false,
-      isRunStill: false,
-      isRunTerminal: false,
-      isRunIdle: true,
-    })
-    props = {
-      module: mockMagneticModule,
-      isExpanded: true,
-      onCloseClick: jest.fn(),
-      isLoadedInRun: true,
-      currentRunId: 'test123',
-    }
-
-    const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Confirm' })
-    const input = getByTestId('magneticModuleV1')
-    fireEvent.change(input, { target: { value: '10' } })
-    expect(button).toBeEnabled()
-    fireEvent.click(button)
-    expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.currentRunId,
       command: {
         commandType: 'magneticModule/engage',
         params: {
