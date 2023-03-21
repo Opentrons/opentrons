@@ -192,11 +192,11 @@ class DoorSwitchStateRequest(utils.BinarySerializable):
 
 
 @dataclass
-class DoorSwitchStateResponse(utils.BinarySerializable):
+class DoorSwitchStateInfo(utils.BinarySerializable):
     """Request the version information from the device."""
 
     message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.door_switch_state_response
+        BinaryMessageId.door_switch_state_info
     )
     length: utils.UInt16Field = utils.UInt16Field(1)
     door_open: utils.UInt8Field = utils.UInt8Field(0)
@@ -217,7 +217,7 @@ BinaryMessageDefinition = Union[
     EstopStateChange,
     EstopButtonDetectionChange,
     DoorSwitchStateRequest,
-    DoorSwitchStateResponse,
+    DoorSwitchStateInfo,
 ]
 
 
