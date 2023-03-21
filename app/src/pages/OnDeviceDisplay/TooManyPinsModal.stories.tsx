@@ -10,4 +10,4 @@ export default {
 const TooManyPinsModalTemplate: Story<
   React.ComponentProps<typeof TooManyPinsModal>
 > = args => <TooManyPinsModal {...args} />
-export const TooManyPinsModalx = TooManyPinsModalTemplate.bind({})
+export const TooManyPins = TooManyPinsModalTemplate.bind({})
