@@ -5,7 +5,11 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
+from opentrons.protocol_runner import (
+    ProtocolRunner,
+    ProtocolRunResult,
+    create_protocol_runner,
+)
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Config as ProtocolEngineConfig,
@@ -132,7 +136,11 @@ class EngineStore:
                 block_on_door_open=feature_flags.enable_door_safety_switch(),
             ),
         )
-        runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
+        runner = create_protocol_runner(
+            protocol_engine=engine,
+            hardware_api=self._hardware_api,
+            protocol_config=protocol.source.config if protocol else None,
+        )
 
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Another run is currently active.")

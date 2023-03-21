@@ -96,17 +96,17 @@ async def get_analysis_store(
     return analysis_store
 
 
-async def get_protocol_analyzer(
-    analysis_store: AnalysisStore = Depends(get_analysis_store),
-    analysis_robot_type: RobotType = Depends(get_robot_type),
-) -> ProtocolAnalyzer:
-    """Construct a ProtocolAnalyzer for a single request."""
-    protocol_runner = await create_simulating_runner(robot_type=analysis_robot_type)
-
-    return ProtocolAnalyzer(
-        protocol_runner=protocol_runner,
-        analysis_store=analysis_store,
-    )
+# async def get_protocol_analyzer(
+#     analysis_store: AnalysisStore = Depends(get_analysis_store),
+#     analysis_robot_type: RobotType = Depends(get_robot_type),
+# ) -> ProtocolAnalyzer:
+#     """Construct a ProtocolAnalyzer for a single request."""
+#     protocol_runner = await create_simulating_runner(robot_type=analysis_robot_type)
+#
+#     return ProtocolAnalyzer(
+#         protocol_runner=protocol_runner,
+#         analysis_store=analysis_store,
+#     )
 
 
 async def get_protocol_auto_deleter(

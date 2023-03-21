@@ -47,7 +47,7 @@ async def test_create_engine(subject: EngineStore) -> None:
 
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
-    assert isinstance(subject.runner, ProtocolRunner)
+    assert isinstance(subject.runner, ProtocolRunner)  # type: ignore[misc]
     assert isinstance(subject.engine, ProtocolEngine)
 
 

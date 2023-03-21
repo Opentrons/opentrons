@@ -309,7 +309,6 @@ async def test_create_protocol(
         protocol_store=protocol_store,
         analysis_store=analysis_store,
         protocol_reader=protocol_reader,
-        protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
         protocol_auto_deleter=protocol_auto_deleter,
         robot_type="OT-2 Standard",

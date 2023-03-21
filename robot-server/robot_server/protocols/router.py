@@ -9,6 +9,7 @@ from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
+from opentrons.protocol_runner import create_simulating_runner
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.errors import ErrorDetails, ErrorBody
@@ -39,7 +40,6 @@ from .dependencies import (
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
-    get_protocol_analyzer,
     get_protocol_directory,
 )
 
@@ -121,7 +121,6 @@ async def create_protocol(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_reader: ProtocolReader = Depends(get_protocol_reader),
-    protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(get_task_runner),
     protocol_auto_deleter: ProtocolAutoDeleter = Depends(get_protocol_auto_deleter),
     robot_type: RobotType = Depends(get_robot_type),
@@ -176,7 +175,12 @@ async def create_protocol(
 
     protocol_auto_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
-
+    protocol_runner = await create_simulating_runner(
+        robot_type=robot_type, protocol_config=source.config
+    )
+    protocol_analyzer = ProtocolAnalyzer(
+        protocol_runner=protocol_runner, analysis_store=analysis_store
+    )
     task_runner.run(
         protocol_analyzer.analyze,
         protocol_resource=protocol_resource,
