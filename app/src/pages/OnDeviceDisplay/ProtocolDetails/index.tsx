@@ -29,7 +29,7 @@ import {
   MediumButton,
   TabbedButton,
 } from '../../../atoms/buttons/OnDeviceDisplay'
-import { Chip } from '../../../atoms/chip'
+import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 import { Deck } from './Deck'
