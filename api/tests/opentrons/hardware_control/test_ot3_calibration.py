@@ -27,7 +27,7 @@ from opentrons.hardware_control.ot3_calibration import (
     _get_calibration_square_position_in_slot,
     InaccurateNonContactSweepError,
     DeckHeightValidRange,
-    DeckNotFoundError,
+    StructureNotFoundError,
     Z_PREP_OFFSET,
     EDGES,
 )
@@ -408,7 +408,7 @@ async def test_deck_not_found(
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = (-3,)
-    with pytest.raises(DeckNotFoundError):
+    with pytest.raises(StructureNotFoundError):
         await find_calibration_structure_height(
             ot3_hardware,
             OT3Mount.RIGHT,

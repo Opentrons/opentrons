@@ -3,6 +3,7 @@ from system_server.jwt import (
     create_jwt,
     jwt_is_valid,
     registrant_from_jwt,
+    expiration_from_jwt,
 )
 from uuid import uuid4
 from datetime import datetime, timedelta, timezone
@@ -105,3 +106,23 @@ async def test_registrant_from_jwt() -> None:
     token = create_jwt(TEST_KEY, timedelta(days=1), reg, TEST_AUDIENCE)
 
     assert registrant_from_jwt(token, TEST_KEY) == reg
+
+
+async def test_expiration_from_jwt() -> None:
+    """Extract expiration date from a JWT"""
+    time = datetime.now(tz=timezone.utc)
+    delta = timedelta(days=1)
+
+    TEST_KEY = "abcdefghijklmnopqrstuvwxyz"
+    TEST_AUDIENCE = "audience test"
+    reg = Registrant(subject="abc", agent="def", agent_id="hij")
+
+    token = create_jwt(TEST_KEY, delta, reg, TEST_AUDIENCE, now=time)
+
+    expected = time + delta
+
+    result = expiration_from_jwt(token, TEST_KEY)
+
+    # The resolution of the timestamps varies, so we compare by converting to
+    # timestamp values and checking that the difference is within a second
+    assert abs(expected.timestamp() - result.timestamp()) < 1

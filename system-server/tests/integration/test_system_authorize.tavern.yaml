@@ -70,3 +70,114 @@ stages:
         authenticationBearer: "{auth_token:s}"
     response:
       status_code: 200
+---
+test_name: GET System Connected
+marks:
+  - usefixtures:
+    - run_server
+stages:
+  - name: Register User
+    request:
+      url: "{host:s}:{port:d}/system/register"
+      method: POST
+      params:
+        agent: 'get-system-connected-test'
+        agentId: 'id1'
+        subject: 'sub1'
+    response:
+      status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          issued_token: "token"
+  - name: Get empty connection list
+    request:
+      url: "{host:s}:{port:d}/system/connected"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        connections: []
+  - name: Authorize User
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{issued_token:s}"
+    response:
+      status_code: 201
+  - name: Get single-entry connection list
+    request:
+      url: "{host:s}:{port:d}/system/connected"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        connections:
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id1'
+  - name: Register second user
+    request:
+      url: "{host:s}:{port:d}/system/register"
+      method: POST
+      params:
+        agent: 'get-system-connected-test'
+        agentId: 'id2'
+        subject: 'sub1'
+    response:
+      status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          second_token: "token"
+  - name: Authorize second user
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{second_token:s}"
+    response:
+      status_code: 201
+  - name: Get two-entry connection list
+    request:
+      url: "{host:s}:{port:d}/system/connected"
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:list_any_order
+      json:
+        connections:
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id2'
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id1'
+  - name: Re-authorize first user
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{issued_token:s}"
+    response:
+      status_code: 201
+  - name: Get two-entry connection list
+    request:
+      url: "{host:s}:{port:d}/system/connected"
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:list_any_order
+      json:
+        connections:
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id2'
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id1'
