@@ -21,7 +21,6 @@ export function TooManyPinsModal(props: {
   return (
     <ModalShell
       borderRadius={BORDERS.size_three}
-      height="26rem"
       onOutsideClick={handleCloseMaxPinsAlert}
       width="32.375rem"
     >
@@ -31,16 +30,19 @@ export function TooManyPinsModal(props: {
         padding={SPACING.spacingXXL}
       >
         <StyledText
-          fontSize="2rem"
-          lineHeight="2.625rem"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
+          color={COLORS.darkBlackEnabled}
+          fontSize={TYPOGRAPHY.fontSize28}
+          fontWeight={TYPOGRAPHY.fontWeightNearlyBold}
+          lineHeight={TYPOGRAPHY.lineHeight36}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('too_many_pins_header')}
         </StyledText>
         <StyledText
-          fontSize="1.75rem"
-          lineHeight="2.625rem"
+          color={COLORS.darkBlack_ninety}
+          fontSize={TYPOGRAPHY.fontSize22}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          lineHeight={TYPOGRAPHY.lineHeight28}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('too_many_pins_body')}
@@ -55,11 +57,12 @@ export function TooManyPinsModal(props: {
         >
           <StyledText
             color={COLORS.white}
-            fontSize="1.375rem"
-            lineHeight="1.75rem"
+            fontSize={TYPOGRAPHY.fontSize22}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            lineHeight={TYPOGRAPHY.lineHeight28}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
-            {t('got_it')}
+            {t('close')}
           </StyledText>
         </Flex>
       </Flex>

@@ -16,7 +16,7 @@ jest.mock('react-router-dom', () => {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <TooManyPinsModal handleCloseMaxPinsAlert={() => {}}/>
+      <TooManyPinsModal handleCloseMaxPinsAlert={() => {}} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -27,6 +27,6 @@ const render = () => {
 describe('Too Many Pins Modal', () => {
   it('should have a close button', () => {
     const [{ getByText }] = render()
-    getByText('Got it')
+    getByText('Close')
   })
 })
