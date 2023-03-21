@@ -159,7 +159,7 @@ describe('PipetteWizardFlows', () => {
     mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
-    const { getByText, getByRole, getByLabelText } = render(props)
+    const { getByText, getByRole } = render(props)
     //  first page
     getByText('Recalibrate Left Pipette')
     getByText('Before you begin')
