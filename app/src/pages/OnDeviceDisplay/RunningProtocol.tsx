@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -50,6 +51,7 @@ type ScreenOption =
   | 'RunningProtocolCommandList'
 
 export function RunningProtocol(): JSX.Element {
+  const { t } = useTranslation('run_details')
   const { runId } = useParams<OnDeviceRouteParams>()
   const [currentOption, setCurrentOption] = React.useState<ScreenOption | null>(
     'CurrentRunningProtocolCommand'
@@ -92,6 +94,11 @@ export function RunningProtocol(): JSX.Element {
 
   console.log('totalSteps', totalIndex)
   console.log('currentRunCommandIndex', currentRunCommandIndex)
+  console.log('runStatus', runStatus)
+
+  const currentRunStatus = t(`status_${runStatus}`)
+  
+  console.log('currentRunStatus', currentRunStatus)
 
   React.useEffect(() => {
     if (
@@ -130,7 +137,7 @@ export function RunningProtocol(): JSX.Element {
         {currentOption === 'CurrentRunningProtocolCommand' ? (
           <CurrentRunningProtocolCommand
             protocolName={protocolName}
-            runStatus={runStatus}
+            currentRunStatus={currentRunStatus}
             currentRunCommandIndex={currentRunCommandIndex}
             robotSideAnalysis={robotSideAnalysis}
             runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
@@ -138,7 +145,7 @@ export function RunningProtocol(): JSX.Element {
         ) : (
           <RunningProtocolCommandList
             protocolName={protocolName}
-            runStatus={runStatus}
+            currentRunStatus={currentRunStatus}
             playRun={playRun}
             pauseRun={pauseRun}
             stopRun={stopRun}

@@ -53,6 +53,7 @@ interface RunTimerInfo {
 }
 
 interface CurrentRunningProtocolCommandProps {
+  currentRunStatus: string
   protocolName?: string
   playRun: () => void
   pauseRun: () => void
@@ -63,6 +64,7 @@ interface CurrentRunningProtocolCommandProps {
 }
 
 export function CurrentRunningProtocolCommand({
+  currentRunStatus,
   protocolName,
   currentRunCommandIndex,
   robotSideAnalysis,
@@ -94,7 +96,7 @@ CurrentRunningProtocolCommandProps): JSX.Element | null {
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
-            {t('status_running')}
+            {currentRunStatus}
           </StyledText>
           <StyledText
             color={COLORS.darkBlack_seventy}

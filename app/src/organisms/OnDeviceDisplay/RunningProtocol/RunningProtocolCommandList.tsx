@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
@@ -24,7 +25,18 @@ import { CommandText } from '../../CommandText'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { CommandIcon } from '../../RunPreview/CommandIcon'
 
+const COMMAND_ROW_STYLE = css`
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: ${TYPOGRAPHY.fontWeightRegular}
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+`
+
 interface RunningProtocolCommandListProps {
+  currentRunStatus: string
   protocolName?: string
   playRun: () => void
   pauseRun: () => void
@@ -34,11 +46,11 @@ interface RunningProtocolCommandListProps {
 }
 
 export function RunningProtocolCommandList({
+  currentRunStatus,
   protocolName,
   currentRunCommandIndex,
   robotSideAnalysis,
 }: RunningProtocolCommandListProps): JSX.Element {
-  const { t } = useTranslation('run_details')
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const ref = React.useRef<ViewportListRef>(null)
 
@@ -50,7 +62,9 @@ export function RunningProtocolCommandList({
         gridGap={SPACING.spacingXXL}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
-          <StyledText fontSize="2rem">{t('status_running')}</StyledText>
+          <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
+            {currentRunStatus}
+          </StyledText>
           <StyledText fontSize="2rem" color={COLORS.darkGreyEnabled}>
             {protocolName}
           </StyledText>
@@ -61,7 +75,11 @@ export function RunningProtocolCommandList({
         </Flex>
       </Flex>
       {robotSideAnalysis != null ? (
-        <Flex ref={viewPortRef} flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          ref={viewPortRef}
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+        >
           <ViewportList
             viewportRef={viewPortRef}
             ref={ref}
@@ -94,6 +112,7 @@ export function RunningProtocolCommandList({
                     <CommandText
                       command={command}
                       robotSideAnalysis={robotSideAnalysis}
+                      css={COMMAND_ROW_STYLE}
                     />
                   </Flex>
                 </Flex>
