@@ -33,6 +33,7 @@ const TableHeader = styled('th')`
 `
 
 const TableRow = styled('tr')`
+  background-color: ${COLORS.light_one};
   border: 1px ${COLORS.white} solid;
   height: 4.75rem;
 `
@@ -105,12 +106,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
             li => getLabwareDisplayName(li.definition) === name
           )?.definition
           return (
-            <TableRow
-              key={name}
-              style={{
-                backgroundColor: '#d6d6d6',
-              }}
-            >
+            <TableRow key={name}>
               <TableDatum>
                 <Flex
                   flexDirection={DIRECTION_ROW}
