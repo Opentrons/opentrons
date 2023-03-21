@@ -951,6 +951,8 @@ async def calibrate_module(
     prepped for calibration (for example, not heating, lid closed,
     not shaking, etc) and the corresponding module calibration
     block placed in the module slot.
+
+    The robot should be homed before calling this function.
     """
 
     try:
