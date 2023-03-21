@@ -32,7 +32,6 @@ class AbstractModule(abc.ABC):
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
-        module_id: Optional[str] = None,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 
@@ -46,14 +45,12 @@ class AbstractModule(abc.ABC):
         usb_port: USBPort,
         execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
-        module_id: Optional[str] = None,
     ) -> None:
         self._port = port
         self._usb_port = usb_port
         self._loop = hw_control_loop
         self._execution_manager = execution_manager
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
-        self._module_id = module_id
 
     @staticmethod
     def sort_key(inst: "AbstractModule") -> int:
@@ -71,10 +68,6 @@ class AbstractModule(abc.ABC):
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         return self._loop
-
-    @property
-    def module_id(self) -> str:
-        return self._module_id
 
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""

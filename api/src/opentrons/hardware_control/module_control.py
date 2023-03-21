@@ -1,7 +1,6 @@
 from __future__ import annotations
 import logging
 import re
-import secrets
 from typing import TYPE_CHECKING, List, Optional, Union
 from glob import glob
 
@@ -10,7 +9,11 @@ from opentrons.drivers.rpi_drivers import types, interfaces, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
-from opentrons.hardware_control.modules.module_calibration import ModuleCalibrationOffset, load_module_calibration_offset, save_module_calibration_offset
+from opentrons.hardware_control.modules.module_calibration import (
+    ModuleCalibrationOffset,
+    load_module_calibration_offset,
+    save_module_calibration_offset,
+)
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.types import Point
 from .types import AionotifyEvent, BoardRevision, OT3Mount
@@ -75,7 +78,6 @@ class AttachedModulesControl:
         usb_port: types.USBPort,
         type: modules.ModuleType,
         sim_model: Optional[str] = None,
-        module_id: Optional[str] = None,
     ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
@@ -85,7 +87,6 @@ class AttachedModulesControl:
             hw_control_loop=self._api.loop,
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
-            module_id=module_id,
         )
 
     async def unregister_modules(
@@ -144,7 +145,6 @@ class AttachedModulesControl:
                 port=mod.port,
                 usb_port=mod.usb_port,
                 type=modules.MODULE_TYPE_BY_NAME[mod.name],
-                module_id=secrets.token_hex(4)
             )
             self._available_modules.append(new_instance)
             log.info(
@@ -218,19 +218,31 @@ class AttachedModulesControl:
             except Exception:
                 log.exception("Exception in Module registration")
 
-    def get_module_by_module_id(self, module_id: str) -> Optional[modules.AbstractModule]:
+    def get_module_by_module_id(
+        self, module_id: str
+    ) -> Optional[modules.AbstractModule]:
+        """Returns the module with the matching serial id."""
         found_module: Optional[modules.AbstractModule] = None
         for module in self.available_modules:
-            if module.module_id == module_id:
+            if module.device_info["serial"] == module_id:
                 found_module = module
                 break
         return found_module
 
-    def load_module_offset(self, module_type: ModuleType, module_id: str, slot: int) -> ModuleCalibrationOffset:
+    def load_module_offset(
+        self, module_type: ModuleType, module_id: str, slot: int
+    ) -> ModuleCalibrationOffset:
         log.info(f"Loading module offset for {module_type} {module_id}")
         return load_module_calibration_offset(module_type, module_id, slot)
 
-    def save_module_offset(self, module: ModuleType, module_id: str, mount: OT3Mount, slot: int, offset: Point) -> ModuleCalibrationOffset:
-        log.info(f"Saving module {module} {module_id} offset: {offset} at slot {slot}")
+    def save_module_offset(
+        self,
+        module: ModuleType,
+        module_id: str,
+        mount: OT3Mount,
+        slot: int,
+        offset: Point,
+    ) -> ModuleCalibrationOffset:
+        log.info(f"Saving module {module} {module_id} offset: {offset} for slot {slot}")
         save_module_calibration_offset(offset, mount, slot, module, module_id)
         return load_module_calibration_offset(module, module_id, slot)

@@ -9,8 +9,6 @@ from enum import Enum
 from math import floor, copysign
 from logging import getLogger
 
-from opentrons.hardware_control.modules.types import ModuleType
-
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
@@ -867,7 +865,6 @@ async def calibrate_module(
     hcapi: OT3API,
     mount: OT3Mount,
     slot: int,
-    module: ModuleType,
     module_id: str,
     method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
 ) -> Point:
@@ -891,7 +888,7 @@ async def calibrate_module(
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
 
         # find the offset
-        offset = await _calibrate_module(hcapi, mount, module, slot, method)
+        offset = await _calibrate_module(hcapi, mount, slot, method)
         await hcapi.save_module_offset(module_id, mount, slot, offset)
         return offset
     finally:
