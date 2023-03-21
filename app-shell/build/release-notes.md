@@ -17,6 +17,7 @@ Welcome to the v6.3.0 release of the Opentrons App!
   - Drill down to view exact volumes for individual wells when setting up a protocol run.
   - Works for all protocols created with Protocol Designer, and for Python protocols that use the liquid setup methods introduced in v2.14 of the Python API.
   - Supports custom liquid colors set in Protocol Designer or the Python API.
+- Calibration Dashboard: Manage your robot's Deck Calibration, Pipette Offset Calibrations, and Tip Length Calibrations all in one place.
 - Run Progress Monitor: The run log has been redesigned to give you a better sense of the progress of your protocol and to make way for future improvements.
 
 ### Improved Features
