@@ -1912,6 +1912,8 @@ class OT3API(
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
             probe_settings.log_pressure,
+            probe_settings.auto_zero_sensor,
+            probe_settings.num_baseline_reads,
         )
         machine_pos = axis_convert(machine_pos_node_id, 0.0)
         position = deck_from_machine(

@@ -126,6 +126,8 @@ ot3_dummy_settings = {
         "expected_liquid_height": 90,
         "log_pressure": True,
         "aspirate_while_sensing": False,
+        "auto_zero_sensor": True,
+        "num_baseline_reads": 10,
         "data_file": "/var/pressure_sensor_data.csv",
     },
     "calibration": {
