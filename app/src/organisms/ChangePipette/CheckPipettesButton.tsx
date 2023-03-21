@@ -31,8 +31,6 @@ export function CheckPipettesButton(
     { refresh: true },
     {
       enabled: false,
-      onSuccess: () => {},
-      onSettled: () => {},
     }
   )
   const handleClick = (): void => {
