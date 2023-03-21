@@ -107,7 +107,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   }
 
   let currentStepContents: React.ReactNode = null
-  if (analysis != null && analysisCommands[lastRunCommandIndex] != null) {
+  if (runStatus === RUN_STATUS_IDLE) {
+    currentStepContents = (
+      <StyledText as="h2">{t('not_started_yet')}</StyledText>
+    )
+  } else if (
+    analysis != null &&
+    analysisCommands[lastRunCommandIndex] != null
+  ) {
     currentStepContents = (
       <CommandText
         robotSideAnalysis={analysis}
@@ -124,10 +131,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         robotSideAnalysis={analysis}
         command={runCommandDetails.data}
       />
-    )
-  } else if (runStatus === RUN_STATUS_IDLE) {
-    currentStepContents = (
-      <StyledText as="h2">{t('not_started_yet')}</StyledText>
     )
   } else if (runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)) {
     currentStepContents = (

@@ -13,7 +13,7 @@ import { useTrackProtocolRunEvent } from '../Devices/hooks'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
-  runId: string | null
+  runId: string
 }
 
 export function ConfirmCancelModal(
@@ -27,13 +27,13 @@ export function ConfirmCancelModal(
   const cancel: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
     e.preventDefault()
     e.stopPropagation()
-    onClose()
 
-    if (runId != null) {
-      stopRun(runId)
-
-      trackProtocolRunEvent({ name: 'runCancel' })
-    }
+    stopRun(runId, {
+      onSuccess: () => {
+        onClose()
+        trackProtocolRunEvent({ name: 'runCancel' })
+      }
+    })
   }
 
   return (
