@@ -181,6 +181,27 @@ class EstopButtonDetectionChange(utils.BinarySerializable):
     aux2_detected: utils.UInt8Field = utils.UInt8Field(0)
 
 
+@dataclass
+class DoorSwitchStateRequest(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.door_switch_state_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class DoorSwitchStateInfo(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.door_switch_state_info
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    door_open: utils.UInt8Field = utils.UInt8Field(0)
+
+
 BinaryMessageDefinition = Union[
     Echo,
     Ack,
@@ -195,6 +216,8 @@ BinaryMessageDefinition = Union[
     ReleaseSyncOut,
     EstopStateChange,
     EstopButtonDetectionChange,
+    DoorSwitchStateRequest,
+    DoorSwitchStateInfo,
 ]
 
 
