@@ -39,6 +39,9 @@ export function CalibrationTaskList({
   deckCalLauncher,
 }: CalibrationTaskListProps): JSX.Element {
   const prevActiveIndex = React.useRef<[number, number] | null>(null)
+  const [hasLaunchedWizard, setHasLaunchedWizard] = React.useState<boolean>(
+    false
+  )
   const [
     showCompletionScreen,
     setShowCompletionScreen,
@@ -53,11 +56,15 @@ export function CalibrationTaskList({
   )
 
   React.useEffect(() => {
-    if (prevActiveIndex.current !== null && activeIndex === null) {
+    if (
+      prevActiveIndex.current !== null &&
+      activeIndex === null &&
+      hasLaunchedWizard
+    ) {
       setShowCompletionScreen(true)
     }
     prevActiveIndex.current = activeIndex
-  }, [activeIndex])
+  }, [activeIndex, hasLaunchedWizard])
 
   // start off assuming we are missing calibrations
   let statusLabelBackgroundColor = COLORS.errorEnabled
@@ -138,6 +145,7 @@ export function CalibrationTaskList({
             activeIndex={activeIndex}
             taskList={taskList}
             taskListStatus={taskListStatus}
+            generalTaskClickHandler={() => setHasLaunchedWizard(true)}
           />
         </>
       )}

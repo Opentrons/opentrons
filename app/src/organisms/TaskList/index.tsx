@@ -199,6 +199,7 @@ function SubTask({
   cta,
   footer,
   markedBad,
+  generalClickHandler,
 }: SubTaskProps): JSX.Element {
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
 
@@ -259,12 +260,29 @@ function SubTask({
         ) : null}
       </Flex>
       {(isTaskListComplete || isPastSubTask) && cta != null ? (
-        <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} onClick={cta.onClick}>
+        <Link
+          css={TYPOGRAPHY.darkLinkLabelSemiBold}
+          onClick={() => {
+            if (generalClickHandler != null) {
+              generalClickHandler()
+            }
+            cta.onClick()
+          }}
+        >
           {cta.label}
         </Link>
       ) : null}
       {isActiveSubTask && cta != null ? (
-        <TertiaryButton onClick={cta.onClick}>{cta.label}</TertiaryButton>
+        <TertiaryButton
+          onClick={() => {
+            if (generalClickHandler != null) {
+              generalClickHandler()
+            }
+            cta.onClick()
+          }}
+        >
+          {cta.label}
+        </TertiaryButton>
       ) : null}
     </Flex>
   )
@@ -281,6 +299,7 @@ function Task({
   taskListLength,
   isComplete,
   markedBad,
+  generalClickHandler,
 }: TaskProps): JSX.Element {
   const [activeTaskIndex] = activeIndex ?? []
 
@@ -372,12 +391,29 @@ function Task({
               height="15px"
             />
           ) : (isTaskListComplete || isPastTask) && cta != null ? (
-            <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} onClick={cta.onClick}>
+            <Link
+              css={TYPOGRAPHY.darkLinkLabelSemiBold}
+              onClick={() => {
+                if (generalClickHandler != null) {
+                  generalClickHandler()
+                }
+                cta.onClick()
+              }}
+            >
               {cta.label}
             </Link>
           ) : null}
           {isActiveTask && cta != null ? (
-            <TertiaryButton onClick={cta.onClick}>{cta.label}</TertiaryButton>
+            <TertiaryButton
+              onClick={() => {
+                if (generalClickHandler != null) {
+                  generalClickHandler()
+                }
+                cta.onClick()
+              }}
+            >
+              {cta.label}
+            </TertiaryButton>
           ) : null}
         </Flex>
         {isTaskOpen ? (
@@ -401,6 +437,7 @@ function Task({
                   subTaskIndex={subTaskIndex}
                   taskIndex={taskIndex}
                   markedBad={markedBad}
+                  generalClickHandler={generalClickHandler}
                 />
               )
             )}
@@ -414,6 +451,7 @@ function Task({
 export function TaskList({
   activeIndex,
   taskList,
+  generalTaskClickHandler,
 }: TaskListProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
@@ -434,6 +472,7 @@ export function TaskList({
             taskListLength={taskList.length}
             isComplete={isComplete}
             markedBad={markedBad}
+            generalClickHandler={generalTaskClickHandler}
           />
         )
       )}
