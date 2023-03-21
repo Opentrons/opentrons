@@ -47,14 +47,14 @@ describe('useHistoricRunDetails', () => {
     )
     const { result, waitFor } = renderHook(useHistoricRunDetails, { wrapper })
     await waitFor(() => result.current != null)
-    expect(result.current).toEqual([MOCK_RUN_EARLIER, MOCK_RUN_LATER])
+    expect(result.current).toEqual([MOCK_RUN_LATER, MOCK_RUN_EARLIER])
   })
   it('returns historical run details with newest first to specific host', async () => {
     when(mockUseAllRunsQuery)
       .calledWith({}, { hostname: 'fakeIp' })
       .mockReturnValue(
         mockSuccessQueryResults({
-          data: [MOCK_RUN_LATER, MOCK_RUN_EARLIER, MOCK_RUN_EARLIER],
+          data: [MOCK_RUN_EARLIER, MOCK_RUN_EARLIER, MOCK_RUN_LATER],
           links: {},
         })
       )
@@ -67,9 +67,9 @@ describe('useHistoricRunDetails', () => {
     )
     await waitFor(() => result.current != null)
     expect(result.current).toEqual([
-      MOCK_RUN_EARLIER,
-      MOCK_RUN_EARLIER,
       MOCK_RUN_LATER,
+      MOCK_RUN_EARLIER,
+      MOCK_RUN_EARLIER,
     ])
   })
 })
