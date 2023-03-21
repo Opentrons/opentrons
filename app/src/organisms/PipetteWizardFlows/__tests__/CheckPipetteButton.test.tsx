@@ -36,6 +36,10 @@ describe('CheckPipetteButton', () => {
     getByRole('button', { name: 'continue' }).click()
     expect(refetch).toHaveBeenCalled()
   })
+  it('button is disabled when fetching is true', () => {
+    const { getByRole } = render({ ...props, isFetching: true })
+    expect(getByRole('button', { name: 'continue' })).toBeDisabled()
+  })
   it('renders button for on device display', () => {
     props = {
       ...props,
