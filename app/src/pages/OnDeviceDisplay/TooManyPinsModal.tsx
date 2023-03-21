@@ -9,20 +9,14 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { ModalShell } from '../../../molecules/Modal'
-
-import type { UseLongPressResult } from '@opentrons/components'
+import { StyledText } from '../../atoms/text'
+import { ModalShell } from '../../molecules/Modal'
 
 export function TooManyPinsModal(props: {
-  longpress: UseLongPressResult
+  handleCloseMaxPinsAlert: () => void
 }): JSX.Element {
-  const { longpress } = props
+  const { handleCloseMaxPinsAlert } = props
   const { t } = useTranslation('protocol_info')
-
-  const handleCloseMaxPinsAlert = (): void => {
-    longpress.setIsLongPressed(false)
-  }
 
   return (
     <ModalShell

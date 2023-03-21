@@ -22,7 +22,7 @@ import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
-import { TooManyPinsModal } from './TooManyPinsModal'
+import { TooManyPinsModal } from '../TooManyPinsModal'
 
 import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
@@ -101,7 +101,9 @@ export function LongPressModal(props: {
   return (
     <>
       {showMaxPinsAlert ? (
-        <TooManyPinsModal longpress={longpress} />
+        <TooManyPinsModal
+          handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
+        />
       ) : (
         <ModalShell
           borderRadius={BORDERS.size_three}
