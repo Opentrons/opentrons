@@ -477,7 +477,8 @@ async def find_slot_center_linear(
     ------
     hcapi: The api instance to run commands through
     mount: The mount to calibrate
-    estimated_center: The XY-center of a slot based on deck definition with the estimated Z height obtained from `find_deck_height()`
+    estimated_center: The XY-center of a slot based on deck definition with the 
+    estimated Z height obtained from `find_calibration_structure_center()`
 
     Returns
     -------

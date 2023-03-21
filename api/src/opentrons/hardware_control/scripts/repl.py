@@ -129,7 +129,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "GripperProbe": GripperProbe,
             "ModuleType": ModuleType,
             "find_edge": wrap_async_util_fn(find_edge_linear, api),
-            "find_deck_height": wrap_async_util_fn(
+            "find_calibration_structure_height": wrap_async_util_fn(
                 find_calibration_structure_height, api
             ),
             "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
