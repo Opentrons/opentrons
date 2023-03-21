@@ -115,7 +115,10 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json': standard384WellNames,
 }
 
-const filterWells = (labwareDef: LabwareDefinition2, predicate: (wellDef: LabwareWell) => boolean): Set<string> => {
+const filterWells = (
+  labwareDef: LabwareDefinition2,
+  predicate: (wellDef: LabwareWell) => boolean
+): Set<string> => {
   return new Set(
     Object.entries(labwareDef.wells)
       .filter(([wellName, wellDef]) => predicate(wellDef))
@@ -123,19 +126,23 @@ const filterWells = (labwareDef: LabwareDefinition2, predicate: (wellDef: Labwar
   )
 }
 
-const getWellsNotMatchingZDimension = (labwareDef: LabwareDefinition2): Set<string> => {
-  return filterWells(labwareDef, (wellDef) => {
+const getWellsNotMatchingZDimension = (
+  labwareDef: LabwareDefinition2
+): Set<string> => {
+  return filterWells(labwareDef, wellDef => {
     const absDifference = Math.abs(
-      (wellDef.depth + wellDef.z) - labwareDef.dimensions.zDimension
+      wellDef.depth + wellDef.z - labwareDef.dimensions.zDimension
     )
     return absDifference > 0.000001 // Tolerate floating point rounding errors.
   })
 }
 
-const getWellsHigherThanZDimension = (labwareDef: LabwareDefinition2): Set<string> => {
-  return filterWells(labwareDef, (wellDef) => {
+const getWellsHigherThanZDimension = (
+  labwareDef: LabwareDefinition2
+): Set<string> => {
+  return filterWells(labwareDef, wellDef => {
     const difference =
-      (wellDef.depth + wellDef.z) - labwareDef.dimensions.zDimension
+      wellDef.depth + wellDef.z - labwareDef.dimensions.zDimension
     return difference > 0.000001 // Tolerate floating point rounding errors.
   })
 }
