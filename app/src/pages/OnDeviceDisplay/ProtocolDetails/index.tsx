@@ -16,15 +16,18 @@ import {
   useDeleteProtocolMutation,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
+import { ProtocolMetadata } from '@opentrons/shared-data'
 import {
   BackButton,
   QuaternaryButton,
   TertiaryButton,
 } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
-import type { OnDeviceRouteParams } from '../../../App/types'
+import { Deck } from './Deck'
 import { Hardware } from './Hardware'
-import { ProtocolMetadata } from '@opentrons/shared-data'
+import { Labware } from './Labware'
+
+import type { OnDeviceRouteParams } from '../../../App/types'
 
 type ProtocolType = 'json' | 'python'
 type CreationMethod = 'Protocol Designer' | 'Python'
@@ -133,10 +136,12 @@ const ProtocolSectionContent = (
       protocolSection = <Hardware protocolId={props.protocolId} />
       break
     case 'Labware':
+      protocolSection = <Labware protocolId={props.protocolId} />
       break
     case 'Liquids':
       break
     case 'Initial Deck Layout':
+      protocolSection = <Deck protocolId={props.protocolId} />
       break
   }
   return <Flex margin={SPACING.spacing4}>{protocolSection}</Flex>

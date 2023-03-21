@@ -125,7 +125,7 @@ class BinaryMessenger:
                 except BinarySerializableException:
                     log.exception("Failed to build message")
             else:
-                log.error(f"Message {message_definition} is not recognized.")
+                log.debug("read timed out, calling read again")
 
     async def _handle_error(self, message_definition: BinaryMessageDefinition) -> None:
         log.error("Got a error message.")

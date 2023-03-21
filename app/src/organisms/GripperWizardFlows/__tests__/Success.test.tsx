@@ -43,32 +43,34 @@ describe('Success', () => {
   })
 
   it('renders correct text for attached and calibrated', () => {
-    const { getByRole } = render({
+    const { getByRole, getByText } = render({
       successfulAction: SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
     })[0]
-    getByRole('heading', {
-      name: 'Gripper Successfully Attached and Calibrated',
-    })
+    getByText('Gripper Successfully Attached and Calibrated')
     getByRole('button', { name: 'exit' })
   })
 
   it('renders correct text for calibrated', () => {
-    const { getByRole } = render({
+    const { getByRole, getByText } = render({
       successfulAction: SUCCESSFULLY_CALIBRATED,
     })[0]
-    getByRole('heading', { name: 'Gripper Successfully Calibrated' })
+    getByText('Gripper Successfully Calibrated')
     getByRole('button', { name: 'exit' })
   })
 
   it('renders correct text for attached', () => {
-    const { getByRole } = render({ successfulAction: SUCCESSFULLY_ATTACHED })[0]
-    getByRole('heading', { name: 'Gripper Successfully Attached' })
+    const { getByRole, getByText } = render({
+      successfulAction: SUCCESSFULLY_ATTACHED,
+    })[0]
+    getByText('Gripper Successfully Attached')
     getByRole('button', { name: 'Calibrate gripper' })
   })
 
   it('renders correct text for detached', () => {
-    const { getByRole } = render({ successfulAction: SUCCESSFULLY_DETACHED })[0]
-    getByRole('heading', { name: 'Gripper Successfully Detached' })
+    const { getByText, getByRole } = render({
+      successfulAction: SUCCESSFULLY_DETACHED,
+    })[0]
+    getByText('Gripper Successfully Detached')
     getByRole('button', { name: 'exit' })
   })
 })

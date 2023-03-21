@@ -21,10 +21,9 @@ log = logging.getLogger(__name__)
 @no_type_check
 def delete_module_offset_file(module_id: str) -> None:
     """
-    Delete module offset file based on mount and module id number
+    Delete module offset file for the given module id.
 
-    :param module: module id number
-    :param mount: instrument mount
+    :param module: module id serial number
     """
     offset_dir = config.get_opentrons_path("module_calibration_dir")
     offset_path = offset_dir / f"{module_id}.json"
@@ -54,10 +53,7 @@ def save_module_calibration(
         Union[local_types.CalibrationStatus, v1.CalibrationStatus]
     ] = None,
 ) -> None:
-    module_dir = (
-        config.get_opentrons_path("module_calibration_dir") / mount.name.lower()
-    )
-
+    module_dir = config.get_opentrons_path("module_calibration_dir")
     if isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
     elif isinstance(cal_status, v1.CalibrationStatus):
@@ -83,17 +79,17 @@ def save_module_calibration(
 
 @no_type_check
 def get_module_offset(
-    module: ModuleType,
-    module_id: str,
-    slot: Optional[int] = None
+    module: ModuleType, module_id: str, slot: Optional[int] = None
 ) -> Optional[v1.ModuleOffsetModel]:
     try:
         module_calibration_filepath = (
-            config.get_opentrons_path("module_calibration_dir") / f"{module.name}-{module_id}.json"
+            config.get_opentrons_path("module_calibration_dir") / f"{module_id}.json"
         )
         return v1.ModuleOffsetModel(**io.read_cal_file(module_calibration_filepath))
     except FileNotFoundError:
-        log.warning(f"Calibrations for {module_id} on slot {slot} does not exist.")
+        log.warning(
+            f"Calibrations for {module} {module_id} on slot {slot} does not exist."
+        )
         return None
     except (json.JSONDecodeError, ValidationError):
         log.warning(

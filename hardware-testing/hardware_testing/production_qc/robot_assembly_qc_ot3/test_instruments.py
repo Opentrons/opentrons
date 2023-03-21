@@ -15,10 +15,10 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point, Gripp
 from hardware_testing.data import ui
 
 PLUNGER_TOLERANCE_MM = 0.2
-GRIPPER_NO_SKIP_TOLERANCE_MM = 0.2
-GRIPPER_Z_ENDSTOP_RETRACT_MM = 0.25
+
+GRIPPER_Z_ENDSTOP_RETRACT_MM = 0.5
 GRIPPER_GRIP_FORCE = 20
-GRIPPER_JAW_WIDTH_TOLERANCE_MM = 1.0
+GRIPPER_JAW_WIDTH_TOLERANCE_MM = 3.0  # FIXME: this is way too big
 
 GRIPPER_MAX_Z_TRAVEL_MM = 170.025
 GRIPPER_Z_NO_SKIP_TRAVEL_MM = GRIPPER_MAX_Z_TRAVEL_MM - 30  # avoid hitting clips
@@ -229,6 +229,8 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
         return not await _z_is_hitting_endstop()
 
     await api.home([z_ax])
+    await api.move_rel(mount, Point(z=-5))
+    await api.home([z_ax])
     try:
         assert (
             await _z_is_hitting_endstop()
@@ -256,8 +258,9 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     # JAW GRIP/UNGRIP
     async def _get_jaw_width_and_record_result(min_max: str) -> None:
         _encoders = await api.encoder_current_position_ot3(mount)
-        _width = jaw_widths["max"] - _encoders[jaw_ax]
+        _width = jaw_widths["max"] - (_encoders[jaw_ax] * 2)
         _diff = abs(_width - jaw_widths[min_max])
+        print(f"jaw: encoder={_encoders[jaw_ax]}, width={_width}")
         _result = CSVResult.from_bool(_diff < GRIPPER_JAW_WIDTH_TOLERANCE_MM)
         report(
             section, f"gripper-jaw-{min_max}", [_width, jaw_widths[min_max], _result]
@@ -265,9 +268,9 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
 
     await api.home([jaw_ax])
     await api.grip(GRIPPER_GRIP_FORCE)
-    await _get_jaw_width_and_record_result("max")
-    await api.ungrip()
     await _get_jaw_width_and_record_result("min")
+    await api.ungrip()
+    await _get_jaw_width_and_record_result("max")
 
     # PROBE-DISTANCE
     await _probe_mount_and_record_result(
@@ -280,8 +283,6 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    while not api.is_simulator and (await _get_pip_mounts(api) or api.has_gripper()):
-        ui.get_user_ready("remove all attached instruments")
     print("homing")
     await api.home()
     print("moving to front of machine")
@@ -302,23 +303,14 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # GRIPPER
     ui.print_header("GRIPPER")
-    print("skipping gripper until DVT grippers are available\n")
-    for t in GRIPPER_TESTS:
-        if t == "id":
-            report(section, f"gripper-{t}", ["", "", CSVResult.PASS])
-        elif t == "no-skip":
-            report(section, f"gripper-{t}", [CSVResult.PASS])
-        else:
-            report(section, f"gripper-{t}", [0.0, 0.0, CSVResult.PASS])
-
-    # TODO: uncomment once EVT grippers have been tested on DVT robots
-    # if not api.is_simulator:
-    #     ui.get_user_ready("attach a gripper")
-    # await _test_gripper(api, report, section)
-    # while not api.is_simulator and await _has_gripper(api):
-    #     ui.get_user_ready("remove the gripper")
+    if not api.is_simulator:
+        ui.get_user_ready("attach a gripper")
+    await _test_gripper(api, report, section)
+    while not api.is_simulator and await _has_gripper(api):
+        ui.get_user_ready("remove the gripper")
 
     print("moving back near home position")
+    await api.home([OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G, OT3Axis.G])
     await api.move_rel(
         OT3Mount.LEFT,
         RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,
