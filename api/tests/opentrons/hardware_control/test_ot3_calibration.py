@@ -23,6 +23,7 @@ from opentrons.hardware_control.ot3_calibration import (
     _edges_from_data,
     _probe_deck_at,
     _get_calibration_square_position_in_slot,
+    _verify_edge_pos,
     InaccurateNonContactSweepError,
     CalibrationStructureNotFoundError,
     EdgeNotFoundError,
@@ -90,6 +91,18 @@ def mock_capacitive_sweep(ot3_hardware: ThreadManager[OT3API]) -> Iterator[Async
 
 
 @pytest.fixture
+def mock_verify_edge(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch(
+        "opentrons.hardware_control.ot3_calibration._verify_edge_pos",
+        AsyncMock(
+            spec=_verify_edge_pos,
+            wraps=_verify_edge_pos,
+        ),
+    ) as mock_verify_edge:
+        yield mock_verify_edge
+
+
+@pytest.fixture
 def mock_data_analysis() -> Iterator[Mock]:
     with patch(
         "opentrons.hardware_control.ot3_calibration._edges_from_data",
@@ -131,24 +144,18 @@ def _other_axis_val(point: Tuple[float, float, float], main_axis: OT3Axis) -> fl
 
 
 @pytest.mark.parametrize(
-    "search_axis,search_direction,probe_results,search_result",
+    "search_axis,direction_if_hit,probe_results,search_result",
     [
         # For each axis and direction, test
-        # 1. miss-hit-hit
-        # 2. hit-miss-miss
+        # 1. hit-miss-miss
+        # 2. miss-hit-hit
         # 3. miss-hit-miss
-        (OT3Axis.X, -1, (1, -1, -1), -2),
-        (OT3Axis.X, -1, (-1, 1, 1), 2),
-        (OT3Axis.X, -1, (-1, 1, -1), 6),
-        (OT3Axis.X, 1, (-1, 1, 1), -2),
-        (OT3Axis.X, 1, (1, -1, -1), 2),
-        (OT3Axis.X, 1, (-1, 1, -1), -6),
-        (OT3Axis.Y, -1, (1, -1, -1), -2),
-        (OT3Axis.Y, -1, (-1, 1, 1), 2),
-        (OT3Axis.Y, -1, (-1, 1, -1), 6),
-        (OT3Axis.Y, 1, (-1, 1, 1), -2),
-        (OT3Axis.Y, 1, (1, -1, -1), 2),
-        (OT3Axis.Y, 1, (-1, 1, -1), -6),
+        (OT3Axis.X, -1, (1, -1, -1), -1),
+        (OT3Axis.X, -1, (-1, 1, 1), 1),
+        (OT3Axis.X, -1, (-1, 1, -1), 3),
+        (OT3Axis.X, 1, (1, -1, -1), 1),
+        (OT3Axis.X, 1, (-1, 1, 1), -1),
+        (OT3Axis.X, 1, (-1, 1, -1), -3),
     ],
 )
 async def test_find_edge(
@@ -157,7 +164,7 @@ async def test_find_edge(
     override_cal_config: None,
     mock_move_to: AsyncMock,
     search_axis: OT3Axis,
-    search_direction: Literal[1, -1],
+    direction_if_hit: Literal[1, -1],
     probe_results: Tuple[float, float, float],
     search_result: float,
 ) -> None:
@@ -168,7 +175,8 @@ async def test_find_edge(
         OT3Mount.RIGHT,
         Point(0, 0, 0),
         search_axis,
-        search_direction,
+        direction_if_hit,
+        False,
     )
     assert search_axis.of_point(result) == search_result
     # the first move is in z only to the cal height
@@ -182,39 +190,28 @@ async def test_find_edge(
 
 
 @pytest.mark.parametrize(
-    "search_axis,search_direction,probe_results",
+    "search_axis,direction_if_hit,probe_results",
     [
-        # For each axis and direction, test
-        # 1. Miss-miss
-        # 2. Hit-hit
-        (OT3Axis.X, -1, (-1, -1)),
-        (OT3Axis.X, -1, (1, 1)),
-        (OT3Axis.X, 1, (-1, -1)),
-        (OT3Axis.X, 1, (1, 1)),
-        (OT3Axis.X, -1, (-1, -1)),
-        (OT3Axis.X, -1, (1, 1)),
-        (OT3Axis.X, 1, (-1, -1)),
-        (OT3Axis.X, 1, (1, 1)),
+        (OT3Axis.X, -1, (1, -1, -1)),
+        (OT3Axis.Y, -1, (-1, 1, 1)),
     ],
 )
 async def test_edge_not_found(
     ot3_hardware: ThreadManager[OT3API],
     mock_capacitive_probe: AsyncMock,
+    mock_verify_edge: AsyncMock,
     override_cal_config: None,
     mock_move_to: AsyncMock,
     search_axis: OT3Axis,
-    search_direction: Literal[1, -1],
+    direction_if_hit: Literal[1, -1],
     probe_results: Tuple[float, float, float],
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = probe_results
+    mock_verify_edge.side_effect = (False,)
     with pytest.raises(EdgeNotFoundError):
         await find_edge_binary(
-            ot3_hardware,
-            OT3Mount.RIGHT,
-            Point(0, 0, 0),
-            search_axis,
-            search_direction,
+            ot3_hardware, OT3Mount.RIGHT, Point(0, 0, 0), search_axis, direction_if_hit
         )
 
 
