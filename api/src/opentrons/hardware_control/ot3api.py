@@ -297,6 +297,9 @@ class OT3API(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
+        door_state = await backend.door_state()
+        api_instance._update_door_state(door_state)
+        backend.add_door_state_listener(api_instance._update_door_state)
         checked_loop.create_task(backend.watch(loop=checked_loop))
         backend.initialized = True
         return api_instance
