@@ -118,7 +118,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         name={iconName ?? 'play'}
         aria-label={`LargeButton_${iconName ?? 'play'}`}
         color={
-          disabled
+          disabled === true
             ? COLORS.darkBlack_sixty
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
         }
