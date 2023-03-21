@@ -94,7 +94,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
 
   React.useEffect(() => {
     chainRunCommands(modulePrepCommands, true)
-      .then(() => {})
+      .then(() => { })
       .catch(e => {
         console.error('Unexpected command failure: ', e)
       })
@@ -128,7 +128,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     />
   )
 
-  let confirmPlacementCommands: CreateCommand[] = [
+  const confirmPlacementCommands: CreateCommand[] = [
     {
       commandType: 'moveLabware' as const,
       params: {
@@ -138,6 +138,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         strategy: 'manualMoveWithoutPause',
       },
     },
+    ...(protocolData.modules.reduce<CreateCommand[]>((acc, mod) => {
+      if (getModuleType(mod.model) === HEATERSHAKER_MODULE_TYPE) {
+        return [...acc, {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: mod.id },
+        }]
+      }
+      return acc
+    }, [])),
     {
       commandType: 'moveToWell' as const,
       params: {
@@ -148,20 +157,6 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       },
     },
   ]
-
-  if (moduleId != null && moduleType != null) {
-    confirmPlacementCommands =
-      moduleType === HEATERSHAKER_MODULE_TYPE
-        ? [
-            confirmPlacementCommands[0],
-            {
-              commandType: 'heaterShaker/closeLabwareLatch',
-              params: { moduleId },
-            },
-            confirmPlacementCommands[1],
-          ]
-        : confirmPlacementCommands
-  }
 
   const handleConfirmPlacement = (): void => {
     chainRunCommands(confirmPlacementCommands, true)
