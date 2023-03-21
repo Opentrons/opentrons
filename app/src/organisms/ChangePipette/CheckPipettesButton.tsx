@@ -31,15 +31,15 @@ export function CheckPipettesButton(
     { refresh: true },
     {
       enabled: false,
-      onSuccess: () => {
-        onDone?.()
-      },
+      onSuccess: () => {},
       onSettled: () => {},
     }
   )
   const handleClick = (): void => {
     refetchPipettes()
-      .then(() => {})
+      .then(() => {
+        onDone?.()
+      })
       .catch(() => {})
   }
   const icon = (
