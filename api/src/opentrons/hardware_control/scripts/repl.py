@@ -67,14 +67,14 @@ LOG_CONFIG = {
             "formatter": "basic",
             "filename": "/var/log/repl.log",
             "maxBytes": 5000000,
-            "level": logging.DEBUG,
+            "level": logging.INFO,
             "backupCount": 3,
         },
     },
     "loggers": {
         "": {
             "handlers": ["file_handler"],
-            "level": logging.DEBUG,
+            "level": logging.INFO,
         },
     },
 }

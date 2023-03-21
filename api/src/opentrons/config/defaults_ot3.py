@@ -54,7 +54,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             sensor_threshold_pf=4.0,
         ),
         search_initial_tolerance_mm=8.0,
-        search_iteration_limit=11,
+        search_iteration_limit=9,
     ),
     probe_length=44.5,
 )
