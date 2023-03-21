@@ -307,7 +307,7 @@ export function ProtocolDetails(): JSX.Element | null {
           width="30.375rem"
         />
         <MediumButton
-          buttonText={t('delete_protocol')}
+          buttonText={t('protocol_info:delete_protocol')}
           buttonType="alertSecondary"
           iconName={'delete'}
           onClick={() => {
