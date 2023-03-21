@@ -78,7 +78,6 @@ describe('CheckPipettesButton', () => {
     const refetch = jest.fn(() => Promise.resolve())
     mockUsePipettesQuery.mockReturnValue({
       refetch,
-      isFetching: true,
     } as any)
     props = {
       robotName: 'otie',
@@ -86,6 +85,8 @@ describe('CheckPipettesButton', () => {
       actualPipette: MOCK_ACTUAL_PIPETTE,
     }
     const { getByLabelText } = render(props)
+    const btn = getByLabelText('Confirm')
+    fireEvent.click(btn)
     expect(getByLabelText('Confirm')).toBeDisabled()
   })
 
@@ -104,5 +105,6 @@ describe('CheckPipettesButton', () => {
     getByText('btn text')
     fireEvent.click(btn)
     expect(refetch).toHaveBeenCalled()
+    expect(getByLabelText('Confirm')).toBeDisabled()
   })
 })
