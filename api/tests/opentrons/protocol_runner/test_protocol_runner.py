@@ -21,10 +21,10 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
 )
 from opentrons.protocol_runner import (
-    ProtocolRunner,
     create_protocol_runner,
     JsonRunner,
     PythonAndLegacyRunner,
+    MaintenanceRunner,
 )
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
@@ -139,6 +139,20 @@ def legacy_subject(
     )
 
 
+@pytest.fixture
+def maintenance_subject(
+    protocol_engine: ProtocolEngine,
+    hardware_api: HardwareAPI,
+    task_queue: TaskQueue,
+) -> MaintenanceRunner:
+    """Get a MaintenanceRunner test subject with mocked dependencies."""
+    return MaintenanceRunner(
+        protocol_engine=protocol_engine,
+        hardware_api=hardware_api,
+        task_queue=task_queue,
+    )
+
+
 async def test_create_protocol_runner(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
@@ -207,6 +221,21 @@ async def test_create_protocol_runner(
         PythonAndLegacyRunner,
     )
 
+    assert isinstance(
+        create_protocol_runner(
+            protocol_config=None,
+            protocol_engine=protocol_engine,
+            hardware_api=hardware_api,
+            task_queue=task_queue,
+            json_file_reader=json_file_reader,
+            json_translator=json_translator,
+            legacy_file_reader=legacy_file_reader,
+            legacy_context_creator=legacy_context_creator,
+            legacy_executor=legacy_executor,
+        ),
+        MaintenanceRunner,
+    )
+
 
 # @pytest.mark.parametrize(
 #     argnames=["subject"],
@@ -256,7 +285,7 @@ async def test_stop_never_started_json_runner(
     decoy: Decoy,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    json_subject: ProtocolRunner,
+    json_subject: JsonRunner,
 ) -> None:
     """It should clean up rather than halt if the runner was never started."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
@@ -274,7 +303,7 @@ async def test_run_json_runner(
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    json_subject: ProtocolRunner,
+    json_subject: JsonRunner,
 ) -> None:
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
@@ -299,7 +328,7 @@ async def test_load_json_runner(
     json_translator: JsonTranslator,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    json_subject: ProtocolRunner,
+    json_subject: JsonRunner,
 ) -> None:
     """It should load a JSON protocol file."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -368,6 +397,61 @@ async def test_load_json_runner(
     )
 
 
+async def test_play_starts_run_legacy_runner(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
+    task_queue: TaskQueue,
+    legacy_subject: PythonAndLegacyRunner,
+) -> None:
+    """It should start a protocol run with play."""
+    legacy_subject.play()
+
+    decoy.verify(protocol_engine.play(), times=1)
+
+
+async def test_pause_legacy_runner(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
+    legacy_subject: PythonAndLegacyRunner,
+) -> None:
+    """It should pause a protocol run with pause."""
+    legacy_subject.pause()
+
+    decoy.verify(protocol_engine.pause(), times=1)
+
+
+async def test_stop_legacy_runner(
+    decoy: Decoy,
+    task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
+    legacy_subject: PythonAndLegacyRunner,
+) -> None:
+    """It should halt a protocol run with stop."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
+
+    legacy_subject.play()
+    await legacy_subject.stop()
+
+    decoy.verify(await protocol_engine.stop(), times=1)
+
+
+async def test_stop_never_started_legacy_runner(
+    decoy: Decoy,
+    task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
+    legacy_subject: PythonAndLegacyRunner,
+) -> None:
+    """It should clean up rather than halt if the runner was never started."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
+
+    await legacy_subject.stop()
+
+    decoy.verify(
+        await protocol_engine.finish(drop_tips_and_home=False, set_run_status=False),
+        times=1,
+    )
+
+
 async def test_load_legacy_python(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
@@ -375,7 +459,7 @@ async def test_load_legacy_python(
     legacy_executor: LegacyExecutor,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    legacy_subject: ProtocolRunner,
+    legacy_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -440,7 +524,7 @@ async def test_load_python_with_pe_papi_core(
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
     protocol_engine: ProtocolEngine,
-    legacy_subject: ProtocolRunner,
+    legacy_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
     legacy_protocol_source = ProtocolSource(
@@ -492,7 +576,7 @@ async def test_load_legacy_json(
     legacy_executor: LegacyExecutor,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    legacy_subject: ProtocolRunner,
+    legacy_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -545,3 +629,105 @@ async def test_load_legacy_json(
             context=legacy_context,
         ),
     )
+
+
+async def test_run_python_runner(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    protocol_engine: ProtocolEngine,
+    task_queue: TaskQueue,
+    legacy_subject: PythonAndLegacyRunner,
+) -> None:
+    """It should run a protocol to completion."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
+        False, True
+    )
+
+    assert legacy_subject.was_started() is False
+    await legacy_subject.run()
+    assert legacy_subject.was_started() is True
+
+    decoy.verify(
+        await hardware_api.home(),
+        protocol_engine.play(),
+        task_queue.start(),
+        await task_queue.join(),
+    )
+
+
+async def test_stop_maintenance_runner(
+    decoy: Decoy,
+    task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
+    maintenance_subject: MaintenanceRunner,
+) -> None:
+    """It should halt a protocol run with stop."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
+
+    await maintenance_subject.stop()
+
+    decoy.verify(await protocol_engine.stop(), times=1)
+
+
+async def test_stop_never_started_maintenance_runner(
+    decoy: Decoy,
+    task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
+    maintenance_subject: MaintenanceRunner,
+) -> None:
+    """It should clean up rather than halt if the runner was never started."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
+
+    await maintenance_subject.stop()
+
+    decoy.verify(
+        await protocol_engine.finish(drop_tips_and_home=False, set_run_status=False),
+        times=1,
+    )
+
+
+async def test_run_maintanence_runner(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    protocol_engine: ProtocolEngine,
+    task_queue: TaskQueue,
+    maintenance_subject: MaintenanceRunner,
+) -> None:
+    """It should run a protocol to completion."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
+        False, True
+    )
+
+    assert maintenance_subject.was_started() is False
+    await maintenance_subject.run()
+    assert maintenance_subject.was_started() is True
+
+    decoy.verify(
+        await hardware_api.home(),
+        task_queue.start(),
+        await task_queue.join(),
+    )
+
+
+def test_play_maintanence_runner_raises(
+    maintenance_subject: MaintenanceRunner,
+) -> None:
+    """Should raise a not supported error."""
+    with pytest.raises(NotImplementedError):
+        maintenance_subject.play()
+
+
+def test_pause_maintanence_runner_raises(
+    maintenance_subject: MaintenanceRunner,
+) -> None:
+    """Should raise a not supported error."""
+    with pytest.raises(NotImplementedError):
+        maintenance_subject.pause()
+
+
+async def test_load_maintanence_runner_raises(
+    maintenance_subject: MaintenanceRunner,
+) -> None:
+    """Should raise a not supported error."""
+    with pytest.raises(NotImplementedError):
+        await maintenance_subject.load(None)  # type: ignore[arg-type]

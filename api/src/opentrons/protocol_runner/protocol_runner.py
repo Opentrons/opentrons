@@ -63,6 +63,12 @@ class ProtocolRunner(TypingProtocol):
         to control the run of a file-based protocol.
         """
 
+    def play(self) -> None:
+        """Start or resume the run."""
+
+    def pause(self) -> None:
+        """Pause the run."""
+
     async def stop(self) -> None:
         """Stop (cancel) the run."""
 
@@ -199,12 +205,6 @@ class JsonRunner(ProtocolRunner):
         self._hardware_api = hardware_api
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_translator = json_translator or JsonTranslator()
-        # self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
-        # self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
-        #     hardware_api=hardware_api,
-        #     protocol_engine=protocol_engine,
-        # )
-        # self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
@@ -304,8 +304,80 @@ class JsonRunner(ProtocolRunner):
         return ProtocolRunResult(commands=commands, state_summary=run_data)
 
 
+class MaintenanceRunner(ProtocolRunner):
+    """Protocol runner implementation for setup commands."""
+
+    def __init__(
+        self,
+        protocol_engine: ProtocolEngine,
+        hardware_api: HardwareControlAPI,
+        task_queue: Optional[TaskQueue] = None,
+    ) -> None:
+        """Initialize the JsonRunner with its dependencies."""
+        self._protocol_engine = protocol_engine
+        # TODO(mc, 2022-01-11): replace task queue with specific implementations
+        # of runner interface
+        self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._hardware_api = hardware_api
+
+    def was_started(self) -> bool:
+        """Whether the runner has been started.
+
+        This value is latched; once it is True, it will never become False.
+        """
+        return self._protocol_engine.state_view.commands.has_been_played()
+
+    async def load(self, protocol_source: ProtocolSource) -> None:
+        """Load a ProtocolSource into managed ProtocolEngine.
+
+        Calling this method is only necessary if the runner will be used
+        to control the run of a file-based protocol.
+        """
+        raise NotImplementedError(
+            "MaintenanceRunner.load() not supported for setup commands. no protocol associated."
+        )
+
+    def play(self) -> None:
+        """Start or resume the run."""
+        raise NotImplementedError(
+            "MaintenanceRunner.play() not supported for setup commands."
+        )
+
+    def pause(self) -> None:
+        """Pause the run."""
+        raise NotImplementedError(
+            "MaintenanceRunner.pause() not supported for setup commands."
+        )
+
+    async def stop(self) -> None:
+        """Stop (cancel) the run."""
+        if self.was_started():
+            await self._protocol_engine.stop()
+        else:
+            await self._protocol_engine.finish(
+                drop_tips_and_home=False,
+                set_run_status=False,
+            )
+
+    async def run(
+        self,
+        protocol_source: Optional[ProtocolSource] = None,
+    ) -> ProtocolRunResult:
+        """Run a given protocol to completion."""
+        if protocol_source:
+            self.load(protocol_source)
+
+        await self._hardware_api.home()
+        self._task_queue.start()
+        await self._task_queue.join()
+
+        run_data = self._protocol_engine.state_view.get_summary()
+        commands = self._protocol_engine.state_view.commands.get_all()
+        return ProtocolRunResult(commands=commands, state_summary=run_data)
+
+
 def create_protocol_runner(
-    protocol_config: Union[JsonProtocolConfig, PythonProtocolConfig],
+    protocol_config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareControlAPI,
     task_queue: Optional[TaskQueue] = None,
@@ -316,26 +388,33 @@ def create_protocol_runner(
     legacy_executor: Optional[LegacyExecutor] = None,
 ) -> ProtocolRunner:
     """Create a protocol runner."""
-    if (
-        isinstance(protocol_config, JsonProtocolConfig)
-        and protocol_config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
-    ):
-        return JsonRunner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            json_file_reader=json_file_reader,
-            json_translator=json_translator,
-            task_queue=task_queue,
-        )
-    else:
-        return PythonAndLegacyRunner(
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            task_queue=task_queue,
-            legacy_file_reader=legacy_file_reader,
-            legacy_context_creator=legacy_context_creator,
-            legacy_executor=legacy_executor,
-        )
+    if protocol_config:
+        if (
+            isinstance(protocol_config, JsonProtocolConfig)
+            and protocol_config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
+        ):
+            return JsonRunner(
+                protocol_engine=protocol_engine,
+                hardware_api=hardware_api,
+                json_file_reader=json_file_reader,
+                json_translator=json_translator,
+                task_queue=task_queue,
+            )
+        else:
+            return PythonAndLegacyRunner(
+                protocol_engine=protocol_engine,
+                hardware_api=hardware_api,
+                task_queue=task_queue,
+                legacy_file_reader=legacy_file_reader,
+                legacy_context_creator=legacy_context_creator,
+                legacy_executor=legacy_executor,
+            )
+
+    return MaintenanceRunner(
+        protocol_engine=protocol_engine,
+        task_queue=task_queue,
+        hardware_api=hardware_api,
+    )
 
 
 async def _yield() -> None:
