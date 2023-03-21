@@ -109,6 +109,14 @@ class ProtocolEngine:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
+    def set_run_started_at(self):
+        """Set run_started_at for maintenance runs"""
+        requested_at = self._model_utils.get_timestamp()
+        if not self.state_view.commands.state.run_result:
+            self.state_view.commands.state.run_started_at = (
+                    self.state_view.commands.state.run_started_at or requested_at
+            )
+
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
         requested_at = self._model_utils.get_timestamp()

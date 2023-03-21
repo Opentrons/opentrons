@@ -11,7 +11,11 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
-from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
+from opentrons.protocol_runner import (
+    ProtocolRunner,
+    ProtocolRunResult,
+    MaintenanceRunner,
+)
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
 from robot_server.protocols import ProtocolResource
@@ -47,7 +51,7 @@ async def test_create_engine(subject: EngineStore) -> None:
 
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
-    assert isinstance(subject.runner, ProtocolRunner)  # type: ignore[misc]
+    assert isinstance(subject.runner, MaintenanceRunner)
     assert isinstance(subject.engine, ProtocolEngine)
 
 
@@ -140,9 +144,19 @@ async def test_clear_engine(subject: EngineStore) -> None:
         subject.runner
 
 
-async def test_clear_engine_not_stopped_or_idle(subject: EngineStore) -> None:
+async def test_clear_engine_not_stopped_or_idle(
+    subject: EngineStore, protocol_source: ProtocolSource
+) -> None:
     """It should raise a conflict if the engine is not stopped."""
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    protocol_resource = ProtocolResource(
+        protocol_id="123",
+        created_at=datetime.now(),
+        source=protocol_source,
+        protocol_key=None,
+    )
+    await subject.create(
+        run_id="run-id", labware_offsets=[], protocol=protocol_resource
+    )
     subject.runner.play()
 
     with pytest.raises(EngineConflictError):

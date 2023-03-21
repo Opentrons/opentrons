@@ -249,7 +249,7 @@ async def test_runs_completed_started_at_persist_via_actions_router(
     # fetch the updated run, which we expect to be persisted
     get_run_response = await client.get_run(run_id=run_id)
     run_data = get_run_response.json()["data"]
-
+    print(run_data)
     assert datetime.fromisoformat(run_data["startedAt"]).timestamp() == pytest.approx(
         expected_started_at.timestamp(), abs=2
     )
