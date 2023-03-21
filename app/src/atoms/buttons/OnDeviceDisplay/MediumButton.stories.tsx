@@ -53,3 +53,10 @@ CustomIconMediumButton.args = {
   buttonType: 'primary',
   iconName: 'restart',
 }
+export const CustomWideIconMediumButton = MediumButtonTemplate.bind({})
+CustomWideIconMediumButton.args = {
+  buttonText: 'Pin protocol',
+  buttonType: 'secondary',
+  iconName: 'push-pin',
+  width: '30.375rem',
+}

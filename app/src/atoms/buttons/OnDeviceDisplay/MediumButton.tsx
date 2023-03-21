@@ -28,6 +28,7 @@ interface MediumButtonProps extends StyleProps {
   disabled?: boolean
   iconName?: IconName
   onClick: () => void
+  width?: string
 }
 
 export function MediumButton(props: MediumButtonProps): JSX.Element {
@@ -37,6 +38,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     disabled = false,
     iconName,
     onClick,
+    width,
   } = props
   const buttonProps = {
     disabled,
@@ -135,13 +137,14 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       css={MEDIUM_BUTTON_STYLE}
       aria-label={`MediumButton_${buttonType}`}
       flexDirection={DIRECTION_ROW}
+      width={width}
     >
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacingSM}
       >
-        {iconName !== null && (
+        {iconName !== undefined && (
           <Icon
             name={iconName ?? 'play'}
             aria-label={`MediumButton_${iconName ?? 'play'}`}
