@@ -1,11 +1,10 @@
+import 'regenerator-runtime/runtime'
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
 
 import schema from '../../labware/schemas/2.json'
-import type { LabwareDefinition2 } from '../types'
-
-import 'regenerator-runtime/runtime'
+import type { LabwareDefinition2, LabwareWell } from '../types'
 
 const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/2')
@@ -35,11 +34,24 @@ const standard24WellNames = generateStandardWellNames(4, 6)
 const standard96WellNames = generateStandardWellNames(8, 12)
 const standard384WellNames = generateStandardWellNames(16, 24)
 
-// Wells whose tops do not exactly match the labware's zDimension.
+// Wells whose tops lie above the labware's zDimension.
+// These are known bugs in the labware definition. See Jira RSS-202.
+const expectedWellsHigherThanZDimension: Record<string, Set<string>> = {
+  'geb_96_tiprack_10ul/1.json': standard96WellNames,
+  'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json': standard24WellNames,
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json': standard24WellNames,
+  'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json': standard96WellNames,
+  'opentrons_96_filtertiprack_200ul/1.json': standard96WellNames,
+  'opentrons_96_tiprack_300ul/1.json': standard96WellNames,
+}
+
+// Wells whose tops do not lie exactly at the labware's zDimension.
 //
 // There are legitimate reasons for this to happen, but it can also be a dangerous bug
 // in the labware definition. So if it happens, it needs to be justified here.
-const expectedHeightMismatchesPerLabware: Record<string, Set<string>> = {
+const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
+  ...expectedWellsHigherThanZDimension,
+
   // These height mismatches are legitimate.
   // These tube racks simultaneously hold tubes of different heights.
   // The labware's zDimension should match the height of the taller tubes,
@@ -66,10 +78,6 @@ const expectedHeightMismatchesPerLabware: Record<string, Set<string>> = {
   // These height mismatches are legitimate. The zDimension should match the taller side.
   'opentrons_calibrationblock_short_side_left/1.json': new Set(['A1']),
   'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
-
-  // These height mismatches are known, confirmed bugs in the labware definition.
-  'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json': standard24WellNames,
-  'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json': standard96WellNames,
 
   // These height mismatches need to be investigated. See Jira RSS-202.
   // Each one should either be explained here or marked as a known bug.
@@ -105,24 +113,32 @@ const expectedHeightMismatchesPerLabware: Record<string, Set<string>> = {
   'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json': standard96WellNames,
   'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json': standard96WellNames,
   'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json': standard384WellNames,
-
-  // These are in expectedLabwareWithOverlyHighWells. These are probably bugs. See Jira RSS-202.
-  'geb_96_tiprack_10ul/1.json': standard96WellNames,
-  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json': standard24WellNames,
-  'opentrons_96_filtertiprack_200ul/1.json': standard96WellNames,
-  'opentrons_96_tiprack_300ul/1.json': standard96WellNames,
 }
 
-// Labware with wells that extend above the labware's zDimension.
-// This is a bug in the labware definition. See Jira RSS-202.
-const expectedLabwareWithOverlyHighWells: Set<string> = new Set([
-  'geb_96_tiprack_10ul/1.json',
-  'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json',
-  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json',
-  'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json',
-  'opentrons_96_filtertiprack_200ul/1.json',
-  'opentrons_96_tiprack_300ul/1.json',
-])
+const filterWells = (labwareDef: LabwareDefinition2, predicate: (wellDef: LabwareWell) => boolean): Set<string> => {
+  return new Set(
+    Object.entries(labwareDef.wells)
+      .filter(([wellName, wellDef]) => predicate(wellDef))
+      .map(([wellName, wellDef]) => wellName)
+  )
+}
+
+const getWellsNotMatchingZDimension = (labwareDef: LabwareDefinition2): Set<string> => {
+  return filterWells(labwareDef, (wellDef) => {
+    const absDifference = Math.abs(
+      (wellDef.depth + wellDef.z) - labwareDef.dimensions.zDimension
+    )
+    return absDifference > 0.000001 // Tolerate floating point rounding errors.
+  })
+}
+
+const getWellsHigherThanZDimension = (labwareDef: LabwareDefinition2): Set<string> => {
+  return filterWells(labwareDef, (wellDef) => {
+    const difference =
+      (wellDef.depth + wellDef.z) - labwareDef.dimensions.zDimension
+    return difference > 0.000001 // Tolerate floating point rounding errors.
+  })
+}
 
 const expectGroupsFollowConvention = (
   labwareDef: LabwareDefinition2,
@@ -132,7 +148,8 @@ const expectGroupsFollowConvention = (
     const topLevelBrand = labwareDef.brand
 
     labwareDef.groups.forEach(group => {
-      if (group.brand) {
+      if (group.brand != null) {
+        // eslint-disable-next-line jest/no-conditional-expect
         expect(group.brand.brand).not.toEqual(topLevelBrand)
       }
     })
@@ -145,37 +162,13 @@ const expectGroupsFollowConvention = (
 
     if (noGroupsMetadataAllowed) {
       labwareDef.groups.forEach(group => {
+        /* eslint-disable jest/no-conditional-expect */
         expect(group.brand).toBe(undefined)
         expect(group.metadata.displayName).toBe(undefined)
         expect(group.metadata.displayCategory).toBe(undefined)
       })
     }
   })
-}
-
-const wellsNotMatchingZDimension = (
-  labwareDef: LabwareDefinition2
-): string[] => {
-  return Object.entries(labwareDef.wells)
-    .filter(([wellName, wellDef]) => {
-      const absDifference = Math.abs(
-        labwareDef.dimensions.zDimension - (wellDef.depth + wellDef.z)
-      )
-      return absDifference > 0.000001 // Tolerate floating point rounding errors.
-    })
-    .map(([wellName, wellDef]) => wellName)
-}
-
-const wellsHigherThanZDimension = (
-  labwareDef: LabwareDefinition2
-): string[] => {
-  return Object.entries(labwareDef.wells)
-    .filter(([wellName, wellDef]) => {
-      const difference =
-        wellDef.depth + wellDef.z - labwareDef.dimensions.zDimension
-      return difference > 0.000001 // Tolerate floating point rounding errors.
-    })
-    .map(([wellName, wellDef]) => wellName)
 }
 
 test('fail on bad labware', () => {
@@ -206,7 +199,8 @@ describe('test schemas of all opentrons definitions', () => {
 
   labwarePaths.forEach(labwarePath => {
     const filename = path.parse(labwarePath).base
-    const labwareDef = require(labwarePath) as LabwareDefinition2
+    const fullLabwarePath = path.join(definitionsDir, labwarePath)
+    const labwareDef = require(fullLabwarePath) as LabwareDefinition2
 
     it(`${filename} validates against schema`, () => {
       const valid = validate(labwareDef)
@@ -248,23 +242,18 @@ describe('test that the dimensions in all opentrons definitions make sense', () 
     const fullLabwarePath = path.join(definitionsDir, labwarePath)
     const labwareDef = require(fullLabwarePath) as LabwareDefinition2
 
-    const expectedHeightMismatches =
-      expectedHeightMismatchesPerLabware[labwarePath] ?? new Set()
-    it(`has the expected ${expectedHeightMismatches.size} wells not matching the labware's zDimension`, () => {
-      const actualHeightMismatches = new Set(
-        wellsNotMatchingZDimension(labwareDef)
-      )
-      expect(actualHeightMismatches).toEqual(expectedHeightMismatches)
+    const expectedWellsNotMatching =
+      expectedWellsNotMatchingZDimension[labwarePath] ?? new Set()
+    it(`has the expected ${expectedWellsNotMatching.size} wells not matching the labware's zDimension`, () => {
+      const wellsNotMatching = getWellsNotMatchingZDimension(labwareDef)
+      expect(wellsNotMatching).toEqual(expectedWellsNotMatching)
     })
 
-    const expectingOverlyHighWells = expectedLabwareWithOverlyHighWells.has(
-      labwarePath
-    )
-    it(`${
-      expectingOverlyHighWells ? 'has' : 'does not have'
-    } wells whose heights are above the labware's zDimension`, () => {
-      const hasTooHighWells = wellsHigherThanZDimension(labwareDef).length > 0
-      expect(hasTooHighWells).toEqual(expectingOverlyHighWells)
+    const expectedWellsHigher =
+      expectedWellsHigherThanZDimension[labwarePath] ?? new Set()
+    it(`has the expected ${expectedWellsHigher.size} wells above the labware's zDimension`, () => {
+      const wellsHigher = getWellsHigherThanZDimension(labwareDef)
+      expect(wellsHigher).toEqual(expectedWellsHigher)
     })
   })
 })
@@ -279,7 +268,8 @@ describe('test schemas of all v2 labware fixtures', () => {
 
   labwarePaths.forEach(labwarePath => {
     const filename = path.parse(labwarePath).base
-    const labwareDef = require(labwarePath) as LabwareDefinition2
+    const fullLabwarePath = path.join(fixturesDir, labwarePath)
+    const labwareDef = require(fullLabwarePath) as LabwareDefinition2
 
     it(`${filename} validates against schema`, () => {
       const valid = validate(labwareDef)
