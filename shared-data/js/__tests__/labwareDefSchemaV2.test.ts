@@ -1,4 +1,4 @@
-import 'regenerator-runtime/runtime'
+// import 'regenerator-runtime/runtime'
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
