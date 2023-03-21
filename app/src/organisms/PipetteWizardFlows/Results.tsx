@@ -123,6 +123,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
             flowType === FLOWS.ATTACH ? 'try_again' : 'attach_and_retry'
           )}
           setFetching={setFetching}
+          isFetching={isFetching}
           isOnDevice={isOnDevice}
         />
       </>

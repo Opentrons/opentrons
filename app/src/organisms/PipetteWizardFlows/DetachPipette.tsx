@@ -110,6 +110,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           proceedButtonText={capitalize(t('shared:continue'))}
           proceed={proceed}
           setFetching={setFetching}
+          isFetching={isFetching}
         />
       }
     />
