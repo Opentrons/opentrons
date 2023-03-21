@@ -62,7 +62,7 @@ module.exports = async () => ({
   /* eslint-enable no-template-curly-in-string */
   asar: true,
   mac: {
-    target: process.platform === 'darwin' ? ['dmg', 'zip'] : ['zip'],
+    target: 'dmg',
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
