@@ -5,6 +5,7 @@ from .system_jwt import (
     create_jwt,
     jwt_is_valid,
     registrant_from_jwt,
+    expiration_from_jwt,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "create_jwt",
     "jwt_is_valid",
     "registrant_from_jwt",
+    "expiration_from_jwt",
 ]
