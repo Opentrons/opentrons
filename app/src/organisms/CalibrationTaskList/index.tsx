@@ -150,7 +150,9 @@ export function CalibrationTaskList({
             taskListStatus={taskListStatus}
             generalTaskClickHandler={() => setHasLaunchedWizard(true)}
             generalTaskDisabledReason={
-              runHasStarted ? 'some_robot_controls_are_not_available' : null
+              runHasStarted
+                ? t('device_settings:some_robot_controls_are_not_available')
+                : null
             }
           />
         </>

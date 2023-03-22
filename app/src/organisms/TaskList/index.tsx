@@ -20,10 +20,9 @@ import {
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
-import { useTranslation } from 'react-i18next'
-import { Tooltip } from '../../atoms/Tooltip'
 
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null
@@ -205,7 +204,6 @@ function SubTask({
   generalClickHandler,
   generalTaskDisabledReason,
 }: SubTaskProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
@@ -290,7 +288,7 @@ function SubTask({
           </Link>
           {isDisabled ? (
             <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
-              {t(generalTaskDisabledReason)}
+              {generalTaskDisabledReason}
             </Tooltip>
           ) : null}
         </>
@@ -311,7 +309,7 @@ function SubTask({
           </TertiaryButton>
           {isDisabled ? (
             <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
-              {t(generalTaskDisabledReason)}
+              {generalTaskDisabledReason}
             </Tooltip>
           ) : null}
         </>
@@ -334,7 +332,6 @@ function Task({
   generalClickHandler,
   generalTaskDisabledReason,
 }: TaskProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [activeTaskIndex] = activeIndex ?? []
 
@@ -449,7 +446,7 @@ function Task({
               </Link>
               {isDisabled ? (
                 <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
-                  {t(generalTaskDisabledReason)}
+                  {generalTaskDisabledReason}
                 </Tooltip>
               ) : null}
             </>
@@ -470,7 +467,7 @@ function Task({
               </TertiaryButton>
               {isDisabled ? (
                 <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
-                  {t(generalTaskDisabledReason)}
+                  {generalTaskDisabledReason}
                 </Tooltip>
               ) : null}
             </>
