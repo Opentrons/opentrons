@@ -14,6 +14,7 @@ import {
   Box,
   TYPOGRAPHY,
   COLORS,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -27,8 +28,9 @@ interface RectProps {
 const TextSizeTile = styled(Box)`
   width: 10.5625rem;
   height: 6.25rem;
-  border-radius: 8px;
-  background: ${(props: RectProps) => (props.isActive ? '#9c3ba4' : '#E7C3E9')};
+  border-radius: ${BORDERS.size_two};
+  background: ${(props: RectProps) =>
+    props.isActive ? COLORS.highlightPurple_one : COLORS.highlightPurple_two};
 `
 
 interface TextSizeProps {
@@ -51,7 +53,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
         >
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
-        <StyledText fontSize="2rem" textAlign="center">
+        <StyledText fontSize="2rem" textAlign={TYPOGRAPHY.textAlignCenter}>
           {t('text_size')}
         </StyledText>
       </Flex>
@@ -60,7 +62,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           textSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={`${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`}
+          color={COLORS.darkBlack_seventy}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('text_size_description')}
@@ -74,7 +76,6 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
         >
           <Btn
-            // disabled={}
             onClick={() => handleClick('down')}
             data-testid="DisplayTextSize_decrease"
           >
@@ -88,7 +89,6 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           </Flex>
 
           <Btn
-            // disabled={}
             onClick={() => handleClick('up')}
             data-testid="DisplayTextSize_increase"
           >
