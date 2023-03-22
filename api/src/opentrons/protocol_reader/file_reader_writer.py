@@ -2,6 +2,7 @@
 
 import os
 import pathlib
+import platform
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Union
 
@@ -77,10 +78,13 @@ async def _write_and_fsync_file(path: pathlib.Path, contents: bytes) -> None:
 
 async def _fsync_directory(path: pathlib.Path) -> None:
     def _fsync_directory_sync() -> None:
-        fd = os.open(path, os.O_RDONLY)
-        try:
-            os.fsync(fd)
-        finally:
-            os.close(fd)
+        # We can't fsync directories on Windows because doing os.open() on them raises
+        # PermissionError. https://stackoverflow.com/questions/21785127
+        if platform.system() != "Windows":
+            fd = os.open(path, os.O_RDONLY)
+            try:
+                os.fsync(fd)
+            finally:
+                os.close(fd)
 
     await anyio.to_thread.run_sync(_fsync_directory_sync)
