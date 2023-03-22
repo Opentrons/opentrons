@@ -38,7 +38,7 @@ def build_arg_parser():
 
 class Pipette_Capacitance_Test:
     def __init__(
-        self, simulate: bool, cycles: int, slot: int, x_increment: float, z_increment: float, x_steps: int, z_steps: int, probe_type: int, edge_mode: int
+        self, simulate: bool, cycles: int, slot: int, x_increment: float, z_increment: float, x_steps: int, z_steps: int, probe_type: int, edge_mode: int, zero_mode: int
     ) -> None:
         self.simulate = simulate
         self.cycles = cycles
@@ -49,6 +49,7 @@ class Pipette_Capacitance_Test:
         self.z_steps = z_steps
         self.probe_type = probe_type
         self.edge_mode = edge_mode
+        self.zero_mode = zero_mode
         self.api = None
         self.mount = None
         self.home = None
@@ -98,9 +99,12 @@ class Pipette_Capacitance_Test:
             # "Z":"/dev/ttyUSB2",
         }
         self.gauge_offsets = {
-            "X":Point(x=5, y=-5, z=9),
-            "Y":Point(x=-5, y=-5, z=9),
-            "Z":Point(x=0, y=0, z=9),
+            # "X":Point(x=5, y=-5, z=9),
+            # "Y":Point(x=-5, y=-5, z=9),
+            # "Z":Point(x=0, y=0, z=9),
+            "X":Point(x=5, y=-6, z=7),
+            "Y":Point(x=-6, y=-5, z=7),
+            "Z":Point(x=0, y=0, z=7),
         }
         self.probe_tag = {
             "1":"solid",
@@ -118,6 +122,8 @@ class Pipette_Capacitance_Test:
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
         self.nominal_center = _get_calibration_square_position_in_slot(self.slot)
+        # self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y + 0) # single-channel
+        self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y - 6) # multi-channel
         if self.simulate:
             self.pipette_id = "SIMULATION"
         else:
@@ -154,24 +160,31 @@ class Pipette_Capacitance_Test:
         return str.join(",", list(dict.values()))+"\n"
 
     def _zero_gauges(self):
-        print(f"\nPlace Gauge Block on Deck Slot #{self.slot}")
-        for axis in self.gauges:
-            gauge_zero = "{} Zero".format(axis)
-            input(f"\nPush block against {axis}-axis Gauge and Press ENTER\n")
-            _reading = True
-            while _reading:
-                zeros = []
-                for i in range(5):
-                    gauge = self.gauges[axis].read_stable(timeout=20)
-                    zeros.append(gauge)
-                _variance = abs(max(zeros) - min(zeros))
-                print(f"Variance = {_variance}")
-                if _variance < 0.1:
-                    _reading = False
-            zero = sum(zeros) / len(zeros)
-            self.test_data[gauge_zero] = str(zero)
-            print(f"{axis} Gauge Zero = {zero}mm")
-        input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
+        if self.zero_mode == 1:
+            print(f"\nPlace Gauge Block on Deck Slot #{self.slot}")
+            for axis in self.gauges:
+                gauge_zero = "{} Zero".format(axis)
+                input(f"\nPush block against {axis}-axis Gauge and Press ENTER\n")
+                _reading = True
+                while _reading:
+                    zeros = []
+                    for i in range(5):
+                        gauge = self.gauges[axis].read_stable(timeout=20)
+                        zeros.append(gauge)
+                    _variance = abs(max(zeros) - min(zeros))
+                    print(f"Variance = {_variance}")
+                    if _variance < 0.1:
+                        _reading = False
+                zero = sum(zeros) / len(zeros)
+                self.test_data[gauge_zero] = str(zero)
+                print(f"{axis} Gauge Zero = {zero}mm")
+            input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
+        elif self.zero_mode == 2:
+            for axis in self.gauges:
+                zero = input(f"\nType value for {axis}-axis Gauge and Press ENTER\n")
+                gauge_zero = "{} Zero".format(axis)
+                self.test_data[gauge_zero] = str(zero)
+                print(f"{axis} Gauge Zero = {zero}mm")
 
     async def _read_gauge(self, axis, step):
         current_position = await self.api.gantry_position(self.mount)
@@ -400,14 +413,21 @@ if __name__ == '__main__':
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
     probe_type = int(input("Choose Probe Type: [Default = 1]\n 1. Solid\n 2. Hole\n") or "1")
+    edge_mode = int(input("Choose Find Edge Mode: [Default = 1]\n 1. Calibration\n 2. Dial Indicator\n") or "1")
+    zero_mode = int(input("Dial Zero Mode: [Default = 1]\n 1. Auto\n 2. Manual\n") or "1")
+
     if probe_type == 1:
         print("Probe Type = Solid")
     elif probe_type == 2:
         print("Probe Type = Hole")
-    edge_mode = int(input("Choose Find Edge Mode: [Default = 1]\n 1. Calibration\n 2. Dial Indicator\n") or "1")
     if edge_mode == 1:
         print("Find Edge = Calibration")
     elif edge_mode == 2:
         print("Find Edge = Dial Indicator")
-    test = Pipette_Capacitance_Test(args.simulate, args.cycles, args.slot, args.x_increment, args.z_increment, args.x_steps, args.z_steps, probe_type, edge_mode)
+    if zero_mode == 1:
+        print("Dial Zero = Auto")
+    elif zero_mode == 2:
+        print("Dial Zero = Manual")
+
+    test = Pipette_Capacitance_Test(args.simulate, args.cycles, args.slot, args.x_increment, args.z_increment, args.x_steps, args.z_steps, probe_type, edge_mode, zero_mode)
     asyncio.run(test.run())
