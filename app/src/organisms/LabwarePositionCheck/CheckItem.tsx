@@ -94,7 +94,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
 
   React.useEffect(() => {
     chainRunCommands(modulePrepCommands, true)
-      .then(() => { })
+      .then(() => {})
       .catch(e => {
         console.error('Unexpected command failure: ', e)
       })
@@ -138,15 +138,18 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         strategy: 'manualMoveWithoutPause',
       },
     },
-    ...(protocolData.modules.reduce<CreateCommand[]>((acc, mod) => {
+    ...protocolData.modules.reduce<CreateCommand[]>((acc, mod) => {
       if (getModuleType(mod.model) === HEATERSHAKER_MODULE_TYPE) {
-        return [...acc, {
-          commandType: 'heaterShaker/closeLabwareLatch',
-          params: { moduleId: mod.id },
-        }]
+        return [
+          ...acc,
+          {
+            commandType: 'heaterShaker/closeLabwareLatch',
+            params: { moduleId: mod.id },
+          },
+        ]
       }
       return acc
-    }, [])),
+    }, []),
     {
       commandType: 'moveToWell' as const,
       params: {

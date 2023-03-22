@@ -46,7 +46,7 @@ export function ConfirmCancelModal(
       },
       onError: () => {
         setIsCanceling(false)
-      }
+      },
     })
   }
   React.useEffect(() => {
@@ -88,7 +88,9 @@ export function ConfirmCancelModal(
             >
               {isCanceling ? (
                 <Icon size={TYPOGRAPHY.fontSizeP} spin name="ot-spinner" />
-              ) : t('cancel_run_modal_confirm')}
+              ) : (
+                t('cancel_run_modal_confirm')
+              )}
             </AlertPrimaryButton>
           </Flex>
         </Flex>

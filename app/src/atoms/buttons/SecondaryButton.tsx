@@ -30,7 +30,6 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   background-color: ${COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}
 
-
   &:hover,
   &:focus {
     box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);

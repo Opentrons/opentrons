@@ -562,7 +562,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             name={buttonIconName}
             size={SIZE_1}
             marginRight={SPACING.spacing3}
-            spin={isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED}
+            spin={
+              isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
+            }
           />
         ) : null}
         <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
