@@ -32,8 +32,8 @@ describe('TextSize', () => {
   })
 
   // ToDo (kj:03/03/2023) These cases will be added when text size change method is decided
-  it.todo('should call mock function when tapping plus button', () => {})
-  it.todo('should call mock function when tapping minus button', () => {})
+  it.todo('should call mock function when tapping plus button')
+  it.todo('should call mock function when tapping minus button')
 
   it('should call mock function when tapping back button', () => {
     const [{ getByTestId }] = render(props)
