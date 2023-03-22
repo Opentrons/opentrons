@@ -92,6 +92,10 @@ class ModuleOffsetModel(BaseModel):
     slot: int = Field(..., description="The slot this module was calibrated in.")
     module: ModuleType = Field(..., description="The module type of this module.")
     module_id: str = Field(..., description="The unique id of this module.")
+    instrument_id: str = Field(
+        ...,
+        description="The unique id of the instrument used to calibrate this module.",
+    )
     lastModified: datetime = Field(
         ..., description="The last time this module was calibrated."
     )

@@ -28,6 +28,7 @@ class ModuleCalibrationOffset:
     source: SourceType
     status: CalibrationStatus
     mount: Optional[OT3Mount] = None
+    instrument_id: Optional[str] = None
     last_modified: Optional[datetime] = None
 
 
@@ -56,6 +57,7 @@ def load_module_calibration_offset(
                 mount=module_offset_data.mount,
                 offset=module_offset_data.offset,
                 last_modified=module_offset_data.lastModified,
+                instrument_id=module_offset_data.instrument_id,
                 source=module_offset_data.source,
                 status=CalibrationStatus(
                     markedAt=module_offset_data.status.markedAt,
@@ -72,7 +74,8 @@ def save_module_calibration_offset(
     slot: int,
     module: ModuleType,
     module_id: str,
+    instrument_id: Optional[str] = None,
 ) -> None:
     """Save the calibration offset for a given module."""
     if module_id and ff.enable_ot3_hardware_controller():
-        save_module_calibration(offset, mount, slot, module, module_id)
+        save_module_calibration(offset, mount, slot, module, module_id, instrument_id)

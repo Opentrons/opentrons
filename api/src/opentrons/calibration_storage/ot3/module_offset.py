@@ -49,6 +49,7 @@ def save_module_calibration(
     slot: int,
     module: ModuleType,
     module_id: str,
+    instrument_id: Optional[str] = None,
     cal_status: Optional[
         Union[local_types.CalibrationStatus, v1.CalibrationStatus]
     ] = None,
@@ -67,6 +68,7 @@ def save_module_calibration(
         slot=slot,
         module=module,
         module_id=module_id,
+        instrument_id=instrument_id,
         lastModified=utc_now(),
         source=local_types.SourceType.user,
         status=cal_status_model,
