@@ -21,6 +21,7 @@ from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_store import (
     ProtocolStore,
 )
+from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
 
 
@@ -89,6 +90,15 @@ async def get_analysis_store(
         _analysis_store_accessor.set_on(app_state, analysis_store)
 
     return analysis_store
+
+
+async def get_protocol_analyzer(
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
+) -> ProtocolAnalyzer:
+    """Construct a ProtocolAnalyzer for a single request."""
+    return ProtocolAnalyzer(
+        analysis_store=analysis_store,
+    )
 
 
 async def get_protocol_auto_deleter(
