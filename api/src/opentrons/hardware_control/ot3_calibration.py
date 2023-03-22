@@ -106,11 +106,12 @@ async def _verify_edge_pos(
     edge_settings = hcapi.config.calibration.edge_sense
     last_result = None
     for dir in [-1, 1]:
+        # twice the last stride size
         checking_pos = found_edge + search_axis.set_in_point(
-            Point(0, 0, 0), last_stride * 2 * dir
+            Point(0, 0, 0), last_stride * 2 * dir 
         )
         LOG.info(
-            f"Checking edge in {dir} direction at {checking_pos}, stride_size: {last_stride * 2}"
+            f"Checking edge in {dir} direction at {checking_pos}, stride_size: {last_stride * 4}"
         )
         height = await _probe_deck_at(
             hcapi, mount, checking_pos, edge_settings.pass_settings
@@ -122,6 +123,14 @@ async def _verify_edge_pos(
         else:
             last_result = hit_deck
     return False
+
+
+def critical_edge_offset(
+    search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]], 
+    direction_if_hit: Literal[1, -1]
+):
+    return search_axis.set_in_point(Point(0, 0, 0), direction_if_hit * CALIBRATION_PROBE_RADIUS)
+
 
 
 async def find_edge_binary(
@@ -157,15 +166,16 @@ async def find_edge_binary(
     and its edge is aligned with the calibration slot edge.
     """
     edge_settings = hcapi.config.calibration.edge_sense
-    # Our first search position is at the slot edge nominal
-    checking_pos = slot_edge_nominal
+    # Our first search position is at the slot edge nominal at the probe's edge
+    checking_pos = slot_edge_nominal + critical_edge_offset(search_axis, direction_if_hit)
     stride = edge_settings.search_initial_tolerance_mm * direction_if_hit
     for _ in range(edge_settings.search_iteration_limit):
         LOG.info(f"Checking position {checking_pos}")
         interaction_pos = await _probe_deck_at(
             hcapi, mount, checking_pos, edge_settings.pass_settings
         )
-        if _deck_hit(interaction_pos, checking_pos.z, edge_settings):
+        hit_deck = _deck_hit(interaction_pos, checking_pos.z, edge_settings)
+        if hit_deck:
             LOG.info(f"hit at {interaction_pos}, stride size: {stride}")
             # In this block, we've hit the deck
             # update the fonud deck value
@@ -191,11 +201,13 @@ async def find_edge_binary(
                 stride = stride / 2
         checking_pos += search_axis.set_in_point(Point(0, 0, 0), stride)
     if verify and not await _verify_edge_pos(
-        hcapi, mount, search_axis, checking_pos, abs(stride)
+        hcapi, mount, search_axis, direction_if_hit, checking_pos, abs(stride * 2)
     ):
         raise EdgeNotFoundError(slot_edge_nominal)
-    LOG.debug(f"Found edge {search_axis} at {checking_pos}")
-    return checking_pos
+    # remove probe offset so we actually get position of the edge
+    found_edge = checking_pos - critical_edge_offset(search_axis, direction_if_hit)
+    LOG.debug(f"Found edge {search_axis} at {found_edge}")
+    return found_edge
 
 
 async def find_slot_center_binary(
@@ -215,7 +227,7 @@ async def find_slot_center_binary(
     )
     LOG.info(f"Found +x edge at {plus_x_edge.x}mm")
     estimated_center = estimated_center._replace(
-        x=plus_x_edge.x + CALIBRATION_PROBE_RADIUS - EDGES["right"].x
+        x=plus_x_edge.x - EDGES["right"].x
     )
 
     minus_x_edge = await find_edge_binary(
@@ -229,7 +241,7 @@ async def find_slot_center_binary(
     )
     LOG.info(f"Found +y edge at {plus_y_edge.y}mm")
     estimated_center = estimated_center._replace(
-        y=plus_y_edge.y + CALIBRATION_PROBE_RADIUS - EDGES["top"].y
+        y=plus_y_edge.y - EDGES["top"].y
     )
 
     minus_y_edge = await find_edge_binary(
