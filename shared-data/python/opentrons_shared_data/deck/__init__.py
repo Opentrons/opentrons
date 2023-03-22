@@ -1,7 +1,8 @@
 """
 opentrons_shared_data.deck: types and bindings for deck definitions
 """
-from typing import Dict, Final, NamedTuple, overload, TYPE_CHECKING
+from typing import Dict, NamedTuple, overload, TYPE_CHECKING
+from typing_extensions import Final
 import json
 
 from .. import load_shared_data
@@ -59,10 +60,10 @@ def get_calibration_square_position_in_slot(slot: int) -> Offset:
     slots = deck["locations"]["orderedSlots"]
     s = slots[slot - 1]
     assert s["id"] == str(slot)
-    bottom_left = list(*s["position"])
+    bottom_left = s["position"]
     slot_size_x = s["boundingBox"]["xDimension"]
     slot_size_y = s["boundingBox"]["yDimension"]
-    relative_center = [(float(slot_size_x) * 0.5, float(slot_size_y) * 0.5, 0)]
+    relative_center = [float(slot_size_x) * 0.5, float(slot_size_y) * 0.5, 0]
     square_z = [0, 0, CALIBRATION_SQUARE_DEPTH]
     # add up the elements of each list and return an Offset of the result
     nominal_position = [float(sum(x)) for x in zip(bottom_left, relative_center, square_z)]

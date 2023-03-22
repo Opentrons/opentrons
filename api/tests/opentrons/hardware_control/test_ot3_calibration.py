@@ -24,14 +24,14 @@ from opentrons.hardware_control.ot3_calibration import (
     _edges_from_data,
     _take_stride,
     _probe_deck_at,
-    _get_calibration_square_position_in_slot,
     InaccurateNonContactSweepError,
     DeckHeightValidRange,
     StructureNotFoundError,
-    Z_PREP_OFFSET,
+    PREP_OFFSET_DEPTH,
     EDGES,
 )
 from opentrons.types import Point
+from opentrons_shared_data.deck import get_calibration_square_position_in_slot
 
 
 @pytest.fixture(autouse=True)
@@ -431,7 +431,7 @@ async def test_find_deck_checks_z_only(
     here = await ot3_hardware.gantry_position(mount)
     await find_calibration_structure_height(ot3_hardware, mount, target)
 
-    z_prep_loc = target + Z_PREP_OFFSET
+    z_prep_loc = target + PREP_OFFSET_DEPTH
 
     mock_probe_deck.assert_called_once_with(
         ot3_hardware,
@@ -458,7 +458,7 @@ async def test_method_enum(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_linear",
         AsyncMock(spec=find_slot_center_linear),
     ) as linear, patch(
-        "opentrons.hardware_control.ot3_calibration._get_calibration_square_position_in_slot",
+        "opentrons.hardware_control.ot3_calibration.get_calibration_square_position_in_slot",
         Mock(),
     ) as calibration_target, patch(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
@@ -542,7 +542,7 @@ async def test_noncontact_sanity(
 ) -> None:
     mock_data_analysis.return_value = (-1000, 1000)
     await ot3_hardware.home()
-    center = _get_calibration_square_position_in_slot(5)
+    center = Point(*get_calibration_square_position_in_slot(5))
     with pytest.raises(InaccurateNonContactSweepError):
         await find_axis_center(
             ot3_hardware,

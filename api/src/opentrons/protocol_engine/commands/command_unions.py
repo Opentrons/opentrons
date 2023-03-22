@@ -302,6 +302,7 @@ CommandParams = Union[
     thermocycler.RunProfileStepParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
+    calibration.CalibrateModuleParams,
     calibration.MoveToMaintenancePositionParams,
 ]
 

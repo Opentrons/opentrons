@@ -46,7 +46,6 @@ NON_REPEATABLE_STRIDES: List[float] = [0.0, 3.0]
 REPEATABLE_STRIDES: List[float] = [1.0, 0.25, 0.1, 0.025]
 
 
-
 @dataclass
 class DeckHeightValidRange:
     min: float
@@ -240,6 +239,7 @@ async def find_slot_center_binary(
 
 
 # LINEAR SEARCH METHODS
+
 
 async def find_calibration_structure_height(
     hcapi: OT3API, mount: OT3Mount, nominal_center: Point
@@ -755,7 +755,6 @@ async def find_calibration_structure_position(
     return nominal_center - found_center
 
 
-
 async def find_slot_center_binary_from_nominal_center(
     hcapi: OT3API,
     mount: OT3Mount,
@@ -934,8 +933,11 @@ async def calibrate_module(
         else:
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
 
+        LOG.info(
+            f"Starting module calibration for {module_id} at {nominal_position} using {mount}"
+        )
         # find the offset
-        offset = await  find_calibration_structure_position(
+        offset = await find_calibration_structure_position(
             hcapi, mount, nominal_position, method=CalibrationMethod.BINARY_SEARCH
         )
         await hcapi.save_module_offset(module_id, mount, slot, offset)
