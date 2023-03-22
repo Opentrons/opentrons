@@ -150,6 +150,10 @@ class GCodeEngine:
                     metadata={},
                     robot_type=robot_type,
                     config=config,
+                    # we don't actually need the content-hash for anything
+                    # since this isn't using the server part, so let's give
+                    # it a placeholder of the filepath
+                    content_hash=path,
                 )
 
                 protocol_runner: ProtocolRunner = ProtocolRunner(
