@@ -23,7 +23,6 @@
     "@opentrons/components": "link:../components",
     "@opentrons/step-generation": "link:../step-generation",
     "@opentrons/shared-data": "link:../shared-data",
-    "@typeform/embed": "0.16.0",
     "@types/redux-actions": "2.6.1",
     "@types/ua-parser-js": "0.7.36",
     "@types/uuid": "8.3.0",

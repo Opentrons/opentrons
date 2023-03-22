@@ -297,6 +297,9 @@ class OT3API(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
+        door_state = await backend.door_state()
+        api_instance._update_door_state(door_state)
+        backend.add_door_state_listener(api_instance._update_door_state)
         checked_loop.create_task(backend.watch(loop=checked_loop))
         backend.initialized = True
         return api_instance
@@ -1909,6 +1912,8 @@ class OT3API(
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
             probe_settings.log_pressure,
+            probe_settings.auto_zero_sensor,
+            probe_settings.num_baseline_reads,
         )
         machine_pos = axis_convert(machine_pos_node_id, 0.0)
         position = deck_from_machine(
