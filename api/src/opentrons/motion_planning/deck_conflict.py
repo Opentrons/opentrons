@@ -43,7 +43,11 @@ HS_ALLOWED_ADJACENT_TALL_LABWARE = [
 
 @dataclass
 class Labware:
-    """A normal labware that occupies a single slot."""
+    """A normal labware that directly occupies a slot.
+
+    Do not use this to represent a labware that's loaded atop a module.
+    Use one of the module types, instead.
+    """
 
     name_for_errors: str
     highest_z: float

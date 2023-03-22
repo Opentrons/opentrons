@@ -24,7 +24,7 @@ import {
   SetWifiSsid,
   SelectAuthenticationType,
   SetWifiCred,
-  SucceededToConnect,
+  WifiConnectionDetails,
 } from '../../organisms/OnDeviceDisplay/SetupNetwork'
 
 import type { State, Dispatch } from '../../redux/types'
@@ -135,7 +135,7 @@ export function ConnectViaWifi(): JSX.Element {
       currentRequestState.status === RobotApi.SUCCESS
     ) {
       return (
-        <SucceededToConnect
+        <WifiConnectionDetails
           ssid={changeState.ssid}
           authType={selectedAuthType}
         />

@@ -1,6 +1,7 @@
 """The usb binary protocol over serial transport."""
 
 import serial  # type: ignore[import]
+from serial.tools.list_ports import comports  # type: ignore[import]
 from functools import partial
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     BinaryMessageDefinition,
@@ -10,7 +11,7 @@ import asyncio
 import logging
 import concurrent.futures
 
-from typing import Optional, Type
+from typing import Optional, Type, Tuple
 from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 
@@ -25,6 +26,10 @@ class SerialUsbDriver:
         self._loop = loop
         self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
         self._connected = False
+        self._vid = 0
+        self._pid = 0
+        self._baudrate = 0
+        self._timeout = 0
 
     def find_and_connect(
         self, vid: int, pid: int, baudrate: int = 115200, timeout: int = 1
@@ -33,6 +38,10 @@ class SerialUsbDriver:
         _port_name = self._find_serial_port(vid, pid)
         if _port_name is None:
             raise IOError("unable to find serial device")
+        self._vid = vid
+        self._pid = pid
+        self._baudrate = baudrate
+        self._timeout = timeout
         _port = serial.Serial(_port_name, baudrate, timeout=timeout)
         self.connect(_port_name, _port)
 
@@ -48,7 +57,7 @@ class SerialUsbDriver:
         return self._connected
 
     def _find_serial_port(self, vid: int, pid: int) -> Optional[str]:
-        ports = serial.tools.list_ports.comports()
+        ports = comports()
 
         for check_port in ports:
             if (check_port.vid, check_port.pid) == (vid, pid):
@@ -84,6 +93,8 @@ class SerialUsbDriver:
             header_data = await self._loop.run_in_executor(
                 self._executor, partial(self._port.read, size=4)
             )  # read the message id and length
+            if len(header_data) < 4:
+                return None
             message_type = BinaryMessageId(
                 int.from_bytes(utils.UInt16Field.build(header_data[0:2]).value, "big")  # type: ignore[arg-type]
             )
@@ -111,3 +122,26 @@ class SerialUsbDriver:
     def __exit__(self) -> None:
         self._connected = False
         self._port.close()
+
+    def __aiter__(self) -> "SerialUsbDriver":
+        """Enter iterator.
+
+        Returns:
+            SerialUsbDriver
+        """
+        return self
+
+    async def __anext__(self) -> Optional[BinaryMessageDefinition]:
+        """Async next.
+
+        Returns:
+            Binary USB message
+        """
+        return await self.read()
+
+    def get_connection_info(self) -> Tuple[int, int, int, int]:
+        """Get the connection information for this device.
+
+        During unit tests since we don't connect via usb device these will all be 0
+        """
+        return (self._vid, self._pid, self._baudrate, self._timeout)

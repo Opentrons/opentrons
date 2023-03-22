@@ -120,7 +120,7 @@ describe('ConnectViaWifi', () => {
     getByText('Connecting...')
   })
 
-  it('should render SucceededToConnect', () => {
+  it('should render WifiConnectionDetails', () => {
     mockGetWifiList.mockReturnValue(mockWifiList)
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,

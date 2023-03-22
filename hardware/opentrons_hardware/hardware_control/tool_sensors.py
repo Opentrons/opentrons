@@ -62,6 +62,8 @@ async def liquid_probe(
     mount_speed: float,
     threshold_pascals: float,
     log_pressure: bool = True,
+    auto_zero_sensor: bool = True,
+    num_baseline_reads: int = 10,
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
@@ -72,6 +74,12 @@ async def liquid_probe(
         node_id=tool,
         stop_threshold=threshold_fixed_point,
     )
+
+    if auto_zero_sensor:
+        pressure_baseline = await sensor_driver.get_baseline(
+            messenger, pressure_sensor, num_baseline_reads
+        )
+        LOG.debug(f"found baseline pressure: {pressure_baseline} pascals")
 
     binding = [SensorOutputBinding.sync]
     await sensor_driver.send_stop_threshold(messenger, pressure_sensor)

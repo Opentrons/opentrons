@@ -14,6 +14,7 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -75,7 +76,7 @@ export function RobotSystemVersion({
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
               gridGap={SPACING.spacing4}
-              borderRadius="12px"
+              borderRadius={BORDERS.size_three}
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.warningBackgroundMed}
             >
@@ -98,11 +99,11 @@ export function RobotSystemVersion({
               'shared:view_latest_release_notes'
             )} ${GITHUB_URL}`}</StyledText>
             <Flex
-              backgroundColor={COLORS.greyDisabled}
+              backgroundColor={COLORS.light_two}
               flexDirection={DIRECTION_ROW}
               padding={SPACING.spacing5}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              borderRadius="12px"
+              borderRadius={BORDERS.size_three}
             >
               <StyledText
                 fontSize="1.5rem"

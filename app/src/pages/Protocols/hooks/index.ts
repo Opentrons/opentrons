@@ -4,7 +4,14 @@ import {
   useAttachedModules,
   useAttachedPipettes,
 } from '../../../organisms/Devices/hooks'
-import type { ModuleModel, PipetteName } from '@opentrons/shared-data'
+import { getLabwareSetupItemGroups } from '../utils'
+
+import type {
+  CompletedProtocolAnalysis,
+  ModuleModel,
+  PipetteName,
+} from '@opentrons/shared-data'
+import type { LabwareSetupItem } from '../utils'
 
 interface ProtocolPipette {
   hardwareType: 'pipette'
@@ -64,4 +71,17 @@ export const useRequiredProtocolHardware = (
   )
 
   return [...requiredPipettes, ...requiredModules]
+}
+
+export const useRequiredProtocolLabware = (
+  protocolId: string
+): LabwareSetupItem[] => {
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const commands =
+    (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
+  const { onDeckItems, offDeckItems } = getLabwareSetupItemGroups(commands)
+  return [...onDeckItems, ...offDeckItems]
 }

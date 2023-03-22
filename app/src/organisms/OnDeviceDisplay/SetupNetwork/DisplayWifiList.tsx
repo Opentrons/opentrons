@@ -15,6 +15,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   COLORS,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -79,7 +80,7 @@ export function DisplayWifiList({
             key={nw.ssid}
             backgroundColor="#d6d6d6"
             marginBottom={SPACING.spacing3}
-            borderRadius="12px"
+            borderRadius={BORDERS.size_three}
             css={NETWORK_ROW_STYLE}
             onClick={() => handleClick(nw)}
           >
@@ -108,7 +109,7 @@ export function DisplayWifiList({
         marginTop={SPACING.spacing3}
         height="4rem"
         backgroundColor="#d6d6d6"
-        borderRadius="12px"
+        borderRadius={BORDERS.size_three}
         color={COLORS.black}
         css={NETWORK_ROW_STYLE}
       >

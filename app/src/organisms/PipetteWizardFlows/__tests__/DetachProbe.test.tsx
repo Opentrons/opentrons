@@ -32,7 +32,6 @@ describe('DetachProbe', () => {
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -44,6 +43,7 @@ describe('DetachProbe', () => {
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
+      isOnDevice: false,
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })

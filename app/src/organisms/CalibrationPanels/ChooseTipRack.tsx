@@ -76,9 +76,12 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     defaultTipracks,
   } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
-  const pipSerial = usePipettesQuery({
-    refetchInterval: EQUIPMENT_POLL_MS,
-  })?.data?.[mount].id
+  const pipSerial = usePipettesQuery(
+    {},
+    {
+      refetchInterval: EQUIPMENT_POLL_MS,
+    }
+  )?.data?.[mount].id
 
   const pipetteOffsetCal = useSelector((state: State) =>
     robotName != null && pipSerial != null

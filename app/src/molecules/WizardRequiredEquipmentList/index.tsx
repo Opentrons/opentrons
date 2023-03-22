@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -11,8 +12,11 @@ import {
   COLORS,
   JUSTIFY_SPACE_AROUND,
   TYPOGRAPHY,
+  Box,
+  BORDERS,
 } from '@opentrons/components'
 
+import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
@@ -28,31 +32,71 @@ export function WizardRequiredEquipmentList(
 ): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { equipmentList, footer } = props
+  const isOnDevice = useSelector(getIsOnDevice)
 
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width={props.width ?? SPACING.spacingAuto}
     >
-      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t('you_will_need')}
-      </StyledText>
-      <Divider />
-      {equipmentList.map(requiredEquipmentProps => (
-        <RequiredEquipmentCard
-          key={requiredEquipmentProps.loadName}
-          {...requiredEquipmentProps}
-        />
-      ))}
-      {footer != null ? (
-        <StyledText
-          marginTop={SPACING.spacing3}
-          as="label"
-          color={COLORS.darkGreyEnabled}
-        >
-          {footer}
-        </StyledText>
-      ) : null}
+      {isOnDevice ? (
+        <>
+          <StyledText
+            fontSize="1.25rem"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            lineHeight="1.5rem"
+            marginBottom={SPACING.spacing3}
+          >
+            {t('you_will_need')}
+          </StyledText>
+
+          <Flex
+            backgroundColor="#16212D33"
+            flexDirection={DIRECTION_COLUMN}
+            borderRadius={BORDERS.size_three}
+          >
+            {equipmentList.map((requiredEquipmentProps, index) => (
+              <Box
+                paddingX={SPACING.spacingM}
+                paddingY={SPACING.spacing2}
+                key={`${index}_${requiredEquipmentProps.loadName}`}
+              >
+                <StyledText fontSize="1.25rem" paddingY="0.75rem">
+                  {requiredEquipmentProps.displayName}
+                </StyledText>
+                {/* do not show divider after the last equipment in the list */}
+                {index + 1 === Object.keys(equipmentList).length ? null : (
+                  <Box
+                    borderBottom={`${SPACING.spacingXXS} solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
+                  />
+                )}
+              </Box>
+            ))}
+          </Flex>
+        </>
+      ) : (
+        <>
+          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('you_will_need')}
+          </StyledText>
+          <Divider />
+          {equipmentList.map(requiredEquipmentProps => (
+            <RequiredEquipmentCard
+              key={requiredEquipmentProps.loadName}
+              {...requiredEquipmentProps}
+            />
+          ))}
+          {footer != null ? (
+            <StyledText
+              marginTop={SPACING.spacing3}
+              as="label"
+              color={COLORS.darkGreyEnabled}
+            >
+              {footer}
+            </StyledText>
+          ) : null}
+        </>
+      )}
     </Flex>
   )
 }

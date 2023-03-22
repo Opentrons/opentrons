@@ -122,6 +122,7 @@ async def test_create_protocol_run(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
     )
 

@@ -58,6 +58,7 @@
   "step": "STEP {{index}}",
   "module_not_connected": "Not connected",
   "module_connected": "Connected",
+  "module_disconnected": "Disconnected",
   "no_usb_port_yet": "No USB Port Yet",
   "usb_port_connected": "USB Port {{port}}",
   "hub_port_connected": "USB Port {{port}} via hub",
@@ -122,6 +123,7 @@
   "on-deck_labware": "{{count}} on-deck labware",
   "optional": "optional",
   "prepare_to_run": "Prepare to Run",
+  "quantity": "Quantity",
   "run": "Run",
   "status": "Status",
   "tip_length_calibration": "tip length calibration",
@@ -158,5 +160,8 @@
   "additional_off_deck_labware": "Additional Off-Deck Labware",
   "recommended_workflow_for_labware_positioning": "Recommended workflow that helps you verify the position of each labware on the deck. <anchor>Learn how it works</anchor>",
   "view_current_offsets": "View current offsets",
-  "view_module_setup_instructions": "View module setup instructions"
+  "view_module_setup_instructions": "View module setup instructions",
+  "deck_map": "Deck Map",
+  "setup_instructions": "Setup Instructions",
+  "labware_latch_instructions": "To add labware to the Heater-Shaker Module, use the labware latch in the controls to the right."
 }

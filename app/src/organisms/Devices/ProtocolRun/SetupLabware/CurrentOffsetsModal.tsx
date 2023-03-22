@@ -2,12 +2,12 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import pick from 'lodash/pick'
 
 import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 import {
   Flex,
@@ -16,24 +16,21 @@ import {
   TYPOGRAPHY,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_FLEX_END,
-  ALIGN_CENTER,
-  Link,
-  useHoverTooltip,
-  TOOLTIP_LEFT,
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
-import { PrimaryButton } from '../../../../atoms/buttons'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { useLPCDisabledReason } from '../../hooks'
 import { getLatestCurrentOffsets } from './utils'
 
 import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  RunTimeCommand,
+  LoadedLabware,
+  LoadedModule,
+} from '@opentrons/shared-data'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -61,31 +58,19 @@ const OffsetTableDatum = styled('td')`
 interface CurrentOffsetsModalProps {
   currentOffsets: LabwareOffset[]
   commands: RunTimeCommand[]
-  runId: string
-  robotName: string
+  labware: LoadedLabware[]
+  modules: LoadedModule[]
   onCloseClick: () => void
-  handleRelaunchLPC: () => void
 }
 export function CurrentOffsetsModal(
   props: CurrentOffsetsModalProps
 ): JSX.Element {
-  const {
-    currentOffsets,
-    commands,
-    runId,
-    robotName,
-    onCloseClick,
-    handleRelaunchLPC,
-  } = props
+  const { currentOffsets, commands, labware, modules, onCloseClick } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_LEFT,
-  })
-  const lpcDisabledReason = useLPCDisabledReason(robotName, runId)
   const latestCurrentOffsets = getLatestCurrentOffsets(currentOffsets)
 
   const TableComponent = (
@@ -125,15 +110,23 @@ export function CurrentOffsetsModal(
   const JupyterSnippet = (
     <PythonLabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
-      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      labwareOffsets={latestCurrentOffsets.map(o =>
+        pick(o, ['definitionUri', 'location', 'vector'])
+      )}
+      commands={commands ?? []}
+      labware={labware ?? []}
+      modules={modules ?? []}
     />
   )
   const CommandLineSnippet = (
     <PythonLabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
-      protocol={null} // todo (jb 2-15-23) update the values passed in as part of the snippet updates
+      labwareOffsets={latestCurrentOffsets.map(o =>
+        pick(o, ['definitionUri', 'location', 'vector'])
+      )}
+      commands={commands ?? []}
+      labware={labware ?? []}
+      modules={modules ?? []}
     />
   )
   return (
@@ -157,33 +150,6 @@ export function CurrentOffsetsModal(
         ) : (
           TableComponent
         )}
-        <Flex
-          width="100%"
-          marginTop={SPACING.spacing6}
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing3}
-        >
-          <Link
-            css={TYPOGRAPHY.linkPSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={onCloseClick}
-            role="button"
-          >
-            {t('shared:cancel')}
-          </Link>
-          <PrimaryButton
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={handleRelaunchLPC}
-            disabled={lpcDisabledReason !== null}
-            {...targetProps}
-          >
-            {t('run_labware_position_check')}
-          </PrimaryButton>
-          {lpcDisabledReason !== null ? (
-            <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
-          ) : null}
-        </Flex>
       </Flex>
     </ModalShell>
   )

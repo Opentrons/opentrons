@@ -24,9 +24,6 @@ from opentrons.protocol_runner import ProtocolRunner
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_translator import JsonTranslator
-from opentrons.protocol_runner.python_file_reader import PythonFileReader
-from opentrons.protocol_runner.python_context_creator import PythonContextCreator
-from opentrons.protocol_runner.python_executor import PythonExecutor
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyFileReader,
@@ -70,24 +67,6 @@ def json_translator(decoy: Decoy) -> JsonTranslator:
 
 
 @pytest.fixture
-def python_file_reader(decoy: Decoy) -> PythonFileReader:
-    """Get a mocked out PythonFileReader dependency."""
-    return decoy.mock(cls=PythonFileReader)
-
-
-@pytest.fixture
-def python_context_creator(decoy: Decoy) -> PythonContextCreator:
-    """Get a mocked out PythonContextCreator dependency."""
-    return decoy.mock(cls=PythonContextCreator)
-
-
-@pytest.fixture
-def python_executor(decoy: Decoy) -> PythonExecutor:
-    """Get a mocked out PythonExecutor dependency."""
-    return decoy.mock(cls=PythonExecutor)
-
-
-@pytest.fixture
 def legacy_file_reader(decoy: Decoy) -> LegacyFileReader:
     """Get a mocked out LegacyFileReader dependency."""
     return decoy.mock(cls=LegacyFileReader)
@@ -124,9 +103,6 @@ def subject(
     task_queue: TaskQueue,
     json_file_reader: JsonFileReader,
     json_translator: JsonTranslator,
-    python_file_reader: PythonFileReader,
-    python_context_creator: PythonContextCreator,
-    python_executor: PythonExecutor,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
@@ -138,9 +114,6 @@ def subject(
         task_queue=task_queue,
         json_file_reader=json_file_reader,
         json_translator=json_translator,
-        python_file_reader=python_file_reader,
-        python_context_creator=python_context_creator,
-        python_executor=python_executor,
         legacy_file_reader=legacy_file_reader,
         legacy_context_creator=legacy_context_creator,
         legacy_executor=legacy_executor,
@@ -244,6 +217,7 @@ async def test_load_json(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
     )
 
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
@@ -316,6 +290,7 @@ async def test_load_json_liquids_ff_on(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
     )
 
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
@@ -376,6 +351,7 @@ async def test_load_legacy_python(
         metadata={},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
+        content_hash="abc123",
     )
 
     extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
@@ -439,6 +415,7 @@ async def test_load_python_with_pe_papi_core(
         metadata={},
         robot_type="OT-2 Standard",
         config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
+        content_hash="abc123",
     )
 
     legacy_protocol = LegacyPythonProtocol(
@@ -493,6 +470,7 @@ async def test_load_legacy_json(
         metadata={},
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=5),
+        content_hash="abc123",
     )
 
     legacy_protocol = LegacyJsonProtocol(

@@ -66,6 +66,7 @@ MessageDefinition = Union[
     defs.ReadFromSensorRequest,
     defs.WriteToSensorRequest,
     defs.BaselineSensorRequest,
+    defs.BaselineSensorResponse,
     defs.SetSensorThresholdRequest,
     defs.ReadFromSensorResponse,
     defs.SensorThresholdResponse,
@@ -88,6 +89,8 @@ MessageDefinition = Union[
     defs.InstrumentInfoRequest,
     defs.BrushedMotorConfRequest,
     defs.BrushedMotorConfResponse,
+    defs.SetGripperErrorTolerance,
+    defs.PushTipPresenceNotification,
 ]
 
 

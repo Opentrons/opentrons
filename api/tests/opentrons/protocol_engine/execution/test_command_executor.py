@@ -29,6 +29,7 @@ from opentrons.protocol_engine.execution import (
     CommandExecutor,
     EquipmentHandler,
     MovementHandler,
+    GantryMover,
     LabwareMovementHandler,
     PipettingHandler,
     TipHandler,
@@ -65,6 +66,12 @@ def equipment(decoy: Decoy) -> EquipmentHandler:
 def movement(decoy: Decoy) -> MovementHandler:
     """Get a mocked out MovementHandler."""
     return decoy.mock(cls=MovementHandler)
+
+
+@pytest.fixture
+def mock_gantry_mover(decoy: Decoy) -> GantryMover:
+    """Get a mocked out GantryMover."""
+    return decoy.mock(cls=GantryMover)
 
 
 @pytest.fixture
@@ -110,6 +117,7 @@ def subject(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
     mock_tip_handler: TipHandler,
@@ -124,6 +132,7 @@ def subject(
         action_dispatcher=action_dispatcher,
         equipment=equipment,
         movement=movement,
+        gantry_mover=mock_gantry_mover,
         labware_movement=labware_movement,
         pipetting=pipetting,
         tip_handler=mock_tip_handler,
@@ -153,6 +162,7 @@ async def test_execute(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
     mock_tip_handler: TipHandler,
@@ -224,6 +234,7 @@ async def test_execute(
             hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
+            gantry_mover=mock_gantry_mover,
             labware_movement=labware_movement,
             pipetting=pipetting,
             tip_handler=mock_tip_handler,
@@ -273,6 +284,7 @@ async def test_execute_raises_protocol_engine_error(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
     mock_tip_handler: TipHandler,
@@ -331,6 +343,7 @@ async def test_execute_raises_protocol_engine_error(
             hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
+            gantry_mover=mock_gantry_mover,
             labware_movement=labware_movement,
             pipetting=pipetting,
             tip_handler=mock_tip_handler,
