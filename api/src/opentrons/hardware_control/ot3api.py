@@ -1416,9 +1416,8 @@ class OT3API(
         )
 
         if instrument.current_volume == 0:
-            speed = self._pipette_handler.plunger_speed(
-                instrument, instrument.blow_out_flow_rate, "aspirate"
-            )
+            max_speeds = self.config.motion_settings.default_max_speed
+            speed = max_speeds[self.gantry_load][OT3AxisKind.P]
             bottom = instrument.plunger_positions.bottom
             target_pos = target_position_from_plunger(
                 OT3Mount.from_mount(mount), bottom, self._current_position
