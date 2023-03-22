@@ -11,6 +11,7 @@ import {
   ALIGN_CENTER,
   COLORS,
   SPACING,
+  BORDERS,
 } from '@opentrons/components'
 
 import { Modal } from '../../../molecules/Modal'
@@ -52,10 +53,10 @@ export function RobotSystemVersionModal({
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
-            backgroundColor="#E0E0E0"
+            backgroundColor={COLORS.light_two}
             paddingX={SPACING.spacing4}
             paddingY={SPACING.spacing5}
-            borderRadius="0.75rem"
+            borderRadius={BORDERS.size_three}
             marginY={SPACING.spacing5}
           >
             <Icon
@@ -79,7 +80,7 @@ export function RobotSystemVersionModal({
             onClick={() => setShowModal(false)}
             fontSize="1.5rem"
             lineHeight="1.375rem"
-            fontWeight="600"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             height="4.375rem"
           >
             {t('remind_me_later')}
@@ -90,7 +91,7 @@ export function RobotSystemVersionModal({
             onClick={() => history.push('/robot-settings/update-robot')}
             fontSize="1.5rem"
             lineHeight="1.375rem"
-            fontWeight="600"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             height="4.375rem"
           >
             {t('shared:update')}
