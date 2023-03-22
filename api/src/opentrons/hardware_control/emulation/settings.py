@@ -71,7 +71,11 @@ class ModuleServerSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    modules: List[ModuleType] = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
+    modules: List[ModuleType] = [
+        ModuleType.Magnetic,
+        ModuleType.Temperature,
+        ModuleType.Thermocycler,
+    ]
     smoothie: SmoothieSettings = SmoothieSettings()
     magdeck: MagDeckSettings = MagDeckSettings(
         serial_number="magnetic_emulator", model="mag_deck_v20", version="2.0.0"
