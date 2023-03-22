@@ -134,7 +134,7 @@ def _apply_labware_offsets(
             f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
             f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
         )
-        labware.set_calibration(o)
+        # labware.set_calibration(o)
 
     _apply(vial)
     for rack in tip_racks:

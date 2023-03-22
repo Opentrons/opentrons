@@ -5,7 +5,7 @@ from typing import List
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import ui
-from hardware_testing.protocols.gravimetric_ot3 import (
+from hardware_testing.protocols.gravimetric_ot3_p50 import (
     SLOTS_TIPRACK,
     SLOT_VIAL,
     metadata,
