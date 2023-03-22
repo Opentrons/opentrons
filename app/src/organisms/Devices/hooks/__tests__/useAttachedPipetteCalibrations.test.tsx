@@ -68,7 +68,7 @@ describe('useAttachedPipetteCalibrations hook', () => {
 
   it('returns attached pipette calibrations when given a robot name', () => {
     when(mockUsePipettesQuery)
-      .calledWith({})
+      .calledWith({}, {})
       .mockReturnValue({
         data: {
           left: {

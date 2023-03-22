@@ -12,13 +12,20 @@ export const darkGrey = '#4a4a4a'
 
 // opacity hex codes to append to 6-digit color hex codes
 // taken from table: https://davidwalsh.name/hex-opacity
+export const opacity0HexCode = '00' // 0% opacity
 export const opacity10HexCode = '1a' // 10% opacity
 export const opacity12HexCode = '1f' // 12% opacity
+export const opacity15HexCode = '26' // 15% opacity
 export const opacity17HexCode = '2b' // 17% opacity
 export const opacity20HexCode = '33' // 20% opacity
+export const opacity30HexCode = '4d' // 30% opacity
 export const opacity35HexCode = '59' // 35% opacity
+export const opacity40HexCode = '66' // 40% opacity
 export const opacity50HexCode = '80' // 50% opacity
 export const opacity55HexCode = '8c' // 55% opacity
+export const opacity60HexCode = '99' // 60% opacity
+export const opacity70HexCode = 'b3' // 70% opacity
+export const opacity90HexCode = 'e6' // 90% opacity
 
 // colors blue
 export const blueEnabled = '#006cfa'
@@ -98,5 +105,37 @@ export const liquidColors = [
   whaleGrey,
 ]
 
-// touchscreen colors
-export const greyDisabled = '#e0e0e0'
+// touchscreen light mode colors
+export const darkBlack_hundred = darkBlackEnabled
+export const darkBlack_ninety = `${darkBlackEnabled}${opacity90HexCode}`
+export const darkBlack_seventy = `${darkBlackEnabled}${opacity70HexCode}`
+export const darkBlack_sixty = `${darkBlackEnabled}${opacity60HexCode}`
+export const darkBlack_fourty = `${darkBlackEnabled}${opacity40HexCode}`
+export const darkBlack_twenty = `${darkBlackEnabled}${opacity20HexCode}`
+
+export const light_one = '#d0d0d0'
+export const light_two = '#e0e0e0'
+
+export const highlightPurple_one = '#9c3ba4'
+export const highlightPurple_one_pressed = '#af62b6'
+export const highlightPurple_two = '#e7c3e9'
+export const highlightPurple_two_pressed = '#bda3c3'
+
+// touchscreen foundational color
+export const foundationalBlue = '#b4d4ff'
+
+// touchscreen communication colors
+export const green_one = '#027e23'
+export const green_two = '#2ebd55'
+export const green_three = '#a1ffbc'
+export const green_four = '#baffcd'
+
+export const yellow_one = '#7a5200'
+export const yellow_two = '#ec930f'
+export const yellow_three = '#ffe1a4'
+export const yellow_four = '#ffe9be'
+
+export const red_one = errorText
+export const red_two = '#e31e1e'
+export const red_three = '#fbcdcd'
+// export const red_four = errorText

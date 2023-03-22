@@ -148,7 +148,7 @@ export function ProtocolRunHeader({
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   // NOTE: we are polling pipettes, though not using their value directly here
-  usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
+  usePipettesQuery({}, { refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
   React.useEffect(() => {

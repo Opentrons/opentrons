@@ -62,7 +62,7 @@ describe('MovePin', () => {
 
   it('renders correct text for move pin to front jaw', () => {
     const { getByRole, getByText } = render()[0]
-    getByRole('heading', { name: 'Insert Calibration Pin into Front Jaw' })
+    getByText('Insert Calibration Pin into Front Jaw')
     getByText(
       'Take the calibration pin from its storage location. Magnetically attach the pin to the hole on the underside of the front gripper jaw.'
     )
@@ -78,7 +78,7 @@ describe('MovePin', () => {
     const { getByRole, getByText } = render({
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
-    getByRole('heading', { name: 'Insert Calibration Pin into Rear Jaw' })
+    getByText('Insert Calibration Pin into Rear Jaw')
     getByText(
       'Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw'
     )
@@ -97,7 +97,7 @@ describe('MovePin', () => {
     const { getByRole, getByText } = render({
       movement: REMOVE_PIN_FROM_REAR_JAW,
     })[0]
-    getByRole('heading', { name: 'Remove Calibration Pin' })
+    getByText('Remove Calibration Pin')
     getByText(
       'Take the calibration pin from the rear gripper jaw and return it to its storage location.'
     )

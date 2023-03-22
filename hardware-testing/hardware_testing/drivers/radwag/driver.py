@@ -2,7 +2,6 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, Optional
 
-from random import uniform
 from serial import Serial  # type: ignore[import]
 
 from .commands import (
@@ -226,6 +225,15 @@ class RadwagScale(RadwagScaleBase):
 class SimRadwagScale(RadwagScaleBase):
     """Simulating Radwag Scale Driver."""
 
+    def __init__(self) -> None:
+        """Constructor."""
+        self._mass: float = 0.0
+
+    @property
+    def sim_mass(self) -> float:
+        """Simulation mass."""
+        return self._mass
+
     def connect(self) -> None:
         """Connect."""
         return
@@ -268,4 +276,8 @@ class SimRadwagScale(RadwagScaleBase):
 
     def read_mass(self) -> Tuple[float, bool]:
         """Read mass."""
-        return uniform(2.5, 2), True
+        return self._mass, True
+
+    def set_simulation_mass(self, mass: float) -> None:
+        """Set simulation mass."""
+        self._mass = mass

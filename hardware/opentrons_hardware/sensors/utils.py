@@ -35,9 +35,9 @@ class ReadSensorInformation:
 
 
 @dataclass
-class PollSensorInformation:
+class BaselineSensorInformation:
     """Poll sensor information."""
 
     sensor: SensorInformation
-    poll_for: int
+    number_of_reads: int
     offset: bool = False

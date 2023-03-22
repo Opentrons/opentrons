@@ -103,8 +103,8 @@ function parseGravimetricCSV(CSVData, retData) {
 }
 
 window.addEventListener('load', function (evt) {
-  const _updateIntervalMillis = 1000
-  let _interval
+  const _updateTimeoutMillis = 100
+  let _timeout
   const layout = {
     title: 'Untitled',
     uirevision: true,
@@ -114,10 +114,10 @@ window.addEventListener('load', function (evt) {
   const name_input_div = document.getElementById('testname')
   const plotlyDivName = 'plotly'
 
-  function _clearInterval() {
-    if (_interval) {
-      clearInterval(_interval)
-      _interval = undefined
+  function _clearTimeout() {
+    if (_timeout) {
+      clearTimeout(_timeout)
+      _timeout = undefined
     }
   }
 
@@ -136,12 +136,13 @@ window.addEventListener('load', function (evt) {
   function _onTestNameResponse() {
     const responseData = JSON.parse(this.responseText)
     name_input_div.value = responseData.name
-    _clearInterval()
-    _interval = setInterval(_getLatestDataFromServer, _updateIntervalMillis)
+    _clearTimeout()
+    _timeout = setTimeout(_getLatestDataFromServer, _updateTimeoutMillis)
     _getLatestDataFromServer()
   }
 
   function _getLatestDataFromServer(evt) {
+    _clearTimeout()
     const oReq = new XMLHttpRequest()
     oReq.addEventListener('load', function () {
       const responseData = JSON.parse(this.responseText)
@@ -152,6 +153,7 @@ window.addEventListener('load', function (evt) {
       // TODO: figure out how to plot this...
       layout.title = responseData.latest.name
       Plotly.react(plotlyDivName, newData, layout, { responsive: true }) // eslint-disable-line no-undef
+      _timeout = setTimeout(_getLatestDataFromServer, _updateTimeoutMillis)
     })
     oReq.open('GET', 'http://' + window.location.host + '/data/latest')
     oReq.send()
@@ -165,7 +167,7 @@ window.addEventListener('load', function (evt) {
   }
 
   function _setTestNameOfServer(evt) {
-    _clearInterval()
+    _clearTimeout()
     _initializePlot()
     const oReq = new XMLHttpRequest()
     oReq.addEventListener('load', _onTestNameResponse)

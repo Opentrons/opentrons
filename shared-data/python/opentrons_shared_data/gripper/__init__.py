@@ -10,8 +10,6 @@ from .gripper_definition import (
     GripperSchema,
     GripperSchemaVersion,
     GripForceProfile,
-    JawMotorConfigurations,
-    ZMotorConfigurations,
     GripperModel,
     Geometry,
 )
@@ -59,8 +57,6 @@ __all__ = [
     "GripperSchema",
     "GripperSchemaVersion",
     "GripForceProfile",
-    "JawMotorConfigurations",
-    "ZMotorConfigurations",
     "GripperModel",
     "Geometry",
     "generate_schema",
