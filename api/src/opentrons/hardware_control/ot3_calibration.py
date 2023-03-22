@@ -10,8 +10,6 @@ from math import floor, copysign
 from logging import getLogger
 from opentrons.util.linal import solve_attitude
 
-from opentrons.hardware_control.modules.types import ModuleType
-
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
@@ -938,7 +936,7 @@ async def calibrate_module(
     hcapi: OT3API,
     mount: OT3Mount,
     slot: int,
-    module: ModuleType,
+    module_id: str,
 ) -> Point:
     """
     Run automatic calibration for a module.
@@ -963,8 +961,7 @@ async def calibrate_module(
 
         # find the offset
         offset = await _calibrate_module(hcapi, mount, slot)
-        LOG.info(f"Found calibration value {offset} for module {module.name}")
-        # TODO (ba, 2023-03-09): save module calibration here
+        await hcapi.save_module_offset(module_id, mount, slot, offset)
         return offset
     finally:
         # remove probe
