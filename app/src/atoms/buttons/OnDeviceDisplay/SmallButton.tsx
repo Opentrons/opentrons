@@ -11,18 +11,21 @@ import {
 import { StyledText } from '../../text'
 import type { StyleProps } from '@opentrons/components'
 
-type SmallButtonTypes = 'alt' | 'alert' | 'default' | 'ghostHigh' | 'ghostLow'
+type SmallButtonTypes =
+  | 'alt'
+  | 'alert'
+  | 'default'
+  | 'tertiaryHigh'
+  | 'tertiaryHighLight'
 interface SmallButtonProps extends StyleProps {
   onClick: () => void
   buttonType: SmallButtonTypes
   buttonText: React.ReactNode
   disabled?: boolean
-  //  optional text color for the 2 ghostHigh options
-  textColor?: string
 }
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
-  const { onClick, buttonType, buttonText, textColor, disabled } = props
+  const { onClick, buttonType, buttonText, disabled } = props
   const buttonProps = {
     onClick,
     disabled,
@@ -48,7 +51,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     },
     alert: {
       defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.errorEnabled,
+      defaultBackgroundColor: COLORS.red_two,
       activeBackgroundColor: '#ab302a',
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
@@ -60,15 +63,15 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
     },
-    ghostLow: {
+    tertiaryHighLight: {
       defaultColor: `${COLORS.darkBlack_seventy}`,
       defaultBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
       disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
     },
-    ghostHigh: {
-      defaultColor: textColor ?? COLORS.blueEnabled,
+    tertiaryHigh: {
+      defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: ` ${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
@@ -81,18 +84,18 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
     cursor: default;
-    border-radius: ${BORDERS.size_three};
+    border-radius: ${BORDERS.size_four};
     box-shadow: none;
-    padding-left: ${SPACING.spacing4};
-    padding-right: ${SPACING.spacing4};
-    line-height: ${TYPOGRAPHY.lineHeight20};
+    padding: ${SPACING.spacing4} ${SPACING.spacing5};
+    line-height: ${TYPOGRAPHY.lineHeight28};
     text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
 
     ${styleProps}
     &:focus {
+      box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
+        .defaultBackgroundColor};
       box-shadow: none;
     }
     &:hover {
@@ -127,7 +130,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       <StyledText
         fontSize="1.375rem"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        padding={SPACING.spacing4}
       >
         {buttonText}
       </StyledText>

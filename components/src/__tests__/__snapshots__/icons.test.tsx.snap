@@ -2517,6 +2517,30 @@ exports[`icons play-circle renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons play-round-corners renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 29 46"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M0 42.6624V3.3376C0 1.21801 2.47214 0.0601182 4.10046 1.41705L27.6953 21.0794C28.8947 22.0789 28.8947 23.9211 27.6953 24.9206L4.10046 44.5829C2.47214 45.9399 0 44.782 0 42.6624Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons plus renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

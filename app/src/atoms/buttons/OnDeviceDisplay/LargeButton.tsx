@@ -67,15 +67,16 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     cursor: default;
     border-radius: ${BORDERS.size_four};
     box-shadow: none;
-    padding: ${SPACING.spacing5} ${SPACING.spacing5} 2.4375rem;
+    padding: ${SPACING.spacing5};
     line-height: ${TYPOGRAPHY.lineHeight20};
     text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
 
     ${styleProps}
     &:focus {
+      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
+        .defaultBackgroundColor};
       box-shadow: none;
     }
     &:hover {
@@ -115,15 +116,14 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         {buttonText}
       </StyledText>
       <Icon
-        name={iconName ?? 'play'}
+        name={iconName ?? 'play-round-corners'}
         aria-label={`LargeButton_${iconName ?? 'play'}`}
         color={
           disabled
             ? COLORS.darkBlack_sixty
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
         }
-        width="1.875rem"
-        height="1.875rem"
+        size="5rem"
       />
     </NewPrimaryBtn>
   )

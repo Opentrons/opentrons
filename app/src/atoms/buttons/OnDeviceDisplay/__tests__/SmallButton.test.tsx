@@ -32,7 +32,7 @@ describe('SmallButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.errorEnabled}`
+      `background-color: ${COLORS.red_two}`
     )
   })
   it('renders the alt button', () => {
@@ -45,30 +45,20 @@ describe('SmallButton', () => {
       `background-color: ${COLORS.foundationalBlue}`
     )
   })
-  it('renders the ghost low button', () => {
+  it('renders the tertiary high light button', () => {
     props = {
       ...props,
-      buttonType: 'ghostLow',
+      buttonType: 'tertiaryHighLight',
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
       `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
     )
   })
-  it('renders the ghost high blue', () => {
+  it('renders the tertiary high', () => {
     props = {
       ...props,
-      buttonType: 'ghostHigh',
-      textColor: COLORS.blueEnabled,
-    }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.blueEnabled}`)
-  })
-  it('renders the ghost high black', () => {
-    props = {
-      ...props,
-      buttonType: 'ghostHigh',
-      textColor: COLORS.darkBlackEnabled,
+      buttonType: 'tertiaryHigh',
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
