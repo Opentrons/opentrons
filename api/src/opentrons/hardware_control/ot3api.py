@@ -16,6 +16,7 @@ from typing import (
     Set,
     Any,
     TypeVar,
+    Tuple,
 )
 
 
@@ -134,6 +135,8 @@ from .dev_types import (
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
+
+from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, USBTarget
 
 mod_log = logging.getLogger(__name__)
 
@@ -272,6 +275,7 @@ class OT3API(
         config: Union[OT3Config, RobotConfig, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        use_usb_bus: bool = False,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -279,7 +283,8 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
-        backend = await OT3Controller.build(checked_config)
+        backend = await OT3Controller.build(checked_config, use_usb_bus)
+
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
 
@@ -292,6 +297,9 @@ class OT3API(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
+        door_state = await backend.door_state()
+        api_instance._update_door_state(door_state)
+        backend.add_door_state_listener(api_instance._update_door_state)
         checked_loop.create_task(backend.watch(loop=checked_loop))
         backend.initialized = True
         return api_instance
@@ -438,12 +446,17 @@ class OT3API(
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
-        nodes = {sub_system_to_node_id(subsystem) for subsystem in subsystems}
+        targets: Set[FirmwareTarget] = set()
+        for subsystem in subsystems:
+            if subsystem is OT3SubSystem.rear_panel:
+                targets.add(USBTarget.rear_panel)
+            else:
+                targets.add(sub_system_to_node_id(subsystem))
         # get the attached pipette subtypes so we can determine which binary to install for pipettes
         pipettes = self._get_pipette_subtypes()
         # start the updates and yield the progress
         async for update_status in self._backend.update_firmware(
-            pipettes, nodes, force
+            pipettes, targets, force
         ):
             yield update_status
         # refresh Instrument cache
@@ -501,9 +514,6 @@ class OT3API(
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
-
-    async def connect_usb_to_rear_panel(self) -> None:
-        await self._backend.connect_usb_to_rear_panel()
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
@@ -1118,26 +1128,40 @@ class OT3API(
         Note that when an axis is move directly to the home position, the axis limit
         switch will not be triggered.
         """
+
+        async def _retrieve_home_position() -> Tuple[
+            OT3AxisMap[float], OT3AxisMap[float]
+        ]:
+            origin = await self._backend.update_position()
+            target_pos = {ax: pos for ax, pos in origin.items()}
+            target_pos.update({axis: self._backend.home_position()[axis]})
+            return origin, target_pos
+
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [OT3Axis.G, OT3Axis.Q]
 
-        # retrieve home position
-        origin = await self._backend.update_position()
-        target_pos = {ax: pos for ax, pos in origin.items()}
-        target_pos.update({axis: self._backend.home_position()[axis]})
-        if self._backend.check_motor_status([axis]):
-            # move directly the home position if the stepper position is valid
-            moves = self._build_moves(origin, target_pos)
-            await self._backend.move(
-                origin,
-                moves[0],
-                MoveStopCondition.none,
-            )
-        elif self._backend.check_encoder_status([axis]):
+        # FIXME: See https://github.com/Opentrons/opentrons/pull/11978
+        # Because of the workaround introduced above, we cannot fully trust the motor
+        # flag until the already_homed check is removed. Until then, we should only
+        # evaluate the encoder status and update motor pos as a safeguard.
+        # if self._backend.check_motor_status(
+        #     [axis]
+        # ) and self._backend.check_encoder_status([axis]):
+        #     # retrieve home position
+        #     origin, target_pos = await _retrieve_home_position()
+        #     # move directly the home position if the stepper position is valid
+        #     moves = self._build_moves(origin, target_pos)
+        #     await self._backend.move(
+        #         origin,
+        #         moves[0],
+        #         MoveStopCondition.none,
+        #     )
+        if self._backend.check_encoder_status([axis]):
             # ensure stepper position can be updated after boot
             await self.engage_axes([axis])
             # update stepper position using the valid encoder position
             await self._update_position_estimation([axis])
+            origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
                 # we can move directly to the home position for accuracy axes
                 # move directly the home position if the stepper position is valid
@@ -1888,6 +1912,8 @@ class OT3API(
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
             probe_settings.log_pressure,
+            probe_settings.auto_zero_sensor,
+            probe_settings.num_baseline_reads,
         )
         machine_pos = axis_convert(machine_pos_node_id, 0.0)
         position = deck_from_machine(

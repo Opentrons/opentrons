@@ -33,7 +33,11 @@ from .ot3utils import (
     PipetteAction,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    FirmwareTarget,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -252,6 +256,8 @@ class OT3Simulator:
         plunger_speed: float,
         threshold_pascals: float,
         log_pressure: bool = True,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
 
@@ -373,7 +379,7 @@ class OT3Simulator:
             raise RuntimeError(
                 f"mount {mount.name} requested a {expected_instr} which is not supported on the OT3"
             )
-        if found_model and expected_instr and (expected_instr != found_model):
+        if found_model and expected_instr and (expected_instr not in found_model):
             if self._strict_attached:
                 raise RuntimeError(
                     "mount {}: expected instrument {} but got {}".format(
@@ -499,7 +505,7 @@ class OT3Simulator:
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
-        nodes: Optional[Set[NodeId]] = None,
+        nodes: Optional[Set[FirmwareTarget]] = None,
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""

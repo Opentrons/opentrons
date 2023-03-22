@@ -39,6 +39,7 @@ from opentrons.hardware_control.types import (  # noqa: E402
 )
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_pipette,
+    calibrate_belts,
     calibrate_gripper_jaw,
     find_edge_linear,
     find_deck_height,
@@ -104,7 +105,9 @@ def stop_server() -> None:
 
 
 def build_api() -> ThreadManager[HardwareControlAPI]:
-    tm = ThreadManager(HCApi.build_hardware_controller)
+    tm = ThreadManager(
+        HCApi.build_hardware_controller, use_usb_bus=ff.rear_panel_integration()
+    )
     tm.managed_thread_ready_blocking()
     return tm
 
@@ -127,6 +130,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "find_edge": wrap_async_util_fn(find_edge_linear, api),
             "find_deck_height": wrap_async_util_fn(find_deck_height, api),
             "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
+            "calibrate_belts": wrap_async_util_fn(calibrate_belts, api),
             "calibrate_gripper": wrap_async_util_fn(calibrate_gripper_jaw, api),
             "gripper_pin_offsets_mean": gripper_pin_offsets_mean,
             "CalibrationMethod": CalibrationMethod,

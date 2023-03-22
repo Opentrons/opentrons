@@ -274,6 +274,14 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def delete_protocol(self, protocol_id: str) -> Response:
+        """DELETE /protocols/{protocol_id}."""
+        response = await self.httpx_client.delete(
+            f"{self.base_url}/protocols/{protocol_id}"
+        )
+        response.raise_for_status()
+        return response
+
     async def post_setting_reset_options(
         self,
         req_body: Dict[str, bool],

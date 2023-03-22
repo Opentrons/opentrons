@@ -8,6 +8,7 @@ import numpy as np
 from enum import Enum
 from math import floor, copysign
 from logging import getLogger
+from opentrons.util.linal import solve_attitude
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
@@ -15,6 +16,7 @@ from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
 import json
 
 from opentrons_shared_data.deck import load as load_deck
+from opentrons.calibration_storage.types import AttitudeMatrix
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -25,6 +27,7 @@ CAL_TRANSIT_HEIGHT: Final[float] = 10
 LINEAR_TRANSIT_HEIGHT: Final[float] = 1
 SEARCH_TRANSIT_HEIGHT: Final[float] = 5
 GRIPPER_GRIP_FORCE: Final[float] = 20
+BELT_CAL_TRANSIT_HEIGHT: Final[float] = 50
 
 # FIXME: add these to shared-data
 Z_PREP_OFFSET = Point(x=13, y=13, z=0)
@@ -819,5 +822,100 @@ async def calibrate_pipette(
         offset = await _calibrate_mount(hcapi, mount, slot, method)
         await hcapi.save_instrument_offset(mount, offset)
         return offset
+    finally:
+        await hcapi.remove_tip(mount)
+
+
+async def find_slot_center_binary_from_nominal_center(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    slot: int,
+) -> Tuple[Point, Point]:
+    """
+    For use with calibrate_belts. For specified slot, finds actual slot center via binary search and nominal slot center
+
+    Params
+    ------
+    hcapi: a hardware control api to run commands against
+    mount: the mount to calibration
+    slot: a specific deck slot
+
+    Returns
+    -------
+    The actual and nominal centers of the specified slot.
+    """
+    nominal_center = _get_calibration_square_position_in_slot(slot)
+    z_height = await find_deck_height(hcapi, mount, nominal_center)
+    return (
+        await find_slot_center_binary(
+            hcapi, mount, nominal_center._replace(z=z_height)
+        ),
+        nominal_center,
+    )
+
+
+async def determine_transform_matrix(
+    hcapi: OT3API,
+    mount: OT3Mount,
+) -> AttitudeMatrix:
+    """
+    Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
+    actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
+
+    Params
+    ------
+    hcapi: a hardware control api to run commands against
+    mount: the mount to calibration
+
+    Returns
+    -------
+    A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
+    """
+    slot_a, slot_b, slot_c = 12, 3, 10
+    point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_a
+    )
+    await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
+    point_b, nominal_point_b = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_b
+    )
+    await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
+    point_c, nominal_point_c = await find_slot_center_binary_from_nominal_center(
+        hcapi, mount, slot_c
+    )
+    expected = (
+        (nominal_point_a.x, nominal_point_a.y, nominal_point_a.z),
+        (nominal_point_b.x, nominal_point_b.y, nominal_point_b.z),
+        (nominal_point_c.x, nominal_point_c.y, nominal_point_c.z),
+    )
+    actual = (
+        (point_a.x, point_a.y, point_a.z),
+        (point_b.x, point_b.y, point_b.z),
+        (point_c.x, point_c.y, point_c.z),
+    )
+    return solve_attitude(expected, actual)
+
+
+async def calibrate_belts(
+    hcapi: OT3API,
+    mount: OT3Mount,
+) -> AttitudeMatrix:
+    """
+    Run automatic calibration for the gantry x and y belts attached to the specified mount.
+
+    Params
+    ------
+    hcapi: a hardware control api to run commands against
+    mount: the mount to calibration
+
+    Returns
+    -------
+    A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
+    """
+    if mount == OT3Mount.GRIPPER:
+        raise RuntimeError("Must use pipette mount, not gripper")
+    try:
+        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+        return await determine_transform_matrix(hcapi, mount)
     finally:
         await hcapi.remove_tip(mount)

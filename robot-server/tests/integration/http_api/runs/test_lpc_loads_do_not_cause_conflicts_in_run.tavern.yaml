@@ -3,6 +3,7 @@ test_name: Make sure Labware Position Check loads do not cause deck conflicts in
 marks:
   - usefixtures:
     - run_server
+    - clean_server_state
   - parametrize:
       # Try loading the Labware Position Check labware in every slot.
       key: slotName
@@ -141,3 +142,4 @@ stages:
               location:
                 slotName: '3'
               model: heaterShakerModuleV1
+

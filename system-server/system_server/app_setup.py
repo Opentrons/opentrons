@@ -17,6 +17,9 @@ app = FastAPI(
         "This OpenAPI spec describes the HTTP API of the Opentrons System Server."
     ),
     version=version,
+    openapi_url="/system/openapi.json",
+    docs_url="/system/docs",
+    redoc_url="/system/redoc",
 )
 
 # cors

@@ -23,7 +23,7 @@ import {
 } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { getLabwareSetupItemGroups } from './utils'
+import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 interface SetupLabwareMapProps {
