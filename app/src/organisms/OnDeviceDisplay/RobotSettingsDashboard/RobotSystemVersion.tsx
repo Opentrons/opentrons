@@ -50,13 +50,13 @@ export function RobotSystemVersion({
 
   return (
     <>
-      {showModal ? (
+      {showModal && (
         <RobotSystemVersionModal
           version={version}
           releaseNotes={releaseNotes}
           setShowModal={setShowModal}
         />
-      ) : null}
+      )}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
           <Btn onClick={() => setCurrentOption(null)}>
