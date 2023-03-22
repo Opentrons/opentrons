@@ -16,6 +16,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     ProtocolFilesInvalidError,
 )
+import opentrons.protocol_runner as protocol_runner
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
@@ -52,6 +53,15 @@ from robot_server.protocols.router import (
     get_protocol_analyses,
     get_protocol_analysis_by_id,
 )
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_create_simulating_runner(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Replace protocol_runner.create_simulating_runner() with a mock."""
+    mock = decoy.mock(func=protocol_runner.create_simulating_runner)
+    monkeypatch.setattr(protocol_runner, "create_simulating_runner", mock)
 
 
 @pytest.fixture
@@ -256,7 +266,6 @@ async def test_create_protocol(
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
     protocol_reader: ProtocolReader,
-    protocol_analyzer: ProtocolAnalyzer,
     task_runner: TaskRunner,
     protocol_auto_deleter: ProtocolAutoDeleter,
 ) -> None:
@@ -284,6 +293,18 @@ async def test_create_protocol(
         created_at=datetime(year=2021, month=1, day=1),
         source=protocol_source,
         protocol_key="dummy-key-111",
+    )
+
+    json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
+    decoy.when(
+        await protocol_runner.create_simulating_runner(
+            robot_type="OT-2 Standard",
+            protocol_config=JsonProtocolConfig(schema_version=123),
+        )
+    ).then_return(json_runner)
+
+    protocol_analyzer = ProtocolAnalyzer(
+        protocol_runner=json_runner, analysis_store=analysis_store
     )
 
     pending_analysis = AnalysisSummary(

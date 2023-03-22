@@ -9,7 +9,7 @@ from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
-from opentrons.protocol_runner import create_simulating_runner
+import opentrons.protocol_runner as protocol_runner
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.errors import ErrorDetails, ErrorBody
@@ -175,11 +175,13 @@ async def create_protocol(
 
     protocol_auto_deleter.make_room_for_new_protocol()
     protocol_store.insert(protocol_resource)
-    protocol_runner = await create_simulating_runner(
+    print(robot_type)
+    print(source.config)
+    simulating_runner = await protocol_runner.create_simulating_runner(
         robot_type=robot_type, protocol_config=source.config
     )
     protocol_analyzer = ProtocolAnalyzer(
-        protocol_runner=protocol_runner, analysis_store=analysis_store
+        protocol_runner=simulating_runner, analysis_store=analysis_store
     )
     task_runner.run(
         protocol_analyzer.analyze,

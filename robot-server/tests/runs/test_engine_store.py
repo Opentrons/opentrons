@@ -12,7 +12,6 @@ from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
 from opentrons.protocol_runner import (
-    ProtocolRunner,
     ProtocolRunResult,
     MaintenanceRunner,
 )
