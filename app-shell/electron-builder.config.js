@@ -30,10 +30,12 @@ module.exports = async () => ({
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
   electronVersion: '21.3.1',
   npmRebuild: false,
-  releaseNotesFile:
-    project === 'robot-stack'
-      ? 'release-notes.md'
-      : 'release-notes-internal.md',
+  releaseInfo: {
+    releaseNotesFile:
+      project === 'robot-stack'
+        ? 'release-notes.md'
+        : 'release-notes-internal.md',
+  },
   files: [
     '**/*',
     'build/br-premigration-wheels',
