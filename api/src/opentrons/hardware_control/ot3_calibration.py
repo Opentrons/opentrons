@@ -10,8 +10,6 @@ from math import floor, copysign
 from logging import getLogger
 from opentrons.util.linal import solve_attitude
 
-from opentrons.hardware_control.modules.types import ModuleType
-
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
