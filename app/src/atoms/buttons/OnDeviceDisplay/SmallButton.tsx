@@ -93,9 +93,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
 
     ${styleProps}
     &:focus {
-      box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
+        .activeBackgroundColor};
       box-shadow: none;
     }
     &:hover {

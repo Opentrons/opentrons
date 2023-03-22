@@ -74,9 +74,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
     ${styleProps}
     &:focus {
-      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
+        .activeBackgroundColor};
       box-shadow: none;
     }
     &:hover {
