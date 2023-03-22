@@ -14,6 +14,7 @@ export interface SubTaskProps {
   isComplete?: boolean
   markedBad?: boolean
   generalClickHandler?: () => void
+  generalTaskDisabledReason?: string | null
 }
 
 export interface TaskProps extends Omit<SubTaskProps, 'subTaskIndex'> {
@@ -28,4 +29,5 @@ export interface TaskListProps {
   taskList: TaskProps[]
   taskListStatus: string | null
   generalTaskClickHandler?: () => void
+  generalTaskDisabledReason?: string | null
 }

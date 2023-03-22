@@ -19,7 +19,8 @@ import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { TaskList } from '../TaskList'
 
-import { useCalibrationTaskList } from '../Devices/hooks'
+import { useCalibrationTaskList, useRunHasStarted } from '../Devices/hooks'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 
 import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
@@ -54,6 +55,8 @@ export function CalibrationTaskList({
     tipLengthCalLauncher,
     deckCalLauncher
   )
+  const runId = useCurrentRunId()
+  const runHasStarted = useRunHasStarted(runId)
 
   React.useEffect(() => {
     if (
@@ -146,6 +149,9 @@ export function CalibrationTaskList({
             taskList={taskList}
             taskListStatus={taskListStatus}
             generalTaskClickHandler={() => setHasLaunchedWizard(true)}
+            generalTaskDisabledReason={
+              runHasStarted ? 'some_robot_controls_are_not_available' : null
+            }
           />
         </>
       )}

@@ -15,12 +15,15 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
+import { useTranslation } from 'react-i18next'
+import { Tooltip } from '../../atoms/Tooltip'
 
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null
@@ -200,7 +203,11 @@ function SubTask({
   footer,
   markedBad,
   generalClickHandler,
+  generalTaskDisabledReason,
 }: SubTaskProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
 
   const isTaskListComplete = activeIndex == null
@@ -211,6 +218,7 @@ function SubTask({
     activeSubTaskIndex != null &&
     ((activeSubTaskIndex > subTaskIndex && activeTaskIndex === taskIndex) ||
       activeTaskIndex > taskIndex)
+  const isDisabled = generalTaskDisabledReason != null
 
   return (
     <Flex
@@ -260,29 +268,53 @@ function SubTask({
         ) : null}
       </Flex>
       {(isTaskListComplete || isPastSubTask) && cta != null ? (
-        <Link
-          css={TYPOGRAPHY.darkLinkLabelSemiBold}
-          onClick={() => {
-            if (generalClickHandler != null) {
-              generalClickHandler()
+        <>
+          <Link
+            {...targetProps}
+            css={
+              isDisabled
+                ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
+                : TYPOGRAPHY.darkLinkLabelSemiBold
             }
-            cta.onClick()
-          }}
-        >
-          {cta.label}
-        </Link>
+            onClick={() => {
+              if (isDisabled) {
+                return
+              }
+              if (generalClickHandler != null) {
+                generalClickHandler()
+              }
+              cta.onClick()
+            }}
+          >
+            {cta.label}
+          </Link>
+          {isDisabled ? (
+            <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+              {t(generalTaskDisabledReason)}
+            </Tooltip>
+          ) : null}
+        </>
       ) : null}
       {isActiveSubTask && cta != null ? (
-        <TertiaryButton
-          onClick={() => {
-            if (generalClickHandler != null) {
-              generalClickHandler()
-            }
-            cta.onClick()
-          }}
-        >
-          {cta.label}
-        </TertiaryButton>
+        <>
+          <TertiaryButton
+            {...targetProps}
+            disabled={isDisabled}
+            onClick={() => {
+              if (generalClickHandler != null) {
+                generalClickHandler()
+              }
+              cta.onClick()
+            }}
+          >
+            {cta.label}
+          </TertiaryButton>
+          {isDisabled ? (
+            <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+              {t(generalTaskDisabledReason)}
+            </Tooltip>
+          ) : null}
+        </>
       ) : null}
     </Flex>
   )
@@ -300,7 +332,10 @@ function Task({
   isComplete,
   markedBad,
   generalClickHandler,
+  generalTaskDisabledReason,
 }: TaskProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const [activeTaskIndex] = activeIndex ?? []
 
   // TODO(bh, 2022-10-18): pass booleans to children as props
@@ -308,6 +343,7 @@ function Task({
   const isPastTask = activeTaskIndex != null && taskIndex < activeTaskIndex
   const isActiveTask = activeTaskIndex === taskIndex
   const hasSubTasks = subTasks.length > 0
+  const isDisabled = generalTaskDisabledReason != null
 
   const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(
     hasSubTasks && isActiveTask
@@ -391,29 +427,53 @@ function Task({
               height="15px"
             />
           ) : (isTaskListComplete || isPastTask) && cta != null ? (
-            <Link
-              css={TYPOGRAPHY.darkLinkLabelSemiBold}
-              onClick={() => {
-                if (generalClickHandler != null) {
-                  generalClickHandler()
+            <>
+              <Link
+                {...targetProps}
+                css={
+                  isDisabled
+                    ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
+                    : TYPOGRAPHY.darkLinkLabelSemiBold
                 }
-                cta.onClick()
-              }}
-            >
-              {cta.label}
-            </Link>
+                onClick={() => {
+                  if (isDisabled) {
+                    return
+                  }
+                  if (generalClickHandler != null) {
+                    generalClickHandler()
+                  }
+                  cta.onClick()
+                }}
+              >
+                {cta.label}
+              </Link>
+              {isDisabled ? (
+                <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+                  {t(generalTaskDisabledReason)}
+                </Tooltip>
+              ) : null}
+            </>
           ) : null}
           {isActiveTask && cta != null ? (
-            <TertiaryButton
-              onClick={() => {
-                if (generalClickHandler != null) {
-                  generalClickHandler()
-                }
-                cta.onClick()
-              }}
-            >
-              {cta.label}
-            </TertiaryButton>
+            <>
+              <TertiaryButton
+                {...targetProps}
+                disabled={isDisabled}
+                onClick={() => {
+                  if (generalClickHandler != null) {
+                    generalClickHandler()
+                  }
+                  cta.onClick()
+                }}
+              >
+                {cta.label}
+              </TertiaryButton>
+              {isDisabled ? (
+                <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+                  {t(generalTaskDisabledReason)}
+                </Tooltip>
+              ) : null}
+            </>
           ) : null}
         </Flex>
         {isTaskOpen ? (
@@ -438,6 +498,7 @@ function Task({
                   taskIndex={taskIndex}
                   markedBad={markedBad}
                   generalClickHandler={generalClickHandler}
+                  generalTaskDisabledReason={generalTaskDisabledReason}
                 />
               )
             )}
@@ -452,6 +513,7 @@ export function TaskList({
   activeIndex,
   taskList,
   generalTaskClickHandler,
+  generalTaskDisabledReason,
 }: TaskListProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
@@ -473,6 +535,7 @@ export function TaskList({
             isComplete={isComplete}
             markedBad={markedBad}
             generalClickHandler={generalTaskClickHandler}
+            generalTaskDisabledReason={generalTaskDisabledReason}
           />
         )
       )}
