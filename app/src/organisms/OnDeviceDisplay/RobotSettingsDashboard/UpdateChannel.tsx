@@ -80,8 +80,8 @@ export function UpdateChannel({
       </Flex>
       <Flex marginTop={SPACING.spacingXXL}>
         <StyledText
-          fontSize="1.75rem"
-          lineHeight="2.25rem  "
+          fontSize={TYPOGRAPHY.fontSize28}
+          lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
           {t('update_channel_description')}
@@ -106,7 +106,7 @@ export function UpdateChannel({
               isSelected={radio.value === channel}
             >
               <StyledText
-                fontSize="1.75rem"
+                fontSize={TYPOGRAPHY.fontSize28}
                 lineHeight="1.875rem"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
@@ -115,8 +115,8 @@ export function UpdateChannel({
               {radio.label === 'Alpha' ? (
                 <StyledText
                   marginTop={SPACING.spacing2}
-                  fontSize="1.75rem"
-                  lineHeight="2.25rem"
+                  fontSize={TYPOGRAPHY.fontSize28}
+                  lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                 >
                   {t('alpha_description')}

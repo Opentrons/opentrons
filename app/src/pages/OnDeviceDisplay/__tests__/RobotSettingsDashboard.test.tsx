@@ -181,10 +181,10 @@ describe('RobotSettingsDashboard', () => {
   })
 
   // The following cases will be activate when RobotSettings PRs are ready
-  // it('should render connection status - only wifi', () => {})
-  // it('should render connection status - wifi + ethernet', () => {})
-  // it('should render connection status - wifi + usb', () => {})
-  // it('should render connection status - ethernet + usb', () => {})
-  // it('should render connection status - all connected', () => {})
-  // it('should render connection status - all not connected', () => {})
+  it.todo('should render connection status - only wifi')
+  it.todo('should render connection status - wifi + ethernet')
+  it.todo('should render connection status - wifi + usb')
+  it.todo('should render connection status - ethernet + usb')
+  it.todo('should render connection status - all connected')
+  it.todo('should render connection status - all not connected')
 })

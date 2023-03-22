@@ -209,12 +209,12 @@ export function RobotSettingsDashboard(): JSX.Element {
 
 interface RobotSettingButtonProps {
   settingName: string
+  iconName: IconName
   settingInfo?: string
   currentOption?: SettingOption
   setCurrentOption?: (currentOption: SettingOption) => void
   robotName?: string
   isUpdateAvailable?: boolean
-  iconName: IconName
   enabledDevTools?: boolean
   devToolsOn?: boolean
 }
