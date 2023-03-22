@@ -1028,7 +1028,7 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
-        await ot3_hardware.drop_tip(Mount.LEFT)
+        await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_has_calls(
             calls=[
