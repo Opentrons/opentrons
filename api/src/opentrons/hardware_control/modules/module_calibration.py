@@ -10,7 +10,6 @@ from opentrons.calibration_storage.ot3.module_offset import (
 from opentrons.calibration_storage.types import SourceType
 from opentrons.config.robot_configs import default_module_calibration_offset
 from opentrons.hardware_control.modules.types import ModuleType
-from opentrons.config import feature_flags as ff
 from opentrons.hardware_control.types import OT3Mount
 
 
@@ -47,7 +46,7 @@ def load_module_calibration_offset(
         source=SourceType.default,
         status=CalibrationStatus(),
     )
-    if module_id and ff.enable_ot3_hardware_controller():
+    if module_id:
         module_offset_data = get_module_offset(module_type, module_id)
         if module_offset_data:
             return ModuleCalibrationOffset(
@@ -77,5 +76,5 @@ def save_module_calibration_offset(
     instrument_id: Optional[str] = None,
 ) -> None:
     """Save the calibration offset for a given module."""
-    if module_id and ff.enable_ot3_hardware_controller():
+    if module_id:
         save_module_calibration(offset, mount, slot, module, module_id, instrument_id)
