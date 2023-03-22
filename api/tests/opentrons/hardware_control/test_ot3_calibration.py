@@ -17,7 +17,7 @@ from opentrons.hardware_control.ot3_calibration import (
     find_axis_center,
     EarlyCapacitiveSenseTrigger,
     find_calibration_structure_height,
-    find_slot_center_linear,
+    find_slot_center_binary,
     find_slot_center_noncontact,
     calibrate_pipette,
     CalibrationMethod,
@@ -26,7 +26,7 @@ from opentrons.hardware_control.ot3_calibration import (
     _probe_deck_at,
     InaccurateNonContactSweepError,
     DeckHeightValidRange,
-    StructureNotFoundError,
+    CalibrationStructureNotFoundError,
     PREP_OFFSET_DEPTH,
     EDGES,
 )
@@ -408,7 +408,7 @@ async def test_deck_not_found(
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = (-3,)
-    with pytest.raises(StructureNotFoundError):
+    with pytest.raises(CalibrationStructureNotFoundError):
         await find_calibration_structure_height(
             ot3_hardware,
             OT3Mount.RIGHT,
@@ -455,10 +455,10 @@ async def test_method_enum(
     override_cal_config: None,
 ) -> None:
     with patch(
-        "opentrons.hardware_control.ot3_calibration.find_slot_center_linear",
-        AsyncMock(spec=find_slot_center_linear),
-    ) as linear, patch(
-        "opentrons.hardware_control.ot3_calibration.get_calibration_square_position_in_slot",
+        "opentrons.hardware_control.ot3_calibration.find_slot_center_binary",
+        AsyncMock(spec=find_slot_center_binary),
+    ) as binary, patch(
+        "opentrons.hardware_control.ot3_calibration._get_calibration_square_position_in_slot",
         Mock(),
     ) as calibration_target, patch(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
@@ -473,15 +473,15 @@ async def test_method_enum(
     ) as save_instrument_offset:
         find_deck.return_value = 10
         calibration_target.return_value = Point(0.0, 0.0, 0.0)
-        linear.return_value = Point(1.0, 2.0, 3.0)
+        binary.return_value = Point(1.0, 2.0, 3.0)
         noncontact.return_value = Point(3.0, 4.0, 5.0)
         await ot3_hardware.home()
         binval = await calibrate_pipette(
-            ot3_hardware, OT3Mount.RIGHT, 5, CalibrationMethod.LINEAR_SEARCH
+            ot3_hardware, OT3Mount.RIGHT, 5, CalibrationMethod.BINARY_SEARCH
         )
         reset_instrument_offset.assert_called_once()
         find_deck.assert_called_once()
-        linear.assert_called_once()
+        binary.assert_called_once()
         noncontact.assert_not_called()
         save_instrument_offset.assert_called_once()
         assert binval == Point(-1.0, -2.0, -3.0)
@@ -489,7 +489,7 @@ async def test_method_enum(
         reset_instrument_offset.reset_mock()
         find_deck.reset_mock()
         calibration_target.reset_mock()
-        linear.reset_mock()
+        binary.reset_mock()
         noncontact.reset_mock()
         save_instrument_offset.reset_mock()
 
@@ -498,7 +498,7 @@ async def test_method_enum(
         )
         reset_instrument_offset.assert_called_once()
         find_deck.assert_called_once()
-        linear.assert_not_called()
+        binary.assert_not_called()
         noncontact.assert_called_once()
         save_instrument_offset.assert_called_once()
         assert ncval == Point(-3.0, -4.0, -5.0)

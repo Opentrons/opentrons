@@ -67,7 +67,7 @@ class CalibrationMethod(Enum):
     NONCONTACT_PASS = "noncontact pass"
 
 
-class StructureNotFoundError(RuntimeError):
+class CalibrationStructureNotFoundError(RuntimeError):
     def __init__(self, structure_height: float, lower_limit: float) -> None:
         super().__init__(
             f"Structure height at z={structure_height}mm beyond lower limit: {lower_limit}."
@@ -259,7 +259,7 @@ async def find_calibration_structure_height(
     structure_z = await _probe_deck_at(hcapi, mount, z_prep_point, z_pass_settings)
     z_limit = nominal_center.z - z_pass_settings.max_overrun_distance_mm
     if structure_z < z_limit:
-        raise StructureNotFoundError(structure_z, z_limit)
+        raise CalibrationStructureNotFoundError(structure_z, z_limit)
     LOG.info(f"autocalibration: found structure at {structure_z}")
     return structure_z
 
@@ -671,13 +671,11 @@ async def find_calibration_structure_center(
     hcapi: OT3API,
     mount: OT3Mount,
     nominal_center: Point,
-    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
 
     # Perform xy offset search
-    if method == CalibrationMethod.LINEAR_SEARCH:
-        found_center = await find_slot_center_linear(hcapi, mount, nominal_center)
-    elif method == CalibrationMethod.BINARY_SEARCH:
+    if method == CalibrationMethod.BINARY_SEARCH:
         found_center = await find_slot_center_binary(hcapi, mount, nominal_center)
     elif method == CalibrationMethod.NONCONTACT_PASS:
         # FIXME: use slot to find ideal position
@@ -691,7 +689,7 @@ async def _calibrate_mount(
     hcapi: OT3API,
     mount: OT3Mount,
     slot: int = 5,
-    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
     Run automatic calibration for the tool attached to the specified mount.
@@ -740,7 +738,7 @@ async def find_calibration_structure_position(
     hcapi: OT3API,
     mount: OT3Mount,
     nominal_center: Point,
-    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """Find the calibration square offset given an arbitry postition on the deck."""
     # Find the estimated structure plate height. This will be used to baseline the edge detection points.
@@ -844,7 +842,7 @@ async def calibrate_gripper_jaw(
     hcapi: OT3API,
     probe: GripperProbe,
     slot: int = 5,
-    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
     Run automatic calibration for gripper jaw.
@@ -885,7 +883,7 @@ async def calibrate_pipette(
     hcapi: OT3API,
     mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
     slot: int = 5,
-    method: CalibrationMethod = CalibrationMethod.LINEAR_SEARCH,
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
 ) -> Point:
     """
     Run automatic calibration for pipette.

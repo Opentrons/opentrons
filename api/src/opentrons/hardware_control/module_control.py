@@ -242,7 +242,10 @@ class AttachedModulesControl:
         mount: OT3Mount,
         slot: int,
         offset: Point,
+        instrument_id: Optional[str] = None,
     ) -> ModuleCalibrationOffset:
         log.info(f"Saving module {module} {module_id} offset: {offset} for slot {slot}")
-        save_module_calibration_offset(offset, mount, slot, module, module_id)
+        save_module_calibration_offset(
+            offset, mount, slot, module, module_id, instrument_id
+        )
         return load_module_calibration_offset(module, module_id, slot)
