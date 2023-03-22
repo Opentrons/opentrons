@@ -16,8 +16,8 @@ from opentrons.hardware_control.ot3_calibration import (
     find_edge_binary,
     find_axis_center,
     EarlyCapacitiveSenseTrigger,
-    find_deck_height,
-    find_slot_center_linear,
+    find_calibration_structure_height,
+    find_slot_center_binary,
     find_slot_center_noncontact,
     calibrate_pipette,
     CalibrationMethod,
@@ -27,7 +27,7 @@ from opentrons.hardware_control.ot3_calibration import (
     _get_calibration_square_position_in_slot,
     InaccurateNonContactSweepError,
     DeckHeightValidRange,
-    DeckNotFoundError,
+    CalibrationStructureNotFoundError,
     Z_PREP_OFFSET,
     EDGES,
 )
@@ -408,8 +408,8 @@ async def test_deck_not_found(
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = (-3,)
-    with pytest.raises(DeckNotFoundError):
-        await find_deck_height(
+    with pytest.raises(CalibrationStructureNotFoundError):
+        await find_calibration_structure_height(
             ot3_hardware,
             OT3Mount.RIGHT,
             Point(0.0, 0.0, 0.0),
@@ -429,7 +429,7 @@ async def test_find_deck_checks_z_only(
 ) -> None:
     await ot3_hardware.home()
     here = await ot3_hardware.gantry_position(mount)
-    await find_deck_height(ot3_hardware, mount, target)
+    await find_calibration_structure_height(ot3_hardware, mount, target)
 
     z_prep_loc = target + Z_PREP_OFFSET
 
@@ -455,17 +455,17 @@ async def test_method_enum(
     override_cal_config: None,
 ) -> None:
     with patch(
-        "opentrons.hardware_control.ot3_calibration.find_slot_center_linear",
-        AsyncMock(spec=find_slot_center_linear),
-    ) as linear, patch(
+        "opentrons.hardware_control.ot3_calibration.find_slot_center_binary",
+        AsyncMock(spec=find_slot_center_binary),
+    ) as binary, patch(
         "opentrons.hardware_control.ot3_calibration._get_calibration_square_position_in_slot",
         Mock(),
     ) as calibration_target, patch(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
         AsyncMock(spec=find_slot_center_noncontact),
     ) as noncontact, patch(
-        "opentrons.hardware_control.ot3_calibration.find_deck_height",
-        AsyncMock(spec=find_deck_height),
+        "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
+        AsyncMock(spec=find_calibration_structure_height),
     ) as find_deck, patch.object(
         ot3_hardware.managed_obj, "reset_instrument_offset", AsyncMock()
     ) as reset_instrument_offset, patch.object(
@@ -473,15 +473,15 @@ async def test_method_enum(
     ) as save_instrument_offset:
         find_deck.return_value = 10
         calibration_target.return_value = Point(0.0, 0.0, 0.0)
-        linear.return_value = Point(1.0, 2.0, 3.0)
+        binary.return_value = Point(1.0, 2.0, 3.0)
         noncontact.return_value = Point(3.0, 4.0, 5.0)
         await ot3_hardware.home()
         binval = await calibrate_pipette(
-            ot3_hardware, OT3Mount.RIGHT, 5, CalibrationMethod.LINEAR_SEARCH
+            ot3_hardware, OT3Mount.RIGHT, 5, CalibrationMethod.BINARY_SEARCH
         )
         reset_instrument_offset.assert_called_once()
         find_deck.assert_called_once()
-        linear.assert_called_once()
+        binary.assert_called_once()
         noncontact.assert_not_called()
         save_instrument_offset.assert_called_once()
         assert binval == Point(-1.0, -2.0, -3.0)
@@ -489,7 +489,7 @@ async def test_method_enum(
         reset_instrument_offset.reset_mock()
         find_deck.reset_mock()
         calibration_target.reset_mock()
-        linear.reset_mock()
+        binary.reset_mock()
         noncontact.reset_mock()
         save_instrument_offset.reset_mock()
 
@@ -498,7 +498,7 @@ async def test_method_enum(
         )
         reset_instrument_offset.assert_called_once()
         find_deck.assert_called_once()
-        linear.assert_not_called()
+        binary.assert_not_called()
         noncontact.assert_called_once()
         save_instrument_offset.assert_called_once()
         assert ncval == Point(-3.0, -4.0, -5.0)
