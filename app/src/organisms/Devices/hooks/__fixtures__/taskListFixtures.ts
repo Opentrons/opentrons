@@ -1114,3 +1114,87 @@ export const expectedIncompleteRightMountTaskList: TaskListProps = {
   ],
   taskListStatus: 'incomplete',
 }
+
+export const expectedIncompleteTaskList: TaskListProps = {
+  activeIndex: [0, 0],
+  taskList: [
+    // deck calibration task
+    {
+      subTasks: [],
+      taskListLength: TASK_COUNT,
+      activeIndex: [0, 0],
+      description:
+        'Start with Deck Calibration, which is the basis for the rest of calibration.',
+      title: 'Deck Calibration',
+      cta: { label: 'Calibrate', onClick: mockDeckCalLauncher },
+      taskIndex: 0,
+    },
+    // left mount calibration task
+    {
+      subTasks: [
+        // tip length calibration subtask
+        {
+          activeIndex: [1, 0],
+          description: 'Calibrate the length of a tip on this pipette.',
+          title: 'Tip Length Calibration',
+          cta: { label: 'Calibrate', onClick: mockTipLengthCalLauncher },
+          taskIndex: 1,
+          subTaskIndex: 0,
+        },
+        // offset calibration subtask
+        {
+          activeIndex: [1, 0],
+          description:
+            "Calibrate this pipette's offset while attached to the robot's left mount.",
+          title: 'Pipette Offset Calibration',
+          cta: { label: 'Calibrate', onClick: mockPipOffsetCalLauncher },
+          taskIndex: 1,
+          subTaskIndex: 1,
+        },
+      ],
+      taskListLength: TASK_COUNT,
+      activeIndex: [1, 0],
+      description: 'Test Left Display Name, test-left',
+      title: 'Left Mount',
+      taskIndex: 1,
+    },
+    // right mount calibration task
+    {
+      subTasks: [
+        // tip length calibration subtask
+        {
+          activeIndex: [0, 0],
+          description: '',
+          title: 'Tip Length Calibration',
+          footer: `Last completed ${formatTimestamp(
+            mockCompleteTipLengthCalibrations[1].lastModified
+          )}`,
+          cta: { label: 'Recalibrate', onClick: mockTipLengthCalLauncher },
+          isComplete: true,
+          taskIndex: 2,
+          subTaskIndex: 0,
+        },
+        // offset calibration subtask
+        {
+          activeIndex: [0, 0],
+          description: '',
+          title: 'Pipette Offset Calibration',
+          footer: `Last completed ${formatTimestamp(
+            mockCompletePipetteOffsetCalibrations[1].lastModified
+          )}`,
+          cta: { label: 'Recalibrate', onClick: mockPipOffsetCalLauncher },
+          isComplete: true,
+          taskIndex: 2,
+          subTaskIndex: 1,
+        },
+      ],
+      isComplete: true,
+      taskListLength: TASK_COUNT,
+      activeIndex: [0, 0],
+      description: 'Test Right Display Name, test-right',
+      title: 'Right Mount',
+      taskIndex: 2,
+    },
+  ],
+  taskListStatus: 'incomplete',
+}

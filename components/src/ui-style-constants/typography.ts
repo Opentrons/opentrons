@@ -139,3 +139,12 @@ export const darkLinkLabelSemiBold = css`
     color: ${COLORS.darkBlackEnabled};
   }
 `
+
+export const darkLinkLabelSemiBoldDisabled = css`
+font-size: ${fontSizeLabel};
+  font-weight: ${fontWeightSemiBold};
+  line-height: ${lineHeight20};
+  color: ${COLORS.medGreyHover};
+  cursor: not-allowed;
+  }
+`
