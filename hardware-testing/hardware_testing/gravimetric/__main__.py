@@ -21,6 +21,7 @@ PROTOCOL_CFG = {
 def run(
     protocol: ProtocolContext,
     pipette_volume: int,
+    pipette_channels: int,
     tip_volume: int,
     trials: int,
     starting_tip: str,
@@ -39,6 +40,7 @@ def run(
             name=PROTOCOL_CFG[pipette_volume].metadata["protocolName"],
             pipette_mount="left",
             pipette_volume=pipette_volume,
+            pipette_channels=pipette_channels,
             tip_volume=tip_volume,
             trials=trials,
             starting_tip=starting_tip,
@@ -60,6 +62,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
+    parser.add_argument("--channels", type=int, choices=[1, 8, 96], required=True)
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--trials", type=int, required=True)
     starting_tip_choices = [
@@ -97,6 +100,7 @@ if __name__ == "__main__":
     run(
         _ctx,
         args.pipette,
+        args.channels,
         args.tip,
         args.trials,
         args.starting_tip,

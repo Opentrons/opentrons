@@ -105,7 +105,13 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
 def _load_pipette(
     ctx: ProtocolContext, cfg: config.GravimetricConfig, tipracks: List[Labware]
 ) -> InstrumentContext:
-    pip_name = f"p{cfg.pipette_volume}_single"
+    load_str_channels = {
+        1: "single", 8: "multi", 96: "96"
+    }
+    if cfg.pipette_channels not in load_str_channels:
+        raise ValueError(f"unexpected number of channels: {cfg.pipette_channels}")
+    chnl_str = load_str_channels[cfg.pipette_channels]
+    pip_name = f"p{cfg.pipette_volume}_{chnl_str}"
     print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
     pipette = ctx.load_instrument(pip_name, cfg.pipette_mount, tip_racks=tipracks)
     pipette.default_speed = config.GANTRY_MAX_SPEED

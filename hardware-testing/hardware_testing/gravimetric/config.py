@@ -10,6 +10,7 @@ class GravimetricConfig:
 
     name: str
     pipette_volume: int
+    pipette_channels: int
     pipette_mount: str
     tip_volume: int
     trials: int
