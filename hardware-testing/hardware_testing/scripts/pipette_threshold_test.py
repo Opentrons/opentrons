@@ -353,4 +353,3 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
     test = Pipette_Threshold_Test(args.simulate, args.cycles, args.trials, args.slot, probe_type, zero_mode)
     asyncio.run(test.run())
-z
