@@ -25,8 +25,6 @@ export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const isRobotBusy = useIsRobotBusy()
 
-  console.log('releaseNotes', releaseNotes)
-
   React.useEffect(() => {
     dispatch(buildrootChangelogSeen(robotName))
   }, [dispatch, robotName])
