@@ -5,11 +5,24 @@ marks:
       - run_server
 
 stages:
-  - name: Create Empty Run
+  - name: Upload a protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/load_one_labware.py'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create a run
     request:
       url: '{host:s}:{port:d}/runs'
       json:
-        data: {}
+        data:
+          protocolId: '{protocol_id}'
       method: POST
     response:
       strict:
@@ -23,6 +36,7 @@ stages:
       save:
         json:
           run_id: data.id
+
   - name: Issue pause to a none active run
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/actions'
@@ -37,3 +51,13 @@ stages:
           - id: 'RunActionNotAllowed'
             title: 'Run Action Not Allowed'
             detail: 'Cannot pause a run that is not running.'
+
+  - name: Stop the run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: stop
+    response:
+      status_code: 201

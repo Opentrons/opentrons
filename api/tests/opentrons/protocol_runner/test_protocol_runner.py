@@ -25,6 +25,7 @@ from opentrons.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     MaintenanceRunner,
+    ProtocolRunner
 )
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
@@ -237,20 +238,20 @@ async def test_create_protocol_runner(
     )
 
 
-# @pytest.mark.parametrize(
-#     argnames=["subject"],
-#     argvalues=[
-#         (pytest.lazy_fixture("json_subject")),
-#     ],
-# )
+@pytest.mark.parametrize(
+    argnames=["subject"],
+    argvalues=[
+        [pytest.lazy_fixture("json_subject")],
+    ],
+)
 async def test_play_starts_run_json_runner(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    json_subject: JsonRunner,
+    subject: ProtocolRunner,
 ) -> None:
     """It should start a protocol run with play."""
-    json_subject.play()
+    subject.play()
 
     decoy.verify(protocol_engine.play(), times=1)
 

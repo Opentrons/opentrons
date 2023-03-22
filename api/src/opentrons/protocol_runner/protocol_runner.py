@@ -368,7 +368,6 @@ class MaintenanceRunner(ProtocolRunner):
             self.load(protocol_source)
 
         await self._hardware_api.home()
-        self._protocol_engine.set_run_started_at()
         self._task_queue.start()
         await self._task_queue.join()
 
