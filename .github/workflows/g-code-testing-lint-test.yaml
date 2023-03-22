@@ -49,10 +49,14 @@ jobs:
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
-
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
+      - name: 'setup-js'
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          make setup-js
       - name: Lint
         run: make -C g-code-testing lint
       - name: Test
