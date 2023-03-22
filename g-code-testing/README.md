@@ -8,18 +8,18 @@ Framework supporting the following:
 - Diffing human-readable text or JSON format
 - CLI access to all the above features
 
-* [Setup](#setup)
-* [Running tests](#running-tests)
+- [Setup](#setup)
+- [Running tests](#running-tests)
   - [Acceptance Tests](#acceptance-tests)
   - [G-Code Program Tests](#g-code-program-tests)
     - [Fast G-Code Program Tests](#fast-g-code-program-tests)
     - [Slow G-Code Program Tests](#slow-g-code-program-tests)
-* [Running Individual G-Code Programs Manually](#running-individual-g-code-programs-manually)
+- [Running Individual G-Code Programs Manually](#running-individual-g-code-programs-manually)
   - [Get Configuration Names](#get-configuration-names)
   - [Run G-Code Program](#run-g-code-program)
   - [Load Stored G-Code Program Comparison](#load-stored-g-code-program-comparison)
   - [Print Diff Between Comparison and Local Code](#print-diff-between-comparison-and-local-code)
-  - [Update Storage Comparision](#update-storage-comparision)
+  - [Update Storage Comparision](#update-storage-comparison)
 
 ## Setup
 
@@ -70,7 +70,7 @@ You can run the various G-Code Programs without pytest, directly in your termina
 
 ### Get Configuration Names
 
-`get-g-code-configurations` prints a list of all available g-code programs to run. Use these printed names
+`make get-g-code-configurations` prints a list of all available g-code programs to run. Use these printed names
 to specify which program to run.
 
 **Command:**
@@ -81,10 +81,9 @@ make get-g-code-configurations
 
 **Sample Output:**
 
-**Note:** All `protocol/` configurations have a version number that represents what PAPI version
-the protocol will run against.
+**Note:** All `protocol/` configurations have a version number that represents what `APIversion` or `schema_version` the protocol will run against.
 
-```
+```shell
 Runnable Configurations:
 http/magdeck_calibrate
 http/magdeck_deactivate
@@ -97,7 +96,6 @@ http/robot_move_left_pipette
 http/robot_move_right_mount
 http/robot_move_right_pipette
 http/tempdeck_deactivate
-http/tempdeck_set_temperature
 http/tempdeck_start_set_temperature
 http/thermocycler_close
 http/thermocycler_cycle_temperatures
@@ -121,6 +119,8 @@ protocols/customizable_serial_dilution_ot2/2.12
 protocols/customizable_serial_dilution_ot2/2.13
 protocols/illumina_nextera_xt_library_prep_part1/2.12
 protocols/illumina_nextera_xt_library_prep_part1/2.13
+protocols/json_smoke/6
+protocols/no_mods/6
 protocols/omega_biotek_magbind_totalpure_ngs/2.12
 protocols/omega_biotek_magbind_totalpure_ngs/2.13
 protocols/opentrons_logo/2.12
@@ -129,10 +129,12 @@ protocols/pcr_prep_part_1/2.12
 protocols/pcr_prep_part_1/2.13
 protocols/pcr_prep_part_2/2.12
 protocols/pcr_prep_part_2/2.13
+protocols/pcr_prep_part_2/2.14
 protocols/set_max_speed/2.12
 protocols/set_max_speed/2.13
 protocols/swift_smoke/2.12
 protocols/swift_smoke/2.13
+protocols/swift_smoke/2.14
 protocols/swift_turbo/2.12
 protocols/swift_turbo/2.13
 ```
@@ -166,17 +168,17 @@ To run the G-Code Program locally use `run-g-code-configuration` and specify the
 **Command:**
 
 ```bash
-make run-g-code-configuration name=protocol/2.13/swift_turbo
+make run-g-code-configuration name=protocols/swift_turbo/2.13
 ```
 
 ### Load Stored G-Code Program Comparison
 
-To load the stored comparision file use `load-g-code-configuration-comparison`
+To load the stored comparison file use `load-g-code-configuration-comparison`
 
 **Command:**
 
 ```bash
-make load-g-code-configuration-comparison name=protocol/2.13/swift_turbo
+make load-g-code-configuration-comparison name=protocols/swift_turbo/2.13
 ```
 
 ### Print Diff Between Comparison and Local Code
@@ -190,7 +192,7 @@ To run the G-Code Program locally and print the diff between the result and the 
 make diff-g-code-configuration-comparison name=protocol/2.13/swift_turbo
 ```
 
-### Update Storage Comparision
+### Update Storage Comparison
 
 To update comparison files, with output of a locally ran G-Code Program, use `update-g-code-configuration-comparison`
 
@@ -229,18 +231,16 @@ BASIC_SMOOTHIE = ProtocolGCodeConfirmConfig(
 
 6. Update the `name` field to a name unique to all existing protocol configurations
 7. Update the `path` field to relative path to your protocol
-8. Leave `results_dir` field set to `DIRECTORY`
-9. Update `versions` field to versions that you want to run
+8. Update `versions` field to versions that you want to run
    1. The field must be a set of APIVersion objects.
-10. Update each of the `Pipette Settings` object on the `settings` field to the pipette model you want
-11. If the protocol is a `slow` protocol add it to the `SLOW_PROTOCOLS` constant at the bottom of the file.
+9. Update each of the `Pipette Settings` object on the `settings` field to the pipette model you want
+10. If the protocol is a `slow` protocol add it to the `SLOW_PROTOCOLS` constant at the bottom of the file.
     Otherwise, add it to the `FAST_PROTOCOLS` constant
-12. Run `make`
 
 ## Generating Non-existent Comparison Files
 
 When either you add a new protocol or add a new version to an existing protocol, you need to
-generate a comparison file. To do this follow thse steps:
+generate a comparison file. To do this follow these steps:
 
 1. Run `make check-for-missing-comparison-files` and confirm that it errors out, and lists your
    new protocol/new version as missing
@@ -248,6 +248,6 @@ generate a comparison file. To do this follow thse steps:
    1. Configuration will be in format of `protocol/<protocol_name>/<version>`
 3. Run `make run-g-code-configuration name=<configuration_path>` and verify the output of your
    protocol is correct.
-4. Run `update-g-code-configuration-comparison name=<configuration_path>`
+4. Run `make update-g-code-configuration-comparison name=<configuration_path>`
 5. Run `make check-for-missing-comparison-files` and confirm that your protocol no longer shows
-   up as having a missing comparision file.
+   up as having a missing comparison file.

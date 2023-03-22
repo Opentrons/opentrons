@@ -54,6 +54,7 @@ export function TouchscreenBrightness({
   const dispatch = useDispatch<Dispatch>()
   const initialBrightness = useSelector(getOnDeviceDisplaySettings).brightness
   const [brightness, setBrightness] = React.useState<number>(initialBrightness)
+  const brightnessLevel = [6, 5, 4, 3, 2, 1]
 
   const handleClick = (changeType: 'up' | 'down'): void => {
     const step = changeType === 'up' ? -1 : 1
@@ -97,12 +98,12 @@ export function TouchscreenBrightness({
           <Icon size="5rem" name="minus" />
         </Btn>
         <Flex flexDirection={DIRECTION_ROW} gridGap="0.4375rem">
-          <BrightnessTile isActive={brightness <= 6} />
-          <BrightnessTile isActive={brightness <= 5} />
-          <BrightnessTile isActive={brightness <= 4} />
-          <BrightnessTile isActive={brightness <= 3} />
-          <BrightnessTile isActive={brightness <= 2} />
-          <BrightnessTile isActive={brightness <= 1} />
+          {brightnessLevel.map(level => (
+            <BrightnessTile
+              key={`brightness_level_${level}`}
+              isActive={brightness <= level}
+            />
+          ))}
         </Flex>
 
         <Btn

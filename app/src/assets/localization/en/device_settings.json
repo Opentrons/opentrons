@@ -235,6 +235,7 @@
   "connected_via": "Connected via {{networkInterface}}",
   "text_size_description": "Text on all screens will adjust to the size you choose below.",
   "display_led_lights": "Display LED Lights",
-  "update_channel": "Update Channel",
-  "enable_developer_tools": "Enable Developer Tools"
+  "update_channel_description": "Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.",
+  "alpha_description": "Warning: alpha releases are feature-complete but may contain significant bugs.",
+  "dev_tools_description": "Enable additional logging and allow access to feature flags."
 }

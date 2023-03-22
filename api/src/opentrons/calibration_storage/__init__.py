@@ -34,6 +34,12 @@ if config.feature_flags.enable_ot3_hardware_controller():
         delete_tip_length_calibration,
     )
     from .ot3 import models
+    from .ot3.module_offset import (
+        save_module_calibration,
+        clear_module_offset_calibrations,
+        get_module_offset,
+        delete_module_offset_file,
+    )
 else:
     from .ot2.deck_attitude import (
         save_robot_deck_attitude,
@@ -73,6 +79,11 @@ __all__ = [
     "tip_lengths_for_pipette",
     "delete_tip_length_calibration",
     "load_tip_length_calibration",
+    # module calibration functions
+    "save_module_calibration",
+    "clear_module_offset_calibrations",
+    "get_module_offset",
+    "delete_module_offset_file",
     # functions only used in robot server
     "_save_custom_tiprack_definition",
     "get_custom_tiprack_definition_for_tlc",

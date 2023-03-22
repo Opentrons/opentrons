@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
@@ -15,7 +16,6 @@ import { FLOWS } from '../constants'
 import { Carriage } from '../Carriage'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
-import { fireEvent, waitFor } from '@testing-library/react'
 
 const render = (props: React.ComponentProps<typeof Carriage>) => {
   return renderWithProviders(<Carriage {...props} />, {
@@ -30,7 +30,6 @@ describe('Carriage', () => {
   let props: React.ComponentProps<typeof Carriage>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -57,6 +56,14 @@ describe('Carriage', () => {
     getByRole('button', { name: 'Continue' })
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
+  })
+  it('renders the correct button when is the on device display', () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_default')
   })
   it('returns the correct information, buttons work as expected when flow is detach', () => {
     props = {

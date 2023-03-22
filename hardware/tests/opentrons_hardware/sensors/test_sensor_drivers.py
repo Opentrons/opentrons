@@ -23,6 +23,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
+    BaselineSensorResponse,
     ReadFromSensorRequest,
     SetSensorThresholdRequest,
     WriteToSensorRequest,
@@ -41,6 +42,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     SensorThresholdResponsePayload,
     BindSensorOutputRequestPayload,
     PeripheralStatusResponsePayload,
+    BaselineSensorResponsePayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
@@ -92,7 +94,7 @@ def sensor_driver() -> SensorDriver:
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
                     sensor_id=SensorIdField(SensorId.S0),
-                    sample_rate=UInt16Field(10),
+                    number_of_reads=UInt16Field(10),
                 )
             ),
         ],
@@ -102,7 +104,7 @@ def sensor_driver() -> SensorDriver:
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
                     sensor_id=SensorIdField(SensorId.S0),
-                    sample_rate=UInt16Field(10),
+                    number_of_reads=UInt16Field(10),
                 )
             ),
         ],
@@ -127,7 +129,7 @@ async def test_polling(
         [lazy_fixture("environment_sensor")],
     ],
 )
-async def test_receive_data_polling(
+async def test_baseline_averaging(
     sensor_driver: SensorDriver,
     sensor_type: BaseSensorType,
     mock_messenger: mock.AsyncMock,
@@ -139,16 +141,16 @@ async def test_receive_data_polling(
         """Message responder."""
         if sensor_type.sensor.sensor_type == SensorType.environment:
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(SensorType.humidity),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -156,16 +158,16 @@ async def test_receive_data_polling(
                 ),
             )
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(SensorType.temperature),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -174,16 +176,16 @@ async def test_receive_data_polling(
             )
         else:
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -505,7 +507,7 @@ async def test_get_baseline(
     """Test for get_baseline.
 
     Tests that a BaselineSensorRequest gets sent,
-    and reads ReadFromSensorResponse message containing the
+    and reads BaselineSensorResponse message containing the
     correct information.
     """
 
@@ -514,16 +516,16 @@ async def test_get_baseline(
         if isinstance(message, BaselineSensorRequest):
             if sensor_type.sensor.sensor_type == SensorType.environment:
                 can_message_notifier.notify(
-                    ReadFromSensorResponse(
-                        payload=ReadFromSensorResponsePayload(
-                            sensor_data=Int32Field(50),
+                    BaselineSensorResponse(
+                        payload=BaselineSensorResponsePayload(
+                            offset_average=Int32Field(50),
                             sensor_id=SensorIdField(SensorId.S0),
                             sensor=SensorTypeField(SensorType.humidity),
                         )
                     ),
                     ArbitrationId(
                         parts=ArbitrationIdParts(
-                            message_id=ReadFromSensorResponse.message_id,
+                            message_id=BaselineSensorResponse.message_id,
                             node_id=NodeId.host,
                             function_code=0,
                             originating_node_id=node_id,
@@ -531,16 +533,16 @@ async def test_get_baseline(
                     ),
                 )
                 can_message_notifier.notify(
-                    ReadFromSensorResponse(
-                        payload=ReadFromSensorResponsePayload(
-                            sensor_data=Int32Field(50),
+                    BaselineSensorResponse(
+                        payload=BaselineSensorResponsePayload(
+                            offset_average=Int32Field(50),
                             sensor_id=SensorIdField(SensorId.S0),
                             sensor=SensorTypeField(SensorType.temperature),
                         )
                     ),
                     ArbitrationId(
                         parts=ArbitrationIdParts(
-                            message_id=ReadFromSensorResponse.message_id,
+                            message_id=BaselineSensorResponse.message_id,
                             node_id=NodeId.host,
                             function_code=0,
                             originating_node_id=node_id,
@@ -549,16 +551,16 @@ async def test_get_baseline(
                 )
             else:
                 can_message_notifier.notify(
-                    ReadFromSensorResponse(
-                        payload=ReadFromSensorResponsePayload(
+                    BaselineSensorResponse(
+                        payload=BaselineSensorResponsePayload(
                             sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                             sensor_id=SensorIdField(SensorId.S0),
-                            sensor_data=Int32Field(50),
+                            offset_average=Int32Field(50),
                         )
                     ),
                     ArbitrationId(
                         parts=ArbitrationIdParts(
-                            message_id=ReadFromSensorResponse.message_id,
+                            message_id=BaselineSensorResponse.message_id,
                             node_id=node_id,
                             function_code=0,
                             originating_node_id=node_id,

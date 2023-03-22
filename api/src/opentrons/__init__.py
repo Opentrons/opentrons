@@ -116,6 +116,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
 
         thread_manager = ThreadManager(
             OT3API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
             threadmanager_nonblocking=True,
         )
     else:
@@ -159,14 +160,19 @@ async def initialize() -> ThreadManagedHardware:
     # is returned. Do our own blinking here to keep it going while we home the robot.
     blink_task = asyncio.create_task(_blink())
 
-    if should_use_ot3() and ff.rear_panel_integration():
-        hardware.connect_usb_to_rear_panel()
-
     try:
 
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
-            await hardware.home_z()
+            try:
+                await hardware.home_z()
+            except Exception:
+                # If this is a flex, and the estop is asserted, we'll get an error
+                # here; make sure that it doesn't prevent things from actually
+                # starting.
+                log.error(
+                    "Exception homing z on startup, ignoring to allow server to start"
+                )
 
         await hardware.set_lights(button=True)
         return hardware
