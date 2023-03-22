@@ -111,6 +111,7 @@ HUMIDITY_THRESH = [10, 90]
 # THRESHOLDS: capacitive sensor
 CAP_THRESH_OPEN_AIR = [0.0, 10.0]
 CAP_THRESH_PROBE = [0.0, 20.0]
+CAP_THRESH_SQUARE = [0.0, 20.0]
 CAP_PROBE_DISTANCE = 50.0
 CAP_PROBE_SECONDS = 5.0
 CAP_PROBE_SETTINGS = CapacitivePassSettings(
@@ -149,7 +150,7 @@ def _get_tips_used_for_droplet_test(
         tip_columns = COLUMNS[:num_trials]
         return [f"{c}1" for c in tip_columns]
     elif pipette_channels == 8:
-        return [f"A{r}" for r in range(num_trials)]
+        return [f"A{r + 1}" for r in range(num_trials)]
     raise RuntimeError(f"unexpected number of channels: {pipette_channels}")
 
 
@@ -500,7 +501,7 @@ async def _read_pipette_sensor_repeatedly_and_average(
             else:
                 raise ValueError(f"unexpected sensor type: {sensor_type}")
         except helpers_ot3.SensorResponseBad:
-            continue
+            return -999999999999.0
         readings.append(r)
     readings.sort()
     readings = readings[1:-1]
@@ -606,6 +607,7 @@ async def _test_diagnostics_capacitive(
     print("testing capacitance")
     capacitive_open_air_pass = True
     capacitive_probe_attached_pass = True
+    capacitive_square_pass = True
     capacitive_probing_pass = True
 
     async def _read_cap() -> float:
@@ -644,6 +646,24 @@ async def _test_diagnostics_capacitive(
             "capacitive-probe",
             capacitance_with_probe,
             _bool_to_pass_fail(capacitive_probe_attached_pass),
+        ]
+    )
+
+    if not api.is_simulator:
+        _get_operator_answer_to_question('touch a SQUARE to the probe, enter "y" when touching')
+    capacitance_with_square = await _read_cap()
+    print(f"square capacitance: {capacitance_with_square}")
+    if (
+        capacitance_with_square < CAP_THRESH_SQUARE[0]
+        or capacitance_with_square > CAP_THRESH_SQUARE[1]
+    ):
+        capacitive_square_pass = False
+        print(f"FAIL: square capacitance ({capacitance_with_square}) is not correct")
+    write_cb(
+        [
+            "capacitive-square",
+            capacitance_with_square,
+            _bool_to_pass_fail(capacitive_square_pass),
         ]
     )
 
@@ -798,18 +818,6 @@ async def _test_plunger_positions(
     return blow_out_passed and drop_tip_passed
 
 
-async def _reduce_speeds_and_accelerations(
-    api: OT3API, axes: List[OT3Axis], factor: float
-) -> None:
-    new_robot_cfg = {}
-    for ax in axes:
-        cfg = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
-        cfg.max_speed *= factor
-        cfg.acceleration *= factor
-        new_robot_cfg[ax] = cfg
-    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, new_robot_cfg)
-
-
 @dataclass
 class CSVCallbacks:
     """CSV callback functions."""
@@ -894,10 +902,6 @@ async def _main(test_config: TestConfig) -> None:
         is_simulating=test_config.simulate,
         pipette_left="p1000_single_v3.4",
         pipette_right="p1000_multi_v3.4",
-    )
-    # FIXME: remove reducing speeds/accelerations once stall detection bug is fixed
-    await _reduce_speeds_and_accelerations(
-        api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L], SPEED_REDUCTION_PERCENTAGE
     )
     pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
     assert pips, "no pipettes attached"
