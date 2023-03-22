@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
+import { format } from 'date-fns'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import {
@@ -92,7 +93,12 @@ describe('ODDProtocolDetails', () => {
   })
   it('renders the protocol date added', () => {
     const [{ getByText }] = render()
-    getByText('Date Added: 05/03/2022')
+    getByText(
+      `Date Added: ${format(
+        new Date('2022-05-03T21:36:12.494778+00:00'),
+        'MM/dd/yyyy k:mm'
+      )}`
+    )
   })
   it('renders the pin protocol button', () => {
     const [{ getByText }] = render()
