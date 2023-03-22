@@ -34,7 +34,7 @@ class LightTransitionType(int, Enum):
     instant = 0x02
 
 @unique 
-class LightActionType(int, Enum):
+class LightAnimationType(int, Enum):
     """Whether an action is looping or runs one single time."""
 
     looping = 0x00
