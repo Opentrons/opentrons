@@ -17,6 +17,8 @@ interface SecondaryButtonProps extends StyleProps {
 export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
 })<SecondaryButtonProps>`
+  appearance: none;
+  cursor: pointer;
   color: ${props =>
     props.isDangerous ? COLORS.errorText : COLORS.blueEnabled};
   border: ${BORDERS.lineBorder};
@@ -27,6 +29,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   text-transform: ${TYPOGRAPHY.textTransformNone};
   background-color: ${COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}
+
 
   &:hover,
   &:focus {
@@ -50,6 +53,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   &.disabled {
     box-shadow: none;
     opacity: 50%;
+    cursor: default;
   }
 
   ${styleProps}
