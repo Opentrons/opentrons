@@ -5,17 +5,17 @@ from typing import List
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import ui
-from hardware_testing.protocols.gravimetric_ot3_p50 import (
-    SLOTS_TIPRACK,
-    SLOT_VIAL,
-    metadata,
-    requirements,
-)
+from hardware_testing.protocols import gravimetric_ot3_p50
+from hardware_testing.protocols import gravimetric_ot3_p1000
 
 from . import execute, helpers, workarounds
 from .config import GravimetricConfig
 
 LABWARE_OFFSETS: List[dict] = list()
+PROTOCOL_CFG = {
+    1000: gravimetric_ot3_p1000,
+    50: gravimetric_ot3_p50
+}
 
 
 def run(
@@ -36,15 +36,15 @@ def run(
     execute.run(
         protocol,
         GravimetricConfig(
-            name=metadata["protocolName"],
+            name=PROTOCOL_CFG[pipette_volume].metadata["protocolName"],
             pipette_mount="left",
             pipette_volume=pipette_volume,
             tip_volume=tip_volume,
             trials=trials,
             starting_tip=starting_tip,
             labware_offsets=LABWARE_OFFSETS,
-            slot_vial=SLOT_VIAL,
-            slots_tiprack=SLOTS_TIPRACK[tip_volume],
+            slot_vial=PROTOCOL_CFG[pipette_volume].SLOT_VIAL,
+            slots_tiprack=PROTOCOL_CFG[pipette_volume].SLOTS_TIPRACK[tip_volume],
             increment=increment,
             return_tip=return_tip,
             blank=blank,
@@ -90,7 +90,7 @@ if __name__ == "__main__":
             print(f"\t\t{offset['vector']}")
             LABWARE_OFFSETS.append(offset)
     _ctx = helpers.get_api_context(
-        requirements["apiLevel"],
+        PROTOCOL_CFG[args.pipette].requirements["apiLevel"],
         is_simulating=args.simulate,
         pipette_left=f"p{args.pipette}_single_v3.3",
     )
