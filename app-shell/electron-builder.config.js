@@ -32,7 +32,7 @@ module.exports = async () => ({
   npmRebuild: false,
   releaseNotesFile: project === 'robot-stack' ? 'release-notes.md' : 'release-notes-internal.md',
   files: [
-g    '**/*',
+    '**/*',
     'build/br-premigration-wheels',
     '!Makefile',
     '!python',
