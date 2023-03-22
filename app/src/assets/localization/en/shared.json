@@ -63,5 +63,7 @@
   "next": "Next",
   "something_went_wrong": "something went wrong",
   "return": "return",
-  "update": "Update"
+  "update": "Update",
+  "on": "On",
+  "off": "Off"
 }
