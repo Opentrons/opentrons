@@ -100,6 +100,7 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
           proceed={proceed}
           proceedButtonText={t('continue')}
           setFetching={setFetching}
+          isFetching={isFetching}
         />
       }
     />

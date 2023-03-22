@@ -108,12 +108,12 @@ MOCK_CONFIGURATIONS_DICT: Dict[
 
 
 @pytest.mark.parametrize("config", PRETTY_CONFIGS)
-def test_glob(config: DataForTest):
+async def test_glob(config: DataForTest):
     sys.argv = ["cli.py", "run", config.config_path]
-    cli = GCodeCLI()
+    cli = await GCodeCLI.create()
     cli.configurations = MOCK_CONFIGURATIONS_DICT
     arg_list = []
-    for command in cli.get_runnable_commands():
+    for command in cli.get_runnable_commands(is_async=False):
         arg_list.extend(command.args)
 
     assert set(arg_list) == config.expected_configurations
