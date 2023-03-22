@@ -25,12 +25,12 @@ def run(
     trials: int,
     starting_tip: str,
     increment: bool,
-    low_volume: bool,
     return_tip: bool,
     blank: bool,
     mix: bool,
     inspect: bool,
     user_volumes: bool,
+    stable: bool,
 ) -> None:
     """Run."""
     execute.run(
@@ -46,12 +46,12 @@ def run(
             slot_vial=SLOT_VIAL,
             slots_tiprack=SLOTS_TIPRACK[tip_volume],
             increment=increment,
-            low_volume=low_volume,
             return_tip=return_tip,
             blank=blank,
             mix=mix,
             inspect=inspect,
             user_volumes=user_volumes,
+            stable=stable,
         ),
     )
 
@@ -69,13 +69,13 @@ if __name__ == "__main__":
         "--starting-tip", type=str, choices=starting_tip_choices, required=True
     )
     parser.add_argument("--increment", action="store_true")
-    parser.add_argument("--low-volume", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--blank", action="store_true")
     parser.add_argument("--mix", action="store_true")
     parser.add_argument("--inspect", action="store_true")
     parser.add_argument("--user-volumes", action="store_true")
+    parser.add_argument("--stable", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -101,10 +101,10 @@ if __name__ == "__main__":
         args.trials,
         args.starting_tip,
         args.increment,
-        args.low_volume,
         args.return_tip,
         args.blank,
         args.mix,
         args.inspect,
         args.user_volumes,
+        args.stable,
     )

@@ -97,13 +97,6 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
         ]
     else:
         test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
-    # anything volumes < 2uL must be done on the super-high-precision scale
-    if cfg.low_volume:
-        test_volumes = [v for v in test_volumes if v < config.LOW_VOLUME_UPPER_LIMIT_UL]
-    else:
-        test_volumes = [
-            v for v in test_volumes if v >= config.LOW_VOLUME_UPPER_LIMIT_UL
-        ]
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
     return sorted(test_volumes, reverse=True)
@@ -134,7 +127,7 @@ def _apply_labware_offsets(
             f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
             f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
         )
-        # labware.set_calibration(o)
+        labware.set_calibration(o)
 
     _apply(vial)
     for rack in tip_racks:
@@ -195,6 +188,7 @@ def _run_trial(
     blank: bool,
     inspect: bool,
     mix: bool = False,
+    stable: bool = False,
 ) -> Tuple[float, float]:
     pipetting_callbacks = _generate_callbacks_for_trial(recorder, volume, trial, blank)
 
@@ -208,7 +202,7 @@ def _run_trial(
                 recorder.scale.add_simulation_mass(volume * -0.001)
             elif m_type == MeasurementType.DISPENSE:
                 recorder.scale.add_simulation_mass(volume * 0.001)
-        m_data = record_measurement_data(ctx, m_tag, recorder, shorten=inspect)
+        m_data = record_measurement_data(ctx, m_tag, recorder, stable, shorten=inspect)
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
             (
@@ -314,10 +308,10 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     )
     print(f'found scale "{recorder.scale.read_serial_number()}"')
     if recorder.is_simulator:
-        if cfg.low_volume:
-            recorder.scale.set_simulation_mass(200)
-        else:
+        if cfg.pipette_volume == 50 or cfg.tip_volume == 50:
             recorder.scale.set_simulation_mass(15)
+        else:
+            recorder.scale.set_simulation_mass(200)
     recorder.record(in_thread=True)
     print(f'scale is recording to "{recorder.file_name}"')
 
@@ -380,6 +374,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     blank=True,  # stay away from the liquid
                     inspect=cfg.inspect,
                     mix=cfg.mix,
+                    stable=cfg.stable,
                 )
                 print(
                     f"blank {trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
@@ -433,32 +428,24 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     blank=False,
                     inspect=cfg.inspect,
                     mix=cfg.mix,
+                    stable=cfg.stable,
                 )
                 print(
                     "measured volumes:\n"
                     f"\taspirate: {round(actual_aspirate, 2)} uL\n"
                     f"\tdispense: {round(actual_dispense, 2)} uL"
                 )
-                # factor in average evaporation (which should each be negative uL amounts)
                 asp_with_evap = actual_aspirate - average_aspirate_evaporation_ul
-                disp_with_evap = actual_dispense - average_dispense_evaporation_ul
+                disp_with_evap = actual_dispense + average_dispense_evaporation_ul
                 print(
-                    "volumes with evaporation:\n"
+                    "measured volumes with evaporation:\n"
                     f"\taspirate: {round(asp_with_evap, 2)} uL\n"
                     f"\tdispense: {round(disp_with_evap, 2)} uL"
                 )
-                # convert volumes to positive amounts
-                aspirate_rectified = abs(asp_with_evap)
-                dispense_rectified = abs(disp_with_evap)
-                print(
-                    "volumes rectified:\n"
-                    f"\taspirate: {round(aspirate_rectified, 2)} uL\n"
-                    f"\tdispense: {round(dispense_rectified, 2)} uL"
-                )
-                actual_asp_list.append(aspirate_rectified)
-                actual_disp_list.append(dispense_rectified)
+                actual_asp_list.append(asp_with_evap)
+                actual_disp_list.append(disp_with_evap)
                 report.store_trial(
-                    test_report, trial, volume, aspirate_rectified, dispense_rectified
+                    test_report, trial, volume, asp_with_evap, disp_with_evap
                 )
                 print("dropping tip")
                 _drop_tip()
