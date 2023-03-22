@@ -197,7 +197,9 @@ class Plot:
         self.plot_param["x_title"] = "Distance from Deck (mm)"
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
-        self.plot_param["y_range"] = [5, 12]
+        # self.plot_param["y_range"] = [5, 12]
+        self.plot_param["y_range"] = [13, 20]
+        # self.plot_param["y_range"] = [14, 26]
         self.plot_param["legend"] = "Probe Side to Edge"
         self.plot_param["annotation"] = None
         zoom_param = self.plot_param.copy()
@@ -205,7 +207,9 @@ class Plot:
         zoom_param["filename"] = "plot_absolute_all_zoom"
         zoom_param["title"] = f"Absolute Capacitance vs. Deck Height Zoomed"
         zoom_param["x_range"] = [x_first, 1]
-        zoom_param["y_range"] = [5, 6.6]
+        # zoom_param["y_range"] = [5.6, 6.6]
+        zoom_param["y_range"] = [13.6, 14.6]
+        # zoom_param["y_range"] = [15.8, 16.8]
         self.write_plot(zoom_param)
 
     def relative_all_plot(self):
