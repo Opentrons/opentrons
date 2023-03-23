@@ -32,6 +32,7 @@ class BinaryMessageId(int, Enum):
     clear_light_action_staging_queue = 0x401
     start_light_action = 0x402
 
+
 @unique
 class LightTransitionType(int, Enum):
     """The types of transitons that the lights can perform."""

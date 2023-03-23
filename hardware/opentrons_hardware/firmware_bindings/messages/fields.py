@@ -23,7 +23,7 @@ from opentrons_hardware.firmware_bindings.constants import (
 
 from opentrons_hardware.firmware_bindings.binary_constants import (
     LightTransitionType,
-    LightActionType,
+    LightAnimationType,
 )
 
 
@@ -396,6 +396,7 @@ class MoveStopConditionField(utils.UInt8Field):
             condition = str(self.value)
         return f"{self.__class__.__name__}(value={condition})"
 
+
 class LightTransitionTypeField(utils.UInt8Field):
     """Light transition type."""
 
@@ -407,13 +408,14 @@ class LightTransitionTypeField(utils.UInt8Field):
             transition = str(self.value)
         return f"{self.__class__.__name__}(value={transition})"
 
-class LightActionTypeField(utils.UInt8Field):
+
+class LightAnimationTypeField(utils.UInt8Field):
     """Light action type."""
 
     def __repr__(self) -> str:
         """Print light action type."""
         try:
-            action = LightActionType(self.value).name
+            action = LightAnimationType(self.value).name
         except ValueError:
             action = str(self.value)
         return f"{self.__class__.__name__}(value={action})"

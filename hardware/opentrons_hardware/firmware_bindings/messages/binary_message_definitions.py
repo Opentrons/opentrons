@@ -4,7 +4,7 @@ from functools import lru_cache
 from typing import Type, Union, Optional
 from typing_extensions import get_args
 
-from ..binary_constants import BinaryMessageId, LightTransitionType, LightActionType
+from ..binary_constants import BinaryMessageId, LightTransitionType, LightAnimationType
 from .. import utils
 import logging
 from .fields import (
@@ -12,7 +12,7 @@ from .fields import (
     VersionFlagsField,
     OptionalRevisionField,
     LightTransitionTypeField,
-    LightActionTypeField,
+    LightAnimationTypeField,
 )
 
 log = logging.getLogger(__name__)
@@ -204,22 +204,27 @@ class DoorSwitchStateInfo(utils.BinarySerializable):
     door_open: utils.UInt8Field = utils.UInt8Field(0)
 
 
-@dataclass 
+@dataclass
 class AddLightActionRequest(utils.BinarySerializable):
-    """Add an action to the staging light queue."""
+    """Add an action to the staging light queue.
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.add_light_action
-    )
+    The RGBW values are uint8_t fields and should be specified in the
+    range [0,255], where 0 is fully off and 255 is fully on.
+    """
+
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.add_light_action)
     length: utils.UInt16Field = utils.UInt16Field(7)
     transition_time: utils.UInt16Field = utils.UInt16Field(0)
-    transition_type: LightTransitionTypeField = LightTransitionTypeField(LightTransitionType.linear)
+    transition_type: LightTransitionTypeField = LightTransitionTypeField(
+        LightTransitionType.linear
+    )
     red: utils.UInt8Field = utils.UInt8Field(0)
     green: utils.UInt8Field = utils.UInt8Field(0)
     blue: utils.UInt8Field = utils.UInt8Field(0)
     white: utils.UInt8Field = utils.UInt8Field(0)
-    
-@dataclass 
+
+
+@dataclass
 class ClearLightActionStagingQueue(utils.BinarySerializable):
     """Clear the staging queue for light actions."""
 
@@ -229,7 +234,7 @@ class ClearLightActionStagingQueue(utils.BinarySerializable):
     length: utils.UInt16Field = utils.UInt16Field(0)
 
 
-@dataclass 
+@dataclass
 class StartLightAction(utils.BinarySerializable):
     """Begin the action that is in the staging queue."""
 
@@ -237,7 +242,9 @@ class StartLightAction(utils.BinarySerializable):
         BinaryMessageId.start_light_action
     )
     length: utils.UInt16Field = utils.UInt16Field(1)
-    type: LightActionTypeField = LightActionTypeField(LightActionType.single_shot)
+    type: LightAnimationTypeField = LightAnimationTypeField(
+        LightAnimationType.single_shot
+    )
 
 
 BinaryMessageDefinition = Union[
