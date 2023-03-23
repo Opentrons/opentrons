@@ -439,7 +439,7 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware {labware_id} has no tip length defined."
             )
 
-        return definition.parameters.tipLength - overlap
+        return definition.parameters.tipLength
 
     def get_tip_drop_z_offset(
         self, labware_id: str, length_scale: float, additional_offset: float

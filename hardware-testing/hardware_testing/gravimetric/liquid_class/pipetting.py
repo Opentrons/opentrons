@@ -265,6 +265,10 @@ def aspirate_with_liquid_class(
     liquid_class = get_liquid_class(
         int(pipette.max_volume), tip_volume, int(aspirate_volume)
     )
+    # FIXME: change API to allow going beyond tip max volume
+    aspirate_volume = min(
+        tip_volume - liquid_class.aspirate.air_gap.trailing_air_gap, aspirate_volume
+    )
     _pipette_with_liquid_settings(
         ctx,
         pipette,
@@ -296,6 +300,10 @@ def dispense_with_liquid_class(
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
         int(pipette.max_volume), tip_volume, int(dispense_volume)
+    )
+    # FIXME: change API to allow going beyond tip max volume
+    dispense_volume = min(
+        tip_volume - liquid_class.aspirate.air_gap.trailing_air_gap, dispense_volume
     )
     _pipette_with_liquid_settings(
         ctx,
