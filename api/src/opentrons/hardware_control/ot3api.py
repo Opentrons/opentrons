@@ -2045,9 +2045,6 @@ class OT3API(
                 probe=InstrumentProbeType.PRIMARY,
             )
         end_pos = await self.gantry_position(mount, refresh=True)
-        mod_log.info(f"==========> Motor position: {self._current_position}")
-        mod_log.info(f"================> Encoder position: {self._encoder_position}")
-
         await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
 

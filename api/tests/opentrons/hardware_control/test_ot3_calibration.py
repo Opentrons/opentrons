@@ -96,7 +96,6 @@ def mock_verify_edge(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]
         "opentrons.hardware_control.ot3_calibration._verify_edge_pos",
         AsyncMock(
             spec=_verify_edge_pos,
-            wraps=_verify_edge_pos,
         ),
     ) as mock_verify_edge:
         yield mock_verify_edge
@@ -162,6 +161,7 @@ async def test_find_edge(
     ot3_hardware: ThreadManager[OT3API],
     mock_capacitive_probe: AsyncMock,
     override_cal_config: None,
+    mock_verify_edge: AsyncMock,
     mock_move_to: AsyncMock,
     search_axis: OT3Axis,
     direction_if_hit: Literal[1, -1],
@@ -192,14 +192,13 @@ async def test_find_edge(
 @pytest.mark.parametrize(
     "search_axis,direction_if_hit,probe_results",
     [
-        (OT3Axis.X, -1, (1, -1, -1)),
-        (OT3Axis.Y, -1, (-1, 1, 1)),
+        (OT3Axis.X, -1, (1, 1)),
+        (OT3Axis.Y, -1, (-1, -1)),
     ],
 )
 async def test_edge_not_found(
     ot3_hardware: ThreadManager[OT3API],
     mock_capacitive_probe: AsyncMock,
-    mock_verify_edge: AsyncMock,
     override_cal_config: None,
     mock_move_to: AsyncMock,
     search_axis: OT3Axis,
@@ -208,10 +207,14 @@ async def test_edge_not_found(
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = probe_results
-    mock_verify_edge.side_effect = (False,)
     with pytest.raises(EdgeNotFoundError):
-        await find_edge_binary(
-            ot3_hardware, OT3Mount.RIGHT, Point(0, 0, 0), search_axis, direction_if_hit
+        await _verify_edge_pos(
+            ot3_hardware,
+            OT3Mount.RIGHT,
+            search_axis,
+            Point(0, 0, 0),
+            0.5,
+            direction_if_hit,
         )
 
 
