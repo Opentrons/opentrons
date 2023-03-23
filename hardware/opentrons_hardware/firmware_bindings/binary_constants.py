@@ -36,7 +36,8 @@ class LightTransitionType(int, Enum):
     sinusoid = 0x01
     instant = 0x02
 
-@unique 
+
+@unique
 class LightAnimationType(int, Enum):
     """Whether an action is looping or runs one single time."""
 
