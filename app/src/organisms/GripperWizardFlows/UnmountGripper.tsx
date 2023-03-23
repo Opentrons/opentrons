@@ -82,13 +82,16 @@ export const UnmountGripper = (
   ) : (
     <GenericWizardTile
       header={t('loosen_screws_and_detach')}
-rightHandBody={
+      rightHandBody={
         <video
-          css={css`max-width: 100%; max-height: 20rem;`}
+          css={css`
+            max-width: 100%;
+            max-height: 20rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
-          aria-label='move calibration pin from front jaw to rear jaw'
+          aria-label="unscrew and disconnect gripper"
         >
           <source src={unmountGripper} />
         </video>

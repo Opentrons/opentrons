@@ -106,11 +106,14 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       inProgressText: t('stand_back_gripper_is_calibrating'),
       inProgressImage: (
         <video
-          css={css`max-width: 100%; max-height: 20rem;`}
+          css={css`
+            max-width: 100%;
+            max-height: 20rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
-          aria-label='move calibration pin from front jaw to rear jaw'
+          aria-label="calibrating front jaw"
         >
           <source src={calibratingFrontJaw} />
         </video>
@@ -120,11 +123,14 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       buttonText: t('begin_calibration'),
       prepImage: (
         <video
-          css={css`max-width: 100%; max-height: 20rem;`}
+          css={css`
+            max-width: 100%;
+            max-height: 20rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
-          aria-label='move calibration pin from storage location to front jaw'
+          aria-label="move calibration pin from storage location to front jaw"
         >
           <source src={movePinStorageToFront} />
         </video>
@@ -134,11 +140,14 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       inProgressText: t('stand_back_gripper_is_calibrating'),
       inProgressImage: (
         <video
-          css={css`max-width: 100%; max-height: 20rem;`}
+          css={css`
+            max-width: 100%;
+            max-height: 20rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
-          aria-label='move calibration pin from front jaw to rear jaw'
+          aria-label="calibrating rear jaw"
         >
           <source src={calibratingRearJaw} />
         </video>
@@ -148,11 +157,14 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       buttonText: t('shared:continue'),
       prepImage: (
         <video
-          css={css`max-width: 100%; max-height: 20rem;`}
+          css={css`
+            max-width: 100%;
+            max-height: 20rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
-          aria-label='move calibration pin from front jaw to rear jaw'
+          aria-label="move calibration pin from front jaw to rear jaw"
         >
           <source src={movePinFrontToRear} />
         </video>
@@ -165,11 +177,14 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       buttonText: t('complete_calibration'),
       prepImage: (
         <video
-          css={css`max-width: 100%; max-height: 20rem;`}
+          css={css`
+            max-width: 100%;
+            max-height: 20rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
-          aria-label='move calibration pin from front jaw to rear jaw'
+          aria-label="move calibration rear jaw to storage"
         >
           <source src={movePinRearToStorage} />
         </video>
@@ -177,10 +192,21 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     },
   }
 
-  const { inProgressText, header, body, buttonText, prepImage, inProgressImage } = infoByMovement[
-    movement
-  ]
-  if (isRobotMoving) return <InProgressModal description={inProgressText} alternativeSpinner={inProgressImage} />
+  const {
+    inProgressText,
+    header,
+    body,
+    buttonText,
+    prepImage,
+    inProgressImage,
+  } = infoByMovement[movement]
+  if (isRobotMoving)
+    return (
+      <InProgressModal
+        description={inProgressText}
+        alternativeSpinner={inProgressImage}
+      />
+    )
   return (
     <GenericWizardTile
       header={header}

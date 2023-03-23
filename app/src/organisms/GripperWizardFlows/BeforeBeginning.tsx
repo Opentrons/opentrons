@@ -86,7 +86,7 @@ export const BeforeBeginning = (
       .then(() => {
         proceed()
       })
-      .catch(() => { })
+      .catch(() => {})
   }
 
   const equipmentInfoByLoadName: {

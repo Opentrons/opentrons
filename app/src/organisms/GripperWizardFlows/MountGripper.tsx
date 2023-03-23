@@ -49,7 +49,12 @@ export const MountGripper = (
       iconColor={COLOR_ERROR}
       isSuccess={false}
     >
-      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        gridGap={SPACING.spacing3}
+      >
         <Link
           role="button"
           css={TYPOGRAPHY.darkLinkH4SemiBold}
@@ -59,7 +64,8 @@ export const MountGripper = (
         </Link>
         <PrimaryButton
           css={CAPITALIZE_FIRST_LETTER_STYLE}
-          onClick={() => setShowUnableToDetect(false)}>
+          onClick={() => setShowUnableToDetect(false)}
+        >
           {t('shared:try_again')}
         </PrimaryButton>
       </Flex>
@@ -69,11 +75,14 @@ export const MountGripper = (
       header={t('connect_and_screw_in_gripper')}
       rightHandBody={
         <video
-          css={css`max-width: 100%; max-height: 20rem;`}
+          css={css`
+            max-width: 100%;
+            max-height: 20rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
-          aria-label='move calibration pin from front jaw to rear jaw'
+          aria-label="connect and screw in gripper"
         >
           <source src={mountGripper} />
         </video>
