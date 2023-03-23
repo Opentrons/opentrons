@@ -1,7 +1,5 @@
 import last from 'lodash/last'
-import reduce from 'lodash/reduce'
 import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
-import { COLORS } from '@opentrons/components'
 import {
   useAttachedModules,
   useAttachedPipettes,
@@ -10,16 +8,10 @@ import { getLabwareSetupItemGroups } from '../utils'
 
 import type {
   CompletedProtocolAnalysis,
-  LoadLiquidRunTimeCommand,
   ModuleModel,
   PipetteName,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
-import {
-  LabwareByLiquidId,
-  ParsedLiquid,
-  parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
 
 interface ProtocolPipette {
   hardwareType: 'pipette'
@@ -92,44 +84,4 @@ export const useRequiredProtocolLabware = (
     (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
   const { onDeckItems, offDeckItems } = getLabwareSetupItemGroups(commands)
   return [...onDeckItems, ...offDeckItems]
-}
-
-interface ProtocolLiquids {
-  liquidsInOrder: ParsedLiquid[]
-  labwareByLiquidId: LabwareByLiquidId
-}
-export const useProtocolLiquids = (protocolId: string): ProtocolLiquids => {
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const completedProtocolAnalysis = last(protocolAnalyses?.data ?? []) ?? null
-  const commands =
-    (completedProtocolAnalysis as CompletedProtocolAnalysis)?.commands ?? []
-  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands ?? [])
-  const liquids =
-    (completedProtocolAnalysis as CompletedProtocolAnalysis)?.liquids ?? []
-  const loadLiquidCommands = commands.filter(
-    (command): command is LoadLiquidRunTimeCommand =>
-      command.commandType === 'loadLiquid'
-  )
-  const loadedLiquids = liquids.map((liquid, index) => {
-    return {
-      ...liquid,
-      displayColor:
-        liquid.displayColor ??
-        COLORS.liquidColors[index % COLORS.liquidColors.length],
-    }
-  })
-  const liquidsInOrder = reduce<LoadLiquidRunTimeCommand, ParsedLiquid[]>(
-    loadLiquidCommands,
-    (acc, command) => {
-      const liquid = loadedLiquids.find(
-        liquid => liquid.id === command.params.liquidId
-      )
-      if (liquid != null && !acc.some(item => item === liquid)) acc.push(liquid)
-      return acc
-    },
-    []
-  )
-  return { liquidsInOrder, labwareByLiquidId }
 }

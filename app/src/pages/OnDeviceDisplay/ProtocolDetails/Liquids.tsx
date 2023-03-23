@@ -13,9 +13,13 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+import {
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/api-client'
 import { getTotalVolumePerLiquidId } from '../../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import { StyledText } from '../../../atoms/text'
-import { useProtocolLiquids } from '../../Protocols/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
@@ -37,7 +41,7 @@ const TableRow = styled('tr')`
 `
 
 const TableDatum = styled('td')`
-  padding: ${SPACING.spacing3} ${SPACING.spacingXXL};
+  padding: ${SPACING.spacing4} ${SPACING.spacing5};
   background-color: ${COLORS.light_one};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
@@ -53,9 +57,16 @@ const TableDatum = styled('td')`
   }
 `
 
-export const Liquids = (props: { protocolId: string }): JSX.Element => {
-  const { protocolId } = props
-  const { liquidsInOrder, labwareByLiquidId } = useProtocolLiquids(protocolId)
+export const Liquids = (props: { runId: string }): JSX.Element => {
+  const { runId } = props
+  const protocolData = useMostRecentCompletedAnalysis(runId)
+  const liquidsInOrder = parseLiquidsInLoadOrder(
+    protocolData?.liquids ?? [],
+    protocolData?.commands ?? []
+  )
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(
+    protocolData?.commands ?? []
+  )
   const { t } = useTranslation('protocol_details')
 
   return (
