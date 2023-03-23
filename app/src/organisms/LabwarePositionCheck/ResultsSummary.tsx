@@ -136,6 +136,7 @@ export const ResultsSummary = (
           TableComponent={TableComponent}
           JupyterComponent={JupyterSnippet}
           CommandLineComponent={CommandLineSnippet}
+          marginTop={SPACING.spacing4}
         />
       ) : (
         <OffsetTable

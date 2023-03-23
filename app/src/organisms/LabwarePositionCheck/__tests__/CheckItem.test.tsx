@@ -97,9 +97,8 @@ describe('CheckItem', () => {
       )
     const { getByRole } = render(props)
     await getByRole('button', { name: 'Confirm placement' }).click()
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(1, [], true) // module prep commands
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
-      2,
+      1,
       [
         {
           commandType: 'moveLabware',
@@ -150,9 +149,8 @@ describe('CheckItem', () => {
     const { getByRole } = render(props)
     await getByRole('button', { name: 'Go back' }).click()
 
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(1, [], true) // module prep commands
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
-      2,
+      1,
       [{ commandType: 'home', params: {} }],
       true
     )
@@ -197,7 +195,7 @@ describe('CheckItem', () => {
       waitUntilComplete: true,
     })
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
-      2,
+      1,
       [
         {
           commandType: 'moveToWell',

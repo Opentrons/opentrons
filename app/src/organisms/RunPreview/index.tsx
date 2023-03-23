@@ -114,12 +114,10 @@ export const RunPreviewComponent = (
                 gridGap={SPACING.spacing2}
                 width="100%"
                 border={`solid 1px ${
-                  index === jumpedIndex ? COLORS.warningEnabled : borderColor
+                  index === jumpedIndex ? COLORS.electricPurple : borderColor
                 }`}
                 backgroundColor={
-                  index === jumpedIndex
-                    ? COLORS.warningBackgroundLight
-                    : backgroundColor
+                  index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
                 color={COLORS.darkBlackEnabled}
                 borderRadius={BORDERS.radiusSoftCorners}
