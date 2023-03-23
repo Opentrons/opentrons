@@ -1,6 +1,6 @@
 import i18n from 'i18next'
-import startCase from 'lodash/startCase'
-import capitalize from 'lodash/capitalize'
+import { capitalCase, sentenceCase } from 'change-case'
+import { titleCase } from 'title-case'
 import { initReactI18next } from 'react-i18next'
 import { resources } from './assets/localization'
 
@@ -24,8 +24,9 @@ i18n.use(initReactI18next).init(
       escapeValue: false, // not needed for react as it escapes by default
       format: function (value, format, lng) {
         if (format === 'uppercase') return value.toUpperCase()
-        if (format === 'capitalize') return capitalize(value)
-        if (format === 'sentenceCase') return startCase(value)
+        if (format === 'capitalize') return capitalCase(value)
+        if (format === 'sentenceCase') return sentenceCase(value)
+        if (format === 'titleCase') return titleCase(value)
         return value
       },
     },
