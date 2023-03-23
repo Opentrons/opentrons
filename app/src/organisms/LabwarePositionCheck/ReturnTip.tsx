@@ -140,10 +140,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     <Flex flexDirection={DIRECTION_COLUMN}>
       <PrepareSpace
         {...props}
-        header={t('prepare_item_in_location', {
-          item: t('tip_rack'),
-          location: displayLocation,
-        })}
+        header={t('return_tip_rack_to_location', { location: displayLocation })}
         body={<UnorderedList items={instructions} />}
         labwareDef={labwareDef}
         confirmPlacement={handleConfirmPlacement}

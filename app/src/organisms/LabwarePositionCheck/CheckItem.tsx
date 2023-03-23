@@ -93,11 +93,13 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   }
 
   React.useEffect(() => {
-    chainRunCommands(modulePrepCommands, true)
-      .then(() => {})
-      .catch(e => {
-        console.error('Unexpected command failure: ', e)
-      })
+    if (modulePrepCommands.length > 0) {
+      chainRunCommands(modulePrepCommands, true)
+        .then(() => { })
+        .catch(e => {
+          console.error('Unexpected command failure: ', e)
+        })
+    }
   }, [moduleId])
 
   if (pipetteName == null || labwareDef == null) return null

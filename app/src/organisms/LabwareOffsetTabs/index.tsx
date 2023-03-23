@@ -14,7 +14,7 @@ import { RoundTab } from '../../molecules/RoundTab'
 
 type TabOptions = 'table' | 'jupyter' | 'cli'
 
-export interface LabwareOffsetTabsProps {
+export interface LabwareOffsetTabsProps extends StyleProps {
   TableComponent: JSX.Element
   JupyterComponent: JSX.Element
   CommandLineComponent: JSX.Element
@@ -24,6 +24,7 @@ export function LabwareOffsetTabs({
   TableComponent,
   JupyterComponent,
   CommandLineComponent,
+  ...styleProps
 }: LabwareOffsetTabsProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const [currentTab, setCurrentTab] = React.useState<TabOptions>('table')
@@ -34,7 +35,7 @@ export function LabwareOffsetTabs({
     cli: CommandLineComponent,
   }
   return (
-    <Flex width="100%" height="100%" flexDirection={DIRECTION_COLUMN}>
+    <Flex width="100%" height="100%" flexDirection={DIRECTION_COLUMN} {...styleProps}>
       <Flex>
         <RoundTab
           isCurrent={currentTab === 'table'}
