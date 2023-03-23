@@ -7,6 +7,8 @@ from subprocess import run
 from time import time
 from typing import List, Optional, Dict, Tuple, Union
 
+from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
+from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
@@ -629,22 +631,48 @@ async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
     return data.to_float()  # type: ignore[union-attr]
 
 
+async def _get_temp_humidity(messenger: CanMessenger, mount: OT3Mount) -> Tuple[float, float]:
+    node_id = sensor_node_for_mount(mount)
+    # FIXME: allow SensorId to specify which sensor on the device to read from
+    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise SensorResponseBad("no response from sensor")
+    return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
+
+
 async def get_temperature_humidity_ot3(
     api: OT3API, mount: OT3Mount
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
         return 25.0, 50.0
-    node_id = sensor_node_for_mount(mount)
-    # FIXME: allow SensorId to specify which sensor on the device to read from
-    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
-    s_driver = sensor_driver.SensorDriver()
-    data = await s_driver.read(
-        api._backend._messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
+    return await _get_temp_humidity(api._backend._messenger, mount)
+
+
+def get_temperature_humidity_outside_api_ot3(mount: OT3Mount, is_simulating: bool = False) -> Tuple[float, float]:
+    settings = DriverSettings(
+        interface=can_bus_settings.DEFAULT_INTERFACE,
+        port=can_bus_settings.DEFAULT_PORT,
+        host=can_bus_settings.DEFAULT_HOST,
+        bit_rate=can_bus_settings.DEFAULT_BITRATE,
+        channel=can_bus_settings.DEFAULT_CHANNEL,
     )
-    if data is None:
-        raise SensorResponseBad("no response from sensor")
-    return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
+
+    async def _run() -> Tuple[float, float]:
+        if is_simulating:
+            return 25.0, 50.0
+        async with build.driver(settings) as driver:
+            messenger = CanMessenger(driver=driver)
+            return await _get_temp_humidity(messenger, mount)
+
+    loop = asyncio.get_event_loop()
+    task = loop.create_task(_run())
+    loop.run_until_complete(task)
+    return task.result()
 
 
 async def get_pressure_ot3(api: OT3API, mount: OT3Mount) -> float:
