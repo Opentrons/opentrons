@@ -97,8 +97,8 @@ class ProtocolUsedByRun(ErrorDetails):
 class RunLink(BaseModel):
     """Link to run resources."""
 
-    href: str = Field(..., description="The run's URL")
     id: str = Field(..., description="The run's id")
+    href: str = Field(..., description="The run's URL")
 
 
 class ProtocolLinks(BaseModel):
@@ -349,7 +349,7 @@ async def get_protocol_by_id(
 
     links = ProtocolLinks.construct(
         referencingRunIds=[
-            RunLink.construct(href=f"/runs/{runId}", id=runId)
+            RunLink.construct(id=runId, href=f"/runs/{runId}")
             for runId in referencingRunIds
         ]
     )
