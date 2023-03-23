@@ -11,7 +11,10 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
+import {
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_STOP_REQUESTED,
+} from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
@@ -50,7 +53,10 @@ export function ConfirmCancelModal(
     })
   }
   React.useEffect(() => {
-    if (runStatus === RUN_STATUS_STOP_REQUESTED) {
+    if (
+      runStatus === RUN_STATUS_STOP_REQUESTED ||
+      runStatus === RUN_STATUS_STOPPED
+    ) {
       onClose()
     }
   }, [runStatus, onClose])
