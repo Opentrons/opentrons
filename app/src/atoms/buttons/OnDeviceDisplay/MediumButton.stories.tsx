@@ -38,13 +38,13 @@ AlertSecondaryMediumButton.args = {
 export const TertiaryMediumButton = MediumButtonTemplate.bind({})
 TertiaryMediumButton.args = {
   buttonText: 'Button text',
-  buttonType: 'tertiary',
+  buttonType: 'tertiaryHigh',
   disabled: false,
 }
 export const TertiaryLightMediumButton = MediumButtonTemplate.bind({})
 TertiaryLightMediumButton.args = {
   buttonText: 'Button text',
-  buttonType: 'tertiaryLight',
+  buttonType: 'tertiaryHighLight',
   disabled: false,
 }
 export const CustomIconMediumButton = MediumButtonTemplate.bind({})

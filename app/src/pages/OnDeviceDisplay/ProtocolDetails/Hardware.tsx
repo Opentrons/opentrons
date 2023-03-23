@@ -1,7 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  BORDERS,
+  COLORS,
+  SPACING,
+  TYPOGRAPHY,
+  WRAP,
+} from '@opentrons/components'
 import {
   getModuleDisplayName,
   getPipetteNameSpecs,
@@ -38,7 +44,7 @@ const TableDatum = styled('td')`
   font-weight: ${TYPOGRAPHY.lineHeight28};
   padding: ${SPACING.spacing2};
   white-space: break-spaces;
-  text-overflow: wrap;
+  text-overflow: ${WRAP};
   &:first-child {
     border-top-left-radius: ${BORDERS.size_four};
     border-bottom-left-radius: ${BORDERS.size_four};

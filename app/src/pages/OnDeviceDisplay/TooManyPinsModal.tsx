@@ -16,7 +16,7 @@ export function TooManyPinsModal(props: {
   handleCloseMaxPinsAlert: () => void
 }): JSX.Element {
   const { handleCloseMaxPinsAlert } = props
-  const { t } = useTranslation('protocol_info')
+  const { t } = useTranslation(['protocol_info', 'shared'])
 
   return (
     <ModalShell
@@ -32,7 +32,7 @@ export function TooManyPinsModal(props: {
         <StyledText
           color={COLORS.darkBlackEnabled}
           fontSize={TYPOGRAPHY.fontSize28}
-          fontWeight={TYPOGRAPHY.fontWeightNearlyBold}
+          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
           lineHeight={TYPOGRAPHY.lineHeight36}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
@@ -61,8 +61,9 @@ export function TooManyPinsModal(props: {
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight={TYPOGRAPHY.lineHeight28}
             textAlign={TYPOGRAPHY.textAlignCenter}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
-            {t('close')}
+            {t('shared:close')}
           </StyledText>
         </Flex>
       </Flex>

@@ -10,6 +10,7 @@ import {
   Icon,
   SPACING,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
@@ -43,7 +44,7 @@ const TableDatum = styled('td')`
   font-weight: ${TYPOGRAPHY.lineHeight28};
   padding: ${SPACING.spacing2};
   white-space: break-spaces;
-  text-overflow: wrap;
+  text-overflow: ${WRAP};
   &:first-child {
     border-top-left-radius: ${BORDERS.size_four};
     border-bottom-left-radius: ${BORDERS.size_four};

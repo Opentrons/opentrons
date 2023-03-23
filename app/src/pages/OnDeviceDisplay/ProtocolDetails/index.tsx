@@ -74,13 +74,17 @@ const ProtocolHeader = (props: {
             color={COLORS.darkBlack_hundred}
           />
         </Btn>
-        <Flex flexDirection={DIRECTION_COLUMN} maxWidth="42.625rem">
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+          maxWidth="42.625rem"
+        >
           <Flex maxWidth="15.125rem">
             <Chip type="warning" text="Chip TBD" />
           </Flex>
           <StyledText
             fontSize={TYPOGRAPHY.fontSize38}
-            fontWeight={TYPOGRAPHY.fontWeightNearlyBold}
+            fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
             lineHeight={TYPOGRAPHY.lineHeight48}
             onClick={toggleTruncate}
           >
@@ -98,7 +102,7 @@ const ProtocolHeader = (props: {
         >
           <StyledText
             fontSize="2.333125rem"
-            fontWeight={TYPOGRAPHY.fontWeightNearlyBold}
+            fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
             lineHeight={TYPOGRAPHY.lineHeight48}
             textTransform={TYPOGRAPHY.textTransformNone}
           >
@@ -125,14 +129,15 @@ interface ProtocolSectionTabsProps {
   setCurrentOption: (option: TabOption) => void
 }
 const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
+  const { currentOption, setCurrentOption } = props
   return (
     <Flex gridGap={SPACING.spacing3} margin={SPACING.spacing4}>
       {protocolSectionTabOptions.map(option => {
         return (
           <TabbedButton
-            foreground={option === props.currentOption}
+            foreground={option === currentOption}
             key={option}
-            onClick={() => props.setCurrentOption(option)}
+            onClick={() => setCurrentOption(option)}
           >
             {option}
           </TabbedButton>
@@ -147,6 +152,7 @@ const Summary = (props: {
   description: string | null
   date: string | null
 }): JSX.Element => {
+  const { author, description, date } = props
   const { t } = useTranslation('protocol_details')
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
@@ -159,17 +165,18 @@ const Summary = (props: {
         <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>{`${t(
           'author'
         )}: `}</StyledText>
-        <StyledText>{props.author}</StyledText>
+        <StyledText>{author}</StyledText>
       </Flex>
       <StyledText
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
       >
-        {props.description}
+        {description}
       </StyledText>
       <Flex
         backgroundColor={COLORS.darkBlack_twenty}
+        borderRadius={BORDERS.size_one}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
@@ -177,8 +184,8 @@ const Summary = (props: {
         padding={`${SPACING.spacing3} 0.75rem`}
       >
         <StyledText>{`${t('protocol_info:date_added')}: ${
-          props.date != null
-            ? format(new Date(props.date), 'MM/dd/yyyy k:mm')
+          date != null
+            ? format(new Date(date), 'MM/dd/yyyy k:mm')
             : t('shared:no_data')
         }`}</StyledText>
       </Flex>
@@ -194,27 +201,28 @@ interface ProtocolSectionContentProps {
 const ProtocolSectionContent = (
   props: ProtocolSectionContentProps
 ): JSX.Element => {
+  const { protocolId, protocolData, currentOption } = props
   let protocolSection
-  switch (props.currentOption) {
+  switch (currentOption) {
     case 'Summary':
       protocolSection = (
         <Summary
-          author={props.protocolData.metadata.author ?? null}
-          date={props.protocolData.createdAt ?? null}
-          description={props.protocolData.metadata.description ?? null}
+          author={protocolData.metadata.author ?? null}
+          date={protocolData.createdAt ?? null}
+          description={protocolData.metadata.description ?? null}
         />
       )
       break
     case 'Hardware':
-      protocolSection = <Hardware protocolId={props.protocolId} />
+      protocolSection = <Hardware protocolId={protocolId} />
       break
     case 'Labware':
-      protocolSection = <Labware protocolId={props.protocolId} />
+      protocolSection = <Labware protocolId={protocolId} />
       break
     case 'Liquids':
       break
     case 'Initial Deck Layout':
-      protocolSection = <Deck protocolId={props.protocolId} />
+      protocolSection = <Deck protocolId={protocolId} />
       break
   }
   return <Flex margin={SPACING.spacing4}>{protocolSection}</Flex>
@@ -302,14 +310,14 @@ export function ProtocolDetails(): JSX.Element | null {
               : t('protocol_info:pin_protocol')
           }
           buttonType="secondary"
-          iconName={'push-pin'}
+          iconName="push-pin"
           onClick={handlePinClick}
           width="30.375rem"
         />
         <MediumButton
           buttonText={t('protocol_info:delete_protocol')}
           buttonType="alertSecondary"
-          iconName={'delete'}
+          iconName="delete"
           onClick={() => {
             deleteProtocol()
             history.goBack()

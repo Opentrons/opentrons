@@ -18,7 +18,7 @@ export const fontSizeCaption = '0.625rem' // 10px
 
 // Font Weights
 export const fontWeightBold = 800
-export const fontWeightNearlyBold = 700
+export const fontWeightLevel2_bold = 700
 export const fontWeightSemiBold = 600
 export const fontWeightRegular = 400
 export const fontWeightLight = 300

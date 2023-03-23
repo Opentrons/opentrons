@@ -20,8 +20,8 @@ type MediumButtonTypes =
   | 'secondary'
   | 'alert'
   | 'alertSecondary'
-  | 'tertiary'
-  | 'tertiaryLight'
+  | 'tertiaryHigh'
+  | 'tertiaryHighLight'
 interface MediumButtonProps extends StyleProps {
   buttonText: React.ReactNode
   buttonType?: MediumButtonTypes
@@ -55,36 +55,40 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     }
   > = {
     alert: {
+      //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#b91f20',
       defaultBackgroundColor: COLORS.red_two,
       defaultColor: COLORS.white,
       iconColor: COLORS.white,
     },
     alertSecondary: {
+      //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#ccabac',
       defaultBackgroundColor: COLORS.red_three,
       defaultColor: COLORS.red_one,
       iconColor: COLORS.red_one,
     },
     primary: {
+      //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#045dd0',
       defaultBackgroundColor: COLORS.blueEnabled,
       defaultColor: COLORS.white,
       iconColor: COLORS.white,
     },
     secondary: {
+      //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#94afd4',
       defaultBackgroundColor: COLORS.foundationalBlue,
       defaultColor: COLORS.darkBlackEnabled,
       iconColor: COLORS.blueEnabled,
     },
-    tertiary: {
+    tertiaryHigh: {
       activeBackgroundColor: COLORS.darkBlack_twenty,
       defaultBackgroundColor: COLORS.white,
       defaultColor: COLORS.darkBlack_hundred,
       iconColor: COLORS.darkBlack_hundred,
     },
-    tertiaryLight: {
+    tertiaryHighLight: {
       activeBackgroundColor: COLORS.darkBlack_twenty,
       defaultBackgroundColor: COLORS.white,
       defaultColor: COLORS.darkBlack_seventy,
@@ -153,8 +157,8 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
                 ? COLORS.darkBlack_sixty
                 : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
             }
-            width="1.875rem"
-            height="1.875rem"
+            width={SPACING.spacingXL}
+            height={SPACING.spacingXL}
           />
         )}
         <StyledText

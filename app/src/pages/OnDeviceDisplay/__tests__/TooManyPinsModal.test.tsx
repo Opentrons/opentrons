@@ -27,6 +27,6 @@ const render = () => {
 describe('Too Many Pins Modal', () => {
   it('should have a close button', () => {
     const [{ getByText }] = render()
-    getByText('Close')
+    getByText('close')
   })
 })
