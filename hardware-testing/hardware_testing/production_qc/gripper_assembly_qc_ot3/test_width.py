@@ -16,11 +16,11 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
-SLOT_WIDTH_GAUGE = 5
+SLOT_WIDTH_GAUGE = 6
 
 FAILURE_THRESHOLD_MM = 3
-GRIP_HEIGHT_MM = 50
-TEST_WIDTHS_MM: List[float] = [60, 80]
+GRIP_HEIGHT_MM = 60
+TEST_WIDTHS_MM: List[float] = [86]
 GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
 
 

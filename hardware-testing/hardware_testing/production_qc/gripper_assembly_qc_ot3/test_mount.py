@@ -13,11 +13,12 @@ from hardware_testing.data.csv_report import (
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
+SLOT_MOUNT_TEST = 5
 RETRACT_AFTER_HOME_MM = 0.5
 Z_AXIS_TRAVEL_DISTANCE = 150.0
 Z_MAX_SKIP_MM = 0.25
 
-SPEEDS_TO_TEST = [25, 50, 100, 200]
+SPEEDS_TO_TEST = [25.0, 50.0, 100.0, 200.0]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
     0.1: SPEEDS_TO_TEST,
     0.2: SPEEDS_TO_TEST,
@@ -68,6 +69,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     default_z_current = settings.run_current
     default_z_speed = settings.max_speed
 
+    await api.home([OT3Axis.Z_G])
+    home_pos = await api.gantry_position(OT3Mount.GRIPPER)
+    target_pos = helpers_ot3.get_slot_calibration_square_position_ot3(SLOT_MOUNT_TEST)
+    target_pos = target_pos._replace(z=home_pos.z)
+    await helpers_ot3.move_to_arched_ot3(api, OT3Mount.GRIPPER, target_pos)
+
     async def _save_result(tag: str) -> bool:
         z_est, z_enc, z_aligned = await _is_z_axis_still_aligned_with_encoder(api)
         result = CSVResult.from_bool(z_aligned)
@@ -98,7 +105,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             print(f"moving down {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
             await _save_result(_get_test_tag(current, speed, "down", "start"))
             await api.move_rel(mount, Point(z=-Z_AXIS_TRAVEL_DISTANCE), speed=speed)
-            down_passed = await _save_result(_get_test_tag(current, speed, "down", "end"))
+            down_passed = await _save_result(
+                _get_test_tag(current, speed, "down", "end")
+            )
             # MOVE UP
             print(f"moving up {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
             await _save_result(_get_test_tag(current, speed, "up", "start"))
@@ -115,8 +124,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             # await api._backend.set_active_current({z_ax: default_z_current})
             await api.home([z_ax])
             if not down_passed or not up_passed and not api.is_simulator:
-                keep_testing = ui.get_user_answer(f"current {current} failed, "
-                                                  f"test remaining speeds for this current")
-                if not keep_testing:
-                    print("skipping any remaining speeds at this current")
-                    break
+                print(f"current {current} failed")
+                print("skipping any remaining speeds at this current")
+                break

@@ -1,4 +1,5 @@
 """Test Force."""
+from asyncio import sleep
 from typing import List, Union, Tuple
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -17,9 +18,9 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
-SLOT_FORCE_GAUGE = 2
+SLOT_FORCE_GAUGE = 4
 GRIP_FORCES_NEWTON = [5, 8, 12, 15, 18, 20]
-GRIP_HEIGHT_MM = 30
+GRIP_HEIGHT_MM = 65
 
 FAILURE_THRESHOLD_PERCENTAGE = 10
 FORCE_GAUGE_PORT = "/dev/ttyUSB0"
@@ -71,10 +72,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     gauge = _get_gauge(api.is_simulator)
     gauge.connect()
 
-    async def _save_result(tag: str, expected: float) -> None:
+    async def _save_result(tag: str, expected: float, length: int = 10) -> None:
         if gauge.is_simulator():
             gauge.set_simulation_force(expected)  # type: ignore[union-attr]
-        actual = float(gauge.read_force())
+        actual = sum([float(gauge.read_force()) for _ in range(length)]) / float(length)
         print(f"reading: {actual} N")
         error = (actual - expected) / expected
         result = CSVResult.from_bool(abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE)
@@ -88,6 +89,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await api.ungrip()
     hover_pos, target_pos = _get_force_gauge_hover_and_grip_positions(api)
     await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+    if not api.is_simulator:
+        ui.get_user_ready("ATTACH the jaw extenders")
+        ui.get_user_ready("confirm jaw extenders are pressed down again PADDLES")
     await api.move_to(mount, target_pos)
     if not api.is_simulator:
         ui.get_user_ready("prepare to grip")
@@ -96,9 +100,13 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # GRIP AND MEASURE FORCE
         print(f"gripping at {force} N")
         await api.grip(force)
+        if not api.is_simulator:
+            await sleep(2)
         await _save_result(_get_test_tag(force), force)
         print("ungrip")
         await api.ungrip()
     # RETRACT
     print("done")
     await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+    if not api.is_simulator:
+        ui.get_user_ready("REMOVE the jaw extenders")

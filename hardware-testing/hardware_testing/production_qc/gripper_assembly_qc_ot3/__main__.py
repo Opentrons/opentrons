@@ -6,7 +6,7 @@ from pathlib import Path
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.types import OT3Mount
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
@@ -20,11 +20,14 @@ async def _main(cfg: TestConfig) -> None:
         gripper="GRPV102",
     )
     await api.home()
-    await api.move_rel(OT3Mount.GRIPPER, Point(x=-520, y=-250))
-
-    while not api.has_gripper():
-        ui.get_user_ready("attach a gripper")
-        await api.reset()
+    home_pos = await api.gantry_position(OT3Mount.GRIPPER)
+    if not api.has_gripper():
+        attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(1)
+        attach_pos = attach_pos._replace(z=home_pos.z)
+        await helpers_ot3.move_to_arched_ot3(api, OT3Mount.GRIPPER, attach_pos)
+        while not api.has_gripper():
+            ui.get_user_ready("attach a gripper")
+            await api.reset()
 
     gripper = api.attached_gripper
     assert gripper
