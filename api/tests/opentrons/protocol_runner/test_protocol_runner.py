@@ -1,5 +1,6 @@
 """Tests for the ProtocolRunner class."""
 import pytest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast
@@ -25,7 +26,7 @@ from opentrons.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     MaintenanceRunner,
-    ProtocolRunner
+    ProtocolRunner,
 )
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
@@ -239,12 +240,13 @@ async def test_create_protocol_runner(
 
 
 @pytest.mark.parametrize(
-    argnames=["subject"],
-    argvalues=[
-        [pytest.lazy_fixture("json_subject")],
+    "subject",
+    [
+        (lazy_fixture("json_subject")),
+        (lazy_fixture("legacy_subject")),
     ],
 )
-async def test_play_starts_run_json_runner(
+async def test_play_starts_run(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
@@ -256,42 +258,63 @@ async def test_play_starts_run_json_runner(
     decoy.verify(protocol_engine.play(), times=1)
 
 
-async def test_pause_json_runner(
+@pytest.mark.parametrize(
+    "subject",
+    [
+        (lazy_fixture("json_subject")),
+        (lazy_fixture("legacy_subject")),
+    ],
+)
+async def test_pause(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
-    json_subject: JsonRunner,
+    subject: ProtocolRunner,
 ) -> None:
     """It should pause a protocol run with pause."""
-    json_subject.pause()
+    subject.pause()
 
     decoy.verify(protocol_engine.pause(), times=1)
 
 
+@pytest.mark.parametrize(
+    "subject",
+    [
+        (lazy_fixture("json_subject")),
+        (lazy_fixture("legacy_subject")),
+    ],
+)
 async def test_stop_json_runner(
     decoy: Decoy,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    json_subject: JsonRunner,
+    subject: ProtocolRunner,
 ) -> None:
     """It should halt a protocol run with stop."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
 
-    json_subject.play()
-    await json_subject.stop()
+    subject.play()
+    await subject.stop()
 
     decoy.verify(await protocol_engine.stop(), times=1)
 
 
+@pytest.mark.parametrize(
+    "subject",
+    [
+        (lazy_fixture("json_subject")),
+        (lazy_fixture("legacy_subject")),
+    ],
+)
 async def test_stop_never_started_json_runner(
     decoy: Decoy,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    json_subject: JsonRunner,
+    subject: ProtocolRunner,
 ) -> None:
     """It should clean up rather than halt if the runner was never started."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
 
-    await json_subject.stop()
+    await subject.stop()
 
     decoy.verify(
         await protocol_engine.finish(drop_tips_and_home=False, set_run_status=False),
@@ -395,61 +418,6 @@ async def test_load_json_runner(
             ),
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),
-    )
-
-
-async def test_play_starts_run_legacy_runner(
-    decoy: Decoy,
-    protocol_engine: ProtocolEngine,
-    task_queue: TaskQueue,
-    legacy_subject: PythonAndLegacyRunner,
-) -> None:
-    """It should start a protocol run with play."""
-    legacy_subject.play()
-
-    decoy.verify(protocol_engine.play(), times=1)
-
-
-async def test_pause_legacy_runner(
-    decoy: Decoy,
-    protocol_engine: ProtocolEngine,
-    legacy_subject: PythonAndLegacyRunner,
-) -> None:
-    """It should pause a protocol run with pause."""
-    legacy_subject.pause()
-
-    decoy.verify(protocol_engine.pause(), times=1)
-
-
-async def test_stop_legacy_runner(
-    decoy: Decoy,
-    task_queue: TaskQueue,
-    protocol_engine: ProtocolEngine,
-    legacy_subject: PythonAndLegacyRunner,
-) -> None:
-    """It should halt a protocol run with stop."""
-    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
-
-    legacy_subject.play()
-    await legacy_subject.stop()
-
-    decoy.verify(await protocol_engine.stop(), times=1)
-
-
-async def test_stop_never_started_legacy_runner(
-    decoy: Decoy,
-    task_queue: TaskQueue,
-    protocol_engine: ProtocolEngine,
-    legacy_subject: PythonAndLegacyRunner,
-) -> None:
-    """It should clean up rather than halt if the runner was never started."""
-    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
-
-    await legacy_subject.stop()
-
-    decoy.verify(
-        await protocol_engine.finish(drop_tips_and_home=False, set_run_status=False),
-        times=1,
     )
 
 

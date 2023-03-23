@@ -91,7 +91,7 @@ class PythonAndLegacyRunner(ProtocolRunner):
         legacy_context_creator: Optional[LegacyContextCreator] = None,
         legacy_executor: Optional[LegacyExecutor] = None,
     ) -> None:
-        """Initialize the JsonRunner with its dependencies."""
+        """Initialize the PythonAndLegacyRunner with its dependencies."""
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
@@ -190,7 +190,7 @@ class PythonAndLegacyRunner(ProtocolRunner):
 
 
 class JsonRunner(ProtocolRunner):
-    """Protocol runner implementation for python protocols and legacy protocols."""
+    """Protocol runner implementation for json protocols."""
 
     def __init__(
         self,
@@ -313,7 +313,7 @@ class MaintenanceRunner(ProtocolRunner):
         hardware_api: HardwareControlAPI,
         task_queue: Optional[TaskQueue] = None,
     ) -> None:
-        """Initialize the JsonRunner with its dependencies."""
+        """Initialize the MaintenanceRunner with its dependencies."""
         self._protocol_engine = protocol_engine
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
