@@ -22,7 +22,78 @@ GANTRY_AXES = [types.OT3Axis.X, types.OT3Axis.Y, types.OT3Axis.Z_L, types.OT3Axi
 MOUNT_AXES = [types.OT3Mount.LEFT, types.OT3Mount.RIGHT]
 THRESHOLD_MM = 0.2
 
-    
+
+CUSTOM_AXIS_SETTINGS = {
+    types.OT3Axis.X: helpers_ot3.GantryLoadSettings(
+        max_speed=500,
+        acceleration=1000,
+        max_start_stop_speed=10,
+        max_change_dir_speed=5,
+        hold_current=0.5,
+        run_current=1.4,
+    ),
+    types.OT3Axis.Y: helpers_ot3.GantryLoadSettings(
+        max_speed=500,
+        acceleration=1000,
+        max_start_stop_speed=10,
+        max_change_dir_speed=5,
+        hold_current=0.5,
+        run_current=1.4,
+    ),
+    types.OT3Axis.Z_L: helpers_ot3.GantryLoadSettings(
+        max_speed=65,
+        acceleration=100,
+        max_start_stop_speed=10,
+        max_change_dir_speed=5,
+        hold_current=0.1,
+        run_current=1.4,
+    ),
+    types.OT3Axis.Z_R: helpers_ot3.GantryLoadSettings(
+        max_speed=65,
+        acceleration=100,
+        max_start_stop_speed=10,
+        max_change_dir_speed=5,
+        hold_current=0.1,
+        run_current=1.4,
+    )
+}
+
+
+DEFAULT_AXIS_SETTINGS = {
+    types.OT3Axis.X: helpers_ot3.GantryLoadSettings(
+        max_speed=500,
+        acceleration=1000,
+        max_start_stop_speed=10,
+        max_change_dir_speed=5,
+        hold_current=0.5,
+        run_current=1.4,
+    ),
+    types.OT3Axis.Y: helpers_ot3.GantryLoadSettings(
+        max_speed=500,
+        acceleration=1000,
+        max_start_stop_speed=10,
+        max_change_dir_speed=5,
+        hold_current=0.5,
+        run_current=1.4,
+    ),
+    types.OT3Axis.Z_L: helpers_ot3.GantryLoadSettings(
+        max_speed=65,
+        acceleration=100,
+        max_start_stop_speed=10,
+        max_change_dir_speed=5,
+        hold_current=0.1,
+        run_current=1.4,
+    ),
+    types.OT3Axis.Z_R: helpers_ot3.GantryLoadSettings(
+        max_speed=65,
+        acceleration=100,
+        max_start_stop_speed=10,
+        max_change_dir_speed=5,
+        hold_current=0.1,
+        run_current=1.4,
+    )
+}
+
 @dataclass
 class CSVCallbacks:
     """CSV callback functions."""
@@ -178,8 +249,43 @@ async def _main(arguments: argparse.Namespace) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=arguments.simulate)
     await helpers_ot3.home_ot3(api)
     ui.get_user_ready("Is the deck totally empty?")
-    encoder = {ax: api._encoder_current_position[ax] for ax in GANTRY_AXES}
     mount = types.OT3Mount.LEFT
+    speeds = []
+    accelerations = []
+    global CUSTOM_AXIS_SETTINGS
+    global DEFAULT_AXIS_SETTINGS
+    if arguments.speeds or arguments.acceleration:
+        if arguments.speeds:
+            condition = True
+            while condition:
+                speeds_input = input(f"WAIT: please input the speeds and spilit with , (100,200,300), press ENTER when ready: ")
+                try:
+                    speeds = speeds_input.strip().replace(' ','').spilit(',')
+                    condition = False
+                except Exception as e:
+                    ui.print_error(e)
+        if arguments.acceleration:
+            condition = True
+            while condition:
+                accelerations_input = input(f"WAIT: please input the acceleration and spilit with , (100,200,300), press ENTER when ready: ")
+                try:
+                    accelerations = accelerations_input.strip().replace(' ','').spilit(',')
+                    condition = False
+                except Exception as e:
+                    ui.print_error(e)
+    for speed in speeds:
+        for acce in accelerations:
+            print('Start testing, Speed= {}, Acceleration= {}::::'.format(speed, acce))
+            userSetting = helpers_ot3.GantryLoadSettings(
+                    max_speed=float(speed),
+                    acceleration=acce,
+                    max_start_stop_speed=1,
+                    max_change_dir_speed=1,
+                    hold_current=0.1,
+                    run_current=1.4)
+            CUSTOM_AXIS_SETTINGS.update({types.OT3Axis.Z_L: userSetting})
+            CUSTOM_AXIS_SETTINGS.update({types.OT3Axis.Z_R: userSetting})
+            await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, CUSTOM_AXIS_SETTINGS)
     for i in range(arguments.cycles):
             csv_cb.write(["--------"])
             csv_cb.write(["run-cycle", i])
@@ -206,6 +312,8 @@ if __name__ == "__main__":
     parser.add_argument("--skip_bowtie", action="store_true")
     parser.add_argument("--skip_hourglass", action="store_true")
     parser.add_argument("--skip_mount", action="store_true")
+    parser.add_argument("--speeds", action="store_true")
+    parser.add_argument("--acceleration", action="store_true")
 
     args = parser.parse_args()
     asyncio.run(_main(args))
