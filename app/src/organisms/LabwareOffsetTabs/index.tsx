@@ -12,6 +12,8 @@ import {
 import { StyledText } from '../../atoms/text'
 import { RoundTab } from '../../molecules/RoundTab'
 
+import type { StyleProps } from '@opentrons/components'
+
 type TabOptions = 'table' | 'jupyter' | 'cli'
 
 export interface LabwareOffsetTabsProps extends StyleProps {
@@ -35,7 +37,12 @@ export function LabwareOffsetTabs({
     cli: CommandLineComponent,
   }
   return (
-    <Flex width="100%" height="100%" flexDirection={DIRECTION_COLUMN} {...styleProps}>
+    <Flex
+      width="100%"
+      height="100%"
+      flexDirection={DIRECTION_COLUMN}
+      {...styleProps}
+    >
       <Flex>
         <RoundTab
           isCurrent={currentTab === 'table'}

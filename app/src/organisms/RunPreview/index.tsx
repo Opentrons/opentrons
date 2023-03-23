@@ -117,7 +117,7 @@ export const RunPreviewComponent = (
                   index === jumpedIndex ? COLORS.electricPurple : borderColor
                 }`}
                 backgroundColor={
-                  index === jumpedIndex ? "#F5E3FF" : backgroundColor
+                  index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
                 color={COLORS.darkBlackEnabled}
                 borderRadius={BORDERS.radiusSoftCorners}
