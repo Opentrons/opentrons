@@ -139,8 +139,9 @@ class RadwagScale(RadwagScaleBase):
             if not retries:
                 raise TimeoutError(f"unable to read from scale, got error: {e}")
             print(e)
-            return self._write_command_and_read_response(cmd, append, timeout, retries - 1)
-
+            return self._write_command_and_read_response(
+                cmd, append, timeout, retries - 1
+            )
 
     def connect(self) -> None:
         """Connect."""
@@ -163,7 +164,7 @@ class RadwagScale(RadwagScaleBase):
     def working_mode(self, mode: RadwagWorkingMode) -> None:
         """Set the working mode."""
         cmd = RadwagCommand.SET_WORKING_MODE
-        res = self._write_command_and_read_response(cmd, append=mode.value)
+        res = self._write_command_and_read_response(cmd, append=str(mode.value))
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
@@ -171,7 +172,7 @@ class RadwagScale(RadwagScaleBase):
     def filter(self, f: RadwagFilter) -> None:
         """Set the filter type."""
         cmd = RadwagCommand.SET_FILTER
-        res = self._write_command_and_read_response(cmd, append=f.value)
+        res = self._write_command_and_read_response(cmd, append=str(f.value))
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
@@ -179,7 +180,7 @@ class RadwagScale(RadwagScaleBase):
     def value_release(self, val_rel: RadwagValueRelease) -> None:
         """Set the value release type."""
         cmd = RadwagCommand.SET_VALUE_RELEASE
-        res = self._write_command_and_read_response(cmd, append=val_rel.value)
+        res = self._write_command_and_read_response(cmd, append=str(val_rel.value))
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
