@@ -220,9 +220,9 @@ def _run_trial(
         m_tag = _tag(m_type)
         if recorder.is_simulator and not blank:
             if m_type == MeasurementType.ASPIRATE:
-                recorder.scale.add_simulation_mass(volume * -0.001)
+                recorder.add_simulation_mass(volume * -0.001)
             elif m_type == MeasurementType.DISPENSE:
-                recorder.scale.add_simulation_mass(volume * 0.001)
+                recorder.add_simulation_mass(volume * 0.001)
         m_data = record_measurement_data(ctx, m_tag, recorder, pipette.mount, stable, shorten=inspect)
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
@@ -329,12 +329,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         ),
         simulate=ctx.is_simulating(),
     )
-    print(f'found scale "{recorder.scale.read_serial_number()}"')
+    print(f'found scale "{recorder.serial_number}"')
     if recorder.is_simulator:
         if cfg.pipette_volume == 50 or cfg.tip_volume == 50:
-            recorder.scale.set_simulation_mass(15)
+            recorder.set_simulation_mass(15)
         else:
-            recorder.scale.set_simulation_mass(200)
+            recorder.set_simulation_mass(200)
     recorder.record(in_thread=True)
     print(f'scale is recording to "{recorder.file_name}"')
 
@@ -347,7 +347,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         test_report,
         robot="ot3",
         pipette=pipette_tag,
-        scale=recorder.scale.read_serial_number(),
+        scale=recorder.serial_number,
         environment="None",
         liquid="None",
     )
