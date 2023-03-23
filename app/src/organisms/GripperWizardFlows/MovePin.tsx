@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { LEFT } from '@opentrons/shared-data'
+import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -11,11 +12,11 @@ import {
 } from './constants'
 import { useCreateRunCommandMutation } from '../../resources/runs/hooks'
 import movePinStorageToFront from '../../assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
-import movePineFrontToRear from '../../assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
+import movePinFrontToRear from '../../assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
+import movePinRearToStorage from '../../assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
 
 import type { GripperWizardStepProps, MovePinStep } from './types'
 import type { Coordinates } from '@opentrons/shared-data'
-import { css } from 'styled-components'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Coordinates) => void
@@ -105,7 +106,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       buttonText: t('begin_calibration'),
       image: (
         <video
-          css={css`max-width: 100%; max-height: 15rem;`}
+          css={css`max-width: 100%; max-height: 20rem;`}
           autoPlay={true}
           loop={true}
           controls={false}
@@ -122,13 +123,13 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       buttonText: t('shared:continue'),
       image: (
         <video
-          css={css`max-width: 100%; max-height: 15rem;`}
+          css={css`max-width: 100%; max-height: 20rem;`}
           autoPlay={true}
           loop={true}
           controls={false}
           aria-label='move calibration pin from front jaw to rear jaw'
         >
-          <source src={movePineFrontToRear} />
+          <source src={movePinFrontToRear} />
         </video>
       ),
     },
@@ -137,7 +138,17 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       header: t('remove_calibration_pin'),
       body: t('move_pin_from_rear_jaw_to_storage'),
       buttonText: t('complete_calibration'),
-      image: <StyledText>TODO image of storing pin</StyledText>,
+      image: (
+        <video
+          css={css`max-width: 100%; max-height: 20rem;`}
+          autoPlay={true}
+          loop={true}
+          controls={false}
+          aria-label='move calibration pin from front jaw to rear jaw'
+        >
+          <source src={movePinRearToStorage} />
+        </video>
+      ),
     },
   }
 

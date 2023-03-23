@@ -7,11 +7,14 @@ import {
   Link,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { PrimaryButton } from '../../atoms/buttons'
+import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
+
 import type { GripperWizardStepProps } from './types'
 
 export const UnmountGripper = (
@@ -76,8 +79,16 @@ export const UnmountGripper = (
   ) : (
     <GenericWizardTile
       header={t('loosen_screws_and_detach')}
-      rightHandBody={
-        <StyledText>TODO image of gripper being unmounted</StyledText>
+rightHandBody={
+        <video
+          css={css`max-width: 100%; max-height: 20rem;`}
+          autoPlay={true}
+          loop={true}
+          controls={false}
+          aria-label='move calibration pin from front jaw to rear jaw'
+        >
+          <source src={unmountGripper} />
+        </video>
       }
       bodyText={
         <StyledText as="p">{t('hold_gripper_and_loosen_screws')}</StyledText>

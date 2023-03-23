@@ -5,6 +5,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -12,6 +13,8 @@ import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
+
 import type { GripperWizardStepProps } from './types'
 
 export const MountGripper = (
@@ -53,7 +56,15 @@ export const MountGripper = (
     <GenericWizardTile
       header={t('connect_and_screw_in_gripper')}
       rightHandBody={
-        <StyledText>TODO image of gripper being mounted</StyledText>
+        <video
+          css={css`max-width: 100%; max-height: 20rem;`}
+          autoPlay={true}
+          loop={true}
+          controls={false}
+          aria-label='move calibration pin from front jaw to rear jaw'
+        >
+          <source src={mountGripper} />
+        </video>
       }
       bodyText={
         <StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>
