@@ -11,11 +11,20 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { ProtocolDetails } from '..'
+import { Deck } from '../Deck'
+import { Hardware } from '../Hardware'
+import { Labware } from '../Labware'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../Deck')
+jest.mock('../Hardware')
+jest.mock('../Labware')
 
 const mockCreateRun = jest.fn((id: string) => {})
 const mockDeleteProtocol = jest.fn((id: string) => {})
+const mockHardware = Hardware as jest.MockedFunction<typeof Hardware>
+const mockLabware = Labware as jest.MockedFunction<typeof Labware>
+const mockDeck = Deck as jest.MockedFunction<typeof Deck>
 const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
   typeof useCreateRunMutation
 >
@@ -109,11 +118,23 @@ describe('ODDProtocolDetails', () => {
     getByText('Delete protocol')
   })
   it('renders the navigation buttons', () => {
-    const [{ getByRole }] = render()
-    getByRole('button', { name: 'Summary' })
-    getByRole('button', { name: 'Hardware' })
-    getByRole('button', { name: 'Labware' })
+    mockHardware.mockReturnValue(<div>Mock Hardware</div>)
+    mockLabware.mockReturnValue(<div>Mock Labware</div>)
+    mockDeck.mockReturnValue(<div>Mock Initial Deck Layout</div>)
+    const [{ getByRole, getByText }] = render()
+    const hardwareButton = getByRole('button', { name: 'Hardware' })
+    hardwareButton.click()
+    getByText('Mock Hardware')
+    const labwareButton = getByRole('button', { name: 'Labware' })
+    labwareButton.click()
+    getByText('Mock Labware')
+    // Can't test this until liquids section exists
     getByRole('button', { name: 'Liquids' })
-    getByRole('button', { name: 'Initial Deck Layout' })
+    const deckButton = getByRole('button', { name: 'Initial Deck Layout' })
+    deckButton.click()
+    getByText('Mock Initial Deck Layout')
+    const summaryButton = getByRole('button', { name: 'Summary' })
+    summaryButton.click()
+    getByText('A short mock protocol')
   })
 })
