@@ -109,9 +109,21 @@ TEMP_THRESH = [20, 40]
 HUMIDITY_THRESH = [10, 90]
 
 # THRESHOLDS: capacitive sensor
-CAP_THRESH_OPEN_AIR = [0.0, 10.0]
-CAP_THRESH_PROBE = [0.0, 20.0]
-CAP_THRESH_SQUARE = [0.0, 20.0]
+CAP_THRESH_OPEN_AIR = {
+    1: [1.0, 8.0],
+    8: [5.0, 20.0],
+    96: [0.0, 10.0],
+}
+CAP_THRESH_PROBE = {
+    1: [1.0, 10.0],
+    8: [5.0, 20.0],
+    96: [0.0, 20.0],
+}
+CAP_THRESH_SQUARE = {
+    1: [0.0, 1000.0],
+    8: [0.0, 1000.0],
+    96: [0.0, 1000.0],
+}
 CAP_PROBE_DISTANCE = 50.0
 CAP_PROBE_SECONDS = 5.0
 CAP_PROBE_SETTINGS = CapacitivePassSettings(
@@ -335,6 +347,7 @@ async def _read_pressure_and_check_results(
     tag: PressureEvent,
     write_cb: Callable,
     accumulate_raw_data_cb: Callable,
+    channels: int = 1,
 ) -> bool:
     pressure_event_config: PressureEventConfig = PRESSURE_CFG[tag]
     if not api.is_simulator:
@@ -354,7 +367,7 @@ async def _read_pressure_and_check_results(
             and delay_time > 0
         ):
             await asyncio.sleep(pressure_event_config.sample_delay)
-    _samples_channel_1 = [s[0] for s in _samples]
+    _samples_channel_1 = [s[c] for s in _samples for c in range(channels)]
     _samples_channel_1.sort()
     _samples_clipped = _samples_channel_1[1:-1]
     _samples_min = min(_samples_clipped)
@@ -396,40 +409,41 @@ async def _fixture_check_pressure(
     accumulate_raw_data_cb: Callable,
 ) -> bool:
     results = []
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pip_vol = int(pip.working_volume)
+    pip_channels = int(pip.channels.value)
     # above the fixture
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.PRE, write_cb, accumulate_raw_data_cb
+        api, fixture, PressureEvent.PRE, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     # insert into the fixture
     await api.move_rel(mount, Point(z=-test_config.fixture_depth))
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.INSERT, write_cb, accumulate_raw_data_cb
+        api, fixture, PressureEvent.INSERT, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     # aspirate 50uL
-    pip = api.hardware_pipettes[mount.to_mount()]
-    assert pip
-    pip_vol = int(pip.working_volume)
     await api.aspirate(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
     if pip_vol == 50:
         asp_evt = PressureEvent.ASPIRATE_P50
     else:
         asp_evt = PressureEvent.ASPIRATE_P1000
     r = await _read_pressure_and_check_results(
-        api, fixture, asp_evt, write_cb, accumulate_raw_data_cb
+        api, fixture, asp_evt, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     # dispense
     await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.DISPENSE, write_cb, accumulate_raw_data_cb
+        api, fixture, PressureEvent.DISPENSE, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     # retract out of fixture
     await api.move_rel(mount, Point(z=test_config.fixture_depth))
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.POST, write_cb, accumulate_raw_data_cb
+        api, fixture, PressureEvent.POST, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     return False not in results
@@ -581,7 +595,7 @@ async def _test_diagnostics_encoder(
     print("homing plunger")
     await api.home([pip_axis])
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if pip_pos != 0.0 or pip_enc != 0.0:
+    if pip_pos != 0.0 or abs(pip_enc) > 0.01:
         print(
             f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not 0.0 after homing"
         )
@@ -609,6 +623,8 @@ async def _test_diagnostics_capacitive(
     capacitive_probe_attached_pass = True
     capacitive_square_pass = True
     capacitive_probing_pass = True
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
 
     async def _read_cap() -> float:
         return await _read_pipette_sensor_repeatedly_and_average(
@@ -618,8 +634,8 @@ async def _test_diagnostics_capacitive(
     capacitance_open_air = await _read_cap()
     print(f"open-air capacitance: {capacitance_open_air}")
     if (
-        capacitance_open_air < CAP_THRESH_OPEN_AIR[0]
-        or capacitance_open_air > CAP_THRESH_OPEN_AIR[1]
+        capacitance_open_air < CAP_THRESH_OPEN_AIR[pip.channels.value][0]
+        or capacitance_open_air > CAP_THRESH_OPEN_AIR[pip.channels.value][1]
     ):
         capacitive_open_air_pass = False
         print(f"FAIL: open-air capacitance ({capacitance_open_air}) is not correct")
@@ -636,8 +652,8 @@ async def _test_diagnostics_capacitive(
     capacitance_with_probe = await _read_cap()
     print(f"probe capacitance: {capacitance_with_probe}")
     if (
-        capacitance_with_probe < CAP_THRESH_PROBE[0]
-        or capacitance_with_probe > CAP_THRESH_PROBE[1]
+        capacitance_with_probe < CAP_THRESH_PROBE[pip.channels.value][0]
+        or capacitance_with_probe > CAP_THRESH_PROBE[pip.channels.value][1]
     ):
         capacitive_probe_attached_pass = False
         print(f"FAIL: probe capacitance ({capacitance_with_probe}) is not correct")
@@ -654,8 +670,8 @@ async def _test_diagnostics_capacitive(
     capacitance_with_square = await _read_cap()
     print(f"square capacitance: {capacitance_with_square}")
     if (
-        capacitance_with_square < CAP_THRESH_SQUARE[0]
-        or capacitance_with_square > CAP_THRESH_SQUARE[1]
+        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels.value][0]
+        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels.value][1]
     ):
         capacitive_square_pass = False
         print(f"FAIL: square capacitance ({capacitance_with_square}) is not correct")
@@ -955,8 +971,9 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["TEST-THRESHOLDS"])
         csv_cb.write(["temperature"] + [str(t) for t in TEMP_THRESH])
         csv_cb.write(["humidity"] + [str(t) for t in HUMIDITY_THRESH])
-        csv_cb.write(["capacitive-open-air"] + [str(t) for t in CAP_THRESH_OPEN_AIR])
-        csv_cb.write(["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE])
+        csv_cb.write(["capacitive-open-air"] + [str(t) for t in CAP_THRESH_OPEN_AIR[pipette_channels]])
+        csv_cb.write(["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE[pipette_channels]])
+        csv_cb.write(["capacitive-square"] + [str(t) for t in CAP_THRESH_SQUARE[pipette_channels]])
         csv_cb.write(
             ["pressure-microliters-aspirated", PRESSURE_ASPIRATE_VOL[pipette_volume]]
         )

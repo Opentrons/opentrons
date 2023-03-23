@@ -613,13 +613,18 @@ class SensorResponseBad(Exception):
     pass
 
 
-async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
+async def get_capacitance_ot3(api: OT3API, mount: OT3Mount, channel: Optional[str] = None) -> float:
     """Get the capacitance reading from the pipette."""
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
     # FIXME: allow SensorId to specify which sensor on the device to read from
-    capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
+    if not channel or channel == "primary":
+        capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
+    elif channel == "secondary":
+        capacitive = sensor_types.CapacitiveSensor.build(SensorId.S1, node_id)
+    else:
+        raise ValueError(f"unexpected channel for capacitance sensor: {channel}")
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
         api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
@@ -647,13 +652,18 @@ async def get_temperature_humidity_ot3(
     return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
 
 
-async def get_pressure_ot3(api: OT3API, mount: OT3Mount) -> float:
+async def get_pressure_ot3(api: OT3API, mount: OT3Mount, channel: Optional[str] = None) -> float:
     """Get the pressure reading from the pipette."""
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
     # FIXME: allow SensorId to specify which sensor on the device to read from
-    pressure = sensor_types.PressureSensor.build(SensorId.S0, node_id)
+    if not channel or channel == "primary":
+        pressure = sensor_types.PressureSensor.build(SensorId.S0, node_id)
+    elif channel == "secondary":
+        pressure = sensor_types.PressureSensor.build(SensorId.S1, node_id)
+    else:
+        raise ValueError(f"unexpected channel for pressure sensor: {channel}")
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
         api._backend._messenger, pressure, offset=False, timeout=1  # type: ignore[union-attr]
