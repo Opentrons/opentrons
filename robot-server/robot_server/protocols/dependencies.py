@@ -11,9 +11,6 @@ from fastapi import Depends
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import ProtocolReader, FileReaderWriter, FileHasher
-from opentrons.protocol_runner import create_simulating_runner
-
-from opentrons_shared_data.robot.dev_types import RobotType
 
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.deletion_planner import ProtocolDeletionPlanner
