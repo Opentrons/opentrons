@@ -662,7 +662,6 @@ async def test_run_maintanence_runner(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
-    task_queue: TaskQueue,
     maintenance_subject: MaintenanceRunner,
 ) -> None:
     """It should run a protocol to completion."""
@@ -676,8 +675,6 @@ async def test_run_maintanence_runner(
 
     decoy.verify(
         await hardware_api.home(),
-        task_queue.start(),
-        await task_queue.join(),
     )
 
 
