@@ -151,7 +151,6 @@ def maintenance_subject(
     return MaintenanceRunner(
         protocol_engine=protocol_engine,
         hardware_api=hardware_api,
-        task_queue=task_queue,
     )
 
 
