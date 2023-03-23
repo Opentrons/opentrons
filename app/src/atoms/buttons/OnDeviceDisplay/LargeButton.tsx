@@ -5,7 +5,7 @@ import {
   COLORS,
   SPACING,
   BORDERS,
-  NewPrimaryBtn,
+  Btn,
   styleProps,
   DIRECTION_ROW,
   Icon,
@@ -69,6 +69,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     box-shadow: none;
     padding: ${SPACING.spacing5};
     line-height: ${TYPOGRAPHY.lineHeight20};
+    max-height: 14.375rem;
     text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
 
@@ -100,7 +101,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
   `
   return (
-    <NewPrimaryBtn
+    <Btn
       {...buttonProps}
       css={LARGE_BUTTON_STYLE}
       aria-label={`LargeButton_${buttonType}`}
@@ -109,7 +110,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       <StyledText
         fontSize="2rem"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        paddingBottom="4.6875rem"
+        paddingBottom="3.75rem"
         lineHeight="2.625rem"
       >
         {buttonText}
@@ -124,6 +125,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         }
         size="5rem"
       />
-    </NewPrimaryBtn>
+    </Btn>
   )
 }

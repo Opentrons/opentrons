@@ -5,7 +5,7 @@ import {
   COLORS,
   SPACING,
   BORDERS,
-  NewPrimaryBtn,
+  Btn,
   styleProps,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
@@ -121,7 +121,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   `
 
   return (
-    <NewPrimaryBtn
+    <Btn
       {...buttonProps}
       css={SMALL_BUTTON_STYLE}
       aria-label={`SmallButton_${buttonType}`}
@@ -132,6 +132,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       >
         {buttonText}
       </StyledText>
-    </NewPrimaryBtn>
+    </Btn>
   )
 }
