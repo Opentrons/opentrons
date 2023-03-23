@@ -421,7 +421,12 @@ async def _fixture_check_pressure(
     # insert into the fixture
     await api.move_rel(mount, Point(z=-test_config.fixture_depth))
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.INSERT, write_cb, accumulate_raw_data_cb, pip_channels
+        api,
+        fixture,
+        PressureEvent.INSERT,
+        write_cb,
+        accumulate_raw_data_cb,
+        pip_channels,
     )
     results.append(r)
     # aspirate 50uL
@@ -437,7 +442,12 @@ async def _fixture_check_pressure(
     # dispense
     await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.DISPENSE, write_cb, accumulate_raw_data_cb, pip_channels
+        api,
+        fixture,
+        PressureEvent.DISPENSE,
+        write_cb,
+        accumulate_raw_data_cb,
+        pip_channels,
     )
     results.append(r)
     # retract out of fixture
@@ -666,7 +676,9 @@ async def _test_diagnostics_capacitive(
     )
 
     if not api.is_simulator:
-        _get_operator_answer_to_question('touch a SQUARE to the probe, enter "y" when touching')
+        _get_operator_answer_to_question(
+            'touch a SQUARE to the probe, enter "y" when touching'
+        )
     capacitance_with_square = await _read_cap()
     print(f"square capacitance: {capacitance_with_square}")
     if (
@@ -971,9 +983,17 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["TEST-THRESHOLDS"])
         csv_cb.write(["temperature"] + [str(t) for t in TEMP_THRESH])
         csv_cb.write(["humidity"] + [str(t) for t in HUMIDITY_THRESH])
-        csv_cb.write(["capacitive-open-air"] + [str(t) for t in CAP_THRESH_OPEN_AIR[pipette_channels]])
-        csv_cb.write(["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE[pipette_channels]])
-        csv_cb.write(["capacitive-square"] + [str(t) for t in CAP_THRESH_SQUARE[pipette_channels]])
+        csv_cb.write(
+            ["capacitive-open-air"]
+            + [str(t) for t in CAP_THRESH_OPEN_AIR[pipette_channels]]
+        )
+        csv_cb.write(
+            ["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE[pipette_channels]]
+        )
+        csv_cb.write(
+            ["capacitive-square"]
+            + [str(t) for t in CAP_THRESH_SQUARE[pipette_channels]]
+        )
         csv_cb.write(
             ["pressure-microliters-aspirated", PRESSURE_ASPIRATE_VOL[pipette_volume]]
         )

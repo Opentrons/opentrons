@@ -613,7 +613,9 @@ class SensorResponseBad(Exception):
     pass
 
 
-async def get_capacitance_ot3(api: OT3API, mount: OT3Mount, channel: Optional[str] = None) -> float:
+async def get_capacitance_ot3(
+    api: OT3API, mount: OT3Mount, channel: Optional[str] = None
+) -> float:
     """Get the capacitance reading from the pipette."""
     if api.is_simulator:
         return 0.0
@@ -652,7 +654,9 @@ async def get_temperature_humidity_ot3(
     return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
 
 
-async def get_pressure_ot3(api: OT3API, mount: OT3Mount, channel: Optional[str] = None) -> float:
+async def get_pressure_ot3(
+    api: OT3API, mount: OT3Mount, channel: Optional[str] = None
+) -> float:
     """Get the pressure reading from the pipette."""
     if api.is_simulator:
         return 0.0
