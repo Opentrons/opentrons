@@ -670,8 +670,8 @@ async def test_pipette_capacitive_sweep(
 @pytest.mark.parametrize(
     "probe,intr_probe",
     [
-        (GripperProbe.FRONT, InstrumentProbeType.PRIMARY),
-        (GripperProbe.REAR, InstrumentProbeType.SECONDARY),
+        (GripperProbe.FRONT, InstrumentProbeType.SECONDARY),
+        (GripperProbe.REAR, InstrumentProbeType.PRIMARY),
     ],
 )
 @pytest.mark.parametrize(
