@@ -31,11 +31,11 @@ import {
 } from '../../../atoms/buttons/OnDeviceDisplay'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
+import { TooManyPinsModal } from '../../../molecules/Modal/OnDeviceDisplay'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
-import { TooManyPinsModal } from '../TooManyPinsModal'
 
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'

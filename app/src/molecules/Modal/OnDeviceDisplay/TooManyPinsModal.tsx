@@ -9,8 +9,8 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { ModalShell } from '../../molecules/Modal'
+import { StyledText } from '../../../atoms/text'
+import { ModalShell } from '../../../molecules/Modal'
 
 export function TooManyPinsModal(props: {
   handleCloseMaxPinsAlert: () => void

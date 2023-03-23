@@ -3,7 +3,7 @@ import { TooManyPinsModal } from './TooManyPinsModal'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Organisms/Modals/TooManyPinsModal',
+  title: 'ODD/Molecules/Modals/TooManyPinsModal',
   argTypes: { onClick: { action: 'clicked' } },
 } as Meta
 
