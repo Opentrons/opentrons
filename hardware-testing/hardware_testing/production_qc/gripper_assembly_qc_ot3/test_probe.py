@@ -55,7 +55,7 @@ async def read_once(
     return 0.0
 
 
-async def read_from_sensor(
+async def _read_from_sensor(
     api: OT3API,
     driver: sensor_driver.SensorDriver,
     sensor: sensor_types.CapacitiveSensor,
@@ -116,7 +116,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # take reading for baseline (1)
         no_probe_baseline = 0.0
         if not api.is_simulator:
-            no_probe_baseline = await read_from_sensor(api, s_driver, cap_sensor, 10)
+            no_probe_baseline = await _read_from_sensor(api, s_driver, cap_sensor, 10)
         print(f"baseline without probe: {no_probe_baseline}")
 
         # take reading for baseline with pin attached (2)
@@ -125,7 +125,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # add pin to update critical point
         probe_baseline = 0.0
         if not api.is_simulator:
-            probe_baseline = await read_from_sensor(api, s_driver, cap_sensor, 10)
+            probe_baseline = await _read_from_sensor(api, s_driver, cap_sensor, 10)
         print(f"baseline with probe: {probe_baseline}")
 
         # begins probing
@@ -148,7 +148,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             height_pressing_deck = found_pos - DISTANCE_PRESS_INTO_DECK_MM
             await api.move_to(mount, probe_pos._replace(z=height_pressing_deck))
             if not api.is_simulator:
-                reading_on_deck = await read_from_sensor(api, s_driver, cap_sensor, 10)
+                reading_on_deck = await _read_from_sensor(api, s_driver, cap_sensor, 10)
         print(f"Reading on deck: {reading_on_deck}")
 
         result = valid_height and reading_on_deck > probe_baseline
