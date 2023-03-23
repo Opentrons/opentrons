@@ -63,6 +63,7 @@ async def test_analyze(
             files=[],
             metadata={},
             robot_type="OT-3 Standard",
+            content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
     )

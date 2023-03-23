@@ -6,7 +6,7 @@ import { SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import attachMountingPlate from '../../assets/images/change-pip/attach-mounting-plate.png'
-import { FLOWS } from './constants'
+import { BODY_STYLE, FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
 export const MountingPlate = (
@@ -76,11 +76,13 @@ export const MountingPlate = (
             t={t}
             i18nKey="attach_mounting_plate_instructions"
             components={{
-              block: <StyledText as="p" marginBottom={SPACING.spacing4} />,
+              block: (
+                <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+              ),
             }}
           />
         ) : (
-          <StyledText as="p">
+          <StyledText css={BODY_STYLE}>
             {t('detach_mounting_plate_instructions')}
           </StyledText>
         )
