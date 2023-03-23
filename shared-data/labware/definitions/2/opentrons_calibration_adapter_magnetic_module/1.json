@@ -1,0 +1,59 @@
+{
+  "ordering": [
+      [
+          "A1"
+      ]
+  ],
+  "brand": {
+      "brand": "Opentrons",
+      "brandId": []
+  },
+  "metadata": {
+      "displayName": "Opentrons Calibration Adapter - Magnetic Module",
+      "displayCategory": "other",
+      "displayVolumeUnits": "µL",
+      "tags": []
+  },
+  "dimensions": {
+      "xDimension": 127.75,
+      "yDimension": 85.5,
+      "zDimension": 15.5
+  },
+  "wells": {
+      "A1": {
+          "depth": 0.25,
+          "totalLiquidVolume": 100,
+          "shape": "rectangular",
+          "xDimension": 20,
+          "yDimension": 20,
+          "x": 63.87,
+          "y": 42.63,
+          "z": 15.25
+      }
+  },
+  "groups": [
+      {
+          "metadata": {
+              "wellBottomShape": "flat"
+          },
+          "wells": [
+              "A1"
+          ]
+      }
+  ],
+  "parameters": {
+      "format": "irregular",
+      "quirks": [],
+      "isTiprack": false,
+      "isMagneticModuleCompatible": true,
+      "loadName": "opentrons_calibration_adapter_magnetic_module"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+  }
+}
