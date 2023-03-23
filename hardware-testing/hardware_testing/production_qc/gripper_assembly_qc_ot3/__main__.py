@@ -20,8 +20,7 @@ async def _main(cfg: TestConfig) -> None:
         gripper="GRPV102",
     )
     await api.home()
-    await api.move_rel(OT3Mount.GRIPPER, Point(x=-520))
-    await api.move_rel(OT3Mount.GRIPPER, Point(y=-250))
+    await api.move_rel(OT3Mount.GRIPPER, Point(x=-520, y=-250))
 
     while not api.has_gripper():
         ui.get_user_ready("attach a gripper")
