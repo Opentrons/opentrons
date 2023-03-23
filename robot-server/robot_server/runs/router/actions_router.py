@@ -12,7 +12,8 @@ from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResp
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
 from ..engine_store import EngineStore
-from ..run_store import RunStore, RunNotFoundError
+from ..run_store import RunStore
+from ..run_models import RunNotFoundError
 from ..run_controller import RunController, RunActionNotAllowedError
 from ..action_models import RunAction, RunActionCreate
 from ..dependencies import get_engine_store, get_run_store
