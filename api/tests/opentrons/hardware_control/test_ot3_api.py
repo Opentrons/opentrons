@@ -76,6 +76,8 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         expected_liquid_height=109,
         log_pressure=False,
         aspirate_while_sensing=False,
+        auto_zero_sensor=False,
+        num_baseline_reads=10,
         data_file="fake_file_name",
     )
 
@@ -447,6 +449,8 @@ async def test_liquid_probe(
             expected_liquid_height=109,
             log_pressure=False,
             aspirate_while_sensing=True,
+            auto_zero_sensor=False,
+            num_baseline_reads=10,
             data_file="fake_file_name",
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
@@ -458,6 +462,8 @@ async def test_liquid_probe(
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.log_pressure,
+            fake_settings_aspirate.auto_zero_sensor,
+            fake_settings_aspirate.num_baseline_reads,
         )
 
         return_dict[head_node], return_dict[pipette_node] = 142, 142
@@ -1022,7 +1028,7 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
-        await ot3_hardware.drop_tip(Mount.LEFT)
+        await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_has_calls(
             calls=[

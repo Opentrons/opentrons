@@ -22,3 +22,24 @@ class BinaryMessageId(int, Enum):
     release_estop = 0x08
     engage_nsync_out = 0x09
     release_nsync_out = 0x0A
+    estop_state_change = 0x0B
+    estop_button_detection_change = 0x0C
+    door_switch_state_request = 0x0D
+    door_switch_state_info = 0x0E
+
+
+@unique
+class LightTransitionType(int, Enum):
+    """The types of transitons that the lights can perform."""
+
+    linear = 0x00
+    sinusoid = 0x01
+    instant = 0x02
+
+
+@unique
+class LightAnimationType(int, Enum):
+    """Whether an action is looping or runs one single time."""
+
+    looping = 0x00
+    single_shot = 0x01
