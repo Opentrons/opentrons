@@ -4,13 +4,15 @@ from functools import lru_cache
 from typing import Type, Union, Optional
 from typing_extensions import get_args
 
-from ..binary_constants import BinaryMessageId
+from ..binary_constants import BinaryMessageId, LightTransitionType, LightActionType
 from .. import utils
 import logging
 from .fields import (
     FirmwareShortSHADataField,
     VersionFlagsField,
     OptionalRevisionField,
+    LightTransitionTypeField,
+    LightActionTypeField,
 )
 
 log = logging.getLogger(__name__)
@@ -202,6 +204,42 @@ class DoorSwitchStateInfo(utils.BinarySerializable):
     door_open: utils.UInt8Field = utils.UInt8Field(0)
 
 
+@dataclass 
+class AddLightActionRequest(utils.BinarySerializable):
+    """Add an action to the staging light queue."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.add_light_action
+    )
+    length: utils.UInt16Field = utils.UInt16Field(7)
+    transition_time: utils.UInt16Field = utils.UInt16Field(0)
+    transition_type: LightTransitionTypeField = LightTransitionTypeField(LightTransitionType.linear)
+    red: utils.UInt8Field = utils.UInt8Field(0)
+    green: utils.UInt8Field = utils.UInt8Field(0)
+    blue: utils.UInt8Field = utils.UInt8Field(0)
+    white: utils.UInt8Field = utils.UInt8Field(0)
+    
+@dataclass 
+class ClearLightActionStagingQueue(utils.BinarySerializable):
+    """Clear the staging queue for light actions."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.clear_light_action_staging_queue
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass 
+class StartLightAction(utils.BinarySerializable):
+    """Begin the action that is in the staging queue."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.start_light_action
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    type: LightActionTypeField = LightActionTypeField(LightActionType.single_shot)
+
+
 BinaryMessageDefinition = Union[
     Echo,
     Ack,
@@ -218,6 +256,9 @@ BinaryMessageDefinition = Union[
     EstopButtonDetectionChange,
     DoorSwitchStateRequest,
     DoorSwitchStateInfo,
+    AddLightActionRequest,
+    ClearLightActionStagingQueue,
+    StartLightAction,
 ]
 
 
