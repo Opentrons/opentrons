@@ -95,14 +95,14 @@ class ProtocolUsedByRun(ErrorDetails):
 
 
 class RunLink(BaseModel):
-    """Link to run resources."""
+    """Link to a run resource."""
 
     id: str = Field(..., description="The run's id")
     href: str = Field(..., description="The run's URL")
 
 
 class ProtocolLinks(BaseModel):
-    """Links returned along with a collection of runs."""
+    """Links returned along with a protocol resource."""
 
     referencingRunIds: List[RunLink] = Field(
         [],
