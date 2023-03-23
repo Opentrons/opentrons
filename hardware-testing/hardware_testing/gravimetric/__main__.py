@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
-    parser.add_argument("--channels", type=int, choices=[1, 8, 96], required=True)
+    parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--trials", type=int, required=True)
     starting_tip_choices = [
