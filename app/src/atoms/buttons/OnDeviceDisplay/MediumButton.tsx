@@ -3,11 +3,11 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Btn,
   COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
-  NewPrimaryBtn,
   SPACING,
   styleProps,
   TYPOGRAPHY,
@@ -136,7 +136,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     }
   `
   return (
-    <NewPrimaryBtn
+    <Btn
       {...buttonProps}
       css={MEDIUM_BUTTON_STYLE}
       aria-label={`MediumButton_${buttonType}`}
@@ -169,6 +169,6 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
           {buttonText}
         </StyledText>
       </Flex>
-    </NewPrimaryBtn>
+    </Btn>
   )
 }
