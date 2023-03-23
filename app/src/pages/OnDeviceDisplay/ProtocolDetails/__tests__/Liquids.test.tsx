@@ -1,22 +1,21 @@
 import * as React from 'react'
+import { UseQueryResult } from 'react-query'
+import { when } from 'jest-when'
+import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
+  ProtocolAnalyses,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { RUN_ID_1 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import { Liquids } from '../Liquids'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/api-client')
-jest.mock(
-  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-)
+jest.mock('@opentrons/react-api-client')
 
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
+const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
+  typeof useProtocolAnalysesQuery
 >
 const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
   typeof parseLiquidsInLoadOrder
@@ -24,6 +23,7 @@ const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFuncti
 const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.MockedFunction<
   typeof parseLabwareInfoByLiquidId
 >
+const MOCK_PROTOCOL_ID = 'mockProtocolId'
 const MOCK_PROTOCOL_ANALYSIS = {
   commands: [
     {
@@ -182,15 +182,17 @@ describe('Liquids', () => {
   let props: React.ComponentProps<typeof Liquids>
   beforeEach(() => {
     props = {
-      runId: RUN_ID_1,
+      protocolId: MOCK_PROTOCOL_ID,
     }
     mockParseLiquidsInLoadOrder.mockReturnValue(MOCK_LIQUIDS_IN_LOAD_ORDER)
     mockParseLabwareInfoByLiquidId.mockReturnValue(
       MOCK_LABWARE_INFO_BY_LIQUID_ID
     )
-    mockUseMostRecentCompletedAnalysis.mockReturnValue(
-      MOCK_PROTOCOL_ANALYSIS as CompletedProtocolAnalysis
-    )
+    when(mockUseProtocolAnalysesQuery)
+      .calledWith(MOCK_PROTOCOL_ID, { staleTime: Infinity })
+      .mockReturnValue({
+        data: { data: [MOCK_PROTOCOL_ANALYSIS] } as any,
+      } as UseQueryResult<ProtocolAnalyses>)
   })
   it('should render the correct headers and liquids', () => {
     const { getByRole, getByText, getByLabelText } = render(props)[0]

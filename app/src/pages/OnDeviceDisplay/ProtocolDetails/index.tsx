@@ -206,7 +206,6 @@ const Summary = (props: {
 }
 
 interface ProtocolSectionContentProps {
-  runId: string
   protocolId: string
   protocolData: ProtocolResource
   currentOption: TabOption
@@ -233,7 +232,7 @@ const ProtocolSectionContent = (
       protocolSection = <Labware protocolId={protocolId} />
       break
     case 'Liquids':
-      protocolSection = <Liquids runId={props.runId} />
+      protocolSection = <Liquids protocolId={props.protocolId} />
       break
     case 'Initial Deck Layout':
       protocolSection = <Deck protocolId={protocolId} />
@@ -308,7 +307,6 @@ export function ProtocolDetails(): JSX.Element | null {
         setCurrentOption={setCurrentOption}
       />
       <ProtocolSectionContent
-        runId={runId}
         protocolId={protocolId}
         protocolData={protocolRecord.data}
         currentOption={currentOption}

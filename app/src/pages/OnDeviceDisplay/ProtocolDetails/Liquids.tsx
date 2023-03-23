@@ -1,4 +1,5 @@
 import * as React from 'react'
+import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
@@ -19,7 +20,8 @@ import {
 } from '@opentrons/api-client'
 import { getTotalVolumePerLiquidId } from '../../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import { StyledText } from '../../../atoms/text'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
@@ -57,15 +59,18 @@ const TableDatum = styled('td')`
   }
 `
 
-export const Liquids = (props: { runId: string }): JSX.Element => {
-  const { runId } = props
-  const protocolData = useMostRecentCompletedAnalysis(runId)
+export const Liquids = (props: { protocolId: string }): JSX.Element => {
+  const { protocolId } = props
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
   const liquidsInOrder = parseLiquidsInLoadOrder(
-    protocolData?.liquids ?? [],
-    protocolData?.commands ?? []
+    (mostRecentAnalysis as CompletedProtocolAnalysis).liquids ?? [],
+    (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
   )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
-    protocolData?.commands ?? []
+    (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
   )
   const { t } = useTranslation('protocol_details')
 
