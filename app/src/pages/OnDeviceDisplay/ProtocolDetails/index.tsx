@@ -56,6 +56,9 @@ const ProtocolHeader = (props: {
   if (title.length > 92 && truncate) {
     displayedTitle = truncateString(title, 92, 69)
   }
+
+  //  TODO(ew, 3/23/23): put real info in the chip
+
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -92,7 +95,12 @@ const ProtocolHeader = (props: {
           </StyledText>
         </Flex>
       </Flex>
-      <Flex alignItems={ALIGN_CENTER} maxHeight="3.75rem" minWidth="15.6875rem">
+      <Flex
+        alignItems={ALIGN_CENTER}
+        marginLeft={SPACING.spacingXXL}
+        maxHeight="3.75rem"
+        minWidth="15.6875rem"
+      >
         <NewPrimaryBtn
           backgroundColor={COLORS.blueEnabled}
           borderRadius={BORDERS.size_six}
@@ -180,6 +188,7 @@ const Summary = (props: {
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
+        margin-top={SPACING.spacingM}
         maxWidth="22rem"
         padding={`${SPACING.spacing3} 0.75rem`}
       >
@@ -264,6 +273,7 @@ export function ProtocolDetails(): JSX.Element | null {
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
+    //  TODO(ew, 3/23/23): show user result via snackbar component
   }
 
   const handleRunProtocol = (): void => {
