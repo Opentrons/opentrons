@@ -164,7 +164,6 @@ export const GripperWizard = (
   }
   let onExit
   if (currentStep == null) return null
-  console.log('current', currentStep, currentStepIndex, gripperWizardSteps)
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmExit) {
     modalContent = (

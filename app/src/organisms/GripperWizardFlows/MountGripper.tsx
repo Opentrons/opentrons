@@ -4,6 +4,8 @@ import {
   COLOR_ERROR,
   JUSTIFY_SPACE_BETWEEN,
   Link,
+  ALIGN_CENTER,
+  SPACING,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import * as React from 'react'
@@ -16,7 +18,13 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
+const CAPITALIZE_FIRST_LETTER_STYLE = css`
+  &:first-letter {
+    text-transform: uppercase;
+  }
+`
 export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
@@ -26,6 +34,8 @@ export const MountGripper = (
   const handleOnClick = (): void => {
     attachedGripper == null ? setShowUnableToDetect(true) : proceed()
   }
+  // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
+  useInstrumentsQuery({ refetchInterval: 3000 })
 
   if (isRobotMoving)
     return (
@@ -39,7 +49,7 @@ export const MountGripper = (
       iconColor={COLOR_ERROR}
       isSuccess={false}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
         <Link
           role="button"
           css={TYPOGRAPHY.darkLinkH4SemiBold}
@@ -47,7 +57,9 @@ export const MountGripper = (
         >
           {t('shared:go_back')}
         </Link>
-        <PrimaryButton onClick={() => setShowUnableToDetect(false)}>
+        <PrimaryButton
+          css={CAPITALIZE_FIRST_LETTER_STYLE}
+          onClick={() => setShowUnableToDetect(false)}>
           {t('shared:try_again')}
         </PrimaryButton>
       </Flex>

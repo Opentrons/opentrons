@@ -16,6 +16,7 @@ import { PrimaryButton } from '../../atoms/buttons'
 import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 export const UnmountGripper = (
   props: GripperWizardStepProps
@@ -44,6 +45,8 @@ export const UnmountGripper = (
       setShowGripperStillDetected(true)
     }
   }
+  // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
+  useInstrumentsQuery({ refetchInterval: 3000 })
 
   if (isRobotMoving)
     return (

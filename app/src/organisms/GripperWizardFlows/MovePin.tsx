@@ -14,6 +14,8 @@ import { useCreateRunCommandMutation } from '../../resources/runs/hooks'
 import movePinStorageToFront from '../../assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
 import movePinFrontToRear from '../../assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
 import movePinRearToStorage from '../../assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
+import calibratingFrontJaw from '../../assets/videos/gripper-wizards/CALIBRATING_FRONT_JAW.webm'
+import calibratingRearJaw from '../../assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
 import type { GripperWizardStepProps, MovePinStep } from './types'
 import type { Coordinates } from '@opentrons/shared-data'
@@ -96,15 +98,27 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       header: string
       body: React.ReactNode
       buttonText: string
-      image: React.ReactNode
+      prepImage: React.ReactNode
+      inProgressImage?: React.ReactNode
     }
   } = {
     [MOVE_PIN_TO_FRONT_JAW]: {
       inProgressText: t('stand_back_gripper_is_calibrating'),
+      inProgressImage: (
+        <video
+          css={css`max-width: 100%; max-height: 20rem;`}
+          autoPlay={true}
+          loop={true}
+          controls={false}
+          aria-label='move calibration pin from front jaw to rear jaw'
+        >
+          <source src={calibratingFrontJaw} />
+        </video>
+      ),
       header: t('insert_pin_into_front_jaw'),
       body: t('move_pin_from_storage_to_front_jaw'),
       buttonText: t('begin_calibration'),
-      image: (
+      prepImage: (
         <video
           css={css`max-width: 100%; max-height: 20rem;`}
           autoPlay={true}
@@ -118,10 +132,21 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     },
     [MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW]: {
       inProgressText: t('stand_back_gripper_is_calibrating'),
+      inProgressImage: (
+        <video
+          css={css`max-width: 100%; max-height: 20rem;`}
+          autoPlay={true}
+          loop={true}
+          controls={false}
+          aria-label='move calibration pin from front jaw to rear jaw'
+        >
+          <source src={calibratingRearJaw} />
+        </video>
+      ),
       header: t('insert_pin_into_rear_jaw'),
       body: t('move_pin_from_front_to_rear_jaw'),
       buttonText: t('shared:continue'),
-      image: (
+      prepImage: (
         <video
           css={css`max-width: 100%; max-height: 20rem;`}
           autoPlay={true}
@@ -138,7 +163,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       header: t('remove_calibration_pin'),
       body: t('move_pin_from_rear_jaw_to_storage'),
       buttonText: t('complete_calibration'),
-      image: (
+      prepImage: (
         <video
           css={css`max-width: 100%; max-height: 20rem;`}
           autoPlay={true}
@@ -152,14 +177,14 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     },
   }
 
-  const { inProgressText, header, body, buttonText, image } = infoByMovement[
+  const { inProgressText, header, body, buttonText, prepImage, inProgressImage } = infoByMovement[
     movement
   ]
-  if (isRobotMoving) return <InProgressModal description={inProgressText} />
+  if (isRobotMoving) return <InProgressModal description={inProgressText} alternativeSpinner={inProgressImage} />
   return (
     <GenericWizardTile
       header={header}
-      rightHandBody={image}
+      rightHandBody={prepImage}
       bodyText={<StyledText as="p">{body}</StyledText>}
       proceedButtonText={buttonText}
       proceed={handleOnClick}
