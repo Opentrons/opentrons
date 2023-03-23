@@ -48,7 +48,7 @@ describe('ReturnTip', () => {
   })
   it('renders correct copy', () => {
     const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Prepare tip rack in slot 1' })
+    getByRole('heading', { name: 'Return tip rack to slot 1' })
     getByText('Clear all deck slots of labware')
     getByText(
       matchTextWithSpans(
