@@ -234,6 +234,8 @@
   "not_connected": "Not connected",
   "connected_via": "Connected via {{networkInterface}}",
   "text_size_description": "Text on all screens will adjust to the size you choose below.",
+  "robot_system_version_available": "Robot System Version {{releaseVersion}} Available",
+  "updating_ot3": "Updating the OT-3 requires a restart",
   "display_led_lights": "Display LED Lights",
   "update_channel_description": "Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.",
   "alpha_description": "Warning: alpha releases are feature-complete but may contain significant bugs.",
