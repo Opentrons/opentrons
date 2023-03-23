@@ -667,7 +667,10 @@ def get_temperature_humidity_outside_api_ot3(mount: OT3Mount, is_simulating: boo
             return 25.0, 50.0
         async with build.driver(settings) as driver:
             messenger = CanMessenger(driver=driver)
-            return await _get_temp_humidity(messenger, mount)
+            messenger.start()
+            ret = await _get_temp_humidity(messenger, mount)
+            await messenger.stop()
+            return ret
 
     loop = asyncio.get_event_loop()
     task = loop.create_task(_run())
