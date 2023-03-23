@@ -65,7 +65,7 @@ def build_report(test_name: str) -> CSVReport:
                 title=TestSection.WIDTH.value, lines=test_width.build_csv_lines()
             ),
             CSVSection(
-                title=TestSection.PROBE.value, lines=test_width.build_csv_lines()
+                title=TestSection.PROBE.value, lines=test_probe.build_csv_lines()
             ),
         ],
     )

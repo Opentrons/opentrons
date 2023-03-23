@@ -90,7 +90,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             print(f"moving down {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
             await _save_result(_get_test_tag(current, speed, "down", "start"))
             await api.move_rel(mount, Point(z=-Z_AXIS_TRAVEL_DISTANCE), speed=speed)
-            down_passed = await _save_result(_get_test_tag(current, speed, "down", "end"))
+            down_passed = await _save_result(
+                _get_test_tag(current, speed, "down", "end")
+            )
             # MOVE UP
             print(f"moving up {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
             await _save_result(_get_test_tag(current, speed, "up", "start"))
@@ -104,8 +106,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             # await api._backend.set_active_current({z_ax: default_z_current})
             await api.home([z_ax])
             if not down_passed or not up_passed and not api.is_simulator:
-                keep_testing = ui.get_user_answer(f"current {current} failed, "
-                                                  f"test remaining speeds for this current")
+                keep_testing = ui.get_user_answer(
+                    f"current {current} failed, "
+                    f"test remaining speeds for this current"
+                )
                 if not keep_testing:
                     print("skipping any remaining speeds at this current")
                     break
