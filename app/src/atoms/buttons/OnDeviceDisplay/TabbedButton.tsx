@@ -13,6 +13,7 @@ const FOREGROUND_STYLES = css`
   &:focus,
   &:hover {
     background-color: ${COLORS.highlightPurple_one};
+    box-shadow: none;
   }
 
   &:active {
@@ -27,6 +28,7 @@ const BACKGROUND_STYLES = css`
   &:focus,
   &:hover {
     background-color: ${COLORS.highlightPurple_two};
+    box-shadow: none;
   }
 
   &:active {
@@ -54,7 +56,6 @@ export const TabbedButton = styled(NewPrimaryBtn)<TabbedButtonProps>`
 
       ${styleProps}
 
-      &:focus,
       &:focus-visible {
         box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
       }
