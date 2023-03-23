@@ -18,15 +18,15 @@ from opentrons.protocol_engine import (
     Liquid,
 )
 from robot_server.service.json_api import ResourceModel
-from .action_models import RunAction
+from .maintenance_action_models import MaintenanceRunAction
 
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
 # this summary model is a lot less useful. Remove and replace with full `Command`
 # models once problematically large objects like full labware and module definitions
 # are no longer part of the public command.result API
-class RunCommandSummary(ResourceModel):
-    """A stripped down model of a full Command for usage in a Run response."""
+class MaintenanceRunCommandSummary(ResourceModel):
+    """A stripped down model of a full Command for usage in a Maintenance run response."""
 
     id: str = Field(..., description="Unique command identifier.")
     key: str = Field(
@@ -57,8 +57,8 @@ class RunCommandSummary(ResourceModel):
     )
 
 
-class Run(ResourceModel):
-    """Run resource model."""
+class MaintenanceRun(ResourceModel):
+    """Maintenance run resource model."""
 
     id: str = Field(..., description="Unique run identifier.")
     createdAt: datetime = Field(..., description="When the run was created")
@@ -69,10 +69,6 @@ class Run(ResourceModel):
             "Whether this run is currently controlling the robot."
             " There can be, at most, one current run."
         ),
-    )
-    actions: List[RunAction] = Field(
-        ...,
-        description="Client-initiated run control actions.",
     )
     errors: List[ErrorOccurrence] = Field(
         ...,
@@ -115,21 +111,17 @@ class Run(ResourceModel):
     )
 
 
-class RunCreate(BaseModel):
-    """Create request data for a new run."""
+class MaintenanceRunCreate(BaseModel):
+    """Create request data for a new maintenance run."""
 
-    protocolId: Optional[str] = Field(
-        None,
-        description="Protocol resource ID that this run will be using, if applicable.",
-    )
     labwareOffsets: List[LabwareOffsetCreate] = Field(
         default_factory=list,
         description="Labware offsets to apply as labware are loaded.",
     )
 
 
-class RunUpdate(BaseModel):
-    """Update request data for an existing run."""
+class MaintenanceRunUpdate(BaseModel):
+    """Update request data for an existing maintenance run."""
 
     current: Optional[bool] = Field(
         None,
@@ -147,11 +139,3 @@ class LabwareDefinitionSummary(BaseModel):
         ...,
         description="The definition's unique resource identifier in the run.",
     )
-
-
-class RunNotFoundError(ValueError):
-    """Error raised when a given Run ID is not found in the store."""
-
-    def __init__(self, run_id: str) -> None:
-        """Initialize the error message from the missing ID."""
-        super().__init__(f"Run {run_id} was not found.")
