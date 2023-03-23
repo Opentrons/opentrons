@@ -1,9 +1,12 @@
 from opentrons import APIVersion
 
 from opentrons.hardware_control.emulation.settings import (
-    Settings, SmoothieSettings, PipetteSettings
+    Settings,
+    SmoothieSettings,
+    PipetteSettings,
 )
 from g_code_test_data.g_code_configuration import ProtocolGCodeConfirmConfig
+from opentrons.hardware_control.emulation.types import ModuleType
 import pytest
 
 
@@ -28,7 +31,7 @@ SWIFT_SMOOTHIE_SETTINGS.tempdeck.temperature.degrees_per_tick = 50
 ##################
 
 BASIC_SMOOTHIE = ProtocolGCodeConfirmConfig(
-    name='basic_smoothie',
+    name="basic_smoothie",
     path="protocol/protocols/fast/smoothie_protocol.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -36,7 +39,7 @@ BASIC_SMOOTHIE = ProtocolGCodeConfirmConfig(
             left=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
             right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
         )
-    )
+    ),
 )
 
 BECKMAN = ProtocolGCodeConfirmConfig(
@@ -45,9 +48,9 @@ BECKMAN = ProtocolGCodeConfirmConfig(
     settings=Settings(
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
-            right=PipetteSettings(model="p20_multi_v2.1", id="P20SV202020070101")
+            right=PipetteSettings(model="p20_multi_v2.1", id="P20SV202020070101"),
         )
-    )
+    ),
 )
 
 CHERRY_PICKING = ProtocolGCodeConfirmConfig(
@@ -58,7 +61,7 @@ CHERRY_PICKING = ProtocolGCodeConfirmConfig(
             left=PipetteSettings(model="p300_single_v2.1", id="P20SV202020070101"),
             right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
         )
-    )
+    ),
 )
 
 CUSTOMIZABLE_SERIAL_DILUTION = ProtocolGCodeConfirmConfig(
@@ -69,11 +72,11 @@ CUSTOMIZABLE_SERIAL_DILUTION = ProtocolGCodeConfirmConfig(
             left=PipetteSettings(model="p300_single_v2.1", id="P20SV202020070101"),
             right=PipetteSettings(model="p20_multi_v2.1", id="P20SV202020070101"),
         ),
-    )
+    ),
 )
 
 TWO_SINGLE_CHANNEL = ProtocolGCodeConfirmConfig(
-    name='2_single_channel',
+    name="2_single_channel",
     path="protocol/protocols/fast/2_single_channel_v2.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -81,17 +84,17 @@ TWO_SINGLE_CHANNEL = ProtocolGCodeConfirmConfig(
             left=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
             right=PipetteSettings(model="p300_single_v2.1", id="P20SV202020070101"),
         )
-    )
+    ),
 )
 
 SET_MAX_SPEED = ProtocolGCodeConfirmConfig(
     path="protocol/protocols/fast/set_max_speed.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
-    settings=SWIFT_SMOOTHIE_SETTINGS
+    settings=SWIFT_SMOOTHIE_SETTINGS,
 )
 
 TWO_MODULES = ProtocolGCodeConfirmConfig(
-    name='2_modules',
+    name="2_modules",
     path="protocol/protocols/slow/2_modules_1s_1m_v2.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -99,7 +102,7 @@ TWO_MODULES = ProtocolGCodeConfirmConfig(
             left=PipetteSettings(model="p300_single_v2.1", id="P20SV202020070101"),
             right=PipetteSettings(model="p20_multi_v2.1", id="P20SV202020070101"),
         ),
-    )
+    ),
 )
 
 
@@ -111,7 +114,7 @@ OPENTRONS_LOGO = ProtocolGCodeConfirmConfig(
             left=PipetteSettings(model="p20_multi_v2.1", id="P20SV202020070101"),
             right=PipetteSettings(model="p300_single_v2.1", id="P20SV202020070101"),
         ),
-    )
+    ),
 )
 
 OMEGA = ProtocolGCodeConfirmConfig(
@@ -122,7 +125,7 @@ OMEGA = ProtocolGCodeConfirmConfig(
             left=PipetteSettings(model="p1000_single_v2.1", id="P20SV202020070101"),
             right=PipetteSettings(model="p300_single_v2.1", id="P20SV202020070101"),
         ),
-    )
+    ),
 )
 
 ILLUMINA = ProtocolGCodeConfirmConfig(
@@ -131,9 +134,9 @@ ILLUMINA = ProtocolGCodeConfirmConfig(
     settings=Settings(
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p20_multi_v2.1", id="P20SV202020070101"),
-            right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101")
+            right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
         )
-    )
+    ),
 )
 
 PCR_PREP_PART_1 = ProtocolGCodeConfirmConfig(
@@ -142,32 +145,59 @@ PCR_PREP_PART_1 = ProtocolGCodeConfirmConfig(
     settings=Settings(
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p1000_single_v2.1", id="P20SV202020070101"),
-            right=PipetteSettings(model="p1000_single_v2.1", id="P20SV202020070101")
+            right=PipetteSettings(model="p1000_single_v2.1", id="P20SV202020070101"),
         )
-    )
+    ),
 )
 
 PCR_PREP_PART_2 = ProtocolGCodeConfirmConfig(
     path="protocol/protocols/fast/pcr_prep_part_2.py",
-    versions={APIVersion(2, 12), APIVersion(2, 13)},
+    versions={APIVersion(2, 12), APIVersion(2, 13),APIVersion(2, 14)},
     settings=Settings(
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
-            right=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101")
+            right=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
         )
-    )
+    ),
 )
 
 SWIFT_SMOKE = ProtocolGCodeConfirmConfig(
     path="protocol/protocols/slow/swift_smoke.py",
-    versions={APIVersion(2, 12), APIVersion(2, 13)},
-    settings=SWIFT_SMOOTHIE_SETTINGS
+    versions={APIVersion(2, 12), APIVersion(2, 13), APIVersion(2, 14)},
+    settings=SWIFT_SMOOTHIE_SETTINGS,
 )
 
 SWIFT_TURBO = ProtocolGCodeConfirmConfig(
     path="protocol/protocols/slow/swift_turbo.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
-    settings=SWIFT_SMOOTHIE_SETTINGS
+    settings=SWIFT_SMOOTHIE_SETTINGS,
+)
+
+# JSON v6 protocols
+
+NO_MODS = ProtocolGCodeConfirmConfig(
+    name="no_mods",
+    path="protocol/protocols/fast/OT2_P300M_P20S_NoMod_6_1_MixTransferManyLiquids.json",
+    versions={6},
+    settings=Settings(
+        smoothie=SmoothieSettings(
+            left=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
+            right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
+        )
+    ),
+)
+
+JSON_SMOKE = ProtocolGCodeConfirmConfig(
+    name="json_smoke",
+    path="protocol/protocols/fast/OT2_P300M_P20S_HS_TM_6_3_SmokeV3.json",
+    versions={6},
+    settings=Settings(
+        modules=[ModuleType.Temperature, ModuleType.Heatershaker],
+        smoothie=SmoothieSettings(
+            left=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
+            right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
+        )
+    ),
 )
 
 SLOW_PROTOCOLS = [
@@ -193,6 +223,8 @@ FAST_PROTOCOLS = [
     PCR_PREP_PART_2,
     SET_MAX_SPEED,
     TWO_SINGLE_CHANNEL,
+    NO_MODS,
+    JSON_SMOKE,
 ]
 
 PROTOCOL_CONFIGURATIONS = SLOW_PROTOCOLS + FAST_PROTOCOLS

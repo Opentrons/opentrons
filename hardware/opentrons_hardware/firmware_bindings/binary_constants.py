@@ -24,6 +24,9 @@ class BinaryMessageId(int, Enum):
     release_nsync_out = 0x0A
     estop_state_change = 0x0B
     estop_button_detection_change = 0x0C
+    door_switch_state_request = 0x0D
+    door_switch_state_info = 0x0E
+
 
 @unique
 class LightTransitionType(int, Enum):
