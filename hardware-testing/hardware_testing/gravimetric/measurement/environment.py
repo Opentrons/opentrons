@@ -2,7 +2,9 @@
 from dataclasses import dataclass, fields
 from typing import Callable, List
 
-from hardware_testing.opentrons_api.helpers_ot3 import get_temperature_humidity_outside_api_ot3
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    get_temperature_humidity_outside_api_ot3,
+)
 from hardware_testing.opentrons_api.types import OT3Mount
 
 

@@ -109,7 +109,9 @@ def _get_approach_submerge_retract_heights(
     return approach_mm, submerge_mm, retract_mm
 
 
-def _submerge(pipette: InstrumentContext, well: Well, height: float, channel_offset: Point) -> None:
+def _submerge(
+    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
         force_direct=True,
@@ -117,7 +119,9 @@ def _submerge(pipette: InstrumentContext, well: Well, height: float, channel_off
     )
 
 
-def _retract(pipette: InstrumentContext, well: Well, height: float, channel_offset: Point) -> None:
+def _retract(
+    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
         force_direct=True,
@@ -194,7 +198,9 @@ def _pipette_with_liquid_settings(
             for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
-                _retract(pipette, well, approach_mm, channel_offset)  # retract to the approach height
+                _retract(
+                    pipette, well, approach_mm, channel_offset
+                )  # retract to the approach height
                 pipette.blow_out().aspirate(pipette.min_volume).dispense()
                 _submerge(pipette, well, submerge_mm, channel_offset)
         # aspirate specified volume

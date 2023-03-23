@@ -12,10 +12,7 @@ from . import execute, helpers, workarounds
 from .config import GravimetricConfig
 
 LABWARE_OFFSETS: List[dict] = list()
-PROTOCOL_CFG = {
-    1000: gravimetric_ot3_p1000,
-    50: gravimetric_ot3_p50
-}
+PROTOCOL_CFG = {1000: gravimetric_ot3_p1000, 50: gravimetric_ot3_p50}
 
 
 def run(
@@ -34,10 +31,11 @@ def run(
     stable: bool,
 ) -> None:
     """Run."""
+    protocol_cfg = PROTOCOL_CFG[pipette_volume]
     execute.run(
         protocol,
         GravimetricConfig(
-            name=PROTOCOL_CFG[pipette_volume].metadata["protocolName"],
+            name=protocol_cfg.metadata["protocolName"],  # type: ignore[attr-defined]
             pipette_mount="left",
             pipette_volume=pipette_volume,
             pipette_channels=pipette_channels,
@@ -45,8 +43,8 @@ def run(
             trials=trials,
             starting_tip=starting_tip,
             labware_offsets=LABWARE_OFFSETS,
-            slot_vial=PROTOCOL_CFG[pipette_volume].SLOT_VIAL,
-            slots_tiprack=PROTOCOL_CFG[pipette_volume].SLOTS_TIPRACK[tip_volume],
+            slot_vial=protocol_cfg.SLOT_VIAL,  # type: ignore[attr-defined]
+            slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
             increment=increment,
             return_tip=return_tip,
             blank=blank,
@@ -93,7 +91,7 @@ if __name__ == "__main__":
             print(f"\t\t{offset['vector']}")
             LABWARE_OFFSETS.append(offset)
     _ctx = helpers.get_api_context(
-        PROTOCOL_CFG[args.pipette].requirements["apiLevel"],
+        PROTOCOL_CFG[args.pipette].requirements["apiLevel"],  # type: ignore[attr-defined]
         is_simulating=args.simulate,
         pipette_left=f"p{args.pipette}_single_v3.3",
     )

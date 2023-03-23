@@ -103,8 +103,9 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
 
 
 def _get_channel_offset(cfg: config.GravimetricConfig, channel: int) -> Point:
-    assert channel < cfg.pipette_channels, \
-        f"unexpected channel on {cfg.pipette_channels} channel pipette: {channel}"
+    assert (
+        channel < cfg.pipette_channels
+    ), f"unexpected channel on {cfg.pipette_channels} channel pipette: {channel}"
     if cfg.pipette_channels == 1:
         return Point()
     if cfg.pipette_channels == 8:
@@ -119,9 +120,7 @@ def _get_channel_offset(cfg: config.GravimetricConfig, channel: int) -> Point:
 def _load_pipette(
     ctx: ProtocolContext, cfg: config.GravimetricConfig, tipracks: List[Labware]
 ) -> InstrumentContext:
-    load_str_channels = {
-        1: "single", 8: "multi", 96: "96"
-    }
+    load_str_channels = {1: "single", 8: "multi", 96: "96"}
     if cfg.pipette_channels not in load_str_channels:
         raise ValueError(f"unexpected number of channels: {cfg.pipette_channels}")
     chnl_str = load_str_channels[cfg.pipette_channels]
@@ -223,7 +222,9 @@ def _run_trial(
                 recorder.add_simulation_mass(volume * -0.001)
             elif m_type == MeasurementType.DISPENSE:
                 recorder.add_simulation_mass(volume * 0.001)
-        m_data = record_measurement_data(ctx, m_tag, recorder, pipette.mount, stable, shorten=inspect)
+        m_data = record_measurement_data(
+            ctx, m_tag, recorder, pipette.mount, stable, shorten=inspect
+        )
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
             (

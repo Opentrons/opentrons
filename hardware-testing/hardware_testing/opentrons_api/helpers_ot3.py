@@ -631,7 +631,9 @@ async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
     return data.to_float()  # type: ignore[union-attr]
 
 
-async def _get_temp_humidity(messenger: CanMessenger, mount: OT3Mount) -> Tuple[float, float]:
+async def _get_temp_humidity(
+    messenger: CanMessenger, mount: OT3Mount
+) -> Tuple[float, float]:
     node_id = sensor_node_for_mount(mount)
     # FIXME: allow SensorId to specify which sensor on the device to read from
     environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
@@ -650,10 +652,14 @@ async def get_temperature_humidity_ot3(
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
         return 25.0, 50.0
-    return await _get_temp_humidity(api._backend._messenger, mount)
+    messenger = api._backend._messenger  # type: ignore[union-attr]
+    return await _get_temp_humidity(messenger, mount)
 
 
-def get_temperature_humidity_outside_api_ot3(mount: OT3Mount, is_simulating: bool = False) -> Tuple[float, float]:
+def get_temperature_humidity_outside_api_ot3(
+    mount: OT3Mount, is_simulating: bool = False
+) -> Tuple[float, float]:
+    """Get the temperature/humidity reading from the pipette outside of a protocol."""
     settings = DriverSettings(
         interface=can_bus_settings.DEFAULT_INTERFACE,
         port=can_bus_settings.DEFAULT_PORT,
