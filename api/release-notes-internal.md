@@ -21,6 +21,8 @@ This is still pretty early in the process, so some things are known not to work,
 
 ### ODD
 - Attach, detach, and calibration flows for pipettes or gripper
+- Deleting protocols stored on the robot via the ODD
+- Changing the text size on the ODD through the settings
 
 ### Robot Control
 - USB connectivity
@@ -36,20 +38,17 @@ This is still pretty early in the process, so some things are known not to work,
 
 ### ODD
 - Protocol execution
-- Deleting protocols stored on the robot
 - Network connection management, including viewing IP addresses and connecting to wifi networks
 - Automatic updates of robot software when new internal releases are created
 - Chrome remote devtools - if you enable them and then use Chrome to go to robotip:9223 you'll get devtools
 - After a while, the ODD should go into idle; if you touch it, it will come back online
 
-
 ## Smaller Known Issues
 ### Robot Control
 - Pipette and gripper automated offset calibration still uses linear search and might have issues; double check that it worked right
 
-
 ## Smaller fun features
 - Pipette firmware senses tips now and puts it on the canbus 
 - The Z-stage will now update its position from encoders after picking up tip instead of homing
-- You can change the text size on the ODD through the settings
+- Some nice images and animations are in place while the robot is starting
 - You can change the brightness of the ODD through the settings
