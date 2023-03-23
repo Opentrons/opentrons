@@ -34,9 +34,9 @@ export function useLastRunCommandKey(runId: string): string | null {
       keepPreviousData: true,
     }
   )
-  return (
-    commandsData?.links?.current?.meta?.key ??
-    commandsData?.data?.[0]?.key ??
-    null
-  )
+  return commandsData?.data?.[0]?.intent !== 'setup'
+    ? commandsData?.links?.current?.meta?.key ??
+        commandsData?.data?.[0]?.key ??
+        null
+    : null
 }

@@ -38,7 +38,7 @@ describe('CheckItem', () => {
 
   beforeEach(() => {
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
-    mockCreateRunCommand = jest.fn()
+    mockCreateRunCommand = jest.fn().mockImplementation(() => Promise.resolve())
     props = {
       section: SECTIONS.CHECK_LABWARE,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -227,7 +227,7 @@ describe('CheckItem', () => {
     })
   })
 
-  it('executes heater shaker open latch command on mount if step is on HS', async () => {
+  it('executes heater shaker open latch command on component mount if step is on HS', async () => {
     props = {
       ...props,
       location: { slotName: '1', moduleModel: HEATERSHAKER_MODULE_V1 },
@@ -281,6 +281,10 @@ describe('CheckItem', () => {
         {
           commandType: 'heaterShaker/closeLabwareLatch',
           params: { moduleId: 'firstHSId' },
+        },
+        {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: 'secondHSId' },
         },
         {
           commandType: 'moveToWell',

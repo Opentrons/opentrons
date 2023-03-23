@@ -505,7 +505,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       trackProtocolRunEvent({ name: 'runPause' })
     }
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
-    buttonIconName = null
+    buttonIconName = 'ot-spinner'
     buttonText = t('canceling_run')
   } else if (runStatus != null && START_RUN_STATUSES.includes(runStatus)) {
     buttonIconName = 'play'
@@ -562,7 +562,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             name={buttonIconName}
             size={SIZE_1}
             marginRight={SPACING.spacing3}
-            spin={isProtocolAnalyzing}
+            spin={
+              isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
+            }
           />
         ) : null}
         <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
