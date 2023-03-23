@@ -48,6 +48,7 @@ from robot_server.protocols.protocol_store import (
 )
 
 from robot_server.protocols.router import (
+    ProtocolLinks,
     create_protocol,
     get_protocols,
     get_protocol_by_id,
@@ -243,12 +244,14 @@ async def test_get_protocol_by_id(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.PYTHON,
-        metadata=Metadata().parse_obj({"referencedRunIds": []}),
+        metadata=Metadata(),
         robotType="OT-2 Standard",
         analysisSummaries=[analysis_summary],
         files=[],
         key="dummy-key-111",
     )
+
+    assert result.content.links == ProtocolLinks.construct(referencingRunIds=[])
     assert result.status_code == 200
 
 
