@@ -28,10 +28,14 @@ This is still pretty early in the process, so some things are known not to work,
 - USB connectivity
 - Pipette/gripper firmware update on attach: if you need to attach a new instrument, attach it and then power-cycle the robot or restart the robot server
 - Pipette pressure sensing both for liquid-level sensing purposes and for clog-detection purposes
+- Labware pick up failure with gripper
+- Cancelling a protocol might hang - fix is to restart
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
-- Protocol execution
+- Liquid handling protocols with 1 and 8 channel pipettes
+- Labware movement between slots/modules, both manual and with gripper, from python protocols
+- Labware drop/gripper crash errors, but they're very insensitive
 - Pipette and gripper automated offset calibration
 - Network connectivity and discoverability
 - Firmware update for all devices attached when the robot turns on

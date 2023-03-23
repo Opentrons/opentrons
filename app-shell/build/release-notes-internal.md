@@ -14,6 +14,7 @@ This is still pretty early in the process, so some things are known not to work,
 - Attach, detach, and calibration flows for the gripper
 - USB connectivity
 - Pipette/gripper firmware update on attach: if you need to attach a new instrument, attach it and then power-cycle the robot
+- If you leave the app on the device page it will very frequently ask what instrument is connected, which causes problems; don't leave the app on the device page of the robot for a really long time
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 - Connecting to Flexs
