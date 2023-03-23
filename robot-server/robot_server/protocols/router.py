@@ -5,7 +5,8 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, UploadFile, status, Form
-from typing import Dict, List, Optional, Union
+from pydantic import BaseModel, Field
+from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_reader import (
@@ -91,6 +92,22 @@ class ProtocolUsedByRun(ErrorDetails):
 
     id: Literal["ProtocolUsedByRun"] = "ProtocolUsedByRun"
     title: str = "Protocol Used by Run"
+
+
+class RunLink(BaseModel):
+    """Link to run resources."""
+
+    href: str = Field(..., description="The run's URL")
+    id: str = Field(..., description="The run's id")
+
+
+class ProtocolLinks(BaseModel):
+    """Links returned along with a collection of runs."""
+
+    referencingRunIds: List[RunLink] = Field(
+        [],
+        description="Links to runs that reference the protocol.",
+    )
 
 
 protocols_router = APIRouter()
@@ -301,7 +318,7 @@ async def get_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> PydanticResponse[Body[Protocol, Dict[str, List[str]]]]:
+) -> PydanticResponse[Body[Protocol, ProtocolLinks]]:
     """Get an uploaded protocol by ID.
 
     Args:
@@ -330,9 +347,17 @@ async def get_protocol_by_id(
         ],
     )
 
+    links = ProtocolLinks.construct(
+        referencingRunIds=[
+            RunLink.construct(href=f"/runs/{runId}", id=runId)
+            for runId in referencingRunIds
+        ]
+    )
+
     return await PydanticResponse.create(
         content=Body.construct(
-            data=data, links={"referencingRunIds": referencingRunIds}
+            data=data,
+            links=links,
         ),
         status_code=status.HTTP_200_OK,
     )
