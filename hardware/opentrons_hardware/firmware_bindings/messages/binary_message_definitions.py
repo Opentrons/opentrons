@@ -247,6 +247,39 @@ class StartLightAction(utils.BinarySerializable):
     )
 
 
+@dataclass
+class SetDeckLightRequest(utils.BinarySerializable):
+    """Set the deck light on or off."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.set_deck_light_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    # Set to 0 for off, 1 for on
+    setting: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class GetDeckLightRequest(utils.BinarySerializable):
+    """Get the deck light status."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.get_deck_light_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class GetDeckLightResponse(utils.BinarySerializable):
+    """Contains deck light status."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.get_deck_light_response
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+    setting: utils.UInt8Field = utils.UInt8Field(0)
+
+
 BinaryMessageDefinition = Union[
     Echo,
     Ack,
@@ -266,6 +299,9 @@ BinaryMessageDefinition = Union[
     AddLightActionRequest,
     ClearLightActionStagingQueue,
     StartLightAction,
+    SetDeckLightRequest,
+    GetDeckLightRequest,
+    GetDeckLightResponse,
 ]
 
 
