@@ -4,9 +4,9 @@ import {
   COLORS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
+  AlertPrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { AlertPrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType } from './types'

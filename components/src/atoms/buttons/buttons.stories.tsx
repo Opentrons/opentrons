@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Flex, DIRECTION_ROW, SPACING } from '../../index'
 import { PrimaryButton } from './PrimaryButton'
 import { SecondaryButton } from './SecondaryButton'
+import { AlertPrimaryButton } from './AlertPrimaryButton'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -39,4 +40,20 @@ const SecondaryButtonTemplate: Story<
 export const Secondary = SecondaryButtonTemplate.bind({})
 Secondary.args = {
   children: 'secondary button',
+}
+
+const AlertPrimaryButtonTemplate: Story<
+  React.ComponentProps<typeof AlertPrimaryButton>
+> = args => {
+  const { children } = args
+  return (
+    <Flex>
+      <AlertPrimaryButton>{children}</AlertPrimaryButton>
+    </Flex>
+  )
+}
+
+export const AlertPrimary = AlertPrimaryButtonTemplate.bind({})
+AlertPrimary.args = {
+  children: 'alert tertiary button',
 }

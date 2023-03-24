@@ -5,9 +5,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
-} from '@opentrons/components'
+} from '../../../index'
 
-import { AlertPrimaryButton } from '..'
+import { AlertPrimaryButton } from '../AlertPrimaryButton'
 
 const render = (props: React.ComponentProps<typeof AlertPrimaryButton>) => {
   return renderWithProviders(<AlertPrimaryButton {...props} />)[0]

@@ -10,10 +10,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
   COLORS,
+  AlertPrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { AlertPrimaryButton } from '../../atoms/buttons'
 
 import { NeedHelpLink } from './NeedHelpLink'
 

@@ -10,6 +10,7 @@ import {
   Icon,
   ALIGN_CENTER,
   TYPOGRAPHY,
+  AlertPrimaryButton,
   DIRECTION_ROW,
   COLORS,
   SPACING,
@@ -18,7 +19,6 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { AlertPrimaryButton } from '../../../atoms/buttons'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,

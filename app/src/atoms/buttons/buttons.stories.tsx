@@ -11,7 +11,6 @@ import {
   TertiaryButton,
   QuaternaryButton,
   SubmitPrimaryButton,
-  AlertPrimaryButton,
   ToggleButton,
 } from './index'
 import { StyledText } from '../text'
@@ -72,23 +71,6 @@ SubmitPrimary.args = {
   },
   disabled: false,
 }
-
-const AlertPrimaryButtonTemplate: Story<
-  React.ComponentProps<typeof AlertPrimaryButton>
-> = args => {
-  const { children } = args
-  return (
-    <Flex>
-      <AlertPrimaryButton>{children}</AlertPrimaryButton>
-    </Flex>
-  )
-}
-
-export const AlertPrimary = AlertPrimaryButtonTemplate.bind({})
-AlertPrimary.args = {
-  children: 'alert tertiary button',
-}
-
 const ToggleButtonTemplate: Story<
   React.ComponentProps<typeof ToggleButton>
 > = args => {

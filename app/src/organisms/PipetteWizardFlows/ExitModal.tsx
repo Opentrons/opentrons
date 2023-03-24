@@ -7,9 +7,9 @@ import {
   Flex,
   TYPOGRAPHY,
   SecondaryButton,
+  AlertPrimaryButton,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { AlertPrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'

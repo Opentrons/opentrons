@@ -4,9 +4,9 @@ import {
   COLORS,
   SPACING,
   SecondaryButton,
+  AlertPrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import { AlertPrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
 import type { Direction } from './types'
