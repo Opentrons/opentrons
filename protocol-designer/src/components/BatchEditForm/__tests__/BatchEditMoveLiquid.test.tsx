@@ -1,6 +1,10 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import { DeprecatedPrimaryButton, OutlineButton, Tooltip } from '@opentrons/components'
+import {
+  DeprecatedPrimaryButton,
+  OutlineButton,
+  Tooltip,
+} from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
   BatchEditMoveLiquid,
