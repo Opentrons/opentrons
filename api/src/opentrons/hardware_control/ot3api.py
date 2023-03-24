@@ -1512,6 +1512,8 @@ class OT3API(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
     ) -> None:
         for press in pipette_spec.presses:
+            start_pos = await self.gantry_position(mount) # move 96ch back to init pos
+            print("force pick up def\n")
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
                     {axis: current for axis, current in press.current.items()}
@@ -1519,11 +1521,21 @@ class OT3API(
                 target_down = target_position_from_relative(
                     mount, press.relative_down, self._current_position
                 )
-                await self._move(target_down, speed=press.speed)
+                try:
+                    print("moving down\n")
+                    await self._move(target_down, speed=press.speed)
+                except RuntimeError as e:
+                    if "collision_detected" in str(e):
+                        print("Collision detected\n")
+                        await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
+                    else:
+                        raise e
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
-            await self._move(target_up)
+            # await self._move(target_up) # prevent 96ch from moving up after tip pick up
+            print("move to start\n")
+            await self.move_to(mount, start_pos) # move 96ch back to init pos
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
@@ -1568,10 +1580,11 @@ class OT3API(
             realmount, tip_length, presses, increment
         )
 
-        if spec.pick_up_motor_actions:
-            await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
-        else:
-            await self._force_pick_up_tip(realmount, spec)
+        ### 96 ch change
+        # if spec.pick_up_motor_actions:
+        #     await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
+        # else:
+        await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
@@ -1580,7 +1593,7 @@ class OT3API(
             await self.move_rel(realmount, rel_point, speed=speed)
         # Here we add in the debounce distance for the switch as
         # a safety precaution
-        await self.retract(realmount, spec.retract_target)
+        # await self.retract(realmount, spec.retract_target)
 
         _add_tip_to_instrs()
 
