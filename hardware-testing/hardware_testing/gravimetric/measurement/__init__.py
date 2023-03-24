@@ -131,10 +131,12 @@ def record_measurement_data(
     ctx: ProtocolContext,
     tag: str,
     recorder: GravimetricRecorder,
+    mount: str,
+    stable: bool,
     shorten: bool = False,
 ) -> MeasurementData:
     """Record measurement data."""
-    env_data = read_environment_data()
+    env_data = read_environment_data(mount, ctx.is_simulating())
     # NOTE: we need to delay some amount, to give the scale time to accumulate samples
     with recorder.samples_of_tag(tag):
         if ctx.is_simulating():
@@ -148,7 +150,7 @@ def record_measurement_data(
             )
             ctx.delay(DELAY_FOR_MEASUREMENT)
     return _build_measurement_data(
-        recorder, tag, env_data, stable=not shorten, simulating=ctx.is_simulating()
+        recorder, tag, env_data, stable=stable, simulating=ctx.is_simulating()
     )
 
 
@@ -190,7 +192,6 @@ def calculate_change_in_volume(
         )
         * 1000.0
     )
-    # NOTE: aspirate will be negative, dispense will be positive
-    liquid_grams = before.grams_average - after.grams_average
+    liquid_grams = abs(before.grams_average - after.grams_average)
     liquid_micro_liters = liquid_grams * z_factor * 1000.0
     return liquid_micro_liters

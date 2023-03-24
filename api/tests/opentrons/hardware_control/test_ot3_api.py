@@ -670,8 +670,8 @@ async def test_pipette_capacitive_sweep(
 @pytest.mark.parametrize(
     "probe,intr_probe",
     [
-        (GripperProbe.FRONT, InstrumentProbeType.PRIMARY),
-        (GripperProbe.REAR, InstrumentProbeType.SECONDARY),
+        (GripperProbe.FRONT, InstrumentProbeType.SECONDARY),
+        (GripperProbe.REAR, InstrumentProbeType.PRIMARY),
     ],
 )
 @pytest.mark.parametrize(
@@ -1028,7 +1028,7 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
-        await ot3_hardware.drop_tip(Mount.LEFT)
+        await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_has_calls(
             calls=[
