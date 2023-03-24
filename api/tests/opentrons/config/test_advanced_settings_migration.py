@@ -7,9 +7,11 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 23
+    return 24
 
 
+# make sure to set a boolean value in default_file_settings only if
+# that value has a migration that changes an old default value to a new one
 @pytest.fixture
 def default_file_settings() -> Dict[str, Any]:
     return {
@@ -21,7 +23,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "rearPanelIntegration": None,
+        "rearPanelIntegration": True,
     }
 
 
@@ -280,6 +282,18 @@ def v23_config(v22_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v24_config(v23_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v23_config.copy()
+    r.update(
+        {
+            "_version": 24,
+            "rearPanelIntegration": True,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -308,6 +322,7 @@ def v23_config(v22_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v21_config"),
         lazy_fixture("v22_config"),
         lazy_fixture("v23_config"),
+        lazy_fixture("v24_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
@@ -322,11 +337,17 @@ def test_migrations(
     settings, version = _migrate(old_settings)
 
     expected = default_file_settings.copy()
+    # this updates the default file settings value to the previous default
+    # the final check if default_file_settings[k] is None was added for when
+    # a migration changes the default value. Without it we overwrite the new
+    # default value with the old default value
     expected.update(
         {
             k: v
             for k, v in old_settings.items()
-            if k != "_version" and k in default_file_settings
+            if k != "_version"
+            and k in default_file_settings
+            and default_file_settings[k] is None
         }
     )
 
