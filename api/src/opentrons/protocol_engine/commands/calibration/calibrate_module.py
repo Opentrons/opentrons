@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import MountType
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
@@ -15,10 +15,9 @@ from opentrons.protocol_engine.commands.command import (
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleData
     from ...state import StateView
 
-from ...types import DeckSlotLocation, ModuleModel, ModuleOffsetVector
+from ...types import ModuleOffsetVector
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount
@@ -31,13 +30,7 @@ CalibrateModuleCommandType = Literal["calibration/calibrateModule"]
 class CalibrateModuleParams(BaseModel):
     """Payload required to calibrate-module."""
 
-    model: ModuleModel = Field(
-        ..., description="The model name of the module to calibrate."
-    )
     moduleId: str = Field(..., description="The unique id of module to calibrate.")
-    location: DeckSlotLocation = Field(
-        ..., description="The slot location this module is in."
-    )
     mount: MountType = Field(
         ..., description="The instrument mount used to calibrate the module."
     )
@@ -60,12 +53,10 @@ class CalibrateModuleImplementation(
         self,
         state_view: StateView,
         hardware_api: HardwareControlAPI,
-        equipment: EquipmentHandler,
         **kwargs: object,
     ) -> None:
         self._state_view = state_view
         self._hardware_api = hardware_api
-        self._equipment = equipment
 
     async def execute(self, params: CalibrateModuleParams) -> CalibrateModuleResult:
         """Execute calibrate-module command."""
@@ -73,16 +64,16 @@ class CalibrateModuleImplementation(
             self._hardware_api,
         )
         ot3_mount = OT3Mount.from_mount(params.mount)
-        slot = DeckSlotName(params.location.slotName).as_int()
-        module: LoadedModuleData = await self._equipment.load_module(
-            params.model, params.location, params.moduleId
-        )
+        module = self._state_view.modules.get(params.moduleId)
+        slot = self._state_view.modules.get_location(params.moduleId).slotName.as_int()
         # TODO (ba, 2023-03-15): add calibration adapter definitions offsets
-        nominal_position = self._state_view.geometry.get_labware_center(
-            params.moduleId, params.location
+        nominal_position = self._state_view.geometry.get_labware_origin_position(
+            params.moduleId
         )
+
+        # start the calibration
         module_offset = await calibration.calibrate_module(
-            ot3_api, ot3_mount, slot, module.serial_number, nominal_position
+            ot3_api, ot3_mount, slot, module.serialNumber, nominal_position
         )
 
         return CalibrateModuleResult(

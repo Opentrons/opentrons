@@ -1121,7 +1121,7 @@
         },
         "location": {
           "title": "Location",
-          "description": "\n\nFor the Thermocycler Module, which occupies multiple deck slots, this should be the front-most occupied slot (normally slot 7).",
+          "description": "The location into which this module should be loaded.\n\nFor the Thermocycler Module, which occupies multiple deck slots, this should be the front-most occupied slot (normally slot 7).",
           "allOf": [
             {
               "$ref": "#/definitions/DeckSlotLocation"
@@ -3298,27 +3298,10 @@
       "description": "Payload required to calibrate-module.",
       "type": "object",
       "properties": {
-        "model": {
-          "description": "The model name of the module to calibrate.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModuleModel"
-            }
-          ]
-        },
         "moduleId": {
           "title": "Moduleid",
           "description": "The unique id of module to calibrate.",
           "type": "string"
-        },
-        "location": {
-          "title": "Location",
-          "description": "The slot location this module is in.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/DeckSlotLocation"
-            }
-          ]
         },
         "mount": {
           "description": "The instrument mount used to calibrate the module.",
@@ -3330,9 +3313,7 @@
         }
       },
       "required": [
-        "model",
         "moduleId",
-        "location",
         "mount"
       ]
     },
@@ -3423,6 +3404,6 @@
       ]
     }
   },
-  "$id": "opentronsCommandSchemaV8",
+  "$id": "opentronsCommandSchemaV7",
   "$schema": "http://json-schema.org/draft-07/schema#"
 }

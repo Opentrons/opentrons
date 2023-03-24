@@ -458,7 +458,7 @@ async def test_method_enum(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_binary",
         AsyncMock(spec=find_slot_center_binary),
     ) as binary, patch(
-        "opentrons.hardware_control.ot3_calibration._get_calibration_square_position_in_slot",
+        "opentrons.hardware_control.ot3_calibration.get_calibration_square_position_in_slot",
         Mock(),
     ) as calibration_target, patch(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
