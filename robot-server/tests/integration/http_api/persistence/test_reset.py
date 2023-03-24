@@ -66,7 +66,7 @@ async def _wait_until_initialization_failed(robot_client: RobotClient) -> None:
                 # The server has reported some other unexpected status code.
                 assert (
                     False
-                ), f"Expected server to report failed initialization, but got: {response}"
+                ), f"Expected server to report failed initialization, but got: {error.response}"
         else:
             # Server hasn't has unexpectedly reported success.
             assert (
