@@ -122,7 +122,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     gauge = _get_gauge(api.is_simulator)
     gauge.connect()
 
-    ui.print_header("SETUP FORCE TEST")
     # HOME
     print("homing Z and G...")
     await api.home([z_ax, g_ax])
@@ -136,6 +135,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await api.move_to(mount, target_pos)
     if not api.is_simulator:
         ui.get_user_ready("prepare to grip")
+
     # LOOP THROUGH FORCES
     ui.print_header("MEASURE NEWTONS")
     for expected_force in GRIP_FORCES_NEWTON:
