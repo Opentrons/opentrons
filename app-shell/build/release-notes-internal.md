@@ -17,7 +17,7 @@ This is still pretty early in the process, so some things are known not to work,
 - If you leave the app on the device page it will very frequently ask what instrument is connected, which causes problems; don't leave the app on the device page of the robot for a really long time
 
 ## Big Things That Do Work Please Do Report Bugs About Them
-- Connecting to Flexs
+- Connecting to a Flex
 - Running protocols on those Flexs including simulate, play/pause, labware position check
   - Except for gripper; no LPC for gripper
 - Attach, detach, and calibration flows for 1, 8, and 96-channel pipettes when started from the device page
