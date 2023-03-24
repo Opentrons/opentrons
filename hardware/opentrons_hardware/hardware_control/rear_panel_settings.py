@@ -6,7 +6,11 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     BinaryMessageDefinition,
     DoorSwitchStateRequest,
     DoorSwitchStateInfo,
+    SetDeckLightRequest,
+    GetDeckLightRequest,
+    GetDeckLightResponse,
 )
+from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from typing import Callable, cast, List, Optional
 
@@ -45,4 +49,38 @@ async def get_door_state(messenger: Optional[BinaryMessenger]) -> bool:
     if len(responses) > 0:
         return bool(cast(DoorSwitchStateInfo, responses[0]).door_open.value)
     # in case of timeout (no messages received) just return closed
+    return False
+
+
+async def set_deck_light(setting: int, messenger: Optional[BinaryMessenger]) -> bool:
+    if messenger is None:
+        # the EVT bots don't have rear panels...
+        return False
+    # Fire-and-forget, ignoring the ack
+    await messenger.send(SetDeckLightRequest(setting=utils.UInt8Field(setting)))
+    return True
+
+
+async def get_deck_light_state(messenger: Optional[BinaryMessenger]) -> bool:
+    """Returns true if the light is currently on."""
+    if messenger is None:
+        # the EVT bots don't have rear panels...
+        return False
+    event = asyncio.Event()
+    responses: List[BinaryMessageDefinition] = list()
+    listener = _create_listener(event, responses)
+    messenger.add_listener(
+        listener,
+        lambda message_id: bool(message_id == BinaryMessageId.get_deck_light_response),
+    )
+    await messenger.send(GetDeckLightRequest())
+    try:
+        await asyncio.wait_for(event.wait(), 1.0)
+    except asyncio.TimeoutError:
+        log.error("get deck light request timed out before response")
+    finally:
+        messenger.remove_listener(listener)
+    if len(responses) > 0:
+        return bool(cast(GetDeckLightResponse, responses[0]).setting.value > 0)
+    # in case of timeout (no messages received) just return off
     return False
