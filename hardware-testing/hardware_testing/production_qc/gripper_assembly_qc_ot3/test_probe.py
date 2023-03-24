@@ -101,7 +101,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         result = CSVResult.from_bool(valid)
         report(section, tag, [no_probe, probe, found, z_limit, deck, result])
 
-    for probe, sensor_id in zip(GripperProbe, SensorId):
+    for probe in GripperProbe:
+        sensor_id = helpers_ot3.sensor_id_for_instrument(GripperProbe.to_type(probe))
         ui.print_header(f"Probe: {probe}")
         cap_sensor = sensor_types.CapacitiveSensor.build(sensor_id, NodeId.gripper)
         print("homing and grip...")
@@ -145,8 +146,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if valid_height:
             if not api.is_simulator:
                 ui.get_user_ready("about to press into the deck")
-            height_pressing_deck = found_pos - DISTANCE_PRESS_INTO_DECK_MM
-            await api.move_to(mount, probe_pos._replace(z=height_pressing_deck))
+            await api.move_to(mount, probe_pos._replace(z=found_pos))
             if not api.is_simulator:
                 reading_on_deck = await _read_from_sensor(api, s_driver, cap_sensor, 10)
         print(f"Reading on deck: {reading_on_deck}")
