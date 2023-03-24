@@ -10,6 +10,7 @@ import {
   DIRECTION_ROW,
   Icon,
 } from '@opentrons/components'
+import { ODD_FOCUS_VISIBLE_STYE } from '../../../App/constants'
 import { StyledText } from '../../text'
 import type { IconName, StyleProps } from '@opentrons/components'
 
@@ -18,7 +19,7 @@ interface LargeButtonProps extends StyleProps {
   onClick: () => void
   buttonType: LargeButtonTypes
   buttonText: React.ReactNode
-  iconName?: IconName
+  iconName: IconName
   disabled?: boolean
 }
 
@@ -87,9 +88,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE_STYE};
     }
-
     &:active {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
@@ -116,8 +116,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         {buttonText}
       </StyledText>
       <Icon
-        name={iconName ?? 'play-round-corners'}
-        aria-label={`LargeButton_${iconName ?? 'play'}`}
+        name={iconName}
+        aria-label={`LargeButton_${iconName}`}
         color={
           disabled
             ? COLORS.darkBlack_sixty
