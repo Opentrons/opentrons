@@ -31,7 +31,7 @@ const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  padding: 0 ${SPACING.spacing5} ${SPACING.spacing3} ${SPACING.spacing5};
+  padding: 0 ${SPACING.spacing5} ${SPACING.spacing3};
 `
 const TableRow = styled('tr')`
   height: 5.75rem;
@@ -65,7 +65,9 @@ interface LiquidDetailsProps {
 export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
   const { liquid, labwareByLiquidId, runId, commands } = props
   const { t } = useTranslation('protocol_setup')
-  const [labwareIdModal, setLabwareId] = React.useState<string | null>(null)
+  const [labwareIdModal, setLabwareIdModal] = React.useState<string | null>(
+    null
+  )
   return (
     <Flex marginTop={SPACING.spacing5}>
       {labwareIdModal != null && (
@@ -73,7 +75,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
           labwareId={labwareIdModal}
           liquidId={liquid.id}
           runId={runId}
-          closeModal={() => setLabwareId(null)}
+          closeModal={() => setLabwareIdModal(null)}
         />
       )}
       <Table>
@@ -92,9 +94,9 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
             )
             return (
               <TableRow
-                key={index}
+                key={labware.labwareId}
                 aria-label={`LiquidDetails_${liquid.id}`}
-                onClick={() => setLabwareId(labware.labwareId)}
+                onClick={() => setLabwareIdModal(labware.labwareId)}
               >
                 <TableDatum>
                   <Flex>
@@ -104,14 +106,18 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                       borderRadius={BORDERS.size_three}
                       border={`3px solid ${COLORS.darkBlackEnabled}`}
                       fontSize={TYPOGRAPHY.fontSize20}
-                      fontWeight={700}
+                      fontWeight="700"
                     >
                       {slotName}
                     </Flex>
                   </Flex>
                 </TableDatum>
                 <TableDatum>
-                  <StyledText lineHeight={TYPOGRAPHY.lineHeight28}>
+                  <StyledText
+                    lineHeight={TYPOGRAPHY.lineHeight28}
+                    fontSize="1.375rem"
+                    fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  >
                     {labwareName}
                   </StyledText>
                 </TableDatum>
