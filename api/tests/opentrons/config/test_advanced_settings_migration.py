@@ -7,9 +7,11 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 19
+    return 24
 
 
+# make sure to set a boolean value in default_file_settings only if
+# that value has a migration that changes an old default value to a new one
 @pytest.fixture
 def default_file_settings() -> Dict[str, Any]:
     return {
@@ -21,7 +23,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "enableProtocolEnginePAPICore": None,
+        "rearPanelIntegration": True,
     }
 
 
@@ -95,12 +97,7 @@ def v5_config(v4_config: Dict[str, Any]) -> Dict[str, Any]:
 @pytest.fixture
 def v6_config(v5_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v5_config.copy()
-    r.update(
-        {
-            "_version": 6,
-            "enableTipLengthCalibration": True,
-        }
-    )
+    r.update({"_version": 6, "enableTipLengthCalibration": True})
     return r
 
 
@@ -237,6 +234,66 @@ def v18_config(v17_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v19_config(v18_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v18_config.copy()
+    r.pop("enableLoadLiquid")
+    r.update({"_version": 19})
+    return r
+
+
+@pytest.fixture
+def v20_config(v19_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v19_config.copy()
+    r.update(
+        {
+            "_version": 20,
+            "enableOT3FirmwareUpdates": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v21_config(v20_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v20_config.copy()
+    r.pop("enableProtocolEnginePAPICore")
+    r.update({"_version": 21})
+    return r
+
+
+@pytest.fixture
+def v22_config(v21_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v21_config.copy()
+    r.pop("enableOT3FirmwareUpdates")
+    r.update({"_version": 22})
+    return r
+
+
+@pytest.fixture
+def v23_config(v22_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v22_config.copy()
+    r.update(
+        {
+            "_version": 23,
+            "rearPanelIntegration": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v24_config(v23_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v23_config.copy()
+    r.update(
+        {
+            "_version": 24,
+            "rearPanelIntegration": True,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -260,6 +317,12 @@ def v18_config(v17_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v16_config"),
         lazy_fixture("v17_config"),
         lazy_fixture("v18_config"),
+        lazy_fixture("v19_config"),
+        lazy_fixture("v20_config"),
+        lazy_fixture("v21_config"),
+        lazy_fixture("v22_config"),
+        lazy_fixture("v23_config"),
+        lazy_fixture("v24_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
@@ -274,11 +337,17 @@ def test_migrations(
     settings, version = _migrate(old_settings)
 
     expected = default_file_settings.copy()
+    # this updates the default file settings value to the previous default
+    # the final check if default_file_settings[k] is None was added for when
+    # a migration changes the default value. Without it we overwrite the new
+    # default value with the old default value
     expected.update(
         {
             k: v
             for k, v in old_settings.items()
-            if k != "_version" and k in default_file_settings
+            if k != "_version"
+            and k in default_file_settings
+            and default_file_settings[k] is None
         }
     )
 
@@ -340,5 +409,5 @@ def test_ensures_config() -> None:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "enableProtocolEnginePAPICore": None,
+        "rearPanelIntegration": None,
     }

@@ -22,6 +22,9 @@ import type {
   ConfigV10,
   ConfigV11,
   ConfigV12,
+  ConfigV13,
+  ConfigV14,
+  ConfigV15,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
@@ -39,7 +42,7 @@ export const DEFAULTS_V0: ConfigV0 = {
   },
 
   buildroot: {
-    manifestUrl: _DEFAULT_ROBOT_UPDATE_MANIFEST_URL_,
+    manifestUrl: OT2_MANIFEST_URL,
   },
 
   // logging config
@@ -247,7 +250,7 @@ const toVersion11 = (prevConfig: ConfigV10): ConfigV11 => {
   return nextConfig
 }
 
-// config version 11 migration and defaults
+// config version 12 migration and defaults
 const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
   // @ts-expect-error deleting a key from the config removes a required param from the prev config
   delete prevConfig.buildroot
@@ -265,6 +268,48 @@ const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
   return nextConfig
 }
 
+// config version 13 migration and defaults
+const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 13 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      protocolsOnDeviceSortKey: null,
+    },
+  }
+  return nextConfig
+}
+
+// config version 14 migration and defaults
+const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 14 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      pinnedProtocolIds: [],
+    },
+  }
+  return nextConfig
+}
+
+// config version 15 migration and defaults
+const toVersion15 = (prevConfig: ConfigV14): ConfigV15 => {
+  // Note (kj:02/10/2023) default settings
+  // sleepMs: never(24h x 7 days), brightness device default settings, textSize x1
+  const nextConfig = {
+    ...prevConfig,
+    version: 15 as const,
+    onDeviceDisplaySettings: {
+      sleepMs: 60 * 1000 * 60 * 24 * 7,
+      brightness: 4,
+      textSize: 1,
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -277,7 +322,10 @@ const MIGRATIONS: [
   (prevConfig: ConfigV8) => ConfigV9,
   (prevConfig: ConfigV9) => ConfigV10,
   (prevConfig: ConfigV10) => ConfigV11,
-  (prevConfig: ConfigV11) => ConfigV12
+  (prevConfig: ConfigV11) => ConfigV12,
+  (prevConfig: ConfigV12) => ConfigV13,
+  (prevConfig: ConfigV13) => ConfigV14,
+  (prevConfig: ConfigV14) => ConfigV15
 ] = [
   toVersion1,
   toVersion2,
@@ -291,6 +339,9 @@ const MIGRATIONS: [
   toVersion10,
   toVersion11,
   toVersion12,
+  toVersion13,
+  toVersion14,
+  toVersion15,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -310,6 +361,9 @@ export function migrate(
     | ConfigV10
     | ConfigV11
     | ConfigV12
+    | ConfigV13
+    | ConfigV14
+    | ConfigV15
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

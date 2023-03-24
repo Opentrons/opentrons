@@ -10,8 +10,6 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 
-from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
-from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.types import DeckSlotName, Point
 
 from .well import WellCoreType
@@ -71,10 +69,6 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def set_name(self, new_name: str) -> None:
-        ...
-
-    @abstractmethod
     def get_definition(self) -> LabwareDefinitionDict:
         """Get the labware's definition as a plain dictionary."""
 
@@ -107,10 +101,6 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def set_tip_length(self, length: float) -> None:
-        ...
-
-    @abstractmethod
     def reset_tips(self) -> None:
         ...
 
@@ -120,30 +110,9 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
     ) -> Optional[str]:
         """Get the name of the next available tip(s) in the rack, if available."""
 
-    # TODO(mc, 2022-11-09): remove from abstract core
-    @abstractmethod
-    def get_tip_tracker(self) -> TipTracker:
-        ...
-
     @abstractmethod
     def get_well_columns(self) -> List[List[str]]:
         """Get the all well names, organized by column, from the labware's definition."""
-
-    @abstractmethod
-    def get_geometry(self) -> AbstractLabwareGeometry:
-        ...
-
-    @abstractmethod
-    def get_default_magnet_engage_height(
-        self,
-        preserve_half_mm: bool = False,
-    ) -> Optional[float]:
-        """Get the labware's default magnet engage height, if defined.
-
-        Value returned is in real millimeters from the labware's base,
-        unless `preserve_half_mm` is specified, in which case
-        some definitions will return half-millimeters.
-        """
 
     @abstractmethod
     def get_well_core(self, well_name: str) -> WellCoreType:

@@ -1,23 +1,51 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import capitalize from 'lodash/capitalize'
 import { SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import attachMountingPlate from '../../assets/images/change-pip/attach-mounting-plate.png'
-import { FLOWS } from './constants'
+import { BODY_STYLE, FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
 export const MountingPlate = (
   props: PipetteWizardStepProps
 ): JSX.Element | null => {
-  const { goBack, proceed, flowType, selectedPipette } = props
+  const {
+    goBack,
+    proceed,
+    flowType,
+    selectedPipette,
+    chainRunCommands,
+    setShowErrorMessage,
+  } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   //  this should never happen but to be safe
   if (selectedPipette === SINGLE_MOUNT_PIPETTES || flowType === FLOWS.CALIBRATE)
     return null
+
+  const handleDetachMountingPlate = (): void => {
+    chainRunCommands(
+      [
+        {
+          // @ts-expect-error calibration type not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: RIGHT,
+          },
+        },
+      ],
+      false
+    )
+      .then(() => {
+        proceed()
+      })
+      .catch(error => {
+        setShowErrorMessage(error.message)
+      })
+  }
 
   return (
     <GenericWizardTile
@@ -48,17 +76,19 @@ export const MountingPlate = (
             t={t}
             i18nKey="attach_mounting_plate_instructions"
             components={{
-              block: <StyledText as="p" marginBottom={SPACING.spacing4} />,
+              block: (
+                <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+              ),
             }}
           />
         ) : (
-          <StyledText as="p">
+          <StyledText css={BODY_STYLE}>
             {t('detach_mounting_plate_instructions')}
           </StyledText>
         )
       }
       proceedButtonText={capitalize(t('shared:continue'))}
-      proceed={proceed}
+      proceed={flowType === FLOWS.ATTACH ? proceed : handleDetachMountingPlate}
       back={goBack}
     />
   )

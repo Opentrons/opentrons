@@ -6,9 +6,14 @@ import * as Constants from '../../../redux/pipettes/constants'
 import type { PipetteModel } from '@opentrons/shared-data'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
-export function useAttachedPipettes(): AttachedPipettesByMount {
-  const attachedPipettesResponse = usePipettesQuery().data
-
+const PIPETTE_POLL_MS = 5000
+export function useAttachedPipettes(
+  poll: boolean = false
+): AttachedPipettesByMount {
+  const attachedPipettesResponse = usePipettesQuery(
+    {},
+    poll ? { refetchInterval: PIPETTE_POLL_MS } : {}
+  )?.data
   return Constants.PIPETTE_MOUNTS.reduce<AttachedPipettesByMount>(
     (result, mount) => {
       const attached = attachedPipettesResponse?.[mount] || null

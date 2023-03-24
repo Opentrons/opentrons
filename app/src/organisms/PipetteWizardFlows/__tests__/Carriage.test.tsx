@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
@@ -29,11 +30,12 @@ describe('Carriage', () => {
   let props: React.ComponentProps<typeof Carriage>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
+      chainRunCommands: jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
       attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.ATTACH,
@@ -41,6 +43,7 @@ describe('Carriage', () => {
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
@@ -53,6 +56,14 @@ describe('Carriage', () => {
     getByRole('button', { name: 'Continue' })
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
+  })
+  it('renders the correct button when is the on device display', () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_default')
   })
   it('returns the correct information, buttons work as expected when flow is detach', () => {
     props = {
@@ -88,18 +99,23 @@ describe('Carriage', () => {
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
   })
-  it('renders the error z axis still attached modal when check z axis button still detects the attachment', async () => {
-    const { getByText, getByRole } = render(props)
-    getByRole('button', { name: 'Continue' }).click()
-    getByText('Z-axis Screw Still Secure')
-    getByText(
-      'You need to loosen the screw before you can attach the 96-Channel Pipette'
+  it('clicking on continue button executes the commands correctly', async () => {
+    const { getByRole } = render(props)
+    const contBtn = getByRole('button', { name: 'Continue' })
+    fireEvent.click(contBtn)
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'home',
+          params: {
+            axes: 'rightZ',
+          },
+        },
+      ],
+      false
     )
-    getByRole('button', { name: 'try again' })
-    getByRole('button', { name: 'Cancel attachment' })
+    await waitFor(() => {
+      expect(props.proceed).toHaveBeenCalled()
+    })
   })
-  //  TODO(jr 1/13/23): when z axis screw status is fully wired up, extend test cases for:
-  // 2nd case try again button where button disappears
-  // try again button click being a success
-  // cancel attachment click
 })

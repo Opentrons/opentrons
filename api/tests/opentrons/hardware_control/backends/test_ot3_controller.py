@@ -1,32 +1,37 @@
+import asyncio
 from unittest.mock import mock_open
+import mock
 import pytest
-from typing import List, Optional, Set, Tuple, Any
+from typing import AsyncIterator, Dict, List, Optional, Set, Tuple, Any
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
     axis_to_node,
+    sensor_node_for_mount,
+    sub_system_to_node_id,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
     MessageListenerCallbackFilter,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, LiquidProbeSettings
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    USBTarget,
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
 from opentrons.hardware_control.types import (
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
     MotorStatus,
-    OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
@@ -36,17 +41,21 @@ from opentrons.hardware_control.errors import (
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
+from opentrons_hardware.firmware_update.utils import FirmwareUpdateType, UpdateInfo
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
 )
 from opentrons_hardware.hardware_control import current_settings
+from opentrons_hardware.hardware_control.network import DeviceInfoCache
 from opentrons_hardware.hardware_control.tools.detector import OneshotToolDetector
 from opentrons_hardware.hardware_control.tools.types import (
     ToolSummary,
     PipetteInformation,
     GripperInformation,
 )
+from opentrons_hardware.hardware_control.types import PCBARevision
 
 
 @pytest.fixture
@@ -94,13 +103,48 @@ def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> AsyncMock:
 
 
 @pytest.fixture
-def mock_driver(mock_messenger) -> AbstractCanDriver:
+def mock_can_driver(mock_messenger: AsyncMock) -> AbstractCanDriver:
     return AsyncMock(spec=AbstractCanDriver)
 
 
 @pytest.fixture
-def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Controller:
-    return OT3Controller(mock_config, mock_driver)
+def mock_usb_driver() -> SerialUsbDriver:
+    return AsyncMock(spec=SerialUsbDriver)
+
+
+@pytest.fixture
+def controller(
+    mock_config: OT3Config, mock_can_driver: AbstractCanDriver
+) -> OT3Controller:
+    with mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"):
+        yield OT3Controller(mock_config, mock_can_driver)
+
+
+@pytest.fixture
+def fake_liquid_settings() -> LiquidProbeSettings:
+    return LiquidProbeSettings(
+        starting_mount_height=100,
+        max_z_distance=15,
+        min_z_distance=5,
+        mount_speed=40,
+        plunger_speed=10,
+        sensor_threshold_pascals=15,
+        expected_liquid_height=109,
+        log_pressure=False,
+        aspirate_while_sensing=False,
+        auto_zero_sensor=False,
+        num_baseline_reads=8,
+        data_file="fake_data_file",
+    )
+
+
+@pytest.fixture
+def mock_send_stop_threshold() -> None:
+    with patch(
+        "opentrons_hardware.sensors.sensor_driver.SensorDriver.send_stop_threshold",
+        autospec=True,
+    ) as mock_stop_threshold:
+        yield mock_stop_threshold
 
 
 @pytest.fixture
@@ -114,23 +158,23 @@ def mock_move_group_run():
 
 
 @pytest.fixture
-def mock_present_nodes(controller: OT3Controller) -> OT3Controller:
-    old_pn = controller._present_nodes
-    controller._present_nodes = set(
+def mock_present_devices(controller: OT3Controller) -> OT3Controller:
+    old_pd = controller._present_devices
+    controller._present_devices = set(
         (
             NodeId.pipette_left,
             NodeId.gantry_x,
             NodeId.gantry_y,
-            NodeId.head_l,
-            NodeId.head_r,
+            NodeId.head,
             NodeId.pipette_right,
-            NodeId.gripper_z,
+            NodeId.gripper,
+            USBTarget.rear_panel,
         )
     )
     try:
         yield controller
     finally:
-        controller._present_nodes = old_pn
+        controller._present_devices = old_pd
 
 
 @pytest.fixture
@@ -146,6 +190,23 @@ def mock_tool_detector(controller: OT3Controller):
         )
 
         yield md
+
+
+@pytest.fixture
+def fw_update_info() -> Dict[NodeId, str]:
+    return {
+        NodeId.head: "/some/path/head.hex",
+        NodeId.gantry_x: "/some/path/gantry.hex",
+    }
+
+
+@pytest.fixture
+def fw_node_info() -> Dict[NodeId, DeviceInfoCache]:
+    node_cache1 = DeviceInfoCache(NodeId.head, 1, "12345678", None, PCBARevision(None))
+    node_cache2 = DeviceInfoCache(
+        NodeId.gantry_x, 1, "12345678", None, PCBARevision(None)
+    )
+    return {NodeId.head: node_cache1, NodeId.gantry_x: node_cache2}
 
 
 home_test_params = [
@@ -167,7 +228,7 @@ def move_group_run_side_effect(controller, axes_to_home):
     gantry_homes = {
         axis_to_node(ax): (0.0, 0.0, True, True)
         for ax in OT3Axis.gantry_axes()
-        if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
+        if ax in axes_to_home and axis_to_node(ax) in controller._present_devices
     }
     if gantry_homes:
         yield gantry_homes
@@ -175,14 +236,14 @@ def move_group_run_side_effect(controller, axes_to_home):
     pipette_homes = {
         axis_to_node(ax): (0.0, 0.0, True, True)
         for ax in OT3Axis.pipette_axes()
-        if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
+        if ax in axes_to_home and axis_to_node(ax) in controller._present_devices
     }
     yield pipette_homes
 
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_execute(
-    controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
+    controller: OT3Controller, mock_move_group_run, axes, mock_present_devices
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     # nothing has been homed
@@ -202,12 +263,12 @@ async def test_home_execute(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_prioritize_mount(
-    controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
+    controller: OT3Controller, mock_move_group_run, axes, mock_present_devices
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     # nothing has been homed
@@ -228,12 +289,12 @@ async def test_home_prioritize_mount(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_build_runners(
-    controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
+    controller: OT3Controller, mock_move_group_run, axes, mock_present_devices
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     assert not controller._motor_status
@@ -258,11 +319,11 @@ async def test_home_build_runners(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
-async def test_home_only_present_nodes(
+async def test_home_only_present_devices(
     controller: OT3Controller, mock_move_group_run, axes
 ):
     starting_position = {
@@ -275,7 +336,7 @@ async def test_home_only_present_nodes(
     }
     homed_position = {}
 
-    controller._present_nodes = set(
+    controller._present_devices = set(
         (NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r)
     )
     controller._position = starting_position
@@ -296,7 +357,7 @@ async def test_home_only_present_nodes(
             for move_group_step in move_group:
                 assert move_group_step  # don't pass in empty moves
                 for node, step in move_group_step.items():
-                    assert node in controller._present_nodes
+                    assert node in controller._present_devices
                     assert step  # don't pass in empty steps
                     homed_position[node] = 0.0  # track homed position for node
 
@@ -311,7 +372,7 @@ async def test_home_only_present_nodes(
 async def test_probing(
     controller: OT3Controller, mock_tool_detector: AsyncMock
 ) -> None:
-    assert controller._present_nodes == set()
+    assert controller._present_devices == set()
 
     call_count = 0
     fake_nodes = set(
@@ -347,14 +408,12 @@ async def test_probing(
                 NodeId.gripper,
             )
         )
-    assert controller._present_nodes == set(
+    assert controller._present_devices == set(
         (
             NodeId.gantry_x,
-            NodeId.head_l,
-            NodeId.head_r,
+            NodeId.head,
             NodeId.pipette_left,
-            NodeId.gripper_g,
-            NodeId.gripper_z,
+            NodeId.gripper,
         )
     )
 
@@ -371,10 +430,10 @@ async def test_probing(
                     serial="hello",
                 ),
                 right=None,
-                gripper=GripperInformation(model="0", serial="fake_serial"),
+                gripper=GripperInformation(model="0.0", serial="fake_serial"),
             ),
             "P1KSV33hello",
-            "GRPV0fake_serial",
+            "GRPV00fake_serial",
             "Gripper V1",
         ),
     ],
@@ -417,7 +476,7 @@ async def test_get_attached_instruments_handles_unknown_name(
             name=FirmwarePipetteName.unknown, name_int=41, model=30, serial="hello"
         ),
         right=None,
-        gripper=GripperInformation(model=0, serial="fake_serial"),
+        gripper=GripperInformation(model=0.0, serial="fake_serial"),
     )
     mock_tool_detector.return_value = tool_summary
 
@@ -443,7 +502,7 @@ async def test_get_attached_instruments_handles_unknown_model(
             serial="hello",
         ),
         right=None,
-        gripper=GripperInformation(model=0, serial="fake_serial"),
+        gripper=GripperInformation(model=0.0, serial="fake_serial"),
     )
     mock_tool_detector.return_value = tool_summary
 
@@ -524,8 +583,8 @@ async def test_gripper_jaw_width(controller: OT3Controller, mock_move_group_run)
 
 
 async def test_get_limit_switches(controller: OT3Controller) -> None:
-    assert controller._present_nodes == set()
-    fake_present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
+    assert controller._present_devices == set()
+    fake_present_devices = {NodeId.gantry_x, NodeId.gantry_y}
     call_count = 0
     fake_response = {
         NodeId.gantry_x: UInt8Field(0),
@@ -543,7 +602,7 @@ async def test_get_limit_switches(controller: OT3Controller) -> None:
 
     with patch(
         "opentrons.hardware_control.backends.ot3controller.get_limit_switches", fake_gls
-    ), patch.object(controller, "_present_nodes", fake_present_nodes):
+    ), patch.object(controller, "_present_devices", fake_present_devices):
         res = await controller.get_limit_switches()
         assert call_count == 1
         assert passed_nodes == {NodeId.gantry_x, NodeId.gantry_y}
@@ -582,7 +641,31 @@ async def test_ready_for_movement(
     controller._motor_status = motor_status
 
     axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
-    assert controller.check_ready_for_movement(axes) == ready
+    assert controller.check_motor_status(axes) == ready
+
+
+@pytest.mark.parametrize("mount", [OT3Mount.LEFT, OT3Mount.RIGHT])
+async def test_liquid_probe(
+    mount: OT3Mount,
+    controller: OT3Controller,
+    fake_liquid_settings: LiquidProbeSettings,
+    mock_move_group_run,
+    mock_send_stop_threshold,
+) -> None:
+    await controller.liquid_probe(
+        mount=mount,
+        max_z_distance=fake_liquid_settings.max_z_distance,
+        mount_speed=fake_liquid_settings.mount_speed,
+        plunger_speed=fake_liquid_settings.plunger_speed,
+        threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
+        log_pressure=fake_liquid_settings.log_pressure,
+    )
+    move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
+    head_node = axis_to_node(OT3Axis.by_mount(mount))
+    tool_node = sensor_node_for_mount(mount)
+    assert move_groups[head_node].stop_condition == MoveStopCondition.sync_line
+    assert len(move_groups) == 2
+    assert move_groups[head_node], move_groups[tool_node]
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
@@ -623,7 +706,7 @@ async def test_update_motor_status(
         "opentrons.hardware_control.backends.ot3controller.get_motor_position", fake_gmp
     ):
         nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
-        controller._present_nodes = nodes
+        controller._present_devices = nodes
         await controller.update_motor_status()
         for node in nodes:
             assert controller._position.get(node) == 0.223
@@ -662,30 +745,40 @@ async def test_update_motor_estimation(
 @pytest.mark.parametrize(
     argnames=["gantry_load", "expected_call"],
     argvalues=[
-        [GantryLoad.NONE, []],
-        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],
+        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],  # this uses the Q motor
         [GantryLoad.LOW_THROUGHPUT, []],
     ],
 )
 async def test_set_default_currents(
-    mock_present_nodes: OT3Controller, gantry_load: GantryLoad, expected_call: bool
+    mock_present_devices: OT3Controller, gantry_load: GantryLoad, expected_call: bool
 ):
-    mock_present_nodes._present_nodes.add(NodeId.gripper_g)
+    mock_present_devices._present_devices.add(NodeId.gripper)
     with patch(
         "opentrons.hardware_control.backends.ot3controller.set_currents",
         spec=current_settings.set_currents,
     ) as mocked_currents:
-        await mock_present_nodes.update_to_default_current_settings(gantry_load)
+        await mock_present_devices.update_to_default_current_settings(gantry_load)
         mocked_currents.assert_called_once_with(
             mocked_currents.call_args_list[0][0][0],
             mocked_currents.call_args_list[0][0][1],
             use_tip_motor_message_for=expected_call,
         )
-
-        for k, v in mock_present_nodes._current_settings.items():
-            assert (
-                mocked_currents.call_args_list[0][0][1][axis_to_node(k)] == v.as_tuple()
-            )
+        for k, v in mock_present_devices._current_settings.items():
+            if k == OT3Axis.P_L and (
+                gantry_load == GantryLoad.HIGH_THROUGHPUT
+                and expected_call[0] == NodeId.pipette_left
+            ):
+                # q motor config
+                v = mock_present_devices._current_settings[OT3Axis.Q]
+                assert (
+                    mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
+                    == v.as_tuple()
+                )
+            else:
+                assert (
+                    mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
+                    == v.as_tuple()
+                )
 
 
 @pytest.mark.parametrize(
@@ -693,7 +786,7 @@ async def test_set_default_currents(
     argvalues=[
         [
             {OT3Axis.X: 1.0, OT3Axis.Y: 2.0},
-            GantryLoad.NONE,
+            GantryLoad.LOW_THROUGHPUT,
             [{NodeId.gantry_x: 1.0, NodeId.gantry_y: 2.0}, []],
         ],
         [
@@ -704,22 +797,26 @@ async def test_set_default_currents(
     ],
 )
 async def test_set_run_current(
-    mock_present_nodes: OT3Controller,
+    mock_present_devices: OT3Controller,
     active_current: OT3AxisMap[float],
     gantry_load: GantryLoad,
     expected_call: List[Any],
 ):
     with patch(
-        "opentrons.hardware_control.backends.ot3controller.set_run_current",
-        spec=current_settings.set_run_current,
-    ) as mocked_currents:
-        await mock_present_nodes.update_to_default_current_settings(gantry_load)
-        await mock_present_nodes.set_active_current(active_current)
-        mocked_currents.assert_called_once_with(
-            mocked_currents.call_args_list[0][0][0],
-            expected_call[0],
-            use_tip_motor_message_for=expected_call[1],
-        )
+        "opentrons.hardware_control.backends.ot3controller.set_currents",
+        spec=current_settings.set_currents,
+    ):
+        with patch(
+            "opentrons.hardware_control.backends.ot3controller.set_run_current",
+            spec=current_settings.set_run_current,
+        ) as mocked_currents:
+            await mock_present_devices.update_to_default_current_settings(gantry_load)
+            await mock_present_devices.set_active_current(active_current)
+            mocked_currents.assert_called_once_with(
+                mocked_currents.call_args_list[0][0][0],
+                expected_call[0],
+                use_tip_motor_message_for=expected_call[1],
+            )
 
 
 @pytest.mark.parametrize(
@@ -727,7 +824,7 @@ async def test_set_run_current(
     argvalues=[
         [
             {OT3Axis.P_L: 0.5, OT3Axis.Y: 0.8},
-            GantryLoad.NONE,
+            GantryLoad.LOW_THROUGHPUT,
             [{NodeId.pipette_left: 0.5, NodeId.gantry_y: 0.8}, []],
         ],
         [
@@ -738,29 +835,67 @@ async def test_set_run_current(
     ],
 )
 async def test_set_hold_current(
-    mock_present_nodes: OT3Controller,
+    mock_present_devices: OT3Controller,
     hold_current: OT3AxisMap[float],
     gantry_load: GantryLoad,
     expected_call: List[Any],
 ):
     with patch(
-        "opentrons.hardware_control.backends.ot3controller.set_hold_current",
-        spec=current_settings.set_hold_current,
-    ) as mocked_currents:
-        await mock_present_nodes.update_to_default_current_settings(gantry_load)
-        await mock_present_nodes.set_hold_current(hold_current)
-        mocked_currents.assert_called_once_with(
-            mocked_currents.call_args_list[0][0][0],
-            expected_call[0],
-            use_tip_motor_message_for=expected_call[1],
-        )
+        "opentrons.hardware_control.backends.ot3controller.set_currents",
+        spec=current_settings.set_currents,
+    ):
+        with patch(
+            "opentrons.hardware_control.backends.ot3controller.set_hold_current",
+            spec=current_settings.set_hold_current,
+        ) as mocked_currents:
+            await mock_present_devices.update_to_default_current_settings(gantry_load)
+            await mock_present_devices.set_hold_current(hold_current)
+            mocked_currents.assert_called_once_with(
+                mocked_currents.call_args_list[0][0][0],
+                expected_call[0],
+                use_tip_motor_message_for=expected_call[1],
+            )
 
 
 async def test_update_required_flag(
     mock_messenger: CanMessenger, controller: OT3Controller
 ) -> None:
+    """Test that FirmwareUpdateRequired is raised when update_required flag is set."""
     axes = [OT3Axis.X, OT3Axis.Y]
-    controller._present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
+    controller._present_devices = {NodeId.gantry_x, NodeId.gantry_y}
+
+    with patch("builtins.open", mock_open()):
+        # raise FirmwareUpdateRequired if the _update_required flag is set
+        controller._update_required = True
+        controller._initialized = True
+        with pytest.raises(FirmwareUpdateRequired):
+            await controller.home(axes)
+
+
+async def test_update_required_bypass_firmware_update(controller: OT3Controller):
+    """Do not raise FirmwareUpdateRequired for update_firmware."""
+    controller._update_required = True
+    controller._initialized = True
+    with mock.patch(
+        "opentrons.hardware_control.backends.ot3controller.firmware_update.utils.load_firmware_manifest"
+    ):
+        try:
+            async for status_element in controller.update_firmware({}):
+                pass
+        except FirmwareUpdateRequired:
+            assert False, "update_firmware raised an exception."
+
+
+async def test_update_required_flag_false(controller: OT3Controller):
+    """Do not raise FirmwareUpdateRequired if update_required is False."""
+    controller._present_devices = {NodeId.gantry_x, NodeId.gantry_y}
+    for node in controller._present_devices:
+        controller._motor_status.update(
+            {node: MotorStatus(motor_ok=False, encoder_ok=True)}
+        )
+
+    # update_required is false so dont raise FirmwareUpdateRequired
+    controller._update_required = False
 
     async def fake_umpe(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
@@ -770,30 +905,215 @@ async def test_update_required_flag(
     with patch(
         "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
         fake_umpe,
-    ), patch(
-        "opentrons.hardware_control.backends.ot3controller.firmware_update.run_update"
-    ), patch(
-        "builtins.open", mock_open()
     ):
-        # raise FirmwareUpdateRequired if the _update_required flag is set
-        controller._update_required = True
-        with pytest.raises(FirmwareUpdateRequired):
-            await controller.update_motor_estimation(axes)
-
-        # do not raise for update_firmware
-        controller._update_required = True
         try:
-            await controller.update_firmware("/some/path", OT3SubSystem.head)
-        except FirmwareUpdateRequired:
-            assert False, "update_firmware raised an exception."
-
-        # do not raise if _update_required is False
-        controller._update_required = False
-        for node in controller._present_nodes:
-            controller._motor_status.update(
-                {node: MotorStatus(motor_ok=False, encoder_ok=True)}
-            )
-        try:
-            await controller.update_motor_estimation(axes)
+            async for status_element in controller.update_firmware({}):
+                pass
         except FirmwareUpdateRequired:
             assert False, "update_motor_estimation raised an exception."
+
+
+async def test_update_required_flag_initialized(controller: OT3Controller):
+    """Do not raise FirmwareUpdateRequired if initialized is False."""
+    controller._present_devices = {NodeId.gantry_x, NodeId.gantry_y}
+    for node in controller._present_devices:
+        controller._motor_status.update(
+            {node: MotorStatus(motor_ok=False, encoder_ok=True)}
+        )
+
+    # update_required is true, but initlaized is false so dont raise FirmwareUpdateRequired
+    controller._update_required = True
+    controller._initialized = False
+
+    async def fake_umpe(
+        can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
+    ):
+        return {node: (0.223, 0.323, False, True) for node in nodes}
+
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
+        fake_umpe,
+    ):
+        try:
+            async for status_element in controller.update_firmware({}):
+                pass
+        except FirmwareUpdateRequired:
+            assert False, "update_motor_estimation raised an exception."
+
+
+async def test_update_firmware_update_required(
+    controller: OT3Controller, fw_update_info: Dict[NodeId, str], fw_node_info
+) -> None:
+    """Test that updates are started when shortsha's dont match."""
+
+    # no updates have been started, but lets set this to true so we can assert later on
+    controller.update_required = True
+    controller.initialized = True
+    controller._network_info._device_info_cache = fw_node_info
+    check_fw_update_return = {
+        NodeId.head: (1, "/some/path/head.hex"),
+        NodeId.gantry_x: (1, "/some/path/gantry.hex"),
+    }
+    with mock.patch(
+        "opentrons_hardware.firmware_update.check_firmware_updates",
+        mock.Mock(return_value=check_fw_update_return),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.RunUpdate"
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        async for status_element in controller.update_firmware({}):
+            pass
+        run_updates.assert_called_with(
+            can_messenger=controller._messenger,
+            usb_messenger=controller._usb_messenger,
+            update_details=fw_update_info,
+            retry_count=mock.ANY,
+            timeout_seconds=mock.ANY,
+            erase=True,
+        )
+
+        assert not controller.update_required
+        probe.assert_called_once()
+
+
+async def test_update_firmware_up_to_date(
+    controller: OT3Controller,
+    fw_update_info: Dict[NodeId, str],
+):
+    """Test that updates are not started if they are not required."""
+    with mock.patch(
+        "opentrons_hardware.firmware_update.RunUpdate.run_updates"
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe, mock.patch(
+        "opentrons_hardware.firmware_update.check_firmware_updates",
+        mock.Mock(return_value={}),
+    ):
+        async for status_element in controller.update_firmware({}):
+            pass
+        assert not controller.update_required
+        run_updates.assert_not_called()
+        probe.assert_not_called()
+
+
+async def test_update_firmware_specified_nodes(
+    controller: OT3Controller,
+    fw_node_info: Dict[NodeId, DeviceInfoCache],
+    fw_update_info: Dict[NodeId, str],
+):
+    """Test that updates are started if nodes are NOT out-of-date when nodes are specified."""
+    for node_cache in fw_node_info.values():
+        node_cache.shortsha = "978abcde"
+
+    check_fw_update_return = {
+        NodeId.head: (1, "/some/path/head.hex"),
+        NodeId.gantry_x: (1, "/some/path/gantry.hex"),
+    }
+    controller._network_info._device_info_cache = fw_node_info
+
+    with mock.patch(
+        "opentrons_hardware.firmware_update.check_firmware_updates",
+        mock.Mock(return_value=check_fw_update_return),
+    ) as check_updates, mock.patch(
+        "opentrons_hardware.firmware_update.RunUpdate"
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        async for status_element in controller.update_firmware(
+            {}, targets={NodeId.head, NodeId.gantry_x}
+        ):
+            pass
+        check_updates.assert_called_with(
+            fw_node_info, {}, targets={NodeId.head, NodeId.gantry_x}, force=False
+        )
+        run_updates.assert_called_with(
+            can_messenger=controller._messenger,
+            usb_messenger=controller._usb_messenger,
+            update_details=fw_update_info,
+            retry_count=mock.ANY,
+            timeout_seconds=mock.ANY,
+            erase=True,
+        )
+
+        assert not controller.update_required
+        probe.assert_called_once()
+
+
+async def test_update_firmware_invalid_specified_node(
+    controller: OT3Controller,
+    fw_node_info: Dict[NodeId, DeviceInfoCache],
+    fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
+):
+    """Test that only nodes in device_info_cache are updated when nodes are specified."""
+    check_fw_update_return = {
+        NodeId.head: (1, "/some/path/head.hex"),
+        NodeId.gantry_x: (1, "/some/path/gantry.hex"),
+    }
+    controller._network_info._device_info_cache = fw_node_info
+    with mock.patch(
+        "opentrons_hardware.firmware_update.check_firmware_updates",
+        mock.Mock(return_value=check_fw_update_return),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.RunUpdate"
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        async for status_element in controller.update_firmware(
+            {}, targets={NodeId.head}
+        ):
+            pass
+        run_updates.assert_called_with(
+            can_messenger=controller._messenger,
+            usb_messenger=controller._usb_messenger,
+            update_details=fw_update_info,
+            retry_count=mock.ANY,
+            timeout_seconds=mock.ANY,
+            erase=True,
+        )
+
+        assert not controller.update_required
+        probe.assert_called_once()
+
+
+async def test_update_firmware_progress(
+    controller: OT3Controller,
+    fw_node_info: Dict[NodeId, DeviceInfoCache],
+    fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
+):
+    """Test that the progress is reported for nodes updating."""
+    controller._network_info._device_info_cache = fw_node_info
+
+    async def _fake_update_progress(
+        fw_node_info: Dict[NodeId, DeviceInfoCache]
+    ) -> AsyncIterator[Tuple[NodeId, StatusElement]]:
+        for node_id in fw_node_info:
+            await asyncio.sleep(0)
+            progress_bar = [0, 0.2, 0.6, 0.8, 0.9, 1]
+            for progress in progress_bar:
+                if progress == 0:
+                    status = FirmwareUpdateStatus.queued
+                elif progress == 1:
+                    status = FirmwareUpdateStatus.done
+                else:
+                    status = FirmwareUpdateStatus.updating
+                yield (node_id, (status, progress))
+
+    with mock.patch(
+        "opentrons_hardware.firmware_update.check_firmware_updates",
+        mock.Mock(return_value=fw_update_info),
+    ), mock.patch(
+        "opentrons_hardware.firmware_update.RunUpdate.run_updates",
+        mock.Mock(return_value=_fake_update_progress(fw_node_info)),
+    ) as run_updates, mock.patch.object(
+        controller._network_info, "probe"
+    ) as probe:
+        async for update_status in controller.update_firmware({}):
+            for update in update_status:
+                node_id = sub_system_to_node_id(update.subsystem)
+                assert node_id in fw_node_info
+        run_updates.assert_called_once()
+
+        assert not controller.update_required
+        assert controller._update_tracker is None
+        probe.assert_called_once()

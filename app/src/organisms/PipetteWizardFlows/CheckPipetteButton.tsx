@@ -1,39 +1,60 @@
 import * as React from 'react'
-import { SUCCESS, FAILURE } from '../../redux/robot-api'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 import { PrimaryButton } from '../../atoms/buttons'
-import { useCheckPipettes } from './hooks'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
 interface CheckPipetteButtonProps {
-  robotName: string
   proceedButtonText: string
-  setPending: React.Dispatch<React.SetStateAction<boolean>>
+  setFetching: React.Dispatch<React.SetStateAction<boolean>>
+  isFetching: boolean
   proceed: () => void
-  isDisabled: boolean
+  isOnDevice: boolean | null
 }
 export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
 ): JSX.Element => {
   const {
-    robotName,
     proceedButtonText,
-    setPending,
     proceed,
-    isDisabled,
+    setFetching,
+    isFetching,
+    isOnDevice,
   } = props
-  const { handleCheckPipette, isPending, requestStatus } = useCheckPipettes(
-    robotName
+  const { refetch } = usePipettesQuery(
+    { refresh: true },
+    {
+      enabled: false,
+      onSettled: () => {
+        setFetching(false)
+      },
+    }
   )
-  React.useEffect(() => {
-    setPending(isPending)
-  }, [isPending, setPending])
 
-  React.useEffect(() => {
-    //  if requestStatus is FAILURE then the error modal will be in the results page
-    if (requestStatus === SUCCESS || requestStatus === FAILURE) proceed()
-  }, [proceed, requestStatus])
-
-  return (
-    <PrimaryButton disabled={isDisabled} onClick={handleCheckPipette}>
+  return isOnDevice ? (
+    <SmallButton
+      disabled={isFetching}
+      buttonText={proceedButtonText}
+      buttonType="default"
+      onClick={() => {
+        setFetching(true)
+        refetch()
+          .then(() => {
+            proceed()
+          })
+          .catch(() => {})
+      }}
+    />
+  ) : (
+    <PrimaryButton
+      disabled={isFetching}
+      onClick={() => {
+        refetch()
+          .then(() => {
+            proceed()
+          })
+          .catch(() => {})
+      }}
+    >
       {proceedButtonText}
     </PrimaryButton>
   )

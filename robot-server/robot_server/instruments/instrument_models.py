@@ -4,14 +4,14 @@ from __future__ import annotations
 import enum
 from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic
+from datetime import datetime
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
-from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-    GripperCalibrationOffset,
-)
-from opentrons.types import Mount
 
+from opentrons.types import Mount
+from opentrons.calibration_storage.types import SourceType
+from opentrons.protocol_engine.types import Vec3f
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
     PipetteModel,
@@ -32,19 +32,15 @@ InstrumentType = Literal["pipette", "gripper"]
 class MountType(enum.Enum):
     """Available mount types."""
 
-    LEFT = enum.auto()
-    RIGHT = enum.auto()
-    EXTENSION = enum.auto()
+    LEFT = "left"
+    RIGHT = "right"
+    EXTENSION = "extension"
 
     @staticmethod
     def from_hw_mount(mount: Mount) -> MountType:
         """Convert from Mount to MountType."""
         mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
         return mount_map[mount]
-
-    def as_string(self) -> str:
-        """Get MountType as a string."""
-        return self.name.lower()
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
@@ -60,13 +56,21 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     data: InstrumentDataT
 
 
+class GripperCalibrationData(BaseModel):
+    """A gripper's calibration data."""
+
+    offset: Vec3f
+    source: SourceType
+    last_modified: Optional[datetime] = None
+
+
 class GripperData(BaseModel):
     """Data from attached gripper."""
 
     jawState: str = Field(..., description="Gripper Jaw state.")
     # TODO (spp, 2023-01-03): update calibration field as decided after
     #  spike https://opentrons.atlassian.net/browse/RSS-167
-    calibratedOffset: Optional[GripperCalibrationOffset] = Field(
+    calibratedOffset: Optional[GripperCalibrationData] = Field(
         None, description="Calibrated gripper offset."
     )
 

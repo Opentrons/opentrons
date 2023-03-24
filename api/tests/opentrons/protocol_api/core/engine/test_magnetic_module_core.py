@@ -64,14 +64,6 @@ def test_create(
     assert result.MODULE_TYPE == ModuleType.MAGNETIC
 
 
-def test_engage_from_home_raises_exception(
-    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
-) -> None:
-    """Should raise a not implemented error."""
-    with pytest.raises(NotImplementedError):
-        subject.engage(height_from_home=7.0)
-
-
 def test_engage_from_base(
     decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
 ) -> None:

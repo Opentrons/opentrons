@@ -85,7 +85,7 @@ describe('ProceedToRunButton', () => {
     const button = getByRole('link', { name: 'Proceed to run' })
     expect(button).not.toBeDisabled()
     expect(button.getAttribute('href')).toEqual(
-      '/devices/otie/protocol-runs/1/run-log'
+      '/devices/otie/protocol-runs/1/run-preview'
     )
   })
 

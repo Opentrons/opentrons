@@ -1,61 +1,51 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { FAILURE, SUCCESS } from '../../../redux/robot-api'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 import { CheckPipetteButton } from '../CheckPipetteButton'
-import { useCheckPipettes } from '../hooks'
-
-jest.mock('../hooks')
-
-const mockUseCheckPipettes = useCheckPipettes as jest.MockedFunction<
-  typeof useCheckPipettes
->
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
   return renderWithProviders(<CheckPipetteButton {...props} />)[0]
 }
 
+jest.mock('@opentrons/react-api-client')
+
+const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
+  typeof usePipettesQuery
+>
+
 describe('CheckPipetteButton', () => {
   let props: React.ComponentProps<typeof CheckPipetteButton>
-  const mockCheckPipette = jest.fn()
+  const refetch = jest.fn(() => Promise.resolve())
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       proceed: jest.fn(),
       proceedButtonText: 'continue',
-      setPending: jest.fn(),
-      isDisabled: false,
+      setFetching: jest.fn(),
+      isOnDevice: false,
+      isFetching: false,
     }
-    mockUseCheckPipettes.mockReturnValue({
-      requestStatus: SUCCESS,
-      isPending: false,
-      handleCheckPipette: mockCheckPipette,
-    })
+    mockUsePipettesQuery.mockReturnValue({
+      refetch,
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
   })
-  it('clicking on the button calls checkPipette success', () => {
+  it('clicking on the button calls refetch', () => {
     const { getByRole } = render(props)
     getByRole('button', { name: 'continue' }).click()
-    expect(mockCheckPipette).toHaveBeenCalled()
+    expect(refetch).toHaveBeenCalled()
   })
-  it('clicking on the button calls checkPipette failure', () => {
-    mockUseCheckPipettes.mockReturnValue({
-      requestStatus: FAILURE,
-      isPending: false,
-      handleCheckPipette: mockCheckPipette,
-    })
-    const { getByRole } = render(props)
-    getByRole('button', { name: 'continue' }).click()
-    expect(mockCheckPipette).toHaveBeenCalled()
+  it('button is disabled when fetching is true', () => {
+    const { getByRole } = render({ ...props, isFetching: true })
+    expect(getByRole('button', { name: 'continue' })).toBeDisabled()
   })
-  it('renders button disbaled when isDisabled is true', () => {
+  it('renders button for on device display', () => {
     props = {
       ...props,
-      isDisabled: true,
+      isOnDevice: true,
     }
-    const { getByRole } = render(props)
-    const proceedBtn = getByRole('button', { name: 'continue' })
-    expect(proceedBtn).toBeDisabled()
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_default')
   })
 })

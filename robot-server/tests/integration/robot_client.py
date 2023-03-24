@@ -4,7 +4,7 @@ import asyncio
 import concurrent.futures
 import contextlib
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, List, Optional
+from typing import Any, AsyncGenerator, BinaryIO, Dict, List, Optional, Tuple, Union
 
 import httpx
 from httpx import Response
@@ -41,7 +41,12 @@ class RobotClient:
     ) -> AsyncGenerator[RobotClient, None]:
         with concurrent.futures.ThreadPoolExecutor() as worker_executor:
             async with httpx.AsyncClient(
-                headers={"opentrons-version": version}
+                headers={"opentrons-version": version},
+                # Set the default timeout high enough for our heaviest requests
+                # (like fetching a large protocol analysis) to fit comfortably.
+                # If an individual test wants to shorten this timeout, it should wrap
+                # its request in anyio.fail_after().
+                timeout=30,
             ) as httpx_client:
                 yield RobotClient(
                     httpx_client=httpx_client,
@@ -118,16 +123,35 @@ class RobotClient:
         )
         return response
 
-    async def post_protocol(self, files: List[Path]) -> Response:
-        """POST /protocols."""
+    async def post_protocol(
+        self, files: List[Union[Path, Tuple[str, bytes]]]
+    ) -> Response:
+        """POST /protocols.
+
+        Params:
+            files: The files to upload, representing the protocol, custom labware, etc.
+                Each file file can be provided as a Path, in which case it's read
+                from the filesystem, or as a (name, contents) tuple.
+        """
+        multipart_upload_name = "files"
+
         with contextlib.ExitStack() as file_exit_stack:
-            file_payload = [
-                ("files", file_exit_stack.enter_context(path.open("rb")))
-                for path in files
-            ]
+            opened_files: List[
+                Union[BinaryIO, Tuple[str, bytes]],
+            ] = []
+
+            for file in files:
+                if isinstance(file, Path):
+                    opened_file = file_exit_stack.enter_context(file.open("rb"))
+                    opened_files.append(opened_file)
+                else:
+                    opened_files.append(file)
+
             response = await self.httpx_client.post(
-                url=f"{self.base_url}/protocols", files=file_payload
+                url=f"{self.base_url}/protocols",
+                files=[(multipart_upload_name, f) for f in opened_files],
             )
+
         response.raise_for_status()
         return response
 
@@ -228,6 +252,14 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_analyses(self, protocol_id: str) -> Response:
+        """GET /protocols/{protocol_id}/analyses."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/protocols/{protocol_id}/analyses"
+        )
+        response.raise_for_status()
+        return response
+
     async def get_analysis(self, protocol_id: str, analysis_id: str) -> Response:
         """GET /protocols/{protocol_id}/{analysis_id}."""
         response = await self.httpx_client.get(
@@ -239,6 +271,14 @@ class RobotClient:
     async def delete_run(self, run_id: str) -> Response:
         """DELETE /runs/{run_id}."""
         response = await self.httpx_client.delete(f"{self.base_url}/runs/{run_id}")
+        response.raise_for_status()
+        return response
+
+    async def delete_protocol(self, protocol_id: str) -> Response:
+        """DELETE /protocols/{protocol_id}."""
+        response = await self.httpx_client.delete(
+            f"{self.base_url}/protocols/{protocol_id}"
+        )
         response.raise_for_status()
         return response
 

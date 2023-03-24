@@ -204,6 +204,9 @@ class PipetteHandlerProvider:
                 "display_name",
                 "tip_length",
                 "model",
+                "fw_update_required",
+                "fw_current_version",
+                "fw_next_version",
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
@@ -277,7 +280,7 @@ class PipetteHandlerProvider:
         )
         instr.current_tiprack_diameter = tiprack_diameter
 
-    def set_working_volume(self, mount: OT3Mount, tip_volume: int) -> None:
+    def set_working_volume(self, mount: OT3Mount, tip_volume: float) -> None:
         instr = self.get_pipette(mount)
         if not instr:
             raise top_types.PipetteNotAttachedError(

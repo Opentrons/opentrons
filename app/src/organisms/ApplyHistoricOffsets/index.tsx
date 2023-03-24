@@ -1,4 +1,7 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+import pick from 'lodash/pick'
+import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Link,
@@ -12,11 +15,18 @@ import {
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import { ModalHeader, ModalShell } from '../../molecules/Modal'
+import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
+import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { StyledText } from '../../atoms/text'
-import { useTranslation } from 'react-i18next'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { CheckboxField } from '../../atoms/CheckboxField'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  LoadedLabware,
+  LoadedModule,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -29,13 +39,44 @@ interface ApplyHistoricOffsetsProps {
   offsetCandidates: OffsetCandidate[]
   shouldApplyOffsets: boolean
   setShouldApplyOffsets: (shouldApplyOffsets: boolean) => void
+  commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  modules: LoadedModule[]
 }
 export function ApplyHistoricOffsets(
   props: ApplyHistoricOffsetsProps
 ): JSX.Element {
-  const { offsetCandidates, shouldApplyOffsets, setShouldApplyOffsets } = props
+  const {
+    offsetCandidates,
+    shouldApplyOffsets,
+    setShouldApplyOffsets,
+    labware,
+    modules,
+    commands,
+  } = props
   const [showOffsetDataModal, setShowOffsetDataModal] = React.useState(false)
   const { t } = useTranslation('labware_position_check')
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    getIsLabwareOffsetCodeSnippetsOn
+  )
+  const JupyterSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="jupyter"
+      labwareOffsets={offsetCandidates.map(o =>
+        pick(o, ['definitionUri', 'vector', 'location'])
+      )}
+      {...{ labware, modules, commands }}
+    />
+  )
+  const CommandLineSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="cli"
+      labwareOffsets={offsetCandidates.map(o =>
+        pick(o, ['definitionUri', 'vector', 'location'])
+      )}
+      {...{ labware, modules, commands }}
+    />
+  )
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <CheckboxField
@@ -76,6 +117,7 @@ export function ApplyHistoricOffsets(
                   : t('robot_has_no_offsets_from_previous_runs')}
               </StyledText>
               <Link
+                external
                 css={TYPOGRAPHY.linkPSemiBold}
                 marginTop={SPACING.spacing3}
                 href={HOW_OFFSETS_WORK_SUPPORT_URL}
@@ -83,7 +125,17 @@ export function ApplyHistoricOffsets(
                 {t('see_how_offsets_work')}
               </Link>
               {offsetCandidates.length > 0 ? (
-                <LabwareOffsetTable offsetCandidates={offsetCandidates} />
+                isLabwareOffsetCodeSnippetsOn ? (
+                  <LabwareOffsetTabs
+                    TableComponent={
+                      <LabwareOffsetTable offsetCandidates={offsetCandidates} />
+                    }
+                    JupyterComponent={JupyterSnippet}
+                    CommandLineComponent={CommandLineSnippet}
+                  />
+                ) : (
+                  <LabwareOffsetTable offsetCandidates={offsetCandidates} />
+                )
               ) : null}
             </Flex>
           </ModalShell>

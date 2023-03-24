@@ -22,10 +22,14 @@ class GripperModel(str, Enum):
     """Gripper models."""
 
     v1 = "gripperV1"
+    v1_1 = "gripperV1.1"
 
     def __str__(self) -> str:
         """Model name."""
-        enum_to_str = {self.__class__.v1: "gripperV1"}
+        enum_to_str = {
+            self.__class__.v1: "gripperV1",
+            self.__class__.v1_1: "gripperV1.1",
+        }
         return enum_to_str[self]
 
 
@@ -65,34 +69,6 @@ class Geometry(GripperBaseModel):
     jaw_width: Dict[str, float]
 
 
-class ZMotorConfigurations(GripperBaseModel):
-    """Gripper z motor configurations."""
-
-    idle: float = Field(
-        ...,
-        description="Motor idle current in A",
-        ge=0.02,
-        le=1.0,
-    )
-    run: float = Field(
-        ...,
-        description="Motor active current in A",
-        ge=0.67,
-        le=2.5,
-    )
-
-
-class JawMotorConfigurations(GripperBaseModel):
-    """Gripper z motor configurations."""
-
-    vref: float = Field(
-        ...,
-        description="Reference voltage in V",
-        ge=0.5,
-        le=2.5,
-    )
-
-
 PolynomialTerm = Tuple[_StrictNonNegativeInt, float]
 
 
@@ -119,6 +95,4 @@ class GripperDefinition(GripperBaseModel):
     display_name: str = Field(..., description="Gripper display name.")
     model: GripperModel
     geometry: Geometry
-    z_motor_configurations: ZMotorConfigurations
-    jaw_motor_configurations: JawMotorConfigurations
     grip_force_profile: GripForceProfile

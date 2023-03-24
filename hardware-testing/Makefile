@@ -71,39 +71,54 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
-.PHONY: test-integration
-test-integration:
-	$(python) protocols/ot2_p300_single_channel_gravimetric.py --simulate
+.PHONY: test-gravimetric
+test-gravimetric:
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 200 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 50 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --tip 50 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1 --inspect
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1 --increment
+
+.PHONY: test-production-qc
+test-production-qc:
+	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
+	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
+
+.PHONY: test-examples
+test-examples:
+	$(python) -m hardware_testing.examples.csv_report
 	$(python) -m hardware_testing.examples.custom_axis_settings_ot3 --simulate
-	$(python) -m hardware_testing.examples.endstop_encoder_ot3 --simulate
 	$(python) -m hardware_testing.examples.pick_up_tip_ot3 --simulate
 	$(python) -m hardware_testing.examples.plunger_ot3 --simulate
 	$(python) -m hardware_testing.examples.capacitive_probe_ot3 --simulate
+
+.PHONY: test-scripts
+test-scripts:
 	$(python) -m hardware_testing.scripts.bowtie_ot3 --simulate
+
+.PHONY: test-integration
+test-integration: test-gravimetric test-production-qc test-examples test-scripts
 
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware_testing tests protocols
-	$(python) -m black --check hardware_testing tests protocols setup.py
-	$(python) -m flake8 hardware_testing tests protocols setup.py
+	$(python) -m mypy hardware_testing tests
+	$(python) -m black --check hardware_testing tests setup.py
+	$(python) -m flake8 hardware_testing tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests protocols setup.py
+	$(python) -m black hardware_testing tests setup.py
 
-define move-plot-webpage
+define move-plot-webpage-ot3
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-mv /data/plot/index.html /usr/lib/python3.7/site-packages/hardware_testing/tools/plot &&\
-mv /data/plot/index.js /usr/lib/python3.7/site-packages/hardware_testing/tools/plot &&\
+mv /data/plot/index.html /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/index.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+rm -rf /data/plot &&\
 cleanup || cleanup"
 endef
-
-.PHONY: push-plot-webpage
-push-plot-webpage:
-	scp -r hardware_testing/tools/plot root@$(host):/data
-	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
 
 .PHONY: push-plot-webpage-ot3
 push-plot-webpage-ot3:
@@ -132,19 +147,11 @@ push-no-restart-ot3: sdist Pipfile.lock
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3 restart-ot3
 
-.PHONY: push-protocols
-push-protocols:
-	scp -r protocols root@$(host):/data/user_storage/opentrons_data
-
-.PHONY: push-protocols-ot3
-push-protocols-ot3:
-	scp -r protocols root@$(host):/opt/opentrons-robot-server
-
 .PHONY: push-all
-push-all: clean wheel push-no-restart push-plot-webpage push-protocols
+push-all: clean wheel push-no-restart push-plot-webpage
 
 .PHONY: push-all-ot3
-push-all: clean wheel push-no-restart-ot3 push-plot-webpage-ot3 push-protocols-ot3
+push-all-ot3: push-ot3 push-plot-webpage-ot3
 
 .PHONY: term
 term:
@@ -163,8 +170,17 @@ push-all-and-term: push-all term
 
 .PHONY: pull-data-ot3
 pull-data-ot3:
-	mkdir -p ./.pulled-data
-	scp -r root@$(host):/home/root/.opentrons/testing_data/$(test) ./.pulled-data
+	mkdir -p "./.pulled-data"
+	scp -r "root@$(host):/data/testing_data/$(test)" "./.pulled-data"
+
+define delete-test-data-cmd
+ssh -i $(2) $(3) root@$(1) \
+"rm -rf /data/testing_data/$(4)"
+endef
+
+.PHONY: delete-data-ot3
+delete-data-ot3:
+	$(call delete-test-data-cmd,$(host),$(br_ssh_key),$(ssh_opts),$(test))
 
 define push-and-update-fw
 scp -i $(2) $(3) ot3-firmware.tar.gz root@$(1):/data/$(notdir ot3-firmware.tar.gz)
@@ -185,7 +201,8 @@ sync-sw-ot3:
 	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../shared-data && $(MAKE) all push-no-restart-ot3 host=$(host)
-	cd ../hardware-testing && $(MAKE) push-no-restart-ot3 host=$(host)
+	cd ../robot-server && $(MAKE) push-ot3 host=$(host)
+	cd ../hardware-testing && $(MAKE) push-all-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:

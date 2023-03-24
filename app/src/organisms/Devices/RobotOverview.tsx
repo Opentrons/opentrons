@@ -6,7 +6,6 @@ import { Link as RouterLink } from 'react-router-dom'
 import {
   Box,
   Flex,
-  useInterval,
   ALIGN_CENTER,
   ALIGN_START,
   BORDERS,
@@ -26,9 +25,6 @@ import OT3_PNG from '../../assets/images/OT3.png'
 import { Banner, BannerType } from '../../atoms/Banner'
 import { ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import * as Config from '../../redux/config'
-import { useDispatchApiRequest } from '../../redux/robot-api'
-import { fetchLights } from '../../redux/robot-controls'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusHeader } from './RobotStatusHeader'
@@ -43,8 +39,6 @@ import {
 } from './hooks'
 
 import type { State } from '../../redux/types'
-
-const EQUIPMENT_POLL_MS = 5000
 
 interface RobotOverviewProps {
   robotName: string
@@ -81,26 +75,12 @@ export function RobotOverview({
     )
   }
 
-  const [dispatchRequest] = useDispatchApiRequest()
-
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
-
   const robot = useRobot(robotName)
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robot?.name ?? '')
   )
   const isRobotViewable = useIsRobotViewable(robot?.name ?? '')
-  const { lightsOn, toggleLights } = useLights(robotName)
-
-  useInterval(
-    () => {
-      dispatchRequest(fetchLights(robotName))
-    },
-    EQUIPMENT_POLL_MS,
-    true
-  )
+  const { lightsOn, toggleLights } = useLights()
 
   return robot != null ? (
     <>
@@ -108,7 +88,7 @@ export function RobotOverview({
         alignItems={ALIGN_START}
         backgroundColor={COLORS.white}
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing3}
+        paddingTop={SPACING.spacing3}
         position={POSITION_RELATIVE}
         width="100%"
       >
@@ -117,13 +97,20 @@ export function RobotOverview({
           marginBottom={SPACING.spacing4}
           width="100%"
         >
-          <img
-            src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
-            style={{ paddingTop: SPACING.spacing3, width: '6.25rem' }}
-            id="RobotOverview_robotImage"
-          />
+          <Flex>
+            <img
+              src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+              style={{
+                width: '6rem',
+                height: '5.4375rem',
+              }}
+              id="RobotOverview_robotImage"
+            />
+          </Flex>
           <Box padding={SPACING.spacing3} width="100%">
-            <ReachableBanner robot={robot} />
+            <Box marginBottom={SPACING.spacing3}>
+              <ReachableBanner robot={robot} />
+            </Box>
             {robot != null ? (
               <UpdateRobotBanner
                 robot={robot}
@@ -187,7 +174,7 @@ export function RobotOverview({
           </Box>
         </Flex>
       </Flex>
-      {enableCalibrationWizards && !isRobotBusy && showCalibrationStatusBanner && (
+      {!isRobotBusy && showCalibrationStatusBanner && (
         <Flex
           paddingBottom={SPACING.spacing4}
           flexDirection={DIRECTION_COLUMN}

@@ -52,8 +52,8 @@ describe('UnmountGripper', () => {
   })
 
   it('renders correct text', () => {
-    const { getByRole, getByText } = render()[0]
-    getByRole('heading', { name: 'Loosen Screws and Detach' })
+    const { getByText } = render()[0]
+    getByText('Loosen Screws and Detach')
     getByText(
       'Hold the gripper in place and loosen the screws. (The screws are captive and will not come apart from the gripper) Then carefully remove the gripper'
     )

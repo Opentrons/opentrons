@@ -5,6 +5,7 @@ by default. Please do not unconditionally import things outside the python stand
 library.
 """
 from enum import Enum, unique
+from typing import Union
 
 
 @unique
@@ -29,6 +30,17 @@ class NodeId(int, Enum):
     gantry_y_bootloader = gantry_y | 0xF
     head_bootloader = head | 0xF
     gripper_bootloader = gripper | 0xF
+
+
+# make these negative numbers so there is no chance they overlap with NodeId
+@unique
+class USBTarget(int, Enum):
+    """List of firmware targets connected over usb."""
+
+    rear_panel = -1
+
+
+FirmwareTarget = Union[NodeId, USBTarget]
 
 
 @unique
@@ -108,6 +120,7 @@ class MessageId(int, Enum):
     add_brushed_linear_move_request = 0x44
     brushed_motor_conf_request = 0x45
     brushed_motor_conf_response = 0x46
+    set_gripper_error_tolerance = 0x47
 
     acknowledgement = 0x50
 
@@ -116,6 +129,7 @@ class MessageId(int, Enum):
 
     attached_tools_request = 0x700
     tools_detected_notification = 0x701
+    tip_presence_notification = 0x702
 
     fw_update_initiate = 0x60
     fw_update_data = 0x61
@@ -151,6 +165,7 @@ class MessageId(int, Enum):
     bind_sensor_output_response = 0x8B
     peripheral_status_request = 0x8C
     peripheral_status_response = 0x8D
+    baseline_sensor_response = 0x8E
 
 
 @unique
@@ -217,7 +232,7 @@ class SensorId(int, Enum):
 
 @unique
 class PipetteName(int, Enum):
-    """High-level type of pipette."""
+    """High-level name of pipette."""
 
     p1000_single = 0x00
     p1000_multi = 0x01
@@ -226,6 +241,15 @@ class PipetteName(int, Enum):
     p1000_96 = 0x04
     p50_96 = 0x05
     unknown = 0xFFFF
+
+
+@unique
+class PipetteType(int, Enum):
+    """High-level type of pipette."""
+
+    pipette_single = 1
+    pipette_multi = 2
+    pipette_96 = 3
 
 
 @unique

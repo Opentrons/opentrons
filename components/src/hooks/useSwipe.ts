@@ -11,6 +11,7 @@ interface UseSwipeResult {
   ref: MutableRefObject<null>
   style: CSSProperties
   isEnabled: boolean
+  setSwipeType: (value: string) => void
   swipeType: string
   enable: () => void
   disable: () => void
@@ -58,6 +59,7 @@ export const useSwipe = (): UseSwipeResult => {
       touchAction: 'none',
     },
     isEnabled,
+    setSwipeType,
     swipeType,
     enable: () => setIsEnabled(true),
     disable: () => setIsEnabled(false),

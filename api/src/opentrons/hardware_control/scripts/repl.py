@@ -31,16 +31,20 @@ from typing import Union, Type, Any  # noqa: E402
 from opentrons.types import Mount, Point  # noqa: E402
 from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
 from opentrons.config import feature_flags as ff  # noqa: E402
+from opentrons.hardware_control.modules.types import ModuleType  # noqa: E402
 from opentrons.hardware_control.types import (  # noqa: E402
     OT3Axis,
     OT3Mount,
+    OT3SubSystem,
     GripperProbe,
 )
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_pipette,
-    calibrate_gripper,
-    find_edge,
-    find_deck_position,
+    calibrate_belts,
+    calibrate_gripper_jaw,
+    calibrate_module,
+    find_calibration_structure_height,
+    find_edge_binary,
     CalibrationMethod,
     find_axis_center,
     gripper_pin_offsets_mean,
@@ -63,14 +67,14 @@ LOG_CONFIG = {
             "formatter": "basic",
             "filename": "/var/log/repl.log",
             "maxBytes": 5000000,
-            "level": logging.DEBUG,
+            "level": logging.INFO,
             "backupCount": 3,
         },
     },
     "loggers": {
         "": {
             "handlers": ["file_handler"],
-            "level": logging.DEBUG,
+            "level": logging.INFO,
         },
     },
 }
@@ -103,7 +107,9 @@ def stop_server() -> None:
 
 
 def build_api() -> ThreadManager[HardwareControlAPI]:
-    tm = ThreadManager(HCApi.build_hardware_controller)
+    tm = ThreadManager(
+        HCApi.build_hardware_controller, use_usb_bus=ff.rear_panel_integration()
+    )
     tm.managed_thread_ready_blocking()
     return tm
 
@@ -121,11 +127,17 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Axis": Axis,
             "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
+            "OT3SubSystem": OT3SubSystem,
             "GripperProbe": GripperProbe,
-            "find_edge": wrap_async_util_fn(find_edge, api),
-            "find_deck_position": wrap_async_util_fn(find_deck_position, api),
+            "ModuleType": ModuleType,
+            "find_edge": wrap_async_util_fn(find_edge_binary, api),
+            "find_calibration_structure_height": wrap_async_util_fn(
+                find_calibration_structure_height, api
+            ),
             "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
-            "calibrate_gripper": wrap_async_util_fn(calibrate_gripper, api),
+            "calibrate_belts": wrap_async_util_fn(calibrate_belts, api),
+            "calibrate_gripper": wrap_async_util_fn(calibrate_gripper_jaw, api),
+            "calibrate_module": wrap_async_util_fn(calibrate_module, api),
             "gripper_pin_offsets_mean": gripper_pin_offsets_mean,
             "CalibrationMethod": CalibrationMethod,
             "find_axis_center": wrap_async_util_fn(find_axis_center, api),

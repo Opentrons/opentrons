@@ -45,6 +45,19 @@ MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
 API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
 
 
+class JSONSchemaVersionTooNewError(RuntimeError):
+    def __init__(self, attempted_schema_version: int) -> None:
+        super().__init__(attempted_schema_version)
+        self.attempted_schema_version = attempted_schema_version
+
+    def __str__(self) -> str:
+        return (
+            f"The protocol you are trying to open is a"
+            f" JSONv{self.attempted_schema_version} protocol,"
+            f" which is not supported by this software version."
+        )
+
+
 def _validate_v2_ast(protocol_ast: ast.Module) -> None:
     defs = [fdef for fdef in protocol_ast.body if isinstance(fdef, ast.FunctionDef)]
     rundefs = [fdef for fdef in defs if fdef.name == "run"]
@@ -462,12 +475,7 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
             "definition was specified instead of a protocol."
         )
     if version_num > MAX_SUPPORTED_JSON_SCHEMA_VERSION:
-        raise RuntimeError(
-            f"The protocol you are trying to open is a JSONv{version_num} "
-            "protocol and is not supported by your current robot server "
-            "version. Please update your OT-2 App and robot server to the "
-            "latest version and try again."
-        )
+        raise JSONSchemaVersionTooNewError(attempted_schema_version=version_num)
     protocol_schema = _get_schema_for_protocol(version_num)
 
     # instruct schema how to resolve all $ref's used in protocol schemas

@@ -13,7 +13,7 @@ from opentrons.hardware_control.modules.types import (
 )
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware, validation
+from opentrons.protocol_api import labware, validation
 from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.core.legacy import module_geometry
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
@@ -62,7 +62,7 @@ def test_well_init() -> None:
             has_tip=has_tip,
             name="A1",
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
     )
     assert well1.geometry.diameter == test_data[well_name]["diameter"]  # type: ignore[typeddict-item]
     assert well1.geometry._length is None
@@ -81,7 +81,7 @@ def test_well_init() -> None:
             has_tip=has_tip,
             name="A1",
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
     )
     assert well2.geometry.diameter is None
     assert well2.geometry._length == test_data[well2_name]["xDimension"]  # type: ignore[typeddict-item]
@@ -104,7 +104,7 @@ def test_top() -> None:
             has_tip=has_tip,
             name="A1",
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
     )
     well_data = test_data[well_name]
     expected_x = well_data["x"] + slot.point.x
@@ -129,7 +129,7 @@ def test_bottom() -> None:
             has_tip=has_tip,
             name="A1",
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
     )
     well_data = test_data[well_name]
     expected_x = well_data["x"] + slot.point.x
@@ -154,7 +154,7 @@ def test_from_center_cartesian():
             has_tip=has_tip,
             name="A1",
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
     )
 
     percent1_x = 1
@@ -188,7 +188,7 @@ def test_from_center_cartesian():
             has_tip=has_tip,
             name="A1",
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
     )
     percent2_x = -0.25
     percent2_y = 0.1
@@ -220,7 +220,7 @@ def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
             definition=corning_96_wellplate_360ul_flat_def,
             parent=Location(Point(0, 0, 0), "Test Slot"),
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )
@@ -239,7 +239,7 @@ def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
             definition=opentrons_96_tiprack_300ul_def,
             parent=Location(Point(0, 0, 0), "Test Slot"),
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )
@@ -308,7 +308,7 @@ def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
             has_tip=has_tip,
             name="A1",
         ),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
     )
     assert well.parent == lw
     assert well.top().labware.object == well
@@ -520,7 +520,7 @@ def test_module_load_labware(module_name) -> None:
         + labware_def["dimensions"]["zDimension"]
         + mod._over_labware
     )
-    with pytest.raises(AssertionError):
+    with pytest.raises(RuntimeError):
         mod.add_labware(lw)
     mod.reset_labware()
     assert mod.labware is None
@@ -532,13 +532,13 @@ def test_tiprack_list():
     labware_def = labware.get_labware_definition(labware_name)
     tiprack = labware.Labware(
         core=LegacyLabwareCore(labware_def, Location(Point(0, 0, 0), "Test Slot")),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )
     tiprack_2 = labware.Labware(
         core=LegacyLabwareCore(labware_def, Location(Point(0, 0, 0), "Test Slot")),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )
@@ -576,7 +576,7 @@ def test_uris():
     assert helpers.uri_from_definition(defn) == uri
     lw = labware.Labware(
         core=LegacyLabwareCore(defn, Location(Point(0, 0, 0), "Test Slot")),
-        api_version=MAX_SUPPORTED_VERSION,
+        api_version=APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )

@@ -16,6 +16,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleModel,
     ModuleLocation,
+    DeckPoint,
 )
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
@@ -275,7 +276,9 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_1_id,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
+        ),
     )
     assert commands_result[8] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
@@ -289,7 +292,9 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_2_id,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
+        ),
     )
 
     assert commands_result[9] == commands.DropTip.construct(
@@ -304,7 +309,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId="fixedTrash",
             wellName="A1",
         ),
-        result=commands.DropTipResult(),
+        result=commands.DropTipResult(position=DeckPoint(x=0, y=0, z=0)),
     )
 
     assert commands_result[10] == commands.PickUpTip.construct(
@@ -319,7 +324,9 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_1_id,
             wellName="B1",
         ),
-        result=commands.PickUpTipResult(),
+        result=commands.PickUpTipResult(
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
+        ),
     )
     assert commands_result[11] == commands.Aspirate.construct(
         id=matchers.IsA(str),
@@ -335,7 +342,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=40,
             flowRate=150,
         ),
-        result=commands.AspirateResult(volume=40),
+        result=commands.AspirateResult(volume=40, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[12] == commands.Dispense.construct(
         id=matchers.IsA(str),
@@ -351,7 +358,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=35,
             flowRate=360,
         ),
-        result=commands.DispenseResult(volume=35),
+        result=commands.DispenseResult(volume=35, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[13] == commands.Aspirate.construct(
         id=matchers.IsA(str),
@@ -367,7 +374,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=40,
             flowRate=150.0,
         ),
-        result=commands.AspirateResult(volume=40),
+        result=commands.AspirateResult(volume=40, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[14] == commands.Dispense.construct(
         id=matchers.IsA(str),
@@ -383,7 +390,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=35,
             flowRate=300,
         ),
-        result=commands.DispenseResult(volume=35),
+        result=commands.DispenseResult(volume=35, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[15] == commands.BlowOut.construct(
         id=matchers.IsA(str),
@@ -398,7 +405,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="B1",
             flowRate=1000.0,
         ),
-        result=commands.BlowOutResult(),
+        result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[16] == commands.Aspirate.construct(
         id=matchers.IsA(str),
@@ -414,7 +421,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=50,
             flowRate=150,
         ),
-        result=commands.AspirateResult(volume=50),
+        result=commands.AspirateResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[17] == commands.Dispense.construct(
         id=matchers.IsA(str),
@@ -430,7 +437,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=50,
             flowRate=300,
         ),
-        result=commands.DispenseResult(volume=50),
+        result=commands.DispenseResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[18] == commands.BlowOut.construct(
         id=matchers.IsA(str),
@@ -445,7 +452,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="B1",
             flowRate=1000.0,
         ),
-        result=commands.BlowOutResult(),
+        result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[19] == commands.Aspirate.construct(
         id=matchers.IsA(str),
@@ -461,7 +468,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=300,
             flowRate=150,
         ),
-        result=commands.AspirateResult(volume=300),
+        result=commands.AspirateResult(volume=300, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[20] == commands.Dispense.construct(
         id=matchers.IsA(str),
@@ -477,7 +484,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=300,
             flowRate=300,
         ),
-        result=commands.DispenseResult(volume=300),
+        result=commands.DispenseResult(volume=300, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[21] == commands.BlowOut.construct(
         id=matchers.IsA(str),
@@ -492,7 +499,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="B1",
             flowRate=1000.0,
         ),
-        result=commands.BlowOutResult(),
+        result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
     #   TODO:(jr, 15.08.2022): this should map to move_to when move_to is mapped in a followup ticket RSS-62
     assert commands_result[22] == commands.Custom.construct(
@@ -567,7 +574,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=50,
             flowRate=150,
         ),
-        result=commands.AspirateResult(volume=50),
+        result=commands.AspirateResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
     assert commands_result[27] == commands.Dispense.construct(
         id=matchers.IsA(str),
@@ -583,7 +590,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=50,
             flowRate=300,
         ),
-        result=commands.DispenseResult(volume=50),
+        result=commands.DispenseResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
     #   TODO:(jr, 15.08.2022): aspirate commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
@@ -627,7 +634,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_1_id,
             wellName="A1",
         ),
-        result=commands.DropTipResult(),
+        result=commands.DropTipResult(position=DeckPoint(x=0, y=0, z=0)),
     )
 
 

@@ -14,6 +14,7 @@ def bus_channel() -> str:
     return "test_channel"
 
 
+@pytest.mark.slow
 @pytest.fixture
 def can_bus(bus_channel: str) -> Bus:
     """A virtual can bus fixture."""

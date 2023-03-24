@@ -28,7 +28,6 @@ import {
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
-import { useFeatureFlag } from '../../../redux/config'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
@@ -45,9 +44,6 @@ jest.mock('../../../redux/config')
 jest.mock('../useCreateRunFromProtocol')
 jest.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
   typeof useOffsetCandidatesForAnalysis
 >
@@ -153,9 +149,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(mockUseFeatureFlag)
-      .calledWith('enableManualDeckStateModification')
-      .mockReturnValue(true)
     when(mockUseOffsetCandidatesForAnalysis)
       .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
       .mockReturnValue([])

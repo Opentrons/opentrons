@@ -1,7 +1,7 @@
 """Custom payload fields."""
 from __future__ import annotations
 
-from typing import Iterable, List, Iterator
+from typing import Iterable, List, Iterator, Optional, Tuple
 
 import binascii
 import enum
@@ -21,6 +21,129 @@ from opentrons_hardware.firmware_bindings.constants import (
     GearMotorId,
 )
 
+from opentrons_hardware.firmware_bindings.binary_constants import (
+    LightTransitionType,
+    LightAnimationType,
+)
+
+
+class OptionalRevisionField(utils.BinaryFieldBase[bytes]):
+    """The revision indicator in a device info.
+
+    This is sized to hold 4 ASCII characters:
+    - the primary revision
+    - the secondary revision
+    - two as-yet unused characters for tertiary revisions or other indications
+
+    If we ever change the electrical revision format we'll need to change this
+    too.
+
+    We use characters here because different boards and different nodes can
+    have different valid revisions - consider that PCBA 1 might have revisions
+    A1, B2, C3... and PCBA 2 might have A2, B1, D.... due to maybe problems
+    or timing that prevented a given revision from being produced. Having
+    an enum that encompassed them all would waste space, and having a different
+    enum for every board would rapidly balloon. Since the revision is used only
+    for reporting and for looking up firmware, we can just make it the string.
+
+    """
+
+    NUM_BYTES = 4
+    FORMAT = f"{NUM_BYTES}s"
+
+    @property
+    def value(self) -> bytes:
+        """The value."""
+        val = b""
+        for elem in (self.primary, self.secondary):
+            if elem:
+                val = val + elem.encode()
+            else:
+                val = val + b"\x00"
+        if self.tertiary:
+            val = val + self.tertiary.encode()
+        else:
+            val = val + b"\x00\x00"
+        return val
+
+    @value.setter
+    def value(self, val: bytes) -> None:
+        self._primary, self._secondary, self._tertiary = self._parse(val)
+
+    @classmethod
+    def _revision_field_from_bytes(
+        cls, data: bytes, start: int, end: int
+    ) -> Optional[str]:
+        try:
+            present_bytes = data[start:end]
+        except IndexError:
+            present_bytes = b"\x00"
+        nonzero_bytes = bytes(b for b in present_bytes if b != 0)
+        try:
+            return nonzero_bytes.decode("utf-8") or None
+        except UnicodeDecodeError:
+            return None
+
+    @classmethod
+    def _parse(cls, data: bytes) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+        primary = cls._revision_field_from_bytes(data, 0, 1)
+        secondary = cls._revision_field_from_bytes(data, 1, 2)
+        tertiary = cls._revision_field_from_bytes(data, 2, 4)
+        return primary, secondary, tertiary
+
+    @classmethod
+    def build(cls, data: bytes) -> "OptionalRevisionField":
+        """Create an OptionalRevisionField from a byte buffer.
+
+        The buffer should either have 4 bytes or no bytes. Devices with bootloaders
+        too old to express their revision will not fill this field, so the
+        deserializer must handle that.
+        """
+        return cls(*cls._parse(data))
+
+    def __init__(
+        self, primary: Optional[str], secondary: Optional[str], tertiary: Optional[str]
+    ) -> None:
+        """Build."""
+        self._primary = primary
+        self._secondary = secondary
+        self._tertiary = tertiary
+
+    @property
+    def primary(self) -> Optional[str]:
+        """The primary revision changes when traces change."""
+        return self._primary
+
+    @property
+    def secondary(self) -> Optional[str]:
+        """The secondary revision changes when functional parts change."""
+        return self._secondary
+
+    @property
+    def tertiary(self) -> Optional[str]:
+        """The tertiary revision changes when non-function parts change.
+
+        The tertiary revision almost never changes and is not usually tracked.
+        If a problem is discovered in the field that aligns with a tertiary
+        revision, we'll begin to track it. This field is normally None.
+        """
+        return self._tertiary
+
+    @property
+    def revision(self) -> Optional[str]:
+        """The relevant revision is primary + secondary.
+
+        It is only valid if both primary and secondary are valid and it forms
+        a string that can be used to look up appropriate firmware.
+        """
+        if not (self.primary is not None and self.secondary is not None):
+            return None
+        return f"{self.primary}{self.secondary}"
+
+    def __repr__(self) -> str:
+        """Repr."""
+        return f"{self.__class__.__name__}(primary={self.primary}, secondary={self.secondary}, tertiary={self.tertiary})"
+
 
 class FirmwareShortSHADataField(utils.BinaryFieldBase[bytes]):
     """The short hash in a device info.
@@ -31,7 +154,7 @@ class FirmwareShortSHADataField(utils.BinaryFieldBase[bytes]):
     increase this too.
     """
 
-    NUM_BYTES = 7
+    NUM_BYTES = 8
     FORMAT = f"{NUM_BYTES}s"
 
 
@@ -272,3 +395,27 @@ class MoveStopConditionField(utils.UInt8Field):
         except ValueError:
             condition = str(self.value)
         return f"{self.__class__.__name__}(value={condition})"
+
+
+class LightTransitionTypeField(utils.UInt8Field):
+    """Light transition type."""
+
+    def __repr__(self) -> str:
+        """Print light transition type."""
+        try:
+            transition = LightTransitionType(self.value).name
+        except ValueError:
+            transition = str(self.value)
+        return f"{self.__class__.__name__}(value={transition})"
+
+
+class LightAnimationTypeField(utils.UInt8Field):
+    """Light action type."""
+
+    def __repr__(self) -> str:
+        """Print light action type."""
+        try:
+            action = LightAnimationType(self.value).name
+        except ValueError:
+            action = str(self.value)
+        return f"{self.__class__.__name__}(value={action})"

@@ -28,6 +28,12 @@ OT3_PIP_CAL = ot3_calibration.PipetteOffsetByPipetteMount(
 )
 
 
+@pytest.mark.ot3_only
+@pytest.fixture
+def fake_fw_info():
+    return types.InstrumentFWInfo(types.OT3Mount.GRIPPER, False, 0, 0)
+
+
 @pytest.fixture
 def hardware_pipette_ot2() -> Callable:
     def _create_pipette(
@@ -41,14 +47,14 @@ def hardware_pipette_ot2() -> Callable:
 
 
 @pytest.fixture
-def hardware_pipette_ot3() -> Callable:
+def hardware_pipette_ot3(fake_fw_info) -> Callable:
     def _create_pipette(
         model: ot3_pipette_config.PipetteModelVersionType,
         calibration: ot3_calibration.PipetteOffsetByPipetteMount = OT3_PIP_CAL,
         id: str = "testID",
     ):
         return ot3_pipette.Pipette(
-            ot3_pipette_config.load_ot3_pipette(model), calibration, id
+            ot3_pipette_config.load_ot3_pipette(model), calibration, fake_fw_info, id
         )
 
     return _create_pipette
@@ -89,7 +95,7 @@ def test_tip_tracking(
         [lazy_fixture("hardware_pipette_ot2"), "p10_single_v1", Point(0, 0, 12.0)],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v3.3"),
             Point(-8.0, -22.0, -259.15),
         ],
     ],
@@ -277,20 +283,20 @@ def test_flow_rate_setting(
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_single_v1.0"),
+            ot3_pipette_config.convert_pipette_model("p1000_single_v3.3"),
             Point(-8.0, -22.0, -259.15),
             Point(-8.0, -22.0, -259.15),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_multi_v1.0"),
+            ot3_pipette_config.convert_pipette_model("p1000_multi_v3.3"),
             Point(-8.0, -47.5, -259.15),
             Point(-8.0, -79.0, -259.15),
         ],
         [
             lazy_fixture("hardware_pipette_ot3"),
-            ot3_pipette_config.convert_pipette_model("p1000_96", "1.0"),
-            Point(13.5, -46.5, -259.15),
+            ot3_pipette_config.convert_pipette_model("p1000_96", "3.3"),
+            Point(13.5, -57.0, -259.15),
             Point(-36.0, -88.5, -259.15),
         ],
     ],
@@ -384,7 +390,9 @@ def test_save_instrument_offset_ot3(hardware_pipette_ot3: Callable) -> None:
         load_cal.assert_called_once_with("testID", Mount.LEFT)
 
 
-def test_reload_instrument_cal_ot3(hardware_pipette_ot3: Callable) -> None:
+def test_reload_instrument_cal_ot3(
+    hardware_pipette_ot3: Callable, fake_fw_info
+) -> None:
     old_pip = hardware_pipette_ot3(
         ot3_pipette_config.convert_pipette_model("p1000_single_v1.0")
     )
@@ -395,7 +403,7 @@ def test_reload_instrument_cal_ot3(hardware_pipette_ot3: Callable) -> None:
         status=cal_types.CalibrationStatus(),
     )
     new_pip, skipped = ot3_pipette._reload_and_check_skip(
-        old_pip.config, old_pip, new_cal
+        old_pip.config, old_pip, new_cal, fake_fw_info
     )
 
     assert skipped

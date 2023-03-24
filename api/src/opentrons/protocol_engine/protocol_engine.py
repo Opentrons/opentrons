@@ -87,7 +87,8 @@ class ProtocolEngine:
             action_dispatcher=self._action_dispatcher,
         )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
-            hardware_api=hardware_api, state_store=state_store
+            hardware_api=hardware_api,
+            state_store=state_store,
         )
         self._door_watcher = door_watcher or DoorWatcher(
             state_store=state_store,

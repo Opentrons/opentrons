@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 import {
@@ -6,6 +7,7 @@ import {
   POSITION_RELATIVE,
   COLORS,
   OVERFLOW_SCROLL,
+  useIdle,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -22,8 +24,12 @@ import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDa
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
+import { AttachInstrumentsDashboard } from '../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
+import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
+import { getOnDeviceDisplaySettings } from '../redux/config'
+import { SLEEP_NEVER_MS } from './constants'
 
 import type { RouteProps } from './types'
 
@@ -104,14 +110,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:runId/run',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>attach instruments</Box>
-      </>
-    ),
+    Component: AttachInstrumentsDashboard,
     exact: true,
-    // 'Attach Instruments Dashboard',
     name: 'Instruments',
     navLinkTo: '/attach-instruments',
     path: '/attach-instruments',
@@ -161,31 +161,49 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   },
 ]
 
+const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
+  'mousedown',
+  'click',
+  'scroll',
+]
+
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const { sleepMs } = useSelector(getOnDeviceDisplaySettings)
+  const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
+  const options = {
+    events: onDeviceDisplayEvents,
+    initialState: false,
+  }
+  const isIdle = useIdle(sleepTime, options)
+
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%">
-        <Switch>
-          {onDeviceDisplayRoutes.map(
-            ({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.white}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            }
-          )}
-          <Redirect exact from="/" to="/dashboard" />
-        </Switch>
+        {Boolean(isIdle) ? (
+          <SleepScreen />
+        ) : (
+          <Switch>
+            {onDeviceDisplayRoutes.map(
+              ({ Component, exact, path }: RouteProps) => {
+                return (
+                  <Route key={path} exact={exact} path={path}>
+                    <Box
+                      position={POSITION_RELATIVE}
+                      width="100%"
+                      height="100%"
+                      backgroundColor={COLORS.white}
+                      overflow={OVERFLOW_SCROLL}
+                    >
+                      <ModalPortalRoot />
+                      <Component />
+                    </Box>
+                  </Route>
+                )
+              }
+            )}
+            <Redirect exact from="/" to="/dashboard" />
+          </Switch>
+        )}
       </Box>
     </ApiHostProvider>
   )
