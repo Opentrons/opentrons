@@ -31,9 +31,9 @@ Alt.args = {
   buttonText: 'Button text',
 }
 
-export const TertiaryHigh = Template.bind({})
-TertiaryHigh.args = {
-  buttonType: 'tertiaryHigh',
+export const TertiaryLowLight = Template.bind({})
+TertiaryLowLight.args = {
+  buttonType: 'TertiaryLowLight',
   buttonText: 'Button text',
 }
 

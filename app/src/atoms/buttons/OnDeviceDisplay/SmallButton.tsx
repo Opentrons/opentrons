@@ -8,6 +8,7 @@ import {
   Btn,
   styleProps,
 } from '@opentrons/components'
+import { ODD_FOCUS_VISIBLE_STYE } from '../../../App/constants'
 import { StyledText } from '../../text'
 import type { StyleProps } from '@opentrons/components'
 
@@ -15,7 +16,7 @@ type SmallButtonTypes =
   | 'alt'
   | 'alert'
   | 'default'
-  | 'tertiaryHigh'
+  | 'tertiaryLowLight'
   | 'tertiaryHighLight'
 interface SmallButtonProps extends StyleProps {
   onClick: () => void
@@ -70,7 +71,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
       disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
     },
-    tertiaryHigh: {
+    tertiaryLowLight: {
       defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: ` ${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${COLORS.darkBlack_twenty}`,
@@ -87,7 +88,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     border-radius: ${BORDERS.size_four};
     box-shadow: none;
     padding: ${SPACING.spacing4} ${SPACING.spacing5};
-    line-height: ${TYPOGRAPHY.lineHeight28};
     text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
 
@@ -105,7 +105,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE_STYE};
     }
 
     &:active {
@@ -128,6 +128,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     >
       <StyledText
         fontSize="1.375rem"
+        lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {buttonText}

@@ -55,10 +55,10 @@ describe('SmallButton', () => {
       `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
     )
   })
-  it('renders the tertiary high', () => {
+  it('renders the tertiary low light', () => {
     props = {
       ...props,
-      buttonType: 'tertiaryHigh',
+      buttonType: 'tertiaryLowLight',
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
