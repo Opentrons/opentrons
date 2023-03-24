@@ -34,15 +34,14 @@ const RUN_TIMER_STYLE = css`
   color: ${COLORS.darkBlackEnabled};
 `
 
-const CURRENT_COMMAND_STYLE = css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;=
-  text-align: ${TYPOGRAPHY.textAlignCenter}
+const COMMAND_ROW_STYLE = css`
   font-size: 1.375rem;
   line-height: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightRegular}
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 `
 
 interface RunTimerInfo {
@@ -130,16 +129,13 @@ CurrentRunningProtocolCommandProps): JSX.Element | null {
         padding={`0.75rem ${SPACING.spacing5}`}
         backgroundColor={COLORS.foundationalBlue}
         borderRadius={BORDERS.size_two}
+        justifyContent={JUSTIFY_CENTER}
       >
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
-            /* fontSize="1.375rem"
-            lineHeight="1.75rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            textAlign={TYPOGRAPHY.textAlignCenter} */
-            css={CURRENT_COMMAND_STYLE}
+            css={COMMAND_ROW_STYLE}
           />
         ) : null}
       </Flex>

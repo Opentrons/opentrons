@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
 import {
@@ -84,7 +83,8 @@ export function RunningProtocolCommandList({
             viewportRef={viewPortRef}
             ref={ref}
             items={robotSideAnalysis?.commands}
-            initialIndex={0}
+            initialIndex={currentRunCommandIndex}
+            // initialIndex={0}
           >
             {(command, index) => {
               const backgroundColor =
@@ -100,7 +100,6 @@ export function RunningProtocolCommandList({
                   <Flex
                     padding={`0.75rem ${SPACING.spacing5}`}
                     alignItems={ALIGN_CENTER}
-                    // gridGap={SPACING.spacing4}
                     backgroundColor={backgroundColor}
                     width="100%"
                     fontSize="1.375rem"
@@ -121,22 +120,6 @@ export function RunningProtocolCommandList({
           </ViewportList>
         </Flex>
       ) : null}
-      {/* <Flex gridGap="1rem">
-          <Flex
-            backgroundColor={COLORS.fundamentalsBackgroundShade}
-            padding="0.25rem 0.5rem"
-          >
-            {`Run: ${createdAtTimestamp}`}
-          </Flex>
-          <Flex
-            backgroundColor={COLORS.fundamentalsBackgroundShade}
-            padding="0.25rem 0.5rem"
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-          >
-            {`${t('status')}: ${runStatus}`}
-          </Flex>
-        </Flex> */}
-      {/* </Flex> */}
     </Flex>
   )
 }
