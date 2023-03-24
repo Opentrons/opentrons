@@ -113,58 +113,56 @@ async def test_create(
     )
 
 
-# async def test_create_with_options(
-#     decoy: Decoy,
-#     mock_engine_store: EngineStore,
-#     subject: MaintenanceRunDataManager,
-#     engine_state_summary: StateSummary,
-# ) -> None:
-#     """It should handle creation with a protocol and labware offsets."""
-#     run_id = "hello world"
-#     created_at = datetime(year=2021, month=1, day=1)
-#
-#     protocol = ProtocolResource(
-#         protocol_id="protocol-id",
-#         created_at=datetime(year=2022, month=2, day=2),
-#         source=None,  # type: ignore[arg-type]
-#         protocol_key=None,
-#     )
-#
-#     labware_offset = pe_types.LabwareOffsetCreate(
-#         definitionUri="namespace/load_name/version",
-#         location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
-#         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-#     )
-#
-#     decoy.when(
-#         await mock_engine_store.create(
-#             run_id=run_id,
-#             labware_offsets=[labware_offset],
-#             protocol=protocol,
-#         )
-#     ).then_return(engine_state_summary)
-#
-#     result = await subject.create(
-#         run_id=run_id,
-#         created_at=created_at,
-#         labware_offsets=[labware_offset],
-#         protocol=protocol,
-#     )
-#
-#     assert result == Run(
-#         id=run_resource.run_id,
-#         protocolId=run_resource.protocol_id,
-#         createdAt=run_resource.created_at,
-#         current=True,
-#         actions=run_resource.actions,
-#         status=engine_state_summary.status,
-#         errors=engine_state_summary.errors,
-#         labware=engine_state_summary.labware,
-#         labwareOffsets=engine_state_summary.labwareOffsets,
-#         pipettes=engine_state_summary.pipettes,
-#         modules=engine_state_summary.modules,
-#         liquids=engine_state_summary.liquids,
-#     )
+async def test_create_with_options(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    subject: MaintenanceRunDataManager,
+    engine_state_summary: StateSummary,
+) -> None:
+    """It should handle creation with a protocol and labware offsets."""
+    run_id = "hello world"
+    created_at = datetime(year=2021, month=1, day=1)
+
+    protocol = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2022, month=2, day=2),
+        source=None,  # type: ignore[arg-type]
+        protocol_key=None,
+    )
+
+    labware_offset = pe_types.LabwareOffsetCreate(
+        definitionUri="namespace/load_name/version",
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
+    decoy.when(
+        await mock_engine_store.create(
+            run_id=run_id,
+            labware_offsets=[labware_offset],
+            protocol=None,
+        )
+    ).then_return(engine_state_summary)
+
+    result = await subject.create(
+        run_id=run_id,
+        created_at=created_at,
+        labware_offsets=[labware_offset],
+    )
+
+    assert result == MaintenanceRun(
+        id=run_id,
+        createdAt=created_at,
+        current=True,
+        actions=[],
+        status=engine_state_summary.status,
+        errors=engine_state_summary.errors,
+        labware=engine_state_summary.labware,
+        labwareOffsets=engine_state_summary.labwareOffsets,
+        pipettes=engine_state_summary.pipettes,
+        modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
+    )
 
 
 async def test_create_engine_error(

@@ -15,7 +15,7 @@ from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
 from robot_server.protocols import ProtocolResource
-from robot_server.runs.engine_store import EngineStore, EngineConflictError
+from robot_server.maintenance_run.engine_store import EngineStore, EngineConflictError
 
 
 @pytest.fixture

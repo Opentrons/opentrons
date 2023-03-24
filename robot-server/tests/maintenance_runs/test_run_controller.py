@@ -14,10 +14,15 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_runner import ProtocolRunResult
 
 from robot_server.service.task_runner import TaskRunner
-from robot_server.runs.action_models import RunAction, RunActionType
-from robot_server.runs.engine_store import EngineStore
-from robot_server.runs.run_store import RunStore
-from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
+from robot_server.maintenance_run.maintenance_action_models import (
+    MaintenanceRunAction,
+    MaintenanceRunActionType,
+)
+from robot_server.maintenance_run.engine_store import EngineStore
+from robot_server.maintenance_run.maintenance_run_controller import (
+    MaintenanceRunController,
+    RunActionNotAllowedError,
+)
 
 
 @pytest.fixture
@@ -26,12 +31,6 @@ def mock_engine_store(decoy: Decoy, run_id: str) -> EngineStore:
     mock = decoy.mock(cls=EngineStore)
     decoy.when(mock.current_run_id).then_return(run_id)
     return mock
-
-
-@pytest.fixture
-def mock_run_store(decoy: Decoy) -> RunStore:
-    """Get a mock RunStore."""
-    return decoy.mock(cls=RunStore)
 
 
 @pytest.fixture
@@ -74,169 +73,34 @@ def protocol_commands() -> List[pe_commands.Command]:
 def subject(
     run_id: str,
     mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
-) -> RunController:
-    """Get a RunController test subject."""
-    return RunController(
+) -> MaintenanceRunController:
+    """Get a MaintenanceRunController test subject."""
+    return MaintenanceRunController(
         run_id=run_id,
         engine_store=mock_engine_store,
-        run_store=mock_run_store,
         task_runner=mock_task_runner,
     )
-
-
-async def test_create_play_action_to_resume(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    run_id: str,
-    subject: RunController,
-) -> None:
-    """It should resume a run."""
-    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
-
-    result = subject.create_action(
-        action_id="some-action-id",
-        action_type=RunActionType.PLAY,
-        created_at=datetime(year=2021, month=1, day=1),
-    )
-
-    assert result == RunAction(
-        id="some-action-id",
-        actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2021, month=1, day=1),
-    )
-
-    decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_engine_store.runner.play(), times=1)
-    decoy.verify(await mock_engine_store.runner.run(), times=0)
-
-
-async def test_create_play_action_to_start(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    mock_task_runner: TaskRunner,
-    engine_state_summary: StateSummary,
-    protocol_commands: List[pe_commands.Command],
-    run_id: str,
-    subject: RunController,
-) -> None:
-    """It should start a run."""
-    decoy.when(mock_engine_store.runner.was_started()).then_return(False)
-
-    result = subject.create_action(
-        action_id="some-action-id",
-        action_type=RunActionType.PLAY,
-        created_at=datetime(year=2021, month=1, day=1),
-    )
-
-    assert result == RunAction(
-        id="some-action-id",
-        actionType=RunActionType.PLAY,
-        createdAt=datetime(year=2021, month=1, day=1),
-    )
-
-    decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-
-    background_task_captor = matchers.Captor()
-    decoy.verify(mock_task_runner.run(background_task_captor))
-
-    decoy.when(await mock_engine_store.runner.run()).then_return(
-        ProtocolRunResult(
-            commands=protocol_commands,
-            state_summary=engine_state_summary,
-        )
-    )
-
-    await background_task_captor.value()
-
-    decoy.verify(
-        mock_run_store.update_run_state(
-            run_id=run_id,
-            summary=engine_state_summary,
-            commands=protocol_commands,
-        ),
-        times=1,
-    )
-
-
-async def test_create_pause_action(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    run_id: str,
-    subject: RunController,
-) -> None:
-    """It should resume a run."""
-    result = subject.create_action(
-        action_id="some-action-id",
-        action_type=RunActionType.PAUSE,
-        created_at=datetime(year=2021, month=1, day=1),
-    )
-
-    assert result == RunAction(
-        id="some-action-id",
-        actionType=RunActionType.PAUSE,
-        createdAt=datetime(year=2021, month=1, day=1),
-    )
-
-    decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_engine_store.runner.pause(), times=1)
 
 
 async def test_create_stop_action(
     decoy: Decoy,
     mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     run_id: str,
-    subject: RunController,
+    subject: MaintenanceRunController,
 ) -> None:
     """It should resume a run."""
     result = subject.create_action(
         action_id="some-action-id",
-        action_type=RunActionType.STOP,
+        action_type=MaintenanceRunActionType.STOP,
         created_at=datetime(year=2021, month=1, day=1),
     )
 
-    assert result == RunAction(
+    assert result == MaintenanceRunAction(
         id="some-action-id",
-        actionType=RunActionType.STOP,
+        actionType=MaintenanceRunActionType.STOP,
         createdAt=datetime(year=2021, month=1, day=1),
     )
 
-    decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
     decoy.verify(mock_task_runner.run(mock_engine_store.runner.stop), times=1)
-
-
-@pytest.mark.parametrize(
-    ("action_type", "exception"),
-    [
-        (RunActionType.PLAY, pe_errors.RobotDoorOpenError("oh no")),
-        (RunActionType.PLAY, pe_errors.RunStoppedError("oh no")),
-        (RunActionType.PAUSE, pe_errors.RunStoppedError("oh no")),
-    ],
-)
-async def test_action_not_allowed(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-    mock_task_runner: TaskRunner,
-    run_id: str,
-    subject: RunController,
-    action_type: RunActionType,
-    exception: Exception,
-) -> None:
-    """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
-    decoy.when(mock_engine_store.runner.was_started()).then_return(True)
-    decoy.when(mock_engine_store.runner.play()).then_raise(exception)
-    decoy.when(mock_engine_store.runner.pause()).then_raise(exception)
-
-    with pytest.raises(RunActionNotAllowedError, match="oh no"):
-        subject.create_action(
-            action_id="whatever",
-            action_type=action_type,
-            created_at=datetime(year=2021, month=1, day=1),
-        )

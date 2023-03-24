@@ -17,7 +17,7 @@ class RunActionNotAllowedError(ValueError):
     """Error raised when a given run action is not allowed."""
 
 
-class RunController:
+class MaintenanceRunController:
     """An interface to manage the side-effects of requested run actions."""
 
     def __init__(
