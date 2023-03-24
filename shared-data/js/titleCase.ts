@@ -4,7 +4,7 @@ const WHITESPACE = /\s/
 const IS_MANUAL_CASE = /.(?=[A-Z]|\..)/
 const ALPHANUMERIC_PATTERN = /[A-Za-z0-9\u00C0-\u00FF]/
 
-export function titleCase(input: string) {
+export function titleCase(input: string): string {
   let result = ''
   let m: RegExpExecArray | null
 
