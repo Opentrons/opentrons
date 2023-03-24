@@ -11,6 +11,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Mount,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import {
@@ -19,7 +20,6 @@ import {
   MEDIUM_STEP_SIZE_MM,
 } from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'

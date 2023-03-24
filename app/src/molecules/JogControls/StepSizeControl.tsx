@@ -11,12 +11,12 @@ import {
   DIRECTION_ROW,
   TEXT_TRANSFORM_CAPITALIZE,
   Box,
+  PrimaryButton,
 } from '@opentrons/components'
 import { ControlContainer } from './ControlContainer'
 
 import { StyledText } from '../../atoms/text'
 import { css } from 'styled-components'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { StepSize } from './types'
 

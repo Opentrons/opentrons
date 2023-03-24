@@ -1,11 +1,11 @@
 import * as React from 'react'
 
-import { CheckboxField as CheckboxFieldComponent } from './CheckboxField'
+import { CheckboxField as CheckboxFieldComponent } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Molecules/Forms/Checkbox Field',
+  title: 'Library/Atoms/Checkbox Field',
   component: CheckboxFieldComponent,
 } as Meta
 

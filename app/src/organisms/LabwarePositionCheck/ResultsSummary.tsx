@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
   CompletedProtocolAnalysis,
@@ -24,6 +23,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
 } from '@opentrons/components'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'

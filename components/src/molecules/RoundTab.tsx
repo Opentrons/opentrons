@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  BORDERS,
-  Btn,
-  COLORS,
-  DISPLAY_BLOCK,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
-  SIZE_1,
-  SPACING,
   TYPOGRAPHY,
-} from '@opentrons/components'
+  BORDERS,
+  SPACING,
+  POSITION_RELATIVE,
+  COLORS,
+  POSITION_ABSOLUTE,
+  DISPLAY_BLOCK,
+  SIZE_1,
+  Btn,
+} from '..'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}

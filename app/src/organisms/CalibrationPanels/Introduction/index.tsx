@@ -7,10 +7,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   ALIGN_CENTER,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 
 import * as Sessions from '../../../redux/sessions'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'

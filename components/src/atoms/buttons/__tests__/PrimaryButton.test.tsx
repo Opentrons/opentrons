@@ -5,9 +5,8 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
-} from '@opentrons/components'
-
-import { PrimaryButton } from '..'
+} from '../../../index'
+import { PrimaryButton } from '../PrimaryButton'
 
 const render = (props: React.ComponentProps<typeof PrimaryButton>) => {
   return renderWithProviders(<PrimaryButton {...props} />)[0]

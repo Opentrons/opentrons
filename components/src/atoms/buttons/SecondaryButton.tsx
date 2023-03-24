@@ -6,9 +6,9 @@ import {
   TYPOGRAPHY,
   styleProps,
   isntStyleProp,
-} from '@opentrons/components'
+} from '../../index'
 
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps } from '../../index'
 
 interface SecondaryButtonProps extends StyleProps {
   /** button action is dangerous and may have non-reversible side-effects for user */

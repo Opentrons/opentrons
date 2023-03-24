@@ -5,54 +5,21 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   useLongPress,
+  PrimaryButton,
 } from '@opentrons/components'
 import {
-  PrimaryButton,
-  SecondaryButton,
   TertiaryButton,
   QuaternaryButton,
   SubmitPrimaryButton,
   AlertPrimaryButton,
   ToggleButton,
 } from './index'
-import type { Story, Meta } from '@storybook/react'
 import { StyledText } from '../text'
+import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Buttons',
 } as Meta
-
-const PrimaryButtonTemplate: Story<
-  React.ComponentProps<typeof PrimaryButton>
-> = args => {
-  const { children } = args
-  return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-      <PrimaryButton>{children}</PrimaryButton>
-    </Flex>
-  )
-}
-
-export const Primary = PrimaryButtonTemplate.bind({})
-Primary.args = {
-  children: 'primary button',
-}
-
-const SecondaryButtonTemplate: Story<
-  React.ComponentProps<typeof SecondaryButton>
-> = args => {
-  const { children } = args
-  return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-      <SecondaryButton>{children}</SecondaryButton>
-    </Flex>
-  )
-}
-
-export const Secondary = SecondaryButtonTemplate.bind({})
-Secondary.args = {
-  children: 'secondary button',
-}
 
 const TertiaryButtonTemplate: Story<
   React.ComponentProps<typeof TertiaryButton>

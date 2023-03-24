@@ -7,9 +7,9 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
+  PrimaryButton,
 } from '@opentrons/components'
 
-import { PrimaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useIsOT3, useRunHasStarted } from '../hooks'

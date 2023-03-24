@@ -7,7 +7,7 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
-} from '@opentrons/components'
+} from '../../../index'
 
 import { CheckboxField } from '..'
 

@@ -5,8 +5,8 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  SecondaryButton,
 } from '@opentrons/components'
-import { SecondaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 

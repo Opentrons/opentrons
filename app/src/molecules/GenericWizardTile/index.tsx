@@ -15,11 +15,11 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_START,
   JUSTIFY_CENTER,
+  PrimaryButton,
 } from '@opentrons/components'
 import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 

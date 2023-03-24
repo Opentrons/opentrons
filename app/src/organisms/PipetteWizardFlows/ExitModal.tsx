@@ -1,9 +1,15 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
-import { COLORS, SPACING, Flex, TYPOGRAPHY } from '@opentrons/components'
+import {
+  COLORS,
+  SPACING,
+  Flex,
+  TYPOGRAPHY,
+  SecondaryButton,
+} from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { AlertPrimaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'

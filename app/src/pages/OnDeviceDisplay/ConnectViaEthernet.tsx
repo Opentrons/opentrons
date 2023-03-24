@@ -21,6 +21,7 @@ import {
   JUSTIFY_FLEX_END,
   ALIGN_FLEX_END,
   POSITION_RELATIVE,
+  PrimaryButton,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
@@ -28,7 +29,6 @@ import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import { StepMeter } from '../../atoms/StepMeter'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { State, Dispatch } from '../../redux/types'
 

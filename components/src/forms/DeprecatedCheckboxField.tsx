@@ -34,8 +34,11 @@ export interface CheckboxFieldProps {
 
 /**
  * Checkbox Form Field
+ * @deprecated
  */
-export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
+export function DeprecatedCheckboxField(
+  props: CheckboxFieldProps
+): JSX.Element {
   const error = props.error != null
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.checkbox_disabled]: props.disabled,

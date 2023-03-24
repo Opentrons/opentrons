@@ -11,9 +11,10 @@ import {
   JUSTIFY_CENTER,
   COLORS,
   TYPOGRAPHY,
+  SecondaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { AlertPrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =

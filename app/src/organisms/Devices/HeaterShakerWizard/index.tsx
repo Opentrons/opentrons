@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { getAdapterName } from '@opentrons/shared-data'
 import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
@@ -18,6 +17,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
   useHoverTooltip,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 
 import type { ModuleModel } from '@opentrons/shared-data'

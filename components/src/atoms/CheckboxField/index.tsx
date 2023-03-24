@@ -10,7 +10,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   SIZE_1,
-} from '@opentrons/components'
+} from '../../index'
 
 export interface CheckboxFieldProps {
   /** change handler */

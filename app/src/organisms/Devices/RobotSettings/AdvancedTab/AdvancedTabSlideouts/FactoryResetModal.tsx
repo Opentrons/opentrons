@@ -12,9 +12,10 @@ import {
   Link,
   TYPOGRAPHY,
   ALIGN_CENTER,
+  PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { AlertPrimaryButton, PrimaryButton } from '../../../../../atoms/buttons'
+import { AlertPrimaryButton } from '../../../../../atoms/buttons'
 import { Modal } from '../../../../../molecules/Modal'
 import {
   useDispatchApiRequest,

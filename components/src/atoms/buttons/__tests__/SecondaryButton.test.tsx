@@ -5,9 +5,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
-} from '@opentrons/components'
+} from '../../../index'
 
-import { SecondaryButton } from '../'
+import { SecondaryButton } from '../SecondaryButton'
 
 const render = (props: React.ComponentProps<typeof SecondaryButton>) => {
   return renderWithProviders(<SecondaryButton {...props} />)[0]
