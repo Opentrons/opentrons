@@ -17,7 +17,7 @@ async def _main(cfg: TestConfig) -> None:
         is_simulating=cfg.simulate,
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",
-        gripper="GRPV102",
+        gripper="GRPV1120230323A01",
     )
     await api.home()
     home_pos = await api.gantry_position(OT3Mount.GRIPPER)
