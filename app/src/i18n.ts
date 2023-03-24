@@ -1,8 +1,9 @@
 import i18n from 'i18next'
-import { capitalCase, sentenceCase } from 'change-case'
-import { titleCase } from 'title-case'
+import capitalize from 'lodash/capitalize'
+import startCase from 'lodash/startCase'
 import { initReactI18next } from 'react-i18next'
 import { resources } from './assets/localization'
+import { titleCase } from '@opentrons/shared-data'
 
 i18n.use(initReactI18next).init(
   {
@@ -23,9 +24,9 @@ i18n.use(initReactI18next).init(
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
       format: function (value, format, lng) {
-        if (format === 'uppercase') return value.toUpperCase()
-        if (format === 'capitalize') return capitalCase(value)
-        if (format === 'sentenceCase') return sentenceCase(value)
+        if (format === 'upperCase') return value.toUpperCase()
+        if (format === 'capitalize') return capitalize(value)
+        if (format === 'sentenceCase') return startCase(value)
         if (format === 'titleCase') return titleCase(value)
         return value
       },
