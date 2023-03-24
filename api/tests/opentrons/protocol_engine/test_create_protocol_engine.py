@@ -1,5 +1,5 @@
 """Smoke tests for the ProtocolEngine creation factory."""
-from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons_shared_data.labware import uri_from_details
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName

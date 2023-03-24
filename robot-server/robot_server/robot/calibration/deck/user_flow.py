@@ -12,8 +12,9 @@ from typing import (
     Union,
 )
 
+from opentrons_shared_data.labware import hash_labware_def
+
 from opentrons.calibration_storage import (
-    helpers,
     types as cal_types,
     clear_pipette_offset_calibrations,
     load_tip_length_calibration,
@@ -327,7 +328,7 @@ class DeckCalibrationUserFlow:
     def _save_attitude_matrix(self):
         e = tuplefy_cal_point_dicts(self._expected_points)
         a = tuplefy_cal_point_dicts(self._saved_points)
-        tiprack_hash = helpers.hash_labware_def(self._tip_rack._core.get_definition())
+        tiprack_hash = hash_labware_def(self._tip_rack._core.get_definition())
         pip_id = self._hw_pipette.pipette_id
         assert pip_id
         robot_cal.save_attitude_matrix(

@@ -8,10 +8,10 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LegacyLabwareDefinition,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware import uri_from_details
 
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
-from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.types import (
     ModuleModel as LegacyModuleModel,

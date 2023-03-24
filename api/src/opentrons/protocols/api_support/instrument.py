@@ -4,9 +4,9 @@ from typing import Optional, Any
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
+from opentrons_shared_data.labware import uri_from_definition
 
 from opentrons import types
-from opentrons.calibration_storage.helpers import uri_from_definition
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.hardware_control.dev_types import PipetteDict
 

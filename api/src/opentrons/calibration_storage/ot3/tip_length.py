@@ -4,9 +4,11 @@ import logging
 from pydantic import ValidationError
 from dataclasses import asdict
 
+from opentrons_shared_data.labware import uri_from_definition, hash_labware_def
+
 from opentrons import config
 
-from .. import file_operators as io, helpers, types as local_types
+from .. import file_operators as io, types as local_types
 
 from opentrons.util.helpers import utc_now
 
@@ -64,7 +66,7 @@ def load_tip_length_calibration(
     :param pip_id: pipette you are using
     :param definition: full definition of the tiprack
     """
-    labware_hash = helpers.hash_labware_def(definition)
+    labware_hash = hash_labware_def(definition)
     load_name = definition["parameters"]["loadName"]
     try:
         return tip_lengths_for_pipette(pip_id)[labware_hash]
@@ -90,8 +92,8 @@ def create_tip_length_data(
     :param definition: full labware definition
     :param length: the tip length to save
     """
-    labware_hash = helpers.hash_labware_def(definition)
-    labware_uri = helpers.uri_from_definition(definition)
+    labware_hash = hash_labware_def(definition)
+    labware_uri = uri_from_definition(definition)
 
     if isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))

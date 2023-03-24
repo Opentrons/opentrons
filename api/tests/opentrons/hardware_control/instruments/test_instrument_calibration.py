@@ -14,6 +14,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     Parameters,
 )
+from opentrons_shared_data import labware
 
 
 from opentrons import calibration_storage
@@ -34,6 +35,15 @@ def _use_mock_calibration_storage(
         calibration_storage_helpers, inspect.isfunction
     ):
         monkeypatch.setattr(calibration_storage_helpers, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def _use_mock_labware_hash_in_subject(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        subject, "hash_labware_def", decoy.mock(func=labware.hash_labware_def)
+    )
 
 
 @pytest.fixture
@@ -89,9 +99,7 @@ def test_load_tip_length(
         )
     ).then_return(tip_length_data)
 
-    decoy.when(calibration_storage.helpers.hash_labware_def(tip_rack_dict)).then_return(
-        "asdfghjk"
-    )
+    decoy.when(subject.hash_labware_def(tip_rack_dict)).then_return("asdfghjk")
 
     result = subject.load_tip_length_for_pipette(
         pipette_id="abc123", tiprack=tip_rack_definition

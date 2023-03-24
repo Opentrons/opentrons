@@ -7,8 +7,8 @@ from typing import Any, cast
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware import uri_from_details
 
-from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (

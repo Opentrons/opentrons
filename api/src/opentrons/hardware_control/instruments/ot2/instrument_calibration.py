@@ -2,14 +2,15 @@ import typing
 from typing_extensions import Literal
 from dataclasses import dataclass
 from datetime import datetime
-from opentrons.config.robot_configs import default_pipette_offset
 
+from opentrons.config.robot_configs import default_pipette_offset
 from opentrons import calibration_storage
-from opentrons.calibration_storage import types, helpers
+from opentrons.calibration_storage import types
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import OT3Mount
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware import hash_labware_def
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -126,7 +127,7 @@ def load_tip_length_for_pipette(
     # TODO (lc 09-26-2022) We shouldn't have to do a hash twice. We should figure out what
     # information we actually need from the labware definition and pass it into
     # the `load_tip_length_calibration` function.
-    tiprack_hash = helpers.hash_labware_def(tiprack)
+    tiprack_hash = hash_labware_def(tiprack)
 
     return TipLengthCalibration(
         tip_length=tip_length_data.tipLength,

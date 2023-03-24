@@ -18,11 +18,11 @@ from typing import (
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.labware import uri_from_details
 
 from opentrons.types import DeckSlotName, Point, MountType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
-from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware

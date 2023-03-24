@@ -3,14 +3,15 @@ import os
 import pytest
 from mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
+
 from opentrons import config
-from opentrons.calibration_storage import helpers, types as CSTypes, models
+from opentrons.calibration_storage import types as CSTypes, models
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config.pipette_config import load
 from opentrons.protocol_api import labware
 
-from opentrons_shared_data.labware import load_definition
+from opentrons_shared_data.labware import load_definition, hash_labware_def
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand
@@ -604,7 +605,7 @@ async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
     )
 
     await uf.save_offset()
-    tiprack_hash = helpers.hash_labware_def(uf._tip_rack._core.get_definition())
+    tiprack_hash = hash_labware_def(uf._tip_rack._core.get_definition())
     offset = uf._cal_ref_point - Point(x=10, y=10, z=40)
     mock_save_pipette.assert_called_with(
         offset=offset,

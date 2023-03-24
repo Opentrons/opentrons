@@ -7,7 +7,8 @@ from typing import cast, List, Tuple, Union, Optional
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
-from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons_shared_data.labware import uri_from_details
+
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Point, DeckSlotName
 

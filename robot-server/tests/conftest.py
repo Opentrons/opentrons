@@ -20,11 +20,11 @@ from pathlib import Path
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware import hash_labware_def
 
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.calibration_storage import (
-    helpers,
     save_pipette_calibration,
     create_tip_length_data,
     save_tip_length_calibration,
@@ -257,7 +257,7 @@ def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
     attached_pip_list = ["123", "321"]
     mount_list = [Mount.LEFT, Mount.RIGHT]
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
-    def_hash = helpers.hash_labware_def(definition)
+    def_hash = hash_labware_def(definition)
     for pip, mount in zip(attached_pip_list, mount_list):
         save_pipette_calibration(
             offset=Point(0, 0, 0),

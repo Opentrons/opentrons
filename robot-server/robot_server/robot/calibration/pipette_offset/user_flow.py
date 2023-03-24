@@ -10,7 +10,6 @@ from typing import (
     Tuple,
 )
 from opentrons.calibration_storage import (
-    helpers,
     get_pipette_offset,
     save_pipette_calibration,
     delete_pipette_offset_file,
@@ -48,6 +47,7 @@ from .state_machine import (
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware import details_from_uri, hash_labware_def
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -350,7 +350,7 @@ class PipetteOffsetCalibrationUserFlow:
             return False, labware.load_from_definition(tip_rack_def, position)
         if existing_calibration and existing_calibration.uri:
             try:
-                details = helpers.details_from_uri(existing_calibration.uri)
+                details = details_from_uri(existing_calibration.uri)
                 return True, labware.load(
                     load_name=details.load_name,
                     namespace=details.namespace,
@@ -437,9 +437,7 @@ class PipetteOffsetCalibrationUserFlow:
                 cur_pt = await self.get_current_point(
                     critical_point=CriticalPoint.FRONT_NOZZLE
                 )
-            tiprack_hash = helpers.hash_labware_def(
-                self._tip_rack._core.get_definition()
-            )
+            tiprack_hash = hash_labware_def(self._tip_rack._core.get_definition())
             offset = self._cal_ref_point - cur_pt
             save_pipette_calibration(
                 offset=offset,

@@ -4,8 +4,8 @@ from typing import Optional, overload, Union
 from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware import uri_from_details
 
-from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI

@@ -1,11 +1,11 @@
 from typing import List, Optional
 
-from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 
 from opentrons.types import DeckSlotName, Location, Point
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
+from opentrons_shared_data.labware import uri_from_definition
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .legacy_well_core import LegacyWellCore
@@ -83,7 +83,7 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
         )
 
     def get_uri(self) -> str:
-        return helpers.uri_from_definition(self._definition)
+        return uri_from_definition(self._definition)
 
     def get_load_params(self) -> LabwareLoadParams:
         return LabwareLoadParams(

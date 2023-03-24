@@ -4,6 +4,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import WellDefinition
+from opentrons_shared_data.labware import uri_from_details, uri_from_definition
 
 from opentrons.hardware_control.modules.types import (
     MagneticModuleModel,
@@ -20,7 +21,6 @@ from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabware
 from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
-from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
 
 test_data: Dict[str, WellDefinition] = {
@@ -569,11 +569,11 @@ def test_tiprack_list():
 def test_uris():
     details = ("opentrons", "opentrons_96_tiprack_300ul", "1")
     uri = "opentrons/opentrons_96_tiprack_300ul/1"
-    assert helpers.uri_from_details(*details) == uri
+    assert uri_from_details(*details) == uri
     defn = labware.get_labware_definition(
         details[1], details[0], details[2]  # type: ignore[arg-type]
     )
-    assert helpers.uri_from_definition(defn) == uri
+    assert uri_from_definition(defn) == uri
     lw = labware.Labware(
         core=LegacyLabwareCore(defn, Location(Point(0, 0, 0), "Test Slot")),
         api_version=APIVersion(2, 13),

@@ -3,7 +3,6 @@ from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, cast
 from typing_extensions import Literal
 
 from opentrons.calibration_storage import (
-    helpers,
     types as cal_types,
     get_robot_deck_attitude,
     save_robot_deck_attitude,
@@ -29,6 +28,7 @@ from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_api.core.legacy.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware import uri_from_definition, details_from_uri
 
 from robot_server.robot.calibration.constants import (
     MOVE_TO_DECK_SAFETY_BUFFER,
@@ -348,7 +348,7 @@ class CheckCalibrationUserFlow:
         pip_offset = get_pipette_offset(pipette.pipette_id, mount)
         if not pip_offset or not pip_offset.uri:
             return None
-        details = helpers.details_from_uri(pip_offset.uri)
+        details = details_from_uri(pip_offset.uri)
         position = self._deck.position_for(TIPRACK_SLOT)
         if details.namespace == OPENTRONS_NAMESPACE:
             tiprack = labware.load(
@@ -430,14 +430,14 @@ class CheckCalibrationUserFlow:
         - If we don't, use the default
         """
         if tip_rack_def:
-            uri = helpers.uri_from_definition(tip_rack_def)
+            uri = uri_from_definition(tip_rack_def)
             if uri == existing_calibration.uri:
                 return labware.load_from_definition(tip_rack_def, position)
             else:
                 raise RobotServerError(definition=CalibrationError.BAD_LABWARE_DEF)
         elif existing_calibration.uri:
             try:
-                details = helpers.details_from_uri(existing_calibration.uri)
+                details = details_from_uri(existing_calibration.uri)
                 if not details.namespace == OPENTRONS_NAMESPACE:
                     tiprack_def = get_custom_tiprack_definition_for_tlc(
                         existing_calibration.uri

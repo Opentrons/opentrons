@@ -9,7 +9,6 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.calibration_storage import (
-    helpers,
     create_tip_length_data,
     save_tip_length_calibration as cal_storage_save_tip_length,
 )
@@ -31,6 +30,8 @@ from .pipette_offset.constants import (
 )
 from .deck.constants import DeckCalibrationState
 from .check.constants import CalibrationCheckState
+
+from opentrons_shared_data.labware import details_from_uri
 
 if TYPE_CHECKING:
     from .deck.user_flow import DeckCalibrationUserFlow
@@ -212,7 +213,7 @@ def save_tip_length_calibration(
 def get_default_tipracks(default_uris: List["LabwareUri"]) -> List["LabwareDefinition"]:
     definitions = []
     for rack in default_uris:
-        details = helpers.details_from_uri(rack)
+        details = details_from_uri(rack)
         rack_def = labware.get_labware_definition(
             details.load_name, details.namespace, details.version
         )

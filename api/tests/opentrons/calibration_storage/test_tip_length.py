@@ -3,9 +3,9 @@ import importlib
 import opentrons
 from typing import cast, Any, TYPE_CHECKING
 
+from opentrons_shared_data.labware import hash_labware_def
 from opentrons.calibration_storage import (
     types as cs_types,
-    helpers,
 )
 
 if TYPE_CHECKING:
@@ -57,7 +57,7 @@ def test_save_tip_length_calibration(
 
     assert tip_lengths_for_pipette("pip1") == {}
     assert tip_lengths_for_pipette("pip2") == {}
-    tip_rack_hash = helpers.hash_labware_def(minimal_labware_def)
+    tip_rack_hash = hash_labware_def(minimal_labware_def)
     tip_length1 = create_tip_length_data(minimal_labware_def, 22.0)
     tip_length2 = create_tip_length_data(minimal_labware_def, 31.0)
     save_tip_length_calibration("pip1", tip_length1)
@@ -99,7 +99,7 @@ def test_delete_specific_tip_calibration(
 
     assert len(tip_lengths_for_pipette("pip1").keys()) == 2
     assert tip_lengths_for_pipette("pip2") != {}
-    tip_rack_hash = helpers.hash_labware_def(minimal_labware_def)
+    tip_rack_hash = hash_labware_def(minimal_labware_def)
     delete_tip_length_calibration(tip_rack_hash, "pip1")
     assert len(tip_lengths_for_pipette("pip1").keys()) == 1
     assert tip_lengths_for_pipette("pip2") != {}

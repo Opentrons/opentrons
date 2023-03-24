@@ -27,10 +27,3 @@ class CalibrationStatus:
     markedBad: bool = False
     source: typing.Optional[SourceType] = None
     markedAt: typing.Optional[datetime] = None
-
-
-@dataclass
-class UriDetails:
-    namespace: str
-    load_name: str
-    version: int
