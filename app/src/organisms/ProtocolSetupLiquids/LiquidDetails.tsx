@@ -134,7 +134,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                       {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
                       {MICRO_LITERS}
                     </Flex>
-                    <Icon name="chevron-right" height="3rem" />
+                    <Icon name="chevron-right" size="3rem" />
                   </Flex>
                 </TableDatum>
               </TableRow>

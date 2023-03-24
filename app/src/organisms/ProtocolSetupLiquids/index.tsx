@@ -95,7 +95,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         width="100%"
         gridGap={SPACING.spacing4}
-        onClick={() => setOpenItem(!openItem)}
+        onClick={() => setOpenItem(prevOpenItem => !prevOpenItem)}
         aria-label={`Liquids_${liquid.id}`}
       >
         <Flex
@@ -110,13 +110,18 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
             name="circle"
             color={liquid.displayColor}
             aria-label={`Liquids_${liquid.displayColor}`}
+            size="1.75rem"
           />
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <StyledText lineHeight={TYPOGRAPHY.lineHeight28}>
+          <StyledText
+            lineHeight={TYPOGRAPHY.lineHeight28}
+            fontSize="1.375rem"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+          >
             {liquid.displayName}
           </StyledText>
         </Flex>
