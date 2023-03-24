@@ -170,7 +170,7 @@ def get_gantry_per_axis_setting_ot3(
     return settings.low_throughput[axis_kind]
 
 
-def set_gantry_load_per_axis_current_settings_ot3(
+async def set_gantry_load_per_axis_current_settings_ot3(
     api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
@@ -194,9 +194,10 @@ def set_gantry_load_per_axis_current_settings_ot3(
             load=load,
             value=run_current,
         )
+    await api.set_gantry_load(load)
 
 
-def set_gantry_load_per_axis_motion_settings_ot3(
+async def set_gantry_load_per_axis_motion_settings_ot3(
     api: OT3API,
     axis: OT3Axis,
     load: Optional[GantryLoad] = None,
@@ -236,6 +237,7 @@ def set_gantry_load_per_axis_motion_settings_ot3(
             load=load,
             value=direction_change_speed_discontinuity,
         )
+    await api.set_gantry_load(load)
 
 
 @dataclass
@@ -293,7 +295,7 @@ async def set_gantry_load_per_axis_settings_ot3(
     if load is None:
         load = api.gantry_load
     for ax, stg in settings.items():
-        set_gantry_load_per_axis_motion_settings_ot3(
+        await set_gantry_load_per_axis_motion_settings_ot3(
             api,
             ax,
             load,
@@ -302,7 +304,7 @@ async def set_gantry_load_per_axis_settings_ot3(
             max_speed_discontinuity=stg.max_start_stop_speed,
             direction_change_speed_discontinuity=stg.max_change_dir_speed,
         )
-        set_gantry_load_per_axis_current_settings_ot3(
+        await set_gantry_load_per_axis_current_settings_ot3(
             api, ax, load, hold_current=stg.hold_current, run_current=stg.run_current
         )
     if load == api.gantry_load:
@@ -333,14 +335,14 @@ async def home_ot3(api: OT3API, axes: Optional[List[OT3Axis]] = None) -> None:
     }
     # overwrite current settings with API settings
     for ax, val in homing_speeds.items():
-        set_gantry_load_per_axis_motion_settings_ot3(
+        await set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
     # actually home
     await api.home(axes=axes)
     # revert back to our script's settings
     for ax, val in cached_discontinuities.items():
-        set_gantry_load_per_axis_motion_settings_ot3(
+        await set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
 
@@ -691,7 +693,9 @@ def get_temperature_humidity_outside_api_ot3(
     return task.result()
 
 
-async def get_pressure_ot3(api: OT3API, mount: OT3Mount) -> float:
+async def get_pressure_ot3(
+    api: OT3API, mount: OT3Mount, channel: Optional[str] = None
+) -> float:
     """Get the pressure reading from the pipette."""
     if api.is_simulator:
         return 0.0

@@ -82,6 +82,7 @@ test-gravimetric:
 
 .PHONY: test-production-qc
 test-production-qc:
+	$(python) -m hardware_testing.production_qc.pipette_current_speed_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 
@@ -98,7 +99,7 @@ test-scripts:
 	$(python) -m hardware_testing.scripts.bowtie_ot3 --simulate
 
 .PHONY: test-integration
-test-integration: test-gravimetric test-production-qc test-examples test-scripts
+test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: lint
 lint:
