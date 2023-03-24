@@ -202,9 +202,6 @@ describe('InstrumentsAndModules', () => {
     })
     expect(mockUsePipettesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
     expect(mockUseModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
-    expect(mockUseInstrumentsQuery).toHaveBeenCalledWith(
-      { refetchInterval: 5000 },
-      true
-    )
+    expect(mockUseInstrumentsQuery).toHaveBeenCalledWith()
   })
 })
