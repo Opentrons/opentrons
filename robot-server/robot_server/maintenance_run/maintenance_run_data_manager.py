@@ -37,7 +37,6 @@ def _build_run(
     return MaintenanceRun.construct(
         id=run_id,
         createdAt=created_at,
-        actions=actions,
         status=state_summary.status,
         errors=state_summary.errors,
         labware=state_summary.labware,
@@ -110,47 +109,36 @@ class MaintenanceRunDataManager:
         return _build_run(
             run_id=run_id,
             created_at=created_at,
-            actions=[],
             state_summary=state_summary,
             current=True,
         )
 
-    # def get(self, run_id: str) -> Run:
-    #     """Get a run resource.
-    #
-    #     This method will pull from the current run or the historical runs,
-    #     depending on if `run_id` refers to the current run.
-    #
-    #     Args:
-    #         run_id: The identifier of the run to return.
-    #
-    #     Returns:
-    #         The run resource.
-    #
-    #     Raises:
-    #         RunNotFoundError: The given run identifier does not exist.
-    #     """
-    #     run_resource = self._run_store.get(run_id=run_id)
-    #     state_summary = self._get_state_summary(run_id=run_id)
-    #     current = run_id == self._engine_store.current_run_id
-    #
-    #     return _build_run(run_resource, state_summary, current)
-    #
-    # def get_all(self) -> List[Run]:
-    #     """Get current and stored run resources.
-    #
-    #     Returns:
-    #         All run resources.
-    #     """
-    #     return [
-    #         _build_run(
-    #             run_resource=run_resource,
-    #             state_summary=self._get_state_summary(run_resource.run_id),
-    #             current=run_resource.run_id == self._engine_store.current_run_id,
-    #         )
-    #         for run_resource in self._run_store.get_all()
-    #     ]
-    #
+    def get(self, run_id: str) -> MaintenanceRun:
+        """Get a run resource.
+
+        This method will pull from the current run or the historical runs,
+        depending on if `run_id` refers to the current run.
+
+        Args:
+            run_id: The identifier of the run to return.
+
+        Returns:
+            The run resource.
+
+        Raises:
+            RunNotFoundError: The given run identifier does not exist.
+        """
+        state_summary = self._get_state_summary(run_id=run_id)
+        current = run_id == self._engine_store.current_run_id
+
+        # store created_at at engine level
+        return _build_run(
+            run_id=run_id,
+            created_at=datetime.now,
+            state_summary=state_summary,
+            current=current,
+        )
+
     # async def delete(self, run_id: str) -> None:
     #     """Delete a current or historical run.
     #

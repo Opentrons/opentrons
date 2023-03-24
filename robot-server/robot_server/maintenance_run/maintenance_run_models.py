@@ -70,10 +70,6 @@ class MaintenanceRun(ResourceModel):
             " There can be, at most, one current run."
         ),
     )
-    actions: List[MaintenanceRunAction] = Field(
-        ...,
-        description="Client-initiated run control actions.",
-    )
     errors: List[ErrorOccurrence] = Field(
         ...,
         description="Any errors that have occurred during the run.",

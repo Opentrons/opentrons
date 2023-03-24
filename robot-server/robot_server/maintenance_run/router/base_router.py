@@ -24,6 +24,7 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
+from ...runs.run_models import RunNotFoundError
 from ..maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunCreate,
@@ -79,22 +80,24 @@ class AllRunsLinks(BaseModel):
     )
 
 
-# async def get_run_data_from_url(
-#     runId: str,
-#     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-# ) -> Run:
-#     """Get the data of a run.
-#
-#     Args:
-#         runId: Run ID pulled from URL.
-#         run_data_manager: Current and historical run data management.
-#     """
-#     try:
-#         run_data = run_data_manager.get(runId)
-#     except RunNotFoundError as e:
-#         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
-#
-#     return run_data
+async def get_run_data_from_url(
+    runId: str,
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
+) -> MaintenanceRunDataManager:
+    """Get the data of a run.
+
+    Args:
+        runId: Run ID pulled from URL.
+        run_data_manager: Current and historical run data management.
+    """
+    try:
+        run_data = run_data_manager.get(runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    return run_data
 
 
 @base_router.post(
@@ -133,12 +136,6 @@ async def create_run(
             the new run.
     """
     offsets = request_body.data.labwareOffsets if request_body is not None else []
-
-    # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
-    # to pass to `RunDataManager.create`. Right now, runs may be deleted
-    # even if a new create is unable to succeed due to a conflict
-    # TODO(tz, 2023-3-23): might need to just clear the cache
-    # run_auto_deleter.make_room_for_new_run()
 
     try:
         run_data = await run_data_manager.create(
