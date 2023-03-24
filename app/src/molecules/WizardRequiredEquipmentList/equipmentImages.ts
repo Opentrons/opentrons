@@ -10,4 +10,5 @@ export const equipmentImages = {
   gen3_pipette: require('../../assets/images/change-pip/calibration_probe.png'),
   pipette_96: require('../../assets/images/change-pip/calibration_probe.png'),
   mounting_plate_96_channel: require('../../assets/images/change-pip/calibration_probe.png'),
+  flex_gripper: require('../../assets/images/flex_gripper.svg'),
 }

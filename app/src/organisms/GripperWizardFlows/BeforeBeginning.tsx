@@ -97,7 +97,7 @@ export const BeforeBeginning = (
       displayName: t('t10_torx_screwdriver'),
       subtitle: t('provided_with_robot_use_right_size'),
     },
-    opentrons_gripper: { displayName: t('gripper') },
+    [GRIPPER_LOADNAME]: { displayName: t('gripper') },
   }
 
   const { bodyI18nKey, equipmentLoadNames } = INFO_BY_FLOW_TYPE[flowType]
