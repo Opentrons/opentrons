@@ -54,21 +54,6 @@ export function GripperWizardFlows(
     onSuccess: closeFlow,
   })
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-  const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
-  React.useEffect(() => {
-    if (
-      isChainCommandMutationLoading ||
-      isCommandLoading ||
-      isStopLoading ||
-      isExiting
-    ) {
-      const timer = setTimeout(() => setIsRobotMoving(true), 700)
-      return () => clearTimeout(timer)
-    } else {
-      setIsRobotMoving(false)
-    }
-  }, [isChainCommandMutationLoading, isStopLoading, isExiting])
-
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     chainRunCommands([{ commandType: 'home' as const, params: {} }], true).then(
@@ -87,7 +72,12 @@ export function GripperWizardFlows(
       attachedGripper={attachedGripper}
       createRun={createRun}
       isCreateLoading={isCreateLoading}
-      isRobotMoving={isRobotMoving}
+      isRobotMoving={
+        isChainCommandMutationLoading ||
+        isCommandLoading ||
+        isStopLoading ||
+        isExiting
+      }
       handleCleanUpAndClose={handleCleanUpAndClose}
       chainRunCommands={chainRunCommands}
       createRunCommand={createRunCommand}
