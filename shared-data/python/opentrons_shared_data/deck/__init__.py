@@ -25,7 +25,7 @@ class Offset(NamedTuple):
 
 
 Z_PREP_OFFSET = Offset(x=13, y=13)
-CALIBRATION_PROBE_DIAMETER: Final[float] = 4
+CALIBRATION_PROBE_RADIUS: Final[float] = 2
 CALIBRATION_SQUARE_DEPTH: Final[float] = -0.25
 CALIBRATION_SQUARE_SIZE: Final[float] = 20
 CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
@@ -66,5 +66,7 @@ def get_calibration_square_position_in_slot(slot: int) -> Offset:
     relative_center = [float(slot_size_x) * 0.5, float(slot_size_y) * 0.5, 0]
     square_z = [0, 0, CALIBRATION_SQUARE_DEPTH]
     # add up the elements of each list and return an Offset of the result
-    nominal_position = [float(sum(x)) for x in zip(bottom_left, relative_center, square_z)]
+    nominal_position = [
+        float(sum(x)) for x in zip(bottom_left, relative_center, square_z)
+    ]
     return Offset(*nominal_position)
