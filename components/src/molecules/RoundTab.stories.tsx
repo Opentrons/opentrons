@@ -8,31 +8,46 @@ export default {
   component: RoundTab,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof RoundTab>> = args => (
-  <Flex
-    width="100%"
-    height="100%"
-    flexDirection={DIRECTION_ROW}
-    marginLeft={SPACING.spacing4}
-  >
-    <RoundTab {...args}>
-      <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
-        {'Protocol Name and Description'}
-      </Text>
-    </RoundTab>
+const Template: Story<
+  React.ComponentProps<typeof RoundTab>
+> = (): JSX.Element => {
+  const [step, setStep] = React.useState<'details' | 'pipette' | 'module'>(
+    'details'
+  )
 
-    <RoundTab isCurrent={false}>
-      <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
-        {'Pipette Selection'}
-      </Text>
-    </RoundTab>
+  return (
+    <Flex
+      width="100%"
+      height="100%"
+      flexDirection={DIRECTION_ROW}
+      marginLeft={SPACING.spacing4}
+    >
+      <RoundTab
+        isCurrent={step === 'details'}
+        onClick={() => setStep('details')}
+      >
+        <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          {'Protocol Name and Description'}
+        </Text>
+      </RoundTab>
 
-    <RoundTab isCurrent={false}>
-      <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
-        {'Module Selection'}
-      </Text>
-    </RoundTab>
-  </Flex>
-)
+      <RoundTab
+        isCurrent={step === 'pipette'}
+        onClick={() => setStep('pipette')}
+      >
+        <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          {'Pipette Selection'}
+        </Text>
+      </RoundTab>
+
+      <RoundTab isCurrent={step === 'module'} onClick={() => setStep('module')}>
+        <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          {'Module Selection'}
+        </Text>
+      </RoundTab>
+    </Flex>
+  )
+}
+
 export const Basic = Template.bind({})
-Basic.args = { isCurrent: true }
+Basic.args = {}
