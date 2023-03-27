@@ -147,11 +147,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             })
           })
           .catch(e => {
-            setFatalError(e)
+            setFatalError(`PickUpTip failed to save position for initial placement with message: ${e}`)
           })
       })
       .catch(e => {
-        setFatalError(e)
+        setFatalError(`PickUpTip failed to move to initial position with message: ${e}`)
       })
   }
   const handleConfirmPosition = (): void => {
@@ -186,11 +186,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         })
           .then(() => setShowTipConfirmation(true))
           .catch(e => {
-            setFatalError(e)
+            setFatalError(`PickUpTip failed to move from final position with message: ${e}`)
           })
       })
       .catch(e => {
-        setFatalError(e)
+        setFatalError(`PickUpTip failed to save final position with message: ${e}`)
       })
   }
 
@@ -219,7 +219,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     )
       .then(() => proceed())
       .catch(e => {
-        setFatalError(e)
+        setFatalError(`PickUpTip failed to move to safe location after tip pick up with message: ${e}`)
       })
   }
   const handleInvalidateTip = (): void => {
@@ -245,7 +245,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         setShowTipConfirmation(false)
       })
       .catch(e => {
-        setFatalError(e)
+        setFatalError(`PickUpTip failed to drop tip with message: ${e}`)
       })
   }
   const handleGoBack = (): void => {

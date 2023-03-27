@@ -37,7 +37,7 @@ export const IntroScreen = (props: {
     chainRunCommands(prepCommands, true)
       .then(() => proceed())
       .catch(e => {
-        setFatalError(e)
+        setFatalError(`IntroScreen failed to issue prep commands with message: ${e}`)
       })
   }
 

@@ -130,7 +130,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         proceed()
       })
       .catch(e => {
-        setFatalError(e)
+        setFatalError(`ReturnTip failed with message: ${e}`)
       })
   }
 
