@@ -9,7 +9,7 @@ const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/2')
 const globPattern = '**/*.json'
 
-// JSON Schema defintion & setup
+// JSON Schema definition & setup
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(schema)
 
