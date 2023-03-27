@@ -80,7 +80,7 @@ class ProtocolRunner(TypingProtocol):
 
 
 class PythonAndLegacyRunner(ProtocolRunner):
-    """Protocol runner implementation for python protocols and legacy protocols."""
+    """Protocol runner implementation for Python protocols, and JSON protocols ≤v5."""
 
     def __init__(
         self,
