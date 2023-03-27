@@ -31,7 +31,7 @@ from .legacy_wrappers import (
 )
 
 
-class ProtocolRunResult(NamedTuple):
+class RunnerRunResult(NamedTuple):
     """Result data from a run, pulled from the ProtocolEngine."""
 
     commands: List[Command]
@@ -81,7 +81,7 @@ class AbstractRunner(ABC):
     async def run(
         self,
         protocol_source: Optional[ProtocolSource] = None,
-    ) -> ProtocolRunResult:
+    ) -> RunnerRunResult:
         """Run a given protocol to completion."""
 
 
@@ -166,7 +166,7 @@ class PythonAndLegacyRunner(AbstractRunner):
     async def run(
         self,
         protocol_source: Optional[ProtocolSource] = None,
-    ) -> ProtocolRunResult:
+    ) -> RunnerRunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
@@ -179,7 +179,7 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return ProtocolRunResult(commands=commands, state_summary=run_data)
+        return RunnerRunResult(commands=commands, state_summary=run_data)
 
 
 class JsonRunner(AbstractRunner):
@@ -268,7 +268,7 @@ class JsonRunner(AbstractRunner):
     async def run(
         self,
         protocol_source: Optional[ProtocolSource] = None,
-    ) -> ProtocolRunResult:
+    ) -> RunnerRunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
@@ -281,7 +281,7 @@ class JsonRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return ProtocolRunResult(commands=commands, state_summary=run_data)
+        return RunnerRunResult(commands=commands, state_summary=run_data)
 
 
 class LiveRunner(AbstractRunner):
@@ -324,15 +324,12 @@ class LiveRunner(AbstractRunner):
     async def run(
         self,
         protocol_source: Optional[ProtocolSource] = None,
-    ) -> ProtocolRunResult:
-        if protocol_source:
-            self.load(protocol_source)
-
+    ) -> RunnerRunResult:
         await self._hardware_api.home()
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return ProtocolRunResult(commands=commands, state_summary=run_data)
+        return RunnerRunResult(commands=commands, state_summary=run_data)
 
 
 def create_protocol_runner(

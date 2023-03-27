@@ -186,7 +186,7 @@ async def test_create_protocol_runner(
             json_file_reader=json_file_reader,
             json_translator=json_translator,
         ),
-        type(runner_type),
+        runner_type,
     )
 
 

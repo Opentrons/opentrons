@@ -6,8 +6,8 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import (
-    ProtocolRunner,
-    ProtocolRunResult,
+    AbstractRunner,
+    RunnerRunResult,
     create_protocol_runner,
 )
 from opentrons.protocol_engine import (
@@ -34,7 +34,7 @@ class RunnerEnginePair(NamedTuple):
     """A stored ProtocolRunner/ProtocolEngine pair."""
 
     run_id: str
-    runner: ProtocolRunner
+    runner: AbstractRunner
     engine: ProtocolEngine
 
 
@@ -65,7 +65,7 @@ class EngineStore:
         return self._runner_engine_pair.engine
 
     @property
-    def runner(self) -> ProtocolRunner:
+    def runner(self) -> AbstractRunner:
         """Get the "current" persisted ProtocolRunner."""
         assert self._runner_engine_pair is not None, "Runner not yet created."
         return self._runner_engine_pair.runner
@@ -162,7 +162,7 @@ class EngineStore:
 
         return engine.state_view.get_summary()
 
-    async def clear(self) -> ProtocolRunResult:
+    async def clear(self) -> RunnerRunResult:
         """Remove the persisted ProtocolEngine.
 
         Raises:
@@ -181,4 +181,4 @@ class EngineStore:
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return ProtocolRunResult(state_summary=run_data, commands=commands)
+        return RunnerRunResult(state_summary=run_data, commands=commands)

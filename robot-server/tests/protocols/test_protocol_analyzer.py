@@ -107,7 +107,7 @@ async def test_analyze(
     ).then_return(json_runner)
 
     decoy.when(await json_runner.run(protocol_resource.source)).then_return(
-        protocol_runner.ProtocolRunResult(
+        protocol_runner.RunnerRunResult(
             commands=[analysis_command],
             state_summary=StateSummary(
                 status=EngineStatus.SUCCEEDED,

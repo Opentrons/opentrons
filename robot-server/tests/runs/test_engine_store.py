@@ -12,8 +12,8 @@ from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
 from opentrons.protocol_runner import (
-    ProtocolRunResult,
-    MaintenanceRunner,
+    RunnerRunResult,
+    LiveRunner,
 )
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
@@ -50,7 +50,7 @@ async def test_create_engine(subject: EngineStore) -> None:
 
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
-    assert isinstance(subject.runner, MaintenanceRunner)
+    assert isinstance(subject.runner, LiveRunner)
     assert isinstance(subject.engine, ProtocolEngine)
 
 
@@ -134,7 +134,7 @@ async def test_clear_engine(subject: EngineStore) -> None:
     result = await subject.clear()
 
     assert subject.current_run_id is None
-    assert isinstance(result, ProtocolRunResult)
+    assert isinstance(result, RunnerRunResult)
 
     with pytest.raises(AssertionError):
         subject.engine
