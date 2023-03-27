@@ -158,18 +158,20 @@ def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
 def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     """Migrate to schema version 2.
 
-    This is a data-only migration, not affecting column types.
+    This migration doesn't affect the schema at the SQL level, but it does affect how
+    we format the values in the database.
 
+    In schema v1, these columns...
 
+    * Column "completed_analysis" in table "analysis"
+    * Column "state_summary" in table "run"
+    * Column "commands" in table "run"
 
-    This migration changes the following columns,
-    which were storing pickled dicts, into JSON strings:
+    ...stored Pydantic models, exported to Python dicts with Pydantic's .dict() method,
+    then serialized to binary blobs with the standard Python pickle module.
 
-    * Column "completed_analysis" of table "analysis"
-    * Column "state_summary" of table "run"
-    * Column "commands" of table "run"
+    In schema v2, we serialize the Pydantic models to JSON, instead.
     """
-
     _migrate_analysis_1_to_2(transaction)
     _migrate_run_1_to_2(transaction)
 
