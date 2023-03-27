@@ -176,6 +176,7 @@ class OT3Config:
     current_settings: OT3CurrentSettings
     z_retract_distance: float
     grip_jaw_home_duty_cycle: float
+    axis_home_distance: float
     deck_transform: OT3Transform
     carriage_offset: Offset
     left_mount_offset: Offset

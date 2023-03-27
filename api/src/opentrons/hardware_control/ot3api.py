@@ -1166,15 +1166,15 @@ class OT3API(
             await self._update_position_estimation([axis])
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
-                distance_from_home = 5.0
+                axis_home_dist = self._config.axis_home_distance
             else:
                 # FIXME: (AA 2/15/23) This is a temporary workaround because of
                 # XY encoder inaccuracy. Otherwise, we should be able to use
                 # 5.0 mm for all axes.
                 # Move to 20 mm away from the home position and then home
-                distance_from_home = 20.0
-            if origin[axis] - target_pos[axis] > distance_from_home:
-                target_pos[axis] += distance_from_home
+                axis_home_dist = 20.0
+            if origin[axis] - target_pos[axis] > axis_home_dist:
+                target_pos[axis] += axis_home_dist
                 moves = self._build_moves(origin, target_pos)
                 await self._backend.move(
                     origin,
