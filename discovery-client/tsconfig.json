@@ -1,6 +1,10 @@
 {
   "extends": "../tsconfig-base.json",
-  "references": [],
+  "references": [
+    {
+      "path": "../usb-bridge/node-client"
+    }
+  ],
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
