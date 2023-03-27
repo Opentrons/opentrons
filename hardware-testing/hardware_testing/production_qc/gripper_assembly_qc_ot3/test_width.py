@@ -71,15 +71,15 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # HOME
     print("homing Z and G...")
     await api.home([z_ax, g_ax])
-    # MOVE TO SLOT
-    await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
     # LOOP THROUGH WIDTHS
     for width, slot in zip(TEST_WIDTHS_MM, SLOT_WIDTH_GAUGE):
         hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
+        # MOVE TO SLOT
+        await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
         # OPERATOR SETS UP GAUGE
         ui.print_header(f"SETUP {width} MM GAUGE")
         if not api.is_simulator:
-            ui.get_user_ready(f"add {width} mm wide gauge to slot {SLOT_WIDTH_GAUGE}")
+            ui.get_user_ready(f"add {width} mm wide gauge to slot {slot}")
         # GRIPPER MOVES TO GAUGE
         await api.ungrip()
         await api.move_to(mount, target_pos)
