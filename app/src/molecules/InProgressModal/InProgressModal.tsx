@@ -7,6 +7,7 @@ import {
   SPACING,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
@@ -24,7 +25,9 @@ export function InProgressModal(props: Props): JSX.Element {
     <Flex
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
-      marginY="8rem"
+      justifyContent={JUSTIFY_CENTER}
+      height="24.625rem"
+      padding={SPACING.spacing6}
     >
       {alternativeSpinner ?? (
         <Icon
