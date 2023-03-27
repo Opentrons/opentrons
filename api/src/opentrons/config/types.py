@@ -163,7 +163,6 @@ class EdgeSenseSettings:
 class OT3CalibrationSettings:
     z_offset: ZSenseSettings
     edge_sense: EdgeSenseSettings
-    edge_sense_binary: EdgeSenseSettings
     probe_length: float
 
 

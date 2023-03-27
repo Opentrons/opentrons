@@ -430,10 +430,10 @@ async def test_probing(
                     serial="hello",
                 ),
                 right=None,
-                gripper=GripperInformation(model="0", serial="fake_serial"),
+                gripper=GripperInformation(model="0.0", serial="fake_serial"),
             ),
             "P1KSV33hello",
-            "GRPV0fake_serial",
+            "GRPV00fake_serial",
             "Gripper V1",
         ),
     ],
@@ -476,7 +476,7 @@ async def test_get_attached_instruments_handles_unknown_name(
             name=FirmwarePipetteName.unknown, name_int=41, model=30, serial="hello"
         ),
         right=None,
-        gripper=GripperInformation(model=0, serial="fake_serial"),
+        gripper=GripperInformation(model=0.0, serial="fake_serial"),
     )
     mock_tool_detector.return_value = tool_summary
 
@@ -502,7 +502,7 @@ async def test_get_attached_instruments_handles_unknown_model(
             serial="hello",
         ),
         right=None,
-        gripper=GripperInformation(model=0, serial="fake_serial"),
+        gripper=GripperInformation(model=0.0, serial="fake_serial"),
     )
     mock_tool_detector.return_value = tool_summary
 
