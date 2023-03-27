@@ -74,8 +74,9 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
         ), "Dev Robot is running and must not be."
         with DevServer(port=port, persistence_directory=snapshot.get_copy()) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
+            assert await robot_client.wait_until_alive(
+                # Leave time for the server to perform database migrations.
+                timeout_sec=40
             ), "Dev Robot never became available."
             all_protocols = (await robot_client.get_protocols()).json()["data"]
 
