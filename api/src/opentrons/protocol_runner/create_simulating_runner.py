@@ -1,4 +1,4 @@
-"""Simulating ProtocolRunner factory."""
+"""Simulating AbstractRunner factory."""
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import API as OT2API, HardwareControlAPI
@@ -11,13 +11,13 @@ from opentrons.protocol_reader.protocol_source import ProtocolConfig
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from .legacy_wrappers import LegacySimulatingContextCreator
-from .protocol_runner import create_protocol_runner, ProtocolRunner
+from .protocol_runner import create_protocol_runner, AbstractRunner
 
 
 async def create_simulating_runner(
     robot_type: RobotType, protocol_config: ProtocolConfig
-) -> ProtocolRunner:
-    """Create a ProtocolRunner wired to a simulating HardwareControlAPI.
+) -> AbstractRunner:
+    """Create a AbstractRunner wired to a simulating HardwareControlAPI.
 
     Example:
         ```python
@@ -27,7 +27,7 @@ async def create_simulating_runner(
         from opentrons.protocol_runner import (
             ProtocolType,
             ProtocolFile,
-            ProtocolRunner,
+            AbstractRunner,
             create_simulating_runner,
         )
 
@@ -35,7 +35,7 @@ async def create_simulating_runner(
             protocol_type=ProtocolType.PYTHON,
             files=[Path("/path/to/protocol.py")],
         )
-        runner: ProtocolRunner = await create_simulating_runner()
+        runner: AbstractRunner = await create_simulating_runner()
         commands: List[Command] = await runner.run(protocol)
         ```
     """

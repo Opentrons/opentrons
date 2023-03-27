@@ -1,9 +1,9 @@
-"""Tests for the ProtocolRunner class."""
+"""Tests for the AbstractRunner class."""
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy, matchers
 from pathlib import Path
-from typing import List, cast
+from typing import List, cast, Optional, Union
 
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
@@ -25,8 +25,8 @@ from opentrons.protocol_runner import (
     create_protocol_runner,
     JsonRunner,
     PythonAndLegacyRunner,
-    MaintenanceRunner,
-    ProtocolRunner,
+    LiveRunner,
+    AbstractRunner,
 )
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
@@ -142,18 +142,28 @@ def legacy_subject(
 
 
 @pytest.fixture
-def maintenance_subject(
+def live_subject(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
-) -> MaintenanceRunner:
-    """Get a MaintenanceRunner test subject with mocked dependencies."""
-    return MaintenanceRunner(
+) -> LiveRunner:
+    """Get a LiveRunner test subject with mocked dependencies."""
+    return LiveRunner(
         protocol_engine=protocol_engine,
         hardware_api=hardware_api,
     )
 
 
+@pytest.mark.parametrize(
+    "config, runner_type",
+    [
+        (JsonProtocolConfig(schema_version=6), JsonRunner),
+        (PythonProtocolConfig(api_version=APIVersion(2, 14)), PythonAndLegacyRunner),
+        (JsonProtocolConfig(schema_version=5), PythonAndLegacyRunner),
+        (PythonProtocolConfig(api_version=APIVersion(2, 13)), PythonAndLegacyRunner),
+        (None, LiveRunner),
+    ],
+)
 async def test_create_protocol_runner(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
@@ -163,78 +173,20 @@ async def test_create_protocol_runner(
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
+    config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
+    runner_type: AbstractRunner,
 ) -> None:
     """It should return protocol runner type depending on the config."""
     assert isinstance(
         create_protocol_runner(
-            protocol_config=JsonProtocolConfig(schema_version=6),
+            protocol_config=config,
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,
             task_queue=task_queue,
             json_file_reader=json_file_reader,
             json_translator=json_translator,
         ),
-        JsonRunner,
-    )
-
-    assert isinstance(
-        create_protocol_runner(
-            protocol_config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            task_queue=task_queue,
-            json_file_reader=json_file_reader,
-            json_translator=json_translator,
-            legacy_file_reader=legacy_file_reader,
-            legacy_context_creator=legacy_context_creator,
-            legacy_executor=legacy_executor,
-        ),
-        PythonAndLegacyRunner,
-    )
-
-    assert isinstance(
-        create_protocol_runner(
-            protocol_config=JsonProtocolConfig(schema_version=5),
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            task_queue=task_queue,
-            json_file_reader=json_file_reader,
-            json_translator=json_translator,
-            legacy_file_reader=legacy_file_reader,
-            legacy_context_creator=legacy_context_creator,
-            legacy_executor=legacy_executor,
-        ),
-        PythonAndLegacyRunner,
-    )
-
-    assert isinstance(
-        create_protocol_runner(
-            protocol_config=JsonProtocolConfig(schema_version=5),
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            task_queue=task_queue,
-            json_file_reader=json_file_reader,
-            json_translator=json_translator,
-            legacy_file_reader=legacy_file_reader,
-            legacy_context_creator=legacy_context_creator,
-            legacy_executor=legacy_executor,
-        ),
-        PythonAndLegacyRunner,
-    )
-
-    assert isinstance(
-        create_protocol_runner(
-            protocol_config=None,
-            protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
-            task_queue=task_queue,
-            json_file_reader=json_file_reader,
-            json_translator=json_translator,
-            legacy_file_reader=legacy_file_reader,
-            legacy_context_creator=legacy_context_creator,
-            legacy_executor=legacy_executor,
-        ),
-        MaintenanceRunner,
+        type(runner_type),
     )
 
 
@@ -243,13 +195,14 @@ async def test_create_protocol_runner(
     [
         (lazy_fixture("json_subject")),
         (lazy_fixture("legacy_subject")),
+        (lazy_fixture("live_subject")),
     ],
 )
 async def test_play_starts_run(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    subject: ProtocolRunner,
+    subject: AbstractRunner,
 ) -> None:
     """It should start a protocol run with play."""
     subject.play()
@@ -262,12 +215,13 @@ async def test_play_starts_run(
     [
         (lazy_fixture("json_subject")),
         (lazy_fixture("legacy_subject")),
+        (lazy_fixture("live_subject")),
     ],
 )
 async def test_pause(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
-    subject: ProtocolRunner,
+    subject: AbstractRunner,
 ) -> None:
     """It should pause a protocol run with pause."""
     subject.pause()
@@ -280,13 +234,14 @@ async def test_pause(
     [
         (lazy_fixture("json_subject")),
         (lazy_fixture("legacy_subject")),
+        (lazy_fixture("live_subject")),
     ],
 )
-async def test_stop_json_runner(
+async def test_stop(
     decoy: Decoy,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    subject: ProtocolRunner,
+    subject: AbstractRunner,
 ) -> None:
     """It should halt a protocol run with stop."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
@@ -302,13 +257,14 @@ async def test_stop_json_runner(
     [
         (lazy_fixture("json_subject")),
         (lazy_fixture("legacy_subject")),
+        (lazy_fixture("live_subject")),
     ],
 )
 async def test_stop_never_started_json_runner(
     decoy: Decoy,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    subject: ProtocolRunner,
+    subject: AbstractRunner,
 ) -> None:
     """It should clean up rather than halt if the runner was never started."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
@@ -627,76 +583,29 @@ async def test_run_python_runner(
     )
 
 
-async def test_stop_maintenance_runner(
-    decoy: Decoy,
-    task_queue: TaskQueue,
-    protocol_engine: ProtocolEngine,
-    maintenance_subject: MaintenanceRunner,
-) -> None:
-    """It should halt a protocol run with stop."""
-    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
-
-    await maintenance_subject.stop()
-
-    decoy.verify(await protocol_engine.stop(), times=1)
-
-
-async def test_stop_never_started_maintenance_runner(
-    decoy: Decoy,
-    task_queue: TaskQueue,
-    protocol_engine: ProtocolEngine,
-    maintenance_subject: MaintenanceRunner,
-) -> None:
-    """It should clean up rather than halt if the runner was never started."""
-    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
-
-    await maintenance_subject.stop()
-
-    decoy.verify(
-        await protocol_engine.finish(drop_tips_and_home=False, set_run_status=False),
-        times=1,
-    )
-
-
 async def test_run_maintanence_runner(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
-    maintenance_subject: MaintenanceRunner,
+    live_subject: LiveRunner,
 ) -> None:
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
     )
 
-    assert maintenance_subject.was_started() is False
-    await maintenance_subject.run()
-    assert maintenance_subject.was_started() is True
+    assert live_subject.was_started() is False
+    await live_subject.run()
+    assert live_subject.was_started() is True
 
     decoy.verify(
         await hardware_api.home(),
     )
 
 
-def test_play_maintanence_runner_raises(
-    maintenance_subject: MaintenanceRunner,
-) -> None:
-    """Should raise a not supported error."""
-    with pytest.raises(NotImplementedError):
-        maintenance_subject.play()
-
-
-def test_pause_maintanence_runner_raises(
-    maintenance_subject: MaintenanceRunner,
-) -> None:
-    """Should raise a not supported error."""
-    with pytest.raises(NotImplementedError):
-        maintenance_subject.pause()
-
-
 async def test_load_maintanence_runner_raises(
-    maintenance_subject: MaintenanceRunner,
+    live_subject: LiveRunner,
 ) -> None:
     """Should raise a not supported error."""
     with pytest.raises(NotImplementedError):
-        await maintenance_subject.load(None)  # type: ignore[arg-type]
+        await live_subject.load(None)  # type: ignore[arg-type]

@@ -1,4 +1,4 @@
-"""Tests for the ProtocolRunner's LegacyContextPlugin."""
+"""Tests for the AbstractRunner's LegacyContextPlugin."""
 import pytest
 from anyio import to_thread
 from decoy import Decoy, matchers

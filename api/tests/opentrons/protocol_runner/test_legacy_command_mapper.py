@@ -1,4 +1,4 @@
-"""Tests for the ProtocolRunner's LegacyContextPlugin."""
+"""Tests for the AbstractRunner's LegacyContextPlugin."""
 import inspect
 from datetime import datetime
 from typing import cast
