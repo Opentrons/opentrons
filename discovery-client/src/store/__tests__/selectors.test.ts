@@ -73,6 +73,7 @@ const STATE: State = {
     { ip: '127.0.0.5', port: 31950 },
     { ip: '127.0.0.6', port: 31950 },
   ],
+  serialPorts: [],
 }
 
 describe('discovery client state selectors', () => {

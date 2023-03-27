@@ -1,3 +1,5 @@
+import type { PortInfo } from '@opentrons/usb-bridge/node-client'
+
 import type { HealthPollerResult } from '../types'
 import type { MdnsBrowserService } from '../mdns-browser'
 
@@ -6,6 +8,9 @@ import * as Types from './types'
 export const SERVICE_FOUND: 'mdns:SERVICE_FOUND' = 'mdns:SERVICE_FOUND'
 
 export const HEALTH_POLLED: 'http:HEALTH_POLLED' = 'http:HEALTH_POLLED'
+
+export const SERIAL_PORTS_POLLED: 'serialport:SERIAL_PORTS_POLLED' =
+  'serialport:SERIAL_PORTS_POLLED'
 
 export const INITIALIZE_STATE: 'client:INITIALIZE_STATE' =
   'client:INITIALIZE_STATE'
@@ -35,6 +40,13 @@ export const healthPolled = (
   payload: HealthPollerResult
 ): Types.HealthPolledAction => ({
   type: HEALTH_POLLED,
+  payload,
+})
+
+export const serialPortsPolled = (
+  payload: PortInfo[]
+): Types.SerialPortsPolledAction => ({
+  type: SERIAL_PORTS_POLLED,
   payload,
 })
 

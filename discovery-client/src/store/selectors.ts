@@ -10,6 +10,7 @@ import {
   RE_HOSTNAME_LOOPBACK,
 } from '../constants'
 
+import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type { DiscoveryClientRobot } from '../types'
 import type {
   State,
@@ -52,6 +53,11 @@ export const getRobots: (
         .map(({ robotName, ...host }) => host),
     }))
   }
+)
+
+export const getSerialPorts: (state: State) => PortInfo[] = createSelector(
+  state => state.serialPorts,
+  serialPorts => serialPorts
 )
 
 // ascending priority order, where no match is lowest priority

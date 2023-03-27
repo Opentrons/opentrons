@@ -1,3 +1,5 @@
+import type { PortInfo } from '@opentrons/usb-bridge/node-client'
+
 import type {
   HealthResponse,
   ServerHealthResponse,
@@ -19,6 +21,7 @@ import {
   SERVICE_FOUND,
   HEALTH_POLLED,
   REMOVE_ROBOT,
+  SERIAL_PORTS_POLLED,
 } from './actions'
 
 /**
@@ -83,6 +86,7 @@ export interface State {
   robotsByName: RobotsByNameMap
   hostsByIp: HostsByIpMap
   manualAddresses: Address[]
+  serialPorts: PortInfo[]
 }
 
 /**
@@ -94,6 +98,7 @@ export interface InitializeStateAction {
   payload: {
     initialRobots?: DiscoveryClientRobot[]
     manualAddresses?: Address[]
+    serialPorts?: PortInfo[]
   }
 }
 
@@ -113,6 +118,11 @@ export interface HealthPolledAction {
   payload: HealthPollerResult
 }
 
+export interface SerialPortsPolledAction {
+  type: typeof SERIAL_PORTS_POLLED
+  payload: PortInfo[]
+}
+
 /**
  * Remove an robot from the state if that IP address has not been seen
  */
@@ -126,5 +136,6 @@ export type Action =
   | ServiceFoundAction
   | HealthPolledAction
   | RemoveRobotAction
+  | SerialPortsPolledAction
 
 export type Dispatch = (action: Action) => Action
