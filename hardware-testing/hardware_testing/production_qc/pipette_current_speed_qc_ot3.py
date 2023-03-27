@@ -29,7 +29,7 @@ PLUNGER_CURRENTS_SPEED = {
 
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
-MAX_CURRENT = max(list(PLUNGER_CURRENTS_SPEED.keys()))
+MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
 MAX_SPEED = max(TEST_SPEEDS)
 
 
@@ -152,7 +152,16 @@ async def _test_direction(
     return True
 
 
+async def _unstick_plunger(api: OT3API, mount: types.OT3Mount) -> None:
+    plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    top, bottom, blowout, drop_tip = plunger_poses
+    await _move_plunger(api, mount, bottom, 10, 1.0)
+    await _home(api, mount)
+
+
 async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -> None:
+    ui.print_header("UNSTICK PLUNGER")
+    await _unstick_plunger(api, mount)
     # start at HIGHEST (easiest) current
     currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
     for current in currents:
