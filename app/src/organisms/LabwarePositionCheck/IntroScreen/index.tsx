@@ -27,16 +27,17 @@ export const IntroScreen = (props: {
   createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   handleJog: Jog
+  setFatalError: (errorMessage: string) => void
   isRobotMoving: boolean
 }): JSX.Element | null => {
-  const { proceed, protocolData, chainRunCommands, isRobotMoving } = props
+  const { proceed, protocolData, chainRunCommands, isRobotMoving, setFatalError } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
     chainRunCommands(prepCommands, true)
       .then(() => proceed())
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
 

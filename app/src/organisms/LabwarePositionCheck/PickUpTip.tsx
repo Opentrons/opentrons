@@ -39,6 +39,7 @@ interface PickUpTipProps extends PickUpTipStep {
   registerPosition: React.Dispatch<RegisterPositionAction>
   createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  setFatalError: (errorMessage: string) => void
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
   handleJog: Jog
@@ -59,6 +60,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     isRobotMoving,
     existingOffsets,
     workingOffsets,
+    setFatalError 
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
 
@@ -145,11 +147,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             })
           })
           .catch(e => {
-            console.error('Unexpected command failure: ', e)
+            setFatalError(e)
           })
       })
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
   const handleConfirmPosition = (): void => {
@@ -184,11 +186,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         })
           .then(() => setShowTipConfirmation(true))
           .catch(e => {
-            console.error('Unexpected command failure: ', e)
+            setFatalError(e)
           })
       })
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
 
@@ -217,7 +219,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     )
       .then(() => proceed())
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
   const handleInvalidateTip = (): void => {
@@ -243,7 +245,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         setShowTipConfirmation(false)
       })
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
   const handleGoBack = (): void => {

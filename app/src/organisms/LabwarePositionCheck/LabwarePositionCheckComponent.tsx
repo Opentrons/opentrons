@@ -15,6 +15,7 @@ import { ResultsSummary } from './ResultsSummary'
 import {
   useCreateCommandMutation,
   useCreateLabwareOffsetMutation,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -33,6 +34,8 @@ import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import { useChainRunCommands } from '../../resources/runs/hooks'
+import { FatalErrorModal } from './FatalErrorModal'
+import { RobotMotionLoader } from './RobotMotionLoader'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
@@ -49,6 +52,7 @@ export const LabwarePositionCheckInner = (
   const { runId, mostRecentAnalysis, onCloseClick, existingOffsets } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const protocolData = mostRecentAnalysis
+  const [fatalError, setFatalError] = React.useState<string | null>(null)
   const [
     { workingOffsets, tipPickUpOffset },
     registerPosition,
@@ -133,6 +137,7 @@ export const LabwarePositionCheckInner = (
   const createRunCommand: CreateRunCommand = (variables, ...options) => {
     return createCommand({ ...variables, runId }, ...options)
   }
+  const { stopRun } = useStopRunMutation()
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
@@ -197,13 +202,13 @@ export const LabwarePositionCheckInner = (
         timeout: JOG_COMMAND_TIMEOUT,
       })
         .then(data => {
-          onSuccess != null && onSuccess(data?.data?.result?.position ?? null)
+          onSuccess?.(data?.data?.result?.position ?? null)
         })
         .catch((e: Error) => {
-          console.error(`error issuing jog command: ${e.message}`)
+          setFatalError(`error issuing jog command: ${e.message}`)
         })
     } else {
-      console.error(`could not find pipette to jog with id: ${pipetteId}`)
+      setFatalError(`could not find pipette to jog with id: ${pipetteId ?? ''}`)
     }
   }
   const movementStepProps = {
@@ -211,6 +216,7 @@ export const LabwarePositionCheckInner = (
     protocolData,
     createRunCommand,
     chainRunCommands,
+    setFatalError,
     registerPosition,
     handleJog,
     isRobotMoving: isCommandMutationLoading || isCommandChainLoading,
@@ -222,16 +228,25 @@ export const LabwarePositionCheckInner = (
     Promise.all(
       offsets.map(data => createLabwareOffset({ runId: runId, data }))
     )
-      .then(() => {
-        onCloseClick()
-      })
+      .then(() => { onCloseClick() })
       .catch((e: Error) => {
-        console.error(`error applying labware offsets: ${e.message}`)
+        setFatalError(`error applying labware offsets: ${e.message}`)
       })
   }
 
+  const handleDismissFatalError = (): void => {
+    setIsExiting(true)
+    createRunCommand({ command: { commandType: 'home' as const, params: {} }, waitUntilComplete: true }).then(() => {
+      stopRun(runId, { onSettled: () => { onCloseClick() } })
+    }).catch(() => onCloseClick())
+  }
+
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (showConfirmation) {
+  if (isExiting) {
+    modalContent = <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+  } else if (fatalError != null) {
+    modalContent = <FatalErrorModal errorMessage={fatalError} onClose={handleDismissFatalError} />
+  } else if (showConfirmation) {
     modalContent = (
       <ExitConfirmation
         onGoBack={cancelExitLPC}

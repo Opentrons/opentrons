@@ -39,6 +39,7 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   proceed: () => void
   createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  setFatalError: (errorMessage: string) => void
   registerPosition: React.Dispatch<RegisterPositionAction>
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
@@ -60,6 +61,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     handleJog,
     isRobotMoving,
     existingOffsets,
+    setFatalError 
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const labwareDef = getLabwareDef(labwareId, protocolData)
@@ -97,7 +99,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       chainRunCommands(modulePrepCommands, true)
         .then(() => {})
         .catch(e => {
-          console.error('Unexpected command failure: ', e)
+          setFatalError(e)
         })
     }
   }, [moduleId])
@@ -180,11 +182,11 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             })
           })
           .catch(e => {
-            console.error('Unexpected command failure: ', e)
+            setFatalError(e)
           })
       })
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
 
@@ -237,11 +239,11 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         chainRunCommands(confirmPositionCommands, true)
           .then(() => proceed())
           .catch(e => {
-            console.error('Unexpected command failure: ', e)
+            setFatalError(e)
           })
       })
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
   const handleGoBack = (): void => {
@@ -258,7 +260,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         })
       })
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
 

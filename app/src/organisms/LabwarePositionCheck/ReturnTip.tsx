@@ -24,6 +24,7 @@ interface ReturnTipProps extends ReturnTipStep {
   proceed: () => void
   createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  setFatalError: (errorMessage: string) => void
   tipPickUpOffset: VectorOffset | null
   isRobotMoving: boolean
 }
@@ -38,6 +39,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     tipPickUpOffset,
     isRobotMoving,
     chainRunCommands,
+    setFatalError,
   } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
@@ -128,7 +130,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         proceed()
       })
       .catch(e => {
-        console.error('Unexpected command failure: ', e)
+        setFatalError(e)
       })
   }
 
