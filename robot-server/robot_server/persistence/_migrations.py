@@ -26,7 +26,7 @@ Database schema versions:
 """
 import logging
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Dict, List, Optional
 from typing_extensions import Final
 
 import sqlalchemy
@@ -175,6 +175,10 @@ def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
 
 
 def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
+    """Migrate the ``analysis`` table from schema 1 to schema 2.
+
+    See `_migrate_1_to_2()` for migration details.
+    """
     v1_completed_analysis_column = sqlalchemy.column(
         "completed_analysis",
         sqlalchemy.LargeBinary
@@ -182,29 +186,40 @@ def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     )
 
     # Extract using the old column definitions.
-    select_statement = sqlalchemy.select(
+    select_v1_rows = sqlalchemy.select(
         newest_analysis_table.c.id, v1_completed_analysis_column
     ).select_from(newest_analysis_table)
 
-    rows = transaction.execute(select_statement)
+    v1_rows = transaction.execute(select_v1_rows)
 
-    for row in rows:
-        id = row.id
-        completed_analysis_dict = _legacy_pickle.loads(row.completed_analysis)
-        completed_analysis = CompletedAnalysis.parse_obj(completed_analysis_dict)
+    for v1_row in v1_rows:
+        v1_id = v1_row.id
+        assert isinstance(v1_id, str)
+        v1_completed_analysis_bytes = v1_row.completed_analysis
+        assert isinstance(v1_completed_analysis_bytes, bytes)
 
-        new_serialized = _pydantic_col.pydantic_to_sql(value=completed_analysis)
+        parsed_completed_analysis = CompletedAnalysis.parse_obj(
+            _legacy_pickle.loads(v1_completed_analysis_bytes)
+        )
+
+        v2_completed_analysis = _pydantic_col.pydantic_to_sql(
+            value=parsed_completed_analysis
+        )
 
         # Reinsert using the new column definitions.
-        update_statement = (
+        update = (
             sqlalchemy.update(newest_analysis_table)
-            .where(newest_analysis_table.c.id == id)
-            .values(completed_analysis=new_serialized)
+            .where(newest_analysis_table.c.id == v1_id)
+            .values(completed_analysis=v2_completed_analysis)
         )
-        transaction.execute(update_statement)
+        transaction.execute(update)
 
 
 def _migrate_run_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
+    """Migrate the ``run`` table from schema 1 to schema 2.
+
+    See `_migrate_1_to_2()` for migration details.
+    """
     v1_state_summary_column = sqlalchemy.column(
         "state_summary",
         sqlalchemy.PickleType(pickler=_legacy_pickle),
@@ -217,31 +232,51 @@ def _migrate_run_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     )
 
     # Extract using the old column definitions.
-    select_statement = sqlalchemy.select(
+    select_v1_rows = sqlalchemy.select(
         newest_run_table.c.id, v1_state_summary_column, v1_commands_column
     ).select_from(newest_run_table)
 
-    rows = transaction.execute(select_statement)
+    v1_rows = transaction.execute(select_v1_rows)
 
-    for row in rows:
-        id = row.id
-        state_summary_dict = row.state_summary
-        state_summary = StateSummary.parse_obj(state_summary_dict)
-        command_dicts = row.commands
-        commands = CommandList.parse_obj(command_dicts)
+    for v1_row in v1_rows:
+        v1_id = v1_row.id
+        assert isinstance(v1_id, str)
 
-        new_serialized_state_summary = _pydantic_col.pydantic_to_sql(
-            value=state_summary
+        v1_state_summary_dict: Optional[Dict[object, object]] = v1_row.state_summary
+        assert isinstance(v1_state_summary_dict, (type(None), dict))
+
+        v1_command_dicts: Optional[List[Dict[object, object]]] = v1_row.commands
+        assert isinstance(v1_command_dicts, (type(None), list))
+
+        parsed_state_summary = (
+            None
+            if v1_state_summary_dict is None
+            else StateSummary.parse_obj(v1_state_summary_dict)
         )
-        new_serialized_commands = _pydantic_col.pydantic_to_sql(value=commands)
+        parsed_commands = (
+            None
+            if v1_command_dicts is None
+            else CommandList.parse_obj(v1_command_dicts)
+        )
+
+        v2_state_summary = (
+            None
+            if parsed_state_summary is None
+            else _pydantic_col.pydantic_to_sql(value=parsed_state_summary)
+        )
+        v2_commands = (
+            None
+            if parsed_commands is None
+            else _pydantic_col.pydantic_to_sql(value=parsed_commands)
+        )
 
         # Reinsert using the new column definitions.
-        update_statement = (
+        update = (
             sqlalchemy.update(newest_run_table)
-            .where(newest_run_table.c.id == id)
+            .where(newest_run_table.c.id == v1_id)
             .values(
-                state_summary=new_serialized_state_summary,
-                commands=new_serialized_commands,
+                state_summary=v2_state_summary,
+                commands=v2_commands,
             )
         )
-        transaction.execute(update_statement)
+        transaction.execute(update)
