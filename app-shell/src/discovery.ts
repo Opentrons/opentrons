@@ -8,7 +8,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import {
   createDiscoveryClient,
   DEFAULT_PORT,
-  DEFAULT_SERIAL,
+  DEFAULT_PRODUCT_ID,
 } from '@opentrons/discovery-client'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
@@ -153,16 +153,25 @@ export function registerDiscovery(
     _event: IpcMainInvokeEvent,
     config: AxiosRequestConfig
   ): Promise<unknown> {
-    const httpAgent = client.createHttpAgent()
-    destroyHttpAgent = httpAgent.destroy
+    // TODO: replace with serialPortPath passed from discovery client via app
+    // find OT-3 serial port by product ID
+    const ot3UsbSerialPort = client
+      .getSerialPorts?.()
+      .find(port => port.productId === DEFAULT_PRODUCT_ID)
+
+    // TODO: handle null case properly
+    const httpAgent = client.createHttpAgent?.(
+      ot3UsbSerialPort?.path ?? 'no path found'
+    )
+
+    destroyHttpAgent = httpAgent?.destroy ?? (() => {})
+
     const response = await axios.request({
       httpAgent,
       ...config,
     })
 
-    const responseData = response.data
-
-    return responseData
+    return response.data
   }
 
   return function handleIncomingAction(action: Action) {
@@ -187,19 +196,25 @@ export function registerDiscovery(
       case SYSTEM_INFO_INITIALIZED:
         if (
           action.payload.usbDevices.find(
-            device => device.serialNumber === DEFAULT_SERIAL
+            device => device.productId === parseInt(DEFAULT_PRODUCT_ID, 16)
           ) != null
         ) {
           ipcMain.handle('usb:request', usbListener)
         }
         break
       case USB_DEVICE_ADDED:
-        if (action.payload.usbDevice.serialNumber === DEFAULT_SERIAL) {
+        if (
+          action.payload.usbDevice.productId ===
+          parseInt(DEFAULT_PRODUCT_ID, 16)
+        ) {
           ipcMain.handle('usb:request', usbListener)
         }
         break
       case USB_DEVICE_REMOVED:
-        if (action.payload.usbDevice.serialNumber === DEFAULT_SERIAL) {
+        if (
+          action.payload.usbDevice.productId ===
+          parseInt(DEFAULT_PRODUCT_ID, 16)
+        ) {
           destroyHttpAgent?.()
           ipcMain.removeHandler('usb:request')
         }
