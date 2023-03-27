@@ -79,26 +79,42 @@ def _record_axis_data(type: str, write_cb: Callable,estimate: Dict[OT3Axis, floa
     write_cb([type] + [encoder[ax] for ax in estimate.keys()])
     write_cb([type,bool_to_string(aligned)])
 
-def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
+def _create_bowtie_points(api: OT3API,homed_position: types.Point) -> List[types.Point]:
+
+    mount =types.OT3Mount.LEFT
+    pip = api.hardware_pipettes[mount.to_mount()]
+    print("hardware_pipettes-----:",pip)
+    if str(pip).find("96 Channel") != -1:
+        bl = 70
+
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
     pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     bowtie_points = [
         pos_max,  # back-right
-        pos_min,  # front-left
+        pos_min._replace(y=pos_min.x+bl),  # front-left
         pos_min._replace(y=pos_max.y),  # back-left
-        pos_max._replace(y=pos_min.y),  # front-right
+        pos_max._replace(y=pos_min.y+bl),  # front-right
         pos_max,  # back-right
     ]
     return bowtie_points
 
-def _create_hour_glass_points(homed_position: types.Point) -> List[types.Point]:
+def _create_hour_glass_points(api: OT3API,homed_position: types.Point) -> List[types.Point]:
+    mount =types.OT3Mount.LEFT
+    pip = api.hardware_pipettes[mount.to_mount()]
+    print("hardware_pipettes-----:",pip)
+    pipserialnum = helpers_ot3.get_pipette_serial_ot3(pip)
+    print("pipserialnum-----:",pipserialnum)
+
+    if str(pip).find("96 Channel") != -1:
+        bl = 70
+
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
     pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     hour_glass_points = [
         pos_max,  # back-right
         pos_min._replace(y=pos_max.y),  # back-left
-        pos_max._replace(y=pos_min.y),  # front-right
-        pos_min,  # front-left
+        pos_max._replace(y=pos_max.x+bl),  # front-right
+        pos_min._replace(y=pos_min.x+bl),  # front-left
         pos_max,  # back-right
     ]
     return hour_glass_points
@@ -107,7 +123,7 @@ def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Poi
     pos_max = homed_position - types.Point(x=1, y=1, z=5)
     pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     mounts_up_down_points = [
-        pos_max._replace(z=pos_max.z - 200),  # down
+        pos_max._replace(z=pos_max.z - 180),  # down
         pos_max,  # up
     ]
     return mounts_up_down_points
@@ -135,15 +151,22 @@ async def _move_and_check(api: OT3API, is_simulating: bool, mount: types.OT3Moun
 async def _run_mount_up_down(api: OT3API, is_simulating: bool, write_cb: Callable) -> None:
     ui.print_header('Run mount up and down')
     for mount in MOUNT_AXES:
+            pip_ax = OT3Axis.of_main_tool_actuator(mount)
+            await api.home([pip_ax])
+            pip = api.hardware_pipettes[mount.to_mount()]
             mount_up_down_points = _create_mounts_up_down_points(await api.gantry_position(mount))
             for pos in mount_up_down_points:
                 es,en,al = await _move_and_check(api,is_simulating,mount,pos)
                 _record_axis_data('Mount_up_down',write_cb,es,en,al)
                 print(f'mounts results: {al}')
+                
+            if str(pip).find("96 Channel") != -1:
+                break
+                
 
 async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run bowtie')
-    bowtie_points = _create_bowtie_points(await api.gantry_position(mount))
+    bowtie_points = _create_bowtie_points(api,await api.gantry_position(mount))
     for p in bowtie_points:
         es,en,al = await _move_and_check(api,is_simulating,mount,p)
         _record_axis_data('Bowtie',write_cb,es,en,al)
@@ -157,7 +180,7 @@ async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, w
 
 async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run hour glass')
-    hour_glass_points = _create_hour_glass_points(await api.gantry_position(mount))
+    hour_glass_points = _create_hour_glass_points(api,await api.gantry_position(mount))
     for q in hour_glass_points:
         es,en,al = await _move_and_check(api,is_simulating,mount,q)
         _record_axis_data('Hour_glass',write_cb,es,en,al)
@@ -192,8 +215,31 @@ async def _run_pipper(api: OT3API):
         pip_ax = OT3Axis.of_main_tool_actuator(mount)
         top, bottom, blowout, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
         await api.home([pip_ax])
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip-1)
+
+        bl = 1
+        ppi96 = 0
+        if str(pip).find("96 Channel") != -1:
+            bl = 13
+            ppi96 = 1
+
+        await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip-bl)
         await helpers_ot3.move_plunger_absolute_ot3(api, mount, top+1)
+        if ppi96 == 1:
+            break
+
+# async def _run_96pipper(api:OT3API):
+#         mount = types.OT3Mount.LEFT
+#         await api.cache_instruments()
+#         pip = api.hardware_pipettes[mount.to_mount()]
+#         if not pip:
+#             ui.print_error(f"no pipette found on {mount.value} mount")
+#             return
+#         pip_ax = OT3Axis.of_main_tool_actuator(mount)
+#         top, bottom, blowout, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
+#         await api.home([pip_ax])
+#         await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip-1)
+#         await helpers_ot3.move_plunger_absolute_ot3(api, mount, top+1)
+
 
 async def _main(arguments: argparse.Namespace) -> None:
     # callback function for writing new data to CSV file
