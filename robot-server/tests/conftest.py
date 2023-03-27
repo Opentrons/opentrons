@@ -94,11 +94,11 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
-def versions() -> MagicMock:
-    m = MagicMock(spec=ComponentVersions)
-    m.api_version = "someTestApiVersion"
-    m.system_version = "someTestSystemVersion"
-    return m
+def versions() -> ComponentVersions:
+    return ComponentVersions(
+        api_version="someTestApiVersion",
+        system_version="someTestSystemVersion",
+    )
 
 
 @pytest.fixture
