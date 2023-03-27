@@ -1,59 +1,53 @@
 {
-    "ordering": [
-        [
-            "A1"
-        ]
-    ],
-    "brand": {
-        "brand": "Opentrons",
-        "brandId": []
-    },
-    "metadata": {
-        "displayName": "Opentrons Calibration Adapter - Heatershaker Module",
-        "displayCategory": "other",
-        "displayVolumeUnits": "µL",
-        "tags": []
-    },
-    "dimensions": {
-        "xDimension": 127.75,
-        "yDimension": 85.5,
-        "zDimension": 13.85
-    },
-    "wells": {
-        "A1": {
-            "depth": 0.25,
-            "totalLiquidVolume": 100,
-            "shape": "rectangular",
-            "xDimension": 20,
-            "yDimension": 20,
-            "x": 64,
-            "y": 42.5,
-            "z": 13.6
-        }
-    },
-    "groups": [
-        {
-            "metadata": {
-                "wellBottomShape": "flat"
-            },
-            "wells": [
-                "A1"
-            ]
-        }
-    ],
-    "parameters": {
-        "format": "irregular",
-        "quirks": [],
-        "isTiprack": false,
-        "isMagneticModuleCompatible": false,
-        "loadName": "opentrons_calibration_adapter_heatershaker_module"
-    },
-    "namespace": "opentrons",
-    "version": 1,
-    "schemaVersion": 2,
-    "cornerOffsetFromSlot": {
-        "x": 0,
-        "y": 0,
-        "z": 0
+  "ordering": [["A1"]],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Calibration Adapter - Heatershaker Module",
+    "displayCategory": "aluminumBlock",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.75,
+    "yDimension": 85.5,
+    "zDimension": 13.85
+  },
+  "wells": {
+    "A1": {
+      "depth": 0.25,
+      "totalLiquidVolume": 100,
+      "shape": "rectangular",
+      "xDimension": 20,
+      "yDimension": 20,
+      "x": 64,
+      "y": 42.5,
+      "z": 13.6
     }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "wellBottomShape": "flat"
+      },
+      "wells": ["A1"]
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_calibration_adapter_heatershaker_module"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }
