@@ -18,7 +18,7 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 FAILURE_THRESHOLD_MM = 3
-GRIP_HEIGHT_MM = 60
+GRIP_HEIGHT_MM = 50
 TEST_WIDTHS_MM: List[float] = [85.75, 62]
 SLOT_WIDTH_GAUGE: List[int] = [3, 9]
 GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
@@ -85,6 +85,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.move_to(mount, target_pos)
         if not api.is_simulator:
             ui.get_user_ready(f"prepare to grip {width} mm")
+        # grip once to center the thing
+        await api.grip(20)
+        await api.ungrip()
         # LOOP THROUGH FORCES
         for force in GRIP_FORCES_NEWTON:
             # GRIP AND MEASURE WIDTH
