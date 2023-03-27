@@ -23,42 +23,6 @@ MOUNT_AXES = [types.OT3Mount.LEFT, types.OT3Mount.RIGHT]
 THRESHOLD_MM = 0.2
 
 
-CUSTOM_AXIS_SETTINGS = {
-    types.OT3Axis.X: helpers_ot3.GantryLoadSettings(
-        max_speed=500,
-        acceleration=1000,
-        max_start_stop_speed=10,
-        max_change_dir_speed=5,
-        hold_current=0.5,
-        run_current=1.4,
-    ),
-    types.OT3Axis.Y: helpers_ot3.GantryLoadSettings(
-        max_speed=500,
-        acceleration=1000,
-        max_start_stop_speed=10,
-        max_change_dir_speed=5,
-        hold_current=0.5,
-        run_current=1.4,
-    ),
-    types.OT3Axis.Z_L: helpers_ot3.GantryLoadSettings(
-        max_speed=65,
-        acceleration=100,
-        max_start_stop_speed=10,
-        max_change_dir_speed=5,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-    types.OT3Axis.Z_R: helpers_ot3.GantryLoadSettings(
-        max_speed=65,
-        acceleration=100,
-        max_start_stop_speed=10,
-        max_change_dir_speed=5,
-        hold_current=0.1,
-        run_current=1.4,
-    )
-}
-
-
 DEFAULT_AXIS_SETTINGS = {
     types.OT3Axis.X: helpers_ot3.GantryLoadSettings(
         max_speed=500,
@@ -203,22 +167,31 @@ async def _move_and_check(api: OT3API, is_simulating: bool, mount: types.OT3Moun
             aligned = False
     return estimate,encoder,aligned
 
-async def _run_mount_up_down(api: OT3API, is_simulating: bool, write_cb: Callable) -> None:
+async def _run_mount_up_down(api: OT3API, is_simulating: bool, write_cb: Callable, record_bool: True) -> bool:
     ui.print_header('Run mount up and down')
     for mount in MOUNT_AXES:
             mount_up_down_points = _create_mounts_up_down_points(await api.gantry_position(mount))
             for pos in mount_up_down_points:
                 es,en,al = await _move_and_check(api,is_simulating,mount,pos)
-                _record_axis_data('Mount_up_down',write_cb,es,en,al)
+                if record_bool:
+                    _record_axis_data('Mount_up_down',write_cb,es,en,al)
                 print(f'mounts results: {al}')
 
-async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, write_cb: Callable) -> None:
+async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, write_cb: Callable, record_bool: True) -> bool:
     ui.print_header('Run bowtie')
     bowtie_points = _create_bowtie_points(await api.gantry_position(mount))
+    pass_count = 0
     for p in bowtie_points:
         es,en,al = await _move_and_check(api,is_simulating,mount,p)
-        _record_axis_data('Bowtie',write_cb,es,en,al)
+        if record_bool:
+            _record_axis_data('Bowtie',write_cb,es,en,al)
+        if al:
+            pass_count += 1
         print(f'bowtie results: {al}')
+    if pass_count == len(bowtie_points):
+        return True
+    else:
+        return False
 
 
 async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Mount, write_cb: Callable) -> None:
@@ -228,6 +201,99 @@ async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Moun
         es,en,al = await _move_and_check(api,is_simulating,mount,q)
         _record_axis_data('Hour_glass',write_cb,es,en,al)
         print(f'hour glass results: {al}')
+
+def _get_accelerations_from_user() -> List:
+    condition = True
+    while condition:
+        accelerations_input = input(f"WAIT: please input the acceleration and spilit with , (100,200,300), press ENTER when ready: ")
+        try:
+            accelerations = accelerations_input.strip().replace(' ','').spilit(',')
+            condition = False
+        except Exception as e:
+            ui.print_error(e)
+    return accelerations
+
+def _get_speeds_from_user() -> List:
+    condition = False
+    while condition:
+        speeds_input = input(f"WAIT: please input the speeds and spilit with , (100,200,300), press ENTER when ready: ")
+        try:
+            speeds = speeds_input.strip().replace(' ','').spilit(',')
+            condition = False
+        except Exception as e:
+            ui.print_error(e)
+    return speeds
+
+def _creat_z_axis_settings() -> List:
+    speeds = _get_speeds_from_user()
+    accelerations = _get_accelerations_from_user()
+    Z_AXIS_SETTINGS = []
+    for speed,acceleration in speeds,accelerations:
+        Z_AXIS_SETTING = {
+        types.OT3Axis.Z_L: helpers_ot3.GantryLoadSettings(
+            max_speed=speed,
+            acceleration=acceleration,
+            max_start_stop_speed=10,
+            max_change_dir_speed=5,
+            hold_current=0.1,
+            run_current=1.4,
+        ),
+        types.OT3Axis.Z_R: helpers_ot3.GantryLoadSettings(
+            max_speed=speed,
+            acceleration=acceleration,
+            max_start_stop_speed=10,
+            max_change_dir_speed=5,
+            hold_current=0.1,
+            run_current=1.4,
+        )
+        }
+        Z_AXIS_SETTINGS.append(Z_AXIS_SETTING)
+
+    return Z_AXIS_SETTINGS
+
+def _creat_xy_axis_settings() -> List:
+    speeds = _get_speeds_from_user()
+    accelerations = _get_accelerations_from_user()
+    XY_AXIS_SETTINGS = []
+    for speed,acceleration in speeds,accelerations:
+        XY_AXIS_SETTING = {
+        types.OT3Axis.X: helpers_ot3.GantryLoadSettings(
+            max_speed=speed,
+            acceleration=acceleration,
+            max_start_stop_speed=10,
+            max_change_dir_speed=5,
+            hold_current=0.5,
+            run_current=1.4,
+        ),
+        types.OT3Axis.Y: helpers_ot3.GantryLoadSettings(
+            max_speed=speed,
+            acceleration=acceleration,
+            max_start_stop_speed=10,
+            max_change_dir_speed=5,
+            hold_current=0.5,
+            run_current=1.4,
+        )
+        }
+        XY_AXIS_SETTINGS.append(XY_AXIS_SETTING)
+
+    return XY_AXIS_SETTINGS
+
+async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
+    Z_AXIS_SETTINGS = _creat_z_axis_settings()
+    for setting in Z_AXIS_SETTINGS:
+        await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
+        for i in range(arguments.cycles):
+            await _run_mount_up_down(api,arguments.simulate,mount,write_cb)
+
+async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
+    ui.print_header('Run xy motion check...')
+    XY_AXIS_SETTINGS = _creat_xy_axis_settings()
+    for setting in XY_AXIS_SETTINGS:
+        await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
+        for i in range(arguments.cycles):
+            res = await _run_bowtie(api,arguments.simulate,mount,write_cb)
+            print(f'Run bowtie cycle: {i}, results: {res}')
+
 
 async def _main(arguments: argparse.Namespace) -> None:
     # callback function for writing new data to CSV file
@@ -250,42 +316,10 @@ async def _main(arguments: argparse.Namespace) -> None:
     await helpers_ot3.home_ot3(api)
     ui.get_user_ready("Is the deck totally empty?")
     mount = types.OT3Mount.LEFT
-    speeds = []
-    accelerations = []
-    global CUSTOM_AXIS_SETTINGS
-    global DEFAULT_AXIS_SETTINGS
-    if arguments.speeds or arguments.acceleration:
-        if arguments.speeds:
-            condition = True
-            while condition:
-                speeds_input = input(f"WAIT: please input the speeds and spilit with , (100,200,300), press ENTER when ready: ")
-                try:
-                    speeds = speeds_input.strip().replace(' ','').spilit(',')
-                    condition = False
-                except Exception as e:
-                    ui.print_error(e)
-        if arguments.acceleration:
-            condition = True
-            while condition:
-                accelerations_input = input(f"WAIT: please input the acceleration and spilit with , (100,200,300), press ENTER when ready: ")
-                try:
-                    accelerations = accelerations_input.strip().replace(' ','').spilit(',')
-                    condition = False
-                except Exception as e:
-                    ui.print_error(e)
-    for speed in speeds:
-        for acce in accelerations:
-            print('Start testing, Speed= {}, Acceleration= {}::::'.format(speed, acce))
-            userSetting = helpers_ot3.GantryLoadSettings(
-                    max_speed=float(speed),
-                    acceleration=acce,
-                    max_start_stop_speed=1,
-                    max_change_dir_speed=1,
-                    hold_current=0.1,
-                    run_current=1.4)
-            CUSTOM_AXIS_SETTINGS.update({types.OT3Axis.Z_L: userSetting})
-            CUSTOM_AXIS_SETTINGS.update({types.OT3Axis.Z_R: userSetting})
-            await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, CUSTOM_AXIS_SETTINGS)
+    if arguments.xy_motion:
+        await _run_xy_motion(arguments,api,mount,csv_cb.write)
+    if arguments.z_motion:
+        await _run_z_motion(arguments,api,mount,csv_cb.write)
     for i in range(arguments.cycles):
             csv_cb.write(["--------"])
             csv_cb.write(["run-cycle", i])
@@ -312,8 +346,12 @@ if __name__ == "__main__":
     parser.add_argument("--skip_bowtie", action="store_true")
     parser.add_argument("--skip_hourglass", action="store_true")
     parser.add_argument("--skip_mount", action="store_true")
-    parser.add_argument("--speeds", action="store_true")
-    parser.add_argument("--acceleration", action="store_true")
+    parser.add_argument("--xy_motion", action="store_true")
+    parser.add_argument("--xy_speeds", action="store_true")
+    parser.add_argument("--xy_accelerations", action="store_true")
+    parser.add_argument("--z_motion", action="store_true")
+    parser.add_argument("--z_speeds", action="store_true")
+    parser.add_argument("--z_accelerations", action="store_true")
 
     args = parser.parse_args()
     asyncio.run(_main(args))
