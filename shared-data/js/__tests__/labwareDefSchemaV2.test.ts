@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime'
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
@@ -18,16 +17,17 @@ const generateStandardWellNames = (
   rowCount: number,
   columnCount: number
 ): Set<string> => {
-  function* generateWelllNames() {
-    for (let column = 0; column < columnCount; column++) {
-      for (let row = 0; row < rowCount; row++) {
-        const columnName = (column + 1).toString()
-        const rowName = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[row]
-        yield rowName + columnName
-      }
+  const result = new Set<string>()
+
+  for (let column = 0; column < columnCount; column++) {
+    for (let row = 0; row < rowCount; row++) {
+      const columnName = (column + 1).toString()
+      const rowName = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[row]
+      result.add(rowName + columnName)
     }
   }
-  return new Set(generateWelllNames())
+
+  return result
 }
 
 const standard24WellNames = generateStandardWellNames(4, 6)
