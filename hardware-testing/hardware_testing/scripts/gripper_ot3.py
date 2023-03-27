@@ -15,18 +15,12 @@ SLOT_SIZE = types.Point(x=128, y=-86, z=0)
 LABWARE_SIZE_ARMADILLO = types.Point(x=127.8, y=-85.55, z=16)
 LABWARE_SIZE_EVT_TIPRACK = types.Point(x=127.6, y=-85.8, z=93)
 LABWARE_SIZE_RESERVOIR = types.Point(x=127.8, y=-85.55, z=30)  # FIXME: get real values
-MAG_PLATE_SIZE = types.Point(x=128, y=-86.0, z=39.5)
 
-# offset created by placing labware on the magnetic plate
-ARMADILLO_HEIGHT_ON_MAG_PLATE = 45.3
-ARMADILLO_OFFSET_ON_MAG_PLATE = types.Point(
-    z=ARMADILLO_HEIGHT_ON_MAG_PLATE - LABWARE_SIZE_ARMADILLO.z
-)
 
 TRAVEL_HEIGHT = 30
 
 PICK_UP_OFFSETS = {
-    "deck": Point(x=-0.2),
+    "deck": Point(),
     "mag-plate": Point(),
     "heater-shaker": Point(),
     "temp-module": Point(),
@@ -54,13 +48,12 @@ LABWARE_GRIP_HEIGHT = {
     "reservoir": LABWARE_SIZE_RESERVOIR.z * 0.5,
 }
 LABWARE_GRIP_FORCE = {k: 15 for k in LABWARE_KEYS}
-LABWARE_WARP = types.Point()
 
 DECK_ITEM_OFFSETS = {
-    "thermo-cycle": None,
-    "heater-shaker": None,
-    "temp-module": None,
-    "mag-plate": None,
+    "thermo-cycle": Point(),
+    "heater-shaker": Point(),
+    "temp-module": Point(),
+    "mag-plate": Point(),
     "deck": Point(),
 }
 ADAPTER_OFFSETS = {
@@ -90,11 +83,8 @@ async def _inspect(api: OT3API) -> None:
 
 
 async def _finish(api: OT3API) -> None:
-    homed_pos = helpers_ot3.get_gantry_homed_position_ot3(api, types.OT3Mount.GRIPPER)
     await api.ungrip()
-    current_pos = await api.gantry_position(mount=types.OT3Mount.GRIPPER)
-    await api.move_to(types.OT3Mount.GRIPPER, current_pos._replace(z=homed_pos.z - 2))
-    await api.move_to(types.OT3Mount.GRIPPER, homed_pos + types.Point(x=-2, y=-2))
+    await api.home()
     exit()
 
 
@@ -115,7 +105,7 @@ def _get_labware_grip_offset(
     return types.Point(x=x, y=y, z=z)
 
 
-async def _gripper_action(
+async def _do_gripper_action(
     api: OT3API,
     pos: types.Point,
     force: float,
@@ -141,7 +131,7 @@ async def _gripper_action(
         await _inspect(api)
 
 
-def _calculate_position_on_deck(
+def _calculate_grip_position_on_deck(
     slot: int,
     labware_key: str,
     deck_item: str,
@@ -175,7 +165,7 @@ def _calculate_position_on_deck(
     return deck_pos
 
 
-async def _slot_to_slot(
+async def _move_labware(
     api: OT3API,
     labware_key: str,
     force: Optional[float],
@@ -194,7 +184,7 @@ async def _slot_to_slot(
     )
 
     # PICK-UP
-    src_loc = _calculate_position_on_deck(
+    src_loc = _calculate_grip_position_on_deck(
         src_slot,
         labware_key,
         src_deck_item,
@@ -203,10 +193,10 @@ async def _slot_to_slot(
     src_loc += PICK_UP_OFFSETS[src_deck_item]
     if inspect:
         await _inspect(api)
-    await _gripper_action(api, src_loc, force, is_grip=True, inspect=inspect)
+    await _do_gripper_action(api, src_loc, force, is_grip=True, inspect=inspect)
 
     # DROP
-    dst_loc = _calculate_position_on_deck(
+    dst_loc = _calculate_grip_position_on_deck(
         dst_slot,
         labware_key,
         dst_deck_item,
@@ -215,7 +205,7 @@ async def _slot_to_slot(
     dst_loc += DROP_OFFSETS[dst_deck_item]
     if inspect:
         await _inspect(api)
-    await _gripper_action(api, dst_loc, force, is_grip=True, inspect=inspect)
+    await _do_gripper_action(api, dst_loc, force, is_grip=True, inspect=inspect)
 
 
 async def _run(
@@ -238,18 +228,16 @@ async def _run(
             return "deck"
 
     for i, s in enumerate(slot_states.slots[:-1]):
-        src = slot_states.slots[i]
-        dst = slot_states.slots[i + 1]
-        src_deck_item = _get_item_from_slot(src)
-        dst_deck_item = _get_item_from_slot(dst)
-        await _slot_to_slot(
+        src_slot = slot_states.slots[i]
+        dst_slot = slot_states.slots[i + 1]
+        await _move_labware(
             api,
             labware_key,
             force,
-            src,
-            dst,
-            src_deck_item=src_deck_item,
-            dst_deck_item=dst_deck_item,
+            src_slot,
+            dst_slot,
+            src_deck_item=_get_item_from_slot(src_slot),
+            dst_deck_item=_get_item_from_slot(dst_slot),
             src_offset=Point(),  # placeholder for error-tolerance testing
             dst_offset=Point(),  # placeholder for error-tolerance testing
             inspect=inspect,
