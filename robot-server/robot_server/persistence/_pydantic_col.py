@@ -12,12 +12,12 @@ import sqlalchemy.ext.compiler
 @dataclass(frozen=True)
 class SerializedPydantic:
     model: Type[BaseModel]
-    json: str
+    json: bytes
 
 
 class PydanticCol(sqlalchemy.types.TypeDecorator[SerializedPydantic]):
-    # Make SQLAlchemy insert the data into the SQLite as a string,
-    # and use Python `str`s for passing data between our code and SQLAlchemy.
+    # Make SQLAlchemy insert the data into the SQLite database as a BLOB,
+    # and use Python `bytes` objects for passing data between our code and SQLAlchemy.
     #
     # We deliberately avoid using sqlalchemy.JSON. It would use JSON-like `dict`s for
     # passing data between our code and SQLAlchemy, which is problematic:
@@ -27,7 +27,7 @@ class PydanticCol(sqlalchemy.types.TypeDecorator[SerializedPydantic]):
     #   * SQLAlchemy would internally do the conversion between `dict`s and raw JSON
     #     strings. This would do heavy compute work inside the SQLAlchemy transaction,
     #     holding SQLite's database lock open for too long.
-    impl = sqlalchemy.String
+    impl = sqlalchemy.LargeBinary
 
     cache_ok = True
 
@@ -39,7 +39,7 @@ class PydanticCol(sqlalchemy.types.TypeDecorator[SerializedPydantic]):
         self,
         value: Optional[SerializedPydantic],
         dialect: object,
-    ) -> Optional[str]:
+    ) -> Optional[bytes]:
         """Prepare a value to be inserted via SQLAlchemy."""
         if isinstance(value, SerializedPydantic):
             if value.model == self._model:
@@ -61,10 +61,10 @@ class PydanticCol(sqlalchemy.types.TypeDecorator[SerializedPydantic]):
 
     def process_result_value(
         self,
-        value: Optional[str],
+        value: Optional[bytes],
         dialect: object,
     ) -> Optional[SerializedPydantic]:
-        """Fix up a string value extracted by SQLAlchemy."""
+        """Wrap a raw binary blob extracted by SQLAlchemy."""
         if value is None:
             return None  # Extracting a SQL NULL value.
         else:
@@ -72,16 +72,6 @@ class PydanticCol(sqlalchemy.types.TypeDecorator[SerializedPydantic]):
                 model=self._model,
                 json=value,
             )
-
-
-# Use `BLOB` as the raw SQL-level column type, as opposed to `VARCHAR`.
-#
-# This is to match sqlalchemy.PickleType and sqlalchemy.LargeBinary,
-# making it a little bit easier to migrate from them--
-# we only have to migrate the data, not change the column type.
-@sqlalchemy.ext.compiler.compiles(PydanticCol)  # type: ignore[misc]
-def _compile_as_blob(type_: object, compiler: object, **kwargs: object) -> str:
-    return "BLOB"
 
 
 _ModelToExtract = TypeVar("_ModelToExtract", bound=BaseModel)
@@ -97,7 +87,7 @@ def sql_to_pydantic(
     """
     if isinstance(sql_value, SerializedPydantic):
         if sql_value.model == model:
-            return model.parse_raw(sql_value.json)
+            return model.parse_raw(sql_value.json, encoding="utf-8")
         else:
             raise TypeError(
                 f"This value came from a SQL column declared to contain"
@@ -119,5 +109,5 @@ def pydantic_to_sql(value: BaseModel) -> SerializedPydantic:
         model=type(value),
         json=value.json(
             by_alias=True,  # For consistency with how models are serialized over HTTP.
-        ),
+        ).encode("utf-8"),
     )
