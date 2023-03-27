@@ -129,7 +129,7 @@ def _override_sql_engine_with_mock() -> Iterator[None]:
 def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
     async def get_version_override() -> ComponentVersions:
         """Override for the get_versions() FastAPI dependency."""
-        return await versions()
+        return cast(ComponentVersions, await versions())
 
     app.dependency_overrides[get_versions] = get_version_override
     yield
