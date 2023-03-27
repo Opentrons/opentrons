@@ -1166,7 +1166,7 @@ class OT3API(
             await self._update_position_estimation([axis])
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
-                distance_from_home = 3.0
+                distance_from_home = 5.0
             else:
                 # FIXME: (AA 2/15/23) This is a temporary workaround because of
                 # XY encoder inaccuracy. Otherwise, we should be able to use
