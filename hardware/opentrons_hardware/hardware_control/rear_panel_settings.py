@@ -56,9 +56,23 @@ async def set_deck_light(setting: int, messenger: Optional[BinaryMessenger]) -> 
     if messenger is None:
         # the EVT bots don't have rear panels...
         return False
-    # Fire-and-forget, ignoring the ack
+
+    event = asyncio.Event()
+    responses: List[BinaryMessageDefinition] = list()
+    listener = _create_listener(event, responses)
+    messenger.add_listener(
+        listener,
+        lambda message_id: bool(message_id == BinaryMessageId.ack),
+    )
+
     await messenger.send(SetDeckLightRequest(setting=utils.UInt8Field(setting)))
-    return True
+    try:
+        await asyncio.wait_for(event.wait(), 1.0)
+    except asyncio.TimeoutError:
+        log.error("set deck light request timed out before response")
+    finally:
+        messenger.remove_listener(listener)
+    return len(responses) > 0
 
 
 async def get_deck_light_state(messenger: Optional[BinaryMessenger]) -> bool:

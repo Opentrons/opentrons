@@ -276,7 +276,7 @@ class GetDeckLightResponse(utils.BinarySerializable):
     message_id: utils.UInt16Field = utils.UInt16Field(
         BinaryMessageId.get_deck_light_response
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = utils.UInt16Field(1)
     setting: utils.UInt8Field = utils.UInt8Field(0)
 
 

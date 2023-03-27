@@ -525,11 +525,13 @@ class OT3Simulator:
         """Engage axes."""
         return None
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
+    @ensure_yield
+    async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
         return None
 
-    def get_lights(self) -> Dict[str, bool]:
+    @ensure_yield
+    async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
         return {}
 
