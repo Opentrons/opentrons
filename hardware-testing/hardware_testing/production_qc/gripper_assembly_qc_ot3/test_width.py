@@ -16,11 +16,11 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
+SLOT_WIDTH_GAUGE = 6
 
 FAILURE_THRESHOLD_MM = 3
 GRIP_HEIGHT_MM = 60
-TEST_WIDTHS_MM: List[float] = [85.75, 62]
-SLOT_WIDTH_GAUGE: List[int] = [3, 9]
+TEST_WIDTHS_MM: List[float] = [85.5]
 GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
 
 
@@ -28,8 +28,8 @@ def _get_test_tag(width: float, force: float) -> str:
     return f"{width}mm-{force}N"
 
 
-def _get_width_hover_and_grip_positions(api: OT3API, slot: int) -> Tuple[Point, Point]:
-    grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
+def _get_width_hover_and_grip_positions(api: OT3API) -> Tuple[Point, Point]:
+    grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(SLOT_WIDTH_GAUGE)
     grip_pos += Point(z=GRIP_HEIGHT_MM)
     hover_pos = grip_pos._replace(z=api.get_instrument_max_height(OT3Mount.GRIPPER))
     return hover_pos, grip_pos
@@ -72,10 +72,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     print("homing Z and G...")
     await api.home([z_ax, g_ax])
     # MOVE TO SLOT
+    hover_pos, target_pos = _get_width_hover_and_grip_positions(api)
     await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
     # LOOP THROUGH WIDTHS
-    for width, slot in zip(TEST_WIDTHS_MM, SLOT_WIDTH_GAUGE):
-        hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
+    for width in TEST_WIDTHS_MM:
         # OPERATOR SETS UP GAUGE
         ui.print_header(f"SETUP {width} MM GAUGE")
         if not api.is_simulator:
