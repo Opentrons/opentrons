@@ -3,17 +3,21 @@ import { v4 as uuidv4 } from 'uuid'
 
 import {
   Flex,
+  ALIGN_CENTER,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN_REVERSE,
+  JUSTIFY_CENTER,
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
 
+import { Snackbar } from '../Snackbar/Snackbar'
 import { Toast } from './Toast'
 import { ToastContext } from './ToastContext'
 
+import type { SnackbarProps } from '../Snackbar/Snackbar'
 import type { ToastProps, ToastType } from './Toast'
-import type { MakeToastOptions } from './ToastContext'
+import type { MakeSnackbarOptions, MakeToastOptions } from './ToastContext'
 
 interface ToasterOvenProps {
   children: React.ReactNode
@@ -28,6 +32,7 @@ const TOASTER_OVEN_SIZE = 5
  */
 export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   const [toasts, setToasts] = React.useState<ToastProps[]>([])
+  const [snackbar, setSnackbar] = React.useState<SnackbarProps>()
 
   /**
    * makes toast, rendering it in the toaster oven display container
@@ -50,6 +55,14 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
     return id
   }
 
+  function makeSnackbar(message: string, options?: MakeSnackbarOptions): void {
+    setSnackbar({ message, ...options })
+  }
+
+  function eatSnackbar(): void {
+    setSnackbar(undefined)
+  }
+
   /**
    * removes (eats) a toast from toaster oven display container
    * @param {string} toastId the id of the toast to remove
@@ -59,7 +72,9 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   }
 
   return (
-    <ToastContext.Provider value={{ eatToast, makeToast }}>
+    <ToastContext.Provider
+      value={{ eatToast, makeToast, eatSnackbar, makeSnackbar }}
+    >
       {toasts.length > 0 ? (
         <Flex
           flexDirection={DIRECTION_COLUMN_REVERSE}
@@ -82,6 +97,24 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           ))}
         </Flex>
       ) : null}
+      {snackbar !== undefined && (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
+          position="absolute"
+          bottom={SPACING.spacingXXL}
+          zIndex={1000}
+        >
+          <Snackbar
+            {...snackbar}
+            onClose={() => {
+              snackbar.onClose?.()
+              eatSnackbar()
+            }}
+          />
+        </Flex>
+      )}
       {children}
     </ToastContext.Provider>
   )
