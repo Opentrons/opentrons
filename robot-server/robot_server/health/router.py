@@ -11,6 +11,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from robot_server.hardware import get_hardware
 from robot_server.persistence import get_sql_engine as ensure_sql_engine_is_ready
 from robot_server.service.legacy.models import V1BasicResponse
+from robot_server.util import call_once
 from .models import Health, HealthLinks
 
 _log = logging.getLogger(__name__)
@@ -27,7 +28,8 @@ class ComponentVersions:
     system_version: str
 
 
-def _get_version() -> Dict[str, str]:
+@call_once
+async def _get_version() -> Dict[str, str]:
     try:
         with open(VERSION_PATH, "r") as version_file:
             return cast(Dict[str, str], json.load(version_file))
@@ -59,7 +61,7 @@ def _get_api_version_dunder() -> str:
 
 async def get_versions() -> ComponentVersions:
     """Dependency function for the versions of system components."""
-    version_file = _get_version()
+    version_file = await _get_version()
 
     def _api_version_or_fallback() -> str:
         if "opentrons_api_version" in version_file:

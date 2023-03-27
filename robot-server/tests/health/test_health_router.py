@@ -6,7 +6,7 @@ from starlette.testclient import TestClient
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
 
-from robot_server.health.router import ComponentVersions, get_versions
+from robot_server.health.router import ComponentVersions, get_versions, _get_version
 
 
 def test_get_health(
@@ -15,8 +15,9 @@ def test_get_health(
     """Test GET /health."""
     hardware.fw_version = "FW111"
     hardware.board_revision = "BR2.1"
-    versions.api_version = "mytestapiversion"
-    versions.system_version = "mytestsystemversion"
+    versions.return_value = ComponentVersions(
+        api_version="mytestapiversion", system_version="mytestsystemversion"
+    )
 
     expected = {
         "name": "opentrons-dev",
@@ -46,7 +47,7 @@ def test_get_health(
 @pytest.fixture
 def mock_version_file_contents() -> Iterator[MagicMock]:
     """Returns a mock for version file contents."""
-    with patch("robot_server.health.router._get_version") as p:
+    with patch("robot_server.health.router._get_version", spec=_get_version) as p:
         p.return_value = {}
         yield p
 

@@ -94,11 +94,13 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
-def versions() -> ComponentVersions:
-    return ComponentVersions(
+def versions() -> MagicMock:
+    m = MagicMock(spec=get_versions)
+    m.return_value = ComponentVersions(
         api_version="someTestApiVersion",
         system_version="someTestSystemVersion",
     )
+    return m
 
 
 @pytest.fixture
@@ -127,7 +129,7 @@ def _override_sql_engine_with_mock() -> Iterator[None]:
 def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
     async def get_version_override() -> ComponentVersions:
         """Override for the get_versions() FastAPI dependency."""
-        return versions
+        return await versions()
 
     app.dependency_overrides[get_versions] = get_version_override
     yield
