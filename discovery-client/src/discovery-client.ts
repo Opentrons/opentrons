@@ -6,6 +6,7 @@ import { createMdnsBrowser } from './mdns-browser'
 import * as Store from './store'
 
 import type { Agent } from 'http'
+import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type {
   DiscoveryClient,
   DiscoveryClientConfig,
@@ -21,14 +22,15 @@ export function createDiscoveryClient(
   const { getState, dispatch, subscribe } = Store.createStore()
   const getAddresses = (): Address[] => Store.getAddresses(getState())
   const getRobots = (): DiscoveryClientRobot[] => Store.getRobots(getState())
+  const getSerialPorts = (): PortInfo[] => Store.getSerialPorts(getState())
   let unsubscribe: (() => void) | null = null
 
-  const createHttpAgent = (): Agent =>
-    // TODO: discover port
-    buildUSBAgent({ serialPort: '/dev/tty.usbmodem011219971' })
+  const createHttpAgent = (serialPort: string): Agent =>
+    buildUSBAgent({ serialPort })
 
   const healthPoller = createHealthPoller({
     onPollResult: result => dispatch(Store.healthPolled(result)),
+    onSerialPortFetch: result => dispatch(Store.serialPortsPolled(result)),
     logger,
   })
 
@@ -49,8 +51,12 @@ export function createDiscoveryClient(
 
     let prevAddrs = getAddresses()
     let prevRobots = getRobots()
+    let prevSerialPorts = getSerialPorts()
 
-    healthPoller.start({ list: prevAddrs, interval: healthPollInterval })
+    healthPoller.start({
+      list: prevAddrs,
+      interval: healthPollInterval,
+    })
     mdnsBrowser.start()
 
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -58,12 +64,16 @@ export function createDiscoveryClient(
       unsubscribe = subscribe(() => {
         const addrs = getAddresses()
         const robots = getRobots()
+        const serialPorts = getSerialPorts()
 
-        if (addrs !== prevAddrs) healthPoller.start({ list: addrs })
+        if (addrs !== prevAddrs || serialPorts !== prevSerialPorts) {
+          healthPoller.start({ list: addrs })
+        }
         if (robots !== prevRobots) onListChange(robots)
 
         prevAddrs = addrs
         prevRobots = robots
+        prevSerialPorts = serialPorts
       })
     }
   }
@@ -78,6 +88,12 @@ export function createDiscoveryClient(
     }
   }
 
-  // return { getRobots, removeRobot, start, stop, httpAgent }
-  return { getRobots, removeRobot, start, stop, createHttpAgent }
+  return {
+    createHttpAgent,
+    getRobots,
+    getSerialPorts,
+    removeRobot,
+    start,
+    stop,
+  }
 }
