@@ -4,6 +4,10 @@ import type { Duplex } from 'stream'
 
 import { SerialPort } from 'serialport'
 
+import type { PortInfo } from '@serialport/bindings-cpp'
+
+export type { PortInfo }
+
 export interface AgentOptions {
   serialPort: string
 }
@@ -19,4 +23,8 @@ export function buildUSBAgent(opts: AgentOptions): http.Agent {
   usbAgent.maxTotalSockets = 1
   usbAgent.destroy = () => port.close()
   return usbAgent
+}
+
+export function fetchSerialPortList(): Promise<PortInfo[]> {
+  return SerialPort.list()
 }
