@@ -35,7 +35,7 @@ export * from './robot-types'
 export * from './testing/utils'
 
 //  Molecules
-export * from './molecules/RoundTab'
+export * from './molecules'
 
 // Atoms
 export * from './atoms'

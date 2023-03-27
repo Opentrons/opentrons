@@ -94,6 +94,100 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
 </label>
 `;
 
+exports[`DeprecatedCheckboxField renders correctly when checked 1`] = `
+.c0 {
+  width: 100%;
+}
+
+.c1.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<label
+  className="form_field foo"
+>
+  <div
+    className="checkbox_icon"
+  >
+    <svg
+      aria-hidden="true"
+      className="c0 c1"
+      fill="currentColor"
+      version="1.1"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10 17l-5-5 1.4-1.4 3.6 3.6 7.6-7.6L19 8m0-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+  <input
+    checked={true}
+    className="input_field accessibly_hidden"
+    onChange={[MockFunction]}
+    type="checkbox"
+  />
+  <div
+    className="label_text"
+  >
+    Check Box 1
+  </div>
+</label>
+`;
+
+exports[`DeprecatedCheckboxField renders correctly when unchecked 1`] = `
+.c0 {
+  width: 100%;
+}
+
+.c1.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<label
+  className="form_field foo"
+>
+  <div
+    className="checkbox_icon"
+  >
+    <svg
+      aria-hidden="true"
+      className="c0 c1"
+      fill="currentColor"
+      version="1.1"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z"
+        fillRule="evenodd"
+      />
+    </svg>
+  </div>
+  <input
+    checked={false}
+    className="input_field accessibly_hidden"
+    onChange={[MockFunction]}
+    type="checkbox"
+  />
+  <div
+    className="label_text"
+  >
+    Check Box 1
+  </div>
+</label>
+`;
+
 exports[`DropdownField renders correctly with a falsey value 1`] = `
 .c0 {
   width: 100%;

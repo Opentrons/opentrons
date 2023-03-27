@@ -33,6 +33,8 @@ jest.mock('@opentrons/components', () => {
     )),
   }
 })
+jest.mock('@opentrons/components/src/molecules/index')
+jest.mock('@opentrons/components/src/atoms/index')
 jest.mock('../../../redux/config')
 
 const mockgetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.MockedFunction<

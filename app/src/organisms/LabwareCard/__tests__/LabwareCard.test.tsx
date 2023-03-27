@@ -8,6 +8,8 @@ import { LabwareCard } from '..'
 
 jest.mock('../../../pages/Labware/hooks')
 jest.mock('../CustomLabwareOverflowMenu')
+jest.mock('@opentrons/components/src/molecules/index')
+jest.mock('@opentrons/components/src/atoms/index')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {

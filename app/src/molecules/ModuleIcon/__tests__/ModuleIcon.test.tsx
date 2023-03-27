@@ -12,6 +12,8 @@ jest.mock('@opentrons/components', () => {
     Tooltip: jest.fn(({ children }) => <div>{children}</div>),
   }
 })
+jest.mock('@opentrons/components/src/molecules/index')
+jest.mock('@opentrons/components/src/atoms/index')
 
 const render = (props: React.ComponentProps<typeof ModuleIcon>) => {
   return renderWithProviders(<ModuleIcon {...props} />)[0]
