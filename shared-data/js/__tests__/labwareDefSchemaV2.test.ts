@@ -155,10 +155,7 @@ const expectGroupsFollowConvention = (
     const topLevelBrand = labwareDef.brand
 
     labwareDef.groups.forEach(group => {
-      if (group.brand != null) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(group.brand.brand).not.toEqual(topLevelBrand)
-      }
+      expect(group.brand?.brand).not.toEqual(topLevelBrand)
     })
   })
 
