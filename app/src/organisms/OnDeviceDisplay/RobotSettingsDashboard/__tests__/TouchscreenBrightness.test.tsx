@@ -41,7 +41,9 @@ describe('TouchscreenBrightness', () => {
     } as any)
   })
 
-  afterEach(() => {})
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('should render text and buttons', () => {
     const [{ getByText, getByTestId }] = render(props)
