@@ -1,11 +1,11 @@
 import * as React from 'react'
+import { renderWithProviders } from '../../../testing/utils'
 import {
-  renderWithProviders,
   COLORS,
-  SPACING,
-  TYPOGRAPHY,
   BORDERS,
-} from '../../../index'
+  TYPOGRAPHY,
+  SPACING,
+} from '../../../ui-style-constants'
 
 import { AlertPrimaryButton } from '../AlertPrimaryButton'
 

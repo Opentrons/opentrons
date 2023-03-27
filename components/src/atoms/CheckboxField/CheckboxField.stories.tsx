@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { CheckboxField as CheckboxFieldComponent } from './index'
 
 import type { Story, Meta } from '@storybook/react'

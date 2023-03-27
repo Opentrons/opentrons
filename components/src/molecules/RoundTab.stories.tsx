@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { Flex, SPACING, TYPOGRAPHY, Text, DIRECTION_ROW } from '..'
+import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
+import { Flex, Text } from '../primitives'
+import { DIRECTION_ROW } from '../styles'
 import { RoundTab } from './RoundTab'
 import type { Story, Meta } from '@storybook/react'
 

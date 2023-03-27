@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { Flex, DIRECTION_ROW, SPACING } from '../../index'
+import { SPACING } from '../../ui-style-constants'
+import { DIRECTION_ROW } from '../../styles'
+import { Flex } from '../../primitives'
 import { PrimaryButton } from './PrimaryButton'
 import { SecondaryButton } from './SecondaryButton'
 import { AlertPrimaryButton } from './AlertPrimaryButton'
