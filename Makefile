@@ -252,4 +252,4 @@ circular-dependencies-js:
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.tsx
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts
