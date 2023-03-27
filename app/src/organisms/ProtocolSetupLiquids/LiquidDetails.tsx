@@ -87,7 +87,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
           </tr>
         </thead>
         <tbody>
-          {labwareByLiquidId[liquid.id].map((labware, index) => {
+          {labwareByLiquidId[liquid.id].map(labware => {
             const { slotName, labwareName } = getSlotLabwareName(
               labware.labwareId,
               commands
