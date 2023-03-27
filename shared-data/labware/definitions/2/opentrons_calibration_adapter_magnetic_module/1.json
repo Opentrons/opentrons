@@ -11,13 +11,13 @@
     "tags": []
   },
   "dimensions": {
-    "xDimension": 127.75,
-    "yDimension": 85.5,
+    "xDimension": 113.95,
+    "yDimension": 77.95,
     "zDimension": 15.5
   },
   "wells": {
     "A1": {
-      "depth": 0.25,
+      "depth": 4.75,
       "totalLiquidVolume": 100,
       "shape": "rectangular",
       "xDimension": 20,

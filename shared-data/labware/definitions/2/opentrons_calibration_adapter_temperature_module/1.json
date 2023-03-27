@@ -17,7 +17,7 @@
   },
   "wells": {
     "A1": {
-      "depth": 0.25,
+      "depth": 4.75,
       "totalLiquidVolume": 100,
       "shape": "rectangular",
       "xDimension": 20,
