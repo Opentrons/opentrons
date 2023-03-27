@@ -104,7 +104,7 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.X: 1000,
         OT3AxisKind.Y: 1000,
         OT3AxisKind.Z: 100,
-        OT3AxisKind.P: 50,
+        OT3AxisKind.P: 100,
         OT3AxisKind.Z_G: 20,
     },
 )
@@ -124,7 +124,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 10,
-        OT3AxisKind.P: 10,
+        OT3AxisKind.P: 5,
         OT3AxisKind.Z_G: 10,
     },
 )
