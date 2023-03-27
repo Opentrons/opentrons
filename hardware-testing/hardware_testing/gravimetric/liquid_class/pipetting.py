@@ -10,7 +10,7 @@ from opentrons.protocol_api.labware import Well
 
 from hardware_testing.gravimetric import config
 from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
-from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.opentrons_api.types import OT3Mount, Point
 
 from .definition import LiquidClassSettings
 from .defaults import get_liquid_class
@@ -109,17 +109,21 @@ def _get_approach_submerge_retract_heights(
     return approach_mm, submerge_mm, retract_mm
 
 
-def _submerge(pipette: InstrumentContext, well: Well, height: float) -> None:
+def _submerge(
+    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+) -> None:
     pipette.move_to(
-        well.bottom(height),
+        well.bottom(height).move(channel_offset),
         force_direct=True,
         speed=config.TIP_SPEED_WHILE_SUBMERGING,
     )
 
 
-def _retract(pipette: InstrumentContext, well: Well, height: float) -> None:
+def _retract(
+    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+) -> None:
     pipette.move_to(
-        well.bottom(height),
+        well.bottom(height).move(channel_offset),
         force_direct=True,
         speed=config.TIP_SPEED_WHILE_RETRACTING,
     )
@@ -130,6 +134,7 @@ def _pipette_with_liquid_settings(
     pipette: InstrumentContext,
     liquid_class: LiquidClassSettings,
     well: Well,
+    channel_offset: Point,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     aspirate: Optional[float] = None,
@@ -193,9 +198,11 @@ def _pipette_with_liquid_settings(
             for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
-                _retract(pipette, well, approach_mm)  # retract to the approach height
+                _retract(
+                    pipette, well, approach_mm, channel_offset
+                )  # retract to the approach height
                 pipette.blow_out().aspirate(pipette.min_volume).dispense()
-                _submerge(pipette, well, submerge_mm)
+                _submerge(pipette, well, submerge_mm, channel_offset)
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
@@ -229,22 +236,22 @@ def _pipette_with_liquid_settings(
         pipette.blow_out()
 
     # PHASE 1: APPROACH
-    pipette.move_to(well.bottom(approach_mm))
+    pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate else _dispense_on_approach()
 
     # PHASE 2: SUBMERGE
     callbacks.on_submerging()
-    _submerge(pipette, well, submerge_mm)
+    _submerge(pipette, well, submerge_mm, channel_offset)
     _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
     # PHASE 3: RETRACT
     callbacks.on_retracting()
-    _retract(pipette, well, retract_mm)
+    _retract(pipette, well, retract_mm, channel_offset)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
     callbacks.on_exiting()
-    pipette.move_to(well.top(), force_direct=True)
+    pipette.move_to(well.top().move(channel_offset), force_direct=True)
 
 
 def aspirate_with_liquid_class(
@@ -253,6 +260,7 @@ def aspirate_with_liquid_class(
     tip_volume: int,
     aspirate_volume: float,
     well: Well,
+    channel_offset: Point,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
@@ -272,6 +280,7 @@ def aspirate_with_liquid_class(
         pipette,
         liquid_class,
         well,
+        channel_offset,
         liquid_tracker,
         callbacks,
         aspirate=aspirate_volume,
@@ -287,6 +296,7 @@ def dispense_with_liquid_class(
     tip_volume: int,
     dispense_volume: float,
     well: Well,
+    channel_offset: Point,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
@@ -306,6 +316,7 @@ def dispense_with_liquid_class(
         pipette,
         liquid_class,
         well,
+        channel_offset,
         liquid_tracker,
         callbacks,
         dispense=dispense_volume,
