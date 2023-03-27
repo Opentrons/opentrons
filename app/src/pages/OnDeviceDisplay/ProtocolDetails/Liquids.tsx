@@ -31,7 +31,6 @@ const Table = styled('table')`
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
   padding: 0 ${SPACING.spacing5} ${SPACING.spacing3} ${SPACING.spacing5};
@@ -72,15 +71,19 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
     (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
   )
-  const { t } = useTranslation('protocol_details')
+  const { t, i18n } = useTranslation('protocol_details')
 
   return (
     <Table>
       <thead>
         <tr>
-          <TableHeader>{t('liquid_name')}</TableHeader>
+          <TableHeader>
+            {i18n.format(t('liquid_name'), 'capitalize')}
+          </TableHeader>
 
-          <TableHeader>{t('total_volume')}</TableHeader>
+          <TableHeader>
+            {i18n.format(t('total_volume'), 'capitalize')}
+          </TableHeader>
         </tr>
       </thead>
       <tbody>
