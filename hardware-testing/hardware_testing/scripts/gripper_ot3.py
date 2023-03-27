@@ -189,7 +189,7 @@ async def _finish(api: OT3API) -> None:
 
 
 def _get_labware_grip_offset(
-    labware_key: str, is_grip: bool, has_clips: bool, warp: Optional[float]
+    labware_key: str, is_grip: bool, has_clips: bool
 ) -> types.Point:
     slot_center = SLOT_SIZE * 0.5
     grip_height = LABWARE_GRIP_HEIGHT[labware_key]
@@ -198,8 +198,6 @@ def _get_labware_grip_offset(
     if is_grip and has_clips:
         labware_center = LABWARE_SIZE[labware_key] * 0.5
         x = labware_center.x
-        if warp:
-            x += warp
     else:
         x = slot_center.x
     y = slot_center.y
@@ -241,7 +239,6 @@ def _calculate_src_and_dst_points(
     dst_deck_item: str,
     src_offset: Optional[types.Point],
     dst_offset: Optional[types.Point],
-    warp: Optional[float],
     adapter: Optional[str],
 ) -> Tuple[types.Point, types.Point]:
     # slot top-left corners
@@ -249,10 +246,10 @@ def _calculate_src_and_dst_points(
     dst_slot_loc = helpers_ot3.get_slot_top_left_position_ot3(dst_slot)
     # relative position, within a slot
     src_labware_offset = _get_labware_grip_offset(
-        labware_key, is_grip=True, has_clips=True, warp=warp
+        labware_key, is_grip=True, has_clips=True
     )
     dst_labware_offset = _get_labware_grip_offset(
-        labware_key, is_grip=False, has_clips=True, warp=warp
+        labware_key, is_grip=False, has_clips=True
     )
     # offset the module applies to an inserted labware
     src_module_offset = types.Point(
@@ -278,15 +275,11 @@ def _calculate_src_and_dst_points(
     print(f"\tSrc Final = {src_loc}")
     print(f"\t\tSlot = {src_slot_loc}")
     print(f"\t\tOffset = {src_labware_offset}")
-    if warp:
-        print(f"\t\tWarp: {warp}")
     if src_offset:
         print(f"\t\tAdditional Offset = {src_offset}")
     print(f"\tDst Final = {dst_loc}")
     print(f"\t\tSlot = {dst_slot_loc}")
     print(f"\t\tOffset = {dst_labware_offset}")
-    if warp:
-        print(f"\t\tWarp: {warp}")
     if dst_offset:
         print(f"\t\tAdditional Offset = {dst_offset}")
     return src_loc, dst_loc
@@ -302,7 +295,6 @@ async def _slot_to_slot(
     dst_deck_item: str,
     src_offset: Optional[types.Point] = None,
     dst_offset: Optional[types.Point] = None,
-    warp: Optional[float] = None,
     adapter: Optional[str] = None,
     inspect: bool = True,
 ) -> None:
@@ -319,7 +311,6 @@ async def _slot_to_slot(
         dst_deck_item,
         src_offset,
         dst_offset,
-        warp=warp,
         adapter=adapter,
     )
     if inspect:
@@ -334,7 +325,6 @@ async def _run(
     slot_states: GripperSlotStates,
     inspect: bool = False,
     force: Optional[float] = None,
-    warp: Optional[float] = None,
     adapter: Optional[str] = None,
 ) -> None:
     def _get_item_from_slot(slot: int) -> str:
@@ -366,7 +356,6 @@ async def _run(
                 src_offset=_s_offset,
                 dst_offset=_d_offset,
                 inspect=inspect,
-                warp=warp,
                 adapter=adapter,
             )
 
@@ -377,7 +366,6 @@ async def _main(
     slot_states: GripperSlotStates,
     inspect: bool = False,
     force: Optional[float] = None,
-    warp: Optional[float] = None,
     adapter: Optional[str] = None,
     cycles: int = 1,
 ) -> None:
@@ -394,7 +382,7 @@ async def _main(
             await _inspect(api)
         for c in range(cycles):
             print(f"Cycle {c + 1}/{cycles}")
-            await _run(api, labware_key, slot_states, inspect, force, warp, adapter)
+            await _run(api, labware_key, slot_states, inspect, force, adapter)
         if api.is_simulator:
             break
 
@@ -461,7 +449,6 @@ if __name__ == "__main__":
     parser.add_argument("--labware", choices=LABWARE_KEYS, required=True)
     parser.add_argument("--cycles", type=int, default=1)
     parser.add_argument("--force", type=int, default=5.0)
-    parser.add_argument("--warp", type=float)
     parser.add_argument("--temp-module-slots", nargs="+")
     parser.add_argument("--heater-shaker-slots", nargs="+")
     parser.add_argument("--thermo-cycler", action="store_true")
@@ -476,7 +463,6 @@ if __name__ == "__main__":
             _gather_and_test_slots(args_parsed),
             inspect=args_parsed.inspect,
             force=args_parsed.force,
-            warp=args_parsed.warp,
             adapter=args_parsed.adapter,
             cycles=args_parsed.cycles,
         )
