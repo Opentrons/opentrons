@@ -26,7 +26,7 @@ FAILURE_THRESHOLD_PERCENTAGE = 10
 GRIP_FORCES_NEWTON: List[int] = [5, 10, 15, 20]
 
 NUM_DUTY_CYCLE_TRIALS = 5
-GRIP_DUTY_CYCLES: List[int] = [5, 10, 20, 30, 40, 50]
+GRIP_DUTY_CYCLES: List[int] = [6, 8, 10, 12, 15, 20, 30, 40]
 
 
 def _get_test_tag(
