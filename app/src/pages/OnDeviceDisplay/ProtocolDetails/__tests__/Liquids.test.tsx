@@ -196,8 +196,8 @@ describe('Liquids', () => {
   })
   it('should render the correct headers and liquids', () => {
     const { getByRole, getByText, getByLabelText } = render(props)[0]
-    getByRole('columnheader', { name: 'liquid name' })
-    getByRole('columnheader', { name: 'total volume' })
+    getByRole('columnheader', { name: 'Liquid Name' })
+    getByRole('columnheader', { name: 'Total Volume' })
     getByText('mock liquid 1')
     getByText('mock sample')
     getByText('50 µL')

@@ -78,11 +78,11 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            {i18n.format(t('liquid_name'), 'capitalize')}
+            {i18n.format(t('liquid_name'), 'titleCase')}
           </TableHeader>
 
           <TableHeader>
-            {i18n.format(t('total_volume'), 'capitalize')}
+            {i18n.format(t('total_volume'), 'titleCase')}
           </TableHeader>
         </tr>
       </thead>
