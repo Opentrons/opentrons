@@ -18,13 +18,12 @@ from hardware_testing.data import ui
 TEST_TAG = "CURRENTS-SPEEDS"
 
 STALL_THRESHOLD_MM = 0.25
-TEST_SPEEDS = [20, 40, 60, 80, 100]
+TEST_SPEEDS = [20, 40, 60, 80]
 PLUNGER_CURRENTS_SPEED = {
     0.1: TEST_SPEEDS,
     0.2: TEST_SPEEDS,
     0.3: TEST_SPEEDS,
     0.4: TEST_SPEEDS,
-    0.5: TEST_SPEEDS,
     0.6: TEST_SPEEDS,
 }
 
@@ -201,6 +200,7 @@ async def _main(is_simulating: bool) -> None:
 
     # test each attached pipette
     while True:
+        input("attach a pipette, press ENTER when ready")
         mount = _get_next_pipette_mount(api)
         pipette = api.hardware_pipettes[mount.to_mount()]
         assert pipette
