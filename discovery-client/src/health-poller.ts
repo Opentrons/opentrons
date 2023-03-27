@@ -4,11 +4,14 @@ import intersectionBy from 'lodash/intersectionBy'
 import unionBy from 'lodash/unionBy'
 import xorBy from 'lodash/xorBy'
 
+import { fetchSerialPortList } from '@opentrons/usb-bridge/node-client'
+
 import {
   ROBOT_SERVER_HEALTH_PATH,
   UPDATE_SERVER_HEALTH_PATH,
 } from './constants'
 
+import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type {
   HealthPoller,
   HealthPollerTarget,
@@ -34,7 +37,7 @@ const DEFAULT_REQUEST_OPTS = {
  * Create a HealthPoller to monitor the health of a set of IP addresses
  */
 export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
-  const { onPollResult, logger } = options
+  const { onPollResult, onSerialPortFetch, logger } = options
   const log = (
     level: LogLevel,
     msg: string,
@@ -105,6 +108,12 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
           pollQueue.push(head)
           // eslint-disable-next-line no-void
           void pollAndNotify(head.ip, head.port)
+          if (onSerialPortFetch != null) {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            fetchSerialPortList().then((list: PortInfo[]) =>
+              onSerialPortFetch?.(list)
+            )
+          }
         }
       }
 
@@ -170,6 +179,8 @@ function fetchAndParse<SuccessBody>(
 /**
  * Poll both /heath and /server/update/health of an IP address and combine the
  * responses into a single result object
+ * TODO: poll via serial port if connection present and combine in same object if same robot?
+ * will poll serial port for every robot
  */
 function pollHealth(ip: string, port: number): Promise<HealthPollerResult> {
   // IPv6 addresses require brackets
