@@ -1166,28 +1166,22 @@ class OT3API(
             await self._update_position_estimation([axis])
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
-                # we can move directly to the home position for accuracy axes
-                # move directly the home position if the stepper position is valid
+                distance_from_home = 3.0
+            else:
+                # FIXME: (AA 2/15/23) This is a temporary workaround because of
+                # XY encoder inaccuracy. Otherwise, we should be able to use
+                # 5.0 mm for all axes.
+                # Move to 20 mm away from the home position and then home
+                distance_from_home = 20.0
+            if origin[axis] - target_pos[axis] > distance_from_home:
+                target_pos[axis] += distance_from_home
                 moves = self._build_moves(origin, target_pos)
                 await self._backend.move(
                     origin,
                     moves[0],
                     MoveStopCondition.none,
                 )
-            else:
-                if origin[axis] - target_pos[axis] > 20.0:
-                    # FIXME: (AA 2/15/23) This is a temporary workaround because of
-                    # XY encoder inaccuracy. We should remove this and move axes directly
-                    # to the home position when we fix the encoder issues.
-                    # Move to 20 mm away from the home position and then home
-                    target_pos[axis] += 20.00
-                    moves = self._build_moves(origin, target_pos)
-                    await self._backend.move(
-                        origin,
-                        moves[0],
-                        MoveStopCondition.none,
-                    )
-                await self._backend.home([axis])
+            await self._backend.home([axis])
         else:
             # both stepper and encoder positions are invalid, must home
             await self._backend.home([axis])
