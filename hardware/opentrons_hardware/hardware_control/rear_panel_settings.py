@@ -53,6 +53,7 @@ async def get_door_state(messenger: Optional[BinaryMessenger]) -> bool:
 
 
 async def set_deck_light(setting: int, messenger: Optional[BinaryMessenger]) -> bool:
+    """Turn the deck light on or off."""
     if messenger is None:
         # the EVT bots don't have rear panels...
         return False

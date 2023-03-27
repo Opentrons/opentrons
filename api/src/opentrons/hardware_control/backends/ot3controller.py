@@ -938,8 +938,10 @@ class OT3Controller:
 
     async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
-        return {"rails": await get_deck_light_state(self._usb_messenger),
-        "button": False}
+        return {
+            "rails": await get_deck_light_state(self._usb_messenger),
+            "button": False,
+        }
 
     def pause(self) -> None:
         """Pause the controller activity."""
