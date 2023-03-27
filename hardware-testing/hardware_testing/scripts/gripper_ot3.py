@@ -25,12 +25,23 @@ ARMADILLO_OFFSET_ON_MAG_PLATE = types.Point(
 
 TRAVEL_HEIGHT = 30
 
+PICK_UP_OFFSETS = {
+    "deck": Point(x=-0.2),
+    "mag-plate": Point(),
+    "heater-shaker": Point(),
+    "temp-module": Point(),
+    "thermo-cycler": Point(),
+}
+DROP_OFFSETS = {
+    "deck": Point(z=-2),
+    "mag-plate": Point(z=9.5),
+    "heater-shaker": Point(z=-2),
+    "temp-module": Point(z=-2),
+    "thermo-cycler": Point(),
+}
+
 ForcedOffsets = List[Tuple[types.Point, types.Point]]
 
-# EDIT BELOW VARIABLES
-TEST_OFFSETS: ForcedOffsets = [
-    (types.Point(x=0, y=0, z=0), types.Point(x=0, y=0, z=0)),
-]
 LABWARE_SIZE = {
     "plate": LABWARE_SIZE_ARMADILLO,
     "tiprack": LABWARE_SIZE_EVT_TIPRACK,
@@ -45,6 +56,22 @@ LABWARE_GRIP_HEIGHT = {
 LABWARE_GRIP_FORCE = {k: 15 for k in LABWARE_KEYS}
 LABWARE_WARP = types.Point()
 
+DECK_ITEM_OFFSETS = {
+    "thermo-cycle": None,
+    "heater-shaker": None,
+    "temp-module": None,
+    "mag-plate": None,
+    "deck": Point(),
+}
+ADAPTER_OFFSETS = {
+    "universal": Point(z=3),
+    "pcr": Point(z=3),
+    "non-contact": Point(z=2.6),
+    "flat": Point(z=1.75),
+    "deep": Point(z=1),
+    "round-bottom": Point(z=1),
+}
+
 
 @dataclass
 class GripperSlotStates:
@@ -55,123 +82,6 @@ class GripperSlotStates:
     heater_shakers: List[int]
     thermo_cyclers: List[int]
     mag_plates: List[int]
-
-
-# TODO: changes for DVT
-#       - weaker clips
-#       - tall-pegs on only top+left sides
-#       - tall-pegs ~5mm from slot-edge
-
-SW_OFFSETS_OT2 = {
-    "deck": Point(),
-    "mag-plate": Point(),
-    "heater-shaker-right": Point(x=0.125, y=-1.125, z=68.275),
-    "heater-shaker-left": Point(x=-0.125, y=1.125, z=68.275),
-    "temp-module": Point(x=-1.45, y=-0.15, z=80.09),
-    "thermo-cycler": Point(y=68.06, z=98.26),
-}
-
-
-def _remove_ot2_sw_offset(o: Point, d_item: str, s: int) -> Point:
-    if d_item == "heater-shaker":
-        if s in [1, 4, 7, 10]:
-            o += SW_OFFSETS_OT2[f"{d_item}-left"]
-        else:
-            o += SW_OFFSETS_OT2[f"{d_item}-right"]
-    else:
-        o += SW_OFFSETS_OT2[d_item]
-    return o
-
-
-def grip_offset(
-    action: str, item: str, slot: Optional[int] = None, adapter: Optional[str] = None
-) -> Dict[str, float]:
-    """Grip offset."""
-    from opentrons.types import Point
-
-    # EDIT these values
-    # NOTE: we are still testing to determine our software's defaults
-    #       but we also expect users will want to edit these
-    _pick_up_offsets = {
-        "deck": Point(x=-0.2),
-        "mag-plate": Point(),
-        "heater-shaker": Point(),
-        "temp-module": Point(),
-        "thermo-cycler": Point(),
-    }
-    # EDIT these values
-    # NOTE: we are still testing to determine our software's defaults
-    #       but we also expect users will want to edit these
-    _drop_offsets = {
-        "deck": Point(z=-2),
-        "mag-plate": Point(z=9.5),
-        "heater-shaker": Point(z=-2),
-        "temp-module": Point(z=-2),
-        "thermo-cycler": Point(),
-    }
-    # do NOT edit these values
-    # NOTE: these values will eventually be in our software
-    #       and will not need to be inside a protocol
-    _sw_offsets_ot2 = {
-        "deck": Point(),
-        "mag-plate": Point(),
-        "heater-shaker-right": Point(x=0.125, y=-1.125, z=68.275),
-        "heater-shaker-left": Point(x=-0.125, y=1.125, z=68.275),
-        "temp-module": Point(x=-1.45, y=-0.15, z=80.09),
-        "thermo-cycler": Point(y=68.06, z=98.26),
-    }
-    _hw_offsets_ot3 = {
-        "deck": Point(),
-        "mag-plate": Point(z=29.5),
-        "heater-shaker-right": Point(x=-3, y=-1, z=19),
-        "heater-shaker-left": Point(x=3, y=1, z=19),
-        "temp-module": Point(x=2.17, z=9),
-        "thermo-cycler": Point(x=-19.88, y=67.76, z=-0.04),
-    }
-    _adapter_offsets = {
-        "universal": Point(z=3),
-        "pcr": Point(z=3),
-        "non-contact": Point(z=2.6),
-        "flat": Point(z=1.75),
-        "deep": Point(z=1),
-        "round-bottom": Point(z=1),
-    }
-    # make sure arguments are correct
-    action_options = ["pick-up", "drop"]
-    item_options = list(_hw_offsets_ot3.keys())
-    item_options.remove("heater-shaker-left")
-    item_options.remove("heater-shaker-right")
-    item_options.append("heater-shaker")
-    if action not in action_options:
-        raise ValueError(
-            f'"{action}" not recognized, available options: {action_options}'
-        )
-    if item not in item_options:
-        raise ValueError(f'"{item}" not recognized, available options: {item_options}')
-    if item == "heater-shaker":
-        assert slot, 'argument slot= is required when using "heater-shaker"'
-        if slot in [1, 4, 7, 10]:
-            side = "left"
-        elif slot in [3, 6, 9, 12]:
-            side = "right"
-        else:
-            raise ValueError("heater shaker must be on either left or right side")
-        k = f"{item}-{side}"
-        hw_offset = _hw_offsets_ot3[k] - _sw_offsets_ot2[k]
-        if adapter:
-            _avail_adapters = list(_adapter_offsets.keys())
-            assert (
-                adapter in _avail_adapters
-            ), f'adapter "{adapter}" not found in {_avail_adapters}'
-            hw_offset += _adapter_offsets[adapter]
-    else:
-        hw_offset = _hw_offsets_ot3[item] - _sw_offsets_ot2[item]
-    if action == "pick-up":
-        offset = hw_offset + _pick_up_offsets[item]
-    else:
-        offset = hw_offset + _drop_offsets[item]
-    # convert from Point() to dict()
-    return {"x": offset.x, "y": offset.y, "z": offset.z}
 
 
 async def _inspect(api: OT3API) -> None:
@@ -231,58 +141,38 @@ async def _gripper_action(
         await _inspect(api)
 
 
-def _calculate_src_and_dst_points(
-    src_slot: int,
-    dst_slot: int,
+def _calculate_position_on_deck(
+    slot: int,
     labware_key: str,
-    src_deck_item: str,
-    dst_deck_item: str,
-    src_offset: Optional[types.Point],
-    dst_offset: Optional[types.Point],
-    adapter: Optional[str],
-) -> Tuple[types.Point, types.Point]:
-    # slot top-left corners
-    src_slot_loc = helpers_ot3.get_slot_top_left_position_ot3(src_slot)
-    dst_slot_loc = helpers_ot3.get_slot_top_left_position_ot3(dst_slot)
-    # relative position, within a slot
-    src_labware_offset = _get_labware_grip_offset(
+    deck_item: str,
+    offset: Optional[types.Point],
+) -> Point:
+    # slot top-left corner
+    slot_pos = helpers_ot3.get_slot_top_left_position_ot3(slot)
+    # offset the module applies to an inserted labware
+    # FIXME: we are only assuming deck slots for now
+    #        need to include module offsets, which are a
+    #        combination of both A) nominal offsets, and
+    #        B) calibration offset
+    # FIXME: also include adapter offsets here
+    assert deck_item == "deck", "currently not supporting modules"
+    deck_item_offset = DECK_ITEM_OFFSETS[deck_item]
+    # relative position of labware, within a slot/module
+    labware_offset = _get_labware_grip_offset(
         labware_key, is_grip=True, has_clips=True
     )
-    dst_labware_offset = _get_labware_grip_offset(
-        labware_key, is_grip=False, has_clips=True
-    )
-    # offset the module applies to an inserted labware
-    src_module_offset = types.Point(
-        **grip_offset("pick-up", src_deck_item, slot=src_slot, adapter=adapter)
-    )
-    src_module_offset = _remove_ot2_sw_offset(
-        src_module_offset, src_deck_item, src_slot
-    )
-    dst_module_offset = types.Point(
-        **grip_offset("drop", dst_deck_item, slot=dst_slot, adapter=adapter)
-    )
-    dst_module_offset = _remove_ot2_sw_offset(
-        dst_module_offset, dst_deck_item, dst_slot
-    )
-    # absolute position, on the deck
-    src_loc = src_slot_loc + src_module_offset + src_labware_offset
-    dst_loc = dst_slot_loc + dst_module_offset + dst_labware_offset
+    # calculate absolute position, on the deck
+    deck_pos = slot_pos + deck_item_offset + labware_offset
     # add additional offsets, for testing purposes
-    if src_offset:
-        src_loc += src_offset
-    if dst_offset:
-        dst_loc += dst_offset
-    print(f"\tSrc Final = {src_loc}")
-    print(f"\t\tSlot = {src_slot_loc}")
-    print(f"\t\tOffset = {src_labware_offset}")
-    if src_offset:
-        print(f"\t\tAdditional Offset = {src_offset}")
-    print(f"\tDst Final = {dst_loc}")
-    print(f"\t\tSlot = {dst_slot_loc}")
-    print(f"\t\tOffset = {dst_labware_offset}")
-    if dst_offset:
-        print(f"\t\tAdditional Offset = {dst_offset}")
-    return src_loc, dst_loc
+    if offset:
+        deck_pos += offset
+    print(f"\tDeck Pos = {deck_pos}")
+    print(f"\t\tSlot = {slot_pos}")
+    print(f"\t\tDeck-Item = {deck_item_offset}")
+    print(f"\t\tLabware = {labware_offset}")
+    if offset:
+        print(f"\t\tAdditional Offset = {offset}")
+    return deck_pos
 
 
 async def _slot_to_slot(
@@ -295,7 +185,6 @@ async def _slot_to_slot(
     dst_deck_item: str,
     src_offset: Optional[types.Point] = None,
     dst_offset: Optional[types.Point] = None,
-    adapter: Optional[str] = None,
     inspect: bool = True,
 ) -> None:
     if not force:
@@ -303,20 +192,30 @@ async def _slot_to_slot(
     print(
         f'\nMoving "{labware_key}" from slot #{src_slot} to #{dst_slot} w/ {force} newtons'
     )
-    src_loc, dst_loc = _calculate_src_and_dst_points(
+
+    # PICK-UP
+    src_loc = _calculate_position_on_deck(
         src_slot,
-        dst_slot,
         labware_key,
         src_deck_item,
-        dst_deck_item,
         src_offset,
-        dst_offset,
-        adapter=adapter,
     )
+    src_loc += PICK_UP_OFFSETS[src_deck_item]
     if inspect:
         await _inspect(api)
     await _gripper_action(api, src_loc, force, is_grip=True, inspect=inspect)
-    await _gripper_action(api, dst_loc, force, is_grip=False, inspect=inspect)
+
+    # DROP
+    dst_loc = _calculate_position_on_deck(
+        dst_slot,
+        labware_key,
+        dst_deck_item,
+        dst_offset,
+    )
+    dst_loc += DROP_OFFSETS[dst_deck_item]
+    if inspect:
+        await _inspect(api)
+    await _gripper_action(api, dst_loc, force, is_grip=True, inspect=inspect)
 
 
 async def _run(
@@ -325,7 +224,6 @@ async def _run(
     slot_states: GripperSlotStates,
     inspect: bool = False,
     force: Optional[float] = None,
-    adapter: Optional[str] = None,
 ) -> None:
     def _get_item_from_slot(slot: int) -> str:
         if slot in slot_states.temp_modules:
@@ -344,20 +242,18 @@ async def _run(
         dst = slot_states.slots[i + 1]
         src_deck_item = _get_item_from_slot(src)
         dst_deck_item = _get_item_from_slot(dst)
-        for _s_offset, _d_offset in TEST_OFFSETS:
-            await _slot_to_slot(
-                api,
-                labware_key,
-                force,
-                src,
-                dst,
-                src_deck_item=src_deck_item,
-                dst_deck_item=dst_deck_item,
-                src_offset=_s_offset,
-                dst_offset=_d_offset,
-                inspect=inspect,
-                adapter=adapter,
-            )
+        await _slot_to_slot(
+            api,
+            labware_key,
+            force,
+            src,
+            dst,
+            src_deck_item=src_deck_item,
+            dst_deck_item=dst_deck_item,
+            src_offset=Point(),  # placeholder for error-tolerance testing
+            dst_offset=Point(),  # placeholder for error-tolerance testing
+            inspect=inspect,
+        )
 
 
 async def _main(
@@ -366,10 +262,9 @@ async def _main(
     slot_states: GripperSlotStates,
     inspect: bool = False,
     force: Optional[float] = None,
-    adapter: Optional[str] = None,
     cycles: int = 1,
 ) -> None:
-    api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
+    api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating, gripper="GRPV3320230327A01")
     await api.home()
 
     if len(slot_states.slots) == 1:
@@ -382,12 +277,21 @@ async def _main(
             await _inspect(api)
         for c in range(cycles):
             print(f"Cycle {c + 1}/{cycles}")
-            await _run(api, labware_key, slot_states, inspect, force, adapter)
+            await _run(api, labware_key, slot_states, inspect, force)
         if api.is_simulator:
             break
 
 
 def _gather_and_test_slots(args: Any) -> GripperSlotStates:
+    """
+    This function checks to make sure that the slots and module
+    positions passed in by the script caller as arguments do not
+    conflict with each other. Eg: no modules overlap on a
+    slot, or no non-module slots are specified where a module is
+    also specified, etc.
+
+    An error will be raised if slots/modules have a conflict.
+    """
     def _slot_array_from_args(a: Any) -> List[int]:
         if a:
             return [int(s) for s in a]
@@ -453,7 +357,6 @@ if __name__ == "__main__":
     parser.add_argument("--heater-shaker-slots", nargs="+")
     parser.add_argument("--thermo-cycler", action="store_true")
     parser.add_argument("--mag-plate-slots", nargs="+")
-    parser.add_argument("--adapter", type=str)
     args_parsed = parser.parse_args()
 
     asyncio.run(
@@ -463,7 +366,6 @@ if __name__ == "__main__":
             _gather_and_test_slots(args_parsed),
             inspect=args_parsed.inspect,
             force=args_parsed.force,
-            adapter=args_parsed.adapter,
             cycles=args_parsed.cycles,
         )
     )
