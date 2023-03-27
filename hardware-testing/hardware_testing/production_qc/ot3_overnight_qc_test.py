@@ -215,7 +215,7 @@ def _get_accelerations_from_user() -> List:
     return accelerations
 
 def _get_speeds_from_user() -> List:
-    condition = False
+    condition = True
     speeds = []
     while condition:
         speeds_input = input(f"WAIT: please input the speeds and spilit with , (100,200,300), press ENTER when ready: ")
@@ -292,9 +292,12 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
 async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run xy motion check...')
     XY_AXIS_SETTINGS = _creat_xy_axis_settings()
+    print(XY_AXIS_SETTINGS)
     for setting in XY_AXIS_SETTINGS:
+        print(setting)
         await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
         for i in range(arguments.cycles):
+            print(12345)
             res = await _run_bowtie(api,arguments.simulate,mount,write_cb,True)
             print(f'Run bowtie cycle: {i}, results: {res}')
 
