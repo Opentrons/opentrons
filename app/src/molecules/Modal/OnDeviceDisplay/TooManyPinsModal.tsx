@@ -12,22 +12,15 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
 
-import type { UseLongPressResult } from '@opentrons/components'
-
 export function TooManyPinsModal(props: {
-  longpress: UseLongPressResult
+  handleCloseMaxPinsAlert: () => void
 }): JSX.Element {
-  const { longpress } = props
-  const { t } = useTranslation('protocol_info')
-
-  const handleCloseMaxPinsAlert = (): void => {
-    longpress.setIsLongPressed(false)
-  }
+  const { handleCloseMaxPinsAlert } = props
+  const { t } = useTranslation(['protocol_info', 'shared'])
 
   return (
     <ModalShell
       borderRadius={BORDERS.size_three}
-      height="26rem"
       onOutsideClick={handleCloseMaxPinsAlert}
       width="32.375rem"
     >
@@ -37,16 +30,19 @@ export function TooManyPinsModal(props: {
         padding={SPACING.spacingXXL}
       >
         <StyledText
-          fontSize="2rem"
-          lineHeight="2.625rem"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
+          color={COLORS.darkBlackEnabled}
+          fontSize={TYPOGRAPHY.fontSize28}
+          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          lineHeight={TYPOGRAPHY.lineHeight36}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('too_many_pins_header')}
         </StyledText>
         <StyledText
-          fontSize="1.75rem"
-          lineHeight="2.625rem"
+          color={COLORS.darkBlack_ninety}
+          fontSize={TYPOGRAPHY.fontSize22}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          lineHeight={TYPOGRAPHY.lineHeight28}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('too_many_pins_body')}
@@ -61,11 +57,13 @@ export function TooManyPinsModal(props: {
         >
           <StyledText
             color={COLORS.white}
-            fontSize="1.375rem"
-            lineHeight="1.75rem"
+            fontSize={TYPOGRAPHY.fontSize22}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            lineHeight={TYPOGRAPHY.lineHeight28}
             textAlign={TYPOGRAPHY.textAlignCenter}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
-            {t('got_it')}
+            {t('shared:close')}
           </StyledText>
         </Flex>
       </Flex>
