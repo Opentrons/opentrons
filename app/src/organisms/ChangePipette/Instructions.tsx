@@ -166,7 +166,17 @@ export function Instructions(props: Props): JSX.Element {
             marginTop="5.9rem"
           >
             <Btn
-              onClick={stepPage === 0 ? back : () => setStepPage(stepPage - 1)}
+              onClick={() => {
+                if (stepPage === 0) {
+                  if (direction === 'detach' || wantedPipette === null) {
+                    back()
+                  } else {
+                    setWantedName(null)
+                  }
+                } else {
+                  setStepPage(stepPage - 1)
+                }
+              }}
             >
               <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
             </Btn>
