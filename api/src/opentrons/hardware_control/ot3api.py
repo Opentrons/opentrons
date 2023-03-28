@@ -1164,27 +1164,20 @@ class OT3API(
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [OT3Axis.G, OT3Axis.Q]
 
-        # FIXME: See https://github.com/Opentrons/opentrons/pull/11978
-        # Because of the workaround introduced above, we cannot fully trust the motor
-        # flag until the already_homed check is removed. Until then, we should only
-        # evaluate the encoder status and update motor pos as a safeguard.
-        # if self._backend.check_motor_status(
-        #     [axis]
-        # ) and self._backend.check_encoder_status([axis]):
-        #     # retrieve home position
-        #     origin, target_pos = await _retrieve_home_position()
-        #     # move directly the home position if the stepper position is valid
-        #     moves = self._build_moves(origin, target_pos)
-        #     await self._backend.move(
-        #         origin,
-        #         moves[0],
-        #         MoveStopCondition.none,
-        #     )
-        if self._backend.check_encoder_status([axis]):
+        motor_ok = self._backend.check_motor_status([axis])
+        encoder_ok = self._backend.check_encoder_status([axis])
+
+        # we can update the motor position if the encoder position is valid
+        if encoder_ok and not motor_ok:
             # ensure stepper position can be updated after boot
             await self.engage_axes([axis])
-            # update stepper position using the valid encoder position
             await self._update_position_estimation([axis])
+            # refresh motor and encoder statuses after position estimation update
+            motor_ok = self._backend.check_motor_status([axis])
+            encoder_ok = self._backend.check_encoder_status([axis])
+
+        # we can move to safe home distance!
+        if encoder_ok and motor_ok:
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
                 axis_home_dist = self._config.safe_home_distance
