@@ -51,7 +51,7 @@ class OT3Transforms(RobotCalibration):
 def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
     return OT3Transforms(
         deck_calibration=DeckCalibration(
-            attitude=config.deck_transform,
+            attitude=load().deck_calibration.attitude,
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         ),

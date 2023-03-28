@@ -8,7 +8,7 @@ import numpy as np
 from enum import Enum
 from math import floor, copysign
 from logging import getLogger
-from opentrons.util.linal import solve_attitude
+from opentrons.util.linal import SolvePoints
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
@@ -16,7 +16,7 @@ from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
 import json
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons.calibration_storage.types import AttitudeMatrix
+from .robot_calibration import save_attitude_matrix
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -857,7 +857,7 @@ async def find_slot_center_binary_from_nominal_center(
 async def determine_transform_matrix(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> AttitudeMatrix:
+) -> Tuple[SolvePoints, SolvePoints]:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
     actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
@@ -893,13 +893,15 @@ async def determine_transform_matrix(
         (point_b.x, point_b.y, point_b.z),
         (point_c.x, point_c.y, point_c.z),
     )
-    return solve_attitude(expected, actual)
+    return expected, actual
 
 
-async def calibrate_belts(
+async def calibrate_deck(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> AttitudeMatrix:
+    pip_id: str,
+    tiprack_hash: str,
+) -> Tuple[SolvePoints, SolvePoints]:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount.
 
@@ -916,6 +918,8 @@ async def calibrate_belts(
         raise RuntimeError("Must use pipette mount, not gripper")
     try:
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        return await determine_transform_matrix(hcapi, mount)
+        expected, actual = await determine_transform_matrix(hcapi, mount)
+        save_attitude_matrix(expected, actual, pip_id, tiprack_hash)
+        return expected, actual  # need to return anything?
     finally:
         await hcapi.remove_tip(mount)
