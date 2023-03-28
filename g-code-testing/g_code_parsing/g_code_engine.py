@@ -7,7 +7,7 @@ from collections import namedtuple
 
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine, AbstractRunner
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_reader.protocol_source import (
     JsonProtocolConfig,
@@ -156,7 +156,7 @@ class GCodeEngine:
                     content_hash=path,
                 )
 
-                protocol_runner: AbstractRunner = create_protocol_runner(
+                protocol_runner = create_protocol_runner(
                     protocol_config=config,
                     protocol_engine=await create_protocol_engine(
                         hardware_api=hardware,  # type: ignore
