@@ -29,10 +29,10 @@ const Template: Story<React.ComponentProps<typeof CardButton>> = args => (
 
 export const Primary = Template.bind({})
 Primary.args = {
-  cardWidth: '19rem',
-  cardHeight: '21.875rem',
-  title: 'Wi-Fi',
+  cardWidth: '15.375rem',
+  cardHeight: '17rem',
+  title: 'Header',
   iconName: 'wifi',
-  description: 'Find a network in your lab or enter your own.',
+  description: 'Subtext.',
   distPath: '/app-molecules-cardbutton--primary',
 }
