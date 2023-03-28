@@ -65,8 +65,8 @@ SuccessWithSecondaryMessageAndCloseButton.args = {
   type: 'success',
 }
 
-export const Warning = TemplateWithTimeout.bind({})
-Warning.args = {
+export const Alert = TemplateWithTimeout.bind({})
+Alert.args = {
   message: 'Alert Toast message',
   type: 'alert',
 }
@@ -125,8 +125,8 @@ SuccessWithSecondaryMessageAndCloseButtonWithoutTimeout.args = {
   disableTimeout: true,
 }
 
-export const WarningWithoutTimeout = TemplateWithoutTimeout.bind({})
-WarningWithoutTimeout.args = {
+export const AlertWithoutTimeout = TemplateWithoutTimeout.bind({})
+AlertWithoutTimeout.args = {
   message: 'Alert Toast message',
   type: 'alert',
   disableTimeout: true,
