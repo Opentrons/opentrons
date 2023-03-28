@@ -24,11 +24,10 @@ from opentrons.protocol_engine import (
 from robot_server.protocols import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
-from robot_server.runs.run_models import Run
+from robot_server.runs.run_models import Run, RunNotFoundError
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
-    RunNotFoundError,
     CommandNotFoundError,
 )
 from robot_server.service.task_runner import TaskRunner

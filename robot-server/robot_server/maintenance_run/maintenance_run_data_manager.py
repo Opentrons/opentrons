@@ -19,7 +19,6 @@ from .maintenance_action_models import MaintenanceRunAction
 def _build_run(
     run_id: str,
     created_at: datetime,
-    actions: List[MaintenanceRunAction],
     state_summary: Optional[StateSummary],
     current: bool,
 ) -> MaintenanceRun:
@@ -134,7 +133,7 @@ class MaintenanceRunDataManager:
         # store created_at at engine level
         return _build_run(
             run_id=run_id,
-            created_at=datetime.now,
+            created_at=datetime(1, 1, 2023),
             state_summary=state_summary,
             current=current,
         )

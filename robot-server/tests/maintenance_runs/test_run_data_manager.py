@@ -101,7 +101,6 @@ async def test_create(
     assert result == MaintenanceRun(
         id=run_id,
         createdAt=created_at,
-        actions=[],
         current=True,
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
@@ -154,7 +153,6 @@ async def test_create_with_options(
         id=run_id,
         createdAt=created_at,
         current=True,
-        actions=[],
         status=engine_state_summary.status,
         errors=engine_state_summary.errors,
         labware=engine_state_summary.labware,

@@ -5,7 +5,7 @@ from decoy import Decoy
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel
-from robot_server.runs.run_store import RunNotFoundError
+from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
 
 from robot_server.runs.action_models import (

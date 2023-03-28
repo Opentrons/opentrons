@@ -85,7 +85,7 @@ async def get_run_data_from_url(
     run_data_manager: MaintenanceRunDataManager = Depends(
         get_maintenance_run_data_manager
     ),
-) -> MaintenanceRunDataManager:
+) -> MaintenanceRun:
     """Get the data of a run.
 
     Args:

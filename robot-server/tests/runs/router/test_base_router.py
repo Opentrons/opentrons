@@ -28,7 +28,7 @@ from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
 from robot_server.runs.engine_store import EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
-from robot_server.runs.run_store import RunNotFoundError
+from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
     create_run,
