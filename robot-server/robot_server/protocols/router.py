@@ -310,7 +310,7 @@ async def get_protocols(
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
     responses={
-        status.HTTP_200_OK: {"model": SimpleBody[Protocol]},
+        status.HTTP_200_OK: {"model": Body[Protocol, ProtocolLinks]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
     },
 )
