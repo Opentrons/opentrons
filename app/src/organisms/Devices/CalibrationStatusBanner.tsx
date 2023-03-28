@@ -28,17 +28,17 @@ export function CalibrationStatusBanner({
   const { taskListStatus, isLoading } = useCalibrationTaskList()
   if (isLoading === true || taskListStatus === 'complete') return null
   return (
-    <Banner
-      type={taskListStatus === 'bad' ? 'warning' : 'error'}
-      width="100%"
-    >
-      <Flex 
+    <Banner type={taskListStatus === 'bad' ? 'warning' : 'error'} width="100%">
+      <Flex
         width="100%"
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
         <StyledText as="p">
-          {taskListStatus === 'bad' ? t('recalibration_recommended') : t('missing_calibration_data_long')}
+          {taskListStatus === 'bad'
+            ? t('recalibration_recommended')
+            : t('missing_calibration_data_long')}
         </StyledText>
         <RouterLink to={`/devices/${robotName}/robot-settings/calibration`}>
           <StyledText

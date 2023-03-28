@@ -134,10 +134,7 @@ describe('useCalibrationTaskList hook', () => {
 
     const { result } = renderHook(
       () =>
-        useCalibrationTaskList(
-          mockTipLengthCalLauncher,
-          mockDeckCalLauncher
-        ),
+        useCalibrationTaskList(mockTipLengthCalLauncher, mockDeckCalLauncher),
       {
         wrapper,
       }

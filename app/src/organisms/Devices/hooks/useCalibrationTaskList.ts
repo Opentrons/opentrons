@@ -25,9 +25,9 @@ import { getLabwareDefURI, PipetteName } from '@opentrons/shared-data'
 const CALIBRATION_DATA_POLL_MS = 5000
 
 export function useCalibrationTaskList(
-  pipOffsetCalLauncher: DashboardCalOffsetInvoker = () => { },
-  tipLengthCalLauncher: DashboardCalTipLengthInvoker = () => { },
-  deckCalLauncher: DashboardCalDeckInvoker = () => { }
+  pipOffsetCalLauncher: DashboardCalOffsetInvoker = () => {},
+  tipLengthCalLauncher: DashboardCalTipLengthInvoker = () => {},
+  deckCalLauncher: DashboardCalDeckInvoker = () => {}
 ): TaskListProps {
   const { t } = useTranslation(['robot_calibration', 'devices_landing'])
   const { deleteCalibration } = useDeleteCalibrationMutation()
@@ -38,20 +38,30 @@ export function useCalibrationTaskList(
     activeIndex: null,
     taskListStatus: 'incomplete',
     taskList: [],
-    isLoading: false
+    isLoading: false,
   }
   const attachedPipettes = useAttachedPipettes()
 
-  const { data: calStatusData, isLoading: calStatusIsLoading } = useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
-  const { data: pipOffsetData, isLoading: pipOffsetIsLoading } = useAllPipetteOffsetCalibrationsQuery({
+  const {
+    data: calStatusData,
+    isLoading: calStatusIsLoading,
+  } = useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
+  const {
+    data: pipOffsetData,
+    isLoading: pipOffsetIsLoading,
+  } = useAllPipetteOffsetCalibrationsQuery({
     refetchInterval: CALIBRATION_DATA_POLL_MS,
   })
-  const { data: tipLengthData, isLoading: tipLengthIsLoading } = useAllTipLengthCalibrationsQuery({
+  const {
+    data: tipLengthData,
+    isLoading: tipLengthIsLoading,
+  } = useAllTipLengthCalibrationsQuery({
     refetchInterval: CALIBRATION_DATA_POLL_MS,
   })
 
-  taskList.isLoading = calStatusIsLoading || pipOffsetIsLoading || tipLengthIsLoading
-  // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations 
+  taskList.isLoading =
+    calStatusIsLoading || pipOffsetIsLoading || tipLengthIsLoading
+  // 3 main tasks: Deck, Left Mount, and Right Mount Calibrations
   const deckCalibrations = calStatusData?.deckCalibration ?? null
 
   const isDeckCalibrated =
@@ -79,11 +89,11 @@ export function useCalibrationTaskList(
     deckTask.isComplete = true
     deckTask.footer =
       deckCalibrationData != null &&
-        'lastModified' in deckCalibrationData &&
-        deckCalibrationData.lastModified != null
+      'lastModified' in deckCalibrationData &&
+      deckCalibrationData.lastModified != null
         ? t('last_completed_on', {
-          timestamp: formatTimestamp(deckCalibrationData.lastModified),
-        })
+            timestamp: formatTimestamp(deckCalibrationData.lastModified),
+          })
         : ''
     deckTask.cta = { label: t('recalibrate'), onClick: deckCalLauncher }
   } else {
