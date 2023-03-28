@@ -141,11 +141,11 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
         )
         print("\r", end="")
 
-def calibrate_tip_racks(api, mount, slot_loc):
+async def calibrate_tip_racks(api, mount, slot_loc):
     print("Calibrate tip rack positions\n")
     calibrated_slot_loc = {}
-    
-    for key in slot_loc.keys()
+
+    for key in slot_loc.keys():
         print(f"TIP RACK IN SLOT {key}\n")
         await api.move_to(mount, Point(slot_loc[key][0], slot_loc[key][1], slot_loc[key][2]))
         # tip_rack_position = await helpers_ot3.jog_mount_ot3(api, mount)
@@ -189,7 +189,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         sys.exit()
     if(test_pip['name'] == 'p1000_single_gen3'):
         tip_len = 85
-    else if(test_pip['name'] == 'p50_single_gen3'):
+    elif(test_pip['name'] == 'p50_single_gen3'):
         tip_len = 57
 
     slot_loc = {
@@ -209,10 +209,10 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     # calibrated_slot_loc = {}
 
     # optional arg for tip rack calibration
-    if(!args.nc):
+    if(not args.nc):
         # print("Calibrate tip rack positions\n")
         # calibrated_slot_loc = {}
-        # for key in slot_loc.keys()
+        # for key in slot_loc.keys():
         #     print(f"TIP RACK IN SLOT {key}\n")
         #     await api.move_to(mount, Point(slot_loc[key][0], slot_loc[key][1], slot_loc[key][2]))
         #     # tip_rack_position = await helpers_ot3.jog_mount_ot3(api, mount)
@@ -224,7 +224,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         # json_object = json.dumps(calibrated_slot_loc, indent=11)
         # with open("calibrated_slot_locations.json", "w") as outfile:
         #     outfile.write(json_object)
-        calibrated_slot_loc = calibrate_tip_racks(api, mount, slot_loc)
+        calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc)
     else:
         ### import calibrated json file
         path = './calibrated_slot_locations.json'
@@ -233,7 +233,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                 calibrated_slot_loc = json.load(openfile)
         else:
             print("Slot locations calibration file not found.\n")
-            calibrated_slot_loc = calibrate_tip_racks(api, mount, slot_loc)
+            calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc)
 
     for tip_rack_pos in tip_rack_pos_list:
         await api.home([AXIS])
@@ -253,10 +253,10 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         print("\t>> Tip not detected!\n")
                         total_failures += 1
                     ### move plunger from blowout to top, back to blow_out
-                    plunger_pos = await helpers_ot3.get_plunger_positions_ot3(api, mount)
+                    top_pos, _, _, blow_out_pos = await helpers_ot3.get_plunger_positions_ot3(api, mount)
 
-                    top_pos = plunger_pos[0]
-                    blow_out_pos = plunger_pos[2]
+                    # top_pos = plunger_pos[0]
+                    # blow_out_pos = plunger_pos[2]
 
                     await helpers_ot3.move_plunger_absolute_ot3(api, mount, blow_out_pos)
                     await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
@@ -265,7 +265,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                     ### check tip presence after tip drop
                     await api.drop_tip(mount)
                     tip_presence_eject = False
-                    if(!tip_presence_eject):
+                    if(not tip_presence_eject):
                         print("\t>> Tip detected after ejecting tip!\n")
                         print("\t>> Canceling script...\n")
                         total_failures += 1
