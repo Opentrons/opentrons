@@ -252,6 +252,7 @@ async def _pick_up_tip(
         tip_volume = pip.working_volume
     tip_length = helpers_ot3.get_default_tip_length(int(tip_volume))
     await api.pick_up_tip(mount, tip_length=tip_length)
+    await api.move_rel(mount, Point(z=tip_length))
     return actual
 
 
