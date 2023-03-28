@@ -34,6 +34,7 @@ import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionC
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
+import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelModal } from '../../organisms/RunDetails/ConfirmCancelModal'
 import {
@@ -264,6 +265,9 @@ function PrepareToRun({
       ? t('additional_labware', { count: additionalLabwareCount })
       : null
 
+  // Liquids information
+  const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
+
   return (
     <>
       {/* Protocol Setup Header */}
@@ -337,6 +341,13 @@ function PrepareToRun({
           onClickSetupStep={() => setSetupScreen('liquids')}
           title={t('liquids')}
           status="general"
+          detail={
+            liquidsInProtocol !== []
+              ? t('initial_liquids_num', {
+                  num: liquidsInProtocol.length,
+                })
+              : t('liquids_not_in_setup')
+          }
         />
       </Flex>
       {showConfirmCancelModal ? (
@@ -386,10 +397,7 @@ export function ProtocolSetup(): JSX.Element {
       </>
     ),
     liquids: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Liquids
-      </>
+      <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
     ),
   }
 
