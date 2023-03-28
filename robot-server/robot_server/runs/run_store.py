@@ -16,7 +16,7 @@ from robot_server.persistence import run_table, action_table
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
-
+from .run_models import RunNotFoundError
 
 _CACHE_ENTRIES = 32
 
