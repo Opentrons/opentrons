@@ -35,8 +35,8 @@ $(if $(is-windows), echo "when using windows with an openSSH version larger then
 
 define push-python-package
 $(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
-scp -i $(2) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
-ssh -i $(2) $(3) root@$(1) \
+scp $(if $(2),"-i $(2)") $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
+ssh $(if $(2),"-i $(2)") $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
@@ -75,7 +75,7 @@ endef
 # argument 4 is the service name
 
 define restart-service
-ssh -i "$(2)" $(3)  root@$(1) \
+ssh $(if $(2),"-i $(2)") $(3)  root@$(1) \
 "systemctl restart $(4)"
 endef
 
@@ -86,6 +86,6 @@ endef
 # argument 3 is any further ssh options, quoted
 # argument 4 is the unit file path
 define push-systemd-unit
-	scp -i $(2) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/
-	ssh -i $(2) $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
+	scp $(if $(2),"-i $(2)") $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/
+	ssh $(if $(2),"-i $(2)") $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
 endef
