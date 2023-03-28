@@ -111,10 +111,10 @@ class PythonAndLegacyRunner(AbstractRunner):
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
-    def was_started(self) -> bool:
+    def was_started(self) -> bool:  # noqa: D102
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    async def load(self, protocol_source: ProtocolSource) -> None:
+    async def load(self, protocol_source: ProtocolSource) -> None:  # noqa: D102
         labware_definitions = await protocol_reader.extract_labware_definitions(
             protocol_source=protocol_source
         )
@@ -149,13 +149,13 @@ class PythonAndLegacyRunner(AbstractRunner):
             context=context,
         )
 
-    def play(self) -> None:
+    def play(self) -> None:  # noqa: D102
         self._protocol_engine.play()
 
-    def pause(self) -> None:
+    def pause(self) -> None:  # noqa: D102
         self._protocol_engine.pause()
 
-    async def stop(self) -> None:
+    async def stop(self) -> None:  # noqa: D102
         if self.was_started():
             await self._protocol_engine.stop()
         else:
@@ -164,7 +164,7 @@ class PythonAndLegacyRunner(AbstractRunner):
                 set_run_status=False,
             )
 
-    async def run(
+    async def run(  # noqa: D102
         self,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunnerRunResult:
@@ -203,10 +203,10 @@ class JsonRunner(AbstractRunner):
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
-    def was_started(self) -> bool:
+    def was_started(self) -> bool:  # noqa: D102
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    async def load(self, protocol_source: ProtocolSource) -> None:
+    async def load(self, protocol_source: ProtocolSource) -> None:  # noqa: D102
         labware_definitions = await protocol_reader.extract_labware_definitions(
             protocol_source=protocol_source
         )
@@ -251,13 +251,13 @@ class JsonRunner(AbstractRunner):
 
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
-    def play(self) -> None:
+    def play(self) -> None:  # noqa: D102
         self._protocol_engine.play()
 
-    def pause(self) -> None:
+    def pause(self) -> None:  # noqa: D102
         self._protocol_engine.pause()
 
-    async def stop(self) -> None:
+    async def stop(self) -> None:  # noqa: D102
         if self.was_started():
             await self._protocol_engine.stop()
         else:
@@ -266,7 +266,7 @@ class JsonRunner(AbstractRunner):
                 set_run_status=False,
             )
 
-    async def run(
+    async def run(  # noqa: D102
         self,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunnerRunResult:
@@ -299,21 +299,21 @@ class LiveRunner(AbstractRunner):
         # of runner interface
         self._hardware_api = hardware_api
 
-    def was_started(self) -> bool:
+    def was_started(self) -> bool:  # noqa: D102
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    async def load(self, protocol_source: ProtocolSource) -> None:
+    async def load(self, protocol_source: ProtocolSource) -> None:  # noqa: D102
         raise NotImplementedError(
             "LiveRunner.load() not supported for setup commands. no protocol associated."
         )
 
-    def play(self) -> None:
+    def play(self) -> None:  # noqa: D102
         self._protocol_engine.play()
 
-    def pause(self) -> None:
+    def pause(self) -> None:  # noqa: D102
         self._protocol_engine.pause()
 
-    async def stop(self) -> None:
+    async def stop(self) -> None:  # noqa: D102
         if self.was_started():
             await self._protocol_engine.stop()
         else:
@@ -322,7 +322,7 @@ class LiveRunner(AbstractRunner):
                 set_run_status=False,
             )
 
-    async def run(
+    async def run(  # noqa: D102
         self,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunnerRunResult:
