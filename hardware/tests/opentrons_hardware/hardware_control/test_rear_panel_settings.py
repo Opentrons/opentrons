@@ -31,7 +31,6 @@ def mock_usb_driver() -> AsyncMock:
 
     # Ensure the write() function returns as normal
     async def mock_write(message: BinaryMessageDefinition) -> int:
-        print(f"Sending message: {message}")
         return message.get_size()
 
     mock.write.side_effect = mock_write
