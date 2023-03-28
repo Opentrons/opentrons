@@ -57,6 +57,7 @@ class AbstractRunner(ABC):
         This value is latched; once it is True, it will never become False.
         """
 
+    # TODO (tz, 03-28-23): Change this to a @classmethod that does not accept protocol_source for live runs and returns the runner instance.
     @abstractmethod
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
