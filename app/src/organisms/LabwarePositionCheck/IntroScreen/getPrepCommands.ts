@@ -5,7 +5,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import type { CreateCommand, RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
+  CreateCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   HeaterShakerCloseLatchCreateCommand,
