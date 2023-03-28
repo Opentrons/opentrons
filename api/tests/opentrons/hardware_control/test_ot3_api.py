@@ -1183,3 +1183,24 @@ async def test_home_axis(
     expected_pos = {axis_to_node(ax): v for ax, v in origin_pos.items()}
     expected_pos.update({axis_to_node(axis): 0})
     assert backend._position == expected_pos
+
+
+@pytest.mark.parametrize("setting", [True, False])
+async def test_light_settings(
+    ot3_hardware: ThreadManager[OT3API], setting: bool
+) -> None:
+    await ot3_hardware.set_lights(rails=setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] == setting
+    assert not check["button"]
+
+    await ot3_hardware.set_lights(rails=not setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] != setting
+    assert not check["button"]
+
+    # Make sure setting the button doesn't affect the rails
+    await ot3_hardware.set_lights(button=setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] != setting
+    assert not check["button"]

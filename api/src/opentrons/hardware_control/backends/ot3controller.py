@@ -130,7 +130,11 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
 )
-from opentrons_hardware.hardware_control.rear_panel_settings import get_door_state
+from opentrons_hardware.hardware_control.rear_panel_settings import (
+    get_door_state,
+    set_deck_light,
+    get_deck_light_state,
+)
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -927,13 +931,17 @@ class OT3Controller:
         nodes = {axis_to_node(ax) for ax in axes}
         await set_enable_motor(self._messenger, nodes)
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
+    async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
-        return None
+        if rails is not None:
+            await set_deck_light(1 if rails else 0, self._usb_messenger)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
-        return {}
+        return {
+            "rails": await get_deck_light_state(self._usb_messenger),
+            "button": False,
+        }
 
     def pause(self) -> None:
         """Pause the controller activity."""
