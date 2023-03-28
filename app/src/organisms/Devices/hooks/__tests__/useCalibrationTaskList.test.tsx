@@ -99,7 +99,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -136,8 +135,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
-          mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
         ),
@@ -169,7 +166,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -202,7 +198,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -235,7 +230,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -268,7 +262,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -301,7 +294,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -334,7 +326,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -365,7 +356,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -396,7 +386,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -429,7 +418,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -460,7 +448,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -493,7 +480,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -526,7 +512,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -567,7 +552,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -609,7 +593,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
@@ -652,7 +635,6 @@ describe('useCalibrationTaskList hook', () => {
     const { result } = renderHook(
       () =>
         useCalibrationTaskList(
-          'otie',
           mockPipOffsetCalLauncher,
           mockTipLengthCalLauncher,
           mockDeckCalLauncher
