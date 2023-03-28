@@ -3,15 +3,17 @@ import {
   Flex,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  JUSTIFY_CENTER,
+  POSITION_FIXED,
   SPACING,
-  PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { Toast } from './index'
+import { PrimaryButton } from '../../buttons'
+import { StyledText } from '../../text'
+import { Toast } from './Toast'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/Toast',
+  title: 'ODD/Atoms/Toast',
   component: Toast,
 } as Meta
 
@@ -33,7 +35,16 @@ const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
           <StyledText as="p">After 5 sec, the Toast will disappear</StyledText>
         </Flex>
       </Flex>
-      {isShowToast && <Toast {...args} onClose={() => setIsShowToast(false)} />}
+      {isShowToast && (
+        <Flex
+          justifyContent={JUSTIFY_CENTER}
+          position={POSITION_FIXED}
+          bottom={SPACING.spacing4}
+          zIndex={1000}
+        >
+          <Toast {...args} onClose={() => setIsShowToast(false)} />
+        </Flex>
+      )}
     </>
   )
 }
@@ -44,22 +55,20 @@ Success.args = {
   type: 'success',
 }
 
+export const SuccessWithSecondaryMessageAndCloseButton = TemplateWithTimeout.bind(
+  {}
+)
+SuccessWithSecondaryMessageAndCloseButton.args = {
+  closeButton: 'Button text',
+  message: 'Toast message',
+  secondaryMessage: 'Optional secondary',
+  type: 'success',
+}
+
 export const Warning = TemplateWithTimeout.bind({})
 Warning.args = {
-  message: 'Warning Toast message',
-  type: 'warning',
-}
-
-export const Error = TemplateWithTimeout.bind({})
-Error.args = {
-  message: 'Error Toast message',
-  type: 'error',
-}
-
-export const Info = TemplateWithTimeout.bind({})
-Info.args = {
-  message: 'Info Toast message',
-  type: 'info',
+  message: 'Alert Toast message',
+  type: 'alert',
 }
 
 const TemplateWithoutTimeout: Story<
@@ -84,7 +93,16 @@ const TemplateWithoutTimeout: Story<
           </StyledText>
         </Flex>
       </Flex>
-      {isShowToast && <Toast {...args} />}
+      {isShowToast && (
+        <Flex
+          justifyContent={JUSTIFY_CENTER}
+          position={POSITION_FIXED}
+          bottom={SPACING.spacing4}
+          zIndex={1000}
+        >
+          <Toast {...args} />
+        </Flex>
+      )}
     </>
   )
 }
@@ -96,23 +114,31 @@ SuccessWithoutTimeout.args = {
   disableTimeout: true,
 }
 
+export const SuccessWithSecondaryMessageAndCloseButtonWithoutTimeout = TemplateWithTimeout.bind(
+  {}
+)
+SuccessWithSecondaryMessageAndCloseButtonWithoutTimeout.args = {
+  closeButton: 'Button text',
+  message: 'Toast message',
+  secondaryMessage: 'Optional secondary',
+  type: 'success',
+  disableTimeout: true,
+}
+
 export const WarningWithoutTimeout = TemplateWithoutTimeout.bind({})
 WarningWithoutTimeout.args = {
-  message: 'Warning Toast message',
-  type: 'warning',
+  message: 'Alert Toast message',
+  type: 'alert',
   disableTimeout: true,
 }
 
-export const ErrorWithoutTimeout = TemplateWithoutTimeout.bind({})
-ErrorWithoutTimeout.args = {
-  message: 'Error Toast message',
-  type: 'error',
-  disableTimeout: true,
-}
-
-export const InfoWithoutTimeout = TemplateWithoutTimeout.bind({})
-InfoWithoutTimeout.args = {
-  message: 'Info Toast message',
-  type: 'info',
+export const SuperLongSecondaryAndCloseButtonWithoutTimeout = TemplateWithTimeout.bind(
+  {}
+)
+SuperLongSecondaryAndCloseButtonWithoutTimeout.args = {
+  closeButton: 'Close',
+  message: 'Successfully received',
+  secondaryMessage: 'Super-long-protocol-file-name-that-the-user-made.py',
+  type: 'success',
   disableTimeout: true,
 }

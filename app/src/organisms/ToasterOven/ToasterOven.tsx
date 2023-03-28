@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
@@ -13,6 +14,8 @@ import {
 
 import { Snackbar } from '../../atoms/Snackbar'
 import { Toast } from '../../atoms/Toast'
+import { Toast as ODDToast } from '../../atoms/Toast/OnDeviceDisplay/Toast'
+import { getIsOnDevice } from '../../redux/config'
 import { ToasterContext } from './ToasterContext'
 
 import type { SnackbarProps } from '../../atoms/Snackbar'
@@ -33,6 +36,7 @@ const TOASTER_OVEN_SIZE = 5
 export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   const [toasts, setToasts] = React.useState<ToastProps[]>([])
   const [snackbar, setSnackbar] = React.useState<SnackbarProps>()
+  const isOnDevice = useSelector(getIsOnDevice)
 
   /**
    * makes toast, rendering it in the toaster oven display container
@@ -86,14 +90,27 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           zIndex={1000}
         >
           {toasts.map(toast => (
-            <Toast
-              {...toast}
-              key={toast.id}
-              onClose={() => {
-                toast.onClose?.()
-                eatToast(toast.id)
-              }}
-            />
+            <>
+              {isOnDevice != null ? (
+                <ODDToast
+                  {...toast}
+                  key={toast.id}
+                  onClose={() => {
+                    toast.onClose?.()
+                    eatToast(toast.id)
+                  }}
+                />
+              ) : (
+                <Toast
+                  {...toast}
+                  key={toast.id}
+                  onClose={() => {
+                    toast.onClose?.()
+                    eatToast(toast.id)
+                  }}
+                />
+              )}
+            </>
           ))}
         </Flex>
       ) : null}

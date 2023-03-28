@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { PrimaryButton } from '../buttons'
 import { StyledText } from '../text'
-import { Snackbar } from '.'
+import { Snackbar } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { Toast } from '..'
+import { Toast } from '../Toast'
 
 const render = (props: React.ComponentProps<typeof Toast>) => {
   return renderWithProviders(<Toast {...props} />)[0]
@@ -13,8 +13,9 @@ describe('Toast', () => {
     props = {
       id: '1',
       message: 'test message',
+      secondaryMessage: 'secondary message',
       type: 'success',
-      closeButton: true,
+      closeButton: 'Close',
       onClose: jest.fn(),
     }
   })
@@ -25,6 +26,19 @@ describe('Toast', () => {
   it('renders correct message', () => {
     const { getByText } = render(props)
     getByText('test message')
+    getByText('secondary message')
+  })
+  it('truncates secondary message whern too long', () => {
+    props = {
+      id: '1',
+      message: 'test message',
+      secondaryMessage: 'Super-long-protocol-file-name-that-the-user-made.py',
+      type: 'success',
+      closeButton: 'Close',
+      onClose: jest.fn(),
+    }
+    const { getByText } = render(props)
+    getByText('Super-long-protocol-file-name-that-the-u...py')
   })
   it('calls onClose when close button is pressed', () => {
     const { getByRole } = render(props)
@@ -32,12 +46,12 @@ describe('Toast', () => {
     fireEvent.click(closeButton)
     expect(props.onClose).toHaveBeenCalled()
   })
-  it('does not render x button if prop is false', () => {
+  it('does not render close button if prop is undefined', () => {
     props = {
       id: '1',
       message: 'test message',
       type: 'success',
-      closeButton: false,
+      closeButton: undefined,
       onClose: jest.fn(),
     }
     const { queryByRole } = render(props)
@@ -54,61 +68,31 @@ describe('Toast', () => {
     const { getByTestId, getByLabelText } = render(props)
     const successToast = getByTestId('Toast_success')
     expect(successToast).toHaveStyle(`color: #04aa65
-    background-color: #f3fffa`)
+    background-color: ##baffcd`)
     getByLabelText('icon_success')
   })
-  it('should have warning styling when passing warning as type', () => {
+  it('should have alert styling when passing alert as type', () => {
     props = {
       id: '1',
       message: 'test message',
-      type: 'warning',
+      type: 'alert',
       closeButton: false,
       onClose: jest.fn(),
     }
     const { getByTestId, getByLabelText } = render(props)
-    const warningToast = getByTestId('Toast_warning')
-    expect(warningToast).toHaveStyle(`color: #f09d20
-    background-color: #fffcf5`)
-    getByLabelText('icon_warning')
+    const alertToast = getByTestId('Toast_alert')
+    expect(alertToast).toHaveStyle(`color: #f09d20
+    background-color: #ffe9be`)
+    getByLabelText('icon_alert')
   })
 
-  it('should have error styling when passing error as type', () => {
-    props = {
-      id: '1',
-      message: 'test message',
-      type: 'error',
-      closeButton: false,
-      onClose: jest.fn(),
-    }
-    const { getByTestId, getByLabelText } = render(props)
-    const errorToast = getByTestId('Toast_error')
-    expect(errorToast).toHaveStyle(`color: #bf0000
-    background-color: #fff3f3`)
-    getByLabelText('icon_error')
-  })
-
-  it('should have info styling when passing info as type', () => {
-    props = {
-      id: '1',
-      message: 'test message',
-      type: 'info',
-      closeButton: false,
-      onClose: jest.fn(),
-    }
-    const { getByTestId, getByLabelText } = render(props)
-    const infoToast = getByTestId('Toast_info')
-    expect(infoToast).toHaveStyle(`color: #16212D
-    background-color: #eaeaeb`)
-    getByLabelText('icon_info')
-  })
-
-  it('after 8 seconds the toast should be closed automatically', async () => {
+  it('after 5 seconds the toast should be closed automatically', async () => {
     jest.useFakeTimers()
     props = {
       id: '1',
       message: 'test message',
-      type: 'info',
-      duration: 8000,
+      type: 'success',
+      duration: 5000,
       closeButton: false,
       onClose: jest.fn(),
     }
@@ -119,17 +103,17 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(8000)
+      jest.advanceTimersByTime(5000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
 
-  it('should stay more than 8 seconds when requiredTimeout is true', async () => {
+  it('should stay more than 5 seconds when requiredTimeout is true', async () => {
     jest.useFakeTimers()
     props = {
       id: '1',
       message: 'test message',
-      type: 'info',
+      type: 'success',
       closeButton: false,
       onClose: jest.fn(),
       disableTimeout: true,
@@ -141,17 +125,17 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(8000)
+      jest.advanceTimersByTime(5000)
     })
     expect(props.onClose).not.toHaveBeenCalled()
   })
 
-  it('should not stay more than 8 seconds when requiredTimeout is false', async () => {
+  it('should not stay more than 5 seconds when requiredTimeout is false', async () => {
     jest.useFakeTimers()
     props = {
       id: '1',
       message: 'test message',
-      type: 'info',
+      type: 'success',
       closeButton: false,
       onClose: jest.fn(),
       disableTimeout: false,
@@ -163,7 +147,7 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(8000)
+      jest.advanceTimersByTime(5000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
