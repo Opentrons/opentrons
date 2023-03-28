@@ -23,20 +23,22 @@ from robot_server.protocols import (
     ProtocolNotFoundError,
 )
 
-from robot_server.runs.run_auto_deleter import RunAutoDeleter
 
-from robot_server.runs.run_models import Run, RunCreate, RunUpdate
-from robot_server.runs.engine_store import EngineConflictError
-from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
+from robot_server.maintenance_run.maintenance_run_models import (
+    MaintenanceRun,
+    MaintenanceRunCreate,
+)
+from robot_server.maintenance_run.engine_store import EngineConflictError
+from robot_server.maintenance_run.maintenance_run_data_manager import (
+    MaintenanceRunDataManager,
+    RunNotCurrentError,
+)
 from robot_server.runs.run_models import RunNotFoundError
-from robot_server.runs.router.base_router import (
-    AllRunsLinks,
+from robot_server.maintenance_run.router.base_router import (
     create_run,
     get_run_data_from_url,
     get_run,
-    get_runs,
-    remove_run,
-    update_run,
+    # remove_run,
 )
 
 
@@ -52,20 +54,17 @@ def labware_offset_create() -> LabwareOffsetCreate:
 
 async def test_create_run(
     decoy: Decoy,
-    mock_run_data_manager: RunDataManager,
-    mock_run_auto_deleter: RunAutoDeleter,
+    mock_run_data_manager: MaintenanceRunDataManager,
     labware_offset_create: pe_types.LabwareOffsetCreate,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
     run_created_at = datetime(year=2021, month=1, day=1)
 
-    expected_response = Run(
+    expected_response = MaintenanceRun(
         id=run_id,
         createdAt=run_created_at,
-        protocolId=None,
         current=True,
-        actions=[],
         errors=[],
         pipettes=[],
         modules=[],
@@ -80,30 +79,25 @@ async def test_create_run(
             run_id=run_id,
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
-            protocol=None,
         )
     ).then_return(expected_response)
 
     result = await create_run(
         request_body=RequestModel(
-            data=RunCreate(labwareOffsets=[labware_offset_create])
+            data=MaintenanceRunCreate(labwareOffsets=[labware_offset_create])
         ),
         run_data_manager=mock_run_data_manager,
         run_id=run_id,
         created_at=run_created_at,
-        run_auto_deleter=mock_run_auto_deleter,
     )
 
     assert result.content.data == expected_response
     assert result.status_code == 201
 
-    decoy.verify(mock_run_auto_deleter.make_room_for_new_run(), times=1)
-
 
 async def test_create_run_conflict(
     decoy: Decoy,
-    mock_run_data_manager: RunDataManager,
-    mock_run_auto_deleter: RunAutoDeleter,
+    mock_run_data_manager: MaintenanceRunDataManager,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -113,7 +107,6 @@ async def test_create_run_conflict(
             run_id="run-id",
             created_at=created_at,
             labware_offsets=[],
-            protocol=None,
         )
     ).then_raise(EngineConflictError("oh no"))
 
@@ -123,42 +116,40 @@ async def test_create_run_conflict(
             created_at=created_at,
             request_body=None,
             run_data_manager=mock_run_data_manager,
-            run_auto_deleter=mock_run_auto_deleter,
         )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunAlreadyActive"
 
 
-#
-# async def test_get_run_data_from_url(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should be able to get a run by ID."""
-#     expected_response = Run(
-#         id="run-id",
-#         protocolId=None,
-#         createdAt=datetime(year=2021, month=1, day=1),
-#         status=pe_types.EngineStatus.IDLE,
-#         current=False,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         modules=[],
-#         labware=[],
-#         labwareOffsets=[],
-#         liquids=[],
-#     )
-#
-#     decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
-#
-#     result = await get_run_data_from_url(
-#         runId="run-id",
-#         run_data_manager=mock_run_data_manager,
-#     )
-#
-#     assert result == expected_response
+async def test_get_run_data_from_url(
+    decoy: Decoy,
+    mock_run_data_manager: MaintenanceRunDataManager,
+) -> None:
+    """It should be able to get a run by ID."""
+    expected_response = MaintenanceRun(
+        id="run-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.IDLE,
+        current=False,
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        liquids=[],
+    )
+
+    decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
+
+    result = await get_run_data_from_url(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+    )
+
+    assert result == expected_response
+
+
 #
 #
 # async def test_get_run_with_missing_id(

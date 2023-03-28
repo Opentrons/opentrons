@@ -184,40 +184,49 @@ async def test_create_engine_error(
         )
 
 
-# async def test_get_current_run(
-#     decoy: Decoy,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-#     subject: RunDataManager,
-#     engine_state_summary: StateSummary,
-#     run_resource: RunResource,
-# ) -> None:
-#     """It should get the current run from the engine."""
-#     run_id = "hello world"
-#
-#     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
-#     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-#     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
-#         engine_state_summary
-#     )
-#
-#     result = subject.get(run_id=run_id)
-#
-#     assert result == Run(
-#         current=True,
-#         id=run_resource.run_id,
-#         protocolId=run_resource.protocol_id,
-#         createdAt=run_resource.created_at,
-#         actions=run_resource.actions,
-#         status=engine_state_summary.status,
-#         errors=engine_state_summary.errors,
-#         labware=engine_state_summary.labware,
-#         labwareOffsets=engine_state_summary.labwareOffsets,
-#         pipettes=engine_state_summary.pipettes,
-#         modules=engine_state_summary.modules,
-#         liquids=engine_state_summary.liquids,
-#     )
-#     assert subject.current_run_id == run_id
+async def test_get_current_run(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    subject: MaintenanceRunDataManager,
+    engine_state_summary: StateSummary,
+) -> None:
+    """It should get the current run from the engine."""
+    run_id = "hello world"
+
+    decoy.when(mock_engine_store.current_run_id).then_return(run_id)
+    decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
+        engine_state_summary
+    )
+
+    result = subject.get(run_id=run_id)
+
+    assert result == MaintenanceRun(
+        current=True,
+        id=run_id,
+        createdAt=datetime(2023, 1, 1),
+        status=engine_state_summary.status,
+        errors=engine_state_summary.errors,
+        labware=engine_state_summary.labware,
+        labwareOffsets=engine_state_summary.labwareOffsets,
+        pipettes=engine_state_summary.pipettes,
+        modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
+    )
+    assert subject.current_run_id == run_id
+
+
+async def test_get_run_not_current(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    subject: MaintenanceRunDataManager,
+    engine_state_summary: StateSummary,
+) -> None:
+    """It should raise a RunNotCurrentError."""
+    run_id = "hello world"
+
+    decoy.when(mock_engine_store.current_run_id).then_return("not-current-id")
+    with pytest.raises(RunNotCurrentError):
+        subject.get(run_id=run_id)
 
 
 # async def test_get_historical_run(

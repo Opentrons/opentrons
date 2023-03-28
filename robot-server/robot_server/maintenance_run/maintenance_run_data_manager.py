@@ -127,13 +127,17 @@ class MaintenanceRunDataManager:
         Raises:
             RunNotFoundError: The given run identifier does not exist.
         """
-        state_summary = self._get_state_summary(run_id=run_id)
         current = run_id == self._engine_store.current_run_id
+        if not current:
+            raise RunNotCurrentError(
+                "Cannot get the run summery of a none current run."
+            )
+        state_summary = self._get_state_summary(run_id=run_id)
 
         # store created_at at engine level
         return _build_run(
             run_id=run_id,
-            created_at=datetime(1, 1, 2023),
+            created_at=datetime(2023, 1, 1),
             state_summary=state_summary,
             current=current,
         )

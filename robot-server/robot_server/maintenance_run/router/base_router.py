@@ -96,6 +96,8 @@ async def get_run_data_from_url(
         run_data = run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    except RunNotCurrentError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
     return run_data
 
@@ -154,58 +156,30 @@ async def create_run(
     )
 
 
-# @base_router.get(
-#     path="/maintenance_runs",
-#     summary="Get all maintenance runs",
-#     description="Get a list of all active and inactive runs.",
-#     responses={
-#         status.HTTP_200_OK: {"model": MultiBody[Run, AllRunsLinks]},
-#     },
-# )
-# async def get_runs(
-#     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-# ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
-#     """Get all runs.
-#
-#     Args:
-#         run_data_manager: Current and historical run data management.
-#     """
-#     data = run_data_manager.get_all()
-#     current_run_id = run_data_manager.current_run_id
-#     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
-#     links = AllRunsLinks(
-#         current=ResourceLink.construct(href=f"/runs/{current_run_id}")
-#         if current_run_id is not None
-#         else None
-#     )
-#
-#     return await PydanticResponse.create(
-#         content=MultiBody.construct(data=data, links=links, meta=meta),
-#         status_code=status.HTTP_200_OK,
-#     )
-#
-#
-# @base_router.get(
-#     path="/maintenance_runs/{runId}",
-#     summary="Get a maintenance run",
-#     description="Get a specific run by its unique identifier.",
-#     responses={
-#         status.HTTP_200_OK: {"model": SimpleBody[Run]},
-#         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-#     },
-# )
-# async def get_run(
-#     run_data: Run = Depends(get_run_data_from_url),
-# ) -> PydanticResponse[SimpleBody[Run]]:
-#     """Get a run by its ID.
-#
-#     Args:
-#         run_data: Data of the run specified in the runId url parameter.
-#     """
-#     return await PydanticResponse.create(
-#         content=SimpleBody.construct(data=run_data),
-#         status_code=status.HTTP_200_OK,
-#     )
+@base_router.get(
+    path="/maintenance_runs/{runId}",
+    summary="Get a maintenance run",
+    description="Get a specific run by its unique identifier.",
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[MaintenanceRun]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
+    },
+)
+async def get_run(
+    run_data: MaintenanceRun = Depends(get_run_data_from_url),
+) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
+    """Get a run by its ID.
+
+    Args:
+        run_data: Data of the run specified in the runId url parameter.
+    """
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(data=run_data),
+        status_code=status.HTTP_200_OK,
+    )
+
+
 #
 #
 # @base_router.delete(
