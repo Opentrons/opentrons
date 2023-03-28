@@ -11,13 +11,13 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { Snackbar } from '../Snackbar/Snackbar'
-import { Toast } from './Toast'
-import { ToastContext } from './ToastContext'
+import { Snackbar } from '../../atoms/Snackbar'
+import { Toast } from '../../atoms/Toast'
+import { ToasterContext } from './ToasterContext'
 
-import type { SnackbarProps } from '../Snackbar/Snackbar'
-import type { ToastProps, ToastType } from './Toast'
-import type { MakeSnackbarOptions, MakeToastOptions } from './ToastContext'
+import type { SnackbarProps } from '../../atoms/Snackbar'
+import type { ToastProps, ToastType } from '../../atoms/Toast'
+import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 
 interface ToasterOvenProps {
   children: React.ReactNode
@@ -72,7 +72,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   }
 
   return (
-    <ToastContext.Provider
+    <ToasterContext.Provider
       value={{ eatToast, makeToast, eatSnackbar, makeSnackbar }}
     >
       {toasts.length > 0 ? (
@@ -116,6 +116,6 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
         </Flex>
       )}
       {children}
-    </ToastContext.Provider>
+    </ToasterContext.Provider>
   )
 }

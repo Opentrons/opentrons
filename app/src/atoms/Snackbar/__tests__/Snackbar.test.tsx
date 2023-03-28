@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { act } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { Snackbar } from '../Snackbar'
+import { Snackbar } from '..'
 
 const render = (props: React.ComponentProps<typeof Snackbar>) => {
   return renderWithProviders(<Snackbar {...props} />)[0]

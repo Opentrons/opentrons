@@ -8,10 +8,10 @@ import {
   DispatchApiRequestType,
   useDispatchApiRequest,
 } from '../../../redux/robot-api'
-import { useToast } from '../../../atoms/Toast'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import * as RobotApi from '../../../redux/robot-api'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useToaster } from '../../ToasterOven'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
@@ -47,7 +47,7 @@ jest.mock('../ModuleOverflowMenu')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../FirmwareUpdateFailedModal')
 jest.mock('../../../redux/robot-api')
-jest.mock('../../../atoms/Toast')
+jest.mock('../../../organisms/ToasterOven')
 jest.mock('../useModuleIdFromRun')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -94,7 +94,7 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
 const mockErrorInfo = ErrorInfo as jest.MockedFunction<typeof ErrorInfo>
-const mockUseToast = useToast as jest.MockedFunction<typeof useToast>
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
   moduleModel: 'magneticModuleV1',
@@ -185,6 +185,8 @@ const mockHotThermo = {
   usbPort: { path: '/dev/ot_module_thermocycler', hub: null, port: 1 },
 } as ThermocyclerModule
 
+const mockMakeSnackbar = jest.fn()
+const mockEatSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 
@@ -213,7 +215,9 @@ describe('ModuleCard', () => {
     mockFirmwareUpdateFailedModal.mockReturnValue(
       <div>mock firmware update failed modal</div>
     )
-    mockUseToast.mockReturnValue({
+    mockUseToaster.mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      eatSnackbar: mockEatSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })

@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { IconProps } from '@opentrons/components'
 import { useAllCommandsQuery, useRunQuery } from '@opentrons/react-api-client'
 
-import { ERROR_TOAST, INFO_TOAST, useToast } from '../../../atoms/Toast'
+import { ERROR_TOAST, INFO_TOAST } from '../../../atoms/Toast'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
 import { downloadFile } from '../utils'
 
@@ -17,7 +18,7 @@ export function useDownloadRunLog(
 ): { downloadRunLog: () => void; isRunLogLoading: boolean } {
   const { t } = useTranslation('run_details')
 
-  const { makeToast } = useToast()
+  const { makeToast } = useToaster()
 
   const {
     data: allCommandsQueryData,

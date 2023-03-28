@@ -1,12 +1,12 @@
 import * as React from 'react'
 
-import { ToastContext } from './ToastContext'
+import { ToasterContext } from './ToasterContext'
 
-import type { ToastContextType } from './ToastContext'
+import type { ToasterContextType } from './ToasterContext'
 
-export function useToast(): ToastContextType {
+export function useToaster(): ToasterContextType {
   const { eatToast, makeToast, eatSnackbar, makeSnackbar } = React.useContext(
-    ToastContext
+    ToasterContext
   )
 
   return { eatToast, makeToast, eatSnackbar, makeSnackbar }

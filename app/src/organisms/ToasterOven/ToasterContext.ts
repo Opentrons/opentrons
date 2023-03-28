@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-import type { ToastProps, ToastType } from './Toast'
-import type { SnackbarProps } from '../Snackbar/Snackbar'
+import type { ToastProps, ToastType } from '../../atoms/Toast'
+import type { SnackbarProps } from '../../atoms/Snackbar'
 
 export type MakeToastOptions = Omit<ToastProps, 'id' | 'message' | 'type'>
 
@@ -13,14 +13,14 @@ type MakeToast = (
 
 type EatToast = (toastId: string) => void
 
-export interface ToastContextType {
+export interface ToasterContextType {
   eatToast: EatToast
   makeToast: MakeToast
   eatSnackbar: EatSnackbar
   makeSnackbar: MakeSnackbar
 }
 
-export const ToastContext = React.createContext<ToastContextType>({
+export const ToasterContext = React.createContext<ToasterContextType>({
   eatToast: () => {},
   makeToast: () => '',
   eatSnackbar: () => {},

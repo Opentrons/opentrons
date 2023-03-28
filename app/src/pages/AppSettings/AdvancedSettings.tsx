@@ -36,7 +36,7 @@ import { Modal } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { SelectOption } from '../../atoms/SelectField/Select'
 import { SelectField } from '../../atoms/SelectField'
-import { ERROR_TOAST, SUCCESS_TOAST, useToast } from '../../atoms/Toast'
+import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { useTrackEvent } from '../../redux/analytics'
 import {
   getU2EAdapterDevice,
@@ -47,6 +47,7 @@ import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
+import { useToaster } from '../../organisms/ToasterOven'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -83,7 +84,7 @@ export function AdvancedSettings(): JSX.Element {
   const enableExtendedHardware = Config.useFeatureFlag('enableExtendedHardware')
 
   const dispatch = useDispatch<Dispatch>()
-  const { makeToast } = useToast()
+  const { makeToast } = useToaster()
   const reachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
   )

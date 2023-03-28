@@ -40,13 +40,14 @@ import {
   SUCCESS,
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
-import { SUCCESS_TOAST, useToast } from '../../atoms/Toast'
+import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -120,7 +121,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     robotName &&
       dispatchApiRequest(updateModule(robotName, module.serialNumber))
   }
-  const { makeToast } = useToast()
+  const { makeToast } = useToaster()
   React.useEffect(() => {
     if (
       module.hasAvailableUpdate === false &&
