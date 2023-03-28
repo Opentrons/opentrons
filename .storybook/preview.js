@@ -11,7 +11,7 @@ import { i18n } from '../app/src/i18n'
 export const decorators = [
   Story => (
     <I18nextProvider i18n={i18n}>
-      <GlobalStyle />
+      <GlobalStyle isOnDevice={true} />
       <Story />
     </I18nextProvider>
   ),
