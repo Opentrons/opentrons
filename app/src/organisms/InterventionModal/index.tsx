@@ -21,10 +21,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   Icon,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
