@@ -27,7 +27,7 @@ PICK_UP_OFFSETS = {
     "thermo-cycler": Point(),
 }
 DROP_OFFSETS = {
-    "deck": Point(z=-2),
+    "deck": Point(z=-0.5),
     "mag-plate": Point(z=9.5),
     "heater-shaker": Point(z=-2),
     "temp-module": Point(z=-2),
@@ -205,7 +205,7 @@ async def _move_labware(
     dst_loc += DROP_OFFSETS[dst_deck_item]
     if inspect:
         await _inspect(api)
-    await _do_gripper_action(api, dst_loc, force, is_grip=True, inspect=inspect)
+    await _do_gripper_action(api, dst_loc, force, is_grip=False, inspect=inspect)
 
 
 async def _run(
