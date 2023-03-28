@@ -4,7 +4,7 @@ import { AlertItem } from './AlertItem'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Modules/AlertItem',
+  title: 'Library/Molecules/AlertItem',
   component: AlertItem,
   argTypes: { onCloseClick: { action: 'clicked' } },
 } as Meta
