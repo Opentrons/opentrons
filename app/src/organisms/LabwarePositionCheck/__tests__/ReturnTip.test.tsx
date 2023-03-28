@@ -38,6 +38,7 @@ describe('ReturnTip', () => {
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
       createRunCommand: jest.fn(),
+      setFatalError: jest.fn(),
       chainRunCommands: mockChainRunCommands,
       tipPickUpOffset: null,
       isRobotMoving: false,

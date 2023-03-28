@@ -26,7 +26,11 @@ export const LabwarePositionCheck = (
     useRunQuery(props.runId).data?.data?.labwareOffsets ?? []
 
   return (
-    <ErrorBoundary logger={logger} ErrorComponent={FatalErrorModal} onClose={props.onCloseClick}>
+    <ErrorBoundary
+      logger={logger}
+      ErrorComponent={FatalErrorModal}
+      onClose={props.onCloseClick}
+    >
       <LabwarePositionCheckComponent
         {...props}
         {...{ mostRecentAnalysis, existingOffsets }}
@@ -39,7 +43,10 @@ interface ErrorBoundaryProps {
   children: React.ReactNode
   onClose: () => void
   logger: ReturnType<typeof useLogger>
-  ErrorComponent: (props: { errorMessage: string, onClose: () => void }) => JSX.Element
+  ErrorComponent: (props: {
+    errorMessage: string
+    onClose: () => void
+  }) => JSX.Element
 }
 class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,
@@ -63,7 +70,13 @@ class ErrorBoundary extends React.Component<
   render(): ErrorBoundaryProps['children'] | JSX.Element {
     const { ErrorComponent, children } = this.props
     const { error } = this.state
-    if (error != null) return <ErrorComponent errorMessage={error.message} onClose={this.props.onClose} />
+    if (error != null)
+      return (
+        <ErrorComponent
+          errorMessage={error.message}
+          onClose={this.props.onClose}
+        />
+      )
     // Normally, just render children
     return children
   }

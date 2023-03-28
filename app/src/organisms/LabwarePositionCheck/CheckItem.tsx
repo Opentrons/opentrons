@@ -61,7 +61,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     handleJog,
     isRobotMoving,
     existingOffsets,
-    setFatalError 
+    setFatalError,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const labwareDef = getLabwareDef(labwareId, protocolData)
@@ -99,7 +99,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       chainRunCommands(modulePrepCommands, true)
         .then(() => {})
         .catch(e => {
-          setFatalError(`CheckItem module prep commands failed with message: ${e}`)
+          setFatalError(
+            `CheckItem module prep commands failed with message: ${e}`
+          )
         })
     }
   }, [moduleId])
@@ -182,11 +184,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             })
           })
           .catch(e => {
-            setFatalError(`CheckItem failed to save position for initial placement with message: ${e}`)
+            setFatalError(
+              `CheckItem failed to save position for initial placement with message: ${e}`
+            )
           })
       })
       .catch(e => {
-        setFatalError(`CheckItem failed to move to initial position with message: ${e}`)
+        setFatalError(
+          `CheckItem failed to move to initial position with message: ${e}`
+        )
       })
   }
 
@@ -239,11 +245,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         chainRunCommands(confirmPositionCommands, true)
           .then(() => proceed())
           .catch(e => {
-            setFatalError(`CheckItem failed to move from final position with message: ${e}`)
+            setFatalError(
+              `CheckItem failed to move from final position with message: ${e}`
+            )
           })
       })
       .catch(e => {
-        setFatalError(`CheckItem failed to save final position with message: ${e}`)
+        setFatalError(
+          `CheckItem failed to save final position with message: ${e}`
+        )
       })
   }
   const handleGoBack = (): void => {

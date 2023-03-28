@@ -30,14 +30,22 @@ export const IntroScreen = (props: {
   setFatalError: (errorMessage: string) => void
   isRobotMoving: boolean
 }): JSX.Element | null => {
-  const { proceed, protocolData, chainRunCommands, isRobotMoving, setFatalError } = props
+  const {
+    proceed,
+    protocolData,
+    chainRunCommands,
+    isRobotMoving,
+    setFatalError,
+  } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
     chainRunCommands(prepCommands, true)
       .then(() => proceed())
       .catch(e => {
-        setFatalError(`IntroScreen failed to issue prep commands with message: ${e}`)
+        setFatalError(
+          `IntroScreen failed to issue prep commands with message: ${e}`
+        )
       })
   }
 

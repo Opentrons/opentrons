@@ -46,6 +46,7 @@ describe('PickUpTip', () => {
       chainRunCommands: mockChainRunCommands,
       handleJog: jest.fn(),
       registerPosition: jest.fn(),
+      setFatalError: jest.fn(),
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,

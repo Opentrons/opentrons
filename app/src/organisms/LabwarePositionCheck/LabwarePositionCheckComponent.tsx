@@ -228,7 +228,9 @@ export const LabwarePositionCheckInner = (
     Promise.all(
       offsets.map(data => createLabwareOffset({ runId: runId, data }))
     )
-      .then(() => { onCloseClick() })
+      .then(() => {
+        onCloseClick()
+      })
       .catch((e: Error) => {
         setFatalError(`error applying labware offsets: ${e.message}`)
       })
@@ -236,16 +238,32 @@ export const LabwarePositionCheckInner = (
 
   const handleDismissFatalError = (): void => {
     setIsExiting(true)
-    createRunCommand({ command: { commandType: 'home' as const, params: {} }, waitUntilComplete: true }).then(() => {
-      stopRun(runId, { onSettled: () => { onCloseClick() } })
-    }).catch(() => onCloseClick())
+    createRunCommand({
+      command: { commandType: 'home' as const, params: {} },
+      waitUntilComplete: true,
+    })
+      .then(() => {
+        stopRun(runId, {
+          onSettled: () => {
+            onCloseClick()
+          },
+        })
+      })
+      .catch(() => onCloseClick())
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isExiting) {
-    modalContent = <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    modalContent = (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
   } else if (fatalError != null) {
-    modalContent = <FatalErrorModal errorMessage={fatalError} onClose={handleDismissFatalError} />
+    modalContent = (
+      <FatalErrorModal
+        errorMessage={fatalError}
+        onClose={handleDismissFatalError}
+      />
+    )
   } else if (showConfirmation) {
     modalContent = (
       <ExitConfirmation
