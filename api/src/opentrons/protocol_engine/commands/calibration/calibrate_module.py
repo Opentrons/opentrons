@@ -31,6 +31,9 @@ class CalibrateModuleParams(BaseModel):
     """Payload required to calibrate-module."""
 
     moduleId: str = Field(..., description="The unique id of module to calibrate.")
+    labwareId: str = Field(
+        ..., description="The unique id of module calibration adapter labware."
+    )
     mount: MountType = Field(
         ..., description="The instrument mount used to calibrate the module."
     )
@@ -64,16 +67,15 @@ class CalibrateModuleImplementation(
             self._hardware_api,
         )
         ot3_mount = OT3Mount.from_mount(params.mount)
-        module = self._state_view.modules.get(params.moduleId)
         slot = self._state_view.modules.get_location(params.moduleId).slotName.as_int()
-        # TODO (ba, 2023-03-15): add calibration adapter definitions offsets
-        nominal_position = self._state_view.geometry.get_labware_origin_position(
-            params.moduleId
+        module_serial = self._state_view.modules.get(params.moduleId).serialNumber
+        # TODO (ba, 2023-03-28): Check that the labware is the calibration adapter for the specific module
+        nominal_position = self._state_view.geometry.get_well_position(
+            labware_id=params.labwareId, well_name="A1"
         )
-
         # start the calibration
         module_offset = await calibration.calibrate_module(
-            ot3_api, ot3_mount, slot, module.serialNumber, nominal_position
+            ot3_api, ot3_mount, slot, module_serial, nominal_position
         )
 
         return CalibrateModuleResult(

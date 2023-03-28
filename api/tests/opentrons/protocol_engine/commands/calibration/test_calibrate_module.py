@@ -16,6 +16,7 @@ from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedErro
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
+    LoadedLabware,
     LoadedModule,
     ModuleModel,
     ModuleOffsetVector,
@@ -46,10 +47,12 @@ async def test_calibrate_module_implementation(
 
     location = DeckSlotLocation(slotName=DeckSlotName("3"))
     model = ModuleModel.TEMPERATURE_MODULE_V2
-    module_id = "test1234"
-    serial = "TC1234abcd"
+    module_id = "module123"
+    labware_id = "labware123"
+    module_serial = "TC1234abcd"
     params = CalibrateModuleParams(
         moduleId=module_id,
+        labwareId=labware_id,
         mount=MountType.LEFT,
     )
 
@@ -57,7 +60,7 @@ async def test_calibrate_module_implementation(
         id=module_id,
         location=location,
         model=model,
-        serialNumber=serial,
+        serialNumber=module_serial,
     )
 
     decoy.when(subject._state_view.modules.get(module_id)).then_return(module)
@@ -65,14 +68,16 @@ async def test_calibrate_module_implementation(
         location
     )
     decoy.when(
-        subject._state_view.geometry.get_labware_origin_position(module_id)
+        subject._state_view.geometry.get_well_position(
+            labware_id=labware_id, well_name="A1"
+        )
     ).then_return(Point(x=3, y=2, z=1))
     decoy.when(
         await calibration.calibrate_module(
             hcapi=ot3_hardware_api,
             mount=OT3Mount.LEFT,
             slot=location.slotName.as_int(),
-            module_id=serial,
+            module_id=module_serial,
             nominal_position=Point(x=3, y=2, z=1),
         )
     ).then_return(Point(x=3, y=4, z=6))
@@ -95,6 +100,7 @@ async def test_calibrate_module_implementation_wrong_hardware(
 
     params = CalibrateModuleParams(
         moduleId="Test1234",
+        labwareId="Test1234",
         mount=MountType.LEFT,
     )
 

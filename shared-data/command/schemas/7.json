@@ -2912,6 +2912,11 @@
           "description": "The unique id of module to calibrate.",
           "type": "string"
         },
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The unique id of module calibration adapter labware.",
+          "type": "string"
+        },
         "mount": {
           "description": "The instrument mount used to calibrate the module.",
           "allOf": [
@@ -2921,7 +2926,7 @@
           ]
         }
       },
-      "required": ["moduleId", "mount"]
+      "required": ["moduleId", "labwareId", "mount"]
     },
     "CalibrateModuleCreate": {
       "title": "CalibrateModuleCreate",
