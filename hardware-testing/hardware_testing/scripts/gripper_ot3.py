@@ -10,15 +10,11 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
-# size of things we are using (NOTE: keep Y-Axis as negative)
-SLOT_SIZE = types.Point(x=128, y=-86, z=0)
-LABWARE_SIZE_ARMADILLO = types.Point(x=127.8, y=-85.55, z=16)
-LABWARE_SIZE_EVT_TIPRACK = types.Point(x=127.6, y=-85.8, z=93)
-LABWARE_SIZE_RESERVOIR = types.Point(x=127.8, y=-85.55, z=30)  # FIXME: get real values
+# arbitrary safe distance for relative-movements upward
+# along Z, after pick-up/dropping a labware
+TRAVEL_HEIGHT = 40
 
-
-TRAVEL_HEIGHT = 30
-
+# NOTE: should probably just always be zero offset here
 PICK_UP_OFFSETS = {
     "deck": Point(),
     "mag-plate": Point(),
@@ -26,6 +22,7 @@ PICK_UP_OFFSETS = {
     "temp-module": Point(),
     "thermo-cycler": Point(),
 }
+# NOTE: these depend on if there's clips, or chamfers, etc.
 DROP_OFFSETS = {
     "deck": Point(z=-0.5),
     "mag-plate": Point(z=9.5),
@@ -34,18 +31,22 @@ DROP_OFFSETS = {
     "thermo-cycler": Point(),
 }
 
-ForcedOffsets = List[Tuple[types.Point, types.Point]]
+# size of things we are using (NOTE: keep Y-Axis as negative)
+SLOT_SIZE = types.Point(x=128, y=-86, z=0)
+LABWARE_SIZE_ARMADILLO = types.Point(x=127.8, y=-85.55, z=16)
+LABWARE_SIZE_EVT_TIPRACK = types.Point(x=127.6, y=-85.8, z=93)
+LABWARE_SIZE_NEST_1_WELL_RESERVOIR = types.Point(x=127.4, y=-85.2, z=31)
 
 LABWARE_SIZE = {
     "plate": LABWARE_SIZE_ARMADILLO,
     "tiprack": LABWARE_SIZE_EVT_TIPRACK,
-    "reservoir": LABWARE_SIZE_RESERVOIR,
+    "reservoir": LABWARE_SIZE_NEST_1_WELL_RESERVOIR,
 }
 LABWARE_KEYS = list(LABWARE_SIZE.keys())
 LABWARE_GRIP_HEIGHT = {
     "plate": LABWARE_SIZE_ARMADILLO.z * 0.5,
     "tiprack": LABWARE_SIZE_EVT_TIPRACK.z * 0.4,
-    "reservoir": LABWARE_SIZE_RESERVOIR.z * 0.5,
+    "reservoir": LABWARE_SIZE_NEST_1_WELL_RESERVOIR.z * 0.5,
 }
 LABWARE_GRIP_FORCE = {k: 15 for k in LABWARE_KEYS}
 
@@ -93,12 +94,12 @@ def _get_labware_grip_offset(
 ) -> types.Point:
     slot_center = SLOT_SIZE * 0.5
     grip_height = LABWARE_GRIP_HEIGHT[labware_key]
-    # if-grip-and-clips(x=LABWARE.center, y=SLOT.center, z=LABWARE.grip)
-    # else(x=SLOT.center, y=SLOT.center, z=LABWARE.grip)
     if is_grip and has_clips:
+        # center of labware != center of slot
         labware_center = LABWARE_SIZE[labware_key] * 0.5
         x = labware_center.x
     else:
+        # center of labware == center of slot
         x = slot_center.x
     y = slot_center.y
     z = grip_height
