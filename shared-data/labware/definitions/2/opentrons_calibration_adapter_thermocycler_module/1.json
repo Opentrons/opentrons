@@ -1,5 +1,5 @@
 {
-  "ordering": [["A1"]],
+  "ordering": [["A1", "B1"]],
   "brand": {
     "brand": "Opentrons",
     "brandId": []
@@ -18,13 +18,22 @@
   "wells": {
     "A1": {
       "depth": 4.75,
-      "totalLiquidVolume": 100,
+      "totalLiquidVolume": 0,
       "shape": "rectangular",
       "xDimension": 20,
       "yDimension": 20,
       "x": 97.88,
-      "y": 42.76,
-      "z": 26.11
+      "y": 42.74,
+      "z": 26.36
+    },
+    "B1": {
+      "depth": 0,
+      "totalLiquidVolume": 0,
+      "shape": "circular",
+      "diameter": 1,
+      "x": 13,
+      "y": 13,
+      "z": 0
     }
   },
   "groups": [
@@ -32,7 +41,7 @@
       "metadata": {
         "wellBottomShape": "flat"
       },
-      "wells": ["A1"]
+      "wells": ["A1", "B1"]
     }
   ],
   "parameters": {
