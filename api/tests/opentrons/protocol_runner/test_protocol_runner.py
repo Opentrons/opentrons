@@ -583,7 +583,7 @@ async def test_run_python_runner(
     )
 
 
-async def test_run_maintanence_runner(
+async def test_run_live_runner(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
@@ -600,10 +600,11 @@ async def test_run_maintanence_runner(
 
     decoy.verify(
         await hardware_api.home(),
+        protocol_engine.play(),
     )
 
 
-async def test_load_maintanence_runner_raises(
+async def test_load_live_runner_raises(
     live_subject: LiveRunner,
 ) -> None:
     """Should raise a not supported error."""

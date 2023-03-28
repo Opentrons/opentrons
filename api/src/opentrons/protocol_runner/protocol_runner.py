@@ -327,6 +327,7 @@ class LiveRunner(AbstractRunner):
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunnerRunResult:
         await self._hardware_api.home()
+        self.play()
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
