@@ -105,7 +105,7 @@ class ProtocolLinks(BaseModel):
     """Links returned along with a protocol resource."""
 
     referencingRunIds: List[RunLink] = Field(
-        [],
+        ...,
         description="Links to runs that reference the protocol.",
     )
 
