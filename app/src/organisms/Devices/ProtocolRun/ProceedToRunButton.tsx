@@ -2,9 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { useHoverTooltip } from '@opentrons/components'
+import { useHoverTooltip, PrimaryButton } from '@opentrons/components'
 
-import { PrimaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useTrackEvent } from '../../../redux/analytics'
 import {

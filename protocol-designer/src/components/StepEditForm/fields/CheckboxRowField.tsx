@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  CheckboxField,
+  DeprecatedCheckboxField,
   useHoverTooltip,
   Tooltip,
   TOOLTIP_TOP,
@@ -42,7 +42,7 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
         {tooltipContent}
       </Tooltip>
       <div className={styles.checkbox_row}>
-        <CheckboxField
+        <DeprecatedCheckboxField
           className={cx(styles.checkbox_field, className)}
           disabled={disabled}
           isIndeterminate={isIndeterminate}

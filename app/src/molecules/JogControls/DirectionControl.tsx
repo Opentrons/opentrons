@@ -19,8 +19,8 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_START,
   ALIGN_FLEX_END,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'

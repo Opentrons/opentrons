@@ -9,11 +9,11 @@ import {
   Icon,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
+  PrimaryButton,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 export function NoUpdateFound(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])

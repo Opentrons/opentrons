@@ -7,10 +7,10 @@ import {
   Box,
   COLORS,
   BORDERS,
+  RoundTab,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { RoundTab } from '../../molecules/RoundTab'
 
 type TabOptions = 'table' | 'jupyter' | 'cli'
 

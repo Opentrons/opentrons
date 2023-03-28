@@ -8,13 +8,14 @@ import {
   Flex,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
+  AlertPrimaryButton,
   SPACING,
   Link,
   TYPOGRAPHY,
   ALIGN_CENTER,
+  PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { AlertPrimaryButton, PrimaryButton } from '../../../../../atoms/buttons'
 import { Modal } from '../../../../../molecules/Modal'
 import {
   useDispatchApiRequest,

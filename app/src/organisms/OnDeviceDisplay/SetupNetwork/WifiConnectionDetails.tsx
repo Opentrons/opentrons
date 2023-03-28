@@ -15,11 +15,12 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   JUSTIFY_CENTER,
+  PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { PrimaryButton, TertiaryButton } from '../../../atoms/buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import {
   getNetworkInterfaces,
   fetchStatus,

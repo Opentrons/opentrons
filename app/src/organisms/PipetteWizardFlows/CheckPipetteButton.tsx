@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { usePipettesQuery } from '@opentrons/react-api-client'
-import { PrimaryButton } from '../../atoms/buttons'
+import { PrimaryButton } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
 interface CheckPipetteButtonProps {
