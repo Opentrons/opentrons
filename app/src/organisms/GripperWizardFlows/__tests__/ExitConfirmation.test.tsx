@@ -44,28 +44,26 @@ describe('ExitConfirmation', () => {
   })
 
   it('renders correct text for attach flow', () => {
-    const { getByRole, getByText } = render({
+    const { getByText } = render({
       flowType: GRIPPER_FLOW_TYPES.ATTACH,
     })[0]
-    getByRole('heading', { name: 'Attach Gripper progress will be lost' })
+    getByText('Attach Gripper progress will be lost')
     getByText('Are you sure you want to exit before completing Attach Gripper?')
   })
 
   it('renders correct text for detach flow', () => {
-    const { getByRole, getByText } = render({
+    const { getByText } = render({
       flowType: GRIPPER_FLOW_TYPES.DETACH,
     })[0]
-    getByRole('heading', { name: 'Detach Gripper progress will be lost' })
+    getByText('Detach Gripper progress will be lost')
     getByText('Are you sure you want to exit before completing Detach Gripper?')
   })
 
   it('renders correct text for recalibrate flow', () => {
-    const { getByRole, getByText } = render({
+    const { getByText } = render({
       flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
     })[0]
-    getByRole('heading', {
-      name: 'Gripper Recalibration progress will be lost',
-    })
+    getByText('Gripper Recalibration progress will be lost')
     getByText(
       'Are you sure you want to exit before completing Gripper Recalibration?'
     )

@@ -22,10 +22,14 @@ class GripperModel(str, Enum):
     """Gripper models."""
 
     v1 = "gripperV1"
+    v1_1 = "gripperV1.1"
 
     def __str__(self) -> str:
         """Model name."""
-        enum_to_str = {self.__class__.v1: "gripperV1"}
+        enum_to_str = {
+            self.__class__.v1: "gripperV1",
+            self.__class__.v1_1: "gripperV1.1",
+        }
         return enum_to_str[self]
 
 

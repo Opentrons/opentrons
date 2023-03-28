@@ -256,6 +256,8 @@ class OT3Simulator:
         plunger_speed: float,
         threshold_pascals: float,
         log_pressure: bool = True,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
 
@@ -377,7 +379,7 @@ class OT3Simulator:
             raise RuntimeError(
                 f"mount {mount.name} requested a {expected_instr} which is not supported on the OT3"
             )
-        if found_model and expected_instr and (expected_instr != found_model):
+        if found_model and expected_instr and (expected_instr not in found_model):
             if self._strict_attached:
                 raise RuntimeError(
                     "mount {}: expected instrument {} but got {}".format(

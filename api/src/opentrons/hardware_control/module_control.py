@@ -9,7 +9,14 @@ from opentrons.drivers.rpi_drivers import types, interfaces, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
-from .types import AionotifyEvent, BoardRevision
+from opentrons.hardware_control.modules.module_calibration import (
+    ModuleCalibrationOffset,
+    load_module_calibration_offset,
+    save_module_calibration_offset,
+)
+from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.types import Point
+from .types import AionotifyEvent, BoardRevision, OT3Mount
 from . import modules
 
 if TYPE_CHECKING:
@@ -210,3 +217,35 @@ class AttachedModulesControl:
                 )
             except Exception:
                 log.exception("Exception in Module registration")
+
+    def get_module_by_module_id(
+        self, module_id: str
+    ) -> Optional[modules.AbstractModule]:
+        """Returns the module with the matching serial id."""
+        found_module: Optional[modules.AbstractModule] = None
+        for module in self.available_modules:
+            if module.device_info["serial"] == module_id:
+                found_module = module
+                break
+        return found_module
+
+    def load_module_offset(
+        self, module_type: ModuleType, module_id: str, slot: int
+    ) -> ModuleCalibrationOffset:
+        log.info(f"Loading module offset for {module_type} {module_id}")
+        return load_module_calibration_offset(module_type, module_id, slot)
+
+    def save_module_offset(
+        self,
+        module: ModuleType,
+        module_id: str,
+        mount: OT3Mount,
+        slot: int,
+        offset: Point,
+        instrument_id: Optional[str] = None,
+    ) -> ModuleCalibrationOffset:
+        log.info(f"Saving module {module} {module_id} offset: {offset} for slot {slot}")
+        save_module_calibration_offset(
+            offset, mount, slot, module, module_id, instrument_id
+        )
+        return load_module_calibration_offset(module, module_id, slot)

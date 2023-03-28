@@ -21,6 +21,11 @@ from opentrons_hardware.firmware_bindings.constants import (
     GearMotorId,
 )
 
+from opentrons_hardware.firmware_bindings.binary_constants import (
+    LightTransitionType,
+    LightAnimationType,
+)
+
 
 class OptionalRevisionField(utils.BinaryFieldBase[bytes]):
     """The revision indicator in a device info.
@@ -390,3 +395,27 @@ class MoveStopConditionField(utils.UInt8Field):
         except ValueError:
             condition = str(self.value)
         return f"{self.__class__.__name__}(value={condition})"
+
+
+class LightTransitionTypeField(utils.UInt8Field):
+    """Light transition type."""
+
+    def __repr__(self) -> str:
+        """Print light transition type."""
+        try:
+            transition = LightTransitionType(self.value).name
+        except ValueError:
+            transition = str(self.value)
+        return f"{self.__class__.__name__}(value={transition})"
+
+
+class LightAnimationTypeField(utils.UInt8Field):
+    """Light action type."""
+
+    def __repr__(self) -> str:
+        """Print light action type."""
+        try:
+            action = LightAnimationType(self.value).name
+        except ValueError:
+            action = str(self.value)
+        return f"{self.__class__.__name__}(value={action})"

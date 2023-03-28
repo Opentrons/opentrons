@@ -13,9 +13,6 @@ const OUTPUT_PATH = path.join(__dirname, 'lib')
 
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
-const OT3_UPDATE_MANIFEST_URL =
-  'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
-
 module.exports = async () => {
   const version = await versionForProject(project)
 
@@ -26,9 +23,6 @@ module.exports = async () => {
         _PKG_VERSION_: JSON.stringify(version),
         _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
         _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
-        _DEFAULT_ROBOT_UPDATE_MANIFEST_URL_: JSON.stringify(
-          OT3_UPDATE_MANIFEST_URL
-        ),
       }),
     ],
   }

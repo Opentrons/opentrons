@@ -22,6 +22,7 @@ from typing import (
     TypeVar,
     Iterator,
     KeysView,
+    Union,
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
@@ -86,6 +87,12 @@ from opentrons_hardware.firmware_bindings.constants import (
     USBTarget,
     FirmwareTarget,
 )
+
+from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
+from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
+    BinaryMessageDefinition,
+    DoorSwitchStateInfo,
+)
 from opentrons_hardware import firmware_update
 
 
@@ -103,6 +110,7 @@ from opentrons.hardware_control.types import (
     PipetteSubType,
     UpdateStatus,
     mount_to_subsystem,
+    DoorState,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -122,7 +130,9 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
 )
-from opentrons_hardware.drivers.gpio import OT3GPIO
+from opentrons_hardware.hardware_control.rear_panel_settings import get_door_state
+
+from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 
@@ -196,14 +206,10 @@ class OT3Controller:
             driver: The Can Driver
         """
         self._configuration = config
-        self._gpio_dev = OT3GPIO("hardware_control")
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._usb_messenger = None
-        if usb_driver is not None:
-            self._usb_messenger = BinaryMessenger(usb_driver)
-            self._usb_messenger.start()
+        self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
         self._position = self._get_home_position()
@@ -245,6 +251,17 @@ class OT3Controller:
         if self._update_required != value:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
+
+    @staticmethod
+    def _build_system_hardware(
+        usb_driver: Optional[SerialUsbDriver],
+    ) -> Tuple[Union[OT3GPIO, RemoteOT3GPIO], Optional[BinaryMessenger]]:
+        if usb_driver is None:
+            return OT3GPIO("hardware_control"), None
+        else:
+            usb_messenger = BinaryMessenger(usb_driver)
+            usb_messenger.start()
+            return RemoteOT3GPIO(usb_messenger), usb_messenger
 
     @staticmethod
     def _attached_pipettes_to_nodes(
@@ -414,7 +431,7 @@ class OT3Controller:
         return hold_currents
 
     @property
-    def gpio_chardev(self) -> OT3GPIO:
+    def gpio_chardev(self) -> Union[OT3GPIO, RemoteOT3GPIO]:
         """Get the GPIO device."""
         return self._gpio_dev
 
@@ -1082,6 +1099,8 @@ class OT3Controller:
         plunger_speed: float,
         threshold_pascals: float,
         log_pressure: bool = True,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
@@ -1095,6 +1114,8 @@ class OT3Controller:
             mount_speed,
             threshold_pascals,
             log_pressure,
+            auto_zero_sensor,
+            num_baseline_reads,
             sensor_id,
         )
         for node, point in positions.items():
@@ -1142,3 +1163,60 @@ class OT3Controller:
         )
         self._position[axis_to_node(moving)] += distance_mm
         return data
+
+    async def release_estop(self) -> None:
+        if self._gpio_dev is None:
+            log.error("no gpio control available")
+            raise IOError("no gpio control")
+        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
+            await self._gpio_dev.deactivate_estop()
+        else:
+            self._gpio_dev.deactivate_estop()
+
+    async def engage_estop(self) -> None:
+        if self._gpio_dev is None:
+            log.error("no gpio control available")
+            raise IOError("no gpio control")
+        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
+            await self._gpio_dev.activate_estop()
+        else:
+            self._gpio_dev.activate_estop()
+
+    async def release_sync(self) -> None:
+        if self._gpio_dev is None:
+            log.error("no gpio control available")
+            raise IOError("no gpio control")
+        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
+            await self._gpio_dev.deactivate_nsync_out()
+        else:
+            self._gpio_dev.deactivate_nsync_out()
+
+    async def engage_sync(self) -> None:
+        if self._gpio_dev is None:
+            log.error("no gpio control available")
+            raise IOError("no gpio control")
+        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
+            await self._gpio_dev.activate_nsync_out()
+        else:
+            self._gpio_dev.activate_nsync_out()
+
+    async def door_state(self) -> DoorState:
+        door_open = await get_door_state(self._usb_messenger)
+        return DoorState.OPEN if door_open else DoorState.CLOSED
+
+    def add_door_state_listener(self, callback: Callable[[DoorState], None]) -> None:
+        def _door_listener(msg: BinaryMessageDefinition) -> None:
+            door_state = (
+                DoorState.OPEN
+                if cast(DoorSwitchStateInfo, msg).door_open.value
+                else DoorState.CLOSED
+            )
+            callback(door_state)
+
+        if self._usb_messenger is not None:
+            self._usb_messenger.add_listener(
+                _door_listener,
+                lambda message_id: bool(
+                    message_id == BinaryMessageId.door_switch_state_info
+                ),
+            )
