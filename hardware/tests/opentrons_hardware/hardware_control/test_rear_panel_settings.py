@@ -103,7 +103,7 @@ async def test_get_deck_light(
 async def test_get_door_state(
     mock_binary_messenger: BinaryMessenger, mock_usb_driver: AsyncMock, state: bool
 ) -> None:
-    """Test getting the deck light."""
+    """Test getting the door state."""
     # Correct response
     await prepare_mock_response(
         mock_binary_messenger,
