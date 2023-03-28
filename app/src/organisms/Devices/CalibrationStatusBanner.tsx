@@ -25,16 +25,15 @@ export function CalibrationStatusBanner({
   robotName,
 }: CalibrationStatusBannerProps): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const { isLoading } = useCalibrationTaskList()
-  // if (isLoading === true || taskListStatus === 'complete') return null
-  const taskListStatus = 'bad'
+  const { taskListStatus, isLoading } = useCalibrationTaskList()
+  if (isLoading === true || taskListStatus === 'complete') return null
   return (
     <Banner
       type={taskListStatus === 'bad' ? 'warning' : 'error'}
-      flexDirection={DIRECTION_ROW}
       width="100%"
     >
       <Flex 
+        width="100%"
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}>
