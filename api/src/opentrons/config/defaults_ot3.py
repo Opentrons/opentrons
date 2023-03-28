@@ -71,8 +71,11 @@ DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-13.5, -60.5, 255.675)
 DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (40.5, -60.5, 255.675)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (84.55, -12.75, 93.85)
 DEFAULT_Z_RETRACT_DISTANCE: Final = 2
+<<<<<<< HEAD
 DEFAULT_GRIPPER_JAW_HOME_DUTY_CYCLE: Final = 25
 DEFAULT_SAFE_HOME_DISTANCE: Final = 5
+=======
+>>>>>>> 014073790 (call home_gripper_jaw)
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
@@ -379,9 +382,6 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         ),
         z_retract_distance=robot_settings.get(
             "z_retract_distance", DEFAULT_Z_RETRACT_DISTANCE
-        ),
-        grip_jaw_home_duty_cycle=robot_settings.get(
-            "grip_jaw_home_duty_cycle", DEFAULT_GRIPPER_JAW_HOME_DUTY_CYCLE
         ),
         safe_home_distance=robot_settings.get(
             "safe_home_distance", DEFAULT_SAFE_HOME_DISTANCE

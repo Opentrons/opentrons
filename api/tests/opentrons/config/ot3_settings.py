@@ -110,7 +110,6 @@ ot3_dummy_settings = {
     },
     "log_level": "NADA",
     "z_retract_distance": 10,
-    "grip_jaw_home_duty_cycle": 25,
     "safe_home_distance": 5,
     "deck_transform": [[-0.5, 0, 1], [0.1, -2, 4], [0, 0, -1]],
     "carriage_offset": (1, 2, 3),

@@ -420,10 +420,11 @@ async def test_liquid_probe(
     fake_liquid_settings: LiquidProbeSettings,
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
+    mock_ungrip: AsyncMock,
     mock_home_plunger: AsyncMock,
 ) -> None:
+    mock_ungrip.return_value = None
     backend = ot3_hardware.managed_obj._backend
-
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -490,9 +491,10 @@ async def test_liquid_sensing_errors(
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
     mock_home_plunger: AsyncMock,
+    mock_ungrip: AsyncMock,
 ) -> None:
     backend = ot3_hardware.managed_obj._backend
-
+    mock_ungrip.return_value = None
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -787,6 +789,8 @@ async def test_gripper_action(
     mock_ungrip.assert_called_once()
     mock_ungrip.reset_mock()
     await ot3_hardware.home([OT3Axis.G])
+    mock_ungrip.assert_called_once()
+    mock_ungrip.reset_mock()
     await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
         gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
@@ -956,7 +960,9 @@ async def test_save_instrument_offset(
 async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
+    mock_ungrip: AsyncMock,
 ) -> None:
+    mock_ungrip.return_value = None
     await ot3_hardware.home()
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
