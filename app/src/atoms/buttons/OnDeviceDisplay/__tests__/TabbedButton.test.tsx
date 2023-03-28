@@ -70,11 +70,19 @@ describe('Background TabbedButton', () => {
   it('applies the correct states to the background tabbed button - focus', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
+    expect(button).toHaveStyleRule('box-shadow', 'none', {
+      modifier: ':focus',
+    })
+  })
+
+  it('applies the correct states to the background tabbed button - focus-visible', () => {
+    const { getByText } = render(props)
+    const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'box-shadow',
       `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
       {
-        modifier: ':focus',
+        modifier: ':focus-visible',
       }
     )
   })
@@ -135,14 +143,22 @@ describe('Foreground TabbedButton', () => {
     )
   })
 
-  it('applies the correct states to the foreground tabbed button - focus-', () => {
+  it('applies the correct states to the foreground tabbed button - focus', () => {
+    const { getByText } = render(props)
+    const button = getByText('tabbed button')
+    expect(button).toHaveStyleRule('box-shadow', 'none', {
+      modifier: ':focus',
+    })
+  })
+
+  it('applies the correct states to the foreground tabbed button - focus-visible', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'box-shadow',
       `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
       {
-        modifier: ':focus',
+        modifier: ':focus-visible',
       }
     )
   })
