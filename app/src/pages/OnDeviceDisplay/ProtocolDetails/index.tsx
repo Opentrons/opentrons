@@ -62,20 +62,22 @@ const ProtocolHeader = (props: {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      marginBottom={SPACING.spacingXXL}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
+      margin={SPACING.spacing4}
+      marginBottom={SPACING.spacingXXL}
     >
       <Flex
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing3}
       >
-        <Btn onClick={() => history.goBack()}>
-          <Icon
-            name="back"
-            width="1.1875rem"
-            color={COLORS.darkBlack_hundred}
-          />
+        <Btn
+          paddingLeft="0rem"
+          paddingRight="1.25rem"
+          onClick={() => history.goBack()}
+          width="2.5rem"
+        >
+          <Icon name="back" width="1.25rem" color={COLORS.darkBlack_hundred} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -188,7 +190,7 @@ const Summary = (props: {
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        margin-top={SPACING.spacingM}
+        marginTop={SPACING.spacing5}
         maxWidth="22rem"
         padding={`${SPACING.spacing3} 0.75rem`}
       >

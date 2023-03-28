@@ -103,7 +103,6 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     box-shadow: none;
     color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     cursor: default;
-    padding: ${SPACING.spacingM} ${SPACING.spacingXXL};
     text-align: ${TYPOGRAPHY.textAlignLeft};
     text-transform: ${TYPOGRAPHY.textTransformNone};
 
@@ -141,6 +140,11 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       css={MEDIUM_BUTTON_STYLE}
       aria-label={`MediumButton_${buttonType}`}
       flexDirection={DIRECTION_ROW}
+      padding={
+        iconName !== undefined
+          ? `${SPACING.spacingM} ${SPACING.spacing5}`
+          : `${SPACING.spacingM} ${SPACING.spacingXXL}`
+      }
       width={width}
     >
       <Flex
