@@ -3,12 +3,10 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_FLEX_END,
-  Btn,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
@@ -21,7 +19,6 @@ import type { Mount } from '../../redux/pipettes/types'
 interface LevelPipetteProps {
   mount: Mount
   pipetteModelName: string
-  back: () => void
   confirm: () => void
 }
 
@@ -50,7 +47,7 @@ function LevelingVideo(props: {
 }
 
 export function LevelPipette(props: LevelPipetteProps): JSX.Element {
-  const { mount, pipetteModelName, back, confirm } = props
+  const { mount, pipetteModelName, confirm } = props
 
   const { t } = useTranslation('change_pipette')
 
@@ -98,22 +95,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
           <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
         </Flex>
       </Flex>
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginBottom={SPACING.spacing6}
-        marginX={SPACING.spacing6}
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing6}
-      >
-        <Btn onClick={back}>
-          <StyledText
-            css={TYPOGRAPHY.pSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            color={COLORS.darkGreyEnabled}
-          >
-            {t('go_back')}
-          </StyledText>
-        </Btn>
+      <Flex justifyContent={JUSTIFY_FLEX_END} margin={SPACING.spacing6}>
         <PrimaryButton onClick={confirm}>{t('confirm_level')}</PrimaryButton>
       </Flex>
     </>
