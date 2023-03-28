@@ -145,10 +145,8 @@ function isLoadCommand(
 ): command is SetupRunTimeCommand {
   const loadCommands: Array<SetupCreateCommand['commandType']> = [
     'loadLabware',
-    'loadLiquid',
     'loadModule',
     'loadPipette',
   ]
-  // @ts-expect-error SetupCommand is more specific than Command, but the whole point of this util :)
-  return loadCommands.includes(command.commandType)
+  return command.commandType in loadCommands
 }
