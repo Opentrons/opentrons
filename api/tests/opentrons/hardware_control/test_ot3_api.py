@@ -1162,7 +1162,10 @@ async def test_home_axis(
             if axis in [OT3Axis.Z_L, OT3Axis.P_L]:
                 # move is called
                 mock_backend_move.assert_awaited_once()
-                mock_backend_home.assert_not_awaited()
+                move = mock_backend_move.call_args_list[0][0][1][0]
+                assert move.distance == 95.0
+                # then home is called
+                mock_backend_home.assert_awaited_once()
             else:
                 # we move to 20 mm away from home
                 mock_backend_move.assert_awaited_once()
