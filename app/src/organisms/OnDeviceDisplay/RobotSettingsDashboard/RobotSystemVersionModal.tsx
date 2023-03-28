@@ -8,6 +8,8 @@ import {
   DIRECTION_ROW,
   Icon,
   TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
   ALIGN_CENTER,
   COLORS,
   SPACING,
@@ -17,7 +19,6 @@ import {
 import { Modal } from '../../../molecules/Modal'
 import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
 import { StyledText } from '../../../atoms/text'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 
 interface RobotSystemVersionModalProps {
   version: string

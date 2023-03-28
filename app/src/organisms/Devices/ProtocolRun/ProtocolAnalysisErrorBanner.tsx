@@ -8,12 +8,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
   SPACING,
+  PrimaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
-import { PrimaryButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 import { StyledText } from '../../../atoms/text'
 

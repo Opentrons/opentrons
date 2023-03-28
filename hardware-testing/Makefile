@@ -73,12 +73,12 @@ test-cov:
 
 .PHONY: test-gravimetric
 test-gravimetric:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 200 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 50 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --tip 50 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1 --inspect
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 200 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 50 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --tip 50 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1 --inspect
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1 --increment
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -201,6 +201,7 @@ sync-sw-ot3:
 	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../shared-data && $(MAKE) all push-no-restart-ot3 host=$(host)
+	cd ../robot-server && $(MAKE) push-ot3 host=$(host)
 	cd ../hardware-testing && $(MAKE) push-all-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3
