@@ -24,9 +24,6 @@ import { ModalShell } from '../../../molecules/Modal'
 import { TooManyPinsModal } from '../../../molecules/Modal/OnDeviceDisplay'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 
-import { SUCCESS_TOAST } from '../../../atoms/Toast'
-import { useToaster } from '../../../organisms/ToasterOven'
-
 import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -44,8 +41,6 @@ export function LongPressModal(props: {
   const pinned = pinnedProtocolIds.includes(protocol.id)
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
-
-  const { makeSnackbar, makeToast } = useToaster()
 
   // This looks totally bonkers, and it is. This construction is to make
   // it easier to use in unit tests, where we have to mock both the mutation
@@ -84,14 +79,10 @@ export function LongPressModal(props: {
       } else {
         pinnedProtocolIds.push(protocol.id)
         handlePinnedProtocolIds(pinnedProtocolIds)
-        makeToast('Have some toast!', SUCCESS_TOAST, {
-          secondaryMessage: protocol.metadata.protocolName,
-        })
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocol.id)
       handlePinnedProtocolIds(pinnedProtocolIds)
-      makeSnackbar('Have a snack!')
     }
   }
 
