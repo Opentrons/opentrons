@@ -137,7 +137,7 @@ describe('Instructions', () => {
     getByAltText('attach-left-single-GEN1-screws')
     const goBack = getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
-    expect(props.back).toHaveBeenCalled()
+    expect(props.setWantedName).toHaveBeenCalled()
     const cont = getByRole('button', { name: 'Continue' })
     fireEvent.click(cont)
     expect(props.setStepPage).toHaveBeenCalled()
