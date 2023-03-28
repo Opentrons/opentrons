@@ -174,7 +174,7 @@ async def test_create_protocol_runner(
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
     config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
-    runner_type: AbstractRunner,
+    runner_type: Union[JsonRunner, PythonAndLegacyRunner, LiveRunner],
 ) -> None:
     """It should return protocol runner type depending on the config."""
     assert isinstance(
@@ -186,7 +186,7 @@ async def test_create_protocol_runner(
             json_file_reader=json_file_reader,
             json_translator=json_translator,
         ),
-        runner_type,
+        runner_type,  # type: ignore[arg-type]
     )
 
 
