@@ -15,6 +15,7 @@ import {
   useRunCreatedAtTimestamp,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
@@ -37,6 +38,7 @@ jest.mock('../../../organisms/ProtocolSetupModules')
 jest.mock('../../../organisms/ProtocolSetupModules/utils')
 jest.mock('../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../organisms/RunTimeControl/hooks')
+jest.mock('../../../organisms/ProtocolSetupLiquids')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -68,7 +70,9 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
-
+const mockProtocolSetupLiquids = ProtocolSetupLiquids as jest.MockedFunction<
+  typeof ProtocolSetupLiquids
+>
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
@@ -92,6 +96,9 @@ describe('ProtocolSetup', () => {
     when(mockUseAttachedModules).calledWith().mockReturnValue([])
     mockProtocolSetupModules.mockReturnValue(
       <div>Mock ProtocolSetupModules</div>
+    )
+    mockProtocolSetupLiquids.mockReturnValue(
+      <div>Mock ProtocolSetupLiquids</div>
     )
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     when(mockUseRunControls)
@@ -177,5 +184,12 @@ describe('ProtocolSetup', () => {
     expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
     queryByText('Modules')?.click()
     getByText('Mock ProtocolSetupModules')
+  })
+
+  it('should launch protocol setup liquids screen when click liquids', () => {
+    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    expect(queryByText('Mock ProtocolSetupLiquids')).toBeNull()
+    queryByText('Liquids')?.click()
+    getByText('Mock ProtocolSetupLiquids')
   })
 })

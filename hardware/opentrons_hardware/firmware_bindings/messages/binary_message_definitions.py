@@ -4,13 +4,15 @@ from functools import lru_cache
 from typing import Type, Union, Optional
 from typing_extensions import get_args
 
-from ..binary_constants import BinaryMessageId
+from ..binary_constants import BinaryMessageId, LightTransitionType, LightAnimationType
 from .. import utils
 import logging
 from .fields import (
     FirmwareShortSHADataField,
     VersionFlagsField,
     OptionalRevisionField,
+    LightTransitionTypeField,
+    LightAnimationTypeField,
 )
 
 log = logging.getLogger(__name__)
@@ -122,8 +124,8 @@ class EnterBootloaderResponse(utils.BinarySerializable):
     message_id: utils.UInt16Field = utils.UInt16Field(
         BinaryMessageId.enter_bootloader_response
     )
-    success: utils.UInt8Field = utils.UInt8Field(0)
     length: utils.UInt16Field = utils.UInt16Field(1)
+    success: utils.UInt8Field = utils.UInt8Field(0)
 
 
 @dataclass
@@ -158,6 +160,126 @@ class ReleaseSyncOut(utils.BinarySerializable):
     lenght: utils.UInt16Field = utils.UInt16Field(0)
 
 
+@dataclass
+class EstopStateChange(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.estop_state_change
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    engaged: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class EstopButtonDetectionChange(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.estop_button_detection_change
+    )
+    length: utils.UInt16Field = utils.UInt16Field(2)
+    aux1_detected: utils.UInt8Field = utils.UInt8Field(0)
+    aux2_detected: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class DoorSwitchStateRequest(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.door_switch_state_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class DoorSwitchStateInfo(utils.BinarySerializable):
+    """Request the version information from the device."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.door_switch_state_info
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    door_open: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class AddLightActionRequest(utils.BinarySerializable):
+    """Add an action to the staging light queue.
+
+    The RGBW values are uint8_t fields and should be specified in the
+    range [0,255], where 0 is fully off and 255 is fully on.
+    """
+
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.add_light_action)
+    length: utils.UInt16Field = utils.UInt16Field(7)
+    transition_time: utils.UInt16Field = utils.UInt16Field(0)
+    transition_type: LightTransitionTypeField = LightTransitionTypeField(
+        LightTransitionType.linear
+    )
+    red: utils.UInt8Field = utils.UInt8Field(0)
+    green: utils.UInt8Field = utils.UInt8Field(0)
+    blue: utils.UInt8Field = utils.UInt8Field(0)
+    white: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class ClearLightActionStagingQueue(utils.BinarySerializable):
+    """Clear the staging queue for light actions."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.clear_light_action_staging_queue
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class StartLightAction(utils.BinarySerializable):
+    """Begin the action that is in the staging queue."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.start_light_action
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    type: LightAnimationTypeField = LightAnimationTypeField(
+        LightAnimationType.single_shot
+    )
+
+
+@dataclass
+class SetDeckLightRequest(utils.BinarySerializable):
+    """Set the deck light on or off."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.set_deck_light_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    # Set to 0 for off, 1 for on
+    setting: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class GetDeckLightRequest(utils.BinarySerializable):
+    """Get the deck light status."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.get_deck_light_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class GetDeckLightResponse(utils.BinarySerializable):
+    """Contains deck light status."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.get_deck_light_response
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    setting: utils.UInt8Field = utils.UInt8Field(0)
+
+
 BinaryMessageDefinition = Union[
     Echo,
     Ack,
@@ -170,6 +292,16 @@ BinaryMessageDefinition = Union[
     ReleaseEstop,
     EngageSyncOut,
     ReleaseSyncOut,
+    EstopStateChange,
+    EstopButtonDetectionChange,
+    DoorSwitchStateRequest,
+    DoorSwitchStateInfo,
+    AddLightActionRequest,
+    ClearLightActionStagingQueue,
+    StartLightAction,
+    SetDeckLightRequest,
+    GetDeckLightRequest,
+    GetDeckLightResponse,
 ]
 
 
