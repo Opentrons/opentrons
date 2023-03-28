@@ -5,9 +5,9 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
+  PrimaryBtn,
   SPACING,
 } from '@opentrons/components'
-import { PrimaryButton } from '../buttons'
 import { StyledText } from '../text'
 import { Snackbar } from './index'
 import type { Story, Meta } from '@storybook/react'
@@ -27,7 +27,7 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
   return (
     <>
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
-        <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
+        <PrimaryBtn onClick={handleClick}>Click me</PrimaryBtn>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
           <StyledText as="p">
             When clicking the button, the Snackbar shows up in the bottom.
@@ -70,7 +70,7 @@ const TenSecondTemplate: Story<
   return (
     <>
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
-        <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
+        <PrimaryBtn onClick={handleClick}>Click me</PrimaryBtn>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
           <StyledText as="p">
             When clicking the button, the Snackbar shows up in the bottom.
