@@ -728,12 +728,16 @@ class OT3API(
         """
         Home the jaw of the gripper.
         """
-        gripper = self._gripper_handler.get_gripper()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-            gripper.default_home_force
-        )
-        await self._ungrip(duty_cycle=dc)
-        gripper.state = GripperJawState.HOMED_READY
+        try:
+            gripper = self._gripper_handler.get_gripper()
+            self._log.info("Homing gripper jaw.")
+            dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+                gripper.default_home_force
+            )
+            await self._ungrip(duty_cycle=dc)
+            gripper.state = GripperJawState.HOMED_READY
+        except GripperNotAttachedError:
+            pass
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
@@ -1191,8 +1195,9 @@ class OT3API(
         async with self._motion_lock:
             for axis in axes:
                 try:
-                    # let backend handle homing gripper jaw and pipette plunger
-                    if axis in [OT3Axis.G, OT3Axis.Q]:
+                    if axis == OT3Axis.G:
+                        await self.home_gripper_jaw()
+                    elif axis == OT3Axis.Q:
                         await self._backend.home([axis])
                     else:
                         await self._home_axis(axis)
@@ -1206,16 +1211,6 @@ class OT3API(
                 else:
                     await self._cache_current_position()
                     await self._cache_encoder_position()
-                    if axis == OT3Axis.G:
-                        try:
-                            self._gripper_handler.set_jaw_state(
-                                GripperJawState.HOMED_READY
-                            )
-                            self._gripper_handler.set_jaw_displacement(
-                                self._encoder_position[OT3Axis.G]
-                            )
-                        except GripperNotAttachedError:
-                            pass
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
