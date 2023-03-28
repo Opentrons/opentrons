@@ -41,7 +41,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             prep_distance_mm=4.0,
             max_overrun_distance_mm=2.0,
             speed_mm_per_s=1.0,
-            sensor_threshold_pf=4.0,
+            sensor_threshold_pf=3.0,
         ),
     ),
     edge_sense=EdgeSenseSettings(
@@ -51,7 +51,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             prep_distance_mm=1,
             max_overrun_distance_mm=1,
             speed_mm_per_s=0.5,
-            sensor_threshold_pf=4.0,
+            sensor_threshold_pf=3.0,
         ),
         search_initial_tolerance_mm=8.0,
         search_iteration_limit=9,
@@ -71,6 +71,7 @@ DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-13.5, -60.5, 255.675)
 DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (40.5, -60.5, 255.675)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (84.55, -12.75, 93.85)
 DEFAULT_Z_RETRACT_DISTANCE: Final = 2
+DEFAULT_SAFE_HOME_DISTANCE: Final = 5
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
@@ -377,6 +378,9 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         ),
         z_retract_distance=robot_settings.get(
             "z_retract_distance", DEFAULT_Z_RETRACT_DISTANCE
+        ),
+        safe_home_distance=robot_settings.get(
+            "safe_home_distance", DEFAULT_SAFE_HOME_DISTANCE
         ),
         deck_transform=_build_default_transform(
             robot_settings.get("deck_transform", []), DEFAULT_DECK_TRANSFORM
