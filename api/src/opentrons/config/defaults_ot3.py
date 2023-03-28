@@ -41,7 +41,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             prep_distance_mm=4.0,
             max_overrun_distance_mm=2.0,
             speed_mm_per_s=1.0,
-            sensor_threshold_pf=4.0,
+            sensor_threshold_pf=3.0,
         ),
     ),
     edge_sense=EdgeSenseSettings(
@@ -51,7 +51,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             prep_distance_mm=1,
             max_overrun_distance_mm=1,
             speed_mm_per_s=0.5,
-            sensor_threshold_pf=4.0,
+            sensor_threshold_pf=3.0,
         ),
         search_initial_tolerance_mm=8.0,
         search_iteration_limit=9,
