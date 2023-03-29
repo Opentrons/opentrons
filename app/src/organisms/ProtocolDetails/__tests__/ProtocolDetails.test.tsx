@@ -158,7 +158,7 @@ describe('ProtocolDetails', () => {
     expect(getByRole('heading', { name: 'Deck View' })).toBeInTheDocument()
     expect(getByText('mock Deck Thumbnail')).toBeInTheDocument()
   })
-  it('opens choose robot slideout when run protocol button is clicked', () => {
+  it('opens choose robot slideout when Start setup button is clicked', () => {
     const { getByRole, getByText, queryByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
@@ -173,7 +173,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    const runProtocolButton = getByRole('button', { name: 'Run protocol' })
+    const runProtocolButton = getByRole('button', { name: 'Start setup' })
     expect(queryByText('mock Choose Robot Slideout')).toBeNull()
     fireEvent.click(runProtocolButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({

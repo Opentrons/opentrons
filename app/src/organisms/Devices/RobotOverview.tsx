@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Link as RouterLink } from 'react-router-dom'
 
 import {
   Box,
@@ -16,13 +15,11 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import OT3_PNG from '../../assets/images/OT3.png'
-import { Banner, BannerType } from '../../atoms/Banner'
 import { ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
@@ -31,12 +28,12 @@ import { RobotStatusHeader } from './RobotStatusHeader'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import {
-  useCalibrationTaskList,
   useIsRobotBusy,
   useIsRobotViewable,
   useLights,
   useRobot,
 } from './hooks'
+import { CalibrationStatusBanner } from './CalibrationStatusBanner'
 
 import type { State } from '../../redux/types'
 
@@ -53,27 +50,7 @@ export function RobotOverview({
     'robot_calibration',
   ])
 
-  const { taskListStatus } = useCalibrationTaskList(robotName)
   const isRobotBusy = useIsRobotBusy({ poll: true })
-
-  // start off assuming we are missing calibrations
-  let showCalibrationStatusBanner = true
-  let calibrationStatusBannerType = 'error'
-  let calibrationStatusBannerText = t(
-    'robot_calibration:missing_calibration_data_long'
-  )
-
-  // if the tasklist is empty, though, all calibrations are good
-  if (taskListStatus === 'complete') {
-    showCalibrationStatusBanner = false
-    // if we have tasks and they are all marked bad, then we should
-    // strongly suggest they re-do those calibrations
-  } else if (taskListStatus === 'bad') {
-    calibrationStatusBannerType = 'warning'
-    calibrationStatusBannerText = t(
-      'robot_calibration:recalibration_recommended'
-    )
-  }
 
   const robot = useRobot(robotName)
   const robotModel = useSelector((state: State) =>
@@ -174,37 +151,7 @@ export function RobotOverview({
           </Box>
         </Flex>
       </Flex>
-      {!isRobotBusy && showCalibrationStatusBanner && (
-        <Flex
-          paddingBottom={SPACING.spacing4}
-          flexDirection={DIRECTION_COLUMN}
-          width="100%"
-        >
-          <Banner type={calibrationStatusBannerType as BannerType}>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              flexDirection={DIRECTION_ROW}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              width="100%"
-            >
-              {calibrationStatusBannerText}
-              <RouterLink
-                to={`/devices/${robotName}/robot-settings/calibration`}
-              >
-                <StyledText
-                  as="p"
-                  color={COLORS.darkBlackEnabled}
-                  paddingRight={SPACING.spacing4}
-                  textAlign={TEXT_ALIGN_RIGHT}
-                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                >
-                  {t('robot_calibration:launch_calibration_link_text')}
-                </StyledText>
-              </RouterLink>
-            </Flex>
-          </Banner>
-        </Flex>
-      )}
+      {!isRobotBusy ? <CalibrationStatusBanner robotName={robotName} /> : null}
       <Flex
         borderBottom={BORDERS.lineBorder}
         marginBottom={SPACING.spacing4}

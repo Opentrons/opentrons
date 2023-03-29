@@ -28,6 +28,7 @@ export interface TaskListProps {
   activeIndex: [number, number] | null
   taskList: TaskProps[]
   taskListStatus: string | null
+  isLoading?: boolean
   generalTaskClickHandler?: () => void
   generalTaskDisabledReason?: string | null
 }

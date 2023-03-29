@@ -127,7 +127,7 @@ export function ProtocolOverflowMenu(
             onClick={handleClickRun}
             data-testid="ProtocolOverflowMenu_run"
           >
-            {t('run_now')}
+            {t('start_setup')}
           </MenuItem>
           <MenuItem
             onClick={handleClickReanalyze}
