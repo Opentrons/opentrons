@@ -100,6 +100,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
@@ -128,6 +129,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
@@ -164,6 +166,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
@@ -200,6 +203,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: MOCK_ACTUAL_PIPETTE,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
@@ -232,6 +236,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
@@ -268,15 +273,13 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
 
     const { getByText, getByRole } = render(props)
     getByText('Level the pipette')
-    const goBack = getByRole('button', { name: 'Go back' })
-    fireEvent.click(goBack)
-    expect(props.tryAgain).toHaveBeenCalled()
     const continueBtn = getByRole('button', { name: 'Confirm level' })
     fireEvent.click(continueBtn)
     expect(props.setConfirmPipetteLevel).toHaveBeenCalled()
@@ -299,6 +302,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: true,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
@@ -332,6 +336,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
@@ -368,6 +373,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
@@ -397,6 +403,7 @@ describe('ConfirmPipette', () => {
       setWrongWantedPipette: jest.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
+      nextStep: jest.fn(),
       setConfirmPipetteLevel: jest.fn(),
       isDisabled: false,
     }
