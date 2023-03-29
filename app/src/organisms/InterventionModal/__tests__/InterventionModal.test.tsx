@@ -3,8 +3,11 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { InterventionModal } from '..'
 import {
+  mockPauseCommandWithNoMessage,
   mockPauseCommandWithoutStartTime,
+  mockPauseCommandWithShortMessage,
   mockPauseCommandWithStartTime,
+  shortCommandText,
   truncatedCommandMessage,
 } from '../__fixtures__'
 
@@ -39,5 +42,17 @@ describe('InterventionModal', () => {
     props = { ...props, command: mockPauseCommandWithoutStartTime }
     const { getByText } = render(props)
     expect(getByText('Paused for --:--:--')).toBeTruthy()
+  })
+
+  it('does not truncate command text when shorter than 220 characters', () => {
+    props = { ...props, command: mockPauseCommandWithShortMessage }
+    const { getByText } = render(props)
+    expect(getByText(shortCommandText)).toBeTruthy()
+  })
+
+  it('displays a default message if pause step does not have a message', () => {
+    props = { ...props, command: mockPauseCommandWithNoMessage }
+    const { getByText } = render(props)
+    expect(getByText('Pausing protocol')).toBeTruthy()
   })
 })
