@@ -1,3 +1,4 @@
 .pulled-data/*
 *.tar.gz
+*.zip
 ot3-firmware/
