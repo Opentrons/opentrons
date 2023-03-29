@@ -173,7 +173,17 @@ describe('CheckItem', () => {
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
-      [{ commandType: 'home', params: {} }],
+      [
+        { commandType: 'home', params: {} },
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'labwareId1',
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+      ],
       false
     )
     await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
@@ -299,6 +309,10 @@ describe('CheckItem', () => {
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
+        {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: 'firstHSId' },
+        },
         {
           commandType: 'heaterShaker/deactivateShaker',
           params: { moduleId: 'firstHSId' },

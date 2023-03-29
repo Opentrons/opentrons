@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import { chainRunCommands, chainRunCommandsRecursive } from './utils'
+import { chainRunCommandsRecursive } from './utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 export type CreateCommandMutate = ReturnType<

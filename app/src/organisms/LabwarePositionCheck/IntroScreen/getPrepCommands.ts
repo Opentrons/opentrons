@@ -16,12 +16,10 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { HomeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
-import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 type LPCPrepCommand =
   | HomeCreateCommand
   | SetupRunTimeCommand
-  | DropTipCreateCommand
   | TCOpenLidCreateCommand
   | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerCloseLatchCreateCommand

@@ -275,7 +275,7 @@ export const LabwarePositionCheckInner = (
             title={t('labware_position_check_title')}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
-            onExit={() =>{
+            onExit={() => {
               if (fatalError != null) {
                 handleCleanUpAndClose()
               } else if (!showConfirmation && !isExiting) {

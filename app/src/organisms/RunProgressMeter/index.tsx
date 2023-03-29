@@ -66,11 +66,17 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const runCommands = allCommandsQueryData?.data ?? []
   const runCommandsLength = allCommandsQueryData?.meta.totalLength
 
+  const downloadIsDisabled =
+    runStatus === RUN_STATUS_RUNNING ||
+    runStatus === RUN_STATUS_IDLE ||
+    runStatus === RUN_STATUS_FINISHING
+
   // todo (jb 2-16-23) This should be switched out soon for something more performant, see https://opentrons.atlassian.net/browse/RLAB-298
   const { downloadRunLog } = useDownloadRunLog(
     robotName,
     runId,
-    analysisCommands.length
+    analysisCommands.length,
+    !downloadIsDisabled
   )
 
   /**
@@ -150,12 +156,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     e.stopPropagation()
     downloadRunLog()
   }
-
-  const downloadIsDisabled =
-    runStatus === RUN_STATUS_RUNNING ||
-    runStatus === RUN_STATUS_IDLE ||
-    runStatus === RUN_STATUS_FINISHING
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

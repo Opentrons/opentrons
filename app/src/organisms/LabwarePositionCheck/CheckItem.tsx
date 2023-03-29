@@ -81,6 +81,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   } else if (moduleId != null && moduleType === HEATERSHAKER_MODULE_TYPE) {
     modulePrepCommands = [
       {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: { moduleId },
+      },
+      {
         commandType: 'heaterShaker/deactivateShaker',
         params: { moduleId },
       },
@@ -90,9 +94,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       },
     ]
   }
+  const initialPosition = workingOffsets.find(
+    o =>
+      o.labwareId === labwareId &&
+      isEqual(o.location, location) &&
+      o.initialPosition != null
+  )?.initialPosition
 
   React.useEffect(() => {
-    if (modulePrepCommands.length > 0) {
+    if (initialPosition == null && modulePrepCommands.length > 0) {
       chainRunCommands(modulePrepCommands, false)
         .then(() => {})
         .catch((e: Error) => {
@@ -255,7 +265,18 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   }
   const handleGoBack = (): void => {
     chainRunCommands(
-      [...modulePrepCommands, { commandType: 'home', params: {} }],
+      [
+        ...modulePrepCommands,
+        { commandType: 'home', params: {} },
+        {
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: labwareId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+      ],
       false
     )
       .then(() => {
@@ -271,12 +292,6 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       })
   }
 
-  const initialPosition = workingOffsets.find(
-    o =>
-      o.labwareId === labwareId &&
-      isEqual(o.location, location) &&
-      o.initialPosition != null
-  )?.initialPosition
   const existingOffset =
     getCurrentOffsetForLabwareInLocation(
       existingOffsets,
