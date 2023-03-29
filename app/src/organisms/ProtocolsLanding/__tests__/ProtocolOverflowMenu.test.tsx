@@ -66,15 +66,15 @@ describe('ProtocolOverflowMenu', () => {
     const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
     getByText('Show in folder')
-    getByText('Run now')
+    getByText('Start setup')
     getByText('Delete')
   })
 
-  it('should call run protocol when clicking run now button', () => {
+  it('should call run protocol when clicking Start setup button', () => {
     const [{ getByTestId, getByText }] = render()
     const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const runButton = getByText('Run now')
+    const runButton = getByText('Start setup')
     fireEvent.click(runButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
