@@ -221,24 +221,28 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       })
   }
   const handleInvalidateTip = (): void => {
-    chainRunCommands([{
-      commandType: 'dropTip',
-      params: {
-        pipetteId,
-        labwareId,
-        wellName: 'A1',
-      },
-    },
-    {
-      commandType: 'moveToWell' as const,
-      params: {
-        pipetteId: pipetteId,
-        labwareId: labwareId,
-        wellName: 'A1',
-        wellLocation: { origin: 'top' as const },
-      },
-    }]
-      , true)
+    chainRunCommands(
+      [
+        {
+          commandType: 'dropTip',
+          params: {
+            pipetteId,
+            labwareId,
+            wellName: 'A1',
+          },
+        },
+        {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          },
+        },
+      ],
+      true
+    )
       .then(() => {
         registerPosition({ type: 'tipPickUpOffset', offset: null })
         registerPosition({

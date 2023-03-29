@@ -220,18 +220,30 @@ describe('PickUpTip', () => {
       waitUntilComplete: true,
     })
     getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
-    getByRole('button', { name: 'try again' }).click()
-    await expect(props.createRunCommand).toHaveBeenNthCalledWith(3, {
-      command: {
-        commandType: 'dropTip',
-        params: {
-          pipetteId: 'pipetteId1',
-          labwareId: 'labwareId1',
-          wellName: 'A1',
+    await getByRole('button', { name: 'try again' }).click()
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          commandType: 'dropTip',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'labwareId1',
+            wellName: 'A1',
+          },
         },
-      },
-      waitUntilComplete: true,
-    })
+        {
+          commandType: 'moveToWell',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'labwareId1',
+            wellName: 'A1',
+            wellLocation: { origin: 'top', offset: undefined },
+          },
+        },
+      ],
+      true
+    )
     await expect(props.registerPosition).toHaveBeenNthCalledWith(3, {
       type: 'tipPickUpOffset',
       offset: null,
