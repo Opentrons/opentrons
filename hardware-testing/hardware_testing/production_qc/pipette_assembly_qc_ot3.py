@@ -786,7 +786,7 @@ async def _test_diagnostics_pressure(
         print(f"FAIL: sealed pressure ({pressure_compress}) is not correct")
     write_cb(
         [
-            "pressure-sealed",
+            "pressure-compressed",
             pressure_compress,
             _bool_to_pass_fail(pressure_compress_pass),
         ]
