@@ -640,7 +640,7 @@ async def _main() -> None:
                     critical_point=CriticalPoint.TIP,
                 )
                 # Aspirate
-                await hw_api.aspirate(mount, 200)
+                await hw_api.aspirate(mount)
                 cur_pos = await hw_api.current_position_ot3(
                     mount, critical_point=CriticalPoint.TIP
                 )
@@ -829,7 +829,7 @@ if __name__ == "__main__":
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
     parser.add_argument("--fg", action="store_true", default=True)
     parser.add_argument("--dial_indicator", action="store_true")
-    parser.add_argument("--tip_size", type=str, default="T200", help="Tip Size")
+    parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
     parser.add_argument("--max_z_distance", type=float, default=40)
     parser.add_argument("--min_z_distance", type=float, default=5)
     parser.add_argument("--mount_speed", type=float, default=11)
