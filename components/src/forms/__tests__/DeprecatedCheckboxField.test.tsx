@@ -1,20 +1,24 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import { CheckboxField } from '../CheckboxField'
+import { DeprecatedCheckboxField } from '../DeprecatedCheckboxField'
 import { Icon } from '../../icons'
 
-describe('CheckboxField', () => {
-  describe('CheckboxField', () => {
+describe('DeprecatedCheckboxField', () => {
+  describe('DeprecatedCheckboxField', () => {
     it('renders a checked icon when value === true', () => {
-      const wrapper = mount(<CheckboxField onChange={jest.fn()} value={true} />)
+      const wrapper = mount(
+        <DeprecatedCheckboxField onChange={jest.fn()} value={true} />
+      )
       const icon = wrapper.find(Icon)
 
       expect(icon.prop('name')).toEqual('checkbox-marked')
     })
 
     it('sets input checked attribute to true when value === true', () => {
-      const wrapper = mount(<CheckboxField onChange={jest.fn()} value={true} />)
+      const wrapper = mount(
+        <DeprecatedCheckboxField onChange={jest.fn()} value={true} />
+      )
 
       const input = wrapper.find('input')
       expect(input.prop('checked')).toBe(true)
@@ -22,7 +26,7 @@ describe('CheckboxField', () => {
 
     it('renders an unchecked icon when value === false', () => {
       const wrapper = mount(
-        <CheckboxField onChange={jest.fn()} value={false} />
+        <DeprecatedCheckboxField onChange={jest.fn()} value={false} />
       )
       const icon = wrapper.find(Icon)
 
@@ -31,7 +35,7 @@ describe('CheckboxField', () => {
 
     it('sets input checked attribute to false when value === false', () => {
       const wrapper = mount(
-        <CheckboxField onChange={jest.fn()} value={false} />
+        <DeprecatedCheckboxField onChange={jest.fn()} value={false} />
       )
 
       const input = wrapper.find('input')
@@ -39,7 +43,7 @@ describe('CheckboxField', () => {
     })
 
     it('renders an unchecked icon when no value prop', () => {
-      const wrapper = mount(<CheckboxField onChange={jest.fn()} />)
+      const wrapper = mount(<DeprecatedCheckboxField onChange={jest.fn()} />)
       const icon = wrapper.find(Icon)
 
       expect(icon).toBeDefined()
@@ -47,17 +51,17 @@ describe('CheckboxField', () => {
     })
 
     it('sets input checked attribute to false when no value prop', () => {
-      const wrapper = mount(<CheckboxField onChange={jest.fn()} />)
+      const wrapper = mount(<DeprecatedCheckboxField onChange={jest.fn()} />)
 
       const input = wrapper.find('input')
       expect(input.prop('checked')).toBe(false)
     })
   })
 
-  describe('indeterminate Checkboxfield', () => {
+  describe('indeterminate DeprecatedCheckboxField', () => {
     it(' renders a minux box icon', () => {
       const wrapper = mount(
-        <CheckboxField onChange={jest.fn()} isIndeterminate />
+        <DeprecatedCheckboxField onChange={jest.fn()} isIndeterminate />
       )
       const icon = wrapper.find(Icon)
       expect(icon.prop('name')).toEqual('minus-box')
@@ -65,7 +69,7 @@ describe('CheckboxField', () => {
 
     it('passes isIndeterimate prop and adds input indeterminate attribute', () => {
       const wrapper = mount(
-        <CheckboxField onChange={jest.fn()} isIndeterminate />
+        <DeprecatedCheckboxField onChange={jest.fn()} isIndeterminate />
       )
 
       const input = wrapper.find('input')

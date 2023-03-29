@@ -7,13 +7,13 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { Modal } from '../../../../molecules/Modal'
 import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
-import { PrimaryButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =

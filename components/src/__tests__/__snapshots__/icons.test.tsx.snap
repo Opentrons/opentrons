@@ -141,6 +141,30 @@ exports[`icons arrow-right renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons back renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 19 34"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M16.6667 33.6668L0 17.0002L16.6667 0.333496L19 2.7085L4.70833 17.0002L19 31.2918L16.6667 33.6668Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons book-open-page-variant renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

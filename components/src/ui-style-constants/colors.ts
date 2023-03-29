@@ -110,7 +110,7 @@ export const darkBlack_hundred = darkBlackEnabled
 export const darkBlack_ninety = `${darkBlackEnabled}${opacity90HexCode}`
 export const darkBlack_seventy = `${darkBlackEnabled}${opacity70HexCode}`
 export const darkBlack_sixty = `${darkBlackEnabled}${opacity60HexCode}`
-export const darkBlack_fourty = `${darkBlackEnabled}${opacity40HexCode}`
+export const darkBlack_forty = `${darkBlackEnabled}${opacity40HexCode}`
 export const darkBlack_twenty = `${darkBlackEnabled}${opacity20HexCode}`
 
 export const light_one = '#d0d0d0'

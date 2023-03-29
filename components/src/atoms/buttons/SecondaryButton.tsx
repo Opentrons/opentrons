@@ -1,14 +1,8 @@
 import styled from 'styled-components'
-import {
-  SPACING,
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  styleProps,
-  isntStyleProp,
-} from '@opentrons/components'
+import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { isntStyleProp, styleProps } from '../../primitives'
 
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps } from '../../index'
 
 interface SecondaryButtonProps extends StyleProps {
   /** button action is dangerous and may have non-reversible side-effects for user */

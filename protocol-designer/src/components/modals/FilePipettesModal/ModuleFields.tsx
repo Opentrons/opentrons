@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
+import {
+  DeprecatedCheckboxField,
+  DropdownField,
+  FormGroup,
+} from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
@@ -89,7 +93,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
         const selectedModel = values[moduleType].model
         return (
           <div className={styles.module_form_group} key={`${moduleType}`}>
-            <CheckboxField
+            <DeprecatedCheckboxField
               label={label}
               name={`${moduleTypeAccessor}.onDeck`}
               value={values[moduleType].onDeck}

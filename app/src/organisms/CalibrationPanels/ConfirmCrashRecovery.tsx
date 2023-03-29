@@ -8,10 +8,10 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
+  AlertPrimaryButton,
   TYPOGRAPHY,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 export interface ConfirmCrashRecoveryProps {
