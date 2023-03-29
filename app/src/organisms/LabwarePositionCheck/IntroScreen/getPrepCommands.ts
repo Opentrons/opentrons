@@ -5,11 +5,11 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
-  SetupRunTimeCommand,
-  SetupCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+  CreateCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { SetupRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
@@ -143,12 +143,10 @@ export function getPrepCommands(
 function isLoadCommand(
   command: RunTimeCommand
 ): command is SetupRunTimeCommand {
-  const loadCommands: Array<SetupCreateCommand['commandType']> = [
+  const loadCommands: Array<CreateCommand['commandType']> = [
     'loadLabware',
-    'loadLiquid',
     'loadModule',
     'loadPipette',
   ]
-  // @ts-expect-error SetupCommand is more specific than Command, but the whole point of this util :)
   return loadCommands.includes(command.commandType)
 }
