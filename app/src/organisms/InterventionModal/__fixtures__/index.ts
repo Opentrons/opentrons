@@ -4,7 +4,8 @@ export const fullCommandMessage =
 export const truncatedCommandMessage =
   'This is a user generated message that gives details about the pause command. This text is truncated to 220 characters. semper risus in hendrerit gravida rutrum quisque non tellus orci ac auctor augue mauris augue nequ...'
 
-export const shortCommandText = "this won't get truncated because it isn't more than 220 characters."
+export const shortCommandText =
+  "this won't get truncated because it isn't more than 220 characters."
 
 export const mockPauseCommandWithStartTime = {
   commandType: 'waitForResume',
