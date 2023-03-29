@@ -81,7 +81,7 @@ async def test_run_update(
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
 
-    target = Target(system_node=NodeId.head)
+    target = Target.from_single_node(NodeId.head)
     update_details: Dict[FirmwareTarget, str] = {
         target.system_node: hex_file_path,
     }
@@ -137,8 +137,8 @@ async def test_run_updates(
     hex_file_2 = str()
     mock_hex_record_processor = MagicMock()
     mock_hex_record_builder.return_value = mock_hex_record_processor
-    target_1 = Target(system_node=NodeId.gantry_x)
-    target_2 = Target(system_node=NodeId.gantry_y)
+    target_1 = Target.from_single_node(NodeId.gantry_x)
+    target_2 = Target.from_single_node(NodeId.gantry_y)
     update_details: Dict[FirmwareTarget, str] = {
         target_1.system_node: hex_file_1,
         target_2.system_node: hex_file_2,

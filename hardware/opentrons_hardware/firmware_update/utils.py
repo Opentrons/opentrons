@@ -8,16 +8,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Optional,
-    Set,
-    Union,
-    Tuple,
-    Iterable,
-    Iterator,
-)
+from typing import Any, Dict, Optional, Set, Union, Tuple, Iterable, Iterator, cast
 from opentrons_hardware.firmware_bindings.constants import (
     FirmwareTarget,
     NodeId,
@@ -33,13 +24,9 @@ _FIRMWARE_MANIFEST_PATH: Final = os.path.abspath(
 
 _DEFAULT_PCBA_REVS: Final[Dict[FirmwareTarget, str]] = {
     NodeId.head: "c2",
-    NodeId.head_bootloader: "c2",
     NodeId.gantry_x: "c1",
-    NodeId.gantry_x_bootloader: "c1",
     NodeId.gantry_y: "c1",
-    NodeId.gantry_y_bootloader: "c1",
     NodeId.gripper: "c1",
-    NodeId.gripper_bootloader: "c1",
     USBTarget.rear_panel: "b1",
 }
 
@@ -64,6 +51,8 @@ class FirmwareUpdateType(Enum):
     pipettes_96 = 6
     rear_panel = 7
     unknown = -1
+    unknown_no_subtype = -2
+    unknown_no_revision = -3
 
     def __str__(self) -> str:
         """Name of enum."""
@@ -97,11 +86,19 @@ class FirmwareUpdateType(Enum):
         """Return FirmwareUpdateType with given node."""
         lookup = {
             NodeId.head: cls.head,
+            NodeId.head: cls.head,
             NodeId.gantry_x: cls.gantry_x,
             NodeId.gantry_y: cls.gantry_y,
             NodeId.gripper: cls.gripper,
         }
-        return lookup.get(node, cls.unknown)
+        return lookup[node.application_for()]
+
+    @classmethod
+    def from_node_info(cls, node: NodeId, subid: int) -> "FirmwareUpdateType":
+        """Build an update type from a node and subid."""
+        if node.application_for() in (NodeId.pipette_left, NodeId.pipette_right):
+            return cls.from_pipette(PipetteType(subid))
+        return cls.from_node(node)
 
     @classmethod
     def from_pipette(cls, pipette: PipetteType) -> "FirmwareUpdateType":
@@ -194,11 +191,14 @@ def _revision_for_core_or_gripper(device_info: DeviceInfoCache) -> str:
     because PCBAs of the default revision were built before revision handling was
     introduced, and cannot be updated because too many were made.
     """
-    return device_info.revision.main or _DEFAULT_PCBA_REVS[device_info.target]
+    return (
+        device_info.revision.main
+        or _DEFAULT_PCBA_REVS[device_info.target.application_for()]
+    )
 
 
 def _revision_for_pipette(
-    pipette_type: PipetteType, device_info: DeviceInfoCache
+    device_info: DeviceInfoCache, fallback_pipette_type: PipetteType
 ) -> str:
     """Returns the appropriate defaulted revision for a pipette.
 
@@ -206,24 +206,33 @@ def _revision_for_pipette(
     needed because PCBAs of the default revision were built before revision handling
     was introduced, and cannot be updated because too many were made.
     """
+    try:
+        pipette_type = PipetteType(device_info.subidentifier)
+    except ValueError:
+        pipette_type = fallback_pipette_type
     return device_info.revision.main or _DEFAULT_PCBA_REVS_PIPETTE[pipette_type]
 
 
+def _revision(version_cache: DeviceInfoCache) -> str:
+    if version_cache.target.application_for() in (
+        NodeId.pipette_left,
+        NodeId.pipette_right,
+    ):
+        return _revision_for_pipette(
+            version_cache, PipetteType(version_cache.subidentifier)
+        )
+    else:
+        return _revision_for_core_or_gripper(version_cache)
+
+
 def _update_details_for_device(
-    attached_pipettes: Dict[NodeId, PipetteType],
     version_cache: DeviceInfoCache,
 ) -> Tuple[FirmwareUpdateType, str]:
     if version_cache.target in NodeId:
         node = NodeId(version_cache.target)
-        if node in attached_pipettes:
-            pipette_type = attached_pipettes[node]
-            return FirmwareUpdateType.from_pipette(pipette_type), _revision_for_pipette(
-                pipette_type, version_cache
-            )
-        else:
-            return FirmwareUpdateType.from_node(node), _revision_for_core_or_gripper(
-                version_cache
-            )
+        return FirmwareUpdateType.from_node_info(
+            node, version_cache.subidentifier
+        ), _revision(version_cache)
     else:
         return FirmwareUpdateType.from_usb_target(
             USBTarget(version_cache.target)
@@ -233,22 +242,27 @@ def _update_details_for_device(
 def _update_type_for_device(
     attached_pipettes: Dict[NodeId, PipetteType],
     version_cache: DeviceInfoCache,
-) -> Union[Tuple[FirmwareUpdateType, str], Tuple[None, None]]:
+) -> Tuple[FirmwareUpdateType, str]:
     try:
-        update_type, revision = _update_details_for_device(
-            attached_pipettes, version_cache
-        )
+        update_type, revision = _update_details_for_device(version_cache)
     except KeyError:
-        pipette_type = (
-            attached_pipettes.get(NodeId(version_cache.target), None)
-            if version_cache.target in NodeId
-            else None
-        )
         log.error(
-            f"Node {version_cache.target.name} (pipette {pipette_type}) "
-            "has no revision or default revision"
+            f"Node {version_cache.target.name} has no revision or default revision and cannot be updated"
         )
-        return None, None
+        return (FirmwareUpdateType.unknown_no_revision, "")
+    except ValueError:
+        # This means we did not have a valid pipette type in the version cache, so fall back to the passed-in
+        # attached_pipettes data.
+        # TODO: Delete this fallback when all pipettes have subidentifiers in their bootloaders.
+        if version_cache.target in attached_pipettes:
+            pipette_type = attached_pipettes[cast(NodeId, version_cache.target)]
+            return FirmwareUpdateType.from_pipette(pipette_type), _revision_for_pipette(
+                version_cache, pipette_type
+            )
+        log.error(
+            f"Target {version_cache.target.name} has no known subtype and cannot be updated"
+        )
+        return (FirmwareUpdateType.unknown_no_subtype, "")
     return update_type, revision
 
 
@@ -259,15 +273,7 @@ def _update_types_from_devices(
     for version_cache in devices:
         log.debug(f"Checking firmware update for {version_cache.target.name}")
         # skip pipettes that dont have a PipetteType
-        node_id = version_cache.target
-        if node_id in [
-            NodeId.pipette_left,
-            NodeId.pipette_right,
-        ] and not attached_pipettes.get(NodeId(node_id)):
-            continue
         update_type, rev = _update_type_for_device(attached_pipettes, version_cache)
-        if not rev or not update_type:
-            continue
         yield (version_cache, update_type, rev)
 
 
@@ -284,6 +290,9 @@ def _should_update(
     update_info: UpdateInfo,
     force: bool,
 ) -> bool:
+    if version_cache.target.is_bootloader():
+        log.info(f"Update required {version_cache.target} (in bootloader)")
+        return True
     if force:
         log.info(f"Update required for {version_cache.target} (forced)")
         return True
@@ -303,7 +312,7 @@ def _update_info_for_type(
     update_type: Optional[FirmwareUpdateType],
 ) -> Optional[UpdateInfo]:
     # Given the update_type find the corresponding updateInfo, monadically on update_info
-    if not update_type:
+    if not update_type or update_type.value <= FirmwareUpdateType.unknown.value:
         return None
     try:
         update_info = known_firmware[update_type]
@@ -337,6 +346,8 @@ def _info_for_required_updates(
             yield version_cache.target, update_info.version, update_info.files_by_revision, rev
 
 
+# TODO: When we're confident that all pipettes report their type in the device info subidentifier
+# field, both in application and bootloader, we can remove the attached_pipettes from this codepath.
 def check_firmware_updates(
     device_info: Dict[FirmwareTarget, DeviceInfoCache],
     attached_pipettes: Dict[NodeId, PipetteType],

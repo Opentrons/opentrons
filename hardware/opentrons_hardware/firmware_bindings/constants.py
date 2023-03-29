@@ -31,6 +31,27 @@ class NodeId(int, Enum):
     head_bootloader = head | 0xF
     gripper_bootloader = gripper | 0xF
 
+    def is_bootloader(self) -> bool:
+        """Whether this node ID is a bootloader."""
+        return bool(self.value & 0xF == 0xF)
+
+    def bootloader_for(self) -> "NodeId":
+        """The associated bootloader node ID for the node.
+
+        This is safe to call on any node id, including ones that are already bootloaders.
+        """
+        return NodeId(self.value | 0xF)
+
+    def application_for(self) -> "NodeId":
+        """The associated core node ID for the node (i.e. head, not head_l).
+
+        This is safe to call on any node ID, including non-core application node IDs like
+        head_l. It will always give the code node ID.
+        """
+        # in c this would be & ~0xf but in python that gives 0x10 for some reason
+        # so let's write out the whole byte
+        return NodeId(self.value & 0xF0)
+
 
 # make these negative numbers so there is no chance they overlap with NodeId
 @unique
@@ -38,6 +59,14 @@ class USBTarget(int, Enum):
     """List of firmware targets connected over usb."""
 
     rear_panel = -1
+
+    def is_bootloader(self) -> bool:
+        """Whether this is a bootloader id (always false)."""
+        return False
+
+    def application_for(self) -> "USBTarget":
+        """The corresponding application id."""
+        return self
 
 
 FirmwareTarget = Union[NodeId, USBTarget]

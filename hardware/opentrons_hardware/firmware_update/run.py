@@ -254,7 +254,7 @@ class RunUpdate:
         initiator = FirmwareUpdateInitiator(messenger)
         downloader = FirmwareUpdateDownloader(messenger)
 
-        target = Target(system_node=node_id)
+        target = Target.from_single_node(node_id)
 
         logger.info(f"Initiating FW Update on {target}.")
         await self._status_queue.put((node_id, (FirmwareUpdateStatus.updating, 0)))

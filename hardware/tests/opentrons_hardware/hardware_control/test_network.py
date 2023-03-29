@@ -67,6 +67,7 @@ class MockCanStatusResponder:
                         flags=fields.VersionFlagsField(0),
                         shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
                         revision=fields.OptionalRevisionField.build(b""),
+                        subidentifier=utils.UInt8Field(0),
                     )
                 )
                 asyncio.get_running_loop().call_soon(
@@ -110,6 +111,7 @@ class MockUSBStatusResponder:
                     flags=fields.VersionFlagsField(0),
                     shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
                     revision=fields.OptionalRevisionField.build(b""),
+                    subidentifier=utils.UInt8Field(0),
                 )
                 asyncio.get_running_loop().call_soon(
                     callback,

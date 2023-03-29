@@ -9,7 +9,7 @@ from opentrons_hardware.firmware_bindings import (
 )
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition, fields
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
-from opentrons_hardware.firmware_bindings.utils import UInt32Field
+from opentrons_hardware.firmware_bindings.utils import UInt32Field, UInt8Field
 
 from opentrons_hardware.firmware_update import initiator
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
@@ -39,6 +39,7 @@ async def test_messaging(
                     flags=fields.VersionFlagsField(0),
                     shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
                     revision=fields.OptionalRevisionField.build(b""),
+                    subidentifier=UInt8Field(0),
                 )
             )
             can_message_notifier.notify(
@@ -53,7 +54,7 @@ async def test_messaging(
                 ),
             )
 
-    target = Target(system_node=NodeId.head)
+    target = Target.from_single_node(NodeId.head)
 
     mock_messenger.send.side_effect = responder
 
@@ -88,6 +89,7 @@ async def test_retry(
                 flags=fields.VersionFlagsField(0),
                 shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
                 revision=fields.OptionalRevisionField.build(b""),
+                subidentifier=UInt8Field(0),
             )
         ),
         None,
@@ -112,7 +114,7 @@ async def test_retry(
                     ),
                 )
 
-    target = Target(system_node=NodeId.head)
+    target = Target.from_single_node(NodeId.head)
 
     mock_messenger.send.side_effect = responder
 
@@ -145,7 +147,7 @@ async def test_bootloader_not_ready(
     mock_messenger: AsyncMock,
 ) -> None:
     """It should raise an error when bootloader never responds."""
-    target = Target(system_node=NodeId.head)
+    target = Target.from_single_node(NodeId.head)
 
     retry_count = 3
     with pytest.raises(BootloaderNotReady):
