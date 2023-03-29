@@ -63,13 +63,13 @@ describe('SetupModules', () => {
     getByRole('button', { name: 'Map View' })
   })
 
-  it('should render Proceed to labware prep CTA that is enabled', () => {
+  it('should render Proceed to labware setup CTA that is enabled', () => {
     const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Proceed to labware prep' })
+    const button = getByRole('button', { name: 'Proceed to labware setup' })
     expect(button).toBeEnabled()
   })
 
-  it('should render a disabled Proceed to labware prep CTA if the protocol requests modules and they are not all attached to the robot', () => {
+  it('should render a disabled Proceed to labware setup CTA if the protocol requests modules and they are not all attached to the robot', () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .mockReturnValue({
@@ -77,7 +77,7 @@ describe('SetupModules', () => {
         remainingAttachedModules: [mockTemperatureModule],
       })
     const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Proceed to labware prep' })
+    const button = getByRole('button', { name: 'Proceed to labware setup' })
     expect(button).toBeDisabled()
   })
 
