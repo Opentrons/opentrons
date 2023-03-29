@@ -20,6 +20,9 @@ from opentrons.hardware_control.instruments.ot2.pipette import Pipette as Pipett
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons_hardware.scripts.sensor_utils import SensorRun
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.scripts.sensors import send_sensor_command
 
 from .types import (
     GantryLoad,
@@ -354,6 +357,7 @@ def get_plunger_positions_ot3(
     )
 
 
+
 async def update_pick_up_current(
     api: OT3API, mount: OT3Mount, current: float = 0.125
 ) -> None:
@@ -362,6 +366,16 @@ async def update_pick_up_current(
     config_model = pipette.pick_up_configurations
     config_model.current = current
     pipette.pick_up_configurations = config_model
+
+
+async def update_drop_tip_current(
+    api: OT3API, mount: OT3Mount, current: float = 1.0
+) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._drop_configurations
+    config_model.current = current
+    pipette._drop_configurations = config_model
 
 
 async def update_pick_up_distance(
