@@ -16,7 +16,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
-from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount, sensor_id_for_instrument
+from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.

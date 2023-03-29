@@ -2,10 +2,11 @@
 from typing import List, Union, Tuple
 
 from hardware_testing.data import ui
-from opentrons_hardware.firmware_bindings.constants import SensorId, NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons_hardware.sensors import sensor_driver, sensor_types
+from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
 
 
 from hardware_testing.data.csv_report import (
@@ -102,7 +103,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         report(section, tag, [no_probe, probe, found, z_limit, deck, result])
 
     for probe in GripperProbe:
-        sensor_id = helpers_ot3.sensor_id_for_instrument(GripperProbe.to_type(probe))
+        sensor_id = sensor_id_for_instrument(GripperProbe.to_type(probe))
         ui.print_header(f"Probe: {probe}")
         cap_sensor = sensor_types.CapacitiveSensor.build(sensor_id, NodeId.gripper)
         print("homing and grip...")

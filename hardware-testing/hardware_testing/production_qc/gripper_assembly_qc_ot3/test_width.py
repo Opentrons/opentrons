@@ -16,7 +16,6 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
-
 FAILURE_THRESHOLD_MM = 3
 GRIP_HEIGHT_MM = 50
 TEST_WIDTHS_MM: List[float] = [85.75, 62]
