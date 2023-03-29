@@ -38,7 +38,7 @@ from robot_server.maintenance_run.router.base_router import (
     create_run,
     get_run_data_from_url,
     get_run,
-    # remove_run,
+    remove_run,
 )
 
 
@@ -150,285 +150,105 @@ async def test_get_run_data_from_url(
     assert result == expected_response
 
 
-#
-#
-# async def test_get_run_with_missing_id(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should 404 if the run ID does not exist."""
-#     not_found_error = RunNotFoundError(run_id="run-id")
-#
-#     decoy.when(mock_run_data_manager.get(run_id="run-id")).then_raise(not_found_error)
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await get_run_data_from_url(
-#             runId="run-id",
-#             run_data_manager=mock_run_data_manager,
-#         )
-#
-#     assert exc_info.value.status_code == 404
-#     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
-#
-#
-# async def test_get_run() -> None:
-#     """It should wrap the run data in a response."""
-#     run_data = Run(
-#         id="run-id",
-#         protocolId=None,
-#         createdAt=datetime(year=2021, month=1, day=1),
-#         status=pe_types.EngineStatus.IDLE,
-#         current=False,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         modules=[],
-#         labware=[],
-#         labwareOffsets=[],
-#         liquids=[],
-#     )
-#
-#     result = await get_run(run_data=run_data)
-#
-#     assert result.content.data == run_data
-#     assert result.status_code == 200
-#
-#
-# async def test_get_runs_empty(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should return an empty collection response when no runs exist."""
-#     decoy.when(mock_run_data_manager.get_all()).then_return([])
-#     decoy.when(mock_run_data_manager.current_run_id).then_return(None)
-#
-#     result = await get_runs(run_data_manager=mock_run_data_manager)
-#
-#     assert result.content.data == []
-#     assert result.content.links == AllRunsLinks(current=None)
-#     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=0)
-#     assert result.status_code == 200
-#
-#
-# async def test_get_runs_not_empty(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should return a collection response when a run exists."""
-#     created_at_1 = datetime(year=2021, month=1, day=1)
-#     created_at_2 = datetime(year=2022, month=2, day=2)
-#
-#     response_1 = Run(
-#         id="unique-id-1",
-#         protocolId=None,
-#         createdAt=created_at_1,
-#         status=pe_types.EngineStatus.SUCCEEDED,
-#         current=False,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         modules=[],
-#         labware=[],
-#         labwareOffsets=[],
-#         liquids=[],
-#     )
-#
-#     response_2 = Run(
-#         id="unique-id-2",
-#         protocolId=None,
-#         createdAt=created_at_2,
-#         status=pe_types.EngineStatus.IDLE,
-#         current=True,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         modules=[],
-#         labware=[],
-#         labwareOffsets=[],
-#         liquids=[],
-#     )
-#
-#     decoy.when(mock_run_data_manager.get_all()).then_return([response_1, response_2])
-#     decoy.when(mock_run_data_manager.current_run_id).then_return("unique-id-2")
-#
-#     result = await get_runs(run_data_manager=mock_run_data_manager)
-#
-#     assert result.content.data == [response_1, response_2]
-#     assert result.content.links == AllRunsLinks(
-#         current=ResourceLink(href="/runs/unique-id-2")
-#     )
-#     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
-#     assert result.status_code == 200
-#
-#
-# async def test_delete_run_by_id(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should be able to remove a run by ID."""
-#     result = await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
-#
-#     decoy.verify(await mock_run_data_manager.delete("run-id"), times=1)
-#
-#     assert result.content == SimpleEmptyBody()
-#     assert result.status_code == 200
-#
-#
-# async def test_delete_run_with_bad_id(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should 404 if the run ID does not exist."""
-#     key_error = RunNotFoundError(run_id="run-id")
-#
-#     decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
-#
-#     assert exc_info.value.status_code == 404
-#     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
-#
-#
-# async def test_delete_active_run(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should 409 if the run is not finished."""
-#     decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(
-#         EngineConflictError("oh no")
-#     )
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
-#
-#     assert exc_info.value.status_code == 409
-#     assert exc_info.value.content["errors"][0]["id"] == "RunNotIdle"
-#
-#
-# async def test_update_run_to_not_current(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should update a run to no longer be current."""
-#     expected_response = Run(
-#         id="run-id",
-#         protocolId=None,
-#         createdAt=datetime(year=2021, month=1, day=1),
-#         status=pe_types.EngineStatus.SUCCEEDED,
-#         current=False,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         modules=[],
-#         labware=[],
-#         labwareOffsets=[],
-#         liquids=[],
-#     )
-#
-#     decoy.when(await mock_run_data_manager.update("run-id", current=False)).then_return(
-#         expected_response
-#     )
-#
-#     result = await update_run(
-#         runId="run-id",
-#         request_body=RequestModel(data=RunUpdate(current=False)),
-#         run_data_manager=mock_run_data_manager,
-#     )
-#
-#     assert result.content == SimpleBody(data=expected_response)
-#     assert result.status_code == 200
-#
-#
-# async def test_update_current_none_noop(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should noop if the update does not request any change to current."""
-#     expected_response = Run(
-#         id="run-id",
-#         protocolId=None,
-#         createdAt=datetime(year=2021, month=1, day=1),
-#         status=pe_types.EngineStatus.SUCCEEDED,
-#         current=True,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         modules=[],
-#         labware=[],
-#         labwareOffsets=[],
-#         liquids=[],
-#     )
-#
-#     decoy.when(await mock_run_data_manager.update("run-id", current=None)).then_return(
-#         expected_response
-#     )
-#
-#     result = await update_run(
-#         runId="run-id",
-#         request_body=RequestModel(data=RunUpdate()),
-#         run_data_manager=mock_run_data_manager,
-#     )
-#
-#     assert result.content == SimpleBody(data=expected_response)
-#     assert result.status_code == 200
-#
-#
-# async def test_update_to_current_not_current(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should 409 if attempting to update a not current run."""
-#     decoy.when(
-#         await mock_run_data_manager.update(run_id="run-id", current=False)
-#     ).then_raise(RunNotCurrentError("oh no"))
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await update_run(
-#             runId="run-id",
-#             request_body=RequestModel(data=RunUpdate(current=False)),
-#             run_data_manager=mock_run_data_manager,
-#         )
-#
-#     assert exc_info.value.status_code == 409
-#     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
-#
-#
-# async def test_update_to_current_conflict(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should 409 if attempting to un-current a run that is not idle."""
-#     decoy.when(
-#         await mock_run_data_manager.update(run_id="run-id", current=False)
-#     ).then_raise(EngineConflictError("oh no"))
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await update_run(
-#             runId="run-id",
-#             request_body=RequestModel(data=RunUpdate(current=False)),
-#             run_data_manager=mock_run_data_manager,
-#         )
-#
-#     assert exc_info.value.status_code == 409
-#     assert exc_info.value.content["errors"][0]["id"] == "RunNotIdle"
-#
-#
-# async def test_update_to_current_missing(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should 404 if attempting to update a missing run."""
-#     decoy.when(
-#         await mock_run_data_manager.update(run_id="run-id", current=False)
-#     ).then_raise(RunNotFoundError(run_id="run-id"))
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await update_run(
-#             runId="run-id",
-#             request_body=RequestModel(data=RunUpdate(current=False)),
-#             run_data_manager=mock_run_data_manager,
-#         )
-#
-#     assert exc_info.value.status_code == 404
-#     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+async def test_get_run_with_missing_id(
+    decoy: Decoy,
+    mock_run_data_manager: MaintenanceRunDataManager,
+) -> None:
+    """It should 404 if the run ID does not exist."""
+    not_found_error = RunNotFoundError(run_id="run-id")
+
+    decoy.when(mock_run_data_manager.get(run_id="run-id")).then_raise(not_found_error)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_run_data_from_url(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_get_run_not_found(
+    decoy: Decoy,
+    mock_run_data_manager: MaintenanceRunDataManager,
+) -> None:
+    """It should 404 if the run ID does not exist."""
+    not_current_error = RunNotFoundError(run_id="run-id")
+
+    decoy.when(mock_run_data_manager.get(run_id="run-id")).then_raise(not_current_error)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_run_data_from_url(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_get_run() -> None:
+    """It should wrap the run data in a response."""
+    run_data = MaintenanceRun(
+        id="run-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.IDLE,
+        current=False,
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        liquids=[],
+    )
+
+    result = await get_run(run_data=run_data)
+
+    assert result.content.data == run_data
+    assert result.status_code == 200
+
+
+async def test_delete_run_by_id(
+    decoy: Decoy,
+    mock_run_data_manager: MaintenanceRunDataManager,
+) -> None:
+    """It should be able to remove a run by ID."""
+    result = await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+
+    decoy.verify(await mock_run_data_manager.delete("run-id"), times=1)
+
+    assert result.content == SimpleEmptyBody()
+    assert result.status_code == 200
+
+
+async def test_delete_run_with_bad_id(
+    decoy: Decoy,
+    mock_run_data_manager: MaintenanceRunDataManager,
+) -> None:
+    """It should 404 if the run ID does not exist."""
+    key_error = RunNotFoundError(run_id="run-id")
+
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)
+
+    with pytest.raises(ApiError) as exc_info:
+        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_delete_active_run(
+    decoy: Decoy,
+    mock_run_data_manager: MaintenanceRunDataManager,
+) -> None:
+    """It should 409 if the run is not finished."""
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(
+        EngineConflictError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotIdle"

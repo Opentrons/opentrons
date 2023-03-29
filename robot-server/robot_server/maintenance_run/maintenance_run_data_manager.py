@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
 
 from .engine_store import EngineStore
 from .maintenance_run_models import MaintenanceRun
+from ..runs.run_models import RunNotFoundError
 from .maintenance_action_models import MaintenanceRunAction
 
 
@@ -129,9 +130,7 @@ class MaintenanceRunDataManager:
         """
         current = run_id == self._engine_store.current_run_id
         if not current:
-            raise RunNotCurrentError(
-                "Cannot get the run summery of a none current run."
-            )
+            raise RunNotFoundError("Cannot get the run summery of a none current run.")
         state_summary = self._get_state_summary(run_id=run_id)
 
         # store created_at at engine level
@@ -142,58 +141,22 @@ class MaintenanceRunDataManager:
             current=current,
         )
 
-    # async def delete(self, run_id: str) -> None:
-    #     """Delete a current or historical run.
-    #
-    #     Args:
-    #         run_id: The identifier of the run to remove.
-    #
-    #     Raises:
-    #         EngineConflictError: If deleting the current run, the current run
-    #             is not idle and cannot be deleted.
-    #         RunNotFoundError: The given run identifier was not found in the database.
-    #     """
-    #     if run_id == self._engine_store.current_run_id:
-    #         await self._engine_store.clear()
-    #     self._run_store.remove(run_id=run_id)
-    #
-    # async def update(self, run_id: str, current: Optional[bool]) -> Run:
-    #     """Get and potentially archive a run.
-    #
-    #     Args:
-    #         run_id: The run to get and maybe archive.
-    #
-    #     Returns:
-    #         The updated run.
-    #
-    #     Raises:
-    #         RunNotFoundError: The run identifier was not found in the database.
-    #         RunNotCurrentError: The run is not the current run.
-    #         EngineConflictError: The run cannot be updated because it is not idle.
-    #     """
-    #     if run_id != self._engine_store.current_run_id:
-    #         raise RunNotCurrentError(
-    #             f"Cannot update {run_id} because it is not the current run."
-    #         )
-    #
-    #     next_current = current if current is False else True
-    #
-    #     if next_current is False:
-    #         commands, state_summary = await self._engine_store.clear()
-    #         run_resource = self._run_store.update_run_state(
-    #             run_id=run_id,
-    #             summary=state_summary,
-    #             commands=commands,
-    #         )
-    #     else:
-    #         state_summary = self._engine_store.engine.state_view.get_summary()
-    #         run_resource = self._run_store.get(run_id=run_id)
-    #
-    #     return _build_run(
-    #         run_resource=run_resource,
-    #         state_summary=state_summary,
-    #         current=next_current,
-    #     )
+    async def delete(self, run_id: str) -> None:
+        """Delete a current run.
+
+        Args:
+            run_id: The identifier of the run to remove.
+
+        Raises:
+            EngineConflictError: If deleting the current run, the current run
+                is not idle and cannot be deleted.
+            RunNotFoundError: The given run identifier was not found in the database.
+        """
+        if run_id == self._engine_store.current_run_id:
+            await self._engine_store.clear()
+        else:
+            raise RunNotFoundError("Given run id was not found. Cannot delete the run.")
+
     #
     # def get_commands_slice(
     #     self,

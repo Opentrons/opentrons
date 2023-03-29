@@ -5,21 +5,11 @@ from decoy import Decoy
 from robot_server.protocols import ProtocolStore
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_store import RunStore
-from robot_server.runs.engine_store import EngineStore
-from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.maintenance_run.engine_store import EngineStore
+from robot_server.maintenance_run.maintenance_run_data_manager import (
+    MaintenanceRunDataManager,
+)
 from opentrons.protocol_engine import ProtocolEngine
-
-
-@pytest.fixture()
-def mock_protocol_store(decoy: Decoy) -> ProtocolStore:
-    """Get a mock ProtocolStore interface."""
-    return decoy.mock(cls=ProtocolStore)
-
-
-@pytest.fixture()
-def mock_run_store(decoy: Decoy) -> RunStore:
-    """Get a mock RunStore interface."""
-    return decoy.mock(cls=RunStore)
 
 
 @pytest.fixture()
@@ -35,12 +25,6 @@ def mock_protocol_engine(decoy: Decoy) -> ProtocolEngine:
 
 
 @pytest.fixture
-def mock_run_data_manager(decoy: Decoy) -> RunDataManager:
+def mock_run_data_manager(decoy: Decoy) -> MaintenanceRunDataManager:
     """Get a mock RunDataManager."""
-    return decoy.mock(cls=RunDataManager)
-
-
-@pytest.fixture()
-def mock_run_auto_deleter(decoy: Decoy) -> RunAutoDeleter:
-    """Get a mock RunAutoDeleter interface."""
-    return decoy.mock(cls=RunAutoDeleter)
+    return decoy.mock(cls=MaintenanceRunDataManager)
