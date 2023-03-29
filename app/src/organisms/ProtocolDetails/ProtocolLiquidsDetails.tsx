@@ -36,12 +36,8 @@ export const ProtocolLiquidsDetails = (
     >
       {liquidsInLoadOrder?.map((liquid, index) => {
         return (
-          <>
-            <Flex
-              key={liquid.id}
-              flexDirection={DIRECTION_COLUMN}
-              marginY={SPACING.spacing4}
-            >
+          <React.Fragment key={liquid.id}>
+            <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
               <LiquidsListItemDetails
                 liquidId={liquid.id}
                 displayColor={liquid.displayColor}
@@ -51,7 +47,7 @@ export const ProtocolLiquidsDetails = (
               />
             </Flex>
             {index < liquidsInLoadOrder.length - 1 && <Divider />}
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>
