@@ -18,16 +18,20 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
 )
 
-from robot_server.runs.run_store import RunStore, CommandNotFoundError
-from robot_server.runs.engine_store import EngineStore
-from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
-from robot_server.runs.router.commands_router import (
+from robot_server.maintenance_run.engine_store import EngineStore
+from robot_server.maintenance_run.maintenance_run_data_manager import (
+    MaintenanceRunDataManager,
+)
+from robot_server.maintenance_run.maintenance_run_models import (
+    MaintenanceRunCommandSummary,
+)
+from robot_server.runs.run_models import RunNotFoundError
+from robot_server.maintenance_run.router.commands_router import (
     CommandCollectionLinks,
     CommandLink,
     CommandLinkMeta,
-    create_run_command,
-    get_run_command,
+    # create_run_command,
+    # get_run_command,
     get_run_commands,
     get_current_run_engine_from_url,
 )
@@ -36,213 +40,188 @@ from robot_server.runs.router.commands_router import (
 async def test_get_current_run_engine_from_url(
     decoy: Decoy,
     mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
 ) -> None:
     """Should get an instance of a run protocol engine."""
-    decoy.when(mock_run_store.has("run-id")).then_return(True)
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
 
     result = await get_current_run_engine_from_url(
         runId="run-id",
         engine_store=mock_engine_store,
-        run_store=mock_run_store,
     )
 
     assert result is mock_engine_store.engine
 
 
-async def test_get_current_run_engine_no_run(
+async def test_get_current_run_engine_from_url_not_found(
     decoy: Decoy,
     mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
-) -> None:
-    """It should 404 if the run is not in the store."""
-    decoy.when(mock_run_store.has("run-id")).then_return(False)
-
-    with pytest.raises(ApiError) as exc_info:
-        await get_current_run_engine_from_url(
-            runId="run-id",
-            engine_store=mock_engine_store,
-            run_store=mock_run_store,
-        )
-
-    assert exc_info.value.status_code == 404
-    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
-
-
-async def test_get_current_run_engine_from_url_not_current(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    mock_run_store: RunStore,
 ) -> None:
     """It should 409 if you try to add commands to non-current run."""
-    decoy.when(mock_run_store.has("run-id")).then_return(True)
     decoy.when(mock_engine_store.current_run_id).then_return("some-other-run-id")
 
     with pytest.raises(ApiError) as exc_info:
         await get_current_run_engine_from_url(
             runId="run-id",
             engine_store=mock_engine_store,
-            run_store=mock_run_store,
         )
 
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
 
 
-async def test_create_run_command(
-    decoy: Decoy,
-    mock_protocol_engine: ProtocolEngine,
-) -> None:
-    """It should add the requested command to the ProtocolEngine and return it."""
-    command_request = pe_commands.WaitForResumeCreate(
-        params=pe_commands.WaitForResumeParams(message="Hello")
-    )
-
-    command_once_added = pe_commands.WaitForResume(
-        id="command-id",
-        key="command-key",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_commands.CommandStatus.QUEUED,
-        params=pe_commands.WaitForResumeParams(message="Hello"),
-    )
-
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(
-            mock_protocol_engine.state_view.commands.get("command-id")
-        ).then_return(command_once_added)
-        return command_once_added
-
-    decoy.when(
-        mock_protocol_engine.add_command(
-            pe_commands.WaitForResumeCreate(
-                params=pe_commands.WaitForResumeParams(message="Hello"),
-                intent=pe_commands.CommandIntent.SETUP,
-            )
-        )
-    ).then_do(_stub_queued_command_state)
-
-    result = await create_run_command(
-        request_body=RequestModel(data=command_request),
-        waitUntilComplete=False,
-        protocol_engine=mock_protocol_engine,
-    )
-
-    assert result.content.data == command_once_added
-    assert result.status_code == 201
-    decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
-
-
-async def test_create_run_command_blocking_completion(
-    decoy: Decoy,
-    mock_protocol_engine: ProtocolEngine,
-) -> None:
-    """It should be able to create a command and wait for it to execute."""
-    command_request = pe_commands.WaitForResumeCreate(
-        params=pe_commands.WaitForResumeParams(message="Hello"),
-        intent=pe_commands.CommandIntent.PROTOCOL,
-    )
-
-    command_once_added = pe_commands.WaitForResume(
-        id="command-id",
-        key="command-key",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_commands.CommandStatus.QUEUED,
-        params=pe_commands.WaitForResumeParams(message="Hello"),
-    )
-
-    command_once_completed = pe_commands.WaitForResume(
-        id="command-id",
-        key="command-key",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        params=pe_commands.WaitForResumeParams(message="Hello"),
-        result=pe_commands.WaitForResumeResult(),
-    )
-
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(
-            mock_protocol_engine.state_view.commands.get("command-id")
-        ).then_return(command_once_added)
-
-        return command_once_added
-
-    def _stub_completed_command_state(*_a: object, **_k: object) -> None:
-        decoy.when(
-            mock_protocol_engine.state_view.commands.get("command-id")
-        ).then_return(command_once_completed)
-
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_do(
-        _stub_queued_command_state
-    )
-
-    decoy.when(await mock_protocol_engine.wait_for_command("command-id")).then_do(
-        _stub_completed_command_state
-    )
-
-    result = await create_run_command(
-        request_body=RequestModel(data=command_request),
-        waitUntilComplete=True,
-        timeout=999,
-        protocol_engine=mock_protocol_engine,
-    )
-
-    assert result.content.data == command_once_completed
-    assert result.status_code == 201
-
-
-async def test_add_conflicting_setup_command(
-    decoy: Decoy,
-    mock_protocol_engine: ProtocolEngine,
-) -> None:
-    """It should raise an error if the setup command cannot be added."""
-    command_request = pe_commands.WaitForResumeCreate(
-        params=pe_commands.WaitForResumeParams(message="Hello"),
-        intent=pe_commands.CommandIntent.SETUP,
-    )
-
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
-        pe_errors.SetupCommandNotAllowedError("oh no")
-    )
-
-    with pytest.raises(ApiError) as exc_info:
-        await create_run_command(
-            request_body=RequestModel(data=command_request),
-            waitUntilComplete=False,
-            protocol_engine=mock_protocol_engine,
-        )
-
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
-
-
-async def test_add_command_to_stopped_engine(
-    decoy: Decoy,
-    mock_protocol_engine: ProtocolEngine,
-) -> None:
-    """It should raise an error if the setup command cannot be added."""
-    command_request = pe_commands.HomeCreate(
-        params=pe_commands.HomeParams(),
-        intent=pe_commands.CommandIntent.SETUP,
-    )
-
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
-        pe_errors.RunStoppedError("oh no")
-    )
-
-    with pytest.raises(ApiError) as exc_info:
-        await create_run_command(
-            request_body=RequestModel(data=command_request),
-            waitUntilComplete=False,
-            protocol_engine=mock_protocol_engine,
-        )
-
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+# async def test_create_run_command(
+#     decoy: Decoy,
+#     mock_protocol_engine: ProtocolEngine,
+# ) -> None:
+#     """It should add the requested command to the ProtocolEngine and return it."""
+#     command_request = pe_commands.WaitForResumeCreate(
+#         params=pe_commands.WaitForResumeParams(message="Hello")
+#     )
+#
+#     command_once_added = pe_commands.WaitForResume(
+#         id="command-id",
+#         key="command-key",
+#         createdAt=datetime(year=2021, month=1, day=1),
+#         status=pe_commands.CommandStatus.QUEUED,
+#         params=pe_commands.WaitForResumeParams(message="Hello"),
+#     )
+#
+#     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
+#         decoy.when(
+#             mock_protocol_engine.state_view.commands.get("command-id")
+#         ).then_return(command_once_added)
+#         return command_once_added
+#
+#     decoy.when(
+#         mock_protocol_engine.add_command(
+#             pe_commands.WaitForResumeCreate(
+#                 params=pe_commands.WaitForResumeParams(message="Hello"),
+#                 intent=pe_commands.CommandIntent.SETUP,
+#             )
+#         )
+#     ).then_do(_stub_queued_command_state)
+#
+#     result = await create_run_command(
+#         request_body=RequestModel(data=command_request),
+#         waitUntilComplete=False,
+#         protocol_engine=mock_protocol_engine,
+#     )
+#
+#     assert result.content.data == command_once_added
+#     assert result.status_code == 201
+#     decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
+#
+#
+# async def test_create_run_command_blocking_completion(
+#     decoy: Decoy,
+#     mock_protocol_engine: ProtocolEngine,
+# ) -> None:
+#     """It should be able to create a command and wait for it to execute."""
+#     command_request = pe_commands.WaitForResumeCreate(
+#         params=pe_commands.WaitForResumeParams(message="Hello"),
+#         intent=pe_commands.CommandIntent.PROTOCOL,
+#     )
+#
+#     command_once_added = pe_commands.WaitForResume(
+#         id="command-id",
+#         key="command-key",
+#         createdAt=datetime(year=2021, month=1, day=1),
+#         status=pe_commands.CommandStatus.QUEUED,
+#         params=pe_commands.WaitForResumeParams(message="Hello"),
+#     )
+#
+#     command_once_completed = pe_commands.WaitForResume(
+#         id="command-id",
+#         key="command-key",
+#         createdAt=datetime(year=2021, month=1, day=1),
+#         status=pe_commands.CommandStatus.SUCCEEDED,
+#         params=pe_commands.WaitForResumeParams(message="Hello"),
+#         result=pe_commands.WaitForResumeResult(),
+#     )
+#
+#     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
+#         decoy.when(
+#             mock_protocol_engine.state_view.commands.get("command-id")
+#         ).then_return(command_once_added)
+#
+#         return command_once_added
+#
+#     def _stub_completed_command_state(*_a: object, **_k: object) -> None:
+#         decoy.when(
+#             mock_protocol_engine.state_view.commands.get("command-id")
+#         ).then_return(command_once_completed)
+#
+#     decoy.when(mock_protocol_engine.add_command(command_request)).then_do(
+#         _stub_queued_command_state
+#     )
+#
+#     decoy.when(await mock_protocol_engine.wait_for_command("command-id")).then_do(
+#         _stub_completed_command_state
+#     )
+#
+#     result = await create_run_command(
+#         request_body=RequestModel(data=command_request),
+#         waitUntilComplete=True,
+#         timeout=999,
+#         protocol_engine=mock_protocol_engine,
+#     )
+#
+#     assert result.content.data == command_once_completed
+#     assert result.status_code == 201
+#
+#
+# async def test_add_conflicting_setup_command(
+#     decoy: Decoy,
+#     mock_protocol_engine: ProtocolEngine,
+# ) -> None:
+#     """It should raise an error if the setup command cannot be added."""
+#     command_request = pe_commands.WaitForResumeCreate(
+#         params=pe_commands.WaitForResumeParams(message="Hello"),
+#         intent=pe_commands.CommandIntent.SETUP,
+#     )
+#
+#     decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+#         pe_errors.SetupCommandNotAllowedError("oh no")
+#     )
+#
+#     with pytest.raises(ApiError) as exc_info:
+#         await create_run_command(
+#             request_body=RequestModel(data=command_request),
+#             waitUntilComplete=False,
+#             protocol_engine=mock_protocol_engine,
+#         )
+#
+#     assert exc_info.value.status_code == 409
+#     assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+#
+#
+# async def test_add_command_to_stopped_engine(
+#     decoy: Decoy,
+#     mock_protocol_engine: ProtocolEngine,
+# ) -> None:
+#     """It should raise an error if the setup command cannot be added."""
+#     command_request = pe_commands.HomeCreate(
+#         params=pe_commands.HomeParams(),
+#         intent=pe_commands.CommandIntent.SETUP,
+#     )
+#
+#     decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+#         pe_errors.RunStoppedError("oh no")
+#     )
+#
+#     with pytest.raises(ApiError) as exc_info:
+#         await create_run_command(
+#             request_body=RequestModel(data=command_request),
+#             waitUntilComplete=False,
+#             protocol_engine=mock_protocol_engine,
+#         )
+#
+#     assert exc_info.value.status_code == 409
+#     assert exc_info.value.content["errors"][0]["detail"] == "oh no"
 
 
 async def test_get_run_commands(
-    decoy: Decoy, mock_run_data_manager: RunDataManager
+    decoy: Decoy, mock_run_data_manager: MaintenanceRunDataManager
 ) -> None:
     """It should return a list of all commands in a run."""
     command = pe_commands.WaitForResume(
@@ -286,7 +265,7 @@ async def test_get_run_commands(
     )
 
     assert result.content.data == [
-        RunCommandSummary(
+        MaintenanceRunCommandSummary(
             id="command-id",
             key="command-key",
             commandType="waitForResume",
@@ -322,7 +301,7 @@ async def test_get_run_commands(
 
 async def test_get_run_commands_empty(
     decoy: Decoy,
-    mock_run_data_manager: RunDataManager,
+    mock_run_data_manager: MaintenanceRunDataManager,
 ) -> None:
     """It should return an empty commands list if no commands."""
     decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(None)
@@ -345,7 +324,7 @@ async def test_get_run_commands_empty(
 
 async def test_get_run_commands_not_found(
     decoy: Decoy,
-    mock_run_data_manager: RunDataManager,
+    mock_run_data_manager: MaintenanceRunDataManager,
 ) -> None:
     """It should 404 if the run is not found."""
     not_found_error = RunNotFoundError("oh no")
@@ -369,57 +348,57 @@ async def test_get_run_commands_not_found(
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
 
 
-async def test_get_run_command_by_id(
-    decoy: Decoy, mock_run_data_manager: RunDataManager
-) -> None:
-    """It should return full details about a command by ID."""
-    command = pe_commands.MoveToWell(
-        id="command-id",
-        key="command-key",
-        status=pe_commands.CommandStatus.RUNNING,
-        createdAt=datetime(year=2022, month=2, day=2),
-        params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
-    )
-
-    decoy.when(mock_run_data_manager.get_command("run-id", "command-id")).then_return(
-        command
-    )
-
-    result = await get_run_command(
-        runId="run-id",
-        commandId="command-id",
-        run_data_manager=mock_run_data_manager,
-    )
-
-    assert result.content.data == command
-    assert result.status_code == 200
-
-
-@pytest.mark.parametrize(
-    "exception",
-    [
-        CommandNotFoundError("oh no"),
-        RunNotFoundError("oh no"),
-    ],
-)
-async def test_get_run_command_missing(
-    decoy: Decoy,
-    mock_run_data_manager: RunDataManager,
-    exception: Exception,
-) -> None:
-    """It should 404 if you attempt to get a non-existent command."""
-    decoy.when(
-        mock_run_data_manager.get_command(run_id="run-id", command_id="command-id")
-    ).then_raise(exception)
-
-    with pytest.raises(ApiError) as exc_info:
-        await get_run_command(
-            runId="run-id",
-            commandId="command-id",
-            run_data_manager=mock_run_data_manager,
-        )
-
-    assert exc_info.value.status_code == 404
-    assert exc_info.value.content["errors"][0]["detail"] == matchers.StringMatching(
-        "oh no"
-    )
+# async def test_get_run_command_by_id(
+#     decoy: Decoy, mock_run_data_manager: RunDataManager
+# ) -> None:
+#     """It should return full details about a command by ID."""
+#     command = pe_commands.MoveToWell(
+#         id="command-id",
+#         key="command-key",
+#         status=pe_commands.CommandStatus.RUNNING,
+#         createdAt=datetime(year=2022, month=2, day=2),
+#         params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
+#     )
+#
+#     decoy.when(mock_run_data_manager.get_command("run-id", "command-id")).then_return(
+#         command
+#     )
+#
+#     result = await get_run_command(
+#         runId="run-id",
+#         commandId="command-id",
+#         run_data_manager=mock_run_data_manager,
+#     )
+#
+#     assert result.content.data == command
+#     assert result.status_code == 200
+#
+#
+# @pytest.mark.parametrize(
+#     "exception",
+#     [
+#         CommandNotFoundError("oh no"),
+#         RunNotFoundError("oh no"),
+#     ],
+# )
+# async def test_get_run_command_missing(
+#     decoy: Decoy,
+#     mock_run_data_manager: RunDataManager,
+#     exception: Exception,
+# ) -> None:
+#     """It should 404 if you attempt to get a non-existent command."""
+#     decoy.when(
+#         mock_run_data_manager.get_command(run_id="run-id", command_id="command-id")
+#     ).then_raise(exception)
+#
+#     with pytest.raises(ApiError) as exc_info:
+#         await get_run_command(
+#             runId="run-id",
+#             commandId="command-id",
+#             run_data_manager=mock_run_data_manager,
+#         )
+#
+#     assert exc_info.value.status_code == 404
+#     assert exc_info.value.content["errors"][0]["detail"] == matchers.StringMatching(
+#         "oh no"
+#     )

@@ -1,109 +1,102 @@
-# """Router for /runs commands endpoints."""
-# import textwrap
-# from datetime import datetime
-# from typing import Optional, Union
-# from typing_extensions import Final, Literal
-#
-# from anyio import move_on_after
-# from fastapi import APIRouter, Depends, Query, status
-# from pydantic import BaseModel, Field
-#
-# from opentrons.protocol_engine import (
-#     ProtocolEngine,
-#     commands as pe_commands,
-#     errors as pe_errors,
-# )
-#
-# from robot_server.errors import ErrorDetails, ErrorBody
-# from robot_server.service.json_api import (
-#     RequestModel,
-#     SimpleBody,
-#     MultiBody,
-#     MultiBodyMeta,
-#     PydanticResponse,
-# )
-#
-# from ..maintenance_run_models import MaintenanceRunCommandSummary
-# from ..maintenance_run_data_manager import RunDataManager
-# from ..engine_store import EngineStore
-# from ..run_store import RunStore, RunNotFoundError, CommandNotFoundError
-# from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
-# from .base_router import RunNotFound, RunStopped
-#
-#
-# _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
-#
-# commands_router = APIRouter()
-#
-#
-# class CommandNotFound(ErrorDetails):
-#     """An error if a given run command is not found."""
-#
-#     id: Literal["CommandNotFound"] = "CommandNotFound"
-#     title: str = "Run Command Not Found"
-#
-#
-# class CommandNotAllowed(ErrorDetails):
-#     """An error if a given run command is not allowed."""
-#
-#     id: Literal["CommandNotAllowed"] = "CommandNotAllowed"
-#     title: str = "Setup Command Not Allowed"
-#
-#
-# class CommandLinkMeta(BaseModel):
-#     """Metadata about a command resource referenced in `links`."""
-#
-#     runId: str = Field(..., description="The ID of the command's run.")
-#     commandId: str = Field(..., description="The ID of the command.")
-#     index: int = Field(..., description="Index of the command in the overall list.")
-#     key: str = Field(..., description="Value of the current command's `key` field.")
-#     createdAt: datetime = Field(
-#         ...,
-#         description="When the current command was created.",
-#     )
-#
-#
-# class CommandLink(BaseModel):
-#     """A link to a command resource."""
-#
-#     href: str = Field(..., description="The path to a command")
-#     meta: CommandLinkMeta = Field(..., description="Information about the command.")
-#
-#
-# class CommandCollectionLinks(BaseModel):
-#     """Links returned along with a collection of commands."""
-#
-#     current: Optional[CommandLink] = Field(
-#         None,
-#         description="Path to the currently running or next queued command.",
-#     )
-#
-#
-# async def get_current_run_engine_from_url(
-#     runId: str,
-#     engine_store: EngineStore = Depends(get_engine_store),
-#     run_store: RunStore = Depends(get_run_store),
-# ) -> ProtocolEngine:
-#     """Get run protocol engine.
-#
-#     Args:
-#         runId: Run ID to associate the command with.
-#         engine_store: Engine store to pull current run ProtocolEngine.
-#         run_store: Run data storage.
-#     """
-#     if not run_store.has(runId):
-#         raise RunNotFound(detail=f"Run {runId} not found.").as_error(
-#             status.HTTP_404_NOT_FOUND
-#         )
-#
-#     if runId != engine_store.current_run_id:
-#         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
-#             status.HTTP_409_CONFLICT
-#         )
-#
-#     return engine_store.engine
-#
-#
+"""Router for /runs commands endpoints."""
+import textwrap
+from datetime import datetime
+from typing import Optional, Union
+from typing_extensions import Final, Literal
+
+from anyio import move_on_after
+from fastapi import APIRouter, Depends, Query, status
+from pydantic import BaseModel, Field
+
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    commands as pe_commands,
+    errors as pe_errors,
+)
+
+from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.service.json_api import (
+    RequestModel,
+    SimpleBody,
+    MultiBody,
+    MultiBodyMeta,
+    PydanticResponse,
+)
+
+from ...runs.run_models import RunNotFoundError
+from ..maintenance_run_models import MaintenanceRunCommandSummary
+from ..maintenance_run_data_manager import MaintenanceRunDataManager
+from ..engine_store import EngineStore
+from ..dependencies import get_engine_store, get_maintenance_run_data_manager
+from .base_router import RunNotFound, RunStopped
+
+
+_DEFAULT_COMMAND_LIST_LENGTH: Final = 20
+
+commands_router = APIRouter()
+
+
+class CommandNotFound(ErrorDetails):
+    """An error if a given run command is not found."""
+
+    id: Literal["CommandNotFound"] = "CommandNotFound"
+    title: str = "Run Command Not Found"
+
+
+class CommandNotAllowed(ErrorDetails):
+    """An error if a given run command is not allowed."""
+
+    id: Literal["CommandNotAllowed"] = "CommandNotAllowed"
+    title: str = "Setup Command Not Allowed"
+
+
+class CommandLinkMeta(BaseModel):
+    """Metadata about a command resource referenced in `links`."""
+
+    runId: str = Field(..., description="The ID of the command's run.")
+    commandId: str = Field(..., description="The ID of the command.")
+    index: int = Field(..., description="Index of the command in the overall list.")
+    key: str = Field(..., description="Value of the current command's `key` field.")
+    createdAt: datetime = Field(
+        ...,
+        description="When the current command was created.",
+    )
+
+
+class CommandLink(BaseModel):
+    """A link to a command resource."""
+
+    href: str = Field(..., description="The path to a command")
+    meta: CommandLinkMeta = Field(..., description="Information about the command.")
+
+
+class CommandCollectionLinks(BaseModel):
+    """Links returned along with a collection of commands."""
+
+    current: Optional[CommandLink] = Field(
+        None,
+        description="Path to the currently running or next queued command.",
+    )
+
+
+async def get_current_run_engine_from_url(
+    runId: str,
+    engine_store: EngineStore = Depends(get_engine_store),
+) -> ProtocolEngine:
+    """Get run protocol engine.
+
+    Args:
+        runId: Run ID to associate the command with.
+        engine_store: Engine store to pull current run ProtocolEngine.
+    """
+    if runId != engine_store.current_run_id:
+        raise RunNotFound(detail=f"Run {runId} not found.").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    return engine_store.engine
+
+
 # @commands_router.post(
 #     path="/runs/{runId}/commands",
 #     summary="Enqueue a command",
@@ -211,100 +204,102 @@
 #         content=SimpleBody.construct(data=response_data),
 #         status_code=status.HTTP_201_CREATED,
 #     )
-#
-#
-# @commands_router.get(
-#     path="/runs/{runId}/commands",
-#     summary="Get a list of all protocol commands in the run",
-#     description=(
-#         "Get a list of all commands in the run and their statuses. "
-#         "This endpoint returns command summaries. Use "
-#         "`GET /runs/{runId}/commands/{commandId}` to get all "
-#         "information available for a given command."
-#     ),
-#     responses={
-#         status.HTTP_200_OK: {
-#             "model": MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]
-#         },
-#         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-#     },
-# )
-# async def get_run_commands(
-#     runId: str,
-#     cursor: Optional[int] = Query(
-#         None,
-#         description=(
-#             "The starting index of the desired first command in the list."
-#             " If unspecified, a cursor will be selected automatically"
-#             " based on the currently running or most recently executed command."
-#         ),
-#     ),
-#     pageLength: int = Query(
-#         _DEFAULT_COMMAND_LIST_LENGTH,
-#         description="The maximum number of commands in the list to return.",
-#     ),
-#     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-# ) -> PydanticResponse[MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]]:
-#     """Get a summary of a set of commands in a run.
-#
-#     Arguments:
-#         runId: Requested run ID, from the URL
-#         cursor: Cursor index for the collection response.
-#         pageLength: Maximum number of items to return.
-#         run_data_manager: Run data retrieval interface.
-#     """
-#     try:
-#         command_slice = run_data_manager.get_commands_slice(
-#             run_id=runId,
-#             cursor=cursor,
-#             length=pageLength,
-#         )
-#     except RunNotFoundError as e:
-#         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
-#
-#     current_command = run_data_manager.get_current_command(run_id=runId)
-#
-#     data = [
-#         MaintenanceRunCommandSummary.construct(
-#             id=c.id,
-#             key=c.key,
-#             commandType=c.commandType,
-#             intent=c.intent,
-#             status=c.status,
-#             createdAt=c.createdAt,
-#             startedAt=c.startedAt,
-#             completedAt=c.completedAt,
-#             params=c.params,
-#             error=c.error,
-#         )
-#         for c in command_slice.commands
-#     ]
-#
-#     meta = MultiBodyMeta(
-#         cursor=command_slice.cursor,
-#         totalLength=command_slice.total_length,
-#     )
-#
-#     links = CommandCollectionLinks()
-#
-#     if current_command is not None:
-#         links.current = CommandLink(
-#             href=f"/runs/{runId}/commands/{current_command.command_id}",
-#             meta=CommandLinkMeta(
-#                 runId=runId,
-#                 commandId=current_command.command_id,
-#                 index=current_command.index,
-#                 key=current_command.command_key,
-#                 createdAt=current_command.created_at,
-#             ),
-#         )
-#
-#     return await PydanticResponse.create(
-#         content=MultiBody.construct(data=data, meta=meta, links=links),
-#         status_code=status.HTTP_200_OK,
-#     )
-#
-#
+
+
+@commands_router.get(
+    path="/runs/{runId}/commands",
+    summary="Get a list of all protocol commands in the run",
+    description=(
+        "Get a list of all commands in the run and their statuses. "
+        "This endpoint returns command summaries. Use "
+        "`GET /runs/{runId}/commands/{commandId}` to get all "
+        "information available for a given command."
+    ),
+    responses={
+        status.HTTP_200_OK: {
+            "model": MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]
+        },
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+    },
+)
+async def get_run_commands(
+    runId: str,
+    cursor: Optional[int] = Query(
+        None,
+        description=(
+            "The starting index of the desired first command in the list."
+            " If unspecified, a cursor will be selected automatically"
+            " based on the currently running or most recently executed command."
+        ),
+    ),
+    pageLength: int = Query(
+        _DEFAULT_COMMAND_LIST_LENGTH,
+        description="The maximum number of commands in the list to return.",
+    ),
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
+) -> PydanticResponse[MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]]:
+    """Get a summary of a set of commands in a run.
+
+    Arguments:
+        runId: Requested run ID, from the URL
+        cursor: Cursor index for the collection response.
+        pageLength: Maximum number of items to return.
+        run_data_manager: Run data retrieval interface.
+    """
+    try:
+        command_slice = run_data_manager.get_commands_slice(
+            run_id=runId,
+            cursor=cursor,
+            length=pageLength,
+        )
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    current_command = run_data_manager.get_current_command(run_id=runId)
+
+    data = [
+        MaintenanceRunCommandSummary.construct(
+            id=c.id,
+            key=c.key,
+            commandType=c.commandType,
+            intent=c.intent,
+            status=c.status,
+            createdAt=c.createdAt,
+            startedAt=c.startedAt,
+            completedAt=c.completedAt,
+            params=c.params,
+            error=c.error,
+        )
+        for c in command_slice.commands
+    ]
+
+    meta = MultiBodyMeta(
+        cursor=command_slice.cursor,
+        totalLength=command_slice.total_length,
+    )
+
+    links = CommandCollectionLinks()
+
+    if current_command is not None:
+        links.current = CommandLink(
+            href=f"/runs/{runId}/commands/{current_command.command_id}",
+            meta=CommandLinkMeta(
+                runId=runId,
+                commandId=current_command.command_id,
+                index=current_command.index,
+                key=current_command.command_key,
+                createdAt=current_command.created_at,
+            ),
+        )
+
+    return await PydanticResponse.create(
+        content=MultiBody.construct(data=data, meta=meta, links=links),
+        status_code=status.HTTP_200_OK,
+    )
+
+
 # @commands_router.get(
 #     path="/runs/{runId}/commands/{commandId}",
 #     summary="Get full details about a specific command in the run",
@@ -322,7 +317,7 @@
 # async def get_run_command(
 #     runId: str,
 #     commandId: str,
-#     run_data_manager: RunDataManager = Depends(get_run_data_manager),
+#     run_data_manager: MaintenanceRunDataManager = Depends(get_maintenance_run_data_manager),
 # ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
 #     """Get a specific command from a run.
 #
