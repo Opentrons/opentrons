@@ -63,7 +63,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
     staleTime: Infinity,
   })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? []
   const liquidsInOrder = parseLiquidsInLoadOrder(
     (mostRecentAnalysis as CompletedProtocolAnalysis).liquids ?? [],
     (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
@@ -111,10 +111,12 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText lineHeight="1.75rem">
+                    <StyledText fontSize="" fontWeight="" lineHeight="1.75rem">
                       {liquid.displayName}
                     </StyledText>
                     <StyledText
+                      fontSize=""
+                      fontWeight=""
                       lineHeight="1.75rem"
                       color={COLORS.darkBlack_seventy}
                     >
