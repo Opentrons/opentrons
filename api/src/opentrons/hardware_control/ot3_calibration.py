@@ -2,21 +2,32 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing_extensions import Final, Literal, TYPE_CHECKING
-from typing import Union, Tuple, List, Dict, Any, Optional
+from typing import Union, Tuple, List, Dict, Any, Optional, cast
 import datetime
 import numpy as np
 from enum import Enum
 from math import floor, copysign
 from logging import getLogger
-from opentrons.util.linal import SolvePoints
+from opentrons.util.linal import SolvePoints, solve_attitude, identity_deck_transform
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
-from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
+from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings, OT3Config
 import json
 
 from opentrons_shared_data.deck import load as load_deck
-from .robot_calibration import save_attitude_matrix
+from .robot_calibration import RobotCalibration, DeckCalibration
+from opentrons.calibration_storage import types
+from opentrons.calibration_storage.ot3.deck_attitude import (
+    save_robot_deck_attitude,
+    get_robot_deck_attitude,
+)
+from opentrons.config.robot_configs import (
+    get_legacy_gantry_calibration,
+    default_deck_calibration,
+)
+from .util import DeckTransformState
+from opentrons import config
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -900,7 +911,6 @@ async def calibrate_deck(
     hcapi: OT3API,
     mount: OT3Mount,
     pip_id: str,
-    tiprack_hash: str,
 ) -> Tuple[SolvePoints, SolvePoints]:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount.
@@ -919,7 +929,134 @@ async def calibrate_deck(
     try:
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
         expected, actual = await determine_transform_matrix(hcapi, mount)
-        save_attitude_matrix(expected, actual, pip_id, tiprack_hash)
+        save_attitude_matrix(expected, actual, pip_id)
         return expected, actual  # need to return anything?
     finally:
         await hcapi.remove_tip(mount)
+
+
+def validate_gantry_calibration(gantry_cal: List[List[float]]) -> DeckTransformState:
+    """
+    This function determines whether the gantry calibration is valid
+    or not based on the following use-cases:
+    """
+    curr_cal = np.array(gantry_cal)
+    row, _ = curr_cal.shape
+
+    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
+
+    id_matrix = identity_deck_transform()
+
+    z = abs(curr_cal[2][-1])
+
+    outofrange = z < 16 or z > 34
+    if row != rank:
+        # Check that the matrix is non-singular
+        return DeckTransformState.SINGULARITY
+    elif np.array_equal(curr_cal, id_matrix):
+        # Check that the matrix is not an identity
+        return DeckTransformState.IDENTITY
+    elif outofrange:
+        # Check that the matrix is not out of range.
+        return DeckTransformState.BAD_CALIBRATION
+    else:
+        # Transform as it stands is sufficient.
+        return DeckTransformState.OK
+
+
+def migrate_affine_xy_to_attitude(
+    gantry_cal: List[List[float]],
+) -> types.AttitudeMatrix:
+    masked_transform = np.array(
+        [
+            [True, True, True, False],
+            [True, True, True, False],
+            [False, False, False, False],
+            [False, False, False, False],
+        ]
+    )
+    masked_array: np.ma.MaskedArray[
+        Any, np.dtype[np.float64]
+    ] = np.ma.masked_array(  # type: ignore
+        gantry_cal, ~masked_transform
+    )
+    attitude_array = np.zeros((3, 3))
+    np.put(attitude_array, [0, 1, 2], masked_array[0].compressed())
+    np.put(attitude_array, [3, 4, 5], masked_array[1].compressed())
+    np.put(attitude_array, 8, 1)
+    return cast(List[List[float]], attitude_array.tolist())
+
+
+def save_attitude_matrix(
+    expected: SolvePoints,
+    actual: SolvePoints,
+    pipette_id: str,
+) -> None:
+    attitude = solve_attitude(expected, actual)
+    save_robot_deck_attitude(
+        attitude,
+        pipette_id,
+    )
+
+
+def load_attitude_matrix() -> DeckCalibration:
+    calibration_data = get_robot_deck_attitude()
+    gantry_cal = get_legacy_gantry_calibration()
+    if not calibration_data and gantry_cal:
+        if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:
+            LOG.debug(
+                "Attitude deck calibration matrix not found. Migrating "
+                "existing affine deck calibration matrix to {}".format(
+                    config.get_opentrons_path("robot_calibration_dir")
+                )
+            )
+            attitude = migrate_affine_xy_to_attitude(gantry_cal)
+            save_robot_deck_attitude(
+                transform=attitude,
+                pip_id=None,
+                source=types.SourceType.legacy,
+            )
+            calibration_data = get_robot_deck_attitude()
+
+    if calibration_data:
+        return DeckCalibration(
+            attitude=calibration_data.attitude,
+            source=calibration_data.source,
+            status=types.CalibrationStatus(**calibration_data.status.dict()),
+            last_modified=calibration_data.last_modified,
+            pipette_calibrated_with=calibration_data.pipette_calibrated_with,
+            tiprack=calibration_data.tiprack,
+        )
+    else:
+        # load default if deck calibration data do not exist
+        return DeckCalibration(
+            attitude=default_deck_calibration(),
+            source=types.SourceType.default,
+            status=types.CalibrationStatus(),
+        )
+
+
+def load() -> RobotCalibration:
+    return RobotCalibration(deck_calibration=load_attitude_matrix())
+
+
+@dataclass
+class OT3Transforms(RobotCalibration):
+    carriage_offset: Point
+    left_mount_offset: Point
+    right_mount_offset: Point
+    gripper_mount_offset: Point
+
+
+def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
+    return OT3Transforms(
+        deck_calibration=DeckCalibration(
+            attitude=load().deck_calibration.attitude,
+            source=types.SourceType.default,
+            status=types.CalibrationStatus(),
+        ),
+        carriage_offset=Point(*config.carriage_offset),
+        left_mount_offset=Point(*config.left_mount_offset),
+        right_mount_offset=Point(*config.right_mount_offset),
+        gripper_mount_offset=Point(*config.gripper_mount_offset),
+    )

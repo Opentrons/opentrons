@@ -93,11 +93,8 @@ from .types import (
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
-from .robot_calibration import (
-    OT3Transforms,
-    RobotCalibration,
-    build_ot3_transforms,
-)
+from .robot_calibration import RobotCalibration
+from .ot3_calibration import build_ot3_transforms, OT3Transforms
 
 from .protocols import HardwareControlAPI
 
