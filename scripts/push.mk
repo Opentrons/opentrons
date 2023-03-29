@@ -91,6 +91,4 @@ endef
 # id-file-arg: Internal helper for generating the -i arg for ssh/scp commands
 #
 # argument 1 is the identity file to use, if any
-define id-file-arg
-    $(if $(1),"-i$($1)")
-endef
+id-file-arg = $(if $(1),-i $(1))
