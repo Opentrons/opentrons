@@ -3,7 +3,7 @@
 find_robot=$(shell yarn run -s discovery find -i 169.254)
 default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
-is-ot3 = $(shell ssh $(id-file-arg $(2)) $(3) root@$(1) systemctl status opentrons-robot-app)
+is-ot3 = $(shell ssh $(call id-file-arg,$(2)) $(3) root@$(1) systemctl status opentrons-robot-app)
 # make version less than 4.4 do not use intcmp
 allowed-ssh-versions="1 2 3 4 5 6 7 8"
 # in order to use comma in a string we have to set it to a var
@@ -34,8 +34,8 @@ $(if $(is-windows), echo "when using windows with an openSSH version larger then
 # argument 4 is the path to the wheel file
 define push-python-package
 $(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
-scp $(id-file-arg $(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
-ssh $(id-file-arg $(2)) $(3) root@$(1) \
+scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
+ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
@@ -53,8 +53,8 @@ endef
 # argument 8 is either egg or dist (default egg)
 define push-python-sdist
 $(if $(is-ot3), ,echo "This is an OT-2. Use 'make push' instead." && exit 1)
-scp $(id-file-arg $(2)) $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
-ssh $(id-file-arg $(2)) $(3) root@$(1) \
+scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
+ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
 "function cleanup () { rm -f /var/$(notdir $(4)) ; rm -rf /var/$(notdir $(4))-unzip; mount -o remount,ro / ; } ;\
  mkdir -p /var/$(notdir $(4))-unzip ; \
  cd /var/$(notdir $(4))-unzip && tar xf ../$(notdir $(4)) ; \
@@ -73,7 +73,7 @@ endef
 # argument 3 is any further ssh options, quoted
 # argument 4 is the service name
 define restart-service
-ssh $(id-file-arg $(2)) $(3)  root@$(1) \
+ssh $(call id-file-arg,$(2)) $(3)  root@$(1) \
 "systemctl restart $(4)"
 endef
 
@@ -84,8 +84,8 @@ endef
 # argument 3 is any further ssh options, quoted
 # argument 4 is the unit file path
 define push-systemd-unit
-	scp $(id-file-arg $(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/
-	ssh $(id-file-arg $(2)) $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
+	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/
+	ssh $(call id-file-arg,$(2)) $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
 endef
 
 # id-file-arg: Internal helper for generating the -i arg for ssh/scp commands
