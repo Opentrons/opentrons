@@ -13,10 +13,10 @@ import {
   Box,
   COLORS,
   Link,
+  PrimaryButton,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { PrimaryButton } from '../../atoms/buttons'
 import { getCustomTipRackDefinitions } from '../../redux/custom-labware'
 import {
   getCalibrationForPipette,

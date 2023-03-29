@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderHook } from '@testing-library/react-hooks'
 
-import { renderWithProviders, useLongPress } from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { TooManyPinsModal } from '../TooManyPinsModal'
-
-import type { UseLongPressResult } from '@opentrons/components'
 
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -16,10 +13,10 @@ jest.mock('react-router-dom', () => {
   }
 })
 
-const render = (longPress: UseLongPressResult) => {
+const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <TooManyPinsModal longpress={longPress} />
+      <TooManyPinsModal handleCloseMaxPinsAlert={() => {}} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -29,9 +26,7 @@ const render = (longPress: UseLongPressResult) => {
 
 describe('Too Many Pins Modal', () => {
   it('should have a close button', () => {
-    const { result } = renderHook(() => useLongPress())
-    result.current.isLongPressed = true
-    const [{ getByText }] = render(result.current)
-    getByText('Got it')
+    const [{ getByText }] = render()
+    getByText('close')
   })
 })

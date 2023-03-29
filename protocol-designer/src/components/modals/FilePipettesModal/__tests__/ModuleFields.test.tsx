@@ -9,7 +9,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { CheckboxField } from '@opentrons/components'
+import { DeprecatedCheckboxField } from '@opentrons/components'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
 import { ModuleDiagram } from '../../../modules'
 import { ModuleFields, ModuleFieldsProps } from '../ModuleFields'
@@ -76,7 +76,7 @@ describe('ModuleFields', () => {
   it('renders a module selection element for every module', () => {
     const wrapper = render(props)
 
-    expect(wrapper.find(CheckboxField)).toHaveLength(4)
+    expect(wrapper.find(DeprecatedCheckboxField)).toHaveLength(4)
   })
 
   it('adds module to protocol when checkbox is selected and resets the model field', () => {

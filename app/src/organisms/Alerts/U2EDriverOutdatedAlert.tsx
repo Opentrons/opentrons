@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import {
   AlertModal,
-  CheckboxField,
+  DeprecatedCheckboxField,
   Link,
   useToggle,
 } from '@opentrons/components'
@@ -33,7 +33,7 @@ const LinkButton = styled(Link)`
   padding-right: 1rem;
 `
 
-const IgnoreCheckbox = styled(CheckboxField)`
+const IgnoreCheckbox = styled(DeprecatedCheckboxField)`
   position: absolute;
   left: 1rem;
   bottom: 1.5rem;

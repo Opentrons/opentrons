@@ -15,6 +15,7 @@ import {
   BORDERS,
   POSITION_ABSOLUTE,
   COLORS,
+  SecondaryButton,
   DIRECTION_COLUMN,
   Overlay,
 } from '@opentrons/components'
@@ -25,7 +26,6 @@ import {
 } from '../../redux/config'
 import { useSortedProtocols } from './hooks'
 import { StyledText } from '../../atoms/text'
-import { SecondaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'

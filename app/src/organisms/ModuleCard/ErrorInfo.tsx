@@ -12,6 +12,7 @@ import {
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
   ALIGN_START,
+  PrimaryButton,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
 } from '@opentrons/components'
@@ -19,7 +20,6 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { AttachedModule } from '../../redux/modules/types'
 

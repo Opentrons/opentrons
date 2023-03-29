@@ -16,13 +16,13 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.png'
-import flatBottom from '@opentrons/app/src/assets/images/flatbottom_thermal_adapter.png'
-import deepwell from '@opentrons/app/src/assets/images/deepwell_thermal_adapter.png'
-import pcr from '@opentrons/app/src/assets/images/pcr_thermal_adapter.png'
-import universal from '@opentrons/app/src/assets/images/universal_thermal_adapter.png'
-import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
-import { StyledText } from '@opentrons/app/src/atoms/text/StyledText'
+import heaterShaker from '../../../assets/images/heater_shaker_empty.png'
+import flatBottom from '../../../assets/images/flatbottom_thermal_adapter.png'
+import deepwell from '../../../assets/images/deepwell_thermal_adapter.png'
+import pcr from '../../../assets/images/pcr_thermal_adapter.png'
+import universal from '../../../assets/images/universal_thermal_adapter.png'
+import screwdriver from '../../../assets/images/t10_torx_screwdriver.png'
+import { StyledText } from '../../../atoms/text'
 
 import type {
   LabwareDefinition2,

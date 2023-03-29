@@ -2,6 +2,7 @@ import { css } from 'styled-components'
 import { COLORS } from './'
 
 // Font Sizes
+export const fontSize38 = '2.375rem' // 38px
 export const fontSize28 = '1.75rem' // 28px
 export const fontSize22 = '1.375rem' // 22px
 export const fontSize20 = '1.25rem' // 20px
@@ -17,11 +18,13 @@ export const fontSizeCaption = '0.625rem' // 10px
 
 // Font Weights
 export const fontWeightBold = 800
+export const fontWeightLevel2_bold = 700
 export const fontWeightSemiBold = 600
 export const fontWeightRegular = 400
 export const fontWeightLight = 300
 
 // Line Heights
+export const lineHeight48 = '3rem' // 48px
 export const lineHeight36 = '2.25rem' // 36px
 export const lineHeight28 = '1.75rem' // 28px
 export const lineHeight24 = '1.5rem' // 24px

@@ -1,20 +1,20 @@
 import * as React from 'react'
 
-import { CheckboxField as CheckboxFieldComponent } from './index'
+import { DeprecatedCheckboxField as DeprecatedCheckboxComponent } from './DeprecatedCheckboxField'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/Checkbox Field',
-  component: CheckboxFieldComponent,
+  title: 'Library/Molecules/Forms/Deprecated Checkbox Field',
+  component: DeprecatedCheckboxComponent,
 } as Meta
 
 const Template: Story<
-  React.ComponentProps<typeof CheckboxFieldComponent>
+  React.ComponentProps<typeof DeprecatedCheckboxComponent>
 > = args => {
   const [isChecked, setIsChecked] = React.useState<boolean>(false)
   return (
-    <CheckboxFieldComponent
+    <DeprecatedCheckboxComponent
       {...args}
       onChange={e => {
         setIsChecked(!isChecked)
@@ -24,8 +24,8 @@ const Template: Story<
     />
   )
 }
-export const CheckboxField = Template.bind({})
-CheckboxField.args = {
+export const DeprecatedCheckboxField = Template.bind({})
+DeprecatedCheckboxField.args = {
   label: 'Remember this setting?',
   isIndeterminate: false,
 }

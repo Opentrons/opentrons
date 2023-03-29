@@ -7,7 +7,7 @@ import styles from './forms.css'
 /**
  * Checkbox Field Properties.
  */
-export interface CheckboxFieldProps {
+export interface DeprecatedCheckboxFieldProps {
   /** change handler */
   onChange: React.ChangeEventHandler
   /** checkbox is checked if value is true */
@@ -34,8 +34,11 @@ export interface CheckboxFieldProps {
 
 /**
  * Checkbox Form Field
+ * @deprecated
  */
-export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
+export function DeprecatedCheckboxField(
+  props: DeprecatedCheckboxFieldProps
+): JSX.Element {
   const error = props.error != null
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.checkbox_disabled]: props.disabled,

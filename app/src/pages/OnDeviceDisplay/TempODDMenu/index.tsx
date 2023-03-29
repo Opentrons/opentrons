@@ -2,9 +2,9 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Flex, useMountEffect } from '@opentrons/components'
+import { Flex, useMountEffect, PrimaryButton } from '@opentrons/components'
 
-import { PrimaryButton, TertiaryButton } from '../../../atoms/buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import { Dispatch } from '../../../redux/types'
 import { checkShellUpdate } from '../../../redux/shell'
