@@ -35,7 +35,7 @@ const TOASTER_OVEN_SIZE = 5
  */
 export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   const [toasts, setToasts] = React.useState<ToastProps[]>([])
-  const [snackbar, setSnackbar] = React.useState<SnackbarProps>()
+  const [snackbar, setSnackbar] = React.useState<SnackbarProps | null>(null)
   const isOnDevice = useSelector(getIsOnDevice)
 
   /**
@@ -64,7 +64,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   }
 
   function eatSnackbar(): void {
-    setSnackbar(undefined)
+    setSnackbar(null)
   }
 
   /**
@@ -114,7 +114,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           ))}
         </Flex>
       ) : null}
-      {snackbar !== undefined && (
+      {snackbar !== null && (
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
