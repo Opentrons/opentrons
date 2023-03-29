@@ -86,7 +86,6 @@ class FirmwareUpdateType(Enum):
         """Return FirmwareUpdateType with given node."""
         lookup = {
             NodeId.head: cls.head,
-            NodeId.head: cls.head,
             NodeId.gantry_x: cls.gantry_x,
             NodeId.gantry_y: cls.gantry_y,
             NodeId.gripper: cls.gripper,
