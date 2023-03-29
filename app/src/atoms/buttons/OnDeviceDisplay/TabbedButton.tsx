@@ -3,16 +3,19 @@ import {
   Btn,
   BORDERS,
   COLORS,
-  NewPrimaryBtn,
   SPACING,
   styleProps,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 const FOREGROUND_STYLES = css`
+  background-color: ${COLORS.highlightPurple_one};
+  color: ${COLORS.white};
+
   &:focus,
   &:hover {
     background-color: ${COLORS.highlightPurple_one};
+    box-shadow: none;
   }
 
   &:active {
@@ -27,6 +30,7 @@ const BACKGROUND_STYLES = css`
   &:focus,
   &:hover {
     background-color: ${COLORS.highlightPurple_two};
+    box-shadow: none;
   }
 
   &:active {
@@ -38,10 +42,9 @@ interface TabbedButtonProps extends React.ComponentProps<typeof Btn> {
   foreground?: boolean
 }
 
-export const TabbedButton = styled(NewPrimaryBtn)<TabbedButtonProps>`
+export const TabbedButton = styled(Btn)<TabbedButtonProps>`
   ${props =>
     css`
-      background-color: ${COLORS.highlightPurple_one};
       border-radius: ${BORDERS.size_four};
       box-shadow: none;
       font-size: ${TYPOGRAPHY.fontSize22};
@@ -54,7 +57,6 @@ export const TabbedButton = styled(NewPrimaryBtn)<TabbedButtonProps>`
 
       ${styleProps}
 
-      &:focus,
       &:focus-visible {
         box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
       }

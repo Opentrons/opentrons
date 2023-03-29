@@ -1,12 +1,6 @@
 import styled from 'styled-components'
-import {
-  TYPOGRAPHY,
-  COLORS,
-  BORDERS,
-  SPACING,
-  NewPrimaryBtn,
-  styleProps,
-} from '@opentrons/components'
+import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { NewPrimaryBtn, styleProps } from '../../primitives'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blueEnabled};

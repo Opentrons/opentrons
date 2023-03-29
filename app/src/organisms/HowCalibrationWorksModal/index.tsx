@@ -11,11 +11,11 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import { Portal } from '../../App/portal'
 import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
-import { PrimaryButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'

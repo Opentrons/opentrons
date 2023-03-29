@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Mount,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -19,7 +20,6 @@ import {
   SMALL_STEP_SIZE_MM,
 } from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'

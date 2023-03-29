@@ -12,10 +12,11 @@ import {
   JUSTIFY_FLEX_END,
   SPACING,
   TYPOGRAPHY,
+  PrimaryButton,
+  AlertPrimaryButton,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { AlertPrimaryButton, PrimaryButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
 import { useRobot } from '../../../../organisms/Devices/hooks'

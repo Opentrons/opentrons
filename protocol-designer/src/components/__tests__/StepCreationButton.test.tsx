@@ -14,7 +14,7 @@ import {
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 
-import { PrimaryButton, Tooltip } from '@opentrons/components'
+import { DeprecatedPrimaryButton, Tooltip } from '@opentrons/components'
 import {
   StepCreationButton,
   StepCreationButtonComponent,
@@ -77,7 +77,7 @@ describe('StepCreationButton', () => {
       .mockReturnValue(false)
 
     const wrapper = render()
-    const button = wrapper.find(PrimaryButton)
+    const button = wrapper.find(DeprecatedPrimaryButton)
     expect(button.prop('disabled')).toBe(false)
   })
 
@@ -87,14 +87,14 @@ describe('StepCreationButton', () => {
       .mockReturnValue(true)
 
     const wrapper = render()
-    const button = wrapper.find(PrimaryButton)
+    const button = wrapper.find(DeprecatedPrimaryButton)
     expect(button.prop('disabled')).toBe(true)
   })
 
   describe('when clicking add step', () => {
     it('expands StepCreationButtonComponent onClick', () => {
       const wrapper = render()
-      const button = wrapper.find(PrimaryButton)
+      const button = wrapper.find(DeprecatedPrimaryButton)
       const initAddStepButton = wrapper.find(StepCreationButtonComponent)
       // component starts off !expanded until click
       expect(initAddStepButton.prop('expanded')).toBe(false)
@@ -112,7 +112,7 @@ describe('StepCreationButton', () => {
 
     it('renders step button items when expanded', () => {
       const wrapper = render()
-      const button = wrapper.find(PrimaryButton)
+      const button = wrapper.find(DeprecatedPrimaryButton)
       act(() => {
         button.simulate('click')
       })
@@ -150,7 +150,7 @@ describe('StepCreationButton', () => {
           },
         })
       const wrapper = render()
-      const button = wrapper.find(PrimaryButton)
+      const button = wrapper.find(DeprecatedPrimaryButton)
 
       act(() => {
         button.simulate('click')
@@ -176,7 +176,7 @@ describe('StepCreationButton', () => {
         .mockImplementation(() => () => null) // mockImplementation is just to avoid calling the real action creator
 
       const wrapper = render()
-      const button = wrapper.find(PrimaryButton)
+      const button = wrapper.find(DeprecatedPrimaryButton)
 
       act(() => {
         button.simulate('click')

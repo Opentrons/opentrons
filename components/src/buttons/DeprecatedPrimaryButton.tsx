@@ -10,9 +10,9 @@ import type { ButtonProps } from './Button'
  * Primary application button. Fills its container and has a dark
  * background with white text
  *
- * @deprecated Use {@link PrimaryBtn}
+ * @deprecated Use {@link PrimaryButton}
  */
-export function PrimaryButton(props: ButtonProps): JSX.Element {
+export function DeprecatedPrimaryButton(props: ButtonProps): JSX.Element {
   const className = cx(styles.button_primary, props.className, {
     [styles.inverted]: props.inverted,
   })

@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS, TEXT_TRANSFORM_CAPITALIZE } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
+import {
+  COLORS,
+  TEXT_TRANSFORM_CAPITALIZE,
+  PrimaryButton,
+} from '@opentrons/components'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import {
   SUCCESSFULLY_ATTACHED,

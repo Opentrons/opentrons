@@ -1,13 +1,8 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import {
-  renderWithProviders,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-} from '@opentrons/components'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
+import { renderWithProviders } from '../../../testing/utils'
+import { COLORS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 
 import { CheckboxField } from '..'
 

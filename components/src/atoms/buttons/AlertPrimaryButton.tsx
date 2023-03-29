@@ -1,12 +1,6 @@
 import styled from 'styled-components'
-import {
-  NewAlertPrimaryBtn,
-  SPACING,
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  styleProps,
-} from '@opentrons/components'
+import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { NewAlertPrimaryBtn, styleProps } from '../../primitives'
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   background-color: ${COLORS.errorEnabled};
