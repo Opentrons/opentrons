@@ -9,6 +9,7 @@ import {
   SPACING,
   ALIGN_STRETCH,
   ALIGN_FLEX_END,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -23,7 +24,6 @@ import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 
 import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
 import singleDemoAsset from '../../assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
-import { PrimaryButton } from '../../atoms/buttons'
 
 const ASSET_MAP = {
   multi: multiDemoAsset,

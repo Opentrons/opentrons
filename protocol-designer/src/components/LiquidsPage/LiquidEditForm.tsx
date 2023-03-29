@@ -6,11 +6,11 @@ import { i18n } from '../../localization'
 import { swatchColors } from '../swatchColors'
 import {
   Card,
-  CheckboxField,
+  DeprecatedCheckboxField,
   FormGroup,
   InputField,
   OutlineButton,
-  PrimaryButton,
+  DeprecatedPrimaryButton,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
 import styles from './LiquidEditForm.css'
@@ -134,7 +134,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
               <p className={styles.info_text}>
                 {i18n.t('form.liquid_edit.serialize_explanation')}
               </p>
-              <CheckboxField
+              <DeprecatedCheckboxField
                 name="serialize"
                 label={i18n.t('form.liquid_edit.serialize')}
                 value={values.serialize}
@@ -146,15 +146,15 @@ export function LiquidEditForm(props: Props): JSX.Element {
               <OutlineButton onClick={deleteLiquidGroup} disabled={!canDelete}>
                 {i18n.t('button.delete')}
               </OutlineButton>
-              <PrimaryButton onClick={cancelForm}>
+              <DeprecatedPrimaryButton onClick={cancelForm}>
                 {i18n.t('button.cancel')}
-              </PrimaryButton>
-              <PrimaryButton
+              </DeprecatedPrimaryButton>
+              <DeprecatedPrimaryButton
                 disabled={!dirty || errors.name != null}
                 type="submit"
               >
                 {i18n.t('button.save')}
-              </PrimaryButton>
+              </DeprecatedPrimaryButton>
             </div>
           </form>
         </Card>

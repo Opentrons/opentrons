@@ -1,11 +1,15 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
+  Flex,
+  TYPOGRAPHY,
+  SecondaryButton,
+  AlertPrimaryButton,
 } from '@opentrons/components'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
@@ -14,10 +18,11 @@ interface ExitModalProps {
   proceed: () => void
   goBack: () => void
   flowType: PipetteWizardFlow
+  isOnDevice: boolean | null
 }
 
 export function ExitModal(props: ExitModalProps): JSX.Element {
-  const { goBack, proceed, flowType } = props
+  const { goBack, proceed, flowType, isOnDevice } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   let flowTitle: string = t('pipette_calibration')
@@ -39,15 +44,34 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       subHeader={t('are_you_sure_exit', { flow: flowTitle })}
       isSuccess={false}
     >
-      <SecondaryButton onClick={goBack} marginRight={SPACING.spacing2}>
-        {t('shared:go_back')}
-      </SecondaryButton>
-      <AlertPrimaryButton
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        onClick={proceed}
-      >
-        {t('shared:exit')}
-      </AlertPrimaryButton>
+      {isOnDevice ? (
+        <>
+          <Flex marginRight={SPACING.spacing3}>
+            <SmallButton
+              onClick={proceed}
+              buttonText={capitalize(t('shared:exit'))}
+              buttonType="alert"
+            />
+          </Flex>
+          <SmallButton
+            buttonText={t('shared:go_back')}
+            buttonType="default"
+            onClick={goBack}
+          />
+        </>
+      ) : (
+        <>
+          <SecondaryButton onClick={goBack} marginRight={SPACING.spacing2}>
+            {t('shared:go_back')}
+          </SecondaryButton>
+          <AlertPrimaryButton
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            onClick={proceed}
+          >
+            {t('shared:exit')}
+          </AlertPrimaryButton>
+        </>
+      )}
     </SimpleWizardBody>
   )
 }

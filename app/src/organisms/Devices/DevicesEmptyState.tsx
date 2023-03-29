@@ -14,11 +14,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
 import { startDiscovery } from '../../redux/discovery'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =

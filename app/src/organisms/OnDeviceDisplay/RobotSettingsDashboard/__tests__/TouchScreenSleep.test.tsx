@@ -1,8 +1,16 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
+import { updateConfigValue } from '../../../../redux/config'
 import { TouchScreenSleep } from '../TouchScreenSleep'
+
+jest.mock('../../../../redux/config')
+
+const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
+  typeof updateConfigValue
+>
 
 const render = (props: React.ComponentProps<typeof TouchScreenSleep>) => {
   return renderWithProviders(<TouchScreenSleep {...props} />, {
@@ -24,10 +32,17 @@ describe('TouchScreenSleep', () => {
     getByText('Touchscreen Sleep')
     getByText('Never')
     getByText('3 minutes')
+    getByText('5 minutes')
+    getByText('10 minutes')
     getByText('15 minutes')
     getByText('30 minutes')
     getByText('1 hour')
   })
 
-  // ToDo (kj:02/06/2023) Additional tests will be added when we implement the update functionality
+  it('should call a mock function when changing the sleep option', () => {
+    const [{ getByText }] = render(props)
+    const button = getByText('10 minutes')
+    fireEvent.click(button)
+    expect(mockUpdateConfigValue).toHaveBeenCalled()
+  })
 })

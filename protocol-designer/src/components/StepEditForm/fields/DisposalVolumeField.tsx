@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   FormGroup,
-  CheckboxField,
+  DeprecatedCheckboxField,
   DropdownField,
   Options,
 } from '@opentrons/components'
@@ -84,7 +84,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
             [styles.captioned_field]: volumeBoundsCaption,
           })}
         >
-          <CheckboxField
+          <DeprecatedCheckboxField
             label="Disposal Volume"
             value={Boolean(value)}
             className={cx(styles.checkbox_field, styles.large_field)}

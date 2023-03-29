@@ -1,12 +1,11 @@
 import * as React from 'react'
 import uniqueId from 'lodash/uniqueId'
 import { i18n } from '../../../i18n'
-import { mountWithProviders } from '@opentrons/components'
+import { mountWithProviders, AlertPrimaryButton } from '@opentrons/components'
 import { act } from 'react-dom/test-utils'
 
 import * as RobotApi from '../../../redux/robot-api'
 import * as Sessions from '../../../redux/sessions'
-import { AlertPrimaryButton } from '../../../atoms/buttons'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'

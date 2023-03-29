@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -13,11 +14,14 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { PrimaryButton } from '../../../atoms/buttons'
+import { RobotSystemVersionModal } from './RobotSystemVersionModal'
+import { getShellUpdateState } from '../../../redux/shell'
+
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons'
@@ -39,9 +43,20 @@ export function RobotSystemVersion({
     'device_details',
     'app_settings',
   ])
+  const [showModal, setShowModal] = React.useState<boolean>(isUpdateAvailable)
+  const updateState = useSelector(getShellUpdateState)
+  const version = updateState?.info?.version ?? ''
+  const releaseNotes = updateState?.info?.releaseNotes ?? ''
 
   return (
     <>
+      {showModal && (
+        <RobotSystemVersionModal
+          version={version}
+          releaseNotes={releaseNotes}
+          setShowModal={setShowModal}
+        />
+      )}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
           <Btn onClick={() => setCurrentOption(null)}>
