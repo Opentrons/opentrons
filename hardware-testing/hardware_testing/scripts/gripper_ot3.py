@@ -4,6 +4,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Optional, List, Tuple, Any, Dict
 
+from opentrons.config.defaults_ot3 import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
@@ -12,7 +13,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 
 # arbitrary safe distance for relative-movements upward
 # along Z, after pick-up/dropping a labware
-TRAVEL_HEIGHT = 40
+TRAVEL_HEIGHT = 100
 
 # NOTE: should probably just always be zero offset here
 PICK_UP_OFFSETS = {
@@ -66,6 +67,26 @@ ADAPTER_OFFSETS = {
     "round-bottom": Point(z=1),
 }
 
+PROBE_MOUNT = types.OT3Mount.LEFT
+ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
+    prep_distance_mm=5,
+    max_overrun_distance_mm=1,
+    speed_mm_per_s=1,
+    sensor_threshold_pf=1.0,
+)
+LABWARE_PROBE_CORNER_TOP_LEFT_XY = {
+    "plate": Point(x=7, y=-7),
+    "tiprack": Point(x=7, y=-7),
+    "reservoir": Point(x=7, y=-7),
+}
+MEASURED_CORNERS: Dict[int, Dict[str, Dict[str, List[List[float]]]]] = {
+    slot: {
+        deck_item: {labware_key: list() for labware_key in LABWARE_KEYS}
+        for deck_item in DECK_ITEM_OFFSETS.keys()
+    }
+    for slot in range(12)
+}
+
 
 @dataclass
 class GripperSlotStates:
@@ -106,6 +127,30 @@ def _get_labware_grip_offset(
     return types.Point(x=x, y=y, z=z)
 
 
+def _get_labware_probe_corners(labware_key: str) -> List[Point]:
+    size = LABWARE_SIZE[labware_key]
+    offset = LABWARE_PROBE_CORNER_TOP_LEFT_XY[labware_key]
+    # NOTE: the Y dimension is defined as negative (-) at the top of this script
+    corners = {
+        "top-left": Point(x=0, y=0, z=size.z),
+        "top-right": Point(x=size.x, y=0, z=size.z),
+        "bottom-right": Point(x=size.x, y=size.y, z=size.z),
+        "bottom-left": Point(x=0, y=size.y, z=size.z),
+    }
+    probe_offsets = {
+        "top-left": Point(x=offset.x, y=offset.y, z=offset.z),
+        "top-right": Point(x=offset.x * -1.0, y=offset.y, z=offset.z),
+        "bottom-right": Point(x=offset.x * -1.0, y=offset.y * -1.0, z=offset.z),
+        "bottom-left": Point(x=offset.x, y=offset.y * -1.0, z=offset.z),
+    }
+    return [
+        corners["top-left"] + probe_offsets["top-left"],
+        corners["top-right"] + probe_offsets["top-right"],
+        corners["bottom-right"] + probe_offsets["bottom-right"],
+        corners["bottom-left"] + probe_offsets["bottom-left"],
+    ]
+
+
 async def _do_gripper_action(
     api: OT3API,
     pos: types.Point,
@@ -115,7 +160,7 @@ async def _do_gripper_action(
 ) -> None:
     mount = types.OT3Mount.GRIPPER
     current_pos = await api.gantry_position(mount)
-    travel_height = max(current_pos.z, pos.z + TRAVEL_HEIGHT)
+    travel_height = max(current_pos.z, TRAVEL_HEIGHT)
     await api.move_to(mount, current_pos._replace(z=travel_height))
     await api.move_to(mount, pos._replace(z=travel_height))
     await api.move_to(mount, pos)
@@ -127,17 +172,16 @@ async def _do_gripper_action(
         await api.ungrip()
     if inspect:
         await _inspect(api)
-    await api.move_rel(mount, types.Point(z=TRAVEL_HEIGHT))
+    if is_grip:
+        # keep bottom of plate >= travel height
+        await api.move_rel(mount, types.Point(z=TRAVEL_HEIGHT))
+    else:
+        await api.move_to(mount, pos._replace(z=TRAVEL_HEIGHT))
     if inspect:
         await _inspect(api)
 
 
-def _calculate_grip_position_on_deck(
-    slot: int,
-    labware_key: str,
-    deck_item: str,
-    offset: Optional[types.Point],
-) -> Point:
+def _calculate_labware_position_on_deck(slot: int, deck_item: str) -> Point:
     # slot top-left corner
     slot_pos = helpers_ot3.get_slot_top_left_position_ot3(slot)
     # offset the module applies to an inserted labware
@@ -148,22 +192,42 @@ def _calculate_grip_position_on_deck(
     # FIXME: also include adapter offsets here
     assert deck_item == "deck", "currently not supporting modules"
     deck_item_offset = DECK_ITEM_OFFSETS[deck_item]
+    return slot_pos + deck_item_offset
+
+
+def _calculate_grip_position(
+    slot: int,
+    labware_key: str,
+    deck_item: str,
+    offset: Optional[types.Point],
+) -> Point:
+    labware_pos_top_left = _calculate_labware_position_on_deck(slot, deck_item)
     # relative position of labware, within a slot/module
-    labware_offset = _get_labware_grip_offset(
+    labware_grip_offset = _get_labware_grip_offset(
         labware_key, is_grip=True, has_clips=True
     )
     # calculate absolute position, on the deck
-    deck_pos = slot_pos + deck_item_offset + labware_offset
+    deck_pos = labware_pos_top_left + labware_grip_offset
     # add additional offsets, for testing purposes
     if offset:
         deck_pos += offset
-    print(f"\tDeck Pos = {deck_pos}")
-    print(f"\t\tSlot = {slot_pos}")
-    print(f"\t\tDeck-Item = {deck_item_offset}")
-    print(f"\t\tLabware = {labware_offset}")
+    print(f'\tDeck Pos = {deck_pos} ("{deck_item}" at slot {slot})')
+    print(f"\t\tLabware Top-Left = {labware_pos_top_left}")
+    print(f"\t\tLabware Grip-Offset = {labware_grip_offset}")
     if offset:
         print(f"\t\tAdditional Offset = {offset}")
     return deck_pos
+
+
+def _calculate_probe_positions(
+    slot: int, labware_key: str, deck_item: str
+) -> List[Point]:
+    labware_pos_top_left = _calculate_labware_position_on_deck(slot, deck_item)
+    probe_poses = [
+        labware_pos_top_left + probe_corner
+        for probe_corner in _get_labware_probe_corners(labware_key)
+    ]
+    return probe_poses
 
 
 async def _move_labware(
@@ -185,7 +249,7 @@ async def _move_labware(
     )
 
     # PICK-UP
-    src_loc = _calculate_grip_position_on_deck(
+    src_loc = _calculate_grip_position(
         src_slot,
         labware_key,
         src_deck_item,
@@ -197,7 +261,7 @@ async def _move_labware(
     await _do_gripper_action(api, src_loc, force, is_grip=True, inspect=inspect)
 
     # DROP
-    dst_loc = _calculate_grip_position_on_deck(
+    dst_loc = _calculate_grip_position(
         dst_slot,
         labware_key,
         dst_deck_item,
@@ -209,11 +273,62 @@ async def _move_labware(
     await _do_gripper_action(api, dst_loc, force, is_grip=False, inspect=inspect)
 
 
+async def _probe_labware_corners(
+    api: OT3API, labware_key: str, slot: int, deck_item: str
+) -> List[float]:
+    nominal_corners = _calculate_probe_positions(slot, labware_key, deck_item)
+    await api.home([types.OT3Axis.by_mount(PROBE_MOUNT)])
+    await api.add_tip(PROBE_MOUNT, api.config.calibration.probe_length)
+    found_heights: List[float] = list()
+    for corner in nominal_corners:
+        current_pos = await api.gantry_position(PROBE_MOUNT)
+        await api.move_to(PROBE_MOUNT, corner._replace(z=current_pos.z))
+        found_z = await api.capacitive_probe(
+            PROBE_MOUNT,
+            types.OT3Axis.by_mount(PROBE_MOUNT),
+            corner.z,
+            ALUMINUM_SEAL_SETTINGS,
+        )
+        found_heights.append(found_z)
+    await api.home([types.OT3Axis.by_mount(PROBE_MOUNT)])
+    await api.remove_tip(PROBE_MOUNT)
+    print(f'\tLabware Corners ("{deck_item}" at slot {slot})')
+    print(f"\t\tTop-Left = {found_heights[0]}")
+    print(f"\t\tTop-Right = {found_heights[1]}")
+    print(f"\t\tBottom-Right = {found_heights[2]}")
+    print(f"\t\tBottom-Left = {found_heights[3]}")
+    return found_heights
+
+
+def _clear_corner_heights() -> None:
+    global MEASURED_CORNERS
+    for slot, deck_items in MEASURED_CORNERS.items():
+        for deck_item, labware_keys in deck_items.items():
+            for labware_key in labware_keys.keys():
+                MEASURED_CORNERS[slot][deck_item][labware_key] = list()
+
+
+def _store_corner_heights(
+    slot: int, deck_item: str, labware_key: str, heights: List[float]
+) -> None:
+    global MEASURED_CORNERS
+    MEASURED_CORNERS[slot][deck_item][labware_key].append(heights)
+    heights_cache = MEASURED_CORNERS[slot][deck_item][labware_key]
+    if len(heights_cache) > 1:
+        # TODO: check variation, raise error if too high
+        pass
+
+
+def _check_corner_heights_variation() -> None:
+    return
+
+
 async def _run(
     api: OT3API,
     labware_key: str,
     slot_states: GripperSlotStates,
     inspect: bool = False,
+    probe: bool = False,
     force: Optional[float] = None,
 ) -> None:
     def _get_item_from_slot(slot: int) -> str:
@@ -231,18 +346,30 @@ async def _run(
     for i, s in enumerate(slot_states.slots[:-1]):
         src_slot = slot_states.slots[i]
         dst_slot = slot_states.slots[i + 1]
+        src_deck_item = _get_item_from_slot(src_slot)
+        dst_deck_item = _get_item_from_slot(dst_slot)
         await _move_labware(
             api,
             labware_key,
             force,
             src_slot,
             dst_slot,
-            src_deck_item=_get_item_from_slot(src_slot),
-            dst_deck_item=_get_item_from_slot(dst_slot),
+            src_deck_item=src_deck_item,
+            dst_deck_item=dst_deck_item,
             src_offset=Point(),  # placeholder for error-tolerance testing
             dst_offset=Point(),  # placeholder for error-tolerance testing
             inspect=inspect,
         )
+        if not probe:
+            continue
+        corner_heights = await _probe_labware_corners(
+            api,
+            labware_key,
+            dst_slot,
+            dst_deck_item,
+        )
+        _store_corner_heights(dst_slot, dst_deck_item, labware_key, corner_heights)
+        _check_corner_heights_variation()
 
 
 async def _main(
@@ -250,11 +377,22 @@ async def _main(
     labware_key: str,
     slot_states: GripperSlotStates,
     inspect: bool = False,
+    probe: bool = False,
     force: Optional[float] = None,
     cycles: int = 1,
 ) -> None:
-    api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating, gripper="GRPV3320230327A01")
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=is_simulating,
+        pipette_left="p1000_single_v3.4",
+        gripper="GRPV1120230327A01",
+    )
+    if probe:
+        assert api.hardware_pipettes[
+            PROBE_MOUNT.to_mount()
+        ], f"no pipette found on {PROBE_MOUNT.name} mount"
     await api.home()
+    if probe and not api.is_simulator:
+        input(f"attach probe to {PROBE_MOUNT.name} pipette, then press ENTER:")
 
     if len(slot_states.slots) == 1:
         slot_states.slots += [slot_states.slots[0]]
@@ -264,9 +402,12 @@ async def _main(
     while True:
         if not api.is_simulator:
             await _inspect(api)
+        if probe:
+            _clear_corner_heights()
         for c in range(cycles):
             print(f"Cycle {c + 1}/{cycles}")
-            await _run(api, labware_key, slot_states, inspect, force)
+            await _run(api, labware_key, slot_states, inspect, probe, force)
+        print("done")
         if api.is_simulator:
             break
 
@@ -281,6 +422,7 @@ def _gather_and_test_slots(args: Any) -> GripperSlotStates:
 
     An error will be raised if slots/modules have a conflict.
     """
+
     def _slot_array_from_args(a: Any) -> List[int]:
         if a:
             return [int(s) for s in a]
@@ -338,6 +480,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--inspect", action="store_true")
+    parser.add_argument("--probe", action="store_true")
     parser.add_argument("--slots", nargs="+", required=True)
     parser.add_argument("--labware", choices=LABWARE_KEYS, required=True)
     parser.add_argument("--cycles", type=int, default=1)
@@ -354,6 +497,7 @@ if __name__ == "__main__":
             args_parsed.labware,
             _gather_and_test_slots(args_parsed),
             inspect=args_parsed.inspect,
+            probe=args_parsed.probe,
             force=args_parsed.force,
             cycles=args_parsed.cycles,
         )
