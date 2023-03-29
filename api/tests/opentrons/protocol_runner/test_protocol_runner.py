@@ -151,6 +151,7 @@ def live_subject(
     return LiveRunner(
         protocol_engine=protocol_engine,
         hardware_api=hardware_api,
+        task_queue=task_queue,
     )
 
 
@@ -587,6 +588,7 @@ async def test_run_live_runner(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
+    task_queue: TaskQueue,
     live_subject: LiveRunner,
 ) -> None:
     """It should run a protocol to completion."""
@@ -601,6 +603,8 @@ async def test_run_live_runner(
     decoy.verify(
         await hardware_api.home(),
         protocol_engine.play(),
+        task_queue.start(),
+        await task_queue.join(),
     )
 
 

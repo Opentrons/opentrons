@@ -292,12 +292,14 @@ class LiveRunner(AbstractRunner):
         self,
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
+        task_queue: Optional[TaskQueue] = None,
     ) -> None:
         """Initialize the LiveRunner with its dependencies."""
         self._protocol_engine = protocol_engine
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._hardware_api = hardware_api
+        self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
     def was_started(self) -> bool:  # noqa: D102
         return self._protocol_engine.state_view.commands.has_been_played()
@@ -328,6 +330,8 @@ class LiveRunner(AbstractRunner):
     ) -> RunnerRunResult:
         await self._hardware_api.home()
         self.play()
+        self._task_queue.start()
+        await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
@@ -371,6 +375,7 @@ def create_protocol_runner(
     return LiveRunner(
         protocol_engine=protocol_engine,
         hardware_api=hardware_api,
+        task_queue=task_queue,
     )
 
 
