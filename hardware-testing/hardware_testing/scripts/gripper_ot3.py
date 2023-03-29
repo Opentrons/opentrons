@@ -72,12 +72,12 @@ ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
     prep_distance_mm=5,
     max_overrun_distance_mm=1,
     speed_mm_per_s=1,
-    sensor_threshold_pf=1.0,
+    sensor_threshold_pf=0.5,
 )
 LABWARE_PROBE_CORNER_TOP_LEFT_XY = {
     "plate": Point(x=7, y=-7),
     "tiprack": Point(x=7, y=-7),
-    "reservoir": Point(x=7, y=-7),
+    "reservoir": Point(x=7, y=-5),
 }
 MEASURED_CORNERS: Dict[int, Dict[str, Dict[str, List[List[float]]]]] = {
     slot: {
@@ -161,6 +161,8 @@ async def _do_gripper_action(
     mount = types.OT3Mount.GRIPPER
     current_pos = await api.gantry_position(mount)
     travel_height = max(current_pos.z, TRAVEL_HEIGHT)
+    if is_grip:
+        await api.ungrip()  # guarantee it
     await api.move_to(mount, current_pos._replace(z=travel_height))
     await api.move_to(mount, pos._replace(z=travel_height))
     await api.move_to(mount, pos)
