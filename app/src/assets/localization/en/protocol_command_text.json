@@ -45,5 +45,6 @@
   "fixed_trash": "Fixed Trash",
   "off_deck": "off deck",
   "perform_manual_step": "Perform manual step on {{robot_name}}",
-  "confirm_and_resume": "Confirm and resume"
+  "confirm_and_resume": "Confirm and resume",
+  "notes": "notes"
 }
