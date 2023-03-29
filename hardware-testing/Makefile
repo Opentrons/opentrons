@@ -183,17 +183,13 @@ delete-data-ot3:
 	$(call delete-test-data-cmd,$(host),$(br_ssh_key),$(ssh_opts),$(test))
 
 define push-and-update-fw
-scp -i $(2) $(3) ot3-firmware.tar.gz root@$(1):/data/$(notdir ot3-firmware.tar.gz)
-ssh -i $(2) $(3) root@$(1) \
-"function cleanup () { rm -f /data/$(notdir ot3-firmware.tar.gz) && mount -o remount,ro / ; } ;\
+scp $(2) root@$(1):/tmp
+ssh root@$(1) \
+"function cleanup () { (rm -rf /tmp/$(2) || true) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-cd /opt/opentrons-robot-server &&\
-(rm -rf ot3-firmware || true) && (rm -f ot3-firmware.tar.gz || true) &&\
-mv /data/ot3-firmware.tar.gz /opt/opentrons-robot-server &&\
-tar -xvf ot3-firmware.tar.gz &&\
-ls ./ot3-firmware &&\
-python3 -m hardware_testing.scripts.update_fw_ot3 --folder /opt/opentrons-robot-server/ot3-firmware &&\
-ls ./ot3-firmware && cleanup"
+(unzip -o /tmp/$(2) -d /usr/lib/firmware || cleanup) &&\
+python3 -m json.tool /usr/lib/firmware/opentrons-firmware.json &&\
+cleanup"
 endef
 
 .PHONY: sync-sw-ot3
@@ -206,7 +202,7 @@ sync-sw-ot3:
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:
-	$(call push-and-update-fw,$(host),$(br_ssh_key),$(ssh_opts))
+	$(call push-and-update-fw,$(host),$(zip))
 
 .PHONY: sync-ot3
 sync-ot3: sync-sw-ot3 sync-fw-ot3
