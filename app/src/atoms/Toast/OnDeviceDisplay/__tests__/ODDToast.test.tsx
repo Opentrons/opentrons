@@ -1,21 +1,21 @@
 import * as React from 'react'
 import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { Toast } from '../Toast'
+import { ODDToast } from '../ODDToast'
 
-const render = (props: React.ComponentProps<typeof Toast>) => {
-  return renderWithProviders(<Toast {...props} />)[0]
+const render = (props: React.ComponentProps<typeof ODDToast>) => {
+  return renderWithProviders(<ODDToast {...props} />)[0]
 }
 
 describe('Toast', () => {
-  let props: React.ComponentProps<typeof Toast>
+  let props: React.ComponentProps<typeof ODDToast>
   beforeEach(() => {
     props = {
       id: '1',
       message: 'test message',
-      secondaryMessage: 'secondary message',
+      secondaryText: 'secondary message',
       type: 'success',
-      closeButton: 'Close',
+      buttonText: 'Close',
       onClose: jest.fn(),
     }
   })
@@ -32,9 +32,9 @@ describe('Toast', () => {
     props = {
       id: '1',
       message: 'test message',
-      secondaryMessage: 'Super-long-protocol-file-name-that-the-user-made.py',
+      secondaryText: 'Super-long-protocol-file-name-that-the-user-made.py',
       type: 'success',
-      closeButton: 'Close',
+      buttonText: 'Close',
       onClose: jest.fn(),
     }
     const { getByText } = render(props)
@@ -51,7 +51,7 @@ describe('Toast', () => {
       id: '1',
       message: 'test message',
       type: 'success',
-      closeButton: undefined,
+      buttonText: undefined,
       onClose: jest.fn(),
     }
     const { queryByRole } = render(props)
@@ -62,7 +62,6 @@ describe('Toast', () => {
       id: '1',
       message: 'test message',
       type: 'success',
-      closeButton: false,
       onClose: jest.fn(),
     }
     const { getByTestId, getByLabelText } = render(props)
@@ -76,7 +75,6 @@ describe('Toast', () => {
       id: '1',
       message: 'test message',
       type: 'alert',
-      closeButton: false,
       onClose: jest.fn(),
     }
     const { getByTestId, getByLabelText } = render(props)
@@ -93,7 +91,6 @@ describe('Toast', () => {
       message: 'test message',
       type: 'success',
       duration: 5000,
-      closeButton: false,
       onClose: jest.fn(),
     }
     const { getByText } = render(props)
@@ -114,7 +111,6 @@ describe('Toast', () => {
       id: '1',
       message: 'test message',
       type: 'success',
-      closeButton: false,
       onClose: jest.fn(),
       disableTimeout: true,
     }
@@ -136,7 +132,6 @@ describe('Toast', () => {
       id: '1',
       message: 'test message',
       type: 'success',
-      closeButton: false,
       onClose: jest.fn(),
       disableTimeout: false,
     }

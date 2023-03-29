@@ -16,16 +16,24 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../text'
-import {
-  ALERT_TOAST,
-  SUCCESS_TOAST,
-  ERROR_TOAST,
-  WARNING_TOAST,
-  INFO_TOAST,
-} from '..'
 
-import type { IconName } from '@opentrons/components'
-import type { ToastType, ToastProps } from '..'
+import type { IconName, StyleProps } from '@opentrons/components'
+
+export const ALERT_ODD_TOAST: 'alert' = 'alert'
+export const SUCCESS_ODD_TOAST: 'success' = 'success'
+
+export type ODDToastType = typeof ALERT_ODD_TOAST | typeof SUCCESS_ODD_TOAST
+
+export interface ODDToastProps extends StyleProps {
+  id: string
+  message: string
+  secondaryText?: string
+  type: ODDToastType
+  buttonText?: string
+  onClose?: () => void
+  disableTimeout?: boolean
+  duration?: number
+}
 
 const TOAST_ANIMATION_DURATION = 500
 
@@ -48,59 +56,39 @@ const EXPANDED_STYLE = css`
 // a bit complicated because removal removes the element from the DOM immediately
 // a library like react-transition-group is a possible solution
 
-// ODD only has Alert and Success. Retrofitting old types into those two.
 const toastODDStyleByType: {
-  [k in ToastType]: {
+  [k in ODDToastType]: {
     iconName: IconName
     color: string
     backgroundColor: string
   }
 } = {
-  [ALERT_TOAST]: {
+  [ALERT_ODD_TOAST]: {
     iconName: 'alert-circle',
     color: COLORS.yellow_two,
     backgroundColor: COLORS.yellow_four,
   },
-  [SUCCESS_TOAST]: {
-    iconName: 'check-circle',
-    color: COLORS.green_two,
-    backgroundColor: COLORS.green_four,
-  },
-  [ERROR_TOAST]: {
-    iconName: 'alert-circle',
-    color: COLORS.yellow_two,
-    backgroundColor: COLORS.yellow_four,
-  },
-  [WARNING_TOAST]: {
-    iconName: 'alert-circle',
-    color: COLORS.yellow_two,
-    backgroundColor: COLORS.yellow_four,
-  },
-  [INFO_TOAST]: {
+  [SUCCESS_ODD_TOAST]: {
     iconName: 'check-circle',
     color: COLORS.green_two,
     backgroundColor: COLORS.green_four,
   },
 }
 
-export function Toast(props: ToastProps): JSX.Element {
+export function ODDToast(props: ODDToastProps): JSX.Element {
   const {
     message,
-    secondaryMessage,
+    secondaryText,
     type,
-    icon,
-    closeButton,
+    buttonText = '',
     onClose,
     disableTimeout = false,
     duration = 5000,
-    heading,
     ...styleProps
   } = props
 
   const secondary =
-    secondaryMessage !== undefined
-      ? truncateString(secondaryMessage, 45, 40)
-      : null
+    secondaryText !== undefined ? truncateString(secondaryText, 45, 40) : null
 
   if (!disableTimeout) {
     setTimeout(() => {
@@ -119,7 +107,7 @@ export function Toast(props: ToastProps): JSX.Element {
       border={BORDERS.styleSolid}
       backgroundColor={toastODDStyleByType[type].backgroundColor}
       // adjust padding when heading is present and creates extra column
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+      padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`}
       data-testid={`Toast_${type}`}
       height="5.76rem"
       width="60rem"
@@ -133,11 +121,10 @@ export function Toast(props: ToastProps): JSX.Element {
         width="100%"
       >
         <Icon
-          name={icon?.name ?? toastODDStyleByType[type].iconName}
+          name={toastODDStyleByType[type].iconName}
           color={toastODDStyleByType[type].color}
           width={SPACING.spacing6}
           marginRight={SPACING.spacing3}
-          spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />
         <StyledText
@@ -164,7 +151,7 @@ export function Toast(props: ToastProps): JSX.Element {
           </StyledText>
         ) : null}
       </Flex>
-      {typeof closeButton === 'string' && closeButton.length > 0 && (
+      {buttonText.length > 0 && (
         <Link onClick={onClose} role="button" height={SPACING.spacing5}>
           <StyledText
             color={COLORS.darkBlack_hundred}
@@ -173,7 +160,7 @@ export function Toast(props: ToastProps): JSX.Element {
             lineHeight={TYPOGRAPHY.lineHeight28}
             whiteSpace="nowrap"
           >
-            {closeButton}
+            {buttonText}
           </StyledText>
         </Link>
       )}

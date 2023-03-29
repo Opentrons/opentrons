@@ -100,7 +100,6 @@ const mockUnreachableOT3 = {
 }
 
 const mockMakeSnackbar = jest.fn()
-const mockEatSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 const mockMutateAsync = jest.fn()
@@ -120,7 +119,6 @@ describe('SendProtocolToOT3Slideout', () => {
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
     when(mockUseToaster).calledWith().mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
-      eatSnackbar: mockEatSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })

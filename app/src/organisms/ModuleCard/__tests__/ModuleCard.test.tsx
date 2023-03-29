@@ -186,7 +186,6 @@ const mockHotThermo = {
 } as ThermocyclerModule
 
 const mockMakeSnackbar = jest.fn()
-const mockEatSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 
@@ -217,7 +216,6 @@ describe('ModuleCard', () => {
     )
     mockUseToaster.mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
-      eatSnackbar: mockEatSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })

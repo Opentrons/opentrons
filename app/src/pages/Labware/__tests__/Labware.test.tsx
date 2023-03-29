@@ -37,7 +37,6 @@ const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 
 let mockTrackEvent: jest.Mock
 const mockMakeSnackbar = jest.fn()
-const mockEatSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 
@@ -71,7 +70,6 @@ describe('Labware', () => {
     })
     mockUseToaster.mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
-      eatSnackbar: mockEatSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })

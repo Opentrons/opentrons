@@ -14,12 +14,16 @@ import {
 
 import { Snackbar } from '../../atoms/Snackbar'
 import { Toast } from '../../atoms/Toast'
-import { Toast as ODDToast } from '../../atoms/Toast/OnDeviceDisplay/Toast'
+import { ODDToast } from '../../atoms/Toast/OnDeviceDisplay/ODDToast'
 import { getIsOnDevice } from '../../redux/config'
 import { ToasterContext } from './ToasterContext'
 
 import type { SnackbarProps } from '../../atoms/Snackbar'
 import type { ToastProps, ToastType } from '../../atoms/Toast'
+import type {
+  ODDToastProps,
+  ODDToastType,
+} from '../../atoms/Toast/OnDeviceDisplay/ODDToast'
 import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 
 interface ToasterOvenProps {
@@ -34,7 +38,9 @@ const TOASTER_OVEN_SIZE = 5
  * @returns
  */
 export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
-  const [toasts, setToasts] = React.useState<ToastProps[]>([])
+  const [toasts, setToasts] = React.useState<Array<ToastProps | ODDToastProps>>(
+    []
+  )
   const [snackbar, setSnackbar] = React.useState<SnackbarProps | null>(null)
   const isOnDevice = useSelector(getIsOnDevice)
 
@@ -47,7 +53,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
    */
   function makeToast(
     message: string,
-    type: ToastType,
+    type: ToastType | ODDToastType,
     options?: MakeToastOptions
   ): string {
     const id = uuidv4()
@@ -63,10 +69,6 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
     setSnackbar({ message, ...options })
   }
 
-  function eatSnackbar(): void {
-    setSnackbar(null)
-  }
-
   /**
    * removes (eats) a toast from toaster oven display container
    * @param {string} toastId the id of the toast to remove
@@ -76,9 +78,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   }
 
   return (
-    <ToasterContext.Provider
-      value={{ eatToast, makeToast, eatSnackbar, makeSnackbar }}
-    >
+    <ToasterContext.Provider value={{ eatToast, makeToast, makeSnackbar }}>
       {toasts.length > 0 ? (
         <Flex
           flexDirection={DIRECTION_COLUMN_REVERSE}
@@ -91,9 +91,9 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
         >
           {toasts.map(toast => (
             <>
-              {isOnDevice != null ? (
+              {isOnDevice != null && isOnDevice ? (
                 <ODDToast
-                  {...toast}
+                  {...(toast as ODDToastProps)}
                   key={toast.id}
                   onClose={() => {
                     toast.onClose?.()
@@ -102,7 +102,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
                 />
               ) : (
                 <Toast
-                  {...toast}
+                  {...(toast as ToastProps)}
                   key={toast.id}
                   onClose={() => {
                     toast.onClose?.()
@@ -127,7 +127,6 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
             {...snackbar}
             onClose={() => {
               snackbar.onClose?.()
-              eatSnackbar()
             }}
           />
         </Flex>

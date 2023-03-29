@@ -4,7 +4,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,
-  PrimaryBtn,
+  PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../text'
 import { Toast } from './index'
@@ -25,7 +25,7 @@ const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
   return (
     <>
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
-        <PrimaryBtn onClick={handleClick}>Click me</PrimaryBtn>
+        <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
           <StyledText as="p">
             When clicking the button, the Toast shows up in the bottom.
@@ -74,7 +74,7 @@ const TemplateWithoutTimeout: Story<
   return (
     <>
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
-        <PrimaryBtn onClick={handleClick}>Click me</PrimaryBtn>
+        <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
           <StyledText as="p">
             When clicking the button, the Toast shows up in the bottom.

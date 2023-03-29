@@ -20,14 +20,12 @@ import { StyledText } from '../text'
 
 import type { IconName, IconProps, StyleProps } from '@opentrons/components'
 
-export const ALERT_TOAST: 'alert' = 'alert'
 export const SUCCESS_TOAST: 'success' = 'success'
 export const WARNING_TOAST: 'warning' = 'warning'
 export const ERROR_TOAST: 'error' = 'error'
 export const INFO_TOAST: 'info' = 'info'
 
 export type ToastType =
-  | typeof ALERT_TOAST
   | typeof SUCCESS_TOAST
   | typeof WARNING_TOAST
   | typeof ERROR_TOAST
@@ -36,10 +34,9 @@ export type ToastType =
 export interface ToastProps extends StyleProps {
   id: string
   message: string
-  secondaryMessage?: string
   type: ToastType
   icon?: IconProps
-  closeButton?: boolean | string
+  closeButton?: boolean
   onClose?: () => void
   disableTimeout?: boolean
   duration?: number
@@ -67,7 +64,6 @@ const EXPANDED_STYLE = css`
 // a bit complicated because removal removes the element from the DOM immediately
 // a library like react-transition-group is a possible solution
 
-// Desktop app doesn't have a single Alert type, so make it match the Warning.
 const toastStyleByType: {
   [k in ToastType]: {
     iconName: IconName
@@ -95,17 +91,11 @@ const toastStyleByType: {
     color: COLORS.darkGreyEnabled,
     backgroundColor: COLORS.darkGreyDisabled,
   },
-  [ALERT_TOAST]: {
-    iconName: 'alert-circle',
-    color: COLORS.errorEnabled,
-    backgroundColor: COLORS.errorBackgroundLight,
-  },
 }
 
 export function Toast(props: ToastProps): JSX.Element {
   const {
     message,
-    secondaryMessage,
     type,
     icon,
     closeButton,

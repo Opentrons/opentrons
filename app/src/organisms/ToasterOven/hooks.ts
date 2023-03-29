@@ -5,9 +5,7 @@ import { ToasterContext } from './ToasterContext'
 import type { ToasterContextType } from './ToasterContext'
 
 export function useToaster(): ToasterContextType {
-  const { eatToast, makeToast, eatSnackbar, makeSnackbar } = React.useContext(
-    ToasterContext
-  )
+  const { eatToast, makeToast, makeSnackbar } = React.useContext(ToasterContext)
 
-  return { eatToast, makeToast, eatSnackbar, makeSnackbar }
+  return { eatToast, makeToast, makeSnackbar }
 }

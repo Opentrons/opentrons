@@ -5,19 +5,21 @@ import {
   DIRECTION_ROW,
   JUSTIFY_CENTER,
   POSITION_FIXED,
-  PrimaryBtn,
+  PrimaryButton,
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
-import { Toast } from './Toast'
+import { ODDToast } from './ODDToast'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Toast',
-  component: Toast,
+  component: ODDToast,
 } as Meta
 
-const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
+const TemplateWithTimeout: Story<
+  React.ComponentProps<typeof ODDToast>
+> = args => {
   const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
 
   const handleClick = (): void => {
@@ -27,7 +29,7 @@ const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
   return (
     <>
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
-        <PrimaryBtn onClick={handleClick}>Click me</PrimaryBtn>
+        <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
           <StyledText as="p">
             When clicking the button, the Toast shows up in the bottom.
@@ -42,7 +44,7 @@ const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
           bottom={SPACING.spacing4}
           zIndex={1000}
         >
-          <Toast {...args} onClose={() => setIsShowToast(false)} />
+          <ODDToast {...args} onClose={() => setIsShowToast(false)} />
         </Flex>
       )}
     </>
@@ -59,9 +61,9 @@ export const SuccessWithSecondaryMessageAndCloseButton = TemplateWithTimeout.bin
   {}
 )
 SuccessWithSecondaryMessageAndCloseButton.args = {
-  closeButton: 'Button text',
+  buttonText: 'Button text',
   message: 'Toast message',
-  secondaryMessage: 'Optional secondary',
+  secondaryText: 'Optional secondary',
   type: 'success',
 }
 
@@ -72,7 +74,7 @@ Alert.args = {
 }
 
 const TemplateWithoutTimeout: Story<
-  React.ComponentProps<typeof Toast>
+  React.ComponentProps<typeof ODDToast>
 > = args => {
   const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
 
@@ -83,7 +85,7 @@ const TemplateWithoutTimeout: Story<
   return (
     <>
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
-        <PrimaryBtn onClick={handleClick}>Click me</PrimaryBtn>
+        <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
           <StyledText as="p">
             When clicking the button, the Toast shows up in the bottom.
@@ -100,7 +102,7 @@ const TemplateWithoutTimeout: Story<
           bottom={SPACING.spacing4}
           zIndex={1000}
         >
-          <Toast {...args} />
+          <ODDToast {...args} />
         </Flex>
       )}
     </>
@@ -118,9 +120,9 @@ export const SuccessWithSecondaryMessageAndCloseButtonWithoutTimeout = TemplateW
   {}
 )
 SuccessWithSecondaryMessageAndCloseButtonWithoutTimeout.args = {
-  closeButton: 'Button text',
+  buttonText: 'Button text',
   message: 'Toast message',
-  secondaryMessage: 'Optional secondary',
+  secondaryText: 'Optional secondary',
   type: 'success',
   disableTimeout: true,
 }
@@ -136,9 +138,9 @@ export const SuperLongSecondaryAndCloseButtonWithoutTimeout = TemplateWithTimeou
   {}
 )
 SuperLongSecondaryAndCloseButtonWithoutTimeout.args = {
-  closeButton: 'Close',
+  buttonText: 'Close',
   message: 'Successfully received',
-  secondaryMessage: 'Super-long-protocol-file-name-that-the-user-made.py',
+  secondaryText: 'Super-long-protocol-file-name-that-the-user-made.py',
   type: 'success',
   disableTimeout: true,
 }
