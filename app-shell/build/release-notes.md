@@ -26,6 +26,7 @@ Welcome to the v6.3.0 release of the Opentrons App!
 - Labware Position Check can now check a single piece of labware that will occupy multiple deck slots over the course of a protocol.
 - Labware Offset data is now available in more places, including when choosing which robot to run a protocol on.
 - The Protocols page will remember your sorting preference when you navigate away from the page.
+- Renamed some buttons and menu commands to "Start setup" to make it clearer that the robot will not immediately start moving when you click on them.
 
 ### Bug Fixes
 
