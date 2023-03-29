@@ -15,7 +15,6 @@ import { ResultsSummary } from './ResultsSummary'
 import {
   useCreateCommandMutation,
   useCreateLabwareOffsetMutation,
-  useStopRunMutation,
 } from '@opentrons/react-api-client'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -137,7 +136,6 @@ export const LabwarePositionCheckInner = (
   const createRunCommand: CreateRunCommand = (variables, ...options) => {
     return createCommand({ ...variables, runId }, ...options)
   }
-  const { stopRun } = useStopRunMutation()
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
@@ -161,9 +159,7 @@ export const LabwarePositionCheckInner = (
       true
     )
       .then(() => props.onCloseClick())
-      .catch(() => {
-        setIsExiting(false)
-      })
+      .catch(() => props.onCloseClick())
   }
   const {
     confirm: confirmExitLPC,
@@ -236,22 +232,6 @@ export const LabwarePositionCheckInner = (
       })
   }
 
-  const handleDismissFatalError = (): void => {
-    setIsExiting(true)
-    createRunCommand({
-      command: { commandType: 'home' as const, params: {} },
-      waitUntilComplete: true,
-    })
-      .then(() => {
-        stopRun(runId, {
-          onSettled: () => {
-            onCloseClick()
-          },
-        })
-      })
-      .catch(() => onCloseClick())
-  }
-
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isExiting) {
     modalContent = (
@@ -261,7 +241,7 @@ export const LabwarePositionCheckInner = (
     modalContent = (
       <FatalErrorModal
         errorMessage={fatalError}
-        onClose={handleDismissFatalError}
+        onClose={handleCleanUpAndClose}
       />
     )
   } else if (showConfirmation) {

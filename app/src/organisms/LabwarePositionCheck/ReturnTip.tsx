@@ -124,13 +124,13 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         },
         { commandType: 'home' as const, params: {} },
       ],
-      true
+      false 
     )
       .then(() => {
         proceed()
       })
-      .catch(e => {
-        setFatalError(`ReturnTip failed with message: ${e}`)
+      .catch((e: Error) => {
+        setFatalError(`ReturnTip failed with message: ${e.message}`)
       })
   }
 

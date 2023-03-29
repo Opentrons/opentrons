@@ -40,11 +40,11 @@ export const IntroScreen = (props: {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
-    chainRunCommands(prepCommands, true)
+    chainRunCommands(prepCommands, false)
       .then(() => proceed())
-      .catch(e => {
+      .catch((e: Error) => {
         setFatalError(
-          `IntroScreen failed to issue prep commands with message: ${e}`
+          `IntroScreen failed to issue prep commands with message: ${e.message}`
         )
       })
   }

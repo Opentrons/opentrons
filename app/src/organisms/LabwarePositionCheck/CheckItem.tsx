@@ -96,11 +96,11 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
 
   React.useEffect(() => {
     if (modulePrepCommands.length > 0) {
-      chainRunCommands(modulePrepCommands, true)
+      chainRunCommands(modulePrepCommands, false)
         .then(() => {})
         .catch(e => {
           setFatalError(
-            `CheckItem module prep commands failed with message: ${e}`
+            `CheckItem module prep commands failed with message: ${e?.message}`
           )
         })
     }
@@ -168,7 +168,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   ]
 
   const handleConfirmPlacement = (): void => {
-    chainRunCommands(confirmPlacementCommands, true)
+    chainRunCommands(confirmPlacementCommands, false)
       .then(() => {
         createRunCommand({
           command: { commandType: 'savePosition', params: { pipetteId } },
@@ -242,7 +242,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             confirmPositionCommands[1],
           ]
         }
-        chainRunCommands(confirmPositionCommands, true)
+        chainRunCommands(confirmPositionCommands, false)
           .then(() => proceed())
           .catch(e => {
             setFatalError(
@@ -259,7 +259,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const handleGoBack = (): void => {
     chainRunCommands(
       [...modulePrepCommands, { commandType: 'home', params: {} }],
-      true
+      false 
     )
       .then(() => {
         registerPosition({

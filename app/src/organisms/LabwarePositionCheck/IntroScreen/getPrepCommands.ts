@@ -1,5 +1,4 @@
 import {
-  FIXED_TRASH_ID,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -30,7 +29,6 @@ type LPCPrepCommand =
 export function getPrepCommands(
   protocolData: CompletedProtocolAnalysis
 ): LPCPrepCommand[] {
-  let dropTipCommands: DropTipCreateCommand[] = []
   // load commands come from the protocol resource
   const loadCommands: LPCPrepCommand[] =
     protocolData.commands
@@ -48,15 +46,6 @@ export function getPrepCommands(
               pipetteId,
             },
           }
-          const dropTipToBeSafe = {
-            commandType: 'dropTip' as const,
-            params: {
-              pipetteId: pipetteId,
-              labwareId: FIXED_TRASH_ID,
-              wellName: 'A1',
-            },
-          }
-          dropTipCommands = [...dropTipCommands, dropTipToBeSafe]
           return [...acc, loadWithPipetteId]
         } else if (
           command.commandType === 'loadLabware' &&
@@ -136,7 +125,6 @@ export function getPrepCommands(
     ...TCCommands,
     ...HSCommands,
     homeCommand,
-    ...dropTipCommands,
   ]
 }
 

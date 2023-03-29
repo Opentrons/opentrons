@@ -130,7 +130,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
       ],
-      true
+      false
     )
       .then(() => {
         createRunCommand({
@@ -223,27 +223,24 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
       ],
-      true
+      false
     )
       .then(() => proceed())
-      .catch(e => {
+      .catch((e: Error) => {
         setFatalError(
-          `PickUpTip failed to move to safe location after tip pick up with message: ${e}`
+          `PickUpTip failed to move to safe location after tip pick up with message: ${e.message}`
         )
       })
   }
   const handleInvalidateTip = (): void => {
-    createRunCommand({
-      command: {
-        commandType: 'dropTip',
-        params: {
-          pipetteId,
-          labwareId,
-          wellName: 'A1',
-        },
+    chainRunCommands([{
+      commandType: 'dropTip',
+      params: {
+        pipetteId,
+        labwareId,
+        wellName: 'A1',
       },
-      waitUntilComplete: true,
-    })
+    }], false)
       .then(() => {
         registerPosition({ type: 'tipPickUpOffset', offset: null })
         registerPosition({
