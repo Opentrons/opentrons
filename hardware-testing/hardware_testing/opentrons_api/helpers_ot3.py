@@ -550,6 +550,7 @@ def get_plunger_positions_ot3(
     )
 
 
+
 async def update_pick_up_current(
     api: OT3API, mount: OT3Mount, current: float = 0.125
 ) -> None:
@@ -560,6 +561,16 @@ async def update_pick_up_current(
         k: current for k in config_model.current_by_tip_count.keys()
     }
     pipette.pick_up_configurations.press_fit = config_model
+
+
+async def update_drop_tip_current(
+    api: OT3API, mount: OT3Mount, current: float = 1.0
+) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._drop_configurations
+    config_model.current = current
+    pipette._drop_configurations = config_model
 
 
 async def update_pick_up_distance(
