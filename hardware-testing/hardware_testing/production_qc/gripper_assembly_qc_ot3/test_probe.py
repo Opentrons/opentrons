@@ -22,7 +22,6 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point, Gripp
 
 TEST_SLOT = 5
 PROBE_PREP_HEIGHT_MM = 5
-DISTANCE_PRESS_INTO_DECK_MM = 0.25
 PROBE_POS_OFFSET = Point(13, 13, 0)
 
 

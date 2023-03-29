@@ -20,7 +20,7 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 SLOT_FORCE_GAUGE = 4
-GRIP_HEIGHT_MM = 65
+GRIP_HEIGHT_MM = 66
 
 FAILURE_THRESHOLD_PERCENTAGE = 10
 GRIP_FORCES_NEWTON: List[int] = [5, 10, 15, 20]
@@ -73,14 +73,14 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-def _read_average_force_from_gauge(
+async def _read_average_force_from_gauge(
     gauge: Union[Mark10, SimMark10], length: int = 10, interval: float = 0.25
 ) -> float:
     n = list()
     for _ in range(length):
         n.append(gauge.read_force())
         if not gauge.is_simulator():
-            sleep(interval)
+            await sleep(interval)
     return sum(n) / float(length)
 
 
@@ -103,7 +103,7 @@ async def _grip_and_read_force(
             gauge.set_simulation_force(float(force))  # type: ignore[union-attr]
     if not api.is_simulator:
         await sleep(2)
-    ret = _read_average_force_from_gauge(gauge)
+    ret = await _read_average_force_from_gauge(gauge)
     await api.ungrip()
     return ret
 
