@@ -181,11 +181,12 @@ async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -
 
 
 def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
+    if not api.is_simulator:
+        ui.get_user_ready("attach a pipette")
     found = [
         types.OT3Mount.from_mount(m) for m, p in api.hardware_pipettes.items() if p
     ]
     if not found:
-        ui.get_user_ready("attach a pipette")
         return _get_next_pipette_mount(api)
     return found[0]
 
@@ -208,7 +209,6 @@ async def _main(is_simulating: bool) -> None:
 
     # test each attached pipette
     while True:
-        input("attach a pipette, press ENTER when ready")
         mount = _get_next_pipette_mount(api)
         pipette = api.hardware_pipettes[mount.to_mount()]
         assert pipette
