@@ -119,6 +119,9 @@ class SupportedTipsDefinition(BaseModel):
         description="The height to return a tip to its tiprack.",
         alias="defaultReturnTipHeight",
     )
+    default_blowout_volume: float = Field(
+        ..., description="The default volume to be used for blow out command."
+    )
     aspirate: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for aspirate."
     )
@@ -308,4 +311,9 @@ class PipetteConfigurations(
 
     version: PipetteVersionType = Field(
         ..., description="The version of the configuration loaded."
+    )
+    shaft_diameter: float = Field(..., description="The diameter of the pipette shaft.")
+    shaft_ul_per_mm: float = Field(
+        ...,
+        description="The conversion rate between uL dispensed and mm of motor movement.",
     )
