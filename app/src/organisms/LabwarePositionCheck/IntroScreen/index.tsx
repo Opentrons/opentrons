@@ -15,7 +15,7 @@ import { StyledText } from '../../../atoms/text'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
 import { useChainRunCommands } from '../../../resources/runs/hooks'
-import type { CreateRunCommand, RegisterPositionAction } from '../types'
+import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 
 export const INTERVAL_MS = 3000
@@ -24,7 +24,6 @@ export const IntroScreen = (props: {
   proceed: () => void
   protocolData: CompletedProtocolAnalysis
   registerPosition: React.Dispatch<RegisterPositionAction>
-  createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   handleJog: Jog
   setFatalError: (errorMessage: string) => void

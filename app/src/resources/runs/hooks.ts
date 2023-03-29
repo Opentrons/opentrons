@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import { chainRunCommands } from './utils'
+import { chainRunCommands, chainRunCommandsRecursive } from './utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 export type CreateCommandMutate = ReturnType<
@@ -33,7 +33,7 @@ export function useChainRunCommands(
   chainRunCommands: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
-  ) => Promise<unknown>
+  ) => ReturnType<typeof chainRunCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
   const [isLoading, setIsLoading] = React.useState(false)
@@ -43,7 +43,7 @@ export function useChainRunCommands(
       commands: CreateCommand[],
       continuePastCommandFailure: boolean
     ) =>
-      chainRunCommands(
+      chainRunCommandsRecursive(
         commands,
         createRunCommand,
         continuePastCommandFailure,

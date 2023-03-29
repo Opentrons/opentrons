@@ -24,11 +24,7 @@ import {
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import type {
-  CreateRunCommand,
-  RegisterPositionAction,
-  WorkingOffset,
-} from './types'
+import type { RegisterPositionAction, WorkingOffset } from './types'
 import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
@@ -124,18 +120,12 @@ export const LabwarePositionCheckInner = (
     { workingOffsets: [], tipPickUpOffset: null }
   )
   const [isExiting, setIsExiting] = React.useState(false)
-  const {
-    createCommand,
-    isLoading: isCommandMutationLoading,
-  } = useCreateCommandMutation()
   const { createCommand: createSilentCommand } = useCreateCommandMutation()
   const {
     chainRunCommands,
     isCommandMutationLoading: isCommandChainLoading,
   } = useChainRunCommands(runId)
-  const createRunCommand: CreateRunCommand = (variables, ...options) => {
-    return createCommand({ ...variables, runId }, ...options)
-  }
+
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
@@ -210,12 +200,11 @@ export const LabwarePositionCheckInner = (
   const movementStepProps = {
     proceed,
     protocolData,
-    createRunCommand,
     chainRunCommands,
     setFatalError,
     registerPosition,
     handleJog,
-    isRobotMoving: isCommandMutationLoading || isCommandChainLoading,
+    isRobotMoving: isCommandChainLoading,
     workingOffsets,
     existingOffsets,
   }
@@ -286,7 +275,13 @@ export const LabwarePositionCheckInner = (
             title={t('labware_position_check_title')}
             currentStep={currentStepIndex}
             totalSteps={totalStepCount}
-            onExit={showConfirmation || isExiting ? null : confirmExitLPC}
+            onExit={() =>{
+              if (fatalError != null) {
+                handleCleanUpAndClose()
+              } else if (!showConfirmation && !isExiting) {
+                confirmExitLPC()
+              }
+            }}
           />
         }
       >

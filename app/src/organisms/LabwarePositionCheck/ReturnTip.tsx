@@ -17,12 +17,11 @@ import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { VectorOffset } from '@opentrons/api-client'
-import type { CreateRunCommand, ReturnTipStep } from './types'
+import type { ReturnTipStep } from './types'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
-  createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   setFatalError: (errorMessage: string) => void
   tipPickUpOffset: VectorOffset | null
@@ -124,7 +123,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         },
         { commandType: 'home' as const, params: {} },
       ],
-      false 
+      false
     )
       .then(() => {
         proceed()

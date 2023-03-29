@@ -120,12 +120,7 @@ export function getPrepCommands(
     params: {},
   }
   // prepCommands will be run when a user starts LPC
-  return [
-    ...loadCommands,
-    ...TCCommands,
-    ...HSCommands,
-    homeCommand,
-  ]
+  return [...loadCommands, ...TCCommands, ...HSCommands, homeCommand]
 }
 
 function isLoadCommand(
