@@ -62,7 +62,7 @@ describe('CheckItem', () => {
   it('renders correct copy when preparing space with tip rack', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Prepare tip rack in slot 1' })
-    getByText('Clear all deck slots of labware')
+    getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
       matchTextWithSpans('Place a full Mock TipRack Definition into slot 1')
     )
@@ -78,7 +78,7 @@ describe('CheckItem', () => {
 
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Prepare labware in slot 2' })
-    getByText('Clear all deck slots of labware')
+    getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(matchTextWithSpans('Place a Mock Labware Definition into slot 2'))
     getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })

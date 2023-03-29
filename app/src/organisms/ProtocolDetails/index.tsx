@@ -437,7 +437,7 @@ export function ProtocolDetails(
                   data-testid="ProtocolDetails_runProtocol"
                   disabled={analysisStatus === 'loading'}
                 >
-                  {t('run_protocol')}
+                  {t('start_setup')}
                 </PrimaryButton>
               </Flex>
             </Flex>

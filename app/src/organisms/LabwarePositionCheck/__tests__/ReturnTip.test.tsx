@@ -49,7 +49,7 @@ describe('ReturnTip', () => {
   it('renders correct copy', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Return tip rack to slot 1' })
-    getByText('Clear all deck slots of labware')
+    getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
       matchTextWithSpans(
         'Place the Mock TipRack Definition that you used before back into slot 1. The pipette will return tips to their original location in the rack.'

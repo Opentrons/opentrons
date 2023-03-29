@@ -241,8 +241,17 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             wellName: 'A1',
           },
         },
+        {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          },
+        },
       ],
-      false
+      false 
     )
       .then(() => {
         registerPosition({ type: 'tipPickUpOffset', offset: null })

@@ -5,19 +5,14 @@ import { LEFT } from '@opentrons/shared-data'
 import { fixtureP10Multi } from '@opentrons/shared-data/pipette/fixtures/name'
 import { i18n } from '../../../i18n'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
-import { LevelPipette } from '../LevelPipette'
 import { Instructions } from '../Instructions'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 jest.mock('../CheckPipettesButton')
-jest.mock('../LevelPipette')
 
 const mockCheckPipettesButton = CheckPipettesButton as jest.MockedFunction<
   typeof CheckPipettesButton
->
-const mockLevelPipette = LevelPipette as jest.MockedFunction<
-  typeof LevelPipette
 >
 
 const render = (props: React.ComponentProps<typeof Instructions>) => {
@@ -48,8 +43,9 @@ describe('Instructions', () => {
       setWantedName: jest.fn(),
       confirm: jest.fn(),
       back: jest.fn(),
-      setStepPage: jest.fn(),
-      stepPage: 0,
+      nextStep: jest.fn(),
+      prevStep: jest.fn(),
+      currentStepCount: 1,
       attachedWrong: false,
     }
     mockCheckPipettesButton.mockReturnValue(
@@ -68,13 +64,13 @@ describe('Instructions', () => {
     fireEvent.click(goBack)
     expect(props.back).toHaveBeenCalled()
     fireEvent.click(cont)
-    expect(props.setStepPage).toHaveBeenCalled()
+    expect(props.nextStep).toHaveBeenCalled()
   })
 
   it('renders 2nd page of the detach pipette flow', () => {
     props = {
       ...props,
-      stepPage: 1,
+      currentStepCount: 2,
     }
     const { getByText, getByRole, getByAltText } = render(props)
     getByText('Remove the pipette')
@@ -84,7 +80,7 @@ describe('Instructions', () => {
     getByAltText('detach-left-single-GEN1-tab')
     const goBack = getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
-    expect(props.setStepPage).toHaveBeenCalled()
+    expect(props.prevStep).toHaveBeenCalled()
     getByText('mock check pipettes button')
   })
 
@@ -99,8 +95,9 @@ describe('Instructions', () => {
       setWantedName: jest.fn(),
       confirm: jest.fn(),
       back: jest.fn(),
-      setStepPage: jest.fn(),
-      stepPage: 0,
+      nextStep: jest.fn(),
+      prevStep: jest.fn(),
+      currentStepCount: 0,
       attachedWrong: false,
     }
     const { getByText, getByRole } = render(props)
@@ -122,8 +119,9 @@ describe('Instructions', () => {
       setWantedName: jest.fn(),
       confirm: jest.fn(),
       back: jest.fn(),
-      setStepPage: jest.fn(),
-      stepPage: 0,
+      nextStep: jest.fn(),
+      prevStep: jest.fn(),
+      currentStepCount: 1,
       attachedWrong: false,
     }
     const { getByText, getByRole, getByAltText } = render(props)
@@ -137,10 +135,10 @@ describe('Instructions', () => {
     getByAltText('attach-left-single-GEN1-screws')
     const goBack = getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
-    expect(props.back).toHaveBeenCalled()
+    expect(props.setWantedName).toHaveBeenCalled()
     const cont = getByRole('button', { name: 'Continue' })
     fireEvent.click(cont)
-    expect(props.setStepPage).toHaveBeenCalled()
+    expect(props.nextStep).toHaveBeenCalled()
   })
 
   it('renders the 2nd page of the attach flow when a p10 single gen 1 is selected', () => {
@@ -154,8 +152,9 @@ describe('Instructions', () => {
       setWantedName: jest.fn(),
       confirm: jest.fn(),
       back: jest.fn(),
-      setStepPage: jest.fn(),
-      stepPage: 1,
+      nextStep: jest.fn(),
+      prevStep: jest.fn(),
+      currentStepCount: 2,
       attachedWrong: false,
     }
     const { getByText, getByRole, getByAltText } = render(props)
@@ -166,7 +165,7 @@ describe('Instructions', () => {
     getByAltText('attach-left-single-GEN1-tab')
     const goBack = getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
-    expect(props.setStepPage).toHaveBeenCalled()
+    expect(props.prevStep).toHaveBeenCalled()
     getByText('mock check pipettes button')
   })
 
@@ -181,8 +180,9 @@ describe('Instructions', () => {
       setWantedName: jest.fn(),
       confirm: jest.fn(),
       back: jest.fn(),
-      setStepPage: jest.fn(),
-      stepPage: 0,
+      nextStep: jest.fn(),
+      prevStep: jest.fn(),
+      currentStepCount: 1,
       attachedWrong: false,
     }
     const { getByText, getByRole, getByAltText } = render(props)
@@ -198,7 +198,7 @@ describe('Instructions', () => {
     getByAltText('attach-left-multi-GEN1-screws')
     const cont = getByRole('button', { name: 'Continue' })
     fireEvent.click(cont)
-    expect(props.setStepPage).toHaveBeenCalled()
+    expect(props.nextStep).toHaveBeenCalled()
   })
 
   it('renders the attach flow 2nd page when a p10 8 channel is selected', () => {
@@ -212,8 +212,9 @@ describe('Instructions', () => {
       setWantedName: jest.fn(),
       confirm: jest.fn(),
       back: jest.fn(),
-      setStepPage: jest.fn(),
-      stepPage: 1,
+      nextStep: jest.fn(),
+      prevStep: jest.fn(),
+      currentStepCount: 2,
       attachedWrong: false,
     }
     const { getByText, getByRole, getByAltText } = render(props)
@@ -224,7 +225,7 @@ describe('Instructions', () => {
     getByAltText('attach-left-multi-GEN1-tab')
     const goBack = getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
-    expect(props.setStepPage).toHaveBeenCalled()
+    expect(props.prevStep).toHaveBeenCalled()
     getByText('mock check pipettes button')
   })
 
@@ -239,8 +240,9 @@ describe('Instructions', () => {
       setWantedName: jest.fn(),
       confirm: jest.fn(),
       back: jest.fn(),
-      setStepPage: jest.fn(),
-      stepPage: 1,
+      nextStep: jest.fn(),
+      prevStep: jest.fn(),
+      currentStepCount: 2,
       attachedWrong: true,
     }
     const { getByText, getByRole, getByAltText } = render(props)
@@ -251,27 +253,7 @@ describe('Instructions', () => {
     getByAltText('attach-left-multi-GEN1-tab')
     const goBack = getByRole('button', { name: 'Go back' })
     fireEvent.click(goBack)
-    expect(props.setStepPage).toHaveBeenCalled()
+    expect(props.prevStep).toHaveBeenCalled()
     getByText('mock check pipettes button')
-  })
-
-  it('renders the attach flow 3rd page when a p300 8 channel is selected', () => {
-    mockLevelPipette.mockReturnValue(<div>mockLevelPipette</div>)
-    props = {
-      robotName: 'otie',
-      mount: LEFT,
-      wantedPipette: fixtureP10Multi,
-      actualPipette: fixtureP10Multi as PipetteModelSpecs,
-      displayCategory: 'GEN1',
-      direction: 'attach',
-      setWantedName: jest.fn(),
-      confirm: jest.fn(),
-      back: jest.fn(),
-      setStepPage: jest.fn(),
-      stepPage: 2,
-      attachedWrong: false,
-    }
-    const { getByText } = render(props)
-    getByText('mockLevelPipette')
   })
 })

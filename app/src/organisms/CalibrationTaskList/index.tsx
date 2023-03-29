@@ -50,7 +50,6 @@ export function CalibrationTaskList({
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
   const history = useHistory()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(
-    robotName,
     pipOffsetCalLauncher,
     tipLengthCalLauncher,
     deckCalLauncher

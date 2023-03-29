@@ -12,20 +12,19 @@ import {
   SIZE_1,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
-
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { DETACH } from './constants'
 
 export interface CheckPipetteButtonProps {
   robotName: string
   children?: React.ReactNode
-  actualPipette?: PipetteModelSpecs
+  direction?: 'detach' | 'attach'
   onDone?: () => void
 }
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
 ): JSX.Element | null {
-  const { onDone, children, actualPipette } = props
+  const { onDone, children, direction } = props
   const { t } = useTranslation('change_pipette')
   const [isPending, setIsPending] = React.useState(false)
   const { refetch: refetchPipettes } = usePipettesQuery(
@@ -69,7 +68,7 @@ export function CheckPipettesButton(
           marginRight={SPACING.spacing3}
         />
         <StyledText>
-          {actualPipette != null
+          {direction === DETACH
             ? t('confirming_detachment')
             : t('confirming_attachment')}
         </StyledText>
@@ -77,7 +76,7 @@ export function CheckPipettesButton(
     )
   } else if (children == null && !isPending) {
     body =
-      actualPipette != null ? t('confirm_detachment') : t('confirm_attachment')
+      direction === DETACH ? t('confirm_detachment') : t('confirm_attachment')
   }
 
   return (

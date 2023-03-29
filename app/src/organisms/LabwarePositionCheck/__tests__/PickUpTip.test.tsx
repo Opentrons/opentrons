@@ -57,7 +57,7 @@ describe('PickUpTip', () => {
   it('renders correct copy when preparing space', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Prepare tip rack in slot 1' })
-    getByText('Clear all deck slots of labware')
+    getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
       matchTextWithSpans('Place a full Mock TipRack Definition into slot 1')
     )
@@ -243,6 +243,15 @@ describe('PickUpTip', () => {
             pipetteId: 'pipetteId1',
             labwareId: 'labwareId1',
             wellName: 'A1',
+          },
+        },
+        {
+          commandType: 'moveToWell',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'labwareId1',
+            wellName: 'A1',
+            wellLocation: { origin: 'top' },
           },
         },
       ],

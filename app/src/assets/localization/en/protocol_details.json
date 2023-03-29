@@ -27,6 +27,7 @@
   "robot_configuration": "robot configuration",
   "robot_is_busy": "{{robotName}} is busy",
   "robot_is_busy_with_protocol": "{{robotName}} is busy with {{protocolName}} in {{runStatus}} state. Do you want to clear it and proceed?",
+  "start_setup": "Start setup",
   "run_protocol": "Run protocol",
   "show_in_folder": "Show in folder",
   "unavailable_robot_not_listed": "{{count}} unavailable robot is not listed.",
