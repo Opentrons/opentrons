@@ -163,7 +163,7 @@ def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
     node_to_subsystem = {
         node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
     }
-    return node_to_subsystem[node_id]
+    return node_to_subsystem[node_id.application_for()]
 
 
 def get_current_settings(

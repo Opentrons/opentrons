@@ -291,7 +291,7 @@ def _should_update(
     force: bool,
 ) -> bool:
     if version_cache.target.is_bootloader():
-        log.info(f"Update required {version_cache.target} (in bootloader)")
+        log.info(f"Update required for {version_cache.target} (in bootloader)")
         return True
     if force:
         log.info(f"Update required for {version_cache.target} (forced)")

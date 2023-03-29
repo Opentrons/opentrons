@@ -297,7 +297,7 @@ class RunUpdate:
         else:
             logger.info("Skipping erase step.")
 
-        logger.info(f"Downloading FW to {target.bootloader_node}.")
+        logger.info(f"Downloading {filepath} to {target.bootloader_node}.")
         with open(filepath) as f:
             hex_processor = HexRecordProcessor.from_file(f)
             async for download_progress in downloader.run(
