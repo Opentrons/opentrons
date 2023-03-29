@@ -1,49 +1,33 @@
 """Tests for Target class."""
 import pytest
-from _pytest.fixtures import FixtureRequest
 
 from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_update.target import Target
 
 
-@pytest.fixture(params=list(NodeId))
-def system_node_id(request: FixtureRequest) -> NodeId:
-    """Each node id fixture."""
-    return request.param  # type: ignore[attr-defined,no-any-return]
-
-
-def test_make_target(system_node_id: NodeId) -> None:
-    """It should create the Target."""
-    if system_node_id == NodeId.head:
-        assert (
-            Target(system_node=system_node_id).bootloader_node == NodeId.head_bootloader
-        )
-    elif system_node_id == NodeId.pipette_left:
-        assert (
-            Target(system_node=system_node_id).bootloader_node
-            == NodeId.pipette_left_bootloader
-        )
-    elif system_node_id == NodeId.pipette_right:
-        assert (
-            Target(system_node=system_node_id).bootloader_node
-            == NodeId.pipette_right_bootloader
-        )
-    elif system_node_id == NodeId.gantry_x:
-        assert (
-            Target(system_node=system_node_id).bootloader_node
-            == NodeId.gantry_x_bootloader
-        )
-    elif system_node_id == NodeId.gantry_y:
-        assert (
-            Target(system_node=system_node_id).bootloader_node
-            == NodeId.gantry_y_bootloader
-        )
-    elif system_node_id == NodeId.gripper:
-        assert (
-            Target(system_node=system_node_id).bootloader_node
-            == NodeId.gripper_bootloader
-        )
-    else:
-        # Every other node id should raise an exception.
+@pytest.mark.parametrize(
+    "system_node_id", [n for n in NodeId if n.application_for() == n]
+)
+def test_make_target_from_system(system_node_id: NodeId) -> None:
+    """It should create the Target from a system id."""
+    if system_node_id in (NodeId.broadcast, NodeId.host):
         with pytest.raises(AssertionError):
-            Target(system_node=system_node_id)
+            Target.from_single_node(system_node_id)
+    else:
+        this_target = Target(
+            system_node=system_node_id, bootloader_node=system_node_id.bootloader_for()
+        )
+        assert Target.from_single_node(system_node_id) == this_target
+
+
+@pytest.mark.parametrize(
+    "bootloader_node_id",
+    [n for n in NodeId if n.is_bootloader()],
+)
+def test_make_target_from_bootloader(bootloader_node_id: NodeId) -> None:
+    """It should create the target from a bootloader."""
+    this_target = Target(
+        system_node=bootloader_node_id.application_for(),
+        bootloader_node=bootloader_node_id,
+    )
+    assert Target.from_single_node(bootloader_node_id) == this_target

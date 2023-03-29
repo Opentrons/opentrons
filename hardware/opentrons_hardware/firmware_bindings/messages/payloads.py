@@ -4,6 +4,7 @@
 #  from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from . import message_definitions
+from typing import Iterator
 
 from .fields import (
     FirmwareShortSHADataField,
@@ -83,16 +84,29 @@ class DeviceInfoResponsePayload(_DeviceInfoResponsePayloadBase):
         consumed_by_super = _DeviceInfoResponsePayloadBase.get_size()
         superdict = asdict(_DeviceInfoResponsePayloadBase.build(data))
         message_index = superdict.pop("message_index")
+
+        # we want to parse this by adding extra 0s that may not be necessary,
+        # which is annoying and complex, so let's wrap it in an iterator
+        def _data_for_optionals(consumed: int, buf: bytes) -> Iterator[bytes]:
+            extended = buf + b"\x00\x00\x00\x00"
+            yield extended[consumed:]
+            consumed += 4
+            extended = extended + b"\x00"
+            yield extended[consumed : consumed + 1]
+
+        optionals_yielder = _data_for_optionals(consumed_by_super, data)
         inst = cls(
             **superdict,
-            revision=OptionalRevisionField.build(
-                (data + b"\x00\x00\x00\x00")[consumed_by_super:]
+            revision=OptionalRevisionField.build(next(optionals_yielder)),
+            subidentifier=utils.UInt8Field.build(
+                int.from_bytes(next(optionals_yielder), "big")
             ),
         )
         inst.message_index = message_index
         return inst
 
     revision: OptionalRevisionField
+    subidentifier: utils.UInt8Field
 
 
 @dataclass(eq=False)

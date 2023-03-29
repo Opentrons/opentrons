@@ -43,6 +43,7 @@ class DeviceInfoCache:
     shortsha: str
     flags: Any
     revision: PCBARevision
+    subidentifier: int
 
     def __repr__(self) -> str:
         """Readable representation of the device info."""
@@ -276,6 +277,7 @@ def _parse_usb_device_info_response(
                 revision=PCBARevision(
                     message.revision.revision, message.revision.tertiary
                 ),
+                subidentifier=message.subidentifier.value,
             )
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")
@@ -304,6 +306,7 @@ def _parse_can_device_info_response(
                 revision=PCBARevision(
                     message.payload.revision.revision, message.payload.revision.tertiary
                 ),
+                subidentifier=message.payload.subidentifier.value,
             )
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")

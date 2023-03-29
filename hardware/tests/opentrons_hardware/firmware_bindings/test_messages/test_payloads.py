@@ -57,6 +57,7 @@ def test_old_get_device_info() -> None:
     assert reparsed_old.revision.primary is None
     assert reparsed_old.revision.secondary is None
     assert reparsed_old.revision.tertiary is None
+    assert reparsed_old.subidentifier.value == 0
 
 
 def test_padded_old_get_device_info() -> None:
@@ -75,6 +76,7 @@ def test_padded_old_get_device_info() -> None:
     assert reparsed_old.revision.primary is None
     assert reparsed_old.revision.secondary is None
     assert reparsed_old.revision.tertiary is None
+    assert reparsed_old.subidentifier.value == 0
 
 
 def test_new_get_device_info() -> None:
@@ -84,6 +86,7 @@ def test_new_get_device_info() -> None:
         flags=fields.VersionFlagsField(0x55667788),
         shortsha=fields.FirmwareShortSHADataField(b"abcdef12"),
         revision=fields.OptionalRevisionField.build(b"a1\x00\x00"),
+        subidentifier=utils.UInt8Field.build(9),
     )
     new.message_index = utils.UInt32Field(0)
     ser = new.serialize()
@@ -94,3 +97,4 @@ def test_new_get_device_info() -> None:
     assert reparsed_new.revision.primary == new.revision.primary
     assert reparsed_new.revision.secondary == new.revision.secondary
     assert reparsed_new.revision.tertiary == new.revision.tertiary
+    assert reparsed_new.subidentifier == new.subidentifier

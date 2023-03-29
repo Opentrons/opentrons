@@ -65,6 +65,7 @@ class DeviceInfoResponse(utils.BinarySerializable):
     flags: VersionFlagsField = VersionFlagsField(0)
     shortsha: FirmwareShortSHADataField = FirmwareShortSHADataField(bytes())
     revision: OptionalRevisionField = OptionalRevisionField("", "", "")
+    subidentifier: utils.UInt8Field = utils.UInt8Field(0)
 
     @classmethod
     def build(cls, data: bytes) -> "DeviceInfoResponse":
@@ -102,8 +103,16 @@ class DeviceInfoResponse(utils.BinarySerializable):
 
         revision = OptionalRevisionField.build(data[data_iter:])
 
+        data_iter = data_iter + revision.NUM_BYTES
+        try:
+            subidentifier = utils.UInt8Field.build(
+                int.from_bytes(data[data_iter : data_iter + 1], "big")
+            )
+        except IndexError:
+            subidentifier = utils.UInt8Field.build(0)
+
         return DeviceInfoResponse(
-            message_id, length, version, flags, shortsha, revision
+            message_id, length, version, flags, shortsha, revision, subidentifier
         )
 
 
