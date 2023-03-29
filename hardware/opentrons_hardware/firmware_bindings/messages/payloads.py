@@ -568,3 +568,10 @@ class SerialNumberPayload(EmptyPayload):
     """A payload with a serial number."""
 
     serial: SerialField
+
+
+@dataclass(eq=False)
+class GetMotorUsageResponsePayload(EmptyPayload):
+    """A payload with motor lifetime usage."""
+
+    distance_um: utils.UInt64Field

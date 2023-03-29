@@ -829,3 +829,25 @@ class PushTipPresenceNotification(BaseMessage):
     message_id: Literal[
         MessageId.tip_presence_notification
     ] = MessageId.tip_presence_notification
+
+
+@dataclass
+class GetMotorUsageRequest(EmptyPayloadMessage):
+    """Prompt a motor to send it's total lifetime usage."""
+
+    message_id: Literal[
+        MessageId.get_motor_usage_request
+    ] = MessageId.get_motor_usage_request
+
+
+@dataclass
+class GetMotorUsageResponse(BaseMessage):
+    """Motor response with total lifetime usage."""
+
+    payload: payloads.GetMotorUsageResponsePayload
+    payload_type: Type[
+        payloads.GetMotorUsageResponsePayload
+    ] = payloads.GetMotorUsageResponsePayload
+    message_id: Literal[
+        MessageId.get_motor_usage_response
+    ] = MessageId.get_motor_usage_response
