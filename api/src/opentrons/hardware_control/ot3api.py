@@ -288,6 +288,8 @@ class OT3API(
             checked_config = config
         backend = await OT3Controller.build(checked_config, use_usb_bus)
 
+        await backend.status_bar_controller().state_idle()
+
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
 
@@ -649,6 +651,7 @@ class OT3API(
         self._pause_manager.pause(pause_type)
 
         async def _chained_calls() -> None:
+            await self._backend.status_bar_controller().state_paused()
             await self._execution_manager.pause()
             self._backend.pause()
 
@@ -676,6 +679,7 @@ class OT3API(
 
         async def _chained_calls() -> None:
             # mirror what happens API.pause.
+            await self._backend.status_bar_controller().state_running()
             await self._execution_manager.resume()
             self._backend.resume()
 

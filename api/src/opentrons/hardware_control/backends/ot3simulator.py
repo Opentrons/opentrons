@@ -58,6 +58,7 @@ from opentrons.hardware_control.types import (
     UpdateStatus,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
@@ -633,3 +634,6 @@ class OT3Simulator:
     async def connect_usb_to_rear_panel(self) -> None:
         """Connect to rear panel over usb."""
         return None
+    
+    def status_bar_controller(self) -> status_bar.StatusBar:
+        return status_bar.StatusBar(None)

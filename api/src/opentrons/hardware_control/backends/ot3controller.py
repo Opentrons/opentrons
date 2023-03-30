@@ -87,6 +87,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     USBTarget,
     FirmwareTarget,
 )
+from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
@@ -222,6 +223,7 @@ class OT3Controller:
         self._update_required = False
         self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
+        self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -1228,3 +1230,6 @@ class OT3Controller:
                     message_id == BinaryMessageId.door_switch_state_info
                 ),
             )
+
+    def status_bar_controller(self) -> status_bar.StatusBar:
+        return self._status_bar
