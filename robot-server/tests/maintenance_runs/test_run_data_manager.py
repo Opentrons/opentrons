@@ -19,7 +19,6 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LabwareOffset,
 )
-from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 
 from robot_server.protocols import ProtocolResource
 from robot_server.maintenance_run.engine_store import EngineStore, EngineConflictError
@@ -27,7 +26,7 @@ from robot_server.maintenance_run.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
 from robot_server.maintenance_run.maintenance_run_models import MaintenanceRun
-from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.run_models import RunNotFoundError, CommandNotFoundError
 
 from opentrons.protocol_engine import Liquid
 
@@ -374,6 +373,9 @@ def test_get_command_from_engine_command_not_found(
 ) -> None:
     """Should get command by id from engine store."""
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+    decoy.when(
+        mock_engine_store.engine.state_view.commands.get("command-not-found-id")
+    ).then_raise(CommandNotFoundError("command-not-found-id"))
 
-    with pytest.raises(CommandDoesNotExistError):
+    with pytest.raises(CommandNotFoundError):
         subject.get_command("run-id", "command-not-found-id")

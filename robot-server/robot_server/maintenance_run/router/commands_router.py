@@ -23,7 +23,7 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
-from ...runs.run_models import RunNotFoundError
+from ...runs.run_models import RunNotFoundError, CommandNotFoundError
 from ..maintenance_run_models import MaintenanceRunCommandSummary
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..engine_store import EngineStore
@@ -97,113 +97,113 @@ async def get_current_run_engine_from_url(
     return engine_store.engine
 
 
-# @commands_router.post(
-#     path="/runs/{runId}/commands",
-#     summary="Enqueue a command",
-#     description=textwrap.dedent(
-#         """
-#         Add a single command to the run. You can add commands to a run
-#         for two reasons:
-#
-#         - Setup commands (`data.source == "setup"`)
-#         - Protocol commands (`data.source == "protocol"`)
-#
-#         Setup commands may be enqueued before the run has been started.
-#         You could use setup commands to prepare a module or
-#         run labware calibration procedures.
-#
-#         Protocol commands may be enqueued anytime using this endpoint.
-#         You can create a protocol purely over HTTP using protocol commands.
-#         If you are running a protocol from a file(s), then you will likely
-#         not need to enqueue protocol commands using this endpoint.
-#
-#         Once enqueued, setup commands will execute immediately with priority,
-#         while protocol commands will wait until a `play` action is issued.
-#         A play action may be issued while setup commands are still queued,
-#         in which case all setup commands will finish executing before
-#         the run moves on to protocol commands.
-#
-#         If you are running a protocol file(s), use caution with this endpoint,
-#         as added commands may interfere with commands added by the protocol
-#         """
-#     ),
-#     status_code=status.HTTP_201_CREATED,
-#     responses={
-#         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
-#         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-#         status.HTTP_409_CONFLICT: {
-#             "model": ErrorBody[Union[RunStopped, CommandNotAllowed]]
-#         },
-#     },
-# )
-# async def create_run_command(
-#     request_body: RequestModel[pe_commands.CommandCreate],
-#     waitUntilComplete: bool = Query(
-#         default=False,
-#         description=(
-#             "If `false`, return immediately, while the new command is still queued."
-#             " If `true`, only return once the new command succeeds or fails,"
-#             " or when the timeout is reached. See the `timeout` query parameter."
-#         ),
-#     ),
-#     timeout: Optional[int] = Query(
-#         default=None,
-#         gt=0,
-#         description=(
-#             "If `waitUntilComplete` is `true`,"
-#             " the maximum time in milliseconds to wait before returning."
-#             " The default is infinite."
-#             "\n\n"
-#             "The timer starts as soon as you enqueue the new command with this request,"
-#             " *not* when the new command starts running. So if there are other commands"
-#             " in the queue before the new one, they will also count towards the"
-#             " timeout."
-#             "\n\n"
-#             "If the timeout elapses before the command succeeds or fails,"
-#             " the command will be returned with its current status."
-#             "\n\n"
-#             "Compatibility note: on robot software v6.2.0 and older,"
-#             " the default was 30 seconds, not infinite."
-#         ),
-#     ),
-#     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
-# ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
-#     """Enqueue a protocol command.
-#
-#     Arguments:
-#         request_body: The request containing the command that the client wants
-#             to enqueue.
-#         waitUntilComplete: If True, return only once the command is completed.
-#             Else, return immediately. Comes from a query parameter in the URL.
-#         timeout: The maximum time, in seconds, to wait before returning.
-#             Comes from a query parameter in the URL.
-#         protocol_engine: The run's `ProtocolEngine` on which the new
-#             command will be enqueued.
-#     """
-#     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
-#     # behavior is to pass through `command_intent` without overriding it
-#     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
-#     command_create = request_body.data.copy(update={"intent": command_intent})
-#
-#     try:
-#         command = protocol_engine.add_command(command_create)
-#
-#     except pe_errors.SetupCommandNotAllowedError as e:
-#         raise CommandNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
-#     except pe_errors.RunStoppedError as e:
-#         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
-#
-#     if waitUntilComplete:
-#         timeout_sec = None if timeout is None else timeout / 1000.0
-#         with move_on_after(timeout_sec):
-#             await protocol_engine.wait_for_command(command.id),
-#
-#     response_data = protocol_engine.state_view.commands.get(command.id)
-#
-#     return await PydanticResponse.create(
-#         content=SimpleBody.construct(data=response_data),
-#         status_code=status.HTTP_201_CREATED,
-#     )
+@commands_router.post(
+    path="/runs/{runId}/commands",
+    summary="Enqueue a command",
+    description=textwrap.dedent(
+        """
+        Add a single command to the run. You can add commands to a run
+        for two reasons:
+
+        - Setup commands (`data.source == "setup"`)
+        - Protocol commands (`data.source == "protocol"`)
+
+        Setup commands may be enqueued before the run has been started.
+        You could use setup commands to prepare a module or
+        run labware calibration procedures.
+
+        Protocol commands may be enqueued anytime using this endpoint.
+        You can create a protocol purely over HTTP using protocol commands.
+        If you are running a protocol from a file(s), then you will likely
+        not need to enqueue protocol commands using this endpoint.
+
+        Once enqueued, setup commands will execute immediately with priority,
+        while protocol commands will wait until a `play` action is issued.
+        A play action may be issued while setup commands are still queued,
+        in which case all setup commands will finish executing before
+        the run moves on to protocol commands.
+
+        If you are running a protocol file(s), use caution with this endpoint,
+        as added commands may interfere with commands added by the protocol
+        """
+    ),
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[Union[RunNotFound, CommandNotAllowed]]
+        },
+    },
+)
+async def create_run_command(
+    request_body: RequestModel[pe_commands.CommandCreate],
+    waitUntilComplete: bool = Query(
+        default=False,
+        description=(
+            "If `false`, return immediately, while the new command is still queued."
+            " If `true`, only return once the new command succeeds or fails,"
+            " or when the timeout is reached. See the `timeout` query parameter."
+        ),
+    ),
+    timeout: Optional[int] = Query(
+        default=None,
+        gt=0,
+        description=(
+            "If `waitUntilComplete` is `true`,"
+            " the maximum time in milliseconds to wait before returning."
+            " The default is infinite."
+            "\n\n"
+            "The timer starts as soon as you enqueue the new command with this request,"
+            " *not* when the new command starts running. So if there are other commands"
+            " in the queue before the new one, they will also count towards the"
+            " timeout."
+            "\n\n"
+            "If the timeout elapses before the command succeeds or fails,"
+            " the command will be returned with its current status."
+            "\n\n"
+            "Compatibility note: on robot software v6.2.0 and older,"
+            " the default was 30 seconds, not infinite."
+        ),
+    ),
+    protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
+) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
+    """Enqueue a protocol command.
+
+    Arguments:
+        request_body: The request containing the command that the client wants
+            to enqueue.
+        waitUntilComplete: If True, return only once the command is completed.
+            Else, return immediately. Comes from a query parameter in the URL.
+        timeout: The maximum time, in seconds, to wait before returning.
+            Comes from a query parameter in the URL.
+        protocol_engine: The run's `ProtocolEngine` on which the new
+            command will be enqueued.
+    """
+    # TODO(mc, 2022-05-26): increment the HTTP API version so that default
+    # behavior is to pass through `command_intent` without overriding it
+    command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
+    command_create = request_body.data.copy(update={"intent": command_intent})
+
+    try:
+        command = protocol_engine.add_command(command_create)
+
+    except pe_errors.SetupCommandNotAllowedError as e:
+        raise CommandNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+    except pe_errors.RunStoppedError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+
+    if waitUntilComplete:
+        timeout_sec = None if timeout is None else timeout / 1000.0
+        with move_on_after(timeout_sec):
+            await protocol_engine.wait_for_command(command.id),
+
+    response_data = protocol_engine.state_view.commands.get(command.id)
+
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(data=response_data),
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @commands_router.get(
@@ -300,40 +300,42 @@ async def get_run_commands(
     )
 
 
-# @commands_router.get(
-#     path="/runs/{runId}/commands/{commandId}",
-#     summary="Get full details about a specific command in the run",
-#     description=(
-#         "Get a command along with any associated payload, result, and "
-#         "execution information."
-#     ),
-#     responses={
-#         status.HTTP_200_OK: {"model": SimpleBody[pe_commands.Command]},
-#         status.HTTP_404_NOT_FOUND: {
-#             "model": Union[ErrorBody[RunNotFound], ErrorBody[CommandNotFound]]
-#         },
-#     },
-# )
-# async def get_run_command(
-#     runId: str,
-#     commandId: str,
-#     run_data_manager: MaintenanceRunDataManager = Depends(get_maintenance_run_data_manager),
-# ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
-#     """Get a specific command from a run.
-#
-#     Arguments:
-#         runId: Run identifier, pulled from route parameter.
-#         commandId: Command identifier, pulled from route parameter.
-#         run_data_manager: Run data retrieval.
-#     """
-#     try:
-#         command = run_data_manager.get_command(run_id=runId, command_id=commandId)
-#     except RunNotFoundError as e:
-#         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
-#     except CommandNotFoundError as e:
-#         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
-#
-#     return await PydanticResponse.create(
-#         content=SimpleBody.construct(data=command),
-#         status_code=status.HTTP_200_OK,
-#     )
+@commands_router.get(
+    path="/runs/{runId}/commands/{commandId}",
+    summary="Get full details about a specific command in the run",
+    description=(
+        "Get a command along with any associated payload, result, and "
+        "execution information."
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[pe_commands.Command]},
+        status.HTTP_404_NOT_FOUND: {
+            "model": Union[ErrorBody[RunNotFound], ErrorBody[CommandNotFound]]
+        },
+    },
+)
+async def get_run_command(
+    runId: str,
+    commandId: str,
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
+) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
+    """Get a specific command from a run.
+
+    Arguments:
+        runId: Run identifier, pulled from route parameter.
+        commandId: Command identifier, pulled from route parameter.
+        run_data_manager: Run data retrieval.
+    """
+    try:
+        command = run_data_manager.get_command(run_id=runId, command_id=commandId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+    except CommandNotFoundError as e:
+        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(data=command),
+        status_code=status.HTTP_200_OK,
+    )

@@ -10,10 +10,11 @@ from opentrons.protocol_engine import (
     CurrentCommand,
     Command,
 )
+from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 
 from .engine_store import EngineStore
 from .maintenance_run_models import MaintenanceRun
-from ..runs.run_models import RunNotFoundError
+from ..runs.run_models import RunNotFoundError, CommandNotFoundError
 from .maintenance_action_models import MaintenanceRunAction
 
 
@@ -203,9 +204,12 @@ class MaintenanceRunDataManager:
             CommandNotFoundError: The given command identifier was not found.
         """
         if self._engine_store.current_run_id == run_id:
-            return self._engine_store.engine.state_view.commands.get(
-                command_id=command_id
-            )
+            try:
+                return self._engine_store.engine.state_view.commands.get(
+                    command_id=command_id
+                )
+            except CommandDoesNotExistError:
+                raise CommandNotFoundError(command_id=command_id)
 
         raise RunNotFoundError(run_id=run_id)
 

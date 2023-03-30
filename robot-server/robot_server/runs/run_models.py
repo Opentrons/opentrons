@@ -155,3 +155,11 @@ class RunNotFoundError(ValueError):
     def __init__(self, run_id: str) -> None:
         """Initialize the error message from the missing ID."""
         super().__init__(f"Run {run_id} was not found.")
+
+
+class CommandNotFoundError(ValueError):
+    """Error raised when a given command ID is not found in the store."""
+
+    def __init__(self, command_id: str) -> None:
+        """Initialize the error message from the missing ID."""
+        super().__init__(f"Command {command_id} was not found.")
