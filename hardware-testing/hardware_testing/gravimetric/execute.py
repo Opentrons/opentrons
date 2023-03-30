@@ -5,7 +5,7 @@ from typing import Optional, Tuple, List
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
 from hardware_testing.data import create_run_id_and_start_time, ui
-from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.types import OT3Mount, Point,OT3Axis
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from . import report
@@ -537,3 +537,4 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             print(f"        avg: {avg}ul")
             print(f"        cv:  {cv}%")
             print(f"        d:   {d}%")
+    ctx.disengage_axes([OT3Axis.X, OT3Axis.Y])
