@@ -8,13 +8,14 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   COLORS,
+  PrimaryButton,
+  SecondaryButton,
   SPACING,
   TYPOGRAPHY,
   Icon,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
 
 import type { RequestState } from '../../../redux/robot-api/types'

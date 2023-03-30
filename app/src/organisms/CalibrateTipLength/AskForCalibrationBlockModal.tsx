@@ -9,6 +9,9 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
+  CheckboxField,
 } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
@@ -18,8 +21,6 @@ import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
-import { CheckboxField } from '../../atoms/CheckboxField'
 import { StyledText } from '../../atoms/text'
 
 import type { Dispatch } from '../../redux/types'

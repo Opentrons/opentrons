@@ -39,6 +39,8 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
   useConditionalConfirm,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
@@ -47,7 +49,6 @@ import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useTrackEvent } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'

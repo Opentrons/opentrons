@@ -12,6 +12,7 @@ import {
   SIZE_1,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  CheckboxField,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import { ModalHeader, ModalShell } from '../../molecules/Modal'
@@ -19,7 +20,6 @@ import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetS
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { StyledText } from '../../atoms/text'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
-import { CheckboxField } from '../../atoms/CheckboxField'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {

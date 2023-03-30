@@ -326,7 +326,7 @@ class API(
         """Control the robot lights."""
         self._backend.set_lights(button, rails)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights.
 
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`

@@ -1,8 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS, TYPOGRAPHY, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  TYPOGRAPHY,
+  SPACING,
+  PrimaryButton,
+  SecondaryButton,
+} from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { CheckPipetteButton } from './CheckPipetteButton'

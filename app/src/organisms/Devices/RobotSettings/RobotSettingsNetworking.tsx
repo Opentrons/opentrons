@@ -12,10 +12,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   SPACING,
+  SecondaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SecondaryButton } from '../../../atoms/buttons'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'

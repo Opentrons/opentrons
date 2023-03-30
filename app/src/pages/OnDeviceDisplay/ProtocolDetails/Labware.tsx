@@ -10,6 +10,7 @@ import {
   Icon,
   SPACING,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
@@ -33,6 +34,7 @@ const TableHeader = styled('th')`
 `
 
 const TableRow = styled('tr')`
+  background-color: ${COLORS.light_one};
   border: 1px ${COLORS.white} solid;
   height: 4.75rem;
 `
@@ -42,7 +44,7 @@ const TableDatum = styled('td')`
   font-weight: ${TYPOGRAPHY.lineHeight28};
   padding: ${SPACING.spacing2};
   white-space: break-spaces;
-  text-overflow: wrap;
+  text-overflow: ${WRAP};
   &:first-child {
     border-top-left-radius: ${BORDERS.size_four};
     border-bottom-left-radius: ${BORDERS.size_four};
@@ -105,12 +107,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
             li => getLabwareDisplayName(li.definition) === name
           )?.definition
           return (
-            <TableRow
-              key={name}
-              style={{
-                backgroundColor: '#d6d6d6',
-              }}
-            >
+            <TableRow key={name}>
               <TableDatum>
                 <Flex
                   flexDirection={DIRECTION_ROW}

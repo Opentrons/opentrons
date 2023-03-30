@@ -10,10 +10,11 @@ import {
   SPACING,
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
 import { Modal } from '../../../molecules/Modal'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
