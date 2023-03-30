@@ -1513,7 +1513,6 @@ class OT3API(
     ) -> None:
         for press in pipette_spec.presses:
             start_pos = await self.gantry_position(mount) # move 96ch back to init pos
-            print("force pick up def\n")
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
                     {axis: current for axis, current in press.current.items()}
@@ -1522,7 +1521,6 @@ class OT3API(
                     mount, press.relative_down, self._current_position
                 )
                 try:
-                    print("moving down\n")
                     await self._move(target_down, speed=press.speed)
                 except RuntimeError as e:
                     if "collision_detected" in str(e):
@@ -1534,7 +1532,6 @@ class OT3API(
                 mount, press.relative_up, self._current_position
             )
             # await self._move(target_up) # prevent 96ch from moving up after tip pick up
-            print("move to start\n")
             await self.move_to(mount, start_pos) # move 96ch back to init pos
 
     async def _motor_pick_up_tip(
@@ -1621,7 +1618,7 @@ class OT3API(
         instrument.working_volume = tip_volume
 
     async def drop_tip(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = True
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False #True
     ) -> None:
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
