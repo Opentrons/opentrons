@@ -95,7 +95,7 @@ class StatusBar:
                 return False
         return True
 
-    # Medium level - actions without context
+    # High level interface
 
     async def static_color(self, color: Color) -> bool:
         """Set the status bar to a static color."""
