@@ -36,6 +36,7 @@ import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
+import { Liquids } from './Liquids'
 
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
@@ -231,6 +232,7 @@ const ProtocolSectionContent = (
       protocolSection = <Labware protocolId={protocolId} />
       break
     case 'Liquids':
+      protocolSection = <Liquids protocolId={props.protocolId} />
       break
     case 'Initial Deck Layout':
       protocolSection = <Deck protocolId={protocolId} />
