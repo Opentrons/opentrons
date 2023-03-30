@@ -537,4 +537,3 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             print(f"        avg: {avg}ul")
             print(f"        cv:  {cv}%")
             print(f"        d:   {d}%")
-    ctx.disengage_axes([OT3Axis.X, OT3Axis.Y])
