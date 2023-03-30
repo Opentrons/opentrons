@@ -62,12 +62,7 @@ class SendAndReceiveListener:
         )
         await self._messenger.send(message)
         try:
-            tasks = asyncio.all_tasks()
-            for task in tasks:
-                # print(f"Task: {task}")
-                pass
             await asyncio.wait_for(self._event.wait(), self._timeout)
-            # await evt.wait()
         except asyncio.TimeoutError:
             log.error("response timed out")
         finally:
