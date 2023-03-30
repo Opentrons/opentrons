@@ -31,8 +31,6 @@ describe('CardButton', () => {
 
   beforeEach(() => {
     props = {
-      cardWidth: '19rem',
-      cardHeight: '21rem',
       title: 'Wi-Fi',
       iconName: 'wifi',
       description: 'Find a network in your lab or enter your own.',

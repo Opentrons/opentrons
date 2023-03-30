@@ -36,7 +36,7 @@ const CARD_BUTTON_STYLE = css`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
   }
 
   &:active {
@@ -49,10 +49,7 @@ const CARD_BUTTON_STYLE = css`
   }
 `
 
-// ToDo kj 11/18/2022 props will be updated when the hi-fi is done
 interface CardButtonProps {
-  cardWidth: string
-  cardHeight: string
   title: string
   iconName: IconName
   description: string
@@ -61,22 +58,13 @@ interface CardButtonProps {
 }
 
 export function CardButton(props: CardButtonProps): JSX.Element {
-  const {
-    cardWidth,
-    cardHeight,
-    title,
-    iconName,
-    description,
-    destinationPath,
-    disabled,
-  } = props
+  const { title, iconName, description, destinationPath, disabled } = props
   const history = useHistory()
 
   return (
     <Btn
       onClick={() => history.push(destinationPath)}
-      width={cardWidth}
-      height={cardHeight}
+      width="100%"
       css={CARD_BUTTON_STYLE}
       backgroundColor={
         disabled ? COLORS.darkBlack_twenty : COLORS.foundationalBlue
@@ -87,14 +75,14 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         name={iconName}
         size="3.75rem"
         data-testid={`cardButton_icon_${String(iconName)}`}
-        color={disabled ? COLORS.darkBlack_seventy : COLORS.blueEnabled}
+        color={disabled ? COLORS.darkBlack_sixty : COLORS.blueEnabled}
       />
       <Flex marginTop={SPACING.spacing4}>
         <StyledText
           fontSize="1.75rem"
           lineHeight="2.25rem"
           fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-          color={disabled ? COLORS.darkBlack_seventy : COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
@@ -105,7 +93,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           fontSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={disabled ? COLORS.darkBlack_seventy : COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {description}

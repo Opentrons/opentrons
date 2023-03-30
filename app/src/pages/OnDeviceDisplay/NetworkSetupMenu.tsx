@@ -86,7 +86,11 @@ export function NetworkSetupMenu(): JSX.Element {
             {t('choose_your_connection_type')}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} columnGap={SPACING.spacing4}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          columnGap={SPACING.spacing3}
+          height="17rem"
+        >
           {NetworkSetupOptions.map(networkOption => (
             <CardButton
               key={networkOption.title}
