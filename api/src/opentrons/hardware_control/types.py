@@ -400,9 +400,16 @@ class DoorState(enum.Enum):
     def __str__(self) -> str:
         return self.name.lower()
 
+class TipState(enum.Enum):
+    NO_TIP_ATTACHED = False
+    TIP_ATTACHED = True
+
+    def __str__(self) -> str:
+        return self.name.lower()
 
 class HardwareEventType(enum.Enum):
     DOOR_SWITCH_CHANGE = enum.auto()
+    TIP_SENSE = enum.auto()
     ERROR_MESSAGE = enum.auto()
 
 
@@ -413,6 +420,12 @@ class DoorStateNotification:
     ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
 
+@dataclass(frozen=True)
+class TipStateNotification:
+    event: Literal[
+        HardwareEventType.TIP_SENSE
+    ] = HardwareEventType.TIP_SENSE
+    new_state: TipState = TipState.NO_TIP_ATTACHED
 
 @dataclass(frozen=True)
 class ErrorMessageNotification:
@@ -532,6 +545,7 @@ class HardwareAction(enum.Enum):
     ASPIRATE = enum.auto()
     DISPENSE = enum.auto()
     BLOWOUT = enum.auto()
+    TIP_SENSE = enum.auto()
     PREPARE_ASPIRATE = enum.auto()
     LIQUID_PROBE = enum.auto()
 

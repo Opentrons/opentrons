@@ -129,6 +129,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
+    tip_notification,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -1110,7 +1111,7 @@ class OT3Controller:
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
-    ) -> Dict[NodeId, float]:
+    ) -> None:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
         tool = sensor_node_for_mount(OT3Mount(mount.value))
         positions = await liquid_probe(
@@ -1129,7 +1130,6 @@ class OT3Controller:
         for node, point in positions.items():
             self._position.update({node: point[0]})
             self._encoder_position.update({node: point[1]})
-        return self._position
 
     async def capacitive_probe(
         self,
@@ -1170,6 +1170,16 @@ class OT3Controller:
             sensor_id_for_instrument(probe),
         )
         self._position[axis_to_node(moving)] += distance_mm
+        return data
+
+    async def get_tip_state(
+        self,
+        mount: OT3Mount
+    ) -> Dict[NodeId, bool]:
+        data = await tip_notification(
+            self._messenger,
+            axis_to_node(OT3Axis.of_main_tool_actuator(mount)),
+        )
         return data
 
     async def release_estop(self) -> None:
@@ -1228,3 +1238,7 @@ class OT3Controller:
                     message_id == BinaryMessageId.door_switch_state_info
                 ),
             )
+
+    async def tip_state(self, mount: OT3Mount) -> TipState:
+        tip_open = await self.get_tip_state(mount)
+        return TipState.OPEN if tip_open else TipState.CLOSED

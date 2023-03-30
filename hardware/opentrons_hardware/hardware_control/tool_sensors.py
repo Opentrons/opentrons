@@ -1,6 +1,6 @@
 """Functions for commanding motion limited by tool sensors."""
 import asyncio
-from typing import Union, List, Iterator, Tuple, Dict
+from typing import Union, List, Iterator, Tuple, Dict, Optional, Callable, cast
 from logging import getLogger
 from numpy import float64
 from math import copysign
@@ -13,25 +13,43 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorThresholdMode,
     SensorOutputBinding,
 )
+
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    PushTipPresenceNotification,
+)
+
+from opentrons_hardware.firmware_bindings.messages import (
+    MessageDefinition,
+    message_definitions,
+    payloads,
+)
+
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings import utils
+
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
-from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
+from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor, TipSensor
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+    WaitableCallback,
+    )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     create_step,
     MoveGroupStep,
 )
+from opentrons_hardware.firmware_bindings.constants import MessageId
+
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 LOG = getLogger(__name__)
 ProbeTarget = Union[Literal[NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]]
-
 
 def _build_pass_step(
     movers: List[NodeId],
@@ -52,6 +70,41 @@ def _build_pass_step(
         stop_condition=stop_condition,
     )
 
+async def _parse_tip_sense_response(reader: WaitableCallback)-> Dict[NodeId, bool]:
+    data = {}
+    async for response, arb_id in reader:
+        node = NodeId(arb_id.parts.originating_node_id).name
+        data.update({node: bool(response.payload.ejector_flag_status.value)})
+        if len(data) != 0:
+            return data
+
+async def tip_notification(
+    messenger: CanMessenger,
+    pipette_node: NodeId,
+) -> Dict[NodeId, bool]:
+    """Obtain the tip presence sensor reading."""
+    sensor_driver = SensorDriver()
+    tip_sensor = TipSensor.build(
+        sensor_id=SensorId.S0,
+        node_id=pipette_node,
+    )
+
+    def _listener_filter(arbitration_id: ArbitrationId) -> bool:
+        return (pipette_node and (
+            MessageId(arbitration_id.parts.message_id)
+            == PushTipPresenceNotification.message_id
+        ))
+    event = asyncio.Event()
+    response =  [MessageId.tip_presence_notification]
+    with WaitableCallback(messenger, _listener_filter) as reader:
+        data = {}
+        try:
+            data = await asyncio.wait_for(_parse_tip_sense_response(reader), 1)
+        except asyncio.TimeoutError:
+            pass
+            #LOG.error("tip sensor request timed out before response")
+        finally:
+            return data
 
 async def liquid_probe(
     messenger: CanMessenger,

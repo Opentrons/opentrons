@@ -153,3 +153,29 @@ class EnvironmentSensor(BaseSensorType):
         """Set the sensor data on the class and return the new data."""
         self.data = EnvironmentSensorDataType.build(sensor_data)
         return self.data
+
+@dataclass
+class TipSensor(BaseSensorType):
+    """An environment sensor type."""
+
+    data: SensorDataType
+
+    @classmethod
+    def build(
+        cls, sensor_id: SensorId, node_id: NodeId, offset: float = 0.0,
+    ) -> "TipSensor":
+        """Build an Tip attached sensor class."""
+        info = SensorInformation(sensor_type = SensorType.tip,
+                                sensor_id = sensor_id,
+                                node_id = node_id)
+
+        sensor_data = SensorDataType.build(0, SensorTypeField(SensorType.tip))
+        # return cls(info, offset, 1, zero_threshold, stop_threshold, sensor_data)
+        return cls(info, offset, 1, sensor_data)
+
+    def set_sensor_data(
+        self, sensor_data: List[SensorDataType]
+    ) -> SensorDataType:
+        """Set the sensor data on the class and return the new data."""
+        self.data = sensor_data[0]
+        return self.data

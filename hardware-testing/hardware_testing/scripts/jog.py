@@ -95,6 +95,7 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
     print(information_str)
     while True:
         input = getch()
+        tip_state = asyncio.ensure_future(api._update_tip_state(mount))
         if input == "a":
             # minus x direction
             sys.stdout.flush()
@@ -174,6 +175,8 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
             round(position[OT3Axis.by_mount(mount)], 2),
             " Motor Step: ",
             step_size[step_length_index],
+            "Tip State: ",
+            api._tip_state,
             end="",
         )
         print("\r", end="")
