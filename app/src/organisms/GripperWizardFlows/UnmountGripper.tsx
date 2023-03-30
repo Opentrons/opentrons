@@ -6,13 +6,13 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { PrimaryButton } from '../../atoms/buttons'
 import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'

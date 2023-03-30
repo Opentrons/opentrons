@@ -6,11 +6,11 @@ import {
   Link,
   ALIGN_CENTER,
   SPACING,
+  PrimaryButton,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
