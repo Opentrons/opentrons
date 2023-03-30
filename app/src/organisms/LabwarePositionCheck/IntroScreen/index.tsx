@@ -15,7 +15,7 @@ import { StyledText } from '../../../atoms/text'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
 import { useChainRunCommands } from '../../../resources/runs/hooks'
-import type { CreateRunCommand, RegisterPositionAction } from '../types'
+import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 
 export const INTERVAL_MS = 3000
@@ -24,19 +24,27 @@ export const IntroScreen = (props: {
   proceed: () => void
   protocolData: CompletedProtocolAnalysis
   registerPosition: React.Dispatch<RegisterPositionAction>
-  createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   handleJog: Jog
+  setFatalError: (errorMessage: string) => void
   isRobotMoving: boolean
 }): JSX.Element | null => {
-  const { proceed, protocolData, chainRunCommands, isRobotMoving } = props
+  const {
+    proceed,
+    protocolData,
+    chainRunCommands,
+    isRobotMoving,
+    setFatalError,
+  } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
-    chainRunCommands(prepCommands, true)
+    chainRunCommands(prepCommands, false)
       .then(() => proceed())
-      .catch(e => {
-        console.error('Unexpected command failure: ', e)
+      .catch((e: Error) => {
+        setFatalError(
+          `IntroScreen failed to issue prep commands with message: ${e.message}`
+        )
       })
   }
 

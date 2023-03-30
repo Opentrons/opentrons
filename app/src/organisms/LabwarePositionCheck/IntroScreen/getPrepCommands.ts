@@ -1,5 +1,4 @@
 import {
-  FIXED_TRASH_ID,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -17,12 +16,10 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { HomeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
-import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 type LPCPrepCommand =
   | HomeCreateCommand
   | SetupRunTimeCommand
-  | DropTipCreateCommand
   | TCOpenLidCreateCommand
   | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerCloseLatchCreateCommand
@@ -30,7 +27,6 @@ type LPCPrepCommand =
 export function getPrepCommands(
   protocolData: CompletedProtocolAnalysis
 ): LPCPrepCommand[] {
-  let dropTipCommands: DropTipCreateCommand[] = []
   // load commands come from the protocol resource
   const loadCommands: LPCPrepCommand[] =
     protocolData.commands
@@ -48,15 +44,6 @@ export function getPrepCommands(
               pipetteId,
             },
           }
-          const dropTipToBeSafe = {
-            commandType: 'dropTip' as const,
-            params: {
-              pipetteId: pipetteId,
-              labwareId: FIXED_TRASH_ID,
-              wellName: 'A1',
-            },
-          }
-          dropTipCommands = [...dropTipCommands, dropTipToBeSafe]
           return [...acc, loadWithPipetteId]
         } else if (
           command.commandType === 'loadLabware' &&
@@ -131,13 +118,7 @@ export function getPrepCommands(
     params: {},
   }
   // prepCommands will be run when a user starts LPC
-  return [
-    ...loadCommands,
-    ...TCCommands,
-    ...HSCommands,
-    homeCommand,
-    ...dropTipCommands,
-  ]
+  return [...loadCommands, ...TCCommands, ...HSCommands, homeCommand]
 }
 
 function isLoadCommand(

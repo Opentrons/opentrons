@@ -37,7 +37,7 @@ describe('ReturnTip', () => {
       location: { slotName: '1' },
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
-      createRunCommand: jest.fn(),
+      setFatalError: jest.fn(),
       chainRunCommands: mockChainRunCommands,
       tipPickUpOffset: null,
       isRobotMoving: false,
@@ -99,7 +99,7 @@ describe('ReturnTip', () => {
         },
         { commandType: 'home', params: {} },
       ],
-      true
+      false
     )
     await expect(props.proceed).toHaveBeenCalled()
   })
@@ -152,7 +152,7 @@ describe('ReturnTip', () => {
         },
         { commandType: 'home', params: {} },
       ],
-      true
+      false
     )
     await expect(props.proceed).toHaveBeenCalled()
   })
@@ -230,7 +230,7 @@ describe('ReturnTip', () => {
         },
         { commandType: 'home', params: {} },
       ],
-      true
+      false
     )
     await expect(props.proceed).toHaveBeenCalled()
   })

@@ -28,7 +28,6 @@ import type { Jog } from '../../molecules/JogControls/types'
 import type {
   PickUpTipStep,
   RegisterPositionAction,
-  CreateRunCommand,
   WorkingOffset,
 } from './types'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -37,8 +36,8 @@ interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   registerPosition: React.Dispatch<RegisterPositionAction>
-  createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  setFatalError: (errorMessage: string) => void
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
   handleJog: Jog
@@ -52,13 +51,13 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     location,
     protocolData,
     proceed,
-    createRunCommand,
     chainRunCommands,
     registerPosition,
     handleJog,
     isRobotMoving,
     existingOffsets,
     workingOffsets,
+    setFatalError,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
 
@@ -127,68 +126,77 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             wellLocation: { origin: 'top' as const },
           },
         },
+        { commandType: 'savePosition', params: { pipetteId } },
       ],
-      true
+      false
     )
-      .then(() => {
-        createRunCommand({
-          command: { commandType: 'savePosition', params: { pipetteId } },
-          waitUntilComplete: true,
-        })
-          .then(response => {
-            const { position } = response.data.result
-            registerPosition({
-              type: 'initialPosition',
-              labwareId,
-              location,
-              position,
-            })
+      .then(responses => {
+        const finalResponse = responses[responses.length - 1]
+        if (finalResponse.data.commandType === 'savePosition') {
+          const { position } = finalResponse.data.result
+          registerPosition({
+            type: 'initialPosition',
+            labwareId,
+            location,
+            position,
           })
-          .catch(e => {
-            console.error('Unexpected command failure: ', e)
-          })
+        } else {
+          setFatalError(
+            `PickUpTip failed to save position for initial placement.`
+          )
+        }
       })
-      .catch(e => {
-        console.error('Unexpected command failure: ', e)
+      .catch((e: Error) => {
+        setFatalError(
+          `PickUpTip failed to save position for initial placement with message: ${e.message}`
+        )
       })
   }
   const handleConfirmPosition = (): void => {
-    createRunCommand({
-      command: { commandType: 'savePosition', params: { pipetteId } },
-      waitUntilComplete: true,
-    })
-      .then(response => {
-        const { position } = response.data.result
-        const offset =
-          initialPosition != null
-            ? getVectorDifference(position, initialPosition)
-            : position
-        registerPosition({
-          type: 'finalPosition',
-          labwareId,
-          location,
-          position,
-        })
-        registerPosition({ type: 'tipPickUpOffset', offset })
-        createRunCommand({
-          command: {
-            commandType: 'pickUpTip',
-            params: {
-              pipetteId,
-              labwareId,
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset },
-            },
-          },
-          waitUntilComplete: true,
-        })
-          .then(() => setShowTipConfirmation(true))
-          .catch(e => {
-            console.error('Unexpected command failure: ', e)
+    chainRunCommands(
+      [{ commandType: 'savePosition', params: { pipetteId } }],
+      false
+    )
+      .then(responses => {
+        if (responses[0].data.commandType === 'savePosition') {
+          const { position } = responses[0].data.result
+          const offset =
+            initialPosition != null
+              ? getVectorDifference(position, initialPosition)
+              : position
+          registerPosition({
+            type: 'finalPosition',
+            labwareId,
+            location,
+            position,
           })
+          registerPosition({ type: 'tipPickUpOffset', offset })
+          chainRunCommands(
+            [
+              {
+                commandType: 'pickUpTip',
+                params: {
+                  pipetteId,
+                  labwareId,
+                  wellName: 'A1',
+                  wellLocation: { origin: 'top', offset },
+                },
+              },
+            ],
+            false
+          )
+            .then(() => setShowTipConfirmation(true))
+            .catch((e: Error) => {
+              setFatalError(
+                `PickUpTip failed to move from final position with message: ${e.message}`
+              )
+            })
+        }
       })
-      .catch(e => {
-        console.error('Unexpected command failure: ', e)
+      .catch((e: Error) => {
+        setFatalError(
+          `PickUpTip failed to save final position with message: ${e.message}`
+        )
       })
   }
 
@@ -213,11 +221,13 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
       ],
-      true
+      false
     )
       .then(() => proceed())
-      .catch(e => {
-        console.error('Unexpected command failure: ', e)
+      .catch((e: Error) => {
+        setFatalError(
+          `PickUpTip failed to move to safe location after tip pick up with message: ${e.message}`
+        )
       })
   }
   const handleInvalidateTip = (): void => {
@@ -241,7 +251,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
       ],
-      true
+      false
     )
       .then(() => {
         registerPosition({ type: 'tipPickUpOffset', offset: null })
@@ -253,17 +263,37 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         })
         setShowTipConfirmation(false)
       })
-      .catch(e => {
-        console.error('Unexpected command failure: ', e)
+      .catch((e: Error) => {
+        setFatalError(`PickUpTip failed to drop tip with message: ${e.message}`)
       })
   }
   const handleGoBack = (): void => {
-    registerPosition({
-      type: 'initialPosition',
-      labwareId,
-      location,
-      position: null,
-    })
+    chainRunCommands(
+      [
+        {
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: labwareId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+      ],
+      false
+    )
+      .then(() => {
+        registerPosition({
+          type: 'initialPosition',
+          labwareId,
+          location,
+          position: null,
+        })
+      })
+      .catch((e: Error) => {
+        setFatalError(
+          `PickUpTip failed to clear tip rack with message: ${e.message}`
+        )
+      })
   }
 
   const existingOffset =

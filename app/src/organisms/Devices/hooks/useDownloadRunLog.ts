@@ -13,7 +13,8 @@ import { downloadFile } from '../utils'
 export function useDownloadRunLog(
   robotName: string,
   runId: string,
-  pageLength: number
+  pageLength: number,
+  enabled: boolean = true
 ): { downloadRunLog: () => void; isRunLogLoading: boolean } {
   const { t } = useTranslation('run_details')
 
@@ -30,7 +31,7 @@ export function useDownloadRunLog(
       cursor: 0,
       pageLength,
     },
-    { staleTime: Infinity }
+    { enabled, staleTime: Infinity }
   )
   const commands = allCommandsQueryData?.data
 
@@ -39,7 +40,7 @@ export function useDownloadRunLog(
     error: runQueryError,
     isError: isRunQueryError,
     isLoading: isRunQueryLoading,
-  } = useRunQuery(runId, { staleTime: Infinity })
+  } = useRunQuery(runId, { enabled, staleTime: Infinity })
   const run = runQueryData?.data
 
   const isError = isAllCommandsQueryError || isRunQueryError

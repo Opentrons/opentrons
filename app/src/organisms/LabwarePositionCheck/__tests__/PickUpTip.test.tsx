@@ -30,8 +30,7 @@ const render = (props: React.ComponentProps<typeof PickUpTip>) => {
 
 describe('PickUpTip', () => {
   let props: React.ComponentProps<typeof PickUpTip>
-  let mockChainRunCommands
-  const mockCreateRunCommand = jest.fn()
+  let mockChainRunCommands: jest.Mock
 
   beforeEach(() => {
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
@@ -42,10 +41,10 @@ describe('PickUpTip', () => {
       location: { slotName: '1' },
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
-      createRunCommand: mockCreateRunCommand,
       chainRunCommands: mockChainRunCommands,
       handleJog: jest.fn(),
       registerPosition: jest.fn(),
+      setFatalError: jest.fn(),
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
@@ -66,15 +65,6 @@ describe('PickUpTip', () => {
     getByRole('button', { name: 'Confirm placement' })
   })
   it('renders correct copy when confirming position', () => {
-    when(mockCreateRunCommand)
-      .calledWith({
-        command: {
-          commandType: 'savePosition',
-          params: { pipetteId: 'pipetteId1' },
-        },
-        waitUntilComplete: true,
-      })
-      .mockImplementation(() => Promise.resolve({} as CommandData))
     const { getByText, getByRole } = render({
       ...props,
       workingOffsets: [
@@ -93,15 +83,12 @@ describe('PickUpTip', () => {
     getByRole('link', { name: 'Need help?' })
   })
   it('executes correct chained commands when confirm placement CTA is clicked', async () => {
-    when(mockCreateRunCommand)
-      .calledWith({
-        command: {
-          commandType: 'savePosition',
-          params: { pipetteId: 'pipetteId1' },
-        },
-        waitUntilComplete: true,
-      })
-      .mockImplementation(() => Promise.resolve({} as CommandData))
+    when(mockChainRunCommands)
+      .calledWith(
+        [{ commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } }],
+        false
+      )
+      .mockImplementation(() => Promise.resolve([{} as CommandData]))
     const { getByRole } = render(props)
     await getByRole('button', { name: 'Confirm placement' }).click()
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
@@ -124,57 +111,77 @@ describe('PickUpTip', () => {
             wellLocation: { origin: 'top', offset: undefined },
           },
         },
-      ],
-      true
-    )
-    await expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
-      command: {
-        commandType: 'savePosition',
-        params: { pipetteId: 'pipetteId1' },
-      },
-      waitUntilComplete: true,
-    })
-  })
-
-  it('executes correct chained commands when confirm position CTA is clicked and user tries again', async () => {
-    when(mockCreateRunCommand)
-      .calledWith({
-        command: {
+        {
           commandType: 'savePosition',
           params: { pipetteId: 'pipetteId1' },
         },
-        waitUntilComplete: true,
-      })
-      .mockImplementation(() =>
-        Promise.resolve({ data: { result: { position: mockStartPosition } } })
+      ],
+      false
+    )
+  })
+
+  it('executes correct chained commands when confirm position CTA is clicked and user tries again', async () => {
+    when(mockChainRunCommands)
+      .calledWith(
+        [{ commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } }],
+        false
       )
-    when(mockCreateRunCommand)
-      .calledWith({
-        command: {
-          commandType: 'pickUpTip',
-          params: {
-            pipetteId: 'pipetteId1',
-            labwareId: 'labwareId1',
-            wellName: 'A1',
-            wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
+      .mockImplementation(() =>
+        Promise.resolve([
+          {
+            data: {
+              commandType: 'savePosition',
+              result: { position: mockStartPosition },
+            },
           },
-        },
-        waitUntilComplete: true,
-      })
-      .mockImplementation(() => Promise.resolve({} as CommandData))
-    when(mockCreateRunCommand)
-      .calledWith({
-        command: {
-          commandType: 'dropTip',
-          params: {
-            pipetteId: 'pipetteId1',
-            labwareId: 'labwareId1',
-            wellName: 'A1',
+          {},
+          {},
+        ])
+      )
+
+    when(mockChainRunCommands)
+      .calledWith(
+        [
+          {
+            commandType: 'savePosition',
+            params: { pipetteId: 'pipetteId1' },
           },
-        },
-        waitUntilComplete: true,
-      })
-      .mockImplementationOnce(() => Promise.resolve({} as CommandData))
+          {
+            commandType: 'pickUpTip',
+            params: {
+              pipetteId: 'pipetteId1',
+              labwareId: 'labwareId1',
+              wellName: 'A1',
+              wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
+            },
+          },
+          {
+            command: {
+              commandType: 'dropTip',
+              params: {
+                pipetteId: 'pipetteId1',
+                labwareId: 'labwareId1',
+                wellName: 'A1',
+              },
+            },
+            waitUntilComplete: true,
+          },
+        ],
+        false
+      )
+      .mockImplementation(() =>
+        Promise.resolve([
+          {
+            data: {
+              commandType: 'savePosition',
+              result: { position: mockStartPosition },
+            },
+          },
+          {},
+          {},
+        ])
+      )
+
     const { getByRole } = render({
       ...props,
       workingOffsets: [
@@ -190,13 +197,16 @@ describe('PickUpTip', () => {
     getByRole('button', { name: 'forward' }).click()
     expect(props.handleJog).toHaveBeenCalled()
     await getByRole('button', { name: 'Confirm position' }).click()
-    await expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
-      command: {
-        commandType: 'savePosition',
-        params: { pipetteId: 'pipetteId1' },
-      },
-      waitUntilComplete: true,
-    })
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          commandType: 'savePosition',
+          params: { pipetteId: 'pipetteId1' },
+        },
+      ],
+      false
+    )
     await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'finalPosition',
       labwareId: 'labwareId1',
@@ -207,22 +217,25 @@ describe('PickUpTip', () => {
       type: 'tipPickUpOffset',
       offset: { x: 9, y: 18, z: 27 },
     })
-    await expect(props.createRunCommand).toHaveBeenNthCalledWith(2, {
-      command: {
-        commandType: 'pickUpTip',
-        params: {
-          pipetteId: 'pipetteId1',
-          labwareId: 'labwareId1',
-          wellName: 'A1',
-          wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
-        },
-      },
-      waitUntilComplete: true,
-    })
-    getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
-    await getByRole('button', { name: 'try again' }).click()
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
-      1,
+      2,
+      [
+        {
+          commandType: 'pickUpTip',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'labwareId1',
+            wellName: 'A1',
+            wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
+          },
+        },
+      ],
+      false
+    )
+    getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
+    getByRole('button', { name: 'try again' }).click()
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      3,
       [
         {
           commandType: 'dropTip',
@@ -238,11 +251,11 @@ describe('PickUpTip', () => {
             pipetteId: 'pipetteId1',
             labwareId: 'labwareId1',
             wellName: 'A1',
-            wellLocation: { origin: 'top', offset: undefined },
+            wellLocation: { origin: 'top' },
           },
         },
       ],
-      true
+      false
     )
     await expect(props.registerPosition).toHaveBeenNthCalledWith(3, {
       type: 'tipPickUpOffset',
@@ -250,44 +263,63 @@ describe('PickUpTip', () => {
     })
   })
   it('proceeds after confirm position and pick up tip', async () => {
-    when(mockCreateRunCommand)
-      .calledWith({
-        command: {
-          commandType: 'savePosition',
-          params: { pipetteId: 'pipetteId1' },
-        },
-        waitUntilComplete: true,
-      })
-      .mockImplementation(() =>
-        Promise.resolve({ data: { result: { position: mockStartPosition } } })
+    when(mockChainRunCommands)
+      .calledWith(
+        [{ commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } }],
+        false
       )
-    when(mockCreateRunCommand)
-      .calledWith({
-        command: {
-          commandType: 'pickUpTip',
-          params: {
-            pipetteId: 'pipetteId1',
-            labwareId: 'labwareId1',
-            wellName: 'A1',
-            wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
+      .mockImplementation(() =>
+        Promise.resolve([
+          {
+            data: {
+              commandType: 'savePosition',
+              result: { position: mockStartPosition },
+            },
           },
-        },
-        waitUntilComplete: true,
-      })
-      .mockImplementation(() => Promise.resolve({} as CommandData))
-    when(mockCreateRunCommand)
-      .calledWith({
-        command: {
-          commandType: 'dropTip',
-          params: {
-            pipetteId: 'pipetteId1',
-            labwareId: 'labwareId1',
-            wellName: 'A1',
+          {},
+          {},
+        ])
+      )
+
+    when(mockChainRunCommands)
+      .calledWith(
+        [
+          {
+            commandType: 'savePosition',
+            params: { pipetteId: 'pipetteId1' },
           },
-        },
-        waitUntilComplete: true,
-      })
-      .mockImplementation(() => Promise.resolve({} as CommandData))
+          {
+            commandType: 'pickUpTip',
+            params: {
+              pipetteId: 'pipetteId1',
+              labwareId: 'labwareId1',
+              wellName: 'A1',
+              wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
+            },
+          },
+          {
+            commandType: 'dropTip',
+            params: {
+              pipetteId: 'pipetteId1',
+              labwareId: 'labwareId1',
+              wellName: 'A1',
+            },
+          },
+        ],
+        false
+      )
+      .mockImplementation(() =>
+        Promise.resolve([
+          {
+            data: {
+              commandType: 'savePosition',
+              result: { position: mockStartPosition },
+            },
+          },
+          {},
+          {},
+        ])
+      )
     const { getByRole } = render({
       ...props,
       workingOffsets: [
@@ -301,14 +333,16 @@ describe('PickUpTip', () => {
     })
 
     await getByRole('button', { name: 'Confirm position' }).click()
-
-    await expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
-      command: {
-        commandType: 'savePosition',
-        params: { pipetteId: 'pipetteId1' },
-      },
-      waitUntilComplete: true,
-    })
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          commandType: 'savePosition',
+          params: { pipetteId: 'pipetteId1' },
+        },
+      ],
+      false
+    )
     await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'finalPosition',
       labwareId: 'labwareId1',
@@ -319,23 +353,26 @@ describe('PickUpTip', () => {
       type: 'tipPickUpOffset',
       offset: { x: 9, y: 18, z: 27 },
     })
-    await expect(props.createRunCommand).toHaveBeenNthCalledWith(2, {
-      command: {
-        commandType: 'pickUpTip',
-        params: {
-          pipetteId: 'pipetteId1',
-          labwareId: 'labwareId1',
-          wellName: 'A1',
-          wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      2,
+      [
+        {
+          commandType: 'pickUpTip',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'labwareId1',
+            wellName: 'A1',
+            wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
+          },
         },
-      },
-      waitUntilComplete: true,
-    })
+      ],
+      false
+    )
     getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
     await getByRole('button', { name: 'yes' }).click()
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
-      1,
+      3,
       [
         {
           commandType: 'moveLabware',
@@ -355,7 +392,7 @@ describe('PickUpTip', () => {
           },
         },
       ],
-      true
+      false
     )
     await expect(props.proceed).toHaveBeenCalled()
   })
@@ -410,8 +447,9 @@ describe('PickUpTip', () => {
             wellLocation: { origin: 'top' },
           },
         },
+        { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
       ],
-      true
+      false
     )
   })
 })

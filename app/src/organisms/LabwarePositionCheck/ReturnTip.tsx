@@ -17,13 +17,13 @@ import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { VectorOffset } from '@opentrons/api-client'
-import type { CreateRunCommand, ReturnTipStep } from './types'
+import type { ReturnTipStep } from './types'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
-  createRunCommand: CreateRunCommand
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  setFatalError: (errorMessage: string) => void
   tipPickUpOffset: VectorOffset | null
   isRobotMoving: boolean
 }
@@ -38,6 +38,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     tipPickUpOffset,
     isRobotMoving,
     chainRunCommands,
+    setFatalError,
   } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
@@ -122,13 +123,13 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         },
         { commandType: 'home' as const, params: {} },
       ],
-      true
+      false
     )
       .then(() => {
         proceed()
       })
-      .catch(e => {
-        console.error('Unexpected command failure: ', e)
+      .catch((e: Error) => {
+        setFatalError(`ReturnTip failed with message: ${e.message}`)
       })
   }
 
