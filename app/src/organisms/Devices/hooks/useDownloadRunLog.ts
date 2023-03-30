@@ -10,9 +10,6 @@ import { ERROR_TOAST, INFO_TOAST, useToast } from '../../../atoms/Toast'
 import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
 import { downloadFile } from '../utils'
 
-// TODO(bh, 2022-12-5): consider refactoring -
-// currently, this hook makes run and commands queries for each historical run on device details page load
-// this is not ideal for performance, and doesn't allow for a toast that responds to "download" status
 export function useDownloadRunLog(
   robotName: string,
   runId: string
