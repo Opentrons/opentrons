@@ -35,7 +35,7 @@ Welcome to the v6.3.0 release of the Opentrons App!
 
 ### Known Issues
 
-- When a protocol reaches a pause step, the Run Preview will incorrectly highlight the following step as the current step.
+- When a protocol reaches a pause step, the Run Preview may incorrectly highlight the following step as the current step.
 
 ---
 
