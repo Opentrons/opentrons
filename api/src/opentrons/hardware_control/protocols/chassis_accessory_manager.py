@@ -28,7 +28,7 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         """
         ...
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights.
 
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`

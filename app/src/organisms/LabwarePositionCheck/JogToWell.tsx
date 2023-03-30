@@ -12,6 +12,8 @@ import {
   COLORS,
   WELL_LABEL_OPTIONS,
   ALIGN_FLEX_START,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -23,7 +25,6 @@ import {
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'

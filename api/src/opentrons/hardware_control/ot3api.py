@@ -471,11 +471,11 @@ class OT3API(
         self, button: Optional[bool] = None, rails: Optional[bool] = None
     ) -> None:
         """Control the robot lights."""
-        self._backend.set_lights(button, rails)
+        await self._backend.set_lights(button, rails)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights."""
-        return self._backend.get_lights()
+        return await self._backend.get_lights()
 
     async def identify(self, duration_s: int = 5) -> None:
         """Blink the button light to identify the robot."""

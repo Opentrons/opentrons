@@ -4,8 +4,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../buttons'
 import { StyledText } from '../text'
 import { Toast } from '.'
 import type { Story, Meta } from '@storybook/react'

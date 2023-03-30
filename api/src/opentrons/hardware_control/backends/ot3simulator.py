@@ -126,6 +126,7 @@ class OT3Simulator:
         self._stubbed_attached_modules = attached_modules
         self._update_required = False
         self._initialized = False
+        self._lights = {"button": False, "rails": False}
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -525,13 +526,17 @@ class OT3Simulator:
         """Engage axes."""
         return None
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
+    @ensure_yield
+    async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
-        return None
+        # Simulate how the real driver does this - there's no button so it's always false
+        if rails is not None:
+            self._lights["rails"] = rails
 
-    def get_lights(self) -> Dict[str, bool]:
+    @ensure_yield
+    async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
-        return {}
+        return self._lights
 
     def pause(self) -> None:
         """Pause the controller activity."""
