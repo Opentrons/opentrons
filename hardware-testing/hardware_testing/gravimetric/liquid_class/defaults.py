@@ -11,7 +11,7 @@ from .definition import (
 
 # submerge/retract Z distances
 _default_submerge_mm = 1.5
-_default_submerge_mm_t50 = 0.5
+_default_submerge_mm_t50 = 1.5
 _default_retract_mm = 3.0
 
 # dispense settings are constant across volumes
