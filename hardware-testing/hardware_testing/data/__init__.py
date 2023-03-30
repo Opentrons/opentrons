@@ -3,9 +3,18 @@ from datetime import datetime
 import os
 from pathlib import Path
 from time import time
-from typing import Tuple
+from typing import Tuple, Optional
 
 from opentrons.config import infer_config_base_dir
+
+
+def get_git_description() -> Optional[str]:
+    """Get commit hash."""
+    hash_file_path = infer_config_base_dir() / ".hardware-testing-description"
+    if hash_file_path.exists():
+        with open(hash_file_path, "r") as f:
+            return f.read().strip()
+    return None
 
 
 def get_testing_data_directory() -> Path:

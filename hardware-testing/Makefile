@@ -125,18 +125,19 @@ push-plot-webpage-ot3:
 	scp -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage-ot3,$(host),$(br_ssh_key),$(ssh_opts))
 
-define create-version-file-ot3
+define create-description-file-ot3
 ssh root@$(1) \
-(rm -rf /data/.hardware-testing-version || true) &&\
-touch /data/.hardware-testing-version &&\
-echo -e $(2) >> /data/.hardware-testing-version &&\
+(rm /data/.hardware-testing-description || true) &&\
+touch /data/.hardware-testing-description &&\
+echo -e $(2) >> /data/.hardware-testing-description &&\
 cleanup || cleanup"
 endef
 
-.PHONY: push-version-ot3
+.PHONY: push-description-ot3
 push-version-ot3:
-	$(eval GIT_HASH=$(shell git rev-parse --short=7 HEAD))
-	$(call create-version-file-ot3, $(host), $(GIT_HASH))
+	$(eval GIT_DESCRIPTION=$(shell git describe))
+	echo $(GIT_DESCRIPTION)
+	$(call create-description-file-ot3, $(host), $(GIT_DESCRIPTION))
 
 .PHONY: restart
 restart:
@@ -164,7 +165,7 @@ push-ot3: push-no-restart-ot3 restart-ot3
 push-all: clean wheel push-no-restart push-plot-webpage
 
 .PHONY: push-all-ot3
-push-all-ot3: push-ot3 push-plot-webpage-ot3 push-version-ot3
+push-all-ot3: push-ot3 push-plot-webpage-ot3 push-description-ot3
 
 .PHONY: term
 term:
