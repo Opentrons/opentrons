@@ -6,7 +6,7 @@
   },
   "metadata": {
     "displayName": "Opentrons Calibration Adapter - Heater-shaker Module",
-    "displayCategory": "aluminumBlock",
+    "displayCategory": "other",
     "displayVolumeUnits": "mL",
     "tags": []
   },
@@ -22,18 +22,18 @@
       "shape": "rectangular",
       "xDimension": 20,
       "yDimension": 20,
-      "x": 64,
-      "y": 43,
-      "z": 13.85
+      "x": 55.5,
+      "y": 37.5,
+      "z": 9.1
     },
     "B1": {
       "depth": 0,
       "totalLiquidVolume": 0,
       "shape": "circular",
       "diameter": 1,
-      "x": 13,
-      "y": 13,
-      "z": 0
+      "x": 68.5,
+      "y": 50.5,
+      "z": 13.85
     }
   },
   "groups": [
@@ -55,8 +55,8 @@
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
+    "x": 8.5,
+    "y": 5.5,
     "z": 0
   }
 }

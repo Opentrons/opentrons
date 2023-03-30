@@ -6,7 +6,7 @@
   },
   "metadata": {
     "displayName": "Opentrons Calibration Adapter - Magnetic Module",
-    "displayCategory": "aluminumBlock",
+    "displayCategory": "other",
     "displayVolumeUnits": "mL",
     "tags": []
   },
@@ -22,18 +22,18 @@
       "shape": "rectangular",
       "xDimension": 20,
       "yDimension": 20,
-      "x": 63.87,
-      "y": 42.87,
-      "z": 15.5
+      "x": 56.97,
+      "y": 38.97,
+      "z": 10.75
     },
     "B1": {
       "depth": 0,
       "totalLiquidVolume": 0,
       "shape": "circular",
       "diameter": 1,
-      "x": 13,
-      "y": 13,
-      "z": 0
+      "x": 69.97,
+      "y": 51.97,
+      "z": 15.5
     }
   },
   "groups": [
@@ -55,8 +55,8 @@
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
+    "x": 7.03,
+    "y": 4.5,
     "z": 0
   }
 }

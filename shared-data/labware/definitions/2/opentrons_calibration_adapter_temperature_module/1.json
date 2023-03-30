@@ -6,7 +6,7 @@
   },
   "metadata": {
     "displayName": "Opentrons Calibration Adapter - Temperature Module",
-    "displayCategory": "aluminumBlock",
+    "displayCategory": "other",
     "displayVolumeUnits": "mL",
     "tags": []
   },
@@ -24,16 +24,16 @@
       "yDimension": 20,
       "x": 64,
       "y": 43,
-      "z": 15
+      "z": 10.25
     },
     "B1": {
       "depth": 0,
       "totalLiquidVolume": 0,
       "shape": "circular",
       "diameter": 1,
-      "x": 13,
-      "y": 13,
-      "z": 0
+      "x": 77,
+      "y": 56,
+      "z": 15
     }
   },
   "groups": [
@@ -55,8 +55,8 @@
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
+    "x": 0.13,
+    "y": 0.25,
     "z": 0
   }
 }

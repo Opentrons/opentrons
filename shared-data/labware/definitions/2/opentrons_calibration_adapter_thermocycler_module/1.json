@@ -6,7 +6,7 @@
   },
   "metadata": {
     "displayName": "Opentrons Calibration Adapter - Thermocycler Module",
-    "displayCategory": "aluminumBlock",
+    "displayCategory": "other",
     "displayVolumeUnits": "mL",
     "tags": []
   },
@@ -24,16 +24,16 @@
       "yDimension": 20,
       "x": 97.88,
       "y": 42.74,
-      "z": 26.36
+      "z": 21.61
     },
     "B1": {
       "depth": 0,
       "totalLiquidVolume": 0,
       "shape": "circular",
       "diameter": 1,
-      "x": 13,
-      "y": 13,
-      "z": 0
+      "x": 110.88,
+      "y": 55.74,
+      "z": 27.5
     }
   },
   "groups": [
@@ -55,8 +55,8 @@
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
+    "x": 5.875,
+    "y": 2.75,
     "z": 0
   }
 }
