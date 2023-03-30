@@ -147,6 +147,10 @@ async def _test_direction(
         api, mount, report, current, speed, direction, "end"
     )
     if not aligned:
+        # move to target position using max current
+        plunger_axis = types.OT3Axis.of_main_tool_actuator(mount)
+        await api._update_position_estimation([plunger_axis])
+        await _move_plunger(api, mount, _plunger_target, DEFAULT_SPEED, MAX_CURRENT)
         return False
     return True
 
@@ -161,6 +165,7 @@ async def _unstick_plunger(api: OT3API, mount: types.OT3Mount) -> None:
 async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -> None:
     ui.print_header("UNSTICK PLUNGER")
     await _unstick_plunger(api, mount)
+    failures = []
     # start at HIGHEST (easiest) current
     currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
     for current in currents:
@@ -177,7 +182,11 @@ async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -
                     ui.print_error(
                         f"failed moving {direction} at {current} amps and {speed} mm/sec"
                     )
-                    break
+                    failures.append((current, speed, direction,))
+    if failures:
+        print(f"current\tspeed\tdirection")
+        for failure in failures:
+            print(f"{failure[0]}\t{failure[1]}\t{failure[2]}")
 
 
 def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
