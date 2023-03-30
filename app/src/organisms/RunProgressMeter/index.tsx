@@ -71,13 +71,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     runStatus === RUN_STATUS_IDLE ||
     runStatus === RUN_STATUS_FINISHING
 
-  // todo (jb 2-16-23) This should be switched out soon for something more performant, see https://opentrons.atlassian.net/browse/RLAB-298
-  const { downloadRunLog } = useDownloadRunLog(
-    robotName,
-    runId,
-    analysisCommands.length,
-    !downloadIsDisabled
-  )
+  const { downloadRunLog } = useDownloadRunLog(robotName, runId)
 
   /**
    * find the analysis command within the analysis
