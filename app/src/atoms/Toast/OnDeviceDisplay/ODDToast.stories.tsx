@@ -34,7 +34,10 @@ const TemplateWithTimeout: Story<
           <StyledText as="p">
             When clicking the button, the Toast shows up in the bottom.
           </StyledText>
-          <StyledText as="p">After 5 sec, the Toast will disappear</StyledText>
+          <StyledText as="p">
+            After between 2 and 7 sec, depending on the length of the test, the
+            Toast will disappear
+          </StyledText>
         </Flex>
       </Flex>
       {isShowToast && (
@@ -142,5 +145,5 @@ SuperLongSecondaryAndCloseButtonWithoutTimeout.args = {
   message: 'Successfully received',
   secondaryText: 'Super-long-protocol-file-name-that-the-user-made.py',
   type: 'success',
-  disableTimeout: true,
+  disableTimeout: false,
 }

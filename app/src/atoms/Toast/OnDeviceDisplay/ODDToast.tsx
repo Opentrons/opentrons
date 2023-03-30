@@ -83,17 +83,37 @@ export function ODDToast(props: ODDToastProps): JSX.Element {
     buttonText = '',
     onClose,
     disableTimeout = false,
-    duration = 5000,
+    duration,
     ...styleProps
   } = props
 
   const secondary =
     secondaryText !== undefined ? truncateString(secondaryText, 45, 40) : null
 
+  const calculatedDuration = (
+    message: string,
+    secondary: string | null,
+    duration: number | undefined
+  ): number => {
+    const primaryDuration = message.length * 50
+    const secondaryDuration = secondary != null ? secondary.length * 50 : 0
+    const combinedDuration = primaryDuration + secondaryDuration
+    if (duration !== undefined) {
+      return duration
+    }
+    if (combinedDuration < 2000) {
+      return 2000
+    }
+    if (combinedDuration > 7000) {
+      return 7000
+    }
+    return combinedDuration
+  }
+
   if (!disableTimeout) {
     setTimeout(() => {
       onClose?.()
-    }, duration)
+    }, calculatedDuration(message, secondary, duration))
   }
 
   return (
