@@ -3,22 +3,24 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useModulesQuery,
+  useInstrumentsQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsRobotViewable, useRunStatuses } from '../hooks'
+import { useIsOT3, useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
+import { GripperCard } from '../../GripperCard'
 import { PipetteCard } from '../PipetteCard'
 import { getIs96ChannelPipetteAttached } from '../utils'
-
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -29,6 +31,7 @@ jest.mock('@opentrons/components', () => {
 })
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
+jest.mock('../../GripperCard')
 jest.mock('../../ModuleCard')
 jest.mock('../PipetteCard')
 jest.mock('../../ProtocolUpload/hooks')
@@ -45,6 +48,9 @@ jest.mock('../../RunTimeControl/hooks')
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
   typeof useModulesQuery
 >
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
+>
 const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
   typeof useIsRobotViewable
 >
@@ -53,6 +59,7 @@ const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrations
 >
 const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
 const mockPipetteCard = PipetteCard as jest.MockedFunction<typeof PipetteCard>
+const mockGripperCard = GripperCard as jest.MockedFunction<typeof GripperCard>
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
 >
@@ -66,6 +73,7 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 const mockGetIs96ChannelPipetteAttached = getIs96ChannelPipetteAttached as jest.MockedFunction<
   typeof getIs96ChannelPipetteAttached
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const render = () => {
   return renderWithProviders(<InstrumentsAndModules robotName="otie" />, {
@@ -83,6 +91,13 @@ describe('InstrumentsAndModules', () => {
       isRunTerminal: false,
     })
     mockGetIs96ChannelPipetteAttached.mockReturnValue(false)
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: { data: [] },
+    } as any)
+    mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
+    mockGripperCard.mockReturnValue(<div>Mock GripperCard</div>)
+    mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
+    mockUseIsOT3.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -108,8 +123,6 @@ describe('InstrumentsAndModules', () => {
         right: null,
       },
     } as any)
-    mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
-    mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
     const [{ getByText }] = render()
 
     getByText('Mock ModuleCard')
@@ -125,10 +138,21 @@ describe('InstrumentsAndModules', () => {
         right: null,
       },
     } as any)
-    mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
-    mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
     const [{ getAllByText }] = render()
     getAllByText('Mock PipetteCard')
+  })
+  it('renders gripper cards when a robot is Flex', () => {
+    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsRobotViewable.mockReturnValue(true)
+    mockUseModulesQuery.mockReturnValue({ data: { data: [] } } as any)
+    mockUsePipettesQuery.mockReturnValue({
+      data: { left: null, right: null },
+    } as any)
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: { data: [instrumentsResponseFixture.data[0]] },
+    } as any)
+    const [{ getByText }] = render()
+    getByText('Mock GripperCard')
   })
   it('renders the protocol loaded banner when protocol is loaded and not terminal state', () => {
     mockUseCurrentRunId.mockReturnValue('RUNID')
@@ -138,13 +162,12 @@ describe('InstrumentsAndModules', () => {
     getByText('mock Banner')
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
-    mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
     mockGetIs96ChannelPipetteAttached.mockReturnValue(true)
     mockUseIsRobotViewable.mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock PipetteCard')
   })
-  it('fetches offset calibrations on long poll and pipettes and modules on short poll', () => {
+  it('fetches offset calibrations on long poll and pipettes, instruments, and modules on short poll', () => {
     const { pipette: pipette1 } = mockPipetteOffsetCalibration1
     const { pipette: pipette2 } = mockPipetteOffsetCalibration2
 
@@ -182,5 +205,6 @@ describe('InstrumentsAndModules', () => {
       { refetchInterval: 5000 }
     )
     expect(mockUseModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
+    expect(mockUseInstrumentsQuery).toHaveBeenCalledWith()
   })
 })
