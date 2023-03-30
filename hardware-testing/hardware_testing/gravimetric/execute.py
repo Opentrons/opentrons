@@ -4,7 +4,7 @@ from typing import Optional, Tuple, List
 
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
-from hardware_testing.data import create_run_id_and_start_time, ui
+from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
@@ -342,8 +342,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
     test_report.set_tag(pipette_tag)
-    test_report.set_operator("unknown")
-    test_report.set_version("unknown")
+    if not ctx.is_simulating():
+        test_report.set_operator(input("OPERATOR name:").strip())
+    else:
+        test_report.set_operator("simulation")
+    test_report.set_version(get_git_description())
     report.store_serial_numbers(
         test_report,
         robot="ot3",

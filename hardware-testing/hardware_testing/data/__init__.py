@@ -2,19 +2,24 @@
 from datetime import datetime
 import os
 from pathlib import Path
+from subprocess import check_output
 from time import time
 from typing import Tuple, Optional
 
-from opentrons.config import infer_config_base_dir
+from opentrons.config import infer_config_base_dir, IS_ROBOT
 
 
 def get_git_description() -> Optional[str]:
     """Get commit hash."""
-    hash_file_path = infer_config_base_dir() / ".hardware-testing-description"
-    if hash_file_path.exists():
+    if IS_ROBOT:
+        hash_file_path = infer_config_base_dir() / ".hardware-testing-description"
+        if not hash_file_path.exists():
+            return None
         with open(hash_file_path, "r") as f:
             return f.read().strip()
-    return None
+    else:
+        description = check_output(["git", "describe"])
+        return description.decode('utf-8').strip()
 
 
 def get_testing_data_directory() -> Path:
