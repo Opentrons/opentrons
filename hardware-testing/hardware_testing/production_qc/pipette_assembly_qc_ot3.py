@@ -1081,6 +1081,8 @@ async def _main(test_config: TestConfig) -> None:
         print(f"CSV: {csv_props.name}")
         print("homing")
         await api.home()
+        # disengage x,y for replace the new pipette
+        await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
     print("done")
 
 
