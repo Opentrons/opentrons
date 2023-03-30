@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { SmallButton } from '../SmallButton'
 
@@ -23,6 +23,9 @@ describe('SmallButton', () => {
     expect(props.onClick).toHaveBeenCalled()
     expect(getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.blueEnabled}`
+    )
+    expect(getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.size_four}`
     )
   })
   it('renders the alert button', () => {
@@ -70,5 +73,32 @@ describe('SmallButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toBeDisabled()
+  })
+  it('renders the button as disabled', () => {
+    props = {
+      ...props,
+      disabled: true,
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toBeDisabled()
+  })
+  it('renders the rounded button category', () => {
+    props = {
+      ...props,
+      buttonCategory: 'rounded',
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.size_five}`
+    )
+  })
+  it('renders an icon with left placement', () => {
+    props = {
+      ...props,
+      iconName: 'alert',
+      iconPlacement: 'left',
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_alert_positionLeft')
   })
 })

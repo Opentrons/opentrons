@@ -42,3 +42,26 @@ TertiaryHighLight.args = {
   buttonType: 'tertiaryHighLight',
   buttonText: 'Button text',
 }
+
+export const LeftIconDefault = Template.bind({})
+LeftIconDefault.args = {
+  buttonType: 'default',
+  buttonText: 'Button text',
+  iconPlacement: 'left',
+  iconName: 'reset',
+}
+
+export const RightIconAlert = Template.bind({})
+RightIconAlert.args = {
+  buttonType: 'alert',
+  buttonText: 'Button text',
+  iconPlacement: 'right',
+  iconName: 'play-round-corners',
+}
+
+export const AltRounded = Template.bind({})
+AltRounded.args = {
+  buttonType: 'alt',
+  buttonText: 'Button text',
+  buttonCategory: 'rounded',
+}
