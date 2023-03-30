@@ -74,7 +74,7 @@ describe('LevelPipette', () => {
     )
     getByText(
       nestedTextMatcher(
-        'Place the calibration block in slot 1/3 with the tall/short surface on the left/right side.'
+        'Place the calibration block in slot 3 with the tall surface on the left side.'
       )
     )
     getByText(
