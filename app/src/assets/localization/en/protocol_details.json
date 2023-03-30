@@ -48,5 +48,7 @@
   "send_protocol_to_ot3": "Send protocol to an OT-3",
   "slot": "Slot {{slotName}}",
   "successfully_sent": "Successfully sent",
-  "unsuccessfully_sent": "Unsuccessfully sent"
+  "unsuccessfully_sent": "Unsuccessfully sent",
+  "liquid_name": "liquid name",
+  "total_volume": "total volume"
 }
