@@ -5,7 +5,7 @@ import {
   Flex,
   SPACING,
   JUSTIFY_CENTER,
-  Box,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
@@ -53,7 +53,11 @@ export const ProtocolRunModuleControls = ({
       paddingBottom={SPACING.spacing3}
       paddingX={SPACING.spacing4}
     >
-      <Box flex="50%">
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        flex="50%"
+        gridGap={SPACING.spacing3}
+      >
         {leftColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (
             <ModuleCard
@@ -66,8 +70,12 @@ export const ProtocolRunModuleControls = ({
             />
           ) : null
         )}
-      </Box>
-      <Box flex="50%">
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        flex="50%"
+        gridGap={SPACING.spacing3}
+      >
         {rightColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (
             <ModuleCard
@@ -80,7 +88,7 @@ export const ProtocolRunModuleControls = ({
             />
           ) : null
         )}
-      </Box>
+      </Flex>
     </Flex>
   )
 }
