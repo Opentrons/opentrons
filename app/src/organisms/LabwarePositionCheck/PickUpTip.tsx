@@ -251,7 +251,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
       ],
-      false 
+      false
     )
       .then(() => {
         registerPosition({ type: 'tipPickUpOffset', offset: null })
