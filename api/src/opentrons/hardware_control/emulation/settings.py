@@ -1,3 +1,5 @@
+from typing import List
+from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
 from pydantic import BaseSettings, BaseModel
 
@@ -69,6 +71,11 @@ class ModuleServerSettings(BaseModel):
 
 
 class Settings(BaseSettings):
+    modules: List[ModuleType] = [
+        ModuleType.Magnetic,
+        ModuleType.Temperature,
+        ModuleType.Thermocycler,
+    ]
     smoothie: SmoothieSettings = SmoothieSettings()
     magdeck: MagDeckSettings = MagDeckSettings(
         serial_number="magnetic_emulator", model="mag_deck_v20", version="2.0.0"

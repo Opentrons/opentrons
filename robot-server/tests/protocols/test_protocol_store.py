@@ -59,6 +59,7 @@ async def test_insert_and_get_protocol(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
     )
@@ -86,6 +87,7 @@ async def test_insert_with_duplicate_key_raises(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
     )
@@ -99,6 +101,7 @@ async def test_insert_with_duplicate_key_raises(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key="dummy-data-222",
     )
@@ -135,6 +138,7 @@ async def test_get_all_protocols(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
     )
@@ -148,6 +152,7 @@ async def test_get_all_protocols(
             files=[],
             metadata={},
             robot_type="OT-3 Standard",
+            content_hash="abc123",
         ),
         protocol_key="dummy-data-222",
     )
@@ -183,6 +188,7 @@ async def test_remove_protocol(
             ],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key="dummy-data-111",
     )
@@ -221,6 +227,7 @@ def test_remove_protocol_conflict(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key=None,
     )
@@ -254,6 +261,7 @@ def test_get_usage_info(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key=None,
     )
@@ -267,6 +275,7 @@ def test_get_usage_info(
             files=[],
             metadata={},
             robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
         protocol_key=None,
     )
@@ -318,3 +327,47 @@ def test_get_usage_info(
             is_used_by_run=False,
         ),
     ]
+
+
+def test_get_referencing_run_ids(
+    subject: ProtocolStore,
+    run_store: RunStore,
+) -> None:
+    """It should return a list of run ids that reference a given protocol."""
+    protocol_resource_1 = ProtocolResource(
+        protocol_id="protocol-id-1",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=None,
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            robot_type="OT-2 Standard",
+            content_hash="abc123",
+        ),
+        protocol_key=None,
+    )
+
+    subject.insert(protocol_resource_1)
+    # Still no runs, so we should still get back an empty list
+    assert subject.get_referencing_run_ids("protocol-id-1") == []
+
+    run_store.insert(
+        run_id="run-id-1",
+        protocol_id="protocol-id-1",
+        created_at=datetime(year=2022, month=1, day=1, tzinfo=timezone.utc),
+    )
+    assert subject.get_referencing_run_ids("protocol-id-1") == ["run-id-1"]
+
+    run_store.insert(
+        run_id="run-id-2",
+        protocol_id="protocol-id-1",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    assert subject.get_referencing_run_ids("protocol-id-1") == ["run-id-1", "run-id-2"]
+
+    run_store.remove(run_id="run-id-1")
+    run_store.remove(run_id="run-id-2")
+
+    assert subject.get_referencing_run_ids("protocol-id-1") == []

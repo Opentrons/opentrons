@@ -5,10 +5,15 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
-import { Icon, Flex, DIRECTION_COLUMN, SIZE_1 } from '@opentrons/components'
+import {
+  Icon,
+  Flex,
+  DIRECTION_COLUMN,
+  SIZE_1,
+  PrimaryButton,
+} from '@opentrons/components'
 
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
-import { PrimaryButton } from '../../atoms/buttons'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'

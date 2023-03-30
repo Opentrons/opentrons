@@ -36,11 +36,11 @@ def test_http(g_code_configuration: HTTPGCodeConfirmConfig):
         for version in conf.versions
     ],
 )
-def test_protocols(
+async def test_protocols(
     g_code_configuration: ProtocolGCodeConfirmConfig, version: APIVersion
 ):
     expected_output = g_code_configuration.get_comparison_file(version)
-    actual_output = g_code_configuration.execute(version)
+    actual_output = await g_code_configuration.execute(version)
     assert actual_output == expected_output, GCodeDiffer(
         actual_output, expected_output
     ).get_html_diff()

@@ -238,6 +238,22 @@ class OT3Axis(enum.Enum):
             cls.G: OT3Mount.GRIPPER,
         }[inst]
 
+    @classmethod
+    def home_order(
+        cls,
+    ) -> Tuple[
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+    ]:
+        return (*cls.mount_axes(), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
+
     def __str__(self) -> str:
         return self.name
 
@@ -571,9 +587,9 @@ class GripperProbe(enum.Enum):
     @classmethod
     def to_type(cls, gp: "GripperProbe") -> InstrumentProbeType:
         if gp == cls.FRONT:
-            return InstrumentProbeType.PRIMARY
-        else:
             return InstrumentProbeType.SECONDARY
+        else:
+            return InstrumentProbeType.PRIMARY
 
 
 class EarlyLiquidSenseTrigger(RuntimeError):

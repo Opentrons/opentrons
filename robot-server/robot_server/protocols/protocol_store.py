@@ -199,6 +199,13 @@ class ProtocolStore:
             for r in all_sql_resources
         ]
 
+    def get_id_by_hash(self, hash: str) -> Optional[str]:
+        """Get all protocol hashes keyed by protocol id."""
+        for p in self.get_all():
+            if p.source.content_hash == hash:
+                return p.protocol_id
+        return None
+
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, protocol_id: str) -> bool:
         """Check for the presence of a protocol ID in the store."""
@@ -275,6 +282,23 @@ class ProtocolStore:
         ]
 
         return usage_info
+
+    def get_referencing_run_ids(self, protocol_id: str) -> List[str]:
+        """Return a list of run ids that reference a particular protocol.
+
+        See the `runs` module for information about runs.
+
+        Results are ordered with the oldest-added (NOT created) run first.
+        """
+        select_referencing_run_ids = sqlalchemy.select(run_table.c.id).where(
+            run_table.c.protocol_id == protocol_id
+        )
+
+        with self._sql_engine.begin() as transaction:
+            referencing_run_ids = (
+                transaction.execute(select_referencing_run_ids).scalars().all()
+            )
+        return referencing_run_ids
 
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(

@@ -16,6 +16,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import {
@@ -29,16 +30,18 @@ import {
   useAttachedModules,
   useRunCreatedAtTimestamp,
 } from '../../organisms/Devices/hooks'
-import { getLabwareSetupItemGroups } from '../../organisms/Devices/ProtocolRun/SetupLabware/utils'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
+import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelModal } from '../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -70,7 +73,7 @@ function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius="1rem"
+        borderRadius={BORDERS.size_four}
         gridGap="1.5rem"
         padding="1.5rem 1rem"
       >
@@ -262,6 +265,9 @@ function PrepareToRun({
       ? t('additional_labware', { count: additionalLabwareCount })
       : null
 
+  // Liquids information
+  const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
+
   return (
     <>
       {/* Protocol Setup Header */}
@@ -335,6 +341,13 @@ function PrepareToRun({
           onClickSetupStep={() => setSetupScreen('liquids')}
           title={t('liquids')}
           status="general"
+          detail={
+            liquidsInProtocol !== []
+              ? t('initial_liquids_num', {
+                  num: liquidsInProtocol.length,
+                })
+              : t('liquids_not_in_setup')
+          }
         />
       </Flex>
       {showConfirmCancelModal ? (
@@ -375,10 +388,7 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupModules runId={runId} setSetupScreen={setSetupScreen} />
     ),
     labware: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Labware
-      </>
+      <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
     ),
     lpc: (
       <>
@@ -387,10 +397,7 @@ export function ProtocolSetup(): JSX.Element {
       </>
     ),
     liquids: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Liquids
-      </>
+      <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
     ),
   }
 

@@ -7,6 +7,7 @@ from typing import (
     Optional,
     Set,
     Type,
+    Union,
 )
 from typing_extensions import (
     Final,
@@ -37,6 +38,7 @@ class SharedFunctionsMixin:
         self.marks.append(user_mark)
 
 
+
 class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     path: str
     name: Optional[constr(regex=r'^[a-z0-9_]*$')]
@@ -44,7 +46,7 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     results_dir: ClassVar[str] = "protocols"
     driver: str = 'protocol'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
-    versions: Set[APIVersion] = Field(..., min_items=1)
+    versions: Set[Union[APIVersion,int]] = Field(..., min_items=1)
 
     class Config:
         arbitrary_types_allowed = True
@@ -74,18 +76,18 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
         file = open(file_path, "r")
         return ''.join(file.readlines()).strip()
 
-    def update_comparison(self, version: APIVersion) -> str:
+    async def update_comparison(self, version: APIVersion) -> str:
         """Run config and override the comparison file with output."""
         Path(os.path.dirname(self._get_full_path(version))).mkdir(parents=True, exist_ok=True)
         with open(self._get_full_path(version), 'w') as file:
-            file.write(self.execute(version))
+            file.write(await self.execute(version))
         return "File uploaded successfully"
 
     def comparison_file_exists(self, version: APIVersion) -> bool:
         return os.path.exists(self._get_full_path(version))
 
-    def execute(self, version: APIVersion):
-        with GCodeEngine(self.settings).run_protocol(self.path, version) as program:
+    async def execute(self, version: APIVersion):
+        async with GCodeEngine(self.settings).run_protocol(self.path, version) as program:
             return program.get_text_explanation(SupportedTextModes.CONCISE)
 
 
@@ -119,10 +121,10 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
         file = open(self._get_full_path(), "r")
         return ''.join(file.readlines()).strip()
 
-    def update_comparison(self) -> str:
+    async def update_comparison(self) -> str:
         """Run config and override the comparison file with output."""
         with open(self._get_full_path(), 'w') as file:
-            file.write(self.execute())
+            file.write(await self.execute())
         return "File uploaded successfully"
 
     def execute(self):

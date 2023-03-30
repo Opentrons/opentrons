@@ -14,9 +14,18 @@ DEFAULT_GRIPPER_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
 
 
 def info_num_to_model(num: str) -> GripperModel:
+    """Returns a GripperModel from a string in the format X.Y.
+    where X is the major model and Y is the minor model
+    """
     major_model = num[0]
-    model_map = {"0": GripperModel.v1, "1": GripperModel.v1}
-    return model_map[major_model]
+    minor_model = num[2]
+    # we provisioned the some EVT grippers as 01 and some as 10
+    # DVT will now be 1.1
+    model_map = {
+        "0": {"0": GripperModel.v1, "1": GripperModel.v1},
+        "1": {"0": GripperModel.v1, "1": GripperModel.v1_1},
+    }
+    return model_map[major_model][minor_model]
 
 
 def load(gripper_model: GripperModel) -> GripperDefinition:

@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_AROUND,
   TYPOGRAPHY,
   Box,
+  BORDERS,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -52,7 +53,7 @@ export function WizardRequiredEquipmentList(
           <Flex
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
-            borderRadius="0.75rem"
+            borderRadius={BORDERS.size_three}
           >
             {equipmentList.map((requiredEquipmentProps, index) => (
               <Box

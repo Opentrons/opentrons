@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -17,7 +18,6 @@ import {
 import find from 'lodash/find'
 import { LEFT, RIGHT } from '../../../redux/pipettes'
 import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '../../../redux/sessions'
-import { PrimaryButton } from '../../../atoms/buttons'
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
 import { RenderMountInformation } from './RenderMountInformation'
 import { CalibrationResult } from './CalibrationResult'

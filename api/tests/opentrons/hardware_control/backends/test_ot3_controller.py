@@ -22,6 +22,7 @@ from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    USBTarget,
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
@@ -131,6 +132,8 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         expected_liquid_height=109,
         log_pressure=False,
         aspirate_while_sensing=False,
+        auto_zero_sensor=False,
+        num_baseline_reads=8,
         data_file="fake_data_file",
     )
 
@@ -155,23 +158,23 @@ def mock_move_group_run():
 
 
 @pytest.fixture
-def mock_present_nodes(controller: OT3Controller) -> OT3Controller:
-    old_pn = controller._present_nodes
-    controller._present_nodes = set(
+def mock_present_devices(controller: OT3Controller) -> OT3Controller:
+    old_pd = controller._present_devices
+    controller._present_devices = set(
         (
             NodeId.pipette_left,
             NodeId.gantry_x,
             NodeId.gantry_y,
-            NodeId.head_l,
-            NodeId.head_r,
+            NodeId.head,
             NodeId.pipette_right,
-            NodeId.gripper_z,
+            NodeId.gripper,
+            USBTarget.rear_panel,
         )
     )
     try:
         yield controller
     finally:
-        controller._present_nodes = old_pn
+        controller._present_devices = old_pd
 
 
 @pytest.fixture
@@ -225,7 +228,7 @@ def move_group_run_side_effect(controller, axes_to_home):
     gantry_homes = {
         axis_to_node(ax): (0.0, 0.0, True, True)
         for ax in OT3Axis.gantry_axes()
-        if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
+        if ax in axes_to_home and axis_to_node(ax) in controller._present_devices
     }
     if gantry_homes:
         yield gantry_homes
@@ -233,14 +236,14 @@ def move_group_run_side_effect(controller, axes_to_home):
     pipette_homes = {
         axis_to_node(ax): (0.0, 0.0, True, True)
         for ax in OT3Axis.pipette_axes()
-        if ax in axes_to_home and axis_to_node(ax) in controller._present_nodes
+        if ax in axes_to_home and axis_to_node(ax) in controller._present_devices
     }
     yield pipette_homes
 
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_execute(
-    controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
+    controller: OT3Controller, mock_move_group_run, axes, mock_present_devices
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     # nothing has been homed
@@ -260,12 +263,12 @@ async def test_home_execute(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_prioritize_mount(
-    controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
+    controller: OT3Controller, mock_move_group_run, axes, mock_present_devices
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     # nothing has been homed
@@ -286,12 +289,12 @@ async def test_home_prioritize_mount(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_build_runners(
-    controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
+    controller: OT3Controller, mock_move_group_run, axes, mock_present_devices
 ):
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     assert not controller._motor_status
@@ -316,11 +319,11 @@ async def test_home_build_runners(
 
     # all commanded axes have been homed
     assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_ready_for_movement(axes)
+    assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
-async def test_home_only_present_nodes(
+async def test_home_only_present_devices(
     controller: OT3Controller, mock_move_group_run, axes
 ):
     starting_position = {
@@ -333,7 +336,7 @@ async def test_home_only_present_nodes(
     }
     homed_position = {}
 
-    controller._present_nodes = set(
+    controller._present_devices = set(
         (NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r)
     )
     controller._position = starting_position
@@ -354,7 +357,7 @@ async def test_home_only_present_nodes(
             for move_group_step in move_group:
                 assert move_group_step  # don't pass in empty moves
                 for node, step in move_group_step.items():
-                    assert node in controller._present_nodes
+                    assert node in controller._present_devices
                     assert step  # don't pass in empty steps
                     homed_position[node] = 0.0  # track homed position for node
 
@@ -369,7 +372,7 @@ async def test_home_only_present_nodes(
 async def test_probing(
     controller: OT3Controller, mock_tool_detector: AsyncMock
 ) -> None:
-    assert controller._present_nodes == set()
+    assert controller._present_devices == set()
 
     call_count = 0
     fake_nodes = set(
@@ -405,14 +408,12 @@ async def test_probing(
                 NodeId.gripper,
             )
         )
-    assert controller._present_nodes == set(
+    assert controller._present_devices == set(
         (
             NodeId.gantry_x,
-            NodeId.head_l,
-            NodeId.head_r,
+            NodeId.head,
             NodeId.pipette_left,
-            NodeId.gripper_g,
-            NodeId.gripper_z,
+            NodeId.gripper,
         )
     )
 
@@ -429,10 +430,10 @@ async def test_probing(
                     serial="hello",
                 ),
                 right=None,
-                gripper=GripperInformation(model="0", serial="fake_serial"),
+                gripper=GripperInformation(model="0.0", serial="fake_serial"),
             ),
             "P1KSV33hello",
-            "GRPV0fake_serial",
+            "GRPV00fake_serial",
             "Gripper V1",
         ),
     ],
@@ -475,7 +476,7 @@ async def test_get_attached_instruments_handles_unknown_name(
             name=FirmwarePipetteName.unknown, name_int=41, model=30, serial="hello"
         ),
         right=None,
-        gripper=GripperInformation(model=0, serial="fake_serial"),
+        gripper=GripperInformation(model=0.0, serial="fake_serial"),
     )
     mock_tool_detector.return_value = tool_summary
 
@@ -501,7 +502,7 @@ async def test_get_attached_instruments_handles_unknown_model(
             serial="hello",
         ),
         right=None,
-        gripper=GripperInformation(model=0, serial="fake_serial"),
+        gripper=GripperInformation(model=0.0, serial="fake_serial"),
     )
     mock_tool_detector.return_value = tool_summary
 
@@ -582,8 +583,8 @@ async def test_gripper_jaw_width(controller: OT3Controller, mock_move_group_run)
 
 
 async def test_get_limit_switches(controller: OT3Controller) -> None:
-    assert controller._present_nodes == set()
-    fake_present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
+    assert controller._present_devices == set()
+    fake_present_devices = {NodeId.gantry_x, NodeId.gantry_y}
     call_count = 0
     fake_response = {
         NodeId.gantry_x: UInt8Field(0),
@@ -601,7 +602,7 @@ async def test_get_limit_switches(controller: OT3Controller) -> None:
 
     with patch(
         "opentrons.hardware_control.backends.ot3controller.get_limit_switches", fake_gls
-    ), patch.object(controller, "_present_nodes", fake_present_nodes):
+    ), patch.object(controller, "_present_devices", fake_present_devices):
         res = await controller.get_limit_switches()
         assert call_count == 1
         assert passed_nodes == {NodeId.gantry_x, NodeId.gantry_y}
@@ -640,7 +641,7 @@ async def test_ready_for_movement(
     controller._motor_status = motor_status
 
     axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
-    assert controller.check_ready_for_movement(axes) == ready
+    assert controller.check_motor_status(axes) == ready
 
 
 @pytest.mark.parametrize("mount", [OT3Mount.LEFT, OT3Mount.RIGHT])
@@ -705,7 +706,7 @@ async def test_update_motor_status(
         "opentrons.hardware_control.backends.ot3controller.get_motor_position", fake_gmp
     ):
         nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
-        controller._present_nodes = nodes
+        controller._present_devices = nodes
         await controller.update_motor_status()
         for node in nodes:
             assert controller._position.get(node) == 0.223
@@ -749,27 +750,26 @@ async def test_update_motor_estimation(
     ],
 )
 async def test_set_default_currents(
-    mock_present_nodes: OT3Controller, gantry_load: GantryLoad, expected_call: bool
+    mock_present_devices: OT3Controller, gantry_load: GantryLoad, expected_call: bool
 ):
-    mock_present_nodes._present_nodes.add(NodeId.gripper_g)
+    mock_present_devices._present_devices.add(NodeId.gripper)
     with patch(
         "opentrons.hardware_control.backends.ot3controller.set_currents",
         spec=current_settings.set_currents,
     ) as mocked_currents:
-        await mock_present_nodes.update_to_default_current_settings(gantry_load)
+        await mock_present_devices.update_to_default_current_settings(gantry_load)
         mocked_currents.assert_called_once_with(
             mocked_currents.call_args_list[0][0][0],
             mocked_currents.call_args_list[0][0][1],
             use_tip_motor_message_for=expected_call,
         )
-
-        for k, v in mock_present_nodes._current_settings.items():
+        for k, v in mock_present_devices._current_settings.items():
             if k == OT3Axis.P_L and (
                 gantry_load == GantryLoad.HIGH_THROUGHPUT
                 and expected_call[0] == NodeId.pipette_left
             ):
                 # q motor config
-                v = mock_present_nodes._current_settings[OT3Axis.Q]
+                v = mock_present_devices._current_settings[OT3Axis.Q]
                 assert (
                     mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
                     == v.as_tuple()
@@ -797,7 +797,7 @@ async def test_set_default_currents(
     ],
 )
 async def test_set_run_current(
-    mock_present_nodes: OT3Controller,
+    mock_present_devices: OT3Controller,
     active_current: OT3AxisMap[float],
     gantry_load: GantryLoad,
     expected_call: List[Any],
@@ -810,8 +810,8 @@ async def test_set_run_current(
             "opentrons.hardware_control.backends.ot3controller.set_run_current",
             spec=current_settings.set_run_current,
         ) as mocked_currents:
-            await mock_present_nodes.update_to_default_current_settings(gantry_load)
-            await mock_present_nodes.set_active_current(active_current)
+            await mock_present_devices.update_to_default_current_settings(gantry_load)
+            await mock_present_devices.set_active_current(active_current)
             mocked_currents.assert_called_once_with(
                 mocked_currents.call_args_list[0][0][0],
                 expected_call[0],
@@ -835,7 +835,7 @@ async def test_set_run_current(
     ],
 )
 async def test_set_hold_current(
-    mock_present_nodes: OT3Controller,
+    mock_present_devices: OT3Controller,
     hold_current: OT3AxisMap[float],
     gantry_load: GantryLoad,
     expected_call: List[Any],
@@ -848,8 +848,8 @@ async def test_set_hold_current(
             "opentrons.hardware_control.backends.ot3controller.set_hold_current",
             spec=current_settings.set_hold_current,
         ) as mocked_currents:
-            await mock_present_nodes.update_to_default_current_settings(gantry_load)
-            await mock_present_nodes.set_hold_current(hold_current)
+            await mock_present_devices.update_to_default_current_settings(gantry_load)
+            await mock_present_devices.set_hold_current(hold_current)
             mocked_currents.assert_called_once_with(
                 mocked_currents.call_args_list[0][0][0],
                 expected_call[0],
@@ -862,7 +862,7 @@ async def test_update_required_flag(
 ) -> None:
     """Test that FirmwareUpdateRequired is raised when update_required flag is set."""
     axes = [OT3Axis.X, OT3Axis.Y]
-    controller._present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
+    controller._present_devices = {NodeId.gantry_x, NodeId.gantry_y}
 
     with patch("builtins.open", mock_open()):
         # raise FirmwareUpdateRequired if the _update_required flag is set
@@ -888,8 +888,8 @@ async def test_update_required_bypass_firmware_update(controller: OT3Controller)
 
 async def test_update_required_flag_false(controller: OT3Controller):
     """Do not raise FirmwareUpdateRequired if update_required is False."""
-    controller._present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
-    for node in controller._present_nodes:
+    controller._present_devices = {NodeId.gantry_x, NodeId.gantry_y}
+    for node in controller._present_devices:
         controller._motor_status.update(
             {node: MotorStatus(motor_ok=False, encoder_ok=True)}
         )
@@ -915,8 +915,8 @@ async def test_update_required_flag_false(controller: OT3Controller):
 
 async def test_update_required_flag_initialized(controller: OT3Controller):
     """Do not raise FirmwareUpdateRequired if initialized is False."""
-    controller._present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
-    for node in controller._present_nodes:
+    controller._present_devices = {NodeId.gantry_x, NodeId.gantry_y}
+    for node in controller._present_devices:
         controller._motor_status.update(
             {node: MotorStatus(motor_ok=False, encoder_ok=True)}
         )
@@ -1021,11 +1021,11 @@ async def test_update_firmware_specified_nodes(
         controller._network_info, "probe"
     ) as probe:
         async for status_element in controller.update_firmware(
-            {}, nodes={NodeId.head, NodeId.gantry_x}
+            {}, targets={NodeId.head, NodeId.gantry_x}
         ):
             pass
         check_updates.assert_called_with(
-            fw_node_info, {}, nodes={NodeId.head, NodeId.gantry_x}, force=False
+            fw_node_info, {}, targets={NodeId.head, NodeId.gantry_x}, force=False
         )
         run_updates.assert_called_with(
             can_messenger=controller._messenger,
@@ -1059,7 +1059,9 @@ async def test_update_firmware_invalid_specified_node(
     ) as run_updates, mock.patch.object(
         controller._network_info, "probe"
     ) as probe:
-        async for status_element in controller.update_firmware({}, nodes={NodeId.head}):
+        async for status_element in controller.update_firmware(
+            {}, targets={NodeId.head}
+        ):
             pass
         run_updates.assert_called_with(
             can_messenger=controller._messenger,

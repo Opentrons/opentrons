@@ -11,23 +11,22 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
   // TODO useDeleteProtocolMutation,
 } from '@opentrons/react-api-client'
 
+import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
+import { TooManyPinsModal } from '../../../molecules/Modal/OnDeviceDisplay'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
-import { TooManyPinsModal } from './TooManyPinsModal'
 
 import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
-
-// What is the maximum number of protocols one can pin? This many.
-const MAXIMUM_PINNED_PROTOCOLS = 8
 
 export function LongPressModal(props: {
   longpress: UseLongPressResult
@@ -102,10 +101,12 @@ export function LongPressModal(props: {
   return (
     <>
       {showMaxPinsAlert ? (
-        <TooManyPinsModal longpress={longpress} />
+        <TooManyPinsModal
+          handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
+        />
       ) : (
         <ModalShell
-          borderRadius="0.75rem"
+          borderRadius={BORDERS.size_three}
           onOutsideClick={handleCloseModal}
           width="15.625rem"
         >

@@ -10,6 +10,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
+  PrimaryButton,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -21,7 +22,6 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { CheckLabwareStep } from './types'
 import { NeedHelpLink } from '../CalibrationPanels'

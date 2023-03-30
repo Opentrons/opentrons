@@ -6,10 +6,10 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
+  CheckboxField,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
-import { CheckboxField } from '../../atoms/CheckboxField'
 import styles from './styles.css'
 
 import type { FieldProps } from 'formik'

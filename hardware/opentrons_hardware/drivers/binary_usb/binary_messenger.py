@@ -2,7 +2,7 @@
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
-from typing import Optional, Callable, Tuple, Dict
+from typing import Optional, Callable, Tuple, Dict, Type
 
 import logging
 
@@ -12,6 +12,7 @@ from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageI
 
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     BinaryMessageDefinition,
+    AckFailed,
 )
 
 from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
@@ -23,6 +24,51 @@ BinaryMessageListenerCallback = Callable[[BinaryMessageDefinition], None]
 
 
 BinaryMessageListenerCallbackFilter = Callable[[BinaryMessageId], bool]
+
+
+class SendAndReceiveListener:
+    """Helper class for sending a message and ensuring a response."""
+
+    def __init__(
+        self,
+        messenger: BinaryMessenger,
+        response_type: Type[BinaryMessageDefinition],
+        timeout: float = 1.0,
+    ) -> None:
+        """Create a new SendAndReceiveListener."""
+        self._event = asyncio.Event()
+        self._messenger = messenger
+        self._response_type = response_type
+        self._timeout = timeout
+        self._response: Optional[BinaryMessageDefinition] = None
+
+    def __call__(self, message: BinaryMessageDefinition) -> None:
+        """When called as a listener, mark the message as received."""
+        if isinstance(message, self._response_type) or isinstance(message, AckFailed):
+            self._response = message
+            self._event.set()
+
+    async def send_and_receive(
+        self, message: BinaryMessageDefinition
+    ) -> Optional[BinaryMessageDefinition]:
+        """Send a message and await the response."""
+        self._event.clear()
+        self._response = None
+        self._messenger.add_listener(
+            self,
+            lambda message_id: bool(
+                int(message_id) == self._response_type().message_id.value
+            ),
+        )
+        await self._messenger.send(message)
+        try:
+            await asyncio.wait_for(self._event.wait(), self._timeout)
+        except asyncio.TimeoutError:
+            log.error("response timed out")
+        finally:
+            self._messenger.remove_listener(self)
+
+        return self._response
 
 
 class BinaryMessenger:
@@ -66,7 +112,7 @@ class BinaryMessenger:
 
     def start(self) -> None:
         """Start the reader task."""
-        if self._task and not self._task.done():
+        if self.reader_is_active():
             log.warning("task already running.")
             return
         self._task = asyncio.get_event_loop().create_task(self._read_task_shield())
@@ -82,6 +128,10 @@ class BinaryMessenger:
 
         else:
             log.warning("task not running.")
+
+    def reader_is_active(self) -> bool:
+        """Check if the reader task is currently active."""
+        return self._task is not None and not self._task.done()
 
     def add_listener(
         self,
@@ -125,7 +175,7 @@ class BinaryMessenger:
                 except BinarySerializableException:
                     log.exception("Failed to build message")
             else:
-                log.error(f"Message {message_definition} is not recognized.")
+                log.debug("read timed out, calling read again")
 
     async def _handle_error(self, message_definition: BinaryMessageDefinition) -> None:
         log.error("Got a error message.")
@@ -133,6 +183,16 @@ class BinaryMessenger:
     def get_driver(self) -> SerialUsbDriver:
         """Return the underling driver for this messenger."""
         return self._drive
+
+    async def send_and_receive(
+        self,
+        message: BinaryMessageDefinition,
+        response_type: Type[BinaryMessageDefinition],
+        timeout: float = 1.0,
+    ) -> Optional[BinaryMessageDefinition]:
+        """Send a message and await a specific response message."""
+        listener = SendAndReceiveListener(self, response_type, timeout)
+        return await listener.send_and_receive(message)
 
 
 class BinaryWaitableCallback:

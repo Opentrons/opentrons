@@ -4,21 +4,30 @@ import capitalize from 'lodash/capitalize'
 import {
   COLORS,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
-import { FLOWS } from './constants'
+import { BODY_STYLE, FLOWS } from './constants'
 
 import type { MotorAxis } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
-  const { goBack, proceed, flowType, selectedPipette, chainRunCommands } = props
+  const {
+    goBack,
+    proceed,
+    flowType,
+    selectedPipette,
+    chainRunCommands,
+    isOnDevice,
+  } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [errorMessage, setErrorMessage] = React.useState<boolean>(false)
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
@@ -60,7 +69,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         {t('cancel_attachment')}
       </SecondaryButton>
       <PrimaryButton
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
         onClick={handleCheckZAxis}
       >
         {t('shared:try_again')}
@@ -88,15 +97,25 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
             flowType === FLOWS.ATTACH ? 'unscrew_at_top' : 'how_to_reattach'
           }
           components={{
-            block: <StyledText as="p" marginBottom={SPACING.spacing4} />,
+            block: (
+              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+            ),
           }}
         />
       }
       back={goBack}
       proceedButton={
-        <PrimaryButton onClick={handleCheckZAxis}>
-          {capitalize(t('shared:continue'))}
-        </PrimaryButton>
+        isOnDevice ? (
+          <SmallButton
+            onClick={handleCheckZAxis}
+            buttonText={capitalize(t('shared:continue'))}
+            buttonType="default"
+          />
+        ) : (
+          <PrimaryButton onClick={handleCheckZAxis}>
+            {capitalize(t('shared:continue'))}
+          </PrimaryButton>
+        )
       }
     />
   )

@@ -5,7 +5,6 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from typing import (
-    Callable,
     Dict,
     List,
     Optional,
@@ -16,6 +15,7 @@ from typing import (
     Set,
     Union,
     Mapping,
+    Iterator,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
@@ -33,7 +33,11 @@ from .ot3utils import (
     PipetteAction,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    FirmwareTarget,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -122,6 +126,7 @@ class OT3Simulator:
         self._stubbed_attached_modules = attached_modules
         self._update_required = False
         self._initialized = False
+        self._lights = {"button": False, "rails": False}
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -217,21 +222,28 @@ class OT3Simulator:
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
 
-    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        get_stat: Callable[
-            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
-        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+    def _get_motor_status(
+        self, ax: Sequence[OT3Axis]
+    ) -> Iterator[Optional[MotorStatus]]:
+        return (self._motor_status.get(axis_to_node(a)) for a in ax)
+
+    def check_motor_status(self, axes: Sequence[OT3Axis]) -> bool:
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
-            for status in get_stat(axes)
+            for status in self._get_motor_status(axes)
         )
 
-    @ensure_yield
+    def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
+        """If any of the encoder statuses is ok, parking can proceed."""
+        return any(
+            isinstance(status, MotorStatus) and status.encoder_ok
+            for status in self._get_motor_status(axes)
+        )
+
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
 
-    @ensure_yield
     async def update_encoder_position(self) -> OT3AxisMap[float]:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
@@ -245,6 +257,8 @@ class OT3Simulator:
         plunger_speed: float,
         threshold_pascals: float,
         log_pressure: bool = True,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
 
@@ -291,24 +305,7 @@ class OT3Simulator:
         else:
             homed = list(self._position.keys())
         for h in homed:
-            self._motor_status[h] = MotorStatus(True, True)
-        return axis_convert(self._position, 0.0)
-
-    @ensure_yield
-    async def fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        """Fast home axes.
-
-        Args:
-            axes: List of axes to home.
-            margin: Margin
-
-        Returns:
-            New position.
-        """
-        homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
-        for h in homed:
+            self._position[h] = self._get_home_position()[h]
             self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
@@ -383,7 +380,7 @@ class OT3Simulator:
             raise RuntimeError(
                 f"mount {mount.name} requested a {expected_instr} which is not supported on the OT3"
             )
-        if found_model and expected_instr and (expected_instr != found_model):
+        if found_model and expected_instr and (expected_instr not in found_model):
             if self._strict_attached:
                 raise RuntimeError(
                     "mount {}: expected instrument {} but got {}".format(
@@ -509,7 +506,7 @@ class OT3Simulator:
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
-        nodes: Optional[Set[NodeId]] = None,
+        nodes: Optional[Set[FirmwareTarget]] = None,
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
@@ -529,13 +526,17 @@ class OT3Simulator:
         """Engage axes."""
         return None
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
+    @ensure_yield
+    async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
-        return None
+        # Simulate how the real driver does this - there's no button so it's always false
+        if rails is not None:
+            self._lights["rails"] = rails
 
-    def get_lights(self) -> Dict[str, bool]:
+    @ensure_yield
+    async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
-        return {}
+        return self._lights
 
     def pause(self) -> None:
         """Pause the controller activity."""

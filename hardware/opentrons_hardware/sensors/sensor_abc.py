@@ -52,7 +52,7 @@ class AbstractSensorDriver(ABC):
         self,
         can_messenger: CanMessenger,
         sensor: BaseSensorType,
-        poll_for_ms: int,
+        number_of_reads: int,
         timeout: int = 1,
     ) -> Optional[SensorReturnType]:
         """Poll the sensor for data."""

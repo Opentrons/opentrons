@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
@@ -119,7 +120,7 @@ function SetupInstructionsButton(
     <Btn
       alignItems="center"
       backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
-      borderRadius="40px"
+      borderRadius={BORDERS.size_five}
       display="flex"
       gridGap="0.5rem"
       padding="1rem 2rem"
@@ -134,14 +135,14 @@ function SetupInstructionsButton(
   )
 }
 
-function ContinueButton(
+export function ContinueButton(
   props: React.HTMLProps<HTMLButtonElement>
 ): JSX.Element {
   const { t } = useTranslation('shared')
   return (
     <Btn
       backgroundColor={COLORS.blueEnabled}
-      borderRadius="40px"
+      borderRadius={BORDERS.size_five}
       color={COLORS.white}
       padding="1rem 2rem"
       onClick={props.onClick}
@@ -157,7 +158,9 @@ function ContinueButton(
   )
 }
 
-function DeckMapButton(props: React.HTMLProps<HTMLButtonElement>): JSX.Element {
+export function DeckMapButton(
+  props: React.HTMLProps<HTMLButtonElement>
+): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   return (
     <Btn
@@ -165,7 +168,7 @@ function DeckMapButton(props: React.HTMLProps<HTMLButtonElement>): JSX.Element {
       bottom="1.5rem"
       right="1.5rem"
       backgroundColor={COLORS.blueEnabled}
-      borderRadius="40px"
+      borderRadius={BORDERS.size_five}
       color={COLORS.white}
       padding="1rem 2rem"
       onClick={props.onClick}

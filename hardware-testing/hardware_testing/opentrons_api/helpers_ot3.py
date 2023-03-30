@@ -1,10 +1,14 @@
 """Opentrons helper methods."""
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
+from math import pi
 from subprocess import run
 from time import time
 from typing import List, Optional, Dict, Tuple, Union
 
+from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
+from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
@@ -67,6 +71,12 @@ def stop_server_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
+def start_server_ot3() -> None:
+    """Start opentrons-robot-server on the OT3."""
+    print('Starting "opentrons-robot-server"...')
+    run(["systemctl", "start", "opentrons-robot-server"])
+
+
 def restart_canbus_ot3() -> None:
     """Restart opentrons-ot3-canbus on the OT3."""
     print('Restarting "opentrons-ot3-canbus"...')
@@ -117,6 +127,7 @@ async def build_async_ot3_hardware_api(
     pipette_left: Optional[str] = None,
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
+    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
@@ -135,7 +146,7 @@ async def build_async_ot3_hardware_api(
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
         restart_canbus_ot3()
-    return await builder(**kwargs)  # type: ignore[arg-type]
+    return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -620,22 +631,57 @@ async def get_capacitance_ot3(api: OT3API, mount: OT3Mount) -> float:
     return data.to_float()  # type: ignore[union-attr]
 
 
+async def _get_temp_humidity(
+    messenger: CanMessenger, mount: OT3Mount
+) -> Tuple[float, float]:
+    node_id = sensor_node_for_mount(mount)
+    # FIXME: allow SensorId to specify which sensor on the device to read from
+    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise SensorResponseBad("no response from sensor")
+    return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
+
+
 async def get_temperature_humidity_ot3(
     api: OT3API, mount: OT3Mount
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
         return 25.0, 50.0
-    node_id = sensor_node_for_mount(mount)
-    # FIXME: allow SensorId to specify which sensor on the device to read from
-    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
-    s_driver = sensor_driver.SensorDriver()
-    data = await s_driver.read(
-        api._backend._messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
+    messenger = api._backend._messenger  # type: ignore[union-attr]
+    return await _get_temp_humidity(messenger, mount)
+
+
+def get_temperature_humidity_outside_api_ot3(
+    mount: OT3Mount, is_simulating: bool = False
+) -> Tuple[float, float]:
+    """Get the temperature/humidity reading from the pipette outside of a protocol."""
+    settings = DriverSettings(
+        interface=can_bus_settings.DEFAULT_INTERFACE,
+        port=can_bus_settings.DEFAULT_PORT,
+        host=can_bus_settings.DEFAULT_HOST,
+        bit_rate=can_bus_settings.DEFAULT_BITRATE,
+        channel=can_bus_settings.DEFAULT_CHANNEL,
     )
-    if data is None:
-        raise SensorResponseBad("no response from sensor")
-    return data.temperature.to_float(), data.humidity.to_float()  # type: ignore[union-attr]
+
+    async def _run() -> Tuple[float, float]:
+        if is_simulating:
+            return 25.0, 50.0
+        async with build.driver(settings) as driver:
+            messenger = CanMessenger(driver=driver)
+            messenger.start()
+            ret = await _get_temp_humidity(messenger, mount)
+            await messenger.stop()
+            return ret
+
+    loop = asyncio.get_event_loop()
+    task = loop.create_task(_run())
+    loop.run_until_complete(task)
+    return task.result()
 
 
 async def get_pressure_ot3(api: OT3API, mount: OT3Mount) -> float:
@@ -794,3 +840,40 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     else:
         id = pipette.pipette_id
     return f"P{volume}{channels}V{version}{id}"
+
+
+def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:
+    """Clear pipette ul-per-mm."""
+
+    def _ul_per_mm_of_shaft_diameter(diameter: float) -> float:
+        return pi * pow(diameter / 2, 2)
+
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    if "p50" in pip.model.lower():
+        pip_nominal_ul_per_mm = _ul_per_mm_of_shaft_diameter(1)
+    elif "p1000" in pip.model.lower():
+        pip_nominal_ul_per_mm = _ul_per_mm_of_shaft_diameter(4.5)
+    else:
+        raise RuntimeError(f"unexpected pipette model: {pip.model}")
+    # 10000 is an arbitrarily large volume that none of our pipettes can reach
+    # so, it is guaranteed that all test volumes will be less than this
+    ul_per_mm = [
+        (
+            0,
+            0.0,
+            pip_nominal_ul_per_mm,
+        ),
+        (
+            10000,
+            0.0,
+            pip_nominal_ul_per_mm,
+        ),
+    ]
+    pip._active_tip_settings.aspirate["default"] = ul_per_mm  # type: ignore[assignment]
+    pip._active_tip_settings.dispense["default"] = ul_per_mm  # type: ignore[assignment]
+    pip.ul_per_mm.cache_clear()
+    assert pip.ul_per_mm(1, "aspirate") == pip_nominal_ul_per_mm
+    assert pip.ul_per_mm(pip.working_volume, "aspirate") == pip_nominal_ul_per_mm
+    assert pip.ul_per_mm(1, "dispense") == pip_nominal_ul_per_mm
+    assert pip.ul_per_mm(pip.working_volume, "dispense") == pip_nominal_ul_per_mm

@@ -4,9 +4,12 @@ from typing import Tuple
 
 from opentrons.protocol_api import Labware, ProtocolContext
 
-from hardware_testing.liquid.height import LiquidTracker
-from hardware_testing.opentrons_api.helpers import get_api_context
-from hardware_testing.labware.definitions import load_radwag_vial_definition
+from hardware_testing.gravimetric.liquid_height.height import (
+    LiquidTracker,
+    initialize_liquid_from_deck,
+)
+from hardware_testing.gravimetric.helpers import get_api_context
+from hardware_testing.gravimetric.radwag_pipette_calibration_vial import VIAL_DEFINITION
 
 CUSTOM_LABWARE_DEFINITION_DIR = (
     Path(__file__).parent.parent.parent.parent / "protocols" / "definitions"
@@ -14,9 +17,7 @@ CUSTOM_LABWARE_DEFINITION_DIR = (
 
 
 def _create_context() -> ProtocolContext:
-    return get_api_context(
-        api_level="2.13", is_simulating=False, connect_to_hardware=False
-    )
+    return get_api_context(api_level="2.13", is_simulating=True)
 
 
 def _load_labware(ctx: ProtocolContext) -> Tuple[Labware, Labware, Labware, Labware]:
@@ -24,9 +25,7 @@ def _load_labware(ctx: ProtocolContext) -> Tuple[Labware, Labware, Labware, Labw
     trough = ctx.load_labware(load_name="nest_12_reservoir_15ml", location="5")
     plate = ctx.load_labware(load_name="corning_96_wellplate_360ul_flat", location="2")
     vial = ctx.load_labware_from_definition(
-        labware_def=load_radwag_vial_definition(
-            directory=CUSTOM_LABWARE_DEFINITION_DIR
-        ),
+        VIAL_DEFINITION,
         location="6",
     )
     return tiprack, trough, plate, vial
@@ -40,7 +39,7 @@ def test_initialize_and_reset() -> None:
     assert len(vial.wells()) == 1
     tracker = LiquidTracker()
     assert len(list(tracker._items.keys())) == 0
-    tracker.initialize_from_deck(ctx)
+    initialize_liquid_from_deck(ctx, tracker)
     assert len(list(tracker._items.keys())) == 12 + 96 + 1
     tracker.reset()
     assert len(list(tracker._items.keys())) == 0
@@ -52,7 +51,7 @@ def test_volume_changes() -> None:
     _, trough, plate, vial = _load_labware(ctx)
     # initialize liquid tracker
     tracker = LiquidTracker()
-    tracker.initialize_from_deck(ctx)
+    initialize_liquid_from_deck(ctx, tracker)
     well = plate["A1"]
 
     # set starting volume
@@ -98,7 +97,7 @@ def test_liquid_height() -> None:
     _, trough, plate, _ = _load_labware(ctx)
     # initialize liquid tracker
     tracker = LiquidTracker()
-    tracker.initialize_from_deck(ctx)
+    initialize_liquid_from_deck(ctx, tracker)
 
     well = plate["A1"]  # a cyclinder
 
@@ -147,7 +146,7 @@ def test_lookup_table() -> None:
     _, _, plate, _ = _load_labware(ctx)
     # initialize liquid tracker
     tracker = LiquidTracker()
-    tracker.initialize_from_deck(ctx)
+    initialize_liquid_from_deck(ctx, tracker)
     well = plate["A1"]
 
     # create a fake lookup table for this well
@@ -182,7 +181,7 @@ def test_before_and_after_heights() -> None:
     multi = ctx.load_instrument("p1000_multi_gen3", mount="right", tip_racks=[tiprack])
     # initialize liquid tracker
     tracker = LiquidTracker()
-    tracker.initialize_from_deck(ctx)
+    initialize_liquid_from_deck(ctx, tracker)
 
     # create a fake lookup tables
     tracker.init_well_liquid_height(plate["A1"], lookup_table=[(0, 0), (10, 10)])
@@ -238,7 +237,7 @@ def test_update_affected_wells() -> None:
     multi = ctx.load_instrument("p1000_multi_gen3", mount="right", tip_racks=[tiprack])
     # initialize liquid tracker
     tracker = LiquidTracker()
-    tracker.initialize_from_deck(ctx)
+    initialize_liquid_from_deck(ctx, tracker)
 
     # create a fake lookup tables
     for well in plate.wells() + trough.wells():
