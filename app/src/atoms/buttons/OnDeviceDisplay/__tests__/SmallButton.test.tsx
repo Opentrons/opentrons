@@ -74,14 +74,6 @@ describe('SmallButton', () => {
     const { getByRole } = render(props)
     expect(getByRole('button')).toBeDisabled()
   })
-  it('renders the button as disabled', () => {
-    props = {
-      ...props,
-      disabled: true,
-    }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toBeDisabled()
-  })
   it('renders the rounded button category', () => {
     props = {
       ...props,
@@ -100,5 +92,14 @@ describe('SmallButton', () => {
     }
     const { getByLabelText } = render(props)
     getByLabelText('SmallButton_alert_positionLeft')
+  })
+  it('renders an icon with right placement', () => {
+    props = {
+      ...props,
+      iconName: 'alert',
+      iconPlacement: 'right',
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_alert_positionRight')
   })
 })
