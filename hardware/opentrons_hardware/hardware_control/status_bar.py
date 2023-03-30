@@ -26,6 +26,8 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 
 @dataclass
 class Color:
+    """Represents an RGBW color. Range for values is [0,255]"""
+
     r: int
     g: int
     b: int
@@ -34,6 +36,8 @@ class Color:
 
 @dataclass
 class ColorStep:
+    """Represents a single step in an animation."""
+
     transition_type: LightTransitionType
     transition_time_ms: int
     color: Color
@@ -43,9 +47,15 @@ RED = Color(r=255, g=0, b=0, w=0)
 GREEN = Color(r=0, g=255, b=0, w=0)
 BLUE = Color(r=0, g=189, b=255, w=0)
 WHITE = Color(r=0, g=0, b=0, w=255)
+ORANGE = Color(r=255, g=165, b=0, w=0)
+PURPLE = Color(r=192, g=0, b=255, w=0)
+YELLOW = Color(r=248, g=255, b=0, w=0)
+OFF = Color(r=0, g=0, b=0, w=0)
 
 
 class StatusBar:
+    """Interface to the status bar."""
+
     def __init__(self, messenger: Optional[BinaryMessenger]) -> None:
         """Create a status bar controller."""
         self._messenger = messenger
@@ -111,18 +121,87 @@ class StatusBar:
             ColorStep(
                 transition_type=LightTransitionType.sinusoid,
                 transition_time_ms=1000,
-                color=Color(r=0, g=0, b=0, w=0),
+                color=OFF,
             ),
         ]
         return await self.start_animation(steps=steps, type=LightAnimationType.looping)
 
-    # High level - based on context
+    async def flash_color(self, color: Color) -> bool:
+        """Set the status bar to flash a color."""
+        steps = [
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=150,
+                color=color,
+            ),
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=150,
+                color=OFF,
+            ),
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=150,
+                color=color,
+            ),
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=150,
+                color=OFF,
+            ),
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=1000,
+                color=color,
+            ),
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=150,
+                color=OFF,
+            ),
+        ]
+        return await self.start_animation(steps=steps, type=LightAnimationType.looping)
 
-    async def state_idle(self) -> bool:
-        await self.static_color(color=WHITE)
+    async def blink_once(self, blink_color: Color, end_color: Color) -> bool:
+        """Blink the status bar once, and then return to end_color."""
+        steps = [
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=150,
+                color=blink_color,
+            ),
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=150,
+                color=OFF,
+            ),
+            ColorStep(
+                transition_type=LightTransitionType.instant,
+                transition_time_ms=150,
+                color=blink_color,
+            ),
+            ColorStep(
+                transition_type=LightTransitionType.linear,
+                transition_time_ms=1000,
+                color=end_color,
+            ),
+        ]
+        return await self.start_animation(
+            steps=steps, type=LightAnimationType.single_shot
+        )
 
-    async def state_paused(self) -> bool:
-        await self.pulse_color(color=BLUE)
-
-    async def state_running(self) -> bool:
-        await self.static_color(color=BLUE)
+    async def cycle_colors(
+        self, colors: List[Color], transition_time_ms: int = 250
+    ) -> bool:
+        """Cycle through a list of colors, leaving the status bar on the last color."""
+        steps = [
+            ColorStep(
+                transition_type=LightTransitionType.linear,
+                transition_time_ms=transition_time_ms,
+                color=c,
+            )
+            for c in colors
+        ]
+        return await self.start_animation(
+            steps=steps, type=LightAnimationType.single_shot
+        )

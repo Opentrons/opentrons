@@ -93,6 +93,7 @@ from .types import (
     EarlyLiquidSenseTrigger,
     LiquidNotFound,
     UpdateStatus,
+    StatusBarState,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -140,6 +141,8 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
 )
 
 from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, USBTarget
+
+from opentrons_hardware.hardware_control import status_bar
 
 mod_log = logging.getLogger(__name__)
 
@@ -208,6 +211,7 @@ class OT3API(
                 self._config.motion_settings, self._gantry_load
             )
         )
+        self._status_bar_state = StatusBarState.IDLE
 
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
@@ -288,10 +292,10 @@ class OT3API(
             checked_config = config
         backend = await OT3Controller.build(checked_config, use_usb_bus)
 
-        await backend.status_bar_controller().state_idle()
-
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
+
+        await api_instance.set_status_bar_state(StatusBarState.IDLE)
 
         # check for and start firmware updates if required
         async for _ in api_instance.update_firmware():
@@ -491,6 +495,79 @@ class OT3API(
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
 
+    async def _status_bar_idle(self) -> None:
+        self._status_bar_state = StatusBarState.IDLE
+        await self._backend.status_bar_controller().static_color(status_bar.WHITE)
+
+    async def _status_bar_running(self) -> None:
+        self._status_bar_state = StatusBarState.RUNNING
+        await self._backend.status_bar_controller().static_color(status_bar.BLUE)
+
+    async def _status_bar_paused(self) -> None:
+        self._status_bar_state = StatusBarState.PAUSED
+        await self._backend.status_bar_controller().pulse_color(status_bar.BLUE)
+
+    async def _status_bar_hardware_error(self) -> None:
+        self._status_bar_state = StatusBarState.HARDWARE_ERROR
+        await self._backend.status_bar_controller().flash_color(status_bar.RED)
+
+    async def _status_bar_software_error(self) -> None:
+        self._status_bar_state = StatusBarState.SOFTWARE_ERROR
+        await self._backend.status_bar_controller().static_color(status_bar.RED)
+
+    async def _status_bar_confirm(self) -> None:
+        # Confirm should revert to IDLE
+        self._status_bar_state = StatusBarState.IDLE
+        await self._backend.status_bar_controller().blink_once(
+            status_bar.GREEN, status_bar.WHITE
+        )
+
+    async def _status_bar_run_complete(self) -> None:
+        self._status_bar_state = StatusBarState.RUN_COMPLETED
+        await self._backend.status_bar_controller().static_color(status_bar.GREEN)
+
+    async def _status_bar_updating(self) -> None:
+        self._status_bar_state = StatusBarState.UPDATING
+        await self._backend.status_bar_controller().pulse_color(status_bar.WHITE)
+
+    async def _status_bar_activation(self) -> None:
+        # Activation should revert to IDLE
+        self._status_bar_state = StatusBarState.IDLE
+        await self._backend.status_bar_controller().blink_once(
+            status_bar.BLUE, status_bar.WHITE
+        )
+
+    async def _status_bar_disco(self) -> None:
+        # TODO - update implementation
+        colors = [
+            status_bar.GREEN,
+            status_bar.YELLOW,
+            status_bar.PURPLE,
+            status_bar.ORANGE,
+            status_bar.GREEN,
+            status_bar.YELLOW,
+            status_bar.PURPLE,
+            status_bar.ORANGE,
+            status_bar.WHITE,
+        ]
+        self._status_bar_state = StatusBarState.IDLE
+        await self._backend.status_bar_controller().cycle_colors(colors)
+
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
+        callbacks = {
+            StatusBarState.IDLE: self._status_bar_idle,
+            StatusBarState.RUNNING: self._status_bar_running,
+            StatusBarState.PAUSED: self._status_bar_paused,
+            StatusBarState.HARDWARE_ERROR: self._status_bar_hardware_error,
+            StatusBarState.SOFTWARE_ERROR: self._status_bar_software_error,
+            StatusBarState.CONFIRMATION: self._status_bar_confirm,
+            StatusBarState.RUN_COMPLETED: self._status_bar_run_complete,
+            StatusBarState.UPDATING: self._status_bar_updating,
+            StatusBarState.ACTIVATION: self._status_bar_activation,
+            StatusBarState.DISCO: self._status_bar_disco,
+        }
+        await callbacks[state]()
+
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
         """Delay execution by pausing and sleeping."""
@@ -651,7 +728,6 @@ class OT3API(
         self._pause_manager.pause(pause_type)
 
         async def _chained_calls() -> None:
-            await self._backend.status_bar_controller().state_paused()
             await self._execution_manager.pause()
             self._backend.pause()
 
@@ -679,7 +755,6 @@ class OT3API(
 
         async def _chained_calls() -> None:
             # mirror what happens API.pause.
-            await self._backend.status_bar_controller().state_running()
             await self._execution_manager.resume()
             self._backend.resume()
 

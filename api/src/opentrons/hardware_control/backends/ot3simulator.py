@@ -634,6 +634,6 @@ class OT3Simulator:
     async def connect_usb_to_rear_panel(self) -> None:
         """Connect to rear panel over usb."""
         return None
-    
+
     def status_bar_controller(self) -> status_bar.StatusBar:
         return status_bar.StatusBar(None)
