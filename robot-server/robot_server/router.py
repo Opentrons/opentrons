@@ -6,6 +6,7 @@ from .errors import LegacyErrorResponse
 from .health import health_router
 from .protocols import protocols_router
 from .runs import runs_router
+from .maintenance_run import maintenance_runs_router
 from .commands import commands_router
 from .modules import modules_router
 from .instruments import instruments_router
@@ -45,6 +46,12 @@ router.include_router(
 router.include_router(
     router=runs_router,
     tags=["Run Management"],
+    dependencies=[Depends(check_version_header)],
+)
+
+router.include_router(
+    router=maintenance_runs_router,
+    tags=["Maintenance run Management"],
     dependencies=[Depends(check_version_header)],
 )
 
