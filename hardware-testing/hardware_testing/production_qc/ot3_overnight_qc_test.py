@@ -312,6 +312,7 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
                 else:
                     fail_count+=1
                 print(f'Run mount up and down cycle: {i}, results: {res}, pass count: {pass_count}, fail count: {fail_count}')
+    _record_motion_check_data('z_motion',write_cb,setting[OT3Axis.Z_L].max_speed,setting[OT3Axis.Z_L].acceleration,arguments.cycles,pass_count,fail_count)
 
 async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run xy motion check...')
@@ -328,6 +329,7 @@ async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: type
             else:
                 fail_count+=1
             print(f'Run bowtie cycle: {i}, results: {res}, pass count: {pass_count}, fail count: {fail_count}')
+    _record_motion_check_data('xy_motion',write_cb,setting[OT3Axis.X].max_speed,setting[OT3Axis.X].acceleration,arguments.cycles,pass_count,fail_count)
 
 
 async def _main(arguments: argparse.Namespace) -> None:
