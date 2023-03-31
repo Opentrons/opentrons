@@ -66,6 +66,13 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const [joggedPosition, setJoggedPosition] = React.useState<VectorOffset>(
     initialPosition
   )
+  React.useEffect(() => {
+    //  NOTE: this will perform a "null" jog when the jog controls mount so
+    //  if a user reaches the "confirm exit" modal (unmounting this component)
+    //  and clicks "go back" we are able so initialize the live offset to whatever
+    //  distance they had already jogged before clicking exit.
+    handleJog('x', 1, 0, setJoggedPosition)
+  }, [handleJog])
 
   let wellsToHighlight: string[] = []
   if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
