@@ -177,11 +177,11 @@ async def _run_mount_up_down(api: OT3API, is_simulating: bool, mount: types.OT3M
         es,en,al = await _move_and_check(api,is_simulating,mount,pos)
         if record_bool:
             if mount is types.OT3Mount.LEFT:
-                mount_type = 'Left' 
+                mount_type = 'Mount_up_down-Left' 
             else:
-                mount_type = 'Right'
-            _record_axis_data('Mount_up_down-{mount_type}',write_cb,es,en,al)
-            print(f'mounts-{mount_type} results: {al}')
+                mount_type = 'Mount_up_down-Right'
+            _record_axis_data(mount_type,write_cb,es,en,al)
+            print(f'{mount_type} results: {al}')
     if pass_count == len(mount_up_down_points):
         return True
     else:
