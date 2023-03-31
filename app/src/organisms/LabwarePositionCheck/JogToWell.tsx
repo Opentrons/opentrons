@@ -72,7 +72,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     //  and clicks "go back" we are able so initialize the live offset to whatever
     //  distance they had already jogged before clicking exit.
     handleJog('x', 1, 0, setJoggedPosition)
-  }, [handleJog])
+  }, [])
 
   let wellsToHighlight: string[] = []
   if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
