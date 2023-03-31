@@ -528,6 +528,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         print("ending recording")
         recorder.stop()
         recorder.deactivate()  # stop the server
+        hw_api = ctx._core.get_hardware()
+        hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
     ui.print_title("RESULTS")
     for vol in test_volumes:
         print(f"  * {vol}:")
