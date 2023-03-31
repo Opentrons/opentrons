@@ -17,6 +17,7 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 FAILURE_THRESHOLD_MM = 3
+GAUGE_HEIGHT_MM = 64  # TODO: confirm new blocks are same height
 GRIP_HEIGHT_MM = 50
 TEST_WIDTHS_MM: List[float] = [85.75, 62]
 SLOT_WIDTH_GAUGE: List[int] = [3, 9]
@@ -30,7 +31,7 @@ def _get_test_tag(width: float, force: float) -> str:
 def _get_width_hover_and_grip_positions(api: OT3API, slot: int) -> Tuple[Point, Point]:
     grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
     grip_pos += Point(z=GRIP_HEIGHT_MM)
-    hover_pos = grip_pos._replace(z=api.get_instrument_max_height(OT3Mount.GRIPPER))
+    hover_pos = grip_pos._replace(z=GAUGE_HEIGHT_MM + 15)
     return hover_pos, grip_pos
 
 

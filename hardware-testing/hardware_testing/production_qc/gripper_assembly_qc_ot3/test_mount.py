@@ -20,7 +20,6 @@ Z_MAX_SKIP_MM = 0.25
 
 SPEEDS_TO_TEST = [25.0, 50.0, 100.0, 200.0]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
-    0.1: SPEEDS_TO_TEST,
     0.2: SPEEDS_TO_TEST,
     0.3: SPEEDS_TO_TEST,
     0.4: SPEEDS_TO_TEST,
@@ -83,9 +82,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # LOOP THROUGH CURRENTS + SPEEDS
     currents = list(CURRENTS_SPEEDS.keys())
-    for current in sorted(currents):
+    for current in sorted(currents, reverse=True):
         speeds = CURRENTS_SPEEDS[current]
-        for speed in sorted(speeds):
+        for speed in sorted(speeds, reverse=False):
             ui.print_header(f"CURRENT: {current}, SPEED: {speed}")
             # HOME
             print("homing...")
@@ -121,7 +120,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api, z_ax, default_max_speed=default_z_speed
             )
-            # await api._backend.set_active_current({z_ax: default_z_current})
             await api.home([z_ax])
             if not down_passed or not up_passed and not api.is_simulator:
                 print(f"current {current} failed")
