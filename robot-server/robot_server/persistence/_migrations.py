@@ -60,32 +60,39 @@ def migrate(sql_engine: sqlalchemy.engine.Engine) -> None:
     NOTE: added columns should be nullable.
     """
     with sql_engine.begin() as transaction:
-        version = _get_schema_version(transaction)
+        starting_version = _get_schema_version(transaction)
 
-        if version is not None:
-            # TODO: Spurious log statement when version is already max?
+        if starting_version is None:
             _log.info(
-                f"Migrating database from schema {version}"
-                f" to schema {_LATEST_SCHEMA_VERSION}."
+                f"Marking fresh database as schema version {_LATEST_SCHEMA_VERSION}."
             )
-            if version < 1:
-                _migrate_0_to_1(transaction)
-            if version < 2:
-                _migrate_1_to_2(transaction)
+            _stamp_schema_version(transaction)
+
+        elif starting_version == _LATEST_SCHEMA_VERSION:
             _log.info(
-                f"Migrated database from schema {version}"
-                f" to schema {_LATEST_SCHEMA_VERSION}."
+                f"Database has schema version {_LATEST_SCHEMA_VERSION}."
+                " no migrations needed."
             )
+
         else:
             _log.info(
-                f"Marking fresh database as schema version {_LATEST_SCHEMA_VERSION}"
+                f"Database has schema version {starting_version}."
+                f" Migrating to {_LATEST_SCHEMA_VERSION}..."
             )
 
-        if version != _LATEST_SCHEMA_VERSION:
-            _insert_migration(transaction)
+            if starting_version < 1:
+                _log.info("Migrating database schema from 0 to 1...")
+                _migrate_0_to_1(transaction)
+            if starting_version < 2:
+                _log.info("Migrating database schema from 1 to 2...")
+                _migrate_1_to_2(transaction)
+
+            _log.info("Database migrations complete.")
+            _stamp_schema_version(transaction)
 
 
-def _insert_migration(transaction: sqlalchemy.engine.Connection) -> None:
+def _stamp_schema_version(transaction: sqlalchemy.engine.Connection) -> None:
+    """Mark the database as having the latest schema version."""
     transaction.execute(
         sqlalchemy.insert(newest_migration_table).values(
             created_at=datetime.now(tz=timezone.utc),
@@ -95,7 +102,7 @@ def _insert_migration(transaction: sqlalchemy.engine.Connection) -> None:
 
 
 def _get_schema_version(transaction: sqlalchemy.engine.Connection) -> Optional[int]:
-    """Get the starting version of the database.
+    """Get the current schema version of the database.
 
     Returns:
         The version found, or None if this is a fresh database that
