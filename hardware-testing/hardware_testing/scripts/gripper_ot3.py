@@ -52,19 +52,19 @@ LABWARE_GRIP_HEIGHT = {
 LABWARE_GRIP_FORCE = {k: 15 for k in LABWARE_KEYS}
 
 DECK_ITEM_OFFSETS = {
-    "thermo-cycle": Point(),
-    "heater-shaker": Point(),
-    "temp-module": Point(),
-    "mag-plate": Point(),
+    "thermo-cycle": Point(),  # FIXME
+    "heater-shaker": Point(),  # FIXME
+    "temp-module": Point(),  # FIXME
+    "mag-plate": Point(),  # FIXME
     "deck": Point(),
 }
 ADAPTER_OFFSETS = {
-    "universal": Point(z=3),
-    "pcr": Point(z=3),
-    "non-contact": Point(z=2.6),
-    "flat": Point(z=1.75),
-    "deep": Point(z=1),
-    "round-bottom": Point(z=1),
+    "universal": Point(),  # FIXME
+    "pcr": Point(),  # FIXME
+    "non-contact": Point(),  # FIXME
+    "flat": Point(),  # FIXME
+    "deep": Point(),  # FIXME
+    "round-bottom": Point(),  # FIXME
 }
 
 PROBE_MOUNT = types.OT3Mount.LEFT
@@ -75,10 +75,16 @@ ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
     sensor_threshold_pf=0.5,
 )
 LABWARE_PROBE_CORNER_TOP_LEFT_XY = {
-    "plate": Point(x=7, y=-7),
-    "tiprack": Point(x=7, y=-7),
-    "reservoir": Point(x=7, y=-5),
+    "plate": Point(x=5, y=-5),
+    "tiprack": Point(x=11.5, y=-9.2),
+    "reservoir": Point(x=9.5, y=-6.3),
 }
+
+# dict holding all the probed corner Z heights
+# - slot
+#   - deck-item
+#     - labware
+#       - List of Z heights relative to deck
 MEASURED_CORNERS: Dict[int, Dict[str, Dict[str, List[List[float]]]]] = {
     slot: {
         deck_item: {labware_key: list() for labware_key in LABWARE_KEYS}
