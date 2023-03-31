@@ -114,7 +114,7 @@ def _record_axis_data(type: str, write_cb: Callable,estimate: Dict[OT3Axis, floa
     write_cb([type,bool_to_string(aligned)])
 
 def _record_motion_check_data(type: str, write_cb: Callable, speed:float, acceleration:float, cycles:int, pass_count:int, fail_count:int) -> None:
-    write_cb([type] + ['Speed'] + [speed] + ['Acceleration'] + [acceleration] + ['Run Cycles'] + [cycles] + ['Pass Count'] + [pass_count] + ['Fail Count'] + [fail_count])
+    write_cb([type] + ['Speed'] + [speed] + ['Acceleration'] + [acceleration] + ['Run Cycle'] + [cycles] + ['Pass Count'] + [pass_count] + ['Fail Count'] + [fail_count])
 
 def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
@@ -176,8 +176,12 @@ async def _run_mount_up_down(api: OT3API, is_simulating: bool, mount: types.OT3M
     for pos in mount_up_down_points:
         es,en,al = await _move_and_check(api,is_simulating,mount,pos)
         if record_bool:
-            _record_axis_data('Mount_up_down',write_cb,es,en,al)
-            print(f'mounts results: {al}')
+            if mount is types.OT3Mount.LEFT:
+                mount_type = 'Left' 
+            else:
+                mount_type = 'Right'
+            _record_axis_data('Mount_up_down-{mount_type}',write_cb,es,en,al)
+            print(f'mounts-{mount_type} results: {al}')
     if pass_count == len(mount_up_down_points):
         return True
     else:
@@ -191,9 +195,9 @@ async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, w
         es,en,al = await _move_and_check(api,is_simulating,mount,p)
         if record_bool:
             _record_axis_data('Bowtie',write_cb,es,en,al)
+            print(f'bowtie results: {al}')
         if al:
             pass_count += 1
-            print(f'bowtie results: {al}')
     if pass_count == len(bowtie_points):
         return True
     else:
@@ -312,7 +316,7 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
                 else:
                     fail_count+=1
                 print(f'Run mount up and down cycle: {i}, results: {res}, pass count: {pass_count}, fail count: {fail_count}')
-        _record_motion_check_data('z_motion',write_cb,setting[OT3Axis.Z_L].max_speed,setting[OT3Axis.Z_L].acceleration,arguments.cycles,pass_count,fail_count)
+            _record_motion_check_data('z_motion',write_cb,setting[OT3Axis.Z_L].max_speed,setting[OT3Axis.Z_L].acceleration,i+1,pass_count,fail_count)
 
 async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run xy motion check...')
@@ -329,7 +333,7 @@ async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: type
             else:
                 fail_count+=1
             print(f'Run bowtie cycle: {i}, results: {res}, pass count: {pass_count}, fail count: {fail_count}')
-        _record_motion_check_data('xy_motion',write_cb,setting[OT3Axis.X].max_speed,setting[OT3Axis.X].acceleration,arguments.cycles,pass_count,fail_count)
+            _record_motion_check_data('xy_motion',write_cb,setting[OT3Axis.X].max_speed,setting[OT3Axis.X].acceleration,i+1,pass_count,fail_count)
 
 
 async def _main(arguments: argparse.Namespace) -> None:
@@ -357,6 +361,8 @@ async def _main(arguments: argparse.Namespace) -> None:
         await _run_xy_motion(arguments,api,mount,csv_cb.write)
     if arguments.z_motion:
         await _run_z_motion(arguments,api,mount,csv_cb.write)
+    # set the default config
+    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, DEFAULT_AXIS_SETTINGS)
     for i in range(arguments.cycles):
             csv_cb.write(["--------"])
             csv_cb.write(["run-cycle", i+1])
