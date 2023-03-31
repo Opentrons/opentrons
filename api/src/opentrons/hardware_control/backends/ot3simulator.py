@@ -635,5 +635,5 @@ class OT3Simulator:
         """Connect to rear panel over usb."""
         return None
 
-    def status_bar_controller(self) -> status_bar.StatusBar:
+    def status_bar_interface(self) -> status_bar.StatusBar:
         return status_bar.StatusBar(None)

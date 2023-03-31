@@ -1231,5 +1231,5 @@ class OT3Controller:
                 ),
             )
 
-    def status_bar_controller(self) -> status_bar.StatusBar:
+    def status_bar_interface(self) -> status_bar.StatusBar:
         return self._status_bar
