@@ -10,21 +10,21 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v6.3.0 release of the OT-2 software!
 
-### New Features
-
-- The number of protocols and runs stored on the robot can now be set with environment variables.
-- Protocols can declare what type of robot they're designed to run on, and analysis reports this information if present. 
-- The new `/instruments` endpoint lists instruments of all types attached to a robot.
-- You can now specify a custom location for dropping tips into tip-rack wells.
-
 ### Improved Features
 
 - The `/calibrations` endpoint now accepts `DELETE` requests.
 
 ### Bug Fixes
 
+- Fixed a problem where labware offsets would sometimes be ignored for labware atop a Temperature Module.
 - Calls to the `/commands` endpoint with `waitUntilComplete=true` no longer time out after 30 seconds if you don't specify a timeout interval.
 - Fixed improper pagination and cursor placement for the `/commands` endpoint.
+
+### Known Issues
+
+- Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
+    - JSON protocols created or modified with Protocol Designer v6.0.0 or higher
+    - Python protocols specifying an `apiLevel` of 2.14
 
 ---
 ## OT-2 Software Changes in 6.2.1
