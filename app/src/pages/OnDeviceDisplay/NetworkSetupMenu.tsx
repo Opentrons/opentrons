@@ -22,24 +22,18 @@ import type { IconName } from '@opentrons/components'
 
 const NetworkSetupOptions = [
   {
-    cardWidth: '19rem',
-    cardHeight: '21.875rem',
     title: 'wifi',
     iconName: 'wifi' as IconName,
     description: 'connection_description',
     destinationPath: '/network-setup/wifi',
   },
   {
-    cardWidth: '19rem',
-    cardHeight: '21.875rem',
     title: 'ethernet',
     iconName: 'ethernet' as IconName,
     description: 'connection_description',
     destinationPath: '/network-setup/ethernet',
   },
   {
-    cardWidth: '19rem',
-    cardHeight: '21.875rem',
     title: 'usb',
     iconName: 'usb' as IconName,
     description: 'connection_description',

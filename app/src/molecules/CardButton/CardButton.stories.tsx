@@ -29,8 +29,6 @@ const Template: Story<React.ComponentProps<typeof CardButton>> = args => (
 
 export const Primary = Template.bind({})
 Primary.args = {
-  cardWidth: '15.375rem',
-  cardHeight: '17rem',
   title: 'Header',
   iconName: 'wifi',
   description: 'Subtext.',
