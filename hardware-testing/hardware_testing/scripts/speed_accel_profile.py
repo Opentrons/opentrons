@@ -68,40 +68,40 @@ TEST_PARAMETERS = {
     GantryLoad.LOW_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 475,
-                'MAX': 525,
-                'INC': 25},
+                'MIN': 450,
+                'MAX': 800,
+                'INC': 50},
             'ACCEL': {
-                'MIN': 950,
-                'MAX': 1050,
-                'INC': 50}},
+                'MIN': 800,
+                'MAX': 3000,
+                'INC': 200}},
         'Y': {
             'SPEED': {
-                'MIN': 275,
-                'MAX': 350,
-                'INC': 25},
+                'MIN': 450,
+                'MAX': 800,
+                'INC': 50},
             'ACCEL': {
-                'MIN': 950,
-                'MAX': 1050,
-                'INC': 50}},
+                'MIN': 800,
+                'MAX': 2200,
+                'INC': 200}},
         'L': {
             'SPEED': {
-                'MIN': 90,
-                'MAX': 110,
+                'MIN': 40,
+                'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 250,
-                'MAX': 350,
-                'INC': 50}},
+                'MIN': 100,
+                'MAX': 900,
+                'INC': 200}},
         'R': {
             'SPEED': {
-                'MIN': 90,
-                'MAX': 110,
+                'MIN': 40,
+                'MAX': 140,
                 'INC': 10},
             'ACCEL': {
-                'MIN': 250,
-                'MAX': 350,
-                'INC': 50}}
+                'MIN': 100,
+                'MAX': 900,
+                'INC': 200}}
     },
     # GantryLoad.TWO_LOW_THROUGHPUT: {
     #     'X': {
@@ -144,31 +144,31 @@ TEST_PARAMETERS = {
     GantryLoad.HIGH_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 475,
-                'MAX': 525,
-                'INC': 25},
+                'MIN': 350,
+                'MAX': 500,
+                'INC': 50},
             'ACCEL': {
-                'MIN': 950,
-                'MAX': 1050,
-                'INC': 50}},
+                'MIN': 600,
+                'MAX': 1000,
+                'INC': 200}},
         'Y': {
             'SPEED': {
                 'MIN': 275,
-                'MAX': 350,
+                'MAX': 475,
                 'INC': 25},
             'ACCEL': {
-                'MIN': 950,
-                'MAX': 1050,
+                'MIN': 700,
+                'MAX': 1200,
                 'INC': 50}},
         'L': {
             'SPEED': {
-                'MIN': 30,
-                'MAX': 40,
-                'INC': 5},
-            'ACCEL': {
-                'MIN': 140,
+                'MIN': 40,
                 'MAX': 140,
-                'INC': 20}},
+                'INC': 10},
+            'ACCEL': {
+                'MIN': 100,
+                'MAX': 900,
+                'INC': 200}},
         'R': {
             'SPEED': {
                 'MIN': 30,

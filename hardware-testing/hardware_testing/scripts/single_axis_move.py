@@ -30,7 +30,7 @@ SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
         max_speed=SPEED_X,
         acceleration=1000,
-        max_start_stop_speed=20,
+        max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=1.5,
         run_current=1.5,
@@ -38,7 +38,7 @@ SETTINGS = {
     OT3Axis.Y: GantryLoadSettings(
         max_speed=SPEED_Y,
         acceleration=ACCEL_Y,
-        max_start_stop_speed=20,
+        max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=1.5,
         run_current=1.5,
@@ -69,7 +69,8 @@ AXIS_MAP = {'Y': OT3Axis.Y,
                 'PR': OT3Axis.P_R}
 
 step_x = 530
-step_y = 400
+#step_y = 400
+step_y = 250
 step_z = 210
 POINT_MAP = {'Y': Point(y=step_y),
              'X': Point(x=step_x),
@@ -88,6 +89,7 @@ async def _single_axis_move(api: OT3API, cycles: int = 1) -> None:
         else:
             MOUNT = MOUNT = OT3Mount.LEFT
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[AXIS], speed=AXIS_SPEED)
+        input()
         await api.move_rel(mount=MOUNT, delta=POINT_MAP[AXIS], speed=AXIS_SPEED)
 
 
@@ -97,7 +99,7 @@ async def _main(is_simulating: bool) -> None:
         await set_gantry_load_per_axis_settings_ot3(api,
                                         SETTINGS,
                                         load=None)
-        await api.home([AXIS_MAP[AXIS]])
+        #await api.home([AXIS_MAP[AXIS]])
         await _single_axis_move(api, cycles=CYCLES)
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
@@ -107,7 +109,7 @@ async def _main(is_simulating: bool) -> None:
 
 
 if __name__ == "__main__":
-    print('2')
+    print('3')
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--axis", type=str, default='Y')
