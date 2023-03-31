@@ -49,10 +49,15 @@ const CARD_BUTTON_STYLE = css`
 `
 
 interface CardButtonProps {
+  /**  Header text should be less than 2 words.  */
   title: string
+  /**  set an Icon */
   iconName: IconName
+  /**  Subtext should be less than 3 lines.  */
   description: string
+  /**  The path when clicking a card button */
   destinationPath: string
+  /**  make button enabled/disabled */
   disabled?: boolean
 }
 

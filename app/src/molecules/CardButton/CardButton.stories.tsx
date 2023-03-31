@@ -32,5 +32,6 @@ Primary.args = {
   title: 'Header',
   iconName: 'wifi',
   description: 'Subtext.',
-  distPath: '/app-molecules-cardbutton--primary',
+  destinationPath: '/app-molecules-cardbutton--primary',
+  disabled: false,
 }
