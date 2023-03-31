@@ -2,7 +2,7 @@
 import argparse
 import asyncio
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Any, Dict
+from typing import Optional, List, Any, Dict
 
 from opentrons.config.defaults_ot3 import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
@@ -415,15 +415,13 @@ async def _main(
 
 
 def _gather_and_test_slots(args: Any) -> GripperSlotStates:
-    """
-    This function checks to make sure that the slots and module
-    positions passed in by the script caller as arguments do not
-    conflict with each other. Eg: no modules overlap on a
-    slot, or no non-module slots are specified where a module is
-    also specified, etc.
-
-    An error will be raised if slots/modules have a conflict.
-    """
+    # This function checks to make sure that the slots and module
+    # positions passed in by the script caller as arguments do not
+    # conflict with each other. Eg: no modules overlap on a
+    # slot, or no non-module slots are specified where a module is
+    # also specified, etc.
+    #
+    # An error will be raised if slots/modules have a conflict.
 
     def _slot_array_from_args(a: Any) -> List[int]:
         if a:
