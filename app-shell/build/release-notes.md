@@ -30,7 +30,6 @@ Welcome to the v6.3.0 release of the Opentrons App!
 
 ### Bug Fixes
 
-- Labware Position Check will use a tip rack in a different slot if slot 2 is blocked by a Heater-Shaker in slot 1 or 3.
 - Loading the module controls before starting a protocol no longer resets the state of the Heater-Shaker.
 
 ### Known Issues
