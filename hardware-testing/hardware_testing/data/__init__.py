@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from subprocess import check_output
 from time import time
-from typing import Tuple, Optional, List
+from typing import Tuple
 
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 
@@ -24,12 +24,12 @@ def _build_git_description_string() -> str:
     return desc_str
 
 
-def get_git_description() -> Optional[str]:
+def get_git_description() -> str:
     """Get git description file."""
     if IS_ROBOT:
         file_path = infer_config_base_dir() / GIT_DESCRIBE_NAME
         if not file_path.exists():
-            return None
+            return "unknown"
         with open(file_path, "r") as f:
             return f.read().strip()
     else:

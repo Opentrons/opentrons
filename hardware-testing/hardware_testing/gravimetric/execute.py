@@ -283,6 +283,13 @@ def _run_trial(
     return volume_aspirate, volume_dispense
 
 
+def _get_operator_name(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("OPERATOR name:").strip()
+    else:
+        return "simulation"
+
+
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
@@ -342,10 +349,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
     test_report.set_tag(pipette_tag)
-    if not ctx.is_simulating():
-        test_report.set_operator(input("OPERATOR name:").strip())
-    else:
-        test_report.set_operator("simulation")
+    test_report.set_operator(_get_operator_name(ctx.is_simulating()))
     test_report.set_version(get_git_description())
     report.store_serial_numbers(
         test_report,
