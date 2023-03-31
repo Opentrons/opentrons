@@ -16,7 +16,6 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 from hardware_testing.data import ui
 
-\
 
 GANTRY_AXES = [types.OT3Axis.X, types.OT3Axis.Y, types.OT3Axis.Z_L, types.OT3Axis.Z_R]
 MOUNT_AXES = [types.OT3Mount.LEFT, types.OT3Mount.RIGHT]
@@ -113,6 +112,9 @@ def _record_axis_data(type: str, write_cb: Callable,estimate: Dict[OT3Axis, floa
     write_cb([type] + [estimate[ax] for ax in estimate])
     write_cb([type] + [encoder[ax] for ax in estimate.keys()])
     write_cb([type,bool_to_string(aligned)])
+
+def _record_motion_check_data(type: str, write_cb: Callable, speed:float, acceleration:float, cycles:int, pass_count:int, fail_count:int) -> None:
+    write_cb([type] + ['Speed'] + [speed] + ['Acceleration'] + [acceleration] + ['Run Cycles'] + [cycles] + ['Pass Count'] + [pass_count] + ['Fail Count'] + [fail_count])
 
 def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
@@ -298,13 +300,13 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
     ui.print_header('Run z motion check...')
     Z_AXIS_SETTINGS = _creat_z_axis_settings(arguments)
     for setting in Z_AXIS_SETTINGS:
-        print(f'Run speed={setting[types.OT3Axis.Z_L].max_speed}, acceleration={setting[types.OT3Axis.Z_L].acceleration}')
+        print(f'Run speed={setting[OT3Axis.Z_L].max_speed}, acceleration={setting[OT3Axis.Z_L].acceleration}')
         await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
         fail_count = 0
         pass_count = 0
         for i in range(arguments.cycles):
             for mount in MOUNT_AXES:
-                res = await _run_mount_up_down(api,arguments.simulate,mount,write_cb,True)
+                res = await _run_mount_up_down(api,arguments.simulate,mount,write_cb,False)
                 if res:
                     pass_count+=1
                 else:
@@ -315,12 +317,12 @@ async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: type
     ui.print_header('Run xy motion check...')
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
     for setting in XY_AXIS_SETTINGS:
-        print(f'Run speed={setting[types.OT3Axis.X].max_speed}, acceleration={setting[types.OT3Axis.X].acceleration}')
+        print(f'Run speed={setting[OT3Axis.X].max_speed}, acceleration={setting[OT3Axis.X].acceleration}')
         await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
         fail_count = 0
         pass_count = 0
         for i in range(arguments.cycles):
-            res = await _run_bowtie(api,arguments.simulate,mount,write_cb,True)
+            res = await _run_bowtie(api,arguments.simulate,mount,write_cb,False)
             if res:
                 pass_count+=1
             else:
