@@ -7,15 +7,17 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../text'
-import { Toast } from './index'
+import { DesktopToast } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Toast',
-  component: Toast,
+  component: DesktopToast,
 } as Meta
 
-const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
+const TemplateWithTimeout: Story<
+  React.ComponentProps<typeof DesktopToast>
+> = args => {
   const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
 
   const handleClick = (): void => {
@@ -33,7 +35,9 @@ const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
           <StyledText as="p">After 5 sec, the Toast will disappear</StyledText>
         </Flex>
       </Flex>
-      {isShowToast && <Toast {...args} onClose={() => setIsShowToast(false)} />}
+      {isShowToast && (
+        <DesktopToast {...args} onClose={() => setIsShowToast(false)} />
+      )}
     </>
   )
 }
@@ -63,7 +67,7 @@ Info.args = {
 }
 
 const TemplateWithoutTimeout: Story<
-  React.ComponentProps<typeof Toast>
+  React.ComponentProps<typeof DesktopToast>
 > = args => {
   const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
 
@@ -84,7 +88,7 @@ const TemplateWithoutTimeout: Story<
           </StyledText>
         </Flex>
       </Flex>
-      {isShowToast && <Toast {...args} />}
+      {isShowToast && <DesktopToast {...args} />}
     </>
   )
 }

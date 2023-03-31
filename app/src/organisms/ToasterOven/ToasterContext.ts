@@ -1,20 +1,14 @@
 import * as React from 'react'
 
 import type { ToastProps, ToastType } from '../../atoms/Toast'
-import type {
-  ODDToastProps,
-  ODDToastType,
-} from '../../atoms/Toast/OnDeviceDisplay/ODDToast'
 import type { SnackbarProps } from '../../atoms/Snackbar'
 
 export type MakeToastOptions = Omit<ToastProps, 'id' | 'message' | 'type'>
 
-export type MakeTODDoastOptions = Omit<ODDToastProps, 'id' | 'message' | 'type'>
-
 type MakeToast = (
   message: string,
-  type: ToastType | ODDToastType,
-  options?: MakeToastOptions | MakeTODDoastOptions
+  type: ToastType,
+  options?: MakeToastOptions
 ) => string
 
 type EatToast = (toastId: string) => void

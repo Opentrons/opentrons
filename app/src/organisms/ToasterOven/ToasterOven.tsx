@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
@@ -14,16 +13,10 @@ import {
 
 import { Snackbar } from '../../atoms/Snackbar'
 import { Toast } from '../../atoms/Toast'
-import { ODDToast } from '../../atoms/Toast/OnDeviceDisplay/ODDToast'
-import { getIsOnDevice } from '../../redux/config'
 import { ToasterContext } from './ToasterContext'
 
 import type { SnackbarProps } from '../../atoms/Snackbar'
 import type { ToastProps, ToastType } from '../../atoms/Toast'
-import type {
-  ODDToastProps,
-  ODDToastType,
-} from '../../atoms/Toast/OnDeviceDisplay/ODDToast'
 import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 
 interface ToasterOvenProps {
@@ -38,11 +31,8 @@ const TOASTER_OVEN_SIZE = 5
  * @returns
  */
 export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
-  const [toasts, setToasts] = React.useState<Array<ToastProps | ODDToastProps>>(
-    []
-  )
+  const [toasts, setToasts] = React.useState<ToastProps[]>([])
   const [snackbar, setSnackbar] = React.useState<SnackbarProps | null>(null)
-  const isOnDevice = useSelector(getIsOnDevice)
 
   /**
    * makes toast, rendering it in the toaster oven display container
@@ -53,7 +43,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
    */
   function makeToast(
     message: string,
-    type: ToastType | ODDToastType,
+    type: ToastType,
     options?: MakeToastOptions
   ): string {
     const id = uuidv4()
@@ -90,27 +80,14 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           zIndex={1000}
         >
           {toasts.map(toast => (
-            <>
-              {isOnDevice != null && isOnDevice ? (
-                <ODDToast
-                  {...(toast as ODDToastProps)}
-                  key={toast.id}
-                  onClose={() => {
-                    toast.onClose?.()
-                    eatToast(toast.id)
-                  }}
-                />
-              ) : (
-                <Toast
-                  {...(toast as ToastProps)}
-                  key={toast.id}
-                  onClose={() => {
-                    toast.onClose?.()
-                    eatToast(toast.id)
-                  }}
-                />
-              )}
-            </>
+            <Toast
+              {...toast}
+              key={toast.id}
+              onClose={() => {
+                toast.onClose?.()
+                eatToast(toast.id)
+              }}
+            />
           ))}
         </Flex>
       ) : null}

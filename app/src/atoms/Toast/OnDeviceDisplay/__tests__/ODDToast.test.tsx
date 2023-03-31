@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { ODDToast } from '../ODDToast'
+import { ODDToast } from '../..'
 
 const render = (props: React.ComponentProps<typeof ODDToast>) => {
   return renderWithProviders(<ODDToast {...props} />)[0]
@@ -13,8 +13,9 @@ describe('Toast', () => {
     props = {
       id: '1',
       message: 'test message',
-      secondaryText: 'secondary message',
+      heading: 'heading message',
       type: 'success',
+      closeButton: true,
       buttonText: 'Close',
       onClose: jest.fn(),
     }
@@ -26,14 +27,15 @@ describe('Toast', () => {
   it('renders correct message', () => {
     const { getByText } = render(props)
     getByText('test message')
-    getByText('secondary message')
+    getByText('heading message')
   })
-  it('truncates secondary message whern too long', () => {
+  it('truncates heading message whern too long', () => {
     props = {
       id: '1',
       message: 'test message',
-      secondaryText: 'Super-long-protocol-file-name-that-the-user-made.py',
+      heading: 'Super-long-protocol-file-name-that-the-user-made.py',
       type: 'success',
+      closeButton: true,
       buttonText: 'Close',
       onClose: jest.fn(),
     }
@@ -51,7 +53,7 @@ describe('Toast', () => {
       id: '1',
       message: 'test message',
       type: 'success',
-      buttonText: undefined,
+      closeButton: false,
       onClose: jest.fn(),
     }
     const { queryByRole } = render(props)

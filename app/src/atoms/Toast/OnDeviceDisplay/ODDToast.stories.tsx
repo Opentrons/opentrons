@@ -9,7 +9,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
-import { ODDToast } from './ODDToast'
+import { ODDToast } from '..'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
@@ -65,8 +65,9 @@ export const SuccessWithSecondaryMessageAndCloseButton = TemplateWithTimeout.bin
 )
 SuccessWithSecondaryMessageAndCloseButton.args = {
   buttonText: 'Button text',
+  closeButton: true,
   message: 'Toast message',
-  secondaryText: 'Optional secondary',
+  heading: 'Optional secondary',
   type: 'success',
 }
 
@@ -124,8 +125,9 @@ export const SuccessWithSecondaryMessageAndCloseButtonWithoutTimeout = TemplateW
 )
 SuccessWithSecondaryMessageAndCloseButtonWithoutTimeout.args = {
   buttonText: 'Button text',
+  closeButton: true,
   message: 'Toast message',
-  secondaryText: 'Optional secondary',
+  heading: 'Optional secondary',
   type: 'success',
   disableTimeout: true,
 }
@@ -142,8 +144,9 @@ export const SuperLongSecondaryAndCloseButtonWithoutTimeout = TemplateWithTimeou
 )
 SuperLongSecondaryAndCloseButtonWithoutTimeout.args = {
   buttonText: 'Close',
+  closeButton: true,
   message: 'Successfully received',
-  secondaryText: 'Super-long-protocol-file-name-that-the-user-made.py',
+  heading: 'Super-long-protocol-file-name-that-the-user-made.py',
   type: 'success',
-  disableTimeout: false,
+  disableTimeout: true,
 }
