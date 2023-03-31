@@ -18,7 +18,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.persistence import (
-    SerializedPydantic,
+    SerializedPydanticModel,
     pydantic_to_sql,
     sql_to_pydantic,
     analysis_table,
@@ -303,7 +303,7 @@ class _CompletedAnalysisResource:
         Avoid calling this from inside a SQL transaction, since it might be slow.
         """
 
-        def serialize_completed_analysis() -> SerializedPydantic:
+        def serialize_completed_analysis() -> SerializedPydanticModel:
             return pydantic_to_sql(value=self.completed_analysis)
 
         serialized_completed_analysis = await anyio.to_thread.run_sync(
