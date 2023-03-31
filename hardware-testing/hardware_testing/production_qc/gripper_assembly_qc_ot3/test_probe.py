@@ -1,14 +1,17 @@
 """Test Probe."""
 from typing import List, Union, Tuple
 
-from hardware_testing.data import ui
+
 from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.sensors import sensor_driver, sensor_types
+
+from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
-from opentrons_hardware.sensors import sensor_driver, sensor_types
 from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
 
 
+from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -135,8 +138,19 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
         # move to 5 mm above the deck
         await api.move_to(mount, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
+        z_ax = OT3Axis.by_mount(mount)
+        # NOTE: currently there's an issue where the 1st time an instrument
+        #       probes, it won't trigger when contacting the deck. However all
+        #       following probes work fine. So, here we do a "fake" probe
+        #       in case this gripper was just turned on
+        await api.capacitive_probe(mount, z_ax, PROBE_PREP_HEIGHT_MM, CapacitivePassSettings(
+            prep_distance_mm=0.0,
+            max_overrun_distance_mm=1.0,
+            speed_mm_per_s=2.0,
+            sensor_threshold_pf=0.1,
+        ))
         found_pos = await api.capacitive_probe(
-            mount, OT3Axis.by_mount(mount), probe_pos.z, pass_settings
+            mount, z_ax, probe_pos.z, pass_settings
         )
         print(f"Found deck height: {found_pos}")
 
