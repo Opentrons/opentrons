@@ -177,7 +177,7 @@ async def _run_mount_up_down(api: OT3API, is_simulating: bool, mount: types.OT3M
         es,en,al = await _move_and_check(api,is_simulating,mount,pos)
         if record_bool:
             _record_axis_data('Mount_up_down',write_cb,es,en,al)
-        print(f'mounts results: {al}')
+            print(f'mounts results: {al}')
     if pass_count == len(mount_up_down_points):
         return True
     else:
@@ -193,7 +193,7 @@ async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, w
             _record_axis_data('Bowtie',write_cb,es,en,al)
         if al:
             pass_count += 1
-        print(f'bowtie results: {al}')
+            print(f'bowtie results: {al}')
     if pass_count == len(bowtie_points):
         return True
     else:
@@ -312,7 +312,7 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
                 else:
                     fail_count+=1
                 print(f'Run mount up and down cycle: {i}, results: {res}, pass count: {pass_count}, fail count: {fail_count}')
-    _record_motion_check_data('z_motion',write_cb,setting[OT3Axis.Z_L].max_speed,setting[OT3Axis.Z_L].acceleration,arguments.cycles,pass_count,fail_count)
+        _record_motion_check_data('z_motion',write_cb,setting[OT3Axis.Z_L].max_speed,setting[OT3Axis.Z_L].acceleration,arguments.cycles,pass_count,fail_count)
 
 async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run xy motion check...')
@@ -329,7 +329,7 @@ async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: type
             else:
                 fail_count+=1
             print(f'Run bowtie cycle: {i}, results: {res}, pass count: {pass_count}, fail count: {fail_count}')
-    _record_motion_check_data('xy_motion',write_cb,setting[OT3Axis.X].max_speed,setting[OT3Axis.X].acceleration,arguments.cycles,pass_count,fail_count)
+        _record_motion_check_data('xy_motion',write_cb,setting[OT3Axis.X].max_speed,setting[OT3Axis.X].acceleration,arguments.cycles,pass_count,fail_count)
 
 
 async def _main(arguments: argparse.Namespace) -> None:
@@ -359,7 +359,7 @@ async def _main(arguments: argparse.Namespace) -> None:
         await _run_z_motion(arguments,api,mount,csv_cb.write)
     for i in range(arguments.cycles):
             csv_cb.write(["--------"])
-            csv_cb.write(["run-cycle", i])
+            csv_cb.write(["run-cycle", i+1])
             print(f"Cycle {i + 1}/{arguments.cycles}")
             if not arguments.skip_bowtie:
                 await _run_bowtie(api,arguments.simulate,mount,csv_cb.write)
@@ -379,8 +379,8 @@ async def _main(arguments: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--cycles", type=int, default=1)
-    parser.add_argument("--operator", type=str, required=True)
+    parser.add_argument("--cycles", type=int, default=2)
+    parser.add_argument("--operator", type=str, default='operator')
     parser.add_argument("--sn", type=str, required=True)
     parser.add_argument("--skip_bowtie", action="store_true")
     parser.add_argument("--skip_hourglass", action="store_true")
