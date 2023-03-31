@@ -68,6 +68,11 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
             <Trans
               t={t}
               i18nKey={'level_the_pipette'}
+              values={{
+                slot: mount === 'left' ? '3' : '1',
+                side: pipetteModelName === 'p20_mutli_gen2' ? 'short' : 'tall',
+                direction: mount,
+              }}
               components={{
                 strong: (
                   <strong
