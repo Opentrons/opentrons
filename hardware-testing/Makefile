@@ -134,10 +134,9 @@ cleanup || cleanup"
 endef
 
 .PHONY: push-description-ot3
-push-version-ot3:
-	$(eval GIT_DESCRIPTION=$(shell git describe))
-	echo $(GIT_DESCRIPTION)
-	$(call create-description-file-ot3, $(host), $(GIT_DESCRIPTION))
+push-description-ot3:
+	$(eval FILE_PATH=$(python) -m hardware_testing.data --create-description-file)
+	echo $(FILE_PATH)
 
 .PHONY: restart
 restart:

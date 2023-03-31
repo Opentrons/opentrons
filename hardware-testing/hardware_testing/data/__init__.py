@@ -4,22 +4,44 @@ import os
 from pathlib import Path
 from subprocess import check_output
 from time import time
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 
+GIT_DESCRIBE_NAME = ".hardware-testing-description"
+
+
+def _git(*args: str) -> str:
+    return check_output(["git"] + list(args)).decode("utf-8").strip()
+
+
+def _build_git_description_string() -> str:
+    if IS_ROBOT:
+        raise RuntimeError("unable to run git describe on robot")
+    description = _git("describe")
+    mods = _git("ls-files", "-m")
+    return f"{description} {mods}"
+
 
 def get_git_description() -> Optional[str]:
-    """Get commit hash."""
+    """Get git description file."""
     if IS_ROBOT:
-        hash_file_path = infer_config_base_dir() / ".hardware-testing-description"
-        if not hash_file_path.exists():
+        file_path = infer_config_base_dir() / GIT_DESCRIBE_NAME
+        if not file_path.exists():
             return None
-        with open(hash_file_path, "r") as f:
+        with open(file_path, "r") as f:
             return f.read().strip()
     else:
-        description = check_output(["git", "describe"])
-        return description.decode('utf-8').strip()
+        return _build_git_description_string()
+
+
+def create_git_description_file() -> str:
+    """Create git description file."""
+    contents = _build_git_description_string()
+    file_path = infer_config_base_dir() / GIT_DESCRIBE_NAME
+    with open(infer_config_base_dir() / GIT_DESCRIBE_NAME, "w+") as f:
+        f.write(contents)
+    return str(file_path)
 
 
 def get_testing_data_directory() -> Path:
@@ -98,3 +120,13 @@ def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) ->
     contents.insert(line, data)
     with open(data_path, "w") as f:
         f.write("".join(contents))
+
+
+if __name__ == "__main__":
+    import argparse
+    _parser = argparse.ArgumentParser()
+    _parser.add_argument("--create-description-file", action="store_true")
+    _args = _parser.parse_args()
+    if _args.build_description_file:
+        print(create_git_description_file())
+
