@@ -42,6 +42,7 @@ extensions = [
     'sphinx.ext.imgmath',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
+    'sphinxext.opengraph',
     # todo(mm, 2021-09-30): Remove numpydoc when we're done transitioning to
     # Google-style docstrings. github.com/Opentrons/opentrons/issues/7051
     'numpydoc'
@@ -412,3 +413,10 @@ suppress_warnings = []
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
+
+# -- Options for Opengraph tags -------------------------------------------
+
+ogp_site_url = "https://docs.opentrons.com/v2/"
+ogp_site_name = "Opentrons Python Protocol API"
+ogp_image = "https://opentrons.com/wp-content/uploads/2023/02/PythonAPI.png"
+ogp_description_length = 170
