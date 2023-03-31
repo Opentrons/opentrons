@@ -19,8 +19,9 @@ def _build_git_description_string() -> str:
     if IS_ROBOT:
         raise RuntimeError("unable to run git describe on robot")
     description = _git("describe")
-    mods = _git("ls-files", "-m")
-    return f"{description} {mods}"
+    mods = _git("ls-files", "-m").replace("\n", ", ")
+    desc_str = f"{description} [{mods}]"
+    return desc_str
 
 
 def get_git_description() -> Optional[str]:
@@ -37,9 +38,11 @@ def get_git_description() -> Optional[str]:
 
 def create_git_description_file() -> str:
     """Create git description file."""
+    if IS_ROBOT:
+        raise RuntimeError("unable to create git description file on robot")
     contents = _build_git_description_string()
     file_path = infer_config_base_dir() / GIT_DESCRIBE_NAME
-    with open(infer_config_base_dir() / GIT_DESCRIBE_NAME, "w+") as f:
+    with open(GIT_DESCRIBE_NAME, "w+") as f:
         f.write(contents)
     return str(file_path)
 
@@ -120,13 +123,3 @@ def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) ->
     contents.insert(line, data)
     with open(data_path, "w") as f:
         f.write("".join(contents))
-
-
-if __name__ == "__main__":
-    import argparse
-    _parser = argparse.ArgumentParser()
-    _parser.add_argument("--create-description-file", action="store_true")
-    _args = _parser.parse_args()
-    if _args.build_description_file:
-        print(create_git_description_file())
-

@@ -125,18 +125,10 @@ push-plot-webpage-ot3:
 	scp -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage-ot3,$(host),$(br_ssh_key),$(ssh_opts))
 
-define create-description-file-ot3
-ssh root@$(1) \
-(rm /data/.hardware-testing-description || true) &&\
-touch /data/.hardware-testing-description &&\
-echo -e $(2) >> /data/.hardware-testing-description &&\
-cleanup || cleanup"
-endef
-
 .PHONY: push-description-ot3
 push-description-ot3:
-	$(eval FILE_PATH=$(python) -m hardware_testing.data --create-description-file)
-	echo $(FILE_PATH)
+	$(python) -c "from hardware_testing.data import create_git_description_file; create_git_description_file()"
+	scp ./.hardware-testing-description root@$(host):/data/.hardware-testing-description
 
 .PHONY: restart
 restart:
