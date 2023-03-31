@@ -7,4 +7,4 @@ export const SLEEP_NEVER_MS = 604800000
 // What is the maximum number of protocols one can pin? This many.
 export const MAXIMUM_PINNED_PROTOCOLS = 8
 
-export const ODD_FOCUS_VISIBLE_STYE = `0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus}`
+export const ODD_FOCUS_VISIBLE_STYLE = `0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus}`

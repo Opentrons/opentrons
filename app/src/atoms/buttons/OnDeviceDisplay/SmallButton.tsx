@@ -11,7 +11,7 @@ import {
   Icon,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE_STYE } from '../../../App/constants'
+import { ODD_FOCUS_VISIBLE_STYLE } from '../../../App/constants'
 import { StyledText } from '../../text'
 import type { IconName, StyleProps } from '@opentrons/components'
 
@@ -125,7 +125,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE_STYE};
+      box-shadow: ${ODD_FOCUS_VISIBLE_STYLE};
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
         .defaultBackgroundColor};
     }
@@ -155,8 +155,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         {iconPlacement === 'left' && iconName != null ? (
           <Flex aria-label={`SmallButton_${iconName}_positionLeft`}>
             <Icon
-              width="1.205625rem"
-              height="1.2rem"
+              width="1.75rem"
+              height="1.75rem"
               marginRight="0.77375rem"
               name={iconName}
             />
@@ -173,8 +173,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         {iconPlacement === 'right' && iconName != null ? (
           <Flex aria-label={`SmallButton_${iconName}_positionRight`}>
             <Icon
-              width="1.205625rem"
-              height="1.2rem"
+              width="1.75rem"
+              height="1.75rem"
               marginLeft="0.77375rem"
               name={iconName}
             />
