@@ -43,19 +43,19 @@ TertiaryHighLight.args = {
   buttonText: 'Button text',
 }
 
-export const LeftIconDefault = Template.bind({})
-LeftIconDefault.args = {
+export const StartIconDefault = Template.bind({})
+StartIconDefault.args = {
   buttonType: 'default',
   buttonText: 'Button text',
-  iconPlacement: 'left',
+  iconPlacement: 'startIcon',
   iconName: 'reset',
 }
 
-export const RightIconAlert = Template.bind({})
-RightIconAlert.args = {
+export const EndIconAlert = Template.bind({})
+EndIconAlert.args = {
   buttonType: 'alert',
   buttonText: 'Button text',
-  iconPlacement: 'right',
+  iconPlacement: 'endIcon',
   iconName: 'play-round-corners',
 }
 

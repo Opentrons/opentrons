@@ -89,6 +89,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE_STYLE};
+      background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
+        .defaultBackgroundColor};
     }
     &:active {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]

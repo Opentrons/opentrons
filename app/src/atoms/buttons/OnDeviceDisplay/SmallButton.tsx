@@ -24,7 +24,7 @@ type SmallButtonTypes =
 
 type SmallButtonCategory = 'default' | 'rounded'
 
-type IconPlacement = 'left' | 'right'
+type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
   onClick: () => void
   buttonType: SmallButtonTypes
@@ -152,8 +152,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         flexDirection={DIRECTION_ROW}
         alignItems={TYPOGRAPHY.textAlignCenter}
       >
-        {iconPlacement === 'left' && iconName != null ? (
-          <Flex aria-label={`SmallButton_${iconName}_positionLeft`}>
+        {iconPlacement === 'startIcon' && iconName != null ? (
+          <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
             <Icon
               width="1.75rem"
               height="1.75rem"
@@ -170,8 +170,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         >
           {buttonText}
         </StyledText>
-        {iconPlacement === 'right' && iconName != null ? (
-          <Flex aria-label={`SmallButton_${iconName}_positionRight`}>
+        {iconPlacement === 'endIcon' && iconName != null ? (
+          <Flex aria-label={`SmallButton_${iconName}_positionEnd`}>
             <Icon
               width="1.75rem"
               height="1.75rem"

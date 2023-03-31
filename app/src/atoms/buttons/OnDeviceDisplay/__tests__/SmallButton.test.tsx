@@ -84,22 +84,22 @@ describe('SmallButton', () => {
       `border-radius: ${BORDERS.size_five}`
     )
   })
-  it('renders an icon with left placement', () => {
+  it('renders an icon with start placement', () => {
     props = {
       ...props,
       iconName: 'alert',
-      iconPlacement: 'left',
+      iconPlacement: 'startIcon',
     }
     const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_alert_positionLeft')
+    getByLabelText('SmallButton_alert_positionStart')
   })
-  it('renders an icon with right placement', () => {
+  it('renders an icon with end placement', () => {
     props = {
       ...props,
       iconName: 'alert',
-      iconPlacement: 'right',
+      iconPlacement: 'endIcon',
     }
     const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_alert_positionRight')
+    getByLabelText('SmallButton_alert_positionEnd')
   })
 })
