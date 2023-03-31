@@ -332,7 +332,7 @@ class InstrumentOffsetVector(BaseModel):
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class ModuleOffsetVector(BaseModel):
-    """Module Offset from home position to robot deck."""
+    """Offset, in deck coordinates, from nominal to actual position of labware on a module."""
 
     x: float
     y: float

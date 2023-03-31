@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import inspect
 import pytest
 from decoy import Decoy
-from opentrons.hardware_control.api import API
+from opentrons.hardware_control.api import API as OT2API
 
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
@@ -16,7 +16,6 @@ from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedErro
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
-    LoadedLabware,
     LoadedModule,
     ModuleModel,
     ModuleOffsetVector,
@@ -91,7 +90,7 @@ async def test_calibrate_module_implementation(
 
 @pytest.mark.ot3_only
 async def test_calibrate_module_implementation_wrong_hardware(
-    decoy: Decoy, ot2_hardware_api: API, state_view: StateView
+    decoy: Decoy, ot2_hardware_api: OT2API, state_view: StateView
 ) -> None:
     """Should raise an unsupported hardware error."""
     subject = CalibrateModuleImplementation(
