@@ -17,8 +17,8 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 FAILURE_THRESHOLD_MM = 3
-GAUGE_HEIGHT_MM = 64  # TODO: confirm new blocks are same height
-GRIP_HEIGHT_MM = 50
+GAUGE_HEIGHT_MM = 40
+GRIP_HEIGHT_MM = 30
 TEST_WIDTHS_MM: List[float] = [85.75, 62]
 SLOT_WIDTH_GAUGE: List[int] = [3, 9]
 GRIP_FORCES_NEWTON: List[float] = [5, 15, 20]
