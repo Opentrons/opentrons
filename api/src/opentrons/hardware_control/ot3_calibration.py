@@ -40,9 +40,6 @@ EDGES = {
     "top": Point(*SQUARE_EDGES["top"]),
     "bottom": Point(*SQUARE_EDGES["bottom"]),
 }
-CALIBRATION_MIN_VALID_STRIDE: Final[float] = 0.1
-NON_REPEATABLE_STRIDES: List[float] = [0.0, 3.0]
-REPEATABLE_STRIDES: List[float] = [1.0, 0.25, 0.1, 0.025]
 
 
 class CalibrationMethod(Enum):
