@@ -150,13 +150,10 @@ push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing")
 
 .PHONY: push-ot3
-push-ot3: push-no-restart-ot3 restart-ot3
+push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3
 
 .PHONY: push-all
 push-all: clean wheel push-no-restart push-plot-webpage
-
-.PHONY: push-all-ot3
-push-all-ot3: push-ot3 push-plot-webpage-ot3 push-description-ot3
 
 .PHONY: term
 term:
@@ -199,11 +196,11 @@ endef
 
 .PHONY: sync-sw-ot3
 sync-sw-ot3:
-	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
-	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
-	cd ../shared-data && $(MAKE) all push-no-restart-ot3 host=$(host)
+	cd ../hardware && $(MAKE) push-ot3 host=$(host)
+	cd ../api && $(MAKE) push-ot3 host=$(host)
+	cd ../shared-data && $(MAKE) all push-ot3 host=$(host)
 	cd ../robot-server && $(MAKE) push-ot3 host=$(host)
-	cd ../hardware-testing && $(MAKE) push-all-ot3 host=$(host)
+	cd ../hardware-testing && $(MAKE) push-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:
