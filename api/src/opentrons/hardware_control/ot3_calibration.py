@@ -82,7 +82,7 @@ def _deck_hit(
     to determine whether or not it had hit the deck.
     """
     if found_pos > expected_pos + settings.early_sense_tolerance_mm:
-        raise EarlyCapacitiveSenseTrigger(expected_pos, expected_pos)
+        raise EarlyCapacitiveSenseTrigger(found_pos, expected_pos)
     return (
         True if found_pos >= (expected_pos - settings.overrun_tolerance_mm) else False
     )
