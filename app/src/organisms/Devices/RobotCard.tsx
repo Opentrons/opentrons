@@ -19,7 +19,10 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import OT3_PNG from '../../assets/images/OT3.png'
@@ -35,6 +38,7 @@ import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -135,18 +139,21 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   ) : null
 }
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
-  const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
+  const isOT3 = useIsOT3(props.robotName)
+  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isOT3 })
+  const extensionInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const leftPipetteDisplayName = attachedPipettes?.left?.modelSpecs.displayName
   const rightPipetteDisplayName =
     attachedPipettes?.right?.modelSpecs.displayName
-
-  const isOT3 = useIsOT3(robotName)
-
-  // TODO(bh, 2022-11-1): insert actual gripper data
-  const extensionMountDisplayName = isOT3 ? 'Gripper GEN1' : null
+  const extensionMountDisplayName =
+    extensionInstrument != null &&
+    extensionInstrument.instrumentModel === 'gripperV1'
+      ? getGripperDisplayName(extensionInstrument.instrumentModel)
+      : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data
   // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
@@ -166,26 +173,16 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
         {leftAndRightMountsPipetteDisplayName != null ? (
           <InstrumentContainer
             displayName={leftAndRightMountsPipetteDisplayName}
-            id={`RobotCard_${robotName}_leftAndRightMountsPipette`}
           />
         ) : null}
         {leftPipetteDisplayName != null ? (
-          <InstrumentContainer
-            displayName={leftPipetteDisplayName}
-            id={`RobotCard_${robotName}_leftMountPipette`}
-          />
+          <InstrumentContainer displayName={leftPipetteDisplayName} />
         ) : null}
         {rightPipetteDisplayName != null ? (
-          <InstrumentContainer
-            displayName={rightPipetteDisplayName}
-            id={`RobotCard_${robotName}_rightMountPipette`}
-          />
+          <InstrumentContainer displayName={rightPipetteDisplayName} />
         ) : null}
         {extensionMountDisplayName != null ? (
-          <InstrumentContainer
-            displayName={extensionMountDisplayName}
-            id={`RobotCard_${robotName}_extensionMount`}
-          />
+          <InstrumentContainer displayName={extensionMountDisplayName} />
         ) : null}
       </Flex>
     </Flex>

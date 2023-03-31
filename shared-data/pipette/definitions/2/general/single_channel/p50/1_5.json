@@ -3,6 +3,8 @@
   "displayName": "P50 Single-Channel GEN1",
   "model": "p50",
   "displayCategory": "GEN1",
+  "majorVersion": 1,
+  "minorVersion": 5,
   "pickUpTipConfigurations": {
     "current": 0.1,
     "speed": 30.0,
@@ -17,14 +19,19 @@
     "increment": 0.0,
     "distance": 0.0
   },
-  "plungerMotorConfigurations": { "idle": 0.3, "run": 0.3 },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 0.3
+  },
   "plungerPositionsConfigurations": {
     "top": 19.5,
     "bottom": 2.0,
     "blowout": 0.5,
     "drop": -5.0
   },
-  "availableSensors": { "sensors": [] },
+  "availableSensors": {
+    "sensors": []
+  },
   "partialTipConfigurations": {
     "partialTipSupported": false,
     "availableConfigurations": null
