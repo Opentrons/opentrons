@@ -420,3 +420,4 @@ ogp_site_url = "https://docs.opentrons.com/v2/"
 ogp_site_name = "Opentrons Python Protocol API"
 ogp_image = "https://opentrons.com/wp-content/uploads/2023/02/PythonAPI.png"
 ogp_description_length = 170
+ogp_enable_meta_description = False
