@@ -5,14 +5,39 @@ from typing import List
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import ui
-from hardware_testing.protocols import gravimetric_ot3_p50
-from hardware_testing.protocols import gravimetric_ot3_p1000
+from hardware_testing.protocols import (
+    gravimetric_ot3_p50,
+    gravimetric_ot3_p50_multi_50ul_tip,
+    gravimetric_ot3_p1000,
+    gravimetric_ot3_p1000_multi_50ul_tip,
+    gravimetric_ot3_p1000_multi_200ul_tip,
+    gravimetric_ot3_p1000_multi_1000ul_tip,
+)
 
 from . import execute, helpers, workarounds
 from .config import GravimetricConfig
 
-LABWARE_OFFSETS: List[dict] = list()
-PROTOCOL_CFG = {1000: gravimetric_ot3_p1000, 50: gravimetric_ot3_p50}
+LABWARE_OFFSETS: List[dict] = []
+
+# Keyed by pipette volume, channel count, and tip volume in that order
+PROTOCOL_CFG = {
+    50: {
+        1: {50: gravimetric_ot3_p50},
+        8: {50: gravimetric_ot3_p50_multi_50ul_tip},
+    },
+    1000: {
+        1: {
+            50: gravimetric_ot3_p1000,
+            200: gravimetric_ot3_p1000,
+            1000: gravimetric_ot3_p1000,
+        },
+        8: {
+            50: gravimetric_ot3_p1000_multi_50ul_tip,
+            200: gravimetric_ot3_p1000_multi_200ul_tip,
+            1000: gravimetric_ot3_p1000_multi_1000ul_tip,
+        },
+    },
+}
 
 
 def run(
@@ -31,7 +56,7 @@ def run(
     stable: bool,
 ) -> None:
     """Run."""
-    protocol_cfg = PROTOCOL_CFG[pipette_volume]
+    protocol_cfg = PROTOCOL_CFG[pipette_volume][pipette_channels][tip_volume]
     execute.run(
         protocol,
         GravimetricConfig(
@@ -90,10 +115,10 @@ if __name__ == "__main__":
             print(f"\t\t{offset['definitionUri']}")
             print(f"\t\t{offset['vector']}")
             LABWARE_OFFSETS.append(offset)
+    _protocol = PROTOCOL_CFG[args.pipette][args.channels][args.tip]
     _ctx = helpers.get_api_context(
-        PROTOCOL_CFG[args.pipette].requirements["apiLevel"],  # type: ignore[attr-defined]
+        _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
         is_simulating=args.simulate,
-        pipette_left=f"p{args.pipette}_single_v3.3",
     )
     run(
         _ctx,

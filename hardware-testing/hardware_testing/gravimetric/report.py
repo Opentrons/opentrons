@@ -86,19 +86,25 @@ def create_csv_test_report(
     meas_info = [field.name.replace("_", "-") for field in fields(MeasurementData)]
     meas_vols = [
         (
-            None,
-            t,
+            None,  # volume
+            0,  # channel (hardcoded to 1)
+            trial,
         )
-        for t in range(config.NUM_BLANK_TRIALS)
+        for trial in range(config.NUM_BLANK_TRIALS)
     ]
-    for v in volumes:
+    for vol in volumes:
         meas_vols += [
             (
-                v,  # type: ignore[misc]
-                t,
+                vol,  # type: ignore[misc]
+                channel,
+                trial,
             )
-            for t in range(cfg.trials)
+            for channel in range(cfg.pipette_channels)
+            for trial in range(cfg.trials)
         ]
+
+    # get list of channels 1 indexed prefaced by 'all'
+    channels = ["all"] + list(range(1, cfg.pipette_channels + 1))  # type: ignore[arg-type]
 
     report = CSVReport(
         test_name=cfg.name,
@@ -125,8 +131,9 @@ def create_csv_test_report(
             CSVSection(
                 title="VOLUMES",
                 lines=[
-                    CSVLine(f"volume-{m}-{round(v, 2)}-{i}", [float])
+                    CSVLine(f"volume-{m}-{round(v, 2)}-channel-{c}-{i}", [float])
                     for v in volumes
+                    for c in channels
                     for m in ["aspirate", "dispense"]
                     for i in ["average", "cv", "d"]
                 ],
@@ -134,8 +141,11 @@ def create_csv_test_report(
             CSVSection(
                 title="TRIALS",
                 lines=[
-                    CSVLine(f"trial-{t + 1}-{m}-{round(v, 2)}-ul", [float])
+                    CSVLine(
+                        f"trial-{t + 1}-{m}-{round(v, 2)}-ul-channel-{c + 1}", [float]
+                    )
                     for v in volumes
+                    for c in range(cfg.pipette_channels)
                     for t in range(cfg.trials)
                     for m in ["aspirate", "dispense"]
                 ],
@@ -158,11 +168,15 @@ def create_csv_test_report(
             CSVSection(
                 title="MEASUREMENTS",
                 lines=[
-                    CSVLine(create_measurement_tag(m, v, t) + f"-{i}", [float])
-                    for v, t in meas_vols
-                    for m in MeasurementType
+                    CSVLine(
+                        create_measurement_tag(measurement, volume, channel, trial)
+                        + f"-{i}",
+                        [float],
+                    )
+                    for volume, channel, trial in meas_vols
+                    for measurement in MeasurementType
                     for i in meas_info
-                    if v is not None or t < config.NUM_BLANK_TRIALS
+                    if volume is not None or trial < config.NUM_BLANK_TRIALS
                 ],
             ),
         ],
@@ -191,36 +205,100 @@ def store_serial_numbers(
     report("SERIAL-NUMBERS", "liquid", [liquid])
 
 
-def store_volume(
+def store_volume_all(
     report: CSVReport, mode: str, volume: float, average: float, cv: float, d: float
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
     vol_in_tag = str(round(volume, 2))
-    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-average", [round(average, 2)])
-    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-cv", [round(cv * 100.0, 2)])
-    report("VOLUMES", f"volume-{mode}-{vol_in_tag}-d", [round(d * 100.0, 2)])
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-channel-all-average",
+        [round(average, 2)],
+    )
+    report(
+        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel-all-cv", [round(cv * 100.0, 2)]
+    )
+    report(
+        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel-all-d", [round(d * 100.0, 2)]
+    )
 
 
-def get_volume_results(
+def store_volume_per_channel(
+    report: CSVReport,
+    mode: str,
+    volume: float,
+    channel: int,
+    average: float,
+    cv: float,
+    d: float,
+) -> None:
+    """Report volume."""
+    assert mode in ["aspirate", "dispense"]
+    vol_in_tag = str(round(volume, 2))
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-average",
+        [round(average, 2)],
+    )
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-cv",
+        [round(cv * 100.0, 2)],
+    )
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-d",
+        [round(d * 100.0, 2)],
+    )
+
+
+def get_volume_results_all(
     report: CSVReport, mode: str, volume: float
 ) -> Tuple[float, float, float]:
     """Get volume results."""
     assert mode in ["aspirate", "dispense"]
     vol_in_tag = str(round(volume, 2))
-    average = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-average"]
-    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-cv"]
-    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-d"]
+    average = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-all-average"]
+    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-all-cv"]
+    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-all-d"]
+    return average.data[0], cv.data[0], d.data[0]  # type: ignore[union-attr]
+
+
+def get_volume_results_per_channel(
+    report: CSVReport, mode: str, volume: float, channel: int
+) -> Tuple[float, float, float]:
+    """Get volume results."""
+    assert mode in ["aspirate", "dispense"]
+    vol_in_tag = str(round(volume, 2))
+    average = report["VOLUMES"][
+        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-average"
+    ]
+    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-cv"]
+    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-d"]
     return average.data[0], cv.data[0], d.data[0]  # type: ignore[union-attr]
 
 
 def store_trial(
-    report: CSVReport, trial: int, volume: float, aspirate: float, dispense: float
+    report: CSVReport,
+    trial: int,
+    volume: float,
+    channel: int,
+    aspirate: float,
+    dispense: float,
 ) -> None:
     """Report trial."""
     vol_in_tag = str(round(volume, 2))
-    report("TRIALS", f"trial-{trial + 1}-aspirate-{vol_in_tag}-ul", [aspirate])
-    report("TRIALS", f"trial-{trial + 1}-dispense-{vol_in_tag}-ul", [dispense])
+    report(
+        "TRIALS",
+        f"trial-{trial + 1}-aspirate-{vol_in_tag}-ul-channel-{channel + 1}",
+        [aspirate],
+    )
+    report(
+        "TRIALS",
+        f"trial-{trial + 1}-dispense-{vol_in_tag}-ul-channel-{channel + 1}",
+        [dispense],
+    )
 
 
 def store_average_evaporation(
