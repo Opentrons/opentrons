@@ -19,6 +19,7 @@ Z_AXIS_TRAVEL_DISTANCE = 150.0
 Z_MAX_SKIP_MM = 0.25
 
 SPEEDS_TO_TEST = [25.0, 50.0, 100.0, 200.0]
+MIN_PASS_CURRENT = 0.5
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
     0.2: SPEEDS_TO_TEST,
     0.3: SPEEDS_TO_TEST,
@@ -45,7 +46,10 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
             for dir in ["down", "up"]:
                 for step in ["start", "end"]:
                     tag = _get_test_tag(current, speed, dir, step)
-                    lines.append(CSVLine(tag, [float, float, CSVResult]))
+                    if current < MIN_PASS_CURRENT:
+                        lines.append(CSVLine(tag, [float, float]))
+                    else:
+                        lines.append(CSVLine(tag, [float, float, CSVResult]))
     return lines
 
 
@@ -74,10 +78,14 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     target_pos = target_pos._replace(z=home_pos.z)
     await helpers_ot3.move_to_arched_ot3(api, OT3Mount.GRIPPER, target_pos)
 
-    async def _save_result(tag: str) -> bool:
+    async def _save_result(tag: str, include_pass_fail: bool) -> bool:
         z_est, z_enc, z_aligned = await _is_z_axis_still_aligned_with_encoder(api)
         result = CSVResult.from_bool(z_aligned)
-        report(section, tag, [z_est, z_enc, result])
+        if include_pass_fail:
+            report(section, tag, [z_est, z_enc, result])
+        else:
+            print(f"{tag}: {result}")
+            report(section, tag, [z_est, z_enc])
         return z_aligned
 
     # LOOP THROUGH CURRENTS + SPEEDS
@@ -85,6 +93,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     for current in sorted(currents, reverse=True):
         speeds = CURRENTS_SPEEDS[current]
         for speed in sorted(speeds, reverse=False):
+            include_pass_fail = current >= MIN_PASS_CURRENT
             ui.print_header(f"CURRENT: {current}, SPEED: {speed}")
             # HOME
             print("homing...")
@@ -102,16 +111,26 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             # await api._backend.set_active_current({z_ax: current})
             # MOVE DOWN
             print(f"moving down {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
-            await _save_result(_get_test_tag(current, speed, "down", "start"))
+            await _save_result(
+                _get_test_tag(current, speed, "down", "start"),
+                include_pass_fail=include_pass_fail,
+            )
             await api.move_rel(mount, Point(z=-Z_AXIS_TRAVEL_DISTANCE), speed=speed)
             down_passed = await _save_result(
-                _get_test_tag(current, speed, "down", "end")
+                _get_test_tag(current, speed, "down", "end"),
+                include_pass_fail=include_pass_fail,
             )
             # MOVE UP
             print(f"moving up {Z_AXIS_TRAVEL_DISTANCE} mm at {speed} mm/sec")
-            await _save_result(_get_test_tag(current, speed, "up", "start"))
+            await _save_result(
+                _get_test_tag(current, speed, "up", "start"),
+                include_pass_fail=include_pass_fail,
+            )
             await api.move_rel(mount, Point(z=Z_AXIS_TRAVEL_DISTANCE), speed=speed)
-            up_passed = await _save_result(_get_test_tag(current, speed, "up", "end"))
+            up_passed = await _save_result(
+                _get_test_tag(current, speed, "up", "end"),
+                include_pass_fail=include_pass_fail,
+            )
             # RESET CURRENTS AND HOME
             print("homing...")
             await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(

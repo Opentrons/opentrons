@@ -143,15 +143,18 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         #       probes, it won't trigger when contacting the deck. However all
         #       following probes work fine. So, here we do a "fake" probe
         #       in case this gripper was just turned on
-        await api.capacitive_probe(mount, z_ax, PROBE_PREP_HEIGHT_MM, CapacitivePassSettings(
-            prep_distance_mm=0.0,
-            max_overrun_distance_mm=1.0,
-            speed_mm_per_s=2.0,
-            sensor_threshold_pf=0.1,
-        ))
-        found_pos = await api.capacitive_probe(
-            mount, z_ax, probe_pos.z, pass_settings
+        await api.capacitive_probe(
+            mount,
+            z_ax,
+            PROBE_PREP_HEIGHT_MM,
+            CapacitivePassSettings(
+                prep_distance_mm=0.0,
+                max_overrun_distance_mm=1.0,
+                speed_mm_per_s=2.0,
+                sensor_threshold_pf=0.1,
+            ),
         )
+        found_pos = await api.capacitive_probe(mount, z_ax, probe_pos.z, pass_settings)
         print(f"Found deck height: {found_pos}")
 
         # check against max overrun
