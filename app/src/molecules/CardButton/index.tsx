@@ -79,6 +79,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       />
       <Flex marginTop={SPACING.spacing4}>
         <StyledText
+          as="h4"
           fontSize="1.75rem"
           lineHeight="2.25rem"
           fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
