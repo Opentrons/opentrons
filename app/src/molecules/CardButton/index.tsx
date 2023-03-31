@@ -24,7 +24,7 @@ const CARD_BUTTON_STYLE = css`
   padding: ${SPACING.spacing6};
 
   &:focus {
-    background-color: #99b1d2; // ToDO (kj: 03/28/2023) will be updated when the name is ready
+    background-color: ${COLORS.medBluePressed};
     box-shadow: none;
   }
 
@@ -40,8 +40,7 @@ const CARD_BUTTON_STYLE = css`
   }
 
   &:active {
-    background-color: #99b1d2; // ToDO (kj: 03/28/2023) will be updated when the name is ready
-  }
+    background-color: ${COLORS.medBluePressed};
 
   &:disabled {
     background-color: ${COLORS.darkBlack_twenty};
