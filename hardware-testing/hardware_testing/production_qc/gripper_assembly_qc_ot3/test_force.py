@@ -20,7 +20,7 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 SLOT_FORCE_GAUGE = 4
-GRIP_HEIGHT_MM = 66
+GRIP_HEIGHT_MM = 120
 
 FAILURE_THRESHOLD_PERCENTAGE = 10
 GRIP_FORCES_NEWTON: List[int] = [5, 10, 15, 20]
@@ -133,6 +133,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         ui.get_user_ready("ATTACH the jaw extenders")
         ui.get_user_ready("confirm jaw extenders are pressed down again PADDLES")
     await api.move_to(mount, target_pos)
+    if not api.is_simulator:
+        ui.get_user_ready("jog gripper to align with gauge")
+    await helpers_ot3.jog_mount_ot3(api, mount)
     if not api.is_simulator:
         ui.get_user_ready("prepare to grip")
 
