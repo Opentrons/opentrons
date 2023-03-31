@@ -76,6 +76,11 @@ Choose a continuous chunk of target copy that composes a translatable unit. This
 
 **Note**: If a component utilizes both the `Trans` component and the `useTranslation` hook, be sure to pass the `t` function in as the `t` prop of the `Trans` component. That way the same namespace resolution order is maintained for all translation keys within that component.
 
+3. Does your copy need to be a specific format (e.g. `upperCase`, `capitalize`, `sentenceCase`, `titleCase`)?
+
+   - If yes, use [`useTranslation` hook](https://react.i18next.com/latest/usetranslation-hook) to retrieve the `t` and `i18n` function and specify the format. (e.g. `const { t, i18n } = useTranslation('shared')` `{i18n.format(t('close'), 'upperCase')}`)
+   - If no,when using the `useTranslation` hook, only use the `t` function.
+
 ## Testing
 
 Tests for the Opentrons App are run from the top level along with all other JS project tests.

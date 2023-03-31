@@ -4,7 +4,7 @@ from time import time
 from typing import Union
 
 from hardware_testing.drivers import (
-    find_port,
+    list_ports_and_select,
     RadwagScale,
     SimRadwagScale,
 )
@@ -64,12 +64,7 @@ class Scale:
     @classmethod
     def find_port(cls) -> str:
         """Find port."""
-        vid, pid = RadwagScale.vid_pid()
-        try:
-            return find_port(vid=vid, pid=pid)
-        except RuntimeError:
-            # also try looking for the RS232 USB adapter cable
-            return find_port(vid=1659, pid=8963)
+        return list_ports_and_select(device_name="scale")
 
     @property
     def is_simulator(self) -> bool:

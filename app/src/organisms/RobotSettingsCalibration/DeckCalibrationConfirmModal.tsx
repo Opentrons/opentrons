@@ -7,12 +7,12 @@ import {
   ALIGN_CENTER,
   COLORS,
   TYPOGRAPHY,
+  PrimaryButton,
   SPACING,
   Link,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown

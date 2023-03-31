@@ -12,8 +12,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 const DROP_ZONE_STYLES = css`

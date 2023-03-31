@@ -19,6 +19,7 @@ import {
   useConditionalConfirm,
   JUSTIFY_FLEX_END,
   Btn,
+  AlertPrimaryButton,
   DIRECTION_ROW,
 } from '@opentrons/components'
 
@@ -43,11 +44,7 @@ import {
   OUTDATED,
 } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
-import {
-  AlertPrimaryButton,
-  TertiaryButton,
-  ToggleButton,
-} from '../../atoms/buttons'
+import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 

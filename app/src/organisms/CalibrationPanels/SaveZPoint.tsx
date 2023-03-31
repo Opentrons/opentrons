@@ -8,12 +8,12 @@ import {
   ALIGN_STRETCH,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,

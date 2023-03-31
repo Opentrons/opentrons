@@ -73,12 +73,12 @@ test-cov:
 
 .PHONY: test-gravimetric
 test-gravimetric:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 200 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 50 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --tip 50 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1 --inspect
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --tip 1000 --trials 3 --starting-tip A1 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 200 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 50 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --tip 50 --trials 3 --starting-tip A1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1 --inspect
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1 --increment
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -183,17 +183,13 @@ delete-data-ot3:
 	$(call delete-test-data-cmd,$(host),$(br_ssh_key),$(ssh_opts),$(test))
 
 define push-and-update-fw
-scp -i $(2) $(3) ot3-firmware.tar.gz root@$(1):/data/$(notdir ot3-firmware.tar.gz)
-ssh -i $(2) $(3) root@$(1) \
-"function cleanup () { rm -f /data/$(notdir ot3-firmware.tar.gz) && mount -o remount,ro / ; } ;\
+scp $(2) root@$(1):/tmp
+ssh root@$(1) \
+"function cleanup () { (rm -rf /tmp/$(2) || true) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-cd /opt/opentrons-robot-server &&\
-(rm -rf ot3-firmware || true) && (rm -f ot3-firmware.tar.gz || true) &&\
-mv /data/ot3-firmware.tar.gz /opt/opentrons-robot-server &&\
-tar -xvf ot3-firmware.tar.gz &&\
-ls ./ot3-firmware &&\
-python3 -m hardware_testing.scripts.update_fw_ot3 --folder /opt/opentrons-robot-server/ot3-firmware &&\
-ls ./ot3-firmware && cleanup"
+(unzip -o /tmp/$(2) -d /usr/lib/firmware || cleanup) &&\
+python3 -m json.tool /usr/lib/firmware/opentrons-firmware.json &&\
+cleanup"
 endef
 
 .PHONY: sync-sw-ot3
@@ -201,11 +197,12 @@ sync-sw-ot3:
 	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
 	cd ../shared-data && $(MAKE) all push-no-restart-ot3 host=$(host)
+	cd ../robot-server && $(MAKE) push-ot3 host=$(host)
 	cd ../hardware-testing && $(MAKE) push-all-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:
-	$(call push-and-update-fw,$(host),$(br_ssh_key),$(ssh_opts))
+	$(call push-and-update-fw,$(host),$(zip))
 
 .PHONY: sync-ot3
 sync-ot3: sync-sw-ot3 sync-fw-ot3

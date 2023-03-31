@@ -10,6 +10,7 @@ import {
   Btn,
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
+  PrimaryButton,
   WRAP_REVERSE,
 } from '@opentrons/components'
 
@@ -17,7 +18,6 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { Dispatch } from '../../redux/types'
 import { analyzeProtocol } from '../../redux/protocol-storage'

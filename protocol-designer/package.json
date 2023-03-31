@@ -26,7 +26,7 @@
     "@types/redux-actions": "2.6.1",
     "@types/ua-parser-js": "0.7.36",
     "@types/uuid": "8.3.0",
-    "ajv": "6.10.2",
+    "ajv": "6.12.3",
     "classnames": "2.2.5",
     "cookie": "0.3.1",
     "core-js": "3.2.1",

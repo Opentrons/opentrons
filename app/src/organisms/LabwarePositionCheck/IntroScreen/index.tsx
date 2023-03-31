@@ -6,10 +6,10 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
+  PrimaryButton,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { NeedHelpLink } from '../../CalibrationPanels'
-import { PrimaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'

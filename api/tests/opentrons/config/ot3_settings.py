@@ -151,18 +151,6 @@ ot3_dummy_settings = {
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,
         },
-        "edge_sense_binary": {
-            "overrun_tolerance_mm": 2,
-            "early_sense_tolerance_mm": 17,
-            "pass_settings": {
-                "prep_distance_mm": 4,
-                "max_overrun_distance_mm": 5,
-                "speed_mm_per_s": 6,
-                "sensor_threshold_pf": 7,
-            },
-            "search_initial_tolerance_mm": 18,
-            "search_iteration_limit": 3,
-        },
         "probe_length": 40,
     },
 }

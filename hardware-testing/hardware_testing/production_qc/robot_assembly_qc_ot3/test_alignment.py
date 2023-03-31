@@ -5,8 +5,8 @@ from typing_extensions import Final
 from opentrons.config.defaults_ot3 import DEFAULT_DECK_TRANSFORM
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
-    find_deck_height,
-    find_slot_center_linear,
+    find_calibration_structure_height,
+    find_slot_center_binary,
 )
 
 from hardware_testing.data.csv_report import (
@@ -53,8 +53,8 @@ async def _find_slot(api: OT3API, mount: OT3Mount, expected: Point) -> Point:
     if not api.is_simulator:
         pos = await api.gantry_position(mount)
         await api.move_to(mount, pos._replace(z=max(pos.z, 100)))
-        z_height = await find_deck_height(api, mount, expected)
-        actual = await find_slot_center_linear(
+        z_height = await find_calibration_structure_height(api, mount, expected)
+        actual = await find_slot_center_binary(
             api, mount, expected._replace(z=z_height)
         )
     else:

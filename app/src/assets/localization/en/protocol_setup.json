@@ -163,5 +163,7 @@
   "view_module_setup_instructions": "View module setup instructions",
   "deck_map": "Deck Map",
   "setup_instructions": "Setup Instructions",
-  "labware_latch_instructions": "To add labware to the Heater-Shaker Module, use the labware latch in the controls to the right."
+  "labware_latch_instructions": "To add labware to the Heater-Shaker Module, use the labware latch in the controls to the right.",
+  "liquids_not_in_setup": "Liquids not in setup",
+  "initial_liquids_num": "{{num}} initial liquids"
 }

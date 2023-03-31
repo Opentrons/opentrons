@@ -1,8 +1,13 @@
 import * as React from 'react'
 
-import { Flex, DIRECTION_COLUMN, SPACING, COLORS } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  COLORS,
+  SecondaryButton,
+} from '@opentrons/components'
 
-import { SecondaryButton } from '../buttons'
 import { StyledText } from '../text'
 import { ProgressBar } from './index'
 

@@ -3,7 +3,7 @@ import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import {
   useOnClickOutside,
-  CheckboxField,
+  DeprecatedCheckboxField,
   Icon,
   OutlineButton,
 } from '@opentrons/components'
@@ -263,7 +263,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
         <div>
           <div className={styles.filters_heading}>Filters</div>
           <div className={styles.filters_section}>
-            <CheckboxField
+            <DeprecatedCheckboxField
               className={styles.filter_checkbox}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 isNextToHeaterShaker
