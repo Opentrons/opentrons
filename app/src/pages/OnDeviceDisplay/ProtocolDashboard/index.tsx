@@ -4,16 +4,13 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
   ALIGN_CENTER,
-  ALIGN_FLEX_START,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  OVERFLOW_HIDDEN,
   SPACING,
   TYPOGRAPHY,
   useSwipe,
@@ -30,7 +27,7 @@ import {
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '../../../redux/config'
-import { PinnedProtocol } from './PinnedProtocol'
+import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { ProtocolRow } from './ProtocolRow'
 import { sortProtocols } from './utils'
 
@@ -192,17 +189,7 @@ export function ProtocolDashboard(): JSX.Element {
           >
             Pinned Protocols
           </StyledText>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_FLEX_START}
-            gridGap={SPACING.spacing3}
-            ref={swipe.ref}
-            overflow={OVERFLOW_HIDDEN}
-          >
-            {pinnedProtocols.map(protocol => {
-              return <PinnedProtocol key={protocol.key} protocol={protocol} />
-            })}
-          </Flex>
+          <PinnedProtocolCarousel pinnedProtocols={pinnedProtocols} />
         </Flex>
       )}
       {sortedProtocols.length > 0 ? (
@@ -213,8 +200,8 @@ export function ProtocolDashboard(): JSX.Element {
                 <Flex flexDirection="row" alignItems="center">
                   <Btn onClick={handleSortByName}>
                     <StyledText
-                      fontSize="1.25rem"
-                      lineHeight="1.6875rem"
+                      fontSize={TYPOGRAPHY.fontSize22}
+                      lineHeight={TYPOGRAPHY.lineHeight28}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('protocol_name_title')}
