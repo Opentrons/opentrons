@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { Toast } from '..'
+import { RawToast } from '..'
 
-const render = (props: React.ComponentProps<typeof Toast>) => {
-  return renderWithProviders(<Toast {...props} />)[0]
+const render = (props: React.ComponentProps<typeof RawToast>) => {
+  return renderWithProviders(<RawToast {...props} displayType="desktop" />)[0]
 }
 
 describe('Toast', () => {
-  let props: React.ComponentProps<typeof Toast>
+  let props: React.ComponentProps<typeof RawToast>
   beforeEach(() => {
     props = {
       id: '1',

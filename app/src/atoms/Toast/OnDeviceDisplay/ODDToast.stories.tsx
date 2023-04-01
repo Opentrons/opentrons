@@ -9,16 +9,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
-import { ODDToast } from '..'
+import { RawToast } from '..'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Toast',
-  component: ODDToast,
+  component: RawToast,
 } as Meta
 
 const TemplateWithTimeout: Story<
-  React.ComponentProps<typeof ODDToast>
+  React.ComponentProps<typeof RawToast>
 > = args => {
   const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
 
@@ -47,7 +47,11 @@ const TemplateWithTimeout: Story<
           bottom={SPACING.spacing4}
           zIndex={1000}
         >
-          <ODDToast {...args} onClose={() => setIsShowToast(false)} />
+          <RawToast
+            {...args}
+            displayType="odd"
+            onClose={() => setIsShowToast(false)}
+          />
         </Flex>
       )}
     </>
@@ -78,7 +82,7 @@ Alert.args = {
 }
 
 const TemplateWithoutTimeout: Story<
-  React.ComponentProps<typeof ODDToast>
+  React.ComponentProps<typeof RawToast>
 > = args => {
   const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
 
@@ -106,7 +110,7 @@ const TemplateWithoutTimeout: Story<
           bottom={SPACING.spacing4}
           zIndex={1000}
         >
-          <ODDToast {...args} />
+          <RawToast {...args} displayType="odd" />
         </Flex>
       )}
     </>

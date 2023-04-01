@@ -7,16 +7,16 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../text'
-import { DesktopToast } from './index'
+import { RawToast } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Toast',
-  component: DesktopToast,
+  component: RawToast,
 } as Meta
 
 const TemplateWithTimeout: Story<
-  React.ComponentProps<typeof DesktopToast>
+  React.ComponentProps<typeof RawToast>
 > = args => {
   const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
 
@@ -36,7 +36,11 @@ const TemplateWithTimeout: Story<
         </Flex>
       </Flex>
       {isShowToast && (
-        <DesktopToast {...args} onClose={() => setIsShowToast(false)} />
+        <RawToast
+          {...args}
+          displayType="desktop"
+          onClose={() => setIsShowToast(false)}
+        />
       )}
     </>
   )
@@ -67,7 +71,7 @@ Info.args = {
 }
 
 const TemplateWithoutTimeout: Story<
-  React.ComponentProps<typeof DesktopToast>
+  React.ComponentProps<typeof RawToast>
 > = args => {
   const [isShowToast, setIsShowToast] = React.useState<boolean>(false)
 
@@ -88,7 +92,7 @@ const TemplateWithoutTimeout: Story<
           </StyledText>
         </Flex>
       </Flex>
-      {isShowToast && <DesktopToast {...args} />}
+      {isShowToast && <RawToast {...args} displayType="desktop" />}
     </>
   )
 }

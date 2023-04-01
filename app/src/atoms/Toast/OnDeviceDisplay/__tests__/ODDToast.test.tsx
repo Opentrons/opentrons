@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { ODDToast } from '../..'
+import { RawToast } from '../..'
 
-const render = (props: React.ComponentProps<typeof ODDToast>) => {
-  return renderWithProviders(<ODDToast {...props} />)[0]
+const render = (props: React.ComponentProps<typeof RawToast>) => {
+  return renderWithProviders(<RawToast {...props} displayType="odd" />)[0]
 }
 
 describe('Toast', () => {
-  let props: React.ComponentProps<typeof ODDToast>
+  let props: React.ComponentProps<typeof RawToast>
   beforeEach(() => {
     props = {
       id: '1',
@@ -72,27 +72,27 @@ describe('Toast', () => {
     background-color: ##baffcd`)
     getByLabelText('icon_success')
   })
-  it('should have alert styling when passing alert as type', () => {
+  it('should have warning styling when passing warning as type', () => {
     props = {
       id: '1',
       message: 'test message',
-      type: 'alert',
+      type: 'warning',
       onClose: jest.fn(),
     }
     const { getByTestId, getByLabelText } = render(props)
-    const alertToast = getByTestId('Toast_alert')
-    expect(alertToast).toHaveStyle(`color: #f09d20
+    const warningToast = getByTestId('Toast_warning')
+    expect(warningToast).toHaveStyle(`color: #f09d20
     background-color: #ffe9be`)
-    getByLabelText('icon_alert')
+    getByLabelText('icon_warning')
   })
 
-  it('after 5 seconds the toast should be closed automatically', async () => {
+  it('after 7 seconds the toast should be closed automatically', async () => {
     jest.useFakeTimers()
     props = {
       id: '1',
       message: 'test message',
       type: 'success',
-      duration: 5000,
+      duration: 7000,
       onClose: jest.fn(),
     }
     const { getByText } = render(props)
@@ -102,12 +102,12 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(7000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
 
-  it('should stay more than 5 seconds when requiredTimeout is true', async () => {
+  it('should stay more than 7 seconds when requiredTimeout is true', async () => {
     jest.useFakeTimers()
     props = {
       id: '1',
@@ -123,12 +123,12 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(7000)
     })
     expect(props.onClose).not.toHaveBeenCalled()
   })
 
-  it('should not stay more than 5 seconds when requiredTimeout is false', async () => {
+  it('should not stay more than 7 seconds when requiredTimeout is false', async () => {
     jest.useFakeTimers()
     props = {
       id: '1',
@@ -144,7 +144,7 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(5000)
+      jest.advanceTimersByTime(8000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
