@@ -36,9 +36,10 @@ const SettingButton = styled.input`
 const SettingButtonLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing5};
   border-radius: ${BORDERS.size_four};
+  height: 5.25rem;
   cursor: pointer;
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.blueEnabled : '#e0e0e0'};
+    isSelected === true ? COLORS.blueEnabled : COLORS.foundationalBlue};
   color: ${({ isSelected }) => isSelected === true && COLORS.white};
 `
 
@@ -60,6 +61,8 @@ export function TouchScreenSleep({
   const settingsButtons = [
     { label: t('never'), value: SLEEP_NEVER_MS },
     { label: t('minutes', { minute: 3 }), value: SLEEP_TIME_MS * 3 },
+    { label: t('minutes', { minute: 5 }), value: SLEEP_TIME_MS * 5 },
+    { label: t('minutes', { minute: 10 }), value: SLEEP_TIME_MS * 10 },
     { label: t('minutes', { minute: 15 }), value: SLEEP_TIME_MS * 15 },
     { label: t('minutes', { minute: 30 }), value: SLEEP_TIME_MS * 30 },
     { label: t('one_hour'), value: SLEEP_TIME_MS * 60 },

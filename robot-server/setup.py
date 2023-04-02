@@ -54,6 +54,7 @@ INSTALL_REQUIRES = [
     f"opentrons=={VERSION}",
     f"opentrons-shared-data=={VERSION}",
     f"notify-server=={VERSION}",
+    f"server-utils=={VERSION}",
     "anyio==3.3.0",
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",

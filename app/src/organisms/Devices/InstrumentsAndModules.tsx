@@ -5,6 +5,7 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useModulesQuery,
   usePipettesQuery,
+  useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
 import {
@@ -53,11 +54,11 @@ export function InstrumentsAndModules({
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
 
-  // TODO(BC, 2022-12-05): replace with attachedGripper after RLAB-88 is done
-  const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
-    model: string
-    serialNumber: string
-  } | null>(null)
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
+  // { refetchInterval: EQUIPMENT_POLL_MS, },
+  const extensionInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
@@ -144,13 +145,8 @@ export function InstrumentsAndModules({
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
               />
-              {/* extension mount here */}
               {isOT3 ? (
-                <GripperCard
-                  robotName={robotName}
-                  attachedGripper={tempAttachedGripper}
-                  tempSetAttachedGripper={tempSetAttachedGripper}
-                />
+                <GripperCard attachedGripper={extensionInstrument} />
               ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard

@@ -14,11 +14,11 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { PrimaryButton } from '../../../atoms/buttons'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 import { getShellUpdateState } from '../../../redux/shell'
 

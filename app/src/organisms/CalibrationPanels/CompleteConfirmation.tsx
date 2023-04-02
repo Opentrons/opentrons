@@ -11,10 +11,10 @@ import {
   JUSTIFY_CENTER,
   COLORS,
   ALIGN_STRETCH,
+  PrimaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 interface CompleteConfirmationProps {

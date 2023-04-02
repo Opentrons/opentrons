@@ -1,8 +1,7 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
-import { COLORS, TYPOGRAPHY } from '@opentrons/components'
-import { AlertPrimaryButton } from '../../atoms/buttons'
+import { COLORS, TYPOGRAPHY, AlertPrimaryButton } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 

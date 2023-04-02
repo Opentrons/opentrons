@@ -12,9 +12,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { Mount } from '../../redux/pipettes/types'
 

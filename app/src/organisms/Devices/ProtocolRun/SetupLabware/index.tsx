@@ -5,10 +5,10 @@ import {
   JUSTIFY_CENTER,
   Flex,
   SPACING,
+  PrimaryButton,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { PrimaryButton } from '../../../../atoms/buttons'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
