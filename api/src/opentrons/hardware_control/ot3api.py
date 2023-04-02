@@ -1409,10 +1409,13 @@ class OT3API(
         self, mount: OT3Mount, rate: float, acquire_lock: bool = True
     ) -> None:
         """
-        Move an instrument's plunger to its bottom, aspiration position.
+        Move an instrument's plunger to its bottom position, while no liquids
+        are held by said instrument.
 
-        Calling this method while the pipette is holding any liquid will raise
-        a Runtime Error.
+        Possible events where this occurs:
+
+        1. After homing the plunger
+        2. Between a blow-out and an aspiration (eg: re-using tips)
 
         Three possible physical tip states when this happens:
 
@@ -1442,13 +1445,17 @@ class OT3API(
         current_pos = self._current_position[pip_ax]
         if instrument.has_tip:
             if current_pos > target_pos[pip_ax]:
-                flow_rate = instrument.aspirate_flow_rate
+                # using slower aspirate flow-rate, to avoid pulling droplets up
+                speed = self._pipette_handler.plunger_speed(
+                    instrument, instrument.aspirate_flow_rate, "aspirate"
+                )
             else:
-                flow_rate = instrument.blow_out_flow_rate
-            speed = self._pipette_handler.plunger_speed(
-                instrument, flow_rate, "aspirate"
-            )
+                # use blow-out flow-rate, so we can push droplets out
+                speed = self._pipette_handler.plunger_speed(
+                    instrument, instrument.blow_out_flow_rate, "dispense"
+                )
         else:
+            # save time by using max speed
             max_speeds = self.config.motion_settings.default_max_speed
             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
         await self._move(
