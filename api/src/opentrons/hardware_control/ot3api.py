@@ -52,7 +52,7 @@ from .util import use_or_initialize_loop, check_motion_bounds
 from .instruments.ot3.pipette import (
     load_from_config_and_check_skip,
 )
-from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
@@ -1344,18 +1344,10 @@ class OT3API(
         try:
             if not self._gripper_handler.is_valid_jaw_width(jaw_width_mm):
                 raise ValueError("Setting gripper jaw width out of bounds")
-            await self._backend.gripper_hold_jaw(
-                int(
-                    1000
-                    * (
-                        self._gripper_handler.get_gripper().config.geometry.jaw_width[
-                            "max"
-                        ]
-                        - jaw_width_mm
-                    )
-                    / 2
-                )
-            )
+            gripper = self._gripper_handler.get_gripper()
+            width_max = gripper.config.geometry.jaw_width["max"]
+            jaw_displacement_mm = (width_max - jaw_width_mm) / 2.0
+            await self._backend.gripper_hold_jaw(int(1000 * jaw_displacement_mm))
             await self._cache_encoder_position()
         except Exception:
             self._log.exception("Gripper set width failed")
@@ -1695,6 +1687,12 @@ class OT3API(
             for m, i in self._pipette_handler.hardware_instruments.items()
             if m != OT3Mount.GRIPPER
         }
+
+    @property
+    def hardware_gripper(self) -> Optional[Gripper]:
+        if not self.has_gripper():
+            return None
+        return self._gripper_handler.get_gripper()
 
     @property
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore

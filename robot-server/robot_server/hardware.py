@@ -20,7 +20,11 @@ from notify_server.settings import Settings as NotifyServerSettings
 from notify_server.models import event, topics
 from notify_server.models.hardware_event import DoorStatePayload
 
-from .app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from .errors import ErrorDetails
 from .settings import get_settings
 

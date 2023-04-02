@@ -31,7 +31,7 @@ def get_version():
 
 VERSION = get_version()
 
-DISTNAME = "robot_server"
+DISTNAME = "server_utils"
 LICENSE = "Apache 2.0"
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
@@ -48,13 +48,9 @@ CLASSIFIERS = [
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
-DESCRIPTION = "A server providing access to the Opentrons API"
+DESCRIPTION = "Common utilities for various Opentrons Python servers."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    f"opentrons=={VERSION}",
-    f"opentrons-shared-data=={VERSION}",
-    f"notify-server=={VERSION}",
-    f"server-utils=={VERSION}",
     "anyio==3.3.0",
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",

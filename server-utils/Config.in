@@ -1,10 +1,6 @@
-config BR2_PACKAGE_PYTHON_OPENTRONS_ROBOT_SERVER
-  bool "python-opentrons-robot-server"
+config BR2_PACKAGE_PYTHON_OPENTRONS_SERVER_UTILS
+  bool "python-opentrons-system-server"
   depends on BR2_PACKAGE_PYTHON3
-  select BR2_PACKAGE_PYTHON_OPENTRONS_API # runtime
-  select BR2_PACKAGE_PYTHON_OPENTRONS_SHARED_DATA # runtime
-  select BR2_PACKAGE_PYTHON_OPENTRONS_NOTIFY_SERVER # runtime
-  select BR2_PACKAGE_PYTHON_OPENTRONS_SERVER_UTILS # runtime
   select BR2_PACKAGE_PYTHON_ANYIO # runtime
   select BR2_PACKAGE_PYTHON_FASTAPI # runtime
   select BR2_PACKAGE_PYTHON_DOTENV # runtime
@@ -17,6 +13,6 @@ config BR2_PACKAGE_PYTHON_OPENTRONS_ROBOT_SERVER
   select BR2_PACKAGE_PYTHON_WSPROTO # runtime
 
   help
-    Opentrons HTTP server. Controls an OT-2 robot.
+    Opentrons HTTP server common utils.
 
     https://opentrons.com

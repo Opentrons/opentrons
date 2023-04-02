@@ -1,18 +1,17 @@
 # This workflow runs tests and lint on non-release branches pushed that alter
-# the system-server subpackage
+# the server-utils subpackage
 
-name: 'system-server test/lint'
+name: 'server-utils test/lint'
 
 on:
   push:
     paths:
-      - 'system-server/**/*'
+      - 'server-utils/**/*'
       - 'Makefile'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
-      - '.github/workflows/system-server-lint-test.yaml'
+      - '.github/workflows/server-utils-lint-test.yaml'
       - '.github/actions/python/**'
-      - 'server-utils/**/*'
     branches: # ignore any release-related thing (handled elsewhere)
       - 'edge'
     tags-ignore:
@@ -20,13 +19,12 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
     paths:
-      - 'system-server/**/*'
+      - 'server-utils/**/*'
       - 'Makefile'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
-      - '.github/workflows/system-server-lint-test.yaml'
+      - '.github/workflows/server-utils-lint-test.yaml'
       - '.github/actions/python/**'
-      - 'server-utils/**/*'
   workflow_dispatch:
 
 concurrency:
@@ -39,7 +37,7 @@ defaults:
 
 jobs:
   lint:
-    name: 'system-server linting'
+    name: 'server-utils linting'
     timeout-minutes: 10
     runs-on: 'ubuntu-22.04'
     steps:
@@ -55,11 +53,11 @@ jobs:
 
       - uses: './.github/actions/python/setup'
         with:
-          project: 'system-server'
+          project: 'server-utils'
       - name: Lint
-        run: make -C system-server lint
+        run: make -C server-utils lint
   test:
-    name: 'system-server package tests'
+    name: 'server-utils package tests'
     timeout-minutes: 10
     needs: [lint]
     runs-on: 'ubuntu-22.04'
@@ -75,10 +73,10 @@ jobs:
           python-version: '3.7'
       - uses: './.github/actions/python/setup'
         with:
-          project: 'system-server'
+          project: 'server-utils'
       - name: Test
-        run: make -C system-server test
+        run: make -C server-utils test
       - uses: 'codecov/codecov-action@v3'
         with:
-          files: ./system-server/coverage.xml
-          flags: system-server
+          files: ./server-utils/coverage.xml
+          flags: server-utils
