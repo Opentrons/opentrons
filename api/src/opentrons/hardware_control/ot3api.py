@@ -52,7 +52,7 @@ from .util import use_or_initialize_loop, check_motion_bounds
 from .instruments.ot3.pipette import (
     load_from_config_and_check_skip,
 )
-from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
@@ -1712,6 +1712,12 @@ class OT3API(
             for m, i in self._pipette_handler.hardware_instruments.items()
             if m != OT3Mount.GRIPPER
         }
+
+    @property
+    def hardware_gripper(self) -> Optional[Gripper]:
+        if not self.has_gripper():
+            return None
+        return self._gripper_handler.get_gripper()
 
     @property
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
