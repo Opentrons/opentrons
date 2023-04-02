@@ -11,10 +11,10 @@ import {
 
 import type { Story, Meta } from '@storybook/react'
 
-import { StyledText } from '../text'
+import { StyledText } from '../../atoms/text'
 
 export default {
-  title: 'App/Atoms/Colors',
+  title: 'Design Tokens/Colors',
 } as Meta
 
 interface ColorsStorybookProps {
