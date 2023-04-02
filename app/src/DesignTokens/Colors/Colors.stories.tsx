@@ -6,7 +6,9 @@ import {
   DIRECTION_ROW,
   SPACING,
   ALIGN_CENTER,
+  JUSTIFY_CENTER,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import type { Story, Meta } from '@storybook/react'
@@ -18,123 +20,58 @@ export default {
 } as Meta
 
 interface ColorsStorybookProps {
-  name: string
-  value: string
+  colors: string[]
 }
 
 const Template: Story<ColorsStorybookProps[]> = args => {
+  const allColors = args.colors.filter(
+    c => !c[0].includes('opacity') || c.length > 2
+  )
+
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacingXXL}>
-      {args.colors.map((color: ColorsStorybookProps) => (
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      gridGap={SPACING.spacing3}
+      flexWrap="wrap"
+      backgroundColor="#dadada"
+      padding={SPACING.spacing5}
+    >
+      {allColors.map((color, index) => (
         <Flex
-          key={color.name}
-          flexDirection={DIRECTION_ROW}
+          key={`color_${index}`}
+          flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          backgroundColor={color[1]}
+          padding={SPACING.spacing4}
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing2}
+          width="20rem"
+          height="4rem"
+          borderRadius={BORDERS.size_two}
         >
-          <Flex
-            backgroundColor={color.value}
-            padding={SPACING.spacingXXL}
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing4}
-            width="25rem"
-            height="8rem"
-            borderRadius="3px"
+          <StyledText
+            color="#cacaca"
+            as="p"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
           >
-            <StyledText
-              fontSize="1.5rem"
-              lineHeight="1.5rem"
-              fontWeight={TYPOGRAPHY.fontWeightRegular}
-            >
-              {color.name}
-            </StyledText>
-            <StyledText
-              fontSize="1.5rem"
-              lineHeight="1.5rem"
-              fontWeight={TYPOGRAPHY.fontWeightRegular}
-            >
-              {color.value}
-            </StyledText>
-          </Flex>
+            {color[0]}
+          </StyledText>
+          <StyledText
+            as="p"
+            color="#cacaca"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+          >
+            {color[1]}
+          </StyledText>
         </Flex>
       ))}
     </Flex>
   )
 }
 
-export const SuccessColors = Template.bind({})
-const successColors = [
-  {
-    name: 'successBackgroundLight',
-    value: COLORS.successBackgroundLight,
-  },
-  {
-    name: 'successBackgroundMed',
-    value: COLORS.successBackgroundMed,
-  },
-  {
-    name: 'successEnabled',
-    value: COLORS.successEnabled,
-  },
-  {
-    name: 'successText',
-    value: COLORS.successText,
-  },
-  {
-    name: 'successDisabled',
-    value: COLORS.successDisabled,
-  },
-]
-SuccessColors.args = {
-  colors: successColors,
+export const AllColors = Template.bind({})
+const allColors = Object.entries(COLORS)
+AllColors.args = {
+  colors: allColors,
 }
-
-export const WarningColors = Template.bind({})
-const warningColors = [
-  {
-    name: 'successBackgroundLight',
-    value: COLORS.warningBackgroundLight,
-  },
-  {
-    name: 'successBackgroundMed',
-    value: COLORS.warningBackgroundMed,
-  },
-  {
-    name: 'successEnabled',
-    value: COLORS.warningEnabled,
-  },
-  {
-    name: 'successText',
-    value: COLORS.warningText,
-  },
-  {
-    name: 'successDisabled',
-    value: COLORS.warningDisabled,
-  },
-]
-WarningColors.args = {
-  colors: warningColors,
-}
-
-// export const Holding = Template.bind({})
-// Holding.args = {
-//   status: 'Holding at target',
-//   backgroundColor: COLORS.medBlue,
-//   iconColor: COLORS.blueEnabled,
-//   pulse: false,
-// }
-
-// export const Idle = Template.bind({})
-// Idle.args = {
-//   status: 'Idle',
-//   backgroundColor: COLORS.medGreyEnabled,
-//   iconColor: COLORS.darkGreyEnabled,
-//   pulse: true,
-// }
-
-// export const Error = Template.bind({})
-// Error.args = {
-//   status: 'Error',
-//   backgroundColor: COLORS.warningBackgroundLight,
-//   iconColor: COLORS.warningEnabled,
-//   pulse: true,
-// }
