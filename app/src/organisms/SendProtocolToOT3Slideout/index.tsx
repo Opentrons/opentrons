@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
-import { PrimaryButton } from '../../atoms/buttons'
+import { PrimaryButton } from '@opentrons/components'
 import {
   ERROR_TOAST,
   INFO_TOAST,

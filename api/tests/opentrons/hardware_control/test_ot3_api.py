@@ -76,6 +76,8 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         expected_liquid_height=109,
         log_pressure=False,
         aspirate_while_sensing=False,
+        auto_zero_sensor=False,
+        num_baseline_reads=10,
         data_file="fake_file_name",
     )
 
@@ -447,6 +449,8 @@ async def test_liquid_probe(
             expected_liquid_height=109,
             log_pressure=False,
             aspirate_while_sensing=True,
+            auto_zero_sensor=False,
+            num_baseline_reads=10,
             data_file="fake_file_name",
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
@@ -458,6 +462,8 @@ async def test_liquid_probe(
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.log_pressure,
+            fake_settings_aspirate.auto_zero_sensor,
+            fake_settings_aspirate.num_baseline_reads,
         )
 
         return_dict[head_node], return_dict[pipette_node] = 142, 142
@@ -664,8 +670,8 @@ async def test_pipette_capacitive_sweep(
 @pytest.mark.parametrize(
     "probe,intr_probe",
     [
-        (GripperProbe.FRONT, InstrumentProbeType.PRIMARY),
-        (GripperProbe.REAR, InstrumentProbeType.SECONDARY),
+        (GripperProbe.FRONT, InstrumentProbeType.SECONDARY),
+        (GripperProbe.REAR, InstrumentProbeType.PRIMARY),
     ],
 )
 @pytest.mark.parametrize(
@@ -1022,7 +1028,7 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
-        await ot3_hardware.drop_tip(Mount.LEFT)
+        await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_has_calls(
             calls=[
@@ -1174,3 +1180,24 @@ async def test_home_axis(
     expected_pos = {axis_to_node(ax): v for ax, v in origin_pos.items()}
     expected_pos.update({axis_to_node(axis): 0})
     assert backend._position == expected_pos
+
+
+@pytest.mark.parametrize("setting", [True, False])
+async def test_light_settings(
+    ot3_hardware: ThreadManager[OT3API], setting: bool
+) -> None:
+    await ot3_hardware.set_lights(rails=setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] == setting
+    assert not check["button"]
+
+    await ot3_hardware.set_lights(rails=not setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] != setting
+    assert not check["button"]
+
+    # Make sure setting the button doesn't affect the rails
+    await ot3_hardware.set_lights(button=setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] != setting
+    assert not check["button"]

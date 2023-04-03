@@ -18,6 +18,7 @@ import {
   GEN3,
   LEFT,
   RIGHT,
+  GRIPPER_V1,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
@@ -202,6 +203,8 @@ export type ModuleModel =
   | TemperatureModuleModel
   | ThermocyclerModuleModel
   | HeaterShakerModuleModel
+
+export type GripperModel = typeof GRIPPER_V1
 
 export type ModuleModelWithLegacy =
   | ModuleModel
@@ -463,3 +466,27 @@ export type ThermalAdapterName =
   | 'Deep Well Adapter'
   | '96 Flat Bottom Adapter'
   | 'Universal Flat Adapter'
+
+// gripper definition that adheres to the v1 gripper json schema
+export interface GripperDefinition {
+  $otSharedSchema: string
+  model: GripperModel
+  schemaVersion: number
+  displayName: string
+  zMotorConfigurations: { idle: number; run: number }
+  jawMotorConfigurations: { vref: number }
+  gripForceProfile: {
+    polynomial: [[number, number], [number, number]]
+    defaultGripForce: number
+    defaultHomeForce: number
+    min: number
+    max: number
+  }
+  geometry: {
+    baseOffsetFromMount: [number, number, number]
+    jawCenterOffsetFromBase: [number, number, number]
+    pinOneOffsetFromBase: [number, number, number]
+    pinTwoOffsetFromBase: [number, number, number]
+    jawWidth: { min: number; max: number }
+  }
+}

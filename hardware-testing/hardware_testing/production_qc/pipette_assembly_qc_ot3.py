@@ -18,7 +18,7 @@ from hardware_testing.drivers.pressure_fixture import (
     PressureFixture,
     SimPressureFixture,
 )
-from hardware_testing.measure.pressure.config import (
+from hardware_testing.measure.pressure.config import (  # type: ignore[import]
     PRESSURE_FIXTURE_TIP_VOLUME,
     PRESSURE_FIXTURE_ASPIRATE_VOLUME,
     PRESSURE_FIXTURE_EVENT_CONFIGS as PRESSURE_CFG,

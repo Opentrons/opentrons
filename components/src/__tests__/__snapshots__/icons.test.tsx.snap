@@ -141,6 +141,30 @@ exports[`icons arrow-right renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons back renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 19 34"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M16.6667 33.6668L0 17.0002L16.6667 0.333496L19 2.7085L4.70833 17.0002L19 31.2918L16.6667 33.6668Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons book-open-page-variant renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
@@ -1096,6 +1120,54 @@ exports[`icons jump-size renders correctly 1`] = `
 >
   <path
     d="M8.63355 14.215C8.6365 14.5124 8.63911 14.7764 8.63911 15H7.36528C7.36528 14.8447 7.36714 14.6621 7.36924 14.4568C7.38181 13.225 7.40273 11.1766 7.07922 9.31768C6.89019 8.23151 6.59339 7.27753 6.15429 6.60988C5.73178 5.96745 5.2075 5.625 4.50024 5.625C3.79297 5.625 3.2687 5.96745 2.84618 6.60988C2.40708 7.27753 2.11028 8.23151 1.92125 9.31768C1.59774 11.1766 1.61866 13.225 1.63124 14.4568C1.63333 14.6621 1.6352 14.8447 1.6352 15H0.385197C0.385197 14.8588 0.383339 14.6876 0.38121 14.4914C0.367987 13.273 0.344279 11.0886 0.689764 9.10337C0.890012 7.95271 1.2241 6.80142 1.80181 5.92302C2.39611 5.01939 3.27456 4.375 4.50024 4.375C5.72592 4.375 6.60437 5.01939 7.19867 5.92301C7.40983 6.24409 7.58845 6.60162 7.73987 6.98226C7.75025 6.91343 7.76092 6.84476 7.77188 6.77626C8.02647 5.18496 8.4487 3.62176 9.16765 2.44065C9.89976 1.23791 10.9823 0.375 12.5141 0.375C14.0321 0.375 15.1148 1.19161 15.852 2.35243C16.5736 3.48863 16.9954 4.99227 17.2488 6.52295C17.6344 8.85309 17.6513 11.4038 17.6372 13.1367L19.1208 12.0031L19.8797 12.9963L17.0169 15.1838L14.1235 12.9984L14.8769 12.001L16.3866 13.1413C16.4006 11.422 16.3863 8.96723 16.0155 6.72705C15.7724 5.25773 15.3851 3.94887 14.7968 3.02257C14.2242 2.12089 13.4961 1.625 12.5141 1.625C11.5458 1.625 10.8158 2.13709 10.2354 3.0906C9.64181 4.06574 9.25156 5.44004 9.00618 6.97374C8.58775 9.58904 8.61631 12.4739 8.63355 14.215Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons latch-closed renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 40 40"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M33.6663 10H6.33301V17H10.333V14H14.167V19.166H26.667V14H29.6663V17H33.6663V10Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons latch-open renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 40 40"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M33.6663 10H6.33301V17H10.333V14H14.167V29.166H26.667V14H29.6663V17H33.6663V10Z"
     fillRule="evenodd"
   />
 </svg>

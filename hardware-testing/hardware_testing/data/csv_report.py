@@ -70,6 +70,11 @@ class CSVLine:
         return f"{_elapsed},{full_str}"
 
     @property
+    def data(self) -> List[Any]:
+        """Data."""
+        return self._data
+
+    @property
     def tag(self) -> str:
         """Line tag."""
         return self._tag
@@ -268,18 +273,23 @@ def _generate_results_overview_section(tags: List[str]) -> CSVSection:
 class CSVReport:
     """CSV Report."""
 
-    def __init__(self, script_path: str, sections: List[CSVSection]) -> None:
+    def __init__(
+        self,
+        test_name: str,
+        sections: List[CSVSection],
+        run_id: Optional[str] = None,
+        start_time: Optional[float] = None,
+    ) -> None:
         """CSV Report init."""
-        self._script_path = script_path
-        self._test_name = data_io.create_test_name_from_file(script_path)
-        self._run_id = data_io.create_run_id()
+        self._test_name = test_name
+        self._run_id = run_id if run_id else data_io.create_run_id()
         self._tag: Optional[str] = None
         self._file_name: Optional[str] = None
         _section_meta = _generate_meta_data_section()
         _section_titles = [s.title for s in sections]
         _section_results = _generate_results_overview_section(_section_titles)
         self._sections = [_section_meta, _section_results] + sections
-        self._cache_start_time()  # must happen before storing any data
+        self._cache_start_time(start_time)  # must happen before storing any data
         self(META_DATA_TITLE, META_DATA_TEST_NAME, [self._test_name])
         self(META_DATA_TITLE, META_DATA_TEST_RUN_ID, [self._run_id])
         _now = datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")
@@ -343,23 +353,29 @@ class CSVReport:
         """Parent directory of this report file."""
         return data_io.create_folder_for_test_data(self._test_name)
 
-    def _cache_start_time(self) -> None:
-        start_time = time()
+    @property
+    def tag(self) -> str:
+        """Tag."""
+        return f"{self.__class__.__name__}-{self._tag}"
+
+    def _cache_start_time(self, start_time: Optional[float] = None) -> None:
+        checked_start_time = start_time if start_time else time()
         for section in self._sections:
             for line in section.lines:
                 if isinstance(line, CSVLineRepeating):
                     for i in range(len(line)):
-                        line[i].cache_start_time(start_time)
+                        line[i].cache_start_time(checked_start_time)
                 else:
-                    line.cache_start_time(start_time)
+                    line.cache_start_time(checked_start_time)
 
     def set_tag(self, tag: str) -> None:
         """CSV Report set tag."""
         self._tag = tag
         self(META_DATA_TITLE, META_DATA_TEST_TAG, [self._tag])
         self._file_name = data_io.create_file_name(
-            self._test_name, self._run_id, self._tag
+            self._test_name, self._run_id, self.tag
         )
+        self.save_to_disk()
 
     def set_operator(self, operator: str) -> None:
         """Set operator."""

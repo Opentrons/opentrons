@@ -587,9 +587,9 @@ class GripperProbe(enum.Enum):
     @classmethod
     def to_type(cls, gp: "GripperProbe") -> InstrumentProbeType:
         if gp == cls.FRONT:
-            return InstrumentProbeType.PRIMARY
-        else:
             return InstrumentProbeType.SECONDARY
+        else:
+            return InstrumentProbeType.PRIMARY
 
 
 class EarlyLiquidSenseTrigger(RuntimeError):

@@ -65,7 +65,7 @@ export function NetworkSettings({
   } // TODO (jb 2-24-2023) implement ethernet and usb details screen titles
 
   const handleChipType = (isConnected: boolean): ChipType => {
-    return isConnected ? 'success' : 'informing'
+    return isConnected ? 'success' : 'neutral'
   }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>

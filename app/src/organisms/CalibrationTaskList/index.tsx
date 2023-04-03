@@ -11,9 +11,9 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 
-import { PrimaryButton } from '../../atoms/buttons'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'

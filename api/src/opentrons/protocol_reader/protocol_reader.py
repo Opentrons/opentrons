@@ -2,7 +2,6 @@
 from pathlib import Path
 from typing import Optional, Sequence
 
-from .input_file import AbstractInputFile
 from .file_identifier import (
     FileIdentifier,
     IdentifiedFile,
@@ -13,7 +12,8 @@ from .file_identifier import (
 )
 from .role_analyzer import RoleAnalyzer, RoleAnalysis
 from .file_format_validator import FileFormatValidator
-from .file_reader_writer import FileReaderWriter
+from .file_reader_writer import FileReaderWriter, BufferedFile
+from .file_hasher import FileHasher
 from .protocol_source import (
     ProtocolSource,
     ProtocolSourceFile,
@@ -33,6 +33,7 @@ class ProtocolReader:
         file_identifier: Optional[FileIdentifier] = None,
         role_analyzer: Optional[RoleAnalyzer] = None,
         file_format_validator: Optional[FileFormatValidator] = None,
+        file_hasher: Optional[FileHasher] = None,
     ) -> None:
         """Initialize the reader with its dependencies.
 
@@ -41,24 +42,26 @@ class ProtocolReader:
             file_identifier: File identifier. Default impl. used if None.
             role_analyzer: File role analyzer. Default impl. used if None.
             file_format_validator: File format validator. Default impl. used if None.
+            file_hasher: File hasher. Default impl. used if None.
         """
         self._file_reader_writer = file_reader_writer or FileReaderWriter()
         self._file_identifier = file_identifier or FileIdentifier()
         self._role_analyzer = role_analyzer or RoleAnalyzer()
         self._file_format_validator = file_format_validator or FileFormatValidator()
+        self._file_hasher = file_hasher or FileHasher()
 
-    async def read_and_save(
-        self, files: Sequence[AbstractInputFile], directory: Path
+    async def save(
+        self, files: Sequence[BufferedFile], directory: Path, content_hash: str
     ) -> ProtocolSource:
-        """Compute a `ProtocolSource` from file-like objects and save them as files.
+        """Compute a `ProtocolSource` from buffered files and save them as files.
 
         The input is parsed and statically analyzed to ensure it's basically
         well-formed. For example, labware definition files must conform to the labware
         definition schema.
 
         Arguments:
-            files: List of files-like objects. Do not attempt to reuse any objects
-                objects in this list once they've been passed to the ProtocolReader.
+            files: List buffered files. Do not attempt to reuse any objects
+                in this list once they've been passed to the ProtocolReader.
             directory: Name of the directory to create and place files in.
 
         Returns:
@@ -68,8 +71,7 @@ class ProtocolReader:
             ProtocolFilesInvalidError: Input file list given to the reader
                 could not be validated as a protocol.
         """
-        buffered_files = await self._file_reader_writer.read(files)
-        identified_files = await self._file_identifier.identify(buffered_files)
+        identified_files = await self._file_identifier.identify(files)
         role_analysis = self._role_analyzer.analyze(identified_files)
         await self._file_format_validator.validate(role_analysis.all_files)
 
@@ -87,6 +89,7 @@ class ProtocolReader:
         return ProtocolSource(
             directory=directory,
             main_file=main_file,
+            content_hash=content_hash,
             files=output_files,
             config=self._map_config(role_analysis),
             robot_type=role_analysis.main_file.robot_type,
@@ -137,6 +140,8 @@ class ProtocolReader:
         )
 
         main_file = role_analysis.main_file.original_file.path
+        content_hash = await self._file_hasher.hash(buffered_files)
+
         output_files = [
             ProtocolSourceFile(path=f.original_file.path, role=self._map_file_role(f))  # type: ignore[arg-type]
             for f in role_analysis.all_files
@@ -145,6 +150,7 @@ class ProtocolReader:
         return ProtocolSource(
             directory=directory,
             main_file=main_file,
+            content_hash=content_hash,
             files=output_files,
             config=self._map_config(role_analysis),
             robot_type=role_analysis.main_file.robot_type,

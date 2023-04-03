@@ -31,6 +31,7 @@ import { FLOWS } from '../../PipetteWizardFlows/constants'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
+import type { SelectablePipettes } from '../../PipetteWizardFlows/types'
 
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
@@ -125,6 +126,10 @@ export function OverflowMenu({
   }, [isRunning, updateRobotStatus])
 
   const { deleteCalibration } = useDeleteCalibrationMutation()
+  const [
+    selectedPipette,
+    setSelectedPipette,
+  ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
 
   const handleDeleteCalibration = (e: React.MouseEvent): void => {
     e.preventDefault()
@@ -162,9 +167,8 @@ export function OverflowMenu({
           flowType={FLOWS.CALIBRATE}
           mount={mount}
           closeFlow={() => setShowPipetteWizardFlows(false)}
-          robotName={robotName}
-          //  TODO(jr/12/1/22): only single mount pipettes can be calibrated here for now
-          selectedPipette={SINGLE_MOUNT_PIPETTES}
+          selectedPipette={selectedPipette}
+          setSelectedPipette={setSelectedPipette}
         />
       ) : null}
       {showOverflowMenu ? (

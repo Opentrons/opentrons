@@ -127,7 +127,9 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
 }
 
 export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
-  const manifestUrl: string = getConfig('robotSystemUpdate').manifestUrls.OT2
+  const manifestUrl: string = getConfig('robotSystemUpdate').manifestUrls[
+    _DEFAULT_ROBOT_UPDATE_SOURCE_CONFIG_SELECTION_
+  ]
 
   return downloadManifest(manifestUrl, MANIFEST_CACHE)
     .then(manifest => {

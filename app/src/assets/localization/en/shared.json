@@ -62,5 +62,8 @@
   "reverse": "Reverse alphabetical",
   "next": "Next",
   "something_went_wrong": "something went wrong",
-  "return": "return"
+  "return": "return",
+  "update": "Update",
+  "on": "On",
+  "off": "Off"
 }

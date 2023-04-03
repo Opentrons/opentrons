@@ -8,13 +8,13 @@ import {
   DISPLAY_FLEX,
   DISPLAY_NONE,
   SPACING,
+  PrimaryButton,
   TYPOGRAPHY,
   BORDERS,
   COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 

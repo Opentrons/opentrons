@@ -140,7 +140,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             [float(target_pos.x), float(target_pos.y), float(target_pos.z)],
         )
         if sig_name == "nsync" or sig_name == "estop":
-            # TODO: enable once implemented in firmware
+            print("FIXME: enable once implemented in firmware")
             report(section, f"{sig_name}-result", [CSVResult.PASS])
             continue
         # External E-Stop

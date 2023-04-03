@@ -21,6 +21,7 @@
   "begin_calibration": "Begin calibration",
   "loosen_screws_and_detach": "Loosen Screws and Detach",
   "connect_and_screw_in_gripper": "Connect and Screw In Gripper",
+  "unable_to_detect_gripper": "Unable to detect Gripper",
   "move_gantry_to_front": "Move gantry to front",
   "move_pin_from_front_to_rear_jaw": "Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw",
   "move_pin_from_storage_to_front_jaw": "Take the calibration pin from its storage location. Magnetically attach the pin to the hole on the underside of the front gripper jaw.",
@@ -33,5 +34,7 @@
   "remove_probe": "Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.",
   "stand_back_gripper_is_calibrating": "Stand Back, Gripper is Calibrating",
   "t10_torx_screwdriver": "T10 Torx Screwdriver",
-  "progress_will_be_lost": "{{flow}} progress will be lost"
+  "progress_will_be_lost": "{{flow}} progress will be lost",
+  "gripper_still_attached": "Gripper Still Attached",
+  "please_retry_gripper_detach": "Please retry the detachment process to successfully detach the Gripper."
 }

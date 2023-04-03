@@ -3,6 +3,7 @@ test_name: Upload, analyze, delete basic_transfer_standalone protocol.
 marks:
   - usefixtures:
       - run_server
+      - clean_server_state
 stages:
   - name: Upload basic_transfer_standalone protocol
     request:
@@ -74,6 +75,7 @@ marks:
   - usefixtures:
       - run_server
       - set_disable_fast_analysis
+      - clean_server_state
 
 stages:
   - name: Upload simple Python protocol
@@ -104,9 +106,3 @@ stages:
           - id: '{analysis_id}'
             status: completed
             result: ok
-  - name: Delete the protocol
-    request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
-      method: DELETE
-    response:
-      status_code: 200

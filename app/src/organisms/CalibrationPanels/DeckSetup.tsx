@@ -9,12 +9,12 @@ import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
   SPACING,
+  PrimaryButton,
 } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../redux/sessions'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from './NeedHelpLink'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'

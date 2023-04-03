@@ -13,11 +13,11 @@ import {
   TOOLTIP_LEFT,
   useHoverTooltip,
   JUSTIFY_FLEX_END,
+  SecondaryButton,
   BORDERS,
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
-import { SecondaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { StyledText } from '../../../../atoms/text'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'

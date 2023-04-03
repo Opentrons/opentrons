@@ -129,6 +129,7 @@ class MessageId(int, Enum):
 
     attached_tools_request = 0x700
     tools_detected_notification = 0x701
+    tip_presence_notification = 0x702
 
     fw_update_initiate = 0x60
     fw_update_data = 0x61
@@ -164,6 +165,7 @@ class MessageId(int, Enum):
     bind_sensor_output_response = 0x8B
     peripheral_status_request = 0x8C
     peripheral_status_response = 0x8D
+    baseline_sensor_response = 0x8E
 
 
 @unique

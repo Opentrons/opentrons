@@ -12,6 +12,7 @@ export const darkGrey = '#4a4a4a'
 
 // opacity hex codes to append to 6-digit color hex codes
 // taken from table: https://davidwalsh.name/hex-opacity
+export const opacity0HexCode = '00' // 0% opacity
 export const opacity10HexCode = '1a' // 10% opacity
 export const opacity12HexCode = '1f' // 12% opacity
 export const opacity15HexCode = '26' // 15% opacity
@@ -30,6 +31,7 @@ export const opacity90HexCode = 'e6' // 90% opacity
 export const blueEnabled = '#006cfa'
 export const blueHover = '#0061e0'
 export const bluePressed = '#0050b8'
+export const medBluePressed = '#9cb9e0'
 
 // colors black
 export const darkBlackEnabled = '#16212d'
@@ -109,14 +111,17 @@ export const darkBlack_hundred = darkBlackEnabled
 export const darkBlack_ninety = `${darkBlackEnabled}${opacity90HexCode}`
 export const darkBlack_seventy = `${darkBlackEnabled}${opacity70HexCode}`
 export const darkBlack_sixty = `${darkBlackEnabled}${opacity60HexCode}`
-export const darkBlack_fourty = `${darkBlackEnabled}${opacity40HexCode}`
+export const darkBlack_forty = `${darkBlackEnabled}${opacity40HexCode}`
 export const darkBlack_twenty = `${darkBlackEnabled}${opacity20HexCode}`
 
 export const light_one = '#d0d0d0'
+export const light_one_pressed = '#b4b6b8'
 export const light_two = '#e0e0e0'
 
 export const highlightPurple_one = '#9c3ba4'
+export const highlightPurple_one_pressed = '#883792'
 export const highlightPurple_two = '#e7c3e9'
+export const highlightPurple_two_pressed = '#c8abcd'
 
 // touchscreen foundational color
 export const foundationalBlue = '#b4d4ff'
@@ -125,14 +130,18 @@ export const foundationalBlue = '#b4d4ff'
 export const green_one = '#027e23'
 export const green_two = '#2ebd55'
 export const green_three = '#a1ffbc'
+export const green_three_pressed = '#8cdea7'
 export const green_four = '#baffcd'
 
 export const yellow_one = '#7a5200'
 export const yellow_two = '#ec930f'
 export const yellow_three = '#ffe1a4'
+export const yellow_three_pressed = '#dcc492'
 export const yellow_four = '#ffe9be'
 
 export const red_one = errorText
 export const red_two = '#e31e1e'
+export const red_two_pressed = '#c41e20'
 export const red_three = '#fbcdcd'
+export const red_three_pressed = '#d9b3b5'
 // export const red_four = errorText

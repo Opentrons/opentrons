@@ -1,10 +1,6 @@
 import { getLatestCurrentOffsets } from '../utils'
 import type { LabwareOffset } from '@opentrons/api-client'
 
-describe('getLabwareSetupItemGroups', () => {
-  it.todo('should thoroughly test this fn')
-})
-
 describe('getLatestCurrentOffsets', () => {
   it('should return the latest offsets when there are multiple offsets', () => {
     const mockCurrentOffsets: LabwareOffset[] = [
