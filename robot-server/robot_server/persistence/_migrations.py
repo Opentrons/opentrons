@@ -182,7 +182,7 @@ def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     """Migrate the ``analysis`` table from schema 1 to schema 2."""
     v1_completed_analysis_column = sqlalchemy.column(
         "completed_analysis",
-        sqlalchemy.LargeBinary
+        sqlalchemy.PickleType(pickler=_legacy_pickle)
         # Originally declared nullable=False in schema v1.
     )
 
@@ -195,11 +195,11 @@ def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     for v1_row in v1_rows:
         v1_id = v1_row.id
         assert isinstance(v1_id, str)
-        v1_completed_analysis_bytes = v1_row.completed_analysis
-        assert isinstance(v1_completed_analysis_bytes, bytes)
+        v1_completed_analysis_dict = v1_row.completed_analysis
+        assert isinstance(v1_completed_analysis_dict, dict)
 
         parsed_completed_analysis = CompletedAnalysis.parse_obj(
-            _legacy_pickle.loads(v1_completed_analysis_bytes)
+            v1_completed_analysis_dict
         )
 
         v2_completed_analysis = _pydantic_col.pydantic_to_sql(
