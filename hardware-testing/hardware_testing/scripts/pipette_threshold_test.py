@@ -9,6 +9,7 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
     find_deck_height,
+    _probe_deck_at,
     _get_calibration_square_position_in_slot,
 )
 from hardware_testing import data
@@ -35,22 +36,19 @@ def build_arg_parser():
 
 class Pipette_Threshold_Test:
     def __init__(
-        self, simulate: bool, cycles: int, trials: int, slot: int, probe_type: int, zero_mode: int
+        self, simulate: bool, cycles: int, trials: int, slot: int
     ) -> None:
         self.simulate = simulate
         self.cycles = cycles
         self.trials = trials
         self.slot = slot
-        self.probe_type = probe_type
-        self.zero_mode = zero_mode
         self.api = None
         self.mount = None
         self.home = None
         self.pipette_id = None
         self.deck_definition = None
         self.deck_height = None
-        self.edge = None
-        self.sensor_id = SensorId.S0
+        self.nominal_center = None
         self.jog_step_forward = 0.1
         self.jog_step_backward = -0.01
         self.jog_speed = 10 # mm/s
@@ -71,6 +69,7 @@ class Pipette_Threshold_Test:
             speed_mm_per_s=1,
             sensor_threshold_pf=1.0,
         )
+        self.Z_PREP_OFFSET = Point(x=13, y=13, z=0)
         self.test_data ={
             "Time":"None",
             "Cycle":"None",
@@ -90,31 +89,20 @@ class Pipette_Threshold_Test:
             "Z":"/dev/ttyUSB2",
         }
         self.gauge_offsets = {
-            # "X":Point(x=5, y=-5, z=9),
-            # "Y":Point(x=-5, y=-5, z=9),
-            # "Z":Point(x=0, y=0, z=9),
-            "X":Point(x=5, y=-6, z=7),
-            "Y":Point(x=-6, y=-5, z=7),
-            "Z":Point(x=0, y=0, z=7),
+            "X":Point(x=5, y=-5, z=9),
+            "Y":Point(x=-5, y=-5, z=9),
+            "Z":Point(x=0, y=0, z=9),
         }
-        self.probe_tag = {
-            "1":"solid",
-            "2":"hole",
-        }
-        self.edge_tag = {
-            "1":"cali",
-            "2":"dial",
-        }
+        self.thresholds = [1.0, 2.0, 3.0, 4.0, 5.0]
 
     async def test_setup(self):
         self.file_setup()
-        if self.edge_mode == 2:
-            self.gauge_setup()
+        self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
         self.nominal_center = _get_calibration_square_position_in_slot(self.slot)
-        # self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y + 0) # single-channel
-        self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y - 6) # multi-channel
+        self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y) # single-channel
+        # self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y - 6) # multi-channel
         if self.simulate:
             self.pipette_id = "SIMULATION"
         else:
@@ -127,10 +115,8 @@ class Pipette_Threshold_Test:
 
     def file_setup(self):
         class_name = self.__class__.__name__
-        probe_tag = self.probe_tag[str(self.probe_type)]
-        edge_tag = self.edge_tag[str(self.edge_mode)]
         self.test_name = class_name.lower()
-        self.test_tag = f"slot{self.slot}_{probe_tag}_{edge_tag}"
+        self.test_tag = f"slot{self.slot}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -151,44 +137,46 @@ class Pipette_Threshold_Test:
         return str.join(",", list(dict.values()))+"\n"
 
     def _zero_gauges(self):
-        if self.zero_mode == 1:
-            print(f"\nPlace Gauge Block on Deck Slot #{self.slot}")
-            for axis in self.gauges:
-                gauge_zero = "{} Zero".format(axis)
-                input(f"\nPush block against {axis}-axis Gauge and Press ENTER\n")
-                _reading = True
-                while _reading:
-                    zeros = []
-                    for i in range(5):
-                        gauge = self.gauges[axis].read_stable(timeout=20)
-                        zeros.append(gauge)
-                    _variance = abs(max(zeros) - min(zeros))
-                    print(f"Variance = {_variance}")
-                    if _variance < 0.1:
-                        _reading = False
-                zero = sum(zeros) / len(zeros)
-                self.test_data[gauge_zero] = str(zero)
-                print(f"{axis} Gauge Zero = {zero}mm")
-            input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
-        elif self.zero_mode == 2:
-            for axis in self.gauges:
-                zero = input(f"\nType value for {axis}-axis Gauge and Press ENTER\n")
-                gauge_zero = "{} Zero".format(axis)
-                self.test_data[gauge_zero] = str(zero)
-                print(f"{axis} Gauge Zero = {zero}mm")
+        print(f"\nPlace Gauge Block on Deck Slot #{self.slot}")
+        for axis in self.gauges:
+            gauge_zero = "{} Zero".format(axis)
+            input(f"\nPush block against {axis}-axis Gauge and Press ENTER\n")
+            _reading = True
+            while _reading:
+                zeros = []
+                for i in range(5):
+                    gauge = self.gauges[axis].read_stable(timeout=20)
+                    zeros.append(gauge)
+                _variance = abs(max(zeros) - min(zeros))
+                print(f"Variance = {_variance}")
+                if _variance < 0.1:
+                    _reading = False
+            zero = sum(zeros) / len(zeros)
+            self.test_data[gauge_zero] = str(zero)
+            print(f"{axis} Gauge Zero = {zero}mm")
+        input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
 
-    async def _read_gauge(self, axis, step):
-        current_position = await self.api.gantry_position(self.mount)
+    async def _read_gauge(self, axis):
+        # current_position = await self.api.gantry_position(self.mount)
+        gauge_position = self.nominal_center + self.gauge_offsets[axis]
         if axis == "X":
-            jog_position = current_position._replace(x=current_position.x + step)
+            jog_position = gauge_position._replace(x=current_position.x + step)
         elif axis == "Y":
-            jog_position = current_position._replace(y=current_position.y - step)
+            jog_position = gauge_position._replace(y=current_position.y - step)
         elif axis == "Z":
-            jog_position = self.nominal_center
+            jog_position = self.nominal_center._replace(z=self.deck_height)
+        # Move to gauge position
+        await self.api.move_to(self.mount, gauge_position, speed=10)
         # Move to jog position
         await self.api.move_to(self.mount, jog_position, speed=self.jog_speed)
         # Read gauge
         gauge = self.gauges[axis].read_stable(timeout=20)
+        # Get current position
+        current_position = await self.api.gantry_position(self.mount)
+        self.test_data["Current Position"] = str(current_position).replace(", ",";")
+        print(f"Current Position = {current_position}")
+        # Return to gauge position
+        await self.api.move_to(self.mount, gauge_position, speed=10)
         return gauge
 
     async def _probe_axis(
@@ -203,83 +191,49 @@ class Pipette_Threshold_Test:
         )
         return point
 
-    async def _record_data(self, cycle):
+    def _record_data(self, cycle, trial, threshold):
         elapsed_time = (time.time() - self.start_time)/60
         self.test_data["Time"] = str(round(elapsed_time, 3))
         self.test_data["Cycle"] = str(cycle)
+        self.test_data["Trial"] = str(trial)
+        self.test_data["Threshold"] = str(threshold)
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
-    async def _get_stable_capacitance(self, sensor_id) -> float:
-        _reading = True
-        _try = 1
-        while _reading:
-            capacitance = []
-            for i in range(10):
-                if self.simulate:
-                    data = 0.0
-                else:
-                    data = await get_capacitance_ot3(self.api, self.mount, sensor_id)
-                capacitance.append(data)
-            _variance = round(abs(max(capacitance) - min(capacitance)), 5)
-            print(f"Try #{_try} Variance = {_variance}")
-            _try += 1
-            if _variance < 0.1:
-                _reading = False
-        return sum(capacitance) / len(capacitance)
-
-    async def _update_position(
-        self, api: OT3API, mount: OT3Mount, x_step: int
+    def _update_threshold(
+        self, threshold: float
     ) -> None:
-        # Move to next position
-        current_position = await api.gantry_position(mount)
-        if x_step > 1:
-            x_position = current_position.x + self.x_increment
-        else:
-            x_position = current_position.x
-        next_position = current_position._replace(x=x_position, z=self.START_HEIGHT)
-        await api.move_to(mount, next_position, speed=1)
+        self.PROBE_SETTINGS_Z_AXIS = CapacitivePassSettings(
+            prep_distance_mm=5,
+            max_overrun_distance_mm=5,
+            speed_mm_per_s=1,
+            sensor_threshold_pf=threshold,
+        )
 
-    async def _record_capacitance(
-        self, api: OT3API, mount: OT3Mount, sensor_id: SensorId, x_step: int, z_step: int, deck_height: float
+    async def _measure_gauge(
+        self, api: OT3API, mount: OT3Mount, slot: int
     ) -> None:
-        # Move to next height
-        current_position = await api.gantry_position(mount)
-        next_height = current_position._replace(z=deck_height + self.z_increment*(z_step - 1))
-        await api.move_to(mount, next_height, speed=1)
-
-        # Get current position
-        current_position = await api.gantry_position(mount)
-        self.test_data["Current Position"] = str(current_position).replace(", ",";")
-        print(f"Current Position = {current_position}")
-
-        # Read capacitance
-        capacitance = await self._get_stable_capacitance(sensor_id)
-        print(f"Capacitance = {capacitance}")
-        self.test_data["Capacitance"] = str(capacitance)
-
-    async def _measure_capacitance(
-        self, api: OT3API, mount: OT3Mount, slot: int, cycle: int
-    ) -> None:
-        nominal_center = _get_calibration_square_position_in_slot(slot)
-        await api.add_tip(mount, api.config.calibration.probe_length)
-        edge_position = self.edge._replace(z=self.deck_height)
-        await api.move_to(mount, edge_position)
-        for i in range(self.x_steps):
-            x_step = i + 1
-            self.test_data["X Step"] = str(x_step)
-            print(f"\n-->> Measuring X Step {x_step}/{self.x_steps}")
-            await self._update_position(self.api, self.mount, x_step)
-            for j in range(self.z_steps):
-                z_step = j + 1
-                self.test_data["Z Step"] = str(z_step)
-                print(f"\n--->>> Measuring Z Step {z_step}/{self.z_steps} (X Step {x_step}/{self.x_steps})")
-                await self._record_capacitance(self.api, self.mount, self.sensor_id, x_step, z_step, self.deck_height)
-                await self._record_data(cycle)
-        current_position = await api.gantry_position(mount)
-        home_z = current_position._replace(z=self.home.z)
-        await api.move_to(mount, home_z)
+        # Move up
+        current_pos = await api.gantry_position(mount)
+        z_offset = current_pos + self.gauge_offsets["Z"]
+        await api.move_to(mount, z_offset, speed=10)
+        # Move above slot center
+        above_slot_center = self.nominal_center + self.gauge_offsets["Z"]
+        await api.move_to(mount, above_slot_center, speed=10)
+        # Measure Z-axis gauge
+        print("Measuring Z Gauge...")
+        z_gauge = await self._read_gauge("Z")
+        self.test_data["Z Gauge"] = str(z_gauge)
+        print(f"Z Gauge = ", self.test_data["Z Gauge"])
         await api.remove_tip(mount)
+
+    async def _get_deck_height(
+        self, api: OT3API, mount: OT3Mount, nominal_center: Point
+    ) -> float:
+        z_pass_settings = self.PROBE_SETTINGS_Z_AXIS
+        z_prep_point = nominal_center + self.Z_PREP_OFFSET
+        deck_z = await _probe_deck_at(api, mount, z_prep_point, z_pass_settings)
+        return deck_z
 
     async def _calibrate_probe(
         self, api: OT3API, mount: OT3Mount, slot: int, nominal_center: Point
@@ -287,19 +241,9 @@ class Pipette_Threshold_Test:
         # Calibrate pipette
         await api.add_tip(mount, api.config.calibration.probe_length)
         home = await api.gantry_position(mount)
-        self.deck_height = await find_deck_height(api, mount, nominal_center)
+        self.deck_height = await self._get_deck_height(api, mount, nominal_center)
         self.test_data["Deck Height"] = str(self.deck_height)
         print(f"Deck Height: {self.deck_height}")
-        if self.edge_mode == 1:
-            self.edge = await self._calibrate_edge(api, mount, nominal_center, self.deck_height)
-        elif self.edge_mode == 2:
-            self.edge = await self._measure_edge(api, mount, nominal_center, "X")
-        self.test_data[f"Edge Position"] = str(self.edge).replace(", ",";")
-        print(f"Edge Position: {self.edge}")
-        current_position = await api.gantry_position(mount)
-        home_z = current_position._replace(z=home.z)
-        await api.move_to(mount, home_z)
-        await api.remove_tip(mount)
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
@@ -326,17 +270,24 @@ class Pipette_Threshold_Test:
         try:
             await self.test_setup()
             if self.api and self.mount:
-                if self.edge_mode == 2:
-                    if len(self.gauges) > 0:
-                        self._zero_gauges()
+                if len(self.gauges) > 0:
+                    self._zero_gauges()
                 input(f"Add Calibration Tip to pipette, then press ENTER: ")
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
-                    await self._home(self.api, self.mount)
-                    await self._calibrate_probe(self.api, self.mount, self.slot, self.nominal_center)
-                    await self._measure_capacitance(self.api, self.mount, self.slot, cycle)
-                    await self._reset(self.api, self.mount)
+                    for j in range(len(self.thresholds)):
+                        threshold = self.thresholds[j]
+                        self._update_threshold(threshold)
+                        print(f"\nUpdated Z Threshold to {self.PROBE_SETTINGS_Z_AXIS.sensor_threshold_pf} pF!")
+                        await self._home(self.api, self.mount)
+                        for k in range(self.trials):
+                            trial = k + 1
+                            print(f"\n-->> Measuring Trial {trial}/{self.trials} (Threshold = {threshold})")
+                            await self._calibrate_probe(self.api, self.mount, self.slot, self.nominal_center)
+                            await self._measure_gauge(self.api, self.mount, self.slot)
+                            self._record_data(cycle, trial, threshold)
+                        await self._reset(self.api, self.mount)
         except Exception as e:
             await self.exit()
             raise e
@@ -351,5 +302,5 @@ if __name__ == '__main__':
     print("\nOT-3 Pipette Threshold Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Pipette_Threshold_Test(args.simulate, args.cycles, args.trials, args.slot, probe_type, zero_mode)
+    test = Pipette_Threshold_Test(args.simulate, args.cycles, args.trials, args.slot)
     asyncio.run(test.run())
