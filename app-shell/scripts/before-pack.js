@@ -104,9 +104,10 @@ const removeUnusedPyExecutables = root =>
 
 module.exports = function beforeBuild(context) {
   const { platform, arch, electronPlatformName } = context
+  console.log(context)
   const platformName = electronPlatformName ?? platform.nodeName
   const standalonePython = getPythonVersion(platformName, arch)
-  const isWin = platform === 'win32'
+  const isWin = platformName === 'win32'
   if (!USE_PYTHON) {
     return Promise.resolve(true)
   }
@@ -168,12 +169,12 @@ module.exports = function beforeBuild(context) {
     .then(() => {
       if (!isWin) {
         console.log(
-          `Not windows (${platform}), not removing python executables`
+          `Not windows (${platformName}), not removing python executables`
         )
         return true
       }
 
       console.log('Removing unused executables to reduce codesign problems')
-      return removeUnusedPyExecutables(PYTHON_DESTINATION, platformName)
+      return removeUnusedPyExecutables(PYTHON_DESTINATION)
     })
 }
