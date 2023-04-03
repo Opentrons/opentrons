@@ -10,6 +10,7 @@ import asyncio
 import logging
 from logging.config import dictConfig
 
+update_firmware = True
 has_robot_server = True
 if os.environ.get("OPENTRONS_SIMULATION"):
     print("Running with simulators")
@@ -23,6 +24,9 @@ if os.environ.get("OT2", None):
 else:
     print("Running with OT3 HC. If you dont want this, set an env var named 'OT2'")
     os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
+    if os.environ.get('OT3_DISABLE_FW_UPDATES'):
+        update_firmware = False
+        print("OT3 firmware updates are disabled")
 
 from code import interact  # noqa: E402
 from subprocess import run  # noqa: E402
@@ -108,7 +112,8 @@ def stop_server() -> None:
 
 def build_api() -> ThreadManager[HardwareControlAPI]:
     tm = ThreadManager(
-        HCApi.build_hardware_controller, use_usb_bus=ff.rear_panel_integration()
+        HCApi.build_hardware_controller, use_usb_bus=ff.rear_panel_integration(),
+        update_firmware=update_firmware
     )
     tm.managed_thread_ready_blocking()
     return tm

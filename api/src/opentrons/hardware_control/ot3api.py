@@ -279,6 +279,7 @@ class OT3API(
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
         use_usb_bus: bool = False,
+        update_firmware: bool = True,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -292,8 +293,11 @@ class OT3API(
         await api_instance._cache_instruments()
 
         # check for and start firmware updates if required
-        async for _ in api_instance.update_firmware():
-            pass
+        if update_firmware:
+            async for progress in api_instance.update_firmware():
+                # NOTE: We are printing to stdout so when the hw controller is
+                # built for a CLI, the operator can know when updates are running.
+                print(progress)
 
         await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(
