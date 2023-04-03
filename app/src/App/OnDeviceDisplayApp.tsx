@@ -24,7 +24,7 @@ import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDa
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
-import { AttachInstrumentsDashboard } from '../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
+import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
@@ -110,11 +110,11 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:runId/run',
   },
   {
-    Component: AttachInstrumentsDashboard,
+    Component: InstrumentsDashboard,
     exact: true,
     name: 'Instruments',
-    navLinkTo: '/attach-instruments',
-    path: '/attach-instruments',
+    navLinkTo: '/instruments',
+    path: '/instruments',
   },
   // insert attach instruments subroutes
   {

@@ -15,7 +15,7 @@ export function getLoadedLabware(
     : analysis.labware[labwareId]
 }
 export function getLoadedPipette(
-  analysis: CompletedProtocolAnalysis,
+  analysis: CompletedProtocolAnalysis, 
   mount: string
 ): LoadedPipette | undefined {
   // NOTE: old analysis contains a object dictionary of pipette entities by id, this case is supported for backwards compatibility purposes

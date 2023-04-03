@@ -9,7 +9,7 @@ import {
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
-import { AttachInstrumentsDashboard } from '../AttachInstrumentsDashboard'
+import { InstrumentsDashboard } from '../InstrumentsDashboard'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../../../organisms/Devices/hooks')
@@ -34,7 +34,7 @@ const mockChoosePipette = ChoosePipette as jest.MockedFunction<
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <AttachInstrumentsDashboard />
+      <InstrumentsDashboard />
     </MemoryRouter>
   )
 }
@@ -44,7 +44,7 @@ const mockPipette: AttachedPipette = {
     ...mockGen3P1000PipetteSpecs,
   },
 }
-describe('AttachInstrumentsDashboard', () => {
+describe('InstrumentsDashboard', () => {
   beforeEach(() => {
     mockChoosePipette.mockReturnValue(<div>mock choose pipette</div>)
     mockGetIs96ChannelPipetteAttached.mockReturnValue(false)

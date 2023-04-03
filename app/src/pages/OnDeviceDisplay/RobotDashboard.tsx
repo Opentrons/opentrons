@@ -33,7 +33,7 @@ const DASHBOARD_ITEMS: MiniCardButtonProps[] = [
   {
     iconName: 'wifi',
     cardName: 'Instrument + Module Hub',
-    destinationPath: '/attach-instruments',
+    destinationPath: '/instruments',
   },
   {
     iconName: 'wifi',
