@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from robot_server.versioning import check_version_header, set_version_response_headers
+from robot_server.authentication import check_auth_token_header
 
 from . import (
     networking,
@@ -19,49 +20,49 @@ legacy_routes = APIRouter()
 legacy_routes.include_router(
     router=networking.router,
     tags=["Networking"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
 )
 
 legacy_routes.include_router(
     router=control.router,
     tags=["Control"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
 )
 
 legacy_routes.include_router(
     router=settings.router,
     tags=["Settings"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
 )
 
 legacy_routes.include_router(
     router=deck_calibration.router,
     tags=["Deck Calibration"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
 )
 
 legacy_routes.include_router(
     router=modules.router,
     tags=["Modules"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
 )
 
 legacy_routes.include_router(
     router=pipettes.router,
     tags=["Pipettes"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
 )
 
 legacy_routes.include_router(
     router=motors.router,
     tags=["Motors"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
 )
 
 legacy_routes.include_router(
     router=camera.router,
     tags=["Camera"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
 )
 
 # logs routes are exempt from version header requirements
