@@ -101,8 +101,8 @@ class Pipette_Threshold_Test:
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
         self.nominal_center = _get_calibration_square_position_in_slot(self.slot)
-        self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y) # single-channel
-        # self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y - 6) # multi-channel
+        # self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y) # single-channel
+        self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y - 6) # multi-channel
         if self.simulate:
             self.pipette_id = "SIMULATION"
         else:
