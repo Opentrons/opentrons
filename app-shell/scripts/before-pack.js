@@ -166,9 +166,14 @@ module.exports = function beforeBuild(context) {
       return true
     })
     .then(() => {
+      if (!isWin) {
+        console.log(
+          `Not windows (${platform}), not removing python executables`
+        )
+        return true
+      }
+
       console.log('Removing unused executables to reduce codesign problems')
-      return isWin
-        ? removeUnusedPyExecutables(PYTHON_DESTINATION, platformName)
-        : Promise.resolve(true)
+      return removeUnusedPyExecutables(PYTHON_DESTINATION, platformName)
     })
 }
