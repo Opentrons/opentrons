@@ -59,7 +59,9 @@ export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
     >
       <Flex alignSelf={ALIGN_STRETCH}>
         <StyledText as="h1">
-          {onFinalPipette ? t('return_tip_and_exit'): t('return_tip_and_continue')}
+          {onFinalPipette
+            ? t('return_tip_and_exit')
+            : t('return_tip_and_continue')}
         </StyledText>
       </Flex>
       <Flex
@@ -68,7 +70,9 @@ export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
         marginTop={SPACING.spacing4}
       >
         <NeedHelpLink />
-        <PrimaryButton onClick={confirmReturnTip}>{t('return_tip')}</PrimaryButton>
+        <PrimaryButton aria-label="return tip" onClick={confirmReturnTip}>
+          {t('return_tip')}
+        </PrimaryButton>
       </Flex>
     </Flex>
   )

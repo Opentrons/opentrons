@@ -45,7 +45,7 @@ const assetMap = {
 
 export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
-  const { isMulti, mount, sendCommands, sessionType, calBlock } = props
+  const { isMulti, mount, sendCommands, sessionType } = props
   const demoAsset = React.useMemo(
     () => mount && assetMap[mount][isMulti ? 'multi' : 'single'],
     [mount, isMulti]
@@ -62,7 +62,6 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
 
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-  console.log('sessionType', sessionType, isHealthCheck)
   const proceed: React.MouseEventHandler<HTMLButtonElement> = _event => {
     isHealthCheck
       ? sendCommands(
@@ -80,14 +79,9 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   )
 
   let title = t('calibrate_z_axis_on_slot')
-  let bodyTranlsationKey = 'jog_pipette_to_touch_slot'
+  const bodyTranslationKey = 'jog_pipette_to_touch_slot'
   if (isHealthCheck) {
-    title =
-      calBlock != null ? t('check_z_axis_on_block') : t('check_z_axis_on_trash')
-    bodyTranlsationKey =
-      calBlock != null
-        ? 'jog_pipette_to_touch_block'
-        : 'jog_pipette_to_touch_trash'
+    title = t('check_z_axis_on_slot')
   }
 
   return (
@@ -109,7 +103,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
             </StyledText>
             <Trans
               t={t}
-              i18nKey={bodyTranlsationKey}
+              i18nKey={bodyTranslationKey}
               components={{
                 block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
               }}

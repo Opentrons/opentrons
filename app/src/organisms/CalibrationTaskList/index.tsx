@@ -19,7 +19,11 @@ import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { TaskList } from '../TaskList'
 
-import { useCalibrationTaskList, useRunHasStarted } from '../Devices/hooks'
+import {
+  useAttachedPipettes,
+  useCalibrationTaskList,
+  useRunHasStarted,
+} from '../Devices/hooks'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 
 import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
@@ -55,7 +59,21 @@ export function CalibrationTaskList({
     deckCalLauncher
   )
   const runId = useCurrentRunId()
+
+  let generalTaskDisabledReason = null
+
+  const attachedPipettes = useAttachedPipettes()
+  if (attachedPipettes.left == null && attachedPipettes.right == null) {
+    generalTaskDisabledReason = t(
+      'device_settings:attach_a_pipette_before_calibrating'
+    )
+  }
+
   const runHasStarted = useRunHasStarted(runId)
+  if (runHasStarted)
+    generalTaskDisabledReason = t(
+      'device_settings:some_robot_controls_are_not_available'
+    )
 
   React.useEffect(() => {
     if (
@@ -148,11 +166,7 @@ export function CalibrationTaskList({
             taskList={taskList}
             taskListStatus={taskListStatus}
             generalTaskClickHandler={() => setHasLaunchedWizard(true)}
-            generalTaskDisabledReason={
-              runHasStarted
-                ? t('device_settings:some_robot_controls_are_not_available')
-                : null
-            }
+            generalTaskDisabledReason={generalTaskDisabledReason}
           />
         </>
       )}
