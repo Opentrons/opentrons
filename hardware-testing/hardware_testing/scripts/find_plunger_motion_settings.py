@@ -8,13 +8,13 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
 
 
-TEST_PASS_FAIL_MM = 0.1
+TEST_PASS_FAIL_MM = 0.05
 TEST_NUM_TRIALS = 3
 
 TEST_MAX_SPEED = 40  # mm/sec (creates ~600 ul/sec for P1000)
-TEST_CURRENT = [0.3, 0.4, 0.5, 0.7, 1.0]  # amps
-TEST_DISCONTINUITIES = [50, 30, 20, 15, 12, 10]  # mm/sec
-TEST_ACCELERATIONS = [200, 150, 120, 100, 80]  # mm/sec/sec
+TEST_CURRENT = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0]  # amps
+TEST_DISCONTINUITIES = [40, 35, 30, 25, 20, 15]  # mm/sec
+TEST_ACCELERATIONS = [2000, 1500, 1200, 1000, 800, 700, 600, 500, 450, 400, 350, 250, 200]  # mm/sec/sec
 
 DEFAULT_HOLD_CURRENT = 0.1
 
@@ -119,11 +119,10 @@ async def _test_trails(
     return True
 
 
-async def _main(is_simulating: bool) -> None:
+async def _main(is_simulating: bool, mount: OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=is_simulating, pipette_left="p1000_single_v3.3"
+        is_simulating=is_simulating, pipette_left="p1000_single_v3.4", pipette_right="p1000_multi_v3.4"
     )
-    mount = OT3Mount.LEFT
     pipette = api.hardware_pipettes[mount.to_mount()]
     if not pipette:
         raise RuntimeError("No pipette on the left mount")
@@ -165,13 +164,21 @@ async def _main(is_simulating: bool) -> None:
                 good_settings[i][-1] = acceleration
                 break
     print("RESULTS")
-    print("current\t\tdiscontinuity\tacceleration")
+    print("current\t\tdiscontinuity\tacceleration\taccel-actual")
     for current, discontinuity, acceleration in good_settings:  # type: ignore[assignment]
-        print(f"{current}\t\t{discontinuity}\t\t{acceleration}")
+        seconds = (TEST_MAX_SPEED - discontinuity) / acceleration
+        accel_actual = TEST_MAX_SPEED / seconds
+        print(f"{current}\t\t{discontinuity}\t\t{acceleration}\t{accel_actual}")
 
 
 if __name__ == "__main__":
+    mount_options = {
+        "left": OT3Mount.LEFT,
+        "right": OT3Mount.RIGHT,
+    }
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--mount", choices=list(mount_options.keys()), required=True)
     args = parser.parse_args()
-    asyncio.run(_main(args.simulate))
+    mount = mount_options[args.mount]
+    asyncio.run(_main(args.simulate, mount))
