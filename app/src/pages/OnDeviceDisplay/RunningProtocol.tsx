@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -12,6 +11,7 @@ import {
   COLORS,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
+  ALIGN_FLEX_END, // temporary
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -20,6 +20,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { StepMeter } from '../../atoms/StepMeter'
+import { TertiaryButton } from '../../atoms/buttons' // temporary
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
 import {
@@ -29,7 +30,9 @@ import {
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
+  RunningProtocolSkelton,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -41,17 +44,16 @@ const Bullet = styled.div`
   width: 1rem;
   border-radius: 50%;
   background: ${(props: BulletProps) =>
-    props.isActive ? COLORS.darkBlack_sixty : COLORS.darkBlack_fourty};
+    props.isActive ? COLORS.darkBlack_sixty : COLORS.darkBlack_forty};
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `
 
-type ScreenOption =
+export type ScreenOption =
   | 'CurrentRunningProtocolCommand'
   | 'RunningProtocolCommandList'
 
 export function RunningProtocol(): JSX.Element {
-  const { t } = useTranslation('run_details')
   const { runId } = useParams<OnDeviceRouteParams>()
   const [currentOption, setCurrentOption] = React.useState<ScreenOption | null>(
     'CurrentRunningProtocolCommand'
@@ -83,6 +85,8 @@ export function RunningProtocol(): JSX.Element {
     isPauseRunActionLoading,
     isStopRunActionLoading,
   } = useRunActionMutations(runId)
+
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   // console.log('commands', robotSideAnalysis?.commands)
 
   // console.log('currentRunCommandIndex', currentRunCommandIndex)
@@ -92,13 +96,13 @@ export function RunningProtocol(): JSX.Element {
       robotSideAnalysis?.commands[currentRunCommandIndex]
   )
 
-  console.log('totalSteps', totalIndex)
-  console.log('currentRunCommandIndex', currentRunCommandIndex)
-  console.log('runStatus', runStatus)
+  // console.log('totalSteps', totalIndex)
+  // console.log('currentRunCommandIndex', currentRunCommandIndex)
+  // console.log('runStatus', runStatus)
 
-  const currentRunStatus = t(`status_${runStatus}`)
-  
-  console.log('currentRunStatus', currentRunStatus)
+  // console.log('currentRunStatus', currentRunStatus)
+
+  // console.log('robotSideAnalysis', robotSideAnalysis)
 
   React.useEffect(() => {
     if (
@@ -136,19 +140,26 @@ export function RunningProtocol(): JSX.Element {
       >
         {currentOption === 'CurrentRunningProtocolCommand' ? (
           <CurrentRunningProtocolCommand
+            runId={runId}
+            playRun={playRun}
+            pauseRun={pauseRun}
+            stopRun={stopRun}
+            trackProtocolRunEvent={trackProtocolRunEvent}
             protocolName={protocolName}
-            currentRunStatus={currentRunStatus}
+            runStatus={runStatus}
             currentRunCommandIndex={currentRunCommandIndex}
             robotSideAnalysis={robotSideAnalysis}
             runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
           />
         ) : (
           <RunningProtocolCommandList
+            runId={runId}
             protocolName={protocolName}
-            currentRunStatus={currentRunStatus}
+            runStatus={runStatus}
             playRun={playRun}
             pauseRun={pauseRun}
             stopRun={stopRun}
+            trackProtocolRunEvent={trackProtocolRunEvent}
             currentRunCommandIndex={currentRunCommandIndex}
             robotSideAnalysis={robotSideAnalysis}
           />
@@ -165,6 +176,15 @@ export function RunningProtocol(): JSX.Element {
           />
           <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
         </Flex>
+      </Flex>
+      <Flex
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
+      >
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
       </Flex>
     </>
   )

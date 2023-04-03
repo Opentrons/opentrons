@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
@@ -17,12 +18,29 @@ import {
   DISPLAY_FLEX,
   BORDERS,
 } from '@opentrons/components'
+import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
+import { CommandIcon } from '../../RunPreview/CommandIcon'
+import { SmallStopButton, SmallPlayPauseButton } from './Buttons'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import { CommandIcon } from '../../RunPreview/CommandIcon'
+import type { RunStatus } from '@opentrons/api-client'
+import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+
+const TITLE_TEXT_STYLE = css`
+  color: ${COLORS.darkBlack_seventy};
+  font-size: 1.75rem;
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: 2.25rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`
 
 const COMMAND_ROW_STYLE = css`
   font-size: 1.375rem;
@@ -35,23 +53,58 @@ const COMMAND_ROW_STYLE = css`
 `
 
 interface RunningProtocolCommandListProps {
-  currentRunStatus: string
-  protocolName?: string
+  runId: string
+  runStatus: RunStatus | null
+  robotSideAnalysis: CompletedProtocolAnalysis | null
   playRun: () => void
   pauseRun: () => void
   stopRun: () => void
+  trackProtocolRunEvent: TrackProtocolRunEvent
+  protocolName?: string
   currentRunCommandIndex?: number
-  robotSideAnalysis: CompletedProtocolAnalysis | null
 }
 
 export function RunningProtocolCommandList({
-  currentRunStatus,
+  runId, // may not need
+  runStatus,
+  robotSideAnalysis,
+  playRun,
+  pauseRun,
+  stopRun,
+  trackProtocolRunEvent,
   protocolName,
   currentRunCommandIndex,
-  robotSideAnalysis,
 }: RunningProtocolCommandListProps): JSX.Element {
+  const { t } = useTranslation('run_details')
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const ref = React.useRef<ViewportListRef>(null)
+  const currentRunStatus = t(`status_${runStatus}`)
+
+  const onStop = (): void => {
+    stopRun()
+    // ToDo (kj:03/28/2023) update event information
+    trackProtocolRunEvent({ name: 'runCancel', properties: { tbd: 'tbd' } })
+  }
+
+  const onTogglePlayPause = (): void => {
+    if (runStatus === RUN_STATUS_RUNNING) {
+      console.log('pause')
+      pauseRun()
+      // ToDo (kj:03/28/2023) update event information
+      trackProtocolRunEvent({ name: 'runPause' })
+    } else {
+      console.log('playRun')
+      playRun()
+      // ToDo (kj:03/28/2023) update event information
+      // trackProtocolRunEvent({
+      //   name: runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume',
+      //   properties:
+      //     runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
+      //       ? robotAnalyticsData
+      //       : {},
+      // })
+    }
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
@@ -64,13 +117,14 @@ export function RunningProtocolCommandList({
           <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
             {currentRunStatus}
           </StyledText>
-          <StyledText fontSize="2rem" color={COLORS.darkGreyEnabled}>
-            {protocolName}
-          </StyledText>
+          <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
         <Flex gridGap="1.5rem">
-          <StopButton onStop={() => console.log('stop')} />
-          <PauseButton onPause={() => console.log('pause')} />
+          <SmallStopButton onStop={onStop} />
+          <SmallPlayPauseButton
+            onTogglePlayPause={onTogglePlayPause}
+            runStatus={runStatus}
+          />
         </Flex>
       </Flex>
       {robotSideAnalysis != null ? (
@@ -121,47 +175,5 @@ export function RunningProtocolCommandList({
         </Flex>
       ) : null}
     </Flex>
-  )
-}
-
-interface StopButtonProps {
-  onStop: () => void
-}
-const StopButton = ({ onStop }: StopButtonProps): JSX.Element => {
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.red_two}
-      borderRadius="50%"
-      display={DISPLAY_FLEX}
-      height="6.25rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="6.25rem"
-      // onClick={onClose}
-      aria-label="close"
-    >
-      <Icon name="close" color={COLORS.white} size="5rem" />
-    </Btn>
-  )
-}
-
-interface PauseButtonProps {
-  onPause: () => void
-}
-const PauseButton = ({ onPause }: PauseButtonProps): JSX.Element => {
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.blueEnabled}
-      borderRadius="50%"
-      display={DISPLAY_FLEX}
-      height="6.25rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="6.25rem"
-      // onClick={onPause}
-      aria-label="pause"
-    >
-      <Icon name="pause" color={COLORS.white} size="2.5rem" />
-    </Btn>
   )
 }
