@@ -10,8 +10,8 @@ import {
   DIRECTION_ROW,
   Icon,
 } from '@opentrons/components'
-import { ODD_FOCUS_VISIBLE_STYLE } from '../../../App/constants'
 import { StyledText } from '../../text'
+import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type LargeButtonTypes = 'primary' | 'secondary' | 'alert'
@@ -87,7 +87,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE_STYLE};
+      box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .defaultBackgroundColor};
     }
