@@ -10,6 +10,8 @@ from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import Thermocycler
 from opentrons.hardware_control.modules.types import TemperatureStatus
 
+from opentrons.hardware_control.modules.thermocycler import ThermocyclerDriverFactory
+
 from .build_module import build_module
 
 
@@ -25,21 +27,24 @@ async def thermocycler(
     # The Thermocycler builder talks to the TCP port, sometimes before it
     # is initialized. This loop is intended to prevent the tests from being
     # flaky and sometimes failing to build the module.
-
+    port = "socket://127.0.0.1:{emulator_settings.thermocycler_proxy.driver_port}"
     for _ in range(3):
         try:
-            module = await build_module(
-                Thermocycler,
-                port=emulator_settings.thermocycler_proxy.driver_port,
-                execution_manager=execution_manager,
-                poll_interval_seconds=poll_interval_seconds,
+            await ThermocyclerDriverFactory.create(
+                port=port,
+                loop=None,
             )
         except Exception:
-            await module.cleanup()
             await asyncio.sleep(0.1)
         else:
             continue
 
+    module = await build_module(
+        Thermocycler,
+        port=emulator_settings.thermocycler_proxy.driver_port,
+        execution_manager=execution_manager,
+        poll_interval_seconds=poll_interval_seconds,
+    )
     yield module
     await module.cleanup()
 
