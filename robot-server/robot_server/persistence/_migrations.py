@@ -18,11 +18,29 @@ Database schema versions:
 
 - Version 0
     - Initial schema version
+
 - Version 1
-    - `run_table.state_summary` column added
-    - `run_table.commands` column added
-    - `run_table.engine_status` column added
-    - `run_table._updated_at` column added
+    This migration adds the following nullable columns to the run table:
+
+    - Column("state_summary, sqlalchemy.PickleType, nullable=True)
+    - Column("commands", sqlalchemy.PickleType, nullable=True)
+    - Column("engine_status", sqlalchemy.String, nullable=True)
+    - Column("_updated_at", sqlalchemy.DateTime, nullable=True)
+
+- Version 2
+    This migration doesn't affect the schema at the SQL level,
+    but it does affect how we format stored values.
+
+    In schema v1, these columns...
+
+    - Column "completed_analysis" in table "analysis"
+    - Column "state_summary" in table "run"
+    - Column "commands" in table "run"
+
+    ...stored Pydantic models, exported to Python dicts with Pydantic's .dict() method,
+    then serialized to binary blobs with the standard Python pickle module.
+
+    In schema v2, we serialize the Pydantic models to JSON, instead.
 """
 import logging
 from datetime import datetime, timezone
@@ -137,15 +155,7 @@ def _is_version_0(transaction: sqlalchemy.engine.Connection) -> bool:
 
 
 def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
-    """Migrate to schema version 1.
-
-    This migration adds the following nullable columns to the run table:
-
-    - Column("state_summary, sqlalchemy.PickleType, nullable=True)
-    - Column("commands", sqlalchemy.PickleType, nullable=True)
-    - Column("engine_status", sqlalchemy.String, nullable=True)
-    - Column("_updated_at", sqlalchemy.DateTime, nullable=True)
-    """
+    """Migrate the database from schema 0 to schema 1."""
     add_summary_column = sqlalchemy.text("ALTER TABLE run ADD state_summary BLOB")
     add_commands_column = sqlalchemy.text("ALTER TABLE run ADD commands BLOB")
     # NOTE: The column type of `STRING` here is mistaken. SQLite won't recognize it,
@@ -163,31 +173,13 @@ def _migrate_0_to_1(transaction: sqlalchemy.engine.Connection) -> None:
 
 
 def _migrate_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
-    """Migrate to schema version 2.
-
-    This migration doesn't affect the schema at the SQL level, but it does affect how
-    we format the values in the database.
-
-    In schema v1, these columns...
-
-    * Column "completed_analysis" in table "analysis"
-    * Column "state_summary" in table "run"
-    * Column "commands" in table "run"
-
-    ...stored Pydantic models, exported to Python dicts with Pydantic's .dict() method,
-    then serialized to binary blobs with the standard Python pickle module.
-
-    In schema v2, we serialize the Pydantic models to JSON, instead.
-    """
+    """Migrate the database from schema 1 to schema 2."""
     _migrate_analysis_1_to_2(transaction)
     _migrate_run_1_to_2(transaction)
 
 
 def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
-    """Migrate the ``analysis`` table from schema 1 to schema 2.
-
-    See `_migrate_1_to_2()` for migration details.
-    """
+    """Migrate the ``analysis`` table from schema 1 to schema 2."""
     v1_completed_analysis_column = sqlalchemy.column(
         "completed_analysis",
         sqlalchemy.LargeBinary
@@ -198,7 +190,6 @@ def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     select_v1_rows = sqlalchemy.select(
         newest_analysis_table.c.id, v1_completed_analysis_column
     ).select_from(newest_analysis_table)
-
     v1_rows = transaction.execute(select_v1_rows)
 
     for v1_row in v1_rows:
@@ -225,10 +216,7 @@ def _migrate_analysis_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
 
 
 def _migrate_run_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
-    """Migrate the ``run`` table from schema 1 to schema 2.
-
-    See `_migrate_1_to_2()` for migration details.
-    """
+    """Migrate the ``run`` table from schema 1 to schema 2."""
     v1_state_summary_column = sqlalchemy.column(
         "state_summary",
         sqlalchemy.PickleType(pickler=_legacy_pickle),
@@ -244,7 +232,6 @@ def _migrate_run_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
     select_v1_rows = sqlalchemy.select(
         newest_run_table.c.id, v1_state_summary_column, v1_commands_column
     ).select_from(newest_run_table)
-
     v1_rows = transaction.execute(select_v1_rows)
 
     for v1_row in v1_rows:
