@@ -62,6 +62,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
 
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+  console.log('sessionType', sessionType, isHealthCheck)
   const proceed: React.MouseEventHandler<HTMLButtonElement> = _event => {
     isHealthCheck
       ? sendCommands(

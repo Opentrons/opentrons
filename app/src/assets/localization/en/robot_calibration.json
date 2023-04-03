@@ -124,5 +124,7 @@
   "opentrons": "opentrons",
   "custom": "custom",
   "confirm_tip_rack": "Confirm tip rack",
-  "recalibrate_pipette": "Recalibrate pipette"
+  "recalibrate_pipette": "Recalibrate pipette",
+  "return_tip_and_continue": "Return tip and continue to next pipette",
+  "return_tip_and_exit": "Return tip and see calibration health check results"
 }
