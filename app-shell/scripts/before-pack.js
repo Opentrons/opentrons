@@ -6,6 +6,7 @@ const download = require('download')
 const decompress = require('decompress')
 const crypto = require('crypto')
 const execa = require('execa')
+const fs = require('fs/promises')
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 
 const HOST_PYTHON = process.env.HOST_PYTHON ?? 'python3.10'
@@ -75,10 +76,34 @@ const PYTHON_DESTINATION = path.join(__dirname, '..')
 const PYTHON_SITE_PACKAGES_TARGET_POSIX = 'python/lib/python3.10/site-packages'
 const PYTHON_SITE_PACKAGES_TARGET_WINDOWS = 'python/Lib/site-packages'
 
+const removeAndLog = filename => {
+  console.log(`removing ${filename}`)
+  return fs.unlink(filename)
+}
+
+const logNotRemoving = filename => {
+  console.log(`not removing ${filename}`)
+  return Promise.resolve(true)
+}
+
+const removeUnusedPyExecutables = root =>
+  ['bin', 'setuptools', path.join('pip', '_vendor', 'distlib')].map(subdir =>
+    fs
+      .readdir(
+        path.join(root, path.join(PYTHON_SITE_PACKAGES_TARGET_WINDOWS, subdir))
+      )
+      .then(entries =>
+        entries.map(entry =>
+          entry.endsWith('exe') ? removeAndLog(entry) : logNotRemoving(entry)
+        )
+      )
+  )
+
 module.exports = function beforeBuild(context) {
   const { platform, arch, electronPlatformName } = context
   const platformName = electronPlatformName ?? platform.nodeName
   const standalonePython = getPythonVersion(platformName, arch)
+  const isWin = platform === 'win32'
   if (!USE_PYTHON) {
     return Promise.resolve(true)
   }
@@ -111,10 +136,9 @@ module.exports = function beforeBuild(context) {
         'Standalone Python extracted, installing `opentrons` and `pandas` packages'
       )
 
-      const sitePackages =
-        platformName === 'win32'
-          ? PYTHON_SITE_PACKAGES_TARGET_WINDOWS
-          : PYTHON_SITE_PACKAGES_TARGET_POSIX
+      const sitePackages = isWin
+        ? PYTHON_SITE_PACKAGES_TARGET_WINDOWS
+        : PYTHON_SITE_PACKAGES_TARGET_POSIX
 
       // TODO(mc, 2022-05-16): explore virtualenvs for a more reliable
       // implementation of this install
@@ -137,5 +161,11 @@ module.exports = function beforeBuild(context) {
       // must return a truthy value, or else electron-builder will
       // skip installing project dependencies into the package
       return true
+    })
+    .then(() => {
+      console.log('Removing unused executables to reduce codesign problems')
+      return isWin
+        ? removeUnusedPyExecutables(PYTHON_DESTINATION, platformName)
+        : Promise.resolve(true)
     })
 }
