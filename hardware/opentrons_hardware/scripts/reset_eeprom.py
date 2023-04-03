@@ -56,31 +56,38 @@ async def run(args: argparse.Namespace) -> None:
     async with build.driver(build_settings(args)) as driver, CanMessenger(
         driver
     ) as messenger:
-
         await clear_eeprom(
-            messenger, TARGETS[args.target], 256 if args.old_verison else 16384,
-            "FFFFFFFFFFFFFFFF" if args.old_verison else "0000000000000000"
+            messenger,
+            TARGETS[args.target],
+            256 if args.old_version else 16384,
+            "0000000000000000" if args.old_version else "FFFFFFFFFFFFFFFF",
         )
 
 
-async def clear_eeprom(messenger: CanMessenger, node: NodeId, limit: int, filler: str) -> None:
+async def clear_eeprom(
+    messenger: CanMessenger, node: NodeId, limit: int, filler: str
+) -> None:
     """Wipe out all of the data used for the general purpose file system."""
-    start = 30
+    start = 28
     max_write = 8
     while start < limit:
+        write_len = min(max_write, limit - start)
         write_msg = message_definitions.WriteToEEPromRequest(
             payload=payloads.EEPromDataPayload(
                 address=utils.UInt16Field(start),
-                data_length=utils.UInt16Field(min(max_write, limit - start)),
+                data_length=utils.UInt16Field(write_len),
                 data=fields.EepromDataField.from_string(filler),
             )
         )
-        await messenger.ensure_send(node, write_msg)
+        start += write_len
+        await messenger.ensure_send(node, write_msg, expected_nodes=[node])
 
 
 def main() -> None:
     """Entry point."""
     parser = argparse.ArgumentParser(description=__doc__)
+
+    add_can_args(parser)
     parser.add_argument(
         "--target",
         help="The FW subsystem to be cleared.",
@@ -89,24 +96,17 @@ def main() -> None:
         choices=TARGETS.keys(),
     )
     parser.add_argument(
-        "-l",
-        "--log-level",
-        help=(
-            "Developer logging level. At DEBUG or below, logs are written "
-            "to console; at INFO or above, logs are only written to "
-            "provision_gripper_debug.log"
-        ),
-        type=str,
-        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-        default="WARNING",
-    )
-    parser.add_argument(
-        "--old-version",
-        help=("enable this flag to clear eeprom on the older 256 Byte eeproms"),
+        "--less-logs",
+        help="Set log level to INFO, so we see less logs.",
         action="store_true",
         default=False,
     )
-    add_can_args(parser)
+    parser.add_argument(
+        "--old-version",
+        help="Enable this flag to clear eeprom on the older 256 Byte eeproms.",
+        action="store_true",
+        default=False,
+    )
 
     args = parser.parse_args()
 
@@ -120,7 +120,6 @@ def main() -> None:
     if args.less_logs:
         _set_log_lvl_warn(LOG_CONFIG)
     dictConfig(LOG_CONFIG)
-
     asyncio.run(run(args))
 
 
