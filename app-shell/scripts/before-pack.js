@@ -86,17 +86,20 @@ const logNotRemoving = filename => {
   return Promise.resolve(true)
 }
 
+const logCheckingDir = dirpath => {
+  console.log(`Checking directory ${dirpath}`)
+  return fs.readdir(dirpath)
+}
+
 const removeUnusedPyExecutables = root =>
   ['bin', 'setuptools', path.join('pip', '_vendor', 'distlib')].map(subdir =>
-    fs
-      .readdir(
-        path.join(root, path.join(PYTHON_SITE_PACKAGES_TARGET_WINDOWS, subdir))
+    logCheckingDir(
+      path.join(root, path.join(PYTHON_SITE_PACKAGES_TARGET_WINDOWS, subdir))
+    ).then(entries =>
+      entries.map(entry =>
+        entry.endsWith('exe') ? removeAndLog(entry) : logNotRemoving(entry)
       )
-      .then(entries =>
-        entries.map(entry =>
-          entry.endsWith('exe') ? removeAndLog(entry) : logNotRemoving(entry)
-        )
-      )
+    )
   )
 
 module.exports = function beforeBuild(context) {
