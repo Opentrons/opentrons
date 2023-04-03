@@ -1,10 +1,11 @@
-from aiohttp import ClientSession
+from aiohttp.client import ClientSession
+from aiohttp.client_exceptions import ClientConnectionError
 from fastapi import Header, Depends, status
 from typing import Union
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails
-from robot_server.util import call_once
+from server_utils.util import call_once
 from robot_server.versioning import get_requested_version
 
 _AUTH_TOKEN_MIN_VERSION = 5
@@ -30,7 +31,10 @@ class SystemServerConnectionError(ErrorDetails):
 async def _get_system_server_client() -> ClientSession:
     """Get a singleton client connection to the system server."""
     try:
-        return ClientSession()
+        # TODO: The version of aiohttp we are using lacks type annotations,
+        # so we have to ignore mypy complaining about the initializer of this
+        # class.
+        return ClientSession()  # type: ignore
     except Exception as e:
         raise SystemServerConnectionError(detail=str(e)).as_error(
             status.HTTP_403_FORBIDDEN
@@ -56,12 +60,17 @@ async def check_auth_token_header(
     # the server should actually exist.
     connection = await _get_system_server_client()
 
-    res = await connection.get(
-        f"{_SYSTEM_SERVER_BASE_URL}/system/authorize",
-        headers={"authenticationBearer": authenticationBearer},
-    )
+    try:
+        res = await connection.get(
+            f"{_SYSTEM_SERVER_BASE_URL}/system/authorize",
+            headers={"authenticationBearer": authenticationBearer},
+        )
 
-    if res.status != 200:
-        raise AuthenticationFailed(detail="Authentication token invalid.").as_error(
+        if res.status != 200:
+            raise AuthenticationFailed(detail="Authentication token invalid.").as_error(
+                status.HTTP_403_FORBIDDEN
+            )
+    except ClientConnectionError as e:
+        raise SystemServerConnectionError(detail=str(e)).as_error(
             status.HTTP_403_FORBIDDEN
         )
