@@ -63,22 +63,21 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     alt: {
       defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: COLORS.foundationalBlue,
-      //  TODO(jr, 3/14/23): replaces these hex codes with the color constants
-      activeBackgroundColor: '#99b1d2',
+      activeBackgroundColor: COLORS.medBluePressed,
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlack_sixty}`,
     },
     alert: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.red_two,
-      activeBackgroundColor: '#ab302a',
+      activeBackgroundColor: COLORS.red_two_pressed,
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlack_sixty}`,
     },
     default: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blueEnabled,
-      activeBackgroundColor: '#2160ca',
+      activeBackgroundColor: COLORS.bluePressed,
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlack_sixty}`,
     },

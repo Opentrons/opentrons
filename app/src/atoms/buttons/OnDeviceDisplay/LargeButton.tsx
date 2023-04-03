@@ -42,20 +42,19 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     secondary: {
       defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: COLORS.foundationalBlue,
-      //  TODO(jr, 3/20/23): replace these hex codes with the color constants
-      activeBackgroundColor: '#99b1d2',
+      activeBackgroundColor: COLORS.medBluePressed,
       iconColor: COLORS.blueEnabled,
     },
     alert: {
       defaultColor: COLORS.red_one,
       defaultBackgroundColor: COLORS.red_three,
-      activeBackgroundColor: '#c8acad',
+      activeBackgroundColor: COLORS.red_three_pressed,
       iconColor: COLORS.red_one,
     },
     primary: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blueEnabled,
-      activeBackgroundColor: '#2160ca',
+      activeBackgroundColor: COLORS.bluePressed,
       iconColor: COLORS.white,
     },
   }
