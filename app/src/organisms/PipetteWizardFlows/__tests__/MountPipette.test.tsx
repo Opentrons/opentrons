@@ -54,9 +54,9 @@ describe('MountPipette', () => {
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Connect and screw in pipette')
+    getByText('Connect and secure pipette')
     getByText(
-      'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
+      'Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.'
     )
 
     getByAltText('Screw pattern')
@@ -73,9 +73,12 @@ describe('MountPipette', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Connect and Attach 96 Channel Pipette')
+    getByText('Connect and attach 96 channel pipette')
     getByText(
-      'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
+      'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
+    )
+    getByText(
+      'Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.'
     )
     getByAltText('Attach 96 channel pipette')
     const backBtn = getByLabelText('back')

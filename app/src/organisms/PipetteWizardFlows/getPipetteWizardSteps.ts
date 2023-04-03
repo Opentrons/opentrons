@@ -25,7 +25,12 @@ export const getPipetteWizardSteps = (
         },
         { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
         { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
-        { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+        {
+          section: SECTIONS.RESULTS,
+          mount: mount,
+          flowType: flowType,
+          recalibrate: true,
+        },
       ]
     }
     case FLOWS.ATTACH: {

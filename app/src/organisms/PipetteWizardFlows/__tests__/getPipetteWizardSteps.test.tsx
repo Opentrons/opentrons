@@ -50,6 +50,7 @@ describe('getPipetteWizardSteps', () => {
         section: SECTIONS.RESULTS,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
+        recalibrate: true,
       },
     ] as PipetteWizardStep[]
 
@@ -314,6 +315,7 @@ describe('getPipetteWizardSteps', () => {
         section: SECTIONS.RESULTS,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
+        recalibrate: true,
       },
     ] as PipetteWizardStep[]
 

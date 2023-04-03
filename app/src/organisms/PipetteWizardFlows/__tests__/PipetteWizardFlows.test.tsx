@@ -164,10 +164,10 @@ describe('PipetteWizardFlows', () => {
     getByText('Recalibrate Left Pipette')
     getByText('Before you begin')
     getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+      'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
-      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+      'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
     )
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
     fireEvent.click(getStarted)
@@ -193,10 +193,7 @@ describe('PipetteWizardFlows', () => {
     })
     // second page
     getByText('Step 1 / 3')
-    getByText('Attach Calibration Probe')
-    getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
-    )
+    getByText('Attach calibration probe')
     const initiate = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(initiate)
     await waitFor(() => {
@@ -216,10 +213,7 @@ describe('PipetteWizardFlows', () => {
     })
     //  third page
     getByText('Step 2 / 3')
-    getByText('Remove Calibration Probe')
-    getByText(
-      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
-    )
+    getByText('Remove calibration probe')
     const complete = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(complete)
     await waitFor(() => {
@@ -252,10 +246,10 @@ describe('PipetteWizardFlows', () => {
     getByText('Recalibrate Left Pipette')
     getByText('Before you begin')
     getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+      'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
-      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+      'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
     )
   })
   it('renders 3rd page and clicking back button redirects to the first page', async () => {
@@ -268,13 +262,13 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // second page
-    getByText('Attach Calibration Probe')
+    getByText('Attach calibration probe')
     getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
     })
     //  third page
-    getByText('Remove Calibration Probe')
+    getByText('Remove calibration probe')
     getByRole('button', { name: 'back' }).click()
     //   first page
     getByText('Before you begin')
@@ -363,7 +357,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Connect and screw in pipette')
+    getByText('Connect and secure pipette')
     const continueBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(continueBtn)
   })
@@ -426,7 +420,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew Z-axis Carriage')
+    getByText('Unscrew z-axis carriage')
     // TODO wait until commands are wired up to write out more of this test!
   })
   it('renders the correct information, calling the correct commands for the detach flow 96 channel', async () => {
@@ -508,7 +502,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Loosen Screws and Detach 96-Channel Pipette')
+    getByText('Loosen screws and detach flex 96-channel 1000 μl')
     const continueBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(continueBtn)
   })
@@ -573,9 +567,6 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText(
-      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
-    )
     getByText('Continue')
   })
   it('renders the correct information, calling the correct commands for the 96-channel calibration flow', async () => {
@@ -588,12 +579,6 @@ describe('PipetteWizardFlows', () => {
     //  first page
     getByText('Calibrate 96-Channel pipette')
     getByText('Before you begin')
-    getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
-    )
-    getByText(
-      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
-    )
     getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -617,10 +602,7 @@ describe('PipetteWizardFlows', () => {
     })
     // second page
     getByText('Step 1 / 3')
-    getByText('Attach Calibration Probe')
-    getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
-    )
+    getByText('Attach calibration probe')
     getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -639,10 +621,7 @@ describe('PipetteWizardFlows', () => {
     })
     //  third page
     getByText('Step 2 / 3')
-    getByText('Remove Calibration Probe')
-    getByText(
-      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
-    )
+    getByText('Remove calibration probe')
     getByRole('button', { name: 'Complete calibration' }).click()
     //  TODO(sb, 3/21/23): rewire this when home issue is sorted
     // await waitFor(() => {
@@ -712,7 +691,6 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Loosen Screws and Detach 96-Channel Pipette')
     getByLabelText('Exit').click()
     getByText('mock unskippable modal')
   })
@@ -760,7 +738,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew Z-axis Carriage')
+    getByText('Unscrew z-axis carriage')
     getByLabelText('Exit').click()
     getByText('mock unskippable modal')
   })

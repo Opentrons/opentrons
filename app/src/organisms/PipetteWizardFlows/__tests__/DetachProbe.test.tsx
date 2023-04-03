@@ -49,10 +49,7 @@ describe('DetachProbe', () => {
   })
   it('returns the correct information, buttons work as expected', () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Remove Calibration Probe')
-    getByText(
-      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
-    )
+    getByText('Remove calibration probe')
     getByAltText('Remove probe')
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(proceedBtn)

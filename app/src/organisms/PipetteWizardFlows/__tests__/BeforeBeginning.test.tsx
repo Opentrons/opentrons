@@ -78,10 +78,10 @@ describe('BeforeBeginning', () => {
       const { getByText, getByAltText, getByRole } = render(props)
       getByText('Before you begin')
       getByText(
-        'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
       )
       getByText('You will need:')
       // getByText('mock need help link')
@@ -151,14 +151,14 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
       )
       getByAltText('1- or 8-Channel Pipette')
       getByText('You will need:')
       getByAltText('Calibration Probe')
       getByAltText('2.5 mm Hex Screwdriver')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
       fireEvent.click(proceedBtn)
@@ -186,11 +186,11 @@ describe('BeforeBeginning', () => {
       const { getByText, getByAltText, getByRole } = render(props)
       getByText('Before you begin')
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
+        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
       fireEvent.click(proceedBtn)
@@ -231,7 +231,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -241,7 +241,7 @@ describe('BeforeBeginning', () => {
       getByAltText('96-Channel Pipette')
       getByAltText('96-Channel Mounting Plate')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', {
         name: 'Move gantry to front',
@@ -279,7 +279,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -289,7 +289,7 @@ describe('BeforeBeginning', () => {
       getByAltText('96-Channel Pipette')
       getByAltText('96-Channel Mounting Plate')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', {
         name: 'Move gantry to front',
@@ -330,7 +330,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on the right-hand side of the door opening.'
+        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -340,7 +340,7 @@ describe('BeforeBeginning', () => {
       getByAltText('96-Channel Pipette')
       getByAltText('96-Channel Mounting Plate')
       getByText(
-        'Provided with robot. Using another size can strip the instruments’s screws.'
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
       const proceedBtn = getByRole('button', {
         name: 'Move gantry to front',
@@ -384,7 +384,7 @@ describe('BeforeBeginning', () => {
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
+        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
       )
     })
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
@@ -400,7 +400,7 @@ describe('BeforeBeginning', () => {
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right'
+        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       const proceedBtn = getByRole('button', { name: 'Move gantry to front' })

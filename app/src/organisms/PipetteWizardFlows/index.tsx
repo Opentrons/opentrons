@@ -240,7 +240,6 @@ export const PipetteWizardFlows = (
         closeFlow()
       }
     }
-
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
@@ -254,6 +253,7 @@ export const PipetteWizardFlows = (
         totalStepCount={totalStepCount}
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
+        recalibrate={`recalibrate` in pipetteWizardSteps[currentStepIndex]}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {

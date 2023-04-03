@@ -1,12 +1,8 @@
 import * as React from 'react'
-import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
-import { SIZE_1 } from '@opentrons/components'
-import { WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { Skeleton } from '../../atoms/Skeleton'
-import { Banner } from '../../atoms/Banner'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import detachPipette from '../../assets/images/change-pip/single-channel-detach-pipette.png'
 import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.png'
@@ -31,7 +27,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     setFetching,
     isOnDevice,
   } = props
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const is96ChannelPipette = attachedPipettes[mount]?.name === 'p1000_96'
 
   let bodyText: React.ReactNode = <div></div>
@@ -51,16 +47,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       </>
     )
   } else {
-    bodyText = (
-      <>
-        <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
-        {!is96ChannelPipette ? null : (
-          <Banner type="warning" size={isOnDevice ? '1.5rem' : SIZE_1}>
-            {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-          </Banner>
-        )}
-      </>
-    )
+    bodyText = <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
   }
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
@@ -73,12 +60,13 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             height="1.75rem"
             backgroundSize={BACKGROUND_SIZE}
           />
-        ) : !is96ChannelPipette ? (
-          t('loose_detach', {
-            pipetteName: attachedPipettes[mount]?.modelSpecs.displayName,
-          })
         ) : (
-          t('unscrew_remove_96_channel')
+          i18n.format(
+            t('loose_detach', {
+              pipetteName: attachedPipettes[mount]?.modelSpecs.displayName,
+            }),
+            'capitalize'
+          )
         )
       }
       //  TODO(Jr, 11/8/22): replace image with correct one!
@@ -107,7 +95,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       proceedButton={
         <CheckPipetteButton
           isOnDevice={isOnDevice}
-          proceedButtonText={capitalize(t('shared:continue'))}
+          proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
           proceed={proceed}
           setFetching={setFetching}
           isFetching={isFetching}
