@@ -254,7 +254,7 @@ class RunUpdate:
         initiator = FirmwareUpdateInitiator(messenger)
         downloader = FirmwareUpdateDownloader(messenger)
 
-        target = Target(system_node=node_id)
+        target = Target.from_single_node(node_id)
 
         logger.info(f"Initiating FW Update on {target}.")
         await self._status_queue.put((node_id, (FirmwareUpdateStatus.updating, 0)))
@@ -297,7 +297,7 @@ class RunUpdate:
         else:
             logger.info("Skipping erase step.")
 
-        logger.info(f"Downloading FW to {target.bootloader_node}.")
+        logger.info(f"Downloading {filepath} to {target.bootloader_node}.")
         with open(filepath) as f:
             hex_processor = HexRecordProcessor.from_file(f)
             async for download_progress in downloader.run(
