@@ -78,9 +78,7 @@ def sql_to_pydantic(
 
 @dataclass(frozen=True)
 class SerializedPydanticModel:
-    """A Pydantic model that's just been extracted from, or is ready to be stored
-    into, SQLAlchemy.
-    """
+    """A Pydantic model that's extracted from, or ready to store into, SQLAlchemy."""
 
     _model: Type[BaseModel]
     _serialized_json: bytes
