@@ -92,17 +92,19 @@ const logCheckingDir = dirpath => {
 }
 
 const removeUnusedPyExecutables = root =>
-  ['bin', 'setuptools', path.join('pip', '_vendor', 'distlib')].map(subdir =>
-    logCheckingDir(
-      path.join(root, path.join(PYTHON_SITE_PACKAGES_TARGET_WINDOWS, subdir))
-    ).then(entries => {
-      console.log(
-        `Removing all exes from the following list: ${entries.join(', ')}`
-      )
-      return entries.map(entry =>
-        entry.endsWith('exe') ? removeAndLog(entry) : logNotRemoving(entry)
-      )
-    })
+  Promise.all(
+    ['bin', 'setuptools', path.join('pip', '_vendor', 'distlib')].map(subdir =>
+      logCheckingDir(
+        path.join(root, path.join(PYTHON_SITE_PACKAGES_TARGET_WINDOWS, subdir))
+      ).then(entries => {
+        console.log(
+          `Removing all exes from the following list: ${entries.join(', ')}`
+        )
+        return entries.map(entry =>
+          entry.endsWith('exe') ? removeAndLog(entry) : logNotRemoving(entry)
+        )
+      })
+    )
   )
 
 module.exports = function beforeBuild(context) {
