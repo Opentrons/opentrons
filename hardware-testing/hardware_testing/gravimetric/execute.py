@@ -6,6 +6,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Lab
 from opentrons.protocol_api.labware import OutOfTipsError
 
 from hardware_testing.data import create_run_id_and_start_time, ui
+from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
@@ -194,6 +195,55 @@ def _jog_to_find_liquid_height(
                 continue
         _liquid_height = min(max(_liquid_height + _jog_size, 0), _well_depth)
     return _liquid_height
+
+
+def _calculate_average(volume_list: List[float]) -> float:
+    return sum(volume_list) / len(volume_list)
+
+
+def _calculate_stats(
+    volume_list: List[float], total_volume: float
+) -> Tuple[float, float, float]:
+    average = _calculate_average(volume_list)
+    if len(volume_list) <= 1:
+        print("skipping CV, only 1x trial per volume")
+        cv = -0.01  # negative number is impossible
+    else:
+        cv = stdev(volume_list) / average
+    d = (average - total_volume) / total_volume
+    return average, cv, d
+
+
+def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
+    print(
+        f"{mode}:\n"
+        f"\tavg: {round(average, 2)} uL\n"
+        f"\tcv: {round(cv * 100.0, 2)}%\n"
+        f"\td: {round(d * 100.0, 2)}%"
+    )
+
+
+def _print_final_results(
+    volumes: List[float], channel_count: int, test_report: CSVReport
+) -> None:
+    for vol in volumes:
+        print(f"  * {vol}ul channel all:")
+        for mode in ["aspirate", "dispense"]:
+            avg, cv, d = report.get_volume_results_all(test_report, mode, vol)
+            print(f"    - {mode}:")
+            print(f"        avg: {avg}ul")
+            print(f"        cv:  {cv}%")
+            print(f"        d:   {d}%")
+        for channel in range(channel_count):
+            print(f"  * vol {vol}ul channel {channel + 1}:")
+            for mode in ["aspirate", "dispense"]:
+                avg, cv, d = report.get_volume_results_per_channel(
+                    test_report, mode, vol, channel
+                )
+                print(f"    - {mode}:")
+                print(f"        avg: {avg}ul")
+                print(f"        cv:  {cv}%")
+                print(f"        d:   {d}%")
 
 
 def _run_trial(
@@ -420,12 +470,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 _drop_tip()
             pipette.reset_tipracks()
             ui.print_header("EVAPORATION AVERAGE")
-            average_aspirate_evaporation_ul = sum(actual_asp_list_evap) / len(
-                actual_asp_list_evap
-            )
-            average_dispense_evaporation_ul = sum(actual_disp_list_evap) / len(
-                actual_disp_list_evap
-            )
+            average_aspirate_evaporation_ul = _calculate_average(actual_asp_list_evap)
+            average_dispense_evaporation_ul = _calculate_average(actual_disp_list_evap)
             print(
                 "average:\n"
                 f"\taspirate: {average_aspirate_evaporation_ul} uL\n"
@@ -507,36 +553,16 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     _drop_tip()
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
-                # AVERAGE
-                dispense_average = sum(actual_disp_list_channel) / len(
-                    actual_disp_list_channel
+                aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
+                    actual_asp_list_channel, volume
                 )
-                aspirate_average = sum(actual_asp_list_channel) / len(
-                    actual_asp_list_channel
+                dispense_average, dispense_cv, dispense_d = _calculate_stats(
+                    actual_disp_list_channel, volume
                 )
-                # %CV
-                if len(actual_asp_list_channel) <= 1:
-                    print("skipping CV, only 1x trial per volume")
-                    aspirate_cv = -0.01  # negative number is impossible
-                    dispense_cv = -0.01
-                else:
-                    aspirate_cv = stdev(actual_asp_list_channel) / aspirate_average
-                    dispense_cv = stdev(actual_disp_list_channel) / dispense_average
-                # %D
-                aspirate_d = (aspirate_average - volume) / volume
-                dispense_d = (dispense_average - volume) / volume
-                print(
-                    "aspirate:\n"
-                    f"\tavg: {round(aspirate_average, 2)} uL\n"
-                    f"\tcv: {round(aspirate_cv * 100.0, 2)}%\n"
-                    f"\td: {round(aspirate_d * 100.0, 2)}%"
-                )
-                print(
-                    "dispense:\n"
-                    f"\tavg: {round(dispense_average, 2)} uL\n"
-                    f"\tcv: {round(dispense_cv * 100.0, 2)}%\n"
-                    f"\td: {round(dispense_d * 100.0, 2)}%"
-                )
+
+                _print_stats("aspirate", aspirate_average, aspirate_cv, aspirate_d)
+                _print_stats("dispense", dispense_average, dispense_cv, dispense_d)
+
                 report.store_volume_per_channel(
                     report=test_report,
                     mode="aspirate",
@@ -559,32 +585,16 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 actual_disp_list_all.extend(actual_disp_list_channel)
 
             ui.print_header(f"{volume} uL channel all CALCULATIONS")
-            # AVERAGE
-            dispense_average = sum(actual_asp_list_all) / len(actual_asp_list_all)
-            aspirate_average = sum(actual_disp_list_all) / len(actual_disp_list_all)
-            # %CV
-            if len(actual_asp_list_all) <= 1:
-                print("skipping CV, only 1x trial per volume")
-                aspirate_cv = -0.01  # negative number is impossible
-                dispense_cv = -0.01
-            else:
-                aspirate_cv = stdev(actual_asp_list_all) / aspirate_average
-                dispense_cv = stdev(actual_disp_list_all) / dispense_average
-            # %D
-            aspirate_d = (aspirate_average - volume) / volume
-            dispense_d = (dispense_average - volume) / volume
-            print(
-                "aspirate:\n"
-                f"\tavg: {round(aspirate_average, 2)} uL\n"
-                f"\tcv: {round(aspirate_cv * 100.0, 2)}%\n"
-                f"\td: {round(aspirate_d * 100.0, 2)}%"
+            aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
+                actual_asp_list_all, volume
             )
-            print(
-                "dispense:\n"
-                f"\tavg: {round(dispense_average, 2)} uL\n"
-                f"\tcv: {round(dispense_cv * 100.0, 2)}%\n"
-                f"\td: {round(dispense_d * 100.0, 2)}%"
+            dispense_average, dispense_cv, dispense_d = _calculate_stats(
+                actual_disp_list_all, volume
             )
+
+            _print_stats("aspirate", aspirate_average, aspirate_cv, aspirate_d)
+            _print_stats("dispense", dispense_average, dispense_cv, dispense_d)
+
             report.store_volume_all(
                 report=test_report,
                 mode="aspirate",
@@ -606,21 +616,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         recorder.stop()
         recorder.deactivate()  # stop the server
     ui.print_title("RESULTS")
-    for vol in test_volumes:
-        print(f"  * {vol}ul channel all:")
-        for mode in ["aspirate", "dispense"]:
-            avg, cv, d = report.get_volume_results_all(test_report, mode, vol)
-            print(f"    - {mode}:")
-            print(f"        avg: {avg}ul")
-            print(f"        cv:  {cv}%")
-            print(f"        d:   {d}%")
-        for channel in range(cfg.pipette_channels):
-            print(f"  * vol {vol}ul channel {channel + 1}:")
-            for mode in ["aspirate", "dispense"]:
-                avg, cv, d = report.get_volume_results_per_channel(
-                    test_report, mode, vol, channel
-                )
-                print(f"    - {mode}:")
-                print(f"        avg: {avg}ul")
-                print(f"        cv:  {cv}%")
-                print(f"        d:   {d}%")
+    _print_final_results(
+        volumes=test_volumes,
+        channel_count=cfg.pipette_channels,
+        test_report=test_report,
+    )
