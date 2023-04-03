@@ -168,11 +168,12 @@ module.exports = function beforeBuild(context) {
         'pandas==1.4.3',
       ])
     })
-    .then(({ stdout }) => {
+    .then(result => {
       console.log(
         "`opentrons` and `pandas` packages installed to app's Python environment"
       )
-      console.debug('pip output:', stdout)
+      console.debug('full result', result)
+      console.debug('pip output:', result.stdout)
       // must return a truthy value, or else electron-builder will
       // skip installing project dependencies into the package
       return true
