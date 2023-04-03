@@ -44,9 +44,17 @@ def database_v0(tmp_path: Path) -> Path:
 @pytest.fixture
 def database_v1(tmp_path: Path) -> Path:
     """Create a database matching schema version 1."""
+    # At the SQL level, schema version 1 is identical to schema version 2.
     db_path = tmp_path / "migration-test-v1.db"
-    # FIX BEFORE MERGE: This is no longer a "v1" database. It's "v2."
-    # Can we replace this with our real v1 database snapshot?
+    sql_engine = create_sql_engine(db_path)
+    sql_engine.dispose()
+    return db_path
+
+
+@pytest.fixture
+def database_v2(tmp_path: Path) -> Path:
+    """Create a database matching schema version 2."""
+    db_path = tmp_path / "migration-test-v2.db"
     sql_engine = create_sql_engine(db_path)
     sql_engine.dispose()
     return db_path
@@ -70,6 +78,7 @@ def subject(database_path: Path) -> Generator[sqlalchemy.engine.Engine, None, No
     [
         lazy_fixture("database_v0"),
         lazy_fixture("database_v1"),
+        lazy_fixture("database_v2"),
     ],
 )
 def test_migration(subject: sqlalchemy.engine.Engine) -> None:
