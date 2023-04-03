@@ -30,7 +30,8 @@ async def thermocycler(
     for _ in range(3):
         try:
             await ThermocyclerDriverFactory.create(
-                emulator_settings.thermocycler_proxy.driver_port
+                port=emulator_settings.thermocycler_proxy.driver_port,
+                loop=asyncio.get_running_loop(),
             )
         except KeyError:
             asyncio.sleep(0.1)
