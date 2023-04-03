@@ -177,6 +177,10 @@ module.exports = function beforeBuild(context) {
       // skip installing project dependencies into the package
       return true
     })
+    .catch(error) => {
+      console.log('heres an error when doing pip stuff', error)
+      return true
+    }
     .then(() => {
       if (!isWin) {
         console.log(
