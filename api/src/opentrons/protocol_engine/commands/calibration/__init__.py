@@ -15,6 +15,14 @@ from .calibrate_pipette import (
     CalibratePipette,
 )
 
+from .calibrate_module import (
+    CalibrateModuleParams,
+    CalibrateModuleResult,
+    CalibrateModuleCreate,
+    CalibrateModuleCommandType,
+    CalibrateModule,
+)
+
 from .move_to_maintenance_position import (
     MoveToMaintenancePositionParams,
     MoveToMaintenancePositionResult,
@@ -24,6 +32,12 @@ from .move_to_maintenance_position import (
 )
 
 __all__ = [
+    # calibration/calibrateModule
+    "CalibrateModule",
+    "CalibrateModuleCreate",
+    "CalibrateModuleParams",
+    "CalibrateModuleResult",
+    "CalibrateModuleCommandType",
     # calibration/calibrateGripper
     "CalibrateGripper",
     "CalibrateGripperCreate",
