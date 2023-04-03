@@ -728,12 +728,16 @@ class OT3API(
         """
         Home the jaw of the gripper.
         """
-        gripper = self._gripper_handler.get_gripper()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-            gripper.default_home_force
-        )
-        await self._ungrip(duty_cycle=dc)
-        gripper.state = GripperJawState.HOMED_READY
+        try:
+            gripper = self._gripper_handler.get_gripper()
+            self._log.info("Homing gripper jaw.")
+            dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+                gripper.default_home_force
+            )
+            await self._ungrip(duty_cycle=dc)
+            gripper.state = GripperJawState.HOMED_READY
+        except GripperNotAttachedError:
+            pass
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
@@ -1166,28 +1170,22 @@ class OT3API(
             await self._update_position_estimation([axis])
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
-                # we can move directly to the home position for accuracy axes
-                # move directly the home position if the stepper position is valid
+                axis_home_dist = self._config.safe_home_distance
+            else:
+                # FIXME: (AA 2/15/23) This is a temporary workaround because of
+                # XY encoder inaccuracy. Otherwise, we should be able to use
+                # 5.0 mm for all axes.
+                # Move to 20 mm away from the home position and then home
+                axis_home_dist = 20.0
+            if origin[axis] - target_pos[axis] > axis_home_dist:
+                target_pos[axis] += axis_home_dist
                 moves = self._build_moves(origin, target_pos)
                 await self._backend.move(
                     origin,
                     moves[0],
                     MoveStopCondition.none,
                 )
-            else:
-                if origin[axis] - target_pos[axis] > 20.0:
-                    # FIXME: (AA 2/15/23) This is a temporary workaround because of
-                    # XY encoder inaccuracy. We should remove this and move axes directly
-                    # to the home position when we fix the encoder issues.
-                    # Move to 20 mm away from the home position and then home
-                    target_pos[axis] += 20.00
-                    moves = self._build_moves(origin, target_pos)
-                    await self._backend.move(
-                        origin,
-                        moves[0],
-                        MoveStopCondition.none,
-                    )
-                await self._backend.home([axis])
+            await self._backend.home([axis])
         else:
             # both stepper and encoder positions are invalid, must home
             await self._backend.home([axis])
@@ -1197,8 +1195,9 @@ class OT3API(
         async with self._motion_lock:
             for axis in axes:
                 try:
-                    # let backend handle homing gripper jaw and pipette plunger
-                    if axis in [OT3Axis.G, OT3Axis.Q]:
+                    if axis == OT3Axis.G:
+                        await self.home_gripper_jaw()
+                    elif axis == OT3Axis.Q:
                         await self._backend.home([axis])
                     else:
                         await self._home_axis(axis)
@@ -1212,16 +1211,6 @@ class OT3API(
                 else:
                     await self._cache_current_position()
                     await self._cache_encoder_position()
-                    if axis == OT3Axis.G:
-                        try:
-                            self._gripper_handler.set_jaw_state(
-                                GripperJawState.HOMED_READY
-                            )
-                            self._gripper_handler.set_jaw_displacement(
-                                self._encoder_position[OT3Axis.G]
-                            )
-                        except GripperNotAttachedError:
-                            pass
 
     @ExecutionManagerProvider.wait_for_running
     async def home(

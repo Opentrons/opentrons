@@ -612,6 +612,9 @@ class OT3Controller:
             A dictionary containing the new positions of each axis
         """
         checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
+        assert (
+            OT3Axis.G not in checked_axes
+        ), "Please home G axis using gripper_home_jaw()"
         if not checked_axes:
             return {}
 
@@ -625,8 +628,6 @@ class OT3Controller:
             if runner
         ]
         positions = await asyncio.gather(*coros)
-        if OT3Axis.G in checked_axes:
-            await self.gripper_home_jaw(self._configuration.grip_jaw_home_duty_cycle)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
                 [OT3Axis.Q],
