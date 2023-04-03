@@ -245,6 +245,6 @@ class Plot:
         self.write_plot(zoom_param)
 
 if __name__ == '__main__':
-    print("\nPlot Gripper Probe Capacitance Results\n")
+    print("\nPlot Pipette Probe Capacitance Results\n")
     plot = Plot(sys.argv[1])
     plot.create_plot()
