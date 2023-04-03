@@ -93,6 +93,7 @@ from .types import (
     EarlyLiquidSenseTrigger,
     LiquidNotFound,
     UpdateStatus,
+    StatusBarState,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -140,6 +141,8 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
 )
 
 from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, USBTarget
+
+from .status_bar_state import StatusBarStateController
 
 mod_log = logging.getLogger(__name__)
 
@@ -207,6 +210,9 @@ class OT3API(
             constraints=get_system_constraints(
                 self._config.motion_settings, self._gantry_load
             )
+        )
+        self._status_bar_controller = StatusBarStateController(
+            self._backend.status_bar_interface()
         )
 
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
@@ -290,6 +296,8 @@ class OT3API(
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
+
+        await api_instance.set_status_bar_state(StatusBarState.IDLE)
 
         # check for and start firmware updates if required
         async for _ in api_instance.update_firmware():
@@ -488,6 +496,9 @@ class OT3API(
             now = self._loop.time()
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
+
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
+        await self._status_bar_controller.set_status_bar_state(state)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
