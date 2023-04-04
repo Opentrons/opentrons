@@ -49,7 +49,7 @@ export function useRunPipetteInfoByMount(
   const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations =
     useAttachedPipetteCalibrations() ?? EMPTY_MOUNTS
-  const tipLengthCalibrations = useTipLengthCalibrations(robotName) ?? []
+  const tipLengthCalibrations = useTipLengthCalibrations() ?? []
 
   if (protocolData == null) {
     return EMPTY_MOUNTS

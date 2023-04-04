@@ -2,6 +2,11 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { SpinnerModalPage, AlertModal } from '@opentrons/components'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+  useCalibrationStatusQuery,
+} from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { Line } from '../../atoms/structure'
@@ -10,7 +15,6 @@ import { CalibrateDeck } from '../../organisms/CalibrateDeck'
 import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
 import { CheckCalibration } from '../../organisms/CheckCalibration'
 import {
-  usePipetteOffsetCalibrations,
   useRobot,
   useAttachedPipettes,
   useRunStatuses,
@@ -35,11 +39,6 @@ import type {
   DeckCalibrationSession,
 } from '../../redux/sessions/types'
 import type { State, Dispatch } from '../../redux/types'
-import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useAllTipLengthCalibrationsQuery,
-  useCalibrationStatusQuery,
-} from '@opentrons/react-api-client'
 
 const CALS_FETCH_MS = 5000
 
@@ -118,8 +117,8 @@ export function RobotSettingsCalibration({
     }
   )
 
-  // wait for robot request to resolve instead of using name directly from params
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
+  const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
+    ?.data
   const attachedPipettes = useAttachedPipettes()
   const { isRunRunning: isRunning } = useRunStatuses()
 

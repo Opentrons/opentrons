@@ -66,7 +66,7 @@ async def test_lift_plate_for_labware_movement_from_tc_gen2(
     labware_location = ModuleLocation(moduleId="thermocycler-id")
     tc_hardware = decoy.mock(cls=Thermocycler)
 
-    decoy.when(state_store.modules.get_model("thermocycler-id")).then_return(
+    decoy.when(state_store.modules.get_connected_model("thermocycler-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V2
     )
     decoy.when(
@@ -99,7 +99,7 @@ async def test_do_not_lift_plate_if_not_in_tc_gen2(
     subject: ThermocyclerPlateLifter,
 ) -> None:
     """It should execute plate lift if moving labware from TC Gen2."""
-    decoy.when(state_store.modules.get_model("thermocycler-id")).then_return(
+    decoy.when(state_store.modules.get_connected_model("thermocycler-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
     await subject.lift_plate_for_labware_movement(
@@ -130,7 +130,7 @@ async def test_do_not_lift_plate_with_lid_closed(
     labware_location = ModuleLocation(moduleId="thermocycler-id")
     tc_hardware = decoy.mock(cls=Thermocycler)
 
-    decoy.when(state_store.modules.get_model("thermocycler-id")).then_return(
+    decoy.when(state_store.modules.get_connected_model("thermocycler-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V2
     )
     decoy.when(
