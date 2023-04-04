@@ -15,7 +15,23 @@ TEST_NUM_TRIALS = 3
 TEST_MAX_SPEED = 40  # mm/sec (creates ~600 ul/sec for P1000)
 TEST_CURRENT = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0]  # amps
 TEST_DISCONTINUITIES = [40, 35, 30, 25, 20, 15]  # mm/sec
-TEST_ACCELERATIONS = [4000, 3000, 2000, 1500, 1200, 1000, 800, 700, 600, 500, 450, 400, 350, 250, 200]  # mm/sec/sec
+TEST_ACCELERATIONS = [
+    4000,
+    3000,
+    2000,
+    1500,
+    1200,
+    1000,
+    800,
+    700,
+    600,
+    500,
+    450,
+    400,
+    350,
+    250,
+    200,
+]  # mm/sec/sec
 
 DEFAULT_HOLD_CURRENT = 0.1
 
@@ -123,7 +139,9 @@ async def _test_trails(
 
 async def _main(is_simulating: bool, mount: OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=is_simulating, pipette_left="p1000_single_v3.4", pipette_right="p1000_multi_v3.4"
+        is_simulating=is_simulating,
+        pipette_left="p1000_single_v3.4",
+        pipette_right="p1000_multi_v3.4",
     )
     pipette = api.hardware_pipettes[mount.to_mount()]
     if not pipette:
@@ -164,20 +182,27 @@ async def _main(is_simulating: bool, mount: OT3Mount) -> None:
             if passed:
                 good_settings[i][2] = acceleration
                 break
+    good_settings = [s for s in good_settings if s[2] is not None]
     for i, vals in enumerate(good_settings):
-        current, discontinuity, acceleration, _ = vals
+        current, discontinuity, acceleration, _ = vals  # type: ignore[assignment]
         if acceleration is not None:
             seconds = (TEST_MAX_SPEED - discontinuity) / acceleration
             if seconds:
                 accel_actual = int(TEST_MAX_SPEED / seconds)
             else:
-                accel_actual = infinity
+                accel_actual = infinity  # type: ignore[assignment]
             good_settings[i][-1] = accel_actual
     print("RESULTS")
     print("current\t\tdiscontinuity\tacceleration\taccel-actual")
-    for i, vals in enumerate(sorted(good_settings, key=lambda x: x[-1], reverse=True)):
-        current, discontinuity, acceleration, accel_actual = vals
+    sorted_good_settings = sorted(
+        good_settings,
+        key=lambda x: x[-1],  # type: ignore[arg-type,return-value]
+        reverse=True,
+    )
+    for i, vals in enumerate(sorted_good_settings):
+        current, discontinuity, acceleration, accel_actual = vals  # type: ignore[assignment]
         print(f"{current}\t\t{discontinuity}\t\t{acceleration}\t\t{accel_actual}")
+
 
 if __name__ == "__main__":
     mount_options = {
