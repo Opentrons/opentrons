@@ -64,7 +64,7 @@ OT3_LIQUID_CLASS = {
                     submerge=_default_submerge_mm_t50,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2.5,
+                        leading_air_gap=1.5,
                         trailing_air_gap=0.1,
                     ),
                 ),
