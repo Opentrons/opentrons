@@ -45,7 +45,7 @@ export function Modal(props: ModalProps): JSX.Element {
       <Flex
         backgroundColor={COLORS.white}
         width={modalWidth}
-        max-height="32.5rem"
+        maxHeight="32.5rem"
         borderRadius={BORDERS.size_three}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing6}
