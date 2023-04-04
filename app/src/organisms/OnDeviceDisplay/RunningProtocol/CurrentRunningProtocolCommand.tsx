@@ -7,15 +7,12 @@ import {
   COLORS,
   DIRECTION_ROW,
   SPACING,
-  Btn,
-  Icon,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   BORDERS,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
-  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -81,7 +78,6 @@ interface RunTimerInfo {
 }
 
 interface CurrentRunningProtocolCommandProps {
-  runId: string
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
   runTimerInfo: RunTimerInfo
@@ -94,7 +90,6 @@ interface CurrentRunningProtocolCommandProps {
 }
 
 export function CurrentRunningProtocolCommand({
-  runId, // may not need
   runStatus,
   robotSideAnalysis,
   runTimerInfo,
@@ -111,24 +106,18 @@ export function CurrentRunningProtocolCommand({
   )
   const currentRunStatus = t(`status_${runStatus}`)
 
-  // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-
   const onStop = (): void => {
-    console.log('stop run')
     stopRun() // from useRunActionMutations
-    trackProtocolRunEvent({ name: 'runCancel', properties: { tbd: 'tbd' } })
+    trackProtocolRunEvent({ name: 'runCancel' })
   }
 
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
       pauseRun()
-      // ToDo (kj:03/28/2023) update event information
       trackProtocolRunEvent({ name: 'runPause' })
     } else {
       playRun()
-      // ToDo (kj:03/28/2023) update event information
-      // robotAnalyticsData needs robotName
-
+      // ToDo (kj:03/28/2023) tbd
       // trackProtocolRunEvent({
       //   name: runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume',
       //   properties:

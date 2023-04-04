@@ -50,7 +50,7 @@ export function StopButton({ onStop }: StopButtonProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       onClick={onStop}
-      aria-label="close"
+      aria-label="stop"
     >
       <Icon name="close" color={COLORS.white} size="10rem" />
     </Btn>

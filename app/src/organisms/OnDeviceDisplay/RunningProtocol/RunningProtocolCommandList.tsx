@@ -8,14 +8,10 @@ import {
   DIRECTION_ROW,
   COLORS,
   SPACING,
-  Icon,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   JUSTIFY_SPACE_BETWEEN,
-  Btn,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  DISPLAY_FLEX,
   BORDERS,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -53,7 +49,6 @@ const COMMAND_ROW_STYLE = css`
 `
 
 interface RunningProtocolCommandListProps {
-  runId: string
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
   playRun: () => void
@@ -65,7 +60,6 @@ interface RunningProtocolCommandListProps {
 }
 
 export function RunningProtocolCommandList({
-  runId, // may not need
   runStatus,
   robotSideAnalysis,
   playRun,
@@ -82,18 +76,15 @@ export function RunningProtocolCommandList({
 
   const onStop = (): void => {
     stopRun()
-    // ToDo (kj:03/28/2023) update event information
-    trackProtocolRunEvent({ name: 'runCancel', properties: { tbd: 'tbd' } })
+    // ToDo (kj:03/28/2023) update event information name & properties
+    trackProtocolRunEvent({ name: 'runCancel', properties: {} })
   }
 
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
-      console.log('pause')
       pauseRun()
-      // ToDo (kj:03/28/2023) update event information
       trackProtocolRunEvent({ name: 'runPause' })
     } else {
-      console.log('playRun')
       playRun()
       // ToDo (kj:03/28/2023) update event information
       // trackProtocolRunEvent({
