@@ -208,7 +208,7 @@ def _run_trial(
     blank: bool,
     inspect: bool,
     mix: bool = False,
-    stable: bool = False,
+    stable: bool = True,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     pipetting_callbacks = _generate_callbacks_for_trial(recorder, volume, trial, blank)
 
@@ -401,7 +401,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     blank=True,  # stay away from the liquid
                     inspect=cfg.inspect,
                     mix=cfg.mix,
-                    stable=cfg.stable,
+                    stable=True,
                 )
                 print(
                     f"blank {trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
@@ -412,7 +412,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 actual_disp_list.append(evap_dispense)
                 print("dropping tip")
                 _drop_tip()
-            pipette.reset_tipracks()
             ui.print_header("EVAPORATION AVERAGE")
             average_aspirate_evaporation_ul = sum(actual_asp_list) / len(
                 actual_asp_list
@@ -466,7 +465,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         blank=False,
                         inspect=cfg.inspect,
                         mix=cfg.mix,
-                        stable=cfg.stable,
+                        stable=True,
                     )
                     print(
                         "measured volumes:\n"
