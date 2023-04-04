@@ -119,9 +119,6 @@ class SupportedTipsDefinition(BaseModel):
         description="The height to return a tip to its tiprack.",
         alias="defaultReturnTipHeight",
     )
-    default_blowout_volume: float = Field(
-        ..., description="The default volume to be used for blow out command."
-    )
     aspirate: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for aspirate."
     )
@@ -238,6 +235,14 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     channels: PipetteChannelType = Field(
         ..., description="The maximum number of channels on the pipette."
     )
+    shaft_diameter: float = Field(
+        ..., description="The diameter of the pipette shaft.", alias="shaftDiameter"
+    )
+    shaft_ul_per_mm: float = Field(
+        ...,
+        description="The conversion rate between uL dispensed and mm of motor movement.",
+        alias="shaftULperMM",
+    )
 
     @validator("pipette_type", pre=True)
     def convert_pipette_model_string(cls, v: str) -> PipetteModelType:
@@ -294,6 +299,11 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         regex="opentrons/[a-z0-9._]+/[0-9]",
         alias="defaultTipracks",
     )
+    default_blowout_volume: float = Field(
+        ...,
+        description="The default volume to be used for blow out command.",
+        alias="defaultBlowoutVolume",
+    )
 
     @validator("supported_tips", pre=True)
     def convert_aspirate_key_to_channel_type(
@@ -311,9 +321,4 @@ class PipetteConfigurations(
 
     version: PipetteVersionType = Field(
         ..., description="The version of the configuration loaded."
-    )
-    shaft_diameter: float = Field(..., description="The diameter of the pipette shaft.")
-    shaft_ul_per_mm: float = Field(
-        ...,
-        description="The conversion rate between uL dispensed and mm of motor movement.",
     )
