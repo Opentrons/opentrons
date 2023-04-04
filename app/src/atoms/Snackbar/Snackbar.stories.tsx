@@ -33,7 +33,7 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
             When clicking the button, the Snackbar shows up in the bottom.
           </StyledText>
           <StyledText as="p">
-            After 4 sec, the Snackbar will disappear
+            By default the Snackbar will disappear after 4 seconds.
           </StyledText>
         </Flex>
       </Flex>
@@ -53,52 +53,7 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
   )
 }
 
-export const QuickSnack = DefaultTemplate.bind({})
-QuickSnack.args = {
+export const SnackbarComponent = DefaultTemplate.bind({})
+SnackbarComponent.args = {
   message: 'Short and sweet message',
-}
-
-const TenSecondTemplate: Story<
-  React.ComponentProps<typeof Snackbar>
-> = args => {
-  const [isShowSnackbar, setIsShowSnackbar] = React.useState<boolean>(false)
-
-  const handleClick = (): void => {
-    setIsShowSnackbar(true)
-  }
-
-  return (
-    <>
-      <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
-        <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
-        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
-          <StyledText as="p">
-            When clicking the button, the Snackbar shows up in the bottom.
-          </StyledText>
-          <StyledText as="p">
-            After 10 sec, the Snackbar will disappear
-          </StyledText>
-        </Flex>
-      </Flex>
-      {isShowSnackbar && (
-        <Flex
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_CENTER}
-          width="100%"
-          position="absolute"
-          bottom={SPACING.spacingXXL}
-          zIndex={1000}
-        >
-          <Snackbar {...args} onClose={() => setIsShowSnackbar(false)} />
-        </Flex>
-      )}
-    </>
-  )
-}
-
-export const SubstantialSnack = TenSecondTemplate.bind({})
-SubstantialSnack.args = {
-  message:
-    'A long complicated Snackbar message that we want to give them time to read',
-  duration: 10000,
 }

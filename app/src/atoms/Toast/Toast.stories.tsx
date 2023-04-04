@@ -28,9 +28,13 @@ const TemplateWithTimeout: Story<React.ComponentProps<typeof Toast>> = args => {
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
           <StyledText as="p">
-            When clicking the button, the Toast shows up in the bottom.
+            When clicking the button, the Toast shows up below.
           </StyledText>
-          <StyledText as="p">After 5 sec, the Toast will disappear</StyledText>
+          <StyledText as="p">
+            Unless you set a duration or disable the timeout, the Toast will
+            disappear between 2 and 7 seconds depending on the length of the
+            text.
+          </StyledText>
         </Flex>
       </Flex>
       {isShowToast && <Toast {...args} onClose={() => setIsShowToast(false)} />}

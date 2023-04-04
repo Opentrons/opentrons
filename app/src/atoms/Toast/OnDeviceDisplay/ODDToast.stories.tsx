@@ -33,8 +33,9 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
             When clicking the button, the Toast shows up in the bottom.
           </StyledText>
           <StyledText as="p">
-            After between 2 and 7 sec, depending on the length of the text, the
-            Toast will disappear
+            Unless you set a duration or disable the timeout, the Toast will
+            disappear between 2 and 7 seconds depending on the length of the
+            text.
           </StyledText>
         </Flex>
       </Flex>
