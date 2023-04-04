@@ -271,7 +271,7 @@ class OT3API(
     async def _update_tip_state(self, mount: OT3Mount):
         status = await self._backend.get_tip_state(mount)
         if len(status) != 0:
-            self._tip_state = TipState(status[mount_to_subsystem(mount).name])
+            self._tip_state = TipState(status[mount_to_subsystem(mount)])
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
