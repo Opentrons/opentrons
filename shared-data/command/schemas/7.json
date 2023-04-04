@@ -144,6 +144,9 @@
       "$ref": "#/definitions/CalibratePipetteCreate"
     },
     {
+      "$ref": "#/definitions/CalibrateModuleCreate"
+    },
+    {
       "$ref": "#/definitions/MoveToMaintenancePositionCreate"
     }
   ],
@@ -2882,6 +2885,62 @@
         },
         "params": {
           "$ref": "#/definitions/CalibratePipetteParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "CalibrateModuleParams": {
+      "title": "CalibrateModuleParams",
+      "description": "Payload required to calibrate-module.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "The unique id of module to calibrate.",
+          "type": "string"
+        },
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The unique id of module calibration adapter labware.",
+          "type": "string"
+        },
+        "mount": {
+          "description": "The instrument mount used to calibrate the module.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MountType"
+            }
+          ]
+        }
+      },
+      "required": ["moduleId", "labwareId", "mount"]
+    },
+    "CalibrateModuleCreate": {
+      "title": "CalibrateModuleCreate",
+      "description": "Create calibrate-module command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "calibration/calibrateModule",
+          "enum": ["calibration/calibrateModule"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/CalibrateModuleParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

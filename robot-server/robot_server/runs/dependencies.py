@@ -6,7 +6,11 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from robot_server.hardware import get_hardware, get_robot_type
 from robot_server.persistence import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner

@@ -13,6 +13,7 @@ import {
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  SecondaryButton,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
@@ -22,7 +23,6 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { SecondaryButton } from '../../atoms/buttons'
 import { ERROR_TOAST, SUCCESS_TOAST, useToast } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useTrackEvent } from '../../redux/analytics'

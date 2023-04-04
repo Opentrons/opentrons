@@ -2,48 +2,96 @@
 import argparse
 import asyncio
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Any, Dict
+from typing import Optional, List, Any, Dict
 
+from opentrons.config.defaults_ot3 import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
+# arbitrary safe distance for relative-movements upward
+# along Z, after pick-up/dropping a labware
+TRAVEL_HEIGHT = 100
+
+# NOTE: should probably just always be zero offset here
+PICK_UP_OFFSETS = {
+    "deck": Point(),
+    "mag-plate": Point(),
+    "heater-shaker": Point(),
+    "temp-module": Point(),
+    "thermo-cycler": Point(),
+}
+# NOTE: these depend on if there's clips, or chamfers, etc.
+DROP_OFFSETS = {
+    "deck": Point(z=-0.5),
+    "mag-plate": Point(z=9.5),
+    "heater-shaker": Point(z=-2),
+    "temp-module": Point(z=-2),
+    "thermo-cycler": Point(),
+}
+
 # size of things we are using (NOTE: keep Y-Axis as negative)
 SLOT_SIZE = types.Point(x=128, y=-86, z=0)
 LABWARE_SIZE_ARMADILLO = types.Point(x=127.8, y=-85.55, z=16)
 LABWARE_SIZE_EVT_TIPRACK = types.Point(x=127.6, y=-85.8, z=93)
-LABWARE_SIZE_RESERVOIR = types.Point(x=127.8, y=-85.55, z=30)  # FIXME: get real values
-MAG_PLATE_SIZE = types.Point(x=128, y=-86.0, z=39.5)
+LABWARE_SIZE_NEST_1_WELL_RESERVOIR = types.Point(x=127.4, y=-85.2, z=31)
 
-# offset created by placing labware on the magnetic plate
-ARMADILLO_HEIGHT_ON_MAG_PLATE = 45.3
-ARMADILLO_OFFSET_ON_MAG_PLATE = types.Point(
-    z=ARMADILLO_HEIGHT_ON_MAG_PLATE - LABWARE_SIZE_ARMADILLO.z
-)
-
-TRAVEL_HEIGHT = 30
-
-ForcedOffsets = List[Tuple[types.Point, types.Point]]
-
-# EDIT BELOW VARIABLES
-TEST_OFFSETS: ForcedOffsets = [
-    (types.Point(x=0, y=0, z=0), types.Point(x=0, y=0, z=0)),
-]
 LABWARE_SIZE = {
     "plate": LABWARE_SIZE_ARMADILLO,
     "tiprack": LABWARE_SIZE_EVT_TIPRACK,
-    "reservoir": LABWARE_SIZE_RESERVOIR,
+    "reservoir": LABWARE_SIZE_NEST_1_WELL_RESERVOIR,
 }
 LABWARE_KEYS = list(LABWARE_SIZE.keys())
 LABWARE_GRIP_HEIGHT = {
     "plate": LABWARE_SIZE_ARMADILLO.z * 0.5,
     "tiprack": LABWARE_SIZE_EVT_TIPRACK.z * 0.4,
-    "reservoir": LABWARE_SIZE_RESERVOIR.z * 0.5,
+    "reservoir": LABWARE_SIZE_NEST_1_WELL_RESERVOIR.z * 0.5,
 }
 LABWARE_GRIP_FORCE = {k: 15 for k in LABWARE_KEYS}
-LABWARE_WARP = types.Point()
+
+DECK_ITEM_OFFSETS = {
+    "thermo-cycle": Point(),  # FIXME
+    "heater-shaker": Point(),  # FIXME
+    "temp-module": Point(),  # FIXME
+    "mag-plate": Point(),  # FIXME
+    "deck": Point(),
+}
+ADAPTER_OFFSETS = {
+    "universal": Point(),  # FIXME
+    "pcr": Point(),  # FIXME
+    "non-contact": Point(),  # FIXME
+    "flat": Point(),  # FIXME
+    "deep": Point(),  # FIXME
+    "round-bottom": Point(),  # FIXME
+}
+
+PROBE_MOUNT = types.OT3Mount.LEFT
+ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
+    prep_distance_mm=5,
+    max_overrun_distance_mm=1,
+    speed_mm_per_s=1,
+    sensor_threshold_pf=0.5,
+)
+LABWARE_PROBE_CORNER_TOP_LEFT_XY = {
+    "plate": Point(x=5, y=-5),
+    "tiprack": Point(x=11.5, y=-9.2),
+    "reservoir": Point(x=9.5, y=-6.3),
+}
+
+# dict holding all the probed corner Z heights
+# - slot
+#   - deck-item
+#     - labware
+#       - List of Z heights relative to deck
+MEASURED_CORNERS: Dict[int, Dict[str, Dict[str, List[List[float]]]]] = {
+    slot: {
+        deck_item: {labware_key: list() for labware_key in LABWARE_KEYS}
+        for deck_item in DECK_ITEM_OFFSETS.keys()
+    }
+    for slot in range(12)
+}
 
 
 @dataclass
@@ -57,157 +105,59 @@ class GripperSlotStates:
     mag_plates: List[int]
 
 
-# TODO: changes for DVT
-#       - weaker clips
-#       - tall-pegs on only top+left sides
-#       - tall-pegs ~5mm from slot-edge
-
-SW_OFFSETS_OT2 = {
-    "deck": Point(),
-    "mag-plate": Point(),
-    "heater-shaker-right": Point(x=0.125, y=-1.125, z=68.275),
-    "heater-shaker-left": Point(x=-0.125, y=1.125, z=68.275),
-    "temp-module": Point(x=-1.45, y=-0.15, z=80.09),
-    "thermo-cycler": Point(y=68.06, z=98.26),
-}
-
-
-def _remove_ot2_sw_offset(o: Point, d_item: str, s: int) -> Point:
-    if d_item == "heater-shaker":
-        if s in [1, 4, 7, 10]:
-            o += SW_OFFSETS_OT2[f"{d_item}-left"]
-        else:
-            o += SW_OFFSETS_OT2[f"{d_item}-right"]
-    else:
-        o += SW_OFFSETS_OT2[d_item]
-    return o
-
-
-def grip_offset(
-    action: str, item: str, slot: Optional[int] = None, adapter: Optional[str] = None
-) -> Dict[str, float]:
-    """Grip offset."""
-    from opentrons.types import Point
-
-    # EDIT these values
-    # NOTE: we are still testing to determine our software's defaults
-    #       but we also expect users will want to edit these
-    _pick_up_offsets = {
-        "deck": Point(x=-0.2),
-        "mag-plate": Point(),
-        "heater-shaker": Point(),
-        "temp-module": Point(),
-        "thermo-cycler": Point(),
-    }
-    # EDIT these values
-    # NOTE: we are still testing to determine our software's defaults
-    #       but we also expect users will want to edit these
-    _drop_offsets = {
-        "deck": Point(z=-2),
-        "mag-plate": Point(z=9.5),
-        "heater-shaker": Point(z=-2),
-        "temp-module": Point(z=-2),
-        "thermo-cycler": Point(),
-    }
-    # do NOT edit these values
-    # NOTE: these values will eventually be in our software
-    #       and will not need to be inside a protocol
-    _sw_offsets_ot2 = {
-        "deck": Point(),
-        "mag-plate": Point(),
-        "heater-shaker-right": Point(x=0.125, y=-1.125, z=68.275),
-        "heater-shaker-left": Point(x=-0.125, y=1.125, z=68.275),
-        "temp-module": Point(x=-1.45, y=-0.15, z=80.09),
-        "thermo-cycler": Point(y=68.06, z=98.26),
-    }
-    _hw_offsets_ot3 = {
-        "deck": Point(),
-        "mag-plate": Point(z=29.5),
-        "heater-shaker-right": Point(x=-3, y=-1, z=19),
-        "heater-shaker-left": Point(x=3, y=1, z=19),
-        "temp-module": Point(x=2.17, z=9),
-        "thermo-cycler": Point(x=-19.88, y=67.76, z=-0.04),
-    }
-    _adapter_offsets = {
-        "universal": Point(z=3),
-        "pcr": Point(z=3),
-        "non-contact": Point(z=2.6),
-        "flat": Point(z=1.75),
-        "deep": Point(z=1),
-        "round-bottom": Point(z=1),
-    }
-    # make sure arguments are correct
-    action_options = ["pick-up", "drop"]
-    item_options = list(_hw_offsets_ot3.keys())
-    item_options.remove("heater-shaker-left")
-    item_options.remove("heater-shaker-right")
-    item_options.append("heater-shaker")
-    if action not in action_options:
-        raise ValueError(
-            f'"{action}" not recognized, available options: {action_options}'
-        )
-    if item not in item_options:
-        raise ValueError(f'"{item}" not recognized, available options: {item_options}')
-    if item == "heater-shaker":
-        assert slot, 'argument slot= is required when using "heater-shaker"'
-        if slot in [1, 4, 7, 10]:
-            side = "left"
-        elif slot in [3, 6, 9, 12]:
-            side = "right"
-        else:
-            raise ValueError("heater shaker must be on either left or right side")
-        k = f"{item}-{side}"
-        hw_offset = _hw_offsets_ot3[k] - _sw_offsets_ot2[k]
-        if adapter:
-            _avail_adapters = list(_adapter_offsets.keys())
-            assert (
-                adapter in _avail_adapters
-            ), f'adapter "{adapter}" not found in {_avail_adapters}'
-            hw_offset += _adapter_offsets[adapter]
-    else:
-        hw_offset = _hw_offsets_ot3[item] - _sw_offsets_ot2[item]
-    if action == "pick-up":
-        offset = hw_offset + _pick_up_offsets[item]
-    else:
-        offset = hw_offset + _drop_offsets[item]
-    # convert from Point() to dict()
-    return {"x": offset.x, "y": offset.y, "z": offset.z}
-
-
 async def _inspect(api: OT3API) -> None:
     if input("ENTER to continue, any key to EXIT: "):
         await _finish(api)
 
 
 async def _finish(api: OT3API) -> None:
-    homed_pos = helpers_ot3.get_gantry_homed_position_ot3(api, types.OT3Mount.GRIPPER)
     await api.ungrip()
-    current_pos = await api.gantry_position(mount=types.OT3Mount.GRIPPER)
-    await api.move_to(types.OT3Mount.GRIPPER, current_pos._replace(z=homed_pos.z - 2))
-    await api.move_to(types.OT3Mount.GRIPPER, homed_pos + types.Point(x=-2, y=-2))
+    await api.home()
     exit()
 
 
 def _get_labware_grip_offset(
-    labware_key: str, is_grip: bool, has_clips: bool, warp: Optional[float]
+    labware_key: str, is_grip: bool, has_clips: bool
 ) -> types.Point:
     slot_center = SLOT_SIZE * 0.5
     grip_height = LABWARE_GRIP_HEIGHT[labware_key]
-    # if-grip-and-clips(x=LABWARE.center, y=SLOT.center, z=LABWARE.grip)
-    # else(x=SLOT.center, y=SLOT.center, z=LABWARE.grip)
     if is_grip and has_clips:
+        # center of labware != center of slot
         labware_center = LABWARE_SIZE[labware_key] * 0.5
         x = labware_center.x
-        if warp:
-            x += warp
     else:
+        # center of labware == center of slot
         x = slot_center.x
     y = slot_center.y
     z = grip_height
     return types.Point(x=x, y=y, z=z)
 
 
-async def _gripper_action(
+def _get_labware_probe_corners(labware_key: str) -> List[Point]:
+    size = LABWARE_SIZE[labware_key]
+    offset = LABWARE_PROBE_CORNER_TOP_LEFT_XY[labware_key]
+    # NOTE: the Y dimension is defined as negative (-) at the top of this script
+    corners = {
+        "top-left": Point(x=0, y=0, z=size.z),
+        "top-right": Point(x=size.x, y=0, z=size.z),
+        "bottom-right": Point(x=size.x, y=size.y, z=size.z),
+        "bottom-left": Point(x=0, y=size.y, z=size.z),
+    }
+    probe_offsets = {
+        "top-left": Point(x=offset.x, y=offset.y, z=offset.z),
+        "top-right": Point(x=offset.x * -1.0, y=offset.y, z=offset.z),
+        "bottom-right": Point(x=offset.x * -1.0, y=offset.y * -1.0, z=offset.z),
+        "bottom-left": Point(x=offset.x, y=offset.y * -1.0, z=offset.z),
+    }
+    return [
+        corners["top-left"] + probe_offsets["top-left"],
+        corners["top-right"] + probe_offsets["top-right"],
+        corners["bottom-right"] + probe_offsets["bottom-right"],
+        corners["bottom-left"] + probe_offsets["bottom-left"],
+    ]
+
+
+async def _do_gripper_action(
     api: OT3API,
     pos: types.Point,
     force: float,
@@ -216,7 +166,9 @@ async def _gripper_action(
 ) -> None:
     mount = types.OT3Mount.GRIPPER
     current_pos = await api.gantry_position(mount)
-    travel_height = max(current_pos.z, pos.z + TRAVEL_HEIGHT)
+    travel_height = max(current_pos.z, TRAVEL_HEIGHT)
+    if is_grip:
+        await api.ungrip()  # guarantee it
     await api.move_to(mount, current_pos._replace(z=travel_height))
     await api.move_to(mount, pos._replace(z=travel_height))
     await api.move_to(mount, pos)
@@ -228,71 +180,65 @@ async def _gripper_action(
         await api.ungrip()
     if inspect:
         await _inspect(api)
-    await api.move_rel(mount, types.Point(z=TRAVEL_HEIGHT))
+    if is_grip:
+        # keep bottom of plate >= travel height
+        await api.move_rel(mount, types.Point(z=TRAVEL_HEIGHT))
+    else:
+        await api.move_to(mount, pos._replace(z=TRAVEL_HEIGHT))
     if inspect:
         await _inspect(api)
 
 
-def _calculate_src_and_dst_points(
-    src_slot: int,
-    dst_slot: int,
-    labware_key: str,
-    src_deck_item: str,
-    dst_deck_item: str,
-    src_offset: Optional[types.Point],
-    dst_offset: Optional[types.Point],
-    warp: Optional[float],
-    adapter: Optional[str],
-) -> Tuple[types.Point, types.Point]:
-    # slot top-left corners
-    src_slot_loc = helpers_ot3.get_slot_top_left_position_ot3(src_slot)
-    dst_slot_loc = helpers_ot3.get_slot_top_left_position_ot3(dst_slot)
-    # relative position, within a slot
-    src_labware_offset = _get_labware_grip_offset(
-        labware_key, is_grip=True, has_clips=True, warp=warp
-    )
-    dst_labware_offset = _get_labware_grip_offset(
-        labware_key, is_grip=False, has_clips=True, warp=warp
-    )
+def _calculate_labware_position_on_deck(slot: int, deck_item: str) -> Point:
+    # slot top-left corner
+    slot_pos = helpers_ot3.get_slot_top_left_position_ot3(slot)
     # offset the module applies to an inserted labware
-    src_module_offset = types.Point(
-        **grip_offset("pick-up", src_deck_item, slot=src_slot, adapter=adapter)
+    # FIXME: we are only assuming deck slots for now
+    #        need to include module offsets, which are a
+    #        combination of both A) nominal offsets, and
+    #        B) calibration offset
+    # FIXME: also include adapter offsets here
+    assert deck_item == "deck", "currently not supporting modules"
+    deck_item_offset = DECK_ITEM_OFFSETS[deck_item]
+    return slot_pos + deck_item_offset
+
+
+def _calculate_grip_position(
+    slot: int,
+    labware_key: str,
+    deck_item: str,
+    offset: Optional[types.Point],
+) -> Point:
+    labware_pos_top_left = _calculate_labware_position_on_deck(slot, deck_item)
+    # relative position of labware, within a slot/module
+    labware_grip_offset = _get_labware_grip_offset(
+        labware_key, is_grip=True, has_clips=True
     )
-    src_module_offset = _remove_ot2_sw_offset(
-        src_module_offset, src_deck_item, src_slot
-    )
-    dst_module_offset = types.Point(
-        **grip_offset("drop", dst_deck_item, slot=dst_slot, adapter=adapter)
-    )
-    dst_module_offset = _remove_ot2_sw_offset(
-        dst_module_offset, dst_deck_item, dst_slot
-    )
-    # absolute position, on the deck
-    src_loc = src_slot_loc + src_module_offset + src_labware_offset
-    dst_loc = dst_slot_loc + dst_module_offset + dst_labware_offset
+    # calculate absolute position, on the deck
+    deck_pos = labware_pos_top_left + labware_grip_offset
     # add additional offsets, for testing purposes
-    if src_offset:
-        src_loc += src_offset
-    if dst_offset:
-        dst_loc += dst_offset
-    print(f"\tSrc Final = {src_loc}")
-    print(f"\t\tSlot = {src_slot_loc}")
-    print(f"\t\tOffset = {src_labware_offset}")
-    if warp:
-        print(f"\t\tWarp: {warp}")
-    if src_offset:
-        print(f"\t\tAdditional Offset = {src_offset}")
-    print(f"\tDst Final = {dst_loc}")
-    print(f"\t\tSlot = {dst_slot_loc}")
-    print(f"\t\tOffset = {dst_labware_offset}")
-    if warp:
-        print(f"\t\tWarp: {warp}")
-    if dst_offset:
-        print(f"\t\tAdditional Offset = {dst_offset}")
-    return src_loc, dst_loc
+    if offset:
+        deck_pos += offset
+    print(f'\tDeck Pos = {deck_pos} ("{deck_item}" at slot {slot})')
+    print(f"\t\tLabware Top-Left = {labware_pos_top_left}")
+    print(f"\t\tLabware Grip-Offset = {labware_grip_offset}")
+    if offset:
+        print(f"\t\tAdditional Offset = {offset}")
+    return deck_pos
 
 
-async def _slot_to_slot(
+def _calculate_probe_positions(
+    slot: int, labware_key: str, deck_item: str
+) -> List[Point]:
+    labware_pos_top_left = _calculate_labware_position_on_deck(slot, deck_item)
+    probe_poses = [
+        labware_pos_top_left + probe_corner
+        for probe_corner in _get_labware_probe_corners(labware_key)
+    ]
+    return probe_poses
+
+
+async def _move_labware(
     api: OT3API,
     labware_key: str,
     force: Optional[float],
@@ -302,8 +248,6 @@ async def _slot_to_slot(
     dst_deck_item: str,
     src_offset: Optional[types.Point] = None,
     dst_offset: Optional[types.Point] = None,
-    warp: Optional[float] = None,
-    adapter: Optional[str] = None,
     inspect: bool = True,
 ) -> None:
     if not force:
@@ -311,21 +255,80 @@ async def _slot_to_slot(
     print(
         f'\nMoving "{labware_key}" from slot #{src_slot} to #{dst_slot} w/ {force} newtons'
     )
-    src_loc, dst_loc = _calculate_src_and_dst_points(
+
+    # PICK-UP
+    src_loc = _calculate_grip_position(
         src_slot,
-        dst_slot,
         labware_key,
         src_deck_item,
-        dst_deck_item,
         src_offset,
-        dst_offset,
-        warp=warp,
-        adapter=adapter,
     )
+    src_loc += PICK_UP_OFFSETS[src_deck_item]
     if inspect:
         await _inspect(api)
-    await _gripper_action(api, src_loc, force, is_grip=True, inspect=inspect)
-    await _gripper_action(api, dst_loc, force, is_grip=False, inspect=inspect)
+    await _do_gripper_action(api, src_loc, force, is_grip=True, inspect=inspect)
+
+    # DROP
+    dst_loc = _calculate_grip_position(
+        dst_slot,
+        labware_key,
+        dst_deck_item,
+        dst_offset,
+    )
+    dst_loc += DROP_OFFSETS[dst_deck_item]
+    if inspect:
+        await _inspect(api)
+    await _do_gripper_action(api, dst_loc, force, is_grip=False, inspect=inspect)
+
+
+async def _probe_labware_corners(
+    api: OT3API, labware_key: str, slot: int, deck_item: str
+) -> List[float]:
+    nominal_corners = _calculate_probe_positions(slot, labware_key, deck_item)
+    await api.home([types.OT3Axis.by_mount(PROBE_MOUNT)])
+    await api.add_tip(PROBE_MOUNT, api.config.calibration.probe_length)
+    found_heights: List[float] = list()
+    for corner in nominal_corners:
+        current_pos = await api.gantry_position(PROBE_MOUNT)
+        await api.move_to(PROBE_MOUNT, corner._replace(z=current_pos.z))
+        found_z = await api.capacitive_probe(
+            PROBE_MOUNT,
+            types.OT3Axis.by_mount(PROBE_MOUNT),
+            corner.z,
+            ALUMINUM_SEAL_SETTINGS,
+        )
+        found_heights.append(found_z)
+    await api.home([types.OT3Axis.by_mount(PROBE_MOUNT)])
+    await api.remove_tip(PROBE_MOUNT)
+    print(f'\tLabware Corners ("{deck_item}" at slot {slot})')
+    print(f"\t\tTop-Left = {found_heights[0]}")
+    print(f"\t\tTop-Right = {found_heights[1]}")
+    print(f"\t\tBottom-Right = {found_heights[2]}")
+    print(f"\t\tBottom-Left = {found_heights[3]}")
+    return found_heights
+
+
+def _clear_corner_heights() -> None:
+    global MEASURED_CORNERS
+    for slot, deck_items in MEASURED_CORNERS.items():
+        for deck_item, labware_keys in deck_items.items():
+            for labware_key in labware_keys.keys():
+                MEASURED_CORNERS[slot][deck_item][labware_key] = list()
+
+
+def _store_corner_heights(
+    slot: int, deck_item: str, labware_key: str, heights: List[float]
+) -> None:
+    global MEASURED_CORNERS
+    MEASURED_CORNERS[slot][deck_item][labware_key].append(heights)
+    heights_cache = MEASURED_CORNERS[slot][deck_item][labware_key]
+    if len(heights_cache) > 1:
+        # TODO: check variation, raise error if too high
+        pass
+
+
+def _check_corner_heights_variation() -> None:
+    return
 
 
 async def _run(
@@ -333,9 +336,8 @@ async def _run(
     labware_key: str,
     slot_states: GripperSlotStates,
     inspect: bool = False,
+    probe: bool = False,
     force: Optional[float] = None,
-    warp: Optional[float] = None,
-    adapter: Optional[str] = None,
 ) -> None:
     def _get_item_from_slot(slot: int) -> str:
         if slot in slot_states.temp_modules:
@@ -350,25 +352,32 @@ async def _run(
             return "deck"
 
     for i, s in enumerate(slot_states.slots[:-1]):
-        src = slot_states.slots[i]
-        dst = slot_states.slots[i + 1]
-        src_deck_item = _get_item_from_slot(src)
-        dst_deck_item = _get_item_from_slot(dst)
-        for _s_offset, _d_offset in TEST_OFFSETS:
-            await _slot_to_slot(
-                api,
-                labware_key,
-                force,
-                src,
-                dst,
-                src_deck_item=src_deck_item,
-                dst_deck_item=dst_deck_item,
-                src_offset=_s_offset,
-                dst_offset=_d_offset,
-                inspect=inspect,
-                warp=warp,
-                adapter=adapter,
-            )
+        src_slot = slot_states.slots[i]
+        dst_slot = slot_states.slots[i + 1]
+        src_deck_item = _get_item_from_slot(src_slot)
+        dst_deck_item = _get_item_from_slot(dst_slot)
+        await _move_labware(
+            api,
+            labware_key,
+            force,
+            src_slot,
+            dst_slot,
+            src_deck_item=src_deck_item,
+            dst_deck_item=dst_deck_item,
+            src_offset=Point(),  # placeholder for error-tolerance testing
+            dst_offset=Point(),  # placeholder for error-tolerance testing
+            inspect=inspect,
+        )
+        if not probe:
+            continue
+        corner_heights = await _probe_labware_corners(
+            api,
+            labware_key,
+            dst_slot,
+            dst_deck_item,
+        )
+        _store_corner_heights(dst_slot, dst_deck_item, labware_key, corner_heights)
+        _check_corner_heights_variation()
 
 
 async def _main(
@@ -376,13 +385,22 @@ async def _main(
     labware_key: str,
     slot_states: GripperSlotStates,
     inspect: bool = False,
+    probe: bool = False,
     force: Optional[float] = None,
-    warp: Optional[float] = None,
-    adapter: Optional[str] = None,
     cycles: int = 1,
 ) -> None:
-    api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=is_simulating,
+        pipette_left="p1000_single_v3.4",
+        gripper="GRPV1120230327A01",
+    )
+    if probe:
+        assert api.hardware_pipettes[
+            PROBE_MOUNT.to_mount()
+        ], f"no pipette found on {PROBE_MOUNT.name} mount"
     await api.home()
+    if probe and not api.is_simulator:
+        input(f"attach probe to {PROBE_MOUNT.name} pipette, then press ENTER:")
 
     if len(slot_states.slots) == 1:
         slot_states.slots += [slot_states.slots[0]]
@@ -392,14 +410,25 @@ async def _main(
     while True:
         if not api.is_simulator:
             await _inspect(api)
+        if probe:
+            _clear_corner_heights()
         for c in range(cycles):
             print(f"Cycle {c + 1}/{cycles}")
-            await _run(api, labware_key, slot_states, inspect, force, warp, adapter)
+            await _run(api, labware_key, slot_states, inspect, probe, force)
+        print("done")
         if api.is_simulator:
             break
 
 
 def _gather_and_test_slots(args: Any) -> GripperSlotStates:
+    # This function checks to make sure that the slots and module
+    # positions passed in by the script caller as arguments do not
+    # conflict with each other. Eg: no modules overlap on a
+    # slot, or no non-module slots are specified where a module is
+    # also specified, etc.
+    #
+    # An error will be raised if slots/modules have a conflict.
+
     def _slot_array_from_args(a: Any) -> List[int]:
         if a:
             return [int(s) for s in a]
@@ -457,16 +486,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--inspect", action="store_true")
+    parser.add_argument("--probe", action="store_true")
     parser.add_argument("--slots", nargs="+", required=True)
     parser.add_argument("--labware", choices=LABWARE_KEYS, required=True)
     parser.add_argument("--cycles", type=int, default=1)
     parser.add_argument("--force", type=int, default=5.0)
-    parser.add_argument("--warp", type=float)
     parser.add_argument("--temp-module-slots", nargs="+")
     parser.add_argument("--heater-shaker-slots", nargs="+")
     parser.add_argument("--thermo-cycler", action="store_true")
     parser.add_argument("--mag-plate-slots", nargs="+")
-    parser.add_argument("--adapter", type=str)
     args_parsed = parser.parse_args()
 
     asyncio.run(
@@ -475,9 +503,8 @@ if __name__ == "__main__":
             args_parsed.labware,
             _gather_and_test_slots(args_parsed),
             inspect=args_parsed.inspect,
+            probe=args_parsed.probe,
             force=args_parsed.force,
-            warp=args_parsed.warp,
-            adapter=args_parsed.adapter,
             cycles=args_parsed.cycles,
         )
     )

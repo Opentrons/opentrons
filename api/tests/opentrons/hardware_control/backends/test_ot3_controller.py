@@ -202,9 +202,11 @@ def fw_update_info() -> Dict[NodeId, str]:
 
 @pytest.fixture
 def fw_node_info() -> Dict[NodeId, DeviceInfoCache]:
-    node_cache1 = DeviceInfoCache(NodeId.head, 1, "12345678", None, PCBARevision(None))
+    node_cache1 = DeviceInfoCache(
+        NodeId.head, 1, "12345678", None, PCBARevision(None), subidentifier=0
+    )
     node_cache2 = DeviceInfoCache(
-        NodeId.gantry_x, 1, "12345678", None, PCBARevision(None)
+        NodeId.gantry_x, 1, "12345678", None, PCBARevision(None), subidentifier=0
     )
     return {NodeId.head: node_cache1, NodeId.gantry_x: node_cache2}
 
@@ -430,10 +432,10 @@ async def test_probing(
                     serial="hello",
                 ),
                 right=None,
-                gripper=GripperInformation(model="0", serial="fake_serial"),
+                gripper=GripperInformation(model="0.0", serial="fake_serial"),
             ),
             "P1KSV33hello",
-            "GRPV0fake_serial",
+            "GRPV00fake_serial",
             "Gripper V1",
         ),
     ],
@@ -476,7 +478,7 @@ async def test_get_attached_instruments_handles_unknown_name(
             name=FirmwarePipetteName.unknown, name_int=41, model=30, serial="hello"
         ),
         right=None,
-        gripper=GripperInformation(model=0, serial="fake_serial"),
+        gripper=GripperInformation(model=0.0, serial="fake_serial"),
     )
     mock_tool_detector.return_value = tool_summary
 
@@ -502,7 +504,7 @@ async def test_get_attached_instruments_handles_unknown_model(
             serial="hello",
         ),
         right=None,
-        gripper=GripperInformation(model=0, serial="fake_serial"),
+        gripper=GripperInformation(model=0.0, serial="fake_serial"),
     )
     mock_tool_detector.return_value = tool_summary
 

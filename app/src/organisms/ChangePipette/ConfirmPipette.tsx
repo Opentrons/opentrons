@@ -6,10 +6,11 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { LevelPipette } from './LevelPipette'
 
 import type {

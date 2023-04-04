@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadedAsyncLock
 
-from robot_server.util import call_once
+from server_utils.util import call_once
 from robot_server.hardware import get_hardware
 from robot_server.service.session.manager import SessionManager
 

@@ -15,7 +15,7 @@ interface ChipStorybookProps extends React.ComponentProps<typeof Chip> {
 // Note: 59rem(944px) is the size of ODD
 const Template: Story<ChipStorybookProps> = ({ ...args }) => (
   <Flex
-    backgroundColor={COLORS.darkBlack_fourty}
+    backgroundColor={COLORS.darkBlack_forty}
     padding={SPACING.spacing4}
     width="59rem"
   >

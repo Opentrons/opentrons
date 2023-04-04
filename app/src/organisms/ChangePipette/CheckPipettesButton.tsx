@@ -10,8 +10,8 @@ import {
   ALIGN_CENTER,
   SPACING,
   SIZE_1,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 

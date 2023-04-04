@@ -5,7 +5,7 @@ import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   Modal,
   OutlineButton,
-  PrimaryButton,
+  DeprecatedPrimaryButton,
   FormGroup,
   DropdownField,
 } from '@opentrons/components'
@@ -51,18 +51,21 @@ export const ResetButton = (props: { onClick: () => void }): JSX.Element => (
 )
 
 export const CancelButton = (props: { onClick: () => void }): JSX.Element => (
-  <PrimaryButton
+  <DeprecatedPrimaryButton
     className={cx(modalStyles.button_medium, modalStyles.button_right_of_break)}
     onClick={props.onClick}
   >
     {i18n.t('button.cancel')}
-  </PrimaryButton>
+  </DeprecatedPrimaryButton>
 )
 
 export const DoneButton = (props: { onClick: () => void }): JSX.Element => (
-  <PrimaryButton className={modalStyles.button_medium} onClick={props.onClick}>
+  <DeprecatedPrimaryButton
+    className={modalStyles.button_medium}
+    onClick={props.onClick}
+  >
     {i18n.t('button.done')}
-  </PrimaryButton>
+  </DeprecatedPrimaryButton>
 )
 
 export class WellOrderModal extends React.Component<

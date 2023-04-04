@@ -19,6 +19,7 @@ import {
   useHoverTooltip,
   ALIGN_CENTER,
   useConditionalConfirm,
+  PrimaryButton,
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
@@ -30,7 +31,7 @@ import {
 } from '@opentrons/shared-data'
 import { Portal } from '../../App/portal'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
