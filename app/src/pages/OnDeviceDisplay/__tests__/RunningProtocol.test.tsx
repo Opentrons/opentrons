@@ -3,7 +3,6 @@ import { Route } from 'react-router'
 import { UseQueryResult } from 'react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
