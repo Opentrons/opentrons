@@ -37,9 +37,8 @@ export const HeaterShakerSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = t('temperature')
-  const isShaking = module.data.speedStatus !== 'idle'
 
-  const sendSetTemperatureOrShakeCommand: React.MouseEventHandler<HTMLInputElement> = e => {
+  const sendSetTemperatureCommand: React.MouseEventHandler<HTMLInputElement> = e => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -89,7 +88,7 @@ export const HeaterShakerSlideout = (
         <SubmitPrimaryButton
           form="HeaterShakerSlideout_submitValue"
           value={t('confirm')}
-          onClick={sendSetTemperatureOrShakeCommand}
+          onClick={sendSetTemperatureCommand}
           disabled={hsValue === null || errorMessage !== null}
           data-testid={`HeaterShakerSlideout_btn_${module.serialNumber}`}
         />
@@ -131,7 +130,6 @@ export const HeaterShakerSlideout = (
               unit: unit,
             })}
             error={errorMessage}
-            disabled={isShaking}
           />
         </form>
       </Flex>
