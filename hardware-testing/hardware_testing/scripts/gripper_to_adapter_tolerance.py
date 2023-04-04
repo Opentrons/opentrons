@@ -12,15 +12,25 @@ RETRACT_HEIGHT_REL_MM = 20
 
 
 async def _main(
-        is_simulating: bool,
-        trials: int,
-        max_error: float,
-        step: float,
-        drop_offset: float,
-        force: float,
-        test_drop: bool,
-        test_pick_up: bool,
+    is_simulating: bool,
+    trials: int,
+    max_error: float,
+    step: float,
+    drop_offset: float,
+    force: float,
+    test_drop: bool,
+    test_pick_up: bool,
 ) -> None:
+    def _get_answer(msg: str) -> bool:
+        if api.is_simulator:
+            return True
+        return ui.get_user_answer(msg)
+
+    def _get_ready(msg: str) -> None:
+        if api.is_simulator:
+            return
+        return ui.get_user_ready(msg)
+
     ui.print_title("SETUP")
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating, gripper="GRPV1120230403A01"
@@ -29,7 +39,14 @@ async def _main(
     await api.home()
     await api.ungrip()
     ui.print_title("JOG TO LABWARE CENTER")
-    await helpers_ot3.jog_mount_ot3(api, OT3Mount.GRIPPER)
+    while True:
+        await helpers_ot3.jog_mount_ot3(api, OT3Mount.GRIPPER)
+        _get_ready("about to GRIP")
+        await api.grip(force)
+        _get_ready("about to UNGRIP")
+        await api.ungrip()
+        if _get_answer("does it look good"):
+            break
     labware_center = await api.gantry_position(OT3Mount.GRIPPER)
     print(f"labware center: {labware_center}")
     await api.ungrip()
@@ -48,22 +65,24 @@ async def _main(
         await _move_to(offset)
         await api.grip(force)
         await api.move_rel(OT3Mount.GRIPPER, Point(z=RETRACT_HEIGHT_REL_MM))
-        if check and not api.is_simulator:
-            return ui.get_user_answer("good pick-up")
-        return True
+        if check:
+            return _get_answer("good pick-up")
+        else:
+            return True
 
     async def _drop(offset: Point, check: bool = False) -> bool:
         await _move_to(offset + Point(z=drop_offset))
         await api.ungrip()
         await api.move_rel(OT3Mount.GRIPPER, Point(z=RETRACT_HEIGHT_REL_MM))
-        if check and not api.is_simulator:
-            return ui.get_user_answer("good drop")
-        return True
+        if check:
+            return _get_answer("good drop")
+        else:
+            return True
 
     async def _test(action: str, axis: OT3Axis) -> List[float]:
         ui.print_title(f"{action.upper()}-{axis.name.upper()}")
-        check_pick_up = (action == "pick-up")
-        check_drop = (action == "drop")
+        check_pick_up = action == "pick-up"
+        check_drop = action == "drop"
         if axis == OT3Axis.X:
             offset = Point(x=max_error * -1)
             step_pnt = Point(x=step)
@@ -72,13 +91,18 @@ async def _main(
             step_pnt = Point(y=step)
         good_offsets = []
         while offset.x <= max_error and offset.y <= max_error:
-            ui.print_header(f"{action.upper()}: X={round(offset.x, 1)}, Y={round(offset.y, 1)}")
+            ui.print_header(
+                f"{action.upper()}: X={round(offset.x, 1)}, Y={round(offset.y, 1)}"
+            )
             for t in range(trials):
                 print(f"trial {t + 1}/{trials}")
-                if not api.is_simulator:
-                    ui.get_user_ready("about to use gripper")
-                picked_up = await _pick_up(offset if check_pick_up else Point(), check=check_pick_up)
-                dropped_off = await _drop(offset if check_drop else Point(), check=check_drop)
+                _get_ready("about to use gripper")
+                picked_up = await _pick_up(
+                    offset if check_pick_up else Point(), check=check_pick_up
+                )
+                dropped_off = await _drop(
+                    offset if check_drop else Point(), check=check_drop
+                )
                 result = picked_up if check_pick_up else dropped_off
                 if not result:
                     break
@@ -121,13 +145,15 @@ if __name__ == "__main__":
     parser.add_argument("--skip-drop", action="store_true")
     parser.add_argument("--skip-pick-up", action="store_true")
     args = parser.parse_args()
-    asyncio.run(_main(
-        is_simulating=args.simulate,
-        trials=args.trials,
-        max_error=args.max_error,
-        step=args.step,
-        drop_offset=args.drop_offset,
-        force=args.force,
-        test_drop=not args.skip_drop,
-        test_pick_up=not args.skip_pick_up,
-    ))
+    asyncio.run(
+        _main(
+            is_simulating=args.simulate,
+            trials=args.trials,
+            max_error=args.max_error,
+            step=args.step,
+            drop_offset=args.drop_offset,
+            force=args.force,
+            test_drop=not args.skip_drop,
+            test_pick_up=not args.skip_pick_up,
+        )
+    )
