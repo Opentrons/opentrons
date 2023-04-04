@@ -52,7 +52,7 @@ from .util import use_or_initialize_loop, check_motion_bounds
 from .instruments.ot3.pipette import (
     load_from_config_and_check_skip,
 )
-from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
@@ -836,6 +836,10 @@ class OT3API(
         self._encoder_position = self._deck_from_machine(
             await self._backend.update_encoder_position()
         )
+        if self.has_gripper():
+            self._gripper_handler.set_jaw_displacement(
+                self._encoder_position[OT3Axis.G]
+            )
         return self._encoder_position
 
     async def encoder_current_position(
@@ -1320,15 +1324,7 @@ class OT3API(
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
-            self._gripper_handler.set_jaw_displacement(
-                self._encoder_position[OT3Axis.G]
-            )
+            await self._cache_encoder_position()
         except Exception:
             self._log.exception(
                 f"Gripper grip failed, encoder pos: {self._encoder_position[OT3Axis.G]}"
@@ -1340,15 +1336,7 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
-            self._gripper_handler.set_jaw_displacement(
-                self._encoder_position[OT3Axis.G]
-            )
+            await self._cache_encoder_position()
         except Exception:
             self._log.exception("Gripper home failed")
             raise
@@ -1359,27 +1347,11 @@ class OT3API(
         try:
             if not self._gripper_handler.is_valid_jaw_width(jaw_width_mm):
                 raise ValueError("Setting gripper jaw width out of bounds")
-            await self._backend.gripper_hold_jaw(
-                int(
-                    1000
-                    * (
-                        self._gripper_handler.get_gripper().config.geometry.jaw_width[
-                            "max"
-                        ]
-                        - jaw_width_mm
-                    )
-                    / 2
-                )
-            )
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
-            self._gripper_handler.set_jaw_displacement(
-                self._encoder_position[OT3Axis.G]
-            )
+            gripper = self._gripper_handler.get_gripper()
+            width_max = gripper.config.geometry.jaw_width["max"]
+            jaw_displacement_mm = (width_max - jaw_width_mm) / 2.0
+            await self._backend.gripper_hold_jaw(int(1000 * jaw_displacement_mm))
+            await self._cache_encoder_position()
         except Exception:
             self._log.exception("Gripper set width failed")
             raise
@@ -1714,6 +1686,12 @@ class OT3API(
         }
 
     @property
+    def hardware_gripper(self) -> Optional[Gripper]:
+        if not self.has_gripper():
+            return None
+        return self._gripper_handler.get_gripper()
+
+    @property
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
@@ -1856,11 +1834,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        carriage_pos = deck_from_machine(
-            self._backend.home_position(),
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
-        )
+        carriage_pos = self._deck_from_machine(self._backend.home_position())
         pos_at_home = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
         )
@@ -1940,11 +1914,7 @@ class OT3API(
             probe_settings.num_baseline_reads,
         )
         machine_pos = axis_convert(machine_pos_node_id, 0.0)
-        position = deck_from_machine(
-            machine_pos,
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
-        )
+        position = self._deck_from_machine(machine_pos)
         z_distance_traveled = (
             position[mount_axis] - probe_settings.starting_mount_height
         )
