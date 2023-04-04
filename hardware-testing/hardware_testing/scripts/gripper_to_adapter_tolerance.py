@@ -14,7 +14,8 @@ RETRACT_HEIGHT_REL_MM = 20
 async def _main(
     is_simulating: bool,
     trials: int,
-    max_error: float,
+    max_error_pick_up: float,
+    max_error_drop: float,
     step: float,
     drop_offset: float,
     force: float,
@@ -83,6 +84,7 @@ async def _main(
         ui.print_title(f"{action.upper()}-{axis.name.upper()}")
         check_pick_up = action == "pick-up"
         check_drop = action == "drop"
+        max_error = max_error_pick_up if check_pick_up else max_error_drop
         if axis == OT3Axis.X:
             offset = Point(x=max_error * -1)
             step_pnt = Point(x=step)
@@ -100,9 +102,13 @@ async def _main(
                 picked_up = await _pick_up(
                     offset if check_pick_up else Point(), check=check_pick_up
                 )
-                dropped_off = await _drop(
-                    offset if check_drop else Point(), check=check_drop
-                )
+                if picked_up:
+                    dropped_off = await _drop(
+                        offset if check_drop else Point(), check=check_drop
+                    )
+                else:
+                    dropped_off = False
+                    await api.ungrip()
                 result = picked_up if check_pick_up else dropped_off
                 if not result:
                     break
@@ -117,11 +123,13 @@ async def _main(
     #       but bad during drop.
     good_drop_x = []
     good_drop_y = []
+    good_pick_up_x = []
     good_pick_up_y = []
     if test_drop:
         good_drop_x = await _test("drop", OT3Axis.X)
         good_drop_y = await _test("drop", OT3Axis.Y)
     if test_pick_up:
+        good_pick_up_x = await _test("pick-up", OT3Axis.X)
         good_pick_up_y = await _test("pick-up", OT3Axis.Y)
     ui.print_title("RESULTS")
     if test_drop:
@@ -131,6 +139,8 @@ async def _main(
         print(good_drop_y)
     if test_pick_up:
         ui.print_header("PICK-UP-Y")
+        print(good_pick_up_x)
+        ui.print_header("PICK-UP-Y")
         print(good_pick_up_y)
 
 
@@ -138,7 +148,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--trials", type=int, default=1)
-    parser.add_argument("--max-error", type=float, default=3.0)
+    parser.add_argument("--max-error-pick-up", type=float, default=3.0)
+    parser.add_argument("--max-error-drop", type=float, default=3.0)
     parser.add_argument("--step", type=float, default=0.5)
     parser.add_argument("--drop-offset", type=float, default=0.0)
     parser.add_argument("--force", type=float, default=15.0)
@@ -149,7 +160,8 @@ if __name__ == "__main__":
         _main(
             is_simulating=args.simulate,
             trials=args.trials,
-            max_error=args.max_error,
+            max_error_pick_up=args.max_error_pick_up,
+            max_error_drop=args.max_error_drop,
             step=args.step,
             drop_offset=args.drop_offset,
             force=args.force,
