@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -18,7 +17,6 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
-import { getIsOnDevice } from '../../redux/config'
 
 import type { IconName, IconProps, StyleProps } from '@opentrons/components'
 
@@ -49,23 +47,7 @@ export interface ToastProps extends StyleProps {
 
 const TOAST_ANIMATION_DURATION = 500
 
-// I really, really wanted to get this done in a single component, but the useSelector
-// is a huuuuge pain to try to get to work in storybook. I couldn't mock it, I couldn't
-// ignore it, and I couldn't get storybook to work in isolation with it there. So... I
-// confined it to the Toast omponent the rest of the app sees and have it determine what
-// display it is using at runtime. Storybook then can use the RawToast and just pass in
-// what display it wants to see.
-
 export function Toast(props: ToastProps): JSX.Element {
-  const isOnDevice = useSelector(getIsOnDevice) ?? null
-  const displayType: 'desktop' | 'odd' =
-    isOnDevice != null && isOnDevice ? 'odd' : 'desktop'
-  const toastProps = { ...props, displayType }
-
-  return <RawToast {...toastProps} />
-}
-
-export function RawToast(props: ToastProps): JSX.Element {
   const {
     buttonText,
     message,
@@ -90,7 +72,12 @@ export function RawToast(props: ToastProps): JSX.Element {
     showODDStyle = true
   }
 
-  const closeText = buttonText ?? (closeButton === true ? 'close' : '')
+  const closeText =
+    buttonText !== undefined && buttonText.length > 0
+      ? buttonText
+      : closeButton === true
+      ? 'close'
+      : ''
   const DESKTOP_ANIMATION = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidein;
@@ -225,48 +212,53 @@ export function RawToast(props: ToastProps): JSX.Element {
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />
-        {showODDStyle ? (
-          <>
-            {headingText != null ? (
-              <StyledText
-                color={COLORS.darkBlackEnabled}
-                fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-                fontSize={TYPOGRAPHY.fontSize22}
-                lineHeight={TYPOGRAPHY.lineHeight28}
-                maxWidth="30.375rem"
-                overflow="hidden"
-                textOverflow="ellipsis"
-                whiteSpace="nowrap"
-              >
-                {headingText}
-              </StyledText>
-            ) : null}
+        <Flex
+          flexDirection={showODDStyle ? DIRECTION_ROW : DIRECTION_COLUMN}
+          overflow="hidden"
+          width={showODDStyle ? 'auto' : '100%'}
+        >
+          {headingText.length > 0 ? (
             <StyledText
-              color={COLORS.darkBlack_hundred}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              fontSize={TYPOGRAPHY.fontSize22}
-              lineHeight={TYPOGRAPHY.lineHeight28}
+              color={COLORS.darkBlackEnabled}
+              fontSize={
+                showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
+              }
+              fontWeight={
+                showODDStyle
+                  ? TYPOGRAPHY.fontWeightLevel2_bold
+                  : TYPOGRAPHY.fontWeightRegular
+              }
+              lineHeight={
+                showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+              }
+              maxWidth={showODDStyle ? '30.375rem' : 'auto'}
+              overflow="hidden"
+              textOverflow="ellipsis"
               whiteSpace="nowrap"
             >
-              {message}
+              {headingText}
             </StyledText>
-          </>
-        ) : (
-          <Flex flexDirection={DIRECTION_COLUMN} overflow="hidden" width="100%">
-            {headingText.length > 0 ? (
-              <StyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                overflow="hidden"
-                textOverflow="ellipsis"
-                whiteSpace="nowrap"
-              >
-                {headingText}
-              </StyledText>
-            ) : null}
-            <StyledText as="p">{message}</StyledText>
-          </Flex>
-        )}
+          ) : null}
+          <StyledText
+            color={
+              showODDStyle ? COLORS.darkBlack_hundred : COLORS.darkBlackEnabled
+            }
+            fontSize={
+              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
+            }
+            fontWeight={
+              showODDStyle
+                ? TYPOGRAPHY.fontWeightSemiBold
+                : TYPOGRAPHY.fontWeightRegular
+            }
+            lineHeight={
+              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+            }
+            whiteSpace="nowrap"
+          >
+            {message}
+          </StyledText>
+        </Flex>
       </Flex>
       {closeText.length > 0 && (
         <Link onClick={onClose} role="button" height={SPACING.spacing5}>
@@ -277,7 +269,7 @@ export function RawToast(props: ToastProps): JSX.Element {
             lineHeight={TYPOGRAPHY.lineHeight28}
             whiteSpace="nowrap"
           >
-            {buttonText}
+            {closeText}
           </StyledText>
         </Link>
       )}
