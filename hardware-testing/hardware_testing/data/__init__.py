@@ -20,8 +20,9 @@ def _build_git_description_string() -> str:
         raise RuntimeError("unable to run git describe on robot")
     description = _git("describe")
     mods = _git("ls-files", "-m").replace("\n", ", ")
-    desc_str = f"{description} [{mods}]"
-    return desc_str
+    if not mods:
+        return description
+    return f"{description} [{mods}]"
 
 
 def get_git_description() -> str:
