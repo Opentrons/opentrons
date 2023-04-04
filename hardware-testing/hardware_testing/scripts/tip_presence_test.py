@@ -77,7 +77,7 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
     step_length_index = 3
     step = step_size[step_length_index]
     xy_speed = 60
-    za_speed = 65
+    za_speed = 30
     information_str = """
         Click  >>   i   << to move up
         Click  >>   k   << to move down
@@ -233,6 +233,7 @@ async def _main() -> None:
                         slot_loc[args.slot][1],
                         home_position[OT3Axis.by_mount(mount)],
                     ),
+                    speed = 30,
                 )
             await home_ot3(hw_api, [OT3Axis.by_mount(mount)])
             input("Press Enter to continue")
@@ -247,6 +248,7 @@ async def _main() -> None:
                     jog_loc[OT3Axis.Y],
                     jog_loc[OT3Axis.by_mount(mount)],
                 ),
+                speed = 30,
             )
             init_position = await hw_api.encoder_current_position_ot3(mount)
             init_position = init_position[OT3Axis.by_mount(mount)]
@@ -258,6 +260,7 @@ async def _main() -> None:
                         jog_loc[OT3Axis.Y],
                         jog_loc[OT3Axis.by_mount(mount)]+ increment_val,
                     ),
+                    speed = 30,
                 )
                 task = asyncio.ensure_future(hw_api._update_tip_state(mount))
                 ejector_status = hw_api._tip_state.value
@@ -270,6 +273,7 @@ async def _main() -> None:
                     print(d_str)
                     break
                 increment_val -= step_size
+        await home_ot3(hw_api, [OT3Axis.by_mount(mount)])
 
 
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
