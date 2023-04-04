@@ -37,15 +37,15 @@ def print_csv_result(test: str, result: CSVResult) -> None:
     print(f"RESULT: {test} - {result}{highlight}\n")
 
 
-META_DATA_TITLE = "META-DATA"
-META_DATA_TEST_NAME = "test-name"
-META_DATA_TEST_TAG = "test-tag"
-META_DATA_TEST_RUN_ID = "test-run-id"
-META_DATA_TEST_TIME_UTC = "test-time-utc"
-META_DATA_TEST_OPERATOR = "test-operator"
-META_DATA_TEST_VERSION = "test-version"
+META_DATA_TITLE = "META_DATA"
+META_DATA_TEST_NAME = "test_name"
+META_DATA_TEST_TAG = "test_tag"
+META_DATA_TEST_RUN_ID = "test_run_id"
+META_DATA_TEST_TIME_UTC = "test_time_utc"
+META_DATA_TEST_OPERATOR = "test_operator"
+META_DATA_TEST_VERSION = "test_version"
 
-RESULTS_OVERVIEW_TITLE = "RESULTS-OVERVIEW"
+RESULTS_OVERVIEW_TITLE = "RESULTS_OVERVIEW"
 
 
 class CSVLine:
@@ -208,11 +208,14 @@ class CSVSection:
 
     def __str__(self) -> str:
         """CSV Section string."""
-        dashes = "-" * len(self.title)
+        dashes = "_" * (len(self.title) + len("_START"))
         lines = "\n".join([str(line) for line in self._lines_and_repeating_lines])
         min_timestamp = self._get_earliest_line_timestamp()
         return (
-            f"{min_timestamp},{dashes}\n" f"{min_timestamp},{self.title}\n" f"{lines}"
+            f"{min_timestamp},{dashes}\n"
+            f"{min_timestamp},{self.title}_START\n"
+            f"{lines}\n"
+            f"{min_timestamp},{self.title}_END"
         )
 
     @property
@@ -266,7 +269,7 @@ def _generate_meta_data_section() -> CSVSection:
 def _generate_results_overview_section(tags: List[str]) -> CSVSection:
     return CSVSection(
         title=RESULTS_OVERVIEW_TITLE,
-        lines=[CSVLine(tag=f"RESULT-{tag}", data=[CSVResult]) for tag in tags],
+        lines=[CSVLine(tag=f"RESULT_{tag}", data=[CSVResult]) for tag in tags],
     )
 
 
@@ -327,7 +330,7 @@ class CSVReport:
     def _refresh_results_overview_values(self) -> None:
         for s in self._sections[2:]:
             section = self[RESULTS_OVERVIEW_TITLE]
-            line = section[f"RESULT-{s.title}"]
+            line = section[f"RESULT_{s.title}"]
             assert isinstance(line, CSVLine)
             line.store(CSVResult.PASS, print_results=False)
             if s.result_passed:
