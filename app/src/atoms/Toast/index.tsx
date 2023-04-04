@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -61,6 +62,7 @@ export function Toast(props: ToastProps): JSX.Element {
     displayType,
     ...styleProps
   } = props
+  const { t } = useTranslation('shared')
 
   // We want to be able to storybook both the ODD and the Desktop versions,
   // so let it (and unit tests, for that matter) be able to pass in a parameter
@@ -76,7 +78,7 @@ export function Toast(props: ToastProps): JSX.Element {
     buttonText !== undefined && buttonText.length > 0
       ? buttonText
       : closeButton === true
-      ? 'close'
+      ? t('close')
       : ''
   const DESKTOP_ANIMATION = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
