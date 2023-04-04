@@ -14,7 +14,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
