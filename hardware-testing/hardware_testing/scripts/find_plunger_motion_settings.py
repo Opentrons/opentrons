@@ -1,6 +1,7 @@
 """Find plunger motion settings."""
 import argparse
 import asyncio
+from math import inf as infinity
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -14,13 +15,14 @@ TEST_NUM_TRIALS = 3
 TEST_MAX_SPEED = 40  # mm/sec (creates ~600 ul/sec for P1000)
 TEST_CURRENT = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0]  # amps
 TEST_DISCONTINUITIES = [40, 35, 30, 25, 20, 15]  # mm/sec
-TEST_ACCELERATIONS = [2000, 1500, 1200, 1000, 800, 700, 600, 500, 450, 400, 350, 250, 200]  # mm/sec/sec
+TEST_ACCELERATIONS = [4000, 3000, 2000, 1500, 1200, 1000, 800, 700, 600, 500, 450, 400, 350, 250, 200]  # mm/sec/sec
 
 DEFAULT_HOLD_CURRENT = 0.1
 
 HOMING_CURRENT = 1.0
 HOMING_SPEED = 10
 HOMING_ACCELERATION = 50
+HOMING_RETRACT_AFTER_MM = 1
 
 
 async def _motion_settings(
@@ -60,7 +62,7 @@ async def _home(api: OT3API, mount: OT3Mount) -> None:
     # FIXME: moving plunger is required to align motor and encoder
     #        during simulation
     top, _, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
-    await helpers_ot3.move_plunger_absolute_ot3(api, mount, top)
+    await helpers_ot3.move_plunger_absolute_ot3(api, mount, HOMING_RETRACT_AFTER_MM)
 
 
 async def _test_dispense(
@@ -143,10 +145,9 @@ async def _main(is_simulating: bool, mount: OT3Mount) -> None:
                 speed=discontinuity,
             )
             if passed:
-                good_settings.append([current, discontinuity, None])
-                break
+                good_settings.append([current, discontinuity, None, None])
     for i, vals in enumerate(good_settings):
-        current, discontinuity, _ = vals  # type: ignore[assignment]
+        current, discontinuity, _, _ = vals  # type: ignore[assignment]
         for acceleration in TEST_ACCELERATIONS:
             print(
                 f"testing acceleration {acceleration} mm/sec^2 "
@@ -161,15 +162,22 @@ async def _main(is_simulating: bool, mount: OT3Mount) -> None:
                 speed=TEST_MAX_SPEED,
             )
             if passed:
-                good_settings[i][-1] = acceleration
+                good_settings[i][2] = acceleration
                 break
+    for i, vals in enumerate(good_settings):
+        current, discontinuity, acceleration, _ = vals
+        if acceleration is not None:
+            seconds = (TEST_MAX_SPEED - discontinuity) / acceleration
+            if seconds:
+                accel_actual = int(TEST_MAX_SPEED / seconds)
+            else:
+                accel_actual = infinity
+            good_settings[i][-1] = accel_actual
     print("RESULTS")
     print("current\t\tdiscontinuity\tacceleration\taccel-actual")
-    for current, discontinuity, acceleration in good_settings:  # type: ignore[assignment]
-        seconds = (TEST_MAX_SPEED - discontinuity) / acceleration
-        accel_actual = TEST_MAX_SPEED / seconds
-        print(f"{current}\t\t{discontinuity}\t\t{acceleration}\t{accel_actual}")
-
+    for i, vals in enumerate(sorted(good_settings, key=lambda x: x[-1], reverse=True)):
+        current, discontinuity, acceleration, accel_actual = vals
+        print(f"{current}\t\t{discontinuity}\t\t{acceleration}\t\t{accel_actual}")
 
 if __name__ == "__main__":
     mount_options = {
