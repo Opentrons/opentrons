@@ -13,7 +13,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  useSwipe,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
@@ -36,9 +35,6 @@ import imgSrc from '../../../assets/images/odd/abstract@x2.png'
 import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
 import type { ProtocolResource } from '@opentrons/shared-data'
-
-// How many pinned protocols fit horizontally on the ODD?
-const PINNED_PROTOCOLS_IN_VIEW = 2
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -74,7 +70,7 @@ export function ProtocolDashboard(): JSX.Element {
   // We want an array of protocols in the same order as the
   // array of IDs we stored. There are many ways to sort
   // the pinned protocols. This way is mine.
-  let pinnedProtocols: ProtocolResource[] = []
+  const pinnedProtocols: ProtocolResource[] = []
   // Also, while we're here...
   // It's possible (here in the early days while running a simulator, anyway)
   // to lose protocols locally but still have their IDs in the pinned config.
@@ -127,48 +123,6 @@ export function ProtocolDashboard(): JSX.Element {
       handleProtocolsBySortKey('oldCreated')
     } else {
       handleProtocolsBySortKey('recentCreated')
-    }
-  }
-
-  const swipe = useSwipe()
-
-  // The pinned protocols are displayed as a horizontal carousel. There can
-  // be more pinned than can be shown at once, so the user can swipe through
-  // them to "spin" the carousel. This can be simulated via css by sliding
-  // divs around, giving negative absolute coordinates, etc., but that can
-  // be dicey to get right on a full browser. We've got electron on a tiny
-  // touch screen. So let's be more clever than that. Instead of moving things
-  // on the screen, how about we just re-order the array? Every swipe, take items
-  // off the front and move them to the back. From the user's POV, the effect is
-  // the same: things that were offscreen to the right are now in view. To
-  // simplify further, I have it so they can just keep swiping to keep spinning
-  // the carousel.
-  if (pinnedProtocols.length > PINNED_PROTOCOLS_IN_VIEW) {
-    if (swipe.swipeType === 'swipe-left') {
-      const inView = pinnedProtocols.slice(0, PINNED_PROTOCOLS_IN_VIEW)
-      const outOfView = pinnedProtocols.slice(PINNED_PROTOCOLS_IN_VIEW)
-      pinnedProtocols = [...outOfView, ...inView]
-      dispatch(
-        updateConfigValue(
-          'protocols.pinnedProtocolIds',
-          pinnedProtocols.map(p => p.id)
-        )
-      )
-      swipe.setSwipeType('')
-    } else if (swipe.swipeType === 'swipe-right') {
-      const lastView = pinnedProtocols.slice(0 - PINNED_PROTOCOLS_IN_VIEW)
-      const outOfView = pinnedProtocols.slice(
-        0,
-        pinnedProtocols.length - PINNED_PROTOCOLS_IN_VIEW
-      )
-      pinnedProtocols = [...lastView, ...outOfView]
-      dispatch(
-        updateConfigValue(
-          'protocols.pinnedProtocolIds',
-          pinnedProtocols.map(p => p.id)
-        )
-      )
-      swipe.setSwipeType('')
     }
   }
 

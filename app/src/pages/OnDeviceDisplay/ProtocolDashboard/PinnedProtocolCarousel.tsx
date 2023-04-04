@@ -46,6 +46,15 @@ export function PinnedProtocolCarousel(props: {
     slider.scrollLeft = scrollLeft - walk
   }
 
+  // Scrolling on the ODD is entirely controlled here, since it doesn't use
+  // mouse events on the touchscreen. The 800px scrolling is an arbitrary
+  // amount that felt the least janky to me in actual use.
+  if (swipe.swipeType === 'swipe-left' || swipe.swipeType === 'swipe-right') {
+    const walk = swipe.swipeType === 'swipe-left' ? -800 : 800
+    slider.scrollLeft = slider.scrollLeft - walk
+    swipe.setSwipeType('')
+  }
+
   const cardSize =
     pinnedProtocols.length === 1
       ? 'full'
