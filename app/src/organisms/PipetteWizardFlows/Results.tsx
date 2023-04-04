@@ -50,21 +50,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
   let subHeader
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      header = i18n.format(
-        t(recalibrate ? 'pip_recal_success' : 'pip_cal_success', {
-          pipetteName: pipetteName,
-        }),
-        'capitalize'
-      )
+      header = t(recalibrate ? 'pip_recal_success' : 'pip_cal_success', {
+        pipetteName: pipetteName,
+      })
       break
     }
     case FLOWS.ATTACH: {
       // attachment flow success
       if (attachedPipettes[mount] != null) {
-        header = i18n.format(
-          t('pipette_attached', { pipetteName: pipetteName }),
-          'cpaitalize'
-        )
+        header = t('pipette_attached', { pipetteName: pipetteName })
         buttonText = t('cal_pipette')
         // attachment flow fail
       } else {
@@ -76,22 +70,16 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
     case FLOWS.DETACH: {
       if (attachedPipettes[mount] != null) {
-        header = i18n.format(
-          t('pipette_failed_to_detach', { pipetteName: pipetteName }),
-          'capitalize'
-        )
+        header = t('pipette_failed_to_detach', { pipetteName: pipetteName })
         iconColor = COLORS.errorEnabled
         isSuccess = false
       } else {
         header = i18n.format(t('pipette_detached'), 'capitalize')
         if (selectedPipette === NINETY_SIX_CHANNEL) {
           if (currentStepIndex === totalStepCount) {
-            header = i18n.format(
-              t('ninety_six_detached_success', {
-                pipetteName: NINETY_SIX_CHANNEL,
-              }),
-              'capitalize'
-            )
+            header = t('ninety_six_detached_success', {
+              pipetteName: NINETY_SIX_CHANNEL,
+            })
           } else {
             header = t('all_pipette_detached')
             subHeader = t('gantry_empty_for_96_channel_success')

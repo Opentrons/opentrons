@@ -167,7 +167,7 @@ describe('PipetteWizardFlows', () => {
       'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
-      'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
+      'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
     )
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
     fireEvent.click(getStarted)
@@ -249,7 +249,7 @@ describe('PipetteWizardFlows', () => {
       'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
-      'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
+      'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
     )
   })
   it('renders 3rd page and clicking back button redirects to the first page', async () => {
@@ -502,7 +502,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Loosen screws and detach flex 96-channel 1000 μl')
+    getByText('Loosen screws and detach Flex 96-Channel 1000 μL')
     const continueBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(continueBtn)
   })

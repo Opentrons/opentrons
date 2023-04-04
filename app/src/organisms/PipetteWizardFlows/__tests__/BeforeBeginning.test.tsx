@@ -81,7 +81,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByText('You will need:')
       // getByText('mock need help link')
@@ -151,7 +151,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByAltText('1- or 8-Channel Pipette')
       getByText('You will need:')
@@ -231,7 +231,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -279,7 +279,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
@@ -330,7 +330,7 @@ describe('BeforeBeginning', () => {
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
       getByText(
-        'The calibration probe is included with the robot and should be stored on front pillar of the robot.'
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
       getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'

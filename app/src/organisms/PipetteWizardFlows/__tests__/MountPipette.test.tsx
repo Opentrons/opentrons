@@ -73,7 +73,7 @@ describe('MountPipette', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('Connect and attach 96 channel pipette')
+    getByText('Connect and attach 96-channel pipette')
     getByText(
       'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
     )

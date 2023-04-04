@@ -67,7 +67,7 @@ describe('Results', () => {
       recalibrate: true,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-channel 1000 μl successfully recalibrated')
+    getByText('Flex 1-Channel 1000 μL successfully recalibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -128,7 +128,7 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-channel 1000 μl still attached')
+    getByText('Flex 1-Channel 1000 μL still attached')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
@@ -161,7 +161,7 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-channel 1000 μl still attached')
+    getByText('Flex 1-Channel 1000 μL still attached')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
@@ -190,7 +190,7 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-channel 1000 μl successfully attached and calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -205,7 +205,7 @@ describe('Results', () => {
       totalStepCount: 9,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-channel 1000 μl successfully attached and calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -220,7 +220,7 @@ describe('Results', () => {
       totalStepCount: 5,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-channel 1000 μl successfully attached and calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -234,7 +234,7 @@ describe('Results', () => {
       recalibrate: true,
     }
     const { getByText, getByRole } = render(props)
-    getByText('Flex 1-channel 1000 μl successfully recalibrated')
+    getByText('Flex 1-Channel 1000 μL successfully recalibrated')
     getByRole('button', { name: 'SmallButton_default' }).click()
     expect(props.proceed).toHaveBeenCalled()
   })

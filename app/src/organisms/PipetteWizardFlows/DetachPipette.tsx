@@ -61,12 +61,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          i18n.format(
-            t('loose_detach', {
-              pipetteName: attachedPipettes[mount]?.modelSpecs.displayName,
-            }),
-            'capitalize'
-          )
+          t('loose_detach', {
+            pipetteName: attachedPipettes[mount]?.modelSpecs.displayName,
+          })
         )
       }
       //  TODO(Jr, 11/8/22): replace image with correct one!
