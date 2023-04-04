@@ -5,21 +5,14 @@ import { i18n } from '../../../i18n'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
-import { chainRunCommands } from '../utils/chainRunCommands'
 import {
   HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { CommandData } from '@opentrons/api-client'
 import { resetAllWhenMocks, when } from 'jest-when'
-
-jest.mock('../utils/chainRunCommands')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 const mockEndPosition = { x: 9, y: 19, z: 29 }
-const mockChainRunCommands = chainRunCommands as jest.Mock<
-  typeof chainRunCommands
->
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
   text: string
@@ -40,9 +33,12 @@ const render = (props: React.ComponentProps<typeof CheckItem>) => {
 
 describe('CheckItem', () => {
   let props: React.ComponentProps<typeof CheckItem>
-  const mockCreateRunCommand = jest.fn()
+  let mockChainRunCommands: jest.Mock
 
   beforeEach(() => {
+    mockChainRunCommands = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve([]))
     props = {
       section: SECTIONS.CHECK_LABWARE,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -50,24 +46,14 @@ describe('CheckItem', () => {
       location: { slotName: '1' },
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
-      createRunCommand: mockCreateRunCommand,
+      chainRunCommands: mockChainRunCommands,
       handleJog: jest.fn(),
       registerPosition: jest.fn(),
+      setFatalError: jest.fn(),
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
     }
-    mockChainRunCommands.mockImplementation(
-      (commands, createRunCommand, onAllSuccess) => {
-        commands.forEach((c: any) => {
-          createRunCommand({
-            command: c,
-            waitUntilComplete: true,
-          })
-        })
-        return onAllSuccess && onAllSuccess()
-      }
-    )
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -76,7 +62,7 @@ describe('CheckItem', () => {
   it('renders correct copy when preparing space with tip rack', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Prepare tip rack in slot 1' })
-    getByText('Clear all deck slots of labware')
+    getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
       matchTextWithSpans('Place a full Mock TipRack Definition into slot 1')
     )
@@ -92,76 +78,85 @@ describe('CheckItem', () => {
 
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Prepare labware in slot 2' })
-    getByText('Clear all deck slots of labware')
+    getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(matchTextWithSpans('Place a Mock Labware Definition into slot 2'))
     getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
   })
-  it('executes correct chained commands when confirm placement CTA is clicked then go back', () => {
-    when(mockCreateRunCommand)
+  it('executes correct chained commands when confirm placement CTA is clicked then go back', async () => {
+    when(mockChainRunCommands)
       .calledWith(
-        {
-          command: {
-            commandType: 'savePosition',
-            params: { pipetteId: 'pipetteId1' },
+        [
+          {
+            commandType: 'moveLabware',
+            params: {
+              labwareId: 'labwareId1',
+              newLocation: { slotName: '1' },
+              strategy: 'manualMoveWithoutPause',
+            },
           },
-          waitUntilComplete: true,
-        },
-        { onSuccess: expect.any(Function) }
+          {
+            commandType: 'moveToWell',
+            params: {
+              pipetteId: 'pipetteId1',
+              labwareId: 'labwareId1',
+              wellName: 'A1',
+              wellLocation: { origin: 'top', offset: undefined },
+            },
+          },
+          { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
+        ],
+        false
       )
-      .mockImplementation((_c, opts) => {
-        opts != null &&
-          (opts?.onSuccess as any)({
+      .mockImplementation(() =>
+        Promise.resolve([
+          {},
+          {},
+          {
             data: {
+              commandType: 'savePosition',
               result: { position: mockStartPosition },
             },
-          })
-        return Promise.resolve({} as CommandData)
-      })
+          },
+        ])
+      )
     const { getByRole } = render(props)
-    getByRole('button', { name: 'Confirm placement' }).click()
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
-      command: {
-        commandType: 'moveLabware',
-        params: {
-          labwareId: 'labwareId1',
-          newLocation: { slotName: '1' },
-          strategy: 'manualMoveWithoutPause',
+    await getByRole('button', { name: 'Confirm placement' }).click()
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'labwareId1',
+            newLocation: { slotName: '1' },
+            strategy: 'manualMoveWithoutPause',
+          },
         },
-      },
-      waitUntilComplete: true,
-    })
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(2, {
-      command: {
-        commandType: 'moveToWell',
-        params: {
-          pipetteId: 'pipetteId1',
-          labwareId: 'labwareId1',
-          wellName: 'A1',
-          wellLocation: { origin: 'top', offset: undefined },
+        {
+          commandType: 'moveToWell',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'labwareId1',
+            wellName: 'A1',
+            wellLocation: { origin: 'top', offset: undefined },
+          },
         },
-      },
-      waitUntilComplete: true,
-    })
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(
-      3,
-      {
-        command: {
+        {
           commandType: 'savePosition',
           params: { pipetteId: 'pipetteId1' },
         },
-        waitUntilComplete: true,
-      },
-      { onSuccess: expect.any(Function) }
+      ],
+      false
     )
-    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
       location: { slotName: '1' },
       position: mockStartPosition,
     })
   })
-  it('executes correct chained commands when go back clicked', () => {
+  it('executes correct chained commands when go back clicked', async () => {
     props = {
       ...props,
       workingOffsets: [
@@ -174,40 +169,70 @@ describe('CheckItem', () => {
       ],
     }
     const { getByRole } = render(props)
-    getByRole('button', { name: 'Go back' }).click()
+    await getByRole('button', { name: 'Go back' }).click()
 
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
-      command: { commandType: 'home', params: {} },
-      waitUntilComplete: true,
-    })
-    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        { commandType: 'home', params: {} },
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'labwareId1',
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+      ],
+      false
+    )
+    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
       location: { slotName: '1' },
       position: null,
     })
   })
-  it('executes correct chained commands when confirm position clicked', () => {
-    when(mockCreateRunCommand)
+  it('executes correct chained commands when confirm position clicked', async () => {
+    when(mockChainRunCommands)
       .calledWith(
-        {
-          command: {
+        [
+          {
             commandType: 'savePosition',
             params: { pipetteId: 'pipetteId1' },
           },
-          waitUntilComplete: true,
-        },
-        { onSuccess: expect.any(Function) }
+          {
+            commandType: 'moveToWell',
+            params: {
+              pipetteId: 'pipetteId1',
+              labwareId: 'fixedTrash',
+              wellName: 'A1',
+              wellLocation: { origin: 'top', offset: undefined },
+            },
+          },
+          {
+            commandType: 'moveLabware',
+            params: {
+              labwareId: 'labwareId1',
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ],
+        false
       )
-      .mockImplementation((_c, opts) => {
-        opts != null &&
-          (opts?.onSuccess as any)({
+      .mockImplementation(() =>
+        Promise.resolve([
+          {
             data: {
+              commandType: 'savePosition',
               result: { position: mockEndPosition },
             },
-          })
-        return Promise.resolve({} as CommandData)
-      })
+          },
+          {},
+          {},
+        ])
+      )
     props = {
       ...props,
       workingOffsets: [
@@ -220,43 +245,36 @@ describe('CheckItem', () => {
       ],
     }
     const { getByRole } = render(props)
-    getByRole('button', { name: 'Confirm position' }).click()
+    await getByRole('button', { name: 'Confirm position' }).click()
 
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
-      {
-        command: {
+      [
+        {
           commandType: 'savePosition',
           params: { pipetteId: 'pipetteId1' },
         },
-        waitUntilComplete: true,
-      },
-      { onSuccess: expect.any(Function) }
+        {
+          commandType: 'moveToWell',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            wellLocation: { origin: 'top', offset: undefined },
+          },
+        },
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'labwareId1',
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+      ],
+      false
     )
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(2, {
-      command: {
-        commandType: 'moveToWell',
-        params: {
-          pipetteId: 'pipetteId1',
-          labwareId: 'fixedTrash',
-          wellName: 'A1',
-          wellLocation: { origin: 'top', offset: undefined },
-        },
-      },
-      waitUntilComplete: true,
-    })
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(3, {
-      command: {
-        commandType: 'moveLabware',
-        params: {
-          labwareId: 'labwareId1',
-          newLocation: 'offDeck',
-          strategy: 'manualMoveWithoutPause',
-        },
-      },
-      waitUntilComplete: true,
-    })
-    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'finalPosition',
       labwareId: 'labwareId1',
       location: { slotName: '1' },
@@ -264,7 +282,7 @@ describe('CheckItem', () => {
     })
   })
 
-  it('executes heater shaker open latch command on mount if step is on HS', () => {
+  it('executes heater shaker open latch command on component mount if step is on HS', async () => {
     props = {
       ...props,
       location: { slotName: '1', moduleModel: HEATERSHAKER_MODULE_V1 },
@@ -288,52 +306,61 @@ describe('CheckItem', () => {
       },
     }
     const { getByRole } = render(props)
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
-      command: {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: { moduleId: 'firstHSId' },
-      },
-      waitUntilComplete: true,
-    })
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(2, {
-      command: {
-        commandType: 'heaterShaker/openLabwareLatch',
-        params: { moduleId: 'firstHSId' },
-      },
-      waitUntilComplete: true,
-    })
-    getByRole('button', { name: 'Confirm placement' }).click()
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(3, {
-      command: {
-        commandType: 'moveLabware',
-        params: {
-          labwareId: 'labwareId1',
-          newLocation: { moduleId: 'firstHSId' },
-          strategy: 'manualMoveWithoutPause',
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: 'firstHSId' },
         },
-      },
-      waitUntilComplete: true,
-    })
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(4, {
-      command: {
-        commandType: 'heaterShaker/closeLabwareLatch',
-        params: { moduleId: 'firstHSId' },
-      },
-      waitUntilComplete: true,
-    })
+        {
+          commandType: 'heaterShaker/deactivateShaker',
+          params: { moduleId: 'firstHSId' },
+        },
+        {
+          commandType: 'heaterShaker/openLabwareLatch',
+          params: { moduleId: 'firstHSId' },
+        },
+      ],
+      false
+    )
+    await getByRole('button', { name: 'Confirm placement' }).click()
 
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(5, {
-      command: {
-        commandType: 'moveToWell',
-        params: {
-          pipetteId: 'pipetteId1',
-          labwareId: 'labwareId1',
-          wellName: 'A1',
-          wellLocation: { origin: 'top', offset: undefined },
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      2,
+      [
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'labwareId1',
+            newLocation: { moduleId: 'firstHSId' },
+            strategy: 'manualMoveWithoutPause',
+          },
         },
-      },
-      waitUntilComplete: true,
-    })
+        {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: 'firstHSId' },
+        },
+        {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: 'secondHSId' },
+        },
+        {
+          commandType: 'moveToWell',
+          params: {
+            pipetteId: 'pipetteId1',
+            labwareId: 'labwareId1',
+            wellName: 'A1',
+            wellLocation: { origin: 'top', offset: undefined },
+          },
+        },
+        {
+          commandType: 'savePosition',
+          params: { pipetteId: 'pipetteId1' },
+        },
+      ],
+      false
+    )
   })
 
   it('executes thermocycler open lid command on mount if checking labware on thermocycler', () => {
@@ -354,12 +381,15 @@ describe('CheckItem', () => {
       },
     }
     render(props)
-    expect(props.createRunCommand).toHaveBeenNthCalledWith(1, {
-      command: {
-        commandType: 'thermocycler/openLid',
-        params: { moduleId: 'tcId' },
-      },
-      waitUntilComplete: true,
-    })
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          commandType: 'thermocycler/openLid',
+          params: { moduleId: 'tcId' },
+        },
+      ],
+      false
+    )
   })
 })
