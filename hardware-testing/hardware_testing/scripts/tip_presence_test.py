@@ -209,6 +209,7 @@ async def _main() -> None:
     details = [pipette_model]
     data_frame = {"init_position(mm)": None,
                 "final_position(mm)": None,
+                "tip_sensor_triggered_position(mm)": None,
                 "tip_count": None,
                 "ejector_status": None,
                 }
@@ -218,7 +219,7 @@ async def _main() -> None:
     plunger_pos = get_plunger_positions_ot3(hw_api, mount)
     home_position = await hw_api.current_position_ot3(mount)
     start_time = time.perf_counter()
-    step_size = 0.05
+    step_size = 0.02
     motion = True
     tips_to_use = 20
     try:
@@ -263,10 +264,8 @@ async def _main() -> None:
                 if ejector_status:
                     final_position = await hw_api.encoder_current_position_ot3(mount)
                     final_position = final_position[OT3Axis.by_mount(mount)]
-                    d_str = f"{init_position},\
-                            {final_position}, \
-                            {tip}, \
-                            {ejector_status} \n"
+                    delta = init_position - final_position
+                    d_str = f"{init_position}, {final_position}, {delta}, {tip}, {ejector_status} \n"
                     data.append_data_to_file(test_n, test_f, d_str)
                     print(d_str)
                     break
