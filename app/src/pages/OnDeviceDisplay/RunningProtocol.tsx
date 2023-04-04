@@ -55,7 +55,7 @@ export type ScreenOption =
 
 export function RunningProtocol(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
-  const [currentOption, setCurrentOption] = React.useState<ScreenOption | null>(
+  const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
   const swipe = useSwipe()
@@ -138,31 +138,33 @@ export function RunningProtocol(): JSX.Element {
         padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
         flexDirection={DIRECTION_COLUMN}
       >
-        {currentOption === 'CurrentRunningProtocolCommand' ? (
-          <CurrentRunningProtocolCommand
-            runId={runId}
-            playRun={playRun}
-            pauseRun={pauseRun}
-            stopRun={stopRun}
-            trackProtocolRunEvent={trackProtocolRunEvent}
-            protocolName={protocolName}
-            runStatus={runStatus}
-            currentRunCommandIndex={currentRunCommandIndex}
-            robotSideAnalysis={robotSideAnalysis}
-            runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
-          />
+        {robotSideAnalysis != null ? (
+          currentOption === 'CurrentRunningProtocolCommand' ? (
+            <CurrentRunningProtocolCommand
+              playRun={playRun}
+              pauseRun={pauseRun}
+              stopRun={stopRun}
+              trackProtocolRunEvent={trackProtocolRunEvent}
+              protocolName={protocolName}
+              runStatus={runStatus}
+              currentRunCommandIndex={currentRunCommandIndex}
+              robotSideAnalysis={robotSideAnalysis}
+              runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
+            />
+          ) : (
+            <RunningProtocolCommandList
+              protocolName={protocolName}
+              runStatus={runStatus}
+              playRun={playRun}
+              pauseRun={pauseRun}
+              stopRun={stopRun}
+              trackProtocolRunEvent={trackProtocolRunEvent}
+              currentRunCommandIndex={currentRunCommandIndex}
+              robotSideAnalysis={robotSideAnalysis}
+            />
+          )
         ) : (
-          <RunningProtocolCommandList
-            runId={runId}
-            protocolName={protocolName}
-            runStatus={runStatus}
-            playRun={playRun}
-            pauseRun={pauseRun}
-            stopRun={stopRun}
-            trackProtocolRunEvent={trackProtocolRunEvent}
-            currentRunCommandIndex={currentRunCommandIndex}
-            robotSideAnalysis={robotSideAnalysis}
-          />
+          <RunningProtocolSkelton currentOption={currentOption} />
         )}
         <Flex
           marginTop="2rem"
