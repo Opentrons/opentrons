@@ -555,6 +555,7 @@ class StatusBarState(enum.Enum):
     UPDATING = 7
     ACTIVATION = 8
     DISCO = 9
+    OFF = 10
 
     def transient(self) -> bool:
         return self.value in {
