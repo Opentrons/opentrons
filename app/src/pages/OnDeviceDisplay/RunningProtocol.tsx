@@ -67,7 +67,6 @@ export function RunningProtocol(): JSX.Element {
   )
   const runStatus = useRunStatus(runId)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
@@ -76,33 +75,15 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-
   const {
     playRun,
     pauseRun,
     stopRun,
-    isPlayRunActionLoading,
-    isPauseRunActionLoading,
-    isStopRunActionLoading,
+    // isPlayRunActionLoading,
+    // isPauseRunActionLoading,
+    // isStopRunActionLoading,
   } = useRunActionMutations(runId)
-
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  // console.log('commands', robotSideAnalysis?.commands)
-
-  // console.log('currentRunCommandIndex', currentRunCommandIndex)
-  console.log(
-    'currentRun',
-    currentRunCommandIndex != null &&
-      robotSideAnalysis?.commands[currentRunCommandIndex]
-  )
-
-  // console.log('totalSteps', totalIndex)
-  // console.log('currentRunCommandIndex', currentRunCommandIndex)
-  // console.log('runStatus', runStatus)
-
-  // console.log('currentRunStatus', currentRunStatus)
-
-  // console.log('robotSideAnalysis', robotSideAnalysis)
 
   React.useEffect(() => {
     if (
@@ -124,15 +105,17 @@ export function RunningProtocol(): JSX.Element {
 
   return (
     <>
-      <StepMeter
-        totalSteps={totalIndex != null ? totalIndex : 0}
-        currentStep={
-          currentRunCommandIndex != null
-            ? Number(currentRunCommandIndex) + 1
-            : 1
-        }
-        OnDevice
-      />
+      {robotSideAnalysis != null ? (
+        <StepMeter
+          totalSteps={totalIndex != null ? totalIndex : 0}
+          currentStep={
+            currentRunCommandIndex != null
+              ? Number(currentRunCommandIndex) + 1
+              : 1
+          }
+          OnDevice
+        />
+      ) : null}
       <Flex
         ref={swipe.ref}
         padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
