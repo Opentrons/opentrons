@@ -266,7 +266,7 @@ def _generate_meta_data_section() -> CSVSection:
 def _generate_results_overview_section(tags: List[str]) -> CSVSection:
     return CSVSection(
         title=RESULTS_OVERVIEW_TITLE,
-        lines=[CSVLine(tag=tag, data=[CSVResult]) for tag in tags],
+        lines=[CSVLine(tag=f"RESULT-{tag}", data=[CSVResult]) for tag in tags],
     )
 
 
@@ -327,7 +327,7 @@ class CSVReport:
     def _refresh_results_overview_values(self) -> None:
         for s in self._sections[2:]:
             section = self[RESULTS_OVERVIEW_TITLE]
-            line = section[s.title]
+            line = section[f"RESULT-{s.title}"]
             assert isinstance(line, CSVLine)
             line.store(CSVResult.PASS, print_results=False)
             if s.result_passed:
