@@ -153,12 +153,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       >
         {iconPlacement === 'startIcon' && iconName != null ? (
           <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
-            <Icon
-              width="1.75rem"
-              height="1.75rem"
-              marginRight="0.77375rem"
-              name={iconName}
-            />
+            <Icon size="1.75rem" marginRight="0.77375rem" name={iconName} />
           </Flex>
         ) : null}
 
@@ -171,12 +166,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         </StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
           <Flex aria-label={`SmallButton_${iconName}_positionEnd`}>
-            <Icon
-              width="1.75rem"
-              height="1.75rem"
-              marginLeft="0.77375rem"
-              name={iconName}
-            />
+            <Icon size="1.75rem" marginLeft="0.77375rem" name={iconName} />
           </Flex>
         ) : null}
       </Flex>

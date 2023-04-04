@@ -33,7 +33,7 @@ Alt.args = {
 
 export const TertiaryLowLight = Template.bind({})
 TertiaryLowLight.args = {
-  buttonType: 'TertiaryLowLight',
+  buttonType: 'tertiaryLowLight',
   buttonText: 'Button text',
 }
 
