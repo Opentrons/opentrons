@@ -15,7 +15,12 @@ import {
   expectedIncompleteRightMountTaskList,
   expectedIncompleteLeftMountTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
-import { useCalibrationTaskList, useRunHasStarted } from '../../Devices/hooks'
+import {
+  useCalibrationTaskList,
+  useRunHasStarted,
+  useAttachedPipettes,
+} from '../../Devices/hooks'
+import { mockLeftProtoPipette } from '../../../redux/pipettes/__fixtures__'
 
 jest.mock('../../Devices/hooks')
 jest.mock('../../ProtocolUpload/hooks')
@@ -25,6 +30,9 @@ const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction
 >
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
+>
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
 >
 
 const render = (robotName: string = 'otie') => {
@@ -47,6 +55,10 @@ describe('CalibrationTaskList', () => {
   beforeEach(() => {
     mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
     mockUseRunHasStarted.mockReturnValue(false)
+    mockUseAttachedPipettes.mockReturnValue({
+      left: mockLeftProtoPipette,
+      right: null,
+    })
   })
 
   afterEach(() => {

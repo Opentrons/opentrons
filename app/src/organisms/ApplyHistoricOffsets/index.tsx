@@ -27,6 +27,7 @@ import type {
   LoadedModule,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -110,7 +111,7 @@ export function ApplyHistoricOffsets(
               <ModalHeader
                 title={t(
                   noOffsetData
-                    ? 'no_offset_data_available'
+                    ? 'what_is_labware_offset_data'
                     : 'stored_offset_data'
                 )}
                 onClose={() => setShowOffsetDataModal(false)}
@@ -126,36 +127,26 @@ export function ApplyHistoricOffsets(
               }
             >
               {noOffsetData ? (
-                <>
-                  <StyledText as="p" marginBottom={SPACING.spacing3}>
-                    {t('no_offset_data_on_robot')}
-                  </StyledText>
-                  <StyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('what_labware_offset')}
-                  </StyledText>
-                  <Trans
-                    t={t}
-                    i18nKey={'robot_has_no_offsets_from_previous_runs'}
-                    components={{
-                      block: (
-                        <StyledText as="p" marginBottom={SPACING.spacing3} />
-                      ),
-                    }}
-                  />
-                </>
+                <Trans
+                  t={t}
+                  i18nKey={'robot_has_no_offsets_from_previous_runs'}
+                  components={{
+                    block: (
+                      <StyledText as="p" marginBottom={SPACING.spacing3} />
+                    ),
+                  }}
+                />
               ) : (
                 <StyledText as="p">
                   {t('robot_has_offsets_from_previous_runs')}
                 </StyledText>
               )}
-              <Link
-                external
-                css={TYPOGRAPHY.linkPSemiBold}
+              <ExternalLink
                 marginTop={noOffsetData ? '0px' : SPACING.spacing3}
                 href={HOW_OFFSETS_WORK_SUPPORT_URL}
               >
                 {t('see_how_offsets_work')}
-              </Link>
+              </ExternalLink>
               {!noOffsetData ? (
                 isLabwareOffsetCodeSnippetsOn ? (
                   <LabwareOffsetTabs
