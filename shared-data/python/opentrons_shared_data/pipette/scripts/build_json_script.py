@@ -5,6 +5,7 @@ from ast import literal_eval
 from typing import Optional, Dict, Union, Any, cast
 from pathlib import Path
 from pydantic import BaseModel
+import math
 
 from ... import get_shared_data_root
 from .. import name_config, model_config
@@ -413,60 +414,68 @@ def migrate_v1_to_v2() -> None:
 
 def migrate_new_blow_out_configs_v2() -> None:
 
-    general_config_files = Path(GENERAL_ROOT).glob("*")
-    for pipette_type in general_config_files:
-        pipette_type_str = str(pipette_type).split("/")[-1]
-        for volume in Path(pipette_type).glob("*"):
-            volume_str = str(volume).split("/")[-1]
-            for version in Path(volume).glob("*"):
-                version_str = str(version).split("/")[-1][:-4]
-                print(f"\n\nFILE = {str(version)}\n")
-                with open(version, "r") as file:
-                    filename_str = (
-                        pipette_type_str
-                        + " "
-                        + volume_str
-                        + " "
-                        + version_str.replace("_", ".")
-                    )
-                    general_config_dict = json.load(file)
-                    shaft_diameter = float(
-                        input(f"Please enter shaft diameter for {filename_str}: ")
-                    )
-                    shaft_uL_for_mm = float(
-                        input(f"Please enter uL to mm rate for {filename_str}")
-                    )
+    blowout_distance = {1: 1.5, 2: 4.5, 3: 5}
+    pipette_volumes = {
+        1: ["p10", "p50", "p300", "p1000"],
+        2: ["p20", "p300", "p1000"],
+        3: ["p50", "p1000"],
+    }
 
-                    general_config_dict["shaftDiameter"] = shaft_diameter
-                    general_config_dict["shaftULperMM"] = shaft_uL_for_mm
+    def fill_blowout_configs(
+        pipette_gen: int, shaft_diameters: Dict[str, float]
+    ) -> None:
+        general_config_files = Path(GENERAL_ROOT).glob("*")
+        for pipette_type in general_config_files:  # single, eight, 96-channel
+            pipette_type_str = str(pipette_type).split("/")[-1]
+            for volume in pipette_volumes[
+                pipette_gen
+            ]:  # pipette max volume- p10, p20, p50, etc.
+                shaft_diameter = shaft_diameters[volume]
+                # calculate uL per mm, default blowout vol
+                ul_per_mm = math.pi * (shaft_diameter / 2) ** 2
+                default_blowout_volume = blowout_distance[pipette_gen] * ul_per_mm
+                # get path for every file version for the pipette gen at hand
+                volume_path = Path(pipette_type / volume)
+                for general_file_version in volume_path.glob(
+                    f"{str(pipette_gen)}_*.json"
+                ):
+                    with open(general_file_version, "r") as file:
+                        general_config_dict = json.load(file)
+                    general_config_dict["shaftDiameter"] = round(shaft_diameter, 3)
+                    general_config_dict["shaftULperMM"] = round(ul_per_mm, 3)
 
-                    path = GENERAL_ROOT / pipette_type / volume
-                    save_to_file(path, version_str, general_config_dict, GENERAL_SCHEMA)
-
-    liquid_config_files = Path(LIQUID_ROOT).glob("*")
-    for pipette_type in liquid_config_files:
-        pipette_type_str = str(pipette_type).split("/")[-1]
-        for volume in Path(pipette_type).glob("*"):
-            volume_str = str(volume).split("/")[-1]
-            for version in Path(volume).glob("*"):
-                version_str = str(version).split("/")[-1][:-4]
-                with open(version, "r") as file:
-                    filename_str = (
-                        pipette_type_str
-                        + " "
-                        + volume_str
-                        + " "
-                        + version_str.replace("_", ".")
-                    )
-                    liquid_config_dict = json.load(file)
-                    default_blowout_volume = float(
-                        input(f"Please enter default blowout volume for {filename_str}")
+                    # get file path to pass into save_to_file
+                    gen_path = GENERAL_ROOT / pipette_type / volume
+                    version_str = str(general_file_version).split("/")[-1][:-5]
+                    save_to_file(
+                        gen_path, version_str, general_config_dict, GENERAL_SCHEMA
                     )
 
-                    liquid_config_dict["defaultBlowoutVolume"] = default_blowout_volume
+                # do the same for liquid data files
+                for liquid_file_version in Path(
+                    LIQUID_ROOT / pipette_type_str / volume
+                ).glob(f"{str(pipette_gen)}_*.json"):
+                    with open(liquid_file_version, "r") as file:
+                        liquid_config_dict = json.load(file)
+                        liquid_config_dict["defaultBlowoutVolume"] = round(
+                            default_blowout_volume, 3
+                        )
 
-                    path = LIQUID_ROOT / pipette_type / volume
-                    save_to_file(path, version_str, liquid_config_dict, LIQUID_SCHEMA)
+                        # get path to pass into save_to_file
+                        liquid_path = Path(LIQUID_ROOT / pipette_type_str / volume)
+                        version_str = str(liquid_file_version).split("/")[-1][:-5]
+                    save_to_file(
+                        liquid_path, version_str, liquid_config_dict, LIQUID_SCHEMA
+                    )
+
+    for pipette_gen in range(1, 4):  # gen 1, gen 2, gen 3
+        print(f"\nTaking data for gen{pipette_gen} pipettes:")
+        # overwrite and pass in dict with user input for each gen
+        shaft_diameters = {
+            vol: float(input(f"Enter shaft diameter for gen{pipette_gen} {vol}: "))
+            for vol in pipette_volumes[pipette_gen]
+        }
+        fill_blowout_configs(pipette_gen, shaft_diameters)
 
 
 def build_new_pipette_model_v2(
