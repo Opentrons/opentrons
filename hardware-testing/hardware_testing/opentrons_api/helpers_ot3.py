@@ -432,8 +432,10 @@ async def move_plunger_relative_ot3(
 
 async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
     """Move the gripper jaw by a relative distance."""
-    gripper = api._gripper_handler.get_gripper()
-    await api.hold_jaw_width(gripper.jaw_width + delta)
+    # FIXME: this should be in relative distances
+    #        but the api isn't setup for reporting current position yet
+    print("FIXME: Not using relative distances for gripper, using absolute...")
+    await api.hold_jaw_width(int(delta))
 
 
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, float]:
