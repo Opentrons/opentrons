@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
   parseLiquidsInLoadOrder,
@@ -15,6 +16,8 @@ import {
   TYPOGRAPHY,
   LabwareRender,
 } from '@opentrons/components'
+import { Modal as OddModal } from '../../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { getIsOnDevice } from '../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
@@ -40,6 +43,7 @@ export const LiquidsLabwareDetailsModal = (
 ): JSX.Element | null => {
   const { liquidId, labwareId, runId, closeModal } = props
   const { t } = useTranslation('protocol_setup')
+  const isODD = useSelector(getIsOnDevice)
   const currentLiquidRef = React.useRef<HTMLDivElement>(null)
   const protocolData = useMostRecentCompletedAnalysis(runId)
   const commands = protocolData?.commands ?? []
@@ -81,7 +85,78 @@ export const LiquidsLabwareDetailsModal = (
   const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
   const disabledLiquidIds = liquidIds.filter(id => id !== selectedValue)
 
-  return (
+  return isODD ? (
+    <OddModal
+      modalSize="large"
+      onOutsideClick={closeModal}
+      header={{ title: labwareName, hasExitIcon: true, onClick: closeModal }}
+    >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        overflowY="auto"
+        css={HIDE_SCROLLBAR}
+        minWidth="10.313rem"
+        gridGap={SPACING.spacing3}
+      >
+        {filteredLiquidsInLoadOrder.map((liquid, index) => {
+          const labwareInfoEntry = Object.entries(labwareInfo).find(
+            entry => entry[0] === liquid.id
+          )
+          return (
+            labwareInfoEntry != null && (
+              <Flex
+                key={index}
+                ref={selectedValue === liquid.id ? currentLiquidRef : undefined}
+              >
+                <LiquidDetailCard
+                  {...liquid}
+                  liquidId={liquid.id}
+                  volumeByWell={labwareInfoEntry[1][0].volumeByWell}
+                  labwareWellOrdering={labwareWellOrdering}
+                  setSelectedValue={setSelectedValue}
+                  selectedValue={selectedValue}
+                />
+              </Flex>
+            )
+          )
+        })}
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        width="100%"
+        maxHeight="365.53px"
+        marginLeft={SPACING.spacing4}
+        marginTop={SPACING.spacing3}
+      >
+        <Flex flex="1 1 30rem" flexDirection={DIRECTION_COLUMN}>
+          <svg
+            viewBox="0 -15 130 100"
+            height="94%"
+            width="94%"
+            transform="scale(1, -1)"
+          >
+            <LabwareRender
+              definition={getSlotLabwareDefinition(
+                labwareId,
+                protocolData.commands
+              )}
+              wellFill={wellFill}
+              wellLabelOption="SHOW_LABEL_INSIDE"
+              highlightedWells={
+                selectedValue != null
+                  ? getWellGroupForLiquidId(labwareInfo, selectedValue)
+                  : {}
+              }
+              disabledWells={getDisabledWellGroupForLiquidId(
+                labwareInfo,
+                disabledLiquidIds
+              )}
+            />
+          </svg>
+        </Flex>
+      </Flex>
+    </OddModal>
+  ) : (
     <Modal
       onClose={closeModal}
       closeOnOutsideClick
@@ -89,7 +164,7 @@ export const LiquidsLabwareDetailsModal = (
       childrenPadding={0}
       width="45rem"
     >
-      <Box
+      {/* <Box
         paddingX={SPACING.spacing4}
         paddingTop={SPACING.spacing4}
         backgroundColor={COLORS.fundamentalsBackground}
@@ -196,7 +271,7 @@ export const LiquidsLabwareDetailsModal = (
             </Flex>
           </Flex>
         </Flex>
-      </Box>
+      </Box> */}
     </Modal>
   )
 }
