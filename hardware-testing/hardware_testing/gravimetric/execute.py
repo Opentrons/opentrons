@@ -99,7 +99,7 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
         test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
-    return sorted(test_volumes, reverse=True)
+    return sorted(test_volumes, reverse=False)  # lowest volumes first
 
 
 def _get_channel_offset(cfg: config.GravimetricConfig, channel: int) -> Point:
