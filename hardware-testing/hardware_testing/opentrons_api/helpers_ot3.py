@@ -194,6 +194,7 @@ async def set_gantry_load_per_axis_current_settings_ot3(
             load=load,
             value=run_current,
         )
+    # make sure new currents are sent to hardware controller
     await api.set_gantry_load(load)
 
 
@@ -237,6 +238,7 @@ async def set_gantry_load_per_axis_motion_settings_ot3(
             load=load,
             value=direction_change_speed_discontinuity,
         )
+    # make sure new currents are sent to hardware controller
     await api.set_gantry_load(load)
 
 

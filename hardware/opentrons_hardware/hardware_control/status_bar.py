@@ -151,7 +151,7 @@ class StatusBar:
             ),
             ColorStep(
                 transition_type=LightTransitionType.instant,
-                transition_time_ms=1000,
+                transition_time_ms=750,
                 color=color,
             ),
             ColorStep(

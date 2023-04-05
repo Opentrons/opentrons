@@ -6,11 +6,15 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { CalibrationDashboard } from '..'
 
-import { useCalibrationTaskList } from '../../../../organisms/Devices/hooks'
+import {
+  useCalibrationTaskList,
+  useAttachedPipettes,
+} from '../../../../organisms/Devices/hooks'
 import { useDashboardCalibratePipOffset } from '../hooks/useDashboardCalibratePipOffset'
 import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTipLength'
 import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
+import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../hooks/useDashboardCalibratePipOffset')
@@ -28,6 +32,9 @@ const mockUseDashboardCalibrateTipLength = useDashboardCalibrateTipLength as jes
 >
 const mockUseDashboardCalibrateDeck = useDashboardCalibrateDeck as jest.MockedFunction<
   typeof useDashboardCalibrateDeck
+>
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
 >
 
 const render = (path = '/') => {
@@ -49,6 +56,10 @@ describe('CalibrationDashboard', () => {
     mockUseDashboardCalibratePipOffset.mockReturnValue([() => {}, null])
     mockUseDashboardCalibrateTipLength.mockReturnValue([() => {}, null])
     mockUseDashboardCalibrateDeck.mockReturnValue([() => {}, null])
+    mockUseAttachedPipettes.mockReturnValue({
+      left: mockLeftProtoPipette,
+      right: null,
+    })
   })
 
   it('renders a robot calibration dashboard title', () => {

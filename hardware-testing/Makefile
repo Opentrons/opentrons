@@ -85,6 +85,7 @@ test-production-qc:
 	$(python) -m hardware_testing.production_qc.pipette_current_speed_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.gripper_assembly_qc_ot3 --simulate
 
 .PHONY: test-examples
 test-examples:
@@ -126,6 +127,11 @@ push-plot-webpage-ot3:
 	scp -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage-ot3,$(host),$(br_ssh_key),$(ssh_opts))
 
+.PHONY: push-description-ot3
+push-description-ot3:
+	$(python) -c "from hardware_testing.data import create_git_description_file; create_git_description_file()"
+	scp ./.hardware-testing-description root@$(host):/data/.hardware-testing-description
+
 .PHONY: restart
 restart:
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"opentrons-robot-server")
@@ -146,13 +152,10 @@ push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing")
 
 .PHONY: push-ot3
-push-ot3: push-no-restart-ot3 restart-ot3
+push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3
 
 .PHONY: push-all
 push-all: clean wheel push-no-restart push-plot-webpage
-
-.PHONY: push-all-ot3
-push-all-ot3: push-ot3 push-plot-webpage-ot3
 
 .PHONY: term
 term:
@@ -195,11 +198,11 @@ endef
 
 .PHONY: sync-sw-ot3
 sync-sw-ot3:
-	cd ../hardware && $(MAKE) push-no-restart-ot3 host=$(host)
-	cd ../api && $(MAKE) push-no-restart-ot3 host=$(host)
-	cd ../shared-data && $(MAKE) all push-no-restart-ot3 host=$(host)
+	cd ../hardware && $(MAKE) push-ot3 host=$(host)
+	cd ../api && $(MAKE) push-ot3 host=$(host)
+	cd ../shared-data && $(MAKE) all push-ot3 host=$(host)
 	cd ../robot-server && $(MAKE) push-ot3 host=$(host)
-	cd ../hardware-testing && $(MAKE) push-all-ot3 host=$(host)
+	cd ../hardware-testing && $(MAKE) push-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:

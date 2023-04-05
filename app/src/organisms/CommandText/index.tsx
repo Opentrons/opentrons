@@ -10,6 +10,7 @@ import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
+import type { StyleProps } from '@opentrons/components'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
@@ -34,12 +35,12 @@ const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   'heaterShaker/waitForTemperature': 'waiting_for_hs_to_reach',
 }
 
-interface Props {
+interface Props extends StyleProps {
   command: RunTimeCommand
   robotSideAnalysis: CompletedProtocolAnalysis
 }
 export function CommandText(props: Props): JSX.Element | null {
-  const { command, robotSideAnalysis } = props
+  const { command, robotSideAnalysis, ...styleProps } = props
   const { t } = useTranslation('protocol_command_text')
 
   switch (command.commandType) {
@@ -50,7 +51,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'dropTip':
     case 'pickUpTip': {
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           <PipettingCommandText {...{ command, robotSideAnalysis }} />
         </StyledText>
       )
@@ -60,7 +61,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadModule':
     case 'loadLiquid': {
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           <LoadCommandText {...{ command, robotSideAnalysis }} />
         </StyledText>
       )
@@ -71,7 +72,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'thermocycler/setTargetLidTemperature':
     case 'heaterShaker/setTargetTemperature': {
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           <TemperatureCommandText command={command} />
         </StyledText>
       )
@@ -83,7 +84,7 @@ export function CommandText(props: Props): JSX.Element | null {
           t('tc_run_profile_steps', { celsius: celsius, seconds: holdSeconds })
       )
       return (
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
           <StyledText marginBottom={SPACING.spacing2}>
             {t('tc_starting_profile', {
               repetitions: Object.keys(steps).length,
@@ -102,13 +103,15 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'heaterShaker/setAndWaitForShakeSpeed': {
       const { rpm } = command.params
       return (
-        <StyledText as="p">{t('set_and_await_hs_shake', { rpm })}</StyledText>
+        <StyledText as="p" {...styleProps}>
+          {t('set_and_await_hs_shake', { rpm })}
+        </StyledText>
       )
     }
     case 'moveToSlot': {
       const { slotName } = command.params
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           {t('move_to_slot', { slot_name: slotName })}
         </StyledText>
       )
@@ -116,18 +119,22 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'moveRelative': {
       const { axis, distance } = command.params
       return (
-        <StyledText as="p">{t('move_relative', { axis, distance })}</StyledText>
+        <StyledText as="p" {...styleProps}>
+          {t('move_relative', { axis, distance })}
+        </StyledText>
       )
     }
     case 'moveToCoordinates': {
       const { coordinates } = command.params
       return (
-        <StyledText as="p">{t('move_to_coordinates', coordinates)}</StyledText>
+        <StyledText as="p" {...styleProps}>
+          {t('move_to_coordinates', coordinates)}
+        </StyledText>
       )
     }
     case 'moveLabware': {
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           <MoveLabwareCommandText {...{ command, robotSideAnalysis }} />
         </StyledText>
       )
@@ -153,7 +160,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const simpleTKey =
         SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE[command.commandType]
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           {simpleTKey != null ? t(simpleTKey) : null}
         </StyledText>
       )
@@ -161,7 +168,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'waitForDuration': {
       const { seconds, message } = command.params
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           {t('wait_for_duration', { seconds, message })}
         </StyledText>
       )
@@ -169,7 +176,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'pause': // legacy pause command
     case 'waitForResume': {
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           {command.params?.message && command.params.message !== ''
             ? command.params.message
             : t('wait_for_resume')}
@@ -181,7 +188,7 @@ export function CommandText(props: Props): JSX.Element | null {
       const { message = '' } = command.params
       if ('waitForResume' in command.params) {
         return (
-          <StyledText as="p">
+          <StyledText as="p" {...styleProps}>
             {command.params?.message && command.params.message !== ''
               ? command.params.message
               : t('wait_for_resume')}
@@ -189,7 +196,7 @@ export function CommandText(props: Props): JSX.Element | null {
         )
       } else {
         return (
-          <StyledText as="p">
+          <StyledText as="p" {...styleProps}>
             {t('wait_for_duration', {
               seconds: command.params.seconds,
               message,
@@ -205,7 +212,7 @@ export function CommandText(props: Props): JSX.Element | null {
           ? JSON.stringify(legacyCommandText)
           : String(legacyCommandText)
       return (
-        <StyledText as="p">
+        <StyledText as="p" {...styleProps}>
           {legacyCommandText != null
             ? sanitizedCommandText
             : `${command.commandType}: ${JSON.stringify(command.params)}`}
@@ -217,7 +224,11 @@ export function CommandText(props: Props): JSX.Element | null {
         'CommandText encountered a command with an unrecognized commandType: ',
         command
       )
-      return <StyledText as="p">{JSON.stringify(command)}</StyledText>
+      return (
+        <StyledText as="p" {...styleProps}>
+          {JSON.stringify(command)}
+        </StyledText>
+      )
     }
   }
 }

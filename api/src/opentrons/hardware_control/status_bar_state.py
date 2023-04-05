@@ -1,5 +1,11 @@
 from .types import StatusBarState
 from opentrons_hardware.hardware_control import status_bar
+from opentrons_hardware.firmware_bindings.binary_constants import (
+    LightAnimationType,
+    LightTransitionType,
+)
+
+from typing import List
 
 
 class StatusBarStateController:
@@ -46,7 +52,27 @@ class StatusBarStateController:
     async def _status_bar_activation(self) -> None:
         # Activation should revert to IDLE
         self._status_bar_state = StatusBarState.IDLE
-        await self._controller.blink_once(status_bar.BLUE, status_bar.WHITE)
+
+        # This animation uses an intermediate color between the blue and the white.
+        # This results in a sort of light-blue effect.
+        steps: List[status_bar.ColorStep] = [
+            status_bar.ColorStep(LightTransitionType.instant, 1000, status_bar.OFF),
+            status_bar.ColorStep(LightTransitionType.linear, 1000, status_bar.BLUE),
+            status_bar.ColorStep(
+                LightTransitionType.linear,
+                250,
+                status_bar.Color(
+                    r=0,
+                    g=int(status_bar.BLUE.g * 0.75),
+                    b=int(status_bar.BLUE.b * 0.75),
+                    w=50,
+                ),
+            ),
+            status_bar.ColorStep(LightTransitionType.linear, 250, status_bar.WHITE),
+        ]
+        await self._controller.start_animation(
+            steps=steps, type=LightAnimationType.single_shot
+        )
 
     async def _status_bar_disco(self) -> None:
         # TODO - update implementation
@@ -61,8 +87,53 @@ class StatusBarStateController:
             status_bar.ORANGE,
             status_bar.WHITE,
         ]
+        steps: List[status_bar.ColorStep] = [
+            status_bar.ColorStep(LightTransitionType.linear, 300, color)
+            for color in colors
+        ]
+        steps.append(
+            status_bar.ColorStep(LightTransitionType.linear, 500, status_bar.OFF)
+        )
+        steps.append(
+            status_bar.ColorStep(LightTransitionType.linear, 75, status_bar.BLUE)
+        )
+        steps.append(
+            status_bar.ColorStep(
+                LightTransitionType.instant,
+                transition_time_ms=150,
+                color=status_bar.GREEN,
+            )
+        )
+        steps.append(
+            status_bar.ColorStep(
+                LightTransitionType.instant,
+                transition_time_ms=150,
+                color=status_bar.OFF,
+            )
+        )
+        steps.append(
+            status_bar.ColorStep(
+                LightTransitionType.instant,
+                transition_time_ms=150,
+                color=status_bar.GREEN,
+            )
+        )
+        steps.append(
+            status_bar.ColorStep(
+                LightTransitionType.linear,
+                transition_time_ms=1000,
+                color=status_bar.WHITE,
+            )
+        )
+
         self._status_bar_state = StatusBarState.IDLE
-        await self._controller.cycle_colors(colors)
+        await self._controller.start_animation(
+            steps=steps, type=LightAnimationType.single_shot
+        )
+
+    async def _status_bar_off(self) -> None:
+        self._status_bar_state = StatusBarState.OFF
+        await self._controller.static_color(status_bar.OFF)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
         """Main interface to set a new state."""
@@ -77,6 +148,7 @@ class StatusBarStateController:
             StatusBarState.UPDATING: self._status_bar_updating,
             StatusBarState.ACTIVATION: self._status_bar_activation,
             StatusBarState.DISCO: self._status_bar_disco,
+            StatusBarState.OFF: self._status_bar_off,
         }
         await callbacks[state]()
 

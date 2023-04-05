@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateView, HardwarePipette
+from ..errors.exceptions import TipNotAttachedError, InvalidPipettingVolumeError
 
 
 class PipettingHandler(TypingProtocol):
@@ -158,6 +159,23 @@ class VirtualPipettingHandler(PipettingHandler):
         """Get whether a pipette is ready to aspirate."""
         return self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
 
+    def _validate_aspirated_volume(self, pipette_id: str, volume: float) -> None:
+        """Get whether the aspirated volume is valid to aspirate."""
+        working_volume = self._state_view.pipettes.get_working_volume(
+            pipette_id=pipette_id
+        )
+
+        current_volume = (
+            self._state_view.pipettes.get_aspirated_volume(pipette_id=pipette_id) or 0
+        )
+
+        new_volume = current_volume + volume
+
+        if new_volume > working_volume:
+            raise InvalidPipettingVolumeError(
+                "Cannot aspirate more than pipette max volume"
+            )
+
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Virtually prepare to aspirate (no-op)."""
 
@@ -168,6 +186,8 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> float:
         """Virtually aspirate (no-op)."""
+        self._validate_tip_attached(pipette_id=pipette_id, command_name="aspirate")
+        self._validate_aspirated_volume(pipette_id=pipette_id, volume=volume)
         return volume
 
     async def dispense_in_place(
@@ -177,6 +197,7 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> float:
         """Virtually dispense (no-op)."""
+        self._validate_tip_attached(pipette_id=pipette_id, command_name="dispense")
         return volume
 
     async def blow_out_in_place(
@@ -185,6 +206,15 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
     ) -> None:
         """Virtually blow out (no-op)."""
+        self._validate_tip_attached(pipette_id=pipette_id, command_name="blow-out")
+
+    def _validate_tip_attached(self, pipette_id: str, command_name: str) -> None:
+        """Validate if there is a tip attached."""
+        tip_geometry = self._state_view.pipettes.get_attached_tip(pipette_id)
+        if not tip_geometry:
+            raise TipNotAttachedError(
+                f"Cannot perform {command_name} without a tip attached"
+            )
 
 
 def create_pipetting_handler(
