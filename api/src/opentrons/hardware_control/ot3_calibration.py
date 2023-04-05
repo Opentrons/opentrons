@@ -2,13 +2,13 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing_extensions import Final, Literal, TYPE_CHECKING
-from typing import Union, Tuple, List, Dict, Any, Optional, cast
+from typing import Union, Tuple, List, Dict, Any, Optional
 import datetime
 import numpy as np
 from enum import Enum
 from math import floor, copysign
 from logging import getLogger
-from opentrons.util.linal import SolvePoints, solve_attitude, identity_deck_transform
+from opentrons.util.linal import SolvePoints, solve_attitude
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
@@ -23,11 +23,8 @@ from opentrons.calibration_storage.ot3.deck_attitude import (
     get_robot_deck_attitude,
 )
 from opentrons.config.robot_configs import (
-    get_legacy_gantry_calibration,
     default_deck_calibration,
 )
-from .util import DeckTransformState
-from opentrons import config
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -935,58 +932,6 @@ async def calibrate_deck(
         await hcapi.remove_tip(mount)
 
 
-def validate_gantry_calibration(gantry_cal: List[List[float]]) -> DeckTransformState:
-    """
-    This function determines whether the gantry calibration is valid
-    or not based on the following use-cases:
-    """
-    curr_cal = np.array(gantry_cal)
-    row, _ = curr_cal.shape
-
-    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
-
-    id_matrix = identity_deck_transform()
-
-    z = abs(curr_cal[2][-1])
-
-    outofrange = z < 16 or z > 34
-    if row != rank:
-        # Check that the matrix is non-singular
-        return DeckTransformState.SINGULARITY
-    elif np.array_equal(curr_cal, id_matrix):
-        # Check that the matrix is not an identity
-        return DeckTransformState.IDENTITY
-    elif outofrange:
-        # Check that the matrix is not out of range.
-        return DeckTransformState.BAD_CALIBRATION
-    else:
-        # Transform as it stands is sufficient.
-        return DeckTransformState.OK
-
-
-def migrate_affine_xy_to_attitude(
-    gantry_cal: List[List[float]],
-) -> types.AttitudeMatrix:
-    masked_transform = np.array(
-        [
-            [True, True, True, False],
-            [True, True, True, False],
-            [False, False, False, False],
-            [False, False, False, False],
-        ]
-    )
-    masked_array: np.ma.MaskedArray[
-        Any, np.dtype[np.float64]
-    ] = np.ma.masked_array(  # type: ignore
-        gantry_cal, ~masked_transform
-    )
-    attitude_array = np.zeros((3, 3))
-    np.put(attitude_array, [0, 1, 2], masked_array[0].compressed())
-    np.put(attitude_array, [3, 4, 5], masked_array[1].compressed())
-    np.put(attitude_array, 8, 1)
-    return cast(List[List[float]], attitude_array.tolist())
-
-
 def save_attitude_matrix(
     expected: SolvePoints,
     actual: SolvePoints,
@@ -1001,22 +946,6 @@ def save_attitude_matrix(
 
 def load_attitude_matrix() -> DeckCalibration:
     calibration_data = get_robot_deck_attitude()
-    gantry_cal = get_legacy_gantry_calibration()
-    if not calibration_data and gantry_cal:
-        if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:
-            LOG.debug(
-                "Attitude deck calibration matrix not found. Migrating "
-                "existing affine deck calibration matrix to {}".format(
-                    config.get_opentrons_path("robot_calibration_dir")
-                )
-            )
-            attitude = migrate_affine_xy_to_attitude(gantry_cal)
-            save_robot_deck_attitude(
-                transform=attitude,
-                pip_id=None,
-                source=types.SourceType.legacy,
-            )
-            calibration_data = get_robot_deck_attitude()
 
     if calibration_data:
         return DeckCalibration(
@@ -1025,7 +954,6 @@ def load_attitude_matrix() -> DeckCalibration:
             status=types.CalibrationStatus(**calibration_data.status.dict()),
             last_modified=calibration_data.last_modified,
             pipette_calibrated_with=calibration_data.pipette_calibrated_with,
-            tiprack=calibration_data.tiprack,
         )
     else:
         # load default if deck calibration data do not exist
@@ -1051,6 +979,7 @@ class OT3Transforms(RobotCalibration):
 def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
     return OT3Transforms(
         deck_calibration=DeckCalibration(
+            # attitude=config.deck_transform,
             attitude=load().deck_calibration.attitude,
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
