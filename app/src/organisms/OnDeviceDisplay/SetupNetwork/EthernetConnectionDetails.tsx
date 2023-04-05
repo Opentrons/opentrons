@@ -32,7 +32,6 @@ export function EthernetConnectionDetails(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  console.log(robotName)
   const { ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
@@ -70,17 +69,19 @@ export function EthernetConnectionDetails(): JSX.Element {
             : i18n.format(t('shared:no_data'), 'capitalize')
         }
       />
-      <Flex marginTop="9rem">
-        <StyledText
-          color={COLORS.darkBlack_seventy}
-          fontSize={TYPOGRAPHY.fontSize28}
-          lineHeight={TYPOGRAPHY.lineHeight36}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          textAlign={TYPOGRAPHY.textAlignCenter}
-        >
-          {t('ethernet_connection_description')}
-        </StyledText>
-      </Flex>
+      {ethernet?.ipAddress === null || ethernet?.macAddress === null ? (
+        <Flex marginTop="9rem">
+          <StyledText
+            color={COLORS.darkBlack_seventy}
+            fontSize={TYPOGRAPHY.fontSize28}
+            lineHeight={TYPOGRAPHY.lineHeight36}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            textAlign={TYPOGRAPHY.textAlignCenter}
+          >
+            {t('ethernet_connection_description')}
+          </StyledText>
+        </Flex>
+      ) : null}
     </Flex>
   )
 }

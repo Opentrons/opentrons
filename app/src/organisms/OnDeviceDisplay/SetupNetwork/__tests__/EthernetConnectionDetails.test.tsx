@@ -53,16 +53,18 @@ describe('EthernetConnectionDetails', () => {
   })
 
   it('should render ip address, subnet mask, mac address, text and button when ethernet is connected', () => {
-    const [{ getByText }] = render()
+    const [{ getByText, queryByText }] = render()
     getByText('IP Address')
     getByText('Subnet Mask')
     getByText('MAC Address')
-    getByText(
-      'Connect an Ethernet cable to the back of the robot and a network switch or hub.'
-    )
     getByText('127.0.0.100')
     getByText('255.255.255.230')
     getByText('ET:NT:00:00:00:00')
+    expect(
+      queryByText(
+        'Connect an Ethernet cable to the back of the robot and a network switch or hub.'
+      )
+    ).not.toBeInTheDocument()
   })
 
   it('should render mac address no data when ethernet is not connected', () => {
@@ -84,5 +86,8 @@ describe('EthernetConnectionDetails', () => {
     getByText('MAC Address')
     expect(getAllByText('No data').length).toBe(2)
     getByText('ET:NT:00:00:00:11')
+    getByText(
+      'Connect an Ethernet cable to the back of the robot and a network switch or hub.'
+    )
   })
 })
