@@ -3,21 +3,22 @@ import signal
 import subprocess
 import time
 import sys
-import tempfile
-import os
 import json
+import os
 import pathlib
 import requests
-import pytest
-
+import tempfile
 from datetime import datetime, timezone
-from fastapi import routing
 from mock import MagicMock
-from starlette.testclient import TestClient
+from pathlib import Path
 from typing import Any, Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
-from pathlib import Path
+
 from sqlalchemy.engine import Engine as SQLEngine
+
+import pytest
+from fastapi import routing
+from starlette.testclient import TestClient
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -39,6 +40,7 @@ from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADE
 from robot_server.service.session.manager import SessionManager
 from robot_server.persistence import get_sql_engine, create_sql_engine
 from .integration.robot_client import RobotClient
+from robot_server.health.router import ComponentVersions, get_versions
 
 test_router = routing.APIRouter()
 
@@ -93,6 +95,16 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
+def versions() -> MagicMock:
+    m = MagicMock(spec=get_versions)
+    m.return_value = ComponentVersions(
+        api_version="someTestApiVersion",
+        system_version="someTestSystemVersion",
+    )
+    return m
+
+
+@pytest.fixture
 def _override_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
     async def get_hardware_override() -> HardwareControlAPI:
         """Override for the get_hardware() FastAPI dependency."""
@@ -115,9 +127,21 @@ def _override_sql_engine_with_mock() -> Iterator[None]:
 
 
 @pytest.fixture
+def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
+    async def get_version_override() -> ComponentVersions:
+        """Override for the get_versions() FastAPI dependency."""
+        return cast(ComponentVersions, await versions())
+
+    app.dependency_overrides[get_versions] = get_version_override
+    yield
+    del app.dependency_overrides[get_versions]
+
+
+@pytest.fixture
 def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
+    _override_version_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
@@ -133,13 +157,6 @@ def api_client_no_errors(
     client = TestClient(app, raise_server_exceptions=False)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return client
-
-
-@pytest.fixture(scope="session")
-def request_session() -> requests.Session:
-    session = requests.Session()
-    session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
-    return session
 
 
 @pytest.fixture(scope="session")
@@ -294,20 +311,6 @@ def session_manager(hardware: HardwareControlAPI) -> SessionManager:
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),
     )
-
-
-@pytest.fixture
-def set_disable_fast_analysis(
-    request_session: requests.Session,
-) -> Iterator[None]:
-    """For integration tests that need to set then clear the
-    enableHttpProtocolSessions feature flag"""
-    url = "http://localhost:31950/settings"
-    data = {"id": "disableFastProtocolUpload", "value": True}
-    request_session.post(url, json=data)
-    yield None
-    data["value"] = None
-    request_session.post(url, json=data)
 
 
 @pytest.fixture

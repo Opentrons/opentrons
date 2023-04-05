@@ -18,10 +18,7 @@ import {
   SIZE_1,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import {
-  useDeleteRunMutation,
-  useAllCommandsQuery,
-} from '@opentrons/react-api-client'
+import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
 import { Divider } from '../../atoms/structure'
 import { Tooltip } from '../../atoms/Tooltip'
@@ -55,6 +52,10 @@ export function HistoricalProtocolRunOverflowMenu(
   const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
+  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
+    props.robotName,
+    runId
+  )
 
   return (
     <Flex
@@ -69,7 +70,12 @@ export function HistoricalProtocolRunOverflowMenu(
             ref={protocolRunOverflowWrapperRef}
             data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
           >
-            <MenuDropdown {...props} closeOverflowMenu={handleOverflowClick} />
+            <MenuDropdown
+              {...props}
+              downloadRunLog={downloadRunLog}
+              isRunLogLoading={isRunLogLoading}
+              closeOverflowMenu={handleOverflowClick}
+            />
           </Box>
           {menuOverlay}
         </>
@@ -80,25 +86,21 @@ export function HistoricalProtocolRunOverflowMenu(
 
 interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   closeOverflowMenu: React.MouseEventHandler<HTMLButtonElement>
+  downloadRunLog: () => void
+  isRunLogLoading: boolean
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const history = useHistory()
 
-  const { runId, robotName, robotIsBusy, closeOverflowMenu } = props
-
-  const commands = useAllCommandsQuery(
+  const {
     runId,
-    { cursor: 0, pageLength: 0 },
-    { staleTime: Infinity }
-  )
-  const runTotalCommandCount = commands?.data?.meta?.totalLength ?? 0
-
-  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
     robotName,
-    runId,
-    runTotalCommandCount
-  )
+    robotIsBusy,
+    closeOverflowMenu,
+    downloadRunLog,
+    isRunLogLoading,
+  } = props
 
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {

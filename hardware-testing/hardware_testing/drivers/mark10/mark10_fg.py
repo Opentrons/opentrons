@@ -1,9 +1,8 @@
 """Mark10 Force Gauge Driver."""
 from serial import Serial  # type: ignore[import]
 from abc import ABC, abstractmethod
+from time import time
 from typing import Tuple
-
-from random import uniform
 
 
 class Mark10Base(ABC):
@@ -16,6 +15,11 @@ class Mark10Base(ABC):
         return 0x0483, 0xA1AD
 
     @abstractmethod
+    def is_simulator(self) -> bool:
+        """Is this a simulation."""
+        ...
+
+    @abstractmethod
     def connect(self) -> None:
         """Connect to the Mark10 Force Gauge."""
         ...
@@ -26,13 +30,22 @@ class Mark10Base(ABC):
         ...
 
     @abstractmethod
-    def read_force(self) -> float:
+    def read_force(self, timeout: float = 1.0) -> float:
         """Read Force in Newtons."""
         ...
 
 
 class SimMark10(Mark10Base):
     """Simulating Mark 10 Driver."""
+
+    def __init__(self) -> None:
+        """Simulating Mark 10 Driver."""
+        self._sim_force = 0.0
+        super().__init__()
+
+    def is_simulator(self) -> bool:
+        """Is a simulator."""
+        return True
 
     def connect(self) -> None:
         """Connect."""
@@ -42,9 +55,13 @@ class SimMark10(Mark10Base):
         """Disconnect."""
         return
 
-    def read_force(self) -> float:
+    def read_force(self, timeout: float = 1.0) -> float:
         """Read Force."""
-        return uniform(2.5, 2)
+        return self._sim_force
+
+    def set_simulation_force(self, force: float) -> None:
+        """Set simulation force."""
+        self._sim_force = force
 
 
 class Mark10(Mark10Base):
@@ -64,6 +81,10 @@ class Mark10(Mark10Base):
         conn.timeout = timeout
         return Mark10(connection=conn)
 
+    def is_simulator(self) -> bool:
+        """Is simulator."""
+        return False
+
     def connect(self) -> None:
         """Connect."""
         self._force_guage.open()
@@ -72,23 +93,23 @@ class Mark10(Mark10Base):
         """Disconnect."""
         self._force_guage.close()
 
-    def read_force(self) -> float:
+    def read_force(self, timeout: float = 1.0) -> float:
         """Get Force in Newtons."""
-        self._force_guage.flushInput()
-        self._force_guage.flushOutput()
         self._force_guage.write("?\r\n".encode("utf-8"))
-        reading = True
-        while reading:
-            (force_val, units) = self._force_guage.readline().strip().split()
-            if force_val != b"":
-                reading = False
-        units = str(units, "utf-8")
-        self._unit = units
-        if units != "N":
-            self._force_guage.write("N\r\n")  # Set force gauge units to Newtons
-            print(
-                f"Gauge units are not correct, expected 'N' currently is {units}. \
-                        Please change units to N"
-            )
-        force_val = str(force_val, "utf-8")
-        return float(force_val)
+        start_time = time()
+        while time() < start_time + timeout:
+            # return "12.3 N"
+            line = self._force_guage.readline().decode("utf-8").strip()
+            force_val, units = line.split(" ")
+            if not force_val:
+                continue
+            if units != "N":
+                self._force_guage.write("N\r\n")  # Set force gauge units to Newtons
+                print(f'Setting gauge units from {units} to "N" (newtons)')
+                continue
+            try:
+                return float(force_val)
+            except ValueError as e:
+                print(e)
+                continue
+        raise TimeoutError(f"unable to read from gauge within {timeout} seconds")
