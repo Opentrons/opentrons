@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import time
+import sys
 from typing import List
 
 from hardware_testing.opentrons_api import types
@@ -22,18 +23,22 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
 
     low_tp_points = {
         '0': [pos_max_left, OT3Mount.LEFT],
-        '1': [pos_max_right - types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
+        '1': [pos_max_right - types.Point(x=0, y=0, z=150), OT3Mount.RIGHT], ## add pick up after 1
+        'Tip Pick Up - Right 1': ['', OT3Mount.RIGHT],
         '2': [pos_min_left._replace(z=pos_min_right.z), OT3Mount.RIGHT],
         '3': [pos_min_left._replace(z=pos_min_right.z) + types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
         '4': [Point(-54, 95, 509.15), OT3Mount.LEFT],
-        '5': [Point(-54, 95, 509.15) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT],
+        '5': [Point(-54, 95, 509.15) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT], ## add pick up after 5
+        'Tip Pick Up - Left 1': ['', OT3Mount.LEFT],
         '6': [pos_min_left._replace(x=-54, y=pos_max_left.y), OT3Mount.LEFT],
         '7': [pos_max_left._replace(x=-54), OT3Mount.LEFT],
-        '8': [pos_max_left._replace(x=0) - types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
+        '8': [pos_max_left._replace(x=0) - types.Point(x=0, y=0, z=150), OT3Mount.RIGHT], ## add pick up after 8
+        'Tip Pick Up - Right 2': ['', OT3Mount.RIGHT],
         '9': [pos_max_left._replace(x=517, y=pos_min_left.y, z=pos_min_right.z), OT3Mount.RIGHT],
         '10': [pos_max_left._replace(x=517, y=pos_min_left.y, z=pos_min_right.z) + types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
         '11': [Point(463, 95, 509.15), OT3Mount.LEFT],
-        '12': [Point(463, 95, 509.15) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT],
+        '12': [Point(463, 95, 509.15) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT], ## add pick up after 12
+        'Tip Pick Up - Left 2': ['', OT3Mount.LEFT],
         '13': [pos_max_left._replace(x=463, z=pos_min_left.z), OT3Mount.LEFT],
         '14': [pos_max_left, OT3Mount.LEFT]
     }
@@ -50,54 +55,22 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
         pos_max_left
     ]
 
-    #await api.move_to(OT3Mount.LEFT, pos_max_left) # back-right-up
     if load == GantryLoad.LOW_THROUGHPUT:
         for key in low_tp_points.keys():
-            print(f"Move {key}\n")
-            # print(f"current position of right mount: {await api.gantry_position(OT3Mount.RIGHT)}\n")
-            # print(f"current position of left mount: {await api.gantry_position(OT3Mount.LEFT)}\n")
-            # print(f"keys: {low_tp_points[key][1]}, {low_tp_points[key][0]}\n")
-            try:
-                await api.move_to(low_tp_points[key][1], low_tp_points[key][0], _check_stalls=True)
-            # input("\n\t>>")
-            except RuntimeError as e:
-                if "collision_detected" in str(e):
-                    print("--STALL DETECTED--\n")
-                    stall_count += 1
-                    print("------HOMING------\n")
-                    await api.home()
-
-        # print("Moving right mount down...\n")
-        # await api.move_rel(OT3Mount.RIGHT, delta=Point(z=-150), _check_stalls=True) # move right mount down
-        # print("Moving to front-left...\n")
-        # await api.move_to(OT3Mount.RIGHT, pos_min_left._replace(z=pos_min_right.z), _check_stalls=True) # move to front-left with right mount down
-        # print("Moving right mount up...\n")
-        # await api.move_rel(OT3Mount.RIGHT, delta=Point(z=150), _check_stalls=True) # move right mount up
-        # cur_pos = await api.current_position_ot3(OT3Mount.LEFT)
-        # print(f"current pos for point 4:{cur_pos}\n")
-        # await api.move_to(OT3Mount.LEFT, Point(cur_pos[OT3Axis.X], cur_pos[OT3Axis.Y], cur_pos[OT3Axis.Z_L]), _check_stalls=True) #pos_min_left) # front-left-down
-        # print("Moving left mount down...\n")
-        # await api.move_rel(OT3Mount.LEFT, delta=Point(z=-150), _check_stalls=True)
-        # print("Moving to back-left...\n")
-        # await api.move_to(OT3Mount.LEFT, pos_min_left._replace(x=cur_pos[OT3Axis.X], y=pos_max_left.y), _check_stalls=True)# back-left-down
-        # print("Moving left mount up...\n")
-        # await api.move_to(OT3Mount.LEFT, pos_max_left._replace(x=cur_pos[OT3Axis.X]), _check_stalls=True) #pos_min_left.x)) # back-left-up
-        # print("Moving right mount down...\n")
-        # await api.move_rel(OT3Mount.RIGHT, delta=Point(z=-150), _check_stalls=True)
-        # print("Moving to front-right...\n")
-        # # print(f"Point: {pos_max_left._replace(x=517.7, y=pos_min_left.y, z=pos_min_right.z)}\n")
-        # await api.move_to(OT3Mount.RIGHT, pos_max_left._replace(x=517, y=pos_min_left.y, z=pos_min_right.z), _check_stalls=True) # front-right-up
-        # print("Moving right mount up...\n")
-        # await api.move_rel(OT3Mount.RIGHT, delta=Point(z=150), _check_stalls=True)
-        # # print(f"current position of right mount: {await api.gantry_position(OT3Mount.RIGHT)}\n")
-        # # print(f"current position of left mount: {await api.gantry_position(OT3Mount.LEFT)}\n")
-        # cur_pos = await api.current_position_ot3(OT3Mount.LEFT)
-        # print(f"current pos for point 11:{cur_pos}\n")
-        # await api.move_to(OT3Mount.LEFT, Point(cur_pos[OT3Axis.X], cur_pos[OT3Axis.Y], cur_pos[OT3Axis.Z_L]), _check_stalls=True) #pos_min_left._replace(x=pos_max_left.x)) # front-right-down
-        # print("Moving left mount down...\n")
-        # await api.move_rel(OT3Mount.LEFT, delta=Point(z=-150), _check_stalls=True)
-        # print("Moving to back-right...\n")
-        # await api.move_to(OT3Mount.LEFT, pos_max_left._replace(x=cur_pos[OT3Axis.X], z=pos_min_left.z), _check_stalls=True) # back-right-down
+            if 'Tip Pick Up' not in key:
+                print(f"Move {key}\n")
+                try:
+                    await api.move_to(low_tp_points[key][1], low_tp_points[key][0], _check_stalls=True)
+                except RuntimeError as e:
+                    if "collision_detected" in str(e):
+                        print("\n--STALL DETECTED--\n")
+                        stall_count += 1
+                        print("\n------HOMING------\n")
+                        await api.home()
+            elif api.get_attached_instrument(low_tp_points[key][1]).get('name') != None:
+                print(f"{key}\n")
+                tip_len = 57
+                await api.pick_up_tip(low_tp_points[key][1], tip_len)
     else:
         for count, p in enumerate(high_tp_points):
             print(f"Move {count}\n")
@@ -107,23 +80,8 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
                 if "collision_detected" in str(e):
                     print("--STALL DETECTED--\n")
                     stall_count += 1
+                    print("------HOMING------\n")
                     await api.home()
-    #     print("Moving to front-left...\n")
-    #     await api.move_to(OT3Mount.LEFT, pos_min_left._replace(z=pos_max_left.z), _check_stalls=True) # front-left-up
-    #     print("Moving mount down...\n")
-    #     await api.move_to(OT3Mount.LEFT, pos_min_left, _check_stalls=True) # front-left-down
-    #     print("Moving to back-left...\n")
-    #     await api.move_to(OT3Mount.LEFT, pos_min_left._replace(y=pos_max_left.y), _check_stalls=True) # back-left-down
-    #     print("Moving mount up...\n")
-    #     await api.move_to(OT3Mount.LEFT, pos_max_left._replace(x=pos_min_left.x), _check_stalls=True) # back-left-up
-    #     print("Moving to front-right...\n")
-    #     await api.move_to(OT3Mount.LEFT, pos_max_left._replace(y=pos_min_left.y), _check_stalls=True) # front-right-up
-    #     print("Moving mount down...\n")
-    #     await api.move_to(OT3Mount.LEFT, pos_min_left._replace(x=pos_max_left.x), _check_stalls=True) # front-right-down
-    #     print("Moving to back-right...\n")
-    #     await api.move_to(OT3Mount.LEFT, pos_max_left._replace(z=pos_min_left.z), _check_stalls=True) # back-right-down
-    #
-    # await api.move_to(OT3Mount.LEFT, pos_max_left, _check_stalls=True)
     return stall_count
 
 async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None:
@@ -160,7 +118,8 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
 
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
 
-    header = ['Time(s)', 'Test Robot', 'Test Configuration', 'Cycle', 'Cycle Stalls', 'Total Stalls', '', 'Left Mount', 'Right Mount', 'Gripper Attached', '', 'Axis',
+    header = ['Time(s)', 'Test Robot', 'Test Configuration', 'Cycle', 'Cycle Stalls',
+              'Total Stalls', '', 'Left Mount', 'Right Mount', 'Gripper Attached', '', 'Axis',
               'Max Speed (mm/s)', 'Acceleration (mm^2/s)', 'Hold Current (A)',
               'Run Current (A)', 'Max Speed Discontinuity', 'Direction Change Speed Discontinuity']
     header_str = data.convert_list_to_csv_line(header)
@@ -176,8 +135,9 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
         stall_count = await _bowtie_move(api, homed_pos_left, homed_pos_right, load)
         total_stalls += stall_count
         if (i == 0 or i == 1 or i == 2):
-            cycle_data = [time.perf_counter()-start_time, test_robot, test_config, i+1, stall_count, total_stalls, '', lm, rm, gripper, '',
-                          OT3Axis.to_kind(AXES[i]), MAX_SPEED[i], ACCEL[i], HOLD_CURRENT[i], RUN_CURRENT[i],
+            cycle_data = [time.perf_counter()-start_time, test_robot, test_config, i+1, stall_count,
+                          total_stalls, '', lm, rm, gripper, '', OT3Axis.to_kind(AXES[i]),
+                          MAX_SPEED[i], ACCEL[i], HOLD_CURRENT[i], RUN_CURRENT[i],
                           MAX_DISCONTINUITY[i], DIRECTION_CHANGE_DISCONTINUITY[i]]
             rm = ''
             lm = ''
@@ -200,7 +160,6 @@ if __name__ == "__main__":
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
     parser.add_argument("--cycles", type=int, default=5)
-    # parser.add_argument("--high_load", action="store_true")
     args = parser.parse_args()
     mount = mount_options[args.mount]
 
