@@ -41,7 +41,7 @@ describe('MediumButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.foundationalBlue}`
+      `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
   it('renders the secondary alert button', () => {

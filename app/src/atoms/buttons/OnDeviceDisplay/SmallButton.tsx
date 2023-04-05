@@ -62,8 +62,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   > = {
     alt: {
       defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.foundationalBlue,
-      activeBackgroundColor: COLORS.medBluePressed,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      activeBackgroundColor: COLORS.mediumBluePressed,
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlack_sixty}`,
     },

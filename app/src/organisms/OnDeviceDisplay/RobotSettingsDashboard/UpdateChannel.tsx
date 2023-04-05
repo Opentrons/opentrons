@@ -38,7 +38,7 @@ const SettingButtonLabel = styled.label<LabelProps>`
   border-radius: ${BORDERS.size_four};
   cursor: pointer;
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.highlightPurple_one : COLORS.light_one};
+    isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
   color: ${({ isSelected }) => isSelected === true && COLORS.white};
 `
 
@@ -118,6 +118,11 @@ export function UpdateChannel({
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  color={
+                    radio.value === channel
+                      ? `${COLORS.white}${COLORS.opacity70HexCode}`
+                      : COLORS.darkBlack_seventy
+                  }
                 >
                   {t('alpha_description')}
                 </StyledText>

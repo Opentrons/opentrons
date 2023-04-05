@@ -333,7 +333,7 @@ function LabwareLatch({
       alignItems={ALIGN_FLEX_START}
       padding={SPACING.spacing4}
       gridGap="0.75rem"
-      backgroundColor={COLORS.foundationalBlue}
+      backgroundColor={COLORS.mediumBlueEnabled}
       color={
         latchStatus === 'opening' || latchStatus === 'closing'
           ? `${COLORS.darkBlack_hundred}${COLORS.opacity60HexCode}`
