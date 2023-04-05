@@ -2997,6 +2997,30 @@ exports[`icons update renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons update-channel renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 48 48"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M32 36V40H16V36H32ZM22 15.98V32H26V15.98H32L24 8L16 15.98H22Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons upload renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
