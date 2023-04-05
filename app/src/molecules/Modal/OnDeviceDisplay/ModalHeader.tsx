@@ -15,10 +15,12 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
   const { title, hasExitIcon, iconName, iconColor, onClick } = props
   return (
     <Flex
+      height="100px"
       width="100%"
       padding={SPACING.spacing6}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
     >
       <Flex flexDirection={DIRECTION_ROW}>
         {iconName != null && iconColor != null ? (
@@ -39,12 +41,8 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
         </StyledText>
       </Flex>
       {hasExitIcon ? (
-        <Flex
-          alignItems={ALIGN_CENTER}
-          onClick={onClick}
-          aria-label="closeIcon"
-        >
-          <Icon size={SPACING.spacing6} name="ot-close" />
+        <Flex onClick={onClick} aria-label="closeIcon">
+          <Icon size="3.5rem" name="ot-close" />
         </Flex>
       ) : null}
     </Flex>
