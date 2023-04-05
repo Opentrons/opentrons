@@ -6,11 +6,9 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import (
-    AbstractRunner,
     RunnerType,
     JsonRunner,
     PythonAndLegacyRunner,
-    LiveRunner,
     RunResult,
     create_protocol_runner,
 )

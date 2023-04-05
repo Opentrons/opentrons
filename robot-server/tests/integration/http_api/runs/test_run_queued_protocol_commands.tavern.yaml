@@ -1,7 +1,6 @@
 test_name: Make sure empty run commands execute protocol commands queue
 
 marks:
-  - xfail
   - usefixtures:
       - run_server
 

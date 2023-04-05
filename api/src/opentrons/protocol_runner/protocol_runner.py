@@ -50,10 +50,10 @@ class AbstractRunner(ABC):
     you will need a new Runner to do another run.
     """
 
-    def __init__(self, protocol_engine: ProtocolEngine):
+    def __init__(self, protocol_engine: ProtocolEngine) -> None:
         self._protocol_engine = protocol_engine
 
-    def was_started(self) -> bool:  # noqa: D102
+    def was_started(self) -> bool:
         """Whether the run has been started.
 
         This value is latched; once it is True, it will never become False.
@@ -111,7 +111,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
-    async def load(self, protocol_source: ProtocolSource) -> None:  # noqa: D102
+    async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
             protocol_source=protocol_source
@@ -187,7 +187,7 @@ class JsonRunner(AbstractRunner):
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
-    async def load(self, protocol_source: ProtocolSource) -> None:  # noqa: D102
+    async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
             protocol_source=protocol_source
