@@ -177,7 +177,9 @@ def _jog_to_find_liquid_height(
     _well_depth = well.depth
     _liquid_height = _well_depth
     _jog_size = -1.0
-    while not ctx.is_simulating():
+    if ctx.is_simulating():
+        return _liquid_height - 1
+    while True:
         pipette.move_to(well.bottom(_liquid_height))
         inp = input(
             f"height={_liquid_height}: ENTER to jog {_jog_size} mm, "
