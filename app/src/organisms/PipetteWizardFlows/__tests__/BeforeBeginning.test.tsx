@@ -186,7 +186,7 @@ describe('BeforeBeginning', () => {
       const { getByText, getByAltText, getByRole } = render(props)
       getByText('Before you begin')
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
+        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByText(
@@ -384,7 +384,7 @@ describe('BeforeBeginning', () => {
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
+        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
     })
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
@@ -400,7 +400,7 @@ describe('BeforeBeginning', () => {
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
       getByText(
-        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
+        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
       getByAltText('2.5 mm Hex Screwdriver')
       const proceedBtn = getByRole('button', { name: 'Move gantry to front' })

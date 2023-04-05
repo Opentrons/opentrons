@@ -58,13 +58,10 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
     <SimpleWizardBody
       iconColor={COLORS.errorEnabled}
       header={i18n.format(t('z_axis_still_attached'), 'capitalize')}
-      subHeader={i18n.format(
-        t(
-          numberOfTryAgains > 2
-            ? 'something_seems_wrong'
-            : 'detach_z_axis_screw_again'
-        ),
-        'capitalize'
+      subHeader={t(
+        numberOfTryAgains > 2
+          ? 'something_seems_wrong'
+          : 'detach_z_axis_screw_again'
       )}
       isSuccess={false}
     >
