@@ -2,10 +2,50 @@
 from datetime import datetime
 import os
 from pathlib import Path
+from subprocess import check_output
 from time import time
 from typing import Tuple
 
-from opentrons.config import infer_config_base_dir
+from opentrons.config import infer_config_base_dir, IS_ROBOT
+
+GIT_DESCRIBE_NAME = ".hardware-testing-description"
+
+
+def _git(*args: str) -> str:
+    return check_output(["git"] + list(args)).decode("utf-8").strip()
+
+
+def _build_git_description_string() -> str:
+    if IS_ROBOT:
+        raise RuntimeError("unable to run git describe on robot")
+    description = _git("describe")
+    mods = _git("ls-files", "-m").replace("\n", ", ")
+    if not mods:
+        return description
+    return f"{description} [{mods}]"
+
+
+def get_git_description() -> str:
+    """Get git description file."""
+    if IS_ROBOT:
+        file_path = infer_config_base_dir() / GIT_DESCRIBE_NAME
+        if not file_path.exists():
+            return "unknown"
+        with open(file_path, "r") as f:
+            return f.read().strip()
+    else:
+        return _build_git_description_string()
+
+
+def create_git_description_file() -> str:
+    """Create git description file."""
+    if IS_ROBOT:
+        raise RuntimeError("unable to create git description file on robot")
+    contents = _build_git_description_string()
+    file_path = infer_config_base_dir() / GIT_DESCRIBE_NAME
+    with open(GIT_DESCRIBE_NAME, "w+") as f:
+        f.write(contents)
+    return str(file_path)
 
 
 def get_testing_data_directory() -> Path:
