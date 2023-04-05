@@ -27,8 +27,9 @@ import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
 import type { ChipType } from '../../../atoms/Chip'
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { State } from '../../../redux/types'
+import { EthernetConnectionDetails } from '../SetupNetwork/EthernetConnectionDetails'
 
-export type ConnectionType = 'wifi' // TODO (jb 2-24-2023) add 'ethernet' and 'usb' as options once implemented
+export type ConnectionType = 'wifi' | 'ethernet' // TODO (kj: 04/05/2023) add 'usb' as options once implemented
 
 interface NetworkSettingsProps {
   networkConnection: NetworkConnection
@@ -62,7 +63,9 @@ export function NetworkSettings({
     screenTitle = 'network_settings'
   } else if (showDetailsTab === 'wifi') {
     screenTitle = 'wifi'
-  } // TODO (jb 2-24-2023) implement ethernet and usb details screen titles
+  } else if (showDetailsTab === 'ethernet') {
+    screenTitle = 'ethernet'
+  }
 
   const handleChipType = (isConnected: boolean): ChipType => {
     return isConnected ? 'success' : 'neutral'
@@ -83,59 +86,71 @@ export function NetworkSettings({
   }
 
   const renderScreen = (): JSX.Element => {
-    if (showDetailsTab === null) {
-      return (
-        <Flex
-          paddingX={SPACING.spacingXXL}
-          marginTop={SPACING.spacing4}
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
-        >
-          {/* wifi */}
-          <NetworkSettingButton
-            buttonTitle={t('wifi')}
-            buttonBackgroundColor={handleButtonBackgroundColor(isWifiConnected)}
-            iconName="wifi"
-            chipType={handleChipType(isWifiConnected)}
-            chipText={handleChipText(isWifiConnected)}
-            chipIconName="ot-check"
-            networkName={activeSsid}
-            displayDetailsTab={() => setShowDetailsTab('wifi')}
+    switch (showDetailsTab) {
+      case 'wifi':
+        return (
+          <WifiConnectionDetails
+            ssid={activeSsid}
+            authType={connectedWifiAuthType}
+            wifiList={list}
+            showHeader={false}
+            showWifiListButton={true}
           />
-          {/* ethernet */}
-          <NetworkSettingButton
-            buttonTitle={t('ethernet')}
-            buttonBackgroundColor={handleButtonBackgroundColor(
-              isEthernetConnected
-            )}
-            iconName="ethernet"
-            chipType={handleChipType(isEthernetConnected)}
-            chipText={handleChipText(isEthernetConnected)}
-            chipIconName="ot-check"
-            displayDetailsTab={() => console.log('Not Implemented')}
+        )
+      case 'ethernet':
+        return (
+          <EthernetConnectionDetails
+            showHeader={false}
+            showWifiListButton={false}
           />
-          {/* usb hard-coded */}
-          <NetworkSettingButton
-            buttonTitle={t('usb')}
-            buttonBackgroundColor={handleButtonBackgroundColor(isUsbConnected)}
-            iconName="usb"
-            chipType={handleChipType(isUsbConnected)}
-            chipText={handleChipText(isUsbConnected)}
-            chipIconName="ot-check"
-            displayDetailsTab={() => console.log('Not Implemented')}
-          />
-        </Flex>
-      )
-    } else {
-      return (
-        <WifiConnectionDetails
-          ssid={activeSsid}
-          authType={connectedWifiAuthType}
-          wifiList={list}
-          showHeader={false}
-          showWifiListButton={true}
-        />
-      )
+        )
+      default:
+        return (
+          <Flex
+            paddingX={SPACING.spacingXXL}
+            marginTop={SPACING.spacing4}
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing3}
+          >
+            {/* wifi */}
+            <NetworkSettingButton
+              buttonTitle={t('wifi')}
+              buttonBackgroundColor={handleButtonBackgroundColor(
+                isWifiConnected
+              )}
+              iconName="wifi"
+              chipType={handleChipType(isWifiConnected)}
+              chipText={handleChipText(isWifiConnected)}
+              chipIconName="ot-check"
+              networkName={activeSsid}
+              displayDetailsTab={() => setShowDetailsTab('wifi')}
+            />
+            {/* ethernet */}
+            <NetworkSettingButton
+              buttonTitle={t('ethernet')}
+              buttonBackgroundColor={handleButtonBackgroundColor(
+                isEthernetConnected
+              )}
+              iconName="ethernet"
+              chipType={handleChipType(isEthernetConnected)}
+              chipText={handleChipText(isEthernetConnected)}
+              chipIconName="ot-check"
+              displayDetailsTab={() => setShowDetailsTab('ethernet')}
+            />
+            {/* usb hard-coded */}
+            <NetworkSettingButton
+              buttonTitle={t('usb')}
+              buttonBackgroundColor={handleButtonBackgroundColor(
+                isUsbConnected
+              )}
+              iconName="usb"
+              chipType={handleChipType(isUsbConnected)}
+              chipText={handleChipText(isUsbConnected)}
+              chipIconName="ot-check"
+              displayDetailsTab={() => console.log('Not Implemented')}
+            />
+          </Flex>
+        )
     }
   }
 
