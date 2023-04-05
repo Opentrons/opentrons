@@ -32,6 +32,7 @@ import {
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
 import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
@@ -109,7 +110,7 @@ const ProtocolHeader = (props: {
           borderRadius={BORDERS.size_six}
           boxShadow="none"
           onClick={handleRunProtocol}
-          padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+          padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`}
         >
           <StyledText
             fontSize="2.333125rem"
@@ -193,7 +194,7 @@ const Summary = (props: {
         lineHeight={TYPOGRAPHY.lineHeight28}
         marginTop={SPACING.spacing5}
         maxWidth="22rem"
-        padding={`${SPACING.spacing3} 0.75rem`}
+        padding={`${String(SPACING.spacing3)} 0.75rem`}
       >
         <StyledText>{`${t('protocol_info:date_added')}: ${
           date != null
@@ -246,6 +247,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
+  const { makeSnackbar } = useToaster()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     protocolSectionTabOptions[0]
   )
@@ -270,14 +272,15 @@ export function ProtocolDetails(): JSX.Element | null {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
+        makeSnackbar(t('protocol_info:pinned_protocol'))
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
+      makeSnackbar(t('protocol_info:unpinned_protocol'))
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
-    //  TODO(ew, 3/23/23): show user result via snackbar component
   }
 
   const handleRunProtocol = (): void => {
