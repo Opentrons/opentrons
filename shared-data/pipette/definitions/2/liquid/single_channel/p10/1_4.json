@@ -65,5 +65,6 @@
     "opentrons/opentrons_96_tiprack_10ul/1",
     "opentrons/opentrons_96_filtertiprack_10ul/1",
     "opentrons/geb_96_tiprack_10ul/1"
-  ]
+  ],
+  "defaultBlowoutVolume": 1.178
 }
