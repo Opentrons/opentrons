@@ -13,6 +13,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   BORDERS,
+  OVERFLOW_HIDDEN,
+  POSITION_RELATIVE,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -33,7 +36,6 @@ const TITLE_TEXT_STYLE = css`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 `
@@ -98,7 +100,11 @@ export function RunningProtocolCommandList({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacingXXL}
+      overflow={OVERFLOW_HIDDEN}
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -123,13 +129,14 @@ export function RunningProtocolCommandList({
           ref={viewPortRef}
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing3}
+          height="20.25rem"
+          position={POSITION_RELATIVE}
         >
           <ViewportList
             viewportRef={viewPortRef}
             ref={ref}
             items={robotSideAnalysis?.commands}
             initialIndex={currentRunCommandIndex}
-            // initialIndex={0}
           >
             {(command, index) => {
               const backgroundColor =
@@ -163,6 +170,14 @@ export function RunningProtocolCommandList({
               )
             }}
           </ViewportList>
+          <Flex
+            position={POSITION_ABSOLUTE}
+            bottom="0"
+            width="100%"
+            height="3.8125rem"
+            zIndex="6"
+            backgroundColor={`${COLORS.white}${COLORS.opacity50HexCode}`}
+          ></Flex>
         </Flex>
       ) : null}
     </Flex>
