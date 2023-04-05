@@ -98,12 +98,7 @@ export function NetworkSettings({
           />
         )
       case 'ethernet':
-        return (
-          <EthernetConnectionDetails
-            showHeader={false}
-            showWifiListButton={false}
-          />
-        )
+        return <EthernetConnectionDetails />
       default:
         return (
           <Flex
