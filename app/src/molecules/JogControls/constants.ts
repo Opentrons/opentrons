@@ -1,5 +1,6 @@
 import type { StepSize } from './types'
 
+export const NULL_STEP_SIZE_MM = 0 as const
 export const SMALL_STEP_SIZE_MM = 0.1 as const
 export const MEDIUM_STEP_SIZE_MM = 1 as const
 export const LARGE_STEP_SIZE_MM = 10 as const

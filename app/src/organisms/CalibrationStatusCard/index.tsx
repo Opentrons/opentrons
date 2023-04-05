@@ -34,7 +34,7 @@ export function CalibrationStatusCard({
   setShowHowCalibrationWorksModal,
 }: CalibrationStatusCardProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
-  const { taskListStatus } = useCalibrationTaskList(robotName)
+  const { taskListStatus } = useCalibrationTaskList()
 
   // start off assuming we are missing calibrations
   let statusLabelBackgroundColor = COLORS.errorEnabled

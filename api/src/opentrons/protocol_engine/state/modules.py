@@ -100,11 +100,31 @@ class HardwareModule:
 
 @dataclass
 class ModuleState:
-    """Basic module data state and getter methods."""
+    """The internal data to keep track of loaded modules."""
 
     slot_by_module_id: Dict[str, Optional[DeckSlotName]]
+    """The deck slot that each module has been loaded into.
+
+    This will be None when the module was added via
+    ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
+    """
+
+    requested_model_by_id: Dict[str, Optional[ModuleModel]]
+    """The model by which each loaded module was requested.
+
+    Becuse of module compatibility, this can differ from the model found through
+    hardware_module_by_id. See `ModuleView.get_requested_model()` versus
+    `ModuleView.get_connected_model()`.
+
+    This will be None when the module was added via
+    ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
+    """
+
     hardware_by_module_id: Dict[str, HardwareModule]
+    """Information about each module's physical hardware."""
+
     substate_by_module_id: Dict[str, ModuleSubStateType]
+    """Information about each module that's specific to the module type."""
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
@@ -115,7 +135,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def __init__(self) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
-            slot_by_module_id={}, hardware_by_module_id={}, substate_by_module_id={}
+            slot_by_module_id={},
+            requested_model_by_id={},
+            hardware_by_module_id={},
+            substate_by_module_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -128,6 +151,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=action.module_id,
                 serial_number=action.serial_number,
                 definition=action.definition,
+                slot_name=None,
+                requested_model=None,
                 module_live_data=action.module_live_data,
             )
 
@@ -138,6 +163,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=command.result.serialNumber,
                 definition=command.result.definition,
                 slot_name=command.params.location.slotName,
+                requested_model=command.params.model,
+                module_live_data=None,
             )
 
         if isinstance(
@@ -180,24 +207,26 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module_id: str,
         serial_number: str,
         definition: ModuleDefinition,
-        slot_name: Optional[DeckSlotName] = None,
-        module_live_data: Optional[LiveData] = None,
+        slot_name: Optional[DeckSlotName],
+        requested_model: Optional[ModuleModel],
+        module_live_data: Optional[LiveData],
     ) -> None:
-        model = definition.model
+        actual_model = definition.model
         live_data = module_live_data["data"] if module_live_data else None
 
+        self._state.requested_model_by_id[module_id] = requested_model
         self._state.slot_by_module_id[module_id] = slot_name
         self._state.hardware_by_module_id[module_id] = HardwareModule(
             serial_number=serial_number,
             definition=definition,
         )
 
-        if ModuleModel.is_magnetic_module_model(model):
+        if ModuleModel.is_magnetic_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
                 module_id=MagneticModuleId(module_id),
-                model=model,
+                model=actual_model,
             )
-        elif ModuleModel.is_heater_shaker_module_model(model):
+        elif ModuleModel.is_heater_shaker_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
                 is_labware_latch_closed=(
@@ -209,12 +238,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 ),
                 plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
-        elif ModuleModel.is_temperature_module_model(model):
+        elif ModuleModel.is_temperature_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
                 module_id=TemperatureModuleId(module_id),
                 plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
-        elif ModuleModel.is_thermocycler_module_model(model):
+        elif ModuleModel.is_thermocycler_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
                 is_lid_open=live_data is not None and live_data["lid"] == "open",
@@ -391,7 +420,7 @@ class ModuleView(HasState[ModuleState]):
             attached_module = self._state.hardware_by_module_id[module_id]
 
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         location = (
             DeckSlotLocation(slotName=slot_name) if slot_name is not None else None
@@ -442,7 +471,7 @@ class ModuleView(HasState[ModuleState]):
         try:
             substate = self._state.substate_by_module_id[module_id]
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         if isinstance(substate, expected_type):
             return substate
@@ -520,8 +549,27 @@ class ModuleView(HasState[ModuleState]):
             )
         return location
 
-    def get_model(self, module_id: str) -> ModuleModel:
-        """Get the model name of the given module."""
+    def get_requested_model(self, module_id: str) -> Optional[ModuleModel]:
+        """Return the model by which this module was requested.
+
+        Or, if this module was not loaded with an explicit ``loadModule`` command,
+        return ``None``.
+
+        See also `get_connected_model()`.
+        """
+        try:
+            return self._state.requested_model_by_id[module_id]
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
+
+    def get_connected_model(self, module_id: str) -> ModuleModel:
+        """Return the model of the connected module.
+
+        This can differ from `get_requested_model()` because of module compatibility.
+        For example, a ``loadModule`` command might request a ``temperatureModuleV1``
+        but return a ``temperatureModuleV2`` if that's what it finds actually connected
+        at run time.
+        """
         return self.get(module_id).model
 
     def get_serial_number(self, module_id: str) -> str:
@@ -537,7 +585,7 @@ class ModuleView(HasState[ModuleState]):
         try:
             attached_module = self._state.hardware_by_module_id[module_id]
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         return attached_module.definition
 
