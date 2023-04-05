@@ -1,19 +1,25 @@
 """Tests for the EngineStore interface."""
 from datetime import datetime
 from pathlib import Path
-
+from typing import cast
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons.protocol_engine.state import StateStore
 from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons import protocol_engine
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_runner import (
-    RunnerRunResult,
+    RunResult,
     LiveRunner,
+    RunnerType,
+    protocol_runner,
+    JsonRunner,
 )
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
@@ -22,11 +28,24 @@ from robot_server.runs.engine_store import EngineStore, EngineConflictError
 
 
 @pytest.fixture
-def subject(decoy: Decoy) -> EngineStore:
-    """Get a EngineStore test subject."""
+def hardware_api(
+    decoy: Decoy,
+) -> HardwareControlAPI:
+    """Return a mock in the shape of a HardwareControlAPI."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=HardwareControlAPI)
+
+
+@pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mock StateStore."""
+    return decoy.mock(cls=StateStore)
+
+
+@pytest.fixture
+def subject(decoy: Decoy, hardware_api: HardwareControlAPI) -> EngineStore:
+    """Get a EngineStore test subject."""
     return EngineStore(
         hardware_api=hardware_api,
         # Arbitrary choice of robot_type. Tests where robot_type matters should
@@ -36,12 +55,28 @@ def subject(decoy: Decoy) -> EngineStore:
 
 
 @pytest.fixture
-async def protocol_source(tmp_path: Path) -> ProtocolSource:
+async def json_protocol_source(tmp_path: Path) -> ProtocolSource:
     """Get a protocol source fixture."""
     simple_protocol = (
         get_shared_data_root() / "protocol" / "fixtures" / "6" / "simpleV6.json"
     )
     return await ProtocolReader().read_saved(files=[simple_protocol], directory=None)
+
+
+@pytest.fixture(autouse=True)
+def mock_patch_create_protocol_runner(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock patch a runner creator."""
+    mock_run_creator = decoy.mock(func=protocol_runner.create_protocol_runner)
+    monkeypatch.setattr(protocol_runner, "create_protocol_runner", mock_run_creator)
+
+
+@pytest.fixture(autouse=True)
+def mock_patch_create_engine(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock patch an engine creator."""
+    mock_engine_creator = decoy.mock(func=protocol_engine.create_protocol_engine)
+    monkeypatch.setattr(protocol_engine, "create_protocol_engine", mock_engine_creator)
 
 
 async def test_create_engine(subject: EngineStore) -> None:
@@ -94,27 +129,81 @@ async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
     ]
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
-async def test_create_engine_with_protocol(
+async def test_create_engine_with_protocol_loads_protocol_source(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
     subject: EngineStore,
-    protocol_source: ProtocolSource,
+    json_protocol_source: ProtocolSource,
 ) -> None:
-    """It should create an engine for a run with labware offsets."""
-    # TODO(mc, 2022-05-18): https://github.com/Opentrons/opentrons/pull/10170
-    raise NotImplementedError("Implement this test when JSONv6 runs are supported")
-
+    """It should create an engine-runner pair for a run with JSONv6 protocol source."""
     protocol = ProtocolResource(
         protocol_id="my cool protocol",
         protocol_key=None,
         created_at=datetime(year=2021, month=1, day=1),
-        source=protocol_source,
+        source=json_protocol_source,
     )
+    mock_engine = decoy.mock(cls=ProtocolEngine)
+    mock_runner = decoy.mock(cls=JsonRunner)
+    assert isinstance(mock_runner, JsonRunner)
+    decoy.when(
+        await protocol_engine.create_protocol_engine(
+            hardware_api=hardware_api,
+            config=Config(robot_type="OT-2 Standard", block_on_door_open=False),
+        )
+    ).then_return(mock_engine)
+    decoy.when(
+        protocol_runner.create_protocol_runner(
+            protocol_config=json_protocol_source.config,
+            protocol_engine=mock_engine,
+            hardware_api=hardware_api,
+        )
+    ).then_return(mock_runner)
 
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
         protocol=protocol,
     )
+    decoy.verify(
+        await protocol_engine.create_protocol_engine(
+            hardware_api=hardware_api,
+            config=Config(
+                robot_type=cast(RobotType, "OT-2 Standard"),
+                block_on_door_open=False,
+            ),
+        )
+    )
+    decoy.verify(await mock_runner.load(json_protocol_source), times=1)
+
+
+async def test_create_engine_for_live_protocol(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    subject: EngineStore,
+) -> None:
+    """It should create an engine-runner for a run with no protocol."""
+    mock_engine = decoy.mock(cls=ProtocolEngine)
+    mock_runner = decoy.mock(cls=LiveRunner)
+    decoy.when(
+        await protocol_engine.create_protocol_engine(
+            hardware_api=hardware_api,
+            config=Config(robot_type="OT-2 Standard", block_on_door_open=False),
+        )
+    ).then_return(mock_engine)
+    decoy.when(
+        protocol_runner.create_protocol_runner(
+            protocol_config=None, protocol_engine=mock_engine, hardware_api=hardware_api
+        )
+    ).then_return(mock_runner)
+
+    await subject.create(
+        run_id="run-id",
+        labware_offsets=[],
+        protocol=None,
+    )
+    decoy.verify(mock_runner.set_task_queue_wait(), times=1)
 
 
 async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> None:
@@ -134,7 +223,7 @@ async def test_clear_engine(subject: EngineStore) -> None:
     result = await subject.clear()
 
     assert subject.current_run_id is None
-    assert isinstance(result, RunnerRunResult)
+    assert isinstance(result, RunResult)
 
     with pytest.raises(AssertionError):
         subject.engine
@@ -144,13 +233,13 @@ async def test_clear_engine(subject: EngineStore) -> None:
 
 
 async def test_clear_engine_not_stopped_or_idle(
-    subject: EngineStore, protocol_source: ProtocolSource
+    subject: EngineStore, json_protocol_source: ProtocolSource
 ) -> None:
     """It should raise a conflict if the engine is not stopped."""
     protocol_resource = ProtocolResource(
         protocol_id="123",
         created_at=datetime.now(),
-        source=protocol_source,
+        source=json_protocol_source,
         protocol_key=None,
     )
     await subject.create(

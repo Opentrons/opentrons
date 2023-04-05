@@ -5,20 +5,22 @@ protocol_runner.py for more details.
 """
 from .protocol_runner import (
     AbstractRunner,
-    RunnerRunResult,
+    RunResult,
     create_protocol_runner,
     JsonRunner,
     PythonAndLegacyRunner,
     LiveRunner,
+    RunnerType,
 )
 from .create_simulating_runner import create_simulating_runner
 
 __all__ = [
     "AbstractRunner",
-    "RunnerRunResult",
+    "RunResult",
     "create_simulating_runner",
     "create_protocol_runner",
     "JsonRunner",
     "PythonAndLegacyRunner",
     "LiveRunner",
+    "RunnerType",
 ]

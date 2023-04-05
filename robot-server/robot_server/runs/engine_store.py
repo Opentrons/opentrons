@@ -7,7 +7,11 @@ from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import (
     AbstractRunner,
-    RunnerRunResult,
+    RunnerType,
+    JsonRunner,
+    PythonAndLegacyRunner,
+    LiveRunner,
+    RunResult,
     create_protocol_runner,
 )
 from opentrons.protocol_engine import (
@@ -34,7 +38,7 @@ class RunnerEnginePair(NamedTuple):
     """A stored AbstractRunner/ProtocolEngine pair."""
 
     run_id: str
-    runner: AbstractRunner
+    runner: RunnerType
     engine: ProtocolEngine
 
 
@@ -65,7 +69,7 @@ class EngineStore:
         return self._runner_engine_pair.engine
 
     @property
-    def runner(self) -> AbstractRunner:
+    def runner(self) -> RunnerType:
         """Get the "current" persisted ProtocolRunner."""
         assert self._runner_engine_pair is not None, "Runner not yet created."
         return self._runner_engine_pair.runner
@@ -145,11 +149,16 @@ class EngineStore:
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Another run is currently active.")
 
-        if protocol is not None:
+        if isinstance(runner, (PythonAndLegacyRunner, JsonRunner)):
             # FIXME(mm, 2022-12-21): This `await` introduces a concurrency hazard. If
             # two requests simultaneously call this method, they will both "succeed"
             # (with undefined results) instead of one raising EngineConflictError.
+            assert (
+                protocol is not None
+            ), "A Python or JSON protocol should have a protocol source file."
             await runner.load(protocol.source)
+        else:  # Why does linter not like `else:`..?
+            runner.set_task_queue_wait()
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
@@ -162,7 +171,7 @@ class EngineStore:
 
         return engine.state_view.get_summary()
 
-    async def clear(self) -> RunnerRunResult:
+    async def clear(self) -> RunResult:
         """Remove the persisted ProtocolEngine.
 
         Raises:
@@ -181,4 +190,4 @@ class EngineStore:
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return RunnerRunResult(state_summary=run_data, commands=commands)
+        return RunResult(state_summary=run_data, commands=commands)

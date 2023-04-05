@@ -27,6 +27,7 @@ from opentrons.protocol_runner import (
     PythonAndLegacyRunner,
     LiveRunner,
     AbstractRunner,
+    RunnerType,
 )
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
@@ -175,7 +176,7 @@ async def test_create_protocol_runner(
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
     config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
-    runner_type: Union[JsonRunner, PythonAndLegacyRunner, LiveRunner],
+    runner_type: RunnerType,
 ) -> None:
     """It should return protocol runner type depending on the config."""
     assert isinstance(
@@ -261,7 +262,7 @@ async def test_stop(
         (lazy_fixture("live_subject")),
     ],
 )
-async def test_stop_never_started_json_runner(
+async def test_stop_when_run_never_started(
     decoy: Decoy,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
@@ -606,11 +607,3 @@ async def test_run_live_runner(
         task_queue.start(),
         await task_queue.join(),
     )
-
-
-async def test_load_live_runner_raises(
-    live_subject: LiveRunner,
-) -> None:
-    """Should raise a not supported error."""
-    with pytest.raises(NotImplementedError):
-        await live_subject.load(None)  # type: ignore[arg-type]

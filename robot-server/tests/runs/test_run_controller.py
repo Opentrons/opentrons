@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     errors as pe_errors,
 )
-from opentrons.protocol_runner import RunnerRunResult
+from opentrons.protocol_runner import RunResult
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
@@ -144,7 +144,7 @@ async def test_create_play_action_to_start(
     decoy.verify(mock_task_runner.run(background_task_captor))
 
     decoy.when(await mock_engine_store.runner.run()).then_return(
-        RunnerRunResult(
+        RunResult(
             commands=protocol_commands,
             state_summary=engine_state_summary,
         )

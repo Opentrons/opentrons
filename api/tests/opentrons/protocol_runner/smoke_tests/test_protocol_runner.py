@@ -112,7 +112,7 @@ async def test_runner_with_python(
 
 
 async def test_runner_with_json(json_protocol_file: Path) -> None:
-    """It should run a JSON protocol on the AbstractRunner."""
+    """It should run a JSON protocol on the JsonRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[json_protocol_file],
@@ -173,7 +173,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
 
 
 async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> None:
-    """It should run a Python protocol on the AbstractRunner."""
+    """It should run a Python protocol on the PythonAndLegacyRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[legacy_python_protocol_file],
@@ -233,7 +233,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
 
 
 async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
-    """It should run a Python protocol on the AbstractRunner."""
+    """It should run a Python protocol on the PythonAndLegacyRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[legacy_json_protocol_file],
