@@ -22,11 +22,12 @@ from python_build_utils import normalize_version  # noqa: E402
 def get_version():
     buildno = os.getenv("BUILD_NUMBER")
     project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
+    git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("robot-server", project, **normalize_opts)
+    return normalize_version("robot-server", project, git_dir=git_dir, **normalize_opts)
 
 
 VERSION = get_version()
@@ -54,6 +55,7 @@ INSTALL_REQUIRES = [
     f"opentrons=={VERSION}",
     f"opentrons-shared-data=={VERSION}",
     f"notify-server=={VERSION}",
+    f"server-utils=={VERSION}",
     "anyio==3.3.0",
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",

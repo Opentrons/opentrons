@@ -94,6 +94,9 @@ class PipetteNotLoadedError(ProtocolEngineError):
 class ModuleNotLoadedError(ProtocolEngineError):
     """Raised when referencing a module that has not been loaded."""
 
+    def __init__(self, *, module_id: str) -> None:
+        super().__init__(f"Module {module_id} not found.")
+
 
 class ModuleNotOnDeckError(ProtocolEngineError):
     """Raised when trying to use a module that is loaded off the deck."""
@@ -207,3 +210,7 @@ class FirmwareUpdateRequired(ProtocolEngineError):
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):
     """Raised when the pipette is not ready to aspirate."""
+
+
+class InvalidPipettingVolumeError(ProtocolEngineError):
+    """Raised when pipetting a volume larger than the pipette volume."""

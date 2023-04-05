@@ -298,18 +298,32 @@ class ProtocolContext(CommandPublisher):
         This function returns the created and initialized labware for use
         later in the protocol.
 
-        :param load_name: A string to use for looking up a labware definition
-        :param location: The slot into which to load the labware such as
-                         1 or '1'
+        :param str load_name: A string to use for looking up a labware definition.
+            You can find the ``load_name`` for any standard labware on the Opentrons
+            `Labware Library <https://labware.opentrons.com>`_.
+
+        :param location: The slot into which to load the labware,
+            such as ``1`` or ``"1"``.
+
         :type location: int or str
-        :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons app.
-        :param str namespace: The namespace the labware definition belongs to.
-            If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition. If
-            unspecified, will use version 1.
+
+        :param str label: An optional special name to give the labware. If specified, this
+            is the name the labware will appear as in the run log and the calibration
+            view in the Opentrons app.
+
+        :param str namespace: The namespace that the labware definition belongs to.
+            If unspecified, will search both:
+
+              * ``"opentrons"``, to load standard Opentrons labware definitions.
+              * ``"custom_beta"``, to load custom labware definitions created with the
+                `Custom Labware Creator <https://labware.opentrons.com/create>`_.
+
+            You might need to specify an explicit ``namespace`` if you have a custom
+            definition whose ``load_name`` is the same as an Opentrons standard
+            definition, and you want to explicitly choose one or the other.
+
+        :param version: The version of the labware definition. You should normally
+            leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
         deck_slot = validation.ensure_deck_slot(location)
@@ -795,6 +809,8 @@ class ProtocolContext(CommandPublisher):
         :param str name: A human-readable name for the liquid.
         :param str description: An optional description of the liquid.
         :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+
+        :return: A :py:class:`~opentrons.protocol_api.Liquid` object representing the specified liquid.
         """
         return self._core.define_liquid(
             name=name,
