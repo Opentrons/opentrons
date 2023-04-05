@@ -182,9 +182,15 @@ async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -
                     ui.print_error(
                         f"failed moving {direction} at {current} amps and {speed} mm/sec"
                     )
-                    failures.append((current, speed, direction,))
+                    failures.append(
+                        (
+                            current,
+                            speed,
+                            direction,
+                        )
+                    )
     if failures:
-        print(f"current\tspeed\tdirection")
+        print("current\tspeed\tdirection")
         for failure in failures:
             print(f"{failure[0]}\t{failure[1]}\t{failure[2]}")
 
