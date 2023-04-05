@@ -13,9 +13,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   BORDERS,
-  OVERFLOW_HIDDEN,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
+  OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -48,6 +48,14 @@ const COMMAND_ROW_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+`
+const BOTTOM_ROW_STYLE = css`
+  position: ${POSITION_ABSOLUTE};
+  bottom: 0;
+  width: 100%;
+  height: 5rem;
+  z-index: 6;
+  backdrop-filter: blur(1.5px);
 `
 
 interface RunningProtocolCommandListProps {
@@ -100,11 +108,7 @@ export function RunningProtocolCommandList({
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
-      overflow={OVERFLOW_HIDDEN}
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -131,6 +135,7 @@ export function RunningProtocolCommandList({
           gridGap={SPACING.spacing3}
           height="20.25rem"
           position={POSITION_RELATIVE}
+          overflow={OVERFLOW_HIDDEN}
         >
           <ViewportList
             viewportRef={viewPortRef}
@@ -170,14 +175,7 @@ export function RunningProtocolCommandList({
               )
             }}
           </ViewportList>
-          <Flex
-            position={POSITION_ABSOLUTE}
-            bottom="0"
-            width="100%"
-            height="3.8125rem"
-            zIndex="6"
-            backgroundColor={`${COLORS.white}${COLORS.opacity50HexCode}`}
-          ></Flex>
+          <Flex css={BOTTOM_ROW_STYLE}></Flex>
         </Flex>
       ) : null}
     </Flex>

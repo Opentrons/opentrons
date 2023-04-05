@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -11,7 +11,8 @@ import {
   COLORS,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
-  ALIGN_FLEX_END, // temporary
+  POSITION_RELATIVE,
+  OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -20,7 +21,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { StepMeter } from '../../atoms/StepMeter'
-import { TertiaryButton } from '../../atoms/buttons' // temporary
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
 import {
@@ -40,9 +40,10 @@ interface BulletProps {
   isActive: boolean
 }
 const Bullet = styled.div`
-  height: 1rem;
-  width: 1rem;
+  height: 0.5rem;
+  width: 0.5rem;
   border-radius: 50%;
+  z-index: 10;
   background: ${(props: BulletProps) =>
     props.isActive ? COLORS.darkBlack_sixty : COLORS.darkBlack_forty};
   transform: ${(props: BulletProps) =>
@@ -75,14 +76,7 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const {
-    playRun,
-    pauseRun,
-    stopRun,
-    // isPlayRunActionLoading,
-    // isPauseRunActionLoading,
-    // isStopRunActionLoading,
-  } = useRunActionMutations(runId)
+  const { playRun, pauseRun, stopRun } = useRunActionMutations(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
 
   React.useEffect(() => {
@@ -104,7 +98,11 @@ export function RunningProtocol(): JSX.Element {
   }, [currentOption, swipe, swipe.setSwipeType])
 
   return (
-    <>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      overflow={OVERFLOW_HIDDEN}
+    >
       {robotSideAnalysis != null ? (
         <StepMeter
           totalSteps={totalIndex != null ? totalIndex : 0}
@@ -162,15 +160,6 @@ export function RunningProtocol(): JSX.Element {
           <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
         </Flex>
       </Flex>
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
-      </Flex>
-    </>
+    </Flex>
   )
 }
