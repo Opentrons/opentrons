@@ -253,7 +253,9 @@ export const PipetteWizardFlows = (
         totalStepCount={totalStepCount}
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
-        recalibrate={`recalibrate` in pipetteWizardSteps[currentStepIndex]}
+        recalibrate={
+          currentStep.recalibrate != null && currentStep.recalibrate === true
+        }
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
