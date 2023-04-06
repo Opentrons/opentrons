@@ -9,7 +9,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-export type StretchButtonProps = React.ComponentProps<typeof Btn> 
+export type StretchButtonProps = React.ComponentProps<typeof Btn>
 
 export function StretchButton(props: StretchButtonProps): JSX.Element {
   return (

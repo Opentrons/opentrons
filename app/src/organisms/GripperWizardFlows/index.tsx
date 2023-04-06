@@ -2,7 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { UseMutateFunction } from 'react-query'
-import { useConditionalConfirm, Flex, DIRECTION_COLUMN, POSITION_ABSOLUTE, COLORS } from '@opentrons/components'
+import {
+  useConditionalConfirm,
+  Flex,
+  DIRECTION_COLUMN,
+  POSITION_ABSOLUTE,
+  COLORS,
+} from '@opentrons/components'
 import {
   useCreateRunMutation,
   useStopRunMutation,
@@ -224,24 +230,21 @@ export const GripperWizard = (
 
   return (
     <Portal level="top">
-      {
-        Boolean(isOnDevice) ? (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            width="100%"
-            position={POSITION_ABSOLUTE}
-            backgroundColor={COLORS.white}
-          >
-            {wizardHeader}
-            {modalContent}
-          </Flex>
-        ) : (
-        <ModalShell width="48rem" header={wizardHeader} >
+      {Boolean(isOnDevice) ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          position={POSITION_ABSOLUTE}
+          backgroundColor={COLORS.white}
+        >
+          {wizardHeader}
+          {modalContent}
+        </Flex>
+      ) : (
+        <ModalShell width="48rem" header={wizardHeader}>
           {modalContent}
         </ModalShell>
-        )
-      }
+      )}
     </Portal>
-
   )
 }

@@ -22,11 +22,13 @@ interface ExtensionMountItemProps {
     props: React.ComponentProps<typeof GripperWizardFlows> | null
   ) => void
 }
-export function ExtensionMountItem(props: ExtensionMountItemProps): JSX.Element {
+export function ExtensionMountItem(
+  props: ExtensionMountItemProps
+): JSX.Element {
   const { t } = useTranslation('device_details')
   const history = useHistory()
   const { attachedInstrument, setWizardProps } = props
-  const handleClick: React.MouseEventHandler = () =>{
+  const handleClick: React.MouseEventHandler = () => {
     if (attachedInstrument == null) {
       setWizardProps({
         flowType: GRIPPER_FLOW_TYPES.ATTACH,
@@ -39,15 +41,19 @@ export function ExtensionMountItem(props: ExtensionMountItemProps): JSX.Element 
   }
   return (
     <StretchButton onClick={handleClick}>
-      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+      >
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing5}>
-          <StyledText as="h1" textTransform={TEXT_TRANSFORM_CAPITALIZE}>{t('mount', { side: 'extension'})}</StyledText>
+          <StyledText as="h1" textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+            {t('mount', { side: 'extension' })}
+          </StyledText>
           <StyledText as="h3">
-            {
-              attachedInstrument == null
-                ? t('empty')
-                : attachedInstrument.instrumentModel
-            }
+            {attachedInstrument == null
+              ? t('empty')
+              : attachedInstrument.instrumentModel}
           </StyledText>
         </Flex>
         <Icon name="chevron-right" size="1.5rem" />

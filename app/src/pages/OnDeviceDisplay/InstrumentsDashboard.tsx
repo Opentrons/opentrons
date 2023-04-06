@@ -1,12 +1,20 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { ALIGN_FLEX_END, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  ALIGN_FLEX_END,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+} from '@opentrons/components'
 import { TertiaryButton } from '../../atoms/buttons'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import { PipetteMountItem, ExtensionMountItem } from '../../organisms/InstrumentMountItem.tsx'
+import {
+  PipetteMountItem,
+  ExtensionMountItem,
+} from '../../organisms/InstrumentMountItem.tsx'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 
 export const InstrumentsDashboard = (): JSX.Element => {
@@ -17,10 +25,11 @@ export const InstrumentsDashboard = (): JSX.Element => {
     (attachedInstruments?.data ?? []).find(i => i.mount === 'right') ?? null
   const extensionInstrument =
     (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
-  const [
-    wizardProps,
-    setWizardProps,
-  ] = React.useState<React.ComponentProps<typeof GripperWizardFlows> | React.ComponentProps<typeof PipetteWizardFlows> | null>(null)
+  const [wizardProps, setWizardProps] = React.useState<
+    | React.ComponentProps<typeof GripperWizardFlows>
+    | React.ComponentProps<typeof PipetteWizardFlows>
+    | null
+  >(null)
 
   return (
     <Flex
@@ -31,9 +40,20 @@ export const InstrumentsDashboard = (): JSX.Element => {
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-        <PipetteMountItem mount="left" attachedPipette={leftPipette} setWizardProps={setWizardProps} />
-        <PipetteMountItem mount="right" attachedPipette={rightPipette} setWizardProps={setWizardProps} />
-        <ExtensionMountItem attachedInstrument={extensionInstrument} setWizardProps={setWizardProps} />
+        <PipetteMountItem
+          mount="left"
+          attachedPipette={leftPipette}
+          setWizardProps={setWizardProps}
+        />
+        <PipetteMountItem
+          mount="right"
+          attachedPipette={rightPipette}
+          setWizardProps={setWizardProps}
+        />
+        <ExtensionMountItem
+          attachedInstrument={extensionInstrument}
+          setWizardProps={setWizardProps}
+        />
       </Flex>
       {wizardProps != null && 'mount' in wizardProps ? (
         <PipetteWizardFlows {...wizardProps} />

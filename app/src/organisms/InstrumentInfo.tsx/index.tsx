@@ -10,7 +10,10 @@ import {
   TYPOGRAPHY,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { SINGLE_MOUNT_PIPETTES, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import {
+  SINGLE_MOUNT_PIPETTES,
+  NINETY_SIX_CHANNEL,
+} from '@opentrons/shared-data'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
@@ -28,19 +31,27 @@ interface InstrumentInfoProps {
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const { t } = useTranslation('instruments_dashboard')
   const { instrument } = props
-  const [
-    wizardProps,
-    setWizardProps,
-  ] = React.useState<React.ComponentProps<typeof GripperWizardFlows> | React.ComponentProps<typeof PipetteWizardFlows> | null>(null)
+  const [wizardProps, setWizardProps] = React.useState<
+    | React.ComponentProps<typeof GripperWizardFlows>
+    | React.ComponentProps<typeof PipetteWizardFlows>
+    | null
+  >(null)
   const sharedPipetteWizardProps = {
     mount: instrument.mount as PipetteMount,
-    selectedPipette: instrument.instrumentModel === 'p1000_96' ? NINETY_SIX_CHANNEL : SINGLE_MOUNT_PIPETTES,
-    setSelectedPipette: () => { },
-    closeFlow: () => { setWizardProps(null) }
+    selectedPipette:
+      instrument.instrumentModel === 'p1000_96'
+        ? NINETY_SIX_CHANNEL
+        : SINGLE_MOUNT_PIPETTES,
+    setSelectedPipette: () => {},
+    closeFlow: () => {
+      setWizardProps(null)
+    },
   }
   const sharedGripperWizardProps = {
     attachedGripper: instrument,
-    closeFlow: () => { setWizardProps(null) }
+    closeFlow: () => {
+      setWizardProps(null)
+    },
   }
   const handleDetach: React.MouseEventHandler = () => {
     setWizardProps(
@@ -52,24 +63,37 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const handleRecalibrate: React.MouseEventHandler = () => {
     setWizardProps(
       instrument.instrumentModel === 'gripperV1'
-        ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.RECALIBRATE }
+        ? {
+            ...sharedGripperWizardProps,
+            flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
+          }
         : { ...sharedPipetteWizardProps, flowType: FLOWS.CALIBRATE }
     )
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_SPACE_BETWEEN} height="100%">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      height="100%"
+    >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
         <InfoItem>
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{t('last_calibrated')}</StyledText>
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('last_calibrated')}
+          </StyledText>
           <StyledText as="h4">TODO</StyledText>
         </InfoItem>
         <InfoItem>
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{t('firmware_version')}</StyledText>
-          <StyledText as="h4" >TODO</StyledText>
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('firmware_version')}
+          </StyledText>
+          <StyledText as="h4">TODO</StyledText>
         </InfoItem>
         <InfoItem>
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{t('serial_number')}</StyledText>
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('serial_number')}
+          </StyledText>
           <StyledText as="h4">{instrument.serialNumber}</StyledText>
         </InfoItem>
       </Flex>
@@ -103,7 +127,6 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   )
 }
 
-
 type InfoItemProps = React.ComponentProps<typeof Flex>
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
@@ -114,6 +137,7 @@ function InfoItem(props: InfoItemProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight36}
       fontSize={TYPOGRAPHY.fontSize22}
-      {...props} />
+      {...props}
+    />
   )
 }

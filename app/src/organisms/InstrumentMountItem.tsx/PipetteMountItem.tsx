@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 
-import { LEFT, NINETY_SIX_CHANNEL, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   Flex,
@@ -15,7 +19,6 @@ import { StretchButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { StyledText } from '../../atoms/text'
 import { useTranslation } from 'react-i18next'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
-import { Portal } from '../../App/portal'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
@@ -26,7 +29,10 @@ interface PipetteMountItemProps {
   mount: Mount
   attachedPipette: InstrumentData | null
   setWizardProps: (
-    props: React.ComponentProps<typeof GripperWizardFlows> | React.ComponentProps<typeof PipetteWizardFlows> | null
+    props:
+      | React.ComponentProps<typeof GripperWizardFlows>
+      | React.ComponentProps<typeof PipetteWizardFlows>
+      | null
   ) => void
 }
 
@@ -35,8 +41,13 @@ export function PipetteMountItem(props: PipetteMountItemProps): JSX.Element {
   const history = useHistory()
   const { mount, attachedPipette, setWizardProps } = props
 
-  const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(false)
-  const [selectedPipette, setSelectedPipette] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
+  const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(
+    false
+  )
+  const [
+    selectedPipette,
+    setSelectedPipette,
+  ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
 
   const handleClick: React.MouseEventHandler = () => {
     if (attachedPipette == null) {
@@ -46,20 +57,28 @@ export function PipetteMountItem(props: PipetteMountItemProps): JSX.Element {
     }
   }
   return (
-    <StretchButton onClick={handleClick}>
-      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing5}>
-          <StyledText as="h1" textTransform={TEXT_TRANSFORM_CAPITALIZE}>{t('mount', { side: mount })}</StyledText>
-          <StyledText as="h3">
-            {
-              attachedPipette == null
+    <>
+      <StretchButton onClick={handleClick}>
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+        >
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing5}>
+            <StyledText as="h1" textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              {t('mount', { side: mount })}
+            </StyledText>
+            <StyledText as="h3">
+              {attachedPipette == null
                 ? t('empty')
-                : attachedPipette.instrumentModel
-            }
-          </StyledText>
+                : attachedPipette.instrumentModel}
+            </StyledText>
+          </Flex>
+          <Icon name="chevron-right" size="1.5rem" />
         </Flex>
-        <Icon name="chevron-right" size="1.5rem" />
-      </Flex>
+
+      </StretchButton>
+
       {showChoosePipetteModal ? (
         <ChoosePipette
           proceed={() => {
@@ -68,8 +87,12 @@ export function PipetteMountItem(props: PipetteMountItemProps): JSX.Element {
               flowType: FLOWS.ATTACH,
               selectedPipette,
               setSelectedPipette,
-              closeFlow: () => { setWizardProps(null) }
+              closeFlow: () => {
+                setWizardProps(null)
+                setShowChoosePipetteModal(false)
+              },
             })
+            setShowChoosePipetteModal(false)
           }}
           setSelectedPipette={setSelectedPipette}
           selectedPipette={selectedPipette}
@@ -79,6 +102,6 @@ export function PipetteMountItem(props: PipetteMountItemProps): JSX.Element {
           mount={mount}
         />
       ) : null}
-    </StretchButton>
+    </>
   )
 }

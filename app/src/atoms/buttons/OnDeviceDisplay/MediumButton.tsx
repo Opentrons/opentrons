@@ -98,12 +98,12 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
 
     &:focus {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
-      .defaultBackgroundColor};
+        .defaultBackgroundColor};
       box-shadow: none;
     }
     &:hover {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
-      .defaultBackgroundColor};
+        .defaultBackgroundColor};
       border: none;
       box-shadow: none;
       color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
@@ -114,7 +114,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
 
     &:active {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
-      .activeBackgroundColor};
+        .activeBackgroundColor};
     }
 
     &:disabled {
@@ -127,7 +127,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       disabled={disabled}
       css={MEDIUM_BUTTON_STYLE}
       aria-label={`MediumButton_${buttonType}`}
-      display='flex'
+      display="flex"
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacingSM}

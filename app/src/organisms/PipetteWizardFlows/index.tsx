@@ -316,10 +316,10 @@ export const PipetteWizardFlows = (
         wizardTitle = isGantryEmpty
           ? t('attach_96_channel')
           : t('attach_96_channel_plus_detach', {
-            pipetteName:
-              attachedPipettes.left?.modelSpecs.displayName ??
-              attachedPipettes.right?.modelSpecs.displayName,
-          })
+              pipetteName:
+                attachedPipettes.left?.modelSpecs.displayName ??
+                attachedPipettes.right?.modelSpecs.displayName,
+            })
       }
       break
     }
@@ -359,8 +359,8 @@ export const PipetteWizardFlows = (
   )
 
   return (
-    <Portal level="top">{
-      Boolean(isOnDevice) ? (
+    <Portal level="top">
+      {Boolean(isOnDevice) ? (
         <Flex
           flexDirection={DIRECTION_COLUMN}
           width="100%"
@@ -377,8 +377,8 @@ export const PipetteWizardFlows = (
             //  changing modal height for now on BeforeBeginning 96 channel attach flow
             //  until we do design qa to normalize the modal sizes
             currentStep.section === SECTIONS.BEFORE_BEGINNING &&
-              selectedPipette === NINETY_SIX_CHANNEL &&
-              flowType === FLOWS.ATTACH
+            selectedPipette === NINETY_SIX_CHANNEL &&
+            flowType === FLOWS.ATTACH
               ? '70%'
               : 'auto'
           }
@@ -386,7 +386,7 @@ export const PipetteWizardFlows = (
         >
           {modalContent}
         </ModalShell>
-      )
-    }
-    </Portal>)
+      )}
+    </Portal>
+  )
 }
