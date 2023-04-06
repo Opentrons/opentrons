@@ -29,6 +29,7 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
             name={iconName}
             color={iconColor}
             size={SPACING.spacing6}
+            alignSelf={ALIGN_CENTER}
             marginRight={SPACING.spacing4}
           />
         ) : null}

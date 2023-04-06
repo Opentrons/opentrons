@@ -7,8 +7,19 @@ export default {
   title: 'ODD/Molecules/Modals/ModalHeader',
   argTypes: {
     iconName: {
-      options: ['information', undefined],
+      options: ['information', 'ot-check', 'ot-alert', undefined],
       control: { type: 'radio' },
+    },
+    iconColor: {
+      control: {
+        type: 'color',
+        presetColors: [
+          COLORS.black,
+          COLORS.fundamentalsFocus,
+          COLORS.red_two,
+          COLORS.successText,
+        ],
+      },
     },
     onClick: { action: 'clicked' },
   },
