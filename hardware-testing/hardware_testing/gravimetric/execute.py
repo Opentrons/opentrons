@@ -1,7 +1,9 @@
 """Gravimetric."""
+from inspect import getsource
 from statistics import stdev
 from typing import Optional, Tuple, List
 
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
@@ -26,7 +28,7 @@ from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from .liquid_class.defaults import get_test_volumes
+from .liquid_class.defaults import get_test_volumes, get_liquid_class
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
     dispense_with_liquid_class,
@@ -87,6 +89,24 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
+def _check_if_software_supports_high_volumes() -> bool:
+    src_a = getsource(Pipette.set_current_volume)
+    src_b = getsource(Pipette.ok_to_add_volume)
+    modified_a = "# assert new_volume <= self.working_volume" in src_a
+    modified_b = "return True" in src_b
+    return modified_a and modified_b
+
+
+def _reduce_volumes_to_not_exceed_software_limit(
+    test_volumes: List[float], cfg: config.GravimetricConfig
+) -> List[float]:
+    for i, v in enumerate(test_volumes):
+        liq_cls = get_liquid_class(cfg.pipette_volume, cfg.tip_volume, int(v))
+        max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
+        test_volumes[i] = min(v, max_vol)
+    return test_volumes
+
+
 def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[float]:
     if cfg.increment:
         test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
@@ -99,6 +119,13 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
         test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
+    if not _check_if_software_supports_high_volumes():
+        if ctx.is_simulating():
+            test_volumes = _reduce_volumes_to_not_exceed_software_limit(
+                test_volumes, cfg
+            )
+        else:
+            raise RuntimeError("you are not the correct branch")
     return sorted(test_volumes, reverse=True)
 
 
