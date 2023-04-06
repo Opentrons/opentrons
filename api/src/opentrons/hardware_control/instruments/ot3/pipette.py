@@ -422,7 +422,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def set_current_volume(self, new_volume: float) -> None:
         assert new_volume >= 0
-        # assert new_volume <= self.working_volume
+        assert new_volume <= self.working_volume
         self._current_volume = new_volume
 
     def add_current_volume(self, volume_incr: float) -> None:
@@ -434,8 +434,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._current_volume -= volume_incr
 
     def ok_to_add_volume(self, volume_incr: float) -> bool:
-        # return self.current_volume + volume_incr <= self.working_volume
-        return True
+        return self.current_volume + volume_incr <= self.working_volume
 
     def add_tip(self, tip_length: float) -> None:
         """
