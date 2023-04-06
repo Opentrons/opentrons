@@ -8799,8 +8799,7 @@
     "dropTipCurrent",
     "dropTipSpeed",
     "tipLength",
-    "quirks",
-    "defaultBlowoutVolume"
+    "quirks"
   ],
   "validQuirks": [
     "pickupTipShake",
