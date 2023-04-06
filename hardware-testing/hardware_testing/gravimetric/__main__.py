@@ -28,7 +28,6 @@ def run(
     mix: bool,
     inspect: bool,
     user_volumes: bool,
-    stable: bool,
 ) -> None:
     """Run."""
     protocol_cfg = PROTOCOL_CFG[pipette_volume]
@@ -51,7 +50,6 @@ def run(
             mix=mix,
             inspect=inspect,
             user_volumes=user_volumes,
-            stable=stable,
         ),
     )
 
@@ -76,7 +74,6 @@ if __name__ == "__main__":
     parser.add_argument("--mix", action="store_true")
     parser.add_argument("--inspect", action="store_true")
     parser.add_argument("--user-volumes", action="store_true")
-    parser.add_argument("--stable", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -108,5 +105,4 @@ if __name__ == "__main__":
         args.mix,
         args.inspect,
         args.user_volumes,
-        args.stable,
     )
