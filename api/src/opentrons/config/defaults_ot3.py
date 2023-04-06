@@ -138,14 +138,14 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.Z: 1,
         OT3AxisKind.P: 5,
         OT3AxisKind.Q: 5,
-        OT3AxisKind.Z_G: 1,
+        OT3AxisKind.Z_G: 5,
     },
     low_throughput={
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 5,
         OT3AxisKind.Z: 1,
         OT3AxisKind.P: 5,
-        OT3AxisKind.Z_G: 1,
+        OT3AxisKind.Z_G: 5,
     },
 )
 
@@ -180,7 +180,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
     low_throughput={
         OT3AxisKind.X: 1.4,
         OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.0,
+        OT3AxisKind.Z: 1.4,
         # TODO: verify this value
         OT3AxisKind.P: 1.0,
         OT3AxisKind.Z_G: 0.67,
