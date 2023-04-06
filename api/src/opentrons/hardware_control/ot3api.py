@@ -776,11 +776,10 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         realmount = OT3Mount.from_mount(mount)
         ot3_pos = await self.current_position_ot3(
-            realmount, critical_point, refresh, fail_on_not_homed
+            realmount, critical_point, refresh
         )
         return self._axis_map_from_ot3axis_map(ot3_pos)
 
@@ -788,31 +787,26 @@ class OT3API(
         self,
         mount: OT3Mount,
         critical_point: Optional[CriticalPoint] = None,
-        # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
-        # position reporting when motors are not homed
         refresh: bool = False,
-        fail_on_not_homed: bool = False,
     ) -> Dict[OT3Axis, float]:
         """Return the postion (in deck coords) of the critical point of the
         specified mount.
         """
-        z_ax = OT3Axis.by_mount(mount)
-        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
-        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
-
-        if fail_on_not_homed and (
-            not self._backend.check_motor_status(position_axes)
-            or not self._current_position
-        ):
-            raise MustHomeError(
-                f"Current position of {str(mount)} pipette is unknown, please home."
-            )
-
-        elif not self._current_position and not refresh:
-            raise MustHomeError("Current position is unknown; please home motors.")
-
         if refresh:
             await self.refresh_positions()
+
+        z_ax = OT3Axis.by_mount(mount)
+        tool_ax = OT3Axis.of_main_tool_actuator(mount)
+        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, tool_ax]
+
+        if not (
+            self._current_position and
+            self._backend.check_motor_status(position_axes)
+        ):
+            raise MustHomeError(
+                f"Current position of {str(mount)} is unknown; please home motors."
+            )
+
         return self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), self._current_position, critical_point
         )
@@ -847,13 +841,12 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         """
         Return the encoder position in absolute deck coords specified mount.
         """
         ot3pos = await self.encoder_current_position_ot3(
-            mount, critical_point, refresh, fail_on_not_homed
+            mount, critical_point, refresh
         )
         return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
 
@@ -862,33 +855,31 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        fail_on_not_homed: bool = False,
     ) -> Dict[OT3Axis, float]:
         """
         Return the encoder position in absolute deck coords specified mount.
         """
-        z_ax = OT3Axis.by_mount(mount)
-        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
-        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
+        if refresh:
+            await self.refresh_positions()
 
-        if fail_on_not_homed and (
-            not self._backend.check_motor_status(position_axes)
-            or not self._encoder_position
+        z_ax = OT3Axis.by_mount(mount)
+        tool_ax = OT3Axis.of_main_tool_actuator(mount)
+        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, tool_ax]
+
+        if not (
+            self._backend.check_motor_status(position_axes)
+            and self._encoder_position
         ):
             raise MustHomeError(
-                f"Current position of {str(mount)} pipette is unknown, please home."
+                f"Encoder position of {str(mount)} is unknown, please home motors."
             )
-        elif not self._encoder_position and not refresh:
-            raise MustHomeError("Encoder position is unknown; please home motors.")
-        async with self._motion_lock:
-            if refresh:
-                await self.refresh_positions()
-            ot3pos = self._effector_pos_from_carriage_pos(
-                OT3Mount.from_mount(mount),
-                self._encoder_position,
-                critical_point,
-            )
-            return ot3pos
+        
+        ot3pos = self._effector_pos_from_carriage_pos(
+            OT3Mount.from_mount(mount),
+            self._encoder_position,
+            critical_point,
+        )
+        return ot3pos
 
     def _effector_pos_from_carriage_pos(
         self,
@@ -918,9 +909,6 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
-        # position reporting when motors are not homed
-        fail_on_not_homed: bool = False,
     ) -> top_types.Point:
         """Return the position of the critical point as pertains to the gantry."""
         realmount = OT3Mount.from_mount(mount)
@@ -928,7 +916,6 @@ class OT3API(
             realmount,
             critical_point,
             refresh,
-            fail_on_not_homed,
         )
         return top_types.Point(
             x=cur_pos[OT3Axis.X],
@@ -949,13 +936,15 @@ class OT3API(
         relative to the deck, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
 
-        # Refresh current position
+        # Cache current position from backend
         await self._cache_current_position()
         await self._cache_encoder_position()
 
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_motor_status(axes_moving):
-            await self.home(axes_moving)
+            raise MustHomeError(
+                f"Inaccurate motor position for {str(realmount)}, please home motors."
+            )
 
         target_position = target_position_from_absolute(
             realmount,
@@ -988,37 +977,25 @@ class OT3API(
         speed: Optional[float] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
-        fail_on_not_homed: bool = False,
         _check_stalls: bool = False,  # For testing only
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
-
-        # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
-        # Having the optional arg makes the bug stick around in existing code and we
-        # really want to fix it when we're not gearing up for a release.
-        mhe = MustHomeError(
-            "Cannot make a relative move because absolute position is unknown"
-        )
-
         realmount = OT3Mount.from_mount(mount)
+
+        # Cache current position from backend
+        await self._cache_current_position()
+        await self._cache_encoder_position()
+
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_motor_status([axis for axis in axes_moving]):
-            if fail_on_not_homed:
-                raise mhe
-            else:
-                await self.home(axes_moving)
-
-        # Refresh current position
-        await self.refresh_positions()
+            raise MustHomeError(
+                f"Inaccurate motor position for {str(realmount)}, please home motors."
+            )
 
         target_position = target_position_from_relative(
             realmount, delta, self._current_position
         )
-        if fail_on_not_homed and not self._backend.check_motor_status(
-            [axis for axis in axes_moving if axis is not None]
-        ):
-            raise mhe
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
                 OT3Axis.from_axis(k): v for k, v in max_speeds.items()
