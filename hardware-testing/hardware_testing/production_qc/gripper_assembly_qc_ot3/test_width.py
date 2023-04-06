@@ -83,6 +83,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # GRIPPER MOVES TO GAUGE
         await api.ungrip()
         await api.move_to(mount, target_pos)
+        # JOG GRIPPER POSITION AND LET THE CALIBRATION BLOCK IN THE MIDDLE OF THE GRIPPER
+        await helpers_ot3.jog_mount_ot3(api, mount)
         if not api.is_simulator:
             ui.get_user_ready(f"prepare to grip {width} mm")
         # grip once to center the thing
