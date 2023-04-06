@@ -1127,7 +1127,9 @@ class OT3API(
                 await self._backend.move(
                     origin,
                     moves[0],
-                    MoveStopCondition.stall if check_stalls and not ff.disable_stall_detection() else MoveStopCondition.none,
+                    MoveStopCondition.stall
+                    if check_stalls and not ff.disable_stall_detection()
+                    else MoveStopCondition.none,
                 )
             except Exception:
                 self._log.exception("Move failed")
