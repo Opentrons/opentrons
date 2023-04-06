@@ -47,6 +47,9 @@ export function createUi(): BrowserWindow {
     }
   )
 
+  // hide menubar
+  mainWindow.setMenuBarVisibility(false)
+
   log.info(`Loading ${url}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
