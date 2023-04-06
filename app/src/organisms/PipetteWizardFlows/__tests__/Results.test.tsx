@@ -12,17 +12,37 @@ import {
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { i18n } from '../../../i18n'
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
+import { useAttachedPipetteCalibrations } from '../../Devices/hooks'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type {
+  AttachedPipette,
+  PipetteCalibrationsByMount,
+} from '../../../redux/pipettes/types'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../Devices/hooks')
 
+const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
+  typeof useAttachedPipetteCalibrations
+>
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
 >
+const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
+  left: {
+    offset: mockPipetteOffsetCalibration1,
+  },
+  right: {
+    offset: mockPipetteOffsetCalibration2,
+  },
+} as any
 
 const render = (props: React.ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {
@@ -57,15 +77,18 @@ describe('Results', () => {
       isFetching: false,
       setFetching: jest.fn(),
     }
+    mockUseAttachedPipetteCalibrations.mockReturnValue({
+      left: {},
+      right: {},
+    } as any)
     pipettePromise = Promise.resolve()
     mockRefetchPipette = jest.fn(() => pipettePromise)
     mockUsePipettesQuery.mockReturnValue({ refetch: mockRefetchPipette } as any)
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
-    props = {
-      ...props,
-      recalibrate: true,
-    }
+    mockUseAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
     const { getByText, getByRole, getByLabelText } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully recalibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
@@ -228,10 +251,12 @@ describe('Results', () => {
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information for success pipette cal on ODD', () => {
+    mockUseAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
     props = {
       ...props,
       isOnDevice: true,
-      recalibrate: true,
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully recalibrated')

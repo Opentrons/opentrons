@@ -7,25 +7,13 @@ import {
   mockAttachedPipette,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
-import { useAttachedPipetteCalibrations } from '../../Devices/hooks'
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import type {
   AttachedPipette,
   AttachedPipettesByMount,
-  PipetteCalibrationsByMount,
 } from '../../../redux/pipettes/types'
 import type { PipetteWizardStep } from '../types'
-
-jest.mock('../../Devices/hooks')
-
-const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
-  typeof useAttachedPipetteCalibrations
->
 
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
@@ -41,26 +29,8 @@ const mockAttachedPipettesNotEmpty: AttachedPipettesByMount = {
   right: null,
 }
 
-const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
-  left: {
-    offset: mockPipetteOffsetCalibration1,
-  },
-  right: {
-    offset: mockPipetteOffsetCalibration2,
-  },
-} as any
-
 describe('getPipetteWizardSteps', () => {
-  beforeEach(() => {
-    mockUseAttachedPipetteCalibrations.mockReturnValue({
-      left: {},
-      right: {},
-    } as any)
-  })
   it('returns the correct array of info when the flow is calibrate single channel', () => {
-    mockUseAttachedPipetteCalibrations.mockReturnValue(
-      mockAttachedPipetteCalibrations
-    )
     const mockCalibrateFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -81,7 +51,6 @@ describe('getPipetteWizardSteps', () => {
         section: SECTIONS.RESULTS,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
-        recalibrate: true,
       },
     ] as PipetteWizardStep[]
 
@@ -325,9 +294,6 @@ describe('getPipetteWizardSteps', () => {
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
   it('returns the corect array of info for calibrate pipette 96 channel', () => {
-    mockUseAttachedPipetteCalibrations.mockReturnValue(
-      mockAttachedPipetteCalibrations
-    )
     const mockCalibrateFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -348,7 +314,6 @@ describe('getPipetteWizardSteps', () => {
         section: SECTIONS.RESULTS,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
-        recalibrate: true,
       },
     ] as PipetteWizardStep[]
 

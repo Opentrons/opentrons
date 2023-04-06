@@ -78,5 +78,4 @@ export interface PipetteWizardStepProps {
   errorMessage: string | null
   selectedPipette: SelectablePipettes
   isOnDevice: boolean | null
-  recalibrate?: boolean
 }
