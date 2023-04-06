@@ -134,7 +134,7 @@ class RunUpdate:
     def __init__(
         self,
         can_messenger: CanMessenger,
-        usb_messenger: BinaryMessenger,
+        usb_messenger: Optional[BinaryMessenger],
         update_details: Dict[FirmwareTarget, str],
         retry_count: int,
         timeout_seconds: float,
@@ -166,6 +166,9 @@ class RunUpdate:
         )
 
     async def _reconnect(self, vid: int, pid: int, baudrate: int, timeout: int) -> bool:
+        if self._usb_messenger is None:
+            return False
+
         device_running = False
         for i in range(self._retry_count):
             logger.info(f"attempt #{i} to reconnect")
@@ -251,7 +254,7 @@ class RunUpdate:
         initiator = FirmwareUpdateInitiator(messenger)
         downloader = FirmwareUpdateDownloader(messenger)
 
-        target = Target(system_node=node_id)
+        target = Target.from_single_node(node_id)
 
         logger.info(f"Initiating FW Update on {target}.")
         await self._status_queue.put((node_id, (FirmwareUpdateStatus.updating, 0)))
@@ -294,7 +297,7 @@ class RunUpdate:
         else:
             logger.info("Skipping erase step.")
 
-        logger.info(f"Downloading FW to {target.bootloader_node}.")
+        logger.info(f"Downloading {filepath} to {target.bootloader_node}.")
         with open(filepath) as f:
             hex_processor = HexRecordProcessor.from_file(f)
             async for download_progress in downloader.run(
@@ -336,16 +339,18 @@ class RunUpdate:
             for target, filepath in self._update_details.items()
             if target in NodeId
         ]
-        usb_tasks = [
-            self._run_usb_update(
-                messenger=self._usb_messenger,
-                retry_count=self._retry_count,
-                update_file=filepath,
-                usb_target=USBTarget(target),
-            )
-            for target, filepath in self._update_details.items()
-            if target in USBTarget
-        ]
+        usb_tasks = []
+        if self._usb_messenger is not None:
+            usb_tasks = [
+                self._run_usb_update(
+                    messenger=self._usb_messenger,
+                    retry_count=self._retry_count,
+                    update_file=filepath,
+                    usb_target=USBTarget(target),
+                )
+                for target, filepath in self._update_details.items()
+                if target in USBTarget
+            ]
         tasks = can_tasks + usb_tasks
         task = asyncio.gather(*tasks)
         while True:

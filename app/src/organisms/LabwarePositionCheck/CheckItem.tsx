@@ -19,24 +19,25 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { useChainRunCommands } from '../../resources/runs/hooks'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
   CheckLabwareStep,
-  CreateRunCommand,
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { chainRunCommands } from './utils/chainRunCommands'
+
 interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
-  createRunCommand: CreateRunCommand
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  setFatalError: (errorMessage: string) => void
   registerPosition: React.Dispatch<RegisterPositionAction>
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
@@ -50,15 +51,16 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     moduleId,
     location,
     protocolData,
-    createRunCommand,
+    chainRunCommands,
     registerPosition,
     workingOffsets,
     proceed,
     handleJog,
     isRobotMoving,
     existingOffsets,
+    setFatalError,
   } = props
-  const { t } = useTranslation('labware_position_check')
+  const { t } = useTranslation(['labware_position_check', 'shared'])
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipetteName =
     protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
@@ -79,6 +81,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   } else if (moduleId != null && moduleType === HEATERSHAKER_MODULE_TYPE) {
     modulePrepCommands = [
       {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: { moduleId },
+      },
+      {
         commandType: 'heaterShaker/deactivateShaker',
         params: { moduleId },
       },
@@ -88,9 +94,23 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       },
     ]
   }
+  const initialPosition = workingOffsets.find(
+    o =>
+      o.labwareId === labwareId &&
+      isEqual(o.location, location) &&
+      o.initialPosition != null
+  )?.initialPosition
 
   React.useEffect(() => {
-    chainRunCommands(modulePrepCommands, createRunCommand)
+    if (initialPosition == null && modulePrepCommands.length > 0) {
+      chainRunCommands(modulePrepCommands, false)
+        .then(() => {})
+        .catch((e: Error) => {
+          setFatalError(
+            `CheckItem module prep commands failed with message: ${e?.message}`
+          )
+        })
+    }
   }, [moduleId])
 
   if (pipetteName == null || labwareDef == null) return null
@@ -121,137 +141,157 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     />
   )
 
-  let confirmPlacementCommands: CreateCommand[] = [
-    {
-      commandType: 'moveLabware' as const,
-      params: {
-        labwareId: labwareId,
-        newLocation:
-          moduleId != null ? { moduleId } : { slotName: location.slotName },
-        strategy: 'manualMoveWithoutPause',
-      },
-    },
-    {
-      commandType: 'moveToWell' as const,
-      params: {
-        pipetteId: pipetteId,
-        labwareId: labwareId,
-        wellName: 'A1',
-        wellLocation: { origin: 'top' as const },
-      },
-    },
-  ]
-
-  if (moduleId != null && moduleType != null) {
-    confirmPlacementCommands =
-      moduleType === HEATERSHAKER_MODULE_TYPE
-        ? [
-            confirmPlacementCommands[0],
-            {
-              commandType: 'heaterShaker/closeLabwareLatch',
-              params: { moduleId },
-            },
-            confirmPlacementCommands[1],
-          ]
-        : confirmPlacementCommands
-  }
-
   const handleConfirmPlacement = (): void => {
-    chainRunCommands(confirmPlacementCommands, createRunCommand, () => {
-      createRunCommand(
+    chainRunCommands(
+      [
         {
-          command: { commandType: 'savePosition', params: { pipetteId } },
-          waitUntilComplete: true,
-        },
-        {
-          onSuccess: response => {
-            const { position } = response.data.result
-            registerPosition({
-              type: 'initialPosition',
-              labwareId,
-              location,
-              position,
-            })
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: labwareId,
+            newLocation:
+              moduleId != null ? { moduleId } : { slotName: location.slotName },
+            strategy: 'manualMoveWithoutPause',
           },
+        },
+        ...protocolData.modules.reduce<CreateCommand[]>((acc, mod) => {
+          if (getModuleType(mod.model) === HEATERSHAKER_MODULE_TYPE) {
+            return [
+              ...acc,
+              {
+                commandType: 'heaterShaker/closeLabwareLatch',
+                params: { moduleId: mod.id },
+              },
+            ]
+          }
+          return acc
+        }, []),
+        {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          },
+        },
+        { commandType: 'savePosition', params: { pipetteId } },
+      ],
+      false
+    )
+      .then(responses => {
+        const finalResponse = responses[responses.length - 1]
+        if (finalResponse.data.commandType === 'savePosition') {
+          const { position } = finalResponse.data.result
+          registerPosition({
+            type: 'initialPosition',
+            labwareId,
+            location,
+            position,
+          })
+        } else {
+          setFatalError(
+            `CheckItem failed to save position for initial placement.`
+          )
         }
-      )
-    })
+      })
+      .catch((e: Error) => {
+        setFatalError(
+          `CheckItem failed to save position for initial placement with message: ${e.message}`
+        )
+      })
   }
 
   const handleConfirmPosition = (): void => {
-    createRunCommand(
+    let confirmPositionCommands: CreateCommand[] = [
       {
-        command: { commandType: 'savePosition', params: { pipetteId } },
-        waitUntilComplete: true,
+        commandType: 'moveToWell' as const,
+        params: {
+          pipetteId: pipetteId,
+          labwareId: FIXED_TRASH_ID,
+          wellName: 'A1',
+          wellLocation: { origin: 'top' as const },
+        },
       },
       {
-        onSuccess: response => {
-          const { position } = response.data.result
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId: labwareId,
+          newLocation: 'offDeck',
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+    if (
+      moduleId != null &&
+      moduleType != null &&
+      moduleType === HEATERSHAKER_MODULE_TYPE
+    ) {
+      confirmPositionCommands = [
+        confirmPositionCommands[0],
+        {
+          commandType: 'heaterShaker/openLabwareLatch',
+          params: { moduleId },
+        },
+        confirmPositionCommands[1],
+      ]
+    }
+    chainRunCommands(
+      [
+        { commandType: 'savePosition', params: { pipetteId } },
+        ...confirmPositionCommands,
+      ],
+      false
+    )
+      .then(responses => {
+        const firstResponse = responses[0]
+        if (firstResponse.data.commandType === 'savePosition') {
+          const { position } = firstResponse.data.result
           registerPosition({
             type: 'finalPosition',
             labwareId,
             location,
             position,
           })
-          let confirmPositionCommands: CreateCommand[] = [
-            {
-              commandType: 'moveToWell' as const,
-              params: {
-                pipetteId: pipetteId,
-                labwareId: FIXED_TRASH_ID,
-                wellName: 'A1',
-                wellLocation: { origin: 'top' as const },
-              },
-            },
-            {
-              commandType: 'moveLabware' as const,
-              params: {
-                labwareId: labwareId,
-                newLocation: 'offDeck',
-                strategy: 'manualMoveWithoutPause',
-              },
-            },
-          ]
-          if (
-            moduleId != null &&
-            moduleType != null &&
-            moduleType === HEATERSHAKER_MODULE_TYPE
-          ) {
-            confirmPositionCommands = [
-              confirmPositionCommands[0],
-              {
-                commandType: 'heaterShaker/openLabwareLatch',
-                params: { moduleId },
-              },
-              confirmPositionCommands[1],
-            ]
-          }
-          chainRunCommands(confirmPositionCommands, createRunCommand, proceed)
-        },
-      }
-    )
+          proceed()
+        } else {
+          setFatalError('CheckItem failed to save final position with message')
+        }
+      })
+      .catch((e: Error) => {
+        setFatalError(
+          `CheckItem failed to move from final position with message: ${e.message}`
+        )
+      })
   }
   const handleGoBack = (): void => {
     chainRunCommands(
-      [...modulePrepCommands, { commandType: 'home', params: {} }],
-      createRunCommand,
-      () => {
+      [
+        ...modulePrepCommands,
+        { commandType: 'home', params: {} },
+        {
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: labwareId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+      ],
+      false
+    )
+      .then(() => {
         registerPosition({
           type: 'initialPosition',
           labwareId,
           location,
           position: null,
         })
-      }
-    )
+      })
+      .catch((e: Error) => {
+        setFatalError(`CheckItem failed to home: ${e.message}`)
+      })
   }
 
-  const initialPosition = workingOffsets.find(
-    o =>
-      o.labwareId === labwareId &&
-      isEqual(o.location, location) &&
-      o.initialPosition != null
-  )?.initialPosition
   const existingOffset =
     getCurrentOffsetForLabwareInLocation(
       existingOffsets,
@@ -259,7 +299,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       location
     )?.vector ?? IDENTITY_VECTOR
 
-  if (isRobotMoving) return <RobotMotionLoader />
+  if (isRobotMoving)
+    return (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
   return (
     <Flex flexDirection={DIRECTION_COLUMN} minHeight="25rem">
       {initialPosition != null ? (

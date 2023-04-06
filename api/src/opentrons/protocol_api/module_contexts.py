@@ -124,14 +124,10 @@ class ModuleContext(CommandPublisher):
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
-        :param name: The name of the labware object.
-        :param str label: An optional display name to give the labware.
-                          If specified, this is the name the labware will use
-                          in the run log and the calibration view in the Opentrons App.
-        :param str namespace: The namespace the labware definition belongs to.
-                              If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition.
-                            If unspecified, will use version 1.
+        The parameters of this function behave like those of
+        :py:obj:`ProtocolContext.load_labware` (which loads labware directly
+        onto the deck). Note that the parameter ``name`` here corresponds to
+        ``load_name`` on the ``ProtocolContext`` function.
 
         :returns: The initialized and loaded labware object.
 
@@ -345,12 +341,14 @@ class MagneticModuleContext(ModuleContext):
         .. deprecated:: 2.14
             This method is unnecessary; remove any usage.
         """
-        _log.warning(
-            "`MagneticModuleContext.calibrate` doesn't do anything useful"
-            " and will no-op in Protocol API version 2.14 and higher."
-        )
         if self._api_version < ENGINE_CORE_API_VERSION:
+            _log.warning(
+                "`MagneticModuleContext.calibrate` doesn't do anything useful"
+                " and will be removed in Protocol API version 2.14 and higher."
+            )
             self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
+        else:
+            raise APIVersionError("`MagneticModuleContext.calibrate` has been removed.")
 
     @publish(command=cmds.magdeck_engage)
     @requires_version(2, 0)

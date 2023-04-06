@@ -10,12 +10,16 @@ from anyio import Path as AsyncPath
 from fastapi import Depends
 from sqlalchemy.engine import Engine as SQLEngine
 
-from opentrons.protocol_reader import ProtocolReader
+from opentrons.protocol_reader import ProtocolReader, FileReaderWriter, FileHasher
 from opentrons.protocol_runner import create_simulating_runner
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.hardware import get_robot_type
 from robot_server.persistence import get_sql_engine, get_persistence_directory
@@ -45,6 +49,16 @@ _protocol_directory_accessor = AppStateAccessor[Path]("protocol_directory")
 def get_protocol_reader() -> ProtocolReader:
     """Get a ProtocolReader to read and save uploaded protocol files."""
     return ProtocolReader()
+
+
+def get_file_reader_writer() -> FileReaderWriter:
+    """Get a FileReaderWriter to read file streams into memory and write file streams to disk."""
+    return FileReaderWriter()
+
+
+def get_file_hasher() -> FileHasher:
+    """Get a FileHasher to hash a file and see if it already exists on the server."""
+    return FileHasher()
 
 
 async def get_protocol_directory(

@@ -3,7 +3,7 @@ import argparse
 import asyncio
 from pathlib import Path
 
-from hardware_testing.data import ui
+from hardware_testing.data import ui, get_git_description
 from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
 
@@ -23,13 +23,13 @@ async def _main(cfg: TestConfig) -> None:
     else:
         robot_id = "ot3-simulated-A01"
         operator = "simulation"
-    software_version = "unknown"  # FIXME: figure out what this should be
     report.set_tag(robot_id)
     report.set_operator(operator)
-    report.set_version(software_version)
+    report.set_version(get_git_description())
 
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
+        use_defaults=True,  # includes default XY calibration matrix
         is_simulating=cfg.simulate,
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",

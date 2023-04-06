@@ -9,9 +9,9 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import screenImage from '../../assets/images/odd/odd_abstract@x2.png'
 

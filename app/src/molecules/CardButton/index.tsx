@@ -10,6 +10,7 @@ import {
   TYPOGRAPHY,
   Icon,
   Btn,
+  BORDERS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
@@ -48,7 +49,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       width={cardWidth}
       height={cardHeight}
       backgroundColor={COLORS.medBlue}
-      borderRadius="16px"
+      borderRadius={BORDERS.size_four}
     >
       <Icon
         name={iconName}

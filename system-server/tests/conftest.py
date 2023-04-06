@@ -36,7 +36,7 @@ def sql_engine(tmpdir: Path) -> Generator[SQLEngine, None, None]:
     sql_engine.dispose()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def run_server() -> Generator[DevServer, None, None]:
     """Run the system server as a subprocess."""
     server = DevServer()

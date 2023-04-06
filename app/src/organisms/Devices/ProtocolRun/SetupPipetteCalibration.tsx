@@ -32,7 +32,7 @@ export function SetupPipetteCalibration({
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
 
-  usePipettesQuery({ refetchInterval: PIPETTE_POLL_FETCH_MS })
+  usePipettesQuery({}, { refetchInterval: PIPETTE_POLL_FETCH_MS })
   useAllPipetteOffsetCalibrationsQuery({
     refetchInterval: PIPETTE_POLL_FETCH_MS,
   })

@@ -62,5 +62,9 @@
   "reverse": "Reverse alphabetical",
   "next": "Next",
   "something_went_wrong": "something went wrong",
-  "return": "return"
+  "return": "return",
+  "update": "Update",
+  "on": "On",
+  "off": "Off",
+  "help_us_improve_send_error_report": "Help us improve your experience by sending an error report to {{support_email}}"
 }

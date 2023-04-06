@@ -38,7 +38,6 @@
   "plug_in_required_module": "Plug in and power up the required module to continue",
   "plug_in_required_module_plural": "Plug in and power up the required modules to continue",
   "proceed_to_labware_setup_step": "Proceed to labware setup",
-  "proceed_to_labware_setup_prep": "Proceed to labware prep",
   "proceed_to_module_setup_step": "Proceed to module setup",
   "proceed_to_liquid_setup_step": "Proceed to liquid setup",
   "attach_pipette_cta": "Attach Pipette",
@@ -123,6 +122,7 @@
   "on-deck_labware": "{{count}} on-deck labware",
   "optional": "optional",
   "prepare_to_run": "Prepare to Run",
+  "quantity": "Quantity",
   "run": "Run",
   "status": "Status",
   "tip_length_calibration": "tip length calibration",
@@ -161,5 +161,10 @@
   "view_current_offsets": "View current offsets",
   "view_module_setup_instructions": "View module setup instructions",
   "deck_map": "Deck Map",
-  "setup_instructions": "Setup Instructions"
+  "setup_instructions": "Setup Instructions",
+  "labware_latch_instructions": "To add labware to the Heater-Shaker Module, use the labware latch in the controls to the right.",
+  "liquids_not_in_setup": "Liquids not in setup",
+  "initial_liquids_num": "{{num}} initial liquids",
+  "opening": "Opening...",
+  "closing": "Closing..."
 }

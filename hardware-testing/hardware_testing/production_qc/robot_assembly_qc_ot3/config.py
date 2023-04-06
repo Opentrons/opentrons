@@ -11,6 +11,7 @@ from . import (
     test_instruments,
     test_connectivity,
     test_peripherals,
+    test_alignment,
 )
 
 
@@ -22,6 +23,7 @@ class TestSection(enum.Enum):
     INSTRUMENTS = "INSTRUMENTS"
     CONNECTIVITY = "CONNECTIVITY"
     PERIPHERALS = "PERIPHERALS"
+    ALIGNMENT = "ALIGNMENT"
 
 
 @dataclass
@@ -53,13 +55,17 @@ TESTS = [
         TestSection.PERIPHERALS,
         test_peripherals.run,
     ),
+    (
+        TestSection.ALIGNMENT,
+        test_alignment.run,
+    ),
 ]
 
 
-def build_report(script_path: str) -> CSVReport:
+def build_report(test_name: str) -> CSVReport:
     """Build report."""
     return CSVReport(
-        script_path=script_path,
+        test_name=test_name,
         sections=[
             CSVSection(
                 title=TestSection.GANTRY.value, lines=test_gantry.build_csv_lines()
@@ -78,6 +84,10 @@ def build_report(script_path: str) -> CSVReport:
             CSVSection(
                 title=TestSection.PERIPHERALS.value,
                 lines=test_peripherals.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.ALIGNMENT.value,
+                lines=test_alignment.build_csv_lines(),
             ),
         ],
     )

@@ -47,10 +47,6 @@ class CommandDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a command that does not exist."""
 
 
-class PipetteTipInfoNotFoundError(ProtocolEngineError):
-    """Raised when fetching information (like tiprack id) of attached tip."""
-
-
 class LabwareNotLoadedError(ProtocolEngineError):
     """Raised when referencing a labware that has not been loaded."""
 
@@ -97,6 +93,9 @@ class PipetteNotLoadedError(ProtocolEngineError):
 
 class ModuleNotLoadedError(ProtocolEngineError):
     """Raised when referencing a module that has not been loaded."""
+
+    def __init__(self, *, module_id: str) -> None:
+        super().__init__(f"Module {module_id} not found.")
 
 
 class ModuleNotOnDeckError(ProtocolEngineError):
@@ -211,3 +210,7 @@ class FirmwareUpdateRequired(ProtocolEngineError):
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):
     """Raised when the pipette is not ready to aspirate."""
+
+
+class InvalidPipettingVolumeError(ProtocolEngineError):
+    """Raised when pipetting a volume larger than the pipette volume."""

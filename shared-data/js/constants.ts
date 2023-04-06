@@ -39,6 +39,8 @@ export const THERMOCYCLER_MODULE_V2: 'thermocyclerModuleV2' =
 export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
   'heaterShakerModuleV1'
 
+export const GRIPPER_V1: 'gripperV1' = 'gripperV1'
+
 // pipette display categories
 export const GEN3: 'GEN3' = 'GEN3'
 export const GEN2: 'GEN2' = 'GEN2'
@@ -145,3 +147,6 @@ export const TC_MODULE_LOCATION_OT2: '7,8,10,11' = '7,8,10,11'
 export const TC_MODULE_LOCATION_OT3: '7+10' = '7+10'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
+
+// ODD
+export const ODD_MEDIA_QUERY_SPECS: '(pointer: coarse)' = '(pointer: coarse)'

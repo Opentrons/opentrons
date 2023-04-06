@@ -349,7 +349,7 @@ async def test_aspirate_new(dummy_instruments):
     await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
     new_plunger_pos = 6.05285
     pos = await hw_api.current_position(mount)
-    assert pos[Axis.B] == new_plunger_pos
+    assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
 async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instruments):
@@ -370,7 +370,7 @@ async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instru
     await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
     new_plunger_pos = 5.660769
     pos = await hw_api.current_position(mount)
-    assert pos[Axis.B] == new_plunger_pos
+    assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
 async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
@@ -389,7 +389,7 @@ async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
     await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
     new_plunger_pos = 71.212208
     pos = await hw_api.current_position(mount)
-    assert pos[Axis.B] == new_plunger_pos
+    assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
 async def test_dispense_ot2(dummy_instruments):

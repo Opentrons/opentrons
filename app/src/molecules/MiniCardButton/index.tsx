@@ -8,6 +8,7 @@ import {
   Icon,
   DIRECTION_COLUMN,
   ALIGN_FLEX_START,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -37,7 +38,7 @@ export function MiniCardButton({
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_FLEX_START}
       padding={SPACING.spacing5}
-      borderRadius="12px"
+      borderRadius={BORDERS.size_three}
       onClick={() => history.push(`${destinationPath}`)}
       backgroundColor={COLORS.lightGreyPressed}
       width={width}

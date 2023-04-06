@@ -130,7 +130,7 @@ async def post_home_robot(
 async def get_robot_light_state(
     hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> control.RobotLightState:
-    light_state = hardware.get_lights()
+    light_state = await hardware.get_lights()
     return control.RobotLightState(on=light_state.get("rails", False))
 
 

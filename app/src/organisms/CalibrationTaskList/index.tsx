@@ -11,15 +11,20 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 
-import { PrimaryButton } from '../../atoms/buttons'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { TaskList } from '../TaskList'
 
-import { useCalibrationTaskList } from '../Devices/hooks'
+import {
+  useAttachedPipettes,
+  useCalibrationTaskList,
+  useRunHasStarted,
+} from '../Devices/hooks'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 
 import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
 import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
@@ -39,6 +44,9 @@ export function CalibrationTaskList({
   deckCalLauncher,
 }: CalibrationTaskListProps): JSX.Element {
   const prevActiveIndex = React.useRef<[number, number] | null>(null)
+  const [hasLaunchedWizard, setHasLaunchedWizard] = React.useState<boolean>(
+    false
+  )
   const [
     showCompletionScreen,
     setShowCompletionScreen,
@@ -46,18 +54,37 @@ export function CalibrationTaskList({
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
   const history = useHistory()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(
-    robotName,
     pipOffsetCalLauncher,
     tipLengthCalLauncher,
     deckCalLauncher
   )
+  const runId = useCurrentRunId()
+
+  let generalTaskDisabledReason = null
+
+  const attachedPipettes = useAttachedPipettes()
+  if (attachedPipettes.left == null && attachedPipettes.right == null) {
+    generalTaskDisabledReason = t(
+      'device_settings:attach_a_pipette_before_calibrating'
+    )
+  }
+
+  const runHasStarted = useRunHasStarted(runId)
+  if (runHasStarted)
+    generalTaskDisabledReason = t(
+      'device_settings:some_robot_controls_are_not_available'
+    )
 
   React.useEffect(() => {
-    if (prevActiveIndex.current !== null && activeIndex === null) {
+    if (
+      prevActiveIndex.current !== null &&
+      activeIndex === null &&
+      hasLaunchedWizard
+    ) {
       setShowCompletionScreen(true)
     }
     prevActiveIndex.current = activeIndex
-  }, [activeIndex])
+  }, [activeIndex, hasLaunchedWizard])
 
   // start off assuming we are missing calibrations
   let statusLabelBackgroundColor = COLORS.errorEnabled
@@ -138,6 +165,8 @@ export function CalibrationTaskList({
             activeIndex={activeIndex}
             taskList={taskList}
             taskListStatus={taskListStatus}
+            generalTaskClickHandler={() => setHasLaunchedWizard(true)}
+            generalTaskDisabledReason={generalTaskDisabledReason}
           />
         </>
       )}

@@ -19,7 +19,7 @@
     "run": 1.0
   },
   "plungerPositionsConfigurations": {
-    "top": 0.5,
+    "top": 0.0,
     "bottom": 71.5,
     "blowout": 76.5,
     "drop": 90.5

@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
-from opentrons.types import MountType
+from opentrons.types import MountType, Point
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -17,6 +17,9 @@ if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
     from ...state import StateView
 
+
+# These offsets are based on testing attach flows with 8/1 channel pipettes
+_INSTRUMENT_ATTACH_OFFSET = Point(y=10, z=400)
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
@@ -58,12 +61,8 @@ class MoveToMaintenancePositionImplementation(
 
         await self._hardware_api.home()
 
-        mount_current_position = await self._hardware_api.gantry_position(
-            hardware_mount
-        )
-
         calibration_coordinates = self._state_view.labware.get_calibration_coordinates(
-            current_z_position=mount_current_position.z
+            offset=_INSTRUMENT_ATTACH_OFFSET
         )
 
         await self._hardware_api.move_to(

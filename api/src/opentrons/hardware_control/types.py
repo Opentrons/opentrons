@@ -238,6 +238,22 @@ class OT3Axis(enum.Enum):
             cls.G: OT3Mount.GRIPPER,
         }[inst]
 
+    @classmethod
+    def home_order(
+        cls,
+    ) -> Tuple[
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+    ]:
+        return (*cls.mount_axes(), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
+
     def __str__(self) -> str:
         return self.name
 
@@ -528,6 +544,28 @@ class PauseType(enum.Enum):
     DELAY = 1
 
 
+class StatusBarState(enum.Enum):
+    IDLE = 0
+    RUNNING = 1
+    PAUSED = 2
+    HARDWARE_ERROR = 3
+    SOFTWARE_ERROR = 4
+    CONFIRMATION = 5
+    RUN_COMPLETED = 6
+    UPDATING = 7
+    ACTIVATION = 8
+    DISCO = 9
+    OFF = 10
+
+    def transient(self) -> bool:
+        return self.value in {
+            StatusBarState.CONFIRMATION.value,
+            StatusBarState.RUN_COMPLETED.value,
+            StatusBarState.ACTIVATION.value,
+            StatusBarState.DISCO.value,
+        }
+
+
 @dataclass
 class AionotifyEvent:
     flags: enum.EnumMeta
@@ -571,9 +609,9 @@ class GripperProbe(enum.Enum):
     @classmethod
     def to_type(cls, gp: "GripperProbe") -> InstrumentProbeType:
         if gp == cls.FRONT:
-            return InstrumentProbeType.PRIMARY
-        else:
             return InstrumentProbeType.SECONDARY
+        else:
+            return InstrumentProbeType.PRIMARY
 
 
 class EarlyLiquidSenseTrigger(RuntimeError):

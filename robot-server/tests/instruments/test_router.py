@@ -94,38 +94,47 @@ async def test_get_all_attached_instruments(
     ot3_hardware_api: OT3API,
 ) -> None:
     """It should get data of all attached instruments."""
-    decoy.when(ot3_hardware_api.attached_gripper).then_return(
-        {
-            "model": GripperModel.v1,
-            "gripper_id": "GripperID321",
-            "display_name": "my-special-gripper",
-            "state": GripperJawState.UNHOMED,
-            "calibration_offset": GripperCalibrationOffset(
-                offset=Point(x=1, y=2, z=3),
-                source=SourceType.default,
-                status=CalibrationStatus(markedBad=False),
-                last_modified=None,
-            ),
-            "fw_update_required": False,
-            "fw_current_version": 1,
-            "fw_next_version": None,
-        }
-    )
-    decoy.when(ot3_hardware_api.attached_pipettes).then_return(
-        {
-            Mount.LEFT: get_sample_pipette_dict(
-                name="p10_multi",
-                model=PipetteModel("abc"),
-                pipette_id="my-pipette-id",
-            ),
-            Mount.RIGHT: get_sample_pipette_dict(
-                name="p20_multi_gen2",
-                model=PipetteModel("xyz"),
-                pipette_id="my-other-pipette-id",
-            ),
-        }
+
+    def rehearse_instrument_retrievals() -> None:
+        decoy.when(ot3_hardware_api.attached_gripper).then_return(
+            {
+                "model": GripperModel.v1,
+                "gripper_id": "GripperID321",
+                "display_name": "my-special-gripper",
+                "state": GripperJawState.UNHOMED,
+                "calibration_offset": GripperCalibrationOffset(
+                    offset=Point(x=1, y=2, z=3),
+                    source=SourceType.default,
+                    status=CalibrationStatus(markedBad=False),
+                    last_modified=None,
+                ),
+                "fw_update_required": False,
+                "fw_current_version": 1,
+                "fw_next_version": None,
+            }
+        )
+        decoy.when(ot3_hardware_api.attached_pipettes).then_return(
+            {
+                Mount.LEFT: get_sample_pipette_dict(
+                    name="p10_multi",
+                    model=PipetteModel("abc"),
+                    pipette_id="my-pipette-id",
+                ),
+                Mount.RIGHT: get_sample_pipette_dict(
+                    name="p20_multi_gen2",
+                    model=PipetteModel("xyz"),
+                    pipette_id="my-other-pipette-id",
+                ),
+            }
+        )
+
+    # We use this convoluted way of testing to verify the important point that
+    # cache_instruments is called before fetching attached pipette and gripper data.
+    decoy.when(await ot3_hardware_api.cache_instruments()).then_do(
+        rehearse_instrument_retrievals
     )
     result = await get_attached_instruments(hardware=ot3_hardware_api)
+
     assert result.content.data == [
         Pipette.construct(
             mount="left",
@@ -191,6 +200,7 @@ async def test_get_ot2_instruments(
         }
     )
     result2 = await get_attached_instruments(hardware=hardware_api)
+    decoy.verify(await hardware_api.cache_instruments(), times=0)
     assert result2.status_code == 200
     assert result2.content.data == [
         Pipette.construct(

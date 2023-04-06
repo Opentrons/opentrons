@@ -4,7 +4,7 @@ import asyncio
 import logging
 import json
 from logging.config import dictConfig
-from typing import Dict, Any, TextIO
+from typing import Dict, Any, TextIO, Optional
 from opentrons_hardware.drivers.binary_usb import (
     SerialUsbDriver,
     BinaryMessenger,
@@ -58,10 +58,14 @@ async def run(args: argparse.Namespace) -> None:
         ): filepath
         for target, filepath in update_dict.items()
     }
-
-    usb_driver: SerialUsbDriver = await (build_rear_panel_driver())
-    usb_messenger: BinaryMessenger = build_rear_panel_messenger(usb_driver)
-    usb_messenger.start()
+    usb_messenger: Optional[BinaryMessenger] = None
+    try:
+        usb_driver: SerialUsbDriver = await (build_rear_panel_driver())
+        usb_messenger = build_rear_panel_messenger(usb_driver)
+        usb_messenger.start()
+    except IOError as e:
+        if USBTarget.rear_panel in update_details.keys():
+            raise e
 
     async with build.can_messenger(build_settings(args)) as can_messenger:
         updater = RunUpdate(

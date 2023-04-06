@@ -219,10 +219,11 @@
   "robot_system_version": "Robot System Version",
   "network_settings": "Network Settings",
   "display_sleep_settings": "Display Sleep Settings",
+  "touchscreen_sleep": "Touchscreen Sleep",
   "display_brightness": "Display Brightness",
-  "display_text_size": "Display Text Size",
+  "touchscreen_brightness": "Touchscreen Brightness",
+  "text_size": "Text Size",
   "device_reset": "Device Reset",
-  "sleep_settings": "Sleep Settings",
   "sleep_settings_description": "Turn the display to sleep after:",
   "never": "Never",
   "minutes": "{{minute}} minutes",
@@ -231,5 +232,13 @@
   "clear_all_stored_data": "Clear all stored data",
   "returns_your_device_to_new_state": "This returns your device to a new state.",
   "not_connected": "Not connected",
-  "connected_via": "Connected via {{networkInterface}}"
+  "connected_via": "Connected via {{networkInterface}}",
+  "text_size_description": "Text on all screens will adjust to the size you choose below.",
+  "robot_system_version_available": "Robot System Version {{releaseVersion}} Available",
+  "updating_ot3": "Updating the OT-3 requires a restart",
+  "display_led_lights": "Display LED Lights",
+  "update_channel_description": "Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.",
+  "alpha_description": "Warning: alpha releases are feature-complete but may contain significant bugs.",
+  "dev_tools_description": "Enable additional logging and allow access to feature flags.",
+  "attach_a_pipette_before_calibrating": "Attach a pipette in order to perform calibration"
 }

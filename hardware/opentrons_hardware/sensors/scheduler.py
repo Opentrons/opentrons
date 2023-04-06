@@ -29,6 +29,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
     SensorThresholdResponse,
     ReadFromSensorResponse,
+    BaselineSensorResponse,
     PeripheralStatusResponse,
     BindSensorOutputRequest,
     ErrorMessage,
@@ -54,7 +55,7 @@ from opentrons_hardware.sensors.sensor_types import SensorInformation
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
     WriteSensorInformation,
-    PollSensorInformation,
+    BaselineSensorInformation,
     SensorThresholdInformation,
 )
 from opentrons_hardware.firmware_bindings.utils import (
@@ -68,8 +69,15 @@ ResponseType = TypeVar("ResponseType", bound=MessageDefinition)
 
 
 def _format_sensor_response(response: MessageDefinition) -> SensorDataType:
-    assert isinstance(response, ReadFromSensorResponse)
-    return SensorDataType.build(response.payload.sensor_data, response.payload.sensor)
+    if isinstance(response, BaselineSensorResponse):
+        return SensorDataType.build(
+            response.payload.offset_average, response.payload.sensor
+        )
+    else:
+        assert isinstance(response, ReadFromSensorResponse)
+        return SensorDataType.build(
+            response.payload.sensor_data, response.payload.sensor
+        )
 
 
 class SensorScheduler:
@@ -96,9 +104,9 @@ class SensorScheduler:
 
         return _filter
 
-    async def run_poll(
+    async def run_baseline(
         self,
-        sensor: PollSensorInformation,
+        sensor: BaselineSensorInformation,
         can_messenger: CanMessenger,
         timeout: int,
         expected_num_messages: int = 1,
@@ -107,7 +115,7 @@ class SensorScheduler:
         sensor_info = sensor.sensor
         with MultipleMessagesWaitableCallback(
             can_messenger,
-            self._create_filter(sensor_info.node_id, ReadFromSensorResponse.message_id),
+            self._create_filter(sensor_info.node_id, BaselineSensorResponse.message_id),
             number_of_messages=expected_num_messages,
         ) as reader:
             data_list: List[SensorDataType] = []
@@ -117,7 +125,7 @@ class SensorScheduler:
                     payload=BaselineSensorRequestPayload(
                         sensor=SensorTypeField(sensor_info.sensor_type),
                         sensor_id=SensorIdField(sensor_info.sensor_id),
-                        sample_rate=UInt16Field(sensor.poll_for),
+                        number_of_reads=UInt16Field(sensor.number_of_reads),
                     )
                 ),
             )

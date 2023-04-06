@@ -3,5 +3,6 @@ name: Common test information
 description: Variables and other info used across tests
 
 variables:
+  # These must match the session_server_host and session_server_port fixtures in conftest.py.
   host: http://localhost
   port: 31950

@@ -39,6 +39,8 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
   useConditionalConfirm,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
@@ -47,7 +49,6 @@ import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useTrackEvent } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
@@ -148,7 +149,7 @@ export function ProtocolRunHeader({
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   // NOTE: we are polling pipettes, though not using their value directly here
-  usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
+  usePipettesQuery({}, { refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
   React.useEffect(() => {
@@ -505,7 +506,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       trackProtocolRunEvent({ name: 'runPause' })
     }
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
-    buttonIconName = null
+    buttonIconName = 'ot-spinner'
     buttonText = t('canceling_run')
   } else if (runStatus != null && START_RUN_STATUSES.includes(runStatus)) {
     buttonIconName = 'play'
@@ -562,7 +563,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             name={buttonIconName}
             size={SIZE_1}
             marginRight={SPACING.spacing3}
-            spin={isProtocolAnalyzing}
+            spin={
+              isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
+            }
           />
         ) : null}
         <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>

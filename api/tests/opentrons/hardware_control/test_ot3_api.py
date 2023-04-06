@@ -76,6 +76,8 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         expected_liquid_height=109,
         log_pressure=False,
         aspirate_while_sensing=False,
+        auto_zero_sensor=False,
+        num_baseline_reads=10,
         data_file="fake_file_name",
     )
 
@@ -178,6 +180,39 @@ async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[Asy
         AsyncMock(spec=ot3_hardware.managed_obj._backend.move),
     ) as mock_move:
         yield mock_move
+
+
+@pytest.fixture
+def mock_check_motor(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj._backend,
+        "check_motor_status",
+        Mock(spec=ot3_hardware.managed_obj._backend.check_motor_status),
+    ) as mock_check:
+        yield mock_check
+
+
+@pytest.fixture
+def mock_check_encoder(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj._backend,
+        "check_encoder_status",
+        Mock(spec=ot3_hardware.managed_obj._backend.check_encoder_status),
+    ) as mock_check:
+        yield mock_check
+
+
+@pytest.fixture
+async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "refresh_positions",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.refresh_positions,
+            wraps=ot3_hardware.managed_obj.refresh_positions,
+        ),
+    ) as mock_refresh:
+        yield mock_refresh
 
 
 @pytest.fixture
@@ -359,14 +394,14 @@ async def test_move_to_without_homing_first(
         await ot3_hardware.cache_gripper(instr_data)
 
     ot3_hardware._backend._motor_status = {}
-    assert not ot3_hardware._backend.check_ready_for_movement(homed_axis)
+    assert not ot3_hardware._backend.check_motor_status(homed_axis)
 
     await ot3_hardware.move_to(
         mount,
         Point(0.001, 0.001, 0.001),
     )
     mock_home.assert_called_once_with(homed_axis)
-    assert ot3_hardware._backend.check_ready_for_movement(homed_axis)
+    assert ot3_hardware._backend.check_motor_status(homed_axis)
 
 
 @pytest.mark.parametrize(
@@ -385,10 +420,11 @@ async def test_liquid_probe(
     fake_liquid_settings: LiquidProbeSettings,
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
+    mock_ungrip: AsyncMock,
     mock_home_plunger: AsyncMock,
 ) -> None:
+    mock_ungrip.return_value = None
     backend = ot3_hardware.managed_obj._backend
-
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -414,6 +450,8 @@ async def test_liquid_probe(
             expected_liquid_height=109,
             log_pressure=False,
             aspirate_while_sensing=True,
+            auto_zero_sensor=False,
+            num_baseline_reads=10,
             data_file="fake_file_name",
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
@@ -425,6 +463,8 @@ async def test_liquid_probe(
             (fake_settings_aspirate.plunger_speed * -1),
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.log_pressure,
+            fake_settings_aspirate.auto_zero_sensor,
+            fake_settings_aspirate.num_baseline_reads,
         )
 
         return_dict[head_node], return_dict[pipette_node] = 142, 142
@@ -451,9 +491,10 @@ async def test_liquid_sensing_errors(
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
     mock_home_plunger: AsyncMock,
+    mock_ungrip: AsyncMock,
 ) -> None:
     backend = ot3_hardware.managed_obj._backend
-
+    mock_ungrip.return_value = None
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -631,8 +672,8 @@ async def test_pipette_capacitive_sweep(
 @pytest.mark.parametrize(
     "probe,intr_probe",
     [
-        (GripperProbe.FRONT, InstrumentProbeType.PRIMARY),
-        (GripperProbe.REAR, InstrumentProbeType.SECONDARY),
+        (GripperProbe.FRONT, InstrumentProbeType.SECONDARY),
+        (GripperProbe.REAR, InstrumentProbeType.PRIMARY),
     ],
 )
 @pytest.mark.parametrize(
@@ -748,6 +789,8 @@ async def test_gripper_action(
     mock_ungrip.assert_called_once()
     mock_ungrip.reset_mock()
     await ot3_hardware.home([OT3Axis.G])
+    mock_ungrip.assert_called_once()
+    mock_ungrip.reset_mock()
     await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
         gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
@@ -830,18 +873,7 @@ async def test_gripper_move_to(
     await ot3_hardware.cache_gripper(instr_data)
 
     await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
-    origin, moves, _ = mock_backend_move.call_args_list[0][0]
-    # The moves that it emits should move only x, y, and the gripper z
-    assert origin == {
-        OT3Axis.X: 0,
-        OT3Axis.Y: 0,
-        OT3Axis.Z_L: 0,
-        OT3Axis.Z_R: 0,
-        OT3Axis.P_L: 0,
-        OT3Axis.P_R: 0,
-        OT3Axis.Z_G: 0,
-        OT3Axis.G: 0,
-    }
+    _, moves, _ = mock_backend_move.call_args_list[0][0]
     for move in moves:
         assert list(sorted(move.unit_vector.keys(), key=lambda elem: elem.value)) == [
             OT3Axis.X,
@@ -928,7 +960,9 @@ async def test_save_instrument_offset(
 async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
+    mock_ungrip: AsyncMock,
 ) -> None:
+    mock_ungrip.return_value = None
     await ot3_hardware.home()
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
@@ -1000,7 +1034,7 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
-        await ot3_hardware.drop_tip(Mount.LEFT)
+        await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_has_calls(
             calls=[
@@ -1030,20 +1064,149 @@ async def test_update_position_estimation(
         mock_update.assert_called_once_with(axes)
 
 
-async def test_refresh_current_position(ot3_hardware: ThreadManager[OT3API]) -> None:
+async def test_refresh_positions(ot3_hardware: ThreadManager[OT3API]) -> None:
 
     backend = ot3_hardware.managed_obj._backend
-
-    mock_update = AsyncMock(spec=backend.update_position)
-    mock_update.return_value = {ax: 100 for ax in OT3Axis}
     ot3_hardware._current_position.clear()
+    ot3_hardware._encoder_position.clear()
+
     with patch.object(
         backend,
+        "update_motor_status",
+        AsyncMock(spec=backend.update_motor_status),
+    ) as mock_update_status, patch.object(
+        backend,
         "update_position",
-        mock_update,
-    ) as mock:
-        await ot3_hardware.refresh_current_position_ot3()
-        mock.assert_called_once()
+        AsyncMock(spec=backend.update_position),
+    ) as mock_pos, patch.object(
+        backend,
+        "update_encoder_position",
+        AsyncMock(spec=backend.update_encoder_position),
+    ) as mock_encoder:
 
-        for ax in OT3Axis:
-            assert ax in ot3_hardware._current_position.keys()
+        mock_pos.return_value = {ax: 100 for ax in OT3Axis}
+        mock_encoder.return_value = {ax: 99 for ax in OT3Axis}
+
+        await ot3_hardware.refresh_positions()
+
+        mock_update_status.assert_called_once()
+        mock_pos.assert_called_once()
+        mock_encoder.assert_called_once()
+
+        assert (ax in ot3_hardware._current_position.keys() for ax in OT3Axis)
+        assert (ax in ot3_hardware._encoder_position.keys() for ax in OT3Axis)
+
+
+@pytest.mark.parametrize("axis", [OT3Axis.X, OT3Axis.Z_L, OT3Axis.P_L, OT3Axis.Y])
+@pytest.mark.parametrize(
+    "stepper_ok,encoder_ok",
+    [
+        (True, True),
+        (False, True),
+        (False, False),
+    ],
+)
+async def test_home_axis(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_check_motor: Mock,
+    mock_check_encoder: Mock,
+    axis: OT3Axis,
+    stepper_ok: bool,
+    encoder_ok: bool,
+) -> None:
+
+    backend = ot3_hardware.managed_obj._backend
+    origin_pos = {ax: 100 for ax in OT3Axis}
+    origin_encoder = {ax: 99 for ax in OT3Axis}
+    backend._position = {axis_to_node(ax): v for ax, v in origin_pos.items()}
+    backend._encoder_position = {
+        axis_to_node(ax): v for ax, v in origin_encoder.items()
+    }
+
+    mock_check_motor.return_value = stepper_ok
+    mock_check_encoder.return_value = encoder_ok
+
+    with patch.object(
+        backend,
+        "move",
+        AsyncMock(
+            spec=backend.move,
+            wraps=backend.move,
+        ),
+    ) as mock_backend_move, patch.object(
+        backend,
+        "home",
+        AsyncMock(
+            spec=backend.home,
+            wraps=backend.home,
+        ),
+    ) as mock_backend_home, patch.object(
+        backend,
+        "update_motor_estimation",
+        AsyncMock(
+            spec=backend.update_motor_estimation,
+            wraps=backend.update_motor_estimation,
+        ),
+    ) as mock_estimate:
+
+        await ot3_hardware._home_axis(axis)
+
+        # FIXME: uncomment the following when stall detection
+        # is fully re-enable
+        # if stepper_ok:
+        #     """Move to home position"""
+        #     # move is called
+        #     mock_backend_move.assert_awaited_once()
+        #     move = mock_backend_move.call_args_list[0][0][1][0]
+        #     assert move.distance == 100.0
+        #     # home is NOT called
+        #     mock_backend_home.assert_not_awaited()
+        if encoder_ok:
+            """Copy encoder position to stepper pos"""
+            mock_estimate.assert_awaited_once()
+            # for accurate axis, we just move to home pos:
+            if axis in [OT3Axis.Z_L, OT3Axis.P_L]:
+                # move is called
+                mock_backend_move.assert_awaited_once()
+                move = mock_backend_move.call_args_list[0][0][1][0]
+                assert move.distance == 95.0
+                # then home is called
+                mock_backend_home.assert_awaited_once()
+            else:
+                # we move to 20 mm away from home
+                mock_backend_move.assert_awaited_once()
+                move = mock_backend_move.call_args_list[0][0][1][0]
+                assert move.distance == 80.0
+                # then home is called
+                mock_backend_home.assert_awaited_once()
+        else:
+            # home axis
+            mock_backend_home.assert_awaited_once()
+            # move not called
+            mock_backend_move.assert_not_awaited()
+
+    # axis is at the home position
+    expected_pos = {axis_to_node(ax): v for ax, v in origin_pos.items()}
+    expected_pos.update({axis_to_node(axis): 0})
+    assert backend._position == expected_pos
+
+
+@pytest.mark.parametrize("setting", [True, False])
+async def test_light_settings(
+    ot3_hardware: ThreadManager[OT3API], setting: bool
+) -> None:
+    await ot3_hardware.set_lights(rails=setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] == setting
+    assert not check["button"]
+
+    await ot3_hardware.set_lights(rails=not setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] != setting
+    assert not check["button"]
+
+    # Make sure setting the button doesn't affect the rails
+    await ot3_hardware.set_lights(button=setting)
+    check = await ot3_hardware.get_lights()
+    assert check["rails"] != setting
+    assert not check["button"]

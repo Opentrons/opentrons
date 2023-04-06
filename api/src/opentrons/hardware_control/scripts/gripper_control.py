@@ -104,7 +104,7 @@ def print_current_state(
     pos = api.sync.current_position_ot3(OT3Mount.GRIPPER)
     gripper_loc = (pos[OT3Axis.X], pos[OT3Axis.Y], pos[OT3Axis.Z_G])
 
-    enc_pos = api.sync._encoder_current_position
+    enc_pos = api.sync._encoder_position
     enc_loc = (enc_pos[OT3Axis.X], enc_pos[OT3Axis.Y], enc_pos[OT3Axis.G])
     print(
         f"{datetime.datetime.now()}, {cycle_index}, {slot}, "

@@ -19,7 +19,7 @@ describe('ReturnTip', () => {
 
   const getContinueButton = (
     wrapper: ReactWrapper<React.ComponentProps<typeof ReturnTip>>
-  ) => wrapper.find('button[title="confirmReturnTip"]')
+  ) => wrapper.find('button[aria-label="return tip"]')
 
   beforeEach(() => {
     mockSendCommands = jest.fn()

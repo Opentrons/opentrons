@@ -5,7 +5,7 @@ import Renderer from 'react-test-renderer'
 import {
   Button,
   FlatButton,
-  PrimaryButton,
+  DeprecatedPrimaryButton,
   OutlineButton,
   IconButton,
 } from '..'
@@ -70,26 +70,26 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('PrimaryButton renders correctly', () => {
+  it('DeprecatedPrimaryButton renders correctly', () => {
     const tree = Renderer.create(
-      <PrimaryButton onClick={onClick} title="t" className="c">
+      <DeprecatedPrimaryButton onClick={onClick} title="t" className="c">
         children
-      </PrimaryButton>
+      </DeprecatedPrimaryButton>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
-  it('PrimaryButton with iconName renders correctly', () => {
+  it('DeprecatedPrimaryButton with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <PrimaryButton
+      <DeprecatedPrimaryButton
         onClick={onClick}
         title="t"
         className="c"
         iconName="flask-outline"
       >
         children
-      </PrimaryButton>
+      </DeprecatedPrimaryButton>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

@@ -9,11 +9,11 @@ import {
   Link,
   TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
-import { PrimaryButton } from '../../atoms/buttons'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
