@@ -1,40 +1,48 @@
-"""Robot assembly QC OT3."""
+"""Gripper assembly QC OT3."""
 import argparse
 import asyncio
 from pathlib import Path
 
-from hardware_testing.data import ui, get_git_description
+from hardware_testing.data import ui
 from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
+from hardware_testing.opentrons_api.types import OT3Mount
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
 
 async def _main(cfg: TestConfig) -> None:
-    # BUILD REPORT
-    test_name = Path(__file__).parent.name
-    report = build_report(test_name)
-    ui.print_title(test_name.replace("_", " ").upper())
-
-    # GET INFO
-    if not cfg.simulate:
-        robot_id = input("enter robot serial number: ")
-        operator = input("enter operator name: ")
-    else:
-        robot_id = "ot3-simulated-A01"
-        operator = "simulation"
-    report.set_tag(robot_id)
-    report.set_operator(operator)
-    report.set_version(get_git_description())
-
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
-        use_defaults=True,  # includes default XY calibration matrix
         is_simulating=cfg.simulate,
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",
-        gripper="GRPV102",
+        gripper="GRPV1120230323A01",
     )
+    await api.home()
+    home_pos = await api.gantry_position(OT3Mount.GRIPPER)
+    if not api.has_gripper():
+        attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(1)
+        attach_pos = attach_pos._replace(z=home_pos.z)
+        await helpers_ot3.move_to_arched_ot3(api, OT3Mount.GRIPPER, attach_pos)
+        while not api.has_gripper():
+            ui.get_user_ready("attach a gripper")
+            await api.reset()
+
+    gripper = api.attached_gripper
+    assert gripper
+    gripper_id = str(gripper["gripper_id"])
+
+    # BUILD REPORT
+    test_name = Path(__file__).parent.name
+    ui.print_title(test_name.replace("_", " ").upper())
+    report = build_report(test_name.replace("_", "-"))
+    report.set_tag(gripper_id)
+    if not cfg.simulate:
+        report.set_operator(input("enter operator name: "))
+    else:
+        report.set_operator("simulation")
+    report.set_version("unknown")  # FIXME: figure out what this should be
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
