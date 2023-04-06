@@ -13,9 +13,9 @@ import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import attachProbe from '../../assets/images/change-pip/attach-stem.png'
 import pipetteCalibrating from '../../assets/images/change-pip/pipette-is-calibrating.png'
-import { BODY_STYLE } from './constants'
+import { BODY_STYLE, SECTIONS } from './constants'
+import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
@@ -45,8 +45,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setShowErrorMessage,
     isOnDevice,
     selectedPipette,
+    flowType,
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
+  const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
   const pipetteId = attachedPipettes[mount]?.id
   const displayName = attachedPipettes[mount]?.modelSpecs.displayName
   const is8Channel = attachedPipettes[mount]?.modelSpecs.channels === 8
@@ -69,6 +71,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: mount,
+            s,
           },
         },
       ],
@@ -115,8 +118,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   ) : (
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
-      //  TODO(Jr, 10/26/22): replace image with correct one!
-      rightHandBody={<img src={attachProbe} width="100%" alt="Attach probe" />}
+      rightHandBody={getPipetteAnimations({
+        pipetteWizardStep,
+        channel: is8Channel ? 8 : 1,
+      })}
       bodyText={
         is8Channel || selectedPipette === NINETY_SIX_CHANNEL ? (
           <Trans

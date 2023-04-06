@@ -8,11 +8,11 @@ import { Flex, JUSTIFY_CENTER, SPACING, SIZE_1 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import screwPattern from '../../assets/images/change-pip/screw-pattern.png'
 import attach96Pipette from '../../assets/images/change-pip/attach-96-pipette.png'
 import { Skeleton } from '../../atoms/Skeleton'
 import { CheckPipetteButton } from './CheckPipetteButton'
-import { BODY_STYLE } from './constants'
+import { BODY_STYLE, SECTIONS } from './constants'
+import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface MountPipetteProps extends PipetteWizardStepProps {
@@ -29,8 +29,11 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
     isFetching,
     setFetching,
     isOnDevice,
+    mount,
+    flowType,
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
+  const pipetteWizardStep = { mount, flowType, section: SECTIONS.MOUNT_PIPETTE }
   const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
   const bodyTextSkeleton = (
     <Skeleton
@@ -95,17 +98,17 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
           />
         ) : (
           <Flex justifyContent={JUSTIFY_CENTER}>
-            <img
-              //  TODO(jr, 11/18/22): attach real image
-              src={isSingleMountPipette ? screwPattern : attach96Pipette}
-              width="171px"
-              height="248px"
-              alt={
-                isSingleMountPipette
-                  ? 'Screw pattern'
-                  : 'Attach 96 channel pipette'
-              }
-            />
+            {isSingleMountPipette ? (
+              getPipetteAnimations({ pipetteWizardStep })
+            ) : (
+              <img
+                //  TODO(jr, 11/18/22): attach real image
+                src={attach96Pipette}
+                width="171px"
+                height="248px"
+                alt={'Attach 96 channel pipette'}
+              />
+            )}
           </Flex>
         )
       }
