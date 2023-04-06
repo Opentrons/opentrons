@@ -81,77 +81,78 @@ export const LiquidsLabwareDetailsModal = (
     }
   `
   if (protocolData == null) return null
-
   const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
   const disabledLiquidIds = liquidIds.filter(id => id !== selectedValue)
+  const labwareRender = (
+    <LabwareRender
+      definition={getSlotLabwareDefinition(labwareId, protocolData.commands)}
+      wellFill={wellFill}
+      wellLabelOption="SHOW_LABEL_INSIDE"
+      highlightedWells={
+        selectedValue != null
+          ? getWellGroupForLiquidId(labwareInfo, selectedValue)
+          : {}
+      }
+      disabledWells={getDisabledWellGroupForLiquidId(
+        labwareInfo,
+        disabledLiquidIds
+      )}
+    />
+  )
+  const liquidCard = filteredLiquidsInLoadOrder.map((liquid, index) => {
+    const labwareInfoEntry = Object.entries(labwareInfo).find(
+      entry => entry[0] === liquid.id
+    )
+    return (
+      labwareInfoEntry != null && (
+        <Flex
+          width="100%"
+          key={index}
+          ref={selectedValue === liquid.id ? currentLiquidRef : undefined}
+        >
+          <LiquidDetailCard
+            {...liquid}
+            liquidId={liquid.id}
+            volumeByWell={labwareInfoEntry[1][0].volumeByWell}
+            labwareWellOrdering={labwareWellOrdering}
+            setSelectedValue={setSelectedValue}
+            selectedValue={selectedValue}
+          />
+        </Flex>
+      )
+    )
+  })
 
   return isODD ? (
     <OddModal
       modalSize="large"
-      onOutsideClick={closeModal}
-      header={{ title: labwareName, hasExitIcon: true, onClick: closeModal }}
+      //  bug in modal component that i want to wait to fix until i merge the modal pr
+      onOutsideClick={() => console.log('wire this up')}
+      header={{
+        title: labwareName,
+        hasExitIcon: true,
+        onClick: closeModal,
+      }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        overflowY="auto"
+        height="24.70375rem"
         css={HIDE_SCROLLBAR}
         minWidth="10.313rem"
-        gridGap={SPACING.spacing3}
+        overflowY="scroll"
+        gridGap={SPACING.spacing4}
       >
-        {filteredLiquidsInLoadOrder.map((liquid, index) => {
-          const labwareInfoEntry = Object.entries(labwareInfo).find(
-            entry => entry[0] === liquid.id
-          )
-          return (
-            labwareInfoEntry != null && (
-              <Flex
-                key={index}
-                ref={selectedValue === liquid.id ? currentLiquidRef : undefined}
-              >
-                <LiquidDetailCard
-                  {...liquid}
-                  liquidId={liquid.id}
-                  volumeByWell={labwareInfoEntry[1][0].volumeByWell}
-                  labwareWellOrdering={labwareWellOrdering}
-                  setSelectedValue={setSelectedValue}
-                  selectedValue={selectedValue}
-                />
-              </Flex>
-            )
-          )
-        })}
+        {liquidCard}
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        width="100%"
-        maxHeight="365.53px"
-        marginLeft={SPACING.spacing4}
-        marginTop={SPACING.spacing3}
-      >
-        <Flex flex="1 1 30rem" flexDirection={DIRECTION_COLUMN}>
+      <Flex width="38.75rem">
+        <Flex marginLeft={SPACING.spacing6}>
           <svg
-            viewBox="0 -15 130 100"
-            height="94%"
-            width="94%"
+            viewBox="0.5 1.2 127 78"
+            height="100%"
+            width="100%"
             transform="scale(1, -1)"
           >
-            <LabwareRender
-              definition={getSlotLabwareDefinition(
-                labwareId,
-                protocolData.commands
-              )}
-              wellFill={wellFill}
-              wellLabelOption="SHOW_LABEL_INSIDE"
-              highlightedWells={
-                selectedValue != null
-                  ? getWellGroupForLiquidId(labwareInfo, selectedValue)
-                  : {}
-              }
-              disabledWells={getDisabledWellGroupForLiquidId(
-                labwareInfo,
-                disabledLiquidIds
-              )}
-            />
+            {labwareRender}
           </svg>
         </Flex>
       </Flex>
@@ -164,7 +165,7 @@ export const LiquidsLabwareDetailsModal = (
       childrenPadding={0}
       width="45rem"
     >
-      {/* <Box
+      <Box
         paddingX={SPACING.spacing4}
         paddingTop={SPACING.spacing4}
         backgroundColor={COLORS.fundamentalsBackground}
@@ -179,30 +180,7 @@ export const LiquidsLabwareDetailsModal = (
             minWidth="10.313rem"
             gridGap={SPACING.spacing3}
           >
-            {filteredLiquidsInLoadOrder.map((liquid, index) => {
-              const labwareInfoEntry = Object.entries(labwareInfo).find(
-                entry => entry[0] === liquid.id
-              )
-              return (
-                labwareInfoEntry != null && (
-                  <Flex
-                    key={index}
-                    ref={
-                      selectedValue === liquid.id ? currentLiquidRef : undefined
-                    }
-                  >
-                    <LiquidDetailCard
-                      {...liquid}
-                      liquidId={liquid.id}
-                      volumeByWell={labwareInfoEntry[1][0].volumeByWell}
-                      labwareWellOrdering={labwareWellOrdering}
-                      setSelectedValue={setSelectedValue}
-                      selectedValue={selectedValue}
-                    />
-                  </Flex>
-                )
-              )
-            })}
+            {liquidCard}
           </Flex>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -250,28 +228,12 @@ export const LiquidsLabwareDetailsModal = (
             </Flex>
             <Flex flex="1 1 30rem" flexDirection={DIRECTION_COLUMN}>
               <svg viewBox="0 -10 130 100" transform="scale(1, -1)">
-                <LabwareRender
-                  definition={getSlotLabwareDefinition(
-                    labwareId,
-                    protocolData.commands
-                  )}
-                  wellFill={wellFill}
-                  wellLabelOption="SHOW_LABEL_INSIDE"
-                  highlightedWells={
-                    selectedValue != null
-                      ? getWellGroupForLiquidId(labwareInfo, selectedValue)
-                      : {}
-                  }
-                  disabledWells={getDisabledWellGroupForLiquidId(
-                    labwareInfo,
-                    disabledLiquidIds
-                  )}
-                />
+                {labwareRender}
               </svg>
             </Flex>
           </Flex>
         </Flex>
-      </Box> */}
+      </Box>
     </Modal>
   )
 }
