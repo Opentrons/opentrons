@@ -13,6 +13,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/OnDeviceDisplay/constants'
 
 import type { IconName } from '@opentrons/components'
 
@@ -36,7 +37,8 @@ const CARD_BUTTON_STYLE = css`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.foundationalBlue}
   }
 
   &:active {
