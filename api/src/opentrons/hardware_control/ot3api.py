@@ -1537,7 +1537,7 @@ class OT3API(
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
-    ) -> None:
+    ) -> Dict[OT3Axis, float]:
         for press in pipette_spec.presses:
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
@@ -1550,7 +1550,10 @@ class OT3API(
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
+            await asyncio.sleep(1)
+            enc_pos = await self.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
             await self._move(target_up)
+            return enc_pos
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
@@ -1588,7 +1591,7 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
-    ) -> None:
+    ) -> Dict[OT3Axis, float]:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
@@ -1598,7 +1601,7 @@ class OT3API(
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
-            await self._force_pick_up_tip(realmount, spec)
+            enc_pos = await self._force_pick_up_tip(realmount, spec)
 
         # we expect a stall has happened during pick up, so we want to
         # update the motor estimation
@@ -1607,13 +1610,14 @@ class OT3API(
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
-        for rel_point, speed in spec.shake_off_list:
-            await self.move_rel(realmount, rel_point, speed=speed)
+        # for rel_point, speed in spec.shake_off_list:
+        #     await self.move_rel(realmount, rel_point, speed=speed)
 
         _add_tip_to_instrs()
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
+        return enc_pos
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
