@@ -104,10 +104,12 @@ def _build_measurement_data(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
     if stable and not simulating:
-        # isolate "stable" scale measurements
-        segment = GravimetricRecording([sample for sample in segment if sample.stable])
-        if segment.duration < MIN_DURATION_STABLE_SEGMENT:
-            raise UnstableMeasurementError(f"duration is {segment.duration} seconds")
+        # try to isolate only "stable" scale readings if sample length >= 2
+        stable_only = GravimetricRecording(
+            [sample for sample in segment if sample.stable]
+        )
+        if len(stable_only) >= 2:
+            segment = stable_only
 
     recording_grams_as_list = segment.grams_as_list
     return MeasurementData(
