@@ -149,7 +149,7 @@ def _map_module(
     engine_state: StateView,
     module_id: str,
 ) -> Optional[Tuple[int, wrapped_deck_conflict.DeckItem]]:
-    module_model = engine_state.modules.get_model(module_id=module_id)
+    module_model = engine_state.modules.get_connected_model(module_id=module_id)
     module_type = module_model.as_type()
     mapped_location = _deck_slot_to_int(
         engine_state.modules.get_location(module_id=module_id)

@@ -14,7 +14,7 @@ import {
 
 import { mockSuccessQueryResults } from '../../../__fixtures__'
 import { i18n } from '../../../i18n'
-import { useToast } from '../../../atoms/Toast'
+import { useToaster } from '../../../organisms/ToasterOven'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -35,7 +35,7 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { SendProtocolToOT3Slideout } from '..'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../atoms/Toast')
+jest.mock('../../../organisms/ToasterOven')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/protocol-storage/selectors')
@@ -56,7 +56,7 @@ const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
 const mockStartDiscovery = startDiscovery as jest.MockedFunction<
   typeof startDiscovery
 >
-const mockUseToast = useToast as jest.MockedFunction<typeof useToast>
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
   typeof useAllRunsQuery
 >
@@ -99,6 +99,7 @@ const mockUnreachableOT3 = {
   robotModel: ROBOT_MODEL_OT3,
 }
 
+const mockMakeSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 const mockMutateAsync = jest.fn()
@@ -116,7 +117,8 @@ describe('SendProtocolToOT3Slideout', () => {
     mockGetScanning.mockReturnValue(false)
     mockStartDiscovery.mockReturnValue({ type: 'mockStartDiscovery' } as any)
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
-    when(mockUseToast).calledWith().mockReturnValue({
+    when(mockUseToaster).calledWith().mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })
