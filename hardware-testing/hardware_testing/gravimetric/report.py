@@ -128,7 +128,13 @@ def create_csv_test_report(
                     CSVLine(f"volume-{m}-{round(v, 2)}-{i}", [float])
                     for v in volumes
                     for m in ["aspirate", "dispense"]
-                    for i in ["average", "cv", "d"]
+                    for i in [
+                        "average",
+                        "cv",
+                        "d",
+                        "celsius-pipette-avg",
+                        "humidity-pipette-avg",
+                    ]
                 ],
             ),
             CSVSection(
@@ -192,7 +198,14 @@ def store_serial_numbers(
 
 
 def store_volume(
-    report: CSVReport, mode: str, volume: float, average: float, cv: float, d: float
+    report: CSVReport,
+    mode: str,
+    volume: float,
+    average: float,
+    cv: float,
+    d: float,
+    celsius: float,
+    humidity: float,
 ) -> None:
     """Report volume."""
     assert mode in ["aspirate", "dispense"]
@@ -200,6 +213,16 @@ def store_volume(
     report("VOLUMES", f"volume-{mode}-{vol_in_tag}-average", [round(average, 2)])
     report("VOLUMES", f"volume-{mode}-{vol_in_tag}-cv", [round(cv * 100.0, 2)])
     report("VOLUMES", f"volume-{mode}-{vol_in_tag}-d", [round(d * 100.0, 2)])
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-celsius-pipette-avg",
+        [round(celsius, 2)],
+    )
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-humidity-pipette-avg",
+        [round(humidity, 2)],
+    )
 
 
 def get_volume_results(
