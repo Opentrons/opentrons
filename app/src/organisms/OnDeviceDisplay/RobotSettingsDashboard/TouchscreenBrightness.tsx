@@ -43,7 +43,7 @@ interface RectProps {
   isActive: boolean
 }
 
-const BrightnessTile = styled(Flex)`
+const BrightnessTile = styled(Box)`
   width: 100%;
   height: 8.75rem;
   border-radius: ${BORDERS.size_two};
