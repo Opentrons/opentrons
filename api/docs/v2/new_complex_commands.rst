@@ -1,10 +1,10 @@
-:og:description: Complex liquid-handling commands for Opentrons robots make it easier to handle large groups of wells and repetitive actions.
+:og:description: Complex liquid-handling commands for Opentrons robots can handle large groups of wells and repetitive actions.
 
 .. _v2-complex-commands:
 
-########################
+################
 Complex Commands
-########################
+################
 
 .. _overview:
 
