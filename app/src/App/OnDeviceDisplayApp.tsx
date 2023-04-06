@@ -27,6 +27,7 @@ import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
+import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings } from '../redux/config'
@@ -116,6 +117,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     name: 'Instruments',
     navLinkTo: '/instruments',
     path: '/instruments',
+  },
+  {
+    Component: InstrumentDetail,
+    exact: true,
+    name: 'Instrument Detail',
+    path: '/instruments/:mount',
   },
   // insert attach instruments subroutes
   {

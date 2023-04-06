@@ -15,11 +15,10 @@ import { StretchButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { StyledText } from '../../atoms/text'
 import { useTranslation } from 'react-i18next'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
+import { Portal } from '../../App/portal'
 import { FLOWS } from '../PipetteWizardFlows/constants'
-import { Portal } from '../../App/__mocks__/portal'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
-
 import type { InstrumentData } from '@opentrons/api-client'
 import type { SelectablePipettes } from '../../organisms/PipetteWizardFlows/types'
 
@@ -61,8 +60,8 @@ export function PipetteMountItem(props: PipetteMountItemProps): JSX.Element {
         </Flex>
         <Icon name="chevron-right" size="1.5rem" />
       </Flex>
-      <Portal>
-        {showChoosePipetteModal ? (
+      {showChoosePipetteModal ? (
+        <Portal>
           <ChoosePipette
             proceed={() => {
               setWizardProps({
@@ -70,16 +69,18 @@ export function PipetteMountItem(props: PipetteMountItemProps): JSX.Element {
                 flowType: FLOWS.ATTACH,
                 selectedPipette,
                 setSelectedPipette,
-                onClose: () => setWizardProps(null)
+                closeFlow: () => { setWizardProps(null) }
               })
             }}
             setSelectedPipette={setSelectedPipette}
             selectedPipette={selectedPipette}
-            exit={() => setShowChoosePipetteModal(false)}
+            exit={() => {
+              setShowChoosePipetteModal(false)
+            }}
             mount={mount}
           />
-        ) : null}
-      </Portal>
+        </Portal>
+      ) : null}
     </StretchButton>
   )
 }
