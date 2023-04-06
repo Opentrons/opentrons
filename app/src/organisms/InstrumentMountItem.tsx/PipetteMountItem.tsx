@@ -61,25 +61,23 @@ export function PipetteMountItem(props: PipetteMountItemProps): JSX.Element {
         <Icon name="chevron-right" size="1.5rem" />
       </Flex>
       {showChoosePipetteModal ? (
-        <Portal>
-          <ChoosePipette
-            proceed={() => {
-              setWizardProps({
-                mount: selectedPipette === NINETY_SIX_CHANNEL ? LEFT : mount,
-                flowType: FLOWS.ATTACH,
-                selectedPipette,
-                setSelectedPipette,
-                closeFlow: () => { setWizardProps(null) }
-              })
-            }}
-            setSelectedPipette={setSelectedPipette}
-            selectedPipette={selectedPipette}
-            exit={() => {
-              setShowChoosePipetteModal(false)
-            }}
-            mount={mount}
-          />
-        </Portal>
+        <ChoosePipette
+          proceed={() => {
+            setWizardProps({
+              mount: selectedPipette === NINETY_SIX_CHANNEL ? LEFT : mount,
+              flowType: FLOWS.ATTACH,
+              selectedPipette,
+              setSelectedPipette,
+              closeFlow: () => { setWizardProps(null) }
+            })
+          }}
+          setSelectedPipette={setSelectedPipette}
+          selectedPipette={selectedPipette}
+          exit={() => {
+            setShowChoosePipetteModal(false)
+          }}
+          mount={mount}
+        />
       ) : null}
     </StretchButton>
   )

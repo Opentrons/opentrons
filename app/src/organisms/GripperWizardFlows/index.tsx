@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { UseMutateFunction } from 'react-query'
-import { useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm, Flex, DIRECTION_COLUMN, POSITION_ABSOLUTE, COLORS } from '@opentrons/components'
 import {
   useCreateRunMutation,
   useStopRunMutation,
@@ -9,6 +10,7 @@ import {
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { getIsOnDevice } from '../../redux/config'
 import {
   useChainRunCommands,
   useCreateRunCommandMutation,
@@ -113,6 +115,7 @@ export const GripperWizard = (
     isRobotMoving,
     createRunCommand,
   } = props
+  const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
   const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -210,21 +213,35 @@ export const GripperWizard = (
     handleExit = handleCleanUpAndClose
   }
 
+  const wizardHeader = (
+    <WizardHeader
+      title={titleByFlowType[flowType]}
+      currentStep={currentStepIndex}
+      totalSteps={totalStepCount}
+      onExit={handleExit}
+    />
+  )
+
   return (
     <Portal level="top">
-      <ModalShell
-        width="48rem"
-        header={
-          <WizardHeader
-            title={titleByFlowType[flowType]}
-            currentStep={currentStepIndex}
-            totalSteps={totalStepCount}
-            onExit={handleExit}
-          />
-        }
-      >
-        {modalContent}
-      </ModalShell>
+      {
+        Boolean(isOnDevice) ? (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            width="100%"
+            position={POSITION_ABSOLUTE}
+            backgroundColor={COLORS.white}
+          >
+            {wizardHeader}
+            {modalContent}
+          </Flex>
+        ) : (
+        <ModalShell width="48rem" header={wizardHeader} >
+          {modalContent}
+        </ModalShell>
+        )
+      }
     </Portal>
+
   )
 }

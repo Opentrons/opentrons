@@ -120,7 +120,10 @@ export function ChooseRobotSlideout(
   )
   const healthyReachableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
-  ).filter(robot => (showOT3Only ? robot.robotModel === ROBOT_MODEL_OT3 : true))
+  ).filter(robot => {
+    console.log('robto', robot)
+    return (showOT3Only ? robot.robotModel === ROBOT_MODEL_OT3 : true)
+  })
 
   const [robotBusyStatusByName, registerRobotBusyStatus] = React.useReducer(
     robotBusyStatusByNameReducer,
