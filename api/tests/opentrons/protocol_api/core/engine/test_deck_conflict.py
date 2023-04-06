@@ -118,7 +118,7 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
         3.14159
     )
 
-    decoy.when(mock_state_view.modules.get_model("module-id")).then_return(
+    decoy.when(mock_state_view.modules.get_connected_model("module-id")).then_return(
         ModuleModel.HEATER_SHAKER_MODULE_V1
     )
     decoy.when(mock_state_view.modules.get_location("module-id")).then_return(
@@ -164,7 +164,7 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
         mock_state_view.geometry.get_labware_highest_z("labware-id")
     ).then_return(3.14159)
 
-    decoy.when(mock_state_view.modules.get_model("module-id")).then_return(
+    decoy.when(mock_state_view.modules.get_connected_model("module-id")).then_return(
         ModuleModel.HEATER_SHAKER_MODULE_V1
     )
     decoy.when(mock_state_view.modules.get_location("module-id")).then_return(
@@ -234,7 +234,9 @@ def test_maps_different_module_models(
         # If a new value is added to ModuleModel, it should cause an error here and
         # force us to think about how it should be mapped.
 
-    decoy.when(mock_state_view.modules.get_model("module-id")).then_return(module_model)
+    decoy.when(mock_state_view.modules.get_connected_model("module-id")).then_return(
+        module_model
+    )
 
     decoy.when(mock_state_view.labware.get_id_by_module("module-id")).then_raise(
         LabwareNotLoadedOnModuleError()

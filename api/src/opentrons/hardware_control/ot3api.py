@@ -52,7 +52,7 @@ from .util import use_or_initialize_loop, check_motion_bounds
 from .instruments.ot3.pipette import (
     load_from_config_and_check_skip,
 )
-from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
@@ -93,6 +93,7 @@ from .types import (
     EarlyLiquidSenseTrigger,
     LiquidNotFound,
     UpdateStatus,
+    StatusBarState,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -140,6 +141,8 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
 )
 
 from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, USBTarget
+
+from .status_bar_state import StatusBarStateController
 
 mod_log = logging.getLogger(__name__)
 
@@ -207,6 +210,9 @@ class OT3API(
             constraints=get_system_constraints(
                 self._config.motion_settings, self._gantry_load
             )
+        )
+        self._status_bar_controller = StatusBarStateController(
+            self._backend.status_bar_interface()
         )
 
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
@@ -290,6 +296,8 @@ class OT3API(
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
+
+        await api_instance.set_status_bar_state(StatusBarState.IDLE)
 
         # check for and start firmware updates if required
         async for _ in api_instance.update_firmware():
@@ -488,6 +496,9 @@ class OT3API(
             now = self._loop.time()
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
+
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
+        await self._status_bar_controller.set_status_bar_state(state)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -728,12 +739,16 @@ class OT3API(
         """
         Home the jaw of the gripper.
         """
-        gripper = self._gripper_handler.get_gripper()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-            gripper.default_home_force
-        )
-        await self._ungrip(duty_cycle=dc)
-        gripper.state = GripperJawState.HOMED_READY
+        try:
+            gripper = self._gripper_handler.get_gripper()
+            self._log.info("Homing gripper jaw.")
+            dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+                gripper.default_home_force
+            )
+            await self._ungrip(duty_cycle=dc)
+            gripper.state = GripperJawState.HOMED_READY
+        except GripperNotAttachedError:
+            pass
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
@@ -1170,28 +1185,22 @@ class OT3API(
             await self._update_position_estimation([axis])
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
-                # we can move directly to the home position for accuracy axes
-                # move directly the home position if the stepper position is valid
+                axis_home_dist = self._config.safe_home_distance
+            else:
+                # FIXME: (AA 2/15/23) This is a temporary workaround because of
+                # XY encoder inaccuracy. Otherwise, we should be able to use
+                # 5.0 mm for all axes.
+                # Move to 20 mm away from the home position and then home
+                axis_home_dist = 20.0
+            if origin[axis] - target_pos[axis] > axis_home_dist:
+                target_pos[axis] += axis_home_dist
                 moves = self._build_moves(origin, target_pos)
                 await self._backend.move(
                     origin,
                     moves[0],
                     MoveStopCondition.none,
                 )
-            else:
-                if origin[axis] - target_pos[axis] > 20.0:
-                    # FIXME: (AA 2/15/23) This is a temporary workaround because of
-                    # XY encoder inaccuracy. We should remove this and move axes directly
-                    # to the home position when we fix the encoder issues.
-                    # Move to 20 mm away from the home position and then home
-                    target_pos[axis] += 20.00
-                    moves = self._build_moves(origin, target_pos)
-                    await self._backend.move(
-                        origin,
-                        moves[0],
-                        MoveStopCondition.none,
-                    )
-                await self._backend.home([axis])
+            await self._backend.home([axis])
         else:
             # both stepper and encoder positions are invalid, must home
             await self._backend.home([axis])
@@ -1201,8 +1210,9 @@ class OT3API(
         async with self._motion_lock:
             for axis in axes:
                 try:
-                    # let backend handle homing gripper jaw and pipette plunger
-                    if axis in [OT3Axis.G, OT3Axis.Q]:
+                    if axis == OT3Axis.G:
+                        await self.home_gripper_jaw()
+                    elif axis == OT3Axis.Q:
                         await self._backend.home([axis])
                     else:
                         await self._home_axis(axis)
@@ -1216,13 +1226,6 @@ class OT3API(
                 else:
                     await self._cache_current_position()
                     await self._cache_encoder_position()
-                    if axis == OT3Axis.G:
-                        try:
-                            self._gripper_handler.set_jaw_state(
-                                GripperJawState.HOMED_READY
-                            )
-                        except GripperNotAttachedError:
-                            pass
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -1344,18 +1347,10 @@ class OT3API(
         try:
             if not self._gripper_handler.is_valid_jaw_width(jaw_width_mm):
                 raise ValueError("Setting gripper jaw width out of bounds")
-            await self._backend.gripper_hold_jaw(
-                int(
-                    1000
-                    * (
-                        self._gripper_handler.get_gripper().config.geometry.jaw_width[
-                            "max"
-                        ]
-                        - jaw_width_mm
-                    )
-                    / 2
-                )
-            )
+            gripper = self._gripper_handler.get_gripper()
+            width_max = gripper.config.geometry.jaw_width["max"]
+            jaw_displacement_mm = (width_max - jaw_width_mm) / 2.0
+            await self._backend.gripper_hold_jaw(int(1000 * jaw_displacement_mm))
             await self._cache_encoder_position()
         except Exception:
             self._log.exception("Gripper set width failed")
@@ -1695,6 +1690,12 @@ class OT3API(
             for m, i in self._pipette_handler.hardware_instruments.items()
             if m != OT3Mount.GRIPPER
         }
+
+    @property
+    def hardware_gripper(self) -> Optional[Gripper]:
+        if not self.has_gripper():
+            return None
+        return self._gripper_handler.get_gripper()
 
     @property
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore

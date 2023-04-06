@@ -95,6 +95,7 @@ export function LongPressModal(props: {
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
+
     longpress.setIsLongPressed(false)
   }
 

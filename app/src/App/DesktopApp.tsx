@@ -8,9 +8,9 @@ import {
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
 
-import { ToasterOven } from '../atoms/Toast'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
+import { ToasterOven } from '../organisms/ToasterOven'
 import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'

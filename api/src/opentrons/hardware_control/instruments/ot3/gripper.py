@@ -103,6 +103,11 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._attached_probe = None
 
     @property
+    def jaw_width(self) -> float:
+        jaw_max = self.geometry.jaw_width["max"]
+        return jaw_max - (self.current_jaw_displacement * 2.0)
+
+    @property
     def current_jaw_displacement(self) -> float:
         """The distance one side of the jaw has traveled from home."""
         return self._current_jaw_displacement
