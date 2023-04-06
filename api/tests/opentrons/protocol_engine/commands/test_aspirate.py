@@ -1,4 +1,5 @@
 """Test aspirate commands."""
+import pytest
 from decoy import Decoy
 
 from opentrons.types import MountType, Point
@@ -20,21 +21,31 @@ from opentrons.protocol_engine.types import CurrentWell, LoadedPipette
 from opentrons.hardware_control import HardwareControlAPI
 
 
-async def test_aspirate_implementation_no_prep(
-    decoy: Decoy,
+@pytest.fixture
+def subject(
     state_view: StateView,
     hardware_api: HardwareControlAPI,
     movement: MovementHandler,
     pipetting: PipettingHandler,
-) -> None:
-    """An Aspirate should have an execution implementation without preparing to aspirate."""
-    subject = AspirateImplementation(
+) -> AspirateImplementation:
+    """Get the implementation subject."""
+    return AspirateImplementation(
         pipetting=pipetting,
         state_view=state_view,
         movement=movement,
         hardware_api=hardware_api,
     )
 
+
+async def test_aspirate_implementation_no_prep(
+    decoy: Decoy,
+    state_view: StateView,
+    hardware_api: HardwareControlAPI,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    subject: AspirateImplementation,
+) -> None:
+    """An Aspirate should have an execution implementation without preparing to aspirate."""
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
     data = AspirateParams(
@@ -73,15 +84,9 @@ async def test_aspirate_implementation_with_prep(
     hardware_api: HardwareControlAPI,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    subject: AspirateImplementation,
 ) -> None:
     """An Aspirate should have an execution implementation with preparing to aspirate."""
-    subject = AspirateImplementation(
-        pipetting=pipetting,
-        state_view=state_view,
-        movement=movement,
-        hardware_api=hardware_api,
-    )
-
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
     data = AspirateParams(
@@ -131,3 +136,28 @@ async def test_aspirate_implementation_with_prep(
         ),
         await pipetting.prepare_for_aspirate(pipette_id="abc"),
     )
+
+
+async def test_aspirate_raises_volume_error(
+    decoy: Decoy, pipetting: PipettingHandler, subject: AspirateImplementation
+) -> None:
+    """Should raise an assertion error for volume larger than working volume."""
+    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
+
+    data = AspirateParams(
+        pipetteId="abc",
+        labwareId="123",
+        wellName="A3",
+        wellLocation=location,
+        volume=50,
+        flowRate=1.23,
+    )
+
+    decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
+
+    decoy.when(
+        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23)
+    ).then_raise(AssertionError("blah blah"))
+
+    with pytest.raises(AssertionError):
+        await subject.execute(data)

@@ -65,5 +65,6 @@
   "return": "return",
   "update": "Update",
   "on": "On",
-  "off": "Off"
+  "off": "Off",
+  "help_us_improve_send_error_report": "Help us improve your experience by sending an error report to {{support_email}}"
 }

@@ -41,7 +41,7 @@ describe('CheckCalibration', () => {
       heading: 'Did pipette pick up tip successfully?',
       currentStep: 'inspectingTip',
     },
-    { heading: 'Check z-axis on trash bin', currentStep: 'comparingHeight' },
+    { heading: 'Check z-axis on slot 5', currentStep: 'comparingHeight' },
     {
       heading: 'Check x- and y-axis in slot 1',
       currentStep: 'comparingPointOne',
