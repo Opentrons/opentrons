@@ -23,6 +23,7 @@ const CARD_BUTTON_STYLE = css`
   align-items: ${ALIGN_CENTER};
   border-radius: ${BORDERS.size_four};
   padding: ${SPACING.spacing6};
+  box-shadow: none;
 
   &:focus {
     background-color: ${COLORS.medBluePressed};
@@ -38,11 +39,12 @@ const CARD_BUTTON_STYLE = css`
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.foundationalBlue}
+    background-color: ${COLORS.foundationalBlue};
   }
 
   &:active {
     background-color: ${COLORS.medBluePressed};
+  }
 
   &:disabled {
     background-color: ${COLORS.darkBlack_twenty};
