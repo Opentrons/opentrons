@@ -53,7 +53,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   )
 
   const handleOverflowClick = (): void => {
-    console.log('this will show a modal')
+    console.log('will be implemented in a following pr')
   }
 
   return (
@@ -76,7 +76,6 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
             {robotName}
           </StyledText>
         </NavigationLink>
-        {/* <Icon name="wifi" size="2.5rem" /> */}
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
