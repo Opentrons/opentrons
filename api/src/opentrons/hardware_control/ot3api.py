@@ -2148,7 +2148,7 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
-    ) -> None:
+    ) -> Dict[OT3Axis, float]:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
@@ -2199,6 +2199,7 @@ class OT3API(
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
+        return enc_pos
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
