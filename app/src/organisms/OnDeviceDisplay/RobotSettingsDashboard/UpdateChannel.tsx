@@ -120,7 +120,7 @@ export function UpdateChannel({
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={
                     radio.value === channel
-                      ? `${COLORS.white}${COLORS.opacity70HexCode}`
+                      ? COLORS.white
                       : COLORS.darkBlack_seventy
                   }
                 >
