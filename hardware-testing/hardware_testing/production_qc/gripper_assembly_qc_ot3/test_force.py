@@ -129,15 +129,22 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await api.ungrip()
     hover_pos, target_pos = _get_force_gauge_hover_and_grip_positions(api)
     await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
-    if not api.is_simulator:
-        ui.get_user_ready("ATTACH the jaw extenders")
-        ui.get_user_ready("confirm jaw extenders are pressed down again PADDLES")
-    await api.move_to(mount, target_pos)
+    # NO NEED JAW EXTENDERS ATTACHED
+    # if not api.is_simulator:
+    #     ui.get_user_ready("ATTACH the jaw extenders")
+    #     ui.get_user_ready("confirm jaw extenders are pressed down again PADDLES")
+    await api.move_to(mount, target_pos._replace(x=64.0,y=118))
+
     if not api.is_simulator:
         ui.get_user_ready("jog gripper to align with gauge")
-    await helpers_ot3.jog_mount_ot3(api, mount)
+    pos = await helpers_ot3.jog_mount_ot3(api, mount)
+    # MOVE FORCE FIXTURE TO THE MIDDLE OF THE POSITION
+    await api.grip(5.0)
+    await api.move_to(mount, Point(x=pos[OT3Axis.X],y=118.0,z=pos[z_ax]))
+    await api.ungrip()
+
     if not api.is_simulator:
-        ui.get_user_ready("prepare to grip")
+        ui.get_user_ready("please check the fixture in the middle position and prepare to grip")
 
     # LOOP THROUGH FORCES
     ui.print_header("MEASURE NEWTONS")
@@ -166,5 +173,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # RETRACT
     print("done")
     await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
-    if not api.is_simulator:
-        ui.get_user_ready("REMOVE the jaw extenders")
+    # NO NEED JAW EXTENDERS REMOVE
+    # if not api.is_simulator:
+    #     ui.get_user_ready("REMOVE the jaw extenders")
