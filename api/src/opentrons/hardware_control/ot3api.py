@@ -30,7 +30,7 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, ot3_pipette_config
+from opentrons.config import robot_configs, ot3_pipette_config, feature_flags as ff
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -948,7 +948,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-        _check_stalls: bool = True,  # For testing only
+        _check_stalls: bool = True,
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -999,7 +999,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-        _check_stalls: bool = True,  # For testing only
+        _check_stalls: bool = True,
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
@@ -1127,7 +1127,7 @@ class OT3API(
                 await self._backend.move(
                     origin,
                     moves[0],
-                    MoveStopCondition.stall if check_stalls else MoveStopCondition.none,
+                    MoveStopCondition.stall if check_stalls and not ff.disable_stall_detection() else MoveStopCondition.none,
                 )
             except Exception:
                 self._log.exception("Move failed")
