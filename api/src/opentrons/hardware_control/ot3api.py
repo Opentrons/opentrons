@@ -776,11 +776,10 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
+        fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         realmount = OT3Mount.from_mount(mount)
-        ot3_pos = await self.current_position_ot3(
-            realmount, critical_point, refresh
-        )
+        ot3_pos = await self.current_position_ot3(realmount, critical_point, refresh)
         return self._axis_map_from_ot3axis_map(ot3_pos)
 
     async def current_position_ot3(
@@ -800,8 +799,7 @@ class OT3API(
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, tool_ax]
 
         if not (
-            self._current_position and
-            self._backend.check_motor_status(position_axes)
+            self._current_position and self._backend.check_motor_status(position_axes)
         ):
             raise MustHomeError(
                 f"Current position of {str(mount)} is unknown; please home motors."
@@ -845,9 +843,7 @@ class OT3API(
         """
         Return the encoder position in absolute deck coords specified mount.
         """
-        ot3pos = await self.encoder_current_position_ot3(
-            mount, critical_point, refresh
-        )
+        ot3pos = await self.encoder_current_position_ot3(mount, critical_point, refresh)
         return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
 
     async def encoder_current_position_ot3(
@@ -867,13 +863,12 @@ class OT3API(
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, tool_ax]
 
         if not (
-            self._backend.check_motor_status(position_axes)
-            and self._encoder_position
+            self._backend.check_motor_status(position_axes) and self._encoder_position
         ):
             raise MustHomeError(
                 f"Encoder position of {str(mount)} is unknown, please home motors."
             )
-        
+
         ot3pos = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount),
             self._encoder_position,
@@ -909,6 +904,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
+        fail_on_not_homed: bool = False,
     ) -> top_types.Point:
         """Return the position of the critical point as pertains to the gantry."""
         realmount = OT3Mount.from_mount(mount)
@@ -977,6 +973,7 @@ class OT3API(
         speed: Optional[float] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
+        fail_on_not_homed: bool = False,
         _check_stalls: bool = False,  # For testing only
     ) -> None:
         """Move the critical point of the specified mount by a specified
