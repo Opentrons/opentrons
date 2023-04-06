@@ -1,5 +1,6 @@
 import { FLOWS, SECTIONS } from './constants'
 import { SINGLE_MOUNT_PIPETTES, LEFT, RIGHT } from '@opentrons/shared-data'
+import { useAttachedPipetteCalibrations } from '../Devices/hooks'
 import type {
   PipetteWizardStep,
   PipetteWizardFlow,
@@ -15,6 +16,8 @@ export const getPipetteWizardSteps = (
   isGantryEmpty: boolean,
   attachedPipettes: AttachedPipettesByMount
 ): PipetteWizardStep[] => {
+  const pipCalibrationsByMount = useAttachedPipetteCalibrations()
+  const hasCalData = pipCalibrationsByMount[mount].offset?.lastModified != null
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       return [
@@ -29,7 +32,7 @@ export const getPipetteWizardSteps = (
           section: SECTIONS.RESULTS,
           mount: mount,
           flowType: flowType,
-          recalibrate: true,
+          recalibrate: hasCalData,
         },
       ]
     }
