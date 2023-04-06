@@ -43,8 +43,8 @@ interface RectProps {
   isActive: boolean
 }
 
-const BrightnessTile = styled(Box)`
-  width: 6.833125rem;
+const BrightnessTile = styled(Flex)`
+  width: 100%;
   height: 8.75rem;
   border-radius: ${BORDERS.size_two};
   background: ${(props: RectProps) =>
@@ -113,7 +113,11 @@ export function TouchscreenBrightness({
         >
           <Icon size="5rem" name="minus" />
         </Btn>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing3}
+          width="43.5rem"
+        >
           {brightnessLevel.map(level => (
             <BrightnessTile
               key={`brightness_level_${level}`}
