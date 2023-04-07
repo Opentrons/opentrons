@@ -1,5 +1,7 @@
 {
-  "last_calibrated": "last calibrated",
+  "detach": "detach",
   "firmware_version": "firmware version",
+  "last_calibrated": "last calibrated",
+  "recalibrate": "recalibrate",
   "serial_number": "serial number"
 }

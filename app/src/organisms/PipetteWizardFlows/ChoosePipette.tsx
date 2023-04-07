@@ -85,7 +85,10 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettesByMount = useAttachedPipettes()
   const isGantryEmpty = getIsGantryEmpty(attachedPipettesByMount)
-  const [showExit, setShowExit] = React.useState<boolean>(false)
+  const [
+    showExitConfirmation,
+    setShowExitConfirmation,
+  ] = React.useState<boolean>(false)
   const proceedButtonText: string = t('next')
   const nintySixChannelWrapper =
     selectedPipette === NINETY_SIX_CHANNEL
@@ -132,11 +135,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             title={startCase(t('attach_pipette', { mount: mount }))}
             currentStep={0}
             totalSteps={3}
-            onExit={showExit ? exit : () => setShowExit(true)}
+            onExit={
+              showExitConfirmation ? exit : () => setShowExitConfirmation(true)
+            }
           />
-          {showExit ? (
+          {showExitConfirmation ? (
             <ExitModal
-              goBack={() => setShowExit(false)}
+              goBack={() => setShowExitConfirmation(false)}
               proceed={exit}
               flowType={FLOWS.ATTACH}
               isOnDevice={isOnDevice}
@@ -206,13 +211,17 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               title={startCase(t('attach_pipette', { mount: mount }))}
               currentStep={0}
               totalSteps={3}
-              onExit={showExit ? exit : () => setShowExit(true)}
+              onExit={
+                showExitConfirmation
+                  ? exit
+                  : () => setShowExitConfirmation(true)
+              }
             />
           }
         >
-          {showExit ? (
+          {showExitConfirmation ? (
             <ExitModal
-              goBack={() => showExit(false)}
+              goBack={() => setShowExitConfirmation(false)}
               proceed={exit}
               flowType={FLOWS.ATTACH}
               isOnDevice={null}

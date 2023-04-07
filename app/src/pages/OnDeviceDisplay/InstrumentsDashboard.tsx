@@ -36,7 +36,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
           setWizardProps={setWizardProps}
         />
         <InstrumentMountItem
-          mount="right"
+          mount="extension"
           attachedInstrument={
             (attachedInstruments?.data ?? []).find(
               i => i.mount === 'extension'
