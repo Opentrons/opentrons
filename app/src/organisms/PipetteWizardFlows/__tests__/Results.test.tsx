@@ -12,17 +12,37 @@ import {
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { i18n } from '../../../i18n'
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
+import { useAttachedPipetteCalibrations } from '../../Devices/hooks'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type {
+  AttachedPipette,
+  PipetteCalibrationsByMount,
+} from '../../../redux/pipettes/types'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../Devices/hooks')
 
+const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
+  typeof useAttachedPipetteCalibrations
+>
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
 >
+const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
+  left: {
+    offset: mockPipetteOffsetCalibration1,
+  },
+  right: {
+    offset: mockPipetteOffsetCalibration2,
+  },
+} as any
 
 const render = (props: React.ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {
@@ -57,13 +77,20 @@ describe('Results', () => {
       isFetching: false,
       setFetching: jest.fn(),
     }
+    mockUseAttachedPipetteCalibrations.mockReturnValue({
+      left: {},
+      right: {},
+    } as any)
     pipettePromise = Promise.resolve()
     mockRefetchPipette = jest.fn(() => pipettePromise)
     mockUsePipettesQuery.mockReturnValue({ refetch: mockRefetchPipette } as any)
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
+    mockUseAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Attached and Calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully recalibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -78,7 +105,7 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-Channel 1000 μL Successfully Attached')
+    getByText('Flex 1-Channel 1000 μL successfully attached')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -94,7 +121,7 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette failed to attach')
+    getByText('Unable to detect pipette')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
@@ -110,7 +137,7 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Detached')
+    getByText('Pipette successfully detached')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -124,11 +151,11 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Still Attached')
+    getByText('Flex 1-Channel 1000 μL still attached')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    getByRole('button', { name: 'Attach and retry' })
+    getByRole('button', { name: 'Try again' })
   })
   it('renders the error exit as disabled when is Fetching is true', () => {
     props = {
@@ -157,11 +184,11 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Still Attached')
+    getByText('Flex 1-Channel 1000 μL still attached')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    getByRole('button', { name: 'Attach and retry' }).click()
+    getByRole('button', { name: 'Try again' }).click()
     await act(() => pipettePromise)
   })
   it('renders the correct information when pipette wizard is a success for 96 channel attach flow and gantry not empty', () => {
@@ -172,7 +199,7 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('All Pipettes Successfully Detached')
+    getByText('All pipettes successfully detached')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
@@ -186,7 +213,7 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Attached and Calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -201,7 +228,7 @@ describe('Results', () => {
       totalStepCount: 9,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Attached and Calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -216,7 +243,7 @@ describe('Results', () => {
       totalStepCount: 5,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette Successfully Attached and Calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
     )
@@ -224,12 +251,15 @@ describe('Results', () => {
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information for success pipette cal on ODD', () => {
+    mockUseAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
     props = {
       ...props,
       isOnDevice: true,
     }
     const { getByText, getByRole } = render(props)
-    getByText('Pipette Successfully Attached and Calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully recalibrated')
     getByRole('button', { name: 'SmallButton_default' }).click()
     expect(props.proceed).toHaveBeenCalled()
   })
@@ -241,7 +271,7 @@ describe('Results', () => {
       isOnDevice: true,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Pipette failed to attach')
+    getByText('Unable to detect pipette')
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
