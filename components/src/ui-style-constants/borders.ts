@@ -5,8 +5,6 @@ import {
   medGreyEnabled,
   transparent,
   medGreyHover,
-  black,
-  opacity40HexCode,
 } from './colors'
 
 export const radiusSoftCorners = '4px'
