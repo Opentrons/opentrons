@@ -8,7 +8,6 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -24,9 +23,9 @@ export function EmptyRecentRun(): JSX.Element {
       backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity15HexCode}`}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
-      gridGap={SPACING.spacing4}
+      padding="5.25rem 3.75rem"
     >
-      <Flex marginTop="5.25rem">
+      <Flex marginBottom={SPACING.spacing4}>
         <img
           src={abstractImage}
           alt="Robot Dashboard no protocol run data"
